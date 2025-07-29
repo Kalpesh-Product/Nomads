@@ -3,15 +3,16 @@ module.exports = {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
-      screens:{
-        'xs': '375px',
-        'tab' : '1023px'
+      screens: {
+        xs: "375px",
+        tab: "1023px",
       },
       colors: {
         primary: {
           DEFAULT: "#FAFAFA",
           light: "#3b82f6",
           dark: "#1e40af",
+          blue: "rgb(80, 186, 232)",
         },
         secondary: {
           DEFAULT: "#202020",
