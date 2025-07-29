@@ -1,6 +1,6 @@
 import { CircularProgress } from "@mui/material"; // Import MUI Spinner
 
-const PrimaryButton = ({
+const SecondaryButton = ({
   title,
   handleSubmit,
   type,
@@ -11,7 +11,7 @@ const PrimaryButton = ({
   className,
   isLoading, // New prop for showing the spinner
 }) => {
-  const baseBgColor = disabled || isLoading ? "bg-gray-400" : "bg-primary";
+  const baseBgColor = disabled || isLoading ? "bg-gray-400" : "bg-primary-blue";
   const hoverBgColor = disabled || isLoading ? "" : "hover:bg-secondary-dark"; // Add hover color here
 
   return (
@@ -19,7 +19,7 @@ const PrimaryButton = ({
       disabled={disabled || isLoading}
       type={type}
       className={`flex uppercase rounded-full items-center cursor-pointer justify-center gap-2
-        ${baseBgColor} ${hoverBgColor} text-secondary
+        ${baseBgColor} ${hoverBgColor} text-primary
         ${fontSize ? fontSize : "text-content leading-5"}
         ${externalStyles} ${padding ? padding : "px-8 py-3"} ${className}`}
       onClick={handleSubmit}>
@@ -29,4 +29,4 @@ const PrimaryButton = ({
   );
 };
 
-export default PrimaryButton;
+export default SecondaryButton;
