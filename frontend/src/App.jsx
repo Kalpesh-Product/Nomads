@@ -14,7 +14,7 @@ const App = () => {
     }
   }, [location.pathname]);
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col h-screen justify-between">
       <div className="fixed w-full z-50">
         <div className="md:block">
           <Header />

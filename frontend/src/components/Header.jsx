@@ -12,12 +12,8 @@ const Header = () => {
     setOpen(false);
   };
   const headerLinks = [
-    { id: 1, text: "ROI", to: "/roi" },
-    { id: 2, text: "Buy", to: "/buy" },
-    // { id: 3, text: "Sell", to: "#" },
-    { id: 3, text: "Mortgage", to: "/mortgage" },
-    { id: 4, text: "Partnership", to: "/partnership" },
-    { id: 5, text: "Contact", to: "/contact" },
+    { id: 1, text: "ROI", to: "" },
+
   ];
   return (
     <div className="flex px-4 justify-between items-center md:py-4 md:px-10 lg:px-24 border border-gray-300 bg-white/10 backdrop-blur-md shadow-md">
@@ -58,7 +54,7 @@ const Header = () => {
       <div className="px-1 hidden xl:flex gap-2">
         <PrimaryButton
           title={"Investor Login"}
-          handleSubmit={() => navigate("/login")}
+          handleSubmit={() => navigate("")}
         />
       </div>
 
@@ -97,7 +93,7 @@ const Header = () => {
               <PrimaryButton
                 title={"Investor Login"}
                 handleSubmit={() => {
-                  navigate("/login")
+                  navigate("")
                   setOpen(false)
                 }}
               />
