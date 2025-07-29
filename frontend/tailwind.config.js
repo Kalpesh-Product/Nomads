@@ -19,7 +19,7 @@ module.exports = {
           light: "#94a3b8",
           dark: "#475569",
         },
-        accent: "#eaa415",
+        accent: "#f4ed4f",
       },
       fontFamily: {
         sans: ["Poppins", "ui-sans-serif", "system-ui"],

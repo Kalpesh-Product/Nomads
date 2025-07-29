@@ -11,10 +11,10 @@ const queryClient = new QueryClient();
 const theme = createTheme({
   typography: {
     fontFamily: [
-      "Elmessiri",
-      "Elmessiri-Regular",
-      "Elmessiri-SemiBold",
-      "Elmessiri-Bold",
+      "Poppins",
+      "Poppins-Regular",
+      "Poppins-SemiBold",
+      "Poppins-Bold",
       "Roboto",
       "Helvetica Neue",
       "Arial",
@@ -40,8 +40,16 @@ const theme = createTheme({
         },
       },
     },
+    MuiSelect: {
+      styleOverrides: {
+        select: {
+          fontSize: "0.85rem", // 🔽 globally reduce selected value font size
+        },
+      },
+    },
   },
 });
+
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
