@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: "Elmessiri", ui-sans-serif, system-ui, sans-serif;
+    scroll-behavior: smooth;
+  }
+}
+
+@font-face {
+    font-family: Elmessiri;
+    src: url("../src/assets/El_Messiri/ElMessiri-VariableFont_wght.ttf");
+  }
+@font-face {
+    font-family: Elmessiri-Regular;
+    src: url("../src/assets/El_Messiri/static/ElMessiri-Regular.ttf");
+  }
+@font-face {
+    font-family: Elmessiri-Bold;
+    src: url("../src/assets/El_Messiri/static/ElMessiri-Bold.ttf");
+  }
+@font-face {
+    font-family: Elmessiri-Medium;
+    src: url("../src/assets/El_Messiri/static/ElMessiri-Medium.ttf");
+  }
+@font-face {
+    font-family: Elmessiri-SemiBold;
+    src: url("../src/assets/El_Messiri/static/ElMessiri-SemiBold.ttf");
+  }
+
+body {
+  background-color: #fafafa;
+}
+/* 👇 By default, hamburger is visible (on small screens) */
+.hamburger-menu {
+  display: block;
+}
+.css-1808mag-MuiPaper-root-MuiAccordion-root {
+  box-shadow: none !important;
+  border-radius: 8px;
+}
+
+.css-1f1pi2l-MuiButtonBase-root-MuiAccordionSummary-root {
+  box-shadow: none !important;
+  border-radius: 8px;
+}
+
+
+
+/* 👇 Hide it on medium and up */
+/* @media screen and (min-width: 768px) {
+  .hamburger-menu {
+    display: none;
+  }
+} */
+@media screen and (min-width: 1280px) {
+  .hamburger-menu {
+    display: none;
+  }
+}
+
