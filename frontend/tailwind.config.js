@@ -25,6 +25,7 @@ module.exports = {
         sans: ["Poppins", "ui-sans-serif", "system-ui"],
         heading: ["Poppins", "ui-sans-serif", "system-ui"],
         mono: ["Fira Code", "ui-monospace"],
+        hero:["Bebas Neue", "ui-sans-serif", "system-ui"]
       },
       fontSize: {
         tiny: ["0.75rem", { lineHeight: "1rem" }], // ~12px

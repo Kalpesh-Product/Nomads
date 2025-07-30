@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import PrimaryButton from "../components/PrimaryButton";
 import SecondaryButton from "../components/SecondaryButton";
 import AccentButton from "../components/AccentButton";
@@ -7,8 +7,10 @@ import { Avatar, MenuItem, TextField } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
 import { CiSearch } from "react-icons/ci";
+import Container from "../components/Container";
 
 const Home = () => {
+  const navigate = useNavigate();
   const { handleSubmit, control, reset } = useForm({
     defaultValues: {
       country: "",
@@ -19,6 +21,7 @@ const Home = () => {
   const { mutate: locationData, isPending: isLocation } = useMutation({
     mutationFn: async (data) => {
       console.log("data", data);
+      navigate("/listings");
     },
     onSuccess: () => {
       console.log("success");
@@ -45,9 +48,9 @@ const Home = () => {
     },
   ];
   return (
-    <div>
-      <section className="flex flex-col gap-2">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div className="flex flex-col w-full">
+      <section className="max-w-7xl mx-auto flex flex-col gap-2 lg:mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="flex flex-col gap-4 justify-end items-start">
             <p className="uppercase font-semibold text-title lg:text-[6rem] lg:leading-normal">
               WORLDS NOMAD COMMUNITY
@@ -76,7 +79,7 @@ const Home = () => {
               </div>
             </div>
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 h-48">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 h-full lg:h-48">
             <div className="flex flex-col gap-4 h-full justify-between">
               <div className="bg-white text-black flex justify-center items-center">
                 {" "}
@@ -195,7 +198,7 @@ const Home = () => {
               </div>
             </form>
 
-            <div >
+            <div>
               <div className="grid grid-cols-3 text-center text-sm font-medium relative">
                 {/* Top Row */}
                 <div className="p-4">Co – Working</div>
@@ -218,6 +221,40 @@ const Home = () => {
           </div>
         </div>
       </section>
+      <section className="bg-black w-full flex flex-col gap-4 py-4 lg:py-16">
+        <div className="max-w-7xl mx-auto flex flex-col text-primary  justify-center items-center ">
+          <h1 className="text-title font-hero lg:leading-none lg:text-[16rem] font-medium">
+            INTRODUCING
+          </h1>
+          <h1 className="text-title font-hero lg:leading-none lg:text-[16rem] font-medium">
+            N-COMMERCE
+          </h1>
+          <p className="uppercase text-[5rem] leading-normal font-hero">
+            ("nomad commerce")
+          </p>
+          <PrimaryButton title={"Partner now"} externalStyles={"mb-[1.5rem]"} />
+        </div>
+      </section>
+      <Container>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="border-2 w-full flex flex-col gap-4">
+            <h1 className="text-title uppercase">WONO for Nomads</h1>
+            <div className="grid grid-cols-2">
+              <div className="flex flex-col gap-4">
+                <span>
+                  Serves as a dynamic platform, seamlessly connecting freelance
+                  professionals, remote workers, and individuals seeking
+                  flexible workspace solutions with nearby co working spaces.
+                </span>
+                <ul>
+                  <li></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div className="border-2 w-full">2</div>
+        </div>
+      </Container>
     </div>
   );
 };
