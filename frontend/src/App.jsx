@@ -8,30 +8,37 @@ const App = () => {
   const location = useLocation();
   const contentRef = useRef(null);
 
+  // Only hide header and footer on these routes
+  const hideHeaderFooter = location.pathname === "/";
+
   useEffect(() => {
     if (contentRef.current) {
       contentRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [location.pathname]);
+
   return (
     <div className="flex flex-col h-screen justify-between">
-      <div className="fixed w-full z-50">
-        <div className="md:block">
-          <Header />
+      {!hideHeaderFooter && (
+        <div className="fixed w-full z-50">
+          <div className="md:block">
+            <Header />
+          </div>
         </div>
-      </div>
+      )}
 
       <div
         ref={contentRef}
-        className="pt-32 pb-16 px-6 xs:pt-32 xs:pb-20 md:pt-40 md:pb-40 lg:pt-36 lg:pb-12 md:px-10 lg:px-0 sm:px-4 flex flex-col gap-4 bg-white"
-      >
+        className={`${
+          hideHeaderFooter
+            ? ""
+            : "pt-32 pb-16 px-6 xs:pt-32 xs:pb-20 md:pt-40 md:pb-40 lg:pt-36 lg:pb-12 md:px-10 lg:px-20 sm:px-4"
+        } flex flex-col gap-4 bg-white`}>
         <Outlet />
         <Toaster />
       </div>
 
-      <div>
-        <Footer />
-      </div>
+      {!hideHeaderFooter && <Footer />}
     </div>
   );
 };

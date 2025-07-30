@@ -1,7 +1,9 @@
 import { createBrowserRouter } from "react-router-dom";
 import App from "./App";
 import Home from "./pages/Home";
+import MainPage from "./pages/MainPage";
 import Listings from "./pages/Listings";
+import ReusableComponents from "./pages/ReusableComponents";
 
 const router = createBrowserRouter([
   {
@@ -11,11 +13,20 @@ const router = createBrowserRouter([
       {
         path: "",
         index: true,
+        element: <MainPage />,
+      },
+      {
+        path: "nomad",
+
         element: <Home />,
       },
       {
         path: "/listings",
         element: <Listings />,
+      },
+      {
+        path: "/components",
+        element: <ReusableComponents />,
       },
     ],
   },
