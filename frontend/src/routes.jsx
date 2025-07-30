@@ -3,6 +3,7 @@ import App from "./App";
 import Home from "./pages/Home";
 import MainPage from "./pages/MainPage";
 import Listings from "./pages/Listings";
+import ReusableComponents from "./pages/ReusableComponents";
 
 const router = createBrowserRouter([
   {
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
       {
         path: "/listings",
         element: <Listings />,
+      },
+      {
+        path: "/components",
+        element: <ReusableComponents />,
       },
     ],
   },
