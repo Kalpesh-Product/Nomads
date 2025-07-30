@@ -12,13 +12,13 @@ const SecondaryButton = ({
   isLoading, // New prop for showing the spinner
 }) => {
   const baseBgColor = disabled || isLoading ? "bg-gray-400" : "bg-primary-blue";
-  const hoverBgColor = disabled || isLoading ? "" : "hover:bg-secondary-dark"; // Add hover color here
+  const hoverBgColor = disabled || isLoading ? "" : "hover:bg-secondary-light"; // Add hover color here
 
   return (
     <button
       disabled={disabled || isLoading}
       type={type}
-      className={`flex uppercase rounded-full items-center cursor-pointer justify-center gap-2
+      className={`flex rounded-full items-center cursor-pointer justify-center  gap-2
         ${baseBgColor} ${hoverBgColor} text-primary
         ${fontSize ? fontSize : "text-content leading-5"}
         ${externalStyles} ${padding ? padding : "px-8 py-3"} ${className}`}

@@ -25,7 +25,7 @@ const Home = () => {
   const { mutate: locationData, isPending: isLocation } = useMutation({
     mutationFn: async (data) => {
       console.log("data", data);
-      navigate("/listings");
+      navigate("listings");
     },
     onSuccess: () => {
       console.log("success");

@@ -1,20 +1,23 @@
 import { MenuItem, TextField } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
-import React from "react";
+import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { CiSearch } from "react-icons/ci";
 import { AiFillStar } from "react-icons/ai";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import Container from "../components/Container";
+import { useNavigate } from "react-router-dom";
 
 const Listings = () => {
-  const [favorites, setFavorites] = React.useState([]);
+  const [favorites, setFavorites] = useState([]);
 
   const toggleFavorite = (id) => {
     setFavorites((prev) =>
       prev.includes(id) ? prev.filter((fav) => fav !== id) : [...prev, id]
     );
   };
+
+  const navigate = useNavigate()
 
   const { handleSubmit, control, reset } = useForm({
     defaultValues: {
@@ -173,7 +176,8 @@ const Listings = () => {
               {listings.map((item) => (
                 <div
                   key={item.id}
-                  className="flex flex-col gap-4 justify-between h-96 w-full bg-white p-4 rounded-lg shadow-md"
+                  onClick={()=>navigate(`${item.name}`)}
+                  className="flex flex-col gap-4 justify-between h-96 w-full bg-white p-4 rounded-lg shadow-md hover:scale-105 hover:shadow-md transition-all cursor-pointer"
                 >
                   {/* ⬇️ Make image container relative to allow absolutely positioning the heart */}
                   <div className="h-3/4 w-full overflow-hidden rounded-xl border-2 relative">

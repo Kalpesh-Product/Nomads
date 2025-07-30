@@ -4,6 +4,8 @@ import Home from "./pages/Home";
 import MainPage from "./pages/MainPage";
 import Listings from "./pages/Listings";
 import ReusableComponents from "./pages/ReusableComponents";
+import NomadLayout from "./pages/NomadLayout";
+import Product from "./pages/Product";
 
 const router = createBrowserRouter([
   {
@@ -17,16 +19,25 @@ const router = createBrowserRouter([
       },
       {
         path: "nomad",
-
-        element: <Home />,
-      },
-      {
-        path: "/listings",
-        element: <Listings />,
-      },
-      {
-        path: "/components",
-        element: <ReusableComponents />,
+        element: <NomadLayout />,
+        children: [
+          {
+            path: "",
+            element: <Home />,
+          },
+          {
+            path: "listings",
+            element: <Listings />,
+          },
+          {
+            path: "listings/:company",
+            element: <Product />,
+          },
+          {
+            path: "components",
+            element: <ReusableComponents />,
+          },
+        ],
       },
     ],
   },

@@ -27,7 +27,10 @@ const MainPage = () => {
 
         {/* Buttons */}
         <div className="flex items-center justify-center gap-6">
-          <button className="bg-primary-blue text-black font-semibold px-6 py-2 rounded-full hover:bg-cyan-300 transition-all duration-200">
+          <button
+            onClick={() => navigate("nomad")}
+            className="bg-primary-blue text-black font-semibold px-6 py-2 rounded-full hover:bg-cyan-300 transition-all duration-200"
+          >
             For Nomads
           </button>
           <button className="bg-primary-blue text-black font-semibold px-6 py-2 rounded-full hover:bg-cyan-300 transition-all duration-200">

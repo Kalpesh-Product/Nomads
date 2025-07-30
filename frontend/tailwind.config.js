@@ -31,6 +31,7 @@ module.exports = {
         tiny: ["0.75rem", { lineHeight: "1rem" }], // ~12px
         small: ["0.875rem", { lineHeight: "1.5rem" }], // 16px
         content: ["1rem", { lineHeight: "1.5rem" }], // 16px
+        "card-title": ["1.5rem", { lineHeight: "1rem" }], // ~20px
         subtitle: ["1.25rem", { lineHeight: "1.75rem" }], // ~20px
         title: ["2rem", { lineHeight: "1" }], // 48px
         hero: ["2rem", { lineHeight: "1" }], // 48px
