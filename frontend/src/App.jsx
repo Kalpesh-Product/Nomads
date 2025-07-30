@@ -33,7 +33,7 @@ const App = () => {
           hideHeaderFooter
             ? ""
             : "pt-32 pb-16 px-6 xs:pt-32 xs:pb-20 md:pt-40 md:pb-40 lg:pt-36 lg:pb-12 md:px-10 lg:px-20 sm:px-4"
-        } flex flex-col gap-4 bg-primary`}>
+        } flex flex-col gap-4 bg-white`}>
         <Outlet />
         <Toaster />
       </div>
