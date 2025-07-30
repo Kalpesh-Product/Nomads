@@ -5,6 +5,7 @@ import { Controller, useForm } from "react-hook-form";
 import { CiSearch } from "react-icons/ci";
 import { AiFillStar } from "react-icons/ai";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
+import Container from "../components/Container";
 
 const Listings = () => {
   const [favorites, setFavorites] = React.useState([]);
@@ -86,7 +87,8 @@ const Listings = () => {
         <div className="flex flex-col gap-4 justify-between w-1/2 ">
           <form
             onSubmit={handleSubmit((data) => locationData(data))}
-            className="flex gap-2 items-center border-2 border-primary-blue rounded-full pl-4 overflow-hidden">
+            className="flex gap-2 items-center border-2 border-primary-blue rounded-full pl-4 overflow-hidden"
+          >
             <Controller
               name="country"
               control={control}
@@ -98,7 +100,8 @@ const Listings = () => {
                   size="small"
                   variant="standard"
                   label="Select Country"
-                  slotProps={{ input: { disableUnderline: true } }}>
+                  slotProps={{ input: { disableUnderline: true } }}
+                >
                   <MenuItem value="" disabled>
                     Select A Country
                   </MenuItem>
@@ -117,7 +120,8 @@ const Listings = () => {
                   size="small"
                   variant="standard"
                   label="Select Country"
-                  slotProps={{ input: { disableUnderline: true } }}>
+                  slotProps={{ input: { disableUnderline: true } }}
+                >
                   <MenuItem value="" disabled>
                     Select A Location
                   </MenuItem>
@@ -137,7 +141,8 @@ const Listings = () => {
                     size="small"
                     variant="standard"
                     label="Select Category"
-                    slotProps={{ input: { disableUnderline: true } }}>
+                    slotProps={{ input: { disableUnderline: true } }}
+                  >
                     <MenuItem value="" disabled>
                       Select A Category
                     </MenuItem>
@@ -149,7 +154,8 @@ const Listings = () => {
             <div className="bg-primary-blue h-full w-20 flex justify-center">
               <button
                 type="submit"
-                className=" flex w-20 justify-center items-center">
+                className=" flex w-20 justify-center items-center"
+              >
                 <CiSearch />
               </button>
             </div>
@@ -157,71 +163,75 @@ const Listings = () => {
         </div>
       </div>
       <hr />
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 ">
-        <div className="  font-semibold text-lg ">
-          <div className="pb-6">
-            <p>Over 16 Co - Working Space</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
-            {listings.map((item) => (
-              <div
-                key={item.id}
-                className="flex flex-col gap-4 justify-between h-96 w-full bg-white p-4 rounded-lg shadow-md">
-                {/* ⬇️ Make image container relative to allow absolutely positioning the heart */}
-                <div className="h-3/4 w-full overflow-hidden rounded-xl border-2 relative">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-full h-full object-cover"
-                  />
+      <Container>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 ">
+          <div className="  font-semibold text-lg ">
+            <div className="pb-6">
+              <p>Over 16 Co - Working Space</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
+              {listings.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex flex-col gap-4 justify-between h-96 w-full bg-white p-4 rounded-lg shadow-md"
+                >
+                  {/* ⬇️ Make image container relative to allow absolutely positioning the heart */}
+                  <div className="h-3/4 w-full overflow-hidden rounded-xl border-2 relative">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-full h-full object-cover"
+                    />
 
-                  {/* ❤️ Heart icon positioned top-right over the image */}
-                  <div
-                    className="absolute top-2 right-2 cursor-pointer"
-                    onClick={() => toggleFavorite(item.id)}>
-                    {favorites.includes(item.id) ? (
-                      <AiFillHeart className="text-white" size={22} />
-                    ) : (
-                      <AiOutlineHeart className="text-white" size={22} />
-                    )}
-                  </div>
-                </div>
-
-                {/* 👇 Existing card content below the image stays untouched */}
-                <div className="h-[25%] flex flex-col gap-1">
-                  <div className="flex w-full justify-between items-center">
-                    <p className="text-sm font-semibold">{item.name}</p>
-                    <div className="flex items-center gap-1 text-black">
-                      <AiFillStar size={16} />
-                      <p className="text-sm font-semibold text-black">
-                        {item.rating}
-                      </p>
+                    {/* ❤️ Heart icon positioned top-right over the image */}
+                    <div
+                      className="absolute top-2 right-2 cursor-pointer"
+                      onClick={() => toggleFavorite(item.id)}
+                    >
+                      {favorites.includes(item.id) ? (
+                        <AiFillHeart className="text-white" size={22} />
+                      ) : (
+                        <AiOutlineHeart className="text-white" size={22} />
+                      )}
                     </div>
                   </div>
 
-                  <div className="flex w-full justify-between items-center">
-                    <p className="text-sm text-gray-600">{item.location}</p>
-                    <p className="text-sm font-semibold">
-                      Reviews({item.reviews})
-                    </p>
-                  </div>
+                  {/* 👇 Existing card content below the image stays untouched */}
+                  <div className="h-[25%] flex flex-col gap-1">
+                    <div className="flex w-full justify-between items-center">
+                      <p className="text-sm font-semibold">{item.name}</p>
+                      <div className="flex items-center gap-1 text-black">
+                        <AiFillStar size={16} />
+                        <p className="text-sm font-semibold text-black">
+                          {item.rating}
+                        </p>
+                      </div>
+                    </div>
 
-                  <div className="flex w-full justify-between items-center">
-                    <p className="text-sm font-semibold">
-                      Starting from {item.price}
-                    </p>
-                  </div>
+                    <div className="flex w-full justify-between items-center">
+                      <p className="text-sm text-gray-600">{item.location}</p>
+                      <p className="text-sm font-semibold">
+                        Reviews({item.reviews})
+                      </p>
+                    </div>
 
-                  <div className="flex w-full justify-between items-center">
-                    <p className="text-xs text-gray-600">{item.note}</p>
+                    <div className="flex w-full justify-between items-center">
+                      <p className="text-sm font-semibold">
+                        Starting from {item.price}
+                      </p>
+                    </div>
+
+                    <div className="flex w-full justify-between items-center">
+                      <p className="text-xs text-gray-600">{item.note}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
+          <div>map here</div>
         </div>
-        <div>map here</div>
-      </div>
+      </Container>
     </div>
   );
 };

@@ -1,6 +1,7 @@
 // components/ReviewCard.jsx
 import React from "react";
 import { AiFillStar } from "react-icons/ai";
+import { NavLink } from "react-router-dom";
 
 const ReviewCard = ({ review }) => {
   const { name, avatar, duration, stars, date, message } = review;
@@ -33,7 +34,7 @@ const ReviewCard = ({ review }) => {
       {/* Review */}
       <p className="text-sm text-gray-700 line-clamp-3">{message}</p>
 
-      <button className="text-sm font-medium underline">Show more</button>
+      <NavLink className="text-small font-medium underline">Show more</NavLink>
     </div>
   );
 };

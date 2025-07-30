@@ -42,16 +42,18 @@ const ReusableComponents = () => {
     },
   ];
   return (
-    <div>
-      <h2 className="text-lg">Reviews Component</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-        {mockReviews.map((review, index) => (
-          <ReviewCard key={index} review={review} />
-        ))}
-      </div>
+    <Container>
+      <div>
+        <h2 className="text-lg">Reviews Component</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+          {mockReviews.map((review, index) => (
+            <ReviewCard key={index} review={review} />
+          ))}
+        </div>
 
-      <h2>Rating Metrics component</h2>
-    </div>
+        <h2>Rating Metrics component</h2>
+      </div>
+    </Container>
   );
 };
 
