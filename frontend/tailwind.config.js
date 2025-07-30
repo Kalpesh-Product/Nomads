@@ -29,10 +29,13 @@ module.exports = {
       },
       fontSize: {
         tiny: ["0.75rem", { lineHeight: "1rem" }], // ~12px
+        small: ["0.875rem", { lineHeight: "1.5rem" }], // 16px
         content: ["1rem", { lineHeight: "1.5rem" }], // 16px
         subtitle: ["1.25rem", { lineHeight: "1.75rem" }], // ~20px
-        title: ["1.5rem", { lineHeight: "2rem" }], // ~24px
-        hero: ["3rem", { lineHeight: "1" }], // 48px
+        title: ["2rem", { lineHeight: "1" }], // 48px
+        hero: ["2rem", { lineHeight: "1" }], // 48px
+        "main-header": ["6rem", { lineHeight: "2rem" }], // ~24px
+        "mega-header": ["16rem", { lineHeight: "2rem" }], // ~24px
       },
       // etc...
     },

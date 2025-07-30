@@ -8,6 +8,10 @@ import { useMutation } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
 import { CiSearch } from "react-icons/ci";
 import Container from "../components/Container";
+import { FaRegListAlt } from "react-icons/fa";
+import Amenities from "../components/Amenities";
+import Carousel from "../components/Carousel";
+import icons from "../assets/icons";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -47,22 +51,126 @@ const Home = () => {
       transform: "scale(1.1) translate(3px, 2px)",
     },
   ];
+  const featureSections = [
+    {
+      icon: <FaRegListAlt />,
+      points: [
+        "Serves as a dynamic platform, seamlessly connecting freelance professionals, remote workers, and individuals seeking flexible workspace solutions with nearby co-working spaces.",
+      ],
+      title: "Listing",
+      bgColor: "bg-[#fef7de]",
+      link: {
+        to: "#",
+        label: "View more >>",
+      },
+    },
+    {
+      icon: <FaRegListAlt />,
+      points: [
+        "Serves as a dynamic platform, seamlessly connecting freelance professionals, remote workers, and individuals seeking flexible workspace solutions with nearby co-working spaces.",
+      ],
+      title: "Booking",
+      bgColor: "bg-[#fbfed5]",
+      link: {
+        to: "#",
+        label: "View more >>",
+      },
+    },
+    {
+      icon: <FaRegListAlt />,
+      points: [
+        "Serves as a dynamic platform, seamlessly connecting freelance professionals, remote workers, and individuals seeking flexible workspace solutions with nearby co-working spaces.",
+      ],
+      title: "Community",
+      bgColor: "bg-[#f4fede]",
+      link: {
+        to: "#",
+        label: "View more >>",
+      },
+    },
+    {
+      icon: <FaRegListAlt />,
+      points: [
+        "Serves as a dynamic platform, seamlessly connecting freelance professionals, remote workers, and individuals seeking flexible workspace solutions with nearby co-working spaces.",
+      ],
+      title: "Communication",
+      bgColor: "bg-[#defede]",
+      link: {
+        to: "#",
+        label: "View more >>",
+      },
+    },
+  ];
+  const amenities = [
+    { image: icons.workspace, title: "WORKSPACE" },
+    { image: icons.livingspace, title: "LIVING SPACE" },
+    { image: icons.airconditioner, title: "AIR CONDITION" },
+    { image: icons.internet, title: "FAST INTERNET" },
+    { image: icons.cafe, title: "CAFE / DINING" },
+    { image: icons.receptionist, title: "RECEPTIONIST" },
+    { image: icons.meetingroom, title: "MEETING ROOMS" },
+    { image: icons.trainingroom, title: "TRAINING ROOMS" },
+    { image: icons.itsupport, title: "IT SUPPORT" },
+    { image: icons.teacoffe, title: "TEA & COFFEE" },
+    { image: icons.privateassistant, title: "ASSIST" },
+    { image: icons.community, title: "COMMUNITY" },
+    { image: icons.ondemand, title: "ON DEMAND" },
+    { image: icons.maintenance, title: "MAINTANANCE" },
+    { image: icons.generator, title: "GENERATOR" },
+    { image: icons.pickupdrop, title: "PICKUP & DROP" },
+    { image: icons.rentbikecar, title: "CAR / BIKE / BUS" },
+    { image: icons.housekeeping, title: "HOUSEKEEPING" },
+    { image: icons.pool, title: "SWIMMING POOL" },
+    { image: icons.television, title: "TELEVISION" },
+    { image: icons.gas, title: "GAS" },
+    { image: icons.laundry, title: "LAUNDRY" },
+    { image: icons.secure, title: "SECURE" },
+    { image: icons.personalised, title: "PERSONALISED" },
+  ];
+  const carouselItems = [
+    {
+      image:
+        "https://images.unsplash.com/photo-1581090700227-1e8a28add49c?auto=format&fit=crop&w=800&q=80",
+      title: "CO-WORKING",
+    },
+    {
+      image:
+        "https://images.unsplash.com/photo-1572120360610-d971b9b78827?auto=format&fit=crop&w=800&q=80",
+      title: "CO-LIVING",
+    },
+    {
+      image:
+        "https://images.unsplash.com/photo-1607083207630-9b22b38138f4?auto=format&fit=crop&w=800&q=80",
+      title: "WORKATION",
+    },
+    {
+      image:
+        "https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=800&q=80",
+      title: "VILLAS",
+    },
+    {
+      image:
+        "https://images.unsplash.com/photo-1616627983135-3b2dc0d9dd75?auto=format&fit=crop&w=800&q=80",
+      title: "MEETING ROOM",
+    },
+  ];
+
   return (
     <div className="flex flex-col w-full">
       <section className="max-w-7xl mx-auto flex flex-col gap-2 lg:mb-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="flex flex-col gap-4 justify-end items-start">
-            <p className="uppercase font-semibold text-title lg:text-[6rem] lg:leading-normal">
+            <p className="uppercase font-semibold text-main-header lg:text-[6rem] lg:leading-normal">
               WORLDS NOMAD COMMUNITY
             </p>
-            <span className="text-[2rem]">
+            <span className="text-hero">
               Connecting Co-working Spaces and Flexible Workers
             </span>
           </div>
           <div className=" rounded-xl overflow-hidden">
             <div className="bg-[url('/images/bg-image.jpg')] bg-cover bg-center h-full w-full rounded-md shadow-md flex items-end">
               <div className="bg-white/10 backdrop-blur-md p-4 w-full flex flex-col gap-4">
-                <span className="text-white">
+                <span className="text-white text-small">
                   Serves as a dynamic platform, seamlessly connecting freelance
                   professionals, remote workers, and individuals seeking
                   flexible workspace
@@ -72,7 +180,7 @@ const Home = () => {
                   <div className="p-3 rounded-2xl bg-white">
                     <span>Ratings here</span>
                   </div>
-                  <NavLink className={"text-white text-sm hover:underline"}>
+                  <NavLink className={"text-white text-small hover:underline"}>
                     View More Reviews
                   </NavLink>
                 </div>
@@ -223,10 +331,10 @@ const Home = () => {
       </section>
       <section className="bg-black w-full flex flex-col gap-4 py-4 lg:py-16">
         <div className="max-w-7xl mx-auto flex flex-col text-primary  justify-center items-center ">
-          <h1 className="text-title font-hero lg:leading-none lg:text-[16rem] font-medium">
+          <h1 className="text-title font-hero lg:leading-none lg:text-mega-header font-medium">
             INTRODUCING
           </h1>
-          <h1 className="text-title font-hero lg:leading-none lg:text-[16rem] font-medium">
+          <h1 className="text-title font-hero lg:leading-none lg:text-mega-header font-medium">
             N-COMMERCE
           </h1>
           <p className="uppercase text-[5rem] leading-normal font-hero">
@@ -236,23 +344,132 @@ const Home = () => {
         </div>
       </section>
       <Container>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div className="border-2 w-full flex flex-col gap-4">
-            <h1 className="text-title uppercase">WONO for Nomads</h1>
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1px_1fr] gap-y-6 lg:gap-x-12">
+          {/* Section: WONO for Nomads */}
+          <div className="w-full flex flex-col gap-4">
+            <h1 className="text-title font-semibold text-center uppercase">
+              WONO for Nomads
+            </h1>
             <div className="grid grid-cols-2">
-              <div className="flex flex-col gap-4">
-                <span>
-                  Serves as a dynamic platform, seamlessly connecting freelance
-                  professionals, remote workers, and individuals seeking
-                  flexible workspace solutions with nearby co working spaces.
-                </span>
-                <ul>
-                  <li></li>
-                </ul>
+              {featureSections.map((section, index) => (
+                <div
+                  key={index}
+                  className={`flex flex-col gap-4 rounded-xl p-3 ${
+                    section.bgColor || "bg-white"
+                  }`}
+                >
+                  <div className="flex flex-col gap-4">
+                    <span className="text-title pl-6">{section.icon}</span>
+                    <ul className="list-disc pl-6">
+                      {section.points.map((point, i) => (
+                        <li key={i}>{point}</li>
+                      ))}
+                    </ul>
+                    <h3 className="text-subtitle font-medium pl-2">
+                      {section.title}
+                    </h3>
+                  </div>
+                </div>
+              ))}
+              <div className="flex justify-center items-center w-full col-span-2 mt-4">
+                <NavLink to={"#"} className="text-primary-dark text-tiny">
+                  View More {">>"}
+                </NavLink>
               </div>
             </div>
           </div>
-          <div className="border-2 w-full">2</div>
+
+          {/* Divider */}
+          <div className="hidden lg:block w-px bg-gray-300 h-full mx-auto" />
+
+          {/* Section: WONO for Business */}
+          <div className="w-full flex flex-col gap-4">
+            <h1 className="text-title font-semibold text-center uppercase">
+              WONO for Business
+            </h1>
+            <div className="grid grid-cols-2">
+              {featureSections.map((section, index) => (
+                <div
+                  key={index}
+                  className={`flex flex-col gap-4 rounded-xl p-3 ${
+                    section.bgColor || "bg-white"
+                  }`}
+                >
+                  <div className="flex flex-col gap-4">
+                    <span className="text-title pl-6">{section.icon}</span>
+                    <ul className="list-disc pl-6">
+                      {section.points.map((point, i) => (
+                        <li key={i}>{point}</li>
+                      ))}
+                    </ul>
+                    <h3 className="text-subtitle font-medium pl-2">
+                      {section.title}
+                    </h3>
+                  </div>
+                </div>
+              ))}
+              <div className="flex justify-center items-center w-full col-span-2 mt-4">
+                <NavLink to={"#"} className="text-primary-dark text-tiny">
+                  View More {">>"}
+                </NavLink>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Container>
+
+      <Container>
+        <div className="flex flex-col gap-4">
+          <h1 className=" uppercase text-title font-semibold">
+            We have solution for your needs.....
+          </h1>
+          <div>
+            <Carousel carouselItems={carouselItems} />
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="flex flex-col gap-2">
+              <h1 className="text-main-header lg:text-[6rem] leading-normal uppercase font-semibold">
+                Exclusive villas
+              </h1>
+              <p className="text-subtitle leading-none lg:text-[2.5rem] font-medium">
+                {" "}
+                250+ Villas all over country
+              </p>
+            </div>
+            <div className="flex flex-col gap-4 py-6 border-b-2 border-black">
+              <p className="text-subtitle">
+                Serves as a{" "}
+                <span className="font-semibold">dynamic platform</span>,
+                seamlessly connecting freelance professionals, remote workers,
+                and individuals seeking{" "}
+                <span className="font-semibold">
+                  flexible workspace solutions
+                </span>{" "}
+                with nearby{" "}
+                <span className="font-semibold">co-working spaces.</span>
+              </p>
+              <span className="text-content">
+                <ul className="list-disc pl-6">
+                  <li>
+                    Serves as a dynamic platform, seamlessly connecting
+                    freelance professionals, remote workers, and individuals
+                    seeking flexible workspace solutions with nearby co-working
+                    spaces.
+                  </li>
+                </ul>
+              </span>
+            </div>
+          </div>
+        </div>
+      </Container>
+      <Container>
+        <div className="flex flex-col gap-8 w-full">
+          <h1 className="text-title font-semibold uppercase">Our inclusions</h1>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-28 gap-y-10">
+            {amenities.map((item, index) => (
+              <Amenities key={index} image={item.image} title={item.title} />
+            ))}
+          </div>
         </div>
       </Container>
     </div>

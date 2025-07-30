@@ -1,0 +1,28 @@
+const icons = {
+  airconditioner: "/icons/airconditioner.webp",
+  cafe: "/icons/cafe.webp",
+  community: "/icons/community.webp",
+  gas: "/icons/gas.webp",
+  generator: "/icons/generator.webp",
+  housekeeping: "/icons/housekeeping.webp",
+  internet: "/icons/internet.webp",
+  itsupport: "/icons/itsupport.webp",
+  laundry: "/icons/laundry.webp",
+  livingspace: "/icons/livingspace.webp",
+  maintenance: "/icons/maintenance.webp",
+  meetingroom: "/icons/meetingroom.webp",
+  ondemand: "/icons/ondemand.webp",
+  personalised: "/icons/personalised.webp",
+  pickupdrop: "/icons/pickupdrop.webp",
+  pool: "/icons/pool.webp",
+  privateassistant: "/icons/privateassistant.webp",
+  receptionist: "/icons/receptionist.webp",
+  rentbikecar: "/icons/rentbikecar.webp",
+  secure: "/icons/secure.webp",
+  teacoffe: "/icons/teacoffe.webp",
+  television: "/icons/television.webp",
+  trainingroom: "/icons/trainingroom.webp",
+  workspace: "/icons/workspace.webp",
+};
+
+export default icons;
