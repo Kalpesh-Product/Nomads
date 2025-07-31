@@ -20,7 +20,7 @@ const Header = () => {
     { id: 1, text: "SWITCH TO BUSINESS", to: "" },
   ];
   return (
-    <div className="flex px-4 justify-between items-center md:py-4 md:px-10 lg:px-24  bg-black backdrop-blur-md ">
+    <div className="flex px-4 justify-between items-center md:py-4 md:px-10 lg:px-20  bg-black backdrop-blur-md ">
       <div
         onClick={() => navigate("/")}
         className="h-10 w-24 overflow-x-hidden rounded-lg flex justify-between items-center cursor-pointer">
