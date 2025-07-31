@@ -35,7 +35,7 @@ module.exports = {
         subtitle: ["1.25rem", { lineHeight: "1.75rem" }], // ~20px
         title: ["2rem", { lineHeight: "1" }], // 48px
         hero: ["2rem", { lineHeight: "1" }], // 48px
-        "main-header": ["6rem", { lineHeight: "2rem" }], // ~24px
+        "main-header": ["6rem", { lineHeight: "4rem" }], // ~24px
         "mega-header": ["16rem", { lineHeight: "2rem" }], // ~24px
       },
       // etc...

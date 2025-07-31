@@ -233,7 +233,9 @@ const Listings = () => {
               ))}
             </div>
           </div>
-          <div>map here</div>
+          <div className="h-full w-full overflow-hidden rounded-xl">
+            <img src="/images/map.png" alt="map" className="h-full w-full object-contain" />
+          </div>
         </div>
       </Container>
     </div>

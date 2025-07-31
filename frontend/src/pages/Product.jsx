@@ -11,6 +11,8 @@ import { useMutation } from "@tanstack/react-query";
 import SecondaryButton from "../components/SecondaryButton";
 import icons from "../assets/icons";
 import Amenities from "../components/Amenities";
+import ReviewCard from "../components/ReviewCard";
+import LeafRatings from "../components/LeafRatings";
 
 const Product = () => {
   const companyImages = [
@@ -57,6 +59,45 @@ const Product = () => {
     { image: icons.secure, title: "SECURE" },
     { image: icons.personalised, title: "PERSONALISED" },
   ];
+
+  const mockReviews = [
+    {
+      name: "Aayushi",
+      avatar: "https://i.pravatar.cc/50?img=1",
+      duration: "3 years on Airbnb",
+      stars: 5,
+      date: "2 days ago",
+      message:
+        "One of the best Airbnbs I’ve stayed at. Loved everything about it, from the stay, to the helpful staff at the place, Bhaskar, to the thoughtfulness they’ve put behind...",
+    },
+    {
+      name: "Vinay",
+      avatar: "https://i.pravatar.cc/50?img=2",
+      duration: "3 years on Airbnb",
+      stars: 5,
+      date: "2 weeks ago",
+      message:
+        "Our caretaker Bhaskar was really responsive and helped a lot. The stay itself is quite good and peaceful. It’s quite secured and we loved the views as well. Good neighborhood...",
+    },
+    {
+      name: "Ankush",
+      avatar: "https://i.pravatar.cc/50?img=3",
+      duration: "New to Airbnb",
+      stars: 5,
+      date: "2 weeks ago",
+      message:
+        "My recent Airbnb stay was absolutely wonderful, thanks to the incredibly helpful host and staff. They were always available and went above and beyond to assist with anything...",
+    },
+    {
+      name: "Irine",
+      avatar: "https://i.pravatar.cc/50?img=4",
+      duration: "2 years on Airbnb",
+      stars: 5,
+      date: "April 2025",
+      message:
+        "The stay was comfortable and had everything we needed. The kitchen was well-equipped with all utensils, making things very convenient. We also received room service...",
+    },
+  ];
   const { handleSubmit, control, reset } = useForm({
     defaultValues: {
       firstName: "",
@@ -69,9 +110,28 @@ const Product = () => {
       endDate: null,
     },
   });
+  const {
+    handleSubmit: handlesubmitSales,
+    control: salesControl,
+    reset: salesReset,
+  } = useForm({
+    defaultValues: {
+      fullName: "",
+      mobileNumber: "",
+      email: "",
+    },
+  });
 
   const { mutate: submitEnquiry, isPending: isSubmitting } = useMutation({
     mutationKey: ["submitEnquiry"],
+    mutationFn: async (data) => {
+      console.log(data);
+    },
+    onSuccess: (data) => {},
+    onError: (error) => {},
+  });
+  const { mutate: submitSales, isPending: isSubmittingSales } = useMutation({
+    mutationKey: ["submitSales"],
     mutationFn: async (data) => {
       console.log(data);
     },
@@ -83,7 +143,7 @@ const Product = () => {
 
   return (
     <div>
-      <Container>
+      <Container padding={false}>
         <div className="flex flex-col gap-4">
           <div className="flex w-full justify-between">
             <h1 className="text-title font-semibold">BIZ Nest Co-Working</h1>
@@ -178,7 +238,9 @@ const Product = () => {
                 </div>
                 <div className="flex w-1/2 gap-4 justify-end">
                   <div className="flex flex-col gap-1 justify-center items-center">
-                    <p className="text-tiny">4.89</p>
+                    <p className="text-tiny">
+                      <LeafRatings ratings={"4.89"} height={30} width={30} />
+                    </p>
                     <span className="text-tiny">stars here</span>
                   </div>
                   <div className="flex flex-col gap-1 justify-center items-center">
@@ -341,16 +403,135 @@ const Product = () => {
               </div>
             </div>
           </div>
-          <hr className="my-10"/>
+          <hr className="my-10" />
           {/* Inclusions */}
           <div className="flex flex-col gap-8 w-full ">
-            <h1 className="text-title font-semibold uppercase">
+            <h1 className="text-title font-semibold ">
               What Inclusion does it offers
             </h1>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-28 gap-y-10">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-24 gap-y-10">
               {amenities.map((item, index) => (
                 <Amenities key={index} image={item.image} title={item.title} />
               ))}
+            </div>
+          </div>
+          <hr className="my-10" />
+          <div className="flex flex-col gap-8 w-full">
+            <div className="flex flex-col justify-center items-center max-w-4xl mx-auto">
+              <h1 className="text-main-header font-medium mt-5">
+                <LeafRatings ratings={"4.89"} align="items-start" />
+              </h1>
+
+              <p className="text-subtitle  my-4 font-medium">Guest favorite</p>
+              <span className="text-content text-center">
+                This home is a guest favourite based on <br /> ratings, reviews
+                and reliability
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+              {mockReviews.map((review, index) => (
+                <ReviewCard key={index} review={review} />
+              ))}
+            </div>
+            <hr className="my-10" />
+            {/* Map */}
+            <div className="flex flex-col gap-8">
+              <h1 className="text-title font-semibold">Where you'll be</h1>
+              <iframe
+                src="https://www.google.com/maps/embed?origin=mfe&pb=!1m3!2m1!1sBIZNest+Sunteck+…rporate+Park,+501+B,Patto+Centre,+Panaji,Goa+403001!6i14!3m1!1sen!5m1!1sen"
+                width="100%"
+                height="600"
+                loading="lazy"
+                className="rounded-xl"
+                referrerpolicy="no-referrer-when-downgrade"
+                title="map"
+              ></iframe>
+            </div>
+            <hr className="my-10" />
+            <div className="grid grid-cols-2 gap-20">
+              <div className="flex flex-col shadow-md gap-4 border-2 rounded-xl p-4 max-w-md">
+                <div className="flex justify-center items-center">
+                  <div className="h-20 w-20 overflow-hidden rounded-full">
+                    <img
+                      src="/images/bg-image.jpg"
+                      alt="poc image"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+                <div className="text-center">
+                  <h1 className="text-title">Anviksha Godkar</h1>
+                  <p className="text-content">Sales Manager</p>
+                </div>
+                <hr />
+                <div>
+                  <p className="text-subtitle mb-4">Host Details</p>
+                  <ul className="list-disc pl-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      <li>Response rate: 100%</li>
+                      <li>Response rate: 100%</li>
+                      <li>Response rate: 100%</li>
+                      <li>Response rate: 100%</li>
+                    </div>
+                  </ul>
+                </div>
+              </div>
+              <div className="flex w-full justify-end">
+                <div className="flex flex-col shadow-md h-full gap-4 border-2 rounded-xl p-6 w-3/4 justify-between">
+                  <h1 className="text-card-title font-semibold">
+                    Connect With Us
+                  </h1>
+                  <form
+                    onSubmit={handlesubmitSales((data) => submitSales(data))}
+                    className="grid grid-cols-1 gap-4"
+                  >
+                    <Controller
+                      name="fullName"
+                      control={salesControl}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          label="Full Name"
+                          fullWidth
+                          variant="standard"
+                          size="small"
+                        />
+                      )}
+                    />
+                    <Controller
+                      name="mobileNumber"
+                      control={salesControl}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          label="Mobile Number"
+                          fullWidth
+                          type="number"
+                          variant="standard"
+                          size="small"
+                        />
+                      )}
+                    />
+                    <Controller
+                      name="email"
+                      control={salesControl}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          label="Email"
+                          fullWidth
+                          type="email"
+                          variant="standard"
+                          size="small"
+                        />
+                      )}
+                    />
+
+                    <SecondaryButton title={"Submit"} type={"submit"} />
+                  </form>
+                </div>
+              </div>
             </div>
           </div>
         </div>

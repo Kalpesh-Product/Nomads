@@ -7,7 +7,7 @@ const ReviewCard = ({ review }) => {
   const { name, avatar, duration, stars, date, message } = review;
 
   return (
-    <div className="flex flex-col gap-2 max-w-sm">
+    <div className="flex flex-col gap-2 max-w-sm border-2 p-4 rounded-xl">
       {/* Header */}
       <div className="flex items-center gap-3">
         <img
