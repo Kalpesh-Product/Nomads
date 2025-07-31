@@ -19,7 +19,6 @@ const Listings = () => {
   };
 
   const navigate = useNavigate();
-  const [isMapOpen, setIsMapOpen] = useState(false);
 
   const { handleSubmit, control, reset } = useForm({
     defaultValues: {
@@ -136,7 +135,7 @@ const Listings = () => {
         <div className="flex flex-col gap-4 justify-between w-3/4 md:w-3/4 lg:w-1/2 h-full">
           <form
             onSubmit={handleSubmit((data) => locationData(data))}
-            className="flex gap-2 items-center border-2 border-primary-blue rounded-full pl-4 overflow-hidden h-16 lg:h-16"
+            className="flex gap-2 items-center border-2 border-primary-blue rounded-full pl-4 overflow-hidden h-10 lg:h-16"
           >
             <Controller
               name="country"
@@ -199,9 +198,9 @@ const Listings = () => {
                   </TextField>
                 )}
               />
-              <div className="bg-primary-blue w-1/2 h-full text-subtitle flex justify-center items-center">
-                <CiSearch />
-              </div>
+            <div className="bg-primary-blue w-1/2 h-full text-subtitle flex justify-center items-center">
+             <CiSearch />
+            </div>
             </div>
           </form>
         </div>
@@ -274,7 +273,7 @@ const Listings = () => {
               ))}
             </div>
           </div>
-          <div className="hidden md:block w-full overflow-hidden rounded-xl h-[38rem]">
+          <div className=" w-full overflow-hidden rounded-xl h-[38rem]">
             <Map />
           </div>
         </div>

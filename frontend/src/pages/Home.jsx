@@ -157,7 +157,7 @@ const Home = () => {
 
   return (
     <div className="flex flex-col w-full">
-      <Container padding={false}>
+      <Container >
         <section className="flex flex-col gap-2 lg:mb-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="flex flex-col gap-4 justify-end items-start">
@@ -352,7 +352,7 @@ const Home = () => {
           </div>
         </div>
       </section>
-      <Container>
+      <Container padding>
         <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-[1fr_1px_1fr] gap-y-6 lg:gap-x-12">
           {/* Section: WONO for Nomads */}
           <div className="w-full flex flex-col gap-4">
