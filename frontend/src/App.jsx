@@ -32,7 +32,7 @@ const App = () => {
         className={`${
           hideHeaderFooter
             ? ""
-            : "pt-16 pb-16 px-0 xs:pt-16 xs:pb-20 md:pt-20 md:pb-40 lg:pt-36 lg:pb-12 md:px-0 lg:px-0 sm:px-4"
+            : "pt-16 pb-16 px-0 xs:pt-16 xs:pb-20 md:pt-20 md:pb-40 lg:pt-36 lg:pb-0 md:px-0 lg:px-0 sm:px-4"
         } flex flex-col gap-4 bg-white`}>
         <Outlet />
         <Toaster />

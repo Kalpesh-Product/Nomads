@@ -19,6 +19,7 @@ const Listings = () => {
   };
 
   const navigate = useNavigate();
+  const [isMapOpen, setIsMapOpen] = useState(false);
 
   const { handleSubmit, control, reset } = useForm({
     defaultValues: {
@@ -53,9 +54,9 @@ const Listings = () => {
     },
     {
       id: 2,
-      name: "NestSpace",
+      name: "MeWo",
       rating: 4.7,
-      location: "Bangalore, KA",
+      location: "Panjim, GOA",
       reviews: 98,
       price: "INR 349 per day",
       note: "*Also available on Weekly basis",
@@ -84,14 +85,58 @@ const Listings = () => {
       image:
         "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp", // add image URL here
     },
+    {
+      id: 5,
+      name: "CoWorkZone",
+      rating: 4.6,
+      location: "Hyderabad, TS",
+      reviews: 112,
+      price: "INR 199 per day",
+      note: "*Also available on Hourly basis",
+      image:
+        "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp", // add image URL here
+    },
+    {
+      id: 6,
+      name: "CoWorkZone",
+      rating: 4.6,
+      location: "Hyderabad, TS",
+      reviews: 112,
+      price: "INR 199 per day",
+      note: "*Also available on Hourly basis",
+      image:
+        "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp", // add image URL here
+    },
+    {
+      id: 7,
+      name: "CoWorkZone",
+      rating: 4.6,
+      location: "Hyderabad, TS",
+      reviews: 112,
+      price: "INR 199 per day",
+      note: "*Also available on Hourly basis",
+      image:
+        "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp", // add image URL here
+    },
+    {
+      id: 8,
+      name: "CoWorkZone",
+      rating: 4.6,
+      location: "Hyderabad, TS",
+      reviews: 112,
+      price: "INR 199 per day",
+      note: "*Also available on Hourly basis",
+      image:
+        "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp", // add image URL here
+    },
   ];
   return (
     <div className="flex flex-col gap-4 ">
       <div className="flex flex-col gap-4 justify-center items-center  w-full mt-10 ">
-        <div className="flex flex-col gap-4 justify-between md:w-3/4 w-1/2 h-full">
+        <div className="flex flex-col gap-4 justify-between w-3/4 md:w-3/4 lg:w-1/2 h-full">
           <form
             onSubmit={handleSubmit((data) => locationData(data))}
-            className="flex gap-2 items-center border-2 border-primary-blue rounded-full pl-4 overflow-hidden h-16"
+            className="flex gap-2 items-center border-2 border-primary-blue rounded-full pl-4 overflow-hidden h-16 lg:h-16"
           >
             <Controller
               name="country"
@@ -154,9 +199,9 @@ const Listings = () => {
                   </TextField>
                 )}
               />
-            <div className="bg-primary-blue w-1/2 h-full text-subtitle flex justify-center items-center">
-             <CiSearch />
-            </div>
+              <div className="bg-primary-blue w-1/2 h-full text-subtitle flex justify-center items-center">
+                <CiSearch />
+              </div>
             </div>
           </form>
         </div>
@@ -168,7 +213,7 @@ const Listings = () => {
             <div className="pb-6">
               <p>Over 16 Co - Working Space</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-[36rem] overflow-y-auto overflow-x-hidden">
               {listings.map((item) => (
                 <div
                   key={item.id}
@@ -229,8 +274,29 @@ const Listings = () => {
               ))}
             </div>
           </div>
-          <div className="h-full w-full overflow-hidden rounded-xl">
+          <div className="hidden md:block w-full overflow-hidden rounded-xl h-[38rem]">
             <Map />
+          </div>
+
+          {/* Mobile Bottom Sheet Map */}
+          <div
+            className={`fixed bottom-0 left-0 w-full bg-white shadow-lg transition-all duration-300 z-40 ${
+              isMapOpen ? "h-[70vh]" : "h-16"
+            } md:hidden rounded-t-xl`}
+          >
+            {/* Drag handle or tap to expand */}
+            <div
+              className="w-full flex justify-center items-center cursor-pointer py-2"
+              onClick={() => setIsMapOpen((prev) => !prev)}
+            >
+              <div className="w-12 h-1.5 rounded-full bg-gray-400"></div>
+            </div>
+            {/* Only show map if open */}
+            {isMapOpen && (
+              <div className="h-full w-full px-2 pb-2">
+                <Map />
+              </div>
+            )}
           </div>
         </div>
       </Container>
