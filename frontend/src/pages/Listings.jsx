@@ -277,27 +277,6 @@ const Listings = () => {
           <div className="hidden md:block w-full overflow-hidden rounded-xl h-[38rem]">
             <Map />
           </div>
-
-          {/* Mobile Bottom Sheet Map */}
-          <div
-            className={`fixed bottom-0 left-0 w-full bg-white shadow-lg transition-all duration-300 z-40 ${
-              isMapOpen ? "h-[70vh]" : "h-16"
-            } md:hidden rounded-t-xl`}
-          >
-            {/* Drag handle or tap to expand */}
-            <div
-              className="w-full flex justify-center items-center cursor-pointer py-2"
-              onClick={() => setIsMapOpen((prev) => !prev)}
-            >
-              <div className="w-12 h-1.5 rounded-full bg-gray-400"></div>
-            </div>
-            {/* Only show map if open */}
-            {isMapOpen && (
-              <div className="h-full w-full px-2 pb-2">
-                <Map />
-              </div>
-            )}
-          </div>
         </div>
       </Container>
     </div>
