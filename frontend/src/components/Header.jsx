@@ -16,8 +16,8 @@ const Header = () => {
   const headerLinks = [
     // { id: 1, text: "ROI", to: "" },
     { id: 1, text: "CAREER", to: "nomad" },
-    { id: 1, text: "CONTACT", to: "" },
-    { id: 1, text: "SWITCH TO BUSINESS", to: "" },
+    { id: 2, text: "CONTACT", to: "" },
+    { id: 3, text: "SWITCH TO BUSINESS", to: "" },
   ];
   return (
     <div className="flex px-4 justify-between items-center md:py-4 md:px-10 lg:px-20  bg-black backdrop-blur-md ">

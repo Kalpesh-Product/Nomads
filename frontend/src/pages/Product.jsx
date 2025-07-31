@@ -64,16 +64,16 @@ const Product = () => {
     {
       name: "Aayushi",
       avatar: "https://i.pravatar.cc/50?img=1",
-      duration: "3 years on Airbnb",
+      duration: "3 years on WoNo",
       stars: 5,
       date: "2 days ago",
       message:
-        "One of the best Airbnbs I’ve stayed at. Loved everything about it, from the stay, to the helpful staff at the place, Bhaskar, to the thoughtfulness they’ve put behind...",
+        "One of the best WoNos I’ve stayed at. Loved everything about it, from the stay, to the helpful staff at the place, Bhaskar, to the thoughtfulness they’ve put behind...",
     },
     {
       name: "Vinay",
       avatar: "https://i.pravatar.cc/50?img=2",
-      duration: "3 years on Airbnb",
+      duration: "3 years on WoNo",
       stars: 5,
       date: "2 weeks ago",
       message:
@@ -82,16 +82,16 @@ const Product = () => {
     {
       name: "Ankush",
       avatar: "https://i.pravatar.cc/50?img=3",
-      duration: "New to Airbnb",
+      duration: "New to WoNo",
       stars: 5,
       date: "2 weeks ago",
       message:
-        "My recent Airbnb stay was absolutely wonderful, thanks to the incredibly helpful host and staff. They were always available and went above and beyond to assist with anything...",
+        "My recent WoNo stay was absolutely wonderful, thanks to the incredibly helpful host and staff. They were always available and went above and beyond to assist with anything...",
     },
     {
       name: "Irine",
       avatar: "https://i.pravatar.cc/50?img=4",
-      duration: "2 years on Airbnb",
+      duration: "2 years on WoNo",
       stars: 5,
       date: "April 2025",
       message:
@@ -105,7 +105,7 @@ const Product = () => {
       mobileNumber: "",
       email: "",
       type: "",
-      numberOfDesks: 0,
+      numberOfDesks: 2,
       startDate: null,
       endDate: null,
     },
@@ -144,14 +144,14 @@ const Product = () => {
   return (
     <div>
       <Container padding={false}>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-8">
           <div className="flex w-full justify-between">
             <h1 className="text-title font-semibold">BIZ Nest Co-Working</h1>
             <NavLink className={"text-small underline"}>Save</NavLink>
           </div>
 
           {/* Image Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-1">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-1 overflow-hidden">
             {/* Main Image */}
             <div className="w-full h-full overflow-hidden rounded-md">
               <img
@@ -162,11 +162,11 @@ const Product = () => {
             </div>
 
             {/* Thumbnail Images */}
-            <div className="grid grid-cols-2 gap-1">
+            <div className="grid grid-cols-2 gap-2">
               {companyImages.map((item) => (
                 <div
                   key={item._id}
-                  className={`w-full h-60 overflow-hidden rounded-md cursor-pointer border-2 ${
+                  className={`w-full h-full overflow-hidden rounded-md cursor-pointer border-2 ${
                     selectedImage._id === item._id
                       ? "border-primary-dark"
                       : "border-transparent"
@@ -201,7 +201,7 @@ const Product = () => {
                 & 501 B, Patto Centre, Panaji, Goa 403001
               </div>
               <h1 className="text-title uppercase font-semibold">about</h1>
-              <p className="text-tiny">
+              <p className="text-sm">
                 BIZ Nest ( Business with a Nest ) is the way of our Future
                 Lifestyle! As data and trends indicate, our ecosystem has
                 already started witnessing a strong and focused nomad community
@@ -215,7 +215,7 @@ const Product = () => {
                 fully-stack solution by providing co-working, co living and
                 workations to ensure their HAPPINESS!
               </p>
-              <p className="text-tiny">
+              <p className="text-sm">
                 We are an early adapted platform of our FUTURE Lifestyle which
                 we are confident will get fully activated in the global
                 ecosystem by the end of this decade. We are the only Destination
@@ -226,37 +226,39 @@ const Product = () => {
               </p>
             </div>
             <div className="flex flex-col gap-4">
-              <div className="border-2 rounded-xl flex gap-4 items-center p-4">
-                <div className="text-tiny w-1/4">
-                  <p>Guest</p>
-                  <p>favorite</p>
-                </div>
-                <div className="w-full">
-                  <p className="text-tiny text-nowrap">
-                    One of the most loved homes on WoNo, according to guests
-                  </p>
-                </div>
-                <div className="flex w-1/2 gap-4 justify-end">
-                  <div className="flex flex-col gap-1 justify-center items-center">
-                    <p className="text-tiny">
-                      <LeafRatings ratings={"4.89"} height={30} width={30} />
-                    </p>
-                    <span className="text-tiny">stars here</span>
+              <div className="border-2 rounded-xl flex flex-wrap lg:flex-nowrap gap-6 lg:gap-4 items-center p-4 h-full lg:h-36">
+                <div className="flex flex-col gap-4">
+                  <div>
+                    <p className="text-title font-semibold">Guest favorite</p>
+                    <p></p>
                   </div>
-                  <div className="flex flex-col gap-1 justify-center items-center">
-                    <p className="text-tiny">28</p>
-                    <span className="text-tiny">Reviews</span>
+                  <div className="w-full">
+                    <p className="text-content lg:text-small lg:text-nowrap text-start lg:text-start">
+                      One of the most loved homes on WoNo, according to guests
+                    </p>
+                  </div>
+                </div>
+                <div className="flex w-full gap-4 justify-evenly lg:justify-end lg:w-1/2">
+                  <div className="flex flex-col gap-4 justify-center items-center">
+                    <span className="text-subtitle lg:text-title">
+                      <LeafRatings ratings={"4.89"} height={30} width={30} />
+                    </span>
+                    <span className="text-sm lg:text-small font-medium">stars here</span>
+                  </div>
+                  <div className="flex flex-col gap-4 lg:gap-4 justify-center items-center">
+                    <p className="text-subtitle lg:text-title">28</p>
+                    <span className="text-small font-medium">Reviews</span>
                   </div>
                 </div>
               </div>
-              <div className="shadow-xl flex flex-col gap-4 p-6 rounded-md border-2">
+              <div className="shadow-md flex flex-col gap-4 p-6 rounded-xl border-2">
                 <h1 className="text-card-title font-semibold">
                   Enquire & Recieve Quote
                 </h1>
                 <form
                   onSubmit={handleSubmit((data) => submitEnquiry(data))}
                   action=""
-                  className="grid grid-cols-2 gap-4"
+                  className="grid grid-cols-1 lg:grid-cols-2 gap-4"
                 >
                   <Controller
                     name="firstName"
@@ -397,13 +399,13 @@ const Product = () => {
                   <SecondaryButton
                     title={"Get Quote"}
                     type={"submit"}
-                    externalStyles={"col-span-2"}
+                    externalStyles={"col-span-1 lg:col-span-2"}
                   />
                 </form>
               </div>
             </div>
           </div>
-          <hr className="my-10" />
+          <hr className="my-5 lg:my-10" />
           {/* Inclusions */}
           <div className="flex flex-col gap-8 w-full ">
             <h1 className="text-title font-semibold ">
@@ -415,7 +417,7 @@ const Product = () => {
               ))}
             </div>
           </div>
-          <hr className="my-10" />
+          <hr className="my-5 lg:my-10" />
           <div className="flex flex-col gap-8 w-full">
             <div className="flex flex-col justify-center items-center max-w-4xl mx-auto">
               <h1 className="text-main-header font-medium mt-5">
@@ -429,12 +431,12 @@ const Product = () => {
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-0 lg:p-6">
               {mockReviews.map((review, index) => (
                 <ReviewCard key={index} review={review} />
               ))}
             </div>
-            <hr className="my-10" />
+            <hr className="my-5 lg:my-10" />
             {/* Map */}
             <div className="flex flex-col gap-8">
               <h1 className="text-title font-semibold">Where you'll be</h1>
@@ -444,12 +446,12 @@ const Product = () => {
                 height="600"
                 loading="lazy"
                 className="rounded-xl"
-                referrerpolicy="no-referrer-when-downgrade"
+                referrerPolicy="no-referrer-when-downgrade"
                 title="map"
               ></iframe>
             </div>
-            <hr className="my-10" />
-            <div className="grid grid-cols-2 gap-20">
+            <hr className="my-5 lg:my-10" />
+            <div className="grid grid-cols-1  lg:grid-cols-2 gap-20">
               <div className="flex flex-col shadow-md gap-4 border-2 rounded-xl p-4 max-w-md">
                 <div className="flex justify-center items-center">
                   <div className="h-20 w-20 overflow-hidden rounded-full">
@@ -461,7 +463,7 @@ const Product = () => {
                   </div>
                 </div>
                 <div className="text-center">
-                  <h1 className="text-title">Anviksha Godkar</h1>
+                  <h1 className="text-title font-semibold">Anviksha Godkar</h1>
                   <p className="text-content">Sales Manager</p>
                 </div>
                 <hr />
@@ -478,7 +480,7 @@ const Product = () => {
                 </div>
               </div>
               <div className="flex w-full justify-end">
-                <div className="flex flex-col shadow-md h-full gap-4 border-2 rounded-xl p-6 w-3/4 justify-between">
+                <div className="flex flex-col shadow-md h-full gap-4 border-2 rounded-xl p-6 w-full lg:w-3/4 justify-between">
                   <h1 className="text-card-title font-semibold">
                     Connect With Us
                   </h1>

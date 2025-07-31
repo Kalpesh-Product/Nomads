@@ -7,7 +7,7 @@ const LeafRatings = ({ratings , height, width, align=""}) => {
         <img src="/images/leaf-left.png" alt="leaf-left" className='h-full w-full object-contain' />
       </div>
       <div className='mt-0'>
-        <p>{ratings}</p>
+        <span>{ratings}</span>
       </div>
       <div style={{height : height || "100%", width : width || "5rem"}} className='h-full w-20 overflow-hidden'>
         <img src="/images/leaf-right.png" alt="leaf-right" className='h-full w-full object-contain' />

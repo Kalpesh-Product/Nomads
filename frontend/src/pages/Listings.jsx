@@ -7,6 +7,7 @@ import { AiFillStar } from "react-icons/ai";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import Container from "../components/Container";
 import { useNavigate } from "react-router-dom";
+import Map from "../components/Map";
 
 const Listings = () => {
   const [favorites, setFavorites] = useState([]);
@@ -234,7 +235,7 @@ const Listings = () => {
             </div>
           </div>
           <div className="h-full w-full overflow-hidden rounded-xl">
-            <img src="/images/map.png" alt="map" className="h-full w-full object-contain" />
+            <Map />
           </div>
         </div>
       </Container>
