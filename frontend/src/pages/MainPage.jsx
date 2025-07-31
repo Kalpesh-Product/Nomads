@@ -21,12 +21,12 @@ const MainPage = () => {
             window.scrollTo({ top: 0, behavior: "instant" });
           }}
         />
-        <h1 className="text-xl  font-cursive">Worlds Nomad Community</h1>
+        <h1 className="text-[3rem]  font-cursive">Worlds Nomad Community</h1>
         <div className="w-36"></div>
       </div>
 
       {/* Main content grid */}
-      <div className="flex flex-col lg:flex-row gap-8 w-full justify-between mt-2">
+      <div className="flex flex-col lg:flex-row gap-8 w-full justify-between mt-2 font-heading">
         {/* Left Column: For Nomads */}
         <div className="flex flex-col items-center gap-4 w-full">
           <img
@@ -55,7 +55,7 @@ const MainPage = () => {
         </div>
 
         {/* Divider only on large screens */}
-        <div className="hidden lg:flex border-l-2 border-dashed border-white mx-4"></div>
+        <div className="hidden lg:flex border-l-2 border-dashed border-gray-400 mx-4"></div>
 
         {/* Right Column: For Businesses */}
         <div className="flex flex-col items-center gap-4 w-full">
@@ -74,36 +74,47 @@ const MainPage = () => {
               A User-Friendly No-Code SaaS platform built to <br /> empower
               nomad-friendly businesses worldwide.
             </p>
+            <ul className="text-left mt-4 list-disc list-inside px-6 lg:px-28 text-subtitle">
+              <li>Website Builder</li>
+              <li>Meeting Room Booking System</li>
+              <li>Tickets Management System</li>
+              <li>Visitor Management System</li>
+              <li>Task Management System</li>
+            </ul>
           </div>
         </div>
       </div>
 
       {/* Footer */}
-      <footer className="mt-4 text-center text-xs text-gray-400 flex flex-col items-center gap-2 border-t border-gray-600  w-full pt-2">
-        <p>
+      <footer className="mt-4 text-center text-content text-white flex flex-col items-center gap-2 border-t border-gray-600  w-full pt-2">
+        <p className="pt-4 text-[1rem] font-heading">
           © Copyright 2025–26 WONOCO PRIVATE LIMITED – SINGAPORE. All Rights
           Reserved.
         </p>
-        <div className="flex gap-4 text-white text-lg">
+        <div className="flex gap-4 text-white text-lg pb-4">
           <a
+            className="p-2 text-[1.5rem]"
             href="https://twitter.com"
             target="_blank"
             rel="noopener noreferrer">
             <FaTwitter />
           </a>
           <a
+            className="p-2 text-[1.5rem]"
             href="https://facebook.com"
             target="_blank"
             rel="noopener noreferrer">
             <FaFacebook />
           </a>
           <a
+            className="p-2 text-[1.5rem]"
             href="https://instagram.com"
             target="_blank"
             rel="noopener noreferrer">
             <FaInstagram />
           </a>
           <a
+            className="p-2 text-[1.5rem]"
             href="https://linkedin.com"
             target="_blank"
             rel="noopener noreferrer">
