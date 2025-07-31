@@ -72,7 +72,7 @@ const Product = () => {
 
   const { mutate: submitEnquiry, isPending: isSubmitting } = useMutation({
     mutationKey: ["submitEnquiry"],
-    mutation: async (data) => {
+    mutationFn: async (data) => {
       console.log(data);
     },
     onSuccess: (data) => {},
@@ -341,9 +341,9 @@ const Product = () => {
               </div>
             </div>
           </div>
-
+          <hr className="my-10"/>
           {/* Inclusions */}
-          <div className="flex flex-col gap-8 w-full">
+          <div className="flex flex-col gap-8 w-full ">
             <h1 className="text-title font-semibold uppercase">
               What Inclusion does it offers
             </h1>
