@@ -157,7 +157,7 @@ const Home = () => {
 
   return (
     <div className="flex flex-col w-full">
-      <Container>
+      <Container padding={false}>
         <section className="flex flex-col gap-2 lg:mb-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="flex flex-col gap-4 justify-end items-start">
@@ -190,20 +190,20 @@ const Home = () => {
                 </div>
               </div>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 h-full lg:h-48">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-5 h-full lg:h-48">
               <div className="flex flex-col gap-4 h-full justify-between">
                 <div className="bg-white text-black flex justify-center items-center">
                   {" "}
                   {/* Consultant Avatars */}
-                  <div className="flex justify-start lg:justify-start items-center -space-x-4 w-full mt-4">
+                  <div className="flex justify-start md:justify-center lg:justify-start items-center -space-x-4 w-full mt-4">
                     {avatarConfigs.map((config, index) => (
                       <Avatar
                         key={index}
                         alt={config.alt}
                         src={config.src}
                         sx={{
-                          width: { xs: 60, lg: 103 },
-                          height: { xs: 60, lg: 103 },
+                          width: { xs: 60, md:90, lg: 103 },
+                          height: { xs: 60, md:90, lg: 103 },
                           border: "2px solid white",
                           "& img": {
                             transform: config.transform,
@@ -215,7 +215,7 @@ const Home = () => {
                     ))}
                   </div>
                 </div>
-                <div className="flex justify-start lg:justify-start items-center">
+                <div className="flex justify-start md:justify-center lg:justify-start items-center">
                   <SecondaryButton title={"BOOK YOUR SPACE NOW"} />
                 </div>
               </div>
@@ -342,19 +342,18 @@ const Home = () => {
           <h1 className="text-mobile-mega-header font-hero lg:leading-none lg:text-mega-header font-medium">
             N-COMMERCE
           </h1>
-          <p className="uppercase text-mobile-main-header lg:text-mega-desc leading-normal font-hero">
+          <p className="uppercase text-mobile-main-header lg:text-mega-desc font-hero">
             ("nomad commerce")
           </p>
-          <div className="flex justify-center items-center w-full">
+          <div className="flex justify-center items-end w-full">
             <PrimaryButton
               title={"Partner now"}
-              // externalStyles={"mb-[1.5rem]"}
             />
           </div>
         </div>
       </section>
       <Container>
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1px_1fr] gap-y-6 lg:gap-x-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-[1fr_1px_1fr] gap-y-6 lg:gap-x-12">
           {/* Section: WONO for Nomads */}
           <div className="w-full flex flex-col gap-4">
             <h1 className="text-title font-semibold text-center uppercase">
@@ -428,8 +427,8 @@ const Home = () => {
         </div>
       </Container>
 
-      <div className="flex flex-col gap-4 p-4">
-        <h1 className=" uppercase lg:text-title font-semibold">
+      <div className="lg:max-w-[85rem] lg:mx-auto  flex flex-col gap-4 md:px-10 px-4">
+        <h1 className=" uppercase lg:text-title font-semibold text-title">
           We have solution for your needs.....
         </h1>
         <div>
@@ -472,7 +471,7 @@ const Home = () => {
       <Container>
         <div className="flex flex-col gap-8 w-full">
           <h1 className="text-title font-semibold uppercase">Our inclusions</h1>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-16 lg:gap-x-28 gap-y-10">
+          <div className="grid grid-cols-2 md:grid-cols-4  lg:grid-cols-6 gap-x-16 md:gap-x-16 lg:gap-x-28 gap-y-10">
             {amenities.map((item, index) => (
               <Amenities key={index} image={item.image} title={item.title} />
             ))}

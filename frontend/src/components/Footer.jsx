@@ -41,13 +41,8 @@ const Footer = () => {
   return (
     <footer className="w-full bg-black text-primary backdrop-blur-md border-t flex flex-col justify-center items-center gap-0 pt-12 pb-0 md:pb-0 md:pt-14 md:px-10 lg:px-20 border-[0.5px] shadow-lg border-gray-300">
       <div className="w-full flex flex-wrap md:flex-wrap lg:flex-nowrap justify-between items-center pb-14">
-        <div className="flex flex-col md:flex-1 md:justify-center md:items-center lg:justify-start lg:items-start mb-8 lg:mb-0">
-          <div className="w-70 md:w-80 h-full ">
-            {/* <img
-              src={logo}
-              alt="logo"
-              className="h-full w-full object-contain mb-3"
-            /> */}
+        <div className="flex flex-col justify-center md:flex-1 md:justify-center md:items-center lg:justify-start lg:items-start mb-8 lg:mb-0">
+          <div className="w-70 md:w-80 h-full">
             <img
               src={logo}
               onClick={() => {
@@ -77,7 +72,7 @@ const Footer = () => {
           </div>
         </div>
         <div className=" ">
-          <div className="w-full md:w-full lg:w-fit grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-10 lg:gap-32">
+          <div className="w-full md:w-full lg:w-fit grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-10 lg:gap-32">
             {footerSections.map((section, idx) => (
               <div
                 key={idx}

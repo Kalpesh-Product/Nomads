@@ -38,7 +38,7 @@ module.exports = {
         "main-header": ["6rem", { lineHeight: "4rem" }], // ~24px
         "mobile-main-header": ["3rem", { lineHeight: "3rem" }], // ~24px
         "mega-header": ["16rem", { lineHeight: "2rem" }], // ~24px
-        "mega-desc": ["5rem", { lineHeight: "2rem" }], // ~24px
+        "mega-desc": ["5rem", { lineHeight: "8rem" }], // ~24px
         "mobile-mega-desc": ["3rem", { lineHeight: "2rem" }], // ~24px
         "mobile-mega-header": ["6rem", { lineHeight: "6rem" }], // ~24px
       },

@@ -195,8 +195,8 @@ const Product = () => {
                   className="h-full w-full object-cover"
                 />
               </div>
-              <div className="text-sm text-gray-700">
-                <MdLocationOn className="inline-block text-lg text-primary-dark mr-1" />
+              <div className="text-sm lg:text-tiny text-gray-700">
+                <MdLocationOn className="inline-block text-primary-dark mr-1" />
                 Sunteck Kanaka Corporate Park, 701 A, 701 B, 601 A, 601 B, 501 A
                 & 501 B, Patto Centre, Panaji, Goa 403001
               </div>
@@ -451,7 +451,7 @@ const Product = () => {
               ></iframe>
             </div>
             <hr className="my-5 lg:my-10" />
-            <div className="grid grid-cols-1  lg:grid-cols-2 gap-20">
+            <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-2 gap-20">
               <div className="flex flex-col shadow-md gap-4 border-2 rounded-xl p-4 max-w-md">
                 <div className="flex justify-center items-center">
                   <div className="h-20 w-20 overflow-hidden rounded-full">

@@ -18,7 +18,7 @@ const Listings = () => {
     );
   };
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const { handleSubmit, control, reset } = useForm({
     defaultValues: {
@@ -87,11 +87,11 @@ const Listings = () => {
   ];
   return (
     <div className="flex flex-col gap-4 ">
-      <div className="flex flex-col gap-4 justify-center items-center  w-full pb-6 ">
-        <div className="flex flex-col gap-4 justify-between w-1/2 ">
+      <div className="flex flex-col gap-4 justify-center items-center  w-full mt-10 ">
+        <div className="flex flex-col gap-4 justify-between md:w-3/4 w-1/2 h-full">
           <form
             onSubmit={handleSubmit((data) => locationData(data))}
-            className="flex gap-2 items-center border-2 border-primary-blue rounded-full pl-4 overflow-hidden"
+            className="flex gap-2 items-center border-2 border-primary-blue rounded-full pl-4 overflow-hidden h-16"
           >
             <Controller
               name="country"
@@ -133,7 +133,7 @@ const Listings = () => {
                 </TextField>
               )}
             />
-            <div className="w-full border-l-2 border-l-primary-blue px-2 h-full">
+            <div className="w-full border-l-2 border-l-primary-blue  flex h-full pl-4 ">
               <Controller
                 name="category"
                 control={control}
@@ -154,14 +154,9 @@ const Listings = () => {
                   </TextField>
                 )}
               />
+            <div className="bg-primary-blue w-1/2 h-full text-subtitle flex justify-center items-center">
+             <CiSearch />
             </div>
-            <div className="bg-primary-blue h-full w-20 flex justify-center">
-              <button
-                type="submit"
-                className=" flex w-20 justify-center items-center"
-              >
-                <CiSearch />
-              </button>
             </div>
           </form>
         </div>
@@ -177,7 +172,7 @@ const Listings = () => {
               {listings.map((item) => (
                 <div
                   key={item.id}
-                  onClick={()=>navigate(`${item.name}`)}
+                  onClick={() => navigate(`${item.name}`)}
                   className="flex flex-col gap-4 justify-between h-96 w-full bg-white p-4 rounded-lg shadow-md hover:scale-105 hover:shadow-md transition-all cursor-pointer"
                 >
                   {/* ⬇️ Make image container relative to allow absolutely positioning the heart */}

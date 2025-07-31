@@ -2,19 +2,22 @@ import { useKeenSlider } from "keen-slider/react";
 import { useEffect } from "react";
 
 const Carousel = ({ carouselItems }) => {
-  const [sliderRef, slider] = useKeenSlider({
-    loop: true,
-    slides: {
-      perView: 5,
-      spacing: 16,
+const [sliderRef, slider] = useKeenSlider({
+  loop: true,
+  slides: {
+    perView: 1, // default for mobile
+    spacing: 12,
+  },
+  breakpoints: {
+    "(min-width: 769px)": {
+      slides: { perView: 2, spacing: 14 }, // tablets
     },
+    "(min-width: 1025px)": {
+      slides: { perView: 5, spacing: 16 }, // desktops
+    },
+  },
+});
 
-    breakpoints: {
-      "(max-width: 768px)": {
-        slides: { perView: 1 },
-      },
-    },
-  });
 
   useEffect(() => {
     const interval = setInterval(() => {
