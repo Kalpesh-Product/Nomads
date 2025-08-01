@@ -1,5 +1,5 @@
 import PointOfContact from "../models/PointOfContact.js";
-import Company from "../models/Company.js";
+import CoworkingCompany from "../models/CoworkingCompany.js";
 import { Readable } from "stream";
 import csvParser from "csv-parser";
 import * as yup from "yup";
@@ -7,7 +7,7 @@ import * as yup from "yup";
 export const createNewPointOfContact = async (req, res, next) => {
   try {
     const schema = yup.object().shape({
-      company: yup.string().required("Please provide the company object ID"),
+      coworkingCompany: yup.string().required("Please provide the company object ID"),
       name: yup
         .string()
         .min(1, "Please provide your name")
@@ -98,7 +98,7 @@ export const bulkInsertPoc = async (req, res, next) => {
     }
 
     // Get all companies to map Business ID to _id
-    const companies = await Company.find().lean().exec();
+    const companies = await CoworkingCompany.find().lean().exec();
     const companyMap = new Map(
       companies.map((company) => [company.businessId, company._id.toString()])
     );
@@ -114,7 +114,7 @@ export const bulkInsertPoc = async (req, res, next) => {
 
         if (companyId) {
           const poc = {
-            company: companyId,
+            coworkingCompany: companyId,
             name: row["POC Name"]?.trim(),
             designation: row["POC Designation"]?.trim(),
             email: row["Email"]?.trim(),
@@ -132,7 +132,7 @@ export const bulkInsertPoc = async (req, res, next) => {
       .on("end", async () => {
         try {
           const inserted = await PointOfContact.insertMany(pocArray, {
-            ordered: false, // allow partial insert
+            ordered: false,
           });
 
           const insertedCount = inserted.length;

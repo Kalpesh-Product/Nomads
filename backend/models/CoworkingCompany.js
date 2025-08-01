@@ -54,5 +54,5 @@ const companySchema = new mongoose.Schema(
   }
 );
 
-const Company = mongoose.model("Company", companySchema);
-export default Company;
+const CoworkingCompany = mongoose.model("CoworkingCompany", companySchema);
+export default CoworkingCompany;

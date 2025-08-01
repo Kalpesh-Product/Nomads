@@ -2,9 +2,9 @@ import mongoose from "mongoose";
 
 const servicesSchema = new mongoose.Schema(
   {
-    company: {
+    coworkingCompany: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Company",
+      ref: "CoworkingCompany",
     },
     hotDesk: {
       type: Boolean,

@@ -1,4 +1,4 @@
-import Company from "../models/Company.js";
+import CoworkingCompany from "../models/CoworkingCompany.js";
 import Inclusions from "../models/Inclusions.js";
 import Review from "../models/Review.js";
 import Services from "../models/Services.js";
@@ -54,14 +54,14 @@ export const addNewCompany = async (req, res, next) => {
 
     await schema.validate(req.body, { abortEarly: false });
 
-    const existingCompany = await Company.findOne({ businessId });
+    const existingCompany = await CoworkingCompany.findOne({ businessId });
     if (existingCompany) {
       return res.status(409).json({
         message: "A company with this businessId already exists.",
       });
     }
 
-    const newCompany = new Company({
+    const newCompany = new CoworkingCompany({
       businessId,
       companyName,
       registeredEntityName,
@@ -83,7 +83,7 @@ export const addNewCompany = async (req, res, next) => {
     const savedCompany = await newCompany.save();
 
     res.status(201).json({
-      message: "Company added successfully.",
+      message: "CoworkingCompany added successfully.",
       data: savedCompany,
     });
   } catch (error) {
@@ -99,7 +99,7 @@ export const addNewCompany = async (req, res, next) => {
 
 export const getCompanyData = async (req, res, next) => {
   try {
-    const companies = await Company.find().lean().exec();
+    const companies = await CoworkingCompany.find().lean().exec();
     const inclusions = await Inclusions.find().lean().exec();
     const pocs = await PointOfContact.find().lean().exec();
     const services = await Services.find().lean().exec();
@@ -109,19 +109,19 @@ export const getCompanyData = async (req, res, next) => {
       const companyId = company._id.toString();
 
       const companyInclusions = inclusions.filter(
-        (item) => item.company?.toString() === companyId
+        (item) => item.coworkingCompany?.toString() === companyId
       );
 
       const companyPOCs = pocs.filter(
-        (item) => item.company?.toString() === companyId
+        (item) => item.coworkingCompany?.toString() === companyId
       );
 
       const companyServices = services.filter(
-        (item) => item.company?.toString() === companyId
+        (item) => item.coworkingCompany?.toString() === companyId
       );
 
       const companyReviews = reviews.filter(
-        (item) => item.company?.toString() === companyId
+        (item) => item.coworkingCompany?.toString() === companyId
       );
 
       return {
@@ -173,7 +173,7 @@ export const bulkInsertCompanies = async (req, res, next) => {
       })
       .on("end", async () => {
         try {
-          const result = await Company.insertMany(companies);
+          const result = await CoworkingCompany.insertMany(companies);
 
           const insertedCount = result.length;
           const failedCount = companies.length - insertedCount;

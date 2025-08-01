@@ -1,5 +1,5 @@
 import Services from "../models/Services.js";
-import Company from "../models/Company.js";
+import CoworkingCompany from "../models/CoworkingCompany.js";
 import { Readable } from "stream";
 import csvParser from "csv-parser";
 
@@ -27,7 +27,7 @@ export const addCompanyService = async (req, res, next) => {
 
     // Basic validation
     if (!company) {
-      return res.status(400).json({ message: "Company ID is required." });
+      return res.status(400).json({ message: "CoworkingCompany ID is required." });
     }
 
     // Optional: check if a services entry already exists for the company
@@ -60,7 +60,7 @@ export const addCompanyService = async (req, res, next) => {
 
     const savedService = await newService.save();
     res.status(201).json({
-      message: "Company services added successfully",
+      message: "CoworkingCompany services added successfully",
       data: savedService,
     });
   } catch (error) {
@@ -95,7 +95,7 @@ export const bulkInsertCompanyServices = async (req, res, next) => {
         .json({ message: "Please provide a valid CSV file." });
     }
 
-    const companies = await Company.find().lean().exec();
+    const companies = await CoworkingCompany.find().lean().exec();
     const companiesMap = new Map(
       companies.map((c) => [c.businessId?.trim(), c._id])
     );
@@ -112,7 +112,7 @@ export const bulkInsertCompanyServices = async (req, res, next) => {
           const companyId = companiesMap.get(businessId);
 
           if (!companyId) {
-            console.warn(`Company not found for Business Id: ${businessId}`);
+            console.warn(`CoworkingCompany not found for Business Id: ${businessId}`);
             return;
           }
 

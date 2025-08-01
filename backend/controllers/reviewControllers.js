@@ -2,12 +2,12 @@ import Review from "../models/Review.js";
 import * as yup from "yup";
 import { Readable } from "stream";
 import csvParser from "csv-parser";
-import Company from "../models/Company.js";
+import CoworkingCompany from "../models/CoworkingCompany.js";
 
 export const addReview = async (req, res, next) => {
   try {
     const schema = yup.object().shape({
-      company: yup.string().required("Please provide the company object ID"),
+      coworkingCompany: yup.string().required("Please provide the company object ID"),
       name: yup
         .string()
         .min(1, "Please provide the reviewer's name")
@@ -70,7 +70,7 @@ export const bulkInsertReviews = async (req, res, next) => {
         .json({ message: "Please provide a valid csv file" });
     }
 
-    const companies = await Company.find().lean().exec();
+    const companies = await CoworkingCompany.find().lean().exec();
     const companyMap = new Map(
       companies.map((company) => [company.businessId, company._id.toString()])
     );
@@ -81,7 +81,7 @@ export const bulkInsertReviews = async (req, res, next) => {
       .pipe(csvParser())
       .on("data", (row) => {
         const formattedReviews = {
-          company: companyMap.get(row["Business ID"]?.trim()),
+          coworkingCompany: companyMap.get(row["Business ID"]?.trim()),
           name: row["Reviewer Name"]?.trim(),
           starCount: parseInt(row["Rating"]?.trim()),
           description: row["Review Text"]?.trim(),

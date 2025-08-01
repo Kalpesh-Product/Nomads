@@ -1,4 +1,4 @@
-import Company from "../models/Company.js";
+import CoworkingCompany from "../models/CoworkingCompany.js";
 import Inclusions from "../models/Inclusions.js";
 import { Readable } from "stream";
 import csvParser from "csv-parser";
@@ -6,7 +6,7 @@ import csvParser from "csv-parser";
 export const addCompanyInclusions = async (req, res, next) => {
   try {
     const {
-      businessId,
+      coworkingCompany,
       businessName,
       airCondition,
       fastInternet,
@@ -48,7 +48,7 @@ export const addCompanyInclusions = async (req, res, next) => {
     } = req.body;
 
     const newInclusion = new Inclusions({
-      businessId,
+      coworkingCompany,
       businessName,
       airCondition,
       fastInternet,
@@ -104,7 +104,7 @@ export const getCompanyInclusions = async (req, res, next) => {
     const { companyId } = req.params;
 
     if (!companyId) {
-      return res.status(400).json({ message: "Company ID is required." });
+      return res.status(400).json({ message: "CoworkingCompany ID is required." });
     }
 
     const inclusions = await Inclusions.findOne({ businessId: companyId });
@@ -133,7 +133,7 @@ export const bulkInsertInclusions = async (req, res, next) => {
         .json({ message: "Please provide a valid CSV file" });
     }
 
-    const companies = await Company.find().lean().exec();
+    const companies = await CoworkingCompany.find().lean().exec();
     const companyMap = new Map(
       companies.map((company) => [company.businessId, company._id.toString()])
     );
@@ -148,7 +148,7 @@ export const bulkInsertInclusions = async (req, res, next) => {
       .on("data", (row) => {
         const businessId = companyMap.get(row["Business ID"]?.trim());
         const inclusion = {
-          company: businessId,
+          coworkingCompany: businessId,
           airCondition: normalize(row["Air Condition"]),
           fastInternet: normalize(row["Fast Internet"]),
           secure: normalize(row["Secure"]),

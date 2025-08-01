@@ -2,9 +2,9 @@ import mongoose from "mongoose";
 
 const pointOfContactSchema = new mongoose.Schema(
   {
-    company: {
+    coworkingCompany: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Company",
+      ref: "CoworkingCompany",
       required: true,
     },
     name: {
