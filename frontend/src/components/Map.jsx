@@ -33,7 +33,7 @@ const locations = [
     reviews: 20,
     rating: 3.5,
     image:
-      "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
+      "https://lh3.googleusercontent.com/p/AF1QipO561sgyDzlQlNPL6h_7Mqh6T6qyMS9dii6Am4U=s1360-w1360-h1020-rw",
   },
   {
     id: 3,
@@ -43,8 +43,7 @@ const locations = [
     location: "Panaji",
     reviews: 20,
     rating: 5.0,
-    image:
-      "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
+    image: "https://www.livv.co.in/assets/img/projects/common-area/1.webp",
   },
 ];
 
