@@ -2,78 +2,73 @@ import mongoose from "mongoose";
 
 const servicesSchema = new mongoose.Schema(
   {
-    businessId: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-    businessName: {
-      type: String,
-      required: true,
+    company: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Company",
     },
     hotDesk: {
-      type: Number,
-      default: 0,
+      type: Boolean,
+      default: false,
     },
     dedicatedDesk: {
-      type: Number,
-      default: 0,
+      type: Boolean,
+      default: false,
     },
     privateCabin: {
-      type: Number,
-      default: 0,
+      type: Boolean,
+      default: false,
     },
     meetingRoom: {
-      type: Number,
-      default: 0,
+      type: Boolean,
+      default: false,
     },
     conferenceRoom: {
-      type: Number,
-      default: 0,
+      type: Boolean,
+      default: false,
     },
     openDeskArea: {
-      type: Number,
-      default: 0,
+      type: Boolean,
+      default: false,
     },
     executiveSuite: {
-      type: Number,
-      default: 0,
+      type: Boolean,
+      default: false,
     },
     virtualOffice: {
-      type: Number,
-      default: 0,
+      type: Boolean,
+      default: false,
     },
     eventSpace: {
-      type: Number,
-      default: 0,
+      type: Boolean,
+      default: false,
     },
     phoneBooth: {
-      type: Number,
-      default: 0,
+      type: Boolean,
+      default: false,
     },
     loungeArea: {
-      type: Number,
-      default: 0,
+      type: Boolean,
+      default: false,
     },
     outdoorWorkspace: {
-      type: Number,
-      default: 0,
+      type: Boolean,
+      default: false,
     },
     dayPass: {
-      type: Number,
-      default: 0,
+      type: Boolean,
+      default: false,
     },
     focusZone: {
-      type: Number,
-      default: 0,
+      type: Boolean,
+      default: false,
     },
     auditorium: {
-      type: Number,
-      default: 0,
+      type: Boolean,
+      default: false,
     },
     trainingRoom: {
-      type: Number,
-      default: 0,
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

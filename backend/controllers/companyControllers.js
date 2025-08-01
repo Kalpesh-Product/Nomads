@@ -1,9 +1,11 @@
 import Company from "../models/Company.js";
+import Inclusions from "../models/Inclusions.js";
+import Review from "../models/Review.js";
+import Services from "../models/Services.js";
+import PointOfContact from "../models/PointOfContact.js";
 import yup from "yup";
 import csvParser from "csv-parser";
 import { Readable } from "stream";
-import fs from "fs";
-import path from "path";
 
 export const addNewCompany = async (req, res, next) => {
   try {
@@ -91,6 +93,48 @@ export const addNewCompany = async (req, res, next) => {
         errors: error.errors,
       });
     }
+    next(error);
+  }
+};
+
+export const getCompanyData = async (req, res, next) => {
+  try {
+    const companies = await Company.find().lean().exec();
+    const inclusions = await Inclusions.find().lean().exec();
+    const pocs = await PointOfContact.find().lean().exec();
+    const services = await Services.find().lean().exec();
+    const reviews = await Review.find().lean().exec();
+
+    const enrichedCompanies = companies.map((company) => {
+      const companyId = company._id.toString();
+
+      const companyInclusions = inclusions.filter(
+        (item) => item.company?.toString() === companyId
+      );
+
+      const companyPOCs = pocs.filter(
+        (item) => item.company?.toString() === companyId
+      );
+
+      const companyServices = services.filter(
+        (item) => item.company?.toString() === companyId
+      );
+
+      const companyReviews = reviews.filter(
+        (item) => item.company?.toString() === companyId
+      );
+
+      return {
+        ...company,
+        inclusions: companyInclusions,
+        pointOfContacts: companyPOCs,
+        services: companyServices,
+        reviews: companyReviews,
+      };
+    });
+
+    res.status(200).json(enrichedCompanies);
+  } catch (error) {
     next(error);
   }
 };
