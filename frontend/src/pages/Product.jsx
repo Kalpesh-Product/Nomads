@@ -448,7 +448,7 @@ const Product = () => {
                 title="map"></iframe>
             </div>
             <hr className="my-5 lg:my-10" />
-            <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-2 gap-20">
+            <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-2 gap-20 pb-20">
               <div className="flex flex-col shadow-md gap-4 border-2 rounded-xl p-4 max-w-md">
                 <div className="flex justify-center items-center">
                   <div className="h-20 w-20 overflow-hidden rounded-full">
