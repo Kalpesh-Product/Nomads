@@ -9,27 +9,34 @@ const pointOfContactSchema = new mongoose.Schema(
     },
     name: {
       type: String,
-      required: true,
     },
     designation: {
       type: String,
     },
-    responseRate: {
-      type: Number, 
-      min: 0,
-      max: 100,
+    email: {
+      type: String,
     },
-    responseTime: {
-      type: String, 
+    phone: {
+      type: String,
+    },
+    linkedInProfile: {
+      type: String,
     },
     languagesSpoken: {
       type: [String],
     },
-    location: {
-      type: String, 
+    address: {
+      type: String,
     },
     profileImage: {
-      type: String, 
+      type: String,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+    availibilityTime: {
+      type: Date,
     },
   },
   {

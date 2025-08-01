@@ -1,7 +1,13 @@
-import Company from "../models/Company";
+import Company from "../models/Company.js";
+import Inclusions from "../models/Inclusions.js";
+import Review from "../models/Review.js";
+import Services from "../models/Services.js";
+import PointOfContact from "../models/PointOfContact.js";
 import yup from "yup";
+import csvParser from "csv-parser";
+import { Readable } from "stream";
 
-const addNewCompany = async (req, res, next) => {
+export const addNewCompany = async (req, res, next) => {
   try {
     const {
       businessId,
@@ -12,8 +18,6 @@ const addNewCompany = async (req, res, next) => {
       logo,
       images,
       address,
-      country,
-      state,
       city,
       about,
       totalSeats,
@@ -22,7 +26,7 @@ const addNewCompany = async (req, res, next) => {
       googleMapLink,
     } = req.body;
 
-    const schema = yup.object({
+    const schema = yup.object().shape({
       companyName: yup.string().required("Please provide your company name"),
       registeredEntityName: yup
         .string()
@@ -57,7 +61,6 @@ const addNewCompany = async (req, res, next) => {
       });
     }
 
-    // Create and save new company
     const newCompany = new Company({
       businessId,
       companyName,
@@ -94,6 +97,119 @@ const addNewCompany = async (req, res, next) => {
   }
 };
 
-export default {
-  addNewCompany,
+export const getCompanyData = async (req, res, next) => {
+  try {
+    const companies = await Company.find().lean().exec();
+    const inclusions = await Inclusions.find().lean().exec();
+    const pocs = await PointOfContact.find().lean().exec();
+    const services = await Services.find().lean().exec();
+    const reviews = await Review.find().lean().exec();
+
+    const enrichedCompanies = companies.map((company) => {
+      const companyId = company._id.toString();
+
+      const companyInclusions = inclusions.filter(
+        (item) => item.company?.toString() === companyId
+      );
+
+      const companyPOCs = pocs.filter(
+        (item) => item.company?.toString() === companyId
+      );
+
+      const companyServices = services.filter(
+        (item) => item.company?.toString() === companyId
+      );
+
+      const companyReviews = reviews.filter(
+        (item) => item.company?.toString() === companyId
+      );
+
+      return {
+        ...company,
+        inclusions: companyInclusions,
+        pointOfContacts: companyPOCs,
+        services: companyServices,
+        reviews: companyReviews,
+      };
+    });
+
+    res.status(200).json(enrichedCompanies);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const bulkInsertCompanies = async (req, res, next) => {
+  try {
+    const file = req.file;
+    if (!file) {
+      return res
+        .status(400)
+        .json({ message: "Please provide a valid CSV file" });
+    }
+
+    const companies = [];
+
+    const stream = Readable.from(file.buffer.toString("utf-8").trim());
+
+    stream
+      .pipe(csvParser())
+      .on("data", (row) => {
+        const formatted = {
+          businessId: row["Business ID"]?.trim(),
+          companyName: row["Business Name"]?.trim(),
+          registeredEntityName: row["Registered Entity name"]?.trim(),
+          website: row["Website"]?.trim() || null,
+          service: row["Service"]?.trim() || "Not Provided",
+          address: row["Address"]?.trim(),
+          city: row["City"]?.trim(),
+          about: row["About"]?.trim(),
+          totalSeats: parseInt(row["Total Seats"]) || null,
+          latitude: parseFloat(row["latitude"]?.trim()),
+          longitude: parseFloat(row["longitude"]?.trim()),
+          googleMapLink: row["Google map"]?.trim(),
+        };
+        companies.push(formatted);
+      })
+      .on("end", async () => {
+        try {
+          const result = await Company.insertMany(companies);
+
+          const insertedCount = result.length;
+          const failedCount = companies.length - insertedCount;
+
+          res.status(200).json({
+            message: "Bulk insert completed with partial success",
+            total: companies.length,
+            inserted: insertedCount,
+            failed: failedCount,
+          });
+        } catch (insertError) {
+          if (insertError.name === "BulkWriteError") {
+            const insertedCount = insertError.result?.nInserted || 0;
+            const failedCount = companies.length - insertedCount;
+
+            res.status(200).json({
+              message: "Bulk insert completed with partial failure",
+              total: companies.length,
+              inserted: insertedCount,
+              failed: failedCount,
+              writeErrors: insertError.writeErrors?.map((e) => ({
+                index: e.index,
+                errmsg: e.errmsg,
+                code: e.code,
+                op: e.op,
+              })),
+            });
+          } else {
+            res.status(500).json({
+              message: "Unexpected error during bulk insert",
+              error: insertError.message,
+            });
+          }
+        }
+      });
+  } catch (error) {
+    next(error);
+  }
 };

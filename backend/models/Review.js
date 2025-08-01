@@ -17,17 +17,8 @@ const reviewSchema = new mongoose.Schema(
     description: {
       type: String,
     },
-    reviewType: {
+    reviewSource: {
       type: String,
-      enum: [
-        "Cleanliness",
-        "Accuracy",
-        "Check-in",
-        "Communication",
-        "Location",
-        "Value",
-      ],
-      required: true,
     },
   },
   {
