@@ -247,7 +247,9 @@ const Listings = () => {
                     </div>
 
                     <div className="flex w-full justify-between items-center">
-                      <p className="text-sm text-gray-600">{item.location}</p>
+                      <p className="text-sm text-gray-600 font-medium">
+                        {item.location}
+                      </p>
                       <p className="text-sm font-semibold">
                         Reviews({item.reviews})
                       </p>
@@ -260,7 +262,9 @@ const Listings = () => {
                     </div>
 
                     <div className="flex w-full justify-between items-center">
-                      <p className="text-xs text-gray-600">{item.note}</p>
+                      <p className="text-xs text-gray-600 font-normal">
+                        {item.note}
+                      </p>
                     </div>
                   </div>
                 </div>

@@ -9,9 +9,9 @@ const MainPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col items-center px-4 py-2">
+    <div className="min-h-screen bg-black text-white flex flex-col items-center py-2">
       {/* Header */}
-      <div className="flex flex-row items-center justify-between gap-2  w-full px-24 py-2">
+      <div className="flex flex-row items-center justify-between gap-2  w-full px-32 py-1">
         <img
           src={logo}
           alt="WONO Logo"
@@ -21,12 +21,12 @@ const MainPage = () => {
             window.scrollTo({ top: 0, behavior: "instant" });
           }}
         />
-        <h1 className="text-[3rem]  font-cursive">Worlds Nomad Community</h1>
+        <h1 className="text-[2.2rem]  font-cursive">Worlds Nomad Community</h1>
         <div className="w-36"></div>
       </div>
 
       {/* Main content grid */}
-      <div className="flex flex-col lg:flex-row gap-8 w-full justify-between mt-2 font-heading">
+      <div className="flex flex-col lg:flex-row gap-8 w-full justify-between mt-2 font-heading px-4">
         {/* Left Column: For Nomads */}
         <div className="flex flex-col items-center gap-4 w-full">
           <img

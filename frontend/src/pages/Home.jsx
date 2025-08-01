@@ -245,7 +245,7 @@ const Home = () => {
               </div>
               <div className="flex flex-col gap-4 h-full justify-between">
                 <div className="bg-white text-black border-l-2 border-black pl-4">
-                  <p className="text-content">
+                  <p className="text-small">
                     Serves as a dynamic platform, seamlessly connecting
                     freelance professionals, remote workers, and individuals
                     seeking flexible workspace solutions with nearby co-working

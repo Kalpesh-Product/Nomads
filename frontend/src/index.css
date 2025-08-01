@@ -241,3 +241,8 @@ body {
     display: none;
   }
 }
+
+/* This hides the close (X) button on the InfoWindow */
+.gm-style-iw button[aria-label="Close"] {
+  display: none !important;
+}
