@@ -165,7 +165,7 @@ const Listings = () => {
                   fullWidth
                   size="small"
                   variant="standard"
-                  label="Select Country"
+                  label="Select Location"
                   slotProps={{ input: { disableUnderline: true } }}>
                   <MenuItem value="" disabled>
                     Select A Location
