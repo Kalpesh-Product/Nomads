@@ -1,8 +1,8 @@
-import Review from "../models/Review.js";
+import Review from "../models/coworking/Review.js";
 import * as yup from "yup";
 import { Readable } from "stream";
 import csvParser from "csv-parser";
-import CoworkingCompany from "../models/CoworkingCompany.js";
+import CoworkingCompany from "../models/coworking/CoworkingCompany.js";
 
 export const addReview = async (req, res, next) => {
   try {

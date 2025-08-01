@@ -1,8 +1,8 @@
-import CoworkingCompany from "../models/CoworkingCompany.js";
-import Inclusions from "../models/Inclusions.js";
-import Review from "../models/Review.js";
-import Services from "../models/Services.js";
-import PointOfContact from "../models/PointOfContact.js";
+import CoworkingCompany from "../models/coworking/CoworkingCompany.js";
+import Inclusions from "../models/coworking/Inclusions.js";
+import Review from "../models/coworking/Review.js";
+import Services from "../models/coworking/Services.js";
+import PointOfContact from "../models/coworking/PointOfContact.js";
 import yup from "yup";
 import csvParser from "csv-parser";
 import { Readable } from "stream";
@@ -14,7 +14,6 @@ export const addNewCompany = async (req, res, next) => {
       companyName,
       registeredEntityName,
       website,
-      service,
       logo,
       images,
       address,
@@ -32,7 +31,6 @@ export const addNewCompany = async (req, res, next) => {
         .string()
         .required("Please provide a Registered Entity Name"),
       website: yup.string().optional().url("Please provide a valid url"),
-      service: yup.string().required("Please provide your business service"),
       address: yup.string().required("Please provide your address"),
       country: yup.string().required("Please provide your country"),
       state: yup.string().required("Please provide your state"),
@@ -160,7 +158,6 @@ export const bulkInsertCompanies = async (req, res, next) => {
           companyName: row["Business Name"]?.trim(),
           registeredEntityName: row["Registered Entity name"]?.trim(),
           website: row["Website"]?.trim() || null,
-          service: row["Service"]?.trim() || "Not Provided",
           address: row["Address"]?.trim(),
           city: row["City"]?.trim(),
           about: row["About"]?.trim(),

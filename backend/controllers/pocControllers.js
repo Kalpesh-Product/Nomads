@@ -1,5 +1,5 @@
-import PointOfContact from "../models/PointOfContact.js";
-import CoworkingCompany from "../models/CoworkingCompany.js";
+import PointOfContact from "../models/coworking/PointOfContact.js";
+import CoworkingCompany from "../models/coworking/CoworkingCompany.js";
 import { Readable } from "stream";
 import csvParser from "csv-parser";
 import * as yup from "yup";

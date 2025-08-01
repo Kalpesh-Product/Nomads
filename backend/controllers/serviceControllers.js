@@ -1,5 +1,5 @@
-import Services from "../models/Services.js";
-import CoworkingCompany from "../models/CoworkingCompany.js";
+import Services from "../models/coworking/Services.js";
+import CoworkingCompany from "../models/coworking/CoworkingCompany.js";
 import { Readable } from "stream";
 import csvParser from "csv-parser";
 
