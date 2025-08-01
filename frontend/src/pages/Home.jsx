@@ -12,6 +12,7 @@ import { FaRegListAlt } from "react-icons/fa";
 import Amenities from "../components/Amenities";
 import Carousel from "../components/Carousel";
 import icons from "../assets/icons";
+import { AiFillStar } from "react-icons/ai";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -130,17 +131,20 @@ const Home = () => {
   const carouselItems = [
     {
       image:
-        "https://images.unsplash.com/photo-1581090700227-1e8a28add49c?auto=format&fit=crop&w=800&q=80",
+        // "https://images.unsplash.com/photo-1581090700227-1e8a28add49c?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=800&q=80",
       title: "CO-WORKING",
     },
     {
       image:
-        "https://images.unsplash.com/photo-1572120360610-d971b9b78827?auto=format&fit=crop&w=800&q=80",
+        // "https://images.unsplash.com/photo-1572120360610-d971b9b78827?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=800&q=80",
       title: "CO-LIVING",
     },
     {
       image:
-        "https://images.unsplash.com/photo-1607083207630-9b22b38138f4?auto=format&fit=crop&w=800&q=80",
+        // "https://images.unsplash.com/photo-1607083207630-9b22b38138f4?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=800&q=80",
       title: "WORKATION",
     },
     {
@@ -150,14 +154,15 @@ const Home = () => {
     },
     {
       image:
-        "https://images.unsplash.com/photo-1616627983135-3b2dc0d9dd75?auto=format&fit=crop&w=800&q=80",
+        // "https://images.unsplash.com/photo-1616627983135-3b2dc0d9dd75?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=800&q=80",
       title: "MEETING ROOM",
     },
   ];
 
   return (
     <div className="flex flex-col w-full">
-      <Container >
+      <Container>
         <section className="flex flex-col gap-2 lg:mb-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="flex flex-col gap-4 justify-end items-start">
@@ -178,12 +183,31 @@ const Home = () => {
                   </span>
                   <hr />
                   <div className="flex items-center gap-2">
-                    <div className="p-3 rounded-2xl bg-white">
-                      <span>Ratings here</span>
+                    <div className="py-3 px-4 rounded-3xl bg-white">
+                      {/* <span>Ratings here</span> */}
+                      <div className="flex items-center gap-4 ">
+                        <div className="flex">
+                          <span className="text-yellow-300">
+                            <AiFillStar size={16} />
+                          </span>
+                          <span className="text-yellow-300">
+                            <AiFillStar size={16} />
+                          </span>
+                          <span className="text-yellow-300">
+                            <AiFillStar size={16} />
+                          </span>
+                          <span className="text-yellow-300">
+                            <AiFillStar size={16} />
+                          </span>
+                          <span className="text-gray-400">
+                            <AiFillStar size={16} />
+                          </span>
+                        </div>
+                        <p className="text-sm font-semibold text-black">4.0</p>
+                      </div>
                     </div>
                     <NavLink
-                      className={"text-white text-small hover:underline"}
-                    >
+                      className={"text-white text-small hover:underline"}>
                       View More Reviews
                     </NavLink>
                   </div>
@@ -202,8 +226,8 @@ const Home = () => {
                         alt={config.alt}
                         src={config.src}
                         sx={{
-                          width: { xs: 60, md:90, lg: 103 },
-                          height: { xs: 60, md:90, lg: 103 },
+                          width: { xs: 60, md: 90, lg: 103 },
+                          height: { xs: 60, md: 90, lg: 103 },
                           border: "2px solid white",
                           "& img": {
                             transform: config.transform,
@@ -236,8 +260,7 @@ const Home = () => {
             <div className="flex flex-col gap-4 justify-between">
               <form
                 onSubmit={handleSubmit((data) => locationData(data))}
-                className="flex gap-2 items-center border-2 border-primary-blue rounded-full pl-4 overflow-hidden"
-              >
+                className="flex gap-2 items-center border-2 border-primary-blue rounded-full pl-4 overflow-hidden">
                 <Controller
                   name="country"
                   control={control}
@@ -249,8 +272,7 @@ const Home = () => {
                       size="small"
                       variant="standard"
                       label="Select Country"
-                      slotProps={{ input: { disableUnderline: true } }}
-                    >
+                      slotProps={{ input: { disableUnderline: true } }}>
                       <MenuItem value="" disabled>
                         Select A Country
                       </MenuItem>
@@ -269,8 +291,7 @@ const Home = () => {
                       size="small"
                       variant="standard"
                       label="Select Country"
-                      slotProps={{ input: { disableUnderline: true } }}
-                    >
+                      slotProps={{ input: { disableUnderline: true } }}>
                       <MenuItem value="" disabled>
                         Select A Location
                       </MenuItem>
@@ -290,8 +311,7 @@ const Home = () => {
                         size="small"
                         variant="standard"
                         label="Select Category"
-                        slotProps={{ input: { disableUnderline: true } }}
-                      >
+                        slotProps={{ input: { disableUnderline: true } }}>
                         <MenuItem value="" disabled>
                           Select A Category
                         </MenuItem>
@@ -303,9 +323,8 @@ const Home = () => {
                 <div className="bg-primary-blue h-full flex justify-center">
                   <button
                     type="submit"
-                    className="h-full text-center w-20 flex justify-center items-center"
-                  >
-                    <CiSearch />
+                    className="h-full text-center w-32 flex justify-center items-center text-white">
+                    <CiSearch /> &nbsp;&nbsp; Search
                   </button>
                 </div>
               </form>
@@ -346,9 +365,7 @@ const Home = () => {
             ("nomad commerce")
           </p>
           <div className="flex justify-center items-end w-full">
-            <PrimaryButton
-              title={"Partner now"}
-            />
+            <PrimaryButton title={"Partner now"} />
           </div>
         </div>
       </section>
@@ -356,7 +373,7 @@ const Home = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-[1fr_1px_1fr] gap-y-6 lg:gap-x-12">
           {/* Section: WONO for Nomads */}
           <div className="w-full flex flex-col gap-4">
-            <h1 className="text-title font-semibold text-center uppercase">
+            <h1 className="text-title font-semibold text-center uppercase pb-10">
               WONO for Nomads
             </h1>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-0">
@@ -365,8 +382,7 @@ const Home = () => {
                   key={index}
                   className={`flex flex-col gap-4 rounded-xl p-3 ${
                     section.bgColor || "bg-white"
-                  }`}
-                >
+                  }`}>
                   <div className="flex flex-col gap-4">
                     <span className="text-title pl-6">{section.icon}</span>
                     <ul className="list-disc pl-6">
@@ -393,7 +409,7 @@ const Home = () => {
 
           {/* Section: WONO for Business */}
           <div className="w-full flex flex-col gap-4">
-            <h1 className="text-title font-semibold text-center uppercase">
+            <h1 className="text-title font-semibold text-center uppercase pb-10">
               WONO for Business
             </h1>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-0">
@@ -402,8 +418,7 @@ const Home = () => {
                   key={index}
                   className={`flex flex-col gap-4 rounded-xl p-3 ${
                     section.bgColor || "bg-white"
-                  }`}
-                >
+                  }`}>
                   <div className="flex flex-col gap-4">
                     <span className="text-title pl-6">{section.icon}</span>
                     <ul className="list-disc pl-6">
@@ -427,9 +442,9 @@ const Home = () => {
         </div>
       </Container>
 
-      <div className="lg:max-w-[85rem] lg:mx-auto  flex flex-col gap-4 md:px-10 px-4">
-        <h1 className=" uppercase lg:text-title font-semibold text-title">
-          We have solution for your needs.....
+      <div className="lg:max-w-[85rem] lg:mx-auto  flex flex-col gap-4 md:px-10 px-4 border-t-2 border-gray-300 py-8">
+        <h1 className=" uppercase lg:text-title font-semibold text-title pb-8">
+          We have solutions for your needs.....
         </h1>
         <div>
           <Carousel carouselItems={carouselItems} />
@@ -445,7 +460,7 @@ const Home = () => {
             </p>
           </div>
           <div className="flex flex-col gap-4 py-6 border-b-2 border-black">
-            <p className="text-subtitle">
+            <p className="text-[1.8rem]">
               Serves as a{" "}
               <span className="font-semibold">dynamic platform</span>,
               seamlessly connecting freelance professionals, remote workers, and
@@ -457,7 +472,7 @@ const Home = () => {
               <span className="font-semibold">co-working spaces.</span>
             </p>
             <span className="text-content">
-              <ul className="list-disc pl-6">
+              <ul className="list-disc pl-6 text-gray-500">
                 <li>
                   Serves as a dynamic platform, seamlessly connecting freelance
                   professionals, remote workers, and individuals seeking
@@ -469,7 +484,7 @@ const Home = () => {
         </div>
       </div>
       <Container>
-        <div className="flex flex-col gap-8 w-full">
+        <div className="flex flex-col gap-8 w-full border-t-2 border-gray-300 py-8">
           <h1 className="text-title font-semibold uppercase">Our inclusions</h1>
           <div className="grid grid-cols-2 md:grid-cols-4  lg:grid-cols-6 gap-x-16 md:gap-x-16 lg:gap-x-28 gap-y-10">
             {amenities.map((item, index) => (

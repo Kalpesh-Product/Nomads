@@ -135,8 +135,7 @@ const Listings = () => {
         <div className="flex flex-col gap-4 justify-between w-3/4 md:w-3/4 lg:w-1/2 h-full">
           <form
             onSubmit={handleSubmit((data) => locationData(data))}
-            className="flex gap-2 items-center border-2 border-primary-blue rounded-full pl-4 overflow-hidden h-10 lg:h-16"
-          >
+            className="flex gap-2 items-center border-2 border-primary-blue rounded-full pl-4 overflow-hidden h-10 lg:h-16">
             <Controller
               name="country"
               control={control}
@@ -148,8 +147,7 @@ const Listings = () => {
                   size="small"
                   variant="standard"
                   label="Select Country"
-                  slotProps={{ input: { disableUnderline: true } }}
-                >
+                  slotProps={{ input: { disableUnderline: true } }}>
                   <MenuItem value="" disabled>
                     Select A Country
                   </MenuItem>
@@ -168,8 +166,7 @@ const Listings = () => {
                   size="small"
                   variant="standard"
                   label="Select Country"
-                  slotProps={{ input: { disableUnderline: true } }}
-                >
+                  slotProps={{ input: { disableUnderline: true } }}>
                   <MenuItem value="" disabled>
                     Select A Location
                   </MenuItem>
@@ -189,8 +186,7 @@ const Listings = () => {
                     size="small"
                     variant="standard"
                     label="Select Category"
-                    slotProps={{ input: { disableUnderline: true } }}
-                  >
+                    slotProps={{ input: { disableUnderline: true } }}>
                     <MenuItem value="" disabled>
                       Select A Category
                     </MenuItem>
@@ -198,9 +194,9 @@ const Listings = () => {
                   </TextField>
                 )}
               />
-            <div className="bg-primary-blue w-1/2 h-full text-subtitle flex justify-center items-center">
-             <CiSearch />
-            </div>
+              <div className="bg-primary-blue w-72 h-full text-subtitle flex justify-center items-center text-white">
+                <CiSearch /> &nbsp;&nbsp; Search
+              </div>
             </div>
           </form>
         </div>
@@ -217,8 +213,7 @@ const Listings = () => {
                 <div
                   key={item.id}
                   onClick={() => navigate(`${item.name}`)}
-                  className="flex flex-col gap-4 justify-between h-96 w-full bg-white p-4 rounded-lg shadow-md hover:scale-105 hover:shadow-md transition-all cursor-pointer"
-                >
+                  className="flex flex-col gap-4 justify-between h-96 w-full bg-white p-4 rounded-lg shadow-md hover:scale-105 hover:shadow-md transition-all cursor-pointer">
                   {/* ⬇️ Make image container relative to allow absolutely positioning the heart */}
                   <div className="h-3/4 w-full overflow-hidden rounded-xl border-2 relative">
                     <img
@@ -230,8 +225,7 @@ const Listings = () => {
                     {/* ❤️ Heart icon positioned top-right over the image */}
                     <div
                       className="absolute top-2 right-2 cursor-pointer"
-                      onClick={() => toggleFavorite(item.id)}
-                    >
+                      onClick={() => toggleFavorite(item.id)}>
                       {favorites.includes(item.id) ? (
                         <AiFillHeart className="text-white" size={22} />
                       ) : (

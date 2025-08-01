@@ -20,13 +20,13 @@ const Header = () => {
     { id: 3, text: "SWITCH TO BUSINESS", to: "" },
   ];
   return (
-    <div className="flex px-4 justify-between items-center md:py-4 md:px-10 lg:px-20  bg-black backdrop-blur-md ">
+    <div className="flex px-4 justify-between items-center md:py-3 md:px-[7.5rem] lg:px-[7.5rem]  bg-black backdrop-blur-md ">
       <div
         onClick={() => navigate("/")}
-        className="h-10 w-24 overflow-x-hidden rounded-lg flex justify-between items-center cursor-pointer">
+        className=" w-36 overflow-x-hidden rounded-lg flex justify-between items-center cursor-pointer">
         <img src={logo} alt={"logo"} className="w-full h-full object-contain" />
       </div>
-      <div className="h-full px-2">
+      <div className="h-full px-2 md:hidden lg:hidden">
         <button
           onClick={() => setOpen(true)}
           className="hamburger-menu rounded-lg text-title text-white">
@@ -34,32 +34,47 @@ const Header = () => {
         </button>
       </div>
 
-      <ul className="hidden xl:flex sm:hidden gap-4 justify-center flex-1">
-        {headerLinks.map((item, index) => (
-          <li key={item.id} className="flex items-center">
-            {!["Signup"].includes(item.text) ? (
-              <>
-                <div className="p-4 px-8 whitespace-nowrap">
-                  <Link
-                    to={item.to}
-                    className="text-base font-medium text-white">
-                    {item.text}
-                  </Link>
-                </div>
-                {/* {index !== headerLinks.length - 1 && (
+      <div>
+        <ul className="hidden xl:flex sm:hidden gap-6 justify-center flex-1">
+          {headerLinks.map((item, index) => (
+            <li key={item.id} className="flex items-center">
+              {!["Signup"].includes(item.text) ? (
+                <>
+                  <div className="p-4 px-0 whitespace-nowrap">
+                    {/* <Link
+                      to={item.to}
+                      className="text-base font-medium text-white">
+                      {item.text}
+                    </Link> */}
+                    <Link
+                      to={item.to}
+                      className="group relative text-base font-medium text-white">
+                      <span className="relative z-10 group-hover:font-bold mb-8">
+                        {item.text}
+                      </span>
+                      <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full "></span>
+                    </Link>
+                  </div>
+                  {/* {index !== headerLinks.length - 1 && (
                   <div className="w-[1px] h-6 bg-gray-300 mx-2"></div>
                 )} */}
-              </>
-            ) : null}
-          </li>
-        ))}
-      </ul>
-
-      <div className="px-1 hidden xl:flex gap-2">
-        <PrimaryButton title={"Sign In"} handleSubmit={() => navigate("")} />
+                </>
+              ) : null}
+            </li>
+          ))}
+        </ul>
       </div>
-      <div className="px-1 hidden xl:flex gap-2">
-        <SecondaryButton title={"Sign Up"} handleSubmit={() => navigate("")} />
+
+      <div className="flex gap-4">
+        <div className="px-1 hidden xl:flex gap-2">
+          <PrimaryButton title={"SIGN IN"} handleSubmit={() => navigate("")} />
+        </div>
+        <div className="px-1 hidden xl:flex gap-2">
+          <SecondaryButton
+            title={"SIGN UP"}
+            handleSubmit={() => navigate("")}
+          />
+        </div>
       </div>
 
       <Drawer

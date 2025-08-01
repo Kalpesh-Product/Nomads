@@ -12,7 +12,7 @@ module.exports = {
           DEFAULT: "#FAFAFA",
           light: "#3b82f6",
           dark: "#1e40af",
-          blue: "rgb(80, 186, 232)",
+          blue: "#0AA9ef",
         },
         secondary: {
           DEFAULT: "#202020",

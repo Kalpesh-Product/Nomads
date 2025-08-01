@@ -171,8 +171,7 @@ const Product = () => {
                       ? "border-primary-dark"
                       : "border-transparent"
                   }`}
-                  onClick={() => setSelectedImage(item)}
-                >
+                  onClick={() => setSelectedImage(item)}>
                   <img
                     src={item.url}
                     alt="company-thumbnail"
@@ -243,7 +242,9 @@ const Product = () => {
                     <span className="text-subtitle lg:text-title">
                       <LeafRatings ratings={"4.89"} height={30} width={30} />
                     </span>
-                    <span className="text-sm lg:text-small font-medium">stars here</span>
+                    <span className="text-sm lg:text-small font-medium">
+                      stars here
+                    </span>
                   </div>
                   <div className="flex flex-col gap-4 lg:gap-4 justify-center items-center">
                     <p className="text-subtitle lg:text-title">28</p>
@@ -258,8 +259,7 @@ const Product = () => {
                 <form
                   onSubmit={handleSubmit((data) => submitEnquiry(data))}
                   action=""
-                  className="grid grid-cols-1 lg:grid-cols-2 gap-4"
-                >
+                  className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   <Controller
                     name="firstName"
                     control={control}
@@ -324,8 +324,7 @@ const Product = () => {
                         fullWidth
                         variant="standard"
                         size="small"
-                        select
-                      >
+                        select>
                         <MenuItem value="" disabled>
                           <em>Select A Type</em>
                         </MenuItem>
@@ -343,8 +342,7 @@ const Product = () => {
                         fullWidth
                         variant="standard"
                         size="small"
-                        select
-                      >
+                        select>
                         <MenuItem value="" disabled>
                           <em>Select Number of Desk</em>
                         </MenuItem>
@@ -447,8 +445,7 @@ const Product = () => {
                 loading="lazy"
                 className="rounded-xl"
                 referrerPolicy="no-referrer-when-downgrade"
-                title="map"
-              ></iframe>
+                title="map"></iframe>
             </div>
             <hr className="my-5 lg:my-10" />
             <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-2 gap-20">
@@ -486,8 +483,7 @@ const Product = () => {
                   </h1>
                   <form
                     onSubmit={handlesubmitSales((data) => submitSales(data))}
-                    className="grid grid-cols-1 gap-4"
-                  >
+                    className="grid grid-cols-1 gap-4">
                     <Controller
                       name="fullName"
                       control={salesControl}

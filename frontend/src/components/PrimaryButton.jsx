@@ -21,7 +21,7 @@ const PrimaryButton = ({
       className={`flex uppercase rounded-full items-center cursor-pointer justify-center gap-2
         ${baseBgColor} ${hoverBgColor} text-secondary
         ${fontSize ? fontSize : "text-content leading-5"}
-        ${externalStyles} ${padding ? padding : "px-8 py-3"} ${className}`}
+        ${externalStyles} ${padding ? padding : "px-6 py-3"} ${className}`}
       onClick={handleSubmit}>
       {isLoading && <CircularProgress size={16} sx={{ color: "#ffffff" }} />}
       <span className="text-center h-4">{title}</span>
