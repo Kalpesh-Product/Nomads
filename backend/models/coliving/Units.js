@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 
-const coLivingBusinessSchema = new mongoose.Schema(
+const ColivingUnitSchema = new mongoose.Schema(
   {
     businessId: {
-      type:mongoose.Schema.Types.ObjectId,
-      ref:"CoLiving"
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "CoLiving",
     },
     businessName: {
       type: String,
@@ -19,4 +19,5 @@ const coLivingBusinessSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model("CoLivingBusiness", coLivingBusinessSchema);
+const ColivingUnits = mongoose.model("ColivingUnit", ColivingUnitSchema);
+export default ColivingUnits;
