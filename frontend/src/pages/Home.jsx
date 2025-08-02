@@ -162,143 +162,109 @@ const Home = () => {
 
   return (
     <div className="flex flex-col w-full">
-      <section className="flex flex-col gap-2 lg:mb-8 max-w-[85rem] mx-auto pb-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="flex flex-col gap-4 justify-end items-start">
-            <p className="uppercase font-semibold text-mobile-main-header lg:text-main-header lg:leading-normal">
-              WORLDS NOMAD COMMUNITY
-            </p>
-            <span className="text-content lg:text-hero">
-              Connecting Co-working Spaces and Flexible Workers
-            </span>
-          </div>
-          <div className=" rounded-xl overflow-hidden">
-            <div className="bg-[url('/images/bg-image.jpg')] bg-cover bg-center h-96 lg:h-full w-full rounded-md shadow-md flex items-end">
-              <div className="bg-white/10 backdrop-blur-md p-4 w-full flex flex-col gap-4">
-                <span className="text-white text-small">
-                  Serves as a dynamic platform, seamlessly connecting freelance
-                  professionals, remote workers, and individuals seeking
-                  flexible workspace
-                </span>
-                <hr />
-                <div className="flex items-center gap-2">
-                  <div className="py-3 px-4 rounded-3xl bg-white">
-                    {/* <span>Ratings here</span> */}
-                    <div className="flex items-center gap-4 ">
-                      <div className="flex">
-                        <span className="text-yellow-300">
-                          <AiFillStar size={16} />
-                        </span>
-                        <span className="text-yellow-300">
-                          <AiFillStar size={16} />
-                        </span>
-                        <span className="text-yellow-300">
-                          <AiFillStar size={16} />
-                        </span>
-                        <span className="text-yellow-300">
-                          <AiFillStar size={16} />
-                        </span>
-                        <span className="text-gray-400">
-                          <AiFillStar size={16} />
-                        </span>
+      <Container padding={false}>
+        <section className="flex flex-col gap-2 lg:mb-8 pb-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="flex flex-col gap-4 justify-end items-start">
+              <p className="uppercase font-semibold text-mobile-main-header lg:text-main-header lg:leading-normal">
+                WORLDS NOMAD COMMUNITY
+              </p>
+              <span className="text-content lg:text-hero">
+                Connecting Co-working Spaces and Flexible Workers
+              </span>
+            </div>
+            <div className=" rounded-xl overflow-hidden">
+              <div className="bg-[url('/images/bg-image.jpg')] bg-cover bg-center h-96 lg:h-full w-full rounded-md shadow-md flex items-end">
+                <div className="bg-white/10 backdrop-blur-md p-4 w-full flex flex-col gap-4">
+                  <span className="text-white text-small">
+                    Serves as a dynamic platform, seamlessly connecting
+                    freelance professionals, remote workers, and individuals
+                    seeking flexible workspace
+                  </span>
+                  <hr />
+                  <div className="flex items-center gap-2">
+                    <div className="py-3 px-4 rounded-3xl bg-white">
+                      {/* <span>Ratings here</span> */}
+                      <div className="flex items-center gap-4 ">
+                        <div className="flex">
+                          <span className="text-yellow-300">
+                            <AiFillStar size={16} />
+                          </span>
+                          <span className="text-yellow-300">
+                            <AiFillStar size={16} />
+                          </span>
+                          <span className="text-yellow-300">
+                            <AiFillStar size={16} />
+                          </span>
+                          <span className="text-yellow-300">
+                            <AiFillStar size={16} />
+                          </span>
+                          <span className="text-gray-400">
+                            <AiFillStar size={16} />
+                          </span>
+                        </div>
+                        <p className="text-sm font-semibold text-black">4.0</p>
                       </div>
-                      <p className="text-sm font-semibold text-black">4.0</p>
                     </div>
+                    <NavLink
+                      className={"text-white text-small hover:underline"}
+                    >
+                      View More Reviews
+                    </NavLink>
                   </div>
-                  <NavLink className={"text-white text-small hover:underline"}>
-                    View More Reviews
-                  </NavLink>
                 </div>
               </div>
             </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-5 h-full lg:h-48">
-            <div className="flex flex-col gap-4 h-full justify-between">
-              <div className="bg-white text-black flex justify-center items-center">
-                {" "}
-                {/* Consultant Avatars */}
-                <div className="flex justify-start md:justify-center lg:justify-start items-center -space-x-4 w-full mt-4">
-                  {avatarConfigs.map((config, index) => (
-                    <Avatar
-                      key={index}
-                      alt={config.alt}
-                      src={config.src}
-                      sx={{
-                        width: { xs: 60, md: 90, lg: 103 },
-                        height: { xs: 60, md: 90, lg: 103 },
-                        border: "2px solid white",
-                        "& img": {
-                          transform: config.transform,
-                          transformOrigin: "center center",
-                          objectFit: "contain",
-                        },
-                      }}
-                    />
-                  ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-5 h-full lg:h-48">
+              <div className="flex flex-col gap-4 h-full justify-between">
+                <div className="bg-white text-black flex justify-center items-center">
+                  {" "}
+                  {/* Consultant Avatars */}
+                  <div className="flex justify-start md:justify-center lg:justify-start items-center -space-x-4 w-full mt-4">
+                    {avatarConfigs.map((config, index) => (
+                      <Avatar
+                        key={index}
+                        alt={config.alt}
+                        src={config.src}
+                        sx={{
+                          width: { xs: 60, md: 90, lg: 103 },
+                          height: { xs: 60, md: 90, lg: 103 },
+                          border: "2px solid white",
+                          "& img": {
+                            transform: config.transform,
+                            transformOrigin: "center center",
+                            objectFit: "contain",
+                          },
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <div className="flex justify-start md:justify-center lg:justify-start items-center">
+                  <SecondaryButton title={"BOOK YOUR SPACE NOW"} />
                 </div>
               </div>
-              <div className="flex justify-start md:justify-center lg:justify-start items-center">
-                <SecondaryButton title={"BOOK YOUR SPACE NOW"} />
+              <div className="flex flex-col gap-4 h-full justify-between">
+                <div className="bg-white text-black border-l-2 border-black pl-4">
+                  <p className="text-small">
+                    Serves as a dynamic platform, seamlessly connecting
+                    freelance professionals, remote workers, and individuals
+                    seeking flexible workspace solutions with nearby co-working
+                    spaces
+                  </p>
+                </div>
+                <div className="flex justify-start lg:justify-start items-center">
+                  <AccentButton title={"LIST YOUR BUSINESS"} />
+                </div>
               </div>
             </div>
-            <div className="flex flex-col gap-4 h-full justify-between">
-              <div className="bg-white text-black border-l-2 border-black pl-4">
-                <p className="text-small">
-                  Serves as a dynamic platform, seamlessly connecting freelance
-                  professionals, remote workers, and individuals seeking
-                  flexible workspace solutions with nearby co-working spaces
-                </p>
-              </div>
-              <div className="flex justify-start lg:justify-start items-center">
-                <AccentButton title={"LIST YOUR BUSINESS"} />
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-col gap-4 justify-between">
-            <form
-              onSubmit={handleSubmit((data) => locationData(data))}
-              className="flex gap-2 items-center border-2 border-primary-blue rounded-full pl-4 overflow-hidden">
-              <Controller
-                name="country"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    select
-                    fullWidth
-                    size="small"
-                    variant="standard"
-                    label="Select Country"
-                    slotProps={{ input: { disableUnderline: true } }}>
-                    <MenuItem value="" disabled>
-                      Select A Country
-                    </MenuItem>
-                    <MenuItem value="india">India</MenuItem>
-                  </TextField>
-                )}
-              />
-              <Controller
-                name="location"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    select
-                    fullWidth
-                    size="small"
-                    variant="standard"
-                    label="Select Location"
-                    slotProps={{ input: { disableUnderline: true } }}>
-                    <MenuItem value="" disabled>
-                      Select A Location
-                    </MenuItem>
-                    <MenuItem value="goa">Goa</MenuItem>
-                  </TextField>
-                )}
-              />
-              <div className="w-full border-l-2 border-l-primary-blue px-2 ">
+            <div className="flex flex-col gap-4 justify-between">
+              <form
+                onSubmit={handleSubmit((data) => locationData(data))}
+                className="flex gap-2 items-center border-2 border-primary-blue rounded-full pl-4 overflow-hidden"
+              >
                 <Controller
-                  name="category"
+                  name="country"
                   control={control}
                   render={({ field }) => (
                     <TextField
@@ -307,51 +273,99 @@ const Home = () => {
                       fullWidth
                       size="small"
                       variant="standard"
-                      label="Select Category"
-                      slotProps={{ input: { disableUnderline: true } }}>
+                      label="Select Country"
+                      slotProps={{ input: { disableUnderline: true } }}
+                    >
                       <MenuItem value="" disabled>
-                        Select A Category
+                        Select A Country
                       </MenuItem>
-                      <MenuItem value="coWorking">Co-Working</MenuItem>
+                      <MenuItem value="india">India</MenuItem>
                     </TextField>
                   )}
                 />
-              </div>
-              <div className="bg-primary-blue h-full flex justify-center">
-                <button
-                  type="submit"
-                  className="h-full text-center w-32 flex justify-center items-center text-white">
-                  <CiSearch /> &nbsp;&nbsp; Search
-                </button>
-              </div>
-            </form>
-
-            <div>
-              <div className="grid grid-cols-3 text-center text-sm font-medium relative">
-                {/* Top Row */}
-                <div className="p-4 text-tiny">Co – Working</div>
-                <div className="p-4 text-tiny border-l border-r border-black">
-                  Co – Living
+                <Controller
+                  name="location"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      select
+                      fullWidth
+                      size="small"
+                      variant="standard"
+                      label="Select Location"
+                      slotProps={{ input: { disableUnderline: true } }}
+                    >
+                      <MenuItem value="" disabled>
+                        Select A Location
+                      </MenuItem>
+                      <MenuItem value="goa">Goa</MenuItem>
+                    </TextField>
+                  )}
+                />
+                <div className="w-full border-l-2 border-l-primary-blue px-2 ">
+                  <Controller
+                    name="category"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        select
+                        fullWidth
+                        size="small"
+                        variant="standard"
+                        label="Select Category"
+                        slotProps={{ input: { disableUnderline: true } }}
+                      >
+                        <MenuItem value="" disabled>
+                          Select A Category
+                        </MenuItem>
+                        <MenuItem value="coWorking">Co-Working</MenuItem>
+                      </TextField>
+                    )}
+                  />
                 </div>
-                <div className="p-4 text-tiny">Workation</div>
-
-                {/* Horizontal Divider */}
-                <div className="absolute left-0 right-0 border-t border-black top-1/2" />
-
-                {/* Bottom Row */}
-                <div className="p-4 text-tiny">Exclusive Campus</div>
-                <div className="p-4 text-tiny border-l border-r border-black">
-                  Meeting Room
+                <div className="bg-primary-blue h-full flex justify-center">
+                  <button
+                    type="submit"
+                    className="h-full text-center w-32 flex justify-center items-center text-white"
+                  >
+                    <CiSearch /> &nbsp;&nbsp; Search
+                  </button>
                 </div>
-                <div className="p-4 text-tiny">Conferences</div>
+              </form>
+
+              <div>
+                <div className="grid grid-cols-3 text-center text-sm font-medium relative">
+                  {/* Top Row */}
+                  <div className="p-4 text-tiny">Co – Working</div>
+                  <div className="p-4 text-tiny border-l border-r border-black">
+                    Co – Living
+                  </div>
+                  <div className="p-4 text-tiny">Workation</div>
+
+                  {/* Horizontal Divider */}
+                  <div className="absolute left-0 right-0 border-t border-black top-1/2" />
+
+                  {/* Bottom Row */}
+                  <div className="p-4 text-tiny">Exclusive Campus</div>
+                  <div className="p-4 text-tiny border-l border-r border-black">
+                    Meeting Room
+                  </div>
+                  <div className="p-4 text-tiny">Conferences</div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </Container>
 
       <section className="bg-black w-full flex flex-col gap-4 py-16 lg:py-16">
-        <div className="max-w-7xl mx-auto flex flex-col text-primary  justify-center items-center ">
+        <Container>
+
+        
+        </Container>
+        <div className=" flex flex-col text-primary  justify-center items-center ">
           <h1 className="text-mobile-mega-header font-hero lg:leading-none lg:text-mega-header font-medium">
             INTRODUCING
           </h1>
@@ -379,7 +393,8 @@ const Home = () => {
                   key={index}
                   className={`flex flex-col gap-4 rounded-xl p-3 ${
                     section.bgColor || "bg-white"
-                  }`}>
+                  }`}
+                >
                   <div className="flex flex-col gap-4">
                     <span className="text-title pl-6">{section.icon}</span>
                     <ul className="list-disc pl-6">
@@ -415,7 +430,8 @@ const Home = () => {
                   key={index}
                   className={`flex flex-col gap-4 rounded-xl p-3 ${
                     section.bgColor || "bg-white"
-                  }`}>
+                  }`}
+                >
                   <div className="flex flex-col gap-4">
                     <span className="text-title pl-6">{section.icon}</span>
                     <ul className="list-disc pl-6">

@@ -131,7 +131,7 @@ const Listings = () => {
   ];
   return (
     <div className="flex flex-col gap-4 ">
-      <div className="flex flex-col gap-4 justify-center items-center  w-full mt-10 ">
+      <div className="flex flex-col gap-4 justify-center items-center  w-full mt-10 lg:mt-0">
         <div className="flex flex-col gap-4 justify-between w-3/4 md:w-3/4 lg:w-1/2 h-full">
           <form
             onSubmit={handleSubmit((data) => locationData(data))}
