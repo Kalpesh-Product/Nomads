@@ -61,6 +61,7 @@ export const getCompanyDataLocationWise = async (req, res, next) => {
           pointOfContacts: companyPOCs,
           services: companyServices,
           reviews: companyReviews,
+          type: "coworking",
         };
       });
 
@@ -110,6 +111,7 @@ export const getCompanyDataLocationWise = async (req, res, next) => {
           pointOfContacts: companyPOCs,
           units: companyUnits,
           reviews: companyReviews,
+           type: "coliving",
         };
       });
 
