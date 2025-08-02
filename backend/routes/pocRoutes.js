@@ -4,7 +4,7 @@ import {
   createNewPointOfContact,
   deactivatePoc,
   getPoc,
-} from "../controllers/pocControllers.js";
+} from "../controllers/coworking_controllers/pocControllers.js";
 import upload from "../config/multerConfig.js";
 
 const router = Router();

@@ -16,8 +16,8 @@ export const getCompanyDataLocationWise = async (req, res, next) => {
         coworkingReviews,
       ] = await Promise.all([
         CoworkingCompany.find({
-          country,
-          state,
+          country: { $regex: `^${country}$`, $options: "i" },
+          state: { $regex: `^${state}$`, $options: "i" },
         })
           .lean()
           .exec(),
@@ -59,7 +59,7 @@ export const getCompanyDataLocationWise = async (req, res, next) => {
         };
       });
 
-      return res.status(200).json(enrichedCompanies)
+      return res.status(200).json(enrichedCompanies);
     }
   } catch (error) {
     next(error);

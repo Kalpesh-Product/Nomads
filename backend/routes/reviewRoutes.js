@@ -5,7 +5,7 @@ import {
   addReview,
   getReviews,
   bulkInsertReviews,
-} from "../controllers/reviewControllers.js";
+} from "../controllers/coworking_controllers/reviewControllers.js";
 
 router.post("/add-review", addReview);
 router.get("/get-reviews/:companyId", getReviews);

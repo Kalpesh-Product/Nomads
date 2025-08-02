@@ -36,7 +36,7 @@ const pointOfContactSchema = new mongoose.Schema(
       default: true,
     },
     availibilityTime: {
-      type: Date,
+      type: String,
     },
   },
   {
