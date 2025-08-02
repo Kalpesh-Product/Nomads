@@ -1,8 +1,8 @@
-import CoworkingCompany from "../models/coworking/CoworkingCompany.js";
-import Inclusions from "../models/coworking/Inclusions.js";
-import Review from "../models/coworking/Review.js";
-import Services from "../models/coworking/Services.js";
-import PointOfContact from "../models/coworking/PointOfContact.js";
+import CoworkingCompany from "../../models/coworking/CoworkingCompany.js";
+import Inclusions from "../../models/coworking/Inclusions.js";
+import Review from "../../models/coworking/Review.js";
+import Services from "../../models/coworking/Services.js";
+import PointOfContact from "../../models/coworking/PointOfContact.js";
 import yup from "yup";
 import csvParser from "csv-parser";
 import { Readable } from "stream";
@@ -97,11 +97,13 @@ export const addNewCompany = async (req, res, next) => {
 
 export const getCompanyData = async (req, res, next) => {
   try {
-    const companies = await CoworkingCompany.find().lean().exec();
-    const inclusions = await Inclusions.find().lean().exec();
-    const pocs = await PointOfContact.find().lean().exec();
-    const services = await Services.find().lean().exec();
-    const reviews = await Review.find().lean().exec();
+    const [companies, inclusions, pocs, services, reviews] = await Promise.all([
+      CoworkingCompany.find().lean().exec(),
+      Inclusions.find().lean().exec(),
+      PointOfContact.find().lean().exec(),
+      Services.find().lean().exec(),
+      Review.find().lean().exec(),
+    ]);
 
     const enrichedCompanies = companies.map((company) => {
       const companyId = company._id.toString();
@@ -132,6 +134,35 @@ export const getCompanyData = async (req, res, next) => {
     });
 
     res.status(200).json(enrichedCompanies);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getIndividualCompany = async (req, res, next) => {
+  try {
+    const { companyId } = req.params;
+    const company = await CoworkingCompany.findOne({ _id: companyId })
+      .lean()
+      .exec();
+
+    const [inclusions, pocs, services, reviews] = await Promise.all([
+      Inclusions.findOne({ coworkingCompany: company._id }).lean().exec(),
+      PointOfContact.findOne({ coworkingCompany: company._id, isActive: true })
+        .lean()
+        .exec(),
+      Services.findOne({ coworkingCompany: company._id }).lean().exec(),
+      Review.findOne({ coworkingCompany: company._id }).lean().exec(),
+    ]);
+
+    const companyObject = {
+      ...company,
+      inclusions,
+      pocs,
+      services,
+      reviews,
+    };
+    return res.status(400).json(companyObject);
   } catch (error) {
     next(error);
   }
