@@ -15,8 +15,8 @@ const Header = () => {
   };
   const headerLinks = [
     // { id: 1, text: "ROI", to: "" },
-    { id: 1, text: "CAREER", to: "nomad" },
-    { id: 2, text: "CONTACT", to: "" },
+    { id: 1, text: "CAREER", to: "nomad/career" },
+    { id: 2, text: "CONTACT", to: "nomad/contact" },
     { id: 3, text: "SWITCH TO BUSINESS", to: "" },
   ];
   return (

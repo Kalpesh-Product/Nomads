@@ -6,6 +6,8 @@ import Listings from "./pages/Listings";
 import ReusableComponents from "./pages/ReusableComponents";
 import NomadLayout from "./pages/NomadLayout";
 import Product from "./pages/Product";
+import Contact from "./pages/Contact";
+import Career from "./pages/Career";
 
 const router = createBrowserRouter([
   {
@@ -36,6 +38,14 @@ const router = createBrowserRouter([
           {
             path: "components",
             element: <ReusableComponents />,
+          },
+          {
+            path: "contact",
+            element: <Contact />,
+          },
+          {
+            path: "career",
+            element: <Career />,
           },
         ],
       },
