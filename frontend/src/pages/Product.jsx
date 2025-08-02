@@ -1,20 +1,44 @@
 import React, { useState } from "react";
 import Container from "../components/Container";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { MdLocationOn } from "react-icons/md";
 import { Controller, useForm } from "react-hook-form";
 import { MenuItem, TextField } from "@mui/material";
 import { DesktopDatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import PrimaryButton from "../components/PrimaryButton";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import SecondaryButton from "../components/SecondaryButton";
 import icons from "../assets/icons";
 import Amenities from "../components/Amenities";
 import ReviewCard from "../components/ReviewCard";
 import LeafRatings from "../components/LeafRatings";
+import axios from "../utils/axios";
+import renderStars from "../utils/renderStarts";
+import relativeTime from "dayjs/plugin/relativeTime";
+import MuiModal from "../components/Modal";
+
+dayjs.extend(relativeTime);
 
 const Product = () => {
+  const location = useLocation();
+  const { companyId } = location.state;
+  const [selectedReview, setSelectedReview] = useState([]);
+  console.log("selected : ", selectedReview);
+  const [open, setOpen] = useState(false);
+  console.log("company id", companyId);
+  const { data: companyDetails, isPending: isCompanyDetails } = useQuery({
+    queryKey: ["companyDetails", companyId],
+    queryFn: async () => {
+      const response = await axios.get(
+        `company/individual-company/${companyId}`
+      );
+      return response.data;
+    },
+    enabled: !!companyId,
+  });
+
+  console.log("companuDetials ", companyDetails);
   const companyImages = [
     {
       _id: 1,
@@ -33,71 +57,40 @@ const Product = () => {
       url: "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
     },
   ];
-  const amenities = [
-    { image: icons.workspace, title: "WORKSPACE" },
-    { image: icons.livingspace, title: "LIVING SPACE" },
-    { image: icons.airconditioner, title: "AIR CONDITION" },
-    { image: icons.internet, title: "FAST INTERNET" },
-    { image: icons.cafe, title: "CAFE / DINING" },
-    { image: icons.receptionist, title: "RECEPTIONIST" },
-    { image: icons.meetingroom, title: "MEETING ROOMS" },
-    { image: icons.trainingroom, title: "TRAINING ROOMS" },
-    { image: icons.itsupport, title: "IT SUPPORT" },
-    { image: icons.teacoffe, title: "TEA & COFFEE" },
-    { image: icons.privateassistant, title: "ASSIST" },
-    { image: icons.community, title: "COMMUNITY" },
-    { image: icons.ondemand, title: "ON DEMAND" },
-    { image: icons.maintenance, title: "MAINTANANCE" },
-    { image: icons.generator, title: "GENERATOR" },
-    { image: icons.pickupdrop, title: "PICKUP & DROP" },
-    { image: icons.rentbikecar, title: "CAR / BIKE / BUS" },
-    { image: icons.housekeeping, title: "HOUSEKEEPING" },
-    { image: icons.pool, title: "SWIMMING POOL" },
-    { image: icons.television, title: "TELEVISION" },
-    { image: icons.gas, title: "GAS" },
-    { image: icons.laundry, title: "LAUNDRY" },
-    { image: icons.secure, title: "SECURE" },
-    { image: icons.personalised, title: "PERSONALISED" },
-  ];
+  const inclusions = companyDetails?.inclusions || {};
 
-  const mockReviews = [
-    {
-      name: "Aayushi",
-      avatar: "https://i.pravatar.cc/50?img=1",
-      duration: "3 years on WoNo",
-      stars: 5,
-      date: "2 days ago",
-      message:
-        "One of the best WoNos I’ve stayed at. Loved everything about it, from the stay, to the helpful staff at the place, Bhaskar, to the thoughtfulness they’ve put behind...",
-    },
-    {
-      name: "Vinay",
-      avatar: "https://i.pravatar.cc/50?img=2",
-      duration: "3 years on WoNo",
-      stars: 5,
-      date: "2 weeks ago",
-      message:
-        "Our caretaker Bhaskar was really responsive and helped a lot. The stay itself is quite good and peaceful. It’s quite secured and we loved the views as well. Good neighborhood...",
-    },
-    {
-      name: "Ankush",
-      avatar: "https://i.pravatar.cc/50?img=3",
-      duration: "New to WoNo",
-      stars: 5,
-      date: "2 weeks ago",
-      message:
-        "My recent WoNo stay was absolutely wonderful, thanks to the incredibly helpful host and staff. They were always available and went above and beyond to assist with anything...",
-    },
-    {
-      name: "Irine",
-      avatar: "https://i.pravatar.cc/50?img=4",
-      duration: "2 years on WoNo",
-      stars: 5,
-      date: "April 2025",
-      message:
-        "The stay was comfortable and had everything we needed. The kitchen was well-equipped with all utensils, making things very convenient. We also received room service...",
-    },
-  ];
+  const amenities = Object.entries(inclusions)
+    .filter(
+      ([key, value]) =>
+        value === true &&
+        key !== "_id" &&
+        key !== "__v" &&
+        key !== "coworkingCompany" &&
+        key !== "createdAt" &&
+        key !== "updatedAt" &&
+        key !== "transportOptions"
+    )
+    .map(([key]) => {
+      const iconKey = key.toLowerCase();
+      return {
+        image: icons[iconKey] || "/icons/default.webp", // fallback if no icon
+        title: key
+          .replace(/([A-Z])/g, " $1") // Add space before capital letters
+          .replace(/^./, (str) => str.toUpperCase()), // Capitalize first letter
+      };
+    });
+
+  const transportOptions = inclusions.transportOptions || {};
+
+  const transportAmenities = Object.entries(transportOptions)
+    .filter(([key, value]) => value === true)
+    .map(([key]) => ({
+      image: icons[key.toLowerCase()] || "/icons/default.webp",
+      title: key.charAt(0).toUpperCase() + key.slice(1),
+    }));
+
+  const allAmenities = [...amenities, ...transportAmenities];
+
   const { handleSubmit, control, reset } = useForm({
     defaultValues: {
       firstName: "",
@@ -141,12 +134,23 @@ const Product = () => {
 
   const [selectedImage, setSelectedImage] = useState(companyImages[0]);
 
+  const reviewData = isCompanyDetails
+    ? []
+    : companyDetails?.reviews.map((item) => ({
+        ...item,
+        stars: item.starCount,
+        message: item.description,
+        date: dayjs(item.createdAt).fromNow(),
+      }));
+
   return (
     <div>
       <Container padding={false}>
         <div className="flex flex-col gap-8">
           <div className="flex w-full justify-between">
-            <h1 className="text-title font-semibold">BIZ Nest Co-Working</h1>
+            <h1 className="text-title font-semibold">
+              {companyDetails?.companyName}
+            </h1>
             <NavLink className={"text-small underline"}>Save</NavLink>
           </div>
 
@@ -171,7 +175,8 @@ const Product = () => {
                       ? "border-primary-dark"
                       : "border-transparent"
                   }`}
-                  onClick={() => setSelectedImage(item)}>
+                  onClick={() => setSelectedImage(item)}
+                >
                   <img
                     src={item.url}
                     alt="company-thumbnail"
@@ -195,33 +200,12 @@ const Product = () => {
                 />
               </div>
               <div className="text-sm lg:text-tiny text-gray-700">
-                <MdLocationOn className="inline-block text-primary-dark mr-1" />
-                Sunteck Kanaka Corporate Park, 701 A, 701 B, 601 A, 601 B, 501 A
-                & 501 B, Patto Centre, Panaji, Goa 403001
+                <MdLocationOn className="inline-block text-secondary text-subtitle mr-1" />
+                {companyDetails?.address}
               </div>
               <h1 className="text-title uppercase font-semibold">about</h1>
               <p className="text-sm">
-                BIZ Nest ( Business with a Nest ) is the way of our Future
-                Lifestyle! As data and trends indicate, our ecosystem has
-                already started witnessing a strong and focused nomad community
-                which has relocated and activated its lifestyle from aspiring
-                destinations across the world and this community is growing
-                bigger every year. Bold founders, professionals and even
-                salaried individuals have quit their busy city lifestyle and
-                have started living a healthy and happy lifestyle in smaller
-                towns. We are building the bridge for these nomads by helping
-                them settle in an aspiring destination like Goa via our
-                fully-stack solution by providing co-working, co living and
-                workations to ensure their HAPPINESS!
-              </p>
-              <p className="text-sm">
-                We are an early adapted platform of our FUTURE Lifestyle which
-                we are confident will get fully activated in the global
-                ecosystem by the end of this decade. We are the only Destination
-                Based Lifestyle Subscription Platform in India targeted to
-                become a ​National Destination Based Lifestyle Subscription
-                Platform by the end of this decade due to our first mover
-                advantage.
+                {companyDetails?.about?.replace(/\\n/g, " ")}
               </p>
             </div>
             <div className="flex flex-col gap-4">
@@ -240,14 +224,32 @@ const Product = () => {
                 <div className="flex w-full gap-4 justify-evenly lg:justify-end lg:w-1/2">
                   <div className="flex flex-col gap-4 justify-center items-center">
                     <span className="text-subtitle lg:text-title">
-                      <LeafRatings ratings={"4.89"} height={30} width={30} />
+                      <LeafRatings
+                        ratings={
+                          (
+                            companyDetails?.reviews.reduce(
+                              (sum, r) => sum + r.starCount,
+                              0
+                            ) / companyDetails?.reviews?.length
+                          ).toFixed(1) || 0
+                        }
+                        height={30}
+                        width={30}
+                      />
                     </span>
-                    <span className="text-sm lg:text-small font-medium">
-                      stars here
+                    <span className="text-sm flex lg:text-small font-medium">
+                      {renderStars(
+                        companyDetails?.reviews.reduce(
+                          (sum, r) => sum + r.starCount,
+                          0
+                        ) / companyDetails?.reviews?.length || 0
+                      )}
                     </span>
                   </div>
                   <div className="flex flex-col gap-4 lg:gap-4 justify-center items-center">
-                    <p className="text-subtitle lg:text-title">28</p>
+                    <p className="text-subtitle lg:text-title">
+                      {companyDetails?.reviews?.length || 0}
+                    </p>
                     <span className="text-small font-medium">Reviews</span>
                   </div>
                 </div>
@@ -259,7 +261,8 @@ const Product = () => {
                 <form
                   onSubmit={handleSubmit((data) => submitEnquiry(data))}
                   action=""
-                  className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  className="grid grid-cols-1 lg:grid-cols-2 gap-4"
+                >
                   <Controller
                     name="firstName"
                     control={control}
@@ -324,7 +327,8 @@ const Product = () => {
                         fullWidth
                         variant="standard"
                         size="small"
-                        select>
+                        select
+                      >
                         <MenuItem value="" disabled>
                           <em>Select A Type</em>
                         </MenuItem>
@@ -342,7 +346,8 @@ const Product = () => {
                         fullWidth
                         variant="standard"
                         size="small"
-                        select>
+                        select
+                      >
                         <MenuItem value="" disabled>
                           <em>Select Number of Desk</em>
                         </MenuItem>
@@ -410,7 +415,7 @@ const Product = () => {
               What Inclusion does it offers
             </h1>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-24 gap-y-10">
-              {amenities.map((item, index) => (
+              {allAmenities.map((item, index) => (
                 <Amenities key={index} image={item.image} title={item.title} />
               ))}
             </div>
@@ -419,7 +424,17 @@ const Product = () => {
           <div className="flex flex-col gap-8 w-full">
             <div className="flex flex-col justify-center items-center max-w-4xl mx-auto">
               <h1 className="text-main-header font-medium mt-5">
-                <LeafRatings ratings={"4.89"} align="items-start" />
+                <LeafRatings
+                  ratings={
+                    (
+                      companyDetails?.reviews?.reduce(
+                        (sum, r) => sum + r.starCount,
+                        0
+                      ) / companyDetails?.reviews?.length
+                    ).toFixed(1) || 0
+                  }
+                  align="items-start"
+                />
               </h1>
 
               <p className="text-subtitle  my-4 font-medium">Guest favorite</p>
@@ -428,12 +443,25 @@ const Product = () => {
                 and reliability
               </span>
             </div>
-
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-0 lg:p-6">
-              {mockReviews.map((review, index) => (
-                <ReviewCard key={index} review={review} />
-              ))}
+              {reviewData.length > 0 ? (
+                reviewData.map((review, index) => (
+                  <ReviewCard
+                    handleClick={() => {
+                      setSelectedReview(review);
+                      setOpen(true)
+                    }}
+                    key={index}
+                    review={review}
+                  />
+                ))
+              ) : (
+                <div className="col-span-full border-2 border-dotted border-gray-300 rounded-xl p-6 text-center text-sm text-gray-500 h-40 flex justify-center items-center">
+                  No reviews yet.
+                </div>
+              )}
             </div>
+
             <hr className="my-5 lg:my-10" />
             {/* Map */}
             <div className="flex flex-col gap-8">
@@ -445,7 +473,8 @@ const Product = () => {
                 loading="lazy"
                 className="rounded-xl"
                 referrerPolicy="no-referrer-when-downgrade"
-                title="map"></iframe>
+                title="map"
+              ></iframe>
             </div>
             <hr className="my-5 lg:my-10" />
             <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-2 gap-20 pb-20">
@@ -460,8 +489,12 @@ const Product = () => {
                   </div>
                 </div>
                 <div className="text-center">
-                  <h1 className="text-title font-semibold">Anviksha Godkar</h1>
-                  <p className="text-content">Sales Manager</p>
+                  <h1 className="text-title font-semibold">
+                    {companyDetails?.pocs?.name || "Unknown"}
+                  </h1>
+                  <p className="text-content">
+                    {companyDetails?.pocs?.designation || "Unknown"}
+                  </p>
                 </div>
                 <hr />
                 <div>
@@ -483,7 +516,8 @@ const Product = () => {
                   </h1>
                   <form
                     onSubmit={handlesubmitSales((data) => submitSales(data))}
-                    className="grid grid-cols-1 gap-4">
+                    className="grid grid-cols-1 gap-4"
+                  >
                     <Controller
                       name="fullName"
                       control={salesControl}
@@ -534,6 +568,47 @@ const Product = () => {
           </div>
         </div>
       </Container>
+<MuiModal open={open} onClose={() => setOpen(false)} title={"Review"}>
+  <div className="flex flex-col gap-4">
+    {/* Reviewer Info */}
+    <div className="flex items-center gap-3">
+      <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-white font-semibold text-lg uppercase">
+        {selectedReview?.name
+          ?.split(" ")
+          .map((n) => n[0])
+          .join("")
+          .slice(0, 2)}
+      </div>
+      <div>
+        <p className="font-semibold text-base">{selectedReview?.name}</p>
+        <p className="text-sm text-gray-500">{selectedReview?.date}</p>
+      </div>
+    </div>
+
+    {/* Star Rating */}
+    <div className="flex items-center gap-1 text-yellow-500 text-sm">
+      {Array(selectedReview?.stars)
+        .fill()
+        .map((_, i) => (
+          <svg
+            key={i}
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+            className="w-4 h-4"
+          >
+            <path d="M12 .587l3.668 7.568L24 9.75l-6 5.859L19.336 24 12 19.897 4.664 24 6 15.609 0 9.75l8.332-1.595z" />
+          </svg>
+        ))}
+    </div>
+
+    {/* Message */}
+    <div className="text-gray-800 text-sm whitespace-pre-line leading-relaxed">
+      {selectedReview?.message}
+    </div>
+  </div>
+</MuiModal>
+
     </div>
   );
 };

@@ -13,19 +13,35 @@ import Amenities from "../components/Amenities";
 import Carousel from "../components/Carousel";
 import icons from "../assets/icons";
 import { AiFillStar } from "react-icons/ai";
+import { ReactFitty } from "react-fitty";
+import { useDispatch, useSelector } from "react-redux";
+import { setFormValues } from "../features/locationSlice";
+import axios from "../utils/axios";
+import { IoIosArrowDown } from "react-icons/io";
+import Select from "react-dropdown-select";
 
 const Home = () => {
   const navigate = useNavigate();
-  const { handleSubmit, control, reset } = useForm({
+  const dispatch = useDispatch();
+  const formData = useSelector((state) => state.location.formValues);
+  const { handleSubmit, control, reset, register } = useForm({
     defaultValues: {
       country: "",
       location: "",
       category: "",
     },
   });
+  // Sample options
+  const countryOptions = [{ label: "India", value: "india" }];
+  const locationOptions = [{ label: "Goa", value: "goa" }];
+  const categoryOptions = [
+    { label: "Co-Working", value: "coworking" },
+    { label: "Co-Living", value: "coliving" },
+  ];
+
   const { mutate: locationData, isPending: isLocation } = useMutation({
     mutationFn: async (data) => {
-      console.log("data", data);
+      dispatch(setFormValues(data));
       navigate("listings");
     },
     onSuccess: () => {
@@ -105,15 +121,15 @@ const Home = () => {
   const amenities = [
     { image: icons.workspace, title: "WORKSPACE" },
     { image: icons.livingspace, title: "LIVING SPACE" },
-    { image: icons.airconditioner, title: "AIR CONDITION" },
-    { image: icons.internet, title: "FAST INTERNET" },
-    { image: icons.cafe, title: "CAFE / DINING" },
+    { image: icons.aircondition, title: "AIR CONDITION" },
+    { image: icons.fastinternet, title: "FAST INTERNET" },
+    { image: icons.cafedining, title: "CAFE / DINING" },
     { image: icons.receptionist, title: "RECEPTIONIST" },
-    { image: icons.meetingroom, title: "MEETING ROOMS" },
-    { image: icons.trainingroom, title: "TRAINING ROOMS" },
+    { image: icons.meetingrooms, title: "MEETING ROOMS" },
+    { image: icons.trainingrooms, title: "TRAINING ROOMS" },
     { image: icons.itsupport, title: "IT SUPPORT" },
-    { image: icons.teacoffe, title: "TEA & COFFEE" },
-    { image: icons.privateassistant, title: "ASSIST" },
+    { image: icons.teacoffee, title: "TEA & COFFEE" },
+    { image: icons.assist, title: "ASSIST" },
     { image: icons.community, title: "COMMUNITY" },
     { image: icons.ondemand, title: "ON DEMAND" },
     { image: icons.maintenance, title: "MAINTANANCE" },
@@ -162,8 +178,8 @@ const Home = () => {
 
   return (
     <div className="flex flex-col w-full">
-      <Container>
-        <section className="flex flex-col gap-2 lg:mb-8">
+      <Container padding={false}>
+        <section className="flex flex-col gap-2 lg:mb-8 pb-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="flex flex-col gap-4 justify-end items-start">
               <p className="uppercase font-semibold text-mobile-main-header lg:text-main-header lg:leading-normal">
@@ -207,7 +223,8 @@ const Home = () => {
                       </div>
                     </div>
                     <NavLink
-                      className={"text-white text-small hover:underline"}>
+                      className={"text-white text-small hover:underline"}
+                    >
                       View More Reviews
                     </NavLink>
                   </div>
@@ -260,71 +277,105 @@ const Home = () => {
             <div className="flex flex-col gap-4 justify-between">
               <form
                 onSubmit={handleSubmit((data) => locationData(data))}
-                className="flex gap-2 items-center border-2 border-primary-blue rounded-full pl-4 overflow-hidden">
-                <Controller
-                  name="country"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      select
-                      fullWidth
-                      size="small"
-                      variant="standard"
-                      label="Select Country"
-                      slotProps={{ input: { disableUnderline: true } }}>
-                      <MenuItem value="" disabled>
-                        Select A Country
-                      </MenuItem>
-                      <MenuItem value="india">India</MenuItem>
-                    </TextField>
-                  )}
-                />
-                <Controller
-                  name="location"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      select
-                      fullWidth
-                      size="small"
-                      variant="standard"
-                      label="Select Country"
-                      slotProps={{ input: { disableUnderline: true } }}>
-                      <MenuItem value="" disabled>
-                        Select A Location
-                      </MenuItem>
-                      <MenuItem value="goa">Goa</MenuItem>
-                    </TextField>
-                  )}
-                />
-                <div className="w-full border-l-2 border-l-primary-blue px-2 ">
+                className="flex gap-2 border-2 border-primary-blue rounded-full pl-4 h-10 lg:h-16 justify-between items-center bg-white"
+              >
+                {/* Country */}
+                <div className="relative w-full">
+                  <Controller
+                    name="country"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        {...field}
+                        options={countryOptions}
+                        onChange={(values) => field.onChange(values[0]?.value)}
+                        values={countryOptions.filter(
+                          (opt) => opt.value === field.value
+                        )}
+                        placeholder="Select A Country"
+                        color="#0000"
+                        dropdownPosition="bottom"
+                        className="w-3/4 text-sm"
+                        style={{
+                          border: "none",
+                          background: "transparent",
+                          boxShadow: "none",
+                          fontSize: "0.875rem",
+                          padding: "0.5rem",
+                          color:'black',
+                          cursor: "pointer",
+                        }}
+                      />
+                    )}
+                  />
+                </div>
+
+                {/* Location */}
+                <div className="relative w-full border-l-2 border-l-primary-blue">
+                  <Controller
+                    name="location"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        {...field}
+                        options={locationOptions}
+                        onChange={(values) => field.onChange(values[0]?.value)}
+                        values={locationOptions.filter(
+                          (opt) => opt.value === field.value
+                        )}
+                        placeholder="Select A Location"
+                        dropdownPosition="bottom"
+                        className="w-3/4 text-sm"
+                        style={{
+                          border: "none",
+                          background: "transparent",
+                          boxShadow: "none",
+                          fontSize: "0.875rem",
+                          padding: "0.5rem",
+                          cursor: "pointer",
+                        }}
+                      />
+                    )}
+                  />
+                </div>
+
+                {/* Category */}
+                <div className="relative w-full border-l-2 border-l-primary-blue pl-2">
                   <Controller
                     name="category"
                     control={control}
                     render={({ field }) => (
-                      <TextField
+                      <Select
                         {...field}
-                        select
-                        fullWidth
-                        size="small"
-                        variant="standard"
-                        label="Select Category"
-                        slotProps={{ input: { disableUnderline: true } }}>
-                        <MenuItem value="" disabled>
-                          Select A Category
-                        </MenuItem>
-                        <MenuItem value="coWorking">Co-Working</MenuItem>
-                      </TextField>
+                        options={categoryOptions}
+                        onChange={(values) => field.onChange(values[0]?.value)}
+                        values={categoryOptions.filter(
+                          (opt) => opt.value === field.value
+                        )}
+                        placeholder="Select A Category"
+                        dropdownPosition="bottom"
+                        className="w-3/4 text-sm"
+                        style={{
+                          border: "none",
+                          background: "transparent",
+                          boxShadow: "none",
+                          fontSize: "0.875rem",
+                          padding: "0.5rem",
+                          cursor: "pointer",
+                        }}
+                      />
                     )}
                   />
                 </div>
-                <div className="bg-primary-blue h-full flex justify-center">
+
+                {/* Submit */}
+                <div className="bg-primary-blue h-full w-3/4 flex justify-center rounded-r-full">
                   <button
                     type="submit"
-                    className="h-full text-center w-32 flex justify-center items-center text-white">
-                    <CiSearch /> &nbsp;&nbsp; Search
+                    disabled={isLocation}
+                    className="h-full text-center w-full flex justify-center items-center text-white"
+                  >
+                    <CiSearch className="text-lg" /> &nbsp; Search
                   </button>
                 </div>
               </form>
@@ -353,14 +404,17 @@ const Home = () => {
           </div>
         </section>
       </Container>
+
       <section className="bg-black w-full flex flex-col gap-4 py-16 lg:py-16">
-        <div className="max-w-7xl mx-auto flex flex-col text-primary  justify-center items-center ">
-          <h1 className="text-mobile-mega-header font-hero lg:leading-none lg:text-mega-header font-medium">
+        <div className="lg:w-[80rem] max-w-[80rem] mx-auto flex flex-col text-primary  justify-center items-center leading-none">
+          {/* <h1 className="text-mobile-mega-header font-hero lg:leading-none lg:text-mega-header font-medium">
             INTRODUCING
-          </h1>
-          <h1 className="text-mobile-mega-header font-hero lg:leading-none lg:text-mega-header font-medium">
+          </h1> */}
+          <ReactFitty className="font-hero">INTRODUCING</ReactFitty>
+          <ReactFitty className="font-hero">N-COMMERCE</ReactFitty>
+          {/* <h1 className="text-mobile-mega-header font-hero lg:leading-none lg:text-mega-header font-medium">
             N-COMMERCE
-          </h1>
+          </h1> */}
           <p className="uppercase text-mobile-main-header lg:text-mega-desc font-hero">
             ("nomad commerce")
           </p>
@@ -382,7 +436,8 @@ const Home = () => {
                   key={index}
                   className={`flex flex-col gap-4 rounded-xl p-3 ${
                     section.bgColor || "bg-white"
-                  }`}>
+                  }`}
+                >
                   <div className="flex flex-col gap-4">
                     <span className="text-title pl-6">{section.icon}</span>
                     <ul className="list-disc pl-6">
@@ -418,7 +473,8 @@ const Home = () => {
                   key={index}
                   className={`flex flex-col gap-4 rounded-xl p-3 ${
                     section.bgColor || "bg-white"
-                  }`}>
+                  }`}
+                >
                   <div className="flex flex-col gap-4">
                     <span className="text-title pl-6">{section.icon}</span>
                     <ul className="list-disc pl-6">
@@ -442,7 +498,7 @@ const Home = () => {
         </div>
       </Container>
 
-      <div className="lg:max-w-[85rem] lg:mx-auto  flex flex-col gap-4 md:px-10 px-4 border-t-2 border-gray-300 py-8">
+      <div className="lg:max-w-[85rem] lg:mx-auto  flex flex-col gap-4 md:px-10 px-6 border-t-2 border-gray-300 py-8">
         <h1 className=" uppercase lg:text-title font-semibold text-title pb-8">
           We have solutions for your needs.....
         </h1>
