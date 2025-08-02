@@ -5,12 +5,10 @@ import {
   addNewCompany,
   bulkInsertCompanies,
   getCompanyData,
-  getIndividualCompany,
 } from "../../controllers/coworking_controllers/companyControllers.js";
 
 router.post("/add-new-company", addNewCompany);
 router.get("/company-data", getCompanyData);
-router.get("/individual-company/:companyId", getIndividualCompany);
 router.post(
   "/bulk-insert-companies",
   upload.single("companies"),

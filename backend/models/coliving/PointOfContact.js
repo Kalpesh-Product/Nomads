@@ -27,4 +27,9 @@ const pointOfContactSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model("ColivingPointOfContact", pointOfContactSchema);
+const ColivingPointOfContact = mongoose.model(
+  "ColivingPointOfContact",
+  pointOfContactSchema
+);
+
+export default ColivingPointOfContact;

@@ -120,3 +120,73 @@ export const getCompanyDataLocationWise = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getIndividualCompany = async (req, res, next) => {
+  try {
+    const { companyId, type } = req.query;
+
+    if (type?.toLowerCase() === "coworking") {
+      const company = await CoworkingCompany.findOne({ _id: companyId })
+        .lean()
+        .exec();
+
+      const [inclusions, pocs, services, reviews] = await Promise.all([
+        CoworkingInclusions.findOne({ coworkingCompany: company._id })
+          .lean()
+          .exec(),
+        CoworkingPointOfContact.findOne({
+          coworkingCompany: company._id,
+          isActive: true,
+        })
+          .lean()
+          .exec(),
+        CoworkingServices.findOne({ coworkingCompany: company._id })
+          .lean()
+          .exec(),
+        CoworkingReviews.find({ coworkingCompany: company._id }).lean().exec(),
+      ]);
+
+      const companyObject = {
+        ...company,
+        inclusions,
+        pocs,
+        services,
+        reviews,
+      };
+      return res.status(200).json(companyObject);
+    } else if (type?.toLowerCase() === "coliving") {
+      const company = await ColivingCompany.findOne({ _id: companyId })
+        .lean()
+        .exec();
+
+      const [inclusions, pocs, units, reviews] = await Promise.all([
+        ColivingInclusions.findOne({ colivingCompany: company._id })
+          .lean()
+          .exec(),
+        ColivingPointOfContact.findOne({
+          colivingCompany: company._id,
+          isActive: true,
+        })
+          .lean()
+          .exec(),
+        ColivingUnits.find({ businessId: company._id }).lean().exec(),
+        ColivingReviews.find({ colivingCompany: company._id }).lean().exec(),
+      ]);
+
+      const companyObject = {
+        ...company,
+        inclusions,
+        pocs,
+        units,
+        reviews,
+      };
+      return res.status(200).json(companyObject);
+    }
+
+    return res
+      .status(404)
+      .json({ message: "Company not found or type invalid" });
+  } catch (error) {
+    next(error);
+  }
+};
