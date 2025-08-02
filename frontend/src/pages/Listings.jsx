@@ -18,9 +18,9 @@ import { setFormValues } from "../features/locationSlice.js";
 
 const Listings = () => {
   const [favorites, setFavorites] = useState([]);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const formData = useSelector((state) => state.location.formValues);
-   const countryOptions = [{ label: "India", value: "india" }];
+  const countryOptions = [{ label: "India", value: "india" }];
   const locationOptions = [{ label: "Goa", value: "goa" }];
   const categoryOptions = [
     { label: "Co-Working", value: "coworking" },
@@ -36,7 +36,8 @@ const Listings = () => {
         `common/location-and-type-based-company-data?country=${country}&state=${location}&category=${category}`
       );
 
-      return response.data;
+      // return response.data;
+      return Array.isArray(response.data.data) ? response.data.data : [];
     },
     enabled:
       !!formData?.country && !!formData?.location && !!formData?.category, // ✅ prevents fetching on empty state
@@ -64,7 +65,7 @@ const Listings = () => {
   }, [formData]);
   const { mutate: locationData, isPending: isLocation } = useMutation({
     mutationFn: async (data) => {
-      dispatch(setFormValues(data))
+      dispatch(setFormValues(data));
     },
     onSuccess: () => {
       console.log("success");
@@ -102,8 +103,7 @@ const Listings = () => {
         <div className="flex flex-col gap-4 justify-between w-3/4 md:w-3/4 lg:w-1/2 h-full">
           <form
             onSubmit={handleSubmit((data) => locationData(data))}
-            className="flex gap-2 border-2 border-primary-blue rounded-full pl-4 h-10 lg:h-16 justify-between items-center bg-white"
-          >
+            className="flex gap-2 border-2 border-primary-blue rounded-full pl-4 h-10 lg:h-16 justify-between items-center bg-white">
             {/* Country */}
             <div className="relative w-full">
               <Controller
@@ -198,8 +198,7 @@ const Listings = () => {
               <button
                 type="submit"
                 disabled={isLocation}
-                className="h-full text-center w-full flex justify-center items-center text-white"
-              >
+                className="h-full text-center w-full flex justify-center items-center text-white">
                 <CiSearch className="text-lg" /> &nbsp; Search
               </button>
             </div>
@@ -211,7 +210,11 @@ const Listings = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 ">
           <div className="  font-semibold text-lg ">
             <div className="pb-6">
-              <p>Over {listingsData?.length -1} {formData.category === "coworking" ? "Co-Working" : 'Co-Living'} Spaces</p>
+              <p>
+                Over {listingsData?.length - 1}{" "}
+                {formData.category === "coworking" ? "Co-Working" : "Co-Living"}{" "}
+                Spaces
+              </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-[36rem] overflow-y-auto overflow-x-hidden">
               {isLisitingLoading ? (
@@ -226,12 +229,11 @@ const Listings = () => {
                       navigate(`${item.companyName}`, {
                         state: {
                           companyId: item._id,
-                          type : item.type
+                          type: item.type,
                         },
                       })
                     }
-                    className="flex flex-col gap-4 justify-between h-96 w-full bg-white p-4 rounded-lg shadow-md hover:scale-105 hover:shadow-md transition-all cursor-pointer"
-                  >
+                    className="flex flex-col gap-4 justify-between h-96 w-full bg-white p-4 rounded-lg shadow-md hover:scale-105 hover:shadow-md transition-all cursor-pointer">
                     {/* ⬇️ Make image container relative to allow absolutely positioning the heart */}
                     <div className="h-3/4 w-full overflow-hidden rounded-xl border-2 relative">
                       <img
@@ -245,8 +247,7 @@ const Listings = () => {
                       {/* ❤️ Heart icon positioned top-right over the image */}
                       <div
                         className="absolute top-2 right-2 cursor-pointer"
-                        onClick={() => toggleFavorite(item._id)}
-                      >
+                        onClick={() => toggleFavorite(item._id)}>
                         {favorites.includes(item._id) ? (
                           <AiFillHeart className="text-white" size={22} />
                         ) : (
