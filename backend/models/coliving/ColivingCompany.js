@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const colivingSchema = new mongoose.Schema(
   {
     businessId: { type: String, required: true, unique: true },
-    name: { type: String, required: true },
+    companyName: { type: String, required: true },
     registeredEntityName: { type: String },
     website: { type: String },
     logo: { type: String },

@@ -139,35 +139,6 @@ export const getCompanyData = async (req, res, next) => {
   }
 };
 
-export const getIndividualCompany = async (req, res, next) => {
-  try {
-    const { companyId } = req.params;
-    const company = await CoworkingCompany.findOne({ _id: companyId })
-      .lean()
-      .exec();
-
-    const [inclusions, pocs, services, reviews] = await Promise.all([
-      Inclusions.findOne({ coworkingCompany: company._id }).lean().exec(),
-      PointOfContact.findOne({ coworkingCompany: company._id, isActive: true })
-        .lean()
-        .exec(),
-      Services.findOne({ coworkingCompany: company._id }).lean().exec(),
-      Review.find({ coworkingCompany: company._id }).lean().exec(),
-    ]);
-
-    const companyObject = {
-      ...company,
-      inclusions,
-      pocs,
-      services,
-      reviews,
-    };
-    return res.status(400).json(companyObject);
-  } catch (error) {
-    next(error);
-  }
-};
-
 export const bulkInsertCompanies = async (req, res, next) => {
   try {
     const file = req.file;

@@ -21,7 +21,7 @@ export const bulkInsertColivingCompanies = async (req, res, next) => {
         // Extract only schema-relevant fields
         const entry = {
           businessId: row["Business ID"]?.trim(),
-          name: row["Business Name"]?.trim(),
+          companyName: row["Business Name"]?.trim(),
           registeredEntityName: row["Registered Entity Name"]?.trim(),
           website: row["Website"]?.trim(),
           address: row["Address"]?.trim(),
