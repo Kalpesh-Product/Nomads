@@ -13,6 +13,7 @@ import Amenities from "../components/Amenities";
 import Carousel from "../components/Carousel";
 import icons from "../assets/icons";
 import { AiFillStar } from "react-icons/ai";
+import {ReactFitty} from 'react-fitty'
 
 const Home = () => {
   const navigate = useNavigate();
@@ -361,22 +362,26 @@ const Home = () => {
       </Container>
 
       <section className="bg-black w-full flex flex-col gap-4 py-16 lg:py-16">
-        <Container>
-
-        
-        </Container>
-        <div className=" flex flex-col text-primary  justify-center items-center ">
-          <h1 className="text-mobile-mega-header font-hero lg:leading-none lg:text-mega-header font-medium">
+        <div className="lg:w-[80rem] max-w-[80rem] mx-auto flex flex-col text-primary  justify-center items-center leading-none">
+          {/* <h1 className="text-mobile-mega-header font-hero lg:leading-none lg:text-mega-header font-medium">
             INTRODUCING
-          </h1>
-          <h1 className="text-mobile-mega-header font-hero lg:leading-none lg:text-mega-header font-medium">
+          </h1> */}
+          <ReactFitty className="font-hero">
+            INTRODUCING
+          </ReactFitty>
+          <ReactFitty className="font-hero">
+             N-COMMERCE
+          </ReactFitty>
+          {/* <h1 className="text-mobile-mega-header font-hero lg:leading-none lg:text-mega-header font-medium">
             N-COMMERCE
-          </h1>
+          </h1> */}
           <p className="uppercase text-mobile-main-header lg:text-mega-desc font-hero">
             ("nomad commerce")
           </p>
           <div className="flex justify-center items-end w-full">
-            <PrimaryButton title={"Partner now"} />
+            <PrimaryButton
+              title={"Partner now"}
+            />
           </div>
         </div>
       </section>
@@ -455,7 +460,7 @@ const Home = () => {
         </div>
       </Container>
 
-      <div className="lg:max-w-[85rem] lg:mx-auto  flex flex-col gap-4 md:px-10 px-4 border-t-2 border-gray-300 py-8">
+      <div className="lg:max-w-[85rem] lg:mx-auto  flex flex-col gap-4 md:px-10 px-6 border-t-2 border-gray-300 py-8">
         <h1 className=" uppercase lg:text-title font-semibold text-title pb-8">
           We have solutions for your needs.....
         </h1>
