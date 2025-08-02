@@ -10,24 +10,26 @@ import { useNavigate } from "react-router-dom";
 import Map from "../components/Map";
 import { useSelector } from "react-redux";
 import axios from "../utils/axios.js";
+import renderStars from "../utils/renderStarts.jsx";
 
 const Listings = () => {
   const [favorites, setFavorites] = useState([]);
   const formData = useSelector((state) => state.location.formValues);
   console.log("formData", formData);
-const { data: listingsData, isPending: isLisitingLoading } = useQuery({
-  queryKey: ["listings", formData], // ✅ ensures it refetches when formData changes
-  queryFn: async () => {
-    const { country, location, category } = formData || {};
+  const { data: listingsData, isPending: isLisitingLoading } = useQuery({
+    queryKey: ["listings", formData], // ✅ ensures it refetches when formData changes
+    queryFn: async () => {
+      const { country, location, category } = formData || {};
 
-    const response = await axios.get(
-      `/location-and-type-based-company-data?country=${country}&state=${location}&category=${category}`
-    );
+      const response = await axios.get(
+        `common/location-and-type-based-company-data?country=${country}&state=${location}&category=${category}`
+      );
 
-    return response.data;
-  },
-  enabled: !!formData?.country && !!formData?.location && !!formData?.category, // ✅ prevents fetching on empty state
-});
+      return response.data;
+    },
+    enabled:
+      !!formData?.country && !!formData?.location && !!formData?.category, // ✅ prevents fetching on empty state
+  });
 
   const toggleFavorite = (id) => {
     setFavorites((prev) =>
@@ -56,96 +58,27 @@ const { data: listingsData, isPending: isLisitingLoading } = useQuery({
     },
   });
 
-  const listings = [
-    {
-      id: 1,
-      name: "BIZNest",
-      rating: 4.9,
-      location: "Panjim, GOA",
-      reviews: 120,
-      price: "INR 259 per day",
-      note: "*Also available on Monthly basis",
-      image:
-        "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp", // add image URL here
-    },
-    {
-      id: 2,
-      name: "MeWo",
-      rating: 4.7,
-      location: "Panjim, GOA",
-      reviews: 98,
-      price: "INR 349 per day",
-      note: "*Also available on Weekly basis",
-      image:
-        "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp", // add image URL here
-    },
-    {
-      id: 3,
-      name: "HiveHub",
-      rating: 4.8,
-      location: "Mumbai, MH",
-      reviews: 145,
-      price: "INR 299 per day",
-      note: "*Monthly plans available",
-      image:
-        "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp", // add image URL here
-    },
-    {
-      id: 4,
-      name: "CoWorkZone",
-      rating: 4.6,
-      location: "Hyderabad, TS",
-      reviews: 112,
-      price: "INR 199 per day",
-      note: "*Also available on Hourly basis",
-      image:
-        "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp", // add image URL here
-    },
-    {
-      id: 5,
-      name: "CoWorkZone",
-      rating: 4.6,
-      location: "Hyderabad, TS",
-      reviews: 112,
-      price: "INR 199 per day",
-      note: "*Also available on Hourly basis",
-      image:
-        "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp", // add image URL here
-    },
-    {
-      id: 6,
-      name: "CoWorkZone",
-      rating: 4.6,
-      location: "Hyderabad, TS",
-      reviews: 112,
-      price: "INR 199 per day",
-      note: "*Also available on Hourly basis",
-      image:
-        "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp", // add image URL here
-    },
-    {
-      id: 7,
-      name: "CoWorkZone",
-      rating: 4.6,
-      location: "Hyderabad, TS",
-      reviews: 112,
-      price: "INR 199 per day",
-      note: "*Also available on Hourly basis",
-      image:
-        "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp", // add image URL here
-    },
-    {
-      id: 8,
-      name: "CoWorkZone",
-      rating: 4.6,
-      location: "Hyderabad, TS",
-      reviews: 112,
-      price: "INR 199 per day",
-      note: "*Also available on Hourly basis",
-      image:
-        "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp", // add image URL here
-    },
-  ];
+  const forMapsData = isLisitingLoading
+    ? []
+    : listingsData.map((item) => ({
+        ...item,
+        id : item._id,
+        lat: item.latitude,
+        lng: item.longitude,
+        name: item.companyName,
+        location: item.city,
+        reviews: item.reviews.length,
+        rating: item.reviews?.length
+          ? (() => {
+              const avg =
+                item.reviews.reduce((sum, r) => sum + r.starCount, 0) /
+                item.reviews.length;
+              return avg % 1 === 0 ? avg : avg.toFixed(1);
+            })()
+          : "0",
+          image : "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp"
+      }));
+
   return (
     <div className="flex flex-col gap-4 ">
       <div className="flex flex-col gap-4 justify-center items-center  w-full mt-10 lg:mt-0">
@@ -230,7 +163,7 @@ const { data: listingsData, isPending: isLisitingLoading } = useQuery({
               <p>Over 16 Co - Working Space</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-[36rem] overflow-y-auto overflow-x-hidden">
-              {listings.map((item) => (
+              {listingsData?.map((item) => (
                 <div
                   key={item.id}
                   onClick={() => navigate(`${item.name}`)}
@@ -239,17 +172,19 @@ const { data: listingsData, isPending: isLisitingLoading } = useQuery({
                   {/* ⬇️ Make image container relative to allow absolutely positioning the heart */}
                   <div className="h-3/4 w-full overflow-hidden rounded-xl border-2 relative">
                     <img
-                      src={item.image}
-                      alt={item.name}
+                      src={
+                        "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp"
+                      }
+                      alt={item.companyName}
                       className="w-full h-full object-cover"
                     />
 
                     {/* ❤️ Heart icon positioned top-right over the image */}
                     <div
                       className="absolute top-2 right-2 cursor-pointer"
-                      onClick={() => toggleFavorite(item.id)}
+                      onClick={() => toggleFavorite(item._id)}
                     >
-                      {favorites.includes(item.id) ? (
+                      {favorites.includes(item._id) ? (
                         <AiFillHeart className="text-white" size={22} />
                       ) : (
                         <AiOutlineHeart className="text-white" size={22} />
@@ -260,33 +195,54 @@ const { data: listingsData, isPending: isLisitingLoading } = useQuery({
                   {/* 👇 Existing card content below the image stays untouched */}
                   <div className="h-[25%] flex flex-col gap-1">
                     <div className="flex w-full justify-between items-center">
-                      <p className="text-sm font-semibold">{item.name}</p>
+                      <p className="text-sm font-semibold">
+                        {item.companyName}
+                      </p>
                       <div className="flex items-center gap-1 text-black">
                         <AiFillStar size={16} />
+                        {/* {renderStars(
+                          item.reviews?.length
+                            ? item.reviews.reduce(
+                                (sum, r) => sum + r.starCount,
+                                0
+                              ) / item.reviews.length
+                            : 0
+                        )} */}
                         <p className="text-sm font-semibold text-black">
-                          {item.rating}
+                          (
+                          {item.reviews?.length
+                            ? (() => {
+                                const avg =
+                                  item.reviews.reduce(
+                                    (sum, r) => sum + r.starCount,
+                                    0
+                                  ) / item.reviews.length;
+                                return avg % 1 === 0 ? avg : avg.toFixed(1);
+                              })()
+                            : "0"}
+                          )
                         </p>
                       </div>
                     </div>
 
                     <div className="flex w-full justify-between items-center">
                       <p className="text-sm text-gray-600 font-medium">
-                        {item.location}
+                        {item.city},{item.state}
                       </p>
                       <p className="text-sm font-semibold">
-                        Reviews({item.reviews})
+                        Reviews({item.reviews.length})
                       </p>
                     </div>
 
                     <div className="flex w-full justify-between items-center">
                       <p className="text-sm font-semibold">
-                        Starting from {item.price}
+                        Starting from {item.price || 125}
                       </p>
                     </div>
 
                     <div className="flex w-full justify-between items-center">
                       <p className="text-xs text-gray-600 font-normal">
-                        {item.note}
+                        {item.note || "*Also available on Monthly basis"}
                       </p>
                     </div>
                   </div>
@@ -294,8 +250,8 @@ const { data: listingsData, isPending: isLisitingLoading } = useQuery({
               ))}
             </div>
           </div>
-          <div className=" w-full overflow-hidden rounded-xl h-[38rem]">
-            <Map />
+          <div className=" w-full overflow-hidden rounded-xl h-[40rem]">
+            <Map locations={forMapsData} />
           </div>
         </div>
       </Container>
