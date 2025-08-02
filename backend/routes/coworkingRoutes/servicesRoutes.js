@@ -1,10 +1,10 @@
 import { Router } from "express";
-import upload from "../config/multerConfig.js";
+import upload from "../../config/multerConfig.js";
 import {
   addCompanyService,
   bulkInsertCompanyServices,
   getCompanyService,
-} from "../controllers/coworking_controllers/serviceControllers.js";
+} from "../../controllers/coworking_controllers/serviceControllers.js";
 
 const router = Router();
 

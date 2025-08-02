@@ -152,7 +152,7 @@ export const getIndividualCompany = async (req, res, next) => {
         .lean()
         .exec(),
       Services.findOne({ coworkingCompany: company._id }).lean().exec(),
-      Review.findOne({ coworkingCompany: company._id }).lean().exec(),
+      Review.find({ coworkingCompany: company._id }).lean().exec(),
     ]);
 
     const companyObject = {

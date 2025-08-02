@@ -10,9 +10,11 @@ const ColivingUnitSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    allUnits: {
-      type: String,
-    },
+    allUnits: [
+      {
+        type: String,
+      },
+    ],
   },
   {
     timestamps: true,

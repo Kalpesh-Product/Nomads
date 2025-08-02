@@ -50,7 +50,7 @@ const businessInclusionSchema = new mongoose.Schema(
 );
 
 const ColivingInclusions = mongoose.model(
-  "BusinessInclusion",
+  "ColivingInclusion",
   businessInclusionSchema
 );
 
