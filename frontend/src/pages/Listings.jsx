@@ -1,5 +1,5 @@
 import { MenuItem, TextField } from "@mui/material";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { CiSearch } from "react-icons/ci";
@@ -8,9 +8,26 @@ import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import Container from "../components/Container";
 import { useNavigate } from "react-router-dom";
 import Map from "../components/Map";
+import { useSelector } from "react-redux";
+import axios from "../utils/axios.js";
 
 const Listings = () => {
   const [favorites, setFavorites] = useState([]);
+  const formData = useSelector((state) => state.location.formValues);
+  console.log("formData", formData);
+const { data: listingsData, isPending: isLisitingLoading } = useQuery({
+  queryKey: ["listings", formData], // ✅ ensures it refetches when formData changes
+  queryFn: async () => {
+    const { country, location, category } = formData || {};
+
+    const response = await axios.get(
+      `/location-and-type-based-company-data?country=${country}&state=${location}&category=${category}`
+    );
+
+    return response.data;
+  },
+  enabled: !!formData?.country && !!formData?.location && !!formData?.category, // ✅ prevents fetching on empty state
+});
 
   const toggleFavorite = (id) => {
     setFavorites((prev) =>
@@ -135,7 +152,8 @@ const Listings = () => {
         <div className="flex flex-col gap-4 justify-between w-3/4 md:w-3/4 lg:w-1/2 h-full">
           <form
             onSubmit={handleSubmit((data) => locationData(data))}
-            className="flex gap-2 items-center border-2 border-primary-blue rounded-full pl-4 overflow-hidden h-10 lg:h-16">
+            className="flex gap-2 items-center border-2 border-primary-blue rounded-full pl-4 overflow-hidden h-10 lg:h-16"
+          >
             <Controller
               name="country"
               control={control}
@@ -147,7 +165,8 @@ const Listings = () => {
                   size="small"
                   variant="standard"
                   label="Select Country"
-                  slotProps={{ input: { disableUnderline: true } }}>
+                  slotProps={{ input: { disableUnderline: true } }}
+                >
                   <MenuItem value="" disabled>
                     Select A Country
                   </MenuItem>
@@ -166,7 +185,8 @@ const Listings = () => {
                   size="small"
                   variant="standard"
                   label="Select Location"
-                  slotProps={{ input: { disableUnderline: true } }}>
+                  slotProps={{ input: { disableUnderline: true } }}
+                >
                   <MenuItem value="" disabled>
                     Select A Location
                   </MenuItem>
@@ -186,7 +206,8 @@ const Listings = () => {
                     size="small"
                     variant="standard"
                     label="Select Category"
-                    slotProps={{ input: { disableUnderline: true } }}>
+                    slotProps={{ input: { disableUnderline: true } }}
+                  >
                     <MenuItem value="" disabled>
                       Select A Category
                     </MenuItem>
@@ -213,7 +234,8 @@ const Listings = () => {
                 <div
                   key={item.id}
                   onClick={() => navigate(`${item.name}`)}
-                  className="flex flex-col gap-4 justify-between h-96 w-full bg-white p-4 rounded-lg shadow-md hover:scale-105 hover:shadow-md transition-all cursor-pointer">
+                  className="flex flex-col gap-4 justify-between h-96 w-full bg-white p-4 rounded-lg shadow-md hover:scale-105 hover:shadow-md transition-all cursor-pointer"
+                >
                   {/* ⬇️ Make image container relative to allow absolutely positioning the heart */}
                   <div className="h-3/4 w-full overflow-hidden rounded-xl border-2 relative">
                     <img
@@ -225,7 +247,8 @@ const Listings = () => {
                     {/* ❤️ Heart icon positioned top-right over the image */}
                     <div
                       className="absolute top-2 right-2 cursor-pointer"
-                      onClick={() => toggleFavorite(item.id)}>
+                      onClick={() => toggleFavorite(item.id)}
+                    >
                       {favorites.includes(item.id) ? (
                         <AiFillHeart className="text-white" size={22} />
                       ) : (

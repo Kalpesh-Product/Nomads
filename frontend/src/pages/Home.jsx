@@ -31,13 +31,11 @@ const Home = () => {
   });
 const { mutate: locationData, isPending: isLocation } = useMutation({
   mutationFn: async (data) => {
-    const response = await axios.post('location-and-type-based-company-data',data)
-    return response.data; 
+    dispatch(setFormValues(data));
+    navigate("listings");
   },
   onSuccess: () => {
     console.log("success");
-    dispatch(setFormValues(data));
-    navigate("listings");
   },
   onError: () => {
     console.log("error");
@@ -328,7 +326,7 @@ const { mutate: locationData, isPending: isLocation } = useMutation({
                         <MenuItem value="" disabled>
                           Select A Category
                         </MenuItem>
-                        <MenuItem value="coWorking">Co-Working</MenuItem>
+                        <MenuItem value="coworking">Co-Working</MenuItem>
                       </TextField>
                     )}
                   />
