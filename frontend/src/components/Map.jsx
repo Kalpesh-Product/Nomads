@@ -6,41 +6,6 @@ import {
   useJsApiLoader,
 } from "@react-google-maps/api";
 
-// const locations = [
-//   {
-//     id: 1,
-//     lat: 15.501,
-//     lng: 73.8294,
-//     name: "BIZ Nest",
-//     location: "Panaji",
-//     reviews: 20,
-//     rating: 4.0,
-//     image:
-//       "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
-//   },
-//   {
-//     id: 2,
-//     lat: 15.492,
-//     lng: 73.8235,
-//     name: "MeWo",
-//     location: "Panaji",
-//     reviews: 20,
-//     rating: 3.5,
-//     image:
-//       "https://lh3.googleusercontent.com/p/AF1QipO561sgyDzlQlNPL6h_7Mqh6T6qyMS9dii6Am4U=s1360-w1360-h1020-rw",
-//   },
-//   {
-//     id: 3,
-//     lat: 15.515,
-//     lng: 73.84,
-//     name: "Livv",
-//     location: "Panaji",
-//     reviews: 20,
-//     rating: 5.0,
-//     image: "https://www.livv.co.in/assets/img/projects/common-area/1.webp",
-//   },
-// ];
-
 const center = {
   lat: 15.501,
   lng: 73.8294,

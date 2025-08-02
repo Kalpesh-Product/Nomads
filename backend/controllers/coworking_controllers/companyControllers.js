@@ -152,7 +152,7 @@ export const getIndividualCompany = async (req, res, next) => {
         .lean()
         .exec(),
       Services.findOne({ coworkingCompany: company._id }).lean().exec(),
-      Review.findOne({ coworkingCompany: company._id }).lean().exec(),
+      Review.find({ coworkingCompany: company._id }).lean().exec(),
     ]);
 
     const companyObject = {
@@ -162,7 +162,7 @@ export const getIndividualCompany = async (req, res, next) => {
       services,
       reviews,
     };
-    return res.status(400).json(companyObject);
+    return res.status(200).json(companyObject);
   } catch (error) {
     next(error);
   }

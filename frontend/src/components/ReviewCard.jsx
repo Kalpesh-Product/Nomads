@@ -3,18 +3,28 @@ import React from "react";
 import { AiFillStar } from "react-icons/ai";
 import { NavLink } from "react-router-dom";
 
-const ReviewCard = ({ review }) => {
+const ReviewCard = ({ review, handleClick }) => {
   const { name, avatar, duration, stars, date, message } = review;
 
   return (
     <div className="flex flex-col gap-2 max-w-sm border-2 p-4 rounded-xl">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <img
-          src={avatar}
-          alt={name}
-          className="w-10 h-10 rounded-full object-cover"
-        />
+        {avatar ? (
+          <img
+            src={avatar}
+            alt={name}
+            className="w-10 h-10 rounded-full object-cover"
+          />
+        ) : (
+          <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-sm font-semibold text-white uppercase">
+            {name
+              ?.split(" ")
+              .map((n) => n[0])
+              .join("")
+              .slice(0, 2)}
+          </div>
+        )}
         <div>
           <p className="font-semibold">{name}</p>
           <p className="text-sm text-gray-500">{duration}</p>
@@ -34,7 +44,12 @@ const ReviewCard = ({ review }) => {
       {/* Review */}
       <p className="text-sm text-gray-700 line-clamp-3">{message}</p>
 
-      <NavLink className="text-small font-medium underline">Show more</NavLink>
+      <span
+        onClick={handleClick}
+        className="text-small font-medium underline cursor-pointer"
+      >
+        Show more
+      </span>
     </div>
   );
 };

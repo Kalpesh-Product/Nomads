@@ -111,15 +111,15 @@ const { mutate: locationData, isPending: isLocation } = useMutation({
   const amenities = [
     { image: icons.workspace, title: "WORKSPACE" },
     { image: icons.livingspace, title: "LIVING SPACE" },
-    { image: icons.airconditioner, title: "AIR CONDITION" },
-    { image: icons.internet, title: "FAST INTERNET" },
-    { image: icons.cafe, title: "CAFE / DINING" },
+    { image: icons.aircondition, title: "AIR CONDITION" },
+    { image: icons.fastinternet, title: "FAST INTERNET" },
+    { image: icons.cafedining, title: "CAFE / DINING" },
     { image: icons.receptionist, title: "RECEPTIONIST" },
-    { image: icons.meetingroom, title: "MEETING ROOMS" },
-    { image: icons.trainingroom, title: "TRAINING ROOMS" },
+    { image: icons.meetingrooms, title: "MEETING ROOMS" },
+    { image: icons.trainingrooms, title: "TRAINING ROOMS" },
     { image: icons.itsupport, title: "IT SUPPORT" },
-    { image: icons.teacoffe, title: "TEA & COFFEE" },
-    { image: icons.privateassistant, title: "ASSIST" },
+    { image: icons.teacoffee, title: "TEA & COFFEE" },
+    { image: icons.assist, title: "ASSIST" },
     { image: icons.community, title: "COMMUNITY" },
     { image: icons.ondemand, title: "ON DEMAND" },
     { image: icons.maintenance, title: "MAINTANANCE" },
@@ -267,7 +267,7 @@ const { mutate: locationData, isPending: isLocation } = useMutation({
             <div className="flex flex-col gap-4 justify-between">
               <form
                 onSubmit={handleSubmit((data) => locationData(data))}
-                className="flex gap-2 items-center border-2 border-primary-blue rounded-full pl-4 overflow-hidden"
+                className="flex gap-2 border-2 border-primary-blue rounded-full pl-4 overflow-hidden h-10 lg:h-16 justify-center items-center"
               >
                 <Controller
                   name="country"
@@ -327,6 +327,7 @@ const { mutate: locationData, isPending: isLocation } = useMutation({
                           Select A Category
                         </MenuItem>
                         <MenuItem value="coworking">Co-Working</MenuItem>
+                        <MenuItem value="coliving">Co-Living</MenuItem>
                       </TextField>
                     )}
                   />
