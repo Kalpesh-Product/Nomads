@@ -1,5 +1,6 @@
 const icons = {
   aircondition: "/icons/airconditioner.webp",
+  ac: "/icons/airconditioner.webp",
   cafedining: "/icons/cafe.webp",
   community: "/icons/community.webp",
   gas: "/icons/gas.webp",
@@ -7,6 +8,7 @@ const icons = {
   dailycleaning: "/icons/housekeeping.webp",
   housekeeping: "/icons/housekeeping.webp",
   fastinternet: "/icons/internet.webp",
+  wifi: "/icons/internet.webp",
   itsupport: "/icons/itsupport.webp",
   laundry: "/icons/laundry.webp",
   livingspace: "/icons/livingspace.webp",
@@ -16,6 +18,7 @@ const icons = {
   personalised: "/icons/personalised.webp",
   pickupdrop: "/icons/pickupdrop.webp",
   pool: "/icons/pool.webp",
+  swimmingpool: "/icons/pool.webp",
   assist: "/icons/privateassistant.webp",
   receptionist: "/icons/receptionist.webp",
   rentbikecar: "/icons/rentbikecar.webp",

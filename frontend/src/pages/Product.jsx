@@ -22,7 +22,7 @@ dayjs.extend(relativeTime);
 
 const Product = () => {
   const location = useLocation();
-  const { companyId } = location.state;
+  const { companyId, type } = location.state;
   const [selectedReview, setSelectedReview] = useState([]);
   console.log("selected : ", selectedReview);
   const [open, setOpen] = useState(false);
@@ -31,11 +31,11 @@ const Product = () => {
     queryKey: ["companyDetails", companyId],
     queryFn: async () => {
       const response = await axios.get(
-        `company/individual-company/${companyId}`
+        `common/individual-company?companyId=${companyId}&&type=${type}`
       );
       return response.data;
     },
-    enabled: !!companyId,
+    enabled: !!companyId && !!type,
   });
 
   console.log("companuDetials ", companyDetails);
@@ -261,7 +261,7 @@ const Product = () => {
                 <form
                   onSubmit={handleSubmit((data) => submitEnquiry(data))}
                   action=""
-                  className="grid grid-cols-1 lg:grid-cols-2 gap-4"
+                  className="grid grid-cols-1 lg:grid-cols-2 gap-6"
                 >
                   <Controller
                     name="firstName"
@@ -317,47 +317,51 @@ const Product = () => {
                       />
                     )}
                   />
-                  <Controller
-                    name="type"
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        label="Type"
-                        fullWidth
-                        variant="standard"
-                        size="small"
-                        select
-                      >
-                        <MenuItem value="" disabled>
-                          <em>Select A Type</em>
-                        </MenuItem>
-                        <MenuItem value="cabin desk">Cabin Desk</MenuItem>
-                      </TextField>
-                    )}
-                  />
-                  <Controller
-                    name="numberOfDesks"
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        label="Number of Desk"
-                        fullWidth
-                        variant="standard"
-                        size="small"
-                        select
-                      >
-                        <MenuItem value="" disabled>
-                          <em>Select Number of Desk</em>
-                        </MenuItem>
-                        <MenuItem value={2}>2</MenuItem>
-                        <MenuItem value={4}>4</MenuItem>
-                        <MenuItem value={10}>10</MenuItem>
-                        <MenuItem value={20}>20</MenuItem>
-                      </TextField>
-                    )}
-                  />
+                  {companyDetails?.type === "coworking" && (
+                    <Controller
+                      name="type"
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          label="Type"
+                          fullWidth
+                          variant="standard"
+                          size="small"
+                          select
+                        >
+                          <MenuItem value="" disabled>
+                            <em>Select A Type</em>
+                          </MenuItem>
+                          <MenuItem value="cabin desk">Cabin Desk</MenuItem>
+                        </TextField>
+                      )}
+                    />
+                  )}
+                  {companyDetails?.type === "coworking" && (
+                    <Controller
+                      name="numberOfDesks"
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          label="Number of Desk"
+                          fullWidth
+                          variant="standard"
+                          size="small"
+                          select
+                        >
+                          <MenuItem value="" disabled>
+                            <em>Select Number of Desk</em>
+                          </MenuItem>
+                          <MenuItem value={2}>2</MenuItem>
+                          <MenuItem value={4}>4</MenuItem>
+                          <MenuItem value={10}>10</MenuItem>
+                          <MenuItem value={20}>20</MenuItem>
+                        </TextField>
+                      )}
+                    />
+                  )}
                   <Controller
                     name="startDate"
                     control={control}
@@ -449,7 +453,7 @@ const Product = () => {
                   <ReviewCard
                     handleClick={() => {
                       setSelectedReview(review);
-                      setOpen(true)
+                      setOpen(true);
                     }}
                     key={index}
                     review={review}
@@ -568,47 +572,46 @@ const Product = () => {
           </div>
         </div>
       </Container>
-<MuiModal open={open} onClose={() => setOpen(false)} title={"Review"}>
-  <div className="flex flex-col gap-4">
-    {/* Reviewer Info */}
-    <div className="flex items-center gap-3">
-      <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-white font-semibold text-lg uppercase">
-        {selectedReview?.name
-          ?.split(" ")
-          .map((n) => n[0])
-          .join("")
-          .slice(0, 2)}
-      </div>
-      <div>
-        <p className="font-semibold text-base">{selectedReview?.name}</p>
-        <p className="text-sm text-gray-500">{selectedReview?.date}</p>
-      </div>
-    </div>
+      <MuiModal open={open} onClose={() => setOpen(false)} title={"Review"}>
+        <div className="flex flex-col gap-4">
+          {/* Reviewer Info */}
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-white font-semibold text-lg uppercase">
+              {selectedReview?.name
+                ?.split(" ")
+                .map((n) => n[0])
+                .join("")
+                .slice(0, 2)}
+            </div>
+            <div>
+              <p className="font-semibold text-base">{selectedReview?.name}</p>
+              <p className="text-sm text-gray-500">{selectedReview?.date}</p>
+            </div>
+          </div>
 
-    {/* Star Rating */}
-    <div className="flex items-center gap-1 text-yellow-500 text-sm">
-      {Array(selectedReview?.stars)
-        .fill()
-        .map((_, i) => (
-          <svg
-            key={i}
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            viewBox="0 0 24 24"
-            className="w-4 h-4"
-          >
-            <path d="M12 .587l3.668 7.568L24 9.75l-6 5.859L19.336 24 12 19.897 4.664 24 6 15.609 0 9.75l8.332-1.595z" />
-          </svg>
-        ))}
-    </div>
+          {/* Star Rating */}
+          <div className="flex items-center gap-1 text-yellow-500 text-sm">
+            {Array(selectedReview?.stars)
+              .fill()
+              .map((_, i) => (
+                <svg
+                  key={i}
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                  className="w-4 h-4"
+                >
+                  <path d="M12 .587l3.668 7.568L24 9.75l-6 5.859L19.336 24 12 19.897 4.664 24 6 15.609 0 9.75l8.332-1.595z" />
+                </svg>
+              ))}
+          </div>
 
-    {/* Message */}
-    <div className="text-gray-800 text-sm whitespace-pre-line leading-relaxed">
-      {selectedReview?.message}
-    </div>
-  </div>
-</MuiModal>
-
+          {/* Message */}
+          <div className="text-gray-800 text-sm whitespace-pre-line leading-relaxed">
+            {selectedReview?.message}
+          </div>
+        </div>
+      </MuiModal>
     </div>
   );
 };

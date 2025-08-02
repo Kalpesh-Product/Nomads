@@ -207,11 +207,11 @@ const Listings = () => {
         </div>
       </div>
       <hr />
-      <Container>
+      <Container padding={false}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 ">
           <div className="  font-semibold text-lg ">
             <div className="pb-6">
-              <p>Over {listingsData?.length -1} Co - Working Space</p>
+              <p>Over {listingsData?.length -1} {formData.category === "coworking" ? "Co-Working" : 'Co-Living'} Spaces</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-[36rem] overflow-y-auto overflow-x-hidden">
               {isLisitingLoading ? (
@@ -226,6 +226,7 @@ const Listings = () => {
                       navigate(`${item.companyName}`, {
                         state: {
                           companyId: item._id,
+                          type : item.type
                         },
                       })
                     }

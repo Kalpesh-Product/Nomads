@@ -98,7 +98,7 @@ export const getCompanyDataLocationWise = async (req, res, next) => {
         );
 
         const companyUnits = colivingUnits.filter(
-          (item) => item.colivingCompany?.toString() === companyId
+          (item) => item.businessId?.toString() === companyId
         );
 
         const companyReviews = colivingReviews.filter(
