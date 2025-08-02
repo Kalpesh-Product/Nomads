@@ -28,25 +28,25 @@ export const getCompanyDataLocationWise = async (req, res, next) => {
           .lean()
           .exec(),
         CoworkingServices.findOne().lean().exec(),
-        CoworkingServices.findOne().lean().exec(),
+        CoworkingReviews.findOne().lean().exec(),
       ]);
 
-      const enrichedCompanies = companies.map((company) => {
+      const enrichedCompanies = coworkingCompanies.map((company) => {
         const companyId = company._id.toString();
 
-        const companyInclusions = inclusions.filter(
+        const companyInclusions = coworkingInclusions.filter(
           (item) => item.coworkingCompany?.toString() === companyId
         );
 
-        const companyPOCs = pocs.filter(
+        const companyPOCs = coworkingPoc.filter(
           (item) => item.coworkingCompany?.toString() === companyId
         );
 
-        const companyServices = services.filter(
+        const companyServices = coworkingServices.filter(
           (item) => item.coworkingCompany?.toString() === companyId
         );
 
-        const companyReviews = reviews.filter(
+        const companyReviews = coworkingReviews.filter(
           (item) => item.coworkingCompany?.toString() === companyId
         );
 

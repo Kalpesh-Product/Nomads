@@ -9,6 +9,7 @@ import pocRoutes from "./routes/pocRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import serviceRoutes from "./routes/servicesRoutes.js";
 import inclusionsRoutes from "./routes/inclusionsRoutes.js";
+import commonCompanyRoutes from "./routes/commonCompanyRoutes.js";
 import mongoose from "mongoose";
 
 const app = express();
@@ -25,6 +26,7 @@ app.use("/api/reviews", reviewRoutes);
 app.use("/api/poc", pocRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/inclusions", inclusionsRoutes);
+app.use("/api/common", commonCompanyRoutes);
 app.use(errorHandler);
 app.listen(
   PORT,
