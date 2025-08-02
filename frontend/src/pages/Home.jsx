@@ -13,10 +13,15 @@ import Amenities from "../components/Amenities";
 import Carousel from "../components/Carousel";
 import icons from "../assets/icons";
 import { AiFillStar } from "react-icons/ai";
-import {ReactFitty} from 'react-fitty'
+import { ReactFitty } from "react-fitty";
+import { useDispatch, useSelector } from "react-redux";
+import { setFormValues } from "../features/locationSlice";
+import axios from '../utils/axios'; 
 
 const Home = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const formData = useSelector((state) => state.location.formValues);
   const { handleSubmit, control, reset } = useForm({
     defaultValues: {
       country: "",
@@ -24,18 +29,20 @@ const Home = () => {
       category: "",
     },
   });
-  const { mutate: locationData, isPending: isLocation } = useMutation({
-    mutationFn: async (data) => {
-      console.log("data", data);
-      navigate("listings");
-    },
-    onSuccess: () => {
-      console.log("success");
-    },
-    onError: () => {
-      console.log("error");
-    },
-  });
+const { mutate: locationData, isPending: isLocation } = useMutation({
+  mutationFn: async (data) => {
+    const response = await axios.post('location-and-type-based-company-data',data)
+    return response.data; 
+  },
+  onSuccess: () => {
+    console.log("success");
+    dispatch(setFormValues(data));
+    navigate("listings");
+  },
+  onError: () => {
+    console.log("error");
+  },
+});
   const avatarConfigs = [
     {
       alt: "Consultant 1",
@@ -329,6 +336,7 @@ const Home = () => {
                 <div className="bg-primary-blue h-full flex justify-center">
                   <button
                     type="submit"
+                    disabled={isLocation}
                     className="h-full text-center w-32 flex justify-center items-center text-white"
                   >
                     <CiSearch /> &nbsp;&nbsp; Search
@@ -366,12 +374,8 @@ const Home = () => {
           {/* <h1 className="text-mobile-mega-header font-hero lg:leading-none lg:text-mega-header font-medium">
             INTRODUCING
           </h1> */}
-          <ReactFitty className="font-hero">
-            INTRODUCING
-          </ReactFitty>
-          <ReactFitty className="font-hero">
-             N-COMMERCE
-          </ReactFitty>
+          <ReactFitty className="font-hero">INTRODUCING</ReactFitty>
+          <ReactFitty className="font-hero">N-COMMERCE</ReactFitty>
           {/* <h1 className="text-mobile-mega-header font-hero lg:leading-none lg:text-mega-header font-medium">
             N-COMMERCE
           </h1> */}
@@ -379,9 +383,7 @@ const Home = () => {
             ("nomad commerce")
           </p>
           <div className="flex justify-center items-end w-full">
-            <PrimaryButton
-              title={"Partner now"}
-            />
+            <PrimaryButton title={"Partner now"} />
           </div>
         </div>
       </section>
