@@ -211,3 +211,20 @@ select:focus {
 .gm-style-iw button[aria-label="Close"] {
   display: none !important;
 }
+
+/* hide scrollbar */
+/* Add this to global CSS */
+html,
+body {
+  overflow: auto;
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, Opera */
+}
