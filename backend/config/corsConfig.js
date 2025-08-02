@@ -1,7 +1,6 @@
 export const allowedOrigins = [
-  "https://thebridg.com",
-  "http://localhost:3000",
   "http://localhost:5173",
+  "https://wononomadsfe.vercel.app",
 ];
 
 export const corsConfig = {
