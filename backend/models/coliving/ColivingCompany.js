@@ -9,6 +9,12 @@ const colivingSchema = new mongoose.Schema(
     logo: { type: String },
     images: [{ type: String }],
     address: { type: String },
+    state: {
+      type: String,
+    },
+    country: {
+      type: String,
+    },
     city: { type: String },
     about: { type: String },
     latitude: { type: Number },
