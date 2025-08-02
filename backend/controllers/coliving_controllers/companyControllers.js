@@ -18,7 +18,6 @@ export const bulkInsertColivingCompanies = async (req, res, next) => {
     stream
       .pipe(csvParser())
       .on("data", (row) => {
-        // Extract only schema-relevant fields
         const entry = {
           businessId: row["Business ID"]?.trim(),
           companyName: row["Business Name"]?.trim(),
