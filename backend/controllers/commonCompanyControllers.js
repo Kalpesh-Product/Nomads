@@ -21,14 +21,14 @@ export const getCompanyDataLocationWise = async (req, res, next) => {
         })
           .lean()
           .exec(),
-        CoworkingInclusions.findOne().lean().exec(),
-        CoworkingPointOfContact.findOne({
+        CoworkingInclusions.find().lean().exec(),
+        CoworkingPointOfContact.find({
           isActive: true,
         })
           .lean()
           .exec(),
-        CoworkingServices.findOne().lean().exec(),
-        CoworkingReviews.findOne().lean().exec(),
+        CoworkingServices.find().lean().exec(),
+        CoworkingReviews.find().lean().exec(),
       ]);
 
       const enrichedCompanies = coworkingCompanies.map((company) => {
