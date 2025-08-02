@@ -8,15 +8,24 @@ import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import Container from "../components/Container";
 import { useNavigate } from "react-router-dom";
 import Map from "../components/Map";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import axios from "../utils/axios.js";
 import renderStars from "../utils/renderStarts.jsx";
 import SkeletonCard from "../components/Skeletons/SkeletonCard.jsx";
 import SkeletonMap from "../components/Skeletons/SkeletonMap.jsx";
+import Select from "react-dropdown-select";
+import { setFormValues } from "../features/locationSlice.js";
 
 const Listings = () => {
   const [favorites, setFavorites] = useState([]);
+  const dispatch = useDispatch()
   const formData = useSelector((state) => state.location.formValues);
+   const countryOptions = [{ label: "India", value: "india" }];
+  const locationOptions = [{ label: "Goa", value: "goa" }];
+  const categoryOptions = [
+    { label: "Co-Working", value: "coworking" },
+    { label: "Co-Living", value: "coliving" },
+  ];
   console.log("formData", formData);
   const { data: listingsData, isPending: isLisitingLoading } = useQuery({
     queryKey: ["listings", formData], // ✅ ensures it refetches when formData changes
@@ -55,7 +64,7 @@ const Listings = () => {
   }, [formData]);
   const { mutate: locationData, isPending: isLocation } = useMutation({
     mutationFn: async (data) => {
-      console.log("data", data);
+      dispatch(setFormValues(data))
     },
     onSuccess: () => {
       console.log("success");
@@ -93,72 +102,106 @@ const Listings = () => {
         <div className="flex flex-col gap-4 justify-between w-3/4 md:w-3/4 lg:w-1/2 h-full">
           <form
             onSubmit={handleSubmit((data) => locationData(data))}
-            className="flex gap-2 items-center border-2 border-primary-blue rounded-full pl-4 overflow-hidden h-10 lg:h-16"
+            className="flex gap-2 border-2 border-primary-blue rounded-full pl-4 h-10 lg:h-16 justify-between items-center bg-white"
           >
-            <Controller
-              name="country"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  select
-                  fullWidth
-                  size="small"
-                  variant="standard"
-                  label="Select Country"
-                  slotProps={{ input: { disableUnderline: true } }}
-                >
-                  <MenuItem value="" disabled>
-                    Select A Country
-                  </MenuItem>
-                  <MenuItem value="india">India</MenuItem>
-                </TextField>
-              )}
-            />
-            <Controller
-              name="location"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  select
-                  fullWidth
-                  size="small"
-                  variant="standard"
-                  label="Select Location"
-                  slotProps={{ input: { disableUnderline: true } }}
-                >
-                  <MenuItem value="" disabled>
-                    Select A Location
-                  </MenuItem>
-                  <MenuItem value="goa">Goa</MenuItem>
-                </TextField>
-              )}
-            />
-            <div className="w-full border-l-2 border-l-primary-blue  flex h-full pl-4 ">
+            {/* Country */}
+            <div className="relative w-full">
+              <Controller
+                name="country"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    options={countryOptions}
+                    onChange={(values) => field.onChange(values[0]?.value)}
+                    values={countryOptions.filter(
+                      (opt) => opt.value === field.value
+                    )}
+                    placeholder="Select A Country"
+                    color="#0000"
+                    dropdownPosition="bottom"
+                    className="w-3/4 text-sm"
+                    style={{
+                      border: "none",
+                      background: "transparent",
+                      boxShadow: "none",
+                      fontSize: "0.875rem",
+                      padding: "0.5rem",
+                      color: "black",
+                      cursor: "pointer",
+                    }}
+                  />
+                )}
+              />
+            </div>
+
+            {/* Location */}
+            <div className="relative w-full border-l-2 border-l-primary-blue">
+              <Controller
+                name="location"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    options={locationOptions}
+                    onChange={(values) => field.onChange(values[0]?.value)}
+                    values={locationOptions.filter(
+                      (opt) => opt.value === field.value
+                    )}
+                    placeholder="Select A Location"
+                    dropdownPosition="bottom"
+                    className="w-3/4 text-sm"
+                    style={{
+                      border: "none",
+                      background: "transparent",
+                      boxShadow: "none",
+                      fontSize: "0.875rem",
+                      padding: "0.5rem",
+                      cursor: "pointer",
+                    }}
+                  />
+                )}
+              />
+            </div>
+
+            {/* Category */}
+            <div className="relative w-full border-l-2 border-l-primary-blue pl-2">
               <Controller
                 name="category"
                 control={control}
                 render={({ field }) => (
-                  <TextField
+                  <Select
                     {...field}
-                    select
-                    fullWidth
-                    size="small"
-                    variant="standard"
-                    label="Select Category"
-                    slotProps={{ input: { disableUnderline: true } }}
-                  >
-                    <MenuItem value="" disabled>
-                      Select A Category
-                    </MenuItem>
-                    <MenuItem value="coworking">Co-Working</MenuItem>
-                  </TextField>
+                    options={categoryOptions}
+                    onChange={(values) => field.onChange(values[0]?.value)}
+                    values={categoryOptions.filter(
+                      (opt) => opt.value === field.value
+                    )}
+                    placeholder="Select A Category"
+                    dropdownPosition="bottom"
+                    className="w-3/4 text-sm"
+                    style={{
+                      border: "none",
+                      background: "transparent",
+                      boxShadow: "none",
+                      fontSize: "0.875rem",
+                      padding: "0.5rem",
+                      cursor: "pointer",
+                    }}
+                  />
                 )}
               />
-              <div className="bg-primary-blue w-72 h-full text-subtitle flex justify-center items-center text-white">
-                <CiSearch /> &nbsp;&nbsp; Search
-              </div>
+            </div>
+
+            {/* Submit */}
+            <div className="bg-primary-blue h-full w-3/4 flex justify-center rounded-r-full">
+              <button
+                type="submit"
+                disabled={isLocation}
+                className="h-full text-center w-full flex justify-center items-center text-white"
+              >
+                <CiSearch className="text-lg" /> &nbsp; Search
+              </button>
             </div>
           </form>
         </div>
@@ -168,7 +211,7 @@ const Listings = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 ">
           <div className="  font-semibold text-lg ">
             <div className="pb-6">
-              <p>Over 16 Co - Working Space</p>
+              <p>Over {listingsData?.length -1} Co - Working Space</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-[36rem] overflow-y-auto overflow-x-hidden">
               {isLisitingLoading ? (

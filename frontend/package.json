@@ -25,6 +25,7 @@
     "mui-tel-input": "^8.0.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-dropdown-select": "^4.12.2",
     "react-fitty": "^1.0.1",
     "react-hook-form": "^7.56.1",
     "react-hot-toast": "^2.5.2",

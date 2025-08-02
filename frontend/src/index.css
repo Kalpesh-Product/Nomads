@@ -178,6 +178,20 @@ body {
 }
 
 
+/* index.css */
+select {
+  outline: none;
+  border: none;
+  background-color: transparent;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+select:focus {
+  outline: none;
+  box-shadow: none;
+}
 
 
 

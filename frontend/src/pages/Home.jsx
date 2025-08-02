@@ -16,31 +16,41 @@ import { AiFillStar } from "react-icons/ai";
 import { ReactFitty } from "react-fitty";
 import { useDispatch, useSelector } from "react-redux";
 import { setFormValues } from "../features/locationSlice";
-import axios from '../utils/axios'; 
+import axios from "../utils/axios";
+import { IoIosArrowDown } from "react-icons/io";
+import Select from "react-dropdown-select";
 
 const Home = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const formData = useSelector((state) => state.location.formValues);
-  const { handleSubmit, control, reset } = useForm({
+  const { handleSubmit, control, reset, register } = useForm({
     defaultValues: {
       country: "",
       location: "",
       category: "",
     },
   });
-const { mutate: locationData, isPending: isLocation } = useMutation({
-  mutationFn: async (data) => {
-    dispatch(setFormValues(data));
-    navigate("listings");
-  },
-  onSuccess: () => {
-    console.log("success");
-  },
-  onError: () => {
-    console.log("error");
-  },
-});
+  // Sample options
+  const countryOptions = [{ label: "India", value: "india" }];
+  const locationOptions = [{ label: "Goa", value: "goa" }];
+  const categoryOptions = [
+    { label: "Co-Working", value: "coworking" },
+    { label: "Co-Living", value: "coliving" },
+  ];
+
+  const { mutate: locationData, isPending: isLocation } = useMutation({
+    mutationFn: async (data) => {
+      dispatch(setFormValues(data));
+      navigate("listings");
+    },
+    onSuccess: () => {
+      console.log("success");
+    },
+    onError: () => {
+      console.log("error");
+    },
+  });
   const avatarConfigs = [
     {
       alt: "Consultant 1",
@@ -267,78 +277,105 @@ const { mutate: locationData, isPending: isLocation } = useMutation({
             <div className="flex flex-col gap-4 justify-between">
               <form
                 onSubmit={handleSubmit((data) => locationData(data))}
-                className="flex gap-2 border-2 border-primary-blue rounded-full pl-4 overflow-hidden h-10 lg:h-16 justify-center items-center"
+                className="flex gap-2 border-2 border-primary-blue rounded-full pl-4 h-10 lg:h-16 justify-between items-center bg-white"
               >
-                <Controller
-                  name="country"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      select
-                      fullWidth
-                      size="small"
-                      variant="standard"
-                      label="Select Country"
-                      slotProps={{ input: { disableUnderline: true } }}
-                    >
-                      <MenuItem value="" disabled>
-                        Select A Country
-                      </MenuItem>
-                      <MenuItem value="india">India</MenuItem>
-                    </TextField>
-                  )}
-                />
-                <Controller
-                  name="location"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      select
-                      fullWidth
-                      size="small"
-                      variant="standard"
-                      label="Select Location"
-                      slotProps={{ input: { disableUnderline: true } }}
-                    >
-                      <MenuItem value="" disabled>
-                        Select A Location
-                      </MenuItem>
-                      <MenuItem value="goa">Goa</MenuItem>
-                    </TextField>
-                  )}
-                />
-                <div className="w-full border-l-2 border-l-primary-blue px-2 ">
+                {/* Country */}
+                <div className="relative w-full">
+                  <Controller
+                    name="country"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        {...field}
+                        options={countryOptions}
+                        onChange={(values) => field.onChange(values[0]?.value)}
+                        values={countryOptions.filter(
+                          (opt) => opt.value === field.value
+                        )}
+                        placeholder="Select A Country"
+                        color="#0000"
+                        dropdownPosition="bottom"
+                        className="w-3/4 text-sm"
+                        style={{
+                          border: "none",
+                          background: "transparent",
+                          boxShadow: "none",
+                          fontSize: "0.875rem",
+                          padding: "0.5rem",
+                          color:'black',
+                          cursor: "pointer",
+                        }}
+                      />
+                    )}
+                  />
+                </div>
+
+                {/* Location */}
+                <div className="relative w-full border-l-2 border-l-primary-blue">
+                  <Controller
+                    name="location"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        {...field}
+                        options={locationOptions}
+                        onChange={(values) => field.onChange(values[0]?.value)}
+                        values={locationOptions.filter(
+                          (opt) => opt.value === field.value
+                        )}
+                        placeholder="Select A Location"
+                        dropdownPosition="bottom"
+                        className="w-3/4 text-sm"
+                        style={{
+                          border: "none",
+                          background: "transparent",
+                          boxShadow: "none",
+                          fontSize: "0.875rem",
+                          padding: "0.5rem",
+                          cursor: "pointer",
+                        }}
+                      />
+                    )}
+                  />
+                </div>
+
+                {/* Category */}
+                <div className="relative w-full border-l-2 border-l-primary-blue pl-2">
                   <Controller
                     name="category"
                     control={control}
                     render={({ field }) => (
-                      <TextField
+                      <Select
                         {...field}
-                        select
-                        fullWidth
-                        size="small"
-                        variant="standard"
-                        label="Select Category"
-                        slotProps={{ input: { disableUnderline: true } }}
-                      >
-                        <MenuItem value="" disabled>
-                          Select A Category
-                        </MenuItem>
-                        <MenuItem value="coworking">Co-Working</MenuItem>
-                        <MenuItem value="coliving">Co-Living</MenuItem>
-                      </TextField>
+                        options={categoryOptions}
+                        onChange={(values) => field.onChange(values[0]?.value)}
+                        values={categoryOptions.filter(
+                          (opt) => opt.value === field.value
+                        )}
+                        placeholder="Select A Category"
+                        dropdownPosition="bottom"
+                        className="w-3/4 text-sm"
+                        style={{
+                          border: "none",
+                          background: "transparent",
+                          boxShadow: "none",
+                          fontSize: "0.875rem",
+                          padding: "0.5rem",
+                          cursor: "pointer",
+                        }}
+                      />
                     )}
                   />
                 </div>
-                <div className="bg-primary-blue h-full flex justify-center">
+
+                {/* Submit */}
+                <div className="bg-primary-blue h-full w-3/4 flex justify-center rounded-r-full">
                   <button
                     type="submit"
                     disabled={isLocation}
-                    className="h-full text-center w-32 flex justify-center items-center text-white"
+                    className="h-full text-center w-full flex justify-center items-center text-white"
                   >
-                    <CiSearch /> &nbsp;&nbsp; Search
+                    <CiSearch className="text-lg" /> &nbsp; Search
                   </button>
                 </div>
               </form>
