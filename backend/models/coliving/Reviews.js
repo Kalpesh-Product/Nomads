@@ -3,10 +3,11 @@ import mongoose from "mongoose";
 const businessReviewSchema = new mongoose.Schema(
   {
     colivingCompany: { type: mongoose.Schema.Types.ObjectId, ref: "CoLiving" },
-    name: { type: String, required: true },
-    starCount: { type: Number, required: true, min: 1, max: 5 },
-    description: { type: String, required: true },
-    reviewSource: { type: String, required: true },
+    name: { type: String },
+    starCount: { type: Number, min: 1, max: 5 },
+    description: { type: String },
+    reviewSource: { type: String },
+    reviewLink: { type: String },
   },
   {
     timestamps: true,
