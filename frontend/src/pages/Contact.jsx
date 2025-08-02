@@ -72,7 +72,7 @@ const Contact = () => {
               <h2 className="text-title font-semibold uppercase mb-6">
                 About Us
               </h2>
-              <p className="text-sm mb-4 leading-relaxed">
+              <p className="text-subtitle mb-4 leading-relaxed">
                 WoNo's B2B Software As A Service (SaaS) Licensing tools are
                 being developed post in depth discussions with 100's of
                 businesses who are trying to develop and evolve the Nomads &
@@ -82,7 +82,7 @@ const Contact = () => {
                 wants to partner with us and we are providing them with our SaaS
                 Tools FREE of Cost in our Testing Phase.
               </p>
-              <p className="text-sm leading-relaxed">
+              <p className="text-subtitle leading-relaxed">
                 WoNo's eventual B2B2C is the largest Nomad Community being built
                 for individuals and companies who intend to work remotely. We're
                 creating the world’s first such platform and community to

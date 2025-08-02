@@ -17,7 +17,12 @@ const Header = () => {
     // { id: 1, text: "ROI", to: "" },
     { id: 1, text: "CAREER", to: "nomad/career" },
     { id: 2, text: "CONTACT", to: "nomad/contact" },
-    { id: 3, text: "SWITCH TO BUSINESS", to: "" },
+    {
+      id: 3,
+      text: "SWITCH TO BUSINESS",
+      external: true,
+      to: "https://wono.co",
+    },
   ];
   return (
     <div className="flex px-4 justify-between items-center md:py-3 md:px-[7.5rem] lg:px-[7.5rem]  bg-black backdrop-blur-md ">
@@ -46,14 +51,33 @@ const Header = () => {
                       className="text-base font-medium text-white">
                       {item.text}
                     </Link> */}
-                    <Link
+                    {/* <Link
                       to={item.to}
                       className="group relative text-base font-medium text-white">
                       <span className="relative z-10 group-hover:font-bold mb-8">
                         {item.text}
                       </span>
                       <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full "></span>
-                    </Link>
+                    </Link> */}
+                    {item.external ? (
+                      <a
+                        href={item.to}
+                        className="group relative text-base font-medium text-white">
+                        <span className="relative z-10 group-hover:font-bold mb-8">
+                          {item.text}
+                        </span>
+                        <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                      </a>
+                    ) : (
+                      <Link
+                        to={item.to}
+                        className="group relative text-base font-medium text-white">
+                        <span className="relative z-10 group-hover:font-bold mb-8">
+                          {item.text}
+                        </span>
+                        <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                      </Link>
+                    )}
                   </div>
                   {/* {index !== headerLinks.length - 1 && (
                   <div className="w-[1px] h-6 bg-gray-300 mx-2"></div>

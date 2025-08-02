@@ -1,7 +1,7 @@
 import React from "react";
 import { FaTwitter, FaFacebook, FaInstagram, FaLinkedin } from "react-icons/fa";
 import logo from "../assets/WONO_LOGO_white _TP.png";
-import img1 from "../assets/download.jpg";
+import img1 from "../assets/download.png";
 import img2 from "../assets/download 2.png";
 import { useNavigate } from "react-router-dom";
 
@@ -32,7 +32,7 @@ const MainPage = () => {
           <img
             src={img1}
             alt="Nomad Woman"
-            className="w-full  h-96 object-cover rounded-md"
+            className="w-full  h-96 object-cover rounded-md object-top"
           />
           <button
             onClick={() => navigate("/nomad")}
@@ -62,7 +62,7 @@ const MainPage = () => {
           <img
             src={img2}
             alt="Nomad Man"
-            className="w-full  h-96 object-cover rounded-md"
+            className="w-full  h-96 object-cover rounded-md object-[0_70%]"
           />
           <button
             onClick={() => (window.location.href = "https://wono.co")}

@@ -8,6 +8,7 @@ import NomadLayout from "./pages/NomadLayout";
 import Product from "./pages/Product";
 import Contact from "./pages/Contact";
 import Career from "./pages/Career";
+import JobDetails from "./pages/JobDetails";
 
 const router = createBrowserRouter([
   {
@@ -46,6 +47,10 @@ const router = createBrowserRouter([
           {
             path: "career",
             element: <Career />,
+          },
+          {
+            path: "career/job/:id",
+            element: <JobDetails />,
           },
         ],
       },

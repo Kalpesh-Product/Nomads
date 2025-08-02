@@ -25,7 +25,7 @@ const Jobrole = () => {
       ],
     },
     {
-      title: "II. Tech Development",
+      title: "II. Tech",
       jobs: [
         {
           id: 3,
@@ -50,6 +50,75 @@ const Jobrole = () => {
         },
       ],
     },
+    {
+      title: "III. Finance",
+      jobs: [
+        {
+          id: 6,
+          title: "Finance Intern",
+          type: "Full-Time",
+          mode: "On-Site",
+          location: "Goa",
+        },
+      ],
+    },
+    {
+      title: "IV. HR & EA",
+      jobs: [
+        {
+          id: 7,
+          title: "HR Generalist",
+          type: "Full-Time",
+          mode: "On-Site",
+          location: "Goa",
+        },
+        {
+          id: 8,
+          title: "Executive Assistant to CEO",
+          type: "Full-Time",
+          mode: "On-Site",
+          location: "Goa",
+        },
+      ],
+    },
+    {
+      title: "V. Sales",
+      jobs: [
+        {
+          id: 9,
+          title: "Sr.Manager Sales & Business Development",
+          type: "Full-Time",
+          mode: "On-Site",
+          location: "Goa",
+        },
+      ],
+    },
+    {
+      title: "VI. Marketing",
+      jobs: [
+        {
+          id: 10,
+          title: "Social Media Executive",
+          type: "Full-Time",
+          mode: "On-Site",
+          location: "Goa",
+        },
+      ],
+    },
+    {
+      title: "VII. Internships",
+      jobs: [
+        {
+          id: 11,
+          title: "Internships Across Departments",
+          subtitle:
+            "- APPLY NOW *Mention your applying department in the message box",
+          type: "Internships",
+          mode: "On-Site",
+          location: "Goa",
+        },
+      ],
+    },
   ];
 
   const [openIndex, setOpenIndex] = useState(null);
@@ -68,7 +137,7 @@ const Jobrole = () => {
             {/* Accordion Header */}
             <button
               onClick={() => toggleAccordion(idx)}
-              className="w-full flex justify-between items-center py-4 text-left text-xl font-bold focus:outline-none">
+              className="w-full flex justify-between items-center py-6 text-left text-3xl font-bold focus:outline-none">
               {section.title}
               <FaChevronDown
                 className={`text-gray-600 transition-transform duration-300 ${
@@ -85,24 +154,27 @@ const Jobrole = () => {
               <div className="space-y-4 mt-2">
                 {section.jobs.map((job, jobIdx) => (
                   <div key={job.id}>
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
-                      <div>
-                        <p className="font-semibold text-lg">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 ">
+                      <div className="md:w-1/2 lg:w-1/2 sm:w-full xs:w-full md:py-8 lg:py-6">
+                        <p className="font-bold text-2xl">
                           {jobIdx + 1}. {job.title}
                         </p>
                         {job.subtitle && (
-                          <p className="text-sm text-gray-600">
-                            {job.subtitle}
-                          </p>
+                          <p className="text-sm text-black ">{job.subtitle}</p>
                         )}
                       </div>
-                      <div className="text-right flex items-center gap-10 sm:w-full sm:justify-between">
-                        <p className="text-sm text-gray-800">
+                      <div className="text-right flex items-center gap-10 sm:justify-between xs:justify-between md:justify-end lg:justify-end md:w-1/2 lg:w-1/2  sm:w-full xs:w-full">
+                        <p className="text-sm font-semibold text-gray-900">
                           {job.type} | {job.mode} | {job.location}
                         </p>
                         <div className="flex justify-end mt-1">
-                          <Link
+                          {/* <Link
                             to={`/nomad/career`}
+                            className="border-2 border-gray-600 p-2 rounded-md hover:bg-black hover:text-white transition-colors">
+                            <FaChevronRight />
+                          </Link> */}
+                          <Link
+                            to={`/nomad/career/job/${job.id}`}
                             className="border-2 border-gray-600 p-2 rounded-md hover:bg-black hover:text-white transition-colors">
                             <FaChevronRight />
                           </Link>
