@@ -1,4 +1,4 @@
-import CoworkingCompany from "../models/coworking/CoworkingCompany";
+import CoworkingCompany from "../models/coworking/CoworkingCompany.js";
 import CoworkingInclusions from "../models/coworking/Inclusions.js";
 import CoworkingReviews from "../models/coworking/Review.js";
 import CoworkingServices from "../models/coworking/Services.js";
