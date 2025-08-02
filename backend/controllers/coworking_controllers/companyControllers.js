@@ -1,8 +1,8 @@
-import CoworkingCompany from "../models/coworking/CoworkingCompany.js";
-import Inclusions from "../models/coworking/Inclusions.js";
-import Review from "../models/coworking/Review.js";
-import Services from "../models/coworking/Services.js";
-import PointOfContact from "../models/coworking/PointOfContact.js";
+import CoworkingCompany from "../../models/coworking/CoworkingCompany.js";
+import Inclusions from "../../models/coworking/Inclusions.js";
+import Review from "../../models/coworking/Review.js";
+import Services from "../../models/coworking/Services.js";
+import PointOfContact from "../../models/coworking/PointOfContact.js";
 import yup from "yup";
 import csvParser from "csv-parser";
 import { Readable } from "stream";
