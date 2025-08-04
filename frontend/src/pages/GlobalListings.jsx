@@ -138,7 +138,7 @@ const GlobalListings = () => {
                         key={cat.value}
                         type="button"
                         onClick={() => handleCategoryClick(cat.value)}
-                        className=" text-primary-blue  px-4 py-2   hover:text-black transition flex items-center justify-center w-fit"
+                        className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-fit"
                       >
                         {iconSrc ? (
                           <div className="h-10 w-full flex flex-col gap-0">
@@ -148,6 +148,9 @@ const GlobalListings = () => {
                               className="h-full w-full object-contain"
                             />
                             <span className="text-sm">{cat.label}</span>
+                            <div>
+                                
+                            </div>
                           </div>
                         ) : (
                           cat.label // fallback if no icon found
