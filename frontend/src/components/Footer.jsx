@@ -9,27 +9,27 @@ const Footer = () => {
     {
       heading: "Corporate",
       links: [
-        { name: "Sign In", link: "/contact" },
-        { name: "Sign Up", link: "/real-estate" },
-        { name: "Contact", link: "/how-it-works" },
+        { name: "Sign In", link: "/nomad" },
+        { name: "Sign Up", link: "/nomad" },
+        { name: "Contact", link: "/nomad" },
         // { name: "Investor Login", link: "/login" },
       ],
     },
     {
       heading: "Services",
       links: [
-        { name: "Switch TO Nomads", link: "/roi" },
-        { name: "Career", link: "/roi" },
-        { name: "About", link: "/partnership" },
+        { name: "Switch TO Nomads", link: "/nomad" },
+        { name: "Career", link: "/nomad" },
+        { name: "About", link: "/nomad" },
         // { name: "Mortgage", link: "/mortgages" },
       ],
     },
     {
       heading: "Support",
       links: [
-        { name: "FAQs", link: "/contact" },
-        { name: "Privacy", link: "/faq" },
-        { name: "T&C", link: "privacy-policy" },
+        { name: "FAQs", link: "/nomad" },
+        { name: "Privacy", link: "/nomad" },
+        { name: "T&C", link: "nomad" },
         // { name: "T & C", link: "terms-conditions" },
       ],
     },
