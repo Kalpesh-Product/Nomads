@@ -12,7 +12,11 @@ import ColivingUnits from "../models/coliving/Units.js";
 export const getCompanyDataLocationWise = async (req, res, next) => {
   try {
     const { country, state, category } = req.query;
-    if (category?.toLowerCase() === "coworking") {
+
+    const countryRegex = { $regex: `^${country}$`, $options: "i" };
+    const stateRegex = { $regex: `^${state}$`, $options: "i" };
+
+    const fetchCoworkingData = async () => {
       const [
         coworkingCompanies,
         coworkingInclusions,
@@ -20,53 +24,37 @@ export const getCompanyDataLocationWise = async (req, res, next) => {
         coworkingServices,
         coworkingReviews,
       ] = await Promise.all([
-        CoworkingCompany.find({
-          country: { $regex: `^${country}$`, $options: "i" },
-          state: { $regex: `^${state}$`, $options: "i" },
-        })
+        CoworkingCompany.find({ country: countryRegex, state: stateRegex })
           .lean()
           .exec(),
         CoworkingInclusions.find().lean().exec(),
-        CoworkingPointOfContact.find({
-          isActive: true,
-        })
-          .lean()
-          .exec(),
+        CoworkingPointOfContact.find({ isActive: true }).lean().exec(),
         CoworkingServices.find().lean().exec(),
         CoworkingReviews.find().lean().exec(),
       ]);
 
-      const enrichedCompanies = coworkingCompanies.map((company) => {
+      return coworkingCompanies.map((company) => {
         const companyId = company._id.toString();
-
-        const companyInclusions = coworkingInclusions.filter(
-          (item) => item.coworkingCompany?.toString() === companyId
-        );
-
-        const companyPOCs = coworkingPoc.filter(
-          (item) => item.coworkingCompany?.toString() === companyId
-        );
-
-        const companyServices = coworkingServices.filter(
-          (item) => item.coworkingCompany?.toString() === companyId
-        );
-
-        const companyReviews = coworkingReviews.filter(
-          (item) => item.coworkingCompany?.toString() === companyId
-        );
-
         return {
           ...company,
-          inclusions: companyInclusions,
-          pointOfContacts: companyPOCs,
-          services: companyServices,
-          reviews: companyReviews,
+          inclusions: coworkingInclusions.filter(
+            (item) => item.coworkingCompany?.toString() === companyId
+          ),
+          pointOfContacts: coworkingPoc.filter(
+            (item) => item.coworkingCompany?.toString() === companyId
+          ),
+          services: coworkingServices.filter(
+            (item) => item.coworkingCompany?.toString() === companyId
+          ),
+          reviews: coworkingReviews.filter(
+            (item) => item.coworkingCompany?.toString() === companyId
+          ),
           type: "coworking",
         };
       });
+    };
 
-      return res.status(200).json(enrichedCompanies);
-    } else if (category?.toLowerCase() === "coliving") {
+    const fetchColivingData = async () => {
       const [
         colivingCompanies,
         colivingInclusions,
@@ -74,10 +62,7 @@ export const getCompanyDataLocationWise = async (req, res, next) => {
         colivingUnits,
         colivingReviews,
       ] = await Promise.all([
-        ColivingCompany.find({
-          country: { $regex: `^${country}$`, $options: "i" },
-          state: { $regex: `^${state}$`, $options: "i" },
-        })
+        ColivingCompany.find({ country: countryRegex, state: stateRegex })
           .lean()
           .exec(),
         ColivingInclusions.find().lean().exec(),
@@ -86,38 +71,40 @@ export const getCompanyDataLocationWise = async (req, res, next) => {
         ColivingReviews.find().lean().exec(),
       ]);
 
-      const enrichedCompanies = colivingCompanies.map((company) => {
+      return colivingCompanies.map((company) => {
         const companyId = company._id.toString();
-
-        const companyInclusions = colivingInclusions.filter(
-          (item) => item.colivingCompany?.toString() === companyId
-        );
-
-        const companyPOCs = colivingPoc.filter(
-          (item) => item.colivingCompany?.toString() === companyId
-        );
-
-        const companyUnits = colivingUnits.filter(
-          (item) => item.businessId?.toString() === companyId
-        );
-
-        const companyReviews = colivingReviews.filter(
-          (item) => item.colivingCompany?.toString() === companyId
-        );
-
         return {
           ...company,
-          inclusions: companyInclusions,
-          pointOfContacts: companyPOCs,
-          units: companyUnits,
-          reviews: companyReviews,
-           type: "coliving",
+          inclusions: colivingInclusions.filter(
+            (item) => item.colivingCompany?.toString() === companyId
+          ),
+          pointOfContacts: colivingPoc.filter(
+            (item) => item.colivingCompany?.toString() === companyId
+          ),
+          units: colivingUnits.filter(
+            (item) => item.businessId?.toString() === companyId
+          ),
+          reviews: colivingReviews.filter(
+            (item) => item.colivingCompany?.toString() === companyId
+          ),
+          type: "coliving",
         };
       });
+    };
 
-      return res.status(200).json(enrichedCompanies);
+    if (category?.toLowerCase() === "coworking") {
+      const coworkingData = await fetchCoworkingData();
+      return res.status(200).json(coworkingData);
+    } else if (category?.toLowerCase() === "coliving") {
+      const colivingData = await fetchColivingData();
+      return res.status(200).json(colivingData);
+    } else {
+      const [coworkingData, colivingData] = await Promise.all([
+        fetchCoworkingData(),
+        fetchColivingData(),
+      ]);
+      return res.status(200).json([...coworkingData, ...colivingData]);
     }
-    return res.status(404).json({ message: "No resource found" });
   } catch (error) {
     next(error);
   }
