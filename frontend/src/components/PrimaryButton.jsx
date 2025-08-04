@@ -11,8 +11,8 @@ const PrimaryButton = ({
   className,
   isLoading, // New prop for showing the spinner
 }) => {
-  const baseBgColor = disabled || isLoading ? "bg-gray-400" : "bg-primary";
-  const hoverBgColor = disabled || isLoading ? "" : "hover:bg-secondary-dark"; // Add hover color here
+  const baseBgColor = disabled || isLoading ? "bg-gray-400" : "bg-[#FF5757]";
+  const hoverBgColor = disabled || isLoading ? "" : "hover:bg-red-600"; // Add hover color here
 
   return (
     <button
