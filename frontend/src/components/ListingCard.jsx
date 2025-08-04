@@ -42,16 +42,16 @@ const ListingCard = ({ item, handleNavigation }) => {
           <p className="text-sm font-semibold">{item.companyName}</p>
           <div className="flex items-center gap-1 text-black">
             <AiFillStar size={16} />
-            <p className="text-sm font-semibold text-black">({item.ratings})</p>
+            <p className="text-sm font-semibold text-black">({item.ratings || 0})</p>
           </div>
         </div>
 
         <div className="flex w-full justify-between items-center">
           <p className="text-sm text-gray-600 font-medium">
-            {item.city}, {item.state}
+            {item.city || "Unknown"}, {item.state || "Unknown"}
           </p>
           <p className="text-sm font-semibold">
-            Reviews({item.reviews?.length || 0})
+            Reviews({item.reviewCount || 0})
           </p>
         </div>
       </div>
