@@ -33,7 +33,7 @@ const Carousel = ({ carouselItems }) => {
       {carouselItems.map((item, index) => (
         <div
           key={index}
-          className="keen-slider__slide relative h-[390px] rounded-xl overflow-hidden bg-cover bg-center"
+          className="keen-slider__slide relative h-[340px] rounded-xl overflow-hidden bg-cover bg-center "
           style={{
             backgroundImage: `url(${item.image || "/placeholder.jpg"})`,
           }}>

@@ -27,6 +27,7 @@ const Product = () => {
   console.log("selected : ", selectedReview);
   const [open, setOpen] = useState(false);
   console.log("company id", companyId);
+
   const { data: companyDetails, isPending: isCompanyDetails } = useQuery({
     queryKey: ["companyDetails", companyId],
     queryFn: async () => {
@@ -175,8 +176,7 @@ const Product = () => {
                       ? "border-primary-dark"
                       : "border-transparent"
                   }`}
-                  onClick={() => setSelectedImage(item)}
-                >
+                  onClick={() => setSelectedImage(item)}>
                   <img
                     src={item.url}
                     alt="company-thumbnail"
@@ -261,8 +261,7 @@ const Product = () => {
                 <form
                   onSubmit={handleSubmit((data) => submitEnquiry(data))}
                   action=""
-                  className="grid grid-cols-1 lg:grid-cols-2 gap-6"
-                >
+                  className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <Controller
                     name="firstName"
                     control={control}
@@ -328,8 +327,7 @@ const Product = () => {
                           fullWidth
                           variant="standard"
                           size="small"
-                          select
-                        >
+                          select>
                           <MenuItem value="" disabled>
                             <em>Select A Type</em>
                           </MenuItem>
@@ -349,8 +347,7 @@ const Product = () => {
                           fullWidth
                           variant="standard"
                           size="small"
-                          select
-                        >
+                          select>
                           <MenuItem value="" disabled>
                             <em>Select Number of Desk</em>
                           </MenuItem>
@@ -477,8 +474,7 @@ const Product = () => {
                 loading="lazy"
                 className="rounded-xl"
                 referrerPolicy="no-referrer-when-downgrade"
-                title="map"
-              ></iframe>
+                title="map"></iframe>
             </div>
             <hr className="my-5 lg:my-10" />
             <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-2 gap-20 pb-20">
@@ -520,8 +516,7 @@ const Product = () => {
                   </h1>
                   <form
                     onSubmit={handlesubmitSales((data) => submitSales(data))}
-                    className="grid grid-cols-1 gap-4"
-                  >
+                    className="grid grid-cols-1 gap-4">
                     <Controller
                       name="fullName"
                       control={salesControl}
@@ -599,8 +594,7 @@ const Product = () => {
                   xmlns="http://www.w3.org/2000/svg"
                   fill="currentColor"
                   viewBox="0 0 24 24"
-                  className="w-4 h-4"
-                >
+                  className="w-4 h-4">
                   <path d="M12 .587l3.668 7.568L24 9.75l-6 5.859L19.336 24 12 19.897 4.664 24 6 15.609 0 9.75l8.332-1.595z" />
                 </svg>
               ))}

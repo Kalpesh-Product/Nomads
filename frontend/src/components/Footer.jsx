@@ -1,11 +1,8 @@
 import { Link } from "react-router-dom";
-import logo from "../assets/WONO_LOGO_white _TP.png";
-import {
-  FaTwitter,
-  FaFacebookF,
-  FaInstagram,
-  FaLinkedinIn,
-} from "react-icons/fa";
+import logo from "../assets/WONO_LOGO_Black_TP.png";
+import { FaTwitter, FaLinkedinIn } from "react-icons/fa";
+import { FaGlobe, FaRupeeSign, FaFacebookF, FaInstagram } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 
 const Footer = () => {
   const footerSections = [
@@ -39,7 +36,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="w-full bg-black text-primary backdrop-blur-md border-t flex flex-col justify-center items-center gap-0  pb-0 md:pb-0  border-[0.5px] shadow-lg border-gray-300">
+    <footer className="w-full bg-gray-100 text-black backdrop-blur-md  flex flex-col justify-center items-center gap-0  pb-0 md:pb-0   shadow-lg ">
       <div className="w-full flex flex-wrap md:flex-wrap lg:flex-nowrap justify-between items-center pt-12 pb-16 px-28">
         <div className="flex flex-col justify-center md:flex-1 md:justify-center md:items-center lg:justify-start lg:items-start mb-8 lg:mb-0">
           <div className="w-70 md:w-80 h-full">
@@ -84,7 +81,7 @@ const Footer = () => {
                   <Link
                     key={i}
                     to={linkObj.link}
-                    className="text-sm  text-primary opacity-80 hover:opacity-100 hover:text-gray-500 transition-all duration-200 cursor-pointer uppercase">
+                    className="text-sm  text-black opacity-80 hover:opacity-100 hover:text-gray-500 transition-all duration-200 cursor-pointer uppercase">
                     {linkObj.name}
                   </Link>
                 ))}
@@ -94,13 +91,42 @@ const Footer = () => {
         </div>
       </div>
       {/* <div className="w-full h-[0.3px] bg-secondary border-t border-white" /> */}
-      <div className="w-full text-center flex flex-col lg:mb-0 py-6 border-t border-gray-600">
+      <div className="w-full text-center flex flex-col lg:mb-0 py-6 border-t-2 border-white">
         <div className="flex justify-center items-center flex-col md:flex-row lg:flex-row gap-2 text-small md:text-base">
           <span>
             &copy; Copyright {new Date().getFullYear()} -{" "}
             {(new Date().getFullYear() + 1).toString().slice(-2)} <span></span>
           </span>{" "}
           <span> WONOCO PRIVATE LIMITED - SINGAPORE. All Rights Reserved.</span>
+        </div>
+      </div>
+      {/* Footer Bottom Section */}
+      <div className="w-full flex flex-col md:flex-row justify-between items-center text-[10px] md:text-xs px-4 py-4 text-gray-800 bg-gray-50 font-semibold">
+        {/* Left Links */}
+        <div className="flex gap-3 mb-2 md:mb-0">
+          <span>Privacy</span>
+          <span>·</span>
+          <span>Terms</span>
+          <span>·</span>
+          <span>Sitemap</span>
+          <span>·</span>
+          <span>Company details</span>
+        </div>
+
+        {/* Right Icons and Settings */}
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1">
+            <FaGlobe className="text-[12px]" />
+            <span>English (IN)</span>
+          </div>
+          <div className="px-2 py-[2px] border-2 border-gray-700 rounded-md text-[12px] flex items-center gap-1">
+            <FaRupeeSign className="text-[12px]" />
+            <span>INR</span>
+          </div>
+          <FaFacebookF className="text-[12px]" />
+
+          <FaXTwitter className="text-[12px]" />
+          <FaInstagram className="text-[12px]" />
         </div>
       </div>
     </footer>

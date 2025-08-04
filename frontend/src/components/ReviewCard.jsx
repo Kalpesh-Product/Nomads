@@ -7,7 +7,7 @@ const ReviewCard = ({ review, handleClick }) => {
   const { name, avatar, duration, stars, date, message } = review;
 
   return (
-    <div className="flex flex-col gap-2 max-w-sm border-2 p-4 rounded-xl">
+    <div className="flex flex-col gap-2 max-w-sm  p-4 rounded-xl">
       {/* Header */}
       <div className="flex items-center gap-3">
         {avatar ? (
@@ -46,8 +46,7 @@ const ReviewCard = ({ review, handleClick }) => {
 
       <span
         onClick={handleClick}
-        className="text-small font-medium underline cursor-pointer"
-      >
+        className="text-small font-medium underline cursor-pointer">
         Show more
       </span>
     </div>
