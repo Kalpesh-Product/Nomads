@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 const ListingCard = ({ item, handleNavigation }) => {
   const navigate = useNavigate();
   const [favorites, setFavorites] = useState([]);
+  console.log("item", item);
 
   const toggleFavorite = (id) => {
     setFavorites((prev) =>
@@ -41,7 +42,7 @@ const ListingCard = ({ item, handleNavigation }) => {
           <p className="text-sm font-semibold">{item.companyName}</p>
           <div className="flex items-center gap-1 text-black">
             <AiFillStar size={16} />
-            <p className="text-sm font-semibold text-black">({avgRating})</p>
+            <p className="text-sm font-semibold text-black">({item.ratings})</p>
           </div>
         </div>
 
