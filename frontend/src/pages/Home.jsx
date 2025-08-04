@@ -1,12 +1,13 @@
 import React from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import PrimaryButton from "../components/PrimaryButton";
 import SecondaryButton from "../components/SecondaryButton";
 import AccentButton from "../components/AccentButton";
 import { Avatar, MenuItem, TextField } from "@mui/material";
-import { useMutation } from "@tanstack/react-query";
+
 import { Controller, useForm } from "react-hook-form";
-import { CiSearch } from "react-icons/ci";
+import { FaSearch } from "react-icons/fa";
+
 import Container from "../components/Container";
 import { FaRegListAlt } from "react-icons/fa";
 import Amenities from "../components/Amenities";
@@ -19,8 +20,28 @@ import { setFormValues } from "../features/locationSlice";
 import axios from "../utils/axios";
 import { IoIosArrowDown } from "react-icons/io";
 import Select from "react-dropdown-select";
+import Image from "../../public/images/homepage.jpeg";
+import ReviewCard from "../components/ReviewCard";
+import { useMutation, useQuery } from "@tanstack/react-query";
+
+import { AiOutlineHeart } from "react-icons/ai";
+import coworking from "../../public/images/bg-image.jpg";
+import hostels from "../../public/images/bg-image.jpg";
+import cafes from "../../public/images/bg-image.jpg";
+import privateStay from "../../public/images/bg-image.jpg";
+import companyWorkation from "../../public/images/bg-image.jpg";
 
 const Home = () => {
+  const destinationData = [
+    { label: "Co-Working", image: coworking },
+    { label: "Hostels", image: hostels },
+    { label: "Cafe’s & Meeting Rooms", image: cafes },
+    { label: "Private Stay", image: privateStay },
+    { label: "Company Workation", image: companyWorkation },
+  ];
+  const location = useLocation();
+  // const { companyId, type } = location.state;
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const formData = useSelector((state) => state.location.formValues);
@@ -28,15 +49,94 @@ const Home = () => {
     defaultValues: {
       country: "",
       location: "",
-      category: "",
+      count: "",
     },
   });
   // Sample options
   const countryOptions = [{ label: "India", value: "india" }];
   const locationOptions = [{ label: "Goa", value: "goa" }];
-  const categoryOptions = [
-    { label: "Co-Working", value: "coworking" },
-    { label: "Co-Living", value: "coliving" },
+  const countOptions = [
+    { label: "0 - 10", value: "0 - 10" },
+    { label: "10 - 20", value: "10 - 20" },
+  ];
+
+  // const { data: companyDetails, isPending: isCompanyDetails } = useQuery({
+  //   queryKey: ["companyDetails", companyId],
+  //   queryFn: async () => {
+  //     const response = await axios.get(
+  //       `common/individual-company?companyId=${companyId}&&type=${type}`
+  //     );
+  //     return response.data;
+  //   },
+  //   enabled: !!companyId && !!type,
+  // });
+
+  // Reviews
+  // const reviewData = isCompanyDetails
+  //   ? []
+  //   : companyDetails?.reviews.map((item) => ({
+  //       ...item,
+  //       stars: item.starCount,
+  //       message: item.description,
+  //       date: dayjs(item.createdAt).fromNow(),
+  //     }));
+
+  const reviewData = [
+    {
+      name: "Aayushi",
+      avatar: "https://i.pravatar.cc/50?img=1",
+      duration: "3 years on Airbnb",
+      stars: 5,
+      date: "2 days ago",
+      message:
+        "One of the best Airbnbs I’ve stayed at. Loved everything about it, from the stay, to the helpful staff at the place, Bhaskar, to the thoughtfulness they’ve put behind...",
+    },
+    {
+      name: "Vinay",
+      avatar: "https://i.pravatar.cc/50?img=2",
+      duration: "3 years on Airbnb",
+      stars: 5,
+      date: "2 weeks ago",
+      message:
+        "Our caretaker Bhaskar was really responsive and helped a lot. The stay itself is quite good and peaceful. It’s quite secured and we loved the views as well. Good neighborhood...",
+    },
+    {
+      name: "Ankush",
+      avatar: "https://i.pravatar.cc/50?img=3",
+      duration: "New to Airbnb",
+      stars: 5,
+      date: "2 weeks ago",
+      message:
+        "My recent Airbnb stay was absolutely wonderful, thanks to the incredibly helpful host and staff. They were always available and went above and beyond to assist with anything...",
+    },
+    {
+      name: "Irine",
+      avatar: "https://i.pravatar.cc/50?img=4",
+      duration: "2 years on Airbnb",
+      stars: 5,
+      date: "April 2025",
+      message:
+        "The stay was comfortable and had everything we needed. The kitchen was well-equipped with all utensils, making things very convenient. We also received room service...",
+    },
+    {
+      name: "Aayushi",
+      avatar: "https://i.pravatar.cc/50?img=1",
+      duration: "3 years on Airbnb",
+      stars: 5,
+      date: "2 days ago",
+      message:
+        "One of the best Airbnbs I’ve stayed at. Loved everything about it, from the stay, to the helpful staff at the place, Bhaskar, to the thoughtfulness they’ve put behind...",
+    },
+
+    {
+      name: "Ankush",
+      avatar: "https://i.pravatar.cc/50?img=3",
+      duration: "New to Airbnb",
+      stars: 5,
+      date: "2 weeks ago",
+      message:
+        "My recent Airbnb stay was absolutely wonderful, thanks to the incredibly helpful host and staff. They were always available and went above and beyond to assist with anything...",
+    },
   ];
 
   const { mutate: locationData, isPending: isLocation } = useMutation({
@@ -178,7 +278,158 @@ const Home = () => {
 
   return (
     <div className="flex flex-col w-full">
+      <Container>
+        <div className="py-4  ">
+          <div className="flex flex-col gap-4 justify-between">
+            <form
+              onSubmit={handleSubmit((data) => locationData(data))}
+              className="flex gap-2 border-2 border-black rounded-full pl-4 h-10 lg:h-16 justify-between items-center bg-white">
+              {/* Country */}
+              <div className="relative w-full">
+                <Controller
+                  name="country"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      options={countryOptions}
+                      onChange={(values) => field.onChange(values[0]?.value)}
+                      values={countryOptions.filter(
+                        (opt) => opt.value === field.value
+                      )}
+                      placeholder="Select aspiring destination"
+                      color="#0000"
+                      dropdownPosition="bottom"
+                      className="w-3/4 text-sm"
+                      style={{
+                        border: "none",
+                        background: "transparent",
+                        boxShadow: "none",
+                        fontSize: "0.875rem",
+                        padding: "0.5rem",
+                        color: "black",
+                        cursor: "pointer",
+                      }}
+                    />
+                  )}
+                />
+              </div>
+
+              {/* Location */}
+              <div className="relative w-full border-l-4 border-black">
+                <Controller
+                  name="location"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      options={locationOptions}
+                      onChange={(values) => field.onChange(values[0]?.value)}
+                      values={locationOptions.filter(
+                        (opt) => opt.value === field.value
+                      )}
+                      placeholder="Select area within Country"
+                      dropdownPosition="bottom"
+                      className="w-3/4 text-sm"
+                      style={{
+                        border: "none",
+                        background: "transparent",
+                        boxShadow: "none",
+                        fontSize: "0.875rem",
+                        padding: "0.5rem",
+                        cursor: "pointer",
+                      }}
+                    />
+                  )}
+                />
+              </div>
+
+              {/* count */}
+              <div className="relative w-full border-l-4 border-black pl-2">
+                <Controller
+                  name="count"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      options={countOptions}
+                      onChange={(values) => field.onChange(values[0]?.value)}
+                      values={countOptions.filter(
+                        (opt) => opt.value === field.value
+                      )}
+                      placeholder="Booking for no of nomads"
+                      dropdownPosition="bottom"
+                      className="w-3/4 text-sm"
+                      style={{
+                        border: "none",
+                        background: "transparent",
+                        boxShadow: "none",
+                        fontSize: "0.875rem",
+                        padding: "0.5rem",
+                        cursor: "pointer",
+                      }}
+                    />
+                  )}
+                />
+              </div>
+
+              {/* Submit */}
+              <div className=" h-full  flex justify-end rounded-r-full pr-3 items-center">
+                <button
+                  type="submit"
+                  disabled={isLocation}
+                  className="h-12 text-center w-12 flex justify-center items-center text-white rounded-full bg-[#ff5757] font-bold">
+                  <FaSearch className="text-3xl " />
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </Container>
+
       <Container padding={false}>
+        <section className="w-full   bg-white pb-12">
+          <div className=" mx-auto flex flex-col md:flex-row items-center gap-12">
+            {/* Left: Text */}
+            <div className="md:w-1/2 text-center md:text-left">
+              <h2 className="text-3xl md:text-7xl lg:text-7xl font-light text-primary-blue leading-snug text-center">
+                Building the <br />
+                <span className="text-5xl md:text-6xl font-light text-primary-blue">
+                  LARGEST
+                </span>
+                <br />
+                COMMUNITY of <br />
+                <span className="text-4xl md:text-5xl text-primary-blue">
+                  Nomads
+                </span>
+              </h2>
+              <p className="mt-6 text-gray-700 text-base md:text-lg text-center">
+                A global movement of remote workers, companies, <br />
+                creators, entrepreneurs, hosts, investors who are
+                <br />
+                redefining how the world lives and works.
+              </p>
+              <p className="mt-4 text-gray-700 text-base md:text-lg text-center">
+                Bound by freedom, flexibility, and connection, nomads <br /> are
+                building the future—one destination at a time.
+              </p>
+            </div>
+
+            {/* Right: Image */}
+            <div className="md:w-1/2">
+              <div className="rounded-md overflow-hidden shadow-lg border border-purple-200">
+                <img
+                  src={Image}
+                  alt="Nomads working together"
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+      </Container>
+
+      {/* <Container padding={false}>
         <section className="flex flex-col gap-2 lg:mb-8 pb-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="flex flex-col gap-4 justify-end items-start">
@@ -200,7 +451,6 @@ const Home = () => {
                   <hr />
                   <div className="flex items-center gap-2">
                     <div className="py-3 px-4 rounded-3xl bg-white">
-                      {/* <span>Ratings here</span> */}
                       <div className="flex items-center gap-4 ">
                         <div className="flex">
                           <span className="text-yellow-300">
@@ -223,8 +473,7 @@ const Home = () => {
                       </div>
                     </div>
                     <NavLink
-                      className={"text-white text-small hover:underline"}
-                    >
+                      className={"text-white text-small hover:underline"}>
                       View More Reviews
                     </NavLink>
                   </div>
@@ -235,7 +484,6 @@ const Home = () => {
               <div className="flex flex-col gap-4 h-full justify-between">
                 <div className="bg-white text-black flex justify-center items-center">
                   {" "}
-                  {/* Consultant Avatars */}
                   <div className="flex justify-start md:justify-center lg:justify-start items-center -space-x-4 w-full mt-4">
                     {avatarConfigs.map((config, index) => (
                       <Avatar
@@ -277,9 +525,7 @@ const Home = () => {
             <div className="flex flex-col gap-4 justify-between">
               <form
                 onSubmit={handleSubmit((data) => locationData(data))}
-                className="flex gap-2 border-2 border-primary-blue rounded-full pl-4 h-10 lg:h-16 justify-between items-center bg-white"
-              >
-                {/* Country */}
+                className="flex gap-2 border-2 border-primary-blue rounded-full pl-4 h-10 lg:h-16 justify-between items-center bg-white">
                 <div className="relative w-full">
                   <Controller
                     name="country"
@@ -302,7 +548,7 @@ const Home = () => {
                           boxShadow: "none",
                           fontSize: "0.875rem",
                           padding: "0.5rem",
-                          color:'black',
+                          color: "black",
                           cursor: "pointer",
                         }}
                       />
@@ -310,7 +556,6 @@ const Home = () => {
                   />
                 </div>
 
-                {/* Location */}
                 <div className="relative w-full border-l-2 border-l-primary-blue">
                   <Controller
                     name="location"
@@ -339,7 +584,6 @@ const Home = () => {
                   />
                 </div>
 
-                {/* Category */}
                 <div className="relative w-full border-l-2 border-l-primary-blue pl-2">
                   <Controller
                     name="category"
@@ -368,31 +612,26 @@ const Home = () => {
                   />
                 </div>
 
-                {/* Submit */}
                 <div className="bg-primary-blue h-full w-3/4 flex justify-center rounded-r-full">
                   <button
                     type="submit"
                     disabled={isLocation}
-                    className="h-full text-center w-full flex justify-center items-center text-white"
-                  >
-                    <CiSearch className="text-lg" /> &nbsp; Search
+                    className="h-full text-center w-full flex justify-center items-center text-white">
+                    <FaSearch className="text-lg" /> &nbsp; Search
                   </button>
                 </div>
               </form>
 
               <div>
                 <div className="grid grid-cols-3 text-center text-sm font-medium relative">
-                  {/* Top Row */}
                   <div className="p-4 text-tiny">Co – Working</div>
                   <div className="p-4 text-tiny border-l border-r border-black">
                     Co – Living
                   </div>
                   <div className="p-4 text-tiny">Workation</div>
 
-                  {/* Horizontal Divider */}
                   <div className="absolute left-0 right-0 border-t border-black top-1/2" />
 
-                  {/* Bottom Row */}
                   <div className="p-4 text-tiny">Exclusive Campus</div>
                   <div className="p-4 text-tiny border-l border-r border-black">
                     Meeting Room
@@ -403,10 +642,10 @@ const Home = () => {
             </div>
           </div>
         </section>
-      </Container>
+      </Container> */}
 
       <section className="bg-black w-full flex flex-col gap-4 py-16 lg:py-16">
-        <div className="lg:w-[80rem] max-w-[80rem] mx-auto flex flex-col text-primary  justify-center items-center leading-none">
+        <div className="lg:w-[80rem] max-w-[80rem] mx-auto flex flex-col text-primary-blue  justify-center items-center leading-none">
           {/* <h1 className="text-mobile-mega-header font-hero lg:leading-none lg:text-mega-header font-medium">
             INTRODUCING
           </h1> */}
@@ -415,17 +654,22 @@ const Home = () => {
           {/* <h1 className="text-mobile-mega-header font-hero lg:leading-none lg:text-mega-header font-medium">
             N-COMMERCE
           </h1> */}
-          <p className="uppercase text-mobile-main-header lg:text-mega-desc font-hero">
+          <p className="uppercase text-mobile-main-header lg:text-9xl font-hero text-white pt-4 pb-20">
             ("nomad commerce")
           </p>
-          <div className="flex justify-center items-end w-full">
+          {/* <div className="flex justify-center items-end w-full">
             <PrimaryButton title={"Partner now"} />
+          </div> */}
+          <div className="text-white w-full text-center ">
+            <ReactFitty className="text-mobile-header lg:text-4xl font-semibold">
+              End-to-end Nomad solutions for working from aspiring destinations
+            </ReactFitty>
           </div>
         </div>
       </section>
-      <Container padding>
+
+      {/* <Container padding>
         <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-[1fr_1px_1fr] gap-y-6 lg:gap-x-12">
-          {/* Section: WONO for Nomads */}
           <div className="w-full flex flex-col gap-4">
             <h1 className="text-title font-semibold text-center uppercase pb-10">
               WONO for Nomads
@@ -436,8 +680,7 @@ const Home = () => {
                   key={index}
                   className={`flex flex-col gap-4 rounded-xl p-3 ${
                     section.bgColor || "bg-white"
-                  }`}
-                >
+                  }`}>
                   <div className="flex flex-col gap-4">
                     <span className="text-title pl-6">{section.icon}</span>
                     <ul className="list-disc pl-6">
@@ -459,10 +702,8 @@ const Home = () => {
             </div>
           </div>
 
-          {/* Divider */}
           <div className="hidden lg:block w-px bg-gray-300 h-full mx-auto" />
 
-          {/* Section: WONO for Business */}
           <div className="w-full flex flex-col gap-4">
             <h1 className="text-title font-semibold text-center uppercase pb-10">
               WONO for Business
@@ -473,8 +714,7 @@ const Home = () => {
                   key={index}
                   className={`flex flex-col gap-4 rounded-xl p-3 ${
                     section.bgColor || "bg-white"
-                  }`}
-                >
+                  }`}>
                   <div className="flex flex-col gap-4">
                     <span className="text-title pl-6">{section.icon}</span>
                     <ul className="list-disc pl-6">
@@ -496,56 +736,83 @@ const Home = () => {
             </div>
           </div>
         </div>
-      </Container>
+      </Container> */}
 
-      <div className="lg:max-w-[85rem] lg:mx-auto  flex flex-col gap-4 md:px-10 px-6 border-t-2 border-gray-300 py-8">
-        <h1 className=" uppercase lg:text-title font-semibold text-title pb-8">
-          We have solutions for your needs.....
+      {/* <div className="lg:max-w-[80rem] min-w-[85%] lg:mx-auto  flex flex-col gap-4 md:px-10 px-6 border-t-2 border-gray-300 pt-16 pb-16">
+        <h1 className="  lg:text-title font-semibold text-title pb-8">
+          Solutions for your aspiring destinations.
         </h1>
         <div>
           <Carousel carouselItems={carouselItems} />
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="flex flex-col gap-2">
-            <h1 className="text-card-title lg:text-[6rem] leading-normal uppercase font-semibold">
-              Exclusive villas
-            </h1>
-            <p className="text-subtitle leading-none lg:text-[2.5rem] font-medium">
-              {" "}
-              250+ Villas all over country
-            </p>
-          </div>
-          <div className="flex flex-col gap-4 py-6 border-b-2 border-black">
-            <p className="text-[1.8rem]">
-              Serves as a{" "}
-              <span className="font-semibold">dynamic platform</span>,
-              seamlessly connecting freelance professionals, remote workers, and
-              individuals seeking{" "}
-              <span className="font-semibold">
-                flexible workspace solutions
-              </span>{" "}
-              with nearby{" "}
-              <span className="font-semibold">co-working spaces.</span>
-            </p>
-            <span className="text-content">
-              <ul className="list-disc pl-6 text-gray-500">
-                <li>
-                  Serves as a dynamic platform, seamlessly connecting freelance
-                  professionals, remote workers, and individuals seeking
-                  flexible workspace solutions with nearby co-working spaces.
-                </li>
-              </ul>
-            </span>
+
+  
+      </div> */}
+
+      {/*  */}
+      <section className="w-full px-6 py-12 bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-medium text-center mb-10 text-gray-700">
+            Solutions for your aspiring destinations.
+          </h2>
+
+          <div className="flex flex-wrap justify-center gap-6">
+            {destinationData.map((item, idx) => (
+              <div
+                key={idx}
+                className="w-44 sm:w-52 md:w-56 lg:w-56 flex flex-col items-center">
+                <div className="relative w-full rounded-xl overflow-hidden shadow-md">
+                  <img
+                    src={item.image}
+                    alt={item.label}
+                    className="w-full h-80 object-cover"
+                  />
+                  {/* <div className="absolute top-2 left-2 bg-white text-xs font-medium text-gray-700 px-2 py-1 rounded-full shadow">
+                    Guest favourite
+                  </div> */}
+                  <div className="absolute top-2 right-2    shadow">
+                    <AiOutlineHeart className="text-white text-xl" />
+                  </div>
+                </div>
+                <p className="mt-2 text-sm md:text-base font-medium text-gray-800 text-center">
+                  {item.label}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
+      </section>
+
       <Container>
         <div className="flex flex-col gap-8 w-full border-t-2 border-gray-300 py-8">
-          <h1 className="text-title font-semibold uppercase">Our inclusions</h1>
+          <h1 className="text-title font-semibold ">Platform inclusions.</h1>
           <div className="grid grid-cols-2 md:grid-cols-4  lg:grid-cols-6 gap-x-16 md:gap-x-16 lg:gap-x-28 gap-y-10">
             {amenities.map((item, index) => (
               <Amenities key={index} image={item.image} title={item.title} />
             ))}
+          </div>
+        </div>
+      </Container>
+      <Container>
+        <div className="flex flex-col gap-8 w-full border-t-2 border-gray-300 py-8">
+          <h1 className="text-title font-semibold ">Happy customers.</h1>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-0 lg:p-6">
+            {reviewData.length > 0 ? (
+              reviewData.map((review, index) => (
+                <ReviewCard
+                  handleClick={() => {
+                    setSelectedReview(review);
+                    setOpen(true);
+                  }}
+                  key={index}
+                  review={review}
+                />
+              ))
+            ) : (
+              <div className="col-span-full border-2 border-dotted border-gray-300 rounded-xl p-6 text-center text-sm text-gray-500 h-40 flex justify-center items-center">
+                No reviews yet.
+              </div>
+            )}
           </div>
         </div>
       </Container>
