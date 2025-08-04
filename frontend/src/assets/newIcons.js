@@ -1,0 +1,9 @@
+const newIcons = {
+  coworking: "/icons-new/coWorking.png",
+  hostels: "/icons-new/hostels.png",
+  cafeMeetings: "/icons-new/cafe-meetings.png",
+  privateStay: "/icons-new/privateStay.png",
+  companyWorkation: "/icons-new/companyWorkation.png",
+};
+
+export default newIcons;

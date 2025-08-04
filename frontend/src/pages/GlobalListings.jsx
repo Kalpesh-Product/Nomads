@@ -16,6 +16,7 @@ import SkeletonMap from "../components/Skeletons/SkeletonMap.jsx";
 import Select from "react-dropdown-select";
 import { setFormValues } from "../features/locationSlice.js";
 import ListingCard from "../components/ListingCard.jsx";
+import newIcons from "../assets/newIcons.js";
 
 const GlobalListings = () => {
   const [favorites, setFavorites] = useState([]);
@@ -88,28 +89,6 @@ const GlobalListings = () => {
     },
   });
 
-  const forMapsData = isLisitingLoading
-    ? []
-    : listingsData.map((item) => ({
-        ...item,
-        id: item._id,
-        lat: item.latitude,
-        lng: item.longitude,
-        name: item.companyName,
-        location: item.city,
-        reviews: item.reviews.length,
-        rating: item.reviews?.length
-          ? (() => {
-              const avg =
-                item.reviews.reduce((sum, r) => sum + r.starCount, 0) /
-                item.reviews.length;
-              return avg % 1 === 0 ? avg : avg.toFixed(1);
-            })()
-          : "0",
-        image:
-          "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
-      }));
-
   const handleCategoryClick = (categoryValue) => {
     const formData = getValues(); // from react-hook-form
 
@@ -149,17 +128,34 @@ const GlobalListings = () => {
               onSubmit={handleSubmit((data) => locationData(data))}
               className="flex flex-col gap-4"
             >
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {categoryOptions.map((cat) => (
-                  <button
-                    key={cat.value}
-                    type="button"
-                    onClick={() => handleCategoryClick(cat.value)}
-                    className="border border-primary-blue text-primary-blue rounded-full px-4 py-2 hover:bg-primary-blue hover:text-white transition"
-                  >
-                    {cat.label}
-                  </button>
-                ))}
+              <div className=" w-full flex justify-center items-center">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {categoryOptions.map((cat) => {
+                    const iconSrc = newIcons[cat.value];
+
+                    return (
+                      <button
+                        key={cat.value}
+                        type="button"
+                        onClick={() => handleCategoryClick(cat.value)}
+                        className=" text-primary-blue  px-4 py-2   hover:text-black transition flex items-center justify-center w-fit"
+                      >
+                        {iconSrc ? (
+                          <div className="h-10 w-full flex flex-col gap-0">
+                            <img
+                              src={iconSrc}
+                              alt={cat.label}
+                              className="h-full w-full object-contain"
+                            />
+                            <span className="text-sm">{cat.label}</span>
+                          </div>
+                        ) : (
+                          cat.label // fallback if no icon found
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               <div className="flex gap-2 border-2 border-primary-blue rounded-full pl-4 h-10 lg:h-16 justify-between items-center bg-white">
