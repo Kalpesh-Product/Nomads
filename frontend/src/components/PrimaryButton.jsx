@@ -18,7 +18,7 @@ const PrimaryButton = ({
     <button
       disabled={disabled || isLoading}
       type={type}
-      className={`flex uppercase rounded-full items-center cursor-pointer justify-center gap-2
+      className={`flex rounded-full items-center cursor-pointer justify-center gap-2
         ${baseBgColor} ${hoverBgColor} text-secondary
         ${fontSize ? fontSize : "text-content leading-5"}
         ${externalStyles} ${padding ? padding : "px-6 py-3"} ${className}`}
