@@ -30,7 +30,7 @@ const router = createBrowserRouter([
             element: <Home />,
           },
           {
-            path: "global-listing",
+            path: ":country/:state",
             element: <GlobalListings />,
           },
           {
