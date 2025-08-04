@@ -305,10 +305,12 @@ const Home = () => {
                         border: "none",
                         background: "transparent",
                         boxShadow: "none",
-                        fontSize: "0.875rem",
+                        // fontSize: "0.875rem",
+                        fontSize: "1.5rem",
                         padding: "0.5rem",
                         color: "black",
                         cursor: "pointer",
+                        fontWeight: "600",
                       }}
                     />
                   )}
@@ -335,9 +337,10 @@ const Home = () => {
                         border: "none",
                         background: "transparent",
                         boxShadow: "none",
-                        fontSize: "0.875rem",
+                        fontSize: "1.5rem",
                         padding: "0.5rem",
                         cursor: "pointer",
+                        fontWeight: "600",
                       }}
                     />
                   )}
@@ -364,9 +367,10 @@ const Home = () => {
                         border: "none",
                         background: "transparent",
                         boxShadow: "none",
-                        fontSize: "0.875rem",
+                        fontSize: "1.5rem",
                         padding: "0.5rem",
                         cursor: "pointer",
+                        fontWeight: "600",
                       }}
                     />
                   )}
@@ -392,7 +396,7 @@ const Home = () => {
           <div className=" mx-auto flex flex-col md:flex-row items-center gap-12">
             {/* Left: Text */}
             <div className="md:w-1/2 text-center md:text-left">
-              <h2 className="text-3xl md:text-7xl lg:text-7xl font-light text-primary-blue leading-snug text-center">
+              <h2 className="text-3xl md:text-7xl lg:text-6xl font-light text-primary-blue lg:leading-snug text-center font-play pb-6">
                 Building the <br />
                 <span className="text-5xl md:text-6xl font-light text-primary-blue">
                   LARGEST
@@ -661,7 +665,7 @@ const Home = () => {
             <PrimaryButton title={"Partner now"} />
           </div> */}
           <div className="text-white w-full text-center ">
-            <ReactFitty className="text-mobile-header lg:text-4xl font-semibold">
+            <ReactFitty className="text-mobile-header lg:text-4xl font-normal">
               End-to-end Nomad solutions for working from aspiring destinations
             </ReactFitty>
           </div>
@@ -770,7 +774,7 @@ const Home = () => {
                   {/* <div className="absolute top-2 left-2 bg-white text-xs font-medium text-gray-700 px-2 py-1 rounded-full shadow">
                     Guest favourite
                   </div> */}
-                  <div className="absolute top-2 right-2    shadow">
+                  <div className="absolute top-2 right-2 shadow">
                     <AiOutlineHeart className="text-white text-xl" />
                   </div>
                 </div>
