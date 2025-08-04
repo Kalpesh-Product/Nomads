@@ -37,7 +37,7 @@ const Listings = () => {
       );
 
       // return response.data;
-      return Array.isArray(response.data.data) ? response.data.data : [];
+      return Array.isArray(response.data) ? response.data : [];
     },
     enabled:
       !!formData?.country && !!formData?.location && !!formData?.category, // ✅ prevents fetching on empty state
