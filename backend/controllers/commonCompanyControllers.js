@@ -37,6 +37,7 @@ export const getCompanyDataLocationWise = async (req, res, next) => {
         const companyId = company._id.toString();
         return {
           ...company,
+          reviewCount: company.reviews,
           inclusions: coworkingInclusions.filter(
             (item) => item.coworkingCompany?.toString() === companyId
           ),
@@ -75,6 +76,7 @@ export const getCompanyDataLocationWise = async (req, res, next) => {
         const companyId = company._id.toString();
         return {
           ...company,
+          reviewCount: company.reviews,
           inclusions: colivingInclusions.filter(
             (item) => item.colivingCompany?.toString() === companyId
           ),
@@ -137,6 +139,7 @@ export const getIndividualCompany = async (req, res, next) => {
 
       const companyObject = {
         ...company,
+        reviewCount: company.reviews,
         inclusions,
         pocs,
         services,
@@ -164,6 +167,7 @@ export const getIndividualCompany = async (req, res, next) => {
 
       const companyObject = {
         ...company,
+        reviewCount: company.reviews,
         inclusions,
         pocs,
         units,
