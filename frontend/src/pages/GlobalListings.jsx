@@ -96,7 +96,7 @@ const GlobalListings = () => {
       alert("Please select Country and Location first.");
       return;
     }
-    dispatch(setFormValues(formData));
+    dispatch(setFormValues({ ...formData, category: categoryValue }));
 
     // const url = `/nomads/${formData.country}.${formData.location}/${categoryValue}`;
     const state = {
