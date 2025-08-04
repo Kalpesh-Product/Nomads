@@ -17,6 +17,12 @@ const companySchema = new mongoose.Schema(
     website: {
       type: String,
     },
+    ratings: {
+      type: Number,
+    },
+    reviews: {
+      type: Number,
+    },
     logo: {
       type: String,
     },
