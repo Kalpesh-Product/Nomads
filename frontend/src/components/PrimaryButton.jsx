@@ -24,7 +24,7 @@ const PrimaryButton = ({
         ${externalStyles} ${padding ? padding : "px-6 py-3"} ${className}`}
       onClick={handleSubmit}>
       {isLoading && <CircularProgress size={16} sx={{ color: "#ffffff" }} />}
-      <span className="text-center h-4">{title}</span>
+      <span className="text-center">{title}</span>
     </button>
   );
 };

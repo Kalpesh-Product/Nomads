@@ -82,13 +82,13 @@ const MainPage = () => {
         <div className="flex gap-8 w-full justify-center items-center">
           <PrimaryButton
             title="For Nomads"
-            padding={0}
-            externalStyles="bg-[#FF5757] text-sm flex lg:text-xl text-white font-bold capatilize hover:bg-[#E14C4C] w-[16rem] text-lg px-6 py-6"
+            
+            externalStyles="bg-[#FF5757] text-sm flex lg:text-small text-white font-bold capatilize hover:bg-[#E14C4C] w-[16rem] px-6"
           />
           <PrimaryButton
             title="For Hosts"
-            padding={0}
-            externalStyles="bg-[#FF5757] text-sm flex lg:text-xl text-white font-bold capatilize hover:bg-[#E14C4C] w-[16rem] text-lg px-6 py-6"
+            
+            externalStyles="bg-[#FF5757] text-sm flex lg:text-small text-white font-bold capatilize hover:bg-[#E14C4C] w-[16rem] px-6"
           />
         </div>
       </article>
