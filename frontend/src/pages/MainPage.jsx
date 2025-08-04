@@ -48,7 +48,7 @@ const MainPage = () => {
   }, [slider]);
 
   return (
-    <main className="min-h-screen flex flex-col justify-between">
+    <main className="min-h-screen flex flex-col justify-around items-center">
       <div className="grid grid-cols-1 lg:grid-cols-2 relative">
         {/* Left Column */}
         <figure className="flex flex-col w-full h-full justify-center items-center p-4 lg:p-6">
