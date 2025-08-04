@@ -9,6 +9,7 @@ import { useKeenSlider } from "keen-slider/react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef } from "react";
 import PrimaryButton from "../components/PrimaryButton";
+import { ReactFitty } from "react-fitty";
 
 const slides = [
   {
@@ -47,52 +48,56 @@ const MainPage = () => {
   }, [slider]);
 
   return (
-    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 relative">
-      {/* Left Column */}
-      <figure className="flex flex-col w-full h-full justify-center items-center p-4 lg:p-6">
-        <img
-          src="images/main-page-branding.png"
-          alt="wono"
-          className="object-cover max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-3xl lg:w-full"
-        />
-      </figure>
-
-      {/* Vertical Centered Dotted Separator */}
-      <div className="hidden lg:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-3/4 border-l-2 border-dashed border-gray-600 z-10" />
-
-      {/* Right Column */}
-      <article className="flex flex-col gap-4 w-full h-full justify-center items-center p-8">
-        <div ref={sliderRef} className="keen-slider w-full">
-          {slides.map((slide, index) => (
-            <div
-              key={index}
-              className="keen-slider__slide flex flex-col items-center gap-4 text-center"
-            >
-              <img
-                src={slide.image}
-                alt={`Slide ${index + 1}`}
-                className="w-full h-auto object-contain"
-              />
-              <p className="text-gray-700 text-base text-pretty leading-relaxed md:line-clamp-3 md:max-h-[6em] overflow-hidden">
-                {slide.text}
-              </p>
-            </div>
-          ))}
-        </div>
-        <div className="flex gap-8 w-full justify-center items-center">
-          <PrimaryButton
-            title="For Nomads"
-            
-            externalStyles="bg-[#FF5757] text-sm flex lg:text-small text-white font-bold capatilize hover:bg-[#E14C4C] w-[16rem] px-6"
+    <main className="min-h-screen flex flex-col justify-between">
+      <div className="grid grid-cols-1 lg:grid-cols-2 relative">
+        {/* Left Column */}
+        <figure className="flex flex-col w-full h-full justify-center items-center p-4 lg:p-6">
+          <img
+            src="images/main-page-branding.png"
+            alt="wono"
+            className="object-cover max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-3xl lg:w-full"
           />
-          <PrimaryButton
-            title="For Hosts"
-            
-            externalStyles="bg-[#FF5757] text-sm flex lg:text-small text-white font-bold capatilize hover:bg-[#E14C4C] w-[16rem] px-6"
-          />
-        </div>
-      </article>
-    </div>
+        </figure>
+
+        {/* Vertical Centered Dotted Separator */}
+        <div className="hidden lg:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-3/4 border-l-2 border-dashed border-gray-600 z-10" />
+
+        {/* Right Column */}
+        <article className="flex flex-col gap-4 w-full h-full justify-center items-center p-8">
+          <div ref={sliderRef} className="keen-slider w-full">
+            {slides.map((slide, index) => (
+              <div
+                key={index}
+                className="keen-slider__slide flex flex-col items-center gap-4 text-center"
+              >
+                <img
+                  src={slide.image}
+                  alt={`Slide ${index + 1}`}
+                  className="w-full h-auto object-contain"
+                />
+                <p className="text-gray-700 text-base text-pretty leading-relaxed md:line-clamp-3 md:max-h-[6em] overflow-hidden">
+                  {slide.text}
+                </p>
+              </div>
+            ))}
+          </div>
+          <div className="flex gap-8 w-full justify-center items-center">
+            <PrimaryButton
+              title="For Nomads"
+              externalStyles="bg-[#FF5757] text-sm flex lg:text-small text-white font-bold capatilize hover:bg-[#E14C4C] w-[16rem] px-6"
+            />
+            <PrimaryButton
+              title="For Hosts"
+              externalStyles="bg-[#FF5757] text-sm flex lg:text-small text-white font-bold capatilize hover:bg-[#E14C4C] w-[16rem] px-6"
+            />
+          </div>
+        </article>
+      </div>
+      <p className="text-center text-xl pb-4">
+        &copy; Copyright 2025–26 WONOCO PRIVATE LIMITED – SINGAPORE. All Rights
+        Reserved.
+      </p>
+    </main>
   );
 };
 
