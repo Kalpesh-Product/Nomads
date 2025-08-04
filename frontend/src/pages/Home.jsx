@@ -756,7 +756,7 @@ const Home = () => {
       {/*  */}
       <section className="w-full px-6 py-12 bg-gray-50">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-2xl md:text-3xl font-medium text-center mb-10 text-gray-700">
+          <h2 className="text-2xl md:text-3xl font-medium text-left mb-10 text-gray-700">
             Solutions for your aspiring destinations.
           </h2>
 
