@@ -20,7 +20,7 @@ const mapOptions = {
   disableDefaultUI: false,
 };
 
-export default function Map({locations}) {
+export default function Map({ locations }) {
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_API_KEY,
   });
@@ -33,11 +33,16 @@ export default function Map({locations}) {
     <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={12}>
       {locations.map((loc) => (
         <Marker
+          icon={{
+            url: "/images/marker.png", // must use `url`, not `path`
+            scaledSize: new window.google.maps.Size(40, 40), // optional: resize icon
+          }}
           key={loc.id}
           position={{ lat: loc.lat, lng: loc.lng }}
           onMouseOver={() => setHoveredMarker(loc.id)}
           onMouseOut={() => setHoveredMarker(null)}
-          options={mapOptions}>
+          options={mapOptions}
+        >
           {hoveredMarker === loc.id && (
             // <InfoWindow position={{ lat: loc.lat, lng: loc.lng }}>
             //   <div>{loc.label}</div>
@@ -59,9 +64,7 @@ export default function Map({locations}) {
                       {"★".repeat(Math.floor(loc.rating)) +
                         "☆".repeat(5 - Math.floor(loc.rating))}
                     </span>
-                    <span className="ml-1 text-gray-600">
-                      {loc.rating}
-                    </span>
+                    <span className="ml-1 text-gray-600">{loc.rating}</span>
                   </div>
                 </div>
                 <div className="flex justify-between items-center text-xs mt-1">

@@ -42,7 +42,7 @@ const Home = () => {
   const { mutate: locationData, isPending: isLocation } = useMutation({
     mutationFn: async (data) => {
       dispatch(setFormValues(data));
-      navigate("listings");
+      navigate("global-listing");
     },
     onSuccess: () => {
       console.log("success");

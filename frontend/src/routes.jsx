@@ -9,6 +9,7 @@ import Product from "./pages/Product";
 import Contact from "./pages/Contact";
 import Career from "./pages/Career";
 import JobDetails from "./pages/JobDetails";
+import GlobalListings from "./pages/GlobalListings";
 
 const router = createBrowserRouter([
   {
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
           {
             path: "",
             element: <Home />,
+          },
+          {
+            path: "global-listing",
+            element: <GlobalListings />,
           },
           {
             path: "listings",
