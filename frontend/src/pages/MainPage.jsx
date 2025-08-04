@@ -84,11 +84,11 @@ const MainPage = () => {
           <div className="flex gap-8 w-full justify-center items-center">
             <PrimaryButton
               title="For Nomads"
-              externalStyles="bg-[#FF5757] text-sm flex lg:text-small text-white font-bold capatilize hover:bg-[#E14C4C] w-[16rem] px-6"
+              externalStyles="bg-[#FF5757] text-sm flex lg:text-2xl text-white font-bold capatilize hover:bg-[#E14C4C] w-[16rem] px-6"
             />
             <PrimaryButton
               title="For Hosts"
-              externalStyles="bg-[#FF5757] text-sm flex lg:text-small text-white font-bold capatilize hover:bg-[#E14C4C] w-[16rem] px-6"
+              externalStyles="bg-[#FF5757] text-sm flex lg:text-2xl text-white font-bold capatilize hover:bg-[#E14C4C] w-[16rem] px-6"
             />
           </div>
         </article>
