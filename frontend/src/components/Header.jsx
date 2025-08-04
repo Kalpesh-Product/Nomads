@@ -133,6 +133,7 @@ const Header = () => {
             <div className="flex justify-center p-4">
               <PrimaryButton
                 title={"Sign In"}
+                externalStyles={"bg-primary-blue"}
                 handleSubmit={() => {
                   navigate("");
                   setOpen(false);

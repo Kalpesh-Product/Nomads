@@ -1,4 +1,12 @@
-import { FaTwitter, FaFacebook, FaInstagram, FaLinkedin } from "react-icons/fa";
+import {
+  FaTwitter,
+  FaFacebook,
+  FaInstagram,
+  FaLinkedin,
+  FaGlobe,
+  FaRupeeSign,
+  FaFacebookF,
+} from "react-icons/fa";
 import sliderImageOne from "../assets/main-slider-images/slider-image-1.png";
 import sliderImageTwo from "../assets/main-slider-images/slider-image-2.png";
 import logo from "../assets/WONO_LOGO_white _TP.png";
@@ -10,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useRef } from "react";
 import PrimaryButton from "../components/PrimaryButton";
 import { ReactFitty } from "react-fitty";
+import { FaXTwitter } from "react-icons/fa6";
 
 const slides = [
   {
@@ -48,7 +57,7 @@ const MainPage = () => {
   }, [slider]);
 
   return (
-    <main className="min-h-screen flex flex-col justify-between">
+    <main className="min-h-screen flex flex-col justify-between pb-4">
       <div className="grid grid-cols-1 lg:grid-cols-2 relative">
         {/* Left Column */}
         <figure className="flex flex-col w-full h-full justify-center items-center p-4 lg:p-6">
@@ -84,7 +93,7 @@ const MainPage = () => {
           <div className="flex gap-8 w-full justify-center items-center">
             <PrimaryButton
               title="For Nomads"
-              handleSubmit={()=>navigate('nomad')}
+              handleSubmit={() => navigate("nomad")}
               externalStyles="bg-[#FF5757] text-sm flex lg:text-small text-white font-bold capatilize hover:bg-[#E14C4C] w-[16rem] px-6"
             />
             <PrimaryButton
@@ -94,10 +103,18 @@ const MainPage = () => {
           </div>
         </article>
       </div>
-      <p className="text-center text-xl pb-4">
-        &copy; Copyright 2025–26 WONOCO PRIVATE LIMITED – SINGAPORE. All Rights
-        Reserved.
-      </p>
+      <div className="flex justify-center items-center flex-col">
+        <p className="text-center text-xl pb-2">
+          &copy; Copyright 2025–26 WONOCO PRIVATE LIMITED – SINGAPORE. All
+          Rights Reserved.
+        </p>
+        <div className="flex items-center gap-4">
+          <FaFacebookF className="text-[12px]" />
+
+          <FaXTwitter className="text-[12px]" />
+          <FaInstagram className="text-[12px]" />
+        </div>
+      </div>
     </main>
   );
 };
