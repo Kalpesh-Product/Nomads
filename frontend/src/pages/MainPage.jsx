@@ -58,7 +58,7 @@ const MainPage = () => {
         {/* Left Column */}
         <figure className="flex flex-col w-full h-full justify-center items-center p-4 lg:p-6">
           <img
-            src="images/main-page-branding.png"
+            src="images/wono-landing-page.png"
             alt="wono"
             className="object-cover max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-3xl lg:w-full"
           />
