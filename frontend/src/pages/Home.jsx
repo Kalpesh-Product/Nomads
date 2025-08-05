@@ -286,7 +286,7 @@ const Home = () => {
           <div className="flex flex-col gap-4 justify-between items-center">
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className=" flex justify-between w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
+              className=" flex justify-around w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
             >
               <Controller
                 name="country"
