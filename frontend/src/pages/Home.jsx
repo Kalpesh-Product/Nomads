@@ -1,33 +1,26 @@
-import React from "react";
-import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { IoSearch } from "react-icons/io5";
-
 import { Controller, useForm } from "react-hook-form";
-import { FaSearch } from "react-icons/fa";
-
 import Container from "../components/Container";
-import { FaRegListAlt } from "react-icons/fa";
 import Amenities from "../components/Amenities";
-import Carousel from "../components/Carousel";
 import icons from "../assets/icons";
-import { AiFillStar } from "react-icons/ai";
 import { ReactFitty } from "react-fitty";
 import { useDispatch, useSelector } from "react-redux";
 import { setFormValues } from "../features/locationSlice";
-import axios from "../utils/axios";
-import { IoIosArrowDown } from "react-icons/io";
-import Select from "react-dropdown-select";
 import Image from "/images/homepage.jpeg";
 import ReviewCard from "../components/ReviewCard";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { AiOutlineHeart } from "react-icons/ai";
+import SearchBarCombobox from "../components/SearchBarCombobox";
+import newIcons from "../assets/newIcons";
+import { AnimatePresence, motion } from "motion/react";
+import { useState } from "react";
 import coworking from "/images/bg-image.jpg";
 import hostels from "/images/bg-image.jpg";
 import cafes from "/images/bg-image.jpg";
 import privateStay from "/images/bg-image.jpg";
 import companyWorkation from "/images/bg-image.jpg";
-import SearchBarCombobox from "../components/SearchBarCombobox";
 
 const Home = () => {
   const destinationData = [
@@ -50,8 +43,8 @@ const Home = () => {
       count: "",
     },
   });
-  const selectedCountry = watch("country")
-  const selectedState = watch("location")
+  const selectedCountry = watch("country");
+  const selectedState = watch("location");
   // Sample options
   const countryOptions = [{ label: "India", value: "india" }];
   const locationOptions = [{ label: "Goa", value: "goa" }];
@@ -194,19 +187,19 @@ const Home = () => {
     { image: icons.secure, title: "SECURE" },
     { image: icons.personalised, title: "PERSONALISED" },
   ];
-
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
   const onSubmit = (data) => {
     locationData(data);
   };
 
   return (
     <div className="flex flex-col w-full">
-      <Container>
-        <div className="py-4  ">
-          <div className="flex flex-col gap-4 justify-between items-center">
+      <Container padding={false}>
+        <div className="py-4  hidden lg:block">
+          <div className="flex flex-col  gap-4 justify-between items-center">
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className=" flex justify-around w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
+              className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
             >
               <Controller
                 name="country"
@@ -218,7 +211,6 @@ const Home = () => {
                     options={countryOptions}
                     label="Select Country"
                     placeholder="Select aspiring destination"
-                    
                     className="w-full z-10"
                   />
                 )}
@@ -262,7 +254,92 @@ const Home = () => {
             </form>
           </div>
         </div>
+        <div className="lg:hidden flex w-full items-center justify-center my-4">
+          <button
+            onClick={() => setShowMobileSearch(true)}
+            className="bg-white flex items-center w-full text-black border-2 px-6 py-3 rounded-full"
+          >
+            <IoSearch className="inline mr-2" />
+            Start Search
+          </button>
+        </div>
       </Container>
+
+      <AnimatePresence>
+        {showMobileSearch && (
+          <motion.div
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ duration: 0.3 }}
+            className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl z-50 p-4 rounded-t-3xl h-[50vh] lg:hidden"
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Search</h3>
+              <button
+                onClick={() => setShowMobileSearch(false)}
+                className="text-gray-500 text-xl"
+              >
+                &times;
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <Controller
+                name="country"
+                control={control}
+                render={({ field }) => (
+                  <SearchBarCombobox
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={countryOptions}
+                    label="Select Country"
+                    placeholder="Select aspiring destination"
+                    className="w-full"
+                  />
+                )}
+              />
+              <Controller
+                name="location"
+                control={control}
+                render={({ field }) => (
+                  <SearchBarCombobox
+                    value={field.value}
+                    onChange={field.onChange}
+                    label="Select Location"
+                    options={locationOptions}
+                    placeholder="Select area within country"
+                    disabled={!selectedCountry}
+                    className="w-full"
+                  />
+                )}
+              />
+              <Controller
+                name="count"
+                control={control}
+                render={({ field }) => (
+                  <SearchBarCombobox
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={countOptions}
+                    label="Select Count"
+                    placeholder="Booking for no. of Nomads"
+                    disabled={!selectedState}
+                    className="w-full"
+                  />
+                )}
+              />
+              <button
+                type="submit"
+                className="w-full bg-[#FF5757] text-white py-3 rounded-full"
+              >
+                <IoSearch className="inline mr-2" />
+                Search
+              </button>
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <Container padding={false}>
         <section className="w-full   bg-white pb-12">
@@ -298,7 +375,7 @@ const Home = () => {
                 <img
                   src={Image}
                   alt="Nomads working together"
-                  className="w-full h-auto object-cover"
+                  className="w-full h-full object-cover"
                 />
               </div>
             </div>
@@ -306,231 +383,11 @@ const Home = () => {
         </section>
       </Container>
 
-      {/* <Container padding={false}>
-        <section className="flex flex-col gap-2 lg:mb-8 pb-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="flex flex-col gap-4 justify-end items-start">
-              <p className="uppercase font-semibold text-mobile-main-header lg:text-main-header lg:leading-normal">
-                WORLDS NOMAD COMMUNITY
-              </p>
-              <span className="text-content lg:text-hero">
-                Connecting Co-working Spaces and Flexible Workers
-              </span>
-            </div>
-            <div className=" rounded-xl overflow-hidden">
-              <div className="bg-[url('/images/bg-image.jpg')] bg-cover bg-center h-96 lg:h-full w-full rounded-md shadow-md flex items-end">
-                <div className="bg-white/10 backdrop-blur-md p-4 w-full flex flex-col gap-4">
-                  <span className="text-white text-small">
-                    Serves as a dynamic platform, seamlessly connecting
-                    freelance professionals, remote workers, and individuals
-                    seeking flexible workspace
-                  </span>
-                  <hr />
-                  <div className="flex items-center gap-2">
-                    <div className="py-3 px-4 rounded-3xl bg-white">
-                      <div className="flex items-center gap-4 ">
-                        <div className="flex">
-                          <span className="text-yellow-300">
-                            <AiFillStar size={16} />
-                          </span>
-                          <span className="text-yellow-300">
-                            <AiFillStar size={16} />
-                          </span>
-                          <span className="text-yellow-300">
-                            <AiFillStar size={16} />
-                          </span>
-                          <span className="text-yellow-300">
-                            <AiFillStar size={16} />
-                          </span>
-                          <span className="text-gray-400">
-                            <AiFillStar size={16} />
-                          </span>
-                        </div>
-                        <p className="text-sm font-semibold text-black">4.0</p>
-                      </div>
-                    </div>
-                    <NavLink
-                      className={"text-white text-small hover:underline"}>
-                      View More Reviews
-                    </NavLink>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-5 h-full lg:h-48">
-              <div className="flex flex-col gap-4 h-full justify-between">
-                <div className="bg-white text-black flex justify-center items-center">
-                  {" "}
-                  <div className="flex justify-start md:justify-center lg:justify-start items-center -space-x-4 w-full mt-4">
-                    {avatarConfigs.map((config, index) => (
-                      <Avatar
-                        key={index}
-                        alt={config.alt}
-                        src={config.src}
-                        sx={{
-                          width: { xs: 60, md: 90, lg: 103 },
-                          height: { xs: 60, md: 90, lg: 103 },
-                          border: "2px solid white",
-                          "& img": {
-                            transform: config.transform,
-                            transformOrigin: "center center",
-                            objectFit: "contain",
-                          },
-                        }}
-                      />
-                    ))}
-                  </div>
-                </div>
-                <div className="flex justify-start md:justify-center lg:justify-start items-center">
-                  <SecondaryButton title={"BOOK YOUR SPACE NOW"} />
-                </div>
-              </div>
-              <div className="flex flex-col gap-4 h-full justify-between">
-                <div className="bg-white text-black border-l-2 border-black pl-4">
-                  <p className="text-small">
-                    Serves as a dynamic platform, seamlessly connecting
-                    freelance professionals, remote workers, and individuals
-                    seeking flexible workspace solutions with nearby co-working
-                    spaces
-                  </p>
-                </div>
-                <div className="flex justify-start lg:justify-start items-center">
-                  <AccentButton title={"LIST YOUR BUSINESS"} />
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-col gap-4 justify-between">
-              <form
-                onSubmit={handleSubmit((data) => locationData(data))}
-                className="flex gap-2 border-2 border-primary-blue rounded-full pl-4 h-10 lg:h-16 justify-between items-center bg-white">
-                <div className="relative w-full">
-                  <Controller
-                    name="country"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        {...field}
-                        options={countryOptions}
-                        onChange={(values) => field.onChange(values[0]?.value)}
-                        values={countryOptions.filter(
-                          (opt) => opt.value === field.value
-                        )}
-                        placeholder="Select A Country"
-                        color="#0000"
-                        dropdownPosition="bottom"
-                        className="w-3/4 text-sm"
-                        style={{
-                          border: "none",
-                          background: "transparent",
-                          boxShadow: "none",
-                          fontSize: "0.875rem",
-                          padding: "0.5rem",
-                          color: "black",
-                          cursor: "pointer",
-                        }}
-                      />
-                    )}
-                  />
-                </div>
-
-                <div className="relative w-full border-l-2 border-l-primary-blue">
-                  <Controller
-                    name="location"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        {...field}
-                        options={locationOptions}
-                        onChange={(values) => field.onChange(values[0]?.value)}
-                        values={locationOptions.filter(
-                          (opt) => opt.value === field.value
-                        )}
-                        placeholder="Select A Location"
-                        dropdownPosition="bottom"
-                        className="w-3/4 text-sm"
-                        style={{
-                          border: "none",
-                          background: "transparent",
-                          boxShadow: "none",
-                          fontSize: "0.875rem",
-                          padding: "0.5rem",
-                          cursor: "pointer",
-                        }}
-                      />
-                    )}
-                  />
-                </div>
-
-                <div className="relative w-full border-l-2 border-l-primary-blue pl-2">
-                  <Controller
-                    name="category"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        {...field}
-                        options={categoryOptions}
-                        onChange={(values) => field.onChange(values[0]?.value)}
-                        values={categoryOptions.filter(
-                          (opt) => opt.value === field.value
-                        )}
-                        placeholder="Select A Category"
-                        dropdownPosition="bottom"
-                        className="w-3/4 text-sm"
-                        style={{
-                          border: "none",
-                          background: "transparent",
-                          boxShadow: "none",
-                          fontSize: "0.875rem",
-                          padding: "0.5rem",
-                          cursor: "pointer",
-                        }}
-                      />
-                    )}
-                  />
-                </div>
-
-                <div className="bg-primary-blue h-full w-3/4 flex justify-center rounded-r-full">
-                  <button
-                    type="submit"
-                    disabled={isLocation}
-                    className="h-full text-center w-full flex justify-center items-center text-white">
-                    <FaSearch className="text-lg" /> &nbsp; Search
-                  </button>
-                </div>
-              </form>
-
-              <div>
-                <div className="grid grid-cols-3 text-center text-sm font-medium relative">
-                  <div className="p-4 text-tiny">Co – Working</div>
-                  <div className="p-4 text-tiny border-l border-r border-black">
-                    Co – Living
-                  </div>
-                  <div className="p-4 text-tiny">Workation</div>
-
-                  <div className="absolute left-0 right-0 border-t border-black top-1/2" />
-
-                  <div className="p-4 text-tiny">Exclusive Campus</div>
-                  <div className="p-4 text-tiny border-l border-r border-black">
-                    Meeting Room
-                  </div>
-                  <div className="p-4 text-tiny">Conferences</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </Container> */}
-
       <section className="bg-black w-full flex flex-col gap-4 py-16 lg:py-16">
         <div className="lg:w-[80rem] max-w-[80rem] mx-auto flex flex-col text-primary-blue  justify-center items-center leading-none">
-          {/* <h1 className="text-mobile-mega-header font-hero lg:leading-none lg:text-mega-header font-medium">
-            INTRODUCING
-          </h1> */}
           <ReactFitty className="font-hero">INTRODUCING</ReactFitty>
           <ReactFitty className="font-hero">N-COMMERCE</ReactFitty>
-          {/* <h1 className="text-mobile-mega-header font-hero lg:leading-none lg:text-mega-header font-medium">
-            N-COMMERCE
-          </h1> */}
+
           <p className="uppercase text-mobile-main-header lg:text-9xl font-hero text-white pt-4 pb-20">
             ("nomad commerce")
           </p>
@@ -544,88 +401,6 @@ const Home = () => {
           </div>
         </div>
       </section>
-
-      {/* <Container padding>
-        <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-[1fr_1px_1fr] gap-y-6 lg:gap-x-12">
-          <div className="w-full flex flex-col gap-4">
-            <h1 className="text-title font-semibold text-center uppercase pb-10">
-              WONO for Nomads
-            </h1>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-0">
-              {featureSections.map((section, index) => (
-                <div
-                  key={index}
-                  className={`flex flex-col gap-4 rounded-xl p-3 ${
-                    section.bgColor || "bg-white"
-                  }`}>
-                  <div className="flex flex-col gap-4">
-                    <span className="text-title pl-6">{section.icon}</span>
-                    <ul className="list-disc pl-6">
-                      {section.points.map((point, i) => (
-                        <li key={i}>{point}</li>
-                      ))}
-                    </ul>
-                    <h3 className="text-subtitle font-medium pl-2">
-                      {section.title}
-                    </h3>
-                  </div>
-                </div>
-              ))}
-              <div className="flex justify-center items-center w-full col-span-1 lg:col-span-2 mt-4">
-                <NavLink to={"#"} className="text-primary-dark text-tiny">
-                  View More {">>"}
-                </NavLink>
-              </div>
-            </div>
-          </div>
-
-          <div className="hidden lg:block w-px bg-gray-300 h-full mx-auto" />
-
-          <div className="w-full flex flex-col gap-4">
-            <h1 className="text-title font-semibold text-center uppercase pb-10">
-              WONO for Business
-            </h1>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-0">
-              {featureSections.map((section, index) => (
-                <div
-                  key={index}
-                  className={`flex flex-col gap-4 rounded-xl p-3 ${
-                    section.bgColor || "bg-white"
-                  }`}>
-                  <div className="flex flex-col gap-4">
-                    <span className="text-title pl-6">{section.icon}</span>
-                    <ul className="list-disc pl-6">
-                      {section.points.map((point, i) => (
-                        <li key={i}>{point}</li>
-                      ))}
-                    </ul>
-                    <h3 className="text-subtitle font-medium pl-2">
-                      {section.title}
-                    </h3>
-                  </div>
-                </div>
-              ))}
-              <div className="flex justify-center items-center w-full col-span-1 lg:col-span-2 mt-4">
-                <NavLink to={"#"} className="text-primary-dark text-tiny">
-                  View More {">>"}
-                </NavLink>
-              </div>
-            </div>
-          </div>
-        </div>
-      </Container> */}
-
-      {/* <div className="lg:max-w-[80rem] min-w-[85%] lg:mx-auto  flex flex-col gap-4 md:px-10 px-6 border-t-2 border-gray-300 pt-16 pb-16">
-        <h1 className="  lg:text-title font-semibold text-title pb-8">
-          Solutions for your aspiring destinations.
-        </h1>
-        <div>
-          <Carousel carouselItems={carouselItems} />
-        </div>
-
-  
-      </div> */}
-
       {/*  */}
       <section className="w-full px-6 py-12 bg-gray-50">
         <div className="max-w-7xl mx-auto">

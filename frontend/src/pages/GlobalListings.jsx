@@ -17,6 +17,9 @@ import Select from "react-dropdown-select";
 import { setFormValues } from "../features/locationSlice.js";
 import ListingCard from "../components/ListingCard.jsx";
 import newIcons from "../assets/newIcons.js";
+import { IoSearch } from "react-icons/io5";
+import SearchBarCombobox from "../components/SearchBarCombobox.jsx";
+import { AnimatePresence, motion } from "motion/react";
 
 const GlobalListings = () => {
   const [favorites, setFavorites] = useState([]);
@@ -24,6 +27,10 @@ const GlobalListings = () => {
   const formData = useSelector((state) => state.location.formValues);
   const countryOptions = [{ label: "India", value: "india" }];
   const locationOptions = [{ label: "Goa", value: "goa" }];
+  const countOptions = [
+    { label: "0 - 10", value: "0 - 10" },
+    { label: "10 - 20", value: "10 - 20" },
+  ];
   const categoryOptions = [
     { label: "Co-Working", value: "coworking" },
     { label: "Hostels", value: "hostels" },
@@ -67,18 +74,23 @@ const GlobalListings = () => {
   };
 
   const navigate = useNavigate();
-
-  const { handleSubmit, control, reset, setValue, getValues } = useForm({
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const onSubmit = (data) => {
+    locationData(data);
+  };
+  const { handleSubmit, control, reset, setValue, getValues, watch } = useForm({
     defaultValues: {
       country: "",
       location: "",
       category: "",
     },
   });
+  const selectedCountry = watch("country");
+  const selectedState = watch("location");
   useEffect(() => {
     setValue("country", formData.country);
     setValue("location", formData.location);
-    setValue("category", formData.category);
+    setValue("count", formData.count);
   }, [formData]);
   const { mutate: locationData, isPending: isLocation } = useMutation({
     mutationFn: async (data) => {
@@ -123,13 +135,14 @@ const GlobalListings = () => {
   };
 
   return (
-    <div className="flex flex-col gap-8 ">
-      <div className="flex flex-col gap-4 justify-center items-center  w-full mt-10 lg:mt-0">
+    <div className="flex flex-col gap-6 ">
+      <div className="flex flex-col gap-4 justify-center items-center  w-full lg:mt-0">
         <Container padding={false}>
-          <div className="flex flex-col gap-4 justify-between w-3/4 md:w-3/4 lg:w-full h-full">
+          <div className="hidden lg:flex flex-col gap-4  justify-between w-3/4 md:w-3/4 lg:w-full h-full">
             <form
               onSubmit={handleSubmit((data) => locationData(data))}
-              className="flex flex-col gap-4">
+              className="flex flex-col gap-4"
+            >
               <div className=" w-full flex justify-center items-center">
                 <div className="grid grid-cols-5 md:grid-cols-5 gap-2">
                   {categoryOptions.map((cat) => {
@@ -140,7 +153,8 @@ const GlobalListings = () => {
                         key={cat.value}
                         type="button"
                         onClick={() => handleCategoryClick(cat.value)}
-                        className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full">
+                        className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full"
+                      >
                         {iconSrc ? (
                           <div className="h-10 w-full flex flex-col gap-0">
                             <img
@@ -160,115 +174,183 @@ const GlobalListings = () => {
                 </div>
               </div>
 
-              <div className="flex gap-2 border-2 border-primary-blue rounded-full pl-4 h-10 lg:h-16 justify-between items-center bg-white">
+              <div className="flex gap-2 border-2  rounded-full h-10 lg:h-16 justify-between items-center bg-gray-50">
                 {/* Country */}
-                <div className="relative w-full">
-                  <Controller
-                    name="country"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        {...field}
-                        options={countryOptions}
-                        onChange={(values) => field.onChange(values[0]?.value)}
-                        values={countryOptions.filter(
-                          (opt) => opt.value === field.value
-                        )}
-                        placeholder="Select A Country"
-                        color="#0000"
-                        dropdownPosition="bottom"
-                        className="w-3/4 text-sm"
-                        style={{
-                          border: "none",
-                          background: "transparent",
-                          boxShadow: "none",
-                          fontSize: "0.875rem",
-                          padding: "0.5rem",
-                          color: "black",
-                          cursor: "pointer",
-                        }}
-                      />
-                    )}
-                  />
-                </div>
+                <Controller
+                  name="country"
+                  control={control}
+                  render={({ field }) => (
+                    <SearchBarCombobox
+                      value={field.value}
+                      onChange={field.onChange}
+                      options={countryOptions}
+                      label="Select Country"
+                      placeholder="Select aspiring destination"
+                      className="w-full z-10"
+                    />
+                  )}
+                />
+                <Controller
+                  name="location"
+                  control={control}
+                  render={({ field }) => (
+                    <SearchBarCombobox
+                      value={field.value}
+                      onChange={field.onChange}
+                      label="Select Location"
+                      options={locationOptions}
+                      placeholder="Select area within country"
+                      disabled={!selectedCountry}
+                      className="-ml-12 w-full z-20"
+                    />
+                  )}
+                />
 
-                {/* Location */}
-                <div className="relative w-full border-l-2 border-l-primary-blue">
-                  <Controller
-                    name="location"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        {...field}
-                        options={locationOptions}
-                        onChange={(values) => field.onChange(values[0]?.value)}
-                        values={locationOptions.filter(
-                          (opt) => opt.value === field.value
-                        )}
-                        placeholder="Select A Location"
-                        dropdownPosition="bottom"
-                        className="w-3/4 text-sm"
-                        style={{
-                          border: "none",
-                          background: "transparent",
-                          boxShadow: "none",
-                          fontSize: "0.875rem",
-                          padding: "0.5rem",
-                          cursor: "pointer",
-                        }}
-                      />
-                    )}
-                  />
-                </div>
-
-                {/* Category */}
-                <div className="relative w-full border-l-2 border-l-primary-blue pl-2">
-                  <Controller
-                    name="category"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        {...field}
-                        options={categoryOptions}
-                        onChange={(values) => field.onChange(values[0]?.value)}
-                        values={categoryOptions.filter(
-                          (opt) => opt.value === field.value
-                        )}
-                        placeholder="Select A Category"
-                        dropdownPosition="bottom"
-                        className="w-3/4 text-sm"
-                        style={{
-                          border: "none",
-                          background: "transparent",
-                          boxShadow: "none",
-                          fontSize: "0.875rem",
-                          padding: "0.5rem",
-                          cursor: "pointer",
-                        }}
-                      />
-                    )}
-                  />
-                </div>
+                <Controller
+                  name="count"
+                  control={control}
+                  render={({ field }) => (
+                    <SearchBarCombobox
+                      value={field.value}
+                      onChange={field.onChange}
+                      options={countOptions}
+                      label="Select Count"
+                      placeholder="Booking for no. of Nomads"
+                      disabled={!selectedState}
+                      className="-ml-12 w-full z-30"
+                    />
+                  )}
+                />
 
                 {/* Submit */}
-                <div className="bg-primary-blue h-full w-3/4 flex justify-center rounded-r-full">
-                  <button
-                    type="submit"
-                    disabled={isLocation}
-                    className="h-full text-center w-full flex justify-center items-center text-white">
-                    <CiSearch className="text-lg" /> &nbsp; Search
-                  </button>
-                </div>
+                <button
+                  type="submit"
+                  className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full"
+                >
+                  <IoSearch />
+                </button>
               </div>
             </form>
           </div>
+          <div className="md:hidden flex w-full items-center justify-center my-4">
+            <button
+              onClick={() => setShowMobileSearch(true)}
+              className="bg-white flex items-center w-full text-black border-2 px-6 py-3 rounded-full"
+            >
+              <IoSearch className="inline mr-2" />
+              Start Search
+            </button>
+          </div>
         </Container>
+        <AnimatePresence>
+          {showMobileSearch && (
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ duration: 0.3 }}
+              className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 p-4 rounded-t-3xl md:hidden"
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold">Search</h3>
+                <button
+                  onClick={() => setShowMobileSearch(false)}
+                  className="text-gray-500 text-xl"
+                >
+                  &times;
+                </button>
+              </div>
+              <div className="grid grid-cols-3 md:grid-cols-5 gap-2 mb-10">
+                {categoryOptions.map((cat) => {
+                  const iconSrc = newIcons[cat.value];
+
+                  return (
+                    <button
+                      key={cat.value}
+                      type="button"
+                      onClick={() => handleCategoryClick(cat.value)}
+                      className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full"
+                    >
+                      {iconSrc ? (
+                        <div className="h-10 w-full flex flex-col gap-0">
+                          <img
+                            src={iconSrc}
+                            alt={cat.label}
+                            className="h-full w-full object-contain"
+                          />
+                          <span className="text-sm">{cat.label}</span>
+                          <div></div>
+                        </div>
+                      ) : (
+                        cat.label // fallback if no icon found
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <Controller
+                  name="country"
+                  control={control}
+                  render={({ field }) => (
+                    <SearchBarCombobox
+                      value={field.value}
+                      onChange={field.onChange}
+                      options={countryOptions}
+                      label="Select Country"
+                      placeholder="Select aspiring destination"
+                      className="w-full"
+                    />
+                  )}
+                />
+                <Controller
+                  name="location"
+                  control={control}
+                  render={({ field }) => (
+                    <SearchBarCombobox
+                      value={field.value}
+                      onChange={field.onChange}
+                      label="Select Location"
+                      options={locationOptions}
+                      placeholder="Select area within country"
+                      disabled={!selectedCountry}
+                      className="w-full"
+                    />
+                  )}
+                />
+                <Controller
+                  name="count"
+                  control={control}
+                  render={({ field }) => (
+                    <SearchBarCombobox
+                      value={field.value}
+                      onChange={field.onChange}
+                      options={countOptions}
+                      label="Select Count"
+                      placeholder="Booking for no. of Nomads"
+                      disabled={!selectedState}
+                      className="w-full"
+                    />
+                  )}
+                />
+                <button
+                  type="submit"
+                  className="w-full bg-[#FF5757] text-white py-3 rounded-full"
+                >
+                  <IoSearch className="inline mr-2" />
+                  Search
+                </button>
+              </form>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
       <hr />
       <Container padding={false}>
         <div className="">
           <div className="font-semibold text-lg">
-            <div className="pr-10 h-[36rem] overflow-y-auto overflow-x-hidden">
+            <div className="pr-0 lg:pr-10 h-[36rem] overflow-y-auto overflow-x-hidden">
               {isLisitingLoading ? (
                 Array.from({ length: 4 }).map((_, i) => (
                   <SkeletonCard key={i} />
@@ -298,7 +380,8 @@ const GlobalListings = () => {
                           <NavLink
                             to={`/nomads/${formData.country}.${formData.location}/${type}`}
                             state={{ ...formData, category: type }}
-                            className="text-primary-blue text-sm font-semibold hover:underline">
+                            className="text-primary-blue text-sm font-semibold hover:underline"
+                          >
                             View More{" "}
                             {typeLabels[type] || typeLabels.default(type)} →
                           </NavLink>

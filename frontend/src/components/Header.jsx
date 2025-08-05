@@ -26,7 +26,7 @@ const Header = () => {
     },
   ];
   return (
-    <div className="flex px-4 justify-between items-center md:py-3 md:px-[7.5rem] lg:px-[7.5rem]  bg-white backdrop-blur-md ">
+    <div className="flex px-4 justify-between items-center md:py-3 md:px-[7.5rem] lg:px-[7.5rem]  bg-white/10 backdrop-blur-md shadow-md ">
       <div
         onClick={() => navigate("/")}
         className=" w-36 overflow-x-hidden rounded-lg flex justify-between items-center cursor-pointer">

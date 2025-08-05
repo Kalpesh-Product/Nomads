@@ -17,6 +17,7 @@ import axios from "../utils/axios";
 import renderStars from "../utils/renderStarts";
 import relativeTime from "dayjs/plugin/relativeTime";
 import MuiModal from "../components/Modal";
+import Map from "../components/Map";
 
 dayjs.extend(relativeTime);
 
@@ -144,6 +145,27 @@ const Product = () => {
         date: dayjs(item.createdAt).fromNow(),
       }));
 
+  const forMapsData ={
+        id: companyDetails?._id,
+        lat: companyDetails?.latitude,
+        lng: companyDetails?.longitude,
+        name: companyDetails?.companyName,
+        location: companyDetails?.city,
+        reviews: companyDetails?.reviews.length,
+        rating: companyDetails?.reviews?.length
+          ? (() => {
+              const avg =
+                companyDetails?.reviews.reduce((sum, r) => sum + r.starCount, 0) /
+                companyDetails?.reviews.length;
+              return avg % 1 === 0 ? avg : avg.toFixed(1);
+            })()
+          : "0",
+        image:
+          "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
+      };
+
+  const mapsData = [forMapsData]
+
   return (
     <div>
       <Container padding={false}>
@@ -158,7 +180,7 @@ const Product = () => {
           {/* Image Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-1 overflow-hidden">
             {/* Main Image */}
-            <div className="w-full h-full overflow-hidden rounded-md">
+            <div className="w-full h-96 overflow-hidden rounded-md">
               <img
                 src={selectedImage.url}
                 className="w-full h-full object-cover"
@@ -167,16 +189,17 @@ const Product = () => {
             </div>
 
             {/* Thumbnail Images */}
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-0">
               {companyImages.map((item) => (
                 <div
                   key={item._id}
-                  className={`w-full h-full overflow-hidden rounded-md cursor-pointer border-2 ${
+                  className={`w-full h-[12rem] overflow-hidden rounded-md cursor-pointer border-2 ${
                     selectedImage._id === item._id
                       ? "border-primary-dark"
                       : "border-transparent"
                   }`}
-                  onClick={() => setSelectedImage(item)}>
+                  onClick={() => setSelectedImage(item)}
+                >
                   <img
                     src={item.url}
                     alt="company-thumbnail"
@@ -199,31 +222,29 @@ const Product = () => {
                   className="h-full w-full object-cover"
                 />
               </div>
-              <div className="text-sm lg:text-tiny text-gray-700">
+              {/* <div className="text-sm lg:text-tiny text-gray-700">
                 <MdLocationOn className="inline-block text-secondary text-subtitle mr-1" />
                 {companyDetails?.address}
-              </div>
+              </div> */}
               <h1 className="text-title uppercase font-semibold">about</h1>
               <p className="text-sm">
                 {companyDetails?.about?.replace(/\\n/g, " ")}
               </p>
             </div>
             <div className="flex flex-col gap-4">
-              <div className="border-2 rounded-xl flex flex-wrap lg:flex-nowrap gap-6 lg:gap-4 items-center p-4 h-full lg:h-36">
-                <div className="flex flex-col gap-4">
-                  <div>
-                    <p className="text-title font-semibold">Guest favorite</p>
-                    <p></p>
-                  </div>
-                  <div className="w-full">
-                    <p className="text-content lg:text-small lg:text-nowrap text-start lg:text-start">
-                      One of the most loved homes on WoNo, according to guests
-                    </p>
-                  </div>
+              <div className="border-2 rounded-xl flex flex-col lg:flex-row gap-4 items-center p-4">
+                <div className="text-tiny w-1/4">
+                  <p>Guest</p>
+                  <p>favorite</p>
                 </div>
-                <div className="flex w-full gap-4 justify-evenly lg:justify-end lg:w-1/2">
-                  <div className="flex flex-col gap-4 justify-center items-center">
-                    <span className="text-subtitle lg:text-title">
+                <div className="w-full">
+                  <p className="text-tiny ">
+                    One of the most loved homes on WoNo, according to guests
+                  </p>
+                </div>
+                <div className="flex w-1/2 gap-4 justify-end">
+                  <div className="flex flex-col gap-1 justify-center items-center">
+                    <p className="text-tiny">
                       <LeafRatings
                         ratings={
                           (
@@ -236,7 +257,7 @@ const Product = () => {
                         height={30}
                         width={30}
                       />
-                    </span>
+                    </p>
                     <span className="text-sm flex lg:text-small font-medium">
                       {renderStars(
                         companyDetails?.reviews.reduce(
@@ -254,14 +275,16 @@ const Product = () => {
                   </div>
                 </div>
               </div>
+
               <div className="shadow-md flex flex-col gap-4 p-6 rounded-xl border-2">
-                <h1 className="text-card-title font-semibold">
+                <h1 className="text-card-title font-semibold leading-normal">
                   Enquire & Recieve Quote
                 </h1>
                 <form
                   onSubmit={handleSubmit((data) => submitEnquiry(data))}
                   action=""
-                  className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+                >
                   <Controller
                     name="firstName"
                     control={control}
@@ -327,7 +350,8 @@ const Product = () => {
                           fullWidth
                           variant="standard"
                           size="small"
-                          select>
+                          select
+                        >
                           <MenuItem value="" disabled>
                             <em>Select A Type</em>
                           </MenuItem>
@@ -347,7 +371,8 @@ const Product = () => {
                           fullWidth
                           variant="standard"
                           size="small"
-                          select>
+                          select
+                        >
                           <MenuItem value="" disabled>
                             <em>Select Number of Desk</em>
                           </MenuItem>
@@ -446,7 +471,7 @@ const Product = () => {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-0 lg:p-6">
               {reviewData.length > 0 ? (
-                reviewData.map((review, index) => (
+                reviewData.slice(0,6).map((review, index) => (
                   <ReviewCard
                     handleClick={() => {
                       setSelectedReview(review);
@@ -465,16 +490,9 @@ const Product = () => {
 
             <hr className="my-5 lg:my-10" />
             {/* Map */}
-            <div className="flex flex-col gap-8">
+            <div className="w-full h-[500px] flex flex-col gap-8 rounded-xl overflow-hidden">
               <h1 className="text-title font-semibold">Where you'll be</h1>
-              <iframe
-                src="https://www.google.com/maps/embed?origin=mfe&pb=!1m3!2m1!1sBIZNest+Sunteck+…rporate+Park,+501+B,Patto+Centre,+Panaji,Goa+403001!6i14!3m1!1sen!5m1!1sen"
-                width="100%"
-                height="600"
-                loading="lazy"
-                className="rounded-xl"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="map"></iframe>
+              <Map locations={mapsData} />
             </div>
             <hr className="my-5 lg:my-10" />
             <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-2 gap-20 pb-20">
@@ -516,7 +534,8 @@ const Product = () => {
                   </h1>
                   <form
                     onSubmit={handlesubmitSales((data) => submitSales(data))}
-                    className="grid grid-cols-1 gap-4">
+                    className="grid grid-cols-1 gap-4"
+                  >
                     <Controller
                       name="fullName"
                       control={salesControl}
@@ -594,7 +613,8 @@ const Product = () => {
                   xmlns="http://www.w3.org/2000/svg"
                   fill="currentColor"
                   viewBox="0 0 24 24"
-                  className="w-4 h-4">
+                  className="w-4 h-4"
+                >
                   <path d="M12 .587l3.668 7.568L24 9.75l-6 5.859L19.336 24 12 19.897 4.664 24 6 15.609 0 9.75l8.332-1.595z" />
                 </svg>
               ))}
