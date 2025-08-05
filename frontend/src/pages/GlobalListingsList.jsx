@@ -139,101 +139,97 @@ const GlobalListingsList = () => {
     <div className="flex flex-col gap-6 ">
       <div className="flex flex-col gap-4 justify-center items-center  w-full lg:mt-0">
         <Container padding={false}>
-           <div className="flex flex-col gap-4 justify-between items-center w-full h-full">
-              {/* the 5 icons */}
-             
-                <div className=" w-full flex justify-center items-center">
-                  <div className="grid grid-cols-5 md:grid-cols-6 gap-0">
-                    {categoryOptions.map((cat) => {
-                      const iconSrc = newIcons[cat.value];
+          <div className="flex flex-col gap-4 justify-between items-center w-full h-full">
+            {/* the 5 icons */}
 
-                      return (
-                        <button
-                          key={cat.value}
-                          type="button"
-                          onClick={() => handleCategoryClick(cat.value)}
-                          className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full"
-                        >
-                          {iconSrc ? (
-                            <div className="h-10 w-full flex flex-col gap-0">
-                              <img
-                                src={iconSrc}
-                                alt={cat.label}
-                                className="h-full w-full object-contain"
-                              />
-                              <span className="text-sm">{cat.label}</span>
-                              <div></div>
-                            </div>
-                          ) : (
-                            cat.label // fallback if no icon found
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-           
-              <form
-                onSubmit={handleSubmit(onSubmit)}
-                className=" flex justify-around w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
-              >
-                <Controller
-                  name="country"
-                  control={control}
-                  render={({ field }) => (
-                    <SearchBarCombobox
-                      value={field.value}
-                      onChange={field.onChange}
-                      options={countryOptions}
-                      label="Select Country"
-                      placeholder="Select aspiring destination"
-                      className="w-full z-10"
-                    />
-                  )}
-                />
-                <Controller
-                  name="location"
-                  control={control}
-                  render={({ field }) => (
-                    <SearchBarCombobox
-                      value={field.value}
-                      onChange={field.onChange}
-                      label="Select Location"
-                      options={locationOptions}
-                      placeholder="Select area within country"
-                      disabled={!selectedCountry}
-                      className="-ml-12 w-full z-20"
-                    />
-                  )}
-                />
-                <Controller
-                  name="count"
-                  control={control}
-                  render={({ field }) => (
-                    <SearchBarCombobox
-                      value={field.value}
-                      onChange={field.onChange}
-                      options={countOptions}
-                      label="Select Count"
-                      placeholder="Booking for no. of Nomads"
-                      disabled={!selectedState}
-                      className="-ml-12 w-full z-30"
-                    />
-                  )}
-                />
-                <button
-                  type="submit"
-                  className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full"
-                >
-                  <IoSearch />
-                </button>
-              </form>
+            <div className=" w-full flex justify-center items-center">
+              <div className="grid grid-cols-5 md:grid-cols-6 gap-0">
+                {categoryOptions.map((cat) => {
+                  const iconSrc = newIcons[cat.value];
+
+                  return (
+                    <button
+                      key={cat.value}
+                      type="button"
+                      onClick={() => handleCategoryClick(cat.value)}
+                      className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full">
+                      {iconSrc ? (
+                        <div className="h-10 w-full flex flex-col gap-0">
+                          <img
+                            src={iconSrc}
+                            alt={cat.label}
+                            className="h-full w-full object-contain"
+                          />
+                          <span className="text-sm">{cat.label}</span>
+                          <div></div>
+                        </div>
+                      ) : (
+                        cat.label // fallback if no icon found
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
+
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className=" flex justify-around w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center">
+              <Controller
+                name="country"
+                control={control}
+                render={({ field }) => (
+                  <SearchBarCombobox
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={countryOptions}
+                    label="Select Country"
+                    placeholder="Select aspiring destination"
+                    className="w-full z-10"
+                  />
+                )}
+              />
+              <Controller
+                name="location"
+                control={control}
+                render={({ field }) => (
+                  <SearchBarCombobox
+                    value={field.value}
+                    onChange={field.onChange}
+                    label="Select Location"
+                    options={locationOptions}
+                    placeholder="Select area within country"
+                    disabled={!selectedCountry}
+                    className="-ml-12 w-full z-20"
+                  />
+                )}
+              />
+              <Controller
+                name="count"
+                control={control}
+                render={({ field }) => (
+                  <SearchBarCombobox
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={countOptions}
+                    label="Select Count"
+                    placeholder="Booking for no. of Nomads"
+                    disabled={!selectedState}
+                    className="-ml-12 w-full z-30"
+                  />
+                )}
+              />
+              <button
+                type="submit"
+                className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full">
+                <IoSearch />
+              </button>
+            </form>
+          </div>
           <div className="md:hidden flex w-full items-center justify-center my-4">
             <button
               onClick={() => setShowMobileSearch(true)}
-              className="bg-white flex items-center w-full text-black border-2 px-6 py-3 rounded-full"
-            >
+              className="bg-white flex items-center w-full text-black border-2 px-6 py-3 rounded-full">
               <IoSearch className="inline mr-2" />
               Start Search
             </button>
@@ -246,14 +242,12 @@ const GlobalListingsList = () => {
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ duration: 0.3 }}
-              className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 p-4 rounded-t-3xl md:hidden"
-            >
+              className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 p-4 rounded-t-3xl md:hidden">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold">Search</h3>
                 <button
                   onClick={() => setShowMobileSearch(false)}
-                  className="text-gray-500 text-xl"
-                >
+                  className="text-gray-500 text-xl">
                   &times;
                 </button>
               </div>
@@ -266,8 +260,7 @@ const GlobalListingsList = () => {
                       key={cat.value}
                       type="button"
                       onClick={() => handleCategoryClick(cat.value)}
-                      className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full"
-                    >
+                      className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full">
                       {iconSrc ? (
                         <div className="h-10 w-full flex flex-col gap-0">
                           <img
@@ -333,8 +326,7 @@ const GlobalListingsList = () => {
                 />
                 <button
                   type="submit"
-                  className="w-full bg-[#FF5757] text-white py-3 rounded-full"
-                >
+                  className="w-full bg-[#FF5757] text-white py-3 rounded-full">
                   <IoSearch className="inline mr-2" />
                   Search
                 </button>
@@ -347,7 +339,7 @@ const GlobalListingsList = () => {
       <Container padding={false}>
         <div className="">
           <div className="font-semibold text-lg">
-            <div className="pr-0 lg:pr-10 h-[36rem] overflow-y-auto overflow-x-hidden">
+            <div className="pr-0 lg:pr-10 h-[36rem] overflow-auto custom-scrollbar-hide">
               {isLisitingLoading ? (
                 Array.from({ length: 4 }).map((_, i) => (
                   <SkeletonCard key={i} />
@@ -373,12 +365,11 @@ const GlobalListingsList = () => {
                       </div>
 
                       {showViewMore && (
-                        <div className="mt-3">
+                        <div className="mt-3 text-right">
                           <NavLink
                             to={`/nomads/${formData.country}.${formData.location}/${type}`}
                             state={{ ...formData, category: type }}
-                            className="text-primary-blue text-sm font-semibold hover:underline"
-                          >
+                            className="text-primary-blue text-sm font-semibold hover:underline">
                             View More{" "}
                             {typeLabels[type] || typeLabels.default(type)} →
                           </NavLink>

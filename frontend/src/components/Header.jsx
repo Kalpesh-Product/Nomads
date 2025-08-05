@@ -92,14 +92,18 @@ const Header = () => {
                 {!["Signup"].includes(item.text) && (
                   <div className="p-4 px-0 whitespace-nowrap">
                     {item.external ? (
-                      <a
-                        href={item.to}
-                        className="group relative text-base font-medium text-black">
-                        <span className="relative z-10 group-hover:font-bold mb-8">
-                          {item.text}
-                        </span>
-                        <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
-                      </a>
+                      <>
+                        {isNomadHome && (
+                          <a
+                            href={item.to}
+                            className="group relative text-base font-medium text-black">
+                            <span className="relative z-10 group-hover:font-bold mb-8">
+                              {item.text}
+                            </span>
+                            <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                          </a>
+                        )}
+                      </>
                     ) : (
                       <Link
                         to={item.to}
@@ -119,20 +123,18 @@ const Header = () => {
       )}
 
       <div className="flex gap-4">
-        {isNomadHome && (
-          <li className="flex items-center">
-            <div className="p-4 px-0 whitespace-nowrap">
-              <a
-                href="https://wono.co"
-                className="group relative text-base font-medium text-black">
-                <span className="relative z-10 group-hover:font-bold mb-8">
-                  Become a host
-                </span>
-                <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
-              </a>
-            </div>
-          </li>
-        )}
+        <li className="flex items-center">
+          <div className="p-4 px-0 whitespace-nowrap">
+            <a
+              href="https://wono.co"
+              className="group relative text-base font-medium text-black">
+              <span className="relative z-10 group-hover:font-bold mb-8">
+                Become a host
+              </span>
+              <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+            </a>
+          </div>
+        </li>
 
         <div className="px-1 hidden xl:flex gap-2">
           <PrimaryButton
