@@ -286,12 +286,12 @@ const Product = () => {
                   className="grid grid-cols-1 lg:grid-cols-2 gap-6"
                 >
                   <Controller
-                    name="firstName"
+                    name="fullName"
                     control={control}
                     render={({ field }) => (
                       <TextField
                         {...field}
-                        label="First Name"
+                        label="Full Name"
                         fullWidth
                         variant="standard"
                         size="small"
@@ -299,12 +299,12 @@ const Product = () => {
                     )}
                   />
                   <Controller
-                    name="lasttName"
+                    name="noOfPeople"
                     control={control}
                     render={({ field }) => (
                       <TextField
                         {...field}
-                        label="Last Name"
+                        label="No. Of People"
                         fullWidth
                         variant="standard"
                         size="small"
