@@ -255,7 +255,7 @@ const Home = () => {
               />
               <button
                 type="submit"
-                className="w-fit h-full  bg-pink-600 text-white p-5 text-subtitle rounded-full"
+                className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full"
               >
                 <IoSearch />
               </button>
