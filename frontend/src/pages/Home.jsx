@@ -1,9 +1,6 @@
 import React from "react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
-import PrimaryButton from "../components/PrimaryButton";
-import SecondaryButton from "../components/SecondaryButton";
-import AccentButton from "../components/AccentButton";
-import { Avatar, MenuItem, TextField } from "@mui/material";
+import { IoSearch } from "react-icons/io5";
 
 import { Controller, useForm } from "react-hook-form";
 import { FaSearch } from "react-icons/fa";
@@ -30,6 +27,7 @@ import hostels from "../../public/images/bg-image.jpg";
 import cafes from "../../public/images/bg-image.jpg";
 import privateStay from "../../public/images/bg-image.jpg";
 import companyWorkation from "../../public/images/bg-image.jpg";
+import SearchBarCombobox from "../components/SearchBarCombobox";
 
 const Home = () => {
   const destinationData = [
@@ -45,13 +43,15 @@ const Home = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const formData = useSelector((state) => state.location.formValues);
-  const { handleSubmit, control, reset, register } = useForm({
+  const { handleSubmit, control, reset, register, watch } = useForm({
     defaultValues: {
       country: "",
       location: "",
       count: "",
     },
   });
+  const selectedCountry = watch("country")
+  const selectedState = watch("location")
   // Sample options
   const countryOptions = [{ label: "India", value: "india" }];
   const locationOptions = [{ label: "Goa", value: "goa" }];
@@ -275,117 +275,70 @@ const Home = () => {
       title: "MEETING ROOM",
     },
   ];
+  const onSubmit = (data) => {
+    console.log("Form Data:", data);
+  };
 
   return (
     <div className="flex flex-col w-full">
       <Container>
         <div className="py-4  ">
-          <div className="flex flex-col gap-4 justify-between">
+          <div className="flex flex-col gap-4 justify-between items-center">
             <form
-              onSubmit={handleSubmit((data) => locationData(data))}
-              className="flex gap-2 border-2 border-black rounded-full pl-4 h-10 lg:h-16 justify-between items-center bg-white">
-              {/* Country */}
-              <div className="relative w-full">
-                <Controller
-                  name="country"
-                  control={control}
-                  render={({ field }) => (
-                    <Select
-                      {...field}
-                      options={countryOptions}
-                      onChange={(values) => field.onChange(values[0]?.value)}
-                      values={countryOptions.filter(
-                        (opt) => opt.value === field.value
-                      )}
-                      placeholder="Select aspiring destination"
-                      color="#0000"
-                      dropdownPosition="bottom"
-                      className="w-3/4 text-sm"
-                      style={{
-                        border: "none",
-                        background: "transparent",
-                        boxShadow: "none",
-                        // fontSize: "0.875rem",
-                        fontSize: "1.5rem",
-                        padding: "0.5rem",
-                        color: "black",
-                        cursor: "pointer",
-                        fontWeight: "600",
-                      }}
-                    />
-                  )}
-                />
-              </div>
-
-              {/* Location */}
-              <div className="relative w-full border-l-4 border-black">
-                <Controller
-                  name="location"
-                  control={control}
-                  render={({ field }) => (
-                    <Select
-                      {...field}
-                      options={locationOptions}
-                      onChange={(values) => field.onChange(values[0]?.value)}
-                      values={locationOptions.filter(
-                        (opt) => opt.value === field.value
-                      )}
-                      placeholder="Select area within Country"
-                      dropdownPosition="bottom"
-                      className="w-3/4 text-sm"
-                      style={{
-                        border: "none",
-                        background: "transparent",
-                        boxShadow: "none",
-                        fontSize: "1.5rem",
-                        padding: "0.5rem",
-                        cursor: "pointer",
-                        fontWeight: "600",
-                      }}
-                    />
-                  )}
-                />
-              </div>
-
-              {/* count */}
-              <div className="relative w-full border-l-4 border-black pl-2">
-                <Controller
-                  name="count"
-                  control={control}
-                  render={({ field }) => (
-                    <Select
-                      {...field}
-                      options={countOptions}
-                      onChange={(values) => field.onChange(values[0]?.value)}
-                      values={countOptions.filter(
-                        (opt) => opt.value === field.value
-                      )}
-                      placeholder="Booking for no of nomads"
-                      dropdownPosition="bottom"
-                      className="w-3/4 text-sm"
-                      style={{
-                        border: "none",
-                        background: "transparent",
-                        boxShadow: "none",
-                        fontSize: "1.5rem",
-                        padding: "0.5rem",
-                        cursor: "pointer",
-                        fontWeight: "600",
-                      }}
-                    />
-                  )}
-                />
-              </div>
-
-              {/* Submit */}
-              <div className=" h-full  flex justify-end rounded-r-full pr-3 items-center">
-                <button
-                  type="submit"
-                  disabled={isLocation}
-                  className="h-12 text-center w-12 flex justify-center items-center text-white rounded-full bg-[#ff5757] font-bold">
-                  <FaSearch className="text-3xl " />
-                </button>
-              </div>
+              onSubmit={handleSubmit(onSubmit)}
+              className=" flex justify-between w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
+            >
+              <Controller
+                name="country"
+                control={control}
+                render={({ field }) => (
+                  <SearchBarCombobox
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={countryOptions}
+                    label="Select Country"
+                    placeholder="Select aspiring destination"
+                    
+                    className="w-full z-10"
+                  />
+                )}
+              />
+              <Controller
+                name="location"
+                control={control}
+                render={({ field }) => (
+                  <SearchBarCombobox
+                    value={field.value}
+                    onChange={field.onChange}
+                    label="Select Location"
+                    options={locationOptions}
+                    placeholder="Select area within country"
+                    disabled={!selectedCountry}
+                    className="-ml-12 w-full z-20"
+                  />
+                )}
+              />
+              <Controller
+                name="count"
+                control={control}
+                render={({ field }) => (
+                  <SearchBarCombobox
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={countOptions}
+                    label="Select Count"
+                    placeholder="Booking for no. of Nomads"
+                    disabled={!selectedState}
+                    className="-ml-12 w-full z-30"
+                  />
+                )}
+              />
+              <button
+                type="submit"
+                className="w-fit h-full  bg-pink-600 text-white p-5 text-subtitle rounded-full"
+              >
+                <IoSearch />
+              </button>
             </form>
           </div>
         </div>
@@ -764,7 +717,8 @@ const Home = () => {
             {destinationData.map((item, idx) => (
               <div
                 key={idx}
-                className="w-44 sm:w-52 md:w-56 lg:w-56 flex flex-col items-center">
+                className="w-44 sm:w-52 md:w-56 lg:w-56 flex flex-col items-center"
+              >
                 <div className="relative w-full rounded-xl overflow-hidden shadow-md">
                   <img
                     src={item.image}
