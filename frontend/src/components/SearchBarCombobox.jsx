@@ -86,6 +86,7 @@ export default function SearchBarCombobox({
                     filteredOptions.map((option) => (
                       <button
                         key={option.value}
+                         type="button" 
                         onClick={() => handleSelect(option.value, close)}
                         className="w-full text-left px-4 py-2 hover:bg-gray-100"
                       >

@@ -168,56 +168,6 @@ const Home = () => {
       transform: "scale(1.1) translate(3px, 2px)",
     },
   ];
-  const featureSections = [
-    {
-      icon: <FaRegListAlt />,
-      points: [
-        "Serves as a dynamic platform, seamlessly connecting freelance professionals, remote workers, and individuals seeking flexible workspace solutions with nearby co-working spaces.",
-      ],
-      title: "Listing",
-      bgColor: "bg-[#fef7de]",
-      link: {
-        to: "#",
-        label: "View more >>",
-      },
-    },
-    {
-      icon: <FaRegListAlt />,
-      points: [
-        "Serves as a dynamic platform, seamlessly connecting freelance professionals, remote workers, and individuals seeking flexible workspace solutions with nearby co-working spaces.",
-      ],
-      title: "Booking",
-      bgColor: "bg-[#fbfed5]",
-      link: {
-        to: "#",
-        label: "View more >>",
-      },
-    },
-    {
-      icon: <FaRegListAlt />,
-      points: [
-        "Serves as a dynamic platform, seamlessly connecting freelance professionals, remote workers, and individuals seeking flexible workspace solutions with nearby co-working spaces.",
-      ],
-      title: "Community",
-      bgColor: "bg-[#f4fede]",
-      link: {
-        to: "#",
-        label: "View more >>",
-      },
-    },
-    {
-      icon: <FaRegListAlt />,
-      points: [
-        "Serves as a dynamic platform, seamlessly connecting freelance professionals, remote workers, and individuals seeking flexible workspace solutions with nearby co-working spaces.",
-      ],
-      title: "Communication",
-      bgColor: "bg-[#defede]",
-      link: {
-        to: "#",
-        label: "View more >>",
-      },
-    },
-  ];
   const amenities = [
     { image: icons.workspace, title: "WORKSPACE" },
     { image: icons.livingspace, title: "LIVING SPACE" },
@@ -244,39 +194,9 @@ const Home = () => {
     { image: icons.secure, title: "SECURE" },
     { image: icons.personalised, title: "PERSONALISED" },
   ];
-  const carouselItems = [
-    {
-      image:
-        // "https://images.unsplash.com/photo-1581090700227-1e8a28add49c?auto=format&fit=crop&w=800&q=80",
-        "https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=800&q=80",
-      title: "CO-WORKING",
-    },
-    {
-      image:
-        // "https://images.unsplash.com/photo-1572120360610-d971b9b78827?auto=format&fit=crop&w=800&q=80",
-        "https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=800&q=80",
-      title: "CO-LIVING",
-    },
-    {
-      image:
-        // "https://images.unsplash.com/photo-1607083207630-9b22b38138f4?auto=format&fit=crop&w=800&q=80",
-        "https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=800&q=80",
-      title: "WORKATION",
-    },
-    {
-      image:
-        "https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=800&q=80",
-      title: "VILLAS",
-    },
-    {
-      image:
-        // "https://images.unsplash.com/photo-1616627983135-3b2dc0d9dd75?auto=format&fit=crop&w=800&q=80",
-        "https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=800&q=80",
-      title: "MEETING ROOM",
-    },
-  ];
+
   const onSubmit = (data) => {
-    console.log("Form Data:", data);
+    locationData(data);
   };
 
   return (
