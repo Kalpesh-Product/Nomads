@@ -26,7 +26,10 @@ const GlobalListings = () => {
   const locationOptions = [{ label: "Goa", value: "goa" }];
   const categoryOptions = [
     { label: "Co-Working", value: "coworking" },
-    { label: "Co-Living", value: "coliving" },
+    { label: "Hostels", value: "hostels" },
+    { label: "Cafe’s/Meeting Rooms", value: "cafeMeetings" },
+    { label: "Private Stay", value: "privateStay" },
+    { label: "Company Workation", value: "companyWorkation" },
   ];
   console.log("formData", formData);
   const { data: listingsData, isPending: isLisitingLoading } = useQuery({
@@ -126,10 +129,9 @@ const GlobalListings = () => {
           <div className="flex flex-col gap-4 justify-between w-3/4 md:w-3/4 lg:w-full h-full">
             <form
               onSubmit={handleSubmit((data) => locationData(data))}
-              className="flex flex-col gap-4"
-            >
+              className="flex flex-col gap-4">
               <div className=" w-full flex justify-center items-center">
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                <div className="grid grid-cols-5 md:grid-cols-5 gap-2">
                   {categoryOptions.map((cat) => {
                     const iconSrc = newIcons[cat.value];
 
@@ -138,8 +140,7 @@ const GlobalListings = () => {
                         key={cat.value}
                         type="button"
                         onClick={() => handleCategoryClick(cat.value)}
-                        className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-fit"
-                      >
+                        className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full">
                         {iconSrc ? (
                           <div className="h-10 w-full flex flex-col gap-0">
                             <img
@@ -148,9 +149,7 @@ const GlobalListings = () => {
                               className="h-full w-full object-contain"
                             />
                             <span className="text-sm">{cat.label}</span>
-                            <div>
-                                
-                            </div>
+                            <div></div>
                           </div>
                         ) : (
                           cat.label // fallback if no icon found
@@ -256,8 +255,7 @@ const GlobalListings = () => {
                   <button
                     type="submit"
                     disabled={isLocation}
-                    className="h-full text-center w-full flex justify-center items-center text-white"
-                  >
+                    className="h-full text-center w-full flex justify-center items-center text-white">
                     <CiSearch className="text-lg" /> &nbsp; Search
                   </button>
                 </div>
@@ -300,8 +298,7 @@ const GlobalListings = () => {
                           <NavLink
                             to={`/nomads/${formData.country}.${formData.location}/${type}`}
                             state={{ ...formData, category: type }}
-                            className="text-primary-blue text-sm font-semibold hover:underline"
-                          >
+                            className="text-primary-blue text-sm font-semibold hover:underline">
                             View More{" "}
                             {typeLabels[type] || typeLabels.default(type)} →
                           </NavLink>

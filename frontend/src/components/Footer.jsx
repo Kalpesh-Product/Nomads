@@ -7,6 +7,15 @@ import { FaXTwitter } from "react-icons/fa6";
 const Footer = () => {
   const footerSections = [
     {
+      heading: "Services",
+      links: [
+        { name: "About", link: "/nomad" },
+        { name: "Career", link: "/nomad" },
+        { name: "FAQs", link: "/nomad" },
+        // { name: "Mortgage", link: "/mortgages" },
+      ],
+    },
+    {
       heading: "Corporate",
       links: [
         { name: "Sign In", link: "/nomad" },
@@ -15,29 +24,20 @@ const Footer = () => {
         // { name: "Investor Login", link: "/login" },
       ],
     },
-    {
-      heading: "Services",
-      links: [
-        { name: "Switch TO Nomads", link: "/nomad" },
-        { name: "Career", link: "/nomad" },
-        { name: "About", link: "/nomad" },
-        // { name: "Mortgage", link: "/mortgages" },
-      ],
-    },
-    {
-      heading: "Support",
-      links: [
-        { name: "FAQs", link: "/nomad" },
-        { name: "Privacy", link: "/nomad" },
-        { name: "T&C", link: "nomad" },
-        // { name: "T & C", link: "terms-conditions" },
-      ],
-    },
+
+    // {
+    //   heading: "Support",
+    //   links: [
+    //     { name: "FAQs", link: "/nomad" },
+    //     { name: "Privacy", link: "/nomad" },
+    //     { name: "T&C", link: "nomad" },
+    //   ],
+    // },
   ];
 
   return (
     <footer className="w-full bg-gray-100 text-black backdrop-blur-md  flex flex-col justify-center items-center gap-0  pb-0 md:pb-0   shadow-lg ">
-      <div className="w-full flex flex-wrap md:flex-wrap lg:flex-nowrap justify-between items-center pt-12 pb-16 px-28">
+      <div className="w-full flex flex-wrap md:flex-wrap lg:flex-nowrap justify-between items-center pt-12 pb-8 px-28">
         <div className="flex flex-col justify-center md:flex-1 md:justify-center md:items-center lg:justify-start lg:items-start mb-8 lg:mb-0">
           <div className="w-70 md:w-80 h-full">
             <img
@@ -60,16 +60,16 @@ const Footer = () => {
                 response@wono.co
               </Link>
             </p>
-            <div className="flex gap-3 mt-4">
+            {/* <div className="flex gap-3 mt-4">
               <FaTwitter className="bg-gray-700 p-1 rounded text-white text-xl cursor-pointer hover:text-blue-400" />
               <FaFacebookF className="bg-gray-700 p-1 rounded text-white text-xl cursor-pointer hover:text-blue-500" />
               <FaInstagram className="bg-gray-700 p-1 rounded text-white text-xl cursor-pointer hover:text-pink-400" />
               <FaLinkedinIn className="bg-gray-700 p-1 rounded text-white text-xl cursor-pointer hover:text-blue-600" />
-            </div>
+            </div> */}
           </div>
         </div>
         <div className=" ">
-          <div className="w-full md:w-full lg:w-fit grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-10 lg:gap-32">
+          <div className="w-full md:w-full lg:w-fit grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-10 lg:gap-32">
             {footerSections.map((section, idx) => (
               <div
                 key={idx}

@@ -18,6 +18,7 @@ import { setFormValues } from "../features/locationSlice.js";
 import { useSearchParams } from "react-router-dom";
 import ListingCard from "../components/ListingCard.jsx";
 import PaginatedGrid from "../components/PaginatedGrid.jsx";
+import newIcons from "../assets/newIcons.js";
 
 const Listings = () => {
   const [favorites, setFavorites] = useState([]);
@@ -28,7 +29,10 @@ const Listings = () => {
   const locationOptions = [{ label: "Goa", value: "goa" }];
   const categoryOptions = [
     { label: "Co-Working", value: "coworking" },
-    { label: "Co-Living", value: "coliving" },
+    { label: "Hostels", value: "hostels" },
+    { label: "Cafe’s/Meeting Rooms", value: "cafeMeetings" },
+    { label: "Private Stay", value: "privateStay" },
+    { label: "Company Workation", value: "companyWorkation" },
   ];
   console.log("formData", formData);
   const { data: listingsData, isPending: isLisitingLoading } = useQuery({
@@ -101,6 +105,36 @@ const Listings = () => {
           "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
       }));
 
+  const handleCategoryClick = (categoryValue) => {
+    const formData = getValues(); // from react-hook-form
+
+    if (!formData.country || !formData.location) {
+      alert("Please select Country and Location first.");
+      return;
+    }
+    dispatch(setFormValues({ ...formData, category: categoryValue }));
+
+    // const url = `/nomads/${formData.country}.${formData.location}/${categoryValue}`;
+    const state = {
+      ...formData,
+      category: categoryValue,
+    };
+
+    // console.log("Generated URL:", url);
+    console.log("State to be passed:", state);
+
+    navigate(
+      `/nomad/listings?country=${formData.country}&location=${formData.location}&category=${state.category}`,
+      {
+        state: {
+          country: formData.country,
+          location: formData.location,
+          category: categoryValue,
+        },
+      }
+    );
+  };
+
   return (
     <div className="flex flex-col gap-4 ">
       <Container padding={false}>
@@ -113,11 +147,40 @@ const Listings = () => {
             Back
           </button> */}
           <div className="flex flex-col gap-4 justify-center items-center  w-full mt-10 lg:mt-0">
-            <div className="flex flex-col gap-4 justify-between w-full md:w-3/4 lg:w-1/2 h-full">
+            <div className="flex flex-col gap-4 justify-between w-full h-full">
+              {/* the 5 icons */}
+              <div className=" w-full flex justify-center items-center">
+                <div className="grid grid-cols-5 md:grid-cols-5 gap-2">
+                  {categoryOptions.map((cat) => {
+                    const iconSrc = newIcons[cat.value];
+
+                    return (
+                      <button
+                        key={cat.value}
+                        type="button"
+                        onClick={() => handleCategoryClick(cat.value)}
+                        className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full">
+                        {iconSrc ? (
+                          <div className="h-10 w-full flex flex-col gap-0">
+                            <img
+                              src={iconSrc}
+                              alt={cat.label}
+                              className="h-full w-full object-contain"
+                            />
+                            <span className="text-sm">{cat.label}</span>
+                            <div></div>
+                          </div>
+                        ) : (
+                          cat.label // fallback if no icon found
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
               <form
                 onSubmit={handleSubmit((data) => locationData(data))}
-                className="flex gap-2 border-2 border-primary-blue rounded-full pl-4 h-10 lg:h-16 justify-between items-center bg-white"
-              >
+                className="flex gap-2 border-2 border-primary-blue rounded-full pl-4 h-10 lg:h-16 justify-between items-center bg-white">
                 {/* Country */}
                 <div className="relative w-full">
                   <Controller
@@ -217,8 +280,7 @@ const Listings = () => {
                   <button
                     type="submit"
                     disabled={isLocation}
-                    className="h-full text-center w-full flex justify-center items-center text-white"
-                  >
+                    className="h-full text-center w-full flex justify-center items-center text-white">
                     <CiSearch className="text-lg" /> &nbsp; Search
                   </button>
                 </div>
