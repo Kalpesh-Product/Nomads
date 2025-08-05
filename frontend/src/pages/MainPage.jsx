@@ -17,7 +17,6 @@ import { useKeenSlider } from "keen-slider/react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef } from "react";
 import PrimaryButton from "../components/PrimaryButton";
-import { ReactFitty } from "react-fitty";
 import { FaXTwitter } from "react-icons/fa6";
 
 const slides = [
@@ -44,14 +43,11 @@ const MainPage = () => {
   });
 
   useEffect(() => {
-    if (!slider) return;
-
-    let index = 0;
+    if (!slider || !slider.current) return;
 
     intervalRef.current = setInterval(() => {
-      index = (index + 1) % slides.length;
-      slider.current?.moveToIdx(index);
-    }, 5000); // every 5 seconds
+      slider.current.next();
+    }, 10000);
 
     return () => clearInterval(intervalRef.current);
   }, [slider]);
@@ -69,7 +65,7 @@ const MainPage = () => {
         </figure>
 
         {/* Vertical Centered Dotted Separator */}
-        <div className="hidden lg:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-3/4 border-l-2 border-dashed border-gray-600 z-10" />
+        <div className="hidden lg:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[90%] border-l-2 border-dashed border-gray-600 z-10" />
 
         {/* Right Column */}
         <article className="flex flex-col gap-4 w-full h-full justify-center items-center p-8">
@@ -93,7 +89,7 @@ const MainPage = () => {
           <div className="flex gap-8 w-full justify-center items-center">
             <PrimaryButton
               title="For Nomads"
-              handleSubmit={()=>navigate('nomad')}
+              handleSubmit={() => navigate("nomad")}
               externalStyles="bg-[#FF5757] text-sm flex lg:text-2xl text-white font-bold capatilize hover:bg-[#E14C4C] w-[16rem] px-6"
             />
             <PrimaryButton
@@ -104,9 +100,10 @@ const MainPage = () => {
         </article>
       </div>
       <div className="flex justify-center items-center flex-col">
-        <p className="text-center text-xl pb-2">
-          &copy; Copyright 2025–26 WONOCO PRIVATE LIMITED – SINGAPORE. All
-          Rights Reserved.
+        <p className="text-center text-xs md:text-xl pb-2">
+          &copy; Copyright {new Date().getFullYear()} -{" "}
+          {(new Date().getFullYear() + 1).toString().slice(-2)} WONOCO PRIVATE
+          LIMITED – SINGAPORE. All Rights Reserved.
         </p>
         <div className="flex items-center gap-4">
           <FaFacebookF className="text-[12px]" />
