@@ -38,6 +38,7 @@ const Listings = () => {
     { label: "Hostels", value: "hostels" },
     { label: "Cafe’s/Meeting Rooms", value: "cafeMeetings" },
     { label: "Private Stay", value: "privateStay" },
+    { label: "Co-Living", value: "coliving" },
     { label: "Company Workation", value: "companyWorkation" },
   ];
 
@@ -156,7 +157,7 @@ const Listings = () => {
             <div className="flex flex-col gap-4 justify-between items-center w-full h-full">
               {/* the 5 icons */}
               <div className=" w-full flex justify-center items-center">
-                <div className="grid grid-cols-5 md:grid-cols-5 gap-2">
+                <div className="grid grid-cols-5 md:grid-cols-6 gap-2">
                   {categoryOptions.map((cat) => {
                     const iconSrc = newIcons[cat.value];
 
