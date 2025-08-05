@@ -156,36 +156,38 @@ const Listings = () => {
           <div className="flex flex-col gap-4 justify-center items-center  w-full mt-10 lg:mt-0">
             <div className="flex flex-col gap-4 justify-between items-center w-full h-full">
               {/* the 5 icons */}
-              <div className=" w-full flex justify-center items-center">
-                <div className="grid grid-cols-5 md:grid-cols-6 gap-2">
-                  {categoryOptions.map((cat) => {
-                    const iconSrc = newIcons[cat.value];
+             
+                <div className=" w-full flex justify-center items-center">
+                  <div className="grid grid-cols-5 md:grid-cols-6 gap-0">
+                    {categoryOptions.map((cat) => {
+                      const iconSrc = newIcons[cat.value];
 
-                    return (
-                      <button
-                        key={cat.value}
-                        type="button"
-                        onClick={() => handleCategoryClick(cat.value)}
-                        className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full"
-                      >
-                        {iconSrc ? (
-                          <div className="h-10 w-full flex flex-col gap-0">
-                            <img
-                              src={iconSrc}
-                              alt={cat.label}
-                              className="h-full w-full object-contain"
-                            />
-                            <span className="text-sm">{cat.label}</span>
-                            <div></div>
-                          </div>
-                        ) : (
-                          cat.label // fallback if no icon found
-                        )}
-                      </button>
-                    );
-                  })}
+                      return (
+                        <button
+                          key={cat.value}
+                          type="button"
+                          onClick={() => handleCategoryClick(cat.value)}
+                          className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full"
+                        >
+                          {iconSrc ? (
+                            <div className="h-10 w-full flex flex-col gap-0">
+                              <img
+                                src={iconSrc}
+                                alt={cat.label}
+                                className="h-full w-full object-contain"
+                              />
+                              <span className="text-sm">{cat.label}</span>
+                              <div></div>
+                            </div>
+                          ) : (
+                            cat.label // fallback if no icon found
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
+           
               <form
                 onSubmit={handleSubmit(onSubmit)}
                 className=" flex justify-around w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
