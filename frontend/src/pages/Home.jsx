@@ -22,11 +22,11 @@ import ReviewCard from "../components/ReviewCard";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { AiOutlineHeart } from "react-icons/ai";
-import coworking from "/images/bg-image.jpg";
-import hostels from "/images/bg-image.jpg";
-import cafes from "/images/bg-image.jpg";
-import privateStay from "/images/bg-image.jpg";
-import companyWorkation from "/images/bg-image.jpg";
+import coworking from "/images/coworking-img.png";
+import hostels from "/images/hostels-img.png";
+import cafes from "/images/meetingrooms-img.png";
+import privateStay from "/images/privatestay-img.png";
+import companyWorkation from "/images/workation-img.png";
 import SearchBarCombobox from "../components/SearchBarCombobox";
 
 const Home = () => {
@@ -50,8 +50,8 @@ const Home = () => {
       count: "",
     },
   });
-  const selectedCountry = watch("country")
-  const selectedState = watch("location")
+  const selectedCountry = watch("country");
+  const selectedState = watch("location");
   // Sample options
   const countryOptions = [{ label: "India", value: "india" }];
   const locationOptions = [{ label: "Goa", value: "goa" }];
@@ -206,8 +206,7 @@ const Home = () => {
           <div className="flex flex-col gap-4 justify-between items-center">
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className=" flex justify-around w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
-            >
+              className=" flex justify-around w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center">
               <Controller
                 name="country"
                 control={control}
@@ -218,7 +217,6 @@ const Home = () => {
                     options={countryOptions}
                     label="Select Country"
                     placeholder="Select aspiring destination"
-                    
                     className="w-full z-10"
                   />
                 )}
@@ -255,8 +253,7 @@ const Home = () => {
               />
               <button
                 type="submit"
-                className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full"
-              >
+                className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full">
                 <IoSearch />
               </button>
             </form>
@@ -637,8 +634,7 @@ const Home = () => {
             {destinationData.map((item, idx) => (
               <div
                 key={idx}
-                className="w-44 sm:w-52 md:w-56 lg:w-56 flex flex-col items-center"
-              >
+                className="w-44 sm:w-52 md:w-56 lg:w-56 flex flex-col items-center">
                 <div className="relative w-full rounded-xl overflow-hidden shadow-md">
                   <img
                     src={item.image}
@@ -648,9 +644,9 @@ const Home = () => {
                   {/* <div className="absolute top-2 left-2 bg-white text-xs font-medium text-gray-700 px-2 py-1 rounded-full shadow">
                     Guest favourite
                   </div> */}
-                  <div className="absolute top-2 right-2 shadow">
+                  {/* <div className="absolute top-2 right-2 shadow">
                     <AiOutlineHeart className="text-white text-xl" />
-                  </div>
+                  </div> */}
                 </div>
                 <p className="mt-2 text-sm md:text-base font-medium text-gray-800 text-center">
                   {item.label}

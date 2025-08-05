@@ -235,3 +235,16 @@ body::-webkit-scrollbar {
   display: none;
   /* Chrome, Safari, Opera */
 }
+
+/* Hide scrollbar for all browsers */
+.custom-scrollbar-hide {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.custom-scrollbar-hide::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, Opera */
+}
