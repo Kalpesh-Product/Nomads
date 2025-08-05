@@ -5,19 +5,25 @@ import { IoCloseSharp } from "react-icons/io5";
 import PrimaryButton from "./PrimaryButton";
 import logo from "../assets/WONO_LOGO_Black_TP.png";
 import SecondaryButton from "./SecondaryButton";
+import { useLocation } from "react-router-dom";
 
 const Header = () => {
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const view = searchParams.get("view"); // could be 'map', 'list', or null
+
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const handleNavigation = (path) => {
     navigate(path);
     setOpen(false);
   };
+
   const headerLinks = [
     // { id: 1, text: "ROI", to: "" },
     // { id: 1, text: "Map view", to: "nomad/career" },
-    { id: 1, text: "Destination news", to: "nomad/contact" },
-    { id: 2, text: "Local Blog", to: "nomad/contact" },
+    { id: 1, text: "Destination news", to: "nomad/destination-news" },
+    { id: 2, text: "Local Blog", to: "nomad/local-blog" },
     {
       id: 3,
       text: "Become a host",
@@ -26,7 +32,7 @@ const Header = () => {
     },
   ];
   return (
-    <div className="flex px-4 justify-between items-center md:py-3 md:px-[7.5rem] lg:px-[7.5rem]  bg-white/10 backdrop-blur-md shadow-md ">
+    <div className="flex px-4 justify-between items-center md:py-3 md:px-[7.5rem] lg:px-[7.5rem]  bg-white/80 backdrop-blur-md ">
       <div
         onClick={() => navigate("/")}
         className=" w-36 overflow-x-hidden rounded-lg flex justify-between items-center cursor-pointer">
@@ -35,37 +41,45 @@ const Header = () => {
       <div className="h-full px-2 md:hidden lg:hidden">
         <button
           onClick={() => setOpen(true)}
-          className="hamburger-menu rounded-lg text-title text-white">
+          className="hamburger-menu rounded-lg text-title text-black">
           ☰
         </button>
       </div>
 
       <div>
         <ul className="hidden xl:flex sm:hidden gap-6 justify-center flex-1">
-          <li lassName="flex items-center">
-            <div className="p-4 px-0 whitespace-nowrap">
-              <Link
-                to={`/nomad/listings?country=India&location=Goa&category=coworking`}
-                className="group relative text-base font-medium text-black ">
-                <span className="relative z-10 group-hover:font-bold mb-2 ">
-                  Map view
-                </span>
-                <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
-              </Link>
-            </div>
-          </li>
-          <li lassName="flex items-center">
-            <div className="p-4 px-0 whitespace-nowrap">
-              <Link
-                to={`/nomad/india/goa`}
-                className="group relative text-base font-medium text-black ">
-                <span className="relative z-10 group-hover:font-bold mb-8">
-                  List view
-                </span>
-                <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
-              </Link>
-            </div>
-          </li>
+          {/* Show Map View only if current view is not 'map' */}
+          {view !== "map" && (
+            <li className="flex items-center">
+              <div className="p-4 px-0 whitespace-nowrap">
+                <Link
+                  to={`/nomad/india/goa?view=map`}
+                  className="group relative text-base font-medium text-black">
+                  <span className="relative z-10 group-hover:font-bold mb-2">
+                    Map view
+                  </span>
+                  <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                </Link>
+              </div>
+            </li>
+          )}
+
+          {/* Show List View only if current view is 'map' */}
+          {view === "map" && (
+            <li className="flex items-center">
+              <div className="p-4 px-0 whitespace-nowrap">
+                <Link
+                  to={`/nomad/india/goa`}
+                  className="group relative text-base font-medium text-black">
+                  <span className="relative z-10 group-hover:font-bold mb-2">
+                    List view
+                  </span>
+                  <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                </Link>
+              </div>
+            </li>
+          )}
+
           {headerLinks.map((item, index) => (
             <li key={item.id} className="flex items-center">
               {!["Signup"].includes(item.text) ? (

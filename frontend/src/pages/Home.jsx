@@ -16,11 +16,11 @@ import SearchBarCombobox from "../components/SearchBarCombobox";
 import newIcons from "../assets/newIcons";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
-import coworking from "/images/bg-image.jpg";
-import hostels from "/images/bg-image.jpg";
-import cafes from "/images/bg-image.jpg";
-import privateStay from "/images/bg-image.jpg";
-import companyWorkation from "/images/bg-image.jpg";
+import coworking from "/images/coworking-img.png";
+import hostels from "/images/hostels-img.png";
+import cafes from "/images/meetingrooms-img.png";
+import privateStay from "/images/privatestay-img.png";
+import companyWorkation from "/images/workation-img.png";
 
 const Home = () => {
   const destinationData = [
@@ -247,8 +247,7 @@ const Home = () => {
               />
               <button
                 type="submit"
-                className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full"
-              >
+                className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full">
                 <IoSearch />
               </button>
             </form>
@@ -412,8 +411,7 @@ const Home = () => {
             {destinationData.map((item, idx) => (
               <div
                 key={idx}
-                className="w-44 sm:w-52 md:w-56 lg:w-56 flex flex-col items-center"
-              >
+                className="w-44 sm:w-52 md:w-56 lg:w-56 flex flex-col items-center">
                 <div className="relative w-full rounded-xl overflow-hidden shadow-md">
                   <img
                     src={item.image}
@@ -423,9 +421,9 @@ const Home = () => {
                   {/* <div className="absolute top-2 left-2 bg-white text-xs font-medium text-gray-700 px-2 py-1 rounded-full shadow">
                     Guest favourite
                   </div> */}
-                  <div className="absolute top-2 right-2 shadow">
+                  {/* <div className="absolute top-2 right-2 shadow">
                     <AiOutlineHeart className="text-white text-xl" />
-                  </div>
+                  </div> */}
                 </div>
                 <p className="mt-2 text-sm md:text-base font-medium text-gray-800 text-center">
                   {item.label}

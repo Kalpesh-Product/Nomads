@@ -10,6 +10,9 @@ import Contact from "./pages/Contact";
 import Career from "./pages/Career";
 import JobDetails from "./pages/JobDetails";
 import GlobalListings from "./pages/GlobalListings";
+import GlobalListingsMap from "./pages/GlobalListingsMap";
+import DestinationNews from "./pages/DestinationNews";
+import LocalBlog from "./pages/LocalBlog";
 
 const router = createBrowserRouter([
   {
@@ -33,6 +36,7 @@ const router = createBrowserRouter([
             path: ":country/:state",
             element: <GlobalListings />,
           },
+
           {
             path: "listings",
             element: <Listings />,
@@ -48,6 +52,14 @@ const router = createBrowserRouter([
           {
             path: "contact",
             element: <Contact />,
+          },
+          {
+            path: "destination-news",
+            element: <DestinationNews />,
+          },
+          {
+            path: "local-blog",
+            element: <LocalBlog />,
           },
           {
             path: "career",
