@@ -20,8 +20,6 @@ const Header = () => {
   };
 
   const headerLinks = [
-    // { id: 1, text: "ROI", to: "" },
-    // { id: 1, text: "Map view", to: "nomad/career" },
     { id: 1, text: "Destination news", to: "nomad/destination-news" },
     { id: 2, text: "Local Blog", to: "nomad/local-blog" },
     {
