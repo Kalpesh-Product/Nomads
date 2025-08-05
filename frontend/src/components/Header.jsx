@@ -12,6 +12,11 @@ const Header = () => {
   const searchParams = new URLSearchParams(location.search);
   const view = searchParams.get("view"); // could be 'map', 'list', or null
 
+  const currentPath = location.pathname;
+  const hideMapListLinks = currentPath === "/nomad";
+
+  const isNomadHome = currentPath === "/nomad";
+
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const handleNavigation = (path) => {
@@ -46,68 +51,59 @@ const Header = () => {
         </button>
       </div>
 
-      <div>
-        <ul className="hidden xl:flex sm:hidden gap-6 justify-center flex-1">
-          {/* Show Map View only if current view is not 'map' */}
-          {view !== "map" && (
-            <li className="flex items-center">
-              <div className="p-4 px-0 whitespace-nowrap">
-                <Link
-                  to={`/nomad/india/goa?view=map`}
-                  className="group relative text-base font-medium text-black">
-                  <span className="relative z-10 group-hover:font-bold mb-2">
-                    Map view
-                  </span>
-                  <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
-                </Link>
-              </div>
-            </li>
-          )}
+      {!hideMapListLinks && (
+        <div>
+          <ul className="hidden xl:flex sm:hidden gap-6 justify-center flex-1">
+            {/* Show Map View only if current view is not 'map' */}
+            {view !== "map" && (
+              <li className="flex items-center">
+                <div className="p-4 px-0 whitespace-nowrap">
+                  <Link
+                    to={`/nomad/india/goa?view=map`}
+                    className="group relative text-base font-medium text-black">
+                    <span className="relative z-10 group-hover:font-bold mb-2">
+                      Map view
+                    </span>
+                    <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                  </Link>
+                </div>
+              </li>
+            )}
 
-          {/* Show List View only if current view is 'map' */}
-          {view === "map" && (
-            <li className="flex items-center">
-              <div className="p-4 px-0 whitespace-nowrap">
-                <Link
-                  to={`/nomad/india/goa`}
-                  className="group relative text-base font-medium text-black">
-                  <span className="relative z-10 group-hover:font-bold mb-2">
-                    List view
-                  </span>
-                  <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
-                </Link>
-              </div>
-            </li>
-          )}
+            {/* Show List View only if current view is 'map' */}
+            {view === "map" && (
+              <li className="flex items-center">
+                <div className="p-4 px-0 whitespace-nowrap">
+                  <Link
+                    to={`/nomad/india/goa`}
+                    className="group relative text-base font-medium text-black">
+                    <span className="relative z-10 group-hover:font-bold mb-2">
+                      List view
+                    </span>
+                    <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                  </Link>
+                </div>
+              </li>
+            )}
 
-          {headerLinks.map((item, index) => (
-            <li key={item.id} className="flex items-center">
-              {!["Signup"].includes(item.text) ? (
-                <>
+            {/* Remaining nav links */}
+            {headerLinks.map((item, index) => (
+              <li key={item.id} className="flex items-center">
+                {!["Signup"].includes(item.text) && (
                   <div className="p-4 px-0 whitespace-nowrap">
-                    {/* <Link
-                      to={item.to}
-                      className="text-base font-medium text-white">
-                      {item.text}
-                    </Link> */}
-                    {/* <Link
-                      to={item.to}
-                      className="group relative text-base font-medium text-white">
-                      <span className="relative z-10 group-hover:font-bold mb-8">
-                        {item.text}
-                      </span>
-                      <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full "></span>
-                    </Link> */}
-
                     {item.external ? (
-                      <a
-                        href={item.to}
-                        className="group relative text-base font-medium text-black">
-                        <span className="relative z-10 group-hover:font-bold mb-8">
-                          {item.text}
-                        </span>
-                        <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
-                      </a>
+                      <>
+                        {isNomadHome && (
+                          <a
+                            href={item.to}
+                            className="group relative text-base font-medium text-black">
+                            <span className="relative z-10 group-hover:font-bold mb-8">
+                              {item.text}
+                            </span>
+                            <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                          </a>
+                        )}
+                      </>
                     ) : (
                       <Link
                         to={item.to}
@@ -119,17 +115,27 @@ const Header = () => {
                       </Link>
                     )}
                   </div>
-                  {/* {index !== headerLinks.length - 1 && (
-                  <div className="w-[1px] h-6 bg-gray-300 mx-2"></div>
-                )} */}
-                </>
-              ) : null}
-            </li>
-          ))}
-        </ul>
-      </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="flex gap-4">
+        <li className="flex items-center">
+          <div className="p-4 px-0 whitespace-nowrap">
+            <a
+              href="https://wono.co"
+              className="group relative text-base font-medium text-black">
+              <span className="relative z-10 group-hover:font-bold mb-8">
+                Become a host
+              </span>
+              <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+            </a>
+          </div>
+        </li>
+
         <div className="px-1 hidden xl:flex gap-2">
           <PrimaryButton
             title={"Login"}
