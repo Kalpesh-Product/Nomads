@@ -17,16 +17,16 @@ import { setFormValues } from "../features/locationSlice";
 import axios from "../utils/axios";
 import { IoIosArrowDown } from "react-icons/io";
 import Select from "react-dropdown-select";
-import Image from "../../public/images/homepage.jpeg";
+import Image from "/images/homepage.jpeg";
 import ReviewCard from "../components/ReviewCard";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { AiOutlineHeart } from "react-icons/ai";
-import coworking from "../../public/images/bg-image.jpg";
-import hostels from "../../public/images/bg-image.jpg";
-import cafes from "../../public/images/bg-image.jpg";
-import privateStay from "../../public/images/bg-image.jpg";
-import companyWorkation from "../../public/images/bg-image.jpg";
+import coworking from "/images/bg-image.jpg";
+import hostels from "/images/bg-image.jpg";
+import cafes from "/images/bg-image.jpg";
+import privateStay from "/images/bg-image.jpg";
+import companyWorkation from "/images/bg-image.jpg";
 import SearchBarCombobox from "../components/SearchBarCombobox";
 
 const Home = () => {
@@ -357,7 +357,7 @@ const Home = () => {
                 <br />
                 COMMUNITY of <br />
                 <span className="text-4xl md:text-5xl text-primary-blue">
-                  Nomads
+                  NOMADS
                 </span>
               </h2>
               <p className="mt-6 text-gray-700 text-base md:text-lg text-center">

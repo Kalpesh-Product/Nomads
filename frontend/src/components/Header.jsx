@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Drawer } from "@mui/material";
 import { IoCloseSharp } from "react-icons/io5";
 import PrimaryButton from "./PrimaryButton";
-import logo from "../assets/WONO_LOGO_white _TP.png";
+import logo from "../assets/WONO_LOGO_Black_TP.png";
 import SecondaryButton from "./SecondaryButton";
 
 const Header = () => {
@@ -15,17 +15,18 @@ const Header = () => {
   };
   const headerLinks = [
     // { id: 1, text: "ROI", to: "" },
-    { id: 1, text: "CAREER", to: "nomad/career" },
-    { id: 2, text: "CONTACT", to: "nomad/contact" },
+    // { id: 1, text: "Map view", to: "nomad/career" },
+    { id: 1, text: "Destination news", to: "nomad/contact" },
+    { id: 2, text: "Local Blog", to: "nomad/contact" },
     {
       id: 3,
-      text: "SWITCH TO BUSINESS",
+      text: "Become a host",
       external: true,
       to: "https://wono.co",
     },
   ];
   return (
-    <div className="flex px-4 justify-between items-center md:py-3 md:px-[7.5rem] lg:px-[7.5rem]  bg-black backdrop-blur-md ">
+    <div className="flex px-4 justify-between items-center md:py-3 md:px-[7.5rem] lg:px-[7.5rem]  bg-white backdrop-blur-md ">
       <div
         onClick={() => navigate("/")}
         className=" w-36 overflow-x-hidden rounded-lg flex justify-between items-center cursor-pointer">
@@ -41,6 +42,30 @@ const Header = () => {
 
       <div>
         <ul className="hidden xl:flex sm:hidden gap-6 justify-center flex-1">
+          <li lassName="flex items-center">
+            <div className="p-4 px-0 whitespace-nowrap">
+              <Link
+                to={`/nomad/listings?country=India&location=Goa&category=coworking`}
+                className="group relative text-base font-medium text-black ">
+                <span className="relative z-10 group-hover:font-bold mb-2 ">
+                  Map view
+                </span>
+                <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+              </Link>
+            </div>
+          </li>
+          <li lassName="flex items-center">
+            <div className="p-4 px-0 whitespace-nowrap">
+              <Link
+                to={`/nomad/india/goa`}
+                className="group relative text-base font-medium text-black ">
+                <span className="relative z-10 group-hover:font-bold mb-8">
+                  List view
+                </span>
+                <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+              </Link>
+            </div>
+          </li>
           {headerLinks.map((item, index) => (
             <li key={item.id} className="flex items-center">
               {!["Signup"].includes(item.text) ? (
@@ -59,10 +84,11 @@ const Header = () => {
                       </span>
                       <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full "></span>
                     </Link> */}
+
                     {item.external ? (
                       <a
                         href={item.to}
-                        className="group relative text-base font-medium text-white">
+                        className="group relative text-base font-medium text-black">
                         <span className="relative z-10 group-hover:font-bold mb-8">
                           {item.text}
                         </span>
@@ -71,7 +97,7 @@ const Header = () => {
                     ) : (
                       <Link
                         to={item.to}
-                        className="group relative text-base font-medium text-white">
+                        className="group relative text-base font-medium text-black">
                         <span className="relative z-10 group-hover:font-bold mb-8">
                           {item.text}
                         </span>
@@ -91,14 +117,18 @@ const Header = () => {
 
       <div className="flex gap-4">
         <div className="px-1 hidden xl:flex gap-2">
-          <PrimaryButton title={"SIGN IN"} handleSubmit={() => navigate("")} />
+          <PrimaryButton
+            title={"Login"}
+            handleSubmit={() => navigate("")}
+            className={"text-white font-bold px-8"}
+          />
         </div>
-        <div className="px-1 hidden xl:flex gap-2">
+        {/* <div className="px-1 hidden xl:flex gap-2">
           <SecondaryButton
             title={"SIGN UP"}
             handleSubmit={() => navigate("")}
           />
-        </div>
+        </div> */}
       </div>
 
       <Drawer
