@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { bulkInsertHostelUnits } from "../../controllers/hostelControllers/hostelUnitControllers.js";
+import { bulkInsertHostelUnits } from "../../controllers/hostel-controllers/hostelUnitControllers.js";
 import upload from "../../config/multerConfig.js";
 
 const router = Router();

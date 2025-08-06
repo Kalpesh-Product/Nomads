@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { bulkInsertUnits } from "../../controllers/coliving_controllers/unitControllers.js";
+import { bulkInsertUnits } from "../../controllers/coliving-controllers/unitControllers.js";
 import upload from "../../config/multerConfig.js";
 
 const router = Router();

@@ -3,7 +3,7 @@ import {
   addCompanyInclusions,
   bulkInsertInclusions,
   getCompanyInclusions,
-} from "../../controllers/coworking_controllers/inclusionsController.js";
+} from "../../controllers/coworking-controllers/inclusionsController.js";
 import upload from "../../config/multerConfig.js";
 
 const router = Router();

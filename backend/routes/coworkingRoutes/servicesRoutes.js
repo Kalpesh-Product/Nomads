@@ -4,7 +4,7 @@ import {
   addCompanyService,
   bulkInsertCompanyServices,
   getCompanyService,
-} from "../../controllers/coworking_controllers/serviceControllers.js";
+} from "../../controllers/coworking-controllers/serviceControllers.js";
 
 const router = Router();
 

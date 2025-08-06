@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { bulkInsertReviews } from "../../controllers/coliving_controllers/reviewControllers.js";
+import { bulkInsertReviews } from "../../controllers/coliving-controllers/reviewControllers.js";
 import upload from "../../config/multerConfig.js";
 
 const router = Router();

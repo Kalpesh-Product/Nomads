@@ -5,7 +5,7 @@ import {
   addNewCompany,
   bulkInsertCompanies,
   getCompanyData,
-} from "../../controllers/coworking_controllers/companyControllers.js";
+} from "../../controllers/coworking-controllers/companyControllers.js";
 
 router.post("/add-new-company", addNewCompany);
 router.get("/company-data", getCompanyData);
