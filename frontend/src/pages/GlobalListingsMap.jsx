@@ -33,7 +33,7 @@ const GlobalListingsMap = () => {
   ];
   const categoryOptions = [
     { label: "Co-Working", value: "coworking" },
-    { label: "Hostels", value: "hostels" },
+    { label: "Hostels", value: "hostel" },
     { label: "Cafe’s/Meeting Rooms", value: "cafeMeetings" },
     { label: "Private Stay", value: "privateStay" },
     { label: "Co-Living", value: "coliving" },

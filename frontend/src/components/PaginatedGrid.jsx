@@ -28,7 +28,14 @@ const PaginatedGrid = ({
       if (currentPage <= 4) {
         buttons.push(1, 2, 3, 4, "...", totalPages);
       } else if (currentPage >= totalPages - 3) {
-        buttons.push(1, "...", totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+        buttons.push(
+          1,
+          "...",
+          totalPages - 3,
+          totalPages - 2,
+          totalPages - 1,
+          totalPages
+        );
       } else {
         buttons.push(
           1,
@@ -72,8 +79,7 @@ const PaginatedGrid = ({
                   currentPage === val
                     ? "bg-black text-white"
                     : "bg-white text-black border border-gray-300"
-                }`}
-              >
+                }`}>
                 {val}
               </button>
             )
