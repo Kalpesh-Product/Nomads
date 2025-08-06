@@ -139,7 +139,7 @@ const GlobalListingsList = () => {
     <div className="flex flex-col gap-6 ">
       <div className="flex flex-col gap-4 justify-center items-center  w-full lg:mt-0">
         <Container padding={false}>
-          <div className="flex flex-col gap-4 justify-between items-center w-full h-full">
+          <div className="hidden lg:flex flex-col gap-4 justify-between items-center w-full h-full">
             {/* the 5 icons */}
 
             <div className=" w-full flex justify-center items-center">
@@ -226,9 +226,9 @@ const GlobalListingsList = () => {
               </button>
             </form>
           </div>
-          <div className="md:hidden flex w-full items-center justify-center my-4">
+          <div className="flex lg:hidden w-full items-center justify-center my-4">
             <button
-              onClick={() => setShowMobileSearch(true)}
+              onClick={() => setShowMobileSearch((prev)=> !prev)}
               className="bg-white flex items-center w-full text-black border-2 px-6 py-3 rounded-full">
               <IoSearch className="inline mr-2" />
               Start Search
@@ -242,7 +242,7 @@ const GlobalListingsList = () => {
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ duration: 0.3 }}
-              className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 p-4 rounded-t-3xl md:hidden">
+              className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 p-4 rounded-t-3xl lg:hidden">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold">Search</h3>
                 <button
@@ -379,7 +379,7 @@ const GlobalListingsList = () => {
                         {sectionTitle}
                       </h2>
 
-                      <div className="grid grid-cols-1 md:grid-cols-5 gap-0">
+                      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-0">
                         {displayItems.map((item) => (
                           <ListingCard key={item._id} item={item} />
                         ))}

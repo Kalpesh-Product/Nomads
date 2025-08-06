@@ -21,11 +21,13 @@ import PaginatedGrid from "../components/PaginatedGrid.jsx";
 import newIcons from "../assets/newIcons.js";
 import SearchBarCombobox from "../components/SearchBarCombobox.jsx";
 import { IoSearch } from "react-icons/io5";
+import { AnimatePresence, motion } from "motion/react";
 
 const Listings = () => {
   const [favorites, setFavorites] = useState([]);
   const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
   const formData = useSelector((state) => state.location.formValues);
   const countryOptions = [{ label: "India", value: "india" }];
   const locationOptions = [{ label: "Goa", value: "goa" }];
@@ -41,6 +43,7 @@ const Listings = () => {
     { label: "Co-Living", value: "coliving" },
     { label: "Company Workation", value: "companyWorkation" },
   ];
+  const activeCategory = searchParams.get("category");
 
   console.log("formData", formData);
   const { data: listingsData, isPending: isLisitingLoading } = useQuery({
@@ -154,40 +157,48 @@ const Listings = () => {
       <Container padding={false}>
         <div className="flex w-full items-center justify-between">
           <div className="flex flex-col gap-4 justify-center items-center  w-full mt-10 lg:mt-0">
-            <div className="flex flex-col gap-4 justify-between items-center w-full h-full">
+            <div className="hidden lg:flex flex-col gap-4 justify-between items-center w-full h-full">
               {/* the 5 icons */}
-             
-                <div className=" w-full flex justify-center items-center">
-                  <div className="grid grid-cols-5 md:grid-cols-6 gap-0">
-                    {categoryOptions.map((cat) => {
-                      const iconSrc = newIcons[cat.value];
 
-                      return (
-                        <button
-                          key={cat.value}
-                          type="button"
-                          onClick={() => handleCategoryClick(cat.value)}
-                          className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full"
-                        >
-                          {iconSrc ? (
-                            <div className="h-10 w-full flex flex-col gap-0">
-                              <img
-                                src={iconSrc}
-                                alt={cat.label}
-                                className="h-full w-full object-contain"
-                              />
-                              <span className="text-sm">{cat.label}</span>
-                              <div></div>
-                            </div>
-                          ) : (
-                            cat.label // fallback if no icon found
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
+              <div className=" w-full flex justify-center items-center">
+                <div className="grid grid-cols-5 md:grid-cols-6 gap-0">
+                  {categoryOptions.map((cat) => {
+                    const iconSrc = newIcons[cat.value];
+                    const isActive = activeCategory === cat.value;
+
+                    return (
+                      <button
+                        key={cat.value}
+                        type="button"
+                        onClick={() => handleCategoryClick(cat.value)}
+                        className="text-black px-4 py-2 hover:text-black transition flex items-center justify-center w-full"
+                      >
+                        {iconSrc ? (
+                          <div className="h-10 w-full flex flex-col gap-0 items-center">
+                            <img
+                              src={iconSrc}
+                              alt={cat.label}
+                              className="h-full w-full object-contain"
+                            />
+                            <span
+                              className={`text-sm border-b-4 ${
+                                isActive
+                                  ? "border-primary-blue"
+                                  : "border-transparent"
+                              }`}
+                            >
+                              {cat.label}
+                            </span>
+                          </div>
+                        ) : (
+                          cat.label
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
-           
+              </div>
+
               <form
                 onSubmit={handleSubmit(onSubmit)}
                 className=" flex justify-around w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
@@ -246,7 +257,125 @@ const Listings = () => {
             </div>
           </div>
         </div>
+        <div className="flex lg:hidden w-full items-center justify-center my-4">
+          <button
+            onClick={() => setShowMobileSearch((prev) => !prev)}
+            className="bg-white flex items-center w-full text-black border-2 px-6 py-3 rounded-full"
+          >
+            <IoSearch className="inline mr-2" />
+            Start Search
+          </button>
+        </div>
       </Container>
+      <AnimatePresence>
+        {showMobileSearch && (
+          <motion.div
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ duration: 0.3 }}
+            className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 p-4 rounded-t-3xl lg:hidden"
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Search</h3>
+              <button
+                onClick={() => setShowMobileSearch(false)}
+                className="text-gray-500 text-xl"
+              >
+                &times;
+              </button>
+            </div>
+            <div className="grid grid-cols-3 md:grid-cols-5 gap-2 mb-10">
+              {categoryOptions.map((cat) => {
+                const iconSrc = newIcons[cat.value];
+                const isActive = activeCategory === cat.value;
+
+                return (
+                  <button
+                    key={cat.value}
+                    type="button"
+                    onClick={() => handleCategoryClick(cat.value)}
+                    className="text-black px-4 py-2 hover:text-black transition flex items-center justify-center w-full"
+                  >
+                    {iconSrc ? (
+                      <div className="h-10 w-full flex flex-col gap-0 items-center">
+                        <img
+                          src={iconSrc}
+                          alt={cat.label}
+                          className="h-full w-full object-contain"
+                        />
+                        <span
+                          className={`text-sm border-b-2 ${
+                            isActive ? "border-[#FF5757]" : "border-transparent"
+                          }`}
+                        >
+                          {cat.label}
+                        </span>
+                      </div>
+                    ) : (
+                      cat.label
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <Controller
+                name="country"
+                control={control}
+                render={({ field }) => (
+                  <SearchBarCombobox
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={countryOptions}
+                    label="Select Country"
+                    placeholder="Select aspiring destination"
+                    className="w-full"
+                  />
+                )}
+              />
+              <Controller
+                name="location"
+                control={control}
+                render={({ field }) => (
+                  <SearchBarCombobox
+                    value={field.value}
+                    onChange={field.onChange}
+                    label="Select Location"
+                    options={locationOptions}
+                    placeholder="Select area within country"
+                    disabled={!selectedCountry}
+                    className="w-full"
+                  />
+                )}
+              />
+              <Controller
+                name="count"
+                control={control}
+                render={({ field }) => (
+                  <SearchBarCombobox
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={countOptions}
+                    label="Select Count"
+                    placeholder="Booking for no. of Nomads"
+                    disabled={!selectedState}
+                    className="w-full"
+                  />
+                )}
+              />
+              <button
+                type="submit"
+                className="w-full bg-[#FF5757] text-white py-3 rounded-full"
+              >
+                <IoSearch className="inline mr-2" />
+                Search
+              </button>
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <hr />
       <Container padding={false}>
         <div className="grid grid-cols-1 lg:grid-cols-9 gap-4 ">

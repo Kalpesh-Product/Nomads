@@ -186,6 +186,12 @@ const Home = () => {
     { image: icons.laundry, title: "LAUNDRY" },
     { image: icons.secure, title: "SECURE" },
     { image: icons.personalised, title: "PERSONALISED" },
+    { image: icons.parking, title: "PARKING" },
+    { image: icons.yogazone, title: "YOGA ZONE" },
+    { image: icons.ergonomicenvironment, title: "Ergonomic Environment" },
+    { image: icons.officesupplies, title: "Office Supplies" },
+    { image: icons.access24x7, title: "Access 24 x 7" },
+    { image: icons.signboard, title: "Sign Board" },
   ];
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const onSubmit = (data) => {
@@ -423,7 +429,7 @@ const Home = () => {
                 className={`w-full sm:w-full md:w-full lg:w-56 flex flex-col items-center ${
                   idx === destinationData.length - 1 &&
                   destinationData.length % 2 !== 0
-                    ? "md:col-span-2"
+                    ? "md:col-span-2 lg:col-span-1"
                     : ""
                 }`}
               >

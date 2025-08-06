@@ -41,7 +41,7 @@ const Header = () => {
         className=" w-36 overflow-x-hidden rounded-lg flex justify-between items-center cursor-pointer">
         <img src={logo} alt={"logo"} className="w-full h-full object-contain" />
       </div>
-      <div className="h-full px-2 md:hidden lg:hidden">
+      <div className="h-full px-2 hidden md:hidden lg:hidden">
         <button
           onClick={() => setOpen(true)}
           className="hamburger-menu rounded-lg text-title text-black">
