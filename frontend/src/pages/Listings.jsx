@@ -32,8 +32,10 @@ const Listings = () => {
   const countryOptions = [{ label: "India", value: "india" }];
   const locationOptions = [{ label: "Goa", value: "goa" }];
   const countOptions = [
-    { label: "0 - 10", value: "0 - 10" },
-    { label: "10 - 20", value: "10 - 20" },
+    { label: "1 - 5", value: "1-5" },
+    { label: "5 - 10", value: "5-10" },
+    { label: "10 - 25", value: "10-25" },
+    { label: "25+", value: "25+" },
   ];
   const categoryOptions = [
     { label: "Co-Working", value: "coworking" },
