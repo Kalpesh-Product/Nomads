@@ -19,6 +19,7 @@ import ListingCard from "../components/ListingCard.jsx";
 import newIcons from "../assets/newIcons.js";
 import { IoSearch } from "react-icons/io5";
 import SearchBarCombobox from "../components/SearchBarCombobox.jsx";
+import { AnimatePresence, motion } from "motion/react";
 
 const GlobalListingsList = () => {
   const [favorites, setFavorites] = useState([]);
@@ -30,11 +31,19 @@ const GlobalListingsList = () => {
     { label: "0 - 10", value: "0 - 10" },
     { label: "10 - 20", value: "10 - 20" },
   ];
+  const categoryOptions = [
+    { label: "Co-Working", value: "coworking" },
+    { label: "Hostels", value: "hostels" },
+    { label: "Cafe’s/Meeting Rooms", value: "cafeMeetings" },
+    { label: "Private Stay", value: "privateStay" },
+    { label: "Co-Living", value: "coliving" },
+    { label: "Company Workation", value: "companyWorkation" },
+  ];
   console.log("formData", formData);
   const { data: listingsData, isPending: isLisitingLoading } = useQuery({
     queryKey: ["listings", formData], // ✅ ensures it refetches when formData changes
     queryFn: async () => {
-      const { country, location, count } = formData || {};
+      const { country, location, category } = formData || {};
 
       const response = await axios.get(
         `common/location-and-type-based-company-data?country=${country}&state=${location}`
@@ -66,23 +75,24 @@ const GlobalListingsList = () => {
   };
 
   const navigate = useNavigate();
-
-  const { handleSubmit, control, reset, register, watch } = useForm({
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const onSubmit = (data) => {
+    locationData(data);
+  };
+  const { handleSubmit, control, reset, setValue, getValues, watch } = useForm({
     defaultValues: {
       country: "",
       location: "",
-      count: "",
+      category: "",
     },
   });
-
   const selectedCountry = watch("country");
   const selectedState = watch("location");
-
-  //   useEffect(() => {
-  //     setValue("country", formData.country);
-  //     setValue("location", formData.location);
-  //     setValue("count", formData.count);
-  //   }, [formData]);
+  useEffect(() => {
+    setValue("country", formData.country);
+    setValue("location", formData.location);
+    setValue("count", formData.count);
+  }, [formData]);
   const { mutate: locationData, isPending: isLocation } = useMutation({
     mutationFn: async (data) => {
       dispatch(setFormValues(data));
@@ -95,49 +105,181 @@ const GlobalListingsList = () => {
     },
   });
 
-  const handlecountClick = (countValue) => {
+  const handleCategoryClick = (categoryValue) => {
     const formData = getValues(); // from react-hook-form
 
     if (!formData.country || !formData.location) {
       alert("Please select Country and Location first.");
       return;
     }
-    dispatch(setFormValues({ ...formData, count: countValue }));
+    dispatch(setFormValues({ ...formData, category: categoryValue }));
 
-    // const url = `/nomads/${formData.country}.${formData.location}/${countValue}`;
+    // const url = `/nomads/${formData.country}.${formData.location}/${categoryValue}`;
     const state = {
       ...formData,
-      count: countValue,
+      category: categoryValue,
     };
 
     // console.log("Generated URL:", url);
     console.log("State to be passed:", state);
 
     navigate(
-      `/nomad/listings?country=${formData.country}&location=${formData.location}&count=${state.count}`,
+      `/nomad/listings?country=${formData.country}&location=${formData.location}&category=${state.category}`,
       {
         state: {
           country: formData.country,
           location: formData.location,
-          count: countValue,
+          category: categoryValue,
         },
       }
     );
   };
 
-  const onSubmit = (data) => {
-    locationData(data);
-  };
-
   return (
-    <div className="flex flex-col gap-8 ">
-      <div className="flex flex-col gap-4 justify-center items-center  w-full mt-10 lg:mt-0">
-        <Container>
-          <div className="py-4  ">
-            <div className="flex flex-col gap-4 justify-between items-center">
-              <form
-                onSubmit={handleSubmit(onSubmit)}
-                className=" flex justify-around w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center">
+    <div className="flex flex-col gap-6 ">
+      <div className="flex flex-col gap-4 justify-center items-center  w-full lg:mt-0">
+        <Container padding={false}>
+          <div className="flex flex-col gap-4 justify-between items-center w-full h-full">
+            {/* the 5 icons */}
+
+            <div className=" w-full flex justify-center items-center">
+              <div className="grid grid-cols-5 md:grid-cols-6 gap-0">
+                {categoryOptions.map((cat) => {
+                  const iconSrc = newIcons[cat.value];
+
+                  return (
+                    <button
+                      key={cat.value}
+                      type="button"
+                      onClick={() => handleCategoryClick(cat.value)}
+                      className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full">
+                      {iconSrc ? (
+                        <div className="h-10 w-full flex flex-col gap-0">
+                          <img
+                            src={iconSrc}
+                            alt={cat.label}
+                            className="h-full w-full object-contain"
+                          />
+                          <span className="text-sm">{cat.label}</span>
+                          <div></div>
+                        </div>
+                      ) : (
+                        cat.label // fallback if no icon found
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className=" flex justify-around w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center">
+              <Controller
+                name="country"
+                control={control}
+                render={({ field }) => (
+                  <SearchBarCombobox
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={countryOptions}
+                    label="Select Country"
+                    placeholder="Select aspiring destination"
+                    className="w-full z-10"
+                  />
+                )}
+              />
+              <Controller
+                name="location"
+                control={control}
+                render={({ field }) => (
+                  <SearchBarCombobox
+                    value={field.value}
+                    onChange={field.onChange}
+                    label="Select Location"
+                    options={locationOptions}
+                    placeholder="Select area within country"
+                    disabled={!selectedCountry}
+                    className="-ml-12 w-full z-20"
+                  />
+                )}
+              />
+              <Controller
+                name="count"
+                control={control}
+                render={({ field }) => (
+                  <SearchBarCombobox
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={countOptions}
+                    label="Select Count"
+                    placeholder="Booking for no. of Nomads"
+                    disabled={!selectedState}
+                    className="-ml-12 w-full z-30"
+                  />
+                )}
+              />
+              <button
+                type="submit"
+                className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full">
+                <IoSearch />
+              </button>
+            </form>
+          </div>
+          <div className="md:hidden flex w-full items-center justify-center my-4">
+            <button
+              onClick={() => setShowMobileSearch(true)}
+              className="bg-white flex items-center w-full text-black border-2 px-6 py-3 rounded-full">
+              <IoSearch className="inline mr-2" />
+              Start Search
+            </button>
+          </div>
+        </Container>
+        <AnimatePresence>
+          {showMobileSearch && (
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ duration: 0.3 }}
+              className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 p-4 rounded-t-3xl md:hidden">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold">Search</h3>
+                <button
+                  onClick={() => setShowMobileSearch(false)}
+                  className="text-gray-500 text-xl">
+                  &times;
+                </button>
+              </div>
+              <div className="grid grid-cols-3 md:grid-cols-5 gap-2 mb-10">
+                {categoryOptions.map((cat) => {
+                  const iconSrc = newIcons[cat.value];
+
+                  return (
+                    <button
+                      key={cat.value}
+                      type="button"
+                      onClick={() => handleCategoryClick(cat.value)}
+                      className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full">
+                      {iconSrc ? (
+                        <div className="h-10 w-full flex flex-col gap-0">
+                          <img
+                            src={iconSrc}
+                            alt={cat.label}
+                            className="h-full w-full object-contain"
+                          />
+                          <span className="text-sm">{cat.label}</span>
+                          <div></div>
+                        </div>
+                      ) : (
+                        cat.label // fallback if no icon found
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <Controller
                   name="country"
                   control={control}
@@ -148,7 +290,7 @@ const GlobalListingsList = () => {
                       options={countryOptions}
                       label="Select Country"
                       placeholder="Select aspiring destination"
-                      className="w-full z-10"
+                      className="w-full"
                     />
                   )}
                 />
@@ -163,7 +305,7 @@ const GlobalListingsList = () => {
                       options={locationOptions}
                       placeholder="Select area within country"
                       disabled={!selectedCountry}
-                      className="-ml-12 w-full z-20"
+                      className="w-full"
                     />
                   )}
                 />
@@ -178,32 +320,54 @@ const GlobalListingsList = () => {
                       label="Select Count"
                       placeholder="Booking for no. of Nomads"
                       disabled={!selectedState}
-                      className="-ml-12 w-full z-30"
+                      className="w-full"
                     />
                   )}
                 />
                 <button
                   type="submit"
-                  className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full">
-                  <IoSearch />
+                  className="w-full bg-[#FF5757] text-white py-3 rounded-full">
+                  <IoSearch className="inline mr-2" />
+                  Search
                 </button>
               </form>
-            </div>
-          </div>
-        </Container>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
       <hr />
       <Container padding={false}>
         <div className="">
           <div className="font-semibold text-lg">
-            <div className=" h-[36rem] overflow-auto custom-scrollbar-hide">
+            <div className="pr-0 lg:pr-10 h-[36rem] overflow-auto custom-scrollbar-hide">
               {isLisitingLoading ? (
                 Array.from({ length: 4 }).map((_, i) => (
                   <SkeletonCard key={i} />
                 ))
               ) : groupedListings && Object.keys(groupedListings).length > 0 ? (
                 Object.entries(groupedListings).map(([type, items]) => {
-                  const displayItems = items.slice(0, 6);
+                  const prioritizedCompanies = ["MeWo", "BIZ Nest"];
+                  const sortedItems = items.sort((a, b) => {
+                    const aPriority = prioritizedCompanies.includes(
+                      a.companyName
+                    )
+                      ? 0
+                      : 1;
+                    const bPriority = prioritizedCompanies.includes(
+                      b.companyName
+                    )
+                      ? 0
+                      : 1;
+
+                    // If both have same priority, keep original order
+                    if (aPriority === bPriority) return 0;
+
+                    // Prioritize a if it's in the list
+                    return aPriority - bPriority;
+                  });
+
+                  const displayItems = sortedItems.slice(0, 5);
+
                   const showViewMore = items.length > 5;
                   const sectionTitle = `Popular ${
                     typeLabels[type] || typeLabels.default(type)
@@ -215,7 +379,7 @@ const GlobalListingsList = () => {
                         {sectionTitle}
                       </h2>
 
-                      <div className="grid grid-cols-1 md:grid-cols-6 gap-0 ">
+                      <div className="grid grid-cols-1 md:grid-cols-5 gap-0">
                         {displayItems.map((item) => (
                           <ListingCard key={item._id} item={item} />
                         ))}
@@ -225,8 +389,8 @@ const GlobalListingsList = () => {
                         <div className="mt-3 text-right">
                           <NavLink
                             to={`/nomads/${formData.country}.${formData.location}/${type}`}
-                            state={{ ...formData, count: type }}
-                            className="text-primary-blue text-sm font-semibold hover:underline ">
+                            state={{ ...formData, category: type }}
+                            className="text-primary-blue text-sm font-semibold hover:underline">
                             View More{" "}
                             {typeLabels[type] || typeLabels.default(type)} →
                           </NavLink>

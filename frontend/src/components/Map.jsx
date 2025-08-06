@@ -24,6 +24,7 @@ export default function Map({ locations }) {
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_API_KEY,
   });
+  console.log("locations ", locations);
 
   const [hoveredMarker, setHoveredMarker] = useState(null);
 

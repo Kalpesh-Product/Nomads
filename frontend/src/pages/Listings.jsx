@@ -19,6 +19,8 @@ import { useSearchParams } from "react-router-dom";
 import ListingCard from "../components/ListingCard.jsx";
 import PaginatedGrid from "../components/PaginatedGrid.jsx";
 import newIcons from "../assets/newIcons.js";
+import SearchBarCombobox from "../components/SearchBarCombobox.jsx";
+import { IoSearch } from "react-icons/io5";
 
 const Listings = () => {
   const [favorites, setFavorites] = useState([]);
@@ -27,13 +29,19 @@ const Listings = () => {
   const formData = useSelector((state) => state.location.formValues);
   const countryOptions = [{ label: "India", value: "india" }];
   const locationOptions = [{ label: "Goa", value: "goa" }];
+  const countOptions = [
+    { label: "0 - 10", value: "0 - 10" },
+    { label: "10 - 20", value: "10 - 20" },
+  ];
   const categoryOptions = [
     { label: "Co-Working", value: "coworking" },
     { label: "Hostels", value: "hostels" },
     { label: "Cafe’s/Meeting Rooms", value: "cafeMeetings" },
     { label: "Private Stay", value: "privateStay" },
+    { label: "Co-Living", value: "coliving" },
     { label: "Company Workation", value: "companyWorkation" },
   ];
+
   console.log("formData", formData);
   const { data: listingsData, isPending: isLisitingLoading } = useQuery({
     queryKey: ["listings", formData], // ✅ ensures it refetches when formData changes
@@ -59,13 +67,15 @@ const Listings = () => {
 
   const navigate = useNavigate();
 
-  const { handleSubmit, control, reset, setValue } = useForm({
+  const { handleSubmit, control, reset, setValue, watch, getValues } = useForm({
     defaultValues: {
       country: "",
       location: "",
       category: "",
     },
   });
+  const selectedCountry = watch("country");
+  const selectedState = watch("location");
   useEffect(() => {
     setValue("country", formData.country);
     setValue("location", formData.location);
@@ -135,155 +145,103 @@ const Listings = () => {
     );
   };
 
+  const onSubmit = (data) => {
+    locationData(data);
+  };
+
   return (
     <div className="flex flex-col gap-4 ">
       <Container padding={false}>
         <div className="flex w-full items-center justify-between">
-          {/* <button
-            onClick={() =>
-              navigate(`/nomad/${formData.country}/${formData.location}`)
-            }
-          >
-            Back
-          </button> */}
           <div className="flex flex-col gap-4 justify-center items-center  w-full mt-10 lg:mt-0">
-            <div className="flex flex-col gap-4 justify-between w-full h-full">
+            <div className="flex flex-col gap-4 justify-between items-center w-full h-full">
               {/* the 5 icons */}
-              <div className=" w-full flex justify-center items-center">
-                <div className="grid grid-cols-5 md:grid-cols-5 gap-2">
-                  {categoryOptions.map((cat) => {
-                    const iconSrc = newIcons[cat.value];
+             
+                <div className=" w-full flex justify-center items-center">
+                  <div className="grid grid-cols-5 md:grid-cols-6 gap-0">
+                    {categoryOptions.map((cat) => {
+                      const iconSrc = newIcons[cat.value];
 
-                    return (
-                      <button
-                        key={cat.value}
-                        type="button"
-                        onClick={() => handleCategoryClick(cat.value)}
-                        className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full">
-                        {iconSrc ? (
-                          <div className="h-10 w-full flex flex-col gap-0">
-                            <img
-                              src={iconSrc}
-                              alt={cat.label}
-                              className="h-full w-full object-contain"
-                            />
-                            <span className="text-sm">{cat.label}</span>
-                            <div></div>
-                          </div>
-                        ) : (
-                          cat.label // fallback if no icon found
-                        )}
-                      </button>
-                    );
-                  })}
+                      return (
+                        <button
+                          key={cat.value}
+                          type="button"
+                          onClick={() => handleCategoryClick(cat.value)}
+                          className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full"
+                        >
+                          {iconSrc ? (
+                            <div className="h-10 w-full flex flex-col gap-0">
+                              <img
+                                src={iconSrc}
+                                alt={cat.label}
+                                className="h-full w-full object-contain"
+                              />
+                              <span className="text-sm">{cat.label}</span>
+                              <div></div>
+                            </div>
+                          ) : (
+                            cat.label // fallback if no icon found
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
+           
               <form
-                onSubmit={handleSubmit((data) => locationData(data))}
-                className="flex gap-2 border-2 border-primary-blue rounded-full pl-4 h-10 lg:h-16 justify-between items-center bg-white">
-                {/* Country */}
-                <div className="relative w-full">
-                  <Controller
-                    name="country"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        {...field}
-                        options={countryOptions}
-                        onChange={(values) => field.onChange(values[0]?.value)}
-                        values={countryOptions.filter(
-                          (opt) => opt.value === field.value
-                        )}
-                        placeholder="Select A Country"
-                        color="#0000"
-                        dropdownPosition="bottom"
-                        className="w-3/4 text-sm"
-                        style={{
-                          border: "none",
-                          background: "transparent",
-                          boxShadow: "none",
-                          fontSize: "0.875rem",
-                          padding: "0.5rem",
-                          color: "black",
-                          cursor: "pointer",
-                        }}
-                      />
-                    )}
-                  />
-                </div>
-
-                {/* Location */}
-                <div className="relative w-full border-l-2 border-l-primary-blue">
-                  <Controller
-                    name="location"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        {...field}
-                        options={locationOptions}
-                        onChange={(values) => field.onChange(values[0]?.value)}
-                        values={locationOptions.filter(
-                          (opt) => opt.value === field.value
-                        )}
-                        placeholder="Select A Location"
-                        dropdownPosition="bottom"
-                        className="w-3/4 text-sm"
-                        style={{
-                          border: "none",
-                          background: "transparent",
-                          boxShadow: "none",
-                          fontSize: "0.875rem",
-                          padding: "0.5rem",
-                          cursor: "pointer",
-                        }}
-                      />
-                    )}
-                  />
-                </div>
-
-                {/* Category */}
-                <div className="relative w-full border-l-2 border-l-primary-blue pl-2">
-                  <Controller
-                    name="category"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        {...field}
-                        options={categoryOptions}
-                        onChange={(values) => {
-                          const newCategory = values[0]?.value;
-                          field.onChange(newCategory); // update form
-                          searchParams.set("category", newCategory); // update URL
-                          setSearchParams(searchParams, { replace: true }); // push new URL
-                        }}
-                        values={categoryOptions.filter(
-                          (opt) => opt.value === field.value
-                        )}
-                        placeholder="Select A Category"
-                        dropdownPosition="bottom"
-                        className="w-3/4 text-sm"
-                        style={{
-                          border: "none",
-                          background: "transparent",
-                          boxShadow: "none",
-                          fontSize: "0.875rem",
-                          padding: "0.5rem",
-                          cursor: "pointer",
-                        }}
-                      />
-                    )}
-                  />
-                </div>
-
-                {/* Submit */}
-                <div className="bg-primary-blue h-full w-3/4 flex justify-center rounded-r-full">
-                  <button
-                    type="submit"
-                    disabled={isLocation}
-                    className="h-full text-center w-full flex justify-center items-center text-white">
-                    <CiSearch className="text-lg" /> &nbsp; Search
-                  </button>
-                </div>
+                onSubmit={handleSubmit(onSubmit)}
+                className=" flex justify-around w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
+              >
+                <Controller
+                  name="country"
+                  control={control}
+                  render={({ field }) => (
+                    <SearchBarCombobox
+                      value={field.value}
+                      onChange={field.onChange}
+                      options={countryOptions}
+                      label="Select Country"
+                      placeholder="Select aspiring destination"
+                      className="w-full z-10"
+                    />
+                  )}
+                />
+                <Controller
+                  name="location"
+                  control={control}
+                  render={({ field }) => (
+                    <SearchBarCombobox
+                      value={field.value}
+                      onChange={field.onChange}
+                      label="Select Location"
+                      options={locationOptions}
+                      placeholder="Select area within country"
+                      disabled={!selectedCountry}
+                      className="-ml-12 w-full z-20"
+                    />
+                  )}
+                />
+                <Controller
+                  name="count"
+                  control={control}
+                  render={({ field }) => (
+                    <SearchBarCombobox
+                      value={field.value}
+                      onChange={field.onChange}
+                      options={countOptions}
+                      label="Select Count"
+                      placeholder="Booking for no. of Nomads"
+                      disabled={!selectedState}
+                      className="-ml-12 w-full z-30"
+                    />
+                  )}
+                />
+                <button
+                  type="submit"
+                  className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full"
+                >
+                  <IoSearch />
+                </button>
               </form>
             </div>
           </div>
@@ -291,8 +249,8 @@ const Listings = () => {
       </Container>
       <hr />
       <Container padding={false}>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 ">
-          <div className="  font-semibold text-lg ">
+        <div className="grid grid-cols-1 lg:grid-cols-9 gap-4 ">
+          <div className="col-span-5  font-semibold text-lg ">
             <div className="pb-6">
               <p>
                 Over {listingsData?.length - 1}{" "}
@@ -319,7 +277,7 @@ const Listings = () => {
               />
             </div>
           </div>
-          <div className="w-full overflow-hidden rounded-xl h-full">
+          <div className="w-full overflow-hidden rounded-xl h-full col-span-4">
             {isLisitingLoading ? (
               <SkeletonMap />
             ) : forMapsData?.length ? (
