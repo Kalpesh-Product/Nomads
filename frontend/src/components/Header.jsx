@@ -13,9 +13,15 @@ const Header = () => {
   const view = searchParams.get("view"); // could be 'map', 'list', or null
 
   const currentPath = location.pathname;
-  const hideMapListLinks = currentPath === "/nomad";
 
-  const isNomadHome = currentPath === "/nomad";
+  const isNomadOrListings = /^\/nomad(\/listings\/[^/]+)?$/.test(currentPath);
+  const hideMapListLinks = isNomadOrListings;
+  const isNomadHome = isNomadOrListings;
+
+  const pathRegex = /^\/nomad\/[^/]+\/[^/]+$/; // e.g., /nomad/india/goa
+  const isNomadLocation = /^\/nomad\/[^/]+\/[^/]+$/.test(location.pathname); // Matches /nomad/:country/:state
+
+  const isNomadListingsPage = location.pathname === "/nomad/listings";
 
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
@@ -34,6 +40,17 @@ const Header = () => {
       to: "https://wono.co",
     },
   ];
+
+  function getListViewPath() {
+    const match = location.pathname.match(/^\/nomad\/([^/]+)\/([^/]+)/);
+    if (match) {
+      const [, country, state] = match;
+      return `/nomad/${country}/${state}`;
+    }
+    // fallback default if nothing matched
+    return "/nomad/india/goa";
+  }
+
   return (
     <div className="flex px-4 justify-between items-center md:py-3 md:px-[7.5rem] lg:px-[7.5rem]  bg-white/80 backdrop-blur-md ">
       <div
@@ -52,37 +69,60 @@ const Header = () => {
       {!hideMapListLinks && (
         <div>
           <ul className="hidden xl:flex sm:hidden gap-6 justify-center flex-1">
-            {/* Show Map View only if current view is not 'map' */}
-            {view !== "map" && (
-              <li className="flex items-center">
-                <div className="p-4 px-0 whitespace-nowrap">
-                  <Link
-                    to={`/nomad/india/goa?view=map`}
-                    className="group relative text-base font-medium text-black">
-                    <span className="relative z-10 group-hover:font-bold mb-2">
-                      Map view
-                    </span>
-                    <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
-                  </Link>
-                </div>
-              </li>
-            )}
+            <>
+              {/* Case 1: It's a /nomad/:country/:state page */}
+              {isNomadLocation ? (
+                <>
+                  {view !== "map" && (
+                    <li className="flex items-center">
+                      <div className="p-4 px-0 whitespace-nowrap">
+                        <Link
+                          to={`${location.pathname}?view=map`}
+                          className="group relative text-base font-medium text-black">
+                          <span className="relative z-10 group-hover:font-bold mb-2">
+                            Map view
+                          </span>
+                          <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                        </Link>
+                      </div>
+                    </li>
+                  )}
 
-            {/* Show List View only if current view is 'map' */}
-            {view === "map" && (
-              <li className="flex items-center">
-                <div className="p-4 px-0 whitespace-nowrap">
-                  <Link
-                    to={`/nomad/india/goa`}
-                    className="group relative text-base font-medium text-black">
-                    <span className="relative z-10 group-hover:font-bold mb-2">
-                      List view
-                    </span>
-                    <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
-                  </Link>
-                </div>
-              </li>
-            )}
+                  {view === "map" && (
+                    <li className="flex items-center">
+                      <div className="p-4 px-0 whitespace-nowrap">
+                        <Link
+                          to={`${location.pathname}`}
+                          className="group relative text-base font-medium text-black">
+                          <span className="relative z-10 group-hover:font-bold mb-2">
+                            List view
+                          </span>
+                          <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                        </Link>
+                      </div>
+                    </li>
+                  )}
+                </>
+              ) : (
+                // Case 2: Not a /nomad/:country/:state page, always show List View
+                <>
+                  {isNomadListingsPage && (
+                    <li className="flex items-center">
+                      <div className="p-4 px-0 whitespace-nowrap">
+                        <Link
+                          to={getListViewPath()}
+                          className="group relative text-base font-medium text-black">
+                          <span className="relative z-10 group-hover:font-bold mb-2">
+                            List view
+                          </span>
+                          <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                        </Link>
+                      </div>
+                    </li>
+                  )}
+                </>
+              )}
+            </>
 
             {/* Remaining nav links */}
             {headerLinks.map((item, index) => (

@@ -1,6 +1,6 @@
-import  { useState } from 'react'
-import { AiFillHeart, AiFillStar, AiOutlineHeart } from 'react-icons/ai';
-import { useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import { AiFillHeart, AiFillStar, AiOutlineHeart } from "react-icons/ai";
+import { useNavigate } from "react-router-dom";
 
 const ListingCard = ({ item, handleNavigation }) => {
   const navigate = useNavigate();
@@ -14,21 +14,25 @@ const ListingCard = ({ item, handleNavigation }) => {
   };
 
   const avgRating = item.reviews?.length
-    ? (item.reviews.reduce((sum, r) => sum + r.starCount, 0) / item.reviews.length).toFixed(1)
+    ? (
+        item.reviews.reduce((sum, r) => sum + r.starCount, 0) /
+        item.reviews.length
+      ).toFixed(1)
     : "0";
 
   return (
     <div
       onClick={handleNavigation}
-      className="flex flex-col gap-2 h-56 w-[95%] bg-white  rounded-lg  transition-all cursor-pointer"
-    >
+      className="flex flex-col gap-2 h-56 w-[95%] bg-white  rounded-lg  transition-all cursor-pointer">
       <div className="h-full w-full overflow-hidden rounded-3xl border-2 relative">
         <img
           src="https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp"
           alt={item.companyName}
           className="w-full h-full object-cover hover:scale-105 transition-all"
         />
-        <div className="absolute top-2 right-2 cursor-pointer" onClick={() => toggleFavorite(item._id)}>
+        <div
+          className="absolute top-2 right-2 cursor-pointer"
+          onClick={() => toggleFavorite(item._id)}>
           {favorites.includes(item._id) ? (
             <AiFillHeart className="text-white" size={22} />
           ) : (
@@ -42,7 +46,9 @@ const ListingCard = ({ item, handleNavigation }) => {
           <p className="text-sm font-semibold">{item.companyName}</p>
           <div className="flex items-center gap-1 text-black">
             <AiFillStar size={16} />
-            <p className="text-sm font-semibold text-black">({item.ratings || 0})</p>
+            <p className="text-sm font-semibold text-black">
+              ({item.ratings || 0})
+            </p>
           </div>
         </div>
 
@@ -59,5 +65,4 @@ const ListingCard = ({ item, handleNavigation }) => {
   );
 };
 
-
-export default ListingCard
+export default ListingCard;

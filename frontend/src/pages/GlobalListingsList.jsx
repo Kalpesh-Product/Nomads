@@ -33,7 +33,7 @@ const GlobalListingsList = () => {
   ];
   const categoryOptions = [
     { label: "Co-Working", value: "coworking" },
-    { label: "Hostels", value: "hostels" },
+    { label: "Hostels", value: "hostel" },
     { label: "Cafe’s/Meeting Rooms", value: "cafeMeetings" },
     { label: "Private Stay", value: "privateStay" },
     { label: "Co-Living", value: "coliving" },
@@ -228,7 +228,7 @@ const GlobalListingsList = () => {
           </div>
           <div className="flex lg:hidden w-full items-center justify-center my-4">
             <button
-              onClick={() => setShowMobileSearch((prev)=> !prev)}
+              onClick={() => setShowMobileSearch((prev) => !prev)}
               className="bg-white flex items-center w-full text-black border-2 px-6 py-3 rounded-full">
               <IoSearch className="inline mr-2" />
               Start Search
