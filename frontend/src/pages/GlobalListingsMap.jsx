@@ -36,7 +36,8 @@ const GlobalListingsMap = () => {
   const categoryOptions = [
     { label: "Co-Working", value: "coworking" },
     { label: "Hostels", value: "hostel" },
-    { label: "Cafe’s/Meeting Rooms", value: "cafeMeetings" },
+    { label: "Cafe’s", value: "cafes" },
+    { label: "Meeting Rooms", value: "meetingRoom" },
     { label: "Private Stay", value: "privateStay" },
     { label: "Co-Living", value: "coliving" },
     { label: "Company Workation", value: "companyWorkation" },
@@ -181,7 +182,7 @@ const GlobalListingsMap = () => {
             {/* the 5 icons */}
 
             <div className=" w-full flex justify-center items-center">
-              <div className="grid grid-cols-5 md:grid-cols-6 gap-0 pb-4">
+              <div className="grid grid-cols-5 md:grid-cols-7 gap-0 pb-4">
                 {categoryOptions.map((cat) => {
                   const iconSrc = newIcons[cat.value];
 
@@ -386,7 +387,7 @@ const GlobalListingsMap = () => {
       <hr />
       <Container padding={false}>
         <div className="">
-          <div className="font-semibold text-lg  grid grid-cols-9 gap-4 min-h-screen">
+          <div className="font-semibold text-md  grid grid-cols-9 gap-4 min-h-screen">
             <div className=" custom-scrollbar-hide col-span-5">
               {isLisitingLoading ? (
                 Array.from({ length: 4 }).map((_, i) => (

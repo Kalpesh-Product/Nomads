@@ -40,7 +40,8 @@ const Listings = () => {
   const categoryOptions = [
     { label: "Co-Working", value: "coworking" },
     { label: "Hostel", value: "hostel" },
-    { label: "Cafe’s/Meeting Rooms", value: "cafeMeetings" },
+    { label: "Cafe’s", value: "cafes" },
+    { label: "Meeting Rooms", value: "meetingRoom" },
     { label: "Private Stay", value: "privateStay" },
     { label: "Co-Living", value: "coliving" },
     { label: "Company Workation", value: "companyWorkation" },
@@ -163,7 +164,7 @@ const Listings = () => {
               {/* the 5 icons */}
 
               <div className=" w-full flex justify-center items-center pb-4">
-                <div className="grid grid-cols-5 md:grid-cols-6 gap-0">
+                <div className="grid grid-cols-5 md:grid-cols-7 gap-0">
                   {categoryOptions.map((cat) => {
                     const iconSrc = newIcons[cat.value];
                     const isActive = activeCategory === cat.value;
@@ -395,8 +396,7 @@ const Listings = () => {
                       duration: 0.4,
                       delay: index * 0.1, // delay each card slightly
                       ease: "easeOut",
-                    }}
-                  >
+                    }}>
                     <ListingCard
                       item={item}
                       handleNavigation={() =>

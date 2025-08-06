@@ -58,7 +58,7 @@ const MainPage = () => {
         {/* Left Column */}
         <figure className="flex flex-col w-full h-full justify-center items-center p-4 lg:p-6">
           <img
-            src="images/wono-landing-page.png"
+            src="images/main-page-1.png"
             alt="wono"
             className="object-cover max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-3xl lg:w-full"
           />
@@ -79,35 +79,38 @@ const MainPage = () => {
                   alt={`Slide ${index + 1}`}
                   className="w-full h-auto object-contain"
                 />
-                <p className="text-gray-700 text-base text-pretty leading-relaxed md:line-clamp-3 md:max-h-[6em] overflow-hidden">
+                <p className="text-gray-700 text-[0.9rem] text-pretty leading-relaxed md:line-clamp-3 md:max-h-[6em] overflow-hidden">
                   {slide.text}
                 </p>
               </div>
             ))}
           </div>
-          <div className="flex gap-8 w-full justify-center items-center">
+          <div className="flex gap-8 w-full justify-center items-center pt-4">
             <PrimaryButton
               title="For Nomads"
               handleSubmit={() => navigate("nomad")}
-              externalStyles="bg-[#FF5757] text-[1.25rem] flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[16rem] px-6"
+              externalStyles="bg-[#FF5757] text-[1rem] flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[12rem] px-6"
             />
             <PrimaryButton
               title="For Hosts"
               handleSubmit={() =>
                 (window.location.href = "https://www.wono.co")
               }
-              externalStyles="bg-[#FF5757] text-[1.25rem] flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[16rem] px-6"
+              externalStyles="bg-[#FF5757] text-[1rem] flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[12rem] px-6"
             />
           </div>
         </article>
       </div>
-      <div className="flex justify-center items-center flex-col">
-        <p className="text-center text-xs md:text-xl pb-2">
-          &copy; Copyright {new Date().getFullYear()} -{" "}
-          {(new Date().getFullYear() + 1).toString().slice(-2)} WONOCO PRIVATE
-          LIMITED – SINGAPORE. All Rights Reserved.
-        </p>
-        <div className="flex items-center gap-4">
+      <div className="flex justify-evenly items-center flex-row w-full ">
+        <div className="w-32"></div>
+        <div className="w-full">
+          <p className="text-center  pb-2">
+            &copy; Copyright {new Date().getFullYear()} -{" "}
+            {(new Date().getFullYear() + 1).toString().slice(-2)} WONOCO PRIVATE
+            LIMITED – SINGAPORE. All Rights Reserved.
+          </p>
+        </div>
+        <div className="flex items-right justify-end gap-4  pb-2 px-2 w-32">
           <FaFacebookF className="text-[12px]" />
 
           <FaXTwitter className="text-[12px]" />

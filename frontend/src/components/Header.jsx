@@ -177,8 +177,10 @@ const Header = () => {
         <div className="px-1 hidden xl:flex gap-2">
           <PrimaryButton
             title={"Login"}
-            handleSubmit={() => navigate("")}
-            className={"text-white font-bold px-8"}
+            handleSubmit={() => navigate("/nomad/login")}
+            className={
+              "bg-[#FF5757] text-[1rem] flex text-white font-[500] capatilize hover:bg-[#E14C4C] px-6"
+            }
           />
         </div>
         {/* <div className="px-1 hidden xl:flex gap-2">
