@@ -110,15 +110,15 @@ export const getIndividualCompany = async (req, res, next) => {
       const company = await Hostels.findOne({ _id: companyId }).lean().exec();
 
       const [inclusions, pocs, units, reviews] = await Promise.all([
-        HostelInclusions.findOne({ hostelCompany: company._id }).lean().exec(),
+        HostelInclusions.findOne({ hostel: companyId }).lean().exec(),
         HostelPointOfContact.findOne({
           hostelCompany: company._id,
           isActive: true,
         })
           .lean()
           .exec(),
-        HostelUnits.find({ businessId: company._id }).lean().exec(),
-        HostelReviews.find({ hostelCompany: company._id }).lean().exec(),
+        HostelUnits.find({ hostel: companyId }).lean().exec(),
+        HostelReviews.find({ hostel: companyId }).lean().exec(),
       ]);
 
       const companyObject = {
