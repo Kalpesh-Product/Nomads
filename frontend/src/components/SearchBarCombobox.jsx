@@ -32,14 +32,12 @@ export default function SearchBarCombobox({
 
   return (
     <Popover
-      className={`w-full flex items-center gap-6 bg-gray-50 rounded-full ${className}`}
-    >
+      className={`w-full flex items-center gap-6 bg-gray-50 rounded-full ${className}`}>
       {({ open, close }) => (
         <div
           className={`relative w-full p-2 px-6 transition-all rounded-full ${
             open ? "bg-white shadow-lg" : "hover:bg-white hover:shadow-lg"
-          }`}
-        >
+          }`}>
           {label && (
             <label className="block text-sm font-medium text-gray-700">
               {label}
@@ -57,8 +55,7 @@ export default function SearchBarCombobox({
               <PopoverButton
                 as="div"
                 className="cursor-pointer"
-                onClick={() => setIsClickedOpen(true)}
-              >
+                onClick={() => setIsClickedOpen(true)}>
                 <div className="w-full rounded-md p-0 flex justify-between items-center">
                   <span className={selectedLabel ? "" : "text-gray-400"}>
                     {selectedLabel || placeholder}
@@ -77,8 +74,7 @@ export default function SearchBarCombobox({
                 animate={{ opacity: 1, scaleY: 1 }}
                 exit={{ opacity: 0, scaleY: 0 }}
                 transition={{ duration: 0.2 }}
-                className="absolute z-10 mt-1 origin-top bg-white w-96 border-2 rounded-2xl shadow-2xl p-4"
-              >
+                className="absolute z-10 mt-1 origin-top bg-white w-56 border-2 rounded-2xl shadow-2xl p-4">
                 <div className="max-h-60 overflow-y-auto">
                   {filteredOptions.length === 0 ? (
                     <div className="p-3 text-gray-500">No results found</div>
@@ -86,10 +82,9 @@ export default function SearchBarCombobox({
                     filteredOptions.map((option) => (
                       <button
                         key={option.value}
-                         type="button" 
+                        type="button"
                         onClick={() => handleSelect(option.value, close)}
-                        className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                      >
+                        className="w-full text-left px-4 py-2 hover:bg-gray-100">
                         {option.label}
                       </button>
                     ))
