@@ -16,6 +16,12 @@ import HostelReviews from "../models/hostels/Review.js";
 import HostelPointOfContact from "../models/hostels/PointOfContact.js";
 import HostelUnits from "../models/hostels/Unit.js";
 import HostelInclusions from "../models/hostels/Inclusions.js";
+import PrivateStay from "../models/private-stay/PrivateStay.js";
+import PrivateStayInclusions from "../models/private-stay/Inclusions.js";
+import PrivateStayPointOfContact from "../models/private-stay/PointOfContact.js";
+import PrivateStayReview from "../models/private-stay/Reviews.js";
+import PrivateStayUnit from "../models/private-stay/Units.js";
+import fetchPrivateStayData from "../utils/fetchPrivateStayData.js";
 
 export const getCompanyDataLocationWise = async (req, res, next) => {
   try {
@@ -29,15 +35,25 @@ export const getCompanyDataLocationWise = async (req, res, next) => {
     } else if (category?.toLowerCase() === "hostel") {
       const hostelData = await fetchHostelData(country, state);
       return res.status(200).json(hostelData);
+    } else if (category?.toLowerCase() === "private-stay") {
+      const privateStayData = await fetchPrivateStayData(country, state);
+      return res.status(200).json(privateStayData);
     } else {
-      const [coworkingData, colivingData, hostelData] = await Promise.all([
-        fetchCoworkingData(country, state),
-        fetchColivingData(country, state),
-        fetchHostelData(country, state),
-      ]);
+      const [coworkingData, colivingData, hostelData, privateStayData] =
+        await Promise.all([
+          fetchCoworkingData(country, state),
+          fetchColivingData(country, state),
+          fetchHostelData(country, state),
+          fetchPrivateStayData(country, state),
+        ]);
       return res
         .status(200)
-        .json([...coworkingData, ...colivingData, ...hostelData]);
+        .json([
+          ...coworkingData,
+          ...colivingData,
+          ...hostelData,
+          privateStayData,
+        ]);
     }
   } catch (error) {
     next(error);
@@ -129,6 +145,35 @@ export const getIndividualCompany = async (req, res, next) => {
         units,
         reviews,
       };
+      return res.status(200).json(companyObject);
+    } else if (type?.toLowerCase() === "private-stay") {
+      const company = await PrivateStay.findOne({ _id: companyId })
+        .lean()
+        .exec();
+
+      const [inclusions, pocs, units, reviews] = await Promise.all([
+        PrivateStayInclusions.findOne({ privateStay: company._id })
+          .lean()
+          .exec(),
+        PrivateStayPointOfContact.findOne({
+          privateStay: company._id,
+          isActive: true,
+        })
+          .lean()
+          .exec(),
+        PrivateStayUnit.find({ privateStay: company._id }).lean().exec(),
+        PrivateStayReview.find({ privateStay: company._id }).lean().exec(),
+      ]);
+
+      const companyObject = {
+        ...company,
+        reviewCount: company.reviews,
+        inclusions,
+        pocs,
+        units,
+        reviews,
+      };
+
       return res.status(200).json(companyObject);
     }
 

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import upload from "../../config/multerConfig.js";
-import { bulkInsertColivingPointOfContact } from "../../controllers/coliving_controllers/pointofContactControllers.js";
+import { bulkInsertColivingPointOfContact } from "../../controllers/coliving-controllers/pointofContactControllers.js";
 
 const router = Router();
 router.post(

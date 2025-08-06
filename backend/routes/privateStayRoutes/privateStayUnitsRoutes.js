@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { bulkInsertHostelUnits } from "../../controllers/hostel-controllers/hostelUnitControllers.js";
+import { bulkInsertPrivateStayUnits } from "../../controllers/private-stay-controllers/unitControllers.js";
 import upload from "../../config/multerConfig.js";
 
 const router = Router();
 router.post(
-  "/bulk-insert-hostel-units",
+  "/bulk-insert-private-stay-units",
   upload.single("units"),
-  bulkInsertHostelUnits
+  bulkInsertPrivateStayUnits
 );
 
 export default router;
