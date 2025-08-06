@@ -337,7 +337,7 @@ const Home = () => {
               />
               <button
                 type="submit"
-                className="w-full bg-[#FF5757] text-white py-3 rounded-full"
+                className="w-full bg-primary-blue text-white py-3 rounded-full"
               >
                 <IoSearch className="inline mr-2" />
                 Search
@@ -349,25 +349,21 @@ const Home = () => {
 
       <Container padding={false}>
         <section className="w-full   bg-white pb-12">
-          <div className=" flex flex-col lg:flex-row items-strech justify-between gap-12">
+          <div className=" flex flex-col lg:flex-row items-strech justify-between h-full gap-12">
             {/* Left: Text */}
-            <div className="lg:w-1/2 flex flex-col h-full gap-8 text-center md:text-start">
-              <h2 className="text-3xl md:text-7xl lg:text-7xl font-light text-primary-blue leading-normal md:leading-normal text-center font-play">
-                Building the <br />
-                <span className="text-5xl md:text-7xl font-light text-primary-blue text-start">
-                  LARGEST
-                </span>
-                <br />
-                {/* COMMUNITY of <br /> */}
-                <ReactFitty>COMMUNITY of</ReactFitty>
-                <span className="text-4xl md:text-6xl text-primary-blue text-start">
-                  NOMADS
-                </span>
-                {/* <ReactFitty>Building the</ReactFitty>
-                <ReactFitty>LARGEST</ReactFitty>
-                <ReactFitty>COMMUNITY of</ReactFitty>
-                <ReactFitty>NOMADS</ReactFitty> */}
-              </h2>
+            <div className="lg:w-1/2 flex flex-col h-full justify-between gap-10 text-center md:text-start">
+              <div className="text-3xl md:text-7xl lg:text-7xl font-light text-primary-blue text-center font-play leading-relaxed lg:space-y-6 lg:leading-normal">
+                <div className="text-center">
+                  <span className="text-[4rem] font-medium">Building the</span>
+                </div>
+                <div className="text-title font-medium">
+                  <ReactFitty>Largets Community of</ReactFitty>
+                </div>
+                <div className="font-semibold">
+                  <ReactFitty>NOMADS</ReactFitty>
+                </div>
+              </div>
+
               <div className="flex flex-col gap-4 text-start text-pretty lg:text-center">
                 <p className=" text-gray-700 text-base md:text-lg">
                   A global movement of remote workers, companies, creators,
@@ -382,7 +378,7 @@ const Home = () => {
             </div>
 
             {/* Right: Image */}
-            <div className="lg:w-1/2 h-full">
+            <div className="lg:w-1/2 h-[38rem]">
               <div className="rounded-md h-full overflow-hidden shadow-lg border border-purple-200">
                 <img
                   src={Image}

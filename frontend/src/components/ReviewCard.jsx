@@ -2,9 +2,21 @@
 import React from "react";
 import { AiFillStar } from "react-icons/ai";
 import { NavLink } from "react-router-dom";
+import renderStars from "../utils/renderStarts";
 
 const ReviewCard = ({ review, handleClick }) => {
-  const { name, avatar, duration, stars, date, message, reviewText, rating } = review;
+  const {
+    name,
+    avatar,
+    duration,
+    stars,
+    date,
+    message,
+    reviewText,
+    rating,
+    description,
+    starCount,
+  } = review;
 
   return (
     <div className="flex flex-col gap-2 max-w-sm  p-4 rounded-xl">
@@ -33,20 +45,19 @@ const ReviewCard = ({ review, handleClick }) => {
 
       {/* Stars and Date */}
       <div className="flex items-center gap-2 text-sm text-gray-700">
-        {Array(stars || rating)
-          .fill()
-          .map((_, i) => (
-            <AiFillStar key={i} className="text-black text-xs" />
-          ))}
+        {renderStars(starCount || rating)}
         <span>· {date}</span>
       </div>
 
       {/* Review */}
-      <p className="text-sm text-gray-700 line-clamp-3">{message || reviewText}</p>
+      <p className="text-sm text-gray-700 line-clamp-3">
+        {message || reviewText || description}
+      </p>
 
       <span
         onClick={handleClick}
-        className="text-small font-medium underline cursor-pointer">
+        className="text-small font-medium underline cursor-pointer"
+      >
         Show more
       </span>
     </div>

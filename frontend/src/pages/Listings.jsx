@@ -394,16 +394,26 @@ const Listings = () => {
                 data={listingsData}
                 entriesPerPage={6}
                 columns="grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-                renderItem={(item) => (
-                  <ListingCard
+                renderItem={(item, index) => (
+                  <motion.div
                     key={item._id}
-                    item={item}
-                    handleNavigation={() =>
-                      navigate(`${item.companyName}`, {
-                        state: { companyId: item._id, type: item.type },
-                      })
-                    }
-                  />
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: 0.4,
+                      delay: index * 0.1, // delay each card slightly
+                      ease: "easeOut",
+                    }}
+                  >
+                    <ListingCard
+                      item={item}
+                      handleNavigation={() =>
+                        navigate(`${item.companyName}`, {
+                          state: { companyId: item._id, type: item.type },
+                        })
+                      }
+                    />
+                  </motion.div>
                 )}
               />
             </div>

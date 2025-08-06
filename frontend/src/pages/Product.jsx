@@ -482,9 +482,9 @@ const Product = () => {
               <Map locations={mapsData} />
             </div>
             <hr className="my-5 lg:my-10" />
-            <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-2 gap-20 pb-20">
-              <div className="flex flex-col shadow-md gap-4 border-2 rounded-xl p-4 max-w-md">
-                <div className="flex justify-center items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-2 gap-10 pb-20">
+              <div className="flex flex-col items-center col-span-1  shadow-md gap-4 border-2 rounded-xl p-4 w-full">
+                <div className="flex flex-col gap-4 justify-center items-center">
                   <div className="h-20 w-20 overflow-hidden rounded-full">
                     <img
                       src="/images/bg-image.jpg"
@@ -492,7 +492,6 @@ const Product = () => {
                       className="w-full h-full object-cover"
                     />
                   </div>
-                </div>
                 <div className="text-center">
                   <h1 className="text-title font-semibold">
                     {companyDetails?.pocs?.name || "Unknown"}
@@ -501,22 +500,23 @@ const Product = () => {
                     {companyDetails?.pocs?.designation || "Unknown"}
                   </p>
                 </div>
+                </div>
                 <hr />
                 <div>
                   <p className="text-subtitle mb-4">Host Details</p>
                   <ul className="list-disc pl-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 gap-x-4 text-small">
                       <li>Response rate: 100%</li>
-                      <li>Response rate: 100%</li>
-                      <li>Response rate: 100%</li>
-                      <li>Response rate: 100%</li>
+                      <li>Speaks English, Hindi and Punjabi</li>
+                      <li>Responds within an hour</li>
+                      <li>Lives in Velha, Goa</li>
                     </div>
                   </ul>
                 </div>
               </div>
-              <div className="flex w-full justify-end">
-                <div className="flex flex-col shadow-md h-full gap-4 border-2 rounded-xl p-6 w-full lg:w-3/4 justify-between">
-                  <h1 className="text-card-title font-semibold">
+              <div className="flex w-full">
+                <div className="flex flex-col  h-full gap-4 rounded-xl p-6 w-full lg:w-full justify-between">
+                  <h1 className="text-title font-semibold">
                     Connect With Us
                   </h1>
                   <form
@@ -565,7 +565,7 @@ const Product = () => {
                       )}
                     />
 
-                    <SecondaryButton title={"Submit"} type={"submit"} />
+                    <SecondaryButton title={"Submit"} type={"submit"} externalStyles={"mt-6"}/>
                   </form>
                 </div>
               </div>
@@ -591,25 +591,13 @@ const Product = () => {
           </div>
 
           {/* Star Rating */}
-          <div className="flex items-center gap-1 text-yellow-500 text-sm">
-            {Array(selectedReview?.stars)
-              .fill()
-              .map((_, i) => (
-                <svg
-                  key={i}
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                  className="w-4 h-4"
-                >
-                  <path d="M12 .587l3.668 7.568L24 9.75l-6 5.859L19.336 24 12 19.897 4.664 24 6 15.609 0 9.75l8.332-1.595z" />
-                </svg>
-              ))}
+          <div className="flex items-center gap-1 text-black text-sm">
+            {renderStars(selectedReview?.rating ||  selectedReview?.starCount)}
           </div>
 
           {/* Message */}
           <div className="text-gray-800 text-sm whitespace-pre-line leading-relaxed">
-            {selectedReview?.message}
+            {selectedReview?.message || selectedReview?.reviewText || selectedReview?.description}
           </div>
         </div>
       </MuiModal>
