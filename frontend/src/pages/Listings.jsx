@@ -153,7 +153,7 @@ const Listings = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4 ">
+    <div className="flex flex-col gap-6 ">
       <Container padding={false}>
         <div className="flex w-full items-center justify-between">
           <div className="flex flex-col gap-4 justify-center items-center  w-full mt-10 lg:mt-0">

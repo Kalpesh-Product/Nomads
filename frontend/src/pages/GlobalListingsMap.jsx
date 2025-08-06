@@ -362,8 +362,8 @@ const GlobalListingsMap = () => {
       <hr />
       <Container padding={false}>
         <div className="">
-          <div className="font-semibold text-lg  flex">
-            <div className="pr-0 lg:pr-10 h-[36rem] overflow-auto custom-scrollbar-hide w-1/2">
+          <div className="font-semibold text-lg  grid grid-cols-9 gap-4">
+            <div className=" h-[36rem] overflow-auto custom-scrollbar-hide col-span-5">
               {isLisitingLoading ? (
                 Array.from({ length: 4 }).map((_, i) => (
                   <SkeletonCard key={i} />
@@ -390,7 +390,7 @@ const GlobalListingsMap = () => {
                     return aPriority - bPriority;
                   });
 
-                  const displayItems = sortedItems.slice(0, 5);
+                  const displayItems = sortedItems.slice(0, 6);
 
                   const showViewMore = items.length > 5;
                   const sectionTitle = `Popular ${
@@ -403,7 +403,7 @@ const GlobalListingsMap = () => {
                         {sectionTitle}
                       </h2>
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-y-4">
                         {displayItems.map((item) => (
                           <ListingCard
                             key={item._id}
@@ -437,8 +437,8 @@ const GlobalListingsMap = () => {
                 </div>
               )}
             </div>
-            <div className="">
-              <div className="w-[40rem] rounded-xl h-[40rem]">
+            <div className="col-span-4">
+              <div className="rounded-xl h-[40rem] overflow-hidden">
                 {isLisitingLoading ? (
                   <SkeletonMap />
                 ) : forMapsData?.length ? (
