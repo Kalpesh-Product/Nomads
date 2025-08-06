@@ -8,6 +8,11 @@ import ColivingInclusions from "../models/coliving/ColivingInclusions.js";
 import ColivingReviews from "../models/coliving/Reviews.js";
 import ColivingPointOfContact from "../models/coliving/PointOfContact.js";
 import ColivingUnits from "../models/coliving/Units.js";
+import Hostels from "../models/hostels/Hostel.js";
+import HostelReviews from "../models/hostels/Review.js";
+import HostelPointOfContact from "../models/hostels/PointOfContact.js";
+import HostelUnits from "../models/hostels/Unit.js";
+import HostelInclusions from "../models/hostels/Inclusions.js";
 
 export const getCompanyDataLocationWise = async (req, res, next) => {
   try {
@@ -94,18 +99,63 @@ export const getCompanyDataLocationWise = async (req, res, next) => {
       });
     };
 
+    const fetchHostelData = async () => {
+      const [
+        hostelCompanies,
+        hostelInclusions,
+        hostelPoc,
+        hostelUnits,
+        hostelReviews,
+      ] = await Promise.all([
+        Hostels.find({ country: countryRegex, state: stateRegex })
+          .lean()
+          .exec(),
+        HostelInclusions.find().lean().exec(),
+        HostelPointOfContact.find({ isActive: true }).lean().exec(),
+        HostelUnits.find().lean().exec(),
+        HostelReviews.find().lean().exec(),
+      ]);
+
+      return hostelCompanies.map((company) => {
+        const companyId = company._id.toString();
+        return {
+          ...company,
+          reviewCount: company.reviews,
+          inclusions: hostelInclusions.filter(
+            (item) => item.hostelCompany?.toString() === companyId
+          ),
+          pointOfContacts: hostelPoc.filter(
+            (item) => item.hostelCompany?.toString() === companyId
+          ),
+          units: hostelUnits.filter(
+            (item) => item.businessId?.toString() === companyId
+          ),
+          reviews: hostelReviews.filter(
+            (item) => item.hostelCompany?.toString() === companyId
+          ),
+          type: "hostel",
+        };
+      });
+    };
+
     if (category?.toLowerCase() === "coworking") {
       const coworkingData = await fetchCoworkingData();
       return res.status(200).json(coworkingData);
     } else if (category?.toLowerCase() === "coliving") {
       const colivingData = await fetchColivingData();
       return res.status(200).json(colivingData);
+    } else if (category?.toLowerCase() === "hostel") {
+      const hostelData = await fetchHostelData();
+      return res.status(200).json(hostelData);
     } else {
-      const [coworkingData, colivingData] = await Promise.all([
+      const [coworkingData, colivingData, hostelData] = await Promise.all([
         fetchCoworkingData(),
         fetchColivingData(),
+        fetchHostelData(),
       ]);
-      return res.status(200).json([...coworkingData, ...colivingData]);
+      return res
+        .status(200)
+        .json([...coworkingData, ...colivingData, ...hostelData]);
     }
   } catch (error) {
     next(error);
@@ -163,6 +213,30 @@ export const getIndividualCompany = async (req, res, next) => {
           .exec(),
         ColivingUnits.find({ businessId: company._id }).lean().exec(),
         ColivingReviews.find({ colivingCompany: company._id }).lean().exec(),
+      ]);
+
+      const companyObject = {
+        ...company,
+        reviewCount: company.reviews,
+        inclusions,
+        pocs,
+        units,
+        reviews,
+      };
+      return res.status(200).json(companyObject);
+    } else if (type?.toLowerCase() === "hostel") {
+      const company = await Hostels.findOne({ _id: companyId }).lean().exec();
+
+      const [inclusions, pocs, units, reviews] = await Promise.all([
+        HostelInclusions.findOne({ hostelCompany: company._id }).lean().exec(),
+        HostelPointOfContact.findOne({
+          hostelCompany: company._id,
+          isActive: true,
+        })
+          .lean()
+          .exec(),
+        HostelUnits.find({ businessId: company._id }).lean().exec(),
+        HostelReviews.find({ hostelCompany: company._id }).lean().exec(),
       ]);
 
       const companyObject = {

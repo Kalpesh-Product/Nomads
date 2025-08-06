@@ -15,6 +15,11 @@ import colivingInclusionsRoutes from "./routes/colivingRoutes/inclusionsRoutes.j
 import colivingReviewRoutes from "./routes/colivingRoutes/reviewRoutes.js";
 import colivingPocRoutes from "./routes/colivingRoutes/colivingPocRoutes.js";
 import commonCompanyRoutes from "./routes/commonCompanyRoutes.js";
+import hostelRoutes from "./routes/hostelRoutes/hostelRoutes.js";
+import hostelReviewRoutes from "./routes/hostelRoutes/reviewRoutes.js";
+import hostelUnitRoutes from "./routes/hostelRoutes/unitsRoutes.js";
+import hostelPointOfContactRoutes from "./routes/hostelRoutes/pointOfContactRoutes.js";
+import hostelInclusionRoutes from "./routes/hostelRoutes/inclusionsRoutes.js";
 import mongoose from "mongoose";
 
 const app = express();
@@ -36,6 +41,11 @@ app.use("/api/coliving/unit", colivingUnitRoutes);
 app.use("/api/coliving/inclusions", colivingInclusionsRoutes);
 app.use("/api/coliving/review", colivingReviewRoutes);
 app.use("/api/coliving/poc", colivingPocRoutes);
+app.use("/api/hostel/company", hostelRoutes);
+app.use("/api/hostel/review", hostelReviewRoutes);
+app.use("/api/hostel/units", hostelUnitRoutes);
+app.use("/api/hostel/poc", hostelPointOfContactRoutes);
+app.use("/api/hostel/inclusions", hostelInclusionRoutes);
 app.use("/api/common", commonCompanyRoutes);
 app.use(errorHandler);
 app.listen(
