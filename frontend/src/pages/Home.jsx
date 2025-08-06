@@ -199,7 +199,8 @@ const Home = () => {
           <div className="flex flex-col  gap-4 justify-between items-center">
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center">
+              className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
+            >
               <Controller
                 name="country"
                 control={control}
@@ -246,7 +247,8 @@ const Home = () => {
               />
               <button
                 type="submit"
-                className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full">
+                className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full"
+              >
                 <IoSearch />
               </button>
             </form>
@@ -255,7 +257,8 @@ const Home = () => {
         <div className="lg:hidden flex w-full items-center justify-center my-4">
           <button
             onClick={() => setShowMobileSearch(true)}
-            className="bg-white flex items-center w-full text-black border-2 px-6 py-3 rounded-full">
+            className="bg-white flex items-center w-full text-black border-2 px-6 py-3 rounded-full"
+          >
             <IoSearch className="inline mr-2" />
             Start Search
           </button>
@@ -269,12 +272,14 @@ const Home = () => {
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ duration: 0.3 }}
-            className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl z-50 p-4 rounded-t-3xl h-[50vh] lg:hidden">
+            className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl z-50 p-4 rounded-t-3xl h-[50vh] lg:hidden"
+          >
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold">Search</h3>
               <button
                 onClick={() => setShowMobileSearch(false)}
-                className="text-gray-500 text-xl">
+                className="text-gray-500 text-xl"
+              >
                 &times;
               </button>
             </div>
@@ -326,7 +331,8 @@ const Home = () => {
               />
               <button
                 type="submit"
-                className="w-full bg-[#FF5757] text-white py-3 rounded-full">
+                className="w-full bg-[#FF5757] text-white py-3 rounded-full"
+              >
                 <IoSearch className="inline mr-2" />
                 Search
               </button>
@@ -337,35 +343,42 @@ const Home = () => {
 
       <Container padding={false}>
         <section className="w-full   bg-white pb-12">
-          <div className=" mx-auto flex flex-col md:flex-row items-center gap-12">
+          <div className=" flex flex-col md:flex-row items-strech justify-between gap-12">
             {/* Left: Text */}
-            <div className="md:w-1/2 text-center md:text-left">
-              <h2 className="text-3xl md:text-7xl lg:text-6xl font-light text-primary-blue lg:leading-snug text-center font-play pb-6">
+            <div className="md:w-1/2 flex flex-col h-full gap-8 text-center md:text-start">
+              <h2 className="text-3xl md:text-7xl lg:text-7xl font-light text-primary-blue lg:leading-normal text-center font-play">
                 Building the <br />
-                <span className="text-5xl md:text-6xl font-light text-primary-blue">
+                <span className="text-5xl md:text-7xl font-light text-primary-blue text-start">
                   LARGEST
                 </span>
                 <br />
-                COMMUNITY of <br />
-                <span className="text-4xl md:text-5xl text-primary-blue">
+                {/* COMMUNITY of <br /> */}
+                <ReactFitty>COMMUNITY of</ReactFitty>
+                <span className="text-4xl md:text-6xl text-primary-blue text-start">
                   NOMADS
                 </span>
+                {/* <ReactFitty>Building the</ReactFitty>
+                <ReactFitty>LARGEST</ReactFitty>
+                <ReactFitty>COMMUNITY of</ReactFitty>
+                <ReactFitty>NOMADS</ReactFitty> */}
               </h2>
-              <p className="mt-6 text-gray-700 text-base md:text-lg text-center">
-                A global movement of remote workers, companies, <br />
-                creators, entrepreneurs, hosts, investors who are
-                <br />
-                redefining how the world lives and works.
-              </p>
-              <p className="mt-4 text-gray-700 text-base md:text-lg text-center">
-                Bound by freedom, flexibility, and connection, nomads <br /> are
-                building the future—one destination at a time.
-              </p>
+              <div className="flex flex-col gap-4 text-center">
+                <p className=" text-gray-700 text-base md:text-lg">
+                  A global movement of remote workers, companies, <br />
+                  creators, entrepreneurs, hosts, investors who are
+                  <br />
+                  redefining how the world lives and works.
+                </p>
+                <p className=" text-gray-700 text-base md:text-lg">
+                  Bound by freedom, flexibility, and connection, nomads <br />{" "}
+                  are building the future—one destination at a time.
+                </p>
+              </div>
             </div>
 
             {/* Right: Image */}
-            <div className="md:w-1/2">
-              <div className="rounded-md overflow-hidden shadow-lg border border-purple-200">
+            <div className="md:w-1/2 h-full">
+              <div className="rounded-md h-full overflow-hidden shadow-lg border border-purple-200">
                 <img
                   src={Image}
                   alt="Nomads working together"
@@ -378,9 +391,11 @@ const Home = () => {
       </Container>
 
       <section className="bg-black w-full flex flex-col gap-4 py-16 lg:py-16">
-        <div className="lg:w-[80rem] max-w-[80rem] mx-auto flex flex-col text-primary-blue  justify-center items-center leading-none">
-          <ReactFitty className="font-hero">INTRODUCING</ReactFitty>
-          <ReactFitty className="font-hero">N-COMMERCE</ReactFitty>
+        <div className="lg:max-w-[80rem] lg:min-w-[85%] max-w-full lg:mx-auto flex flex-col text-primary-blue  justify-center items-center leading-none">
+          <div className="flex flex-col w-full font-hero px-4">
+            <ReactFitty>INTRODUCING</ReactFitty>
+            <ReactFitty>N-COMMERCE</ReactFitty>
+          </div>
 
           <p className="uppercase text-mobile-main-header lg:text-9xl font-hero text-white pt-4 pb-20">
             ("nomad commerce")
@@ -388,8 +403,8 @@ const Home = () => {
           {/* <div className="flex justify-center items-end w-full">
             <PrimaryButton title={"Partner now"} />
           </div> */}
-          <div className="text-white w-full text-center ">
-            <ReactFitty className="text-mobile-header lg:text-4xl font-normal">
+          <div className="text-white w-full text-center">
+            <ReactFitty className="text-mobile-header font-normal">
               End-to-end Nomad solutions for working from aspiring destinations
             </ReactFitty>
           </div>
@@ -406,7 +421,8 @@ const Home = () => {
             {destinationData.map((item, idx) => (
               <div
                 key={idx}
-                className="w-44 sm:w-52 md:w-56 lg:w-56 flex flex-col items-center">
+                className="w-full sm:w-full md:w-56 lg:w-56 flex flex-col items-center"
+              >
                 <div className="relative w-full rounded-xl overflow-hidden shadow-md">
                   <img
                     src={item.image}
@@ -432,7 +448,7 @@ const Home = () => {
       <Container>
         <div className="flex flex-col gap-8 w-full border-t-2 border-gray-300 py-8">
           <h1 className="text-title font-semibold ">Platform inclusions.</h1>
-          <div className="grid grid-cols-2 md:grid-cols-4  lg:grid-cols-6 gap-x-16 md:gap-x-16 lg:gap-x-28 gap-y-10">
+          <div className="grid grid-cols-2 md:grid-cols-4  lg:grid-cols-5 gap-x-16 md:gap-x-16 lg:gap-x-28 gap-y-10">
             {amenities.map((item, index) => (
               <Amenities key={index} image={item.image} title={item.title} />
             ))}
