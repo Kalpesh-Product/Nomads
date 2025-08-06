@@ -38,21 +38,19 @@ export const bulkInsertPrivateStayPointOfContact = async (req, res, next) => {
 
         const pocData = {
           privateStay: privateStayId,
-          poc: {
-            name: row["POC Name"]?.trim(),
-            image: row["POC Image"]?.trim(),
-            designation: row["POC Designation"]?.trim(),
-            email: row["Email"]?.trim().toLowerCase(),
-            phoneNumber: row["Phone Number"]?.trim(),
-            linkedInProfile: row["LinkedIn Profile"]?.trim(),
-          },
+          name: row["POC Name"]?.trim(),
+          image: row["POC Image"]?.trim(),
+          designation: row["POC Designation"]?.trim(),
+          email: row["Email"]?.trim().toLowerCase(),
+          phoneNumber: row["Phone Number"]?.trim(),
+          linkedInProfile: row["LinkedIn Profile"]?.trim(),
           languages,
           address: row["Address"]?.trim(),
           availabilityTime: row["Availibility time"]?.trim(),
         };
 
         // Basic validation
-        if (pocData.poc.name && pocData.poc.email && privateStayId) {
+        if (pocData.name && pocData.email && privateStayId) {
           pocs.push(pocData);
         }
       })

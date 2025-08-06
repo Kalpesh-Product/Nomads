@@ -6,38 +6,40 @@ const privateStayPointOfContactSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "PrivateStay",
     },
-    poc: {
-      name: {
-        type: String,
-        required: true,
-        trim: true,
-      },
-      image: {
-        type: String, // URL to the image
-        trim: true,
-      },
-      designation: {
-        type: String,
-        trim: true,
-      },
-      email: {
-        type: String,
-        required: true,
-        trim: true,
-        lowercase: true,
-      },
-      phoneNumber: {
-        type: String,
-        trim: true,
-      },
-      linkedInProfile: {
-        type: String,
-        trim: true,
-      },
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    image: {
+      type: String, // URL to the image
+      trim: true,
+    },
+    designation: {
+      type: String,
+      trim: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      trim: true,
+      lowercase: true,
+    },
+    phoneNumber: {
+      type: String,
+      trim: true,
+    },
+    linkedInProfile: {
+      type: String,
+      trim: true,
     },
     languages: {
       type: [String], // e.g., ["English", "Hindi"]
       default: [],
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
     },
     address: {
       type: String,
