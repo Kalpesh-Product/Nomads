@@ -430,16 +430,28 @@ const Product = () => {
           </div>
           <hr className="my-5 lg:my-10" />
           {/* Inclusions */}
-          <div className="flex flex-col gap-8 w-full ">
-            <h1 className="text-title font-semibold ">
+          <div className="flex flex-col gap-8 w-full">
+            <h1 className="text-title font-semibold">
               What Inclusion does it offers
             </h1>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-24 gap-y-10">
-              {allAmenities.map((item, index) => (
-                <Amenities key={index} image={item.image} title={item.title} />
-              ))}
-            </div>
+
+            {allAmenities.length === 0 ? (
+              <div className="w-full border-2 border-dotted border-gray-400 rounded-lg p-6 text-center text-gray-500">
+                Inclusions not available
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-24 gap-y-10">
+                {allAmenities.map((item, index) => (
+                  <Amenities
+                    key={index}
+                    image={item.image}
+                    title={item.title}
+                  />
+                ))}
+              </div>
+            )}
           </div>
+
           <hr className="my-5 lg:my-10" />
           <div className="flex flex-col gap-8 w-full">
             <div className="flex flex-col justify-center items-center max-w-4xl mx-auto">
@@ -492,14 +504,14 @@ const Product = () => {
                       className="w-full h-full object-cover"
                     />
                   </div>
-                <div className="text-center">
-                  <h1 className="text-title font-semibold">
-                    {companyDetails?.pocs?.name || "Unknown"}
-                  </h1>
-                  <p className="text-content">
-                    {companyDetails?.pocs?.designation || "Unknown"}
-                  </p>
-                </div>
+                  <div className="text-center">
+                    <h1 className="text-title font-semibold">
+                      {companyDetails?.pocs?.name || "Unknown"}
+                    </h1>
+                    <p className="text-content">
+                      {companyDetails?.pocs?.designation || "Unknown"}
+                    </p>
+                  </div>
                 </div>
                 <hr />
                 <div>
@@ -516,9 +528,7 @@ const Product = () => {
               </div>
               <div className="flex w-full">
                 <div className="flex flex-col  h-full gap-4 rounded-xl p-6 w-full lg:w-full justify-between">
-                  <h1 className="text-title font-semibold">
-                    Connect With Us
-                  </h1>
+                  <h1 className="text-title font-semibold">Connect With Us</h1>
                   <form
                     onSubmit={handlesubmitSales((data) => submitSales(data))}
                     className="grid grid-cols-1 gap-4"
@@ -565,7 +575,11 @@ const Product = () => {
                       )}
                     />
 
-                    <SecondaryButton title={"Submit"} type={"submit"} externalStyles={"mt-6"}/>
+                    <SecondaryButton
+                      title={"Submit"}
+                      type={"submit"}
+                      externalStyles={"mt-6"}
+                    />
                   </form>
                 </div>
               </div>
@@ -592,12 +606,14 @@ const Product = () => {
 
           {/* Star Rating */}
           <div className="flex items-center gap-1 text-black text-sm">
-            {renderStars(selectedReview?.rating ||  selectedReview?.starCount)}
+            {renderStars(selectedReview?.rating || selectedReview?.starCount)}
           </div>
 
           {/* Message */}
           <div className="text-gray-800 text-sm whitespace-pre-line leading-relaxed">
-            {selectedReview?.message || selectedReview?.reviewText || selectedReview?.description}
+            {selectedReview?.message ||
+              selectedReview?.reviewText ||
+              selectedReview?.description}
           </div>
         </div>
       </MuiModal>
