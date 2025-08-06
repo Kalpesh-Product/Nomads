@@ -201,8 +201,7 @@ const Listings = () => {
 
               <form
                 onSubmit={handleSubmit(onSubmit)}
-                className=" flex justify-around w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
-              >
+                className=" flex justify-around w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center">
                 <Controller
                   name="country"
                   control={control}
@@ -249,8 +248,7 @@ const Listings = () => {
                 />
                 <button
                   type="submit"
-                  className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full"
-                >
+                  className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full">
                   <IoSearch />
                 </button>
               </form>
