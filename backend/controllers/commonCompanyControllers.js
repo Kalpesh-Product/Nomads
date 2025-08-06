@@ -31,9 +31,9 @@ export const getCompanyDataLocationWise = async (req, res, next) => {
       return res.status(200).json(hostelData);
     } else {
       const [coworkingData, colivingData, hostelData] = await Promise.all([
-        fetchCoworkingData(),
-        fetchColivingData(),
-        fetchHostelData(),
+        fetchCoworkingData(country, state),
+        fetchColivingData(country, state),
+        fetchHostelData(country, state),
       ]);
       return res
         .status(200)
