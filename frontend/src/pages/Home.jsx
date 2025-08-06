@@ -343,10 +343,10 @@ const Home = () => {
 
       <Container padding={false}>
         <section className="w-full   bg-white pb-12">
-          <div className=" flex flex-col md:flex-row items-strech justify-between gap-12">
+          <div className=" flex flex-col lg:flex-row items-strech justify-between gap-12">
             {/* Left: Text */}
-            <div className="md:w-1/2 flex flex-col h-full gap-8 text-center md:text-start">
-              <h2 className="text-3xl md:text-7xl lg:text-7xl font-light text-primary-blue lg:leading-normal text-center font-play">
+            <div className="lg:w-1/2 flex flex-col h-full gap-8 text-center md:text-start">
+              <h2 className="text-3xl md:text-7xl lg:text-7xl font-light text-primary-blue leading-normal md:leading-normal text-center font-play">
                 Building the <br />
                 <span className="text-5xl md:text-7xl font-light text-primary-blue text-start">
                   LARGEST
@@ -362,22 +362,21 @@ const Home = () => {
                 <ReactFitty>COMMUNITY of</ReactFitty>
                 <ReactFitty>NOMADS</ReactFitty> */}
               </h2>
-              <div className="flex flex-col gap-4 text-center">
+              <div className="flex flex-col gap-4 text-start text-pretty lg:text-center">
                 <p className=" text-gray-700 text-base md:text-lg">
-                  A global movement of remote workers, companies, <br />
-                  creators, entrepreneurs, hosts, investors who are
-                  <br />
-                  redefining how the world lives and works.
+                  A global movement of remote workers, companies, creators,
+                  entrepreneurs, hosts, investors who are redefining how the
+                  world lives and works.
                 </p>
                 <p className=" text-gray-700 text-base md:text-lg">
-                  Bound by freedom, flexibility, and connection, nomads <br />{" "}
-                  are building the future—one destination at a time.
+                  Bound by freedom, flexibility, and connection, nomads are
+                  building the future—one destination at a time.
                 </p>
               </div>
             </div>
 
             {/* Right: Image */}
-            <div className="md:w-1/2 h-full">
+            <div className="lg:w-1/2 h-full">
               <div className="rounded-md h-full overflow-hidden shadow-lg border border-purple-200">
                 <img
                   src={Image}
@@ -392,7 +391,7 @@ const Home = () => {
 
       <section className="bg-black w-full flex flex-col gap-4 py-16 lg:py-16">
         <div className="lg:max-w-[80rem] lg:min-w-[85%] max-w-full lg:mx-auto flex flex-col text-primary-blue  justify-center items-center leading-none">
-          <div className="flex flex-col w-full font-hero px-4">
+          <div className="flex flex-col w-full font-hero px-4 md:px-8">
             <ReactFitty>INTRODUCING</ReactFitty>
             <ReactFitty>N-COMMERCE</ReactFitty>
           </div>
@@ -404,7 +403,7 @@ const Home = () => {
             <PrimaryButton title={"Partner now"} />
           </div> */}
           <div className="text-white w-full text-center">
-            <ReactFitty className="text-mobile-header font-normal">
+            <ReactFitty className="text-mobile-header font-normal md:px-4">
               End-to-end Nomad solutions for working from aspiring destinations
             </ReactFitty>
           </div>
@@ -417,11 +416,16 @@ const Home = () => {
             Solutions for your aspiring destinations.
           </h2>
 
-          <div className="flex flex-wrap justify-evenly gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
             {destinationData.map((item, idx) => (
               <div
                 key={idx}
-                className="w-full sm:w-full md:w-56 lg:w-56 flex flex-col items-center"
+                className={`w-full sm:w-full md:w-full lg:w-56 flex flex-col items-center ${
+                  idx === destinationData.length - 1 &&
+                  destinationData.length % 2 !== 0
+                    ? "md:col-span-2"
+                    : ""
+                }`}
               >
                 <div className="relative w-full rounded-xl overflow-hidden shadow-md">
                   <img
@@ -448,7 +452,7 @@ const Home = () => {
       <Container>
         <div className="flex flex-col gap-8 w-full border-t-2 border-gray-300 py-8">
           <h1 className="text-title font-semibold ">Platform inclusions.</h1>
-          <div className="grid grid-cols-2 md:grid-cols-4  lg:grid-cols-5 gap-x-16 md:gap-x-16 lg:gap-x-28 gap-y-10">
+          <div className="grid grid-cols-2 md:grid-cols-3  lg:grid-cols-5 gap-x-16 md:gap-x-16 lg:gap-x-28 gap-y-10">
             {amenities.map((item, index) => (
               <Amenities key={index} image={item.image} title={item.title} />
             ))}
