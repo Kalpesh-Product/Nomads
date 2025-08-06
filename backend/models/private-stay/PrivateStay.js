@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const privateStaySchema = new mongoose.Schema(
   {
@@ -29,6 +29,12 @@ const privateStaySchema = new mongoose.Schema(
     city: {
       type: String,
     },
+    country: {
+      type: String,
+    },
+    state: {
+      type: String,
+    },
     about: {
       type: String,
     },
@@ -39,7 +45,7 @@ const privateStaySchema = new mongoose.Schema(
       type: Number,
     },
     googleMap: {
-      type: String, // embed link or map URL
+      type: String, 
     },
     ratings: {
       type: Number,

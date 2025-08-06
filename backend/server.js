@@ -20,6 +20,11 @@ import hostelReviewRoutes from "./routes/hostelRoutes/reviewRoutes.js";
 import hostelUnitRoutes from "./routes/hostelRoutes/unitsRoutes.js";
 import hostelPointOfContactRoutes from "./routes/hostelRoutes/pointOfContactRoutes.js";
 import hostelInclusionRoutes from "./routes/hostelRoutes/inclusionsRoutes.js";
+import privateStayCompanyRoutes from "./routes/privateStayRoutes/companyRoutes.js";
+import privateStayUnitRoutes from "./routes/privateStayRoutes/privateStayUnitsRoutes.js";
+import privateStayInclusionsRoutes from "./routes/privateStayRoutes/privateStayInclusions.js";
+import privateStayReviewRoutes from "./routes/privateStayRoutes/privateStayReviewRoutes.js";
+import privateStayPocRoutes from "./routes/privateStayRoutes/privateStayPocRoutes.js";
 import mongoose from "mongoose";
 
 const app = express();
@@ -46,6 +51,11 @@ app.use("/api/hostel/review", hostelReviewRoutes);
 app.use("/api/hostel/units", hostelUnitRoutes);
 app.use("/api/hostel/poc", hostelPointOfContactRoutes);
 app.use("/api/hostel/inclusions", hostelInclusionRoutes);
+app.use("/api/private-stay/company", privateStayCompanyRoutes);
+app.use("/api/private-stay/unit", privateStayUnitRoutes);
+app.use("/api/private-stay/inclusions", privateStayInclusionsRoutes);
+app.use("/api/private-stay/review", privateStayReviewRoutes);
+app.use("/api/private-stay/poc", privateStayPocRoutes);
 app.use("/api/common", commonCompanyRoutes);
 app.use(errorHandler);
 app.listen(
