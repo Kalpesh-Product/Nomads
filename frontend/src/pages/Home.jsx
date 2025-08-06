@@ -46,7 +46,10 @@ const Home = () => {
   const selectedCountry = watch("country");
   const selectedState = watch("location");
   // Sample options
-  const countryOptions = [{ label: "India", value: "india" }];
+  const countryOptions = [
+    { label: "India", value: "india" },
+    // { label: "Bali", value: "bali" },
+  ];
   const locationOptions = [{ label: "Goa", value: "goa" }];
   const countOptions = [
     { label: "1 - 5", value: "1-5" },
@@ -189,11 +192,11 @@ const Home = () => {
     { image: icons.secure, title: "SECURE" },
     { image: icons.personalised, title: "PERSONALISED" },
     { image: icons.parking, title: "PARKING" },
-    { image: icons.yogazone, title: "YOGA ZONE" },
-    { image: icons.ergonomicenvironment, title: "Ergonomic Environment" },
-    { image: icons.officesupplies, title: "Office Supplies" },
-    { image: icons.access24x7, title: "Access 24 x 7" },
-    { image: icons.signboard, title: "Sign Board" },
+    // { image: icons.yogazone, title: "YOGA ZONE" },
+    // { image: icons.ergonomicenvironment, title: "Ergonomic Environment" },
+    // { image: icons.officesupplies, title: "Office Supplies" },
+    // { image: icons.access24x7, title: "Access 24 x 7" },
+    // { image: icons.signboard, title: "Sign Board" },
   ];
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const onSubmit = (data) => {
@@ -203,11 +206,12 @@ const Home = () => {
   return (
     <div className="flex flex-col w-full">
       <Container padding={false}>
-        <div className="py-4  hidden lg:block">
+        <div className="py-8  hidden lg:block">
           <div className="flex flex-col  gap-4 justify-between items-center">
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center">
+              className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
+            >
               <Controller
                 name="country"
                 control={control}
@@ -254,7 +258,8 @@ const Home = () => {
               />
               <button
                 type="submit"
-                className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full">
+                className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full"
+              >
                 <IoSearch />
               </button>
             </form>
@@ -263,7 +268,8 @@ const Home = () => {
         <div className="lg:hidden flex w-full items-center justify-center my-4">
           <button
             onClick={() => setShowMobileSearch(true)}
-            className="bg-white flex items-center w-full text-black border-2 px-6 py-3 rounded-full">
+            className="bg-white flex items-center w-full text-black border-2 px-6 py-3 rounded-full"
+          >
             <IoSearch className="inline mr-2" />
             Start Search
           </button>
@@ -277,12 +283,14 @@ const Home = () => {
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ duration: 0.3 }}
-            className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl z-50 p-4 rounded-t-3xl h-[50vh] lg:hidden">
+            className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl z-50 p-4 rounded-t-3xl h-[50vh] lg:hidden"
+          >
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold">Search</h3>
               <button
                 onClick={() => setShowMobileSearch(false)}
-                className="text-gray-500 text-xl">
+                className="text-gray-500 text-xl"
+              >
                 &times;
               </button>
             </div>
@@ -334,7 +342,8 @@ const Home = () => {
               />
               <button
                 type="submit"
-                className="w-full bg-[#FF5757] text-white py-3 rounded-full">
+                className="w-full bg-[#FF5757] text-white py-3 rounded-full"
+              >
                 <IoSearch className="inline mr-2" />
                 Search
               </button>
@@ -389,7 +398,7 @@ const Home = () => {
 
       <section className="bg-black w-full flex flex-col gap-4 py-16 lg:py-16">
         <div className="lg:max-w-[80rem] lg:min-w-[85%] max-w-full lg:mx-auto flex flex-col text-primary-blue  justify-center items-center leading-none">
-          <div className="flex flex-col w-full font-hero px-4 md:px-8">
+          <div className="flex flex-col w-full font-hero px-4 md:px-0">
             <ReactFitty>INTRODUCING</ReactFitty>
             <ReactFitty>N-COMMERCE</ReactFitty>
           </div>
@@ -423,7 +432,8 @@ const Home = () => {
                   destinationData.length % 2 !== 0
                     ? "md:col-span-2 lg:col-span-1"
                     : ""
-                }`}>
+                }`}
+              >
                 <div className="relative w-full rounded-xl overflow-hidden shadow-md">
                   <img
                     src={item.image}
@@ -437,7 +447,7 @@ const Home = () => {
                     <AiOutlineHeart className="text-white text-xl" />
                   </div> */}
                 </div>
-                <p className="mt-2 text-sm md:text-base font-medium text-gray-800 text-center">
+                <p className="mt-2 text-sm md:text-base font-medium text-gray-800 text-center uppercase">
                   {item.label}
                 </p>
               </div>
@@ -446,9 +456,11 @@ const Home = () => {
         </div>
       </section>
 
-      <Container>
+      <Container padding={false}>
         <div className="flex flex-col gap-8 w-full border-t-2 border-gray-300 py-8">
-          <h1 className="text-title font-semibold ">Platform inclusions.</h1>
+           <h2 className="text-2xl md:text-3xl font-medium text-left mb-10 text-gray-700">
+            Platform Inclusions.
+          </h2>
           <div className="grid grid-cols-2 md:grid-cols-3  lg:grid-cols-5 gap-x-16 md:gap-x-16 lg:gap-x-28 gap-y-10">
             {amenities.map((item, index) => (
               <Amenities key={index} image={item.image} title={item.title} />
@@ -456,7 +468,7 @@ const Home = () => {
           </div>
         </div>
       </Container>
-      <Container>
+      <Container padding={false}>
         <div className="flex flex-col gap-8 w-full border-t-2 border-gray-300 py-8">
           <h1 className="text-title font-semibold ">Happy customers.</h1>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-0 lg:p-6">

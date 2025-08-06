@@ -53,7 +53,7 @@ const PaginatedGrid = ({
   };
 
   return (
-    <div className="flex flex-col gap-4  overflow-y-auto  justify-between">
+    <div className="flex flex-col gap-4 min-h-[65vh] overflow-y-auto max-h-screen justify-between">
       <div className={`grid ${columns} gap-2`}>
         {currentData.length ? (
           currentData.map((item, i) => renderItem(item, i))
@@ -79,8 +79,7 @@ const PaginatedGrid = ({
                   currentPage === val
                     ? "bg-black text-white"
                     : "bg-white text-black border border-gray-300"
-                }`}
-              >
+                }`}>
                 {val}
               </button>
             )

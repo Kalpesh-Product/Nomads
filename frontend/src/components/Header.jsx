@@ -68,7 +68,7 @@ const Header = () => {
 
       {!hideMapListLinks && (
         <div>
-          <ul className="hidden xl:flex sm:hidden gap-6 justify-center flex-1">
+          <ul className="hidden xl:flex sm:hidden gap-8 justify-center flex-1">
             <>
               {/* Case 1: It's a /nomad/:country/:state page */}
               {isNomadLocation ? (
@@ -78,7 +78,7 @@ const Header = () => {
                       <div className="p-4 px-0 whitespace-nowrap">
                         <Link
                           to={`${location.pathname}?view=map`}
-                          className="group relative text-base font-medium text-black">
+                          className="group relative text-sm  text-black">
                           <span className="relative z-10 group-hover:font-bold mb-2">
                             Map view
                           </span>
@@ -93,7 +93,7 @@ const Header = () => {
                       <div className="p-4 px-0 whitespace-nowrap">
                         <Link
                           to={`${location.pathname}`}
-                          className="group relative text-base font-medium text-black">
+                          className="group relative text-md text-black">
                           <span className="relative z-10 group-hover:font-bold mb-2">
                             List view
                           </span>
@@ -111,7 +111,7 @@ const Header = () => {
                       <div className="p-4 px-0 whitespace-nowrap">
                         <Link
                           to={getListViewPath()}
-                          className="group relative text-base font-medium text-black">
+                          className="group relative text-md text-black">
                           <span className="relative z-10 group-hover:font-bold mb-2">
                             List view
                           </span>
@@ -134,7 +134,7 @@ const Header = () => {
                         {isNomadHome && (
                           <a
                             href={item.to}
-                            className="group relative text-base font-medium text-black">
+                            className="group relative font-light text-md">
                             <span className="relative z-10 group-hover:font-bold mb-8">
                               {item.text}
                             </span>
@@ -145,7 +145,7 @@ const Header = () => {
                     ) : (
                       <Link
                         to={item.to}
-                        className="group relative text-base font-medium text-black">
+                        className="group relative text-md text-black">
                         <span className="relative z-10 group-hover:font-bold mb-8">
                           {item.text}
                         </span>
@@ -160,12 +160,12 @@ const Header = () => {
         </div>
       )}
 
-      <div className="flex gap-4">
+      <div className="flex gap-6">
         <li className="flex items-center">
           <div className="p-4 px-0 whitespace-nowrap">
             <a
               href="https://wono.co"
-              className="group relative text-base font-medium text-black">
+              className="group relative text-md text-black">
               <span className="relative z-10 group-hover:font-bold mb-8">
                 Become a host
               </span>
@@ -213,7 +213,7 @@ const Header = () => {
             {headerLinks.map((item) => (
               <li key={item.id} className="items-center text-center">
                 <div onClick={() => handleNavigation(item.to)} className="py-4">
-                  <p className="text-primary">{item.text}</p>
+                  <p className="text-primary text-lg">{item.text}</p>
                 </div>
                 <div className="h-[0.2px] bg-gray-300"></div>
               </li>

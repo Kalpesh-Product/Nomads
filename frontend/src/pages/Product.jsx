@@ -257,7 +257,7 @@ const Product = () => {
                 </div>
                 <div className="w-full">
                   <p className="text-tiny ">
-                    One of the most loved homes on WoNo, according to guests
+                    One of the most loved places on WoNo, according to guests
                   </p>
                 </div>
                 <div className="flex w-1/2 gap-4 justify-end">
@@ -453,27 +453,11 @@ const Product = () => {
                 Inclusions not available
               </div>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-24 gap-y-10">
-                {allAmenities.map((item, index) => {
-                  let style = {};
-
-                  // If item is in the last row and it's an incomplete row
-                  if (index >= lastRowStartIndex && remainder !== 0) {
-                    const span = Math.floor(columns / remainder); // Span per item
-                    style = { gridColumn: `span ${span}` };
-                  }
-
-                  return (
-                    <div
-                      key={index}
-                      style={style}
-                      className="flex justify-center"
-                    >
-                      <Amenities image={item.image} title={item.title} />
-                    </div>
-                  );
-                })}
-              </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-24 gap-y-10">
+              {allAmenities.map((item, index) => (
+                <Amenities key={index} image={item.image} title={item.title} />
+              ))}
+            </div>
             )}
           </div>
 
@@ -489,7 +473,7 @@ const Product = () => {
 
               <p className="text-subtitle  my-4 font-medium">Guest favorite</p>
               <span className="text-content text-center">
-                This home is a guest favourite based on <br /> ratings, reviews
+                This place is a guest favourite based on <br /> ratings, reviews
                 and reliability
               </span>
             </div>
@@ -520,7 +504,7 @@ const Product = () => {
             </div>
             <hr className="my-5 lg:my-10" />
             <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-2 gap-10 pb-20">
-              <div className="flex flex-col items-center col-span-1  shadow-md gap-4 border-2 rounded-xl p-4 w-full">
+              <div className="flex flex-col items-center col-span-1 border-2 shadow-md gap-4 rounded-xl p-4 w-full">
                 <div className="flex flex-col gap-4 justify-center items-center">
                   <div className="h-20 w-20 overflow-hidden rounded-full">
                     <img
@@ -529,7 +513,7 @@ const Product = () => {
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <div className="text-center">
+                  <div className="text-center space-y-3">
                     <h1 className="text-title font-semibold">
                       {companyDetails?.pocs?.name || "Unknown"}
                     </h1>
@@ -551,7 +535,7 @@ const Product = () => {
                   </ul>
                 </div>
               </div>
-              <div className="flex w-full">
+              <div className="flex w-full border-2 shadow-md">
                 <div className="flex flex-col  h-full gap-4 rounded-xl p-6 w-full lg:w-full justify-between">
                   <h1 className="text-title font-semibold">Connect With Us</h1>
                   <form
