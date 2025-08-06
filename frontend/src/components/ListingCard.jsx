@@ -57,7 +57,8 @@ const ListingCard = ({ item, handleNavigation }) => {
             {item.city || "Unknown"}, {item.state || "Unknown"}
           </p>
           <p className="text-sm font-semibold">
-            Reviews ({item.reviewCount || 0})
+            <span className="font-normal">Reviews</span> (
+            {item.reviewCount || 0})
           </p>
         </div>
       </div>

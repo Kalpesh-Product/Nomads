@@ -13,6 +13,8 @@ import GlobalListings from "./pages/GlobalListings";
 import GlobalListingsMap from "./pages/GlobalListingsMap";
 import DestinationNews from "./pages/DestinationNews";
 import LocalBlog from "./pages/LocalBlog";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 
 const router = createBrowserRouter([
   {
@@ -68,6 +70,14 @@ const router = createBrowserRouter([
           {
             path: "career/job/:id",
             element: <JobDetails />,
+          },
+          {
+            path: "login",
+            element: <Login />,
+          },
+          {
+            path: "signup",
+            element: <Signup />,
           },
         ],
       },
