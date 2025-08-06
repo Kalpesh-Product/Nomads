@@ -43,8 +43,6 @@ export const bulkInsertPrivateStay = async (req, res, next) => {
           registeredEntityName: registeredEntityName?.trim(),
           website: website?.trim(),
           address: address?.trim(),
-          country: "India",
-          state: "Goa",
           city: city?.trim(),
           about: about?.trim(),
           latitude: parseFloat(latitude) || undefined,
