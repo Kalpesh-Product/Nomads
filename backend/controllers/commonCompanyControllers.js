@@ -26,7 +26,7 @@ export const getCompanyDataLocationWise = async (req, res, next) => {
     } else if (category?.toLowerCase() === "coliving") {
       const colivingData = await fetchColivingData(country, state);
       return res.status(200).json(colivingData);
-    } else if (category?.toLowerCase() === "hostel") {
+    } else if (category?.toLowerCase() === "hostels") {
       const hostelData = await fetchHostelData(country, state);
       return res.status(200).json(hostelData);
     } else {
@@ -106,7 +106,7 @@ export const getIndividualCompany = async (req, res, next) => {
         reviews,
       };
       return res.status(200).json(companyObject);
-    } else if (type?.toLowerCase() === "hostel") {
+    } else if (type?.toLowerCase() === "hostels") {
       const company = await Hostels.findOne({ _id: companyId }).lean().exec();
 
       const [inclusions, pocs, units, reviews] = await Promise.all([
