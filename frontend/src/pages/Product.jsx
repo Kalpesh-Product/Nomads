@@ -250,12 +250,7 @@ const Product = () => {
                 <div className="flex w-1/2 gap-4 justify-end">
                   <div className="flex flex-col gap-4 justify-center items-center">
                     <p className="text-subtitle lg:text-title">
-                      {(
-                        companyDetails?.reviews.reduce(
-                          (sum, r) => sum + r.starCount,
-                          0
-                        ) / companyDetails?.reviews?.length
-                      ).toFixed(1) || 0}
+                      {companyDetails?.ratings}
                     </p>
                     <span className="text-sm flex lg:text-small font-medium">
                       {renderStars(
@@ -450,14 +445,7 @@ const Product = () => {
             <div className="flex flex-col justify-center items-center max-w-4xl mx-auto">
               <h1 className="text-main-header font-medium mt-5">
                 <LeafRatings
-                  ratings={
-                    (
-                      companyDetails?.reviews?.reduce(
-                        (sum, r) => sum + r.starCount,
-                        0
-                      ) / companyDetails?.reviews?.length
-                    ).toFixed(1) || 0
-                  }
+                  ratings={companyDetails?.ratings || 0}
                   align="items-start"
                 />
               </h1>
@@ -469,8 +457,8 @@ const Product = () => {
               </span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-0 lg:p-6">
-              {reviewData.length > 0 ? (
-                reviewData.slice(0, 6).map((review, index) => (
+              {companyDetails?.reviews?.length > 0 ? (
+                companyDetails?.reviews?.slice(0, 6).map((review, index) => (
                   <ReviewCard
                     handleClick={() => {
                       setSelectedReview(review);

@@ -37,7 +37,7 @@ const Listings = () => {
   ];
   const categoryOptions = [
     { label: "Co-Working", value: "coworking" },
-    { label: "Hostels", value: "hostels" },
+    { label: "Hostel", value: "hostel" },
     { label: "Cafe’s/Meeting Rooms", value: "cafeMeetings" },
     { label: "Private Stay", value: "privateStay" },
     { label: "Co-Living", value: "coliving" },
@@ -201,7 +201,8 @@ const Listings = () => {
 
               <form
                 onSubmit={handleSubmit(onSubmit)}
-                className=" flex justify-around w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center">
+                className=" flex justify-around w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
+              >
                 <Controller
                   name="country"
                   control={control}
@@ -248,7 +249,8 @@ const Listings = () => {
                 />
                 <button
                   type="submit"
-                  className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full">
+                  className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full"
+                >
                   <IoSearch />
                 </button>
               </form>
@@ -381,10 +383,12 @@ const Listings = () => {
             <div className="pb-6">
               <p>
                 Over {listingsData?.length - 1}{" "}
-                {formData.category === "coworking" ? "Co-Working" : "Co-Living"}{" "}
+                {formData.category?.charAt(0).toUpperCase() +
+                  formData.category?.slice(1)}{" "}
                 Spaces
               </p>
             </div>
+
             <div>
               <PaginatedGrid
                 data={listingsData}

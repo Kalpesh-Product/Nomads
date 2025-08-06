@@ -1,6 +1,6 @@
 const newIcons = {
   coworking: "/icons-new/coWorking.png",
-  hostels: "/icons-new/hostels.png",
+  hostel: "/icons-new/hostels.png",
   cafeMeetings: "/icons-new/cafe-meetings.png",
   privateStay: "/icons-new/privateStay.png",
   coliving: "/icons-new/coliving.png",
