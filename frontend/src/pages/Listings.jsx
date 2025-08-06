@@ -107,7 +107,7 @@ const Listings = () => {
         lng: item.longitude,
         name: item.companyName,
         location: item.city,
-        reviews: item.reviews.length,
+        reviews: item.reviews?.length,
         rating: item.reviews?.length
           ? (() => {
               const avg =
