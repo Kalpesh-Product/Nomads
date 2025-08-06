@@ -405,7 +405,15 @@ const GlobalListingsMap = () => {
 
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
                         {displayItems.map((item) => (
-                          <ListingCard key={item._id} item={item} />
+                          <ListingCard
+                            key={item._id}
+                            item={item}
+                            handleNavigation={() =>
+                              navigate(`/nomad/listings/${item.companyName}`, {
+                                state: { companyId: item._id, type: item.type },
+                              })
+                            }
+                          />
                         ))}
                       </div>
 
