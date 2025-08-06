@@ -73,8 +73,7 @@ const MainPage = () => {
             {slides.map((slide, index) => (
               <div
                 key={index}
-                className="keen-slider__slide flex flex-col items-center gap-4 text-center"
-              >
+                className="keen-slider__slide flex flex-col items-center gap-4 text-center">
                 <img
                   src={slide.image}
                   alt={`Slide ${index + 1}`}
@@ -90,14 +89,14 @@ const MainPage = () => {
             <PrimaryButton
               title="For Nomads"
               handleSubmit={() => navigate("nomad")}
-              externalStyles="bg-[#FF5757] text-sm flex lg:text-2xl text-white font-bold capatilize hover:bg-[#E14C4C] w-[16rem] px-6"
+              externalStyles="bg-[#FF5757] text-[1.25rem] flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[16rem] px-6"
             />
             <PrimaryButton
               title="For Hosts"
               handleSubmit={() =>
                 (window.location.href = "https://www.wono.co")
               }
-              externalStyles="bg-[#FF5757] text-sm flex lg:text-2xl text-white font-bold capatilize hover:bg-[#E14C4C] w-[16rem] px-6"
+              externalStyles="bg-[#FF5757] text-[1.25rem] flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[16rem] px-6"
             />
           </div>
         </article>
