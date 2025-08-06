@@ -2,8 +2,7 @@ import mongoose from "mongoose";
 
 const hostelUnitsSchema = new mongoose.Schema(
   {
-    businessId: { type: String, required: true, unique: true },
-    businessName: { type: String, required: true },
+    hostel: { type: mongoose.Schema.Types.ObjectId, ref: "Hostel" },
     units: [String],
   },
   {

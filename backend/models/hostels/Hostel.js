@@ -13,7 +13,6 @@ const hostelSchema = new mongoose.Schema(
     },
     registeredEntityName: {
       type: String,
-      required: true,
     },
     website: {
       type: String,
@@ -31,6 +30,12 @@ const hostelSchema = new mongoose.Schema(
     city: {
       type: String,
       required: true,
+    },
+    country: {
+      type: String,
+    },
+    state: {
+      type: String,
     },
     about: {
       type: String,

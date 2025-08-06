@@ -6,23 +6,35 @@ const hostelPointOfContact = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Hostel",
     },
-    poc: {
-      name: { type: String, required: true },
-      image: { type: String },
-      designation: { type: String },
-      email: { type: String, required: true },
-      phoneNumber: { type: String, required: true },
-      linkedInProfile: { type: String },
+    name: {
+      type: String,
     },
-    languages: {
-      type: [String], 
-      default: [],
+    designation: {
+      type: String,
+    },
+    email: {
+      type: String,
+    },
+    phone: {
+      type: String,
+    },
+    linkedInProfile: {
+      type: String,
+    },
+    languagesSpoken: {
+      type: [String],
     },
     address: {
       type: String,
-      required: true,
     },
-    availabilityTime: {
+    profileImage: {
+      type: String,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+    availibilityTime: {
       type: String,
     },
   },
@@ -30,7 +42,7 @@ const hostelPointOfContact = new mongoose.Schema(
 );
 
 const HostelPointOfContact = mongoose.model(
-  "BusinessDetails",
+  "HostelPointOfContact",
   hostelPointOfContact
 );
 
