@@ -26,8 +26,6 @@ export const bulkInsertHostels = async (req, res, next) => {
           website: row["Website"]?.trim(),
           address: row["Address"]?.trim(),
           city: row["City"]?.trim(),
-          country: "India",
-          state: "Goa",
           about: row["About"]?.trim(),
           latitude: row["Latitude"] ? parseFloat(row["Latitude"]) : undefined,
           longitude: row["Longitude"]

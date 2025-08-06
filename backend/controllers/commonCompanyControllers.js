@@ -22,6 +22,11 @@ import PrivateStayPointOfContact from "../models/private-stay/PointOfContact.js"
 import PrivateStayReview from "../models/private-stay/Reviews.js";
 import PrivateStayUnit from "../models/private-stay/Units.js";
 import fetchPrivateStayData from "../utils/fetchPrivateStayData.js";
+import Cafe from "../models/cafe/Cafe.js";
+import CafeInclusions from "../models/cafe/Inclusions.js";
+import CafePoc from "../models/cafe/PointOfContact.js";
+import CafeReview from "../models/cafe/Review.js";
+import fetchCafeData from "../utils/fetchCafeData.js";
 
 export const getCompanyDataLocationWise = async (req, res, next) => {
   try {
@@ -35,24 +40,34 @@ export const getCompanyDataLocationWise = async (req, res, next) => {
     } else if (category?.toLowerCase() === "hostel") {
       const hostelData = await fetchHostelData(country, state);
       return res.status(200).json(hostelData);
-    } else if (category?.toLowerCase() === "private-stay") {
+    } else if (category?.toLowerCase() === "privatestay") {
       const privateStayData = await fetchPrivateStayData(country, state);
       return res.status(200).json(privateStayData);
+    } else if (category?.toLowerCase() === "cafe") {
+      const cafeData = await fetchCafeData(country, state);
+      return res.status(200).json(cafeData);
     } else {
-      const [coworkingData, colivingData, hostelData, privateStayData] =
-        await Promise.all([
-          fetchCoworkingData(country, state),
-          fetchColivingData(country, state),
-          fetchHostelData(country, state),
-          fetchPrivateStayData(country, state),
-        ]);
+      const [
+        coworkingData,
+        colivingData,
+        hostelData,
+        privateStayData,
+        cafeData,
+      ] = await Promise.all([
+        fetchCoworkingData(country, state),
+        fetchColivingData(country, state),
+        fetchHostelData(country, state),
+        fetchPrivateStayData(country, state),
+        fetchCafeData(country, state),
+      ]);
       return res
         .status(200)
         .json([
           ...coworkingData,
           ...colivingData,
           ...hostelData,
-          privateStayData,
+          ...privateStayData,
+          ...cafeData,
         ]);
     }
   } catch (error) {
@@ -146,7 +161,7 @@ export const getIndividualCompany = async (req, res, next) => {
         reviews,
       };
       return res.status(200).json(companyObject);
-    } else if (type?.toLowerCase() === "private-stay") {
+    } else if (type?.toLowerCase() === "privatestay") {
       const company = await PrivateStay.findOne({ _id: companyId })
         .lean()
         .exec();
@@ -173,7 +188,23 @@ export const getIndividualCompany = async (req, res, next) => {
         units,
         reviews,
       };
+      return res.status(200).json(companyObject);
+    } else if (type?.toLowerCase() === "cafe") {
+      const company = await Cafe.findOne({ _id: companyId }).lean().exec();
 
+      const [inclusions, pocs, reviews] = await Promise.all([
+        CafeInclusions.findOne({ cafe: company._id }).lean().exec(),
+        CafePoc.findOne({ cafe: company._id, isActive: true }).lean().exec(),
+        CafeReview.find({ cafe: company._id }).lean().exec(),
+      ]);
+
+      const companyObject = {
+        ...company,
+        reviewCount: company.reviews,
+        inclusions,
+        pocs,
+        reviews,
+      };
       return res.status(200).json(companyObject);
     }
 

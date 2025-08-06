@@ -27,13 +27,13 @@ const fetchPrivateStayData = async (country, state) => {
         (item) => item.privateStay?.toString() === stayId
       ),
       pointOfContacts: pocs.filter(
-        (item) => item.privateStayCompany?.toString() === stayId
+        (item) => item.privateStay?.toString() === stayId
       ),
       units: units.filter((item) => item.privateStay?.toString() === stayId),
       reviews: reviews.filter(
-        (item) => item.privateStay?.toString() === stayId
+        (item) => item?.privateStay?.toString() === stayId
       ),
-      type: "private-stay",
+      type: "privateStay",
     };
   });
 };
