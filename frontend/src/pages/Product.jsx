@@ -18,6 +18,7 @@ import renderStars from "../utils/renderStarts";
 import relativeTime from "dayjs/plugin/relativeTime";
 import MuiModal from "../components/Modal";
 import Map from "../components/Map";
+import LeafWrapper from "../components/LeafWrapper";
 
 dayjs.extend(relativeTime);
 
@@ -145,26 +146,26 @@ const Product = () => {
         date: dayjs(item.createdAt).fromNow(),
       }));
 
-  const forMapsData ={
-        id: companyDetails?._id,
-        lat: companyDetails?.latitude,
-        lng: companyDetails?.longitude,
-        name: companyDetails?.companyName,
-        location: companyDetails?.city,
-        reviews: companyDetails?.reviews.length,
-        rating: companyDetails?.reviews?.length
-          ? (() => {
-              const avg =
-                companyDetails?.reviews.reduce((sum, r) => sum + r.starCount, 0) /
-                companyDetails?.reviews.length;
-              return avg % 1 === 0 ? avg : avg.toFixed(1);
-            })()
-          : "0",
-        image:
-          "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
-      };
+  const forMapsData = {
+    id: companyDetails?._id,
+    lat: companyDetails?.latitude,
+    lng: companyDetails?.longitude,
+    name: companyDetails?.companyName,
+    location: companyDetails?.city,
+    reviews: companyDetails?.reviews.length,
+    rating: companyDetails?.reviews?.length
+      ? (() => {
+          const avg =
+            companyDetails?.reviews.reduce((sum, r) => sum + r.starCount, 0) /
+            companyDetails?.reviews.length;
+          return avg % 1 === 0 ? avg : avg.toFixed(1);
+        })()
+      : "0",
+    image:
+      "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
+  };
 
-  const mapsData = [forMapsData]
+  const mapsData = [forMapsData];
 
   return (
     <div>
@@ -234,8 +235,12 @@ const Product = () => {
             <div className="flex flex-col gap-4">
               <div className="border-2 rounded-xl flex flex-col lg:flex-row gap-4 items-center p-4">
                 <div className="text-tiny w-1/4">
-                  <p>Guest</p>
-                  <p>favorite</p>
+                  <LeafWrapper height="3rem" width="4rem">
+                    <div className="text-black font-semibold flex flex-col gap-1 items-center">
+                      <span>Guest</span>
+                      <span>Favorite</span>
+                    </div>
+                  </LeafWrapper>
                 </div>
                 <div className="w-full">
                   <p className="text-tiny ">
@@ -243,20 +248,14 @@ const Product = () => {
                   </p>
                 </div>
                 <div className="flex w-1/2 gap-4 justify-end">
-                  <div className="flex flex-col gap-1 justify-center items-center">
-                    <p className="text-tiny">
-                      <LeafRatings
-                        ratings={
-                          (
-                            companyDetails?.reviews.reduce(
-                              (sum, r) => sum + r.starCount,
-                              0
-                            ) / companyDetails?.reviews?.length
-                          ).toFixed(1) || 0
-                        }
-                        height={30}
-                        width={30}
-                      />
+                  <div className="flex flex-col gap-4 justify-center items-center">
+                    <p className="text-subtitle lg:text-title">
+                      {(
+                        companyDetails?.reviews.reduce(
+                          (sum, r) => sum + r.starCount,
+                          0
+                        ) / companyDetails?.reviews?.length
+                      ).toFixed(1) || 0}
                     </p>
                     <span className="text-sm flex lg:text-small font-medium">
                       {renderStars(
@@ -471,7 +470,7 @@ const Product = () => {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-0 lg:p-6">
               {reviewData.length > 0 ? (
-                reviewData.slice(0,6).map((review, index) => (
+                reviewData.slice(0, 6).map((review, index) => (
                   <ReviewCard
                     handleClick={() => {
                       setSelectedReview(review);
