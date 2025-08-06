@@ -1,13 +1,16 @@
-import CoworkingCompany from "../models/coworking/CoworkingCompany.js";
-import CoworkingInclusions from "../models/coworking/Inclusions.js";
-import CoworkingReviews from "../models/coworking/Review.js";
-import CoworkingServices from "../models/coworking/Services.js";
-import CoworkingPointOfContact from "../models/coworking/PointOfContact.js";
+import fetchCoworkingData from "../utils/fetchCoworkingData.js";
+import fetchColivingData from "../utils/fetchColivingData.js";
+import fetchHostelData from "../utils/fetchHostelData.js";
 import ColivingCompany from "../models/coliving/ColivingCompany.js";
 import ColivingInclusions from "../models/coliving/ColivingInclusions.js";
 import ColivingReviews from "../models/coliving/Reviews.js";
 import ColivingPointOfContact from "../models/coliving/PointOfContact.js";
 import ColivingUnits from "../models/coliving/Units.js";
+import CoworkingCompany from "../models/coworking/CoworkingCompany.js";
+import CoworkingInclusions from "../models/coworking/Inclusions.js";
+import CoworkingReviews from "../models/coworking/Review.js";
+import CoworkingServices from "../models/coworking/Services.js";
+import CoworkingPointOfContact from "../models/coworking/PointOfContact.js";
 import Hostels from "../models/hostels/Hostel.js";
 import HostelReviews from "../models/hostels/Review.js";
 import HostelPointOfContact from "../models/hostels/PointOfContact.js";
@@ -17,135 +20,14 @@ import HostelInclusions from "../models/hostels/Inclusions.js";
 export const getCompanyDataLocationWise = async (req, res, next) => {
   try {
     const { country, state, category } = req.query;
-
-    const countryRegex = { $regex: `^${country}$`, $options: "i" };
-    const stateRegex = { $regex: `^${state}$`, $options: "i" };
-
-    const fetchCoworkingData = async () => {
-      const [
-        coworkingCompanies,
-        coworkingInclusions,
-        coworkingPoc,
-        coworkingServices,
-        coworkingReviews,
-      ] = await Promise.all([
-        CoworkingCompany.find({ country: countryRegex, state: stateRegex })
-          .lean()
-          .exec(),
-        CoworkingInclusions.find().lean().exec(),
-        CoworkingPointOfContact.find({ isActive: true }).lean().exec(),
-        CoworkingServices.find().lean().exec(),
-        CoworkingReviews.find().lean().exec(),
-      ]);
-
-      return coworkingCompanies.map((company) => {
-        const companyId = company._id.toString();
-        return {
-          ...company,
-          reviewCount: company.reviews,
-          inclusions: coworkingInclusions.filter(
-            (item) => item.coworkingCompany?.toString() === companyId
-          ),
-          pointOfContacts: coworkingPoc.filter(
-            (item) => item.coworkingCompany?.toString() === companyId
-          ),
-          services: coworkingServices.filter(
-            (item) => item.coworkingCompany?.toString() === companyId
-          ),
-          reviews: coworkingReviews.filter(
-            (item) => item.coworkingCompany?.toString() === companyId
-          ),
-          type: "coworking",
-        };
-      });
-    };
-
-    const fetchColivingData = async () => {
-      const [
-        colivingCompanies,
-        colivingInclusions,
-        colivingPoc,
-        colivingUnits,
-        colivingReviews,
-      ] = await Promise.all([
-        ColivingCompany.find({ country: countryRegex, state: stateRegex })
-          .lean()
-          .exec(),
-        ColivingInclusions.find().lean().exec(),
-        ColivingPointOfContact.find({ isActive: true }).lean().exec(),
-        ColivingUnits.find().lean().exec(),
-        ColivingReviews.find().lean().exec(),
-      ]);
-
-      return colivingCompanies.map((company) => {
-        const companyId = company._id.toString();
-        return {
-          ...company,
-          reviewCount: company.reviews,
-          inclusions: colivingInclusions.filter(
-            (item) => item.colivingCompany?.toString() === companyId
-          ),
-          pointOfContacts: colivingPoc.filter(
-            (item) => item.colivingCompany?.toString() === companyId
-          ),
-          units: colivingUnits.filter(
-            (item) => item.businessId?.toString() === companyId
-          ),
-          reviews: colivingReviews.filter(
-            (item) => item.colivingCompany?.toString() === companyId
-          ),
-          type: "coliving",
-        };
-      });
-    };
-
-    const fetchHostelData = async () => {
-      const [
-        hostelCompanies,
-        hostelInclusions,
-        hostelPoc,
-        hostelUnits,
-        hostelReviews,
-      ] = await Promise.all([
-        Hostels.find({ country: countryRegex, state: stateRegex })
-          .lean()
-          .exec(),
-        HostelInclusions.find().lean().exec(),
-        HostelPointOfContact.find({ isActive: true }).lean().exec(),
-        HostelUnits.find().lean().exec(),
-        HostelReviews.find().lean().exec(),
-      ]);
-
-      return hostelCompanies.map((company) => {
-        const companyId = company._id.toString();
-        return {
-          ...company,
-          reviewCount: company.reviews,
-          inclusions: hostelInclusions.filter(
-            (item) => item.hostelCompany?.toString() === companyId
-          ),
-          pointOfContacts: hostelPoc.filter(
-            (item) => item.hostelCompany?.toString() === companyId
-          ),
-          units: hostelUnits.filter(
-            (item) => item.businessId?.toString() === companyId
-          ),
-          reviews: hostelReviews.filter(
-            (item) => item.hostelCompany?.toString() === companyId
-          ),
-          type: "hostel",
-        };
-      });
-    };
-
     if (category?.toLowerCase() === "coworking") {
-      const coworkingData = await fetchCoworkingData();
+      const coworkingData = await fetchCoworkingData(country, state);
       return res.status(200).json(coworkingData);
     } else if (category?.toLowerCase() === "coliving") {
-      const colivingData = await fetchColivingData();
+      const colivingData = await fetchColivingData(country, state);
       return res.status(200).json(colivingData);
     } else if (category?.toLowerCase() === "hostel") {
-      const hostelData = await fetchHostelData();
+      const hostelData = await fetchHostelData(country, state);
       return res.status(200).json(hostelData);
     } else {
       const [coworkingData, colivingData, hostelData] = await Promise.all([
