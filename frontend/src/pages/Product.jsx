@@ -93,6 +93,19 @@ const Product = () => {
     }));
 
   const allAmenities = [...amenities, ...transportAmenities];
+  const total = allAmenities.length;
+  const columns = 6;
+  const remainder = total % columns;
+  const lastRowStartIndex = remainder === 0 ? -1 : total - remainder;
+
+  // Tailwind-safe col-span mapping for remainder values
+  const colSpanSafeMap = {
+    1: "lg:col-span-6",
+    2: "lg:col-span-3",
+    3: "lg:col-span-2",
+    4: "lg:col-span-3 ",
+    5: "lg:col-span-2",
+  };
 
   const { handleSubmit, control, reset } = useForm({
     defaultValues: {
@@ -261,8 +274,8 @@ const Product = () => {
                       )}
                     </span>
                   </div>
-                  <div className="flex flex-col gap-4 lg:gap-4 justify-center items-center">
-                    <p className="text-subtitle lg:text-title">
+                  <div className="flex flex-col gap-4 lg:gap-3 justify-center items-center">
+                    <p className="text-subtitle lg:text-title mt-1">
                       {companyDetails?.reviews?.length || 0}
                     </p>
                     <span className="text-small font-medium">Reviews</span>
@@ -441,13 +454,25 @@ const Product = () => {
               </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-24 gap-y-10">
-                {allAmenities.map((item, index) => (
-                  <Amenities
-                    key={index}
-                    image={item.image}
-                    title={item.title}
-                  />
-                ))}
+                {allAmenities.map((item, index) => {
+                  let style = {};
+
+                  // If item is in the last row and it's an incomplete row
+                  if (index >= lastRowStartIndex && remainder !== 0) {
+                    const span = Math.floor(columns / remainder); // Span per item
+                    style = { gridColumn: `span ${span}` };
+                  }
+
+                  return (
+                    <div
+                      key={index}
+                      style={style}
+                      className="flex justify-center"
+                    >
+                      <Amenities image={item.image} title={item.title} />
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>

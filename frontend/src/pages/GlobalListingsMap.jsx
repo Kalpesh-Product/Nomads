@@ -364,8 +364,8 @@ const GlobalListingsMap = () => {
       <hr />
       <Container padding={false}>
         <div className="">
-          <div className="font-semibold text-lg  grid grid-cols-9 gap-4">
-            <div className=" h-[36rem] overflow-auto custom-scrollbar-hide col-span-5">
+          <div className="font-semibold text-lg  grid grid-cols-9 gap-4 min-h-screen">
+            <div className=" custom-scrollbar-hide col-span-5">
               {isLisitingLoading ? (
                 Array.from({ length: 4 }).map((_, i) => (
                   <SkeletonCard key={i} />
@@ -439,7 +439,7 @@ const GlobalListingsMap = () => {
                 </div>
               )}
             </div>
-            <div className="col-span-4">
+            <div className="col-span-4 sticky top-24 h-[80vh]">
               <div className="rounded-xl h-[40rem] overflow-hidden">
                 {isLisitingLoading ? (
                   <SkeletonMap />
@@ -451,7 +451,7 @@ const GlobalListingsMap = () => {
                   </div>
                 )}
               </div>
-            </div>
+            </div>  
           </div>
         </div>
       </Container>

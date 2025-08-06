@@ -341,7 +341,7 @@ const GlobalListingsList = () => {
       <Container padding={false}>
         <div className="">
           <div className="font-semibold text-lg">
-            <div className="pr-0 lg:pr-10 h-[36rem] overflow-auto custom-scrollbar-hide">
+            <div className=" custom-scrollbar-hide">
               {isLisitingLoading ? (
                 Array.from({ length: 4 }).map((_, i) => (
                   <SkeletonCard key={i} />
