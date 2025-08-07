@@ -2,25 +2,23 @@ import React from 'react';
 
 const LeafWrapper = ({ children, height, width, align = "" }) => {
   return (
-    <div className={`flex ${align || "items-center"} gap-0`}>
+    <div className={`flex ${align || "items-start"} gap-2`}>
       <div
         style={{ height: height || "100%", width: width || "5rem" }}
-        className="w-20 overflow-hidden"
       >
         <img
-          src="/images/leaf-left.png"
-          alt="leaf-left"
+          src="/svg/LeafL.svg"
+          alt="leaf-front"
           className="h-full w-full object-contain"
         />
       </div>
       <div className="mt-0">{children}</div>
       <div
         style={{ height: height || "100%", width: width || "5rem" }}
-        className="h-full w-20 overflow-hidden"
       >
         <img
-          src="/images/leaf-right.png"
-          alt="leaf-right"
+          src="/svg/LeafR.svg"
+          alt="leaf-rear"
           className="h-full w-full object-contain"
         />
       </div>

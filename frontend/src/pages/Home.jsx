@@ -187,7 +187,7 @@ const Home = () => {
     { image: icons.housekeeping, title: "HOUSEKEEPING" },
     { image: icons.pool, title: "SWIMMING POOL" },
     { image: icons.television, title: "TELEVISION" },
-    { image: icons.gas, title: "GAS" },
+    { image: icons.stationery, title: "STATIONERY" },
     { image: icons.laundry, title: "LAUNDRY" },
     { image: icons.secure, title: "SECURE" },
     { image: icons.personalised, title: "PERSONALISED" },
@@ -210,7 +210,8 @@ const Home = () => {
           <div className="flex flex-col  gap-4 justify-between items-center">
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center">
+              className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
+            >
               <Controller
                 name="country"
                 control={control}
@@ -257,7 +258,8 @@ const Home = () => {
               />
               <button
                 type="submit"
-                className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full">
+                className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full"
+              >
                 <IoSearch />
               </button>
             </form>
@@ -266,7 +268,8 @@ const Home = () => {
         <div className="lg:hidden flex w-full items-center justify-center my-4">
           <button
             onClick={() => setShowMobileSearch(true)}
-            className="bg-white flex items-center w-full text-black border-2 px-6 py-3 rounded-full">
+            className="bg-white flex items-center w-full text-black border-2 px-6 py-3 rounded-full"
+          >
             <IoSearch className="inline mr-2" />
             Start Search
           </button>
@@ -280,12 +283,14 @@ const Home = () => {
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ duration: 0.3 }}
-            className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl z-50 p-4 rounded-t-3xl h-[50vh] lg:hidden">
+            className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl z-50 p-4 rounded-t-3xl h-[50vh] lg:hidden"
+          >
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold">Search</h3>
               <button
                 onClick={() => setShowMobileSearch(false)}
-                className="text-gray-500 text-xl">
+                className="text-gray-500 text-xl"
+              >
                 &times;
               </button>
             </div>
@@ -337,7 +342,8 @@ const Home = () => {
               />
               <button
                 type="submit"
-                className="w-full bg-[#FF5757] text-white py-3 rounded-full">
+                className="w-full bg-[#FF5757] text-white py-3 rounded-full"
+              >
                 <IoSearch className="inline mr-2" />
                 Search
               </button>
@@ -348,18 +354,18 @@ const Home = () => {
 
       <Container padding={false}>
         <section className="w-full   bg-white pb-12">
-          <div className=" flex flex-col lg:flex-row items-strech justify-between h-full gap-12">
+          <div className=" flex flex-col tab:flex-col lg:flex-row items-strech justify-between h-full gap-12">
             {/* Left: Text */}
             <div className="lg:w-1/2 flex flex-col h-full justify-between gap-10 text-center md:text-start">
-              <div className="text-3xl md:text-7xl lg:text-7xl font-light text-primary-blue text-center font-play leading-relaxed lg:space-y-6 lg:leading-normal">
+              <div className=" font-light text-primary-blue text-center font-play leading-relaxed lg:space-y-6 lg:leading-normal">
                 <div className="text-center">
-                  <span className="text-[4rem] font-medium">Building the</span>
+                  <h1 className="text-[clamp(1rem,13.71vw,6rem)] text-nowrap">Building the</h1>
                 </div>
                 <div className="text-title font-medium">
-                  <ReactFitty>Largets Community of</ReactFitty>
+                  <h1 className="text-[clamp(1rem,7.3vw,3.3rem)] text-nowrap">Largets Community of</h1>
                 </div>
                 <div className="font-semibold">
-                  <ReactFitty>NOMADS</ReactFitty>
+                  <h1 className="text-[clamp(4rem,8vw,16rem)]">NOMADS</h1>
                 </div>
               </div>
 
@@ -392,21 +398,21 @@ const Home = () => {
 
       <section className="bg-black w-full flex flex-col gap-4 py-16 lg:py-16">
         <div className="lg:max-w-[80rem] lg:min-w-[85%] max-w-full lg:mx-auto flex flex-col text-primary-blue  justify-center items-center leading-none">
-          <div className="flex flex-col w-full font-hero px-4 md:px-0">
-            <ReactFitty>INTRODUCING</ReactFitty>
-            <ReactFitty>N-COMMERCE</ReactFitty>
+          <div className="flex flex-col text-center w-full font-hero px-4 md:px-0">
+            <h1 className="text-giant uppercase">Introducing</h1>
+            <h1 className="text-giant uppercase text-nowrap">N-COMMERCE</h1>
           </div>
 
-          <p className="uppercase text-mobile-main-header lg:text-9xl font-hero text-white pt-4 pb-20">
+          <p className="uppercase text-[clamp(2.5rem,7.3vw,7rem)] font-hero text-white pt-4 pb-20">
             ("nomad commerce")
           </p>
           {/* <div className="flex justify-center items-end w-full">
             <PrimaryButton title={"Partner now"} />
           </div> */}
-          <div className="text-white w-full text-center">
-            <ReactFitty className="text-mobile-header font-medium">
+          <div className="text-white w-full text-center px-4">
+            <h2 className="text-clamp-heading font-normal">
               End-to-end Nomad solutions for working from aspiring destinations
-            </ReactFitty>
+            </h2>
           </div>
         </div>
       </section>
@@ -427,7 +433,8 @@ const Home = () => {
                   destinationData.length % 2 !== 0
                     ? "md:col-span-2 lg:col-span-1"
                     : ""
-                }`}>
+                }`}
+              >
                 <div className="relative w-full rounded-xl overflow-hidden shadow-md">
                   <img
                     src={item.image}

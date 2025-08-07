@@ -418,7 +418,7 @@ const GlobalListingsMap = () => {
 
                   return (
                     <div key={type} className="col-span-full mb-6">
-                      <h2 className="text-subtitle font-semibold mb-5">
+                      <h2 className="text-subtitle text-secondary-dark font-semibold mb-5">
                         {sectionTitle}
                       </h2>
 
@@ -441,7 +441,7 @@ const GlobalListingsMap = () => {
                           <button
                             onClick={() => handleShowMoreClick(type)}
                             className="text-primary-blue text-sm font-semibold hover:underline">
-                            Show More →
+                            View More →
                           </button>
                         </div>
                       )}

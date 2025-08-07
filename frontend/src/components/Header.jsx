@@ -179,7 +179,7 @@ const Header = () => {
             title={"Login"}
             handleSubmit={() => navigate("/nomad/login")}
             className={
-              "bg-[#FF5757] text-[1rem] flex text-white font-[500] capatilize hover:bg-[#E14C4C] px-6"
+              "bg-[#FF5757]  flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[7rem] px-6"
             }
           />
         </div>

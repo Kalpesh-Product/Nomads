@@ -17,7 +17,7 @@ module.exports = {
         secondary: {
           DEFAULT: "#202020",
           light: "#94a3b8",
-          dark: "#475569",
+          dark: "#222222",
         },
         accent: "#f4ed4f",
       },
@@ -43,6 +43,8 @@ module.exports = {
         "mega-desc": ["5rem", { lineHeight: "8rem" }], // ~24px
         "mobile-mega-desc": ["3rem", { lineHeight: "2rem" }], // ~24px
         "mobile-mega-header": ["6rem", { lineHeight: "6rem" }], // ~24px
+        'clamp-heading': 'clamp(1.3rem, 2.5vw, 2.3rem)',
+        'giant': 'clamp(1.5rem, 20.6vw, 21rem)',
       },
       // etc...
     },

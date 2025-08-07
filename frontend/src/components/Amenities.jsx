@@ -10,7 +10,7 @@ const Amenities = ({ image, title }) => {
           alt={image || ""}
         />
       </div>
-      <p className="text-center w-full text-[0.89rem] font-semibold uppercase">
+      <p className="text-center text-secondary-dark w-full text-[0.89rem] font-semibold uppercase">
         {title || ""}
       </p>
     </div>

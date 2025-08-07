@@ -36,11 +36,11 @@ const GlobalListingsList = () => {
   const categoryOptions = [
     { label: "Co-Working", value: "coworking" },
     { label: "Hostels", value: "hostel" },
-    { label: "Cafe’s", value: "cafes" },
+    { label: "Cafe’s", value: "cafe" },
     { label: "Meeting Rooms", value: "meetingRoom" },
     { label: "Private Stay", value: "privateStay" },
     { label: "Co-Living", value: "coliving" },
-    { label: "Company Workation", value: "companyWorkation" },
+    { label: "Company Workation", value: "workation" },
   ];
   console.log("formData", formData);
   const handleShowMoreClick = (type) => {
@@ -400,7 +400,7 @@ const GlobalListingsList = () => {
 
                   return (
                     <div key={type} className="col-span-full mb-6">
-                      <h2 className="text-subtitle font-semibold mb-5">
+                      <h2 className="text-subtitle font-semibold mb-5 text-secondary-dark">
                         {sectionTitle}
                       </h2>
 
@@ -423,7 +423,7 @@ const GlobalListingsList = () => {
                           <button
                             onClick={() => handleShowMoreClick(type)}
                             className="text-primary-blue text-sm font-semibold hover:underline">
-                            Show More →
+                            View More →
                           </button>
                         </div>
                       )}

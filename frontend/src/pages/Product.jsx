@@ -181,11 +181,11 @@ const Product = () => {
   const mapsData = [forMapsData];
 
   return (
-    <div>
+    <div className="p-4">
       <div className="min-w-[70%] max-w-[80rem] lg:max-w-[70rem] mx-0 md:mx-auto">
         <div className="flex flex-col gap-8">
           <div className="flex w-full justify-between">
-            <h1 className="text-title font-semibold">
+            <h1 className="text-title font-semibold text-secondary-dark">
               {companyDetails?.companyName}
             </h1>
             <NavLink className={"text-small underline"}>Save</NavLink>
@@ -226,7 +226,7 @@ const Product = () => {
 
           {/* About and Location */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-8">
               <div className="w-full h-36 overflow-hidden rounded-md">
                 <img
                   src={
@@ -236,33 +236,37 @@ const Product = () => {
                   className="h-full w-full object-cover"
                 />
               </div>
-              {/* <div className="text-sm lg:text-tiny text-gray-700">
+              <div className="space-y-2">
+                <h1 className="text-title uppercase font-semibold text-secondary-dark">
+                  about
+                </h1>
+                {/* <div className="text-sm lg:text-tiny text-gray-700">
                 <MdLocationOn className="inline-block text-secondary text-subtitle mr-1" />
                 {companyDetails?.address}
               </div> */}
-              <h1 className="text-title uppercase font-semibold">about</h1>
-              <p className="text-sm">
-                {companyDetails?.about?.replace(/\\n/g, " ")}
-              </p>
+                <p className="text-sm text-secondary-dark">
+                  {companyDetails?.about?.replace(/\\n/g, " ")}
+                </p>
+              </div>
             </div>
             <div className="flex flex-col gap-4">
-              <div className="border-2 rounded-xl flex flex-col lg:flex-row gap-4 items-center p-4">
-                <div className="text-tiny w-1/4">
-                  <LeafWrapper height="3rem" width="4rem">
-                    <div className="text-black font-semibold flex flex-col gap-1 items-center">
+              <div className="border-2 rounded-xl flex  gap-1 items-center p-4">
+                <div className="text-tiny w-full hidden lg:flex justify-center items-center">
+                  <LeafWrapper height="3rem" width={"2rem"}>
+                    <div className="text-secondary-dark font-semibold flex text-subtitle flex-col leading-5  items-center">
                       <span>Guest</span>
                       <span>Favorite</span>
                     </div>
                   </LeafWrapper>
                 </div>
-                <div className="w-full">
+                <div className="w-full hidden lg:flex">
                   <p className="text-tiny ">
                     One of the most loved places on WoNo, according to guests
                   </p>
                 </div>
-                <div className="flex w-1/2 gap-4 justify-end">
-                  <div className="flex flex-col gap-4 justify-center items-center">
-                    <p className="text-subtitle lg:text-title">
+                <div className="flex w-full lg:w-1/2 gap-1 justify-end">
+                  <div className="flex flex-col gap-0 justify-center items-center">
+                    <p className="text-subtitle lg:text-subtitle">
                       {companyDetails?.ratings}
                     </p>
                     <span className="text-sm flex lg:text-small font-medium">
@@ -274,8 +278,22 @@ const Product = () => {
                       )}
                     </span>
                   </div>
-                  <div className="flex flex-col gap-4 lg:gap-3 justify-center items-center">
-                    <p className="text-subtitle lg:text-title mt-1">
+                         {/* Vertical Separator */}
+                  <div className="w-px h-10 bg-gray-300 mx-2 my-auto lg:hidden" />
+                  <div className="text-tiny w-full flex justify-center items-center lg:hidden">
+                    <LeafWrapper height="3rem" width={"2rem"}>
+                      <div className="text-secondary-dark font-semibold flex text-subtitle flex-col leading-5  items-center">
+                        <span>Guest</span>
+                        <span>Favorite</span>
+                      </div>
+                    </LeafWrapper>
+                  </div>
+
+                  {/* Vertical Separator */}
+                  <div className="w-px h-10 bg-gray-300 mx-2 my-auto" />
+
+                  <div className="flex flex-col gap-4 lg:gap-0 justify-center items-center">
+                    <p className="text-subtitle lg:text-subtitle mt-1">
                       {companyDetails?.reviews?.length || 0}
                     </p>
                     <span className="text-small font-medium">Reviews</span>
@@ -284,7 +302,7 @@ const Product = () => {
               </div>
 
               <div className="shadow-md flex flex-col gap-4 p-6 rounded-xl border-2">
-                <h1 className="text-card-title font-semibold leading-normal">
+                <h1 className="text-card-title text-secondary-dark font-semibold leading-normal">
                   Enquire & Recieve Quote
                 </h1>
                 <form
@@ -444,7 +462,7 @@ const Product = () => {
           <hr className="my-5 lg:my-10" />
           {/* Inclusions */}
           <div className="flex flex-col gap-8 w-full">
-            <h1 className="text-title font-semibold">
+            <h1 className="text-title text-secondary-dark font-semibold">
               What Inclusion does it offers
             </h1>
 
@@ -453,11 +471,15 @@ const Product = () => {
                 Inclusions not available
               </div>
             ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-24 gap-y-10">
-              {allAmenities.map((item, index) => (
-                <Amenities key={index} image={item.image} title={item.title} />
-              ))}
-            </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-24 gap-y-10">
+                {allAmenities.map((item, index) => (
+                  <Amenities
+                    key={index}
+                    image={item.image}
+                    title={item.title}
+                  />
+                ))}
+              </div>
             )}
           </div>
 
