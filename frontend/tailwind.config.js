@@ -6,6 +6,8 @@ module.exports = {
       screens: {
         xs: "375px",
         tab: "1023px",
+        afterPro: "1025px",
+        "2xlplus": "1685px", // custom breakpoint
       },
       colors: {
         primary: {
