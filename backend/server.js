@@ -27,8 +27,8 @@ import privateStayReviewRoutes from "./routes/privateStayRoutes/privateStayRevie
 import privateStayPocRoutes from "./routes/privateStayRoutes/privateStayPocRoutes.js";
 import cafeRoutes from "./routes/cafeRoutes/cafeRoutes.js";
 import cafeReviewRoutes from "./routes/cafeRoutes/cafeReviews.js";
-import cafeInclusionsRoutes from "./routes/cafeRoutes/cafeInclusionRoutes.js"
-import cafePocRoutes from "./routes/cafeRoutes/cafePocRoutes.js"
+import cafeInclusionsRoutes from "./routes/cafeRoutes/cafeInclusionRoutes.js";
+import cafePocRoutes from "./routes/cafeRoutes/cafePocRoutes.js";
 import mongoose from "mongoose";
 
 const app = express();
@@ -62,8 +62,8 @@ app.use("/api/private-stay/review", privateStayReviewRoutes);
 app.use("/api/private-stay/poc", privateStayPocRoutes);
 app.use("/api/cafe/company", cafeRoutes);
 app.use("/api/cafe/review", cafeReviewRoutes);
-app.use("/api/cafe/inclusions",cafeInclusionsRoutes)
-app.use("/api/cafe/poc",cafePocRoutes)
+app.use("/api/cafe/inclusions", cafeInclusionsRoutes);
+app.use("/api/cafe/poc", cafePocRoutes);
 app.use("/api/common", commonCompanyRoutes);
 app.use(errorHandler);
 app.listen(

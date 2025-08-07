@@ -27,6 +27,7 @@ import CafeInclusions from "../models/cafe/Inclusions.js";
 import CafePoc from "../models/cafe/PointOfContact.js";
 import CafeReview from "../models/cafe/Review.js";
 import fetchCafeData from "../utils/fetchCafeData.js";
+import { uploadFileToS3 } from "../config/s3Config.js";
 
 export const getCompanyDataLocationWise = async (req, res, next) => {
   try {
@@ -211,6 +212,63 @@ export const getIndividualCompany = async (req, res, next) => {
     return res
       .status(404)
       .json({ message: "Company not found or type invalid" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const companyModels = {
+  coworking: CoworkingCompany,
+  coliving: ColivingCompany,
+  hostels: Hostels,
+  "private-stay": PrivateStay,
+  cafe: Cafe,
+};
+
+export const uploadCompanyImages = async (req, res, next) => {
+  try {
+    const file = req.file;
+    const { type, companyType, companyId } = req.body;
+
+    const Model = companyModels[companyType?.toLowerCase()];
+    if (!Model) {
+      return res.status(400).json({ message: "Invalid company type" });
+    }
+
+    const company = await Model.findById(companyId).exec();
+    if (!company) {
+      return res.status(404).json({ message: "No such company found" });
+    }
+
+    const folderPath = `nomads/${companyType}/${company.companyName}`;
+
+    let s3Key;
+    if (type.toLowerCase() === "logo") {
+      s3Key = `${folderPath}/logo/${file?.originalname}`;
+    } else {
+      s3Key = `${folderPath}/images/${file?.originalname}`;
+    }
+
+    try {
+      const uploadedUrl = await uploadFileToS3(s3Key, file);
+
+      if (type.toLowerCase() === "logo") {
+        company.logo = uploadedUrl;
+      } else {
+        company.images.push({
+          url: uploadedUrl,
+          index: company.images.length + 1,
+        });
+      }
+
+      await company.save({ validateBeforeSave: false });
+
+      return res.status(200).json({
+        message: `Successfully uploaded ${companyType} company ${type.toLowerCase()}`,
+      });
+    } catch (uploadError) {
+      return res.status(500).json({ message: "Failed to upload image to S3" });
+    }
   } catch (error) {
     next(error);
   }

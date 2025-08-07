@@ -21,7 +21,7 @@ const hostelSchema = new mongoose.Schema(
       type: String,
     },
     images: {
-      type: [String],
+      type: [{ url: String, index: Number }],
     },
     address: {
       type: String,

@@ -1,6 +1,7 @@
 import Cafe from "../../models/cafe/Cafe.js";
 import { Readable } from "stream";
 import csvParser from "csv-parser";
+import { uploadFileToS3 } from "../../config/s3Config.js";
 
 export const bulkInsertCafe = async (req, res, next) => {
   try {
@@ -70,6 +71,36 @@ export const bulkInsertCafe = async (req, res, next) => {
       .on("error", (err) => {
         next(err);
       });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const uploadCafeImage = async (req, res, next) => {
+  try {
+    const file = req.file;
+    const { type, cafeId } = req.body;
+    if (type?.toLowerCase() === "logo") {
+      const cafe = await Cafe.findOne({ _id: cafeId }).exec();
+      if (!cafe) {
+        return res.status(404).json({ message: "No such company found" });
+      }
+      try {
+        const response = await uploadFileToS3(
+          `nomads/cafe/${cafe?.companyName}/logo/${file?.originalName}`,
+          file
+        );
+        cafe.logo = response;
+        await cafe.save({ validateBeforeSave: false });
+        return res
+          .status(400)
+          .json({ message: "Successfully uploaded cafe logo" });
+      } catch (error) {
+        return res
+          .status(500)
+          .json({ message: "Failed to upload image to S3" });
+      }
+    }
   } catch (error) {
     next(error);
   }
