@@ -435,7 +435,7 @@ const Home = () => {
                   <img
                     src={item.image}
                     alt={item.label}
-                    className="w-full h-[26rem] object-cover"
+                    className="w-full h-96 object-cover"
                   />
                   {/* <div className="absolute top-2 left-2 bg-white text-xs font-medium text-gray-700 px-2 py-1 rounded-full shadow">
                     Guest favourite
