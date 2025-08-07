@@ -371,7 +371,7 @@ const Listings = () => {
       </AnimatePresence>
       <hr />
       <Container padding={false}>
-        <div className="grid grid-cols-1 lg:grid-cols-9 gap-4 ">
+        <div className="grid grid-cols-1 lg:grid-cols-9 gap-4">
           <div className="col-span-5  font-semibold text-lg ">
             <div className="pb-6">
               <p>
@@ -386,7 +386,7 @@ const Listings = () => {
               <PaginatedGrid
                 data={listingsData}
                 entriesPerPage={6}
-                columns="grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+                columns="grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-5"
                 renderItem={(item, index) => (
                   <motion.div
                     key={item._id}

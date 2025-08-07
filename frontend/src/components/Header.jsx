@@ -178,9 +178,10 @@ const Header = () => {
           </div>
         </li>
 
-        <div className="px-1 hidden xl:flex gap-2">
+        <div className="px-1 hidden xl:flex   py-2">
           <PrimaryButton
             title={"Login"}
+            padding={"py-1"}
             handleSubmit={() => navigate("/nomad/login")}
             className={
               "bg-[#FF5757]  flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[7rem] px-6"

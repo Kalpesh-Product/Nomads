@@ -40,7 +40,7 @@ const GlobalListingsList = () => {
     { label: "Meeting Rooms", value: "meetingRoom" },
     { label: "Private Stay", value: "privateStay" },
     { label: "Co-Living", value: "coliving" },
-    { label: "Company Workation", value: "workation" },
+    { label: "Workation", value: "workation" },
   ];
   console.log("formData", formData);
   const handleShowMoreClick = (type) => {
@@ -404,7 +404,7 @@ const GlobalListingsList = () => {
                         {sectionTitle}
                       </h2>
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-x-2 gap-y-0">
+                      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-x-5 gap-y-0">
                         {displayItems.map((item) => (
                           <ListingCard
                             key={item._id}

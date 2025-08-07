@@ -214,7 +214,8 @@ const Product = () => {
                       ? "border-primary-dark"
                       : "border-transparent"
                   }`}
-                  onClick={() => setSelectedImage(item)}>
+                  onClick={() => setSelectedImage(item)}
+                >
                   <img
                     src={item.url}
                     alt="company-thumbnail"
@@ -279,7 +280,7 @@ const Product = () => {
                       )}
                     </span>
                   </div>
-                         {/* Vertical Separator */}
+                  {/* Vertical Separator */}
                   <div className="w-px h-10 bg-gray-300 mx-2 my-auto lg:hidden" />
                   <div className="text-tiny w-full flex justify-center items-center lg:hidden">
                     <LeafWrapper height="3rem" width={"2rem"}>
@@ -309,7 +310,8 @@ const Product = () => {
                 <form
                   onSubmit={handleSubmit((data) => submitEnquiry(data))}
                   action=""
-                  className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+                >
                   <Controller
                     name="fullName"
                     control={control}
@@ -375,7 +377,8 @@ const Product = () => {
                           fullWidth
                           variant="standard"
                           size="small"
-                          select>
+                          select
+                        >
                           <MenuItem value="" disabled>
                             <em>Select A Type</em>
                           </MenuItem>
@@ -395,7 +398,8 @@ const Product = () => {
                           fullWidth
                           variant="standard"
                           size="small"
-                          select>
+                          select
+                        >
                           <MenuItem value="" disabled>
                             <em>Select Number of Desk</em>
                           </MenuItem>
@@ -447,12 +451,13 @@ const Product = () => {
                       />
                     )}
                   />
-
-                  <SecondaryButton
-                    title={"Get Quote"}
-                    type={"submit"}
-                    externalStyles={"col-span-1 lg:col-span-2"}
-                  />
+                  <div className="flex justify-center items-center lg:col-span-2">
+                    <SecondaryButton
+                      title={"Get Quote"}
+                      type={"submit"}
+                      externalStyles={"w-1/2"}
+                    />
+                  </div>
                 </form>
               </div>
             </div>
@@ -560,7 +565,8 @@ const Product = () => {
                   <h1 className="text-title font-semibold">Connect With Us</h1>
                   <form
                     onSubmit={handlesubmitSales((data) => submitSales(data))}
-                    className="grid grid-cols-1 gap-4">
+                    className="grid grid-cols-1 gap-4"
+                  >
                     <Controller
                       name="fullName"
                       control={salesControl}
@@ -602,12 +608,13 @@ const Product = () => {
                         />
                       )}
                     />
-
-                    <SecondaryButton
-                      title={"Submit"}
-                      type={"submit"}
-                      externalStyles={"mt-6"}
-                    />
+                    <div className="flex justify-center items-center">
+                      <SecondaryButton
+                        title={"Submit"}
+                        type={"submit"}
+                        externalStyles={"mt-6 w-1/2"}
+                      />
+                    </div>
                   </form>
                 </div>
               </div>

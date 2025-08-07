@@ -40,7 +40,7 @@ const GlobalListingsMap = () => {
     { label: "Meeting Rooms", value: "meetingRoom" },
     { label: "Private Stay", value: "privateStay" },
     { label: "Co-Living", value: "coliving" },
-    { label: "Company Workation", value: "workation" },
+    { label: "Workation", value: "workation" },
   ];
   console.log("formData", formData);
   const typeLabels = {
@@ -422,7 +422,7 @@ const GlobalListingsMap = () => {
                         {sectionTitle}
                       </h2>
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 gap-x-2">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 gap-x-5">
                         {displayItems.map((item) => (
                           <ListingCard
                             key={item._id}

@@ -179,7 +179,7 @@ const Home = () => {
     { image: icons.teacoffee, title: "TEA & COFFEE" },
     { image: icons.assist, title: "ASSIST" },
     { image: icons.community, title: "COMMUNITY" },
-    { image: icons.ondemand, title: "ON DEMAND" },
+  { image: icons.secure, title: "SECURE" },
     { image: icons.maintenance, title: "MAINTANANCE" },
     { image: icons.generator, title: "GENERATOR" },
     { image: icons.pickupdrop, title: "PICKUP & DROP" },
@@ -187,11 +187,11 @@ const Home = () => {
     { image: icons.housekeeping, title: "HOUSEKEEPING" },
     { image: icons.pool, title: "SWIMMING POOL" },
     { image: icons.television, title: "TELEVISION" },
-    { image: icons.stationery, title: "STATIONERY" },
-    { image: icons.laundry, title: "LAUNDRY" },
-    { image: icons.secure, title: "SECURE" },
-    { image: icons.personalised, title: "PERSONALISED" },
-    { image: icons.parking, title: "PARKING" },
+    // { image: icons.stationery, title: "STATIONERY" },
+    // { image: icons.laundry, title: "LAUNDRY" },
+    // { image: icons.secure, title: "SECURE" },
+    // { image: icons.personalised, title: "PERSONALISED" },
+    // { image: icons.parking, title: "PARKING" },
     // { image: icons.yogazone, title: "YOGA ZONE" },
     // { image: icons.ergonomicenvironment, title: "Ergonomic Environment" },
     // { image: icons.officesupplies, title: "Office Supplies" },
@@ -451,7 +451,7 @@ const Home = () => {
                     <AiOutlineHeart className="text-white text-xl" />
                   </div> */}
                 </div>
-                <p className="mt-2 text-sm md:text-base font-medium text-gray-800 text-center uppercase">
+                <p className="mt-6 text-sm md:text-base font-medium text-gray-800 text-center uppercase">
                   {item.label}
                 </p>
               </div>

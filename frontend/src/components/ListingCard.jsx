@@ -43,25 +43,26 @@ const ListingCard = ({ item, handleNavigation }) => {
         </div>
       </div>
 
-      <div className="h-[25%] flex flex-col gap-1">
+      <div className="h-[25%] flex flex-col gap-1 px-2">
         <div className="flex w-full justify-between items-center">
           <p className="text-sm font-semibold">{item.companyName}</p>
-          <div className="flex items-center gap-1 text-black">
-            <AiFillStar size={16} />
-            <p className="text-sm font-semibold text-black">
-              ({item.ratings || 0})
-            </p>
-          </div>
+       
         </div>
 
-        <div className="flex w-full justify-between items-center">
+        <div className="flex w-full gap-2 items-center">
           <p className="text-sm text-gray-600 font-medium">
             {item.city || "Unknown"}, {item.state || "Unknown"}
           </p>
-          <p className="text-sm font-semibold">
+             <div className="flex items-center gap-1 text-gray-600">
+            <AiFillStar size={16} />
+            <p className="text-sm  text-gray-600">
+              ({item.ratings || 0})
+            </p>
+          </div>
+          {/* <p className="text-sm font-semibold">
             <span className="font-normal">Reviews</span> (
             {item.reviewCount || 0})
-          </p>
+          </p> */}
         </div>
       </div>
     </div>
