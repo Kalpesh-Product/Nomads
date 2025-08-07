@@ -160,7 +160,7 @@ const Header = () => {
         </div>
       )}
 
-      <div className="flex gap-20">
+      <div className="flex gap-10">
         <li className="flex items-center">
           <div className="p-4 px-0 whitespace-nowrap">
             <a

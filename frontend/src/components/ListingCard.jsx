@@ -23,8 +23,10 @@ const ListingCard = ({ item, handleNavigation }) => {
   return (
     <div
       onClick={handleNavigation}
-      className="flex flex-col gap-2 h-56 w-[95%] bg-white  rounded-lg  transition-all cursor-pointer">
-      <div className="h-full w-full overflow-hidden rounded-3xl border-2 relative">
+      // className="flex flex-col gap-2 h-56 w-[95%] bg-white  rounded-lg  transition-all cursor-pointer">
+      className="flex flex-col gap-2 w-full max-w-sm bg-white rounded-lg transition-all cursor-pointer">
+      {/* <div className="h-full w-full overflow-hidden rounded-3xl border-2 relative"> */}
+      <div className="w-full aspect-square overflow-hidden rounded-3xl border-2 relative">
         <img
           src="https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp"
           alt={item.companyName}
