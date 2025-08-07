@@ -425,7 +425,7 @@ const Home = () => {
             {destinationData.map((item, idx) => (
               <div
                 key={idx}
-                className={`w-full sm:w-full md:w-full afterPro:w-56 flex flex-col items-center  ${
+                className={`w-full sm:w-full md:w-full afterPro:w-60 flex flex-col items-center  ${
                   idx === destinationData.length - 1 &&
                   destinationData.length % 2 !== 0
                     ? "md:col-span-2 afterPro:col-span-1"
@@ -435,7 +435,7 @@ const Home = () => {
                   <img
                     src={item.image}
                     alt={item.label}
-                    className="w-full h-80 object-cover"
+                    className="w-full h-[26rem] object-cover"
                   />
                   {/* <div className="absolute top-2 left-2 bg-white text-xs font-medium text-gray-700 px-2 py-1 rounded-full shadow">
                     Guest favourite
