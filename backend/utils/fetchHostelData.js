@@ -27,16 +27,16 @@ const fetchHostelData = async (country, state) => {
       ...company,
       reviewCount: company.reviews,
       inclusions: hostelInclusions.filter(
-        (item) => item.hostelCompany?.toString() === companyId
+        (item) => item.hostel?.toString() === companyId
       ),
       pointOfContacts: hostelPoc.filter(
-        (item) => item.hostelCompany?.toString() === companyId
+        (item) => item.hostel?.toString() === companyId
       ),
       units: hostelUnits.filter(
-        (item) => item.businessId?.toString() === companyId
+        (item) => item.hostel?.toString() === companyId
       ),
       reviews: hostelReviews.filter(
-        (item) => item.hostelCompany?.toString() === companyId
+        (item) => item.hostel?.toString() === companyId
       ),
       type: "hostel",
     };
