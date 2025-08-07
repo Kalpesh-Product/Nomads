@@ -40,11 +40,11 @@ const Listings = () => {
   const categoryOptions = [
     { label: "Co-Working", value: "coworking" },
     { label: "Hostel", value: "hostel" },
-    { label: "Cafe’s", value: "cafes" },
+    { label: "Cafe’s", value: "cafe" },
     { label: "Meeting Rooms", value: "meetingRoom" },
     { label: "Private Stay", value: "privateStay" },
     { label: "Co-Living", value: "coliving" },
-    { label: "Company Workation", value: "companyWorkation" },
+    { label: " Workation", value: "workation" },
   ];
   const activeCategory = searchParams.get("category");
 
@@ -163,7 +163,7 @@ const Listings = () => {
             <div className="hidden lg:flex flex-col gap-4 justify-between items-center w-full h-full">
               {/* the 5 icons */}
 
-              <div className=" w-full flex justify-center items-center pb-4">
+              <div className=" w-3/4 flex justify-center items-center pb-4">
                 <div className="grid grid-cols-5 md:grid-cols-7 gap-0">
                   {categoryOptions.map((cat) => {
                     const iconSrc = newIcons[cat.value];

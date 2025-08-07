@@ -78,7 +78,7 @@ const Header = () => {
                       <div className="p-4 px-0 whitespace-nowrap">
                         <Link
                           to={`${location.pathname}?view=map`}
-                          className="group relative text-sm  text-black">
+                          className="group relative text-md  text-black">
                           <span className="relative z-10 group-hover:font-bold mb-2">
                             Map view
                           </span>
@@ -160,7 +160,7 @@ const Header = () => {
         </div>
       )}
 
-      <div className="flex gap-6">
+      <div className="flex gap-20">
         <li className="flex items-center">
           <div className="p-4 px-0 whitespace-nowrap">
             <a

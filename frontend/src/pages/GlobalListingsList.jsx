@@ -166,7 +166,7 @@ const GlobalListingsList = () => {
           <div className="hidden lg:flex flex-col gap-4 justify-between items-center w-full h-full">
             {/* the 5 icons */}
 
-            <div className=" w-full flex justify-center items-center">
+            <div className=" w-3/4 flex justify-center items-center">
               <div className="grid grid-cols-5 md:grid-cols-7 gap-0 pb-4">
                 {categoryOptions.map((cat) => {
                   const iconSrc = newIcons[cat.value];

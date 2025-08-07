@@ -13,14 +13,14 @@ const App = () => {
 
   useEffect(() => {
     if (contentRef.current) {
-      contentRef.current.scrollIntoView({ behavior: "smooth" });
+      contentRef.current.scrollTo({ behavior: "smooth", top: "0" });
     }
   }, [location.pathname]);
 
   return (
-    <div className="flex flex-col h-screen justify-between">
+    <div ref={contentRef} className="flex flex-col h-screen overflow-auto justify-between relative">
       {!hideHeaderFooter && (
-        <div className="fixed w-full z-50">
+        <div className="sticky top-0 w-full z-50">
           <div className="md:block">
             <Header />
           </div>
@@ -28,12 +28,13 @@ const App = () => {
       )}
 
       <div
-        ref={contentRef}
+        // ref={contentRef}
         className={`${
           hideHeaderFooter
             ? ""
-            : "pt-16 pb-16 px-0 xs:pt-16 xs:pb-20 md:pt-20 md:pb-40 lg:pt-24 lg:pb-4 md:px-0 lg:px-0 sm:px-4"
-        } flex flex-col gap-4 bg-white`}>
+            : "pt-16 pb-16 px-0 xs:pt-16 xs:pb-20 md:pt-20 md:pb-40 lg:pt-0 lg:pb-0 md:px-0 lg:px-0 sm:px-4"
+        } flex flex-col gap-4 bg-white`}
+      >
         <Outlet />
         <Toaster />
       </div>

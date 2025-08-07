@@ -182,7 +182,7 @@ const Product = () => {
 
   return (
     <div>
-      <Container padding={false}>
+      <div className="min-w-[70%] max-w-[80rem] lg:max-w-[70rem] mx-0 md:mx-auto">
         <div className="flex flex-col gap-8">
           <div className="flex w-full justify-between">
             <h1 className="text-title font-semibold">
@@ -192,9 +192,9 @@ const Product = () => {
           </div>
 
           {/* Image Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-1 overflow-hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 overflow-hidden">
             {/* Main Image */}
-            <div className="w-full h-96 overflow-hidden rounded-md">
+            <div className="w-full h-full overflow-hidden rounded-md">
               <img
                 src={selectedImage.url}
                 className="w-full h-full object-cover"
@@ -203,11 +203,11 @@ const Product = () => {
             </div>
 
             {/* Thumbnail Images */}
-            <div className="grid grid-cols-2 gap-0">
+            <div className="grid grid-cols-2 gap-1">
               {companyImages.map((item) => (
                 <div
                   key={item._id}
-                  className={`w-full h-[12rem] overflow-hidden rounded-md cursor-pointer border-2 ${
+                  className={`w-full h-full overflow-hidden rounded-md cursor-pointer border-2 ${
                     selectedImage._id === item._id
                       ? "border-primary-dark"
                       : "border-transparent"
@@ -595,7 +595,7 @@ const Product = () => {
             </div>
           </div>
         </div>
-      </Container>
+      </div>
       <MuiModal open={open} onClose={() => setOpen(false)} title={"Review"}>
         <div className="flex flex-col gap-4">
           {/* Reviewer Info */}

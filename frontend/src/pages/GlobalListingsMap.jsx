@@ -36,18 +36,19 @@ const GlobalListingsMap = () => {
   const categoryOptions = [
     { label: "Co-Working", value: "coworking" },
     { label: "Hostels", value: "hostel" },
-    { label: "Cafe’s", value: "cafes" },
+    { label: "Cafe’s", value: "cafe" },
     { label: "Meeting Rooms", value: "meetingRoom" },
     { label: "Private Stay", value: "privateStay" },
     { label: "Co-Living", value: "coliving" },
     { label: "Company Workation", value: "companyWorkation" },
   ];
   console.log("formData", formData);
-    const typeLabels = {
+  const typeLabels = {
     coworking: "Co-Working Spaces",
     coliving: "Co-Living Spaces",
     hostel: "hostel",
-    // fallback for unknown types
+    privateStay: "Private Stay",
+    cafe: "cafe",
     default: (type) => `${type[0].toUpperCase() + type.slice(1)} Spaces`,
   };
   const handleShowMoreClick = (type) => {
@@ -58,9 +59,12 @@ const GlobalListingsMap = () => {
 
     dispatch(setFormValues(updatedForm));
 
-    navigate(`/nomad/listings?country=${formData.country}&location=${formData.location}&category=${type}`, {
-      state: updatedForm,
-    });
+    navigate(
+      `/nomad/listings?country=${formData.country}&location=${formData.location}&category=${type}`,
+      {
+        state: updatedForm,
+      }
+    );
   };
   const { data: listingsData, isPending: isLisitingLoading } = useQuery({
     queryKey: ["listings", formData], // ✅ ensures it refetches when formData changes
@@ -82,8 +86,6 @@ const GlobalListingsMap = () => {
     acc[item.type].push(item);
     return acc;
   }, {});
-
-
 
   const toggleFavorite = (id) => {
     setFavorites((prev) =>
@@ -181,7 +183,7 @@ const GlobalListingsMap = () => {
           <div className="flex flex-col gap-4 justify-between items-center">
             {/* the 5 icons */}
 
-            <div className=" w-full flex justify-center items-center">
+            <div className=" w-3/4 flex justify-center items-center">
               <div className="grid grid-cols-5 md:grid-cols-7 gap-0 pb-4">
                 {categoryOptions.map((cat) => {
                   const iconSrc = newIcons[cat.value];
@@ -461,8 +463,8 @@ const GlobalListingsMap = () => {
                 </div>
               )}
             </div>
-            <div className="col-span-4 sticky top-24 h-[75vh]">
-              <div className="rounded-xl h-[35rem] overflow-hidden">
+            <div className="col-span-4 sticky top-24 h-[98vh] pb-20">
+              <div className="rounded-xl h-full overflow-hidden">
                 {isLisitingLoading ? (
                   <SkeletonMap />
                 ) : forMapsData?.length ? (
