@@ -40,7 +40,7 @@ const GlobalListingsMap = () => {
     { label: "Meeting Rooms", value: "meetingRoom" },
     { label: "Private Stay", value: "privateStay" },
     { label: "Co-Living", value: "coliving" },
-    { label: "Company Workation", value: "companyWorkation" },
+    { label: "Company Workation", value: "workation" },
   ];
   console.log("formData", formData);
   const typeLabels = {

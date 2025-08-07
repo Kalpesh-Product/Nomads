@@ -36,11 +36,11 @@ const GlobalListingsList = () => {
   const categoryOptions = [
     { label: "Co-Working", value: "coworking" },
     { label: "Hostels", value: "hostel" },
-    { label: "Cafe’s", value: "cafes" },
+    { label: "Cafe’s", value: "cafe" },
     { label: "Meeting Rooms", value: "meetingRoom" },
     { label: "Private Stay", value: "privateStay" },
     { label: "Co-Living", value: "coliving" },
-    { label: "Company Workation", value: "companyWorkation" },
+    { label: "Company Workation", value: "workation" },
   ];
   console.log("formData", formData);
   const handleShowMoreClick = (type) => {
