@@ -210,8 +210,7 @@ const Home = () => {
           <div className="flex flex-col  gap-4 justify-between items-center">
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
-            >
+              className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center">
               <Controller
                 name="country"
                 control={control}
@@ -258,8 +257,7 @@ const Home = () => {
               />
               <button
                 type="submit"
-                className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full"
-              >
+                className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full">
                 <IoSearch />
               </button>
             </form>
@@ -268,8 +266,7 @@ const Home = () => {
         <div className="lg:hidden flex w-full items-center justify-center my-4">
           <button
             onClick={() => setShowMobileSearch(true)}
-            className="bg-white flex items-center w-full text-black border-2 px-6 py-3 rounded-full"
-          >
+            className="bg-white flex items-center w-full text-black border-2 px-6 py-3 rounded-full">
             <IoSearch className="inline mr-2" />
             Start Search
           </button>
@@ -283,14 +280,12 @@ const Home = () => {
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ duration: 0.3 }}
-            className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl z-50 p-4 rounded-t-3xl h-[50vh] lg:hidden"
-          >
+            className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl z-50 p-4 rounded-t-3xl h-[50vh] lg:hidden">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold">Search</h3>
               <button
                 onClick={() => setShowMobileSearch(false)}
-                className="text-gray-500 text-xl"
-              >
+                className="text-gray-500 text-xl">
                 &times;
               </button>
             </div>
@@ -342,8 +337,7 @@ const Home = () => {
               />
               <button
                 type="submit"
-                className="w-full bg-[#FF5757] text-white py-3 rounded-full"
-              >
+                className="w-full bg-[#FF5757] text-white py-3 rounded-full">
                 <IoSearch className="inline mr-2" />
                 Search
               </button>
@@ -418,7 +412,8 @@ const Home = () => {
       </section>
       {/*  */}
       <section className="w-full px-6 py-12 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
+        {/* <div className="max-w-7xl mx-auto"> */}
+        <div className="min-w-[85%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0 lg:py-0 py-0">
           <h2 className="text-2xl md:text-3xl font-medium text-left mb-10 text-gray-700">
             Solutions for your aspiring destinations.
           </h2>
@@ -432,8 +427,7 @@ const Home = () => {
                   destinationData.length % 2 !== 0
                     ? "md:col-span-2 lg:col-span-1"
                     : ""
-                }`}
-              >
+                }`}>
                 <div className="relative w-full rounded-xl overflow-hidden shadow-md">
                   <img
                     src={item.image}
@@ -458,7 +452,7 @@ const Home = () => {
 
       <Container padding={false}>
         <div className="flex flex-col gap-8 w-full border-t-2 border-gray-300 py-8">
-           <h2 className="text-2xl md:text-3xl font-medium text-left mb-10 text-gray-700">
+          <h2 className="text-2xl md:text-3xl font-medium text-left mb-10 text-gray-700">
             Platform Inclusions.
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3  lg:grid-cols-5 gap-x-16 md:gap-x-16 lg:gap-x-28 gap-y-10">

@@ -176,8 +176,7 @@ const GlobalListingsList = () => {
                       key={cat.value}
                       type="button"
                       onClick={() => handleCategoryClick(cat.value)}
-                      className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full"
-                    >
+                      className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full">
                       {iconSrc ? (
                         <div className="h-10 w-full flex flex-col gap-0">
                           <img
@@ -199,8 +198,7 @@ const GlobalListingsList = () => {
 
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className=" flex justify-around w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
-            >
+              className=" flex justify-around w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center">
               <Controller
                 name="country"
                 control={control}
@@ -247,8 +245,7 @@ const GlobalListingsList = () => {
               />
               <button
                 type="submit"
-                className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full"
-              >
+                className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full">
                 <IoSearch />
               </button>
             </form>
@@ -256,8 +253,7 @@ const GlobalListingsList = () => {
           <div className="flex lg:hidden w-full items-center justify-center my-4">
             <button
               onClick={() => setShowMobileSearch((prev) => !prev)}
-              className="bg-white flex items-center w-full text-black border-2 px-6 py-3 rounded-full"
-            >
+              className="bg-white flex items-center w-full text-black border-2 px-6 py-3 rounded-full">
               <IoSearch className="inline mr-2" />
               Start Search
             </button>
@@ -270,14 +266,12 @@ const GlobalListingsList = () => {
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ duration: 0.3 }}
-              className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 p-4 rounded-t-3xl lg:hidden"
-            >
+              className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 p-4 rounded-t-3xl lg:hidden">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold">Search</h3>
                 <button
                   onClick={() => setShowMobileSearch(false)}
-                  className="text-gray-500 text-xl"
-                >
+                  className="text-gray-500 text-xl">
                   &times;
                 </button>
               </div>
@@ -290,8 +284,7 @@ const GlobalListingsList = () => {
                       key={cat.value}
                       type="button"
                       onClick={() => handleCategoryClick(cat.value)}
-                      className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full"
-                    >
+                      className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full">
                       {iconSrc ? (
                         <div className="h-10 w-full flex flex-col gap-0">
                           <img
@@ -357,8 +350,7 @@ const GlobalListingsList = () => {
                 />
                 <button
                   type="submit"
-                  className="w-full bg-[#FF5757] text-white py-3 rounded-full"
-                >
+                  className="w-full bg-[#FF5757] text-white py-3 rounded-full">
                   <IoSearch className="inline mr-2" />
                   Search
                 </button>
@@ -412,7 +404,7 @@ const GlobalListingsList = () => {
                         {sectionTitle}
                       </h2>
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-0">
+                      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-x-2 gap-y-0">
                         {displayItems.map((item) => (
                           <ListingCard
                             key={item._id}
@@ -430,8 +422,7 @@ const GlobalListingsList = () => {
                         <div className="mt-3 text-right">
                           <button
                             onClick={() => handleShowMoreClick(type)}
-                            className="text-primary-blue text-sm font-semibold hover:underline"
-                          >
+                            className="text-primary-blue text-sm font-semibold hover:underline">
                             Show More →
                           </button>
                         </div>
