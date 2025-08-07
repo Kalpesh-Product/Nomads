@@ -14,7 +14,11 @@ const Header = () => {
 
   const currentPath = location.pathname;
 
-  const isNomadOrListings = /^\/nomad(\/listings\/[^/]+)?$/.test(currentPath);
+  const isNomadOrListings =
+    /^\/nomad(\/listings\/[^/]+)?$/.test(currentPath) ||
+    currentPath === "/nomad/login" ||
+    currentPath === "/nomad/signup";
+
   const hideMapListLinks = isNomadOrListings;
   const isNomadHome = isNomadOrListings;
 

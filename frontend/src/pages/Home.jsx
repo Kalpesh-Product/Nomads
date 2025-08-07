@@ -419,19 +419,22 @@ const Home = () => {
       {/*  */}
       <section className="w-full px-6 py-12 bg-gray-50">
         {/* <div className="max-w-7xl mx-auto"> */}
-        <div className="min-w-[85%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0 lg:py-0 py-0">
+        {/* <div className="min-w-[85%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0 lg:py-0 py-0"> */}
+        {/* <div className="min-w-[90%] max-w-[91rem] lg:max-w-[91rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0 lg:py-0 py-0"> */}
+        <div className="w-[90%] max-w-[91rem] mx-auto lg:px-3 2xlplus:w-[88%] 2xlplus:max-w-[95rem] ">
+          {/* <div className="w-[90%] max-w-[91rem] mx-auto px-4 sm:w-[95%] xs:w-[97%]"> */}
           <h2 className="text-2xl md:text-3xl font-medium text-left mb-10 text-gray-700">
             Solutions for your aspiring destinations.
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 afterPro:grid-cols-5 gap-6">
             {destinationData.map((item, idx) => (
               <div
                 key={idx}
-                className={`w-full sm:w-full md:w-full lg:w-56 flex flex-col items-center ${
+                className={`w-full sm:w-full md:w-full afterPro:w-60 flex flex-col items-center  ${
                   idx === destinationData.length - 1 &&
                   destinationData.length % 2 !== 0
-                    ? "md:col-span-2 lg:col-span-1"
+                    ? "md:col-span-2 afterPro:col-span-1"
                     : ""
                 }`}
               >
@@ -439,7 +442,7 @@ const Home = () => {
                   <img
                     src={item.image}
                     alt={item.label}
-                    className="w-full h-80 object-cover"
+                    className="w-full h-96 object-cover"
                   />
                   {/* <div className="absolute top-2 left-2 bg-white text-xs font-medium text-gray-700 px-2 py-1 rounded-full shadow">
                     Guest favourite
