@@ -188,7 +188,9 @@ const Product = () => {
             <h1 className="text-title font-semibold">
               {companyDetails?.companyName}
             </h1>
-            <NavLink className={"text-small underline"}>Save</NavLink>
+            <NavLink className={"text-small underline"} to={"/nomad/login"}>
+              Save
+            </NavLink>
           </div>
 
           {/* Image Section */}
@@ -212,8 +214,7 @@ const Product = () => {
                       ? "border-primary-dark"
                       : "border-transparent"
                   }`}
-                  onClick={() => setSelectedImage(item)}
-                >
+                  onClick={() => setSelectedImage(item)}>
                   <img
                     src={item.url}
                     alt="company-thumbnail"
@@ -290,8 +291,7 @@ const Product = () => {
                 <form
                   onSubmit={handleSubmit((data) => submitEnquiry(data))}
                   action=""
-                  className="grid grid-cols-1 lg:grid-cols-2 gap-6"
-                >
+                  className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <Controller
                     name="fullName"
                     control={control}
@@ -357,8 +357,7 @@ const Product = () => {
                           fullWidth
                           variant="standard"
                           size="small"
-                          select
-                        >
+                          select>
                           <MenuItem value="" disabled>
                             <em>Select A Type</em>
                           </MenuItem>
@@ -378,8 +377,7 @@ const Product = () => {
                           fullWidth
                           variant="standard"
                           size="small"
-                          select
-                        >
+                          select>
                           <MenuItem value="" disabled>
                             <em>Select Number of Desk</em>
                           </MenuItem>
@@ -453,11 +451,15 @@ const Product = () => {
                 Inclusions not available
               </div>
             ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-24 gap-y-10">
-              {allAmenities.map((item, index) => (
-                <Amenities key={index} image={item.image} title={item.title} />
-              ))}
-            </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-24 gap-y-10">
+                {allAmenities.map((item, index) => (
+                  <Amenities
+                    key={index}
+                    image={item.image}
+                    title={item.title}
+                  />
+                ))}
+              </div>
             )}
           </div>
 
@@ -540,8 +542,7 @@ const Product = () => {
                   <h1 className="text-title font-semibold">Connect With Us</h1>
                   <form
                     onSubmit={handlesubmitSales((data) => submitSales(data))}
-                    className="grid grid-cols-1 gap-4"
-                  >
+                    className="grid grid-cols-1 gap-4">
                     <Controller
                       name="fullName"
                       control={salesControl}
