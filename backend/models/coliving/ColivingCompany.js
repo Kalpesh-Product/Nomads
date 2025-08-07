@@ -7,7 +7,9 @@ const colivingSchema = new mongoose.Schema(
     registeredEntityName: { type: String },
     website: { type: String },
     logo: { type: String },
-    images: [{ type: String }],
+    images: {
+      type: [{ url: String, index: Number }],
+    },
     address: { type: String },
     ratings: {
       type: Number,

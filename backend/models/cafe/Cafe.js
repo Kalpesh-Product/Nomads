@@ -14,6 +14,12 @@ const cafeSchema = new mongoose.Schema(
     registeredEntityName: {
       type: String,
     },
+    logo: {
+      type: String,
+    },
+    images: {
+      type: [{ url: String, index: Number }],
+    },
     website: {
       type: String,
     },
@@ -21,6 +27,12 @@ const cafeSchema = new mongoose.Schema(
       type: String,
     },
     city: {
+      type: String,
+    },
+    state: {
+      type: String,
+    },
+    country: {
       type: String,
     },
     about: {
@@ -33,7 +45,7 @@ const cafeSchema = new mongoose.Schema(
       type: Number,
     },
     googleMap: {
-      type: String, 
+      type: String,
     },
     ratings: {
       type: Number,

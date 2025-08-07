@@ -6,6 +6,7 @@ import PointOfContact from "../../models/coworking/PointOfContact.js";
 import yup from "yup";
 import csvParser from "csv-parser";
 import { Readable } from "stream";
+import { uploadFileToS3 } from "../../config/s3Config.js";
 
 export const addNewCompany = async (req, res, next) => {
   try {

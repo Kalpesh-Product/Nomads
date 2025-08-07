@@ -21,7 +21,7 @@ const privateStaySchema = new mongoose.Schema(
       type: String, // URL to the logo
     },
     images: {
-      type: [String], // array of image URLs
+      type: [{ url: String, index: Number }],
     },
     address: {
       type: String,
@@ -45,7 +45,7 @@ const privateStaySchema = new mongoose.Schema(
       type: Number,
     },
     googleMap: {
-      type: String, 
+      type: String,
     },
     ratings: {
       type: Number,
