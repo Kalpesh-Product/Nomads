@@ -29,7 +29,6 @@ import cafeRoutes from "./routes/cafeRoutes/cafeRoutes.js";
 import cafeReviewRoutes from "./routes/cafeRoutes/cafeReviews.js";
 import cafeInclusionsRoutes from "./routes/cafeRoutes/cafeInclusionRoutes.js";
 import cafePocRoutes from "./routes/cafeRoutes/cafePocRoutes.js";
-import testRoutes from "./routes/testRoutes.js";
 import mongoose from "mongoose";
 
 const app = express();
@@ -66,7 +65,6 @@ app.use("/api/cafe/review", cafeReviewRoutes);
 app.use("/api/cafe/inclusions", cafeInclusionsRoutes);
 app.use("/api/cafe/poc", cafePocRoutes);
 app.use("/api/common", commonCompanyRoutes);
-app.use("/api/test", testRoutes);
 app.use(errorHandler);
 app.listen(
   PORT,
