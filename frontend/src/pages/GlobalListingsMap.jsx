@@ -67,7 +67,7 @@ const GlobalListingsMap = () => {
     );
   };
   const { data: listingsData, isPending: isLisitingLoading } = useQuery({
-    queryKey: ["listings", formData], // ✅ ensures it refetches when formData changes
+    queryKey: ["globallistings", formData], // ✅ ensures it refetches when formData changes
     queryFn: async () => {
       const { country, location, category } = formData || {};
 
@@ -142,8 +142,8 @@ const GlobalListingsMap = () => {
 
     // console.log("Generated URL:", url);
     console.log("State to be passed:", state);
-    setShowMobileSearch(false)
-    setShowListings(false)
+    setShowMobileSearch(false);
+    setShowListings(false);
 
     navigate(
       `/nomad/listings?country=${formData.country}&location=${formData.location}&category=${state.category}`,
@@ -166,8 +166,8 @@ const GlobalListingsMap = () => {
         lng: item.longitude,
         name: item.companyName,
         location: item.city,
-        reviews: item.reviews?.length,
-        rating: item.reviews?.length
+        reviews: item.reviewCount,
+        rating: item.ratings
           ? (() => {
               const avg =
                 item.reviews.reduce((sum, r) => sum + r.starCount, 0) /
@@ -416,23 +416,30 @@ const GlobalListingsMap = () => {
               ) : groupedListings && Object.keys(groupedListings).length > 0 ? (
                 Object.entries(groupedListings).map(([type, items]) => {
                   const prioritizedCompanies = ["MeWo", "BIZ Nest"];
-                  const sortedItems = items.sort((a, b) => {
-                    const aPriority = prioritizedCompanies.includes(
+                  const sortedItems = [...items].sort((a, b) => {
+                    const aIsPriority = prioritizedCompanies.includes(
                       a.companyName
-                    )
-                      ? 0
-                      : 1;
-                    const bPriority = prioritizedCompanies.includes(
+                    );
+                    const bIsPriority = prioritizedCompanies.includes(
                       b.companyName
-                    )
-                      ? 0
-                      : 1;
+                    );
 
-                    // If both have same priority, keep original order
-                    if (aPriority === bPriority) return 0;
+                    if (aIsPriority && !bIsPriority) return -1;
+                    if (!aIsPriority && bIsPriority) return 1;
 
-                    // Prioritize a if it's in the list
-                    return aPriority - bPriority;
+                    // If both are priority or both are not, sort by rating descending
+                    const aRating =
+                      a.reviews?.length > 0
+                        ? a.reviews.reduce((sum, r) => sum + r.starCount, 0) /
+                          a.reviews.length
+                        : 0;
+                    const bRating =
+                      b.reviews?.length > 0
+                        ? b.reviews.reduce((sum, r) => sum + r.starCount, 0) /
+                          b.reviews.length
+                        : 0;
+
+                    return bRating - aRating;
                   });
 
                   const displayItems = sortedItems.slice(0, 6);

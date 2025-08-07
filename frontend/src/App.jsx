@@ -32,7 +32,7 @@ const App = () => {
         className={`${
           hideHeaderFooter
             ? ""
-            : "py-0 px-0 xs:py-2 xs:pb-20 md:pt-20 md:pb-40 lg:pt-0 lg:pb-0 md:px-0 lg:px-0 sm:px-4"
+            : "py-0 px-0 xs:py-2 xs:pb-20 md:pt-20 md:pb-40 lg:py-4 md:px-0 lg:px-0 sm:px-4"
         } flex flex-col gap-4 bg-white`}
       >
         <Outlet />

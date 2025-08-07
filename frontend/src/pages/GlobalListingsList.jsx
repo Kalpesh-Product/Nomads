@@ -60,7 +60,7 @@ const GlobalListingsList = () => {
   };
 
   const { data: listingsData, isPending: isLisitingLoading } = useQuery({
-    queryKey: ["listings", formData], // ✅ ensures it refetches when formData changes
+    queryKey: ["globallistings", formData], // ✅ ensures it refetches when formData changes
     queryFn: async () => {
       const { country, location, category } = formData || {};
 
@@ -158,9 +158,30 @@ const GlobalListingsList = () => {
       }
     );
   };
+  // Prioritize BIZ Nest and MeWo first, then sort the rest by rating descending
+  const prioritizedCompanies = ["BIZ Nest", "MeWo"];
+  const sortedListings = [...(listingsData || [])].sort((a, b) => {
+    const aIsPriority = prioritizedCompanies.includes(a.companyName);
+    const bIsPriority = prioritizedCompanies.includes(b.companyName);
+
+    if (aIsPriority && !bIsPriority) return -1;
+    if (!aIsPriority && bIsPriority) return 1;
+
+    // If both are priority or both are not, then sort by average rating descending
+    const aRating =
+      a.reviews?.length > 0
+        ? a.reviews.reduce((sum, r) => sum + r.starCount, 0) / a.reviews.length
+        : 0;
+    const bRating =
+      b.reviews?.length > 0
+        ? b.reviews.reduce((sum, r) => sum + r.starCount, 0) / b.reviews.length
+        : 0;
+
+    return bRating - aRating;
+  });
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 lg:gap-6">
       <div className="flex flex-col gap-4 justify-center items-center  w-full lg:mt-0">
         <Container padding={false}>
           <div className="hidden lg:flex flex-col gap-4 justify-between items-center w-full h-full">
@@ -199,7 +220,7 @@ const GlobalListingsList = () => {
 
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className=" flex justify-around w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
+              className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
             >
               <Controller
                 name="country"
@@ -211,10 +232,11 @@ const GlobalListingsList = () => {
                     options={countryOptions}
                     label="Select Country"
                     placeholder="Select aspiring destination"
-                    className="w-full z-10"
+                    className="w-full "
                   />
                 )}
               />
+              <div className="w-px h-10 bg-gray-300 mx-2 my-auto" />
               <Controller
                 name="location"
                 control={control}
@@ -226,10 +248,11 @@ const GlobalListingsList = () => {
                     options={locationOptions}
                     placeholder="Select area within country"
                     disabled={!selectedCountry}
-                    className="-ml-12 w-full z-20"
+                    className="w-full"
                   />
                 )}
               />
+              <div className="w-px h-10 bg-gray-300 mx-2 my-auto" />
               <Controller
                 name="count"
                 control={control}
@@ -241,7 +264,7 @@ const GlobalListingsList = () => {
                     label="Select Count"
                     placeholder="Booking for no. of Nomads"
                     disabled={!selectedState}
-                    className="-ml-12 w-full z-30"
+                    className="w-full "
                   />
                 )}
               />
@@ -384,25 +407,31 @@ const GlobalListingsList = () => {
                 ))
               ) : groupedListings && Object.keys(groupedListings).length > 0 ? (
                 Object.entries(groupedListings).map(([type, items]) => {
-                  console.log("typoe ", type);
                   const prioritizedCompanies = ["MeWo", "BIZ Nest"];
-                  const sortedItems = items.sort((a, b) => {
-                    const aPriority = prioritizedCompanies.includes(
+                  const sortedItems = [...items].sort((a, b) => {
+                    const aIsPriority = prioritizedCompanies.includes(
                       a.companyName
-                    )
-                      ? 0
-                      : 1;
-                    const bPriority = prioritizedCompanies.includes(
+                    );
+                    const bIsPriority = prioritizedCompanies.includes(
                       b.companyName
-                    )
-                      ? 0
-                      : 1;
+                    );
 
-                    // If both have same priority, keep original order
-                    if (aPriority === bPriority) return 0;
+                    if (aIsPriority && !bIsPriority) return -1;
+                    if (!aIsPriority && bIsPriority) return 1;
 
-                    // Prioritize a if it's in the list
-                    return aPriority - bPriority;
+                    // If both are priority or both are not, sort by rating descending
+                    const aRating =
+                      a.reviews?.length > 0
+                        ? a.reviews.reduce((sum, r) => sum + r.starCount, 0) /
+                          a.reviews.length
+                        : 0;
+                    const bRating =
+                      b.reviews?.length > 0
+                        ? b.reviews.reduce((sum, r) => sum + r.starCount, 0) /
+                          b.reviews.length
+                        : 0;
+
+                    return bRating - aRating;
                   });
 
                   const displayItems = sortedItems.slice(0, 5);

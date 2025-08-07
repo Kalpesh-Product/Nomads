@@ -43,7 +43,7 @@ const ListingCard = ({ item, handleNavigation }) => {
         </div>
       </div>
 
-      <div className="h-[25%] flex flex-col gap-1 px-2">
+      <div className="h-[25%] flex flex-col gap-1 px-4">
         <div className="flex w-full justify-between items-center">
           <p className="text-sm font-semibold">{item.companyName}</p>
        
@@ -55,7 +55,7 @@ const ListingCard = ({ item, handleNavigation }) => {
           </p>
              <div className="flex items-center gap-1 text-gray-600">
             <AiFillStar size={16} />
-            <p className="text-sm  text-gray-600">
+            <p className="text-sm  text-gray-600 font-medium">
               ({item.ratings || 0})
             </p>
           </div>

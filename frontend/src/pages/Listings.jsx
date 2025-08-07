@@ -1,5 +1,5 @@
 import { MenuItem, TextField } from "@mui/material";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { CiSearch } from "react-icons/ci";
@@ -47,6 +47,10 @@ const Listings = () => {
     { label: " Workation", value: "workation" },
   ];
   const activeCategory = searchParams.get("category");
+  const queryClient = new QueryClient();
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: ["listings", formData] });
+  }, [formData]);
 
   console.log("formData", formData);
   const { data: listingsData, isPending: isLisitingLoading } = useQuery({
@@ -61,8 +65,7 @@ const Listings = () => {
       // return response.data;
       return Array.isArray(response.data) ? response.data : [];
     },
-    enabled:
-      !!formData?.country && !!formData?.location && !!formData?.category, // ✅ prevents fetching on empty state
+    enabled: !!formData?.country && !!formData?.location, // ✅ prevents fetching on empty state
   });
 
   const toggleFavorite = (id) => {
@@ -138,7 +141,7 @@ const Listings = () => {
 
     // console.log("Generated URL:", url);
     console.log("State to be passed:", state);
-    setShowMobileSearch(false)
+    setShowMobileSearch(false);
     navigate(
       `/nomad/listings?country=${formData.country}&location=${formData.location}&category=${state.category}`,
       {
@@ -154,6 +157,29 @@ const Listings = () => {
   const onSubmit = (data) => {
     locationData(data);
   };
+  const [mapOpen, setMapOpen] = useState(true);
+
+  // Prioritize BIZ Nest and MeWo first, then sort the rest by rating descending
+  const prioritizedCompanies = ["BIZ Nest", "MeWo"];
+  const sortedListings = [...(listingsData || [])].sort((a, b) => {
+    const aIsPriority = prioritizedCompanies.includes(a.companyName);
+    const bIsPriority = prioritizedCompanies.includes(b.companyName);
+
+    if (aIsPriority && !bIsPriority) return -1;
+    if (!aIsPriority && bIsPriority) return 1;
+
+    // If both are priority or both are not, then sort by average rating descending
+    const aRating =
+      a.reviews?.length > 0
+        ? a.reviews.reduce((sum, r) => sum + r.starCount, 0) / a.reviews.length
+        : 0;
+    const bRating =
+      b.reviews?.length > 0
+        ? b.reviews.reduce((sum, r) => sum + r.starCount, 0) / b.reviews.length
+        : 0;
+
+    return bRating - aRating;
+  });
 
   return (
     <div className="flex flex-col gap:2 lg:gap-6 ">
@@ -398,56 +424,82 @@ const Listings = () => {
       <hr />
       <Container padding={false}>
         <div className="grid grid-cols-1 lg:grid-cols-9 gap-4">
-          <div className="col-span-5  font-semibold text-lg ">
-            <div className="pb-6">
+          {/* LIST VIEW */}
+          <motion.div
+            key="list-view"
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -50 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className={`${
+              mapOpen ? "col-span-5" : "col-span-9"
+            } font-semibold text-lg`}
+          >
+            <div className="flex w-full justify-between pb-6">
               <p>
                 Over {listingsData?.length - 1}{" "}
                 {formData.category?.charAt(0).toUpperCase() +
                   formData.category?.slice(1)}{" "}
                 Spaces
               </p>
+              <button onClick={() => setMapOpen((prev) => !prev)}>
+                {mapOpen ? "← List View" : "Map View →"}
+              </button>
             </div>
 
-            <div>
-              <PaginatedGrid
-                data={listingsData}
-                entriesPerPage={6}
-                columns="grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-5"
-                renderItem={(item, index) => (
-                  <motion.div
-                    key={item._id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      duration: 0.4,
-                      delay: index * 0.1, // delay each card slightly
-                      ease: "easeOut",
-                    }}
-                  >
-                    <ListingCard
-                      item={item}
-                      handleNavigation={() =>
-                        navigate(`${item.companyName}`, {
-                          state: { companyId: item._id, type: item.type },
-                        })
-                      }
-                    />
-                  </motion.div>
+            <PaginatedGrid
+              data={sortedListings}
+              entriesPerPage={6}
+              columns={`grid-cols-1 md:grid-cols-2 ${
+                mapOpen ? "lg:grid-cols-3" : "lg:grid-cols-5"
+              } gap-x-5`}
+              renderItem={(item, index) => (
+                <motion.div
+                  key={item._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: 0.4,
+                    delay: index * 0.1,
+                    ease: "easeOut",
+                  }}
+                >
+                  <ListingCard
+                    item={item}
+                    handleNavigation={() =>
+                      navigate(`${item.companyName}`, {
+                        state: { companyId: item._id, type: item.type },
+                      })
+                    }
+                  />
+                </motion.div>
+              )}
+            />
+          </motion.div>
+
+          {/* MAP VIEW */}
+          <AnimatePresence>
+            {mapOpen && (
+              <motion.div
+                key="map-view"
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 50 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="col-span-4 w-full overflow-hidden rounded-xl h-full"
+              >
+                {isLisitingLoading ? (
+                  <SkeletonMap />
+                ) : forMapsData?.length ? (
+                  <Map locations={forMapsData} />
+                ) : (
+                  <div className="h-full flex items-center justify-center text-gray-500 text-sm border border-dotted rounded-lg">
+                    Map data not available.
+                  </div>
                 )}
-              />
-            </div>
-          </div>
-          <div className="w-full overflow-hidden rounded-xl h-full col-span-4">
-            {isLisitingLoading ? (
-              <SkeletonMap />
-            ) : forMapsData?.length ? (
-              <Map locations={forMapsData} />
-            ) : (
-              <div className="h-full flex items-center justify-center text-gray-500 text-sm border border-dotted rounded-lg">
-                Map data not available.
-              </div>
+              </motion.div>
             )}
-          </div>
+          </AnimatePresence>
         </div>
       </Container>
     </div>

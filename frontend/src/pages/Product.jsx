@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Container from "../components/Container";
 import { NavLink, useLocation } from "react-router-dom";
 import { MdLocationOn } from "react-icons/md";
@@ -42,24 +42,7 @@ const Product = () => {
   });
 
   console.log("companuDetials ", companyDetails);
-  const companyImages = [
-    {
-      _id: 1,
-      url: "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
-    },
-    {
-      _id: 2,
-      url: "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
-    },
-    {
-      _id: 3,
-      url: "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
-    },
-    {
-      _id: 4,
-      url: "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
-    },
-  ];
+  const companyImages = companyDetails?.images.slice(0,4) || []
   const inclusions = companyDetails?.inclusions || {};
 
   const amenities = Object.entries(inclusions)
@@ -148,7 +131,12 @@ const Product = () => {
     onError: (error) => {},
   });
 
-  const [selectedImage, setSelectedImage] = useState(companyImages[0]);
+  const [selectedImage, setSelectedImage] = useState(null);
+  useEffect(() => {
+  if (companyImages?.length && !selectedImage) {
+    setSelectedImage(companyImages[0]);
+  }
+}, [companyImages, selectedImage]);
 
   const reviewData = isCompanyDetails
     ? []
@@ -186,7 +174,7 @@ const Product = () => {
         <div className="flex flex-col gap-8">
           <div className="flex w-full justify-between">
             <h1 className="text-title font-semibold text-secondary-dark">
-              {companyDetails?.companyName}
+              {companyDetails?.companyName || "Unknown"}
             </h1>
             <NavLink className={"text-small underline"} to={"/nomad/login"}>
               Save
@@ -196,9 +184,9 @@ const Product = () => {
           {/* Image Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 overflow-hidden">
             {/* Main Image */}
-            <div className="w-full h-full overflow-hidden rounded-md">
+            <div className="w-full h-[28.5rem] overflow-hidden rounded-md">
               <img
-                src={selectedImage.url}
+                src={selectedImage?.url || "https://via.placeholder.com/400x200?text=No+Image+Found+"}
                 className="w-full h-full object-cover"
                 alt="Selected"
               />
@@ -209,8 +197,8 @@ const Product = () => {
               {companyImages.map((item) => (
                 <div
                   key={item._id}
-                  className={`w-full h-full overflow-hidden rounded-md cursor-pointer border-2 ${
-                    selectedImage._id === item._id
+                  className={`w-full h-56 overflow-hidden rounded-md cursor-pointer border-2 ${
+                    selectedImage?._id === item._id
                       ? "border-primary-dark"
                       : "border-transparent"
                   }`}
@@ -232,10 +220,10 @@ const Product = () => {
               <div className="w-full h-36 overflow-hidden rounded-md">
                 <img
                   src={
-                    "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp"
+                   companyDetails?.logo || "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp"
                   }
                   alt="company-logo"
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-contain"
                 />
               </div>
               <div className="space-y-2">
@@ -269,14 +257,11 @@ const Product = () => {
                 <div className="flex w-full lg:w-1/2 gap-1 justify-end">
                   <div className="flex flex-col gap-0 justify-center items-center">
                     <p className="text-subtitle lg:text-subtitle">
-                      {companyDetails?.ratings}
+                      {companyDetails?.ratings || 0}
                     </p>
                     <span className="text-sm flex lg:text-small font-medium">
                       {renderStars(
-                        companyDetails?.reviews.reduce(
-                          (sum, r) => sum + r.starCount,
-                          0
-                        ) / companyDetails?.reviews?.length || 0
+                        companyDetails?.ratings || 0
                       )}
                     </span>
                   </div>
@@ -296,7 +281,7 @@ const Product = () => {
 
                   <div className="flex flex-col gap-4 lg:gap-0 justify-center items-center">
                     <p className="text-subtitle lg:text-subtitle mt-1">
-                      {companyDetails?.reviews?.length || 0}
+                      {companyDetails?.reviewCount || 0}
                     </p>
                     <span className="text-small font-medium">Reviews</span>
                   </div>
@@ -540,10 +525,10 @@ const Product = () => {
                   </div>
                   <div className="text-center space-y-3">
                     <h1 className="text-title text-secondary-dark font-semibold">
-                      {companyDetails?.pocs?.name || "Unknown"}
+                      {companyDetails?.pocs?.name || "Anviksha Godkar"}
                     </h1>
                     <p className="text-content">
-                      {companyDetails?.pocs?.designation || "Unknown"}
+                      {companyDetails?.pocs?.designation || "Deputy Sales Manager"}
                     </p>
                   </div>
                 </div>
