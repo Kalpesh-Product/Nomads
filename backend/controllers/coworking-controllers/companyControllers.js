@@ -6,6 +6,7 @@ import PointOfContact from "../../models/coworking/PointOfContact.js";
 import yup from "yup";
 import csvParser from "csv-parser";
 import { Readable } from "stream";
+import { uploadFileToS3 } from "../../config/s3Config.js";
 
 export const addNewCompany = async (req, res, next) => {
   try {
@@ -208,6 +209,36 @@ export const bulkInsertCompanies = async (req, res, next) => {
           }
         }
       });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const uploadCoworkingImage = async (req, res, next) => {
+  try {
+    const file = req.file;
+    const { type, coworkingCompanyId } = req.body;
+    if (type?.toLowerCase() === "logo") {
+      const cowrokingCompany = await CoworkingCompany.findOne({ _id: coworkingCompanyId }).exec();
+      if (!cowrokingCompany) {
+        return res.status(404).json({ message: "No such company found" });
+      }
+      try {
+        const response = await uploadFileToS3(
+          `nomads/coworking/${cowrokingCompany?.companyName}/logo/${file?.originalname}`,
+          file
+        );
+        cowrokingCompany.logo = response;
+        await cowrokingCompany.save({ validateBeforeSave: false });
+        return res
+          .status(200)
+          .json({ message: "Successfully uploaded coworking company logo" });
+      } catch (error) {
+        return res
+          .status(500)
+          .json({ message: "Failed to upload image to S3" });
+      }
+    }
   } catch (error) {
     next(error);
   }

@@ -5,6 +5,7 @@ import {
   addNewCompany,
   bulkInsertCompanies,
   getCompanyData,
+  uploadCoworkingImage,
 } from "../../controllers/coworking-controllers/companyControllers.js";
 
 router.post("/add-new-company", addNewCompany);
@@ -13,5 +14,10 @@ router.post(
   "/bulk-insert-companies",
   upload.single("companies"),
   bulkInsertCompanies
+);
+router.post(
+  "/upload-coworking-company-image",
+  upload.single("image"),
+  uploadCoworkingImage
 );
 export default router;
