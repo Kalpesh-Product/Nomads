@@ -529,7 +529,7 @@ const Product = () => {
             </div>
             <hr className="my-5 lg:my-10" />
             <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-2 gap-10 pb-20">
-              <div className="flex flex-col items-center col-span-1 border-2 shadow-md gap-4 rounded-xl p-4 w-full">
+              <div className="flex flex-col lg:flex-row  items-center col-span-1 border-2 shadow-md gap-4 rounded-xl p-4 w-full">
                 <div className="flex flex-col gap-4 justify-center items-center">
                   <div className="h-20 w-20 overflow-hidden rounded-full">
                     <img
@@ -539,7 +539,7 @@ const Product = () => {
                     />
                   </div>
                   <div className="text-center space-y-3">
-                    <h1 className="text-title font-semibold">
+                    <h1 className="text-title text-secondary-dark font-semibold">
                       {companyDetails?.pocs?.name || "Unknown"}
                     </h1>
                     <p className="text-content">
@@ -547,11 +547,12 @@ const Product = () => {
                     </p>
                   </div>
                 </div>
-                <hr />
+                      <div className="w-px h-full bg-gray-300 mx-2 my-auto" />
                 <div>
-                  <p className="text-subtitle mb-4">Host Details</p>
+             
+                  <p className="text-subtitle text-secondary-dark font-semibold mb-4">Host Details</p>
                   <ul className="list-disc pl-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 gap-x-4 text-small">
+                    <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 gap-x-4 text-small">
                       <li>Response rate: 100%</li>
                       <li>Speaks English, Hindi and Punjabi</li>
                       <li>Responds within an hour</li>
@@ -560,9 +561,9 @@ const Product = () => {
                   </ul>
                 </div>
               </div>
-              <div className="flex w-full border-2 shadow-md">
+              <div className="flex w-full border-2 shadow-md rounded-xl">
                 <div className="flex flex-col  h-full gap-4 rounded-xl p-6 w-full lg:w-full justify-between">
-                  <h1 className="text-title font-semibold">Connect With Us</h1>
+                  <h1 className="text-title text-secondary-dark font-semibold">Connect With Us</h1>
                   <form
                     onSubmit={handlesubmitSales((data) => submitSales(data))}
                     className="grid grid-cols-1 gap-4"
