@@ -32,7 +32,7 @@ const TransparentModal = ({
               className="bg-black shadow-xl outline-none w-screen h-screen overflow-y-auto"
             >
               {/* Header */}
-              <div className="flex justify-between items-center px-4 py-2 rounded-t-md">
+              <div className="flex justify-end items-center px-4 py-2 rounded-t-md">
                 <IconButton sx={{ p: 0 }} onClick={onClose}>
                   <IoMdClose
                     className="text-white"

@@ -19,6 +19,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import MuiModal from "../components/Modal";
 import Map from "../components/Map";
 import LeafWrapper from "../components/LeafWrapper";
+import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
 
 dayjs.extend(relativeTime);
 
@@ -153,6 +154,7 @@ const Product = () => {
   };
 
   const mapsData = [forMapsData];
+  const [heartClicked, setHeartClicked] = useState(false);
 
   return (
     <div className="p-4">
@@ -162,99 +164,162 @@ const Product = () => {
             <h1 className="text-title font-semibold text-secondary-dark">
               {companyDetails?.companyName || "Unknown"}
             </h1>
-            <NavLink className={"text-small underline"} to={"/nomad/login"}>
-              Save
-            </NavLink>
+            <div className="items-center flex gap-2">
+              <div
+                onClick={() => setHeartClicked((prev) => !prev)}
+                className="cursor-pointer relative"
+              >
+                {heartClicked ? <IoIosHeart /> : <IoIosHeartEmpty />}
+              </div>
+              <NavLink className={"text-small underline"} to={"/nomad/login"}>
+                Save
+              </NavLink>
+            </div>
           </div>
 
           {/* Image Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 overflow-hidden">
-            {/* Main Image */}
-            <div className="w-full h-[28.5rem] overflow-hidden rounded-md">
-              <img
-                src={
-                  selectedImage?.url ||
-                  "https://via.placeholder.com/400x200?text=No+Image+Found+"
-                }
-                className="w-full h-full object-cover"
-                alt="Selected"
-              />
-            </div>
-
-            {/* Thumbnail Images */}
-            <div className="grid grid-cols-2 gap-1">
-              {companyImages.map((item, index) => (
-                <div
-                  key={item._id}
-                  className={`relative w-full h-56 overflow-hidden rounded-md cursor-pointer border-2 ${
-                    selectedImage?._id === item._id
-                      ? "border-primary-dark"
-                      : "border-transparent"
-                  }`}
-                  onClick={() =>
-                    navigate("images", {
-                      state: {
-                        companyName: companyDetails?.companyName,
-                        images: companyDetails?.images,
-                        selectedImageId: item._id,
-                      },
-                    })
-                  }
-                >
-                  <img
-                    src={item.url}
-                    alt="company-thumbnail"
-                    className="w-full h-full object-cover"
+          {isCompanyDetails ? (
+            // 🔄 Loading skeletons
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 overflow-hidden animate-pulse">
+              {/* Main Skeleton */}
+              <div className="w-full h-[28.5rem] bg-gray-200 rounded-md" />
+              {/* Thumbnail Skeletons */}
+              <div className="grid grid-cols-2 gap-1">
+                {[1, 2, 3, 4].map((_, idx) => (
+                  <div
+                    key={idx}
+                    className="w-full h-56 bg-gray-200 rounded-md"
                   />
-
-                  {/* Button on bottom right of 4th image */}
-                  {showMore && index === 3 && (
-                    <div className="absolute inset-0 bg-black/40 flex items-end justify-end p-2">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation(); // prevent selecting the image
-                          navigate("images", {
-                            state: {
-                              companyName: companyDetails?.companyName,
-                              images: companyDetails?.images,
-                            },
-                          });
-                        }}
-                        className="bg-white text-sm px-3 py-1 rounded shadow font-medium"
-                      >
-                        +{companyDetails.images.length - 4} more
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          ) : companyImages.length === 0 ? (
+            // 🚫 No images fallback
+            <div className="flex flex-col items-center justify-center gap-4 py-10 border border-dashed border-gray-300 rounded-md">
+              <img
+                src="https://via.placeholder.com/150x100?text=No+Images"
+                alt="No images"
+                className="w-40 h-auto"
+              />
+              <p className="text-gray-500 text-sm">
+                No images have been provided by the company.
+              </p>
+            </div>
+          ) : (
+            // ✅ Actual image display
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 overflow-hidden">
+              {/* Main Image */}
+              <div className="w-full h-[28.5rem] overflow-hidden rounded-md">
+                <img
+                  src={
+                    selectedImage?.url ||
+                    "https://via.placeholder.com/400x200?text=No+Image+Found+"
+                  }
+                  className="w-full h-full object-cover"
+                  alt="Selected"
+                />
+              </div>
+
+              {/* Thumbnail Images */}
+              <div className="grid grid-cols-2 gap-1">
+                {companyImages.map((item, index) => (
+                  <div
+                    key={item._id}
+                    className={`relative w-full h-56 overflow-hidden rounded-md cursor-pointer border-2 ${
+                      selectedImage?._id === item._id
+                        ? "border-primary-dark"
+                        : "border-transparent"
+                    }`}
+                    onClick={() =>
+                      navigate("images", {
+                        state: {
+                          companyName: companyDetails?.companyName,
+                          images: companyDetails?.images,
+                          selectedImageId: item._id,
+                        },
+                      })
+                    }
+                  >
+                    <img
+                      src={item.url}
+                      alt="company-thumbnail"
+                      className="w-full h-full object-cover"
+                    />
+
+                    {/* Button on bottom right of 4th image */}
+                    {showMore && index === 3 && (
+                      <div className="absolute inset-0 bg-black/40 flex items-end justify-end p-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation(); // prevent selecting the image
+                            navigate("images", {
+                              state: {
+                                companyName: companyDetails?.companyName,
+                                images: companyDetails?.images,
+                              },
+                            });
+                          }}
+                          className="bg-white text-sm px-3 py-1 rounded shadow font-medium"
+                        >
+                          +{companyDetails.images.length - 4} more
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* About and Location */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="flex flex-col gap-8">
-              <div className="w-full h-36 overflow-hidden rounded-md">
-                <img
-                  src={
-                    companyDetails?.logo ||
-                    "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp"
-                  }
-                  alt="company-logo"
-                  className="h-full w-full object-contain"
-                />
-              </div>
+              {isCompanyDetails ? (
+                // 🔄 Skeleton while loading
+                <div className="w-full h-36 bg-gray-200 animate-pulse rounded-md" />
+              ) : !companyDetails?.logo ? (
+                // 🚫 Fallback UI when logo is missing
+                <div className="w-full h-36 flex items-center justify-center bg-gray-100 border border-dashed border-gray-300 rounded-md">
+                  <span className="text-gray-500 text-sm">
+                    No company logo available
+                  </span>
+                </div>
+              ) : (
+                // ✅ Show actual logo
+                <div className="w-full h-36 overflow-hidden rounded-md">
+                  <img
+                    src={companyDetails.logo}
+                    alt="company-logo"
+                    className="h-full w-full object-contain"
+                  />
+                </div>
+              )}
+
               <div className="space-y-2">
                 <h1 className="text-title uppercase font-semibold text-secondary-dark">
                   about
                 </h1>
-                {/* <div className="text-sm lg:text-tiny text-gray-700">
-                <MdLocationOn className="inline-block text-secondary text-subtitle mr-1" />
-                {companyDetails?.address}
-              </div> */}
-                <p className="text-sm text-secondary-dark">
-                  {companyDetails?.about?.replace(/\\n/g, " ")}
-                </p>
+
+                {isCompanyDetails ? (
+                  // 🔄 Skeleton UI while loading
+                  <div className="space-y-1 animate-pulse">
+                    <div className="h-3 bg-gray-200 rounded w-3/4" />
+                    <div className="h-3 bg-gray-200 rounded w-2/3" />
+                    <div className="h-3 bg-gray-200 rounded w-1/2" />
+                  </div>
+                ) : !companyDetails?.about ? (
+                  // 🚫 Fallback if no "about" content
+                  <div className="place-content-center w-full h-full">
+                    <p className="text-sm text-gray-500 italic">
+                      Company information is not provided.
+                    </p>
+                  </div>
+                ) : (
+                  // ✅ Actual content
+                  <p className="text-sm text-secondary-dark">
+                    {companyDetails.about.replace(/\\n/g, " ")}
+                  </p>
+                )}
               </div>
             </div>
             <div className="flex flex-col gap-4">
@@ -533,7 +598,7 @@ const Product = () => {
               <div className="flex flex-col lg:flex-row  items-center col-span-1 border-2 shadow-md gap-4 rounded-xl p-4 w-full">
                 <div className="flex flex-col gap-4 justify-center items-center">
                   {/* Avatar with Initials */}
-                  <div className="h-20 w-20 rounded-full bg-primary-light flex items-center justify-center text-seconday-dark text-xl font-semibold uppercase">
+                  <div className="h-20 w-20 rounded-full bg-primary-blue flex items-center justify-center text-white text-xl font-semibold uppercase">
                     {companyDetails?.pocs?.name
                       ?.split(" ")
                       .map((n) => n[0])
@@ -636,15 +701,23 @@ const Product = () => {
         <div className="flex flex-col gap-4">
           {/* Reviewer Info */}
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-primary-blue flex items-center justify-center text-secondary-dark font-semibold text-lg uppercase">
-              {selectedReview?.reviewerName
+            <div className="w-12 h-12 rounded-full bg-primary-blue flex items-center justify-center text-white font-semibold text-lg uppercase">
+              {(
+                selectedReview?.reviewerName ||
+                selectedReview?.name ||
+                "Unknown"
+              )
                 ?.split(" ")
                 .map((n) => n[0])
                 .join("")
                 .slice(0, 2)}
             </div>
             <div>
-              <p className="font-semibold text-base">{selectedReview?.reviewerName}</p>
+              <p className="font-semibold text-base">
+                {selectedReview?.reviewerName ||
+                  selectedReview?.name ||
+                  "Unknown"}
+              </p>
               <p className="text-sm text-gray-500">{selectedReview?.date}</p>
             </div>
           </div>

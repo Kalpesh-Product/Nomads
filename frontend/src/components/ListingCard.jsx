@@ -14,7 +14,6 @@ const ListingCard = ({ item, handleNavigation }) => {
 
   const thumbnailImage = (item?.images?.[0]?.url) ;
 
-  console.log("item in listings ", thumbnailImage);
 
   return (
     <div

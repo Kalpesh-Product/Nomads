@@ -14,7 +14,7 @@ module.exports = {
           DEFAULT: "#FAFAFA",
           light: "#3b82f6",
           dark: "#1e40af",
-          blue: "#0AA9ef",
+          blue: "#0BA9EF",
         },
         secondary: {
           DEFAULT: "#202020",
