@@ -7,6 +7,7 @@ import {
   MarkerClusterer,
 } from "@react-google-maps/api";
 import renderStars from "../utils/renderStarts";
+import { FaStar } from "react-icons/fa6";
 
 const center = {
   lat: 15.501,
@@ -66,9 +67,9 @@ export default function Map({ locations }) {
                       <div className="mt-1 font-semibold text-xs text-black truncate">
                         {loc.name}
                       </div>
-                      <div className="flex items-center mt-1 text-xs">
-                        {renderStars(loc.ratings || 0)}
-                        <span className="ml-1 text-gray-600">{loc.ratings || 0}</span>
+                      <div className="flex items-center gap-1 mt-1 text-xs ">
+                    <FaStar />
+                        <span className="text-gray-600">{loc.ratings || 0}</span>
                       </div>
                     </div>
                     <div className="flex justify-between items-center text-xs mt-1">
@@ -76,8 +77,8 @@ export default function Map({ locations }) {
                         {loc.location}
                       </span>
                       <span className="text-black font-semibold">
-                        Reviews(<span className="font-bold">{loc.reviews || 0}</span>
-                        )
+                        Reviews(
+                        <span className="font-bold">{loc.reviews || 0}</span>)
                       </span>
                     </div>
                   </div>

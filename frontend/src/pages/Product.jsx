@@ -532,13 +532,16 @@ const Product = () => {
             <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-2 gap-10 pb-20">
               <div className="flex flex-col lg:flex-row  items-center col-span-1 border-2 shadow-md gap-4 rounded-xl p-4 w-full">
                 <div className="flex flex-col gap-4 justify-center items-center">
-                  <div className="h-20 w-20 overflow-hidden rounded-full">
-                    <img
-                      src="/images/bg-image.jpg"
-                      alt="poc image"
-                      className="w-full h-full object-cover"
-                    />
+                  {/* Avatar with Initials */}
+                  <div className="h-20 w-20 rounded-full bg-primary-light flex items-center justify-center text-seconday-dark text-xl font-semibold uppercase">
+                    {companyDetails?.pocs?.name
+                      ?.split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                      .slice(0, 2) || "AG"}
                   </div>
+
+                  {/* Name & Designation */}
                   <div className="text-center space-y-3">
                     <h1 className="text-title text-secondary-dark font-semibold">
                       {companyDetails?.pocs?.name || "Anviksha Godkar"}
@@ -549,6 +552,7 @@ const Product = () => {
                     </p>
                   </div>
                 </div>
+
                 <div className="w-px h-full bg-gray-300 mx-2 my-auto" />
                 <div>
                   <p className="text-subtitle text-secondary-dark font-semibold mb-4">
@@ -632,15 +636,15 @@ const Product = () => {
         <div className="flex flex-col gap-4">
           {/* Reviewer Info */}
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-white font-semibold text-lg uppercase">
-              {selectedReview?.name
+            <div className="w-12 h-12 rounded-full bg-primary-blue flex items-center justify-center text-secondary-dark font-semibold text-lg uppercase">
+              {selectedReview?.reviewerName
                 ?.split(" ")
                 .map((n) => n[0])
                 .join("")
                 .slice(0, 2)}
             </div>
             <div>
-              <p className="font-semibold text-base">{selectedReview?.name}</p>
+              <p className="font-semibold text-base">{selectedReview?.reviewerName}</p>
               <p className="text-sm text-gray-500">{selectedReview?.date}</p>
             </div>
           </div>
