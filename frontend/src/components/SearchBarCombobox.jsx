@@ -74,7 +74,7 @@ export default function SearchBarCombobox({
                 animate={{ opacity: 1, scaleY: 1 }}
                 exit={{ opacity: 0, scaleY: 0 }}
                 transition={{ duration: 0.2 }}
-                className="absolute left-4  z-0 mt-1 origin-top bg-white w-80 border-2 rounded-b-2xl rounded-t-none shadow-2xl p-0">
+                className="absolute left-4  z-20 mt-1 origin-top bg-white w-72 rounded-b-2xl rounded-t-none shadow-2xl p-0">
                 <div className="max-h-60 overflow-y-auto">
                   {filteredOptions.length === 0 ? (
                     <div className="p-3 text-gray-500">No results found</div>

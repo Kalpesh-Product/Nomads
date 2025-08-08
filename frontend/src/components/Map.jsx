@@ -6,6 +6,7 @@ import {
   useJsApiLoader,
   MarkerClusterer,
 } from "@react-google-maps/api";
+import renderStars from "../utils/renderStarts";
 
 const center = {
   lat: 15.501,
@@ -66,11 +67,8 @@ export default function Map({ locations }) {
                         {loc.name}
                       </div>
                       <div className="flex items-center mt-1 text-xs">
-                        <span className="text-yellow-400 text-sm leading-none">
-                          {"★".repeat(Math.floor(loc.rating)) +
-                            "☆".repeat(5 - Math.floor(loc.rating))}
-                        </span>
-                        <span className="ml-1 text-gray-600">{loc.rating}</span>
+                        {renderStars(loc.ratings || 0)}
+                        <span className="ml-1 text-gray-600">{loc.ratings || 0}</span>
                       </div>
                     </div>
                     <div className="flex justify-between items-center text-xs mt-1">
@@ -78,7 +76,7 @@ export default function Map({ locations }) {
                         {loc.location}
                       </span>
                       <span className="text-black font-semibold">
-                        Reviews(<span className="font-bold">{loc.reviews}</span>
+                        Reviews(<span className="font-bold">{loc.reviews || 0}</span>
                         )
                       </span>
                     </div>

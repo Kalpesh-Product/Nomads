@@ -179,7 +179,7 @@ const Home = () => {
     { image: icons.teacoffee, title: "TEA & COFFEE" },
     { image: icons.assist, title: "ASSIST" },
     { image: icons.community, title: "COMMUNITY" },
-  { image: icons.secure, title: "SECURE" },
+    { image: icons.secure, title: "SECURE" },
     { image: icons.maintenance, title: "MAINTANANCE" },
     { image: icons.generator, title: "GENERATOR" },
     { image: icons.pickupdrop, title: "PICKUP & DROP" },
@@ -222,10 +222,11 @@ const Home = () => {
                     options={countryOptions}
                     label="Select Country"
                     placeholder="Select aspiring destination"
-                    className="w-full z-10"
+                    className="w-full "
                   />
                 )}
               />
+              <div className="w-px h-10 bg-gray-300 mx-2 my-auto" />
               <Controller
                 name="location"
                 control={control}
@@ -237,10 +238,11 @@ const Home = () => {
                     options={locationOptions}
                     placeholder="Select area within country"
                     disabled={!selectedCountry}
-                    className="-ml-12 w-full z-20"
+                    className="w-full"
                   />
                 )}
               />
+               <div className="w-px h-10 bg-gray-300 mx-2 my-auto" />
               <Controller
                 name="count"
                 control={control}
@@ -252,7 +254,7 @@ const Home = () => {
                     label="Select Count"
                     placeholder="Booking for no. of Nomads"
                     disabled={!selectedState}
-                    className="-ml-12 w-full z-30"
+                    className="w-full "
                   />
                 )}
               />
@@ -268,7 +270,7 @@ const Home = () => {
         <div className="lg:hidden flex w-full items-center justify-center my-4">
           <button
             onClick={() => setShowMobileSearch(true)}
-            className="bg-white flex items-center w-full text-black border-2 px-6 py-3 rounded-full"
+            className="bg-white flex items-center w-full text-gray-400 font-medium border-2 px-6 py-3 rounded-full"
           >
             <IoSearch className="inline mr-2" />
             Start Search
@@ -359,10 +361,14 @@ const Home = () => {
             <div className="lg:w-1/2 flex flex-col h-full justify-between gap-10 text-center md:text-start">
               <div className=" font-light text-primary-blue text-center font-play leading-relaxed lg:space-y-6 lg:leading-normal">
                 <div className="text-center">
-                  <h1 className="text-[clamp(1rem,13.71vw,6rem)] text-nowrap">Building the</h1>
+                  <h1 className="text-[clamp(1rem,13.71vw,6rem)] text-nowrap">
+                    Building the
+                  </h1>
                 </div>
                 <div className="text-title font-medium">
-                  <h1 className="text-[clamp(1rem,7.3vw,3.3rem)] text-nowrap">Largets Community of</h1>
+                  <h1 className="text-[clamp(1rem,7.3vw,3.3rem)] text-nowrap">
+                    Largets Community of
+                  </h1>
                 </div>
                 <div className="font-semibold">
                   <h1 className="text-[clamp(4rem,8vw,16rem)]">NOMADS</h1>
@@ -418,11 +424,7 @@ const Home = () => {
       </section>
       {/*  */}
       <section className="w-full px-6 py-12 bg-gray-50">
-        {/* <div className="max-w-7xl mx-auto"> */}
-        {/* <div className="min-w-[85%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0 lg:py-0 py-0"> */}
-        {/* <div className="min-w-[90%] max-w-[91rem] lg:max-w-[91rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0 lg:py-0 py-0"> */}
-        <div className="w-[90%] max-w-[91rem] mx-auto lg:px-3 2xlplus:w-[88%] 2xlplus:max-w-[95rem] ">
-          {/* <div className="w-[90%] max-w-[91rem] mx-auto px-4 sm:w-[95%] xs:w-[97%]"> */}
+        <div className="w-full max-w-[91rem] mx-auto lg:px-3">
           <h2 className="text-2xl md:text-3xl font-medium text-left mb-10 text-gray-700">
             Solutions for your aspiring destinations.
           </h2>

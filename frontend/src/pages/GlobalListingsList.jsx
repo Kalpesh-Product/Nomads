@@ -60,7 +60,7 @@ const GlobalListingsList = () => {
   };
 
   const { data: listingsData, isPending: isLisitingLoading } = useQuery({
-    queryKey: ["listings", formData], // ✅ ensures it refetches when formData changes
+    queryKey: ["globallistings", formData], // ✅ ensures it refetches when formData changes
     queryFn: async () => {
       const { country, location, category } = formData || {};
 
@@ -158,9 +158,30 @@ const GlobalListingsList = () => {
       }
     );
   };
+  // Prioritize BIZ Nest and MeWo first, then sort the rest by rating descending
+  const prioritizedCompanies = ["BIZ Nest", "MeWo"];
+  const sortedListings = [...(listingsData || [])].sort((a, b) => {
+    const aIsPriority = prioritizedCompanies.includes(a.companyName);
+    const bIsPriority = prioritizedCompanies.includes(b.companyName);
+
+    if (aIsPriority && !bIsPriority) return -1;
+    if (!aIsPriority && bIsPriority) return 1;
+
+    // If both are priority or both are not, then sort by average rating descending
+    const aRating =
+      a.reviews?.length > 0
+        ? a.reviews.reduce((sum, r) => sum + r.starCount, 0) / a.reviews.length
+        : 0;
+    const bRating =
+      b.reviews?.length > 0
+        ? b.reviews.reduce((sum, r) => sum + r.starCount, 0) / b.reviews.length
+        : 0;
+
+    return bRating - aRating;
+  });
 
   return (
-    <div className="flex flex-col gap-6 ">
+    <div className="flex flex-col gap-2 lg:gap-6">
       <div className="flex flex-col gap-4 justify-center items-center  w-full lg:mt-0">
         <Container padding={false}>
           <div className="hidden lg:flex flex-col gap-4 justify-between items-center w-full h-full">
@@ -176,7 +197,8 @@ const GlobalListingsList = () => {
                       key={cat.value}
                       type="button"
                       onClick={() => handleCategoryClick(cat.value)}
-                      className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full">
+                      className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full"
+                    >
                       {iconSrc ? (
                         <div className="h-10 w-full flex flex-col gap-0">
                           <img
@@ -198,7 +220,8 @@ const GlobalListingsList = () => {
 
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className=" flex justify-around w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center">
+              className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
+            >
               <Controller
                 name="country"
                 control={control}
@@ -209,10 +232,11 @@ const GlobalListingsList = () => {
                     options={countryOptions}
                     label="Select Country"
                     placeholder="Select aspiring destination"
-                    className="w-full z-10"
+                    className="w-full "
                   />
                 )}
               />
+              <div className="w-px h-10 bg-gray-300 mx-2 my-auto" />
               <Controller
                 name="location"
                 control={control}
@@ -224,10 +248,11 @@ const GlobalListingsList = () => {
                     options={locationOptions}
                     placeholder="Select area within country"
                     disabled={!selectedCountry}
-                    className="-ml-12 w-full z-20"
+                    className="w-full"
                   />
                 )}
               />
+              <div className="w-px h-10 bg-gray-300 mx-2 my-auto" />
               <Controller
                 name="count"
                 control={control}
@@ -239,13 +264,14 @@ const GlobalListingsList = () => {
                     label="Select Count"
                     placeholder="Booking for no. of Nomads"
                     disabled={!selectedState}
-                    className="-ml-12 w-full z-30"
+                    className="w-full "
                   />
                 )}
               />
               <button
                 type="submit"
-                className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full">
+                className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full"
+              >
                 <IoSearch />
               </button>
             </form>
@@ -253,9 +279,16 @@ const GlobalListingsList = () => {
           <div className="flex lg:hidden w-full items-center justify-center my-4">
             <button
               onClick={() => setShowMobileSearch((prev) => !prev)}
-              className="bg-white flex items-center w-full text-black border-2 px-6 py-3 rounded-full">
-              <IoSearch className="inline mr-2" />
-              Start Search
+              className="bg-white flex items-center w-full text-center justify-center font-medium text-secondary-dark border-2 px-6 py-2 rounded-full flex-col gap-2"
+            >
+              <span>
+                Search Results in{" "}
+                {formData?.location?.charAt(0).toUpperCase() +
+                  formData?.location?.slice(1) || "Unknown"}
+              </span>
+              <span className="text-tiny text-gray-500">
+                {formData?.count || "N/A"} Nomads
+              </span>
             </button>
           </div>
         </Container>
@@ -266,12 +299,14 @@ const GlobalListingsList = () => {
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ duration: 0.3 }}
-              className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 p-4 rounded-t-3xl lg:hidden">
+              className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 p-4 rounded-t-3xl lg:hidden"
+            >
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold">Search</h3>
                 <button
                   onClick={() => setShowMobileSearch(false)}
-                  className="text-gray-500 text-xl">
+                  className="text-gray-500 text-xl"
+                >
                   &times;
                 </button>
               </div>
@@ -284,7 +319,8 @@ const GlobalListingsList = () => {
                       key={cat.value}
                       type="button"
                       onClick={() => handleCategoryClick(cat.value)}
-                      className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full">
+                      className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full"
+                    >
                       {iconSrc ? (
                         <div className="h-10 w-full flex flex-col gap-0">
                           <img
@@ -350,7 +386,8 @@ const GlobalListingsList = () => {
                 />
                 <button
                   type="submit"
-                  className="w-full bg-[#FF5757] text-white py-3 rounded-full">
+                  className="w-full bg-[#FF5757] text-white py-3 rounded-full"
+                >
                   <IoSearch className="inline mr-2" />
                   Search
                 </button>
@@ -370,25 +407,31 @@ const GlobalListingsList = () => {
                 ))
               ) : groupedListings && Object.keys(groupedListings).length > 0 ? (
                 Object.entries(groupedListings).map(([type, items]) => {
-                  console.log("typoe ", type);
                   const prioritizedCompanies = ["MeWo", "BIZ Nest"];
-                  const sortedItems = items.sort((a, b) => {
-                    const aPriority = prioritizedCompanies.includes(
+                  const sortedItems = [...items].sort((a, b) => {
+                    const aIsPriority = prioritizedCompanies.includes(
                       a.companyName
-                    )
-                      ? 0
-                      : 1;
-                    const bPriority = prioritizedCompanies.includes(
+                    );
+                    const bIsPriority = prioritizedCompanies.includes(
                       b.companyName
-                    )
-                      ? 0
-                      : 1;
+                    );
 
-                    // If both have same priority, keep original order
-                    if (aPriority === bPriority) return 0;
+                    if (aIsPriority && !bIsPriority) return -1;
+                    if (!aIsPriority && bIsPriority) return 1;
 
-                    // Prioritize a if it's in the list
-                    return aPriority - bPriority;
+                    // If both are priority or both are not, sort by rating descending
+                    const aRating =
+                      a.reviews?.length > 0
+                        ? a.reviews.reduce((sum, r) => sum + r.starCount, 0) /
+                          a.reviews.length
+                        : 0;
+                    const bRating =
+                      b.reviews?.length > 0
+                        ? b.reviews.reduce((sum, r) => sum + r.starCount, 0) /
+                          b.reviews.length
+                        : 0;
+
+                    return bRating - aRating;
                   });
 
                   const displayItems = sortedItems.slice(0, 5);
@@ -422,7 +465,8 @@ const GlobalListingsList = () => {
                         <div className="mt-3 text-right">
                           <button
                             onClick={() => handleShowMoreClick(type)}
-                            className="text-primary-blue text-sm font-semibold hover:underline">
+                            className="text-primary-blue text-sm font-semibold hover:underline"
+                          >
                             View More →
                           </button>
                         </div>
