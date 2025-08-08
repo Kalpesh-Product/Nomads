@@ -15,6 +15,7 @@ const icons = {
   itsupport: "/icons/itsupport.webp",
   laundry: "/icons/laundry.webp",
   library: "/icons/library.png",
+  waterfront: "/icons/waterfront.png",
   livingspace: "/icons/livingspace.webp",
   maintenance: "/icons/maintenance.webp",
   meetingrooms: "/icons/meetingroom.webp",
