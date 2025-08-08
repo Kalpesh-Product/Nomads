@@ -280,13 +280,15 @@ export default function Signup() {
             </FormControl>
           </div>
 
-          <div className="col-span-1 md:col-span-2 flex justify-center items-center mt-2">
+          <div className="col-span-1 md:col-span-2 flex justify-center items-center mt-2 py-2">
             <PrimaryButton
               type={"submit"}
               isLoading={isRegisterationPending}
               title={"Signup"}
               disabled={isRegisterationPending}
-              className={"text-white font-semibold "}
+               className={
+              "bg-[#FF5757]  flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[7rem] px-6"
+            }
             />
           </div>
 

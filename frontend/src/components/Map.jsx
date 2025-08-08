@@ -24,8 +24,8 @@ const mapOptions = {
   disableDefaultUI: false,
 };
 
-export default function Map({ locations }) {
-  const navigate = useNavigate()
+export default function Map({ locations, disableNavigation = false }) {
+  const navigate = useNavigate();
   console.log("location inside map ", locations);
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_API_KEY,
@@ -57,10 +57,16 @@ export default function Map({ locations }) {
               }}
               onMouseOver={() => setHoveredMarker(loc.id)}
               onMouseOut={() => setHoveredMarker(null)}
-              onClick={()=> navigate(`${loc.name}`,{state:{
-                companyId : loc?._id,
-                type : loc?.type
-              }})}
+              onClick={() => {
+                if (!disableNavigation) {
+                  navigate(`${loc.name}`, {
+                    state: {
+                      companyId: loc?._id,
+                      type: loc?.type,
+                    },
+                  });
+                }
+              }}
             >
               {hoveredMarker === loc.id && (
                 <InfoWindow position={{ lat: loc.lat, lng: loc.lng }}>
@@ -75,8 +81,10 @@ export default function Map({ locations }) {
                         {loc.name}
                       </div>
                       <div className="flex items-center gap-1 mt-1 text-xs ">
-                    <FaStar />
-                        <span className="text-gray-600">{loc.ratings || 0}</span>
+                        <FaStar />
+                        <span className="text-gray-600">
+                          {loc.ratings || 0}
+                        </span>
                       </div>
                     </div>
                     <div className="flex justify-between items-center text-xs mt-1">

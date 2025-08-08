@@ -48,37 +48,36 @@ const Product = () => {
   const showMore = (companyDetails?.images?.length || 0) > 4;
   const inclusions = companyDetails?.inclusions || {};
 
-  const amenities = Object.entries(inclusions)
-    .filter(
-      ([key, value]) =>
-        value === true &&
-        key !== "_id" &&
-        key !== "__v" &&
-        key !== "coworkingCompany" &&
-        key !== "createdAt" &&
-        key !== "updatedAt" &&
-        key !== "transportOptions"
-    )
-    .map(([key]) => {
-      const iconKey = key.toLowerCase();
-      return {
-        image: icons[iconKey] || "/icons/default.webp", // fallback if no icon
-        title: key
-          .replace(/([A-Z])/g, " $1") // Add space before capital letters
-          .replace(/^./, (str) => str.toUpperCase()), // Capitalize first letter
-      };
-    });
+const amenities = Object.entries(inclusions)
+  .filter(([key]) =>
+    !["_id", "__v", "coworkingCompany", "createdAt", "updatedAt", "transportOptions"].includes(key)
+  )
+  .map(([key, value]) => {
+    const iconKey = key.toLowerCase();
+    return {
+      image: icons[iconKey] || "/icons/default.webp",
+      title: key
+        .replace(/([A-Z])/g, " $1")
+        .replace(/^./, (str) => str.toUpperCase()),
+      isAvailable: value === true,
+    };
+  });
 
   const transportOptions = inclusions.transportOptions || {};
 
-  const transportAmenities = Object.entries(transportOptions)
-    .filter(([key, value]) => value === true)
-    .map(([key]) => ({
-      image: icons[key.toLowerCase()] || "/icons/default.webp",
-      title: key.charAt(0).toUpperCase() + key.slice(1),
-    }));
+const transportAmenities = Object.entries(transportOptions)
+  .map(([key, value]) => ({
+    image: icons[key.toLowerCase()] || "/icons/default.webp",
+    title: key.charAt(0).toUpperCase() + key.slice(1),
+    isAvailable: value === true,
+  }));
 
-  const allAmenities = [...amenities, ...transportAmenities];
+  const sortedAmenities = amenities.sort((a, b) => b.isAvailable - a.isAvailable);
+const sortedTransportAmenities = transportAmenities.sort((a, b) => b.isAvailable - a.isAvailable);
+
+
+const allAmenities = [...sortedAmenities, ...sortedTransportAmenities];
+
   const total = allAmenities.length;
   const columns = 6;
   const remainder = total % columns;
@@ -555,6 +554,7 @@ const Product = () => {
                     key={index}
                     image={item.image}
                     title={item.title}
+                      isAvailable={item.isAvailable}
                   />
                 ))}
               </div>
@@ -600,7 +600,7 @@ const Product = () => {
             {/* Map */}
             <div className="w-full h-[500px] flex flex-col gap-8 rounded-xl overflow-hidden">
               <h1 className="text-title font-semibold">Where you'll be</h1>
-              <Map locations={mapsData} />
+              <Map locations={mapsData} disableNavigation/>
             </div>
             <hr className="my-5 lg:my-10" />
             <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-2 gap-10 pb-20">
