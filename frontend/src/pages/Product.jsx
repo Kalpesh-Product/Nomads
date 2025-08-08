@@ -215,7 +215,16 @@ const Product = () => {
                     selectedImage?.url ||
                     "https://via.placeholder.com/400x200?text=No+Image+Found+"
                   }
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover cursor-pointer"
+                  onClick={() =>
+                    navigate("images", {
+                      state: {
+                        companyName: companyDetails?.companyName,
+                        images: companyDetails?.images,
+                        selectedImageId: selectedImage?._id, // ✅ Fix here
+                      },
+                    })
+                  }
                   alt="Selected"
                 />
               </div>
