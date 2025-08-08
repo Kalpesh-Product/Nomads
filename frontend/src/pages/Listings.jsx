@@ -1,4 +1,4 @@
-import { MenuItem, TextField } from "@mui/material";
+import { Box, MenuItem, Skeleton, TextField } from "@mui/material";
 import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -51,8 +51,8 @@ const Listings = () => {
   useEffect(() => {
     queryClient.invalidateQueries({ queryKey: ["listings", formData] });
   }, [formData]);
+  const skeletonArray = Array.from({ length: 6 });
 
-  console.log("formData", formData);
   const { data: listingsData, isPending: isLisitingLoading } = useQuery({
     queryKey: ["listings", formData], // ✅ ensures it refetches when formData changes
     queryFn: async () => {
@@ -120,8 +120,7 @@ const Listings = () => {
               return avg % 1 === 0 ? avg : avg.toFixed(1);
             })()
           : "0",
-        image:
-          "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
+        image: item.images?.[0]?.url,
       }));
 
   const handleCategoryClick = (categoryValue) => {
@@ -138,9 +137,6 @@ const Listings = () => {
       ...formData,
       category: categoryValue,
     };
-
-    // console.log("Generated URL:", url);
-    console.log("State to be passed:", state);
     setShowMobileSearch(false);
     navigate(
       `/nomad/listings?country=${formData.country}&location=${formData.location}&category=${state.category}`,
@@ -230,7 +226,7 @@ const Listings = () => {
 
               <form
                 onSubmit={handleSubmit(onSubmit)}
-                className=" flex justify-around w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
+                className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
               >
                 <Controller
                   name="country"
@@ -242,10 +238,11 @@ const Listings = () => {
                       options={countryOptions}
                       label="Select Country"
                       placeholder="Select aspiring destination"
-                      className="w-full z-10"
+                      className="w-full "
                     />
                   )}
                 />
+                <div className="w-px h-10 bg-gray-300 mx-2 my-auto" />
                 <Controller
                   name="location"
                   control={control}
@@ -257,10 +254,11 @@ const Listings = () => {
                       options={locationOptions}
                       placeholder="Select area within country"
                       disabled={!selectedCountry}
-                      className="-ml-12 w-full z-20"
+                      className="w-full"
                     />
                   )}
                 />
+                <div className="w-px h-10 bg-gray-300 mx-2 my-auto" />
                 <Controller
                   name="count"
                   control={control}
@@ -272,7 +270,7 @@ const Listings = () => {
                       label="Select Count"
                       placeholder="Booking for no. of Nomads"
                       disabled={!selectedState}
-                      className="-ml-12 w-full z-30"
+                      className="w-full "
                     />
                   )}
                 />
@@ -435,45 +433,63 @@ const Listings = () => {
               mapOpen ? "col-span-5" : "col-span-9"
             } font-semibold text-lg`}
           >
-            <div className="flex w-full justify-between pb-6">
-              <p>
-                Over {listingsData?.length - 1}{" "}
-                {formData.category?.charAt(0).toUpperCase() +
-                  formData.category?.slice(1)}{" "}
-                Spaces
-              </p>
-              <button onClick={() => setMapOpen((prev) => !prev)}>
-                {mapOpen ? "← List View" : "Map View →"}
-              </button>
-            </div>
+            {!isLisitingLoading ? (
+              <div className="flex w-full justify-between pb-6">
+                <p>
+                  Over {listingsData?.length - 1}{" "}
+                  {formData.category?.charAt(0).toUpperCase() +
+                    formData.category?.slice(1)}{" "}
+                  Spaces
+                </p>
+                <button onClick={() => setMapOpen((prev) => !prev)}>
+                  {mapOpen ? "← List View" : "Map View →"}
+                </button>
+              </div>
+            ) : (
+              <Box className="w-full h-full">
+                <Skeleton width={400} height={50} />
+              </Box>
+            )}
 
             <PaginatedGrid
-              data={sortedListings}
-              entriesPerPage={6}
+              data={isLisitingLoading ? skeletonArray : sortedListings}
+              entriesPerPage={!mapOpen ? 10 : 6}
               columns={`grid-cols-1 md:grid-cols-2 ${
                 mapOpen ? "lg:grid-cols-3" : "lg:grid-cols-5"
               } gap-x-5`}
-              renderItem={(item, index) => (
-                <motion.div
-                  key={item._id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: 0.4,
-                    delay: index * 0.1,
-                    ease: "easeOut",
-                  }}
-                >
-                  <ListingCard
-                    item={item}
-                    handleNavigation={() =>
-                      navigate(`${item.companyName}`, {
-                        state: { companyId: item._id, type: item.type },
-                      })
-                    }
-                  />
-                </motion.div>
-              )}
+              renderItem={(item, index) =>
+                isLisitingLoading ? (
+                  <Box key={index} className="w-full h-full">
+                    <Skeleton
+                      variant="rectangular"
+                      height={200}
+                      sx={{ borderRadius: 2 }}
+                    />
+                    <Skeleton variant="text" width="80%" sx={{ mt: 1 }} />
+                    <Skeleton variant="text" width="60%" />
+                  </Box>
+                ) : (
+                  <motion.div
+                    key={item._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: 0.4,
+                      delay: index * 0.1,
+                      ease: "easeOut",
+                    }}
+                  >
+                    <ListingCard
+                      item={item}
+                      handleNavigation={() =>
+                        navigate(`${item.companyName}`, {
+                          state: { companyId: item._id, type: item.type },
+                        })
+                      }
+                    />
+                  </motion.div>
+                )
+              }
             />
           </motion.div>
 

@@ -22,12 +22,11 @@ const PaginatedGrid = ({
     const buttons = [];
 
     if (totalPages <= 6) {
-      // show all pages if 6 or fewer
       for (let i = 1; i <= totalPages; i++) buttons.push(i);
     } else {
-      if (currentPage <= 4) {
+      if (currentPage <= 3) {
         buttons.push(1, 2, 3, 4, "...", totalPages);
-      } else if (currentPage >= totalPages - 3) {
+      } else if (currentPage >= totalPages - 2) {
         buttons.push(
           1,
           "...",
@@ -53,7 +52,7 @@ const PaginatedGrid = ({
   };
 
   return (
-    <div className="flex flex-col gap-4 min-h-[65vh] overflow-y-auto max-h-screen justify-between">
+    <div className="flex flex-col gap-4 min-h-[65vh] overflow-y-auto max-h-screen justify-between custom-scrollbar-hide">
       <div className={`grid ${columns} gap-2`}>
         {currentData.length ? (
           currentData.map((item, i) => renderItem(item, i))
@@ -66,7 +65,7 @@ const PaginatedGrid = ({
 
       {totalPages > 1 && (
         <div className="flex justify-center gap-2 mt-4">
-          {getPageButtons().map((val, i) =>
+          {/* {getPageButtons().map((val, i) =>
             val === "..." ? (
               <span key={i} className="px-2 text-gray-400">
                 ...
@@ -83,7 +82,28 @@ const PaginatedGrid = ({
                 {val}
               </button>
             )
-          )}
+          )} */}
+
+          <div className="overflow-x-auto">
+            <div className="flex justify-start gap-2 mt-4 w-max px-2">
+              {Array.from({ length: totalPages }, (_, index) => {
+                const val = index + 1;
+                return (
+                  <button
+                    key={val}
+                    onClick={() => setCurrentPage(val)}
+                    className={`h-8 w-8 flex justify-center items-center rounded-full text-sm transition shrink-0 ${
+                      currentPage === val
+                        ? "bg-black text-white"
+                        : "bg-white text-black border border-gray-300"
+                    }`}
+                  >
+                    {val}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
       )}
     </div>

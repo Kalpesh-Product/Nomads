@@ -16,6 +16,7 @@ const ReviewCard = ({ review, handleClick }) => {
     rating,
     description,
     starCount,
+    reviewerName,
   } = review;
 
   return (
@@ -29,16 +30,16 @@ const ReviewCard = ({ review, handleClick }) => {
             className="w-10 h-10 rounded-full object-cover"
           />
         ) : (
-          <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-sm font-semibold text-white uppercase">
-            {name
-              ?.split(" ")
+          <div className="w-10 h-10 rounded-full bg-primary-blue flex items-center justify-center text-sm font-semibold text-white uppercase">
+            {(name || reviewerName || "")
+              .split(" ")
               .map((n) => n[0])
               .join("")
               .slice(0, 2)}
           </div>
         )}
         <div>
-          <p className="font-semibold">{name}</p>
+          <p className="font-semibold">{name || reviewerName}</p>
           <p className="text-sm text-gray-500">{duration}</p>
         </div>
       </div>

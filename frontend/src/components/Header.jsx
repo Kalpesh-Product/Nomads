@@ -35,7 +35,7 @@ const Header = () => {
   };
 
   const headerLinks = [
-    { id: 1, text: "Destination news", to: "nomad/destination-news" },
+    { id: 1, text: "Destination News", to: "nomad/destination-news" },
     { id: 2, text: "Local Blog", to: "nomad/local-blog" },
     {
       id: 3,
@@ -62,17 +62,11 @@ const Header = () => {
         className=" w-36 overflow-x-hidden rounded-lg flex justify-between items-center cursor-pointer">
         <img src={logo} alt={"logo"} className="w-full h-full object-contain" />
       </div>
-      <div className="h-full px-2 hidden md:hidden lg:hidden">
-        <button
-          onClick={() => setOpen(true)}
-          className="hamburger-menu rounded-lg text-title text-black">
-          ☰
-        </button>
-      </div>
+
 
       {!hideMapListLinks && (
         <div>
-          <ul className="hidden xl:flex sm:hidden gap-8 justify-center flex-1">
+          <ul className="hidden xl:flex sm:hidden gap-8 pl-20 justify-center flex-1">
             <>
               {/* Case 1: It's a /nomad/:country/:state page */}
               {isNomadLocation ? (
@@ -164,7 +158,7 @@ const Header = () => {
         </div>
       )}
 
-      <div className="flex gap-10">
+      <div className="hidden lg:flex gap-10">
         <li className="flex items-center">
           <div className="p-4 px-0 whitespace-nowrap">
             <a
@@ -195,6 +189,13 @@ const Header = () => {
           />
         </div> */}
       </div>
+            <div className="h-full px-2 block  lg:hidden">
+        <button
+          onClick={() => setOpen(true)}
+          className="hamburger-menu rounded-lg text-title text-black">
+          ☰
+        </button>
+      </div>
 
       <Drawer
         sx={{
@@ -217,10 +218,104 @@ const Header = () => {
                 <IoCloseSharp />
               </span>
             </div>
+
+               {!hideMapListLinks && (
+        <div>
+          <ul className="hidden xl:flex sm:hidden gap-8 pl-20 justify-center flex-1">
+            <>
+              {/* Case 1: It's a /nomad/:country/:state page */}
+              {isNomadLocation ? (
+                <>
+                  {view !== "map" && (
+                    <li className="flex items-center">
+                      <div className="p-4 px-0 whitespace-nowrap">
+                        <Link
+                          to={`${location.pathname}?view=map`}
+                          className="group relative text-md  text-black">
+                          <span className="relative z-10 group-hover:font-bold mb-2">
+                            Map view
+                          </span>
+                          <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                        </Link>
+                      </div>
+                    </li>
+                  )}
+
+                  {view === "map" && (
+                    <li className="flex items-center">
+                      <div className="p-4 px-0 whitespace-nowrap">
+                        <Link
+                          to={`${location.pathname}`}
+                          className="group relative text-md text-black">
+                          <span className="relative z-10 group-hover:font-bold mb-2">
+                            List view
+                          </span>
+                          <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                        </Link>
+                      </div>
+                    </li>
+                  )}
+                </>
+              ) : (
+                // Case 2: Not a /nomad/:country/:state page, always show List View
+                <>
+                  {isNomadListingsPage && (
+                    <li className="flex items-center">
+                      <div className="p-4 px-0 whitespace-nowrap">
+                        <Link
+                          to={getListViewPath()}
+                          className="group relative text-md text-black">
+                          <span className="relative z-10 group-hover:font-bold mb-2">
+                            List view
+                          </span>
+                          <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                        </Link>
+                      </div>
+                    </li>
+                  )}
+                </>
+              )}
+            </>
+
+            {/* Remaining nav links */}
+            {headerLinks.map((item, index) => (
+              <li key={item.id} className="flex items-center">
+                {!["Signup"].includes(item.text) && (
+                  <div className="p-4 px-0 whitespace-nowrap">
+                    {item.external ? (
+                      <>
+                        {isNomadHome && (
+                          <a
+                            href={item.to}
+                            className="group relative font-light text-md">
+                            <span className="relative z-10 group-hover:font-bold mb-8">
+                              {item.text}
+                            </span>
+                            <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                          </a>
+                        )}
+                      </>
+                    ) : (
+                      <Link
+                        to={item.to}
+                        className="group relative text-md text-black">
+                        <span className="relative z-10 group-hover:font-bold mb-8">
+                          {item.text}
+                        </span>
+                        <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                      </Link>
+                    )}
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
             {headerLinks.map((item) => (
               <li key={item.id} className="items-center text-center">
                 <div onClick={() => handleNavigation(item.to)} className="py-4">
-                  <p className="text-primary text-lg">{item.text}</p>
+                  <p className="text-secondary-dark text-lg">{item.text}</p>
                 </div>
                 <div className="h-[0.2px] bg-gray-300"></div>
               </li>
