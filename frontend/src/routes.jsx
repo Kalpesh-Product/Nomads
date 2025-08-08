@@ -15,6 +15,7 @@ import DestinationNews from "./pages/DestinationNews";
 import LocalBlog from "./pages/LocalBlog";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import ImageGallery from "./pages/ImageGallery";
 
 const router = createBrowserRouter([
   {
@@ -46,6 +47,10 @@ const router = createBrowserRouter([
           {
             path: "listings/:company",
             element: <Product />,
+          },
+          {
+            path: "listings/:company/images",
+            element: <ImageGallery />,
           },
           {
             path: "components",

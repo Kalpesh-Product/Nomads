@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Container from "../components/Container";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { MdLocationOn } from "react-icons/md";
 import { Controller, useForm } from "react-hook-form";
 import { MenuItem, TextField } from "@mui/material";
@@ -24,6 +24,7 @@ dayjs.extend(relativeTime);
 
 const Product = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { companyId, type } = location.state;
   const [selectedReview, setSelectedReview] = useState([]);
   console.log("selected : ", selectedReview);
@@ -42,7 +43,8 @@ const Product = () => {
   });
 
   console.log("companuDetials ", companyDetails);
-  const companyImages = companyDetails?.images.slice(0,4) || []
+  const companyImages = companyDetails?.images?.slice(0, 4) || [];
+  const showMore = (companyDetails?.images?.length || 0) > 4;
   const inclusions = companyDetails?.inclusions || {};
 
   const amenities = Object.entries(inclusions)
@@ -80,15 +82,6 @@ const Product = () => {
   const columns = 6;
   const remainder = total % columns;
   const lastRowStartIndex = remainder === 0 ? -1 : total - remainder;
-
-  // Tailwind-safe col-span mapping for remainder values
-  const colSpanSafeMap = {
-    1: "lg:col-span-6",
-    2: "lg:col-span-3",
-    3: "lg:col-span-2",
-    4: "lg:col-span-3 ",
-    5: "lg:col-span-2",
-  };
 
   const { handleSubmit, control, reset } = useForm({
     defaultValues: {
@@ -133,10 +126,10 @@ const Product = () => {
 
   const [selectedImage, setSelectedImage] = useState(null);
   useEffect(() => {
-  if (companyImages?.length && !selectedImage) {
-    setSelectedImage(companyImages[0]);
-  }
-}, [companyImages, selectedImage]);
+    if (companyImages?.length && !selectedImage) {
+      setSelectedImage(companyImages[0]);
+    }
+  }, [companyImages, selectedImage]);
 
   const reviewData = isCompanyDetails
     ? []
@@ -153,15 +146,8 @@ const Product = () => {
     lng: companyDetails?.longitude,
     name: companyDetails?.companyName,
     location: companyDetails?.city,
-    reviews: companyDetails?.reviews.length,
-    rating: companyDetails?.reviews?.length
-      ? (() => {
-          const avg =
-            companyDetails?.reviews.reduce((sum, r) => sum + r.starCount, 0) /
-            companyDetails?.reviews.length;
-          return avg % 1 === 0 ? avg : avg.toFixed(1);
-        })()
-      : "0",
+    reviews: companyDetails?.reviewCount,
+    ratings: companyDetails?.ratings,
     image:
       "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
   };
@@ -186,7 +172,10 @@ const Product = () => {
             {/* Main Image */}
             <div className="w-full h-[28.5rem] overflow-hidden rounded-md">
               <img
-                src={selectedImage?.url || "https://via.placeholder.com/400x200?text=No+Image+Found+"}
+                src={
+                  selectedImage?.url ||
+                  "https://via.placeholder.com/400x200?text=No+Image+Found+"
+                }
                 className="w-full h-full object-cover"
                 alt="Selected"
               />
@@ -194,21 +183,49 @@ const Product = () => {
 
             {/* Thumbnail Images */}
             <div className="grid grid-cols-2 gap-1">
-              {companyImages.map((item) => (
+              {companyImages.map((item, index) => (
                 <div
                   key={item._id}
-                  className={`w-full h-56 overflow-hidden rounded-md cursor-pointer border-2 ${
+                  className={`relative w-full h-56 overflow-hidden rounded-md cursor-pointer border-2 ${
                     selectedImage?._id === item._id
                       ? "border-primary-dark"
                       : "border-transparent"
                   }`}
-                  onClick={() => setSelectedImage(item)}
+                  onClick={() =>
+                    navigate("images", {
+                      state: {
+                        companyName: companyDetails?.companyName,
+                        images: companyDetails?.images,
+                        selectedImageId: item._id,
+                      },
+                    })
+                  }
                 >
                   <img
                     src={item.url}
                     alt="company-thumbnail"
                     className="w-full h-full object-cover"
                   />
+
+                  {/* Button on bottom right of 4th image */}
+                  {showMore && index === 3 && (
+                    <div className="absolute inset-0 bg-black/40 flex items-end justify-end p-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation(); // prevent selecting the image
+                          navigate("images", {
+                            state: {
+                              companyName: companyDetails?.companyName,
+                              images: companyDetails?.images,
+                            },
+                          });
+                        }}
+                        className="bg-white text-sm px-3 py-1 rounded shadow font-medium"
+                      >
+                        +{companyDetails.images.length - 4} more
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -220,7 +237,8 @@ const Product = () => {
               <div className="w-full h-36 overflow-hidden rounded-md">
                 <img
                   src={
-                   companyDetails?.logo || "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp"
+                    companyDetails?.logo ||
+                    "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp"
                   }
                   alt="company-logo"
                   className="h-full w-full object-contain"
@@ -260,9 +278,7 @@ const Product = () => {
                       {companyDetails?.ratings || 0}
                     </p>
                     <span className="text-sm flex lg:text-small font-medium">
-                      {renderStars(
-                        companyDetails?.ratings || 0
-                      )}
+                      {renderStars(companyDetails?.ratings || 0)}
                     </span>
                   </div>
                   {/* Vertical Separator */}
@@ -528,14 +544,16 @@ const Product = () => {
                       {companyDetails?.pocs?.name || "Anviksha Godkar"}
                     </h1>
                     <p className="text-content">
-                      {companyDetails?.pocs?.designation || "Deputy Sales Manager"}
+                      {companyDetails?.pocs?.designation ||
+                        "Deputy Sales Manager"}
                     </p>
                   </div>
                 </div>
-                      <div className="w-px h-full bg-gray-300 mx-2 my-auto" />
+                <div className="w-px h-full bg-gray-300 mx-2 my-auto" />
                 <div>
-             
-                  <p className="text-subtitle text-secondary-dark font-semibold mb-4">Host Details</p>
+                  <p className="text-subtitle text-secondary-dark font-semibold mb-4">
+                    Host Details
+                  </p>
                   <ul className="list-disc pl-6">
                     <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 gap-x-4 text-small">
                       <li>Response rate: 100%</li>
@@ -548,7 +566,9 @@ const Product = () => {
               </div>
               <div className="flex w-full border-2 shadow-md rounded-xl">
                 <div className="flex flex-col  h-full gap-4 rounded-xl p-6 w-full lg:w-full justify-between">
-                  <h1 className="text-title text-secondary-dark font-semibold">Connect With Us</h1>
+                  <h1 className="text-title text-secondary-dark font-semibold">
+                    Connect With Us
+                  </h1>
                   <form
                     onSubmit={handlesubmitSales((data) => submitSales(data))}
                     className="grid grid-cols-1 gap-4"
