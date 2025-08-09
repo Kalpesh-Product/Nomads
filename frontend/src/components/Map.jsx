@@ -20,12 +20,14 @@ const containerStyle = {
   height: "100%",
 };
 
-const mapOptions = {
-  disableDefaultUI: false,
-};
 
-export default function Map({ locations, disableNavigation = false }) {
+
+export default function Map({ locations, disableNavigation = false, disableTwoFingerScroll = false }) {
   const navigate = useNavigate();
+  const mapOptions = {
+  disableDefaultUI: false,
+      gestureHandling: disableTwoFingerScroll ? "none" : "greedy", 
+};
   console.log("location inside map ", locations);
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_API_KEY,
@@ -51,15 +53,15 @@ export default function Map({ locations, disableNavigation = false }) {
               key={createKey(loc)}
               position={{ lat: loc.lat, lng: loc.lng }}
               clusterer={clusterer}
-              icon={{
-                url: "/images/marker.png",
-                scaledSize: new window.google.maps.Size(40, 40),
-              }}
+              // icon={{
+              //   url: "/images/marker.png",
+              //   scaledSize: new window.google.maps.Size(40, 40),
+              // }}
               onMouseOver={() => setHoveredMarker(loc.id)}
               onMouseOut={() => setHoveredMarker(null)}
               onClick={() => {
                 if (!disableNavigation) {
-                  navigate(`${loc.name}`, {
+                  navigate(`/nomad/listings/${loc.name}`, {
                     state: {
                       companyId: loc?._id,
                       type: loc?.type,

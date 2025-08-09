@@ -41,7 +41,7 @@ const Listings = () => {
     { label: "Co-Working", value: "coworking" },
     { label: "Hostel", value: "hostel" },
     { label: "Cafe’s", value: "cafe" },
-    { label: "Meeting Rooms", value: "meetingRoom" },
+    { label: "Meetings", value: "meetingRoom" },
     { label: "Private Stay", value: "privateStay" },
     { label: "Co-Living", value: "coliving" },
     { label: " Workation", value: "workation" },

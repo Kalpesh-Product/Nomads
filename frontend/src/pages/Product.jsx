@@ -20,7 +20,15 @@ import MuiModal from "../components/Modal";
 import Map from "../components/Map";
 import LeafWrapper from "../components/LeafWrapper";
 import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
-import { FaCheck } from "react-icons/fa";
+import {
+  isAlphanumeric,
+  isValidEmail,
+  isValidPhoneNumber,
+  noOnlyWhitespace,
+} from "../utils/validators";
+import { useSelector } from "react-redux";
+import toast from "react-hot-toast";
+import AmenitiesList from "../components/AmenitiesList";import { FaCheck } from "react-icons/fa";
 
 dayjs.extend(relativeTime);
 
@@ -47,94 +55,88 @@ const Product = () => {
   console.log("companuDetials ", companyDetails);
   const companyImages = companyDetails?.images?.slice(0, 4) || [];
   const showMore = (companyDetails?.images?.length || 0) > 4;
-  const inclusions = companyDetails?.inclusions || {};
+  const inclusions = companyDetails?.inclusions || [];
 
-  const amenities = Object.entries(inclusions)
-    .filter(
-      ([key]) =>
-        ![
-          "_id",
-          "__v",
-          "coworkingCompany",
-          "createdAt",
-          "updatedAt",
-          "transportOptions",
-        ].includes(key)
-    )
-    .map(([key, value]) => {
-      const iconKey = key.toLowerCase();
-      return {
-        image: icons[iconKey] || "/icons/default.webp",
-        title: key
-          .replace(/([A-Z])/g, " $1")
-          .replace(/^./, (str) => str.toUpperCase()),
-        isAvailable: value === true,
-      };
-    });
+  // const total = allAmenities.length;
+  // const columns = 6;
+  // const remainder = total % columns;
+  // const lastRowStartIndex = remainder === 0 ? -1 : total - remainder;
 
-  const transportOptions = inclusions.transportOptions || {};
-
-  const transportAmenities = Object.entries(transportOptions).map(
-    ([key, value]) => ({
-      image: icons[key.toLowerCase()] || "/icons/default.webp",
-      title: key.charAt(0).toUpperCase() + key.slice(1),
-      isAvailable: value === true,
-    })
-  );
-
-  const sortedAmenities = amenities.sort(
-    (a, b) => b.isAvailable - a.isAvailable
-  );
-  const sortedTransportAmenities = transportAmenities.sort(
-    (a, b) => b.isAvailable - a.isAvailable
-  );
-
-  const allAmenities = [...sortedAmenities, ...sortedTransportAmenities];
-
-  const total = allAmenities.length;
-  const columns = 6;
-  const remainder = total % columns;
-  const lastRowStartIndex = remainder === 0 ? -1 : total - remainder;
-
-  const { handleSubmit, control, reset } = useForm({
+  const {
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors },
+    watch,
+  } = useForm({
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      mobileNumber: "",
+      fullName: "",
+      noOfPeople: 0,
+      mobileNumber: 0,
       email: "",
-      type: "",
-      numberOfDesks: 2,
       startDate: null,
       endDate: null,
     },
+    mode: "onChange",
   });
+  const selectedStartDate = watch("startDate");
   const {
     handleSubmit: handlesubmitSales,
     control: salesControl,
     reset: salesReset,
+    formState: { errors: salesErrors },
   } = useForm({
     defaultValues: {
       fullName: "",
-      mobileNumber: "",
+      mobileNumber: 0,
       email: "",
     },
+    mode: "onChange",
   });
 
   const { mutate: submitEnquiry, isPending: isSubmitting } = useMutation({
     mutationKey: ["submitEnquiry"],
     mutationFn: async (data) => {
-      console.log(data);
+      const response = await axios.post("/form/add-new-enquiry", {
+        ...data,
+        country: companyDetails?.country,
+        state: companyDetails?.state,
+        companyType: companyDetails?.type,
+        personelCount: parseInt(data?.noOfPeople),
+        companyName: companyDetails?.companyName,
+        sheetName: "All_Enquiry",
+        phone: data?.mobileNumber,
+      });
+      return response.data;
     },
-    onSuccess: (data) => {},
-    onError: (error) => {},
+    onSuccess: (data) => {
+      toast.success(data.message);
+      reset();
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message);
+    },
   });
   const { mutate: submitSales, isPending: isSubmittingSales } = useMutation({
     mutationKey: ["submitSales"],
     mutationFn: async (data) => {
-      console.log(data);
+      const response = await axios.post("/form/add-new-enquiry", {
+        ...data,
+        pocName: companyDetails?.pocs?.name || "Anviksha Godkar",
+        pocCompany: companyDetails?.companyName,
+        pocDesignation: companyDetails?.pocs?.designation,
+        sheetName: "All_POC_Contact",
+        mobile: data.mobileNumber,
+      });
+      return response.data;
     },
-    onSuccess: (data) => {},
-    onError: (error) => {},
+    onSuccess: (data) => {
+      toast.success(data.message);
+      salesReset();
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message);
+    },
   });
 
   const [selectedImage, setSelectedImage] = useState(null);
@@ -162,6 +164,7 @@ const Product = () => {
     reviews: companyDetails?.reviewCount,
     ratings: companyDetails?.ratings,
     image:
+      companyDetails?.images?.[0]?.url ||
       "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
   };
 
@@ -395,6 +398,13 @@ const Product = () => {
                   className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <Controller
                     name="fullName"
+                    rules={{
+                      required: "Full Name is required",
+                      validate: {
+                        noOnlyWhitespace,
+                        isAlphanumeric,
+                      },
+                    }}
                     control={control}
                     render={({ field }) => (
                       <TextField
@@ -403,39 +413,62 @@ const Product = () => {
                         fullWidth
                         variant="standard"
                         size="small"
+                        helperText={errors?.fullName?.message}
+                        error={!!errors.fullName}
                       />
                     )}
                   />
                   <Controller
                     name="noOfPeople"
                     control={control}
+                    rules={{
+                      required: "No. of people is required",
+                    }}
                     render={({ field }) => (
                       <TextField
                         {...field}
                         label="No. Of People"
                         fullWidth
+                        type="number"
                         variant="standard"
                         size="small"
+                        helperText={errors?.noOfPeople?.message}
+                        error={!!errors.noOfPeople}
                       />
                     )}
                   />
                   <Controller
                     name="mobileNumber"
                     control={control}
+                    rules={{
+                      required: "Mobile number is required",
+                      validate: {
+                        isValidPhoneNumber,
+                      },
+                    }}
                     render={({ field }) => (
                       <TextField
                         {...field}
                         label="Mobile Number"
                         fullWidth
                         type="number"
+                        value={field.value || ""}
                         variant="standard"
                         size="small"
+                        helperText={errors?.mobileNumber?.message}
+                        error={!!errors.mobileNumber}
                       />
                     )}
                   />
                   <Controller
                     name="email"
                     control={control}
+                    rules={{
+                      required: "Email is required",
+                      validate: {
+                        isValidEmail,
+                      },
+                    }}
                     render={({ field }) => (
                       <TextField
                         {...field}
@@ -444,30 +477,13 @@ const Product = () => {
                         type="email"
                         variant="standard"
                         size="small"
+                        helperText={errors?.email?.message}
+                        error={!!errors.email}
                       />
                     )}
                   />
-                  {companyDetails?.type === "coworking" && (
-                    <Controller
-                      name="type"
-                      control={control}
-                      render={({ field }) => (
-                        <TextField
-                          {...field}
-                          label="Type"
-                          fullWidth
-                          variant="standard"
-                          size="small"
-                          select>
-                          <MenuItem value="" disabled>
-                            <em>Select A Type</em>
-                          </MenuItem>
-                          <MenuItem value="cabin desk">Cabin Desk</MenuItem>
-                        </TextField>
-                      )}
-                    />
-                  )}
-                  {companyDetails?.type === "coworking" && (
+
+                  {/* {companyDetails?.type === "coworking" && (
                     <Controller
                       name="numberOfDesks"
                       control={control}
@@ -489,7 +505,7 @@ const Product = () => {
                         </TextField>
                       )}
                     />
-                  )}
+                  )} */}
                   <Controller
                     name="startDate"
                     control={control}
@@ -497,6 +513,7 @@ const Product = () => {
                       <DesktopDatePicker
                         {...field}
                         label="Start Date"
+                        disablePast
                         format="DD-MM-YYYY"
                         value={field.value ? dayjs(field.value) : null}
                         onChange={field.onChange}
@@ -518,6 +535,8 @@ const Product = () => {
                         {...field}
                         label="End Date"
                         format="DD-MM-YYYY"
+                        disablePast
+                        disabled={!selectedStartDate}
                         value={field.value ? dayjs(field.value) : null}
                         onChange={field.onChange}
                         slotProps={{
@@ -532,6 +551,8 @@ const Product = () => {
                   />
                   <div className="flex justify-center items-center lg:col-span-2">
                     <SecondaryButton
+                      disabled={isSubmitting}
+                      isLoading={isSubmitting}
                       title={"Get Quote"}
                       type={"submit"}
                       externalStyles={"w-1/2"}
@@ -548,21 +569,22 @@ const Product = () => {
               What Inclusions does it offer
             </h1>
 
-            {allAmenities.length === 0 ? (
+            {inclusions.length === 0 ? (
               <div className="w-full border-2 border-dotted border-gray-400 rounded-lg p-6 text-center text-gray-500">
                 Inclusions not available
               </div>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-24 gap-y-10">
-                {allAmenities.map((item, index) => (
-                  <Amenities
-                    key={index}
-                    image={item.image}
-                    title={item.title}
-                    isAvailable={item.isAvailable}
-                  />
-                ))}
-              </div>
+              // <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-24 gap-y-10">
+              //   {allAmenities.map((item, index) => (
+              //     <Amenities
+              //       key={index}
+              //       image={item.image}
+              //       title={item.title}
+              //       isAvailable={item.isAvailable}
+              //     />
+              //   ))}
+              // </div>
+              <AmenitiesList type={companyDetails?.type.toLowerCase() || ''} inclusions={inclusions} />
             )}
           </div>
 
@@ -607,7 +629,11 @@ const Product = () => {
               <h1 className="text-title font-medium text-gray-700">
                 Where you'll be
               </h1>
-              <Map locations={mapsData} disableNavigation />
+              <Map
+                locations={mapsData}
+                disableNavigation 
+                disableTwoFingerScroll
+              />
             </div>
             <hr className="my-5 lg:my-10" />
             <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-2 gap-10 pb-20">
@@ -665,6 +691,13 @@ const Product = () => {
                     <Controller
                       name="fullName"
                       control={salesControl}
+                      rules={{
+                        required: "Full Name is required",
+                        validate: {
+                          isAlphanumeric,
+                          noOnlyWhitespace,
+                        },
+                      }}
                       render={({ field }) => (
                         <TextField
                           {...field}
@@ -672,26 +705,41 @@ const Product = () => {
                           fullWidth
                           variant="standard"
                           size="small"
+                          error={!!salesErrors?.fullName}
+                          helperText={salesErrors?.fullName?.message}
                         />
                       )}
                     />
                     <Controller
                       name="mobileNumber"
                       control={salesControl}
+                      rules={{
+                        required: "Mobile number is required",
+                        validate: {
+                          isValidPhoneNumber,
+                        },
+                      }}
                       render={({ field }) => (
                         <TextField
                           {...field}
                           label="Mobile Number"
                           fullWidth
+                          value={field.value || ""}
                           type="number"
                           variant="standard"
                           size="small"
+                          error={!!salesErrors?.mobileNumber}
+                          helperText={salesErrors?.mobileNumber?.message}
                         />
                       )}
                     />
                     <Controller
                       name="email"
                       control={salesControl}
+                      rules={{
+                        required: "Email is required",
+                        validate: { isValidEmail },
+                      }}
                       render={({ field }) => (
                         <TextField
                           {...field}
@@ -700,6 +748,8 @@ const Product = () => {
                           type="email"
                           variant="standard"
                           size="small"
+                          error={!!salesErrors?.email}
+                          helperText={salesErrors?.email?.message}
                         />
                       )}
                     />
@@ -708,6 +758,8 @@ const Product = () => {
                         title={"Submit"}
                         type={"submit"}
                         externalStyles={"mt-6 w-1/2"}
+                        disabled={isSubmittingSales}
+                        isLoading={isSubmittingSales}
                       />
                     </div>
                   </form>

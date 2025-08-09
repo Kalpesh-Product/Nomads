@@ -34,6 +34,15 @@
   src: url("../src/assets/El_Messiri/static/ElMessiri-SemiBold.ttf");
 }
 
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
 .playwrite-us-modern-go {
   font-family: "Playwrite US Modern";
   font-optical-sizing: auto;
@@ -229,6 +238,7 @@ body {
   scrollbar-width: none;
   /* Firefox */
 }
+
 
 html::-webkit-scrollbar,
 body::-webkit-scrollbar {

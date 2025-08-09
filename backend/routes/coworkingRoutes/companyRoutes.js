@@ -2,13 +2,9 @@ import { Router } from "express";
 import upload from "../../config/multerConfig.js";
 const router = Router();
 import {
-  addNewCompany,
   bulkInsertCompanies,
-  getCompanyData,
 } from "../../controllers/coworking-controllers/companyControllers.js";
 
-router.post("/add-new-company", addNewCompany);
-router.get("/company-data", getCompanyData);
 router.post(
   "/bulk-insert-companies",
   upload.single("companies"),

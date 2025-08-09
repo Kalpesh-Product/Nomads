@@ -2,33 +2,23 @@ import Hostels from "../models/hostels/Hostel.js";
 import HostelReviews from "../models/hostels/Review.js";
 import HostelPointOfContact from "../models/hostels/PointOfContact.js";
 import HostelUnits from "../models/hostels/Unit.js";
-import HostelInclusions from "../models/hostels/Inclusions.js";
 
 const fetchHostelData = async (country, state) => {
   const countryRegex = { $regex: `^${country}$`, $options: "i" };
   const stateRegex = { $regex: `^${state}$`, $options: "i" };
-  const [
-    hostelCompanies,
-    hostelInclusions,
-    hostelPoc,
-    hostelUnits,
-    hostelReviews,
-  ] = await Promise.all([
-    Hostels.find({ country: countryRegex, state: stateRegex }).lean().exec(),
-    HostelInclusions.find().lean().exec(),
-    HostelPointOfContact.find({ isActive: true }).lean().exec(),
-    HostelUnits.find().lean().exec(),
-    HostelReviews.find().lean().exec(),
-  ]);
+  const [hostelCompanies, hostelPoc, hostelUnits, hostelReviews] =
+    await Promise.all([
+      Hostels.find({ country: countryRegex, state: stateRegex }).lean().exec(),
+      HostelPointOfContact.find({ isActive: true }).lean().exec(),
+      HostelUnits.find().lean().exec(),
+      HostelReviews.find().lean().exec(),
+    ]);
 
   return hostelCompanies.map((company) => {
     const companyId = company._id.toString();
     return {
       ...company,
       reviewCount: company.reviews,
-      inclusions: hostelInclusions.filter(
-        (item) => item.hostel?.toString() === companyId
-      ),
       pointOfContacts: hostelPoc.filter(
         (item) => item.hostel?.toString() === companyId
       ),
@@ -38,6 +28,13 @@ const fetchHostelData = async (country, state) => {
       reviews: hostelReviews.filter(
         (item) => item.hostel?.toString() === companyId
       ),
+      inclusions: company.inclusions
+        .split(",")
+        .map((inc) =>
+          inc?.split(" ").length
+            ? inc?.split(" ")?.join("").toLowerCase().trim()
+            : inc?.trim().toLowerCase()
+        ),
       type: "hostel",
     };
   });
