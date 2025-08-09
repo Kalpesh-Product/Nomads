@@ -20,6 +20,7 @@ import MuiModal from "../components/Modal";
 import Map from "../components/Map";
 import LeafWrapper from "../components/LeafWrapper";
 import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
+import { FaCheck } from "react-icons/fa";
 
 dayjs.extend(relativeTime);
 
@@ -48,35 +49,47 @@ const Product = () => {
   const showMore = (companyDetails?.images?.length || 0) > 4;
   const inclusions = companyDetails?.inclusions || {};
 
-const amenities = Object.entries(inclusions)
-  .filter(([key]) =>
-    !["_id", "__v", "coworkingCompany", "createdAt", "updatedAt", "transportOptions"].includes(key)
-  )
-  .map(([key, value]) => {
-    const iconKey = key.toLowerCase();
-    return {
-      image: icons[iconKey] || "/icons/default.webp",
-      title: key
-        .replace(/([A-Z])/g, " $1")
-        .replace(/^./, (str) => str.toUpperCase()),
-      isAvailable: value === true,
-    };
-  });
+  const amenities = Object.entries(inclusions)
+    .filter(
+      ([key]) =>
+        ![
+          "_id",
+          "__v",
+          "coworkingCompany",
+          "createdAt",
+          "updatedAt",
+          "transportOptions",
+        ].includes(key)
+    )
+    .map(([key, value]) => {
+      const iconKey = key.toLowerCase();
+      return {
+        image: icons[iconKey] || "/icons/default.webp",
+        title: key
+          .replace(/([A-Z])/g, " $1")
+          .replace(/^./, (str) => str.toUpperCase()),
+        isAvailable: value === true,
+      };
+    });
 
   const transportOptions = inclusions.transportOptions || {};
 
-const transportAmenities = Object.entries(transportOptions)
-  .map(([key, value]) => ({
-    image: icons[key.toLowerCase()] || "/icons/default.webp",
-    title: key.charAt(0).toUpperCase() + key.slice(1),
-    isAvailable: value === true,
-  }));
+  const transportAmenities = Object.entries(transportOptions).map(
+    ([key, value]) => ({
+      image: icons[key.toLowerCase()] || "/icons/default.webp",
+      title: key.charAt(0).toUpperCase() + key.slice(1),
+      isAvailable: value === true,
+    })
+  );
 
-  const sortedAmenities = amenities.sort((a, b) => b.isAvailable - a.isAvailable);
-const sortedTransportAmenities = transportAmenities.sort((a, b) => b.isAvailable - a.isAvailable);
+  const sortedAmenities = amenities.sort(
+    (a, b) => b.isAvailable - a.isAvailable
+  );
+  const sortedTransportAmenities = transportAmenities.sort(
+    (a, b) => b.isAvailable - a.isAvailable
+  );
 
-
-const allAmenities = [...sortedAmenities, ...sortedTransportAmenities];
+  const allAmenities = [...sortedAmenities, ...sortedTransportAmenities];
 
   const total = allAmenities.length;
   const columns = 6;
@@ -166,8 +179,7 @@ const allAmenities = [...sortedAmenities, ...sortedTransportAmenities];
             <div className="items-center flex gap-2">
               <div
                 onClick={() => setHeartClicked((prev) => !prev)}
-                className="cursor-pointer relative"
-              >
+                className="cursor-pointer relative">
                 {heartClicked ? <IoIosHeart /> : <IoIosHeartEmpty />}
               </div>
               <NavLink className={"text-small underline"} to={"/nomad/login"}>
@@ -246,8 +258,7 @@ const allAmenities = [...sortedAmenities, ...sortedTransportAmenities];
                           selectedImageId: item._id,
                         },
                       })
-                    }
-                  >
+                    }>
                     <img
                       src={item.url}
                       alt="company-thumbnail"
@@ -267,8 +278,7 @@ const allAmenities = [...sortedAmenities, ...sortedTransportAmenities];
                               },
                             });
                           }}
-                          className="bg-white text-sm px-3 py-1 rounded shadow font-medium"
-                        >
+                          className="bg-white text-sm px-3 py-1 rounded shadow font-medium">
                           +{companyDetails.images.length - 4} more
                         </button>
                       </div>
@@ -384,8 +394,7 @@ const allAmenities = [...sortedAmenities, ...sortedTransportAmenities];
                 <form
                   onSubmit={handleSubmit((data) => submitEnquiry(data))}
                   action=""
-                  className="grid grid-cols-1 lg:grid-cols-2 gap-6"
-                >
+                  className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <Controller
                     name="fullName"
                     control={control}
@@ -451,8 +460,7 @@ const allAmenities = [...sortedAmenities, ...sortedTransportAmenities];
                           fullWidth
                           variant="standard"
                           size="small"
-                          select
-                        >
+                          select>
                           <MenuItem value="" disabled>
                             <em>Select A Type</em>
                           </MenuItem>
@@ -472,8 +480,7 @@ const allAmenities = [...sortedAmenities, ...sortedTransportAmenities];
                           fullWidth
                           variant="standard"
                           size="small"
-                          select
-                        >
+                          select>
                           <MenuItem value="" disabled>
                             <em>Select Number of Desk</em>
                           </MenuItem>
@@ -554,7 +561,7 @@ const allAmenities = [...sortedAmenities, ...sortedTransportAmenities];
                     key={index}
                     image={item.image}
                     title={item.title}
-                      isAvailable={item.isAvailable}
+                    isAvailable={item.isAvailable}
                   />
                 ))}
               </div>
@@ -600,14 +607,14 @@ const allAmenities = [...sortedAmenities, ...sortedTransportAmenities];
             {/* Map */}
             <div className="w-full h-[500px] flex flex-col gap-8 rounded-xl overflow-hidden">
               <h1 className="text-title font-semibold">Where you'll be</h1>
-              <Map locations={mapsData} disableNavigation/>
+              <Map locations={mapsData} disableNavigation />
             </div>
             <hr className="my-5 lg:my-10" />
             <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-2 gap-10 pb-20">
-              <div className="flex flex-col lg:flex-row  items-center col-span-1 border-2 shadow-md gap-4 rounded-xl p-4 w-full">
-                <div className="flex flex-col gap-4 justify-center items-center">
+              <div className="flex flex-col lg:flex-row  items-center col-span-1 border-2 shadow-md gap-4 rounded-xl p-6 w-full">
+                <div className="flex flex-col gap-4 justify-between items-center h-full">
                   {/* Avatar with Initials */}
-                  <div className="h-20 w-20 rounded-full bg-primary-blue flex items-center justify-center text-white text-xl font-semibold uppercase">
+                  <div className="w-32 aspect-square rounded-full bg-primary-blue flex items-center justify-center text-white text-6xl font-semibold uppercase">
                     {companyDetails?.pocs?.name
                       ?.split(" ")
                       .map((n) => n[0])
@@ -616,7 +623,7 @@ const allAmenities = [...sortedAmenities, ...sortedTransportAmenities];
                   </div>
 
                   {/* Name & Designation */}
-                  <div className="text-center space-y-3">
+                  <div className="text-center space-y-3 h-1/2 flex flex-col justify-evenly items-center">
                     <h1 className="text-title text-secondary-dark font-semibold">
                       {companyDetails?.pocs?.name || "Anviksha Godkar"}
                     </h1>
@@ -628,29 +635,33 @@ const allAmenities = [...sortedAmenities, ...sortedTransportAmenities];
                 </div>
 
                 <div className="w-px h-full bg-gray-300 mx-2 my-auto" />
-                <div>
-                  <p className="text-subtitle text-secondary-dark font-semibold mb-4">
+                <div className="h-full">
+                  <p className="text-title text-center text-secondary-dark font-semibold mb-8 underline">
                     Host Details
                   </p>
-                  <ul className="list-disc pl-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 gap-x-4 text-small">
-                      <li>Response rate: 100%</li>
-                      <li>Speaks English, Hindi and Punjabi</li>
-                      <li>Responds within an hour</li>
-                      <li>Lives in Velha, Goa</li>
-                    </div>
-                  </ul>
+                  <div className="grid grid-cols-1 gap-10 text-sm sm:text-base">
+                    {[
+                      "Response rate: 100%",
+                      "Speaks English, Hindi and Punjabi",
+                      "Responds within an hour",
+                      "Lives in Velha, Goa",
+                    ].map((detail, index) => (
+                      <div key={index} className="flex items-start gap-2">
+                        <FaCheck className="text-blue-500 mt-1 flex-shrink-0" />
+                        <span className="leading-snug">{detail}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
               <div className="flex w-full border-2 shadow-md rounded-xl">
                 <div className="flex flex-col  h-full gap-4 rounded-xl p-6 w-full lg:w-full justify-between">
                   <h1 className="text-title text-secondary-dark font-semibold">
-                    Connect With Us
+                    Connect With Host
                   </h1>
                   <form
                     onSubmit={handlesubmitSales((data) => submitSales(data))}
-                    className="grid grid-cols-1 gap-4"
-                  >
+                    className="grid grid-cols-1 gap-4">
                     <Controller
                       name="fullName"
                       control={salesControl}
