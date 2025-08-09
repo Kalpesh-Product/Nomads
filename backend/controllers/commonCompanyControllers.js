@@ -153,7 +153,13 @@ export const getIndividualCompany = async (req, res, next) => {
         pocs,
         units,
         reviews,
-        inclusions: company.inclusions.split(",").map((inc) => inc.trim()),
+        inclusions: company.inclusions
+          .split(",")
+          .map((inc) =>
+            inc?.split(" ").length
+              ? inc?.split(" ")?.join("").toLowerCase().trim()
+              : inc?.trim().toLowerCase()
+          ),
       };
       return res.status(200).json(companyObject);
     } else if (type?.toLowerCase() === "privatestay") {
