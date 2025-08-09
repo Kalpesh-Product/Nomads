@@ -2,12 +2,10 @@ import fetchCoworkingData from "../utils/fetchCoworkingData.js";
 import fetchColivingData from "../utils/fetchColivingData.js";
 import fetchHostelData from "../utils/fetchHostelData.js";
 import ColivingCompany from "../models/coliving/ColivingCompany.js";
-import ColivingInclusions from "../models/coliving/ColivingInclusions.js";
 import ColivingReviews from "../models/coliving/Reviews.js";
 import ColivingPointOfContact from "../models/coliving/PointOfContact.js";
 import ColivingUnits from "../models/coliving/Units.js";
 import CoworkingCompany from "../models/coworking/CoworkingCompany.js";
-import CoworkingInclusions from "../models/coworking/Inclusions.js";
 import CoworkingReviews from "../models/coworking/Review.js";
 import CoworkingServices from "../models/coworking/Services.js";
 import CoworkingPointOfContact from "../models/coworking/PointOfContact.js";
@@ -15,15 +13,12 @@ import Hostels from "../models/hostels/Hostel.js";
 import HostelReviews from "../models/hostels/Review.js";
 import HostelPointOfContact from "../models/hostels/PointOfContact.js";
 import HostelUnits from "../models/hostels/Unit.js";
-import HostelInclusions from "../models/hostels/Inclusions.js";
 import PrivateStay from "../models/private-stay/PrivateStay.js";
-import PrivateStayInclusions from "../models/private-stay/Inclusions.js";
 import PrivateStayPointOfContact from "../models/private-stay/PointOfContact.js";
 import PrivateStayReview from "../models/private-stay/Reviews.js";
 import PrivateStayUnit from "../models/private-stay/Units.js";
 import fetchPrivateStayData from "../utils/fetchPrivateStayData.js";
 import Cafe from "../models/cafe/Cafe.js";
-import CafeInclusions from "../models/cafe/Inclusions.js";
 import CafePoc from "../models/cafe/PointOfContact.js";
 import CafeReview from "../models/cafe/Review.js";
 import fetchCafeData from "../utils/fetchCafeData.js";
@@ -85,10 +80,7 @@ export const getIndividualCompany = async (req, res, next) => {
         .lean()
         .exec();
 
-      const [inclusions, pocs, services, reviews] = await Promise.all([
-        CoworkingInclusions.findOne({ coworkingCompany: company._id })
-          .lean()
-          .exec(),
+      const [pocs, services, reviews] = await Promise.all([
         CoworkingPointOfContact.findOne({
           coworkingCompany: company._id,
           isActive: true,
@@ -104,11 +96,10 @@ export const getIndividualCompany = async (req, res, next) => {
       const companyObject = {
         ...company,
         reviewCount: company.reviews,
-        inclusions,
         pocs,
         services,
         reviews,
-        type: "Coworking",
+        inclusions: company.inclusions.split(",").map((inc) => inc.trim()),
       };
       return res.status(200).json(companyObject);
     } else if (type?.toLowerCase() === "coliving") {
@@ -116,10 +107,7 @@ export const getIndividualCompany = async (req, res, next) => {
         .lean()
         .exec();
 
-      const [inclusions, pocs, units, reviews] = await Promise.all([
-        ColivingInclusions.findOne({ colivingCompany: company._id })
-          .lean()
-          .exec(),
+      const [pocs, units, reviews] = await Promise.all([
         ColivingPointOfContact.findOne({
           colivingCompany: company._id,
           isActive: true,
@@ -133,18 +121,16 @@ export const getIndividualCompany = async (req, res, next) => {
       const companyObject = {
         ...company,
         reviewCount: company.reviews,
-        inclusions,
         pocs,
         units,
         reviews,
-        type: "Coliving",
+        inclusions: company.inclusions.split(",").map((inc) => inc.trim()),
       };
       return res.status(200).json(companyObject);
     } else if (type?.toLowerCase() === "hostel") {
       const company = await Hostels.findOne({ _id: companyId }).lean().exec();
 
-      const [inclusions, pocs, units, reviews] = await Promise.all([
-        HostelInclusions.findOne({ hostel: companyId }).lean().exec(),
+      const [pocs, units, reviews] = await Promise.all([
         HostelPointOfContact.findOne({
           hostelCompany: company._id,
           isActive: true,
@@ -158,11 +144,10 @@ export const getIndividualCompany = async (req, res, next) => {
       const companyObject = {
         ...company,
         reviewCount: company.reviews,
-        inclusions,
         pocs,
         units,
         reviews,
-        type: "Hostel",
+        inclusions: company.inclusions.split(",").map((inc) => inc.trim()),
       };
       return res.status(200).json(companyObject);
     } else if (type?.toLowerCase() === "privatestay") {
@@ -170,10 +155,7 @@ export const getIndividualCompany = async (req, res, next) => {
         .lean()
         .exec();
 
-      const [inclusions, pocs, units, reviews] = await Promise.all([
-        PrivateStayInclusions.findOne({ privateStay: company._id })
-          .lean()
-          .exec(),
+      const [pocs, units, reviews] = await Promise.all([
         PrivateStayPointOfContact.findOne({
           privateStay: company._id,
           isActive: true,
@@ -187,18 +169,16 @@ export const getIndividualCompany = async (req, res, next) => {
       const companyObject = {
         ...company,
         reviewCount: company.reviews,
-        inclusions,
         pocs,
         units,
         reviews,
-        type: "Private-Stay",
+        inclusions: company.inclusions.split(",").map((inc) => inc.trim()),
       };
       return res.status(200).json(companyObject);
     } else if (type?.toLowerCase() === "cafe") {
       const company = await Cafe.findOne({ _id: companyId }).lean().exec();
 
-      const [inclusions, pocs, reviews] = await Promise.all([
-        CafeInclusions.findOne({ cafe: company._id }).lean().exec(),
+      const [pocs, reviews] = await Promise.all([
         CafePoc.findOne({ cafe: company._id, isActive: true }).lean().exec(),
         CafeReview.find({ cafe: company._id }).lean().exec(),
       ]);
@@ -206,10 +186,9 @@ export const getIndividualCompany = async (req, res, next) => {
       const companyObject = {
         ...company,
         reviewCount: company.reviews,
-        inclusions,
         pocs,
         reviews,
-        type: "Cafe",
+        inclusions: company.inclusions.split(",").map((inc) => inc.trim()),
       };
       return res.status(200).json(companyObject);
     }

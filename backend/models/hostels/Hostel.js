@@ -27,6 +27,7 @@ const hostelSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    inclusions: String,
     city: {
       type: String,
       required: true,

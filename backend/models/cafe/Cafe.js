@@ -41,6 +41,7 @@ const cafeSchema = new mongoose.Schema(
     latitude: {
       type: Number,
     },
+    inclusions: String,
     longitude: {
       type: Number,
     },

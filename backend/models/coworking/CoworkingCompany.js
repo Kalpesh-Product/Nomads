@@ -44,6 +44,7 @@ const companySchema = new mongoose.Schema(
     about: {
       type: String,
     },
+    inclusions: String,
     totalSeats: {
       type: Number,
       default: 0,
