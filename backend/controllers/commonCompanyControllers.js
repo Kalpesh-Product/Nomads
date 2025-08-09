@@ -108,6 +108,7 @@ export const getIndividualCompany = async (req, res, next) => {
         pocs,
         services,
         reviews,
+        type: "Coworking",
       };
       return res.status(200).json(companyObject);
     } else if (type?.toLowerCase() === "coliving") {
@@ -136,6 +137,7 @@ export const getIndividualCompany = async (req, res, next) => {
         pocs,
         units,
         reviews,
+        type: "Coliving",
       };
       return res.status(200).json(companyObject);
     } else if (type?.toLowerCase() === "hostel") {
@@ -160,6 +162,7 @@ export const getIndividualCompany = async (req, res, next) => {
         pocs,
         units,
         reviews,
+        type: "Hostel",
       };
       return res.status(200).json(companyObject);
     } else if (type?.toLowerCase() === "privatestay") {
@@ -188,6 +191,7 @@ export const getIndividualCompany = async (req, res, next) => {
         pocs,
         units,
         reviews,
+        type: "Private-Stay",
       };
       return res.status(200).json(companyObject);
     } else if (type?.toLowerCase() === "cafe") {
@@ -205,6 +209,7 @@ export const getIndividualCompany = async (req, res, next) => {
         inclusions,
         pocs,
         reviews,
+        type: "Cafe",
       };
       return res.status(200).json(companyObject);
     }

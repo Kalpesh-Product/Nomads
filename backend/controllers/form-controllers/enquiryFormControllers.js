@@ -35,8 +35,6 @@ const enquirySchema = yup.object({
     .required("Please provide the end date"),
   country: yup.string().trim().nullable(),
   state: yup.string().trim().nullable(),
-  // ❗️FYI: `companyName` appears twice in your original snippet; duplicate keys
-  // will overwrite the first. Keeping only one here.
   sheetName: yup.string().required("Please provide a sheet name"),
 });
 
