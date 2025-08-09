@@ -53,15 +53,15 @@ export default function Map({ locations, disableNavigation = false, disableTwoFi
               key={createKey(loc)}
               position={{ lat: loc.lat, lng: loc.lng }}
               clusterer={clusterer}
-              icon={{
-                url: "/images/marker.png",
-                scaledSize: new window.google.maps.Size(40, 40),
-              }}
+              // icon={{
+              //   url: "/images/marker.png",
+              //   scaledSize: new window.google.maps.Size(40, 40),
+              // }}
               onMouseOver={() => setHoveredMarker(loc.id)}
               onMouseOut={() => setHoveredMarker(null)}
               onClick={() => {
                 if (!disableNavigation) {
-                  navigate(`${loc.name}`, {
+                  navigate(`/nomad/listings/${loc.name}`, {
                     state: {
                       companyId: loc?._id,
                       type: loc?.type,

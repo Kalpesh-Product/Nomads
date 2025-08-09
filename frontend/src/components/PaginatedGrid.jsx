@@ -6,6 +6,7 @@ const PaginatedGrid = ({
   entriesPerPage = 6,
   columns = "grid-cols-1",
   renderItem,
+  allowScroll=true
 }) => {
   const localStorageKey = "verticalListingsPage";
   const formData = useSelector((state) => state.location.formValues);
@@ -40,7 +41,7 @@ const PaginatedGrid = ({
   );
 
   return (
-    <div className="flex flex-col gap-4 min-h-[65vh] overflow-y-auto max-h-screen justify-between custom-scrollbar-hide">
+    <div className={`flex flex-col gap-4 ${allowScroll ? "min-h-[65vh] overflow-y-auto max-h-screen" : ""} justify-between custom-scrollbar-hide`}>
       <div className={`grid ${columns} gap-2`}>
         {currentData.length ? (
           currentData.map((item, i) => renderItem(item, i))

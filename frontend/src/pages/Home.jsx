@@ -205,7 +205,7 @@ const Home = () => {
 
   return (
     <div className="flex flex-col w-full">
-      <Container padding={false}>
+      <div className="min-w-[85%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0">
         <div className="py-8  hidden lg:block">
           <div className="flex flex-col  gap-4 justify-between items-center">
             <form
@@ -276,7 +276,7 @@ const Home = () => {
             Start Search
           </button>
         </div>
-      </Container>
+      </div>
 
       <AnimatePresence>
         {showMobileSearch && (
@@ -358,7 +358,7 @@ const Home = () => {
         <section className="w-full   bg-white pb-12">
           <div className=" flex flex-col tab:flex-col lg:flex-row items-strech justify-between h-full gap-12">
             {/* Left: Text */}
-            <div className="lg:w-1/2 flex flex-col h-full justify-between gap-10 text-center md:text-start">
+            <div className="lg:w-1/2 flex flex-col h-full justify-between gap-5 text-center md:text-start">
               <div className=" font-light text-primary-blue text-center font-play leading-relaxed lg:space-y-6 lg:leading-normal">
                 <div className="text-center">
                   <h1 className="text-[clamp(1rem,13.71vw,6rem)] text-nowrap">
@@ -424,8 +424,8 @@ const Home = () => {
       </section>
       {/*  */}
       <section className="w-full px-6 py-12 bg-gray-50">
-        <div className="w-full max-w-[91rem] mx-auto lg:px-3">
-          <h2 className="text-2xl md:text-3xl font-medium text-left mb-10 text-gray-700">
+        <div className="w-full min-w-[] max-w-[79rem] mx-auto lg:px-3">
+          <h2 className="text-2xl md:text-3xl font-medium text-left mb-10 text-gray-700 uppercase">
             Solutions for your aspiring destinations.
           </h2>
 
@@ -464,7 +464,7 @@ const Home = () => {
 
       <Container padding={false}>
         <div className="flex flex-col gap-8 w-full border-t-2 border-gray-300 py-8">
-          <h2 className="text-2xl md:text-3xl font-medium text-left mb-10 text-gray-700">
+          <h2 className="text-2xl md:text-3xl font-medium text-left mb-10 text-gray-700 uppercase">
             Platform Inclusions.
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3  lg:grid-cols-5 gap-x-16 md:gap-x-16 lg:gap-x-28 gap-y-10">

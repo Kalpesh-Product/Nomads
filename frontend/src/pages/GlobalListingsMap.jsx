@@ -1,4 +1,4 @@
-import { MenuItem, TextField } from "@mui/material";
+import { Box, MenuItem, Skeleton, TextField } from "@mui/material";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -20,6 +20,7 @@ import newIcons from "../assets/newIcons.js";
 import { IoSearch } from "react-icons/io5";
 import SearchBarCombobox from "../components/SearchBarCombobox.jsx";
 import { AnimatePresence, motion } from "motion/react";
+import PaginatedGrid from "../components/PaginatedGrid.jsx";
 
 const GlobalListingsMap = () => {
   const [favorites, setFavorites] = useState([]);
@@ -27,6 +28,7 @@ const GlobalListingsMap = () => {
   const formData = useSelector((state) => state.location.formValues);
   const countryOptions = [{ label: "India", value: "india" }];
   const locationOptions = [{ label: "Goa", value: "goa" }];
+  const skeletonArray = Array.from({ length: 6 });
   const countOptions = [
     { label: "1 - 5", value: "1-5" },
     { label: "5 - 10", value: "5-10" },
@@ -37,7 +39,7 @@ const GlobalListingsMap = () => {
     { label: "Co-Working", value: "coworking" },
     { label: "Hostels", value: "hostel" },
     { label: "Cafe’s", value: "cafe" },
-    { label: "Meeting Rooms", value: "meetingRoom" },
+    { label: "Meetings", value: "meetingRoom" },
     { label: "Private Stay", value: "privateStay" },
     { label: "Co-Living", value: "coliving" },
     { label: "Workation", value: "workation" },
@@ -175,7 +177,9 @@ const GlobalListingsMap = () => {
               return avg % 1 === 0 ? avg : avg.toFixed(1);
             })()
           : "0",
-        image:item.images?.[0]?.url || "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
+        image:
+          item.images?.[0]?.url ||
+          "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
       }));
 
   return (
@@ -217,63 +221,63 @@ const GlobalListingsMap = () => {
             </div>
 
             {/* Search Form */}
-                 <form
-                      onSubmit={handleSubmit(onSubmit)}
-                      className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
-                    >
-                      <Controller
-                        name="country"
-                        control={control}
-                        render={({ field }) => (
-                          <SearchBarCombobox
-                            value={field.value}
-                            onChange={field.onChange}
-                            options={countryOptions}
-                            label="Select Country"
-                            placeholder="Select aspiring destination"
-                            className="w-full "
-                          />
-                        )}
-                      />
-                      <div className="w-px h-10 bg-gray-300 mx-2 my-auto" />
-                      <Controller
-                        name="location"
-                        control={control}
-                        render={({ field }) => (
-                          <SearchBarCombobox
-                            value={field.value}
-                            onChange={field.onChange}
-                            label="Select Location"
-                            options={locationOptions}
-                            placeholder="Select area within country"
-                            disabled={!selectedCountry}
-                            className="w-full"
-                          />
-                        )}
-                      />
-                       <div className="w-px h-10 bg-gray-300 mx-2 my-auto" />
-                      <Controller
-                        name="count"
-                        control={control}
-                        render={({ field }) => (
-                          <SearchBarCombobox
-                            value={field.value}
-                            onChange={field.onChange}
-                            options={countOptions}
-                            label="Select Count"
-                            placeholder="Booking for no. of Nomads"
-                            disabled={!selectedState}
-                            className="w-full "
-                          />
-                        )}
-                      />
-                      <button
-                        type="submit"
-                        className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full"
-                      >
-                        <IoSearch />
-                      </button>
-                    </form>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
+            >
+              <Controller
+                name="country"
+                control={control}
+                render={({ field }) => (
+                  <SearchBarCombobox
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={countryOptions}
+                    label="Select Country"
+                    placeholder="Select aspiring destination"
+                    className="w-full "
+                  />
+                )}
+              />
+              <div className="w-px h-10 bg-gray-300 mx-2 my-auto" />
+              <Controller
+                name="location"
+                control={control}
+                render={({ field }) => (
+                  <SearchBarCombobox
+                    value={field.value}
+                    onChange={field.onChange}
+                    label="Select Location"
+                    options={locationOptions}
+                    placeholder="Select area within country"
+                    disabled={!selectedCountry}
+                    className="w-full"
+                  />
+                )}
+              />
+              <div className="w-px h-10 bg-gray-300 mx-2 my-auto" />
+              <Controller
+                name="count"
+                control={control}
+                render={({ field }) => (
+                  <SearchBarCombobox
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={countOptions}
+                    label="Select Count"
+                    placeholder="Booking for no. of Nomads"
+                    disabled={!selectedState}
+                    className="w-full "
+                  />
+                )}
+              />
+              <button
+                type="submit"
+                className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full"
+              >
+                <IoSearch />
+              </button>
+            </form>
           </div>
 
           <div className="md:hidden flex w-full items-center justify-center my-4">
@@ -414,78 +418,62 @@ const GlobalListingsMap = () => {
                 Array.from({ length: 4 }).map((_, i) => (
                   <SkeletonCard key={i} />
                 ))
-              ) : groupedListings && Object.keys(groupedListings).length > 0 ? (
-                Object.entries(groupedListings).map(([type, items]) => {
-                  const prioritizedCompanies = ["MeWo", "BIZ Nest"];
-                  const sortedItems = [...items].sort((a, b) => {
-                    const aIsPriority = prioritizedCompanies.includes(
-                      a.companyName
-                    );
-                    const bIsPriority = prioritizedCompanies.includes(
-                      b.companyName
-                    );
+              ) : (
+                <div className="col-span-full mb-6">
+                  <h2 className="text-subtitle text-secondary-dark font-semibold mb-5">
+                    Search results for{" "}
+                    {formData?.country
+                      ? formData.country.charAt(0).toUpperCase() +
+                        formData.country.slice(1)
+                      : "Unknown"}{" "}
+                    {formData?.location
+                      ? formData.location.charAt(0).toUpperCase() +
+                        formData.location.slice(1)
+                      : "Unknown"}
+                  </h2>
 
-                    if (aIsPriority && !bIsPriority) return -1;
-                    if (!aIsPriority && bIsPriority) return 1;
-
-                    // If both are priority or both are not, sort by rating descending
-                    const aRating =
-                      a.reviews?.length > 0
-                        ? a.reviews.reduce((sum, r) => sum + r.starCount, 0) /
-                          a.reviews.length
-                        : 0;
-                    const bRating =
-                      b.reviews?.length > 0
-                        ? b.reviews.reduce((sum, r) => sum + r.starCount, 0) /
-                          b.reviews.length
-                        : 0;
-
-                    return bRating - aRating;
-                  });
-
-                  const displayItems = sortedItems.slice(0, 6);
-
-                  const showViewMore = items.length > 5;
-                  const sectionTitle = `Popular ${
-                    typeLabels[type] || typeLabels.default(type)
-                  } in ${formData?.location}`;
-
-                  return (
-                    <div key={type} className="col-span-full mb-6">
-                      <h2 className="text-subtitle text-secondary-dark font-semibold mb-5">
-                        {sectionTitle}
-                      </h2>
-
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 gap-x-5">
-                        {displayItems.map((item) => (
+                  <PaginatedGrid
+                    data={isLisitingLoading ? skeletonArray : listingsData}
+                    allowScroll={false}
+                    entriesPerPage={9}
+                    columns={`grid-cols-1 md:grid-cols-2 lg:grid-cols-3  gap-x-5`}
+                    renderItem={(item, index) =>
+                      isLisitingLoading ? (
+                        <Box key={index} className="w-full h-full">
+                          <Skeleton
+                            variant="rectangular"
+                            height={200}
+                            sx={{ borderRadius: 2 }}
+                          />
+                          <Skeleton variant="text" width="80%" sx={{ mt: 1 }} />
+                          <Skeleton variant="text" width="60%" />
+                        </Box>
+                      ) : (
+                        <motion.div
+                          key={item._id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{
+                            duration: 0.4,
+                            delay: index * 0.1,
+                            ease: "easeOut",
+                          }}
+                        >
                           <ListingCard
-                            key={item._id}
                             item={item}
                             handleNavigation={() =>
-                              navigate(`/nomad/listings/${item.companyName}`, {
-                                state: { companyId: item._id, type: item.type },
+                              navigate(`${item.companyName}`, {
+                                state: {
+                                  companyId: item._id,
+                                  type: item.type,
+                                },
                               })
                             }
                           />
-                        ))}
-                      </div>
-
-                      {showViewMore && (
-                        <div className="mt-3 text-right">
-                          <button
-                            onClick={() => handleShowMoreClick(type)}
-                            className="text-primary-blue text-sm font-semibold hover:underline"
-                          >
-                            View More →
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })
-              ) : (
-                <div className="col-span-full text-center text-sm text-gray-500 border border-dotted rounded-lg p-4">
-                  No listings found.
+                        </motion.div>
+                      )
+                    }
+                  />
                 </div>
               )}
             </div>

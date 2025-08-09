@@ -37,7 +37,7 @@ const GlobalListingsList = () => {
     { label: "Co-Working", value: "coworking" },
     { label: "Hostels", value: "hostel" },
     { label: "Cafe’s", value: "cafe" },
-    { label: "Meeting Rooms", value: "meetingRoom" },
+    { label: "Meetings", value: "meetingRoom" },
     { label: "Private Stay", value: "privateStay" },
     { label: "Co-Living", value: "coliving" },
     { label: "Workation", value: "workation" },
@@ -218,63 +218,63 @@ const GlobalListingsList = () => {
               </div>
             </div>
 
-                <form
-                     onSubmit={handleSubmit(onSubmit)}
-                     className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
-                   >
-                     <Controller
-                       name="country"
-                       control={control}
-                       render={({ field }) => (
-                         <SearchBarCombobox
-                           value={field.value}
-                           onChange={field.onChange}
-                           options={countryOptions}
-                           label="Select Country"
-                           placeholder="Select aspiring destination"
-                           className="w-full "
-                         />
-                       )}
-                     />
-                     <div className="w-px h-10 bg-gray-300 mx-2 my-auto" />
-                     <Controller
-                       name="location"
-                       control={control}
-                       render={({ field }) => (
-                         <SearchBarCombobox
-                           value={field.value}
-                           onChange={field.onChange}
-                           label="Select Location"
-                           options={locationOptions}
-                           placeholder="Select area within country"
-                           disabled={!selectedCountry}
-                           className="w-full"
-                         />
-                       )}
-                     />
-                      <div className="w-px h-10 bg-gray-300 mx-2 my-auto" />
-                     <Controller
-                       name="count"
-                       control={control}
-                       render={({ field }) => (
-                         <SearchBarCombobox
-                           value={field.value}
-                           onChange={field.onChange}
-                           options={countOptions}
-                           label="Select Count"
-                           placeholder="Booking for no. of Nomads"
-                           disabled={!selectedState}
-                           className="w-full "
-                         />
-                       )}
-                     />
-                     <button
-                       type="submit"
-                       className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full"
-                     >
-                       <IoSearch />
-                     </button>
-                   </form>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
+            >
+              <Controller
+                name="country"
+                control={control}
+                render={({ field }) => (
+                  <SearchBarCombobox
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={countryOptions}
+                    label="Select Country"
+                    placeholder="Select aspiring destination"
+                    className="w-full "
+                  />
+                )}
+              />
+              <div className="w-px h-10 bg-gray-300 mx-2 my-auto" />
+              <Controller
+                name="location"
+                control={control}
+                render={({ field }) => (
+                  <SearchBarCombobox
+                    value={field.value}
+                    onChange={field.onChange}
+                    label="Select Location"
+                    options={locationOptions}
+                    placeholder="Select area within country"
+                    disabled={!selectedCountry}
+                    className="w-full"
+                  />
+                )}
+              />
+              <div className="w-px h-10 bg-gray-300 mx-2 my-auto" />
+              <Controller
+                name="count"
+                control={control}
+                render={({ field }) => (
+                  <SearchBarCombobox
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={countOptions}
+                    label="Select Count"
+                    placeholder="Booking for no. of Nomads"
+                    disabled={!selectedState}
+                    className="w-full "
+                  />
+                )}
+              />
+              <button
+                type="submit"
+                className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full"
+              >
+                <IoSearch />
+              </button>
+            </form>
           </div>
           <div className="flex lg:hidden w-full items-center justify-center my-4">
             <button
@@ -434,12 +434,17 @@ const GlobalListingsList = () => {
                     return bRating - aRating;
                   });
 
-                  const displayItems = sortedItems.slice(0, 5);
+                  const displayItems = sortedItems;
 
                   const showViewMore = items.length > 5;
                   const sectionTitle = `Popular ${
                     typeLabels[type] || typeLabels.default(type)
-                  } in ${formData?.location}`;
+                  } in ${
+                    formData?.location
+                      ? formData.location.charAt(0).toUpperCase() +
+                        formData.location.slice(1)
+                      : ""
+                  }`;
 
                   return (
                     <div key={type} className="col-span-full mb-6">
@@ -461,7 +466,7 @@ const GlobalListingsList = () => {
                         ))}
                       </div>
 
-                      {showViewMore && (
+                      {/* {showViewMore && (
                         <div className="mt-3 text-right">
                           <button
                             onClick={() => handleShowMoreClick(type)}
@@ -470,7 +475,7 @@ const GlobalListingsList = () => {
                             View More →
                           </button>
                         </div>
-                      )}
+                      )} */}
                     </div>
                   );
                 })

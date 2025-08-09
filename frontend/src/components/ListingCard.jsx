@@ -12,8 +12,15 @@ const ListingCard = ({ item, handleNavigation }) => {
     );
   };
 
-  const thumbnailImage = (item?.images?.[0]?.url) ;
+    const typeLabels = {
+    coworking: "CoWorking",
+    coliving: "CoLiving",
+    hostel: "Hostel",
+    privateStay: "Private Stay",
+    cafe: "Cafe",
+  };
 
+  const thumbnailImage = item?.images?.[0]?.url;
 
   return (
     <div
@@ -45,10 +52,17 @@ const ListingCard = ({ item, handleNavigation }) => {
 
       <div className="h-[25%] flex flex-col gap-1 px-4">
         <div className="flex w-full justify-between items-center">
-          <p className="text-sm font-semibold">{item.companyName}</p>
+          <div className="w-full">
+            <p className="text-sm font-semibold">
+              {item.companyName.length > 10
+                ? `${item.companyName.slice(0, 10)}...`
+                : item.companyName}
+            </p>
+          </div>
+          <p className="text-sm   text-gray-600">{typeLabels[item.type] || "Unknown"}</p>
         </div>
 
-        <div className="flex w-full gap-2 items-center">
+        <div className="flex w-full justify-between items-center">
           <p className="text-sm text-gray-600 font-medium">
             {item.city || "Unknown"}, {item.state || "Unknown"}
           </p>
