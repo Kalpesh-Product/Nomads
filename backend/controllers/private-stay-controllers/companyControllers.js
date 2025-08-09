@@ -24,8 +24,6 @@ export const bulkInsertPrivateStay = async (req, res, next) => {
           "Business Name": companyName,
           "Registered Entity Name": registeredEntityName,
           Website: website,
-          Logo: logo,
-          Images: images,
           Address: address,
           City: city,
           State: state,

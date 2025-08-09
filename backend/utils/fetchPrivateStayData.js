@@ -28,7 +28,7 @@ const fetchPrivateStayData = async (country, state) => {
       reviews: reviews.filter(
         (item) => item?.privateStay?.toString() === stayId
       ),
-      inclusions: company.inclusions.split(",").map((inc) => inc.trim()),
+      inclusions: stay.inclusions.split(",").map((inc) => inc.trim()),
       type: "privateStay",
     };
   });
