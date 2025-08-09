@@ -1,7 +1,6 @@
-// Career.jsx
-import React from "react";
-import Jobrole from "./Jobrole"; // Make sure path is correct
-import Container from "../components/Container";
+import { Container } from '@mui/material';
+import React from 'react';
+import Jobrole from '../Jobrole';
 
  const jobRoles = [
     {
@@ -120,10 +119,10 @@ import Container from "../components/Container";
       ],
     },
   ];
-  
-const Career = () => {
+
+const HostCareer = () => {
   return (
-    <Container padding={false}>
+     <Container padding={false}>
       <div className="">
         <h3 className="text-4xl md:text-6xl font-semibold mb-6">
           JOIN OUR TEAM
@@ -139,4 +138,5 @@ const Career = () => {
   );
 };
 
-export default Career;
+export default HostCareer;
+ 
