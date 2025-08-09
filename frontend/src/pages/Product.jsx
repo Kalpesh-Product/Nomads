@@ -28,6 +28,7 @@ import {
 } from "../utils/validators";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import AmenitiesList from "../components/AmenitiesList";
 dayjs.extend(relativeTime);
 
 const Product = () => {
@@ -53,54 +54,12 @@ const Product = () => {
   console.log("companuDetials ", companyDetails);
   const companyImages = companyDetails?.images?.slice(0, 4) || [];
   const showMore = (companyDetails?.images?.length || 0) > 4;
-  const inclusions = companyDetails?.inclusions || {};
+  const inclusions = companyDetails?.inclusions || [];
 
-  const amenities = Object.entries(inclusions)
-    .filter(
-      ([key]) =>
-        ![
-          "_id",
-          "__v",
-          "coworkingCompany",
-          "createdAt",
-          "updatedAt",
-          "transportOptions",
-        ].includes(key)
-    )
-    .map(([key, value]) => {
-      const iconKey = key.toLowerCase();
-      return {
-        image: icons[iconKey] || "/icons/default.webp",
-        title: key
-          .replace(/([A-Z])/g, " $1")
-          .replace(/^./, (str) => str.toUpperCase()),
-        isAvailable: value === true,
-      };
-    });
-
-  const transportOptions = inclusions.transportOptions || {};
-
-  const transportAmenities = Object.entries(transportOptions).map(
-    ([key, value]) => ({
-      image: icons[key.toLowerCase()] || "/icons/default.webp",
-      title: key.charAt(0).toUpperCase() + key.slice(1),
-      isAvailable: value === true,
-    })
-  );
-
-  const sortedAmenities = amenities.sort(
-    (a, b) => b.isAvailable - a.isAvailable
-  );
-  const sortedTransportAmenities = transportAmenities.sort(
-    (a, b) => b.isAvailable - a.isAvailable
-  );
-
-  const allAmenities = [...sortedAmenities, ...sortedTransportAmenities];
-
-  const total = allAmenities.length;
-  const columns = 6;
-  const remainder = total % columns;
-  const lastRowStartIndex = remainder === 0 ? -1 : total - remainder;
+  // const total = allAmenities.length;
+  // const columns = 6;
+  // const remainder = total % columns;
+  // const lastRowStartIndex = remainder === 0 ? -1 : total - remainder;
 
   const {
     handleSubmit,
@@ -131,7 +90,7 @@ const Product = () => {
       mobileNumber: 0,
       email: "",
     },
-    mode:"onChange"
+    mode: "onChange",
   });
 
   const { mutate: submitEnquiry, isPending: isSubmitting } = useMutation({
@@ -160,19 +119,19 @@ const Product = () => {
   const { mutate: submitSales, isPending: isSubmittingSales } = useMutation({
     mutationKey: ["submitSales"],
     mutationFn: async (data) => {
-      const response = await axios.post('/form/add-new-enquiry', {
+      const response = await axios.post("/form/add-new-enquiry", {
         ...data,
-        pocName : companyDetails?.pocs?.name || "Anviksha Godkar",
-        pocCompany : companyDetails?.companyName,
-        pocDesignation : companyDetails?.pocs?.designation,
-        sheetName : "All_POC_Contact",
-        mobile : data.mobileNumber
-      })
-      return response.data
+        pocName: companyDetails?.pocs?.name || "Anviksha Godkar",
+        pocCompany: companyDetails?.companyName,
+        pocDesignation: companyDetails?.pocs?.designation,
+        sheetName: "All_POC_Contact",
+        mobile: data.mobileNumber,
+      });
+      return response.data;
     },
     onSuccess: (data) => {
       toast.success(data.message);
-      salesReset()
+      salesReset();
     },
     onError: (error) => {
       toast.error(error.response?.data?.message);
@@ -204,7 +163,8 @@ const Product = () => {
     reviews: companyDetails?.reviewCount,
     ratings: companyDetails?.ratings,
     image:
-      companyDetails?.images?.[0]?.url ||"https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
+      companyDetails?.images?.[0]?.url ||
+      "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
   };
 
   const mapsData = [forMapsData];
@@ -615,21 +575,22 @@ const Product = () => {
               What Inclusion does it offers
             </h1>
 
-            {allAmenities.length === 0 ? (
+            {inclusions.length === 0 ? (
               <div className="w-full border-2 border-dotted border-gray-400 rounded-lg p-6 text-center text-gray-500">
                 Inclusions not available
               </div>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-24 gap-y-10">
-                {allAmenities.map((item, index) => (
-                  <Amenities
-                    key={index}
-                    image={item.image}
-                    title={item.title}
-                    isAvailable={item.isAvailable}
-                  />
-                ))}
-              </div>
+              // <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-24 gap-y-10">
+              //   {allAmenities.map((item, index) => (
+              //     <Amenities
+              //       key={index}
+              //       image={item.image}
+              //       title={item.title}
+              //       isAvailable={item.isAvailable}
+              //     />
+              //   ))}
+              // </div>
+              <AmenitiesList inclusions={inclusions} />
             )}
           </div>
 
@@ -672,7 +633,11 @@ const Product = () => {
             {/* Map */}
             <div className="w-full h-[500px] flex flex-col gap-8 rounded-xl overflow-hidden">
               <h1 className="text-title font-semibold">Where you'll be</h1>
-              <Map locations={mapsData} disableNavigation disableTwoFingerScroll />
+              <Map
+                locations={mapsData}
+                disableNavigation
+                disableTwoFingerScroll
+              />
             </div>
             <hr className="my-5 lg:my-10" />
             <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-2 gap-10 pb-20">
