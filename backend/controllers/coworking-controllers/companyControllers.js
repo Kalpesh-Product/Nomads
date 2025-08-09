@@ -25,6 +25,8 @@ export const bulkInsertCompanies = async (req, res, next) => {
           website: row["Website"]?.trim() || null,
           address: row["Address"]?.trim(),
           city: row["City"]?.trim(),
+          state: row["State"]?.trim(),
+          country: row["Country"]?.trim(),
           about: row["About"]?.trim(),
           totalSeats: parseInt(row["Total Seats"]) || null,
           latitude: parseFloat(row["latitude"]?.trim()),

@@ -28,8 +28,8 @@ export const bulkInsertCafe = async (req, res, next) => {
           website: row["Website"]?.trim(),
           address: row["Address"]?.trim(),
           city: row["City"]?.trim(),
-          state: "Goa",
-          country: "India",
+          state: row["State"]?.trim(),
+          country: row["Country"]?.trim(),
           about: row["About"]?.trim(),
           latitude: row["Latitude"]?.trim()
             ? parseFloat(row["Latitude"]?.trim())
