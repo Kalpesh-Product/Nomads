@@ -6,17 +6,13 @@ import HostelUnits from "../models/hostels/Unit.js";
 const fetchHostelData = async (country, state) => {
   const countryRegex = { $regex: `^${country}$`, $options: "i" };
   const stateRegex = { $regex: `^${state}$`, $options: "i" };
-  const [
-    hostelCompanies,
-    hostelPoc,
-    hostelUnits,
-    hostelReviews,
-  ] = await Promise.all([
-    Hostels.find({ country: countryRegex, state: stateRegex }).lean().exec(),
-    HostelPointOfContact.find({ isActive: true }).lean().exec(),
-    HostelUnits.find().lean().exec(),
-    HostelReviews.find().lean().exec(),
-  ]);
+  const [hostelCompanies, hostelPoc, hostelUnits, hostelReviews] =
+    await Promise.all([
+      Hostels.find({ country: countryRegex, state: stateRegex }).lean().exec(),
+      HostelPointOfContact.find({ isActive: true }).lean().exec(),
+      HostelUnits.find().lean().exec(),
+      HostelReviews.find().lean().exec(),
+    ]);
 
   return hostelCompanies.map((company) => {
     const companyId = company._id.toString();
@@ -32,7 +28,13 @@ const fetchHostelData = async (country, state) => {
       reviews: hostelReviews.filter(
         (item) => item.hostel?.toString() === companyId
       ),
-      inclusions: company.inclusions.split(",").map((inc) => inc.trim()),
+      inclusions: company.inclusions
+        .split(",")
+        .map((inc) =>
+          inc?.split(" ").length
+            ? inc?.split(" ")?.join("").toLocaleLowerCase().trim()
+            : inc?.trim().toLocaleLowerCase()
+        ),
       type: "hostel",
     };
   });
