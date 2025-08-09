@@ -20,12 +20,14 @@ const containerStyle = {
   height: "100%",
 };
 
-const mapOptions = {
-  disableDefaultUI: false,
-};
 
-export default function Map({ locations, disableNavigation = false }) {
+
+export default function Map({ locations, disableNavigation = false, disableTwoFingerScroll = false }) {
   const navigate = useNavigate();
+  const mapOptions = {
+  disableDefaultUI: false,
+      gestureHandling: disableTwoFingerScroll ? "none" : "greedy", 
+};
   console.log("location inside map ", locations);
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_API_KEY,

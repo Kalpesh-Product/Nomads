@@ -27,6 +27,7 @@ import {
   noOnlyWhitespace,
 } from "../utils/validators";
 import { useSelector } from "react-redux";
+import toast from "react-hot-toast";
 dayjs.extend(relativeTime);
 
 const Product = () => {
@@ -34,7 +35,6 @@ const Product = () => {
   const navigate = useNavigate();
   const { companyId, type } = location.state;
   const [selectedReview, setSelectedReview] = useState([]);
-  const formData = useSelector((state) => state.location.formValues);
   console.log("selected : ", selectedReview);
   const [open, setOpen] = useState(false);
   console.log("company id", companyId);
@@ -112,9 +112,8 @@ const Product = () => {
     defaultValues: {
       fullName: "",
       noOfPeople: 0,
-      mobileNumber: null,
+      mobileNumber: 0,
       email: "",
-      verticalType: "",
       startDate: null,
       endDate: null,
     },
@@ -125,12 +124,14 @@ const Product = () => {
     handleSubmit: handlesubmitSales,
     control: salesControl,
     reset: salesReset,
+    formState: { errors: salesErrors },
   } = useForm({
     defaultValues: {
       fullName: "",
-      mobileNumber: "",
+      mobileNumber: 0,
       email: "",
     },
+    mode:"onChange"
   });
 
   const { mutate: submitEnquiry, isPending: isSubmitting } = useMutation({
@@ -140,25 +141,42 @@ const Product = () => {
         ...data,
         country: companyDetails?.country,
         state: companyDetails?.state,
-        companyType: formData?.category,
+        companyType: companyDetails?.type,
+        personelCount: parseInt(data?.noOfPeople),
+        companyName: companyDetails?.companyName,
+        sheetName: "All_Enquiry",
+        phone: data?.mobileNumber,
       });
       return response.data;
     },
     onSuccess: (data) => {
-      console.log(data);
+      toast.success(data.message);
       reset();
     },
     onError: (error) => {
-      console.error(error);
+      toast.error(error.response?.data?.message);
     },
   });
   const { mutate: submitSales, isPending: isSubmittingSales } = useMutation({
     mutationKey: ["submitSales"],
     mutationFn: async (data) => {
-      console.log(data);
+      const response = await axios.post('/form/add-new-enquiry', {
+        ...data,
+        pocName : companyDetails?.pocs?.name || "Anviksha Godkar",
+        pocCompany : companyDetails?.companyName,
+        pocDesignation : companyDetails?.pocs?.designation,
+        sheetName : "All_POC_Contact",
+        mobile : data.mobileNumber
+      })
+      return response.data
     },
-    onSuccess: (data) => {},
-    onError: (error) => {},
+    onSuccess: (data) => {
+      toast.success(data.message);
+      salesReset()
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message);
+    },
   });
 
   const [selectedImage, setSelectedImage] = useState(null);
@@ -186,7 +204,7 @@ const Product = () => {
     reviews: companyDetails?.reviewCount,
     ratings: companyDetails?.ratings,
     image:
-      "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
+      companyDetails?.images?.[0]?.url ||"https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
   };
 
   const mapsData = [forMapsData];
@@ -450,9 +468,6 @@ const Product = () => {
                     control={control}
                     rules={{
                       required: "No. of people is required",
-                      validate: {
-                        isAlphanumeric,
-                      },
                     }}
                     render={({ field }) => (
                       <TextField
@@ -474,7 +489,6 @@ const Product = () => {
                       required: "Mobile number is required",
                       validate: {
                         isValidPhoneNumber,
-                        isAlphanumeric,
                       },
                     }}
                     render={({ field }) => (
@@ -483,6 +497,7 @@ const Product = () => {
                         label="Mobile Number"
                         fullWidth
                         type="number"
+                        value={field.value || ""}
                         variant="standard"
                         size="small"
                         helperText={errors?.mobileNumber?.message}
@@ -657,7 +672,7 @@ const Product = () => {
             {/* Map */}
             <div className="w-full h-[500px] flex flex-col gap-8 rounded-xl overflow-hidden">
               <h1 className="text-title font-semibold">Where you'll be</h1>
-              <Map locations={mapsData} disableNavigation />
+              <Map locations={mapsData} disableNavigation disableTwoFingerScroll />
             </div>
             <hr className="my-5 lg:my-10" />
             <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-2 gap-10 pb-20">
@@ -711,6 +726,13 @@ const Product = () => {
                     <Controller
                       name="fullName"
                       control={salesControl}
+                      rules={{
+                        required: "Full Name is required",
+                        validate: {
+                          isAlphanumeric,
+                          noOnlyWhitespace,
+                        },
+                      }}
                       render={({ field }) => (
                         <TextField
                           {...field}
@@ -718,26 +740,41 @@ const Product = () => {
                           fullWidth
                           variant="standard"
                           size="small"
+                          error={!!salesErrors?.fullName}
+                          helperText={salesErrors?.fullName?.message}
                         />
                       )}
                     />
                     <Controller
                       name="mobileNumber"
                       control={salesControl}
+                      rules={{
+                        required: "Mobile number is required",
+                        validate: {
+                          isValidPhoneNumber,
+                        },
+                      }}
                       render={({ field }) => (
                         <TextField
                           {...field}
                           label="Mobile Number"
                           fullWidth
+                          value={field.value || ""}
                           type="number"
                           variant="standard"
                           size="small"
+                          error={!!salesErrors?.mobileNumber}
+                          helperText={salesErrors?.mobileNumber?.message}
                         />
                       )}
                     />
                     <Controller
                       name="email"
                       control={salesControl}
+                      rules={{
+                        required: "Email is required",
+                        validate: { isValidEmail },
+                      }}
                       render={({ field }) => (
                         <TextField
                           {...field}
@@ -746,6 +783,8 @@ const Product = () => {
                           type="email"
                           variant="standard"
                           size="small"
+                          error={!!salesErrors?.email}
+                          helperText={salesErrors?.email?.message}
                         />
                       )}
                     />
@@ -754,6 +793,8 @@ const Product = () => {
                         title={"Submit"}
                         type={"submit"}
                         externalStyles={"mt-6 w-1/2"}
+                        disabled={isSubmittingSales}
+                        isLoading={isSubmittingSales}
                       />
                     </div>
                   </form>
