@@ -20,7 +20,13 @@ import MuiModal from "../components/Modal";
 import Map from "../components/Map";
 import LeafWrapper from "../components/LeafWrapper";
 import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
-
+import {
+  isAlphanumeric,
+  isValidEmail,
+  isValidPhoneNumber,
+  noOnlyWhitespace,
+} from "../utils/validators";
+import { useSelector } from "react-redux";
 dayjs.extend(relativeTime);
 
 const Product = () => {
@@ -28,6 +34,7 @@ const Product = () => {
   const navigate = useNavigate();
   const { companyId, type } = location.state;
   const [selectedReview, setSelectedReview] = useState([]);
+  const formData = useSelector((state) => state.location.formValues);
   console.log("selected : ", selectedReview);
   const [open, setOpen] = useState(false);
   console.log("company id", companyId);
@@ -48,53 +55,72 @@ const Product = () => {
   const showMore = (companyDetails?.images?.length || 0) > 4;
   const inclusions = companyDetails?.inclusions || {};
 
-const amenities = Object.entries(inclusions)
-  .filter(([key]) =>
-    !["_id", "__v", "coworkingCompany", "createdAt", "updatedAt", "transportOptions"].includes(key)
-  )
-  .map(([key, value]) => {
-    const iconKey = key.toLowerCase();
-    return {
-      image: icons[iconKey] || "/icons/default.webp",
-      title: key
-        .replace(/([A-Z])/g, " $1")
-        .replace(/^./, (str) => str.toUpperCase()),
-      isAvailable: value === true,
-    };
-  });
+  const amenities = Object.entries(inclusions)
+    .filter(
+      ([key]) =>
+        ![
+          "_id",
+          "__v",
+          "coworkingCompany",
+          "createdAt",
+          "updatedAt",
+          "transportOptions",
+        ].includes(key)
+    )
+    .map(([key, value]) => {
+      const iconKey = key.toLowerCase();
+      return {
+        image: icons[iconKey] || "/icons/default.webp",
+        title: key
+          .replace(/([A-Z])/g, " $1")
+          .replace(/^./, (str) => str.toUpperCase()),
+        isAvailable: value === true,
+      };
+    });
 
   const transportOptions = inclusions.transportOptions || {};
 
-const transportAmenities = Object.entries(transportOptions)
-  .map(([key, value]) => ({
-    image: icons[key.toLowerCase()] || "/icons/default.webp",
-    title: key.charAt(0).toUpperCase() + key.slice(1),
-    isAvailable: value === true,
-  }));
+  const transportAmenities = Object.entries(transportOptions).map(
+    ([key, value]) => ({
+      image: icons[key.toLowerCase()] || "/icons/default.webp",
+      title: key.charAt(0).toUpperCase() + key.slice(1),
+      isAvailable: value === true,
+    })
+  );
 
-  const sortedAmenities = amenities.sort((a, b) => b.isAvailable - a.isAvailable);
-const sortedTransportAmenities = transportAmenities.sort((a, b) => b.isAvailable - a.isAvailable);
+  const sortedAmenities = amenities.sort(
+    (a, b) => b.isAvailable - a.isAvailable
+  );
+  const sortedTransportAmenities = transportAmenities.sort(
+    (a, b) => b.isAvailable - a.isAvailable
+  );
 
-
-const allAmenities = [...sortedAmenities, ...sortedTransportAmenities];
+  const allAmenities = [...sortedAmenities, ...sortedTransportAmenities];
 
   const total = allAmenities.length;
   const columns = 6;
   const remainder = total % columns;
   const lastRowStartIndex = remainder === 0 ? -1 : total - remainder;
 
-  const { handleSubmit, control, reset } = useForm({
+  const {
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors },
+    watch,
+  } = useForm({
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      mobileNumber: "",
+      fullName: "",
+      noOfPeople: 0,
+      mobileNumber: null,
       email: "",
-      type: "",
-      numberOfDesks: 2,
+      verticalType: "",
       startDate: null,
       endDate: null,
     },
+    mode: "onChange",
   });
+  const selectedStartDate = watch("startDate");
   const {
     handleSubmit: handlesubmitSales,
     control: salesControl,
@@ -110,10 +136,21 @@ const allAmenities = [...sortedAmenities, ...sortedTransportAmenities];
   const { mutate: submitEnquiry, isPending: isSubmitting } = useMutation({
     mutationKey: ["submitEnquiry"],
     mutationFn: async (data) => {
-      console.log(data);
+      const response = await axios.post("/form/add-new-enquiry", {
+        ...data,
+        country: companyDetails?.country,
+        state: companyDetails?.state,
+        companyType: formData?.category,
+      });
+      return response.data;
     },
-    onSuccess: (data) => {},
-    onError: (error) => {},
+    onSuccess: (data) => {
+      console.log(data);
+      reset();
+    },
+    onError: (error) => {
+      console.error(error);
+    },
   });
   const { mutate: submitSales, isPending: isSubmittingSales } = useMutation({
     mutationKey: ["submitSales"],
@@ -388,6 +425,13 @@ const allAmenities = [...sortedAmenities, ...sortedTransportAmenities];
                 >
                   <Controller
                     name="fullName"
+                    rules={{
+                      required: "Full Name is required",
+                      validate: {
+                        noOnlyWhitespace,
+                        isAlphanumeric,
+                      },
+                    }}
                     control={control}
                     render={({ field }) => (
                       <TextField
@@ -396,25 +440,43 @@ const allAmenities = [...sortedAmenities, ...sortedTransportAmenities];
                         fullWidth
                         variant="standard"
                         size="small"
+                        helperText={errors?.fullName?.message}
+                        error={!!errors.fullName}
                       />
                     )}
                   />
                   <Controller
                     name="noOfPeople"
                     control={control}
+                    rules={{
+                      required: "No. of people is required",
+                      validate: {
+                        isAlphanumeric,
+                      },
+                    }}
                     render={({ field }) => (
                       <TextField
                         {...field}
                         label="No. Of People"
                         fullWidth
+                        type="number"
                         variant="standard"
                         size="small"
+                        helperText={errors?.noOfPeople?.message}
+                        error={!!errors.noOfPeople}
                       />
                     )}
                   />
                   <Controller
                     name="mobileNumber"
                     control={control}
+                    rules={{
+                      required: "Mobile number is required",
+                      validate: {
+                        isValidPhoneNumber,
+                        isAlphanumeric,
+                      },
+                    }}
                     render={({ field }) => (
                       <TextField
                         {...field}
@@ -423,12 +485,20 @@ const allAmenities = [...sortedAmenities, ...sortedTransportAmenities];
                         type="number"
                         variant="standard"
                         size="small"
+                        helperText={errors?.mobileNumber?.message}
+                        error={!!errors.mobileNumber}
                       />
                     )}
                   />
                   <Controller
                     name="email"
                     control={control}
+                    rules={{
+                      required: "Email is required",
+                      validate: {
+                        isValidEmail,
+                      },
+                    }}
                     render={({ field }) => (
                       <TextField
                         {...field}
@@ -437,31 +507,13 @@ const allAmenities = [...sortedAmenities, ...sortedTransportAmenities];
                         type="email"
                         variant="standard"
                         size="small"
+                        helperText={errors?.email?.message}
+                        error={!!errors.email}
                       />
                     )}
                   />
-                  {companyDetails?.type === "coworking" && (
-                    <Controller
-                      name="type"
-                      control={control}
-                      render={({ field }) => (
-                        <TextField
-                          {...field}
-                          label="Type"
-                          fullWidth
-                          variant="standard"
-                          size="small"
-                          select
-                        >
-                          <MenuItem value="" disabled>
-                            <em>Select A Type</em>
-                          </MenuItem>
-                          <MenuItem value="cabin desk">Cabin Desk</MenuItem>
-                        </TextField>
-                      )}
-                    />
-                  )}
-                  {companyDetails?.type === "coworking" && (
+
+                  {/* {companyDetails?.type === "coworking" && (
                     <Controller
                       name="numberOfDesks"
                       control={control}
@@ -484,7 +536,7 @@ const allAmenities = [...sortedAmenities, ...sortedTransportAmenities];
                         </TextField>
                       )}
                     />
-                  )}
+                  )} */}
                   <Controller
                     name="startDate"
                     control={control}
@@ -492,6 +544,7 @@ const allAmenities = [...sortedAmenities, ...sortedTransportAmenities];
                       <DesktopDatePicker
                         {...field}
                         label="Start Date"
+                        disablePast
                         format="DD-MM-YYYY"
                         value={field.value ? dayjs(field.value) : null}
                         onChange={field.onChange}
@@ -513,6 +566,8 @@ const allAmenities = [...sortedAmenities, ...sortedTransportAmenities];
                         {...field}
                         label="End Date"
                         format="DD-MM-YYYY"
+                        disablePast
+                        disabled={!selectedStartDate}
                         value={field.value ? dayjs(field.value) : null}
                         onChange={field.onChange}
                         slotProps={{
@@ -527,6 +582,8 @@ const allAmenities = [...sortedAmenities, ...sortedTransportAmenities];
                   />
                   <div className="flex justify-center items-center lg:col-span-2">
                     <SecondaryButton
+                      disabled={isSubmitting}
+                      isLoading={isSubmitting}
                       title={"Get Quote"}
                       type={"submit"}
                       externalStyles={"w-1/2"}
@@ -554,7 +611,7 @@ const allAmenities = [...sortedAmenities, ...sortedTransportAmenities];
                     key={index}
                     image={item.image}
                     title={item.title}
-                      isAvailable={item.isAvailable}
+                    isAvailable={item.isAvailable}
                   />
                 ))}
               </div>
@@ -600,7 +657,7 @@ const allAmenities = [...sortedAmenities, ...sortedTransportAmenities];
             {/* Map */}
             <div className="w-full h-[500px] flex flex-col gap-8 rounded-xl overflow-hidden">
               <h1 className="text-title font-semibold">Where you'll be</h1>
-              <Map locations={mapsData} disableNavigation/>
+              <Map locations={mapsData} disableNavigation />
             </div>
             <hr className="my-5 lg:my-10" />
             <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-2 gap-10 pb-20">
