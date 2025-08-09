@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AiFillHeart, AiFillStar, AiOutlineHeart } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 
-const ListingCard = ({ item, handleNavigation }) => {
+const ListingCard = ({ item, handleNavigation, showVertical=true }) => {
   const navigate = useNavigate();
   const [favorites, setFavorites] = useState([]);
 
@@ -12,7 +12,7 @@ const ListingCard = ({ item, handleNavigation }) => {
     );
   };
 
-    const typeLabels = {
+  const typeLabels = {
     coworking: "CoWorking",
     coliving: "CoLiving",
     hostel: "Hostel",
@@ -54,12 +54,16 @@ const ListingCard = ({ item, handleNavigation }) => {
         <div className="flex w-full justify-between items-center">
           <div className="w-full">
             <p className="text-sm font-semibold">
-              {item.companyName.length > 10
+              {item.companyName.length > 10 && showVertical
                 ? `${item.companyName.slice(0, 10)}...`
                 : item.companyName}
             </p>
           </div>
-          <p className="text-sm   text-gray-600">{typeLabels[item.type] || "Unknown"}</p>
+          {showVertical && (
+            <p className="text-tiny   text-gray-600">
+              {typeLabels[item.type] || "Unknown"}
+            </p>
+          )}
         </div>
 
         <div className="flex w-full justify-between items-center">

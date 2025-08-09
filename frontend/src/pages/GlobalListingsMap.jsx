@@ -185,7 +185,7 @@ const GlobalListingsMap = () => {
   return (
     <div className="flex flex-col gap-2 lg:gap-6">
       <div className="flex flex-col gap-4 justify-center items-center  w-full lg:mt-0">
-        <Container padding={false}>
+        <div className="min-w-[85%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0">
           <div className="hidden lg:flex flex-col gap-4 justify-between items-center">
             {/* the 5 icons */}
 
@@ -295,7 +295,7 @@ const GlobalListingsMap = () => {
               </span>
             </button>
           </div>
-        </Container>
+        </div>
         <AnimatePresence>
           {showMobileSearch && (
             <motion.div
@@ -422,14 +422,14 @@ const GlobalListingsMap = () => {
                 <div className="col-span-full mb-6">
                   <h2 className="text-subtitle text-secondary-dark font-semibold mb-5">
                     Search results for{" "}
+                    {formData?.location
+                      ? formData.location.charAt(0).toUpperCase() +
+                        formData.location.slice(1)
+                      : "Unknown"},{" "}
                     {formData?.country
                       ? formData.country.charAt(0).toUpperCase() +
                         formData.country.slice(1)
                       : "Unknown"}{" "}
-                    {formData?.location
-                      ? formData.location.charAt(0).toUpperCase() +
-                        formData.location.slice(1)
-                      : "Unknown"}
                   </h2>
 
                   <PaginatedGrid
@@ -461,8 +461,9 @@ const GlobalListingsMap = () => {
                         >
                           <ListingCard
                             item={item}
+                            showVertical={true}
                             handleNavigation={() =>
-                              navigate(`${item.companyName}`, {
+                              navigate(`/nomad/listings/${item.companyName}`, {
                                 state: {
                                   companyId: item._id,
                                   type: item.type,
@@ -477,7 +478,7 @@ const GlobalListingsMap = () => {
                 </div>
               )}
             </div>
-            <div className="col-span-full lg:col-span-4 sticky top-24 h-[98vh] pb-20">
+            <div className="col-span-full lg:col-span-4 sticky top-24 h-[68%] pb-20">
               <div className="rounded-xl h-full overflow-hidden">
                 {isLisitingLoading ? (
                   <SkeletonMap />

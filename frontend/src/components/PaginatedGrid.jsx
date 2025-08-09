@@ -41,7 +41,9 @@ const PaginatedGrid = ({
   );
 
   return (
-    <div className={`flex flex-col gap-4 ${allowScroll ? "min-h-[65vh] overflow-y-auto max-h-screen" : ""} justify-between custom-scrollbar-hide`}>
+    <div className="flex justify-between flex-col rounded-xl">
+
+    <div className={`flex flex-col gap-4 ${allowScroll ? "min-h-[65vh] h-[75vh] overflow-y-auto max-h-screen" : ""} justify-between custom-scrollbar-hide`}>
       <div className={`grid ${columns} gap-2`}>
         {currentData.length ? (
           currentData.map((item, i) => renderItem(item, i))
@@ -52,6 +54,7 @@ const PaginatedGrid = ({
         )}
       </div>
 
+    </div>
       {totalPages > 1 && (
         <div className="overflow-x-auto">
           <div className="flex justify-center gap-2 mt-4 w-full px-2">

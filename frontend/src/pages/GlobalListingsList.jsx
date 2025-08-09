@@ -396,7 +396,7 @@ const GlobalListingsList = () => {
           )}
         </AnimatePresence>
       </div>
-      <hr />
+      {/* <hr /> */}
       <Container padding={false}>
         <div className="">
           <div className="font-semibold text-md">
@@ -434,7 +434,7 @@ const GlobalListingsList = () => {
                     return bRating - aRating;
                   });
 
-                  const displayItems = sortedItems;
+                  const displayItems = sortedItems.slice(0,5);
 
                   const showViewMore = items.length > 5;
                   const sectionTitle = `Popular ${
@@ -457,6 +457,7 @@ const GlobalListingsList = () => {
                           <ListingCard
                             key={item._id}
                             item={item}
+                            showVertical={false}
                             handleNavigation={() =>
                               navigate(`/nomad/listings/${item.companyName}`, {
                                 state: { companyId: item._id, type: item.type },
@@ -466,7 +467,7 @@ const GlobalListingsList = () => {
                         ))}
                       </div>
 
-                      {/* {showViewMore && (
+                      {showViewMore && (
                         <div className="mt-3 text-right">
                           <button
                             onClick={() => handleShowMoreClick(type)}
@@ -475,7 +476,7 @@ const GlobalListingsList = () => {
                             View More →
                           </button>
                         </div>
-                      )} */}
+                      )}
                     </div>
                   );
                 })

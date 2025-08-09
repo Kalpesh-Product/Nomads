@@ -125,20 +125,21 @@ const fixedAmenitiesMap = {
   ],
 };
 
+// Normalize key for matching
 const normalizeKey = (str) =>
-  str
-    .toLowerCase()
-    .replace(/[\s&-]/g, "")
-    .trim();
+  str.toLowerCase().replace(/[\s&]/g, "").trim();
 
 export default function AmenitiesList({ type = "coworking", inclusions = [] }) {
+  // Normalize all backend inclusions once
+  const normalizedInclusions = inclusions.map(normalizeKey);
+
   // Pick correct fixed amenities list based on type
   const fixedAmenities = fixedAmenitiesMap[type?.toLowerCase()] || [];
 
   // Sort: available first, then unavailable; both groups sorted alphabetically
   const sortedAmenities = [...fixedAmenities].sort((a, b) => {
-    const aAvailable = inclusions.includes(normalizeKey(a));
-    const bAvailable = inclusions.includes(normalizeKey(b));
+    const aAvailable = normalizedInclusions.includes(normalizeKey(a));
+    const bAvailable = normalizedInclusions.includes(normalizeKey(b));
 
     if (aAvailable && !bAvailable) return -1; // a before b
     if (!aAvailable && bAvailable) return 1; // b before a
@@ -149,7 +150,7 @@ export default function AmenitiesList({ type = "coworking", inclusions = [] }) {
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-24 gap-y-10">
       {sortedAmenities.map((amenity) => {
         const key = normalizeKey(amenity);
-        const isAvailable = inclusions.includes(key);
+        const isAvailable = normalizedInclusions.includes(key);
         const iconSrc = icons[key] || "/icons/default.webp";
 
         return (

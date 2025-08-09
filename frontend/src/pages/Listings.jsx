@@ -179,7 +179,7 @@ const Listings = () => {
 
   return (
     <div className="flex flex-col gap:2 lg:gap-6 ">
-      <Container padding={false}>
+      <div className="min-w-[85%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0">
         <div className="lg:flex w-full items-center justify-between hidden">
           <div className="flex flex-col gap-4 justify-center items-center  w-full mt-10 lg:mt-0">
             <div className="hidden lg:flex flex-col gap-4 justify-between items-center w-full h-full">
@@ -299,7 +299,7 @@ const Listings = () => {
             </span>
           </button>
         </div>
-      </Container>
+      </div>
       <AnimatePresence>
         {showMobileSearch && (
           <motion.div
@@ -453,7 +453,7 @@ const Listings = () => {
 
             <PaginatedGrid
               data={isLisitingLoading ? skeletonArray : sortedListings}
-              entriesPerPage={!mapOpen ? 10 : 6}
+              entriesPerPage={!mapOpen ? 10 : 9}
               columns={`grid-cols-1 md:grid-cols-2 ${
                 mapOpen ? "lg:grid-cols-3" : "lg:grid-cols-5"
               } gap-x-5`}
@@ -481,8 +481,9 @@ const Listings = () => {
                   >
                     <ListingCard
                       item={item}
+                      showVertical={false}
                       handleNavigation={() =>
-                        navigate(`${item.companyName}`, {
+                        navigate(`/nomad/listings/${item.companyName}`, {
                           state: { companyId: item._id, type: item.type },
                         })
                       }
@@ -502,7 +503,7 @@ const Listings = () => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 50 }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="col-span-4 w-full overflow-hidden rounded-xl h-full"
+                className="col-span-4 w-full overflow-hidden rounded-xl h-[80%]"
               >
                 {isLisitingLoading ? (
                   <SkeletonMap />

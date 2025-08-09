@@ -15,7 +15,7 @@ const icons = {
   housekeeping: "/icons/housekeeping.webp",
   fastinternet: "/icons/internet.webp",
   wifi: "/icons/internet.webp",
-  highspeedwifi: "/icons/internet.webp",
+  "highspeedwi-fi": "/icons/internet.webp",
   itsupport: "/icons/itsupport.webp",
   laundry: "/icons/laundry.webp",
   laundryfacilities: "/icons/laundry.webp",
@@ -77,6 +77,8 @@ const icons = {
   desk: "/icons/desk.png",
   privatedesk: "/icons/desk.png",
   gamingzone: "/icons/game-center.png",
+  sharedspace: "/icons/sharedspace.png",
+  visitorallowed: "/icons/visitorallowed.png",
 };
 
 export default icons;
