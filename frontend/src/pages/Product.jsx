@@ -314,9 +314,7 @@ const Product = () => {
               )}
 
               <div className="space-y-2">
-                <h1 className="text-title uppercase font-medium text-gray-700">
-                  About
-                </h1>
+                <h1 className="text-title  font-medium text-gray-700">About</h1>
 
                 {isCompanyDetails ? (
                   // 🔄 Skeleton UI while loading
