@@ -128,8 +128,8 @@ export const getIndividualCompany = async (req, res, next) => {
           .split(",")
           .map((inc) =>
             inc?.split(" ").length
-              ? inc?.split(" ")?.join("").toLocaleLowerCase().trim()
-              : inc?.trim().toLocaleLowerCase()
+              ? inc?.split(" ")?.join("").toLowerCase().trim()
+              : inc?.trim().toLowerCase()
           ),
       };
       return res.status(200).json(companyObject);

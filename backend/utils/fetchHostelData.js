@@ -32,8 +32,8 @@ const fetchHostelData = async (country, state) => {
         .split(",")
         .map((inc) =>
           inc?.split(" ").length
-            ? inc?.split(" ")?.join("").toLocaleLowerCase().trim()
-            : inc?.trim().toLocaleLowerCase()
+            ? inc?.split(" ")?.join("").toLowerCase().trim()
+            : inc?.trim().toLowerCase()
         ),
       type: "hostel",
     };
