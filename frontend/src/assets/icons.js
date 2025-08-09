@@ -15,6 +15,7 @@ const icons = {
   housekeeping: "/icons/housekeeping.webp",
   fastinternet: "/icons/internet.webp",
   wifi: "/icons/internet.webp",
+  "wi-fi": "/icons/internet.webp",
   "highspeedwi-fi": "/icons/internet.webp",
   itsupport: "/icons/itsupport.webp",
   laundry: "/icons/laundry.webp",
