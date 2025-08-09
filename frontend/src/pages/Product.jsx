@@ -173,7 +173,7 @@ const Product = () => {
       <div className="min-w-[70%] max-w-[80rem] lg:max-w-[70rem] mx-0 md:mx-auto">
         <div className="flex flex-col gap-8">
           <div className="flex w-full justify-between">
-            <h1 className="text-title font-semibold text-secondary-dark">
+            <h1 className="text-title font-medium text-gray-700">
               {companyDetails?.companyName || "Unknown"}
             </h1>
             <div className="items-center flex gap-2">
@@ -314,8 +314,8 @@ const Product = () => {
               )}
 
               <div className="space-y-2">
-                <h1 className="text-title uppercase font-semibold text-secondary-dark">
-                  about
+                <h1 className="text-title uppercase font-medium text-gray-700">
+                  About
                 </h1>
 
                 {isCompanyDetails ? (
@@ -546,8 +546,8 @@ const Product = () => {
           <hr className="my-5 lg:my-10" />
           {/* Inclusions */}
           <div className="flex flex-col gap-8 w-full">
-            <h1 className="text-title text-secondary-dark font-semibold">
-              What Inclusion does it offers
+            <h1 className="text-title text-gray-700 font-medium">
+              What Inclusions does it offer
             </h1>
 
             {allAmenities.length === 0 ? (
@@ -606,7 +606,9 @@ const Product = () => {
             <hr className="my-5 lg:my-10" />
             {/* Map */}
             <div className="w-full h-[500px] flex flex-col gap-8 rounded-xl overflow-hidden">
-              <h1 className="text-title font-semibold">Where you'll be</h1>
+              <h1 className="text-title font-medium text-gray-700">
+                Where you'll be
+              </h1>
               <Map locations={mapsData} disableNavigation />
             </div>
             <hr className="my-5 lg:my-10" />
@@ -624,7 +626,7 @@ const Product = () => {
 
                   {/* Name & Designation */}
                   <div className="text-center space-y-3 h-1/2 flex flex-col justify-evenly items-center">
-                    <h1 className="text-title text-secondary-dark font-semibold">
+                    <h1 className="text-title text-gray-700 font-medium">
                       {companyDetails?.pocs?.name || "Anviksha Godkar"}
                     </h1>
                     <p className="text-content">
@@ -636,7 +638,7 @@ const Product = () => {
 
                 <div className="w-px h-full bg-gray-300 mx-2 my-auto" />
                 <div className="h-full">
-                  <p className="text-title text-center text-secondary-dark font-semibold mb-8 underline">
+                  <p className="text-title text-center text-gray-700 font-medium mb-8 underline">
                     Host Details
                   </p>
                   <div className="grid grid-cols-1 gap-10 text-sm sm:text-base">
@@ -656,7 +658,7 @@ const Product = () => {
               </div>
               <div className="flex w-full border-2 shadow-md rounded-xl">
                 <div className="flex flex-col  h-full gap-4 rounded-xl p-6 w-full lg:w-full justify-between">
-                  <h1 className="text-title text-secondary-dark font-semibold">
+                  <h1 className="text-title text-gray-700 font-medium">
                     Connect With Host
                   </h1>
                   <form
