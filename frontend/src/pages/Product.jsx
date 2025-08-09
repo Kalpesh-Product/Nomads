@@ -624,7 +624,7 @@ const Product = () => {
 
                   {/* Name & Designation */}
                   <div className="text-center space-y-3 h-1/2 flex flex-col justify-evenly items-center">
-                    <h1 className="text-title text-gray-700 font-medium">
+                    <h1 className="text-title text-gray-700 font-medium leading-10">
                       {companyDetails?.pocs?.name || "Anviksha Godkar"}
                     </h1>
                     <p className="text-content">
