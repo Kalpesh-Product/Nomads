@@ -637,8 +637,8 @@ const Product = () => {
             </div>
             <hr className="my-5 lg:my-10" />
             <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-2 gap-10 pb-20">
-              <div className="flex flex-col lg:flex-row  items-center col-span-1 border-2 shadow-md gap-4 rounded-xl p-6 w-full">
-                <div className="flex flex-col gap-4 justify-between items-center h-full">
+              <div className="flex flex-col lg:flex-row justify-center items-center col-span-1 border-2 shadow-md gap-4 rounded-xl p-6 w-full">
+                <div className="flex flex-col gap-4 justify-between items-center h-full w-56">
                   {/* Avatar with Initials */}
                   <div className="w-32 aspect-square rounded-full bg-primary-blue flex items-center justify-center text-white text-6xl font-semibold uppercase">
                     {companyDetails?.pocs?.name
@@ -661,7 +661,7 @@ const Product = () => {
                 </div>
 
                 <div className="w-px h-full bg-gray-300 mx-2 my-auto" />
-                <div className="h-full">
+                <div className="h-full w-56">
                   <p className="text-title text-center text-gray-700 font-medium mb-8 underline">
                     Host Details
                   </p>
