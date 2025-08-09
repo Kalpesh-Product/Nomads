@@ -10,8 +10,9 @@ import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 
 const ImageGallery = () => {
   const location = useLocation();
-  const { images = [], companyName, selectedImageId  } = location.state || {};
+  const { images = [], companyName, selectedImageId } = location.state || {};
   const imageRefs = useRef({});
+  const [imageLoadStatus, setImageLoadStatus] = useState({});
 
   const [photos, setPhotos] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -51,32 +52,28 @@ const ImageGallery = () => {
       const loadedPhotos = await Promise.all(promises);
       setPhotos(loadedPhotos);
     };
-    
-    
 
     loadImageDimensions();
   }, [images]);
 
   useEffect(() => {
-  if (selectedImageId && imageRefs.current[selectedImageId]) {
-    imageRefs.current[selectedImageId].scrollIntoView({
-      behavior: "smooth",
-      block: "center",
-    });
-  }
-}, [photos, selectedImageId]);
+    if (selectedImageId && imageRefs.current[selectedImageId]) {
+      imageRefs.current[selectedImageId].scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [photos, selectedImageId]);
 
+  const openModal = (index) => {
+    setCurrentIndex(index);
+    setIsModalOpen(true);
 
-const openModal = (index) => {
-  setCurrentIndex(index);
-  setIsModalOpen(true);
-
-  // Wait for the modal and slider to render
-  setTimeout(() => {
-    instanceRef.current?.moveToIdx(index);
-  }, 0);
-};
-
+    // Wait for the modal and slider to render
+    setTimeout(() => {
+      instanceRef.current?.moveToIdx(index);
+    }, 0);
+  };
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -92,35 +89,49 @@ const openModal = (index) => {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-6 flex flex-col gap-4">
-        <div>
-            <h1 className="text-title font-semibold text-secondary-dark">{companyName || "Unknown"} Gallery</h1>
-        </div>
-<ColumnsPhotoAlbum
-  photos={photos}
-  spacing={8}
-  columns={(containerWidth) => {
-    if (containerWidth < 640) return 1;
-    if (containerWidth < 1024) return 2;
-    return 2;
-  }}
-  renderPhoto={({ photo, wrapperStyle, imageProps }) => (
-    <div
-      style={wrapperStyle}
-      key={photo.key}
-      ref={(el) => {
-        if (el) imageRefs.current[photo.key] = el;
-      }}
-    >
-      <img
-        {...imageProps}
-        className="rounded-md cursor-pointer hover:opacity-80 transition"
-        alt="gallery"
-      />
-    </div>
-  )}
-  onClick={({ index }) => openModal(index)} // Optional: if you keep the modal feature
-/>
+      <div>
+        <h1 className="text-title font-semibold text-secondary-dark">
+          {companyName || "Unknown"} Gallery
+        </h1>
+      </div>
+      <ColumnsPhotoAlbum
+        photos={photos}
+        spacing={8}
+        columns={(containerWidth) => {
+          if (containerWidth < 640) return 1;
+          if (containerWidth < 1024) return 2;
+          return 2;
+        }}
+        renderPhoto={({ photo, wrapperStyle, imageProps }) => {
+          const isLoaded = imageLoadStatus[photo.key];
 
+          return (
+            <div
+              style={wrapperStyle}
+              key={photo.key}
+              ref={(el) => {
+                if (el) imageRefs.current[photo.key] = el;
+              }}
+              className="relative"
+            >
+              {!isLoaded && (
+                <div className="absolute inset-0 bg-gray-200 animate-pulse rounded-md" />
+              )}
+              <img
+                {...imageProps}
+                onLoad={() =>
+                  setImageLoadStatus((prev) => ({ ...prev, [photo.key]: true }))
+                }
+                className={`rounded-md cursor-pointer transition ${
+                  isLoaded ? "opacity-100" : "opacity-0"
+                }`}
+                alt="gallery"
+              />
+            </div>
+          );
+        }}
+        onClick={({ index }) => openModal(index)} // Optional: if you keep the modal feature
+      />
 
       <TransparentModal
         open={isModalOpen}
@@ -133,7 +144,7 @@ const openModal = (index) => {
             onClick={goToPrev}
             className="text-white hidden  border-white border-2 bg-black hover:bg-gray-600 w-12 h-12 p-0 lg:flex items-center justify-center rounded-full"
           >
-           <IoIosArrowBack />
+            <IoIosArrowBack />
           </button>
           <div ref={sliderRef} className="keen-slider w-full">
             {photos.map((photo, idx) => (
@@ -153,7 +164,7 @@ const openModal = (index) => {
             onClick={goToNext}
             className="text-white hidden  border-white border-2 bg-black hover:bg-gray-600 w-12 h-12 p-2 lg:flex items-center justify-center rounded-full"
           >
-           <IoIosArrowForward />
+            <IoIosArrowForward />
           </button>
         </div>
       </TransparentModal>

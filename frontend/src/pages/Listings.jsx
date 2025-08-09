@@ -53,7 +53,6 @@ const Listings = () => {
   }, [formData]);
   const skeletonArray = Array.from({ length: 6 });
 
-  console.log("formData", formData);
   const { data: listingsData, isPending: isLisitingLoading } = useQuery({
     queryKey: ["listings", formData], // ✅ ensures it refetches when formData changes
     queryFn: async () => {
@@ -121,8 +120,7 @@ const Listings = () => {
               return avg % 1 === 0 ? avg : avg.toFixed(1);
             })()
           : "0",
-        image:
-          "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
+        image: item.images?.[0]?.url,
       }));
 
   const handleCategoryClick = (categoryValue) => {
@@ -139,9 +137,6 @@ const Listings = () => {
       ...formData,
       category: categoryValue,
     };
-
-    // console.log("Generated URL:", url);
-    console.log("State to be passed:", state);
     setShowMobileSearch(false);
     navigate(
       `/nomad/listings?country=${formData.country}&location=${formData.location}&category=${state.category}`,
@@ -231,7 +226,7 @@ const Listings = () => {
 
               <form
                 onSubmit={handleSubmit(onSubmit)}
-                className=" flex justify-around w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
+                className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
               >
                 <Controller
                   name="country"
@@ -243,10 +238,11 @@ const Listings = () => {
                       options={countryOptions}
                       label="Select Country"
                       placeholder="Select aspiring destination"
-                      className="w-full z-10"
+                      className="w-full "
                     />
                   )}
                 />
+                <div className="w-px h-10 bg-gray-300 mx-2 my-auto" />
                 <Controller
                   name="location"
                   control={control}
@@ -258,10 +254,11 @@ const Listings = () => {
                       options={locationOptions}
                       placeholder="Select area within country"
                       disabled={!selectedCountry}
-                      className="-ml-12 w-full z-20"
+                      className="w-full"
                     />
                   )}
                 />
+                <div className="w-px h-10 bg-gray-300 mx-2 my-auto" />
                 <Controller
                   name="count"
                   control={control}
@@ -273,7 +270,7 @@ const Listings = () => {
                       label="Select Count"
                       placeholder="Booking for no. of Nomads"
                       disabled={!selectedState}
-                      className="-ml-12 w-full z-30"
+                      className="w-full "
                     />
                   )}
                 />
@@ -437,18 +434,17 @@ const Listings = () => {
             } font-semibold text-lg`}
           >
             {!isLisitingLoading ? (
-
-            <div className="flex w-full justify-between pb-6">
-              <p>
-                Over {listingsData?.length - 1}{" "}
-                {formData.category?.charAt(0).toUpperCase() +
-                  formData.category?.slice(1)}{" "}
-                Spaces
-              </p>
-              <button onClick={() => setMapOpen((prev) => !prev)}>
-                {mapOpen ? "← List View" : "Map View →"}
-              </button>
-            </div>
+              <div className="flex w-full justify-between pb-6">
+                <p>
+                  Over {listingsData?.length - 1}{" "}
+                  {formData.category?.charAt(0).toUpperCase() +
+                    formData.category?.slice(1)}{" "}
+                  Spaces
+                </p>
+                <button className="hidden lg:block" onClick={() => setMapOpen((prev) => !prev)}>
+                  {mapOpen ? "← List View" : "Map View →"}
+                </button>
+              </div>
             ) : (
               <Box className="w-full h-full">
                 <Skeleton width={400} height={50} />
@@ -457,7 +453,7 @@ const Listings = () => {
 
             <PaginatedGrid
               data={isLisitingLoading ? skeletonArray : sortedListings}
-              entriesPerPage={6}
+              entriesPerPage={!mapOpen ? 10 : 6}
               columns={`grid-cols-1 md:grid-cols-2 ${
                 mapOpen ? "lg:grid-cols-3" : "lg:grid-cols-5"
               } gap-x-5`}

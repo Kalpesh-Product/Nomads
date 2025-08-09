@@ -8,6 +8,7 @@ import {
 } from "@react-google-maps/api";
 import renderStars from "../utils/renderStarts";
 import { FaStar } from "react-icons/fa6";
+import { useNavigate } from "react-router-dom";
 
 const center = {
   lat: 15.501,
@@ -23,7 +24,9 @@ const mapOptions = {
   disableDefaultUI: false,
 };
 
-export default function Map({ locations }) {
+export default function Map({ locations, disableNavigation = false }) {
+  const navigate = useNavigate();
+  console.log("location inside map ", locations);
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_API_KEY,
   });
@@ -54,10 +57,20 @@ export default function Map({ locations }) {
               }}
               onMouseOver={() => setHoveredMarker(loc.id)}
               onMouseOut={() => setHoveredMarker(null)}
+              onClick={() => {
+                if (!disableNavigation) {
+                  navigate(`${loc.name}`, {
+                    state: {
+                      companyId: loc?._id,
+                      type: loc?.type,
+                    },
+                  });
+                }
+              }}
             >
               {hoveredMarker === loc.id && (
                 <InfoWindow position={{ lat: loc.lat, lng: loc.lng }}>
-                  <div className="w-40 max-w-[160px] rounded-xl shadow-md bg-white pl-1 preset">
+                  <div className="w-40 max-w-[160px] rounded-xl shadow-md bg-white p-0 preset">
                     <img
                       src={loc.image}
                       alt={loc.name}
@@ -68,8 +81,10 @@ export default function Map({ locations }) {
                         {loc.name}
                       </div>
                       <div className="flex items-center gap-1 mt-1 text-xs ">
-                    <FaStar />
-                        <span className="text-gray-600">{loc.ratings || 0}</span>
+                        <FaStar />
+                        <span className="text-gray-600">
+                          {loc.ratings || 0}
+                        </span>
                       </div>
                     </div>
                     <div className="flex justify-between items-center text-xs mt-1">
