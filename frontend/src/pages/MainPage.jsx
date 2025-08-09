@@ -10,8 +10,7 @@ import {
 import sliderImageOne from "../assets/main-slider-images/slider-image-1.png";
 import sliderImageTwo from "../assets/main-slider-images/slider-image-2.png";
 import logo from "../assets/WONO_LOGO_white _TP.png";
-import img1 from "../assets/download.png";
-import img2 from "../assets/download 2.png";
+
 import "keen-slider/keen-slider.min.css";
 import { useKeenSlider } from "keen-slider/react";
 import { useNavigate } from "react-router-dom";

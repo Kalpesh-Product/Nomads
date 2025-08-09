@@ -28,7 +28,8 @@ import {
 } from "../utils/validators";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import AmenitiesList from "../components/AmenitiesList";
+import AmenitiesList from "../components/AmenitiesList";import { FaCheck } from "react-icons/fa";
+
 dayjs.extend(relativeTime);
 
 const Product = () => {
@@ -175,14 +176,13 @@ const Product = () => {
       <div className="min-w-[70%] max-w-[80rem] lg:max-w-[70rem] mx-0 md:mx-auto">
         <div className="flex flex-col gap-8">
           <div className="flex w-full justify-between">
-            <h1 className="text-title font-semibold text-secondary-dark">
+            <h1 className="text-title font-medium text-gray-700">
               {companyDetails?.companyName || "Unknown"}
             </h1>
             <div className="items-center flex gap-2">
               <div
                 onClick={() => setHeartClicked((prev) => !prev)}
-                className="cursor-pointer relative"
-              >
+                className="cursor-pointer relative">
                 {heartClicked ? <IoIosHeart /> : <IoIosHeartEmpty />}
               </div>
               <NavLink className={"text-small underline"} to={"/nomad/login"}>
@@ -261,8 +261,7 @@ const Product = () => {
                           selectedImageId: item._id,
                         },
                       })
-                    }
-                  >
+                    }>
                     <img
                       src={item.url}
                       alt="company-thumbnail"
@@ -282,8 +281,7 @@ const Product = () => {
                               },
                             });
                           }}
-                          className="bg-white text-sm px-3 py-1 rounded shadow font-medium"
-                        >
+                          className="bg-white text-sm px-3 py-1 rounded shadow font-medium">
                           +{companyDetails.images.length - 4} more
                         </button>
                       </div>
@@ -319,9 +317,7 @@ const Product = () => {
               )}
 
               <div className="space-y-2">
-                <h1 className="text-title uppercase font-semibold text-secondary-dark">
-                  about
-                </h1>
+                <h1 className="text-title  font-medium text-gray-700">About</h1>
 
                 {isCompanyDetails ? (
                   // 🔄 Skeleton UI while loading
@@ -399,8 +395,7 @@ const Product = () => {
                 <form
                   onSubmit={handleSubmit((data) => submitEnquiry(data))}
                   action=""
-                  className="grid grid-cols-1 lg:grid-cols-2 gap-6"
-                >
+                  className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <Controller
                     name="fullName"
                     rules={{
@@ -499,8 +494,7 @@ const Product = () => {
                           fullWidth
                           variant="standard"
                           size="small"
-                          select
-                        >
+                          select>
                           <MenuItem value="" disabled>
                             <em>Select Number of Desk</em>
                           </MenuItem>
@@ -571,8 +565,8 @@ const Product = () => {
           <hr className="my-5 lg:my-10" />
           {/* Inclusions */}
           <div className="flex flex-col gap-8 w-full">
-            <h1 className="text-title text-secondary-dark font-semibold">
-              What Inclusion does it offers
+            <h1 className="text-title text-gray-700 font-medium">
+              What Inclusions does it offer
             </h1>
 
             {inclusions.length === 0 ? (
@@ -632,19 +626,21 @@ const Product = () => {
             <hr className="my-5 lg:my-10" />
             {/* Map */}
             <div className="w-full h-[500px] flex flex-col gap-8 rounded-xl overflow-hidden">
-              <h1 className="text-title font-semibold">Where you'll be</h1>
+              <h1 className="text-title font-medium text-gray-700">
+                Where you'll be
+              </h1>
               <Map
                 locations={mapsData}
-                disableNavigation
+                disableNavigation 
                 disableTwoFingerScroll
               />
             </div>
             <hr className="my-5 lg:my-10" />
             <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-2 gap-10 pb-20">
-              <div className="flex flex-col lg:flex-row  items-center col-span-1 border-2 shadow-md gap-4 rounded-xl p-4 w-full">
-                <div className="flex flex-col gap-4 justify-center items-center">
+              <div className="flex flex-col lg:flex-row  items-center col-span-1 border-2 shadow-md gap-4 rounded-xl p-6 w-full">
+                <div className="flex flex-col gap-4 justify-between items-center h-full">
                   {/* Avatar with Initials */}
-                  <div className="h-20 w-20 rounded-full bg-primary-blue flex items-center justify-center text-white text-xl font-semibold uppercase">
+                  <div className="w-32 aspect-square rounded-full bg-primary-blue flex items-center justify-center text-white text-6xl font-semibold uppercase">
                     {companyDetails?.pocs?.name
                       ?.split(" ")
                       .map((n) => n[0])
@@ -653,8 +649,8 @@ const Product = () => {
                   </div>
 
                   {/* Name & Designation */}
-                  <div className="text-center space-y-3">
-                    <h1 className="text-title text-secondary-dark font-semibold">
+                  <div className="text-center space-y-3 h-1/2 flex flex-col justify-evenly items-center">
+                    <h1 className="text-title text-gray-700 font-medium leading-10">
                       {companyDetails?.pocs?.name || "Anviksha Godkar"}
                     </h1>
                     <p className="text-content">
@@ -665,29 +661,33 @@ const Product = () => {
                 </div>
 
                 <div className="w-px h-full bg-gray-300 mx-2 my-auto" />
-                <div>
-                  <p className="text-subtitle text-secondary-dark font-semibold mb-4">
+                <div className="h-full">
+                  <p className="text-title text-center text-gray-700 font-medium mb-8 underline">
                     Host Details
                   </p>
-                  <ul className="list-disc pl-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 gap-x-4 text-small">
-                      <li>Response rate: 100%</li>
-                      <li>Speaks English, Hindi and Punjabi</li>
-                      <li>Responds within an hour</li>
-                      <li>Lives in Velha, Goa</li>
-                    </div>
-                  </ul>
+                  <div className="grid grid-cols-1 gap-10 text-sm sm:text-base">
+                    {[
+                      "Response rate: 100%",
+                      "Speaks English, Hindi and Punjabi",
+                      "Responds within an hour",
+                      "Lives in Velha, Goa",
+                    ].map((detail, index) => (
+                      <div key={index} className="flex items-start gap-2">
+                        <FaCheck className="text-blue-500 mt-1 flex-shrink-0" />
+                        <span className="leading-snug">{detail}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
               <div className="flex w-full border-2 shadow-md rounded-xl">
                 <div className="flex flex-col  h-full gap-4 rounded-xl p-6 w-full lg:w-full justify-between">
-                  <h1 className="text-title text-secondary-dark font-semibold">
-                    Connect With Us
+                  <h1 className="text-title text-gray-700 font-medium">
+                    Connect With Host
                   </h1>
                   <form
                     onSubmit={handlesubmitSales((data) => submitSales(data))}
-                    className="grid grid-cols-1 gap-4"
-                  >
+                    className="grid grid-cols-1 gap-4">
                     <Controller
                       name="fullName"
                       control={salesControl}
