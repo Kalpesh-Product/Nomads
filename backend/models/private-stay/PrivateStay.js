@@ -17,8 +17,9 @@ const privateStaySchema = new mongoose.Schema(
     website: {
       type: String,
     },
+    inclusions: String,
     logo: {
-      type: String, // URL to the logo
+      type: String, 
     },
     images: {
       type: [{ url: String, index: Number }],

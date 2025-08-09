@@ -23,6 +23,7 @@ const colivingSchema = new mongoose.Schema(
     country: {
       type: String,
     },
+    inclusions: String,
     city: { type: String },
     about: { type: String },
     latitude: { type: Number },
