@@ -6,19 +6,15 @@ import ColivingUnits from "../models/coliving/Units.js";
 const fetchColivingData = async (country, state) => {
   const countryRegex = { $regex: `^${country}$`, $options: "i" };
   const stateRegex = { $regex: `^${state}$`, $options: "i" };
-  const [
-    colivingCompanies,
-    colivingPoc,
-    colivingUnits,
-    colivingReviews,
-  ] = await Promise.all([
-    ColivingCompany.find({ country: countryRegex, state: stateRegex })
-      .lean()
-      .exec(),
-    ColivingPointOfContact.find({ isActive: true }).lean().exec(),
-    ColivingUnits.find().lean().exec(),
-    ColivingReviews.find().lean().exec(),
-  ]);
+  const [colivingCompanies, colivingPoc, colivingUnits, colivingReviews] =
+    await Promise.all([
+      ColivingCompany.find({ country: countryRegex, state: stateRegex })
+        .lean()
+        .exec(),
+      ColivingPointOfContact.find({ isActive: true }).lean().exec(),
+      ColivingUnits.find().lean().exec(),
+      ColivingReviews.find().lean().exec(),
+    ]);
 
   return colivingCompanies.map((company) => {
     const companyId = company._id.toString();
@@ -34,7 +30,13 @@ const fetchColivingData = async (country, state) => {
       reviews: colivingReviews.filter(
         (item) => item.colivingCompany?.toString() === companyId
       ),
-      inclusions: company.inclusions.split(",").map((inc) => inc.trim()),
+      inclusions: company.inclusions
+        .split(",")
+        .map((inc) =>
+          inc?.split(" ").length
+            ? inc?.split(" ")?.join("").toLocaleLowerCase().trim()
+            : inc?.trim().toLocaleLowerCase()
+        ),
       type: "coliving",
     };
   });

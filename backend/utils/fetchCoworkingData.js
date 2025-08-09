@@ -34,7 +34,13 @@ const fetchCoworkingData = async (country, state) => {
       reviews: coworkingReviews.filter(
         (item) => item.coworkingCompany?.toString() === companyId
       ),
-      inclusions: company.inclusions.split(",").map((inc) => inc.trim()),
+      inclusions: company.inclusions
+        .split(",")
+        .map((inc) =>
+          inc?.split(" ").length
+            ? inc?.split(" ")?.join("").toLocaleLowerCase().trim()
+            : inc?.trim().toLocaleLowerCase()
+        ),
       type: "coworking",
     };
   });
