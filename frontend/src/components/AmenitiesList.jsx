@@ -20,6 +20,8 @@ const fixedAmenitiesMap = {
     "Cafeteria",
     "Printing Services",
     "CCTV Secure",
+    "Water Purifier",
+    "Custom Solutions",
   ],
   coliving: [
     "Shared Space",
@@ -41,7 +43,7 @@ const fixedAmenitiesMap = {
     "CCTV Secure",
     "Swimming Pool",
   ],
-  servicedapartments: [
+  "private-stay": [
     "Private Space",
     "Private Storage",
     "Television",
@@ -61,7 +63,7 @@ const fixedAmenitiesMap = {
     "CCTV Secure",
     "Swimming Pool",
   ],
-  hostels: [
+  hostel: [
     "Shared Space",
     "Private Space",
     "Private Storage",
@@ -98,6 +100,8 @@ const fixedAmenitiesMap = {
     "Cafeteria",
     "Printing Services",
     "CCTV Secure",
+    "Water Purifier",
+    "Custom Solutions",
   ],
   meetingrooms: [
     "Private Meeting Room",
@@ -116,16 +120,20 @@ const fixedAmenitiesMap = {
     "Cafeteria",
     "Printing Services",
     "CCTV Secure",
+    "Water Purifier",
+    "Custom Solutions",
   ],
 };
 
 const normalizeKey = (str) =>
-  str.toLowerCase().replace(/[\s&-]/g, "").trim();
+  str
+    .toLowerCase()
+    .replace(/[\s&-]/g, "")
+    .trim();
 
 export default function AmenitiesList({ type = "coworking", inclusions = [] }) {
   // Pick correct fixed amenities list based on type
-  const fixedAmenities =
-    fixedAmenitiesMap[type?.toLowerCase()] || [];
+  const fixedAmenities = fixedAmenitiesMap[type?.toLowerCase()] || [];
 
   // Sort: available first, then unavailable; both groups sorted alphabetically
   const sortedAmenities = [...fixedAmenities].sort((a, b) => {

@@ -590,7 +590,7 @@ const Product = () => {
               //     />
               //   ))}
               // </div>
-              <AmenitiesList inclusions={inclusions} />
+              <AmenitiesList type={companyDetails?.type.toLowerCase() || ''} inclusions={inclusions} />
             )}
           </div>
 
