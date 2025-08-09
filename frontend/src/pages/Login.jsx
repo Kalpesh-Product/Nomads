@@ -53,7 +53,8 @@ export default function LoginPage() {
         <h1 className="text-hero text-center">Login</h1>
         <form
           //   onSubmit={handleSubmit(onSubmit)}
-          className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+          className="w-full grid grid-cols-1 md:grid-cols-2 gap-6"
+        >
           <div className="col-span-1">
             <Controller
               name="email"
@@ -94,7 +95,8 @@ export default function LoginPage() {
                         <IconButton
                           onClick={togglePasswordVisibility}
                           edge="end"
-                          tabIndex={-1}>
+                          tabIndex={-1}
+                        >
                           {showPassword ? <FiEyeOff /> : <FiEye />}
                         </IconButton>
                       </InputAdornment>
@@ -105,13 +107,15 @@ export default function LoginPage() {
             />
           </div>
 
-          <div className="col-span-1 md:col-span-2 flex justify-center items-center mt-2">
+          <div className="col-span-1 md:col-span-2 flex justify-center items-center mt-2 py-2">
             <PrimaryButton
               title={"Login"}
               type={"submit"}
               isLoading={isLoginPending}
               disabled={isLoginPending}
-              className={"text-white font-semibold "}
+              className={
+                "bg-[#FF5757]  flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[7rem] px-6"
+              }
             />
           </div>
 

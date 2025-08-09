@@ -441,7 +441,7 @@ const Listings = () => {
                     formData.category?.slice(1)}{" "}
                   Spaces
                 </p>
-                <button onClick={() => setMapOpen((prev) => !prev)}>
+                <button className="hidden lg:block" onClick={() => setMapOpen((prev) => !prev)}>
                   {mapOpen ? "← List View" : "Map View →"}
                 </button>
               </div>
