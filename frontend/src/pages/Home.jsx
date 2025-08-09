@@ -365,7 +365,7 @@ const Home = () => {
                   </h1>
                 </div>
                 <div className="font-semibold">
-                  <h1 className="text-[clamp(4rem,8vw,16rem)]">NOMADS</h1>
+                  <h1 className="text-[clamp(4rem,7vw,16rem)]">NOMADS</h1>
                 </div>
               </div>
 
