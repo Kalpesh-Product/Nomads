@@ -29,6 +29,7 @@ import cafeRoutes from "./routes/cafeRoutes/cafeRoutes.js";
 import cafeReviewRoutes from "./routes/cafeRoutes/cafeReviews.js";
 import cafeInclusionsRoutes from "./routes/cafeRoutes/cafeInclusionRoutes.js";
 import cafePocRoutes from "./routes/cafeRoutes/cafePocRoutes.js";
+import formRoutes from "./routes/formRoutes.js";
 import mongoose from "mongoose";
 
 const app = express();
@@ -56,7 +57,7 @@ app.use("/api/hostel/units", hostelUnitRoutes);
 app.use("/api/hostel/poc", hostelPointOfContactRoutes);
 app.use("/api/hostel/inclusions", hostelInclusionRoutes);
 app.use("/api/private-stay/company", privateStayCompanyRoutes);
-app.use("/api/private-stay/unit", privateStayUnitRoutes);
+app.use("/api/private-stay/units", privateStayUnitRoutes);
 app.use("/api/private-stay/inclusions", privateStayInclusionsRoutes);
 app.use("/api/private-stay/review", privateStayReviewRoutes);
 app.use("/api/private-stay/poc", privateStayPocRoutes);
@@ -65,6 +66,7 @@ app.use("/api/cafe/review", cafeReviewRoutes);
 app.use("/api/cafe/inclusions", cafeInclusionsRoutes);
 app.use("/api/cafe/poc", cafePocRoutes);
 app.use("/api/common", commonCompanyRoutes);
+app.use("/api/form", formRoutes);
 app.use(errorHandler);
 app.listen(
   PORT,
