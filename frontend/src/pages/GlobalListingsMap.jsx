@@ -175,8 +175,7 @@ const GlobalListingsMap = () => {
               return avg % 1 === 0 ? avg : avg.toFixed(1);
             })()
           : "0",
-        image:
-          "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
+        image:item.images?.[0]?.url || "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
       }));
 
   return (

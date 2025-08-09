@@ -167,7 +167,7 @@ const Home = () => {
     },
   ];
   const amenities = [
-    { image: icons.workspace, title: "WORKSPACE" },
+    { image: icons.workspace, title: "WORKSPACE", isAvailable : true },
     { image: icons.livingspace, title: "LIVING SPACE" },
     { image: icons.aircondition, title: "AIR CONDITION" },
     { image: icons.fastinternet, title: "FAST INTERNET" },
@@ -469,7 +469,7 @@ const Home = () => {
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3  lg:grid-cols-5 gap-x-16 md:gap-x-16 lg:gap-x-28 gap-y-10">
             {amenities.map((item, index) => (
-              <Amenities key={index} image={item.image} title={item.title} />
+              <Amenities key={index} image={item.image} title={item.title} isAvailable={true} />
             ))}
           </div>
         </div>
