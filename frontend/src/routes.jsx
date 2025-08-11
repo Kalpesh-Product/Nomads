@@ -31,8 +31,7 @@ import HostAbout from "./pages/host/About";
 import HostTermsAndConditions from "./pages/host/TermsAndConditions";
 import HostPrivacy from "./pages/host/Privacy";
 import HostFAQ from "./pages/host/FAQ";
-
-
+import Leads from "./pages/host/Leads";
 
 const router = createBrowserRouter([
   {
@@ -103,8 +102,8 @@ const router = createBrowserRouter([
           },
         ],
       },
-         {
-        path: "host",
+      {
+        path: "hosts",
         element: <HostLayout />,
         children: [
           {
@@ -119,7 +118,7 @@ const router = createBrowserRouter([
             path: "career",
             element: <HostCareer />,
           },
-            {
+          {
             path: "career/job/:id",
             element: <JobDetails />,
           },
@@ -138,6 +137,10 @@ const router = createBrowserRouter([
           {
             path: "themes",
             element: <Themes />,
+          },
+          {
+            path: "leads",
+            element: <Leads />,
           },
           {
             path: "capital",
