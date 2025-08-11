@@ -13,6 +13,7 @@ const Header = () => {
   const view = searchParams.get("view"); // could be 'map', 'list', or null
 
   const currentPath = location.pathname;
+ 
 
   const isNomadOrListings =
     /^\/nomad(\/listings\/[^/]+)?$/.test(currentPath) ||
@@ -166,7 +167,8 @@ const Header = () => {
         <li className="flex items-center">
           <div className="p-4 px-0 whitespace-nowrap">
             <a
-              href="https://wono.co"
+              // href="https://wono.co"
+              href="/hosts"
               className="group relative text-md text-black">
               <span className="relative z-10 group-hover:font-bold mb-8">
                 Become a host

@@ -3,6 +3,8 @@ import { Outlet, useLocation } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { Toaster } from "react-hot-toast";
+import HostHeader from "./components/HostHeader";
+import HostFooter from "./components/HostFooter";
 
 const App = () => {
   const location = useLocation();
@@ -10,7 +12,10 @@ const App = () => {
 
   // Only hide header and footer on these routes
   const hideHeaderFooter = location.pathname === "/";
+  const isNomad = location.pathname.includes("/nomad");
+  const isHost = location.pathname.includes("/hosts");
 
+  
   useEffect(() => {
     if (contentRef.current) {
       contentRef.current.scrollTo({ behavior: "smooth", top: "0" });
@@ -22,7 +27,10 @@ const App = () => {
       {!hideHeaderFooter && (
         <div className="sticky top-0 w-full z-50">
           <div className="md:block">
-            <Header />
+            {
+              isNomad ? <Header /> : <HostHeader/>
+            }
+            
           </div>
         </div>
       )}
@@ -41,7 +49,7 @@ const App = () => {
         <Toaster />
       </div>
 
-      {!hideHeaderFooter && <Footer />}
+      {!hideHeaderFooter && isNomad ? <Footer /> : <HostFooter/>}
     </div>
   );
 };
