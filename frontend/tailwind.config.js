@@ -25,6 +25,7 @@ module.exports = {
       },
       fontFamily: {
         sans: ["Poppins", "ui-sans-serif", "system-ui"],
+        comic: ["Comic Sans MS", "cursive", "ui-sans-serif"],
         heading: ["Poppins", "ui-sans-serif", "system-ui"],
         mono: ["Fira Code", "ui-monospace"],
         hero: ["Bebas Neue", "ui-sans-serif", "system-ui"],
@@ -45,8 +46,8 @@ module.exports = {
         "mega-desc": ["5rem", { lineHeight: "8rem" }], // ~24px
         "mobile-mega-desc": ["3rem", { lineHeight: "2rem" }], // ~24px
         "mobile-mega-header": ["6rem", { lineHeight: "6rem" }], // ~24px
-        'clamp-heading': 'clamp(1.3rem, 2.5vw, 2.3rem)',
-        'giant': 'clamp(1.5rem, 20.6vw, 21rem)',
+        "clamp-heading": "clamp(1.3rem, 2.5vw, 2.3rem)",
+        giant: "clamp(1.5rem, 20.6vw, 21rem)",
       },
       // etc...
     },

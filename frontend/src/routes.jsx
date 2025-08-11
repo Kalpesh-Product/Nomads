@@ -17,6 +17,23 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ImageGallery from "./pages/ImageGallery";
 
+//Host Imports
+import HostLayout from "./pages/host/Layout";
+import HostHome from "./pages/host/Home";
+import HostContact from "./pages/host/Contact";
+import HostCareer from "./pages/host/Career";
+import HostLogin from "./pages/host/Login";
+import HostSignup from "./pages/host/Signup";
+import Modules from "./pages/host/Modules";
+import Themes from "./pages/host/Themes";
+import Capital from "./pages/host/Capital";
+import HostAbout from "./pages/host/About";
+import HostTermsAndConditions from "./pages/host/TermsAndConditions";
+import HostPrivacy from "./pages/host/Privacy";
+import HostFAQ from "./pages/host/FAQ";
+
+
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -83,6 +100,64 @@ const router = createBrowserRouter([
           {
             path: "signup",
             element: <Signup />,
+          },
+        ],
+      },
+         {
+        path: "host",
+        element: <HostLayout />,
+        children: [
+          {
+            path: "",
+            element: <HostHome />,
+          },
+          {
+            path: "contact",
+            element: <HostContact />,
+          },
+          {
+            path: "career",
+            element: <HostCareer />,
+          },
+            {
+            path: "career/job/:id",
+            element: <JobDetails />,
+          },
+          {
+            path: "login",
+            element: <HostLogin />,
+          },
+          {
+            path: "signup",
+            element: <HostSignup />,
+          },
+          {
+            path: "modules",
+            element: <Modules />,
+          },
+          {
+            path: "themes",
+            element: <Themes />,
+          },
+          {
+            path: "capital",
+            element: <Capital />,
+          },
+          {
+            path: "about",
+            element: <HostAbout />,
+          },
+          {
+            path: "terms-and-conditions",
+            element: <HostTermsAndConditions />,
+          },
+          {
+            path: "privacy",
+            element: <HostPrivacy />,
+          },
+          {
+            path: "faq",
+            element: <HostFAQ />,
           },
         ],
       },
