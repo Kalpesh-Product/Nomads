@@ -116,7 +116,7 @@ const router = createBrowserRouter([
           },
           {
             path: "career",
-            element: <HostCareer />,
+            element: <Career />,
           },
           {
             path: "career/job/:id",
