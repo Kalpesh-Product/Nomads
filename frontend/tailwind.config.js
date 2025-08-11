@@ -22,6 +22,7 @@ module.exports = {
           dark: "#222222",
         },
         accent: "#f4ed4f",
+        host: "#212529",
       },
       fontFamily: {
         sans: ["Poppins", "ui-sans-serif", "system-ui"],
