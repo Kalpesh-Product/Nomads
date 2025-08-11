@@ -37,14 +37,14 @@ const Listings = () => {
     { label: "10 - 25", value: "10-25" },
     { label: "25+", value: "25+" },
   ];
-  const categoryOptions = [
+    const categoryOptions = [
     { label: "Co-Working", value: "coworking" },
-    { label: "Hostel", value: "hostel" },
+    { label: "Co-Living", value: "coliving" },
+    { label: "Hostels", value: "hostel" },
+    { label: "Private Stay", value: "privateStay" },
     { label: "Cafe’s", value: "cafe" },
     { label: "Meetings", value: "meetingRoom" },
-    { label: "Private Stay", value: "privateStay" },
-    { label: "Co-Living", value: "coliving" },
-    { label: " Workation", value: "workation" },
+    { label: "Workation", value: "workation" },
   ];
   const activeCategory = searchParams.get("category");
   const queryClient = new QueryClient();

@@ -19,7 +19,7 @@ const HostHome = () => {
                 </h1>
                 <img className="absolute w-full -bottom-6 left-0 h-1/2" src="/blue-line.png" alt="underline" />
               </div>
-              <p className="text-[clamp(1rem,3vw,2.8rem)]">
+              <p className="text-[clamp(1rem,3.2vw,3rem)]">
                 "<span>Wo</span>rld <span>No</span>mad <span>Co</span>mmerce"
               </p>
             </div>

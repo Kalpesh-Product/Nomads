@@ -23,7 +23,7 @@ const App = () => {
   }, [location.pathname]);
 
   return (
-    <div ref={contentRef} className="flex flex-col h-screen overflow-auto justify-between relative">
+    <div ref={contentRef} className="flex flex-col h-screen overflow-auto justify-between relative bg-white">
       {!hideHeaderFooter && (
         <div className="sticky top-0 w-full z-50">
           <div className="md:block">
