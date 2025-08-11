@@ -28,7 +28,9 @@ import {
 } from "../utils/validators";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import AmenitiesList from "../components/AmenitiesList";import { FaCheck } from "react-icons/fa";
+import AmenitiesList from "../components/AmenitiesList";
+import { FaCheck } from "react-icons/fa";
+import TransparentModal from "../components/TransparentModal";
 
 dayjs.extend(relativeTime);
 
@@ -37,6 +39,7 @@ const Product = () => {
   const navigate = useNavigate();
   const { companyId, type } = location.state;
   const [selectedReview, setSelectedReview] = useState([]);
+  const [showAmenities, setShowAmenities] = useState(false);
   console.log("selected : ", selectedReview);
   const [open, setOpen] = useState(false);
   console.log("company id", companyId);
@@ -175,22 +178,6 @@ const Product = () => {
     <div className="p-4">
       <div className="min-w-[70%] max-w-[80rem] lg:max-w-[70rem] mx-0 md:mx-auto">
         <div className="flex flex-col gap-8">
-          <div className="flex w-full justify-between">
-            <h1 className="text-title font-medium text-gray-700">
-              {companyDetails?.companyName || "Unknown"}
-            </h1>
-            <div className="items-center flex gap-2">
-              <div
-                onClick={() => setHeartClicked((prev) => !prev)}
-                className="cursor-pointer relative">
-                {heartClicked ? <IoIosHeart /> : <IoIosHeartEmpty />}
-              </div>
-              <NavLink className={"text-small underline"} to={"/nomad/login"}>
-                Save
-              </NavLink>
-            </div>
-          </div>
-
           {/* Image Section */}
           {isCompanyDetails ? (
             // 🔄 Loading skeletons
@@ -226,7 +213,7 @@ const Product = () => {
               <div className="w-full h-[28.5rem] overflow-hidden rounded-md">
                 <img
                   src={
-                    selectedImage?.url ||
+                    companyDetails?.images?.[0]?.url ||
                     "https://via.placeholder.com/400x200?text=No+Image+Found+"
                   }
                   className="w-full h-full object-cover cursor-pointer"
@@ -245,7 +232,7 @@ const Product = () => {
 
               {/* Thumbnail Images */}
               <div className="grid grid-cols-2 gap-1">
-                {companyImages.map((item, index) => (
+                {companyDetails?.images?.slice(1).map((item, index) => (
                   <div
                     key={item._id}
                     className={`relative w-full h-56 overflow-hidden rounded-md cursor-pointer border-2 ${
@@ -261,7 +248,8 @@ const Product = () => {
                           selectedImageId: item._id,
                         },
                       })
-                    }>
+                    }
+                  >
                     <img
                       src={item.url}
                       alt="company-thumbnail"
@@ -281,7 +269,8 @@ const Product = () => {
                               },
                             });
                           }}
-                          className="bg-white text-sm px-3 py-1 rounded shadow font-medium">
+                          className="bg-white text-sm px-3 py-1 rounded shadow font-medium"
+                        >
                           +{companyDetails.images.length - 4} more
                         </button>
                       </div>
@@ -317,7 +306,25 @@ const Product = () => {
               )}
 
               <div className="space-y-2">
-                <h1 className="text-title  font-medium text-gray-700">About</h1>
+                <div className="flex justify-between items-center">
+                  <h1 className="text-title  font-medium text-gray-700 uppercase">
+                    About
+                  </h1>
+                  <div className="items-center flex gap-2">
+                    <div
+                      onClick={() => setHeartClicked((prev) => !prev)}
+                      className="cursor-pointer relative"
+                    >
+                      {heartClicked ? <IoIosHeart /> : <IoIosHeartEmpty />}
+                    </div>
+                    <NavLink
+                      className={"text-small underline"}
+                      to={"/nomad/login"}
+                    >
+                      Save
+                    </NavLink>
+                  </div>
+                </div>
 
                 {isCompanyDetails ? (
                   // 🔄 Skeleton UI while loading
@@ -395,7 +402,8 @@ const Product = () => {
                 <form
                   onSubmit={handleSubmit((data) => submitEnquiry(data))}
                   action=""
-                  className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+                >
                   <Controller
                     name="fullName"
                     rules={{
@@ -565,7 +573,7 @@ const Product = () => {
           <hr className="my-5 lg:my-10" />
           {/* Inclusions */}
           <div className="flex flex-col gap-8 w-full">
-            <h1 className="text-title text-gray-700 font-medium">
+            <h1 className="text-title text-gray-700 font-medium uppercase">
               What Inclusions does it offer
             </h1>
 
@@ -574,17 +582,20 @@ const Product = () => {
                 Inclusions not available
               </div>
             ) : (
-              // <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-24 gap-y-10">
-              //   {allAmenities.map((item, index) => (
-              //     <Amenities
-              //       key={index}
-              //       image={item.image}
-              //       title={item.title}
-              //       isAvailable={item.isAvailable}
-              //     />
-              //   ))}
-              // </div>
-              <AmenitiesList type={companyDetails?.type.toLowerCase() || ''} inclusions={inclusions} />
+              <div className="flex flex-col gap-10 w-full">
+                <AmenitiesList
+                  type={companyDetails?.type.toLowerCase() || ""}
+                  inclusions={inclusions}
+                />
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => setShowAmenities(true)}
+                    className="text-primary-blue text-content hover:underline"
+                  >
+                    Show more
+                  </button>
+                </div>
+              </div>
             )}
           </div>
 
@@ -626,12 +637,12 @@ const Product = () => {
             <hr className="my-5 lg:my-10" />
             {/* Map */}
             <div className="w-full h-[500px] flex flex-col gap-8 rounded-xl overflow-hidden">
-              <h1 className="text-title font-medium text-gray-700">
+              <h1 className="text-title font-medium text-gray-700 uppercase">
                 Where you'll be
               </h1>
               <Map
                 locations={mapsData}
-                disableNavigation 
+                disableNavigation
                 disableTwoFingerScroll
               />
             </div>
@@ -661,11 +672,11 @@ const Product = () => {
                 </div>
 
                 <div className="w-px h-full bg-gray-300 mx-2 my-auto" />
-                <div className="h-full w-56">
-                  <p className="text-title text-center text-gray-700 font-medium mb-8 underline">
+                <div className="h-full w-56 flex flex-col justify-between">
+                  <p className="text-title text-center text-gray-700 font-medium mb-8 underline uppercase">
                     Host Details
                   </p>
-                  <div className="grid grid-cols-1 gap-10 text-sm sm:text-base">
+                  <div className="flex flex-col gap-5 text-sm sm:text-base">
                     {[
                       "Response rate: 100%",
                       "Speaks English, Hindi and Punjabi",
@@ -682,12 +693,13 @@ const Product = () => {
               </div>
               <div className="flex w-full border-2 shadow-md rounded-xl">
                 <div className="flex flex-col  h-full gap-4 rounded-xl p-6 w-full lg:w-full justify-between">
-                  <h1 className="text-title text-gray-700 font-medium">
+                  <h1 className="text-title text-gray-700 font-medium uppercase">
                     Connect With Host
                   </h1>
                   <form
                     onSubmit={handlesubmitSales((data) => submitSales(data))}
-                    className="grid grid-cols-1 gap-4">
+                    className="grid grid-cols-1 gap-4"
+                  >
                     <Controller
                       name="fullName"
                       control={salesControl}
@@ -807,6 +819,29 @@ const Product = () => {
           </div>
         </div>
       </MuiModal>
+      <TransparentModal
+        open={showAmenities}
+        onClose={() => setShowAmenities(false)}
+      >
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 p-4">
+          {(Array.isArray(companyDetails?.inclusions)
+            ? companyDetails.inclusions
+            : companyDetails?.inclusions?.split(",") || []
+          ).map((item) => (
+            <span
+              key={item}
+              className="bg-gray-800 text-white text-sm rounded-lg px-3 py-2 text-center"
+            >
+              {item
+                .replace(/([a-z])([A-Z])/g, "$1 $2")
+                .replace(/-/g, " ")
+                .replace(/&/g, " & ")
+                .toLowerCase()
+                .replace(/\b\w/g, (char) => char.toUpperCase())}
+            </span>
+          ))}
+        </div>
+      </TransparentModal>
     </div>
   );
 };
