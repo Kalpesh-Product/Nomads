@@ -104,7 +104,7 @@ const router = createBrowserRouter([
         ],
       },
          {
-        path: "host",
+        path: "hosts",
         element: <HostLayout />,
         children: [
           {

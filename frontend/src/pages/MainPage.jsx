@@ -93,7 +93,8 @@ const MainPage = () => {
             <PrimaryButton
               title="For Hosts"
               handleSubmit={() =>
-                (window.location.href = "https://www.wono.co")
+                // (window.location.href = "https://www.wono.co")
+                navigate("hosts")
               }
               externalStyles="bg-[#FF5757] text-[1rem] flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[12rem] px-6"
             />
