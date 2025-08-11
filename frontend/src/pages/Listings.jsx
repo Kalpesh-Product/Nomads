@@ -419,7 +419,6 @@ const Listings = () => {
           </motion.div>
         )}
       </AnimatePresence>
-      <hr />
       <Container padding={false}>
         <div className="grid grid-cols-1 lg:grid-cols-9 gap-4">
           {/* LIST VIEW */}
@@ -433,24 +432,7 @@ const Listings = () => {
               mapOpen ? "col-span-5" : "col-span-9"
             } font-semibold text-lg`}
           >
-            {!isLisitingLoading ? (
-              <div className="flex w-full justify-between pb-6">
-                <p>
-                  Over {listingsData?.length - 1}{" "}
-                  {formData.category?.charAt(0).toUpperCase() +
-                    formData.category?.slice(1)}{" "}
-                  Spaces
-                </p>
-                <button className="hidden lg:block" onClick={() => setMapOpen((prev) => !prev)}>
-                  {mapOpen ? "← List View" : "Map View →"}
-                </button>
-              </div>
-            ) : (
-              <Box className="w-full h-full">
-                <Skeleton width={400} height={50} />
-              </Box>
-            )}
-
+          
             <PaginatedGrid
               data={isLisitingLoading ? skeletonArray : sortedListings}
               entriesPerPage={!mapOpen ? 10 : 9}
@@ -503,7 +485,7 @@ const Listings = () => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 50 }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="col-span-4 w-full overflow-hidden rounded-xl h-[80%]"
+                className="col-span-4 w-full overflow-hidden rounded-xl h-full"
               >
                 {isLisitingLoading ? (
                   <SkeletonMap />

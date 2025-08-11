@@ -30,6 +30,7 @@ import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import AmenitiesList from "../components/AmenitiesList";
 import { FaCheck } from "react-icons/fa";
+import TransparentModal from "../components/TransparentModal";
 
 dayjs.extend(relativeTime);
 
@@ -38,6 +39,7 @@ const Product = () => {
   const navigate = useNavigate();
   const { companyId, type } = location.state;
   const [selectedReview, setSelectedReview] = useState([]);
+  const [showAmenities, setShowAmenities] = useState(false);
   console.log("selected : ", selectedReview);
   const [open, setOpen] = useState(false);
   console.log("company id", companyId);
@@ -211,7 +213,7 @@ const Product = () => {
               <div className="w-full h-[28.5rem] overflow-hidden rounded-md">
                 <img
                   src={
-                    selectedImage?.url ||
+                    companyDetails?.images?.[0]?.url ||
                     "https://via.placeholder.com/400x200?text=No+Image+Found+"
                   }
                   className="w-full h-full object-cover cursor-pointer"
@@ -230,7 +232,7 @@ const Product = () => {
 
               {/* Thumbnail Images */}
               <div className="grid grid-cols-2 gap-1">
-                {companyImages.map((item, index) => (
+                {companyDetails?.images?.slice(1).map((item, index) => (
                   <div
                     key={item._id}
                     className={`relative w-full h-56 overflow-hidden rounded-md cursor-pointer border-2 ${
@@ -580,20 +582,20 @@ const Product = () => {
                 Inclusions not available
               </div>
             ) : (
-              // <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-24 gap-y-10">
-              //   {allAmenities.map((item, index) => (
-              //     <Amenities
-              //       key={index}
-              //       image={item.image}
-              //       title={item.title}
-              //       isAvailable={item.isAvailable}
-              //     />
-              //   ))}
-              // </div>
-              <AmenitiesList
-                type={companyDetails?.type.toLowerCase() || ""}
-                inclusions={inclusions}
-              />
+              <div className="flex flex-col gap-10 w-full">
+                <AmenitiesList
+                  type={companyDetails?.type.toLowerCase() || ""}
+                  inclusions={inclusions}
+                />
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => setShowAmenities(true)}
+                    className="text-primary-blue text-content hover:underline"
+                  >
+                    Show more
+                  </button>
+                </div>
+              </div>
             )}
           </div>
 
@@ -817,6 +819,29 @@ const Product = () => {
           </div>
         </div>
       </MuiModal>
+      <TransparentModal
+        open={showAmenities}
+        onClose={() => setShowAmenities(false)}
+      >
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 p-4">
+          {(Array.isArray(companyDetails?.inclusions)
+            ? companyDetails.inclusions
+            : companyDetails?.inclusions?.split(",") || []
+          ).map((item) => (
+            <span
+              key={item}
+              className="bg-gray-800 text-white text-sm rounded-lg px-3 py-2 text-center"
+            >
+              {item
+                .replace(/([a-z])([A-Z])/g, "$1 $2")
+                .replace(/-/g, " ")
+                .replace(/&/g, " & ")
+                .toLowerCase()
+                .replace(/\b\w/g, (char) => char.toUpperCase())}
+            </span>
+          ))}
+        </div>
+      </TransparentModal>
     </div>
   );
 };
