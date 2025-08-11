@@ -37,11 +37,11 @@ const GlobalListingsMap = () => {
   ];
   const categoryOptions = [
     { label: "Co-Working", value: "coworking" },
+    { label: "Co-Living", value: "coliving" },
     { label: "Hostels", value: "hostel" },
+    { label: "Private Stay", value: "privateStay" },
     { label: "Cafe’s", value: "cafe" },
     { label: "Meetings", value: "meetingRoom" },
-    { label: "Private Stay", value: "privateStay" },
-    { label: "Co-Living", value: "coliving" },
     { label: "Workation", value: "workation" },
   ];
   console.log("formData", formData);
@@ -409,7 +409,6 @@ const GlobalListingsMap = () => {
           )}
         </AnimatePresence>
       </div>
-      <hr />
       <Container padding={false}>
         <div className="">
           <div className="font-semibold text-md  grid grid-cols-9 gap-4 min-h-screen">
@@ -420,7 +419,7 @@ const GlobalListingsMap = () => {
                 ))
               ) : (
                 <div className="col-span-full mb-6">
-                  <h2 className="text-subtitle text-secondary-dark font-semibold mb-5">
+                  {/* <h2 className="text-subtitle text-secondary-dark font-semibold mb-5">
                     Search results for{" "}
                     {formData?.location
                       ? formData.location.charAt(0).toUpperCase() +
@@ -430,7 +429,7 @@ const GlobalListingsMap = () => {
                       ? formData.country.charAt(0).toUpperCase() +
                         formData.country.slice(1)
                       : "Unknown"}{" "}
-                  </h2>
+                  </h2> */}
 
                   <PaginatedGrid
                     data={isLisitingLoading ? skeletonArray : listingsData}

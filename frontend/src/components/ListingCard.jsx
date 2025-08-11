@@ -50,7 +50,7 @@ const ListingCard = ({ item, handleNavigation, showVertical=true }) => {
         </div>
       </div>
 
-      <div className="h-[25%] flex flex-col gap-1 px-4">
+      <div className="h-[25%] flex flex-col gap-1 pl-4">
         <div className="flex w-full justify-between items-center">
           <div className="w-full">
             <p className="text-sm font-semibold">

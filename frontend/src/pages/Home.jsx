@@ -471,7 +471,7 @@ const Home = () => {
       </Container>
       <Container padding={false}>
         <div className="flex flex-col gap-8 w-full border-t-2 border-gray-300 py-8">
-          <h1 className="text-title font-medium text-gray-700">
+          <h1 className="text-title font-medium text-gray-700 uppercase">
             Happy customers.
           </h1>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-0 lg:p-6">

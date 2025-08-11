@@ -25,6 +25,7 @@ const GlobalListingsList = () => {
   const [favorites, setFavorites] = useState([]);
   const dispatch = useDispatch();
   const formData = useSelector((state) => state.location.formValues);
+  const [expandedCategories, setExpandedCategories] = useState([]);
   const countryOptions = [{ label: "India", value: "india" }];
   const locationOptions = [{ label: "Goa", value: "goa" }];
   const countOptions = [
@@ -35,27 +36,17 @@ const GlobalListingsList = () => {
   ];
   const categoryOptions = [
     { label: "Co-Working", value: "coworking" },
+    { label: "Co-Living", value: "coliving" },
     { label: "Hostels", value: "hostel" },
+    { label: "Private Stay", value: "privateStay" },
     { label: "Cafe’s", value: "cafe" },
     { label: "Meetings", value: "meetingRoom" },
-    { label: "Private Stay", value: "privateStay" },
-    { label: "Co-Living", value: "coliving" },
     { label: "Workation", value: "workation" },
   ];
   console.log("formData", formData);
   const handleShowMoreClick = (type) => {
-    const updatedForm = {
-      ...formData,
-      category: type,
-    };
-
-    dispatch(setFormValues(updatedForm));
-
-    navigate(
-      `/nomad/listings?country=${formData.country}&location=${formData.location}&category=${type}`,
-      {
-        state: updatedForm,
-      }
+    setExpandedCategories((prev) =>
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
     );
   };
 
@@ -183,7 +174,7 @@ const GlobalListingsList = () => {
   return (
     <div className="flex flex-col gap-2 lg:gap-6">
       <div className="flex flex-col gap-4 justify-center items-center  w-full lg:mt-0">
-        <Container padding={false}>
+        <div className="min-w-[85%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0">
           <div className="hidden lg:flex flex-col gap-4 justify-between items-center w-full h-full">
             {/* the 5 icons */}
 
@@ -291,7 +282,7 @@ const GlobalListingsList = () => {
               </span>
             </button>
           </div>
-        </Container>
+        </div>
         <AnimatePresence>
           {showMobileSearch && (
             <motion.div
@@ -434,9 +425,13 @@ const GlobalListingsList = () => {
                     return bRating - aRating;
                   });
 
-                  const displayItems = sortedItems.slice(0,5);
+                  const displayItems = expandedCategories.includes(type)
+                    ? sortedItems
+                    : sortedItems.slice(0, 5);
 
-                  const showViewMore = items.length > 5;
+                  console.log("sortedItems ", sortedItems.length);
+
+                  const showViewMore = sortedItems.length > 5;
                   const sectionTitle = `Popular ${
                     typeLabels[type] || typeLabels.default(type)
                   } in ${
@@ -473,7 +468,9 @@ const GlobalListingsList = () => {
                             onClick={() => handleShowMoreClick(type)}
                             className="text-primary-blue text-sm font-semibold hover:underline"
                           >
-                            View More →
+                            {expandedCategories.includes(type)
+                              ? "View Less ←"
+                              : "View More →"}
                           </button>
                         </div>
                       )}
