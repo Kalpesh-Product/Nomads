@@ -13,37 +13,39 @@ const HostHeader = () => {
     { name: "Career", link: "/hosts/career" },
   ];
   return (
-    <Container padding={false}>
-      <div className="flex px-4 lg:px-0 justify-between items-center md:py-3 bg-white/80 backdrop-blur-md ">
-        <div
-          onClick={() => navigate("/")}
-          className=" w-36 overflow-x-hidden rounded-lg flex justify-between items-center cursor-pointer"
-        >
-          <img
-            src={logo}
-            alt={"logo"}
-            className="w-full h-full object-contain"
-          />
+    <header className="bg-white/80 backdrop-blur-md">
+      <Container padding={false}>
+        <div className="flex px-4 lg:px-0 justify-between items-center md:py-3  ">
+          <div
+            onClick={() => navigate("/")}
+            className=" w-36 overflow-x-hidden rounded-lg flex justify-between items-center cursor-pointer"
+          >
+            <img
+              src={logo}
+              alt={"logo"}
+              className="w-full h-full object-contain"
+            />
+          </div>
+          <ul className="hidden xl:flex sm:hidden gap-8 pl-20 justify-center flex-1">
+            {links.map((link) => (
+              <li>
+                <Link to={`${link.link}`}>{link.name}</Link>
+              </li>
+            ))}
+          </ul>
+          <div className="px-1 hidden xl:flex   py-2">
+            <PrimaryButton
+              title={"Login"}
+              padding={"py-2"}
+              handleSubmit={() => navigate("/hosts/login")}
+              className={
+                "bg-[#FF5757]  flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[7rem] px-6"
+              }
+            />
+          </div>
         </div>
-        <ul className="hidden xl:flex sm:hidden gap-8 pl-20 justify-center flex-1">
-          {links.map((link) => (
-            <li>
-              <Link to={`${link.link}`}>{link.name}</Link>
-            </li>
-          ))}
-        </ul>
-        <div className="px-1 hidden xl:flex   py-2">
-          <PrimaryButton
-            title={"Login"}
-            padding={"py-2"}
-            handleSubmit={() => navigate("/hosts/login")}
-            className={
-              "bg-[#FF5757]  flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[7rem] px-6"
-            }
-          />
-        </div>
-      </div>
-    </Container>
+      </Container>
+    </header>
   );
 };
 

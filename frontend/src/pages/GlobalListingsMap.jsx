@@ -37,7 +37,7 @@ const GlobalListingsMap = () => {
   ];
   const categoryOptions = [
     { label: "Co-Working", value: "coworking" },
-    { label: "Co-Living", value: "coliving" },
+    // { label: "Co-Living", value: "coliving" },
     { label: "Hostels", value: "hostel" },
     { label: "Private Stay", value: "privateStay" },
     { label: "Cafe’s", value: "cafe" },
@@ -189,8 +189,8 @@ const GlobalListingsMap = () => {
           <div className="hidden lg:flex flex-col gap-4 justify-between items-center">
             {/* the 5 icons */}
 
-            <div className=" w-3/4 flex justify-center items-center">
-              <div className="grid grid-cols-5 md:grid-cols-7 gap-0 pb-4">
+            <div className=" w-3/4 pb-4">
+              <div className="flex justify-between items-center">
                 {categoryOptions.map((cat) => {
                   const iconSrc = newIcons[cat.value];
 
