@@ -15,7 +15,6 @@ const App = () => {
   const isNomad = location.pathname.includes("/nomad");
   const isHost = location.pathname.includes("/hosts");
 
-  
   useEffect(() => {
     if (contentRef.current) {
       contentRef.current.scrollTo({ behavior: "smooth", top: "0" });
@@ -23,33 +22,29 @@ const App = () => {
   }, [location.pathname]);
 
   return (
-    <div ref={contentRef} className="flex flex-col h-screen overflow-auto justify-between relative bg-white">
+    <div
+      ref={contentRef}
+      className="flex flex-col h-screen overflow-auto justify-between relative bg-white custom-scrollbar-hide">
       {!hideHeaderFooter && (
         <div className="sticky top-0 w-full z-50">
           <div className="md:block">
-            {
-              isNomad ? <Header /> : <HostHeader/>
-            }
-            
+            {isNomad ? <Header /> : <HostHeader />}
           </div>
         </div>
       )}
 
-
-      
       <div
         // ref={contentRef}
         className={`${
           hideHeaderFooter
             ? ""
             : "py-0 px-0 xs:py-2 xs:pb-20 md:pt-20 md:pb-40 lg:py-4 md:px-0 lg:px-0 sm:px-4"
-        } flex flex-col gap-4 bg-white`}
-      >
+        } flex flex-col gap-4 bg-white`}>
         <Outlet />
         <Toaster />
       </div>
 
-      {!hideHeaderFooter && isNomad ? <Footer /> : <HostFooter/>}
+      {!hideHeaderFooter && isNomad ? <Footer /> : <HostFooter />}
     </div>
   );
 };
