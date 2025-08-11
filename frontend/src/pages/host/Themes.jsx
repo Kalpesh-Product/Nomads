@@ -1,74 +1,62 @@
-import { Container } from "@mui/material";
-import React from "react";
-import BiznestImage from "../../../public/hosts/themes/biznest.png";
-import CoWorkingMewo from "../../../public/hosts/themes/coWorkingMewo.png";
-import CoWorkingImage from "../../../public/hosts/themes/coworking.png";
-import Boutique from "../../../public/hosts/themes/boutique.png";
-import CoLivingImage from "../../../public/hosts/themes/coliving.png";
-import CoWorkingImage_2 from "../../../public/hosts/themes/coworking2.png";
-import CoWorkingImage_3 from "../../../public/hosts/themes/coworking3.png";
-import Cafe_2 from "../../../public/hosts/themes/cafe2.png";
-import Cafe_3 from "../../../public/hosts/themes/cafe3.png";
-import Hostels from "../../../public/hosts/themes/hostels.png";
 import GetStartedButton from "../../components/GetStartedButton";
 
 const themes = [
   {
-    src: BiznestImage,
+    src: "/hosts/themes/biznest.png",
     // mockup: BiznestImageMockup,
     alt: "BiznestImage",
     tag: "co-working",
   },
   {
-    src: CoWorkingMewo,
+    src: "/hosts/themes/coworkingMewo.png",
     // mockup: CoWorkingMewoMockup,
     alt: "CoWorkingMewo",
     tag: "co-working",
   },
   {
-    src: CoWorkingImage,
+    src: "/hosts/themes/coworking.png",
     // mockup: CoWorkingImageMockup,
     alt: "Co-Working Image",
     tag: "co-working",
   },
   {
-    src: Boutique,
+    src: "/hosts/themes/boutique.png",
     // mockup: BoutiqueMockup,
     alt: "Boutique Image",
     tag: "boutique",
   },
   {
-    src: CoLivingImage,
+    src: "/hosts/themes/coliving.png",
     // mockup: CoLivingImageMockup,
     alt: "Co-Living Image",
     tag: "co-living",
   },
   {
-    src: CoWorkingImage_2,
+    src: "/hosts/themes/coworking2.png",
     // mockup: CoWorkingNomad,
     alt: "CoLivingImage_2",
     tag: "co-working",
   },
   {
-    src: CoWorkingImage_3,
+    src: "/hosts/themes/coworking3.png",
     // mockup: CoWorkingImage_3_Mockup,
     alt: "CoLivingImage_3",
     tag: "co-working",
   },
   {
-    src: Cafe_2,
+    src: "/hosts/themes/cafe2.png",
     // mockup: Cafe2Mockup,
     alt: "Cafe_2",
     tag: "cafe",
   },
   {
-    src: Cafe_3,
+    src: "/hosts/themes/cafe3.png",
     //  mockup: Cafe3Mockup,
     alt: "Cafe_3",
     tag: "cafe",
   },
   {
-    src: Hostels,
+    src: "/hosts/themes/hostels.png",
     // mockup: Hostels_mockup,
     alt: "Hostels",
     tag: "hostels",
@@ -115,6 +103,12 @@ const Themes = () => {
           title={"Get Started"}
         />
       </div>
+
+      {/*Customize */}
+      <div className="flex ">
+         <h1>Customize it your way</h1>
+      </div>
+
     </div>
   );
 };
