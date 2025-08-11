@@ -672,7 +672,7 @@ const Product = () => {
                 </div>
 
                 <div className="w-px h-full bg-gray-300 mx-2 my-auto" />
-                <div className="h-full w-56 flex flex-col justify-between">
+                <div className="h-full w-56 flex flex-col justify-normal">
                   <p className="text-title text-center text-gray-700 font-medium mb-8 underline uppercase">
                     Host Details
                   </p>
