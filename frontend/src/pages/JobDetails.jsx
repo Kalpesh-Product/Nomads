@@ -1,11 +1,14 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import Container from "../components/Container";
 import JobApplicationForm from "./JobApplicationForm";
+import HostJobApplicationForm from "./host/HostJobApplicationForm";
 
 const JobDetails = () => {
   const { id } = useParams();
   const [activeTab, setActiveTab] = useState("description");
+ const {pathname} = useLocation();
+ const isHost = pathname.includes("host")
 
   // Ideally this would come from context, API, or match from jobRoles
   const jobTitle = "UI Designer"; // Temporary placeholder
@@ -101,7 +104,7 @@ const JobDetails = () => {
             </p>
           </div>
         ) : (
-          <JobApplicationForm />
+          isHost ? <HostJobApplicationForm/> : <JobApplicationForm />
         )}
       </div>
     </Container>
