@@ -208,7 +208,7 @@ const Home = () => {
   return (
     <div className="flex flex-col w-full">
       <div className="min-w-[85%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0">
-        <div className="py-8  hidden lg:block">
+        <div className="py-12  hidden lg:block">
           <div className="flex flex-col  gap-4 justify-between items-center">
             <form
               onSubmit={handleSubmit(onSubmit)}
