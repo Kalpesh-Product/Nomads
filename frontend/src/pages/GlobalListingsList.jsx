@@ -38,10 +38,19 @@ const GlobalListingsList = () => {
     { label: "Co-Working", value: "coworking" },
     // { label: "Co-Living", value: "coliving" },
     { label: "Hostels", value: "hostel" },
-    { label: "Private Stay", value: "privateStay" },
-    { label: "Cafe’s", value: "cafe" },
-    { label: "Meetings", value: "meetingRoom" },
     { label: "Workation", value: "workation" },
+    { label: "Private Stay", value: "privateStay" },
+    { label: "Meetings", value: "meetingRoom" },
+    { label: "Cafe’s", value: "cafe" },
+  ];
+  const typeOrder = [
+    "coworking",
+    "hostel",
+    "workation",
+    "privateStay",
+    "meetingRoom",
+    "cafe",
+    "coliving",
   ];
   console.log("formData", formData);
   const handleShowMoreClick = (type) => {
@@ -65,13 +74,12 @@ const GlobalListingsList = () => {
     enabled: !!formData?.country && !!formData?.location, // ✅ prevents fetching on empty state
   });
 
-const groupedListings = listingsData?.reduce((acc, item) => {
-  if (item.type === "coliving") return acc; // skip coliving
-  if (!acc[item.type]) acc[item.type] = [];
-  acc[item.type].push(item);
-  return acc;
-}, {});
-
+  const groupedListings = listingsData?.reduce((acc, item) => {
+    if (item.type === "coliving") return acc; // skip coliving
+    if (!acc[item.type]) acc[item.type] = [];
+    acc[item.type].push(item);
+    return acc;
+  }, {});
 
   console.log("frou[ed ", groupedListings);
 
@@ -180,8 +188,8 @@ const groupedListings = listingsData?.reduce((acc, item) => {
           <div className="hidden lg:flex flex-col gap-4 justify-between items-center w-full h-full">
             {/* the 5 icons */}
 
-           <div className=" w-3/4 pb-4">
-                <div className="flex justify-between items-center">
+            <div className=" w-3/4 pb-4">
+              <div className="flex justify-between items-center">
                 {categoryOptions.map((cat) => {
                   const iconSrc = newIcons[cat.value];
 
@@ -394,91 +402,113 @@ const groupedListings = listingsData?.reduce((acc, item) => {
         <div className="">
           <div className="font-semibold text-md">
             <div className=" custom-scrollbar-hide">
+              {/* Popular section */}
               {isLisitingLoading ? (
                 Array.from({ length: 4 }).map((_, i) => (
                   <SkeletonCard key={i} />
                 ))
               ) : groupedListings && Object.keys(groupedListings).length > 0 ? (
-                Object.entries(groupedListings).map(([type, items]) => {
-                  const prioritizedCompanies = ["MeWo", "BIZ Nest"];
-                  const sortedItems = [...items].sort((a, b) => {
-                    const aIsPriority = prioritizedCompanies.includes(
-                      a.companyName
+                Object.entries(groupedListings)
+                  .sort(([typeA], [typeB]) => {
+                    const typeOrder = [
+                      "coworking",
+                      "hostel",
+                      "workation",
+                      "privateStay",
+                      "meetingRoom",
+                      "cafe",
+                      "coliving",
+                    ];
+                    const indexA = typeOrder.indexOf(typeA);
+                    const indexB = typeOrder.indexOf(typeB);
+                    return (
+                      (indexA === -1 ? 999 : indexA) -
+                      (indexB === -1 ? 999 : indexB)
                     );
-                    const bIsPriority = prioritizedCompanies.includes(
-                      b.companyName
-                    );
+                  })
+                  .map(([type, items]) => {
+                    const prioritizedCompanies = ["MeWo", "BIZ Nest"];
+                    const sortedItems = [...items].sort((a, b) => {
+                      const aIsPriority = prioritizedCompanies.includes(
+                        a.companyName
+                      );
+                      const bIsPriority = prioritizedCompanies.includes(
+                        b.companyName
+                      );
 
-                    if (aIsPriority && !bIsPriority) return -1;
-                    if (!aIsPriority && bIsPriority) return 1;
+                      if (aIsPriority && !bIsPriority) return -1;
+                      if (!aIsPriority && bIsPriority) return 1;
 
-                    // If both are priority or both are not, sort by rating descending
-                    const aRating =
-                      a.reviews?.length > 0
-                        ? a.reviews.reduce((sum, r) => sum + r.starCount, 0) /
-                          a.reviews.length
-                        : 0;
-                    const bRating =
-                      b.reviews?.length > 0
-                        ? b.reviews.reduce((sum, r) => sum + r.starCount, 0) /
-                          b.reviews.length
-                        : 0;
+                      const aRating =
+                        a.reviews?.length > 0
+                          ? a.reviews.reduce((sum, r) => sum + r.starCount, 0) /
+                            a.reviews.length
+                          : 0;
+                      const bRating =
+                        b.reviews?.length > 0
+                          ? b.reviews.reduce((sum, r) => sum + r.starCount, 0) /
+                            b.reviews.length
+                          : 0;
 
-                    return bRating - aRating;
-                  });
+                      return bRating - aRating;
+                    });
 
-                  const displayItems = expandedCategories.includes(type)
-                    ? sortedItems
-                    : sortedItems.slice(0, 5);
+                    const displayItems = expandedCategories.includes(type)
+                      ? sortedItems
+                      : sortedItems.slice(0, 5);
 
-                  console.log("sortedItems ", sortedItems.length);
+                    const showViewMore = sortedItems.length > 5;
+                    const sectionTitle = `Popular ${
+                      typeLabels[type] || typeLabels.default(type)
+                    } in ${
+                      formData?.location
+                        ? formData.location.charAt(0).toUpperCase() +
+                          formData.location.slice(1)
+                        : ""
+                    }`;
 
-                  const showViewMore = sortedItems.length > 5;
-                  const sectionTitle = `Popular ${
-                    typeLabels[type] || typeLabels.default(type)
-                  } in ${
-                    formData?.location
-                      ? formData.location.charAt(0).toUpperCase() +
-                        formData.location.slice(1)
-                      : ""
-                  }`;
+                    return (
+                      <div key={type} className="col-span-full mb-6">
+                        <h2 className="text-subtitle font-semibold mb-5 text-secondary-dark">
+                          {sectionTitle}
+                        </h2>
 
-                  return (
-                    <div key={type} className="col-span-full mb-6">
-                      <h2 className="text-subtitle font-semibold mb-5 text-secondary-dark">
-                        {sectionTitle}
-                      </h2>
-
-                      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-x-5 gap-y-0">
-                        {displayItems.map((item) => (
-                          <ListingCard
-                            key={item._id}
-                            item={item}
-                            showVertical={false}
-                            handleNavigation={() =>
-                              navigate(`/nomad/listings/${item.companyName}`, {
-                                state: { companyId: item._id, type: item.type },
-                              })
-                            }
-                          />
-                        ))}
-                      </div>
-
-                      {showViewMore && (
-                        <div className="mt-3 text-right">
-                          <button
-                            onClick={() => handleShowMoreClick(type)}
-                            className="text-primary-blue text-sm font-semibold hover:underline"
-                          >
-                            {expandedCategories.includes(type)
-                              ? "View Less ←"
-                              : "View More →"}
-                          </button>
+                        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-x-5 gap-y-0">
+                          {displayItems.map((item) => (
+                            <ListingCard
+                              key={item._id}
+                              item={item}
+                              showVertical={false}
+                              handleNavigation={() =>
+                                navigate(
+                                  `/nomad/listings/${item.companyName}`,
+                                  {
+                                    state: {
+                                      companyId: item._id,
+                                      type: item.type,
+                                    },
+                                  }
+                                )
+                              }
+                            />
+                          ))}
                         </div>
-                      )}
-                    </div>
-                  );
-                })
+
+                        {showViewMore && (
+                          <div className="mt-3 text-right">
+                            <button
+                              onClick={() => handleShowMoreClick(type)}
+                              className="text-primary-blue text-sm font-semibold hover:underline"
+                            >
+                              {expandedCategories.includes(type)
+                                ? "View Less ←"
+                                : "View More →"}
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
               ) : (
                 <div className="col-span-full text-center text-sm text-gray-500 border border-dotted rounded-lg p-4">
                   No listings found.
