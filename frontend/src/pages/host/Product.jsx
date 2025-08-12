@@ -177,11 +177,11 @@ const HostProduct = () => {
           </div>
         </div>
       </section>
-      <section className="w-full bg-[#E9F9FF] flex flex-col justify-center items-center gap-8 py-14 h-[80%] px-28 mb-[-2rem]">
+      <section className="w-full bg-[#E9F9FF] flex flex-col justify-center items-center gap-8 py-14 h-[80%] px-28 mt-[-2rem]">
         <ReactFitty>Few more suggestions for you</ReactFitty>
 
         <div className="grid grid-cols-2 justify-between gap-8">
-          {themes.filter((theme)=> theme.alt !== selectedImage.alt && theme.tag === selectedImage.tag).map((theme) => (
+          {themes.filter((theme)=> theme.tag === selectedImage.tag).map((theme) => (
             <div className="w-full h-full overflow-hidden rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.5)] cursor-pointer" 
             onClick={()=> setSelectedImage(theme)}>
               <img
