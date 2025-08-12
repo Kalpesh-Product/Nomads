@@ -227,15 +227,16 @@ const Header = () => {
 
             {!hideMapListLinks && (
               <div>
-                <ul className="hidden xl:flex sm:hidden gap-8 pl-20 justify-center flex-1">
+                <ul className=" xl:flex gap-8  justify-center flex-1">
                   <>
                     {/* Case 1: It's a /nomad/:country/:state page */}
                     {isNomadLocation ? (
                       <>
                         {view !== "map" && (
-                          <li className="flex items-center">
+                          <li className="flex flex-col justify-center items-center">
                             <div className="p-4 px-0 whitespace-nowrap">
                               <Link
+                              onClick={()=>setOpen(false)}
                                 to={`${location.pathname}?view=map`}
                                 className="group relative text-md  text-black">
                                 <span className="relative z-10 group-hover:font-bold mb-2">
@@ -244,13 +245,15 @@ const Header = () => {
                                 <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
                               </Link>
                             </div>
+                             <div className="h-[0.2px] bg-gray-300 w-full"></div>
                           </li>
                         )}
 
                         {view === "map" && (
-                          <li className="flex items-center">
+                          <li className="flex flex-col justify-center items-center">
                             <div className="p-4 px-0 whitespace-nowrap">
                               <Link
+                               onClick={()=>setOpen(false)}
                                 to={`${location.pathname}`}
                                 className="group relative text-md text-black">
                                 <span className="relative z-10 group-hover:font-bold mb-2">
@@ -259,6 +262,7 @@ const Header = () => {
                                 <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
                               </Link>
                             </div>
+                              <div className="h-[0.2px] bg-gray-300 w-full"></div>
                           </li>
                         )}
                       </>
@@ -266,7 +270,7 @@ const Header = () => {
                       // Case 2: Not a /nomad/:country/:state page, always show List View
                       <>
                         {isNomadListingsPage && (
-                          <li className="flex items-center">
+                          <li className="flex items-center justify-center">
                             <div className="p-4 px-0 whitespace-nowrap">
                               <Link
                                 to={getListViewPath()}
@@ -283,23 +287,6 @@ const Header = () => {
                     )}
                   </>
 
-                  {/* Remaining nav links */}
-                  {headerLinks.map((item, index) => (
-                    <li key={item.id} className="flex items-center">
-                      {!["Signup"].includes(item.text) && (
-                        <div className="p-4 px-0 whitespace-nowrap">
-                          <Link
-                            to={item.to}
-                            className="group relative text-md text-black">
-                            <span className="relative z-10 group-hover:font-bold mb-8">
-                              {item.text}
-                            </span>
-                            <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
-                          </Link>
-                        </div>
-                      )}
-                    </li>
-                  ))}
                 </ul>
               </div>
             )}
