@@ -4,61 +4,61 @@ import GetStartedButton from "../../components/GetStartedButton";
 const themes = [
   {
     src: "/hosts/themes/biznest.png",
-    // mockup: BiznestImageMockup,
+    mockup: "/hosts/themes/biznestProduct.png",
     alt: "BiznestImage",
     tag: "co-working",
   },
   {
     src: "/hosts/themes/coworkingMewo.png",
-    // mockup: CoWorkingMewoMockup,
+    mockup: "/hosts/themes/coworkingMewoProduct.png",
     alt: "CoWorkingMewo",
     tag: "co-working",
   },
   {
     src: "/hosts/themes/coworking.png",
-    // mockup: CoWorkingImageMockup,
+    mockup: "/hosts/themes/coworkingProduct.png",
     alt: "Co-Working Image",
     tag: "co-working",
   },
   {
     src: "/hosts/themes/boutique.png",
-    // mockup: BoutiqueMockup,
+    mockup: "/hosts/themes/boutiqueProduct.png",
     alt: "Boutique Image",
     tag: "boutique",
   },
   {
     src: "/hosts/themes/coliving.png",
-    // mockup: CoLivingImageMockup,
+    mockup: "/hosts/themes/colivingProduct.png",
     alt: "Co-Living Image",
     tag: "co-living",
   },
   {
     src: "/hosts/themes/coworking2.png",
-    // mockup: CoWorkingNomad,
+    mockup: "/hosts/themes/coworkingNomadProduct.png",
     alt: "CoLivingImage_2",
     tag: "co-working",
   },
   {
     src: "/hosts/themes/coworking3.png",
-    // mockup: CoWorkingImage_3_Mockup,
+    mockup: "/hosts/themes/coworking3Product.png",
     alt: "CoLivingImage_3",
     tag: "co-working",
   },
   {
     src: "/hosts/themes/cafe2.png",
-    // mockup: Cafe2Mockup,
+    mockup: "/hosts/themes/cafe2Product.png",
     alt: "Cafe_2",
     tag: "cafe",
   },
   {
     src: "/hosts/themes/cafe3.png",
-    //  mockup: Cafe3Mockup,
+     mockup: "/hosts/themes/cafe3Product.png",
     alt: "Cafe_3",
     tag: "cafe",
   },
   {
     src: "/hosts/themes/hostels.png",
-    // mockup: Hostels_mockup,
+    mockup: "/hosts/themes/hostelsProduct.png",
     alt: "Hostels",
     tag: "hostels",
   },
@@ -139,11 +139,11 @@ const Themes = () => {
             business growth. Fully tech ready, integrated and responsive.
           </span>
         </div>
-        <div className="grid grid-cols-2 px-28 gap-10">
+        <div className="grid grid-cols-2 px-28 gap-10 ">
           {themes.map((image, index) => (
             <div
               data-aos="fade-up"
-              className="w-full h-full overflow-hidden rounded-xl"
+              className="w-full h-full overflow-hidden rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.5)]"
               onClick={()=> navigate("products",{state:{image}})}
               key={index}
             >
