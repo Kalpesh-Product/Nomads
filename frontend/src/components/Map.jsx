@@ -70,7 +70,7 @@ const MarkerItem = React.memo(function MarkerItem({
             <div className="flex justify-between items-center text-xs mt-1">
               <span className="text-gray-600 font-semibold">{loc.location}</span>
               <span className="text-black font-semibold">
-                Reviews(<span className="font-bold">{loc.reviewCount || loc.totalReviews || 0}</span>)
+                Reviews(<span className="font-bold">{loc.reviewCount || loc.totalReviews || loc.reviews ||  0}</span>)
               </span>
             </div>
           </div>
