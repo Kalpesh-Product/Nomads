@@ -8,17 +8,17 @@ import { config } from "dotenv";
 config();
 
 const s3Client = new S3Client({
-  region: process.env.AWS_REGION,
+  region: process.env.PROJECT_AWS_REGION,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY,
-    secretAccessKey: process.env.AWS_SECRET_KEY,
+    accessKeyId: process.env.PROJECT_AWS_ACCESS_KEY,
+    secretAccessKey: process.env.PROJECT_AWS_SECRET_KEY,
   },
 });
 
 export async function uploadFileToS3(route, file) {
   try {
     const uploadParams = {
-      Bucket: process.env.S3_BUCKET_NAME,
+      Bucket: process.env.PROJECT_S3_BUCKET_NAME,
       Key: route,
       Body: file.buffer,
       ContentType: file.mimetype,
@@ -27,7 +27,7 @@ export async function uploadFileToS3(route, file) {
 
     const command = new PutObjectCommand(uploadParams);
     await s3Client.send(command);
-    const fileUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${route}`;
+    const fileUrl = `https://${process.env.PROJECT_S3_BUCKET_NAME}.s3.${process.env.PROJECT_AWS_REGION}.amazonaws.com/${route}`;
     return fileUrl;
   } catch (error) {
     throw new Error(error);
@@ -40,7 +40,7 @@ export async function deleteFileFromS3ByUrl(fileUrl) {
 
   // Step 2: Prepare and send the delete command
   const deleteParams = {
-    Bucket: process.env.S3_BUCKET_NAME,
+    Bucket: process.env.PROJECT_S3_BUCKET_NAME,
     Key: key,
   };
 
