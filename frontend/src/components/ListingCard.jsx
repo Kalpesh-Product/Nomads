@@ -50,17 +50,17 @@ const ListingCard = ({ item, handleNavigation, showVertical=true }) => {
         </div>
       </div>
 
-      <div className="h-[25%] flex flex-col gap-1 pl-4">
+      <div className="h-[25%] flex flex-col gap-1 pl-4 pr-1">
         <div className="flex w-full justify-between items-center">
           <div className="w-full">
             <p className="text-sm font-semibold">
-              {item.companyName.length > 10 && showVertical
-                ? `${item.companyName.slice(0, 10)}...`
+              { showVertical
+                ? `${item.companyName.slice(0, 9)}...`
                 : item.companyName}
             </p>
           </div>
           {showVertical && (
-            <p className="text-tiny   text-gray-600">
+            <p className="text-tiny w-full text-right   text-gray-600">
               {typeLabels[item.type] || "Unknown"}
             </p>
           )}

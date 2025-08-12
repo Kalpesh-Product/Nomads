@@ -1,31 +1,65 @@
 import React, { useState } from "react";
 import { Stepper, Step } from "react-form-stepper";
 import { useForm, Controller } from "react-hook-form";
-import { TextField, Button, Box } from "@mui/material";
+import {
+  TextField,
+  Button,
+  Box,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
+  FormHelperText,
+} from "@mui/material";
 import Container from "../../components/Container";
+import GetStartedButton from "../../components/GetStartedButton";
+import { NavLink } from "react-router-dom";
 
-const steps = ["Account Info", "Company Info", "Payout Info", "Review"];
+const steps = ["Personal Info", "Company Info", "Services", "Review"];
+
+const serviceOptions = [
+  "Web Development",
+  "App Development",
+  "SEO",
+  "Marketing",
+];
 
 const HostSignup = () => {
   const [activeStep, setActiveStep] = useState(0);
 
   const { control, handleSubmit, getValues, trigger } = useForm({
     defaultValues: {
-      name: "",
+      fullName: "",
       email: "",
+      phoneNumber: "",
+      country: "",
+      state: "",
+      city: "",
       companyName: "",
-      companyAddress: "",
-      payoutMethod: "",
-      payoutDetails: "",
+      industry: "",
+      companySize: "",
+      companyType: "",
+      companyState: "",
+      companyCity: "",
+      companyWebsite: "",
+      linkedinUrl: "",
+      services: [],
     },
   });
 
-  // Validation rules per step
   const stepFields = [
-    ["name", "email"], // Step 1 fields
-    ["companyName", "companyAddress"], // Step 2 fields
-    ["payoutMethod", "payoutDetails"], // Step 3 fields
-    [], // Step 4 (no fields)
+    ["fullName", "email", "phoneNumber", "country", "state", "city"], // Step 1
+    [
+      "companyName",
+      "industry",
+      "companySize",
+      "companyType",
+      "companyState",
+      "companyCity",
+      "companyWebsite",
+      "linkedinUrl",
+    ], // Step 2
+    ["services"], // Step 3
+    [], // Step 4
   ];
 
   const handleNext = async () => {
@@ -49,15 +83,16 @@ const HostSignup = () => {
         return (
           <>
             <Controller
-              name="name"
+              name="fullName"
               control={control}
-              rules={{ required: "Name is required" }}
+              rules={{ required: "Full Name is required" }}
               render={({ field, fieldState }) => (
                 <TextField
                   {...field}
-                  label="Name"
+                  label="Full Name"
                   fullWidth
                   margin="normal"
+                  variant="standard"
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
                 />
@@ -70,16 +105,81 @@ const HostSignup = () => {
                 required: "Email is required",
                 pattern: {
                   value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: "Invalid email address",
+                  message: "Invalid email",
                 },
               }}
               render={({ field, fieldState }) => (
                 <TextField
                   {...field}
                   label="Email"
+                  type="email"
+                  fullWidth
+                  variant="standard"
+                  margin="normal"
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                />
+              )}
+            />
+            <Controller
+              name="phoneNumber"
+              control={control}
+              rules={{ required: "Phone Number is required" }}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  label="Phone Number"
                   fullWidth
                   margin="normal"
-                  type="email"
+                  variant="standard"
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                />
+              )}
+            />
+            <Controller
+              name="country"
+              control={control}
+              rules={{ required: "Country is required" }}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  label="Country"
+                  fullWidth
+                  margin="normal"
+                  variant="standard"
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                />
+              )}
+            />
+            <Controller
+              name="state"
+              control={control}
+              rules={{ required: "State is required" }}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  label="State"
+                  fullWidth
+                  margin="normal"
+                  variant="standard"
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                />
+              )}
+            />
+            <Controller
+              name="city"
+              control={control}
+              rules={{ required: "City is required" }}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  label="City"
+                  fullWidth
+                  margin="normal"
+                  variant="standard"
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
                 />
@@ -101,21 +201,119 @@ const HostSignup = () => {
                   label="Company Name"
                   fullWidth
                   margin="normal"
+                  variant="standard"
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
                 />
               )}
             />
             <Controller
-              name="companyAddress"
+              name="industry"
               control={control}
-              rules={{ required: "Company Address is required" }}
+              rules={{ required: "Industry is required" }}
               render={({ field, fieldState }) => (
                 <TextField
                   {...field}
-                  label="Company Address"
+                  label="Industry"
                   fullWidth
                   margin="normal"
+                  variant="standard"
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                />
+              )}
+            />
+            <Controller
+              name="companySize"
+              control={control}
+              rules={{ required: "Company Size is required" }}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  label="Company Size"
+                  fullWidth
+                  margin="normal"
+                  variant="standard"
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                />
+              )}
+            />
+            <Controller
+              name="companyType"
+              control={control}
+              rules={{ required: "Company Type is required" }}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  label="Company Type"
+                  fullWidth
+                  margin="normal"
+                  variant="standard"
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                />
+              )}
+            />
+            <Controller
+              name="companyState"
+              control={control}
+              rules={{ required: "Company State is required" }}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  label="Company State"
+                  fullWidth
+                  margin="normal"
+                  variant="standard"
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                />
+              )}
+            />
+            <Controller
+              name="companyCity"
+              control={control}
+              rules={{ required: "Company City is required" }}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  label="Company City"
+                  fullWidth
+                  variant="standard"
+                  margin="normal"
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                />
+              )}
+            />
+            <Controller
+              name="companyWebsite"
+              control={control}
+              rules={{ required: "Company Website is required" }}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  label="Company Website"
+                  fullWidth
+                  margin="normal"
+                  variant="standard"
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                />
+              )}
+            />
+            <Controller
+              name="linkedinUrl"
+              control={control}
+              rules={{ required: "LinkedIn URL is required" }}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  label="LinkedIn URL"
+                  fullWidth
+                  margin="normal"
+                  variant="standard"
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
                 />
@@ -126,42 +324,79 @@ const HostSignup = () => {
 
       case 2:
         return (
-          <>
-            <Controller
-              name="payoutMethod"
-              control={control}
-              rules={{ required: "Payout Method is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Payout Method"
-                  fullWidth
-                  margin="normal"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
-            <Controller
-              name="payoutDetails"
-              control={control}
-              rules={{ required: "Payout Details are required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Payout Details"
-                  fullWidth
-                  margin="normal"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
-          </>
+          <Controller
+            name="services"
+            control={control}
+            rules={{
+              validate: (value) =>
+                value.length > 0 || "Please select at least one service",
+            }}
+            render={({ field, fieldState }) => (
+              <Box sx={{ mt: 2 }}>
+                <FormGroup>
+                  {serviceOptions.map((service) => (
+                    <FormControlLabel
+                      key={service}
+                      control={
+                        <Checkbox
+                          checked={field.value.includes(service)}
+                          onChange={(e) => {
+                            const newValue = e.target.checked
+                              ? [...field.value, service]
+                              : field.value.filter((s) => s !== service);
+                            field.onChange(newValue);
+                          }}
+                        />
+                      }
+                      label={service}
+                    />
+                  ))}
+                </FormGroup>
+                {fieldState.error && (
+                  <FormHelperText error>
+                    {fieldState.error.message}
+                  </FormHelperText>
+                )}
+              </Box>
+            )}
+          />
         );
 
       case 3:
-        return <p>Review and Submit your details.</p>;
+        return (
+          <div className="flex flex-col gap-4 col-span-2">
+            <h1 className="text-title text-center">Account Activation</h1>
+            <div className="space-y-10">
+              <div>
+                <p>
+                  An email has been sent to your email address {"<EMAIL?>"}{" "}
+                  containing all the further process for activating the account.
+                </p>
+                <p>
+                  Please let us know if there is any more queries from your
+                  side, or you can contact us at : {"response@wono.co"}
+                </p>
+              </div>
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-2">
+                  <div className="h-10 w-10 overflow-hidden">
+                    <img src="/logos/gmailLogo.jpg" alt="gmail-logo" />
+                  </div>
+                  <NavLink className={"underline"}>Open Gmail</NavLink>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="h-10 w-10 overflow-hidden">
+                    <img src="/logos/outlookLogo.png" alt="outlook-logo" />
+                  </div>
+                  <NavLink className={"underline"}>Open Outlook</NavLink>
+                </div>
+              </div>
+              <div>
+                <p>Did not recieve an email ? Please check your spam folder.</p>
+              </div>
+            </div>
+          </div>
+        );
 
       default:
         return null;
@@ -169,8 +404,9 @@ const HostSignup = () => {
   };
 
   return (
-    <Container>
+    <div className="h-full flex flex-col justify-start gap-10 p-4 lg:p-10 items-center w-full">
       <Stepper
+        className="w-full p-0"
         connectorStateColors={true}
         styleConfig={{
           activeBgColor: "#2196F3", // Blue for the active step
@@ -189,37 +425,44 @@ const HostSignup = () => {
           completedColor: "#4CAF50", // Color of the connector when completed
           inactiveColor: "#E0E0E0", // Color of the connector when inactive
         }}
-        style={{ paddingTop: 0, textTransform: "uppercase", fontFamily:"Poppins" }}
+        style={{
+          // paddingTop: 0,
+          textTransform: "uppercase",
+          fontFamily: "Poppins",
+        }}
         activeStep={activeStep}
       >
         {steps.map((label, index) => (
           <Step label={label} key={index} />
         ))}
       </Stepper>
-
-      <form onSubmit={handleSubmit(handleFinalSubmit)}>
-        {renderStepFields()}
-        <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
-          {activeStep > 0 && (
-            <Button
-              variant="outlined"
-              onClick={() => setActiveStep((prev) => prev - 1)}
-            >
-              Back
-            </Button>
-          )}
-          {activeStep < steps.length - 1 ? (
-            <Button variant="contained" onClick={handleNext}>
-              Next
-            </Button>
-          ) : (
-            <Button variant="contained" type="submit">
-              Submit
-            </Button>
-          )}
-        </Box>
-      </form>
-    </Container>
+      <div className="max-w-5xl mx-auto w-full">
+        {activeStep !== 3 && (
+          <h1 className="text-title text-center">
+            Let's set up your free account
+          </h1>
+        )}
+        <form
+          className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-4"
+          onSubmit={handleSubmit(handleFinalSubmit)}
+        >
+          {renderStepFields()}
+          <div className="col-span-1 lg:col-span-2 flex justify-between items-center">
+            {activeStep > 0 && (
+              <GetStartedButton
+                title="Back"
+                handleSubmit={() => setActiveStep((prev) => prev - 1)}
+              />
+            )}
+            {activeStep < steps.length - 1 ? (
+              <GetStartedButton title="Next" handleSubmit={handleNext} />
+            ) : (
+              <GetStartedButton title="Submit" type={"submit"} />
+            )}
+          </div>
+        </form>
+      </div>
+    </div>
   );
 };
 
