@@ -208,7 +208,7 @@ const Themes = () => {
     <hr className="border-t border-gray-300" />
 
       {/*We're here*/}
-      <section className="flex flex-col justify-between items-center px-28 gap-10">
+      <section className="flex flex-col justify-between items-center px-28 gap-10 py-8">
         <div className="text-[clamp(1rem,13.71vw,4rem)] w-[70%] self-start leading-[1.2]">
           <h1>We're here for you</h1>
         </div>
