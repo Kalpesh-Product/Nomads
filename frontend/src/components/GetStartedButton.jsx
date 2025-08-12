@@ -1,7 +1,7 @@
 import { CircularProgress } from "@mui/material"; // Import MUI Spinner
 
 const GetStartedButton = ({
-  title,
+  title="Get Started",
   handleSubmit,
   type,
   fontSize,
