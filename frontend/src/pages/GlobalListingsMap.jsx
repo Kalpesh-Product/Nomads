@@ -409,7 +409,7 @@ const GlobalListingsMap = () => {
       </div>
       <Container padding={false}>
         <div className="">
-          <div className="font-semibold text-md  grid grid-cols-9 gap-4 min-h-screen">
+          <div className="font-semibold text-md  grid grid-cols-9 gap-4 min-h-screen pt-3">
             <div className="hidden lg:block custom-scrollbar-hide lg:col-span-5">
               {isLisitingLoading ? (
                 Array.from({ length: 4 }).map((_, i) => (
@@ -417,18 +417,6 @@ const GlobalListingsMap = () => {
                 ))
               ) : (
                 <div className="col-span-full mb-6">
-                  {/* <h2 className="text-subtitle text-secondary-dark font-semibold mb-5">
-                    Search results for{" "}
-                    {formData?.location
-                      ? formData.location.charAt(0).toUpperCase() +
-                        formData.location.slice(1)
-                      : "Unknown"},{" "}
-                    {formData?.country
-                      ? formData.country.charAt(0).toUpperCase() +
-                        formData.country.slice(1)
-                      : "Unknown"}{" "}
-                  </h2> */}
-
                   <PaginatedGrid
                     data={isLisitingLoading ? skeletonArray : listingsData}
                     allowScroll={false}

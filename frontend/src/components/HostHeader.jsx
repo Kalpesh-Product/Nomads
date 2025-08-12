@@ -46,7 +46,7 @@ const HostHeader = () => {
             <PrimaryButton
               title={"SIGN UP"}
               padding={"py-2"}
-              handleSubmit={() => navigate("/hosts/login")}
+              handleSubmit={() => navigate("/hosts/signup")}
               className={
                 "bg-primary-blue  flex text-white font-[500] capatilize hover:font-semibold hover:bg-primary-blue transition-all w-[7rem] px-4"
               }
