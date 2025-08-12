@@ -3,7 +3,8 @@ import JobCategory from "../../models/job-post/JobPostCategory.js";
 
 export const addNewJobPost = async (req, res, next) => {
   try {
-    const { categoryId, about, responsibilities, qualifications } = req.body;
+    const { categoryId, title, about, responsibilities, qualifications } =
+      req.body;
 
     const category = await JobCategory.findById(categoryId).exec();
     if (!category) {
@@ -22,6 +23,7 @@ export const addNewJobPost = async (req, res, next) => {
     };
 
     const newJob = await JobPost.create({
+      title,
       category: categoryId,
       about: String(about || "").trim(),
       responsibilities: normalizeArray(responsibilities),
@@ -41,17 +43,24 @@ export const addNewJobPost = async (req, res, next) => {
 export const getJobPosts = async (req, res, next) => {
   try {
     const allActiveJobPosts = await JobCategory.aggregate([
+      { $match: { isActive: true } },
       {
         $lookup: {
-          from: "jobpost",
+          from: "jobposts",
           localField: "_id",
           foreignField: "category",
           as: "jobPosts",
         },
       },
       {
-        $match: {
-          isActive: true,
+        $addFields: {
+          jobPosts: {
+            $filter: {
+              input: "$jobPosts",
+              as: "jp",
+              cond: { $eq: ["$$jp.isActive", true] }, // Only keep active posts
+            },
+          },
         },
       },
     ]);

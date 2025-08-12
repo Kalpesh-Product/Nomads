@@ -5,6 +5,9 @@ const jobPostSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "jobcategory",
   },
+  title: {
+    type: String,
+  },
   about: {
     type: String,
     required: true,
@@ -20,7 +23,7 @@ const jobPostSchema = new mongoose.Schema({
     },
   ],
   isActive: {
-    type: String,
+    type: Boolean,
     default: true,
   },
 });
