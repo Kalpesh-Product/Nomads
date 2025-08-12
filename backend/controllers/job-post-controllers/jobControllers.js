@@ -40,63 +40,21 @@ export const addNewJobPost = async (req, res, next) => {
 
 export const getJobPosts = async (req, res, next) => {
   try {
-    const { withEmpty = "false", limit = 0, page = 1 } = req.query;
-    const perPage = Math.max(parseInt(limit, 10) || 0, 0);
-    const skip = perPage
-      ? (Math.max(parseInt(page, 10) || 1, 1) - 1) * perPage
-      : 0;
-
-    const pipeline = [
-      // 1) keep only active categories first
-      { $match: { isActive: true } },
-
-      // 2) lookup active posts per category
+    const allActiveJobPosts = await JobCategory.aggregate([
       {
         $lookup: {
-          from: "jobposts", // <-- use your real collection name
-          let: { catId: "$_id" },
-          pipeline: [
-            {
-              $match: {
-                $expr: { $eq: ["$category", "$$catId"] }, // adjust to your field name (e.g., categoryId)
-                isActive: true, // only active posts
-              },
-            },
-            { $sort: { createdAt: -1 } }, // optional: newest first
-            {
-              $project: {
-                title: 1,
-                location: 1,
-                type: 1,
-                createdAt: 1,
-                // add other fields you want exposed
-              },
-            },
-          ],
+          from: "jobpost",
+          localField: "_id",
+          foreignField: "category",
           as: "jobPosts",
         },
       },
-
-      // 3) (optional) keep only categories that have posts
-      ...(withEmpty === "false"
-        ? [{ $match: { "jobPosts.0": { $exists: true } } }]
-        : []),
-
-      // 4) (optional) paginate categories
-      ...(perPage ? [{ $skip: skip }, { $limit: perPage }] : []),
-
-      // 5) final shape
       {
-        $project: {
-          _id: 1,
-          name: 1, // or categoryName, whatever your field is
-          isActive: 1,
-          jobPosts: 1,
+        $match: {
+          isActive: true,
         },
       },
-    ];
-
-    const allActiveJobPosts = await JobCategory.aggregate(pipeline);
+    ]);
     res.status(200).json(allActiveJobPosts);
   } catch (error) {
     next(error);
