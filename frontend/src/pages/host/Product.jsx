@@ -80,17 +80,53 @@ const themes = [
   },
   {
     src: "/hosts/themes/boutique.png",
-    mockup: BoutiqueMockup,
+    mockup: "BoutiqueMockup",
     alt: "Boutique Image",
     tag: "boutique",
+  },
+  {
+    src: "/hosts/themes/coliving.png",
+    mockup: "/hosts/themes/colivingNomadProduct.png",
+    alt: "Co-Living Image",
+    tag: "co-living",
+  },
+  {
+    src: "/hosts/themes/coworking2.png",
+    mockup: "/hosts/themes/coworking2Product.png",
+    alt: "CoLivingImage_2",
+    tag: "co-working",
+  },
+  {
+    src: "/hosts/themes/coworking3.png",
+    mockup: "/hosts/themes/coworking3Product.png",
+    alt: "CoLivingImage_3",
+    tag: "co-working",
+  },
+  {
+    src: "/hosts/themes/cafe2.png",
+    mockup: "/hosts/themes/cafe2Product.png",
+    alt: "Cafe_2",
+    tag: "cafe",
+  },
+  {
+    src: "/hosts/themes/cafe3.png",
+     mockup: "/hosts/themes/cafe3Product.png",
+    alt: "Cafe_3",
+    tag: "cafe",
+  },
+  {
+    src: "/hosts/themes/hostels.png",
+    mockup: "/hosts/themes/hostelsProduct.png",
+    alt: "Hostels",
+    tag: "hostels",
   },
 ];
 
 const HostProduct = () => {
   const { state } = useLocation();
   const initialImage = state.image;
+  console.log("initial",initialImage)
   const [selectedImage, setSelectedImage] = useState(initialImage);
-
   return (
     <div className="flex flex-col gap-8">
       <section className="w-full bg-black text-white flex flex-col justify-center items-center gap-8 py-8 h-[80%]">
@@ -115,7 +151,7 @@ const HostProduct = () => {
           >
             <img
               className="rounded-xl w-full h-full object-cover"
-              src={selectedImage.src}
+              src={selectedImage.mockup}
               alt={selectedImage.alt}
             />
           </div>
@@ -146,8 +182,9 @@ const HostProduct = () => {
         <ReactFitty>Few more suggestions for you</ReactFitty>
 
         <div className="grid grid-cols-2 justify-between gap-8">
-          {themes.map((theme) => (
-            <div className="w-full h-full overflow-hidden rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.5)] cursor-pointer">
+          {themes.filter((theme)=> theme.alt !== selectedImage.alt && theme.tag === selectedImage.tag).map((theme) => (
+            <div className="w-full h-full overflow-hidden rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.5)] cursor-pointer" 
+            onClick={()=> setSelectedImage(theme)}>
               <img
                 src={theme.src}
                 alt={theme.alt}
