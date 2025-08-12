@@ -80,7 +80,7 @@ const themes = [
   },
   {
     src: "/hosts/themes/boutique.png",
-    mockup: BoutiqueMockup,
+    // mockup: BoutiqueMockup,
     alt: "Boutique Image",
     tag: "boutique",
   },
