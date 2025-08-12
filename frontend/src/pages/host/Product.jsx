@@ -125,17 +125,16 @@ const themes = [
 const HostProduct = () => {
   const { state } = useLocation();
   const initialImage = state.image;
-  console.log("initial",initialImage)
   const [selectedImage, setSelectedImage] = useState(initialImage);
   return (
     <div className="flex flex-col gap-8">
-      <section className="w-full bg-black text-white flex flex-col justify-center items-center gap-8 py-8 h-[80%]">
+      <section className="w-full bg-black flex flex-col justify-center gap-8 py-8 h-[80vh]">
         <div className="flex justify-around">
-          <div className="flex flex-col gap-10 justify-center">
+          <div className="flex flex-col gap-10 justify-center text-white">
             <h1 className="text-hero font-semibold">INCLUSIONS</h1>
             <ul className="flex flex-col gap-2 ">
               {features.map((feat) => (
-                <li className="flex gap-2 text-subtitle">
+                <li className="flex gap-2 text-subtitle ">
                   <span className="text-[#0AA9EF] font-bold">
                     ✔&nbsp;&nbsp;
                   </span>
@@ -143,11 +142,11 @@ const HostProduct = () => {
                 </li>
               ))}
             </ul>
-            <GetStartedButton externalStyles={"bg-white text-black"} />
+            <GetStartedButton externalStyles="bg-white text-black" />
           </div>
           <div
             data-aos="fade-up"
-            className="w-[50%] h-[50%] overflow-hidden rounded-xl"
+            className="w-[50%] overflow-hidden rounded-xl"
           >
             <img
               className="rounded-xl w-full h-full object-cover"
@@ -178,7 +177,7 @@ const HostProduct = () => {
           </div>
         </div>
       </section>
-      <section className="w-full bg-[#E9F9FF] flex flex-col justify-center items-center gap-8 py-8 h-[80%] px-28">
+      <section className="w-full bg-[#E9F9FF] flex flex-col justify-center items-center gap-8 py-14 h-[80%] px-28 mb-[-2rem]">
         <ReactFitty>Few more suggestions for you</ReactFitty>
 
         <div className="grid grid-cols-2 justify-between gap-8">

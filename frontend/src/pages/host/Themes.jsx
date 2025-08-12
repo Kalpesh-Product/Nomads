@@ -139,11 +139,11 @@ const Themes = () => {
             business growth. Fully tech ready, integrated and responsive.
           </span>
         </div>
-        <div className="grid grid-cols-2 px-28 gap-10">
+        <div className="grid grid-cols-2 px-28 gap-10 ">
           {themes.map((image, index) => (
             <div
               data-aos="fade-up"
-              className="w-full h-full overflow-hidden rounded-xl"
+              className="w-full h-full overflow-hidden rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.5)]"
               onClick={()=> navigate("products",{state:{image}})}
               key={index}
             >
