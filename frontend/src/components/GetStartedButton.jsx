@@ -1,7 +1,7 @@
 import { CircularProgress } from "@mui/material"; // Import MUI Spinner
 
 const GetStartedButton = ({
-  title="Get Started",
+  title = "Get Started",
   handleSubmit,
   type,
   fontSize,
@@ -20,7 +20,7 @@ const GetStartedButton = ({
       type={type}
       className={`flex rounded-full items-center cursor-pointer justify-center  gap-2
         ${baseBgColor} ${hoverBgColor} text-primary
-        ${fontSize ? fontSize : "text-content leading-5"}
+        ${fontSize ? fontSize : "text-content leading-6"}
         ${externalStyles} ${padding ? padding : "px-8 py-2"} ${className}`}
       onClick={handleSubmit}>
       {isLoading && <CircularProgress size={16} sx={{ color: "#ffffff" }} />}
