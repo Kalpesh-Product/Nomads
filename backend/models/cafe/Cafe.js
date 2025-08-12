@@ -58,10 +58,10 @@ const cafeSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, // Adds createdAt and updatedAt
+    timestamps: true,
   }
 );
 
-const Cafe = mongoose.model("Cafe", cafeSchema);
+const Cafe = mongoose.model("cafe", cafeSchema, "cafes");
 
 export default Cafe;
