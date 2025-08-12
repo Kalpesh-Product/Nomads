@@ -100,7 +100,7 @@ const Product = () => {
   const { mutate: submitEnquiry, isPending: isSubmitting } = useMutation({
     mutationKey: ["submitEnquiry"],
     mutationFn: async (data) => {
-      const response = await axios.post("/form/add-new-enquiry", {
+      const response = await axios.post("/add-new-b2c-form-submission", {
         ...data,
         country: companyDetails?.country,
         state: companyDetails?.state,
