@@ -32,6 +32,7 @@ import HostTermsAndConditions from "./pages/host/TermsAndConditions";
 import HostPrivacy from "./pages/host/Privacy";
 import HostFAQ from "./pages/host/FAQ";
 import Leads from "./pages/host/Leads";
+import HostProduct from "./pages/host/Product";
 
 const router = createBrowserRouter([
   {
@@ -137,6 +138,10 @@ const router = createBrowserRouter([
           {
             path: "themes",
             element: <Themes />,
+          },
+          {
+            path: "themes/products",
+            element: <HostProduct />,
           },
           {
             path: "leads",
