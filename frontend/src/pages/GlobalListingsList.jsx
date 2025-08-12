@@ -296,11 +296,11 @@ const GlobalListingsList = () => {
         <AnimatePresence>
           {showMobileSearch && (
             <motion.div
-              initial={{ y: "100%" }}
-              animate={{ y: 0 }}
-              exit={{ y: "100%" }}
+              // initial={{ y: "-100%" }}
+              // animate={{ y: 0 }}
+              exit={{ y: "-100%" }}
               transition={{ duration: 0.3 }}
-              className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 p-4 rounded-t-3xl lg:hidden"
+              className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 p-4 rounded-t-3xl lg:hidden h-screen"
             >
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold">Search</h3>
@@ -311,7 +311,12 @@ const GlobalListingsList = () => {
                   &times;
                 </button>
               </div>
-              <div className="grid grid-cols-3 md:grid-cols-5 gap-2 mb-10">
+              <motion.div
+                initial={{ y: "-100%" }}
+                animate={{ y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="grid grid-cols-3 md:grid-cols-5 gap-2 gap-y-10 mb-16"
+              >
                 {categoryOptions.map((cat) => {
                   const iconSrc = newIcons[cat.value];
 
@@ -327,7 +332,7 @@ const GlobalListingsList = () => {
                           <img
                             src={iconSrc}
                             alt={cat.label}
-                            className="h-full w-full object-contain"
+                            className="h-full w-[90%] object-contain"
                           />
                           <span className="text-sm">{cat.label}</span>
                           <div></div>
@@ -338,7 +343,7 @@ const GlobalListingsList = () => {
                     </button>
                   );
                 })}
-              </div>
+              </motion.div>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <Controller

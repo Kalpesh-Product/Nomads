@@ -324,7 +324,7 @@ const Listings = () => {
                 animate={{ y: 0 }}
                 exit={{ y: "-100%" }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="grid grid-cols-3 md:grid-cols-5 gap-y-6 lg:gap-2  mb-10"
+                className="grid grid-cols-3 md:grid-cols-5 gap-2 gap-y-10 mb-16"
               >
                 {categoryOptions.map((cat) => {
                   const iconSrc = newIcons[cat.value];
