@@ -232,7 +232,7 @@ const Product = () => {
 
               {/* Thumbnail Images */}
               <div className="grid grid-cols-2 gap-1">
-                {companyDetails?.images?.slice(1).map((item, index) => (
+                {companyDetails?.images?.slice(1,5).map((item, index) => (
                   <div
                     key={item._id}
                     className={`relative w-full h-56 overflow-hidden rounded-md cursor-pointer border-2 ${
@@ -388,7 +388,7 @@ const Product = () => {
 
                   <div className="flex flex-col gap-4 lg:gap-0 justify-center items-center">
                     <p className="text-subtitle lg:text-subtitle mt-1">
-                      {companyDetails?.reviewCount || 0}
+                      {companyDetails?.reviewCount || companyDetails?.totalReviews || 0}
                     </p>
                     <span className="text-small font-medium">Reviews</span>
                   </div>
@@ -587,14 +587,14 @@ const Product = () => {
                   type={companyDetails?.type.toLowerCase() || ""}
                   inclusions={inclusions}
                 />
-                <div className="flex justify-end">
+                {/* <div className="flex justify-end">
                   <button
                     onClick={() => setShowAmenities(true)}
                     className="text-primary-blue text-content hover:underline"
                   >
                     Show more
                   </button>
-                </div>
+                </div> */}
               </div>
             )}
           </div>
@@ -615,7 +615,7 @@ const Product = () => {
                 and reliability
               </span>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-0 lg:p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-0 lg:p-0">
               {companyDetails?.reviews?.length > 0 ? (
                 companyDetails?.reviews?.slice(0, 6).map((review, index) => (
                   <ReviewCard
@@ -672,7 +672,7 @@ const Product = () => {
                 </div>
 
                 <div className="w-px h-full bg-gray-300 mx-2 my-auto" />
-                <div className="h-full w-56 flex flex-col justify-between">
+                <div className="h-full w-56 flex flex-col justify-normal">
                   <p className="text-title text-center text-gray-700 font-medium mb-8 underline uppercase">
                     Host Details
                   </p>

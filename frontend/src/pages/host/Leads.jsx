@@ -1,7 +1,72 @@
 import React from "react";
 import Container from "../../components/Container";
-import LeadsImage from "/hosts/leads-section-image-webp.webp";
-import GoogleSheetsImage from "/hosts/google-sheets-image-webp.webp";
+import LeadsImage from "/hosts/leads-page/leads-section-image-webp.webp";
+import GoogleSheetsImage from "/hosts/leads-page/google-sheets-image-webp.webp";
+
+import RoiImage from "/hosts/leads-page/roi.webp";
+import CompleteViewImage from "/hosts/leads-page/complete-view-image.webp";
+import FinerPointsImage from "/hosts/leads-page/finer-points-image.webp";
+
+import CompanyLogosDesktop from "/hosts/leads-page/leads-companies-image-desktop.png";
+import CompanyLogosTab from "/hosts/leads-page/leads-companies-image-tab.png";
+import CompanyLogosMobile from "/hosts/leads-page/leads-companies-image-phone.png";
+
+import { GrFormCheckmark } from "react-icons/gr";
+import { ReactFitty } from "react-fitty";
+
+const checklistItems = [
+  "Google My Business",
+  "Google Maps",
+  "Google Reviews",
+  "Google SEO",
+  "Website",
+  "LinkedIn",
+  "Facebook",
+  "Instagram",
+  "Free Integrations",
+  "Cross Promotions",
+  "Database",
+  "WhatsApp",
+];
+
+const contentItems = [
+  {
+    heading: "SEO tools",
+    text: "Use a complete suite of advanced SEO tools to optimize your site for search and increase your organic traffic.",
+  },
+  {
+    heading: "Analytics",
+    text: "Get reports with actionable insights and data about your site and marketing activities.",
+  },
+  {
+    heading: "Logo Maker",
+    text: "Create a custom logo for your brand in minutes with our AI logo generator.",
+  },
+  {
+    heading: "Google Ads with WoNo",
+    text: "Launch a Google Ads campaign to reach your site's target audience and appear high up in Google search results.",
+  },
+  {
+    heading: "Email marketing",
+    text: "Create and customize strong email marketing campaigns to engage your audience, send promotions and increase traffic.",
+  },
+  {
+    heading: "Google Business Profile",
+    text: "Attract the right customers and boost credibility by managing your business’s presence on Google Maps, Search and more.",
+  },
+  {
+    heading: "Facebook & Instagram Ads",
+    text: "Launch targeted ad campaigns on Facebook and Instagram to generate leads and drive traffic.",
+  },
+  {
+    heading: "Marketing integrations",
+    text: "Connect tools such as Google Analytics and Facebook Pixel and CAPI to get insights on site traffic, visitor behavior and more.",
+  },
+  {
+    heading: "Social media marketing",
+    text: "Design, schedule, and easily share your content across multiple platforms to boost engagement.",
+  },
+];
 
 const Leads = () => {
   return (
@@ -12,14 +77,16 @@ const Leads = () => {
       <Container>
         <div>
           <div>
-            <p>
+            <h2 className="lg:text-[2.6rem] md:text-[1.75rem] sm:text-[1.75rem] xs:text-[1.75rem] leading-[1.4] font-semibold text-host">
               Generate continuos structured leads for your business with the
               support of our automated platform and trained and experienced
               resources.
-            </p>
+            </h2>
           </div>
-          <div>
-            <button className="bg-black text-white">Get Started</button>
+          <div className="flex flex-row lg:justify-end md:justify-end  sm:justify-center xs:justify-center items-center py-6">
+            <button className="bg-black text-white px-8 py-2 rounded-full">
+              Get Started
+            </button>
           </div>
         </div>
       </Container>
@@ -33,12 +100,52 @@ const Leads = () => {
       <Container>
         <div>
           <div>
-            <p>Our core focus is to generate ORGANIC LEADS!</p>
-            <p>With NO INVESTMENTS!</p>
+            <h2 className="lg:text-[2.75rem] md:text-[2.75rem] sm:text-[1.75rem] xs:text-[1.75rem] xs:leading-9 font-semibold text-host">
+              Our core focus is to generate ORGANIC LEADS!
+            </h2>
+            <h2 className="lg:text-[2.75rem] md:text-[2.75rem] sm:text-[1.75rem] xs:text-[1.75rem] font-semibold text-host">
+              With NO INVESTMENTS!
+            </h2>
           </div>
-          <div className="flex flex-row justify-center items-center gap-4">
-            <div>Checklist</div>
-            <div>Company logos section</div>
+          <div className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-1 xs:grid-cols-1">
+            <div className="col-span-4">
+              <div className="p-4">
+                <ul role="list" className="list-none m-0 p-0 space-y-2">
+                  {checklistItems.map((item, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <GrFormCheckmark
+                        size={20}
+                        className="mt-0.5 text-primary-blue shrink-0 text-[1.1rem]"
+                        aria-hidden
+                      />
+                      <span className="text-slate-800">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <div className="col-span-8">
+              {/* Desktop */}
+              <img
+                src={CompanyLogosDesktop}
+                alt="Leads Company Logos"
+                className="hidden lg:block"
+              />
+
+              {/* Tablet */}
+              <img
+                src={CompanyLogosTab}
+                alt="Leads Company Logos Tablet"
+                className="hidden md:block lg:hidden"
+              />
+
+              {/* Mobile */}
+              <img
+                src={CompanyLogosMobile}
+                alt="Leads Company Logos Mobile"
+                className="block md:hidden"
+              />
+            </div>
           </div>
         </div>
       </Container>
@@ -47,8 +154,12 @@ const Leads = () => {
       <Container>
         <div>
           <div>
-            <p>Automated Google LEAD SHEET!</p>
-            <p>Never miss any leads generated from our platform.</p>
+            <h2 className="lg:text-[2.75rem] md:text-[2.75rem] sm:text-[1.75rem] xs:text-[1.75rem] lg:leading-[3.5rem] md:leading-9 sm:leading-9 xs:leading-9 font-semibold text-host">
+              Automated Google LEAD SHEET!
+            </h2>
+            <h2 className="lg:text-[2.75rem] md:text-[2.75rem] sm:text-[1.75rem] xs:text-[1.75rem]  lg:leading-[3.5rem] md:leading-9 sm:leading-9 xs:leading-9  font-semibold text-host">
+              Never miss any leads generated from our platform.
+            </h2>
           </div>
           <div className="h-[16rem]">
             <img
@@ -61,51 +172,100 @@ const Leads = () => {
       </Container>
 
       {/* Run & Scale Grid Section */}
-      <div>
-        <div>RUN & SCALE YOUR BUSINESS</div>
-        <div>Marketing</div>
-        <hr />
-        <div>Grid With Sections</div>
-        <div>
-          <button className="bg-black text-white">Get Started</button>
-        </div>
-      </div>
+      <Container padding={false}>
+        <div className="pb-8">
+          <ReactFitty className="text-host">
+            RUN & SCALE YOUR BUSINESS
+          </ReactFitty>
 
-      <hr />
+          <h2 className=" lg:text-left lg:text-[2.5rem] xs:text-center xs:text-3xl font-semibold text-host pb-2">
+            Marketing
+          </h2>
+          <hr />
+          <br />
+          <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {contentItems.map((item, index) => (
+              <div key={index} className="py-2">
+                <h2 className="text-[1.5rem] font-semibold">{item.heading}</h2>
+                <p>{item.text}</p>
+              </div>
+            ))}
+          </div>
+          <div className="flex lg:justify-end xs:justify-center items-center">
+            <button className="bg-black text-white px-8 py-2 rounded-full">
+              Get Started
+            </button>
+          </div>
+        </div>
+      </Container>
+      <Container padding={false}>
+        <hr />
+      </Container>
 
       {/* Get better ROI Section */}
-      <div className="flex flex-row justify-center items-center gap-4">
-        <div>Image</div>
-        <div>
-          <div>Header</div>
+      <Container>
+        <div className="grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 xs:grid-cols-1">
+          <div>
+            <img src={RoiImage} alt="ROI Image" />
+          </div>
+          <div className="flex flex-col justify-center">
+            <h2 className="text-[4rem] sm:text-[2.5rem] xs:text-[2.5rem] leading-[1.2]  text-host">
+              Get better ROI from your marketing.
+            </h2>
 
-          <div>Content</div>
+            <p className="text-[1.2rem] pt-8">
+              Discover all the ways that Analytics surfaces helpful insights for
+              a complete understanding of your customers — from built-in
+              automation and customized reporting, to cross-platform attribution
+              and more.
+            </p>
+          </div>
         </div>
-      </div>
+      </Container>
 
       <hr />
 
       {/* Get a Complete View Section */}
-      <div className="flex flex-row justify-center items-center gap-4">
-        <div>
-          <div>Header</div>
+      <Container>
+        <div className="grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 xs:grid-cols-1">
+          <div className="flex flex-col justify-center lg:order-1 md:order-1 sm:order-2 xs:order-2">
+            <h2 className="text-[4rem] sm:text-[2.5rem] xs:text-[2.5rem] leading-[1.2]  text-host">
+              Get a complete view.
+            </h2>
 
-          <div>Content</div>
+            <p className="text-[1.2rem] pt-8">
+              Analytics helps you get a more complete understanding of how your
+              customers engage with your business so you can deliver better
+              experiences and drive results.
+            </p>
+          </div>
+          <div className="lg:order-2 md:order-2 sm:order-1 xs:order-1">
+            <img src={CompleteViewImage} alt="Complete View Image" />
+          </div>
         </div>
-        <div>Image</div>
-      </div>
+      </Container>
 
       <hr />
 
       {/* The finer points Section */}
-      <div className="flex flex-row justify-center items-center gap-4">
-        <div>Image</div>
-        <div>
-          <div>Header</div>
+      <Container>
+        <div className="grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 xs:grid-cols-1">
+          <div>
+            <img src={FinerPointsImage} alt="Finer Points" />
+          </div>
+          <div className="flex flex-col justify-center">
+            <h2 className="text-[4rem] sm:text-[2.5rem] xs:text-[2.5rem] leading-[1.2]  text-host">
+              The finer points.
+            </h2>
 
-          <div>Content</div>
+            <p className="text-[1.2rem] pt-8">
+              Analytics helps you understand how people use your sites and apps,
+              so you can take action to improve their experience. Discover what
+              Google Analytics can do by checking out the features listed below.
+            </p>
+          </div>
         </div>
-      </div>
+      </Container>
 
       {/* Dummy Footer (To Be Removed Later) */}
       <div className="h-80 w-full bg-black"></div>
