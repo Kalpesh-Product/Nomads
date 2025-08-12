@@ -421,7 +421,7 @@ const Home = () => {
       {/*  */}
       <section className="w-full px-6 py-12 bg-gray-50">
         <div className="w-full min-w-[] max-w-[79rem] mx-auto lg:px-3">
-          <h2 className="text-2xl md:text-3xl font-medium text-left mb-10 text-gray-700 uppercase">
+          <h2 className="text-2xl md:text-3xl font-medium text-left mb-10 text-primary-blue uppercase">
             Solutions for your aspiring destinations.
           </h2>
 
@@ -459,7 +459,7 @@ const Home = () => {
 
       <Container padding={false}>
         <div className="flex flex-col gap-8 w-full border-t-2 border-gray-300 py-8">
-          <h2 className="text-2xl md:text-3xl font-medium text-left mb-10 text-gray-700 uppercase">
+          <h2 className="text-2xl md:text-3xl font-medium text-left mb-10 text-primary-blue uppercase">
             Platform Inclusions.
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3  lg:grid-cols-5 gap-x-16 md:gap-x-16 lg:gap-x-28 gap-y-10">
@@ -471,7 +471,7 @@ const Home = () => {
       </Container>
       <Container padding={false}>
         <div className="flex flex-col gap-8 w-full border-t-2 border-gray-300 py-8">
-          <h1 className="text-title font-medium text-gray-700 uppercase">
+          <h1 className="text-title font-medium text-primary-blue uppercase">
             Happy customers.
           </h1>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-0 lg:p-6">

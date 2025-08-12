@@ -11,7 +11,7 @@ const GetStartedButton = ({
   className,
   isLoading, // New prop for showing the spinner
 }) => {
-  const baseBgColor = disabled || isLoading ? "bg-gray-400"  :"bg-black";
+  const baseBgColor = disabled || isLoading ? "bg-gray-400" : "bg-black";
   const hoverBgColor = disabled || isLoading ? "" : "hover:bg-secondary-light"; // Add hover color here
 
   return (

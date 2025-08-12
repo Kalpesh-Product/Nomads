@@ -154,10 +154,10 @@ const Leads = () => {
       <Container>
         <div>
           <div>
-            <h2 className="lg:text-[2.75rem] md:text-[2.75rem] sm:text-[1.75rem] xs:text-[1.75rem] xs:leading-9 font-semibold text-host">
+            <h2 className="lg:text-[2.75rem] md:text-[2.75rem] sm:text-[1.75rem] xs:text-[1.75rem] lg:leading-[3.5rem] md:leading-9 sm:leading-9 xs:leading-9 font-semibold text-host">
               Automated Google LEAD SHEET!
             </h2>
-            <h2 className="lg:text-[2.75rem] md:text-[2.75rem] sm:text-[1.75rem] xs:text-[1.75rem]  xs:leading-9  font-semibold text-host">
+            <h2 className="lg:text-[2.75rem] md:text-[2.75rem] sm:text-[1.75rem] xs:text-[1.75rem]  lg:leading-[3.5rem] md:leading-9 sm:leading-9 xs:leading-9  font-semibold text-host">
               Never miss any leads generated from our platform.
             </h2>
           </div>
@@ -178,7 +178,7 @@ const Leads = () => {
             RUN & SCALE YOUR BUSINESS
           </ReactFitty>
 
-          <h2 className="text-[2.5rem] xs:text-center xs:text-3xl font-semibold text-host pb-2">
+          <h2 className=" lg:text-left lg:text-[2.5rem] xs:text-center xs:text-3xl font-semibold text-host pb-2">
             Marketing
           </h2>
           <hr />
@@ -191,7 +191,7 @@ const Leads = () => {
               </div>
             ))}
           </div>
-          <div className="flex justify-end xs:justify-center items-center">
+          <div className="flex lg:justify-end xs:justify-center items-center">
             <button className="bg-black text-white px-8 py-2 rounded-full">
               Get Started
             </button>

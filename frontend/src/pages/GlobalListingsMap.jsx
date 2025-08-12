@@ -39,10 +39,10 @@ const GlobalListingsMap = () => {
     { label: "Co-Working", value: "coworking" },
     // { label: "Co-Living", value: "coliving" },
     { label: "Hostels", value: "hostel" },
-    { label: "Private Stay", value: "privateStay" },
-    { label: "Cafe’s", value: "cafe" },
-    { label: "Meetings", value: "meetingRoom" },
     { label: "Workation", value: "workation" },
+    { label: "Private Stay", value: "privateStay" },
+    { label: "Meetings", value: "meetingRoom" },
+    { label: "Cafe’s", value: "cafe" },
   ];
   console.log("formData", formData);
   const typeLabels = {
