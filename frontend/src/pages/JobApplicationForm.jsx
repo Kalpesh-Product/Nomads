@@ -5,12 +5,19 @@ import {
   InputLabel,
   FormControl,
   Button,
+  CircularProgress,
 } from "@mui/material";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { DatePicker } from "@mui/x-date-pickers";
 import { useMutation } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import axios from "../utils/axios";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+import dayjs from "dayjs";
+import toast from "react-hot-toast";
+import GetStartedButton from "../components/GetStartedButton";
 
 const JobApplicationForm = () => {
   const [formValues, setFormValues] = useState({
@@ -71,39 +78,66 @@ const JobApplicationForm = () => {
     },
   });
 
-  const { mutate: submitJobApplication, isPending } = useMutation({
+  const { mutate: submitJobApplication, isLoading } = useMutation({
     mutationFn: async (data) => {
-      console.log("data",data)
-      const response = await axios.post("job/add-new-job-post", data);
+      const formatDOB = dayjs(data.dateOfBirth).format("YYYY-MM-DD");
+      const formatSubmissionDate = dayjs(data.submissionDate).format(
+        "YYYY-MM-DD"
+      );
+      const formatSubmissionTime = dayjs(data.submissionTime).format(
+        "HH:mm:ss"
+      );
 
-      return response.data
+      const formattedData = {
+        ...data,
+        submissionDate: formatSubmissionDate,
+        submissionTime: formatSubmissionTime,
+        experienceYears: parseInt(data.experienceYears),
+        dob: formatDOB,
+        personality:
+          "A detail-oriented and adaptable developer who enjoys solving complex problems and learning new technologies.",
+        skills:
+          "Proficient in MERN stack, REST APIs, and responsive UI design; experienced with state management and database optimization.",
+        whyConsider:
+          "I bring a balance of technical expertise and collaborative mindset to deliver scalable, high-quality solutions efficiently.",
+        willingToBootstrap:
+          "Yes, I’m eager to contribute my skills and grow alongside the company.",
+        message:
+          "Excited about the opportunity to work on impactful projects and contribute to your team’s success.",
+      };
+
+      const formData = new FormData();
+      formData.append("formName", "jobApplication");
+
+      // Append all fields
+      Object.keys(formattedData).forEach((key) => {
+        if (key === "resumeLink" && formattedData[key]) {
+          formData.append(key, formattedData[key]); // File
+        } else {
+          formData.append(key, formattedData[key] ?? "");
+        }
+      });
+      const response = await axios.post(
+        "form/add-new-b2b-form-submission",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      return response.data;
     },
-    onSuccess: () => {
-      console.log("success");
+    onSuccess: (data) => {
+      toast.success(data.message);
+      reset();
     },
-    onError: () => {
-      console.log("error");
+    onError: (error) => {
+      toast.error(error.response.data.message);
+      reset();
     },
   });
-
-  // const handleChange = (e) => {
-  //   const { name, value, files } = e.target;
-  //   if (files) {
-  //     setFormValues((prev) => ({ ...prev, [name]: files[0] }));
-  //   } else {
-  //     setFormValues((prev) => ({ ...prev, [name]: value }));
-  //   }
-  // };
-
-  // const handleDateChange = (newValue) => {
-  //   setFormValues((prev) => ({ ...prev, dateOfBirth: newValue }));
-  // };
-
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   console.log(formValues);
-  //   // Submit logic here
-  // };
 
   return (
     <div className="text-sm text-gray-800 w-full">
@@ -134,6 +168,7 @@ const JobApplicationForm = () => {
         />
 
         {/* Date of Birth */}
+        {/* <LocalizationProvider dateAdapter={AdapterDayjs}> */}
         <Controller
           name="dateOfBirth"
           control={control}
@@ -151,6 +186,7 @@ const JobApplicationForm = () => {
             />
           )}
         />
+        {/* </LocalizationProvider>  */}
 
         {/* Mobile */}
         <Controller
@@ -273,7 +309,9 @@ const JobApplicationForm = () => {
                 label="Upload Resume / CV"
                 value={field.value?.name || ""}
                 InputProps={{ readOnly: true }}
-                onClick={() => document.getElementById("resumeLink-upload").click()}
+                onClick={() =>
+                  document.getElementById("resumeLink-upload").click()
+                }
               />
               <input
                 type="file"
@@ -305,24 +343,25 @@ const JobApplicationForm = () => {
           )}
         />
 
-        {/* Submission Time */}
-        <Controller
-          name="submissionTime"
-          control={control}
-          render={({ field }) => (
-            <DatePicker
-              label="Submission Time"
-              value={field.value || null}
-              onChange={field.onChange}
-              slotProps={{
-                textField: {
-                  fullWidth: true,
-                  variant: "standard",
-                },
-              }}
-            />
-          )}
-        />
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <Controller
+            name="submissionTime"
+            control={control}
+            render={({ field }) => (
+              <TimePicker
+                label="Submission Time"
+                value={field.value || null}
+                onChange={(newValue) => field.onChange(newValue)}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    variant: "standard",
+                  },
+                }}
+              />
+            )}
+          />
+        </LocalizationProvider>
 
         {/* Join Time */}
         <Controller
@@ -414,7 +453,7 @@ const JobApplicationForm = () => {
           render={({ field }) => (
             <TextField
               {...field}
-              label="Are you willingToBootstrap to bootstrap to join a growing startup?"
+              label="Are you willing to join a growing startup?"
               fullWidth
               multiline
               rows={3}
@@ -463,6 +502,7 @@ const JobApplicationForm = () => {
           <Button
             variant="contained"
             type="submit"
+            
             sx={{
               backgroundColor: "black",
               borderRadius: "9999px",
@@ -473,7 +513,10 @@ const JobApplicationForm = () => {
               },
             }}
           >
-            SUBMIT
+            {isLoading && (
+              <CircularProgress size={20} sx={{ color: "white", mr: 1 }} />
+            )}
+            {isLoading ? "Submitting..." : "SUBMIT"}
           </Button>
         </div>
       </form>
