@@ -42,35 +42,34 @@ const Capital = () => {
   return (
     <div>
       {/* Top banner section */}
-      <Container>
-        <div>
-          <h1 className="text-card-title leading-normal lg:text-[2.5rem] text-host text-center lg:leading-[3rem] font-medium">
+      <Container padding={false}>
+        <div className="pt-16 pb-11">
+          <h1 className="lg:text-[2.5rem] text-host text-center lg:leading-[3rem] font-medium">
             We{" "}
             <span className="hero_animation-container">
               help the daring
               <svg
                 fill="none"
                 viewBox="0 0 390 97"
-                className="hero__animation hero__animation--standard"
-              >
+                className="hero__animation hero__animation--standard">
                 <path d="M2,76.26c16.11,4.95,31.91,3.84,48.58,3.84,20.39,0,40.67,0,61,1,18,.87,36-1,53.94-1,15.79,0,31.51,1.81,47.31,1.21,24.51-.93,49.17-2.18,73.68-2.49,19.45-.25,39.4,1.59,58.76-.64,15-1.73,29-2.29,39.75-14.79C387.89,60.1,390.5,48.5,386.5,40c-5.69-12.09-12.63-18.68-23.67-25.17C341.68,2.4,314.67,1.82,291.09,2c-21.31.2-55.45,3.62-68.52,24.46C212.14,43.1,212,59.57,227.79,72.77c24.81,20.81,63.45,26.8,93.41,18.85"></path>
               </svg>
             </span>{" "}
             build{" "}
           </h1>
-          <h1 className="text-card-title leading-normal lg:text-[2.5rem] text-host text-center lg:leading-[3rem] font-medium">
+          <h1 className="lg:text-[2.5rem] text-host text-center lg:leading-[3rem] font-medium">
             legandary Companies.
           </h1>
-          <div className="flex justify-center lg:justify-end pt-6">
+          <div className="flex lg:justify-end pt-6">
             <GetStartedButton title="CONNECT WITH US" />
           </div>
         </div>
       </Container>
 
       {/* 4 images section */}
-      <div className="bg-black text-white">
-        <Container>
-          <div className="grid lg:grid-cols-4 grid-cols-1 gap-5">
+      <div className="bg-black text-white pt-12">
+        <Container padding={false}>
+          <div className="grid lg:grid-cols-4 grid-cols-2 gap-5">
             {investorData.map((item, index) => (
               <div key={index}>
                 <h3 className="uppercase mb-5 text-xl">{item.title}</h3>
@@ -91,13 +90,15 @@ const Capital = () => {
       {/* Our software Suite section */}
       <Container>
         <div>
-          <p className="text-subtitle lg:text-[3.32rem] text-host lg:text-left lg:leading-[4rem] font-normal">
-            Our software suite amplifies the opportunity for the correct
-            investor such as angel investors, venture capital firms and debt
-            firms to integrate with your company at the most appropriate time
-            regardless of the stage you are which ensure the company does not
-            slow its growth strategy.
-          </p>
+          <div>
+            <p className="lg:text-[3.32rem] text-host lg:text-left lg:leading-[4rem] font-normal">
+              Our software suite amplifies the opportunity for the correct
+              investor such as angel investors, venture capital firms and debt
+              firms to integrate with your company at the most appropriate time
+              regardless of the stage you are which ensure the company does not
+              slow its growth strategy.
+            </p>
+          </div>
         </div>
       </Container>
       <div className="grid lg:grid-cols-3 grid-cols-1 gap-[0.375rem] p-2">
@@ -126,10 +127,10 @@ const Capital = () => {
 
       {/* Systematic & Seamless section */}
       <div className="bg-black text-white">
-        <Container>
+        <Container padding={false}>
           <div>
-            <div className="flex flex-col gap-10 items-center mb-10">
-              <h1 className="text-card-title leading-normal lg:text-[3.5rem] font-normal text-center lg:leading-[4.3rem]">
+            <div className="py-16 flex flex-col gap-10 items-center">
+              <h1 className="text-[3.563rem] font-normal text-center leading-[4.3rem]">
                 <span className="text-[#0aa9ef]">Systematic & seamless</span>{" "}
                 fundraising with accurate projections and cashflow trends.
               </h1>

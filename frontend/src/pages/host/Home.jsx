@@ -106,7 +106,7 @@ const HostHome = () => {
                 </p>
               </div>
             </div>
-            <div className="flex flex-col justify-center items-start gap-3">
+            <div className="flex flex-col justify-center items-start gap-3 py-12">
               <p className="text-subtitle lg:text-title font-semibold">
                 A simple NO CODE SaaS Platform.
               </p>
@@ -139,14 +139,15 @@ const HostHome = () => {
       <section className="bg-black">
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-2 lg:h-[70vh] font-hero">
-            <div className="min-w-full h-[50vh] lg:h-full" style={{ textAlign: "left" }}>
+            <div
+              className="min-w-full h-[50vh] lg:h-full"
+              style={{ textAlign: "left" }}>
               <Canvas
                 className="canvas"
                 camera={{
                   position: [0, 0, ismobile ? 15 : 25],
                   fov: ismobile ? 50 : isTablet ? 50 : isLaptop ? 40 : 28,
-                }}
-              >
+                }}>
                 <ambientLight intensity={0.5} />
                 <pointLight position={[10, 10, 10]} />
                 <RotatingGlobe />
@@ -168,16 +169,17 @@ const HostHome = () => {
                 “NOMAD COMMERCE”{" "}
               </p>
               <div
-               className="w-1/2 lg:w-fit"
+                className="w-1/2 lg:w-fit"
                 style={{
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                }}
-              >
+                }}>
                 <GetStartedButton
                   title="CONNECT WITH US"
-                  externalStyles={"bg-white text-seconadary-dark w-full text-subtitle lg:text-content"}
+                  externalStyles={
+                    "bg-white text-seconadary-dark w-full text-subtitle lg:text-content"
+                  }
                   handleSubmit={() => {
                     navigate("/register");
                     window.scrollTo({ top: 0, behavior: "instant" });
@@ -225,8 +227,7 @@ const HostHome = () => {
               {onePartner.map((item) => (
                 <div
                   key={item.id}
-                  className="border-t-2 border-black w-full space-y-2 py-2"
-                >
+                  className="border-t-2 border-black w-full space-y-2 py-2">
                   <h1 className="text-title py-4">
                     {item.title || "Title here"}
                   </h1>
@@ -263,8 +264,7 @@ const HostHome = () => {
               {noCode.map((item) => (
                 <div
                   key={item.id}
-                  className="h-72 w-full overflow-hidden rounded-lg  shadow-lg"
-                >
+                  className="h-72 w-full overflow-hidden rounded-lg  shadow-lg">
                   <img
                     src={item.image || "/hosts/themes/cafe.webp"}
                     className="h-full w-full object-cover"
@@ -302,8 +302,7 @@ const HostHome = () => {
                 <div>
                   <h4
                     className="my-4"
-                    style={{ fontFamily: "Amsterdam", fontSize: "2rem" }}
-                  >
+                    style={{ fontFamily: "Amsterdam", fontSize: "2rem" }}>
                     Kashif Shaikh
                   </h4>
                   <p className="m-0">Co-Founder & COO</p>

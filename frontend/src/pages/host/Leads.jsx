@@ -11,7 +11,8 @@ import CompanyLogosDesktop from "/hosts/leads-page/leads-companies-image-desktop
 import CompanyLogosTab from "/hosts/leads-page/leads-companies-image-tab.png";
 import CompanyLogosMobile from "/hosts/leads-page/leads-companies-image-phone.png";
 
-import { GrFormCheckmark } from "react-icons/gr";
+// import { GrFormCheckmark } from "react-icons/gr";
+import { PiCheckFatFill } from "react-icons/pi";
 import { ReactFitty } from "react-fitty";
 
 const checklistItems = [
@@ -95,9 +96,9 @@ const Leads = () => {
       </div>
 
       {/* Our Core focus section */}
-      <Container>
-        <div >
-          <div >
+      <Container padding={false}>
+        <div className="pt-16 pb-8">
+          <div className="pb-16">
             <h2 className="lg:text-[2.75rem] md:text-[2.75rem] sm:text-[1.75rem] xs:text-[1.75rem] lg:leading-[3.5rem] xs:leading-9 font-semibold text-host">
               Our core focus is to generate ORGANIC LEADS!
             </h2>
@@ -107,11 +108,11 @@ const Leads = () => {
           </div>
           <div className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-1 xs:grid-cols-1">
             <div className="col-span-4">
-              <div className="px-4">
+              <div className="pr-4">
                 <ul role="list" className="list-none m-0 p-0 space-y-1.5">
                   {checklistItems.map((item, index) => (
                     <li key={index} className="flex items-start gap-3 mt-0">
-                      <GrFormCheckmark
+                      <PiCheckFatFill
                         size={20}
                         className=" text-primary-blue shrink-0 text-[1.1rem]"
                         aria-hidden
@@ -151,9 +152,9 @@ const Leads = () => {
       </Container>
 
       {/* Automated Google Leads Section */}
-      <Container>
-        <div>
-          <div>
+      <Container padding={false}>
+        <div className="pt-16 pb-8">
+          <div className="pb-6">
             <h2 className="lg:text-[2.75rem] md:text-[2.75rem] sm:text-[1.75rem] xs:text-[1.75rem] lg:leading-[3.5rem] md:leading-9 sm:leading-9 xs:leading-9 font-semibold text-host">
               Automated Google LEAD SHEET!
             </h2>
@@ -172,8 +173,8 @@ const Leads = () => {
       </Container>
 
       {/* Run & Scale Grid Section */}
-      <Container >
-        <div>
+      <Container padding={false}>
+        <div className="pt-16 pb-8">
           <ReactFitty className="text-host">
             RUN & SCALE YOUR BUSINESS
           </ReactFitty>
