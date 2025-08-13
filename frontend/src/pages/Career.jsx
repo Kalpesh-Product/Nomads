@@ -3,130 +3,23 @@ import React, { useState } from "react";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 import Container from "../components/Container";
 import { Link,useLocation } from "react-router-dom";
-
-const jobRoles = [
-  {
-    title: "I. Product Management",
-    jobs: [
-      {
-        id: 1,
-        title: "UI Designer",
-        type: "Full-Time",
-        mode: "On-Site",
-        location: "Goa",
-      },
-      {
-        id: 2,
-        title: "Marketing Analytics",
-        subtitle: "(SEO/Google Analytics)",
-        type: "Full-Time",
-        mode: "On-Site",
-        location: "Goa",
-      },
-    ],
-  },
-  {
-    title: "II. Tech",
-    jobs: [
-      {
-        id: 3,
-        title: "Jr. UI/UX Developer",
-        type: "Full-Time",
-        mode: "On-Site",
-        location: "Goa",
-      },
-      {
-        id: 4,
-        title: "PHP Developer",
-        type: "Full-Time",
-        mode: "On-Site",
-        location: "Goa",
-      },
-      {
-        id: 5,
-        title: "Web Developer Intern",
-        type: "Full-Time",
-        mode: "On-Site",
-        location: "Goa",
-      },
-    ],
-  },
-  {
-    title: "III. Finance",
-    jobs: [
-      {
-        id: 6,
-        title: "Finance Intern",
-        type: "Full-Time",
-        mode: "On-Site",
-        location: "Goa",
-      },
-    ],
-  },
-  {
-    title: "IV. HR & EA",
-    jobs: [
-      {
-        id: 7,
-        title: "HR Generalist",
-        type: "Full-Time",
-        mode: "On-Site",
-        location: "Goa",
-      },
-      {
-        id: 8,
-        title: "Executive Assistant to CEO",
-        type: "Full-Time",
-        mode: "On-Site",
-        location: "Goa",
-      },
-    ],
-  },
-  {
-    title: "V. Sales",
-    jobs: [
-      {
-        id: 9,
-        title: "Sr.Manager Sales & Business Development",
-        type: "Full-Time",
-        mode: "On-Site",
-        location: "Goa",
-      },
-    ],
-  },
-  {
-    title: "VI. Marketing",
-    jobs: [
-      {
-        id: 10,
-        title: "Social Media Executive",
-        type: "Full-Time",
-        mode: "On-Site",
-        location: "Goa",
-      },
-    ],
-  },
-  {
-    title: "VII. Internships",
-    jobs: [
-      {
-        id: 11,
-        title: "Internships Across Departments",
-        subtitle:
-          "- APPLY NOW *Mention your applying department in the message box",
-        type: "Internships",
-        mode: "On-Site",
-        location: "Goa",
-      },
-    ],
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import axios from "../utils/axios"
 
 const Career = () => {
   const [openIndex, setOpenIndex] = useState(null);
   const { pathname } = useLocation();
   const isHost = pathname.includes("host");
   const customLink = isHost ? `/hosts/career/job` : `/nomad/career/job`;
+  const customRoute =  isHost ? "job/get-job-posts" : ""
+
+   const { data: jobRoles, isLoading } = useQuery({
+      queryKey: ["jobRoles"],
+      queryFn: async () => {
+        const response = await axios.get(`${customRoute}`);
+        return response.data;
+      },
+    });
 
   const toggleAccordion = (idx) => {
     setOpenIndex((prev) => (prev === idx ? null : idx));
@@ -142,7 +35,7 @@ const Career = () => {
         <div className="border-b-2 border-gray-300 w-[5%] mb-6"></div>
         {/* <Jobrole jobRoles={jobRoles}/> */}
         <div className="flex flex-col gap-4">
-          {jobRoles.map((section, idx) => {
+          {isLoading ? [] : jobRoles.map((section, idx) => {
             const isOpen = openIndex === idx;
 
             return (
@@ -152,7 +45,7 @@ const Career = () => {
                   onClick={() => toggleAccordion(idx)}
                   className="w-full flex justify-between items-center py-6 text-left text-3xl font-bold focus:outline-none"
                 >
-                  {section.title}
+                  {section.categoryTitle}
                   <FaChevronDown
                     className={`text-gray-600 transition-transform duration-300 ${
                       isOpen ? "rotate-180" : ""
@@ -167,14 +60,14 @@ const Career = () => {
                   } overflow-hidden`}
                 >
                   <div className="space-y-4 mt-2">
-                    {section.jobs.map((job, jobIdx) => (
-                      <div key={job.id}>
+                    {section.jobPosts.map((job, jobIdx) => (
+                      <div key={job._id}>
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 ">
                           <div className="md:w-1/2 lg:w-1/2 sm:w-full xs:w-full md:py-8 lg:py-6">
                             <p className="font-bold text-2xl">
                               {jobIdx + 1}. {job.title}
                             </p>
-                            {job.subtitle && (
+                            {job.title && (
                               <p className="text-sm text-black ">
                                 {job.subtitle}
                               </p>
@@ -182,7 +75,7 @@ const Career = () => {
                           </div>
                           <div className="text-right flex items-center gap-10 sm:justify-between xs:justify-between md:justify-end lg:justify-end md:w-1/2 lg:w-1/2  sm:w-full xs:w-full">
                             <p className="text-sm font-semibold text-gray-900">
-                              {job.type} | {job.mode} | {job.location}
+                              {"Full-Time"} | {"On-Site"} | {"Goa"}
                             </p>
                             <div className="flex justify-end mt-1">
                               {/* <Link
@@ -191,7 +84,7 @@ const Career = () => {
                             <FaChevronRight />
                           </Link> */}
                               <Link
-                                to={`${customLink}/${job.id}`}
+                                to={`${customLink}/${job._id}`}
                                 className="border-2 border-gray-600 p-2 rounded-md hover:bg-black hover:text-white transition-colors"
                               >
                                 <FaChevronRight />
@@ -199,8 +92,8 @@ const Career = () => {
                             </div>
                           </div>
                         </div>
-                        {section.jobs.length > 1 &&
-                          jobIdx < section.jobs.length - 1 && (
+                        {section.jobPosts.length > 1 &&
+                          jobIdx < section.jobPosts.length - 1 && (
                             <hr className="mt-4" />
                           )}
                       </div>
