@@ -62,7 +62,6 @@ export const bulkInsertWorkations = async (req, res, next) => {
         pocs.push(poc);
       })
       .on("end", async () => {
-        console.log(pocs);
         try {
           if (pocs.length === 0) {
             return res
