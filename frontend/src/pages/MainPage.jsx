@@ -110,7 +110,7 @@ const MainPage = () => {
             LIMITED – SINGAPORE. All Rights Reserved.
           </p>
         </div>
-        <div className="flex items-right justify-end gap-4  pb-2 px-2 w-32">
+        <div className="flex items-right justify-end gap-4  pb-2 px-6 w-32">
           <FaFacebookF className="text-[12px]" />
 
           <FaXTwitter className="text-[12px]" />

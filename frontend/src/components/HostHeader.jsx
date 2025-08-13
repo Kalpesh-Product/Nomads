@@ -5,7 +5,7 @@ import PrimaryButton from "./PrimaryButton";
 import Container from "./Container";
 
 const HostHeader = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const links = [
     { name: "Modules", link: "/hosts/modules" },
     { name: "Themes", link: "/hosts/themes" },
@@ -39,7 +39,7 @@ const HostHeader = () => {
               padding={"py-2"}
               onClick={() => navigate("/hosts/login")}
               className={
-                "bg-[#FF5757]  flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[7rem] px-6"
+                "bg-white  flex text-black font-[500] capatilize hover:font-semibold hover:bg-white w-[7rem] px-6"
               }
             />
             <PrimaryButton
