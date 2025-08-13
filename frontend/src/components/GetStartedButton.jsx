@@ -20,6 +20,7 @@ const GetStartedButton = ({
       className={`flex rounded-full items-center cursor-pointer justify-center  gap-2
        
         ${baseBgColor} 
+          hover:font-semibold transition-all
         ${fontSize ? fontSize : "text-content leading-5"}
          ${!externalStyles?.includes("text-") ? "text-primary" : ""}
          ${externalStyles}

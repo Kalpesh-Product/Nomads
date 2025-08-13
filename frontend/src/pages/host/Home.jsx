@@ -17,7 +17,7 @@ const HostHome = () => {
   const amenities = [
     // Group 1
     { id: 1, title: "No Code Website", icon: images.website },
-    { id: 11, title: "Booking Engine", icon: images.bookin }, // using bookingsSaas as booking engine
+    { id: 11, title: "Booking Engine", icon: images.bookingsSaas }, // using bookingsSaas as booking engine
     { id: 2, title: "Payment Gateway", icon: images.paymentGateway },
     { id: 5, title: "Leads Management", icon: images.leadGenerationSM },
     { id: 27, title: "AI SEO", icon: images.automatedSeoSM },
@@ -138,13 +138,13 @@ const HostHome = () => {
       {/* GLOBE SECTIon */}
       <section className="bg-black">
         <Container>
-          <div className="grid grid-cols-1 lg:grid-cols-2 h-[70vh] font-hero">
-            <div className="min-w-full h-full" style={{ textAlign: "left" }}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 lg:h-[70vh] font-hero">
+            <div className="min-w-full h-[50vh] lg:h-full" style={{ textAlign: "left" }}>
               <Canvas
                 className="canvas"
                 camera={{
                   position: [0, 0, ismobile ? 15 : 25],
-                  fov: ismobile ? 60 : isTablet ? 50 : isLaptop ? 40 : 28,
+                  fov: ismobile ? 50 : isTablet ? 50 : isLaptop ? 40 : 28,
                 }}
               >
                 <ambientLight intensity={0.5} />
@@ -168,6 +168,7 @@ const HostHome = () => {
                 “NOMAD COMMERCE”{" "}
               </p>
               <div
+               className="w-1/2 lg:w-fit"
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -176,7 +177,7 @@ const HostHome = () => {
               >
                 <GetStartedButton
                   title="CONNECT WITH US"
-                  externalStyles={"bg-white text-seconadary-dark"}
+                  externalStyles={"bg-white text-seconadary-dark w-full text-subtitle lg:text-content"}
                   handleSubmit={() => {
                     navigate("/register");
                     window.scrollTo({ top: 0, behavior: "instant" });
@@ -286,7 +287,7 @@ const HostHome = () => {
             <h1 className="text-title lg:text-main-header uppercase text-center font-semibold lg:font-normal">
               TESTIMONIAL
             </h1>
-            <div className="flex flex-col lg:flex-row justify-between w-full items-stretch">
+            <div className="flex flex-col gap-4 lg:gap-0 lg:flex-row justify-between w-full items-stretch">
               {/* Left Section */}
               <div className="flex flex-col justify-between h-96 lg:h-96 w-full lg:w-3/4">
                 <div>

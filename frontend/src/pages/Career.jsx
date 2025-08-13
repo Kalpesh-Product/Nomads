@@ -26,9 +26,9 @@ const Career = () => {
   };
 
   return (
-    <Container padding={false}>
+    <Container >
       <div className="">
-        <h3 className="text-4xl md:text-6xl font-semibold mb-6">
+        <h3 className="text-4xl md:text-6xl font-semibold ">
           JOIN OUR TEAM
         </h3>
         <h2 className="text-xl md:text-3xl font-bold mb-4">OPEN POSITION</h2>
@@ -37,7 +37,7 @@ const Career = () => {
         <div className="flex flex-col gap-4">
           {isLoading
             ? []
-            : jobRoles.map((section, idx) => {
+            : jobRoles.filter((item)=>item.jobPosts?.length).map((section, idx) => {
                 const isOpen = openIndex === idx;
 
                 return (
@@ -63,12 +63,13 @@ const Career = () => {
                           : "max-h-0 opacity-0"
                       } overflow-hidden`}
                     >
+                      
                       <div className="space-y-4 mt-2">
-                        {section.jobPosts.map((job, jobIdx) => (
+                        {section.jobPosts?.map((job, jobIdx) => (
                           <div key={job._id}>
                             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 ">
                               <div className="md:w-1/2 lg:w-1/2 sm:w-full xs:w-full md:py-8 lg:py-6">
-                                <p className="font-bold text-2xl">
+                                <p className="font-medium text-subtitle">
                                   {jobIdx + 1}. {job.title}
                                 </p>
                                 {job.title && (
@@ -109,6 +110,7 @@ const Career = () => {
                           </div>
                         ))}
                       </div>
+                 
                     </div>
                   </div>
                 );
@@ -117,7 +119,7 @@ const Career = () => {
       </div>
 
       {/* extra spacing below to match current wono website (Current as in: as of 02-08-2025) */}
-      <div className="py-20"></div>
+      {/* <div className="py-20"></div> */}
     </Container>
   );
 };

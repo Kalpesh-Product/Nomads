@@ -5,6 +5,7 @@ import PrimaryButton from "./PrimaryButton";
 import Container from "./Container";
 import { Drawer } from "@mui/material";
 import { IoCloseSharp } from "react-icons/io5";
+import GetStartedButton from "./GetStartedButton";
 
 const HostHeader = () => {
   const navigate = useNavigate();
@@ -24,10 +25,11 @@ const HostHeader = () => {
   return (
     <header className="bg-black text-white py-3 lg:py-0">
       <Container padding={false}>
-        <div className="flex px-4 lg:px-0 justify-between items-center md:py-3  ">
+        <div className="flex  lg:px-0 justify-between items-center md:py-3  ">
           <div
             onClick={() => navigate("/")}
-            className="w-24 lg:w-36 overflow-x-hidden rounded-lg flex justify-between items-center cursor-pointer">
+            className="w-24 lg:w-36 overflow-x-hidden rounded-lg flex justify-between items-center cursor-pointer"
+          >
             <img
               src={logo}
               alt={"logo"}
@@ -52,11 +54,12 @@ const HostHeader = () => {
             /> */}
             <a
               href="https://wonofe.vercel.app"
-              className="bg-white flex items-center justify-center text-black font-[500] capitalize hover:font-semibold hover:bg-white w-[7rem] px-4 py-2 rounded-full">
+              className="bg-white flex items-center justify-center text-black font-[500] capitalize hover:font-semibold hover:bg-white w-[7rem] px-4 py-2 rounded-full"
+            >
               SIGN IN
             </a>
 
-            <PrimaryButton
+            <GetStartedButton
               title={"SIGN UP"}
               padding={"py-2"}
               handleSubmit={() => navigate("/hosts/signup")}
@@ -68,7 +71,8 @@ const HostHeader = () => {
           <div className="h-full px-2  lg:hidden">
             <button
               onClick={() => setOpen(true)}
-              className=" rounded-lg text-subtitle text-white">
+              className=" rounded-lg text-subtitle text-white"
+            >
               ☰
             </button>
           </div>
@@ -86,13 +90,15 @@ const HostHeader = () => {
         }}
         anchor="left"
         open={open}
-        onClose={() => setOpen(false)}>
+        onClose={() => setOpen(false)}
+      >
         <div className="flex flex-col h-full justify-between">
           <ul className="flex flex-col gap-4 p-4 ">
             <div className="flex justify-end w-full">
               <span
                 className="text-title cursor-pointer text-secondary-light"
-                onClick={() => setOpen(false)}>
+                onClick={() => setOpen(false)}
+              >
                 <IoCloseSharp />
               </span>
             </div>
@@ -101,12 +107,27 @@ const HostHeader = () => {
               <li key={item.id} className="items-center text-center">
                 <div
                   onClick={() => handleNavigation(item.link)}
-                  className="py-4">
+                  className="py-4"
+                >
                   <p className="text-white text-lg">{item.name}</p>
                 </div>
                 <div className="h-[0.2px] bg-gray-300"></div>
               </li>
             ))}
+            <div className="flex justify-center p-4">
+              <GetStartedButton
+                title={"SIGN UP"}
+                padding={"py-2"}
+                handleSubmit={() => {
+                  navigate("/hosts/signup")
+                  setOpen(false)
+                }}
+                className={
+                  "bg-primary-blue  flex text-white font-[500] capatilize hover:font-semibold hover:bg-blue-500 transition-all w-[7rem] px-4"
+                }
+              />
+            </div>
+             <div className="h-[0.2px] bg-gray-300"></div>
             <div className="flex justify-center p-4">
               <PrimaryButton
                 title={"Sign In"}

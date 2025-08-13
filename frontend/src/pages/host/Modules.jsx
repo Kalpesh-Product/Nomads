@@ -55,7 +55,7 @@ export default function Modules() {
       <div className="flex flex-col gap-8 w-full">
         <div className="flex flex-col gap-8">
           <div className="text-center">
-            <h1 className="text-[clamp(1.7rem,3.7vw,7rem)] text-start lg:text-start font-semibold font-comic">
+            <h1 className="text-[clamp(1.7rem,3.3vw,5rem)] text-start lg:text-start font-semibold font-comic">
               The ONLY Nomad Ecosystem SaaS Platform!
             </h1>
           </div>
