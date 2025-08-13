@@ -29,6 +29,7 @@ const App = () => {
         <div className="sticky top-0 w-full z-50">
           <div className="md:block">
             {isNomad ? <Header /> : <HostHeader />}
+            {/* {isNomad ? <Header /> : <Header />} */}
           </div>
         </div>
       )}
@@ -44,6 +45,7 @@ const App = () => {
 
       {/* {!hideHeaderFooter && isNomad ? <Footer /> : <HostFooter />} */}
       {!hideHeaderFooter && (isNomad ? <Footer /> : <HostFooter />)}
+      {/* {!hideHeaderFooter && (isNomad ? <Footer /> : <Footer />)} */}
     </div>
   );
 };

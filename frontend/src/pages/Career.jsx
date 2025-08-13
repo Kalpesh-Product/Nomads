@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 import Container from "../components/Container";
-import { Link, useLocation } from "react-router-dom";
+import { Link,  useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import axios from "../utils/axios";
 
@@ -40,20 +40,19 @@ const Career = () => {
             : jobRoles.filter((item)=>item.jobPosts?.length).map((section, idx) => {
                 const isOpen = openIndex === idx;
 
-                return (
-                  <div key={idx} className="border-b pb-4 overflow-hidden">
-                    {/* Accordion Header */}
-                    <button
-                      onClick={() => toggleAccordion(idx)}
-                      className="w-full flex justify-between items-center py-6 text-left text-3xl font-bold focus:outline-none"
-                    >
-                      {section.categoryTitle}
-                      <FaChevronDown
-                        className={`text-gray-600 transition-transform duration-300 ${
-                          isOpen ? "rotate-180" : ""
-                        }`}
-                      />
-                    </button>
+            return (
+              <div key={idx} className="border-b pb-4 overflow-hidden">
+                {/* Accordion Header */}
+                <button
+                  onClick={() => toggleAccordion(idx)}
+                  className="w-full flex justify-between items-center py-6 text-left text-3xl font-bold focus:outline-none">
+                  {section.title}
+                  <FaChevronDown
+                    className={`text-gray-600 transition-transform duration-300 ${
+                      isOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
 
                     {/* Accordion Body with Transition */}
                     <div
@@ -89,32 +88,25 @@ const Career = () => {
                             className="border-2 border-gray-600 p-2 rounded-md hover:bg-black hover:text-white transition-colors">
                             <FaChevronRight />
                           </Link> */}
-                                  <Link
-                                    to={`${customLink}/${job.title.toLowerCase().replace(/\s+/g,"-")}`}
-                                    state={{
-                                      about: job?.about,
-                                      responsibilities: job?.responsibilities,
-                                      qualifications: job?.qualifications,
-                                    }}
-                                    className="border-2 border-gray-600 p-2 rounded-md hover:bg-black hover:text-white transition-colors"
-                                  >
-                                    <FaChevronRight />
-                                  </Link>
-                                </div>
-                              </div>
+                              <Link
+                                to={`${customLink}/${job.id}`}
+                                className="border-2 border-gray-600 p-2 rounded-md hover:bg-black hover:text-white transition-colors">
+                                <FaChevronRight />
+                              </Link>
                             </div>
-                            {section.jobPosts.length > 1 &&
-                              jobIdx < section.jobPosts.length - 1 && (
-                                <hr className="mt-4" />
-                              )}
                           </div>
-                        ))}
+                        </div>
+                        {section?.jobs?.length > 1 &&
+                          jobIdx < section.jobs.length - 1 && (
+                            <hr className="mt-4" />
+                          )}
                       </div>
-                 
-                    </div>
+                    ))}
                   </div>
-                );
-              })}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
