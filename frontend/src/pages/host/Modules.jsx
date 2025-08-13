@@ -55,31 +55,22 @@ export default function Modules() {
       <div className="flex flex-col gap-8 w-full">
         <div className="flex flex-col gap-8">
           <div className="text-center">
-            <h1 className="text-[clamp(1rem,3.7vw,7rem)] font-bold">
+            <h1 className="text-[clamp(1.7rem,3.7vw,7rem)] text-start lg:text-start font-semibold font-comic">
               The ONLY Nomad Ecosystem SaaS Platform!
             </h1>
           </div>
           <div>
-            <ReactFitty className="text-lg text-center">
-              No Code Website{" "}
-              <span className="text-primary-blue font-semibold"></span>
-              <span className="text-primary-blue font-semibold">+</span> Booking
-              Engine <span className="text-primary-blue font-semibold">+</span>{" "}
-              Payment Gateway{" "}
-              <span className="text-primary-blue font-semibold">+</span>{" "}
-              Accounting{" "}
-              <span className="text-primary-blue font-semibold">+</span> Reports{" "}
-            </ReactFitty>
-            <br />
-            <ReactFitty className="text-lg text-center">
-              <span className="text-primary-blue font-semibold">+</span>{" "}
-              Analytics{" "}
-              <span className="text-primary-blue font-semibold">+</span> HR
-              Support <span className="text-primary-blue font-semibold">+</span>{" "}
-              Customer & Client Management{" "}
-              <span className="text-primary-blue font-semibold">+</span>{" "}
-              Marketing and more.
-            </ReactFitty>
+            <h4 className="text-lg lg:text-[1.8rem] lg:leading-[2.75rem] text-start md:text-center lg:text-center ">
+            No Code Website <span className="text-primary-blue"></span>
+            <span className="text-primary-blue">+</span> Booking Engine{" "}
+            <span className="text-primary-blue">+</span> Payment Gateway{" "}
+            <span className="text-primary-blue">+</span> Accounting{" "}
+            <span className="text-primary-blue">+</span> Reports{" "}
+            <span className="text-primary-blue">+</span> Analytics{" "}
+            <span className="text-primary-blue">+</span> HR Support{" "}
+            <span className="text-primary-blue">+</span> Customer & Client Management{" "}
+            <span className="text-primary-blue">+</span> Marketing and more.
+          </h4>
           </div>
           <div className="flex justify-end items-end">
             <GetStartedButton title="Get Started" />
@@ -92,14 +83,14 @@ export default function Modules() {
         data-aos="fade-up"
         className="SaaS-featured-master flex flex-col gap-4 py-0 lg:py-4"
       >
-        <div className="grid grid-cols-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-1">
           <div className=" flex flex-col gap-2">
-            <div className="flex flex-col relative text-[1.5rem] md:text-3xl font-bold mb-3 w-full">
+            <div className="flex flex-col relative text-card-title md:text-3xl font-medium my-3 w-full">
               Real-time operations
               <img
                 src="/blue-line.png"
                 alt="greenUnderLine"
-                className="w-1/4 h-6"
+                className="w-3/4 lg:w-1/4 h-6"
               />
             </div>
             {isMobile && (

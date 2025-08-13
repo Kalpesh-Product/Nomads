@@ -46,11 +46,7 @@ const SaaSFeatureBlock = ({
       }}
     >
       <div
-        className="flex gap-2 items-start justify-between flex-wrap"
-        style={{
-          flexDirection: rowReverse ? "row-reverse" : "row",
-          flexWrap: "wrap",
-        }}
+        className={`flex gap-2 items-start justify-between flex-col ${rowReverse ? "flex-col lg:flex-row-reverse" : "flex-col lg:flex-row"} `}
       >
         {/* Description Column */}
         <div
@@ -89,7 +85,7 @@ const SaaSFeatureBlock = ({
             display: "flex",
             justifyContent: "center",
           }}
-          className="border-[1px] border-gray-200 rounded-xl overflow-hidden w-[120%]"
+          className="border-[1px] border-gray-200 rounded-xl overflow-hidden w-full"
         >
           <img
             src={image}

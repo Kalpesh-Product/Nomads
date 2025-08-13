@@ -84,13 +84,13 @@ const HostHome = () => {
           <div className="lg:space-y-0">
             <div className="flex flex-col lg:flex-row justify-center items-center ">
               <div className="mb-0 lg:mb-20 text-center w-full">
-                <h1 className="font-semibold text-[clamp(3.3rem,6.5vw,7rem)]">
+                <h1 className="font-semibold text-[clamp(3.3rem,6.2vw,7rem)]">
                   Introducing
                 </h1>{" "}
               </div>
               <div className="leading-normal text-center w-full">
                 <div className="relative mb-8 lg:mb-0">
-                  <h1 className="font-semibold text-[clamp(2.8rem,6.3vw,6rem)] text-nowrap">
+                  <h1 className="font-semibold text-[clamp(2.8rem,6.1vw,6rem)] text-nowrap">
                     N-Commerce
                   </h1>
                   <img
@@ -163,7 +163,7 @@ const HostHome = () => {
                   SUPPORTING THE FOUNDATION OF N-COMMERCE <br />
                 </strong>
               </h3>
-              <p className="text-primary-blue text-[clamp(1rem,6.4vw,7rem)] text-nowrap">
+              <p className="text-primary-blue text-[clamp(2.3rem,6.4vw,7rem)] text-nowrap">
                 {" "}
                 “NOMAD COMMERCE”{" "}
               </p>
@@ -174,16 +174,14 @@ const HostHome = () => {
                   justifyContent: "center",
                 }}
               >
-                <button
-                  className="hero-button"
-                  data-aos-delay="200"
-                  onClick={() => {
+                <GetStartedButton
+                  title="CONNECT WITH US"
+                  externalStyles={"bg-white text-seconadary-dark"}
+                  handleSubmit={() => {
                     navigate("/register");
                     window.scrollTo({ top: 0, behavior: "instant" });
                   }}
-                >
-                  CONNECT
-                </button>
+                />
               </div>
             </div>
           </div>
@@ -238,7 +236,7 @@ const HostHome = () => {
               ))}
             </div>
 
-            <div className="flex w-full justify-end pr-20">
+            <div className="flex w-full justify-center lg:justify-end pr-0 lg:pr-20">
               <GetStartedButton title={"Get Started"} />
             </div>
           </div>
@@ -285,7 +283,7 @@ const HostHome = () => {
       <section>
         <Container>
           <div className="flex flex-col gap-16">
-            <h1 className="text-title lg:text-main-header uppercase text-center">
+            <h1 className="text-title lg:text-main-header uppercase text-center font-semibold lg:font-normal">
               TESTIMONIAL
             </h1>
             <div className="flex flex-col lg:flex-row justify-between w-full items-stretch">
