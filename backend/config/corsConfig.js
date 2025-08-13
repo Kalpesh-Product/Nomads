@@ -1,7 +1,7 @@
 export const allowedOrigins = [
   "http://localhost:5173",
-  "https://wononomadsfe.vercel.app",
   "https://wono.co",
+  "https://wononomadsfe.vercel.app",
 ];
 
 export const corsConfig = {
