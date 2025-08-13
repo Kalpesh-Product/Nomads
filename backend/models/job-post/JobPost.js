@@ -26,6 +26,15 @@ const jobPostSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  jobType: {
+    type: String,
+  },
+  jobMode: {
+    type: String,
+  },
+  location: {
+    type: String,
+  },
 });
 
 const JobPost = mongoose.model("jobpost", jobPostSchema);
