@@ -10,7 +10,7 @@ const Footer = () => {
       heading: "Services",
       links: [
         { name: "About", link: "/nomad" },
-        { name: "Career", link: "/nomad" },
+        { name: "Career", link: "/nomad/career" },
         { name: "FAQs", link: "/nomad" },
         // { name: "Mortgage", link: "/mortgages" },
       ],
@@ -18,9 +18,9 @@ const Footer = () => {
     {
       heading: "Corporate",
       links: [
-        { name: "Sign In", link: "/nomad" },
-        { name: "Sign Up", link: "/nomad" },
-        { name: "Contact", link: "/nomad" },
+        { name: "Sign In", link: "/nomad/login" },
+        { name: "Sign Up", link: "/nomad/signup" },
+        { name: "Contact", link: "/nomad/contact" },
         // { name: "Investor Login", link: "/login" },
       ],
     },
