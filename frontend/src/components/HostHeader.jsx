@@ -42,14 +42,20 @@ const HostHeader = () => {
             ))}
           </ul>
           <div className="px-1 hidden xl:flex xl:gap-4 py-2">
-            <PrimaryButton
+            {/* <PrimaryButton
               title={"SIGN IN"}
               padding={"py-2"}
               onClick={() => navigate("/hosts/login")}
               className={
                 "bg-white  flex text-black font-[500] capatilize hover:font-semibold hover:bg-white w-[7rem] px-6"
               }
-            />
+            /> */}
+            <a
+              href="https://wonofe.vercel.app"
+              className="bg-white flex items-center justify-center text-black font-[500] capitalize hover:font-semibold hover:bg-white w-[7rem] px-4 py-2 rounded-full">
+              SIGN IN
+            </a>
+
             <PrimaryButton
               title={"SIGN UP"}
               padding={"py-2"}
