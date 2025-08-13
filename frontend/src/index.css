@@ -10,6 +10,11 @@
 }
 
 @font-face {
+  font-family: Amsterdam;
+  src: url("../src/assets/El_Messiri/amsterdam.ttf");
+}
+
+@font-face {
   font-family: Elmessiri;
   src: url("../src/assets/El_Messiri/ElMessiri-VariableFont_wght.ttf");
 }
@@ -386,7 +391,7 @@ body::-webkit-scrollbar {
 /* <= 768px */
 @media (max-width: 768px) {
   .hero__animation {
-    padding-left: 53px;
+    padding-left: 39px;
     padding-bottom: 9px;
     height: 60px;
     top: -5px;

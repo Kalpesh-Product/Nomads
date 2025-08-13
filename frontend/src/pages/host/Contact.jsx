@@ -83,7 +83,7 @@ const HostContact = () => {
     <div className="bg-white text-black font-sans">
       {/* About & Form */}
       {/* <section className="py-10 px-4 md:px-20"> */}
-      <Container padding={false}>
+      <Container>
         <section className="">
           <div className="grid md:grid-cols-2 gap-10">
             {/* About Us */}
@@ -253,7 +253,7 @@ const HostContact = () => {
       {/* Maps */}
       {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-4 md:px-20 pb-10"> */}
       <Container>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8  pb-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 ">
           <div className="shadow-md">
             <iframe
               title="Singapore Office"

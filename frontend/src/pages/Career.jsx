@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 import Container from "../components/Container";
-import { Link, useLocation } from "react-router-dom";
+import { Link,  useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import axios from "../utils/axios";
 
@@ -26,9 +26,9 @@ const Career = () => {
   };
 
   return (
-    <Container padding={false}>
+    <Container >
       <div className="">
-        <h3 className="text-4xl md:text-6xl font-semibold mb-6">
+        <h3 className="text-4xl md:text-6xl font-semibold ">
           JOIN OUR TEAM
         </h3>
         <h2 className="text-xl md:text-3xl font-bold mb-4">OPEN POSITION</h2>
@@ -37,23 +37,22 @@ const Career = () => {
         <div className="flex flex-col gap-4">
           {isLoading
             ? []
-            : jobRoles.map((section, idx) => {
+            : jobRoles.filter((item)=>item.jobPosts?.length).map((section, idx) => {
                 const isOpen = openIndex === idx;
 
-                return (
-                  <div key={idx} className="border-b pb-4 overflow-hidden">
-                    {/* Accordion Header */}
-                    <button
-                      onClick={() => toggleAccordion(idx)}
-                      className="w-full flex justify-between items-center py-6 text-left text-3xl font-bold focus:outline-none"
-                    >
-                      {section.categoryTitle}
-                      <FaChevronDown
-                        className={`text-gray-600 transition-transform duration-300 ${
-                          isOpen ? "rotate-180" : ""
-                        }`}
-                      />
-                    </button>
+            return (
+              <div key={idx} className="border-b pb-4 overflow-hidden">
+                {/* Accordion Header */}
+                <button
+                  onClick={() => toggleAccordion(idx)}
+                  className="w-full flex justify-between items-center py-6 text-left text-3xl font-bold focus:outline-none">
+                  {section.categoryTitle}
+                  <FaChevronDown
+                    className={`text-gray-600 transition-transform duration-300 ${
+                      isOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
 
                     {/* Accordion Body with Transition */}
                     <div
@@ -63,12 +62,13 @@ const Career = () => {
                           : "max-h-0 opacity-0"
                       } overflow-hidden`}
                     >
+                      
                       <div className="space-y-4 mt-2">
-                        {section.jobPosts.map((job, jobIdx) => (
+                        {section.jobPosts?.map((job, jobIdx) => (
                           <div key={job._id}>
                             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 ">
                               <div className="md:w-1/2 lg:w-1/2 sm:w-full xs:w-full md:py-8 lg:py-6">
-                                <p className="font-bold text-2xl">
+                                <p className="font-medium text-subtitle">
                                   {jobIdx + 1}. {job.title}
                                 </p>
                                 {job.title && (
@@ -88,36 +88,30 @@ const Career = () => {
                             className="border-2 border-gray-600 p-2 rounded-md hover:bg-black hover:text-white transition-colors">
                             <FaChevronRight />
                           </Link> */}
-                                  <Link
-                                    to={`${customLink}/${job.title.toLowerCase().replace(/\s+/g,"-")}`}
-                                    state={{
-                                      about: job?.about,
-                                      responsibilities: job?.responsibilities,
-                                      qualifications: job?.qualifications,
-                                    }}
-                                    className="border-2 border-gray-600 p-2 rounded-md hover:bg-black hover:text-white transition-colors"
-                                  >
-                                    <FaChevronRight />
-                                  </Link>
-                                </div>
-                              </div>
+                              <Link
+                                to={`${customLink}/${job.id}`}
+                                className="border-2 border-gray-600 p-2 rounded-md hover:bg-black hover:text-white transition-colors">
+                                <FaChevronRight />
+                              </Link>
                             </div>
-                            {section.jobPosts.length > 1 &&
-                              jobIdx < section.jobPosts.length - 1 && (
-                                <hr className="mt-4" />
-                              )}
                           </div>
-                        ))}
+                        </div>
+                        {section?.jobs?.length > 1 &&
+                          jobIdx < section.jobs.length - 1 && (
+                            <hr className="mt-4" />
+                          )}
                       </div>
-                    </div>
+                    ))}
                   </div>
-                );
-              })}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
       {/* extra spacing below to match current wono website (Current as in: as of 02-08-2025) */}
-      <div className="py-20"></div>
+      {/* <div className="py-20"></div> */}
     </Container>
   );
 };

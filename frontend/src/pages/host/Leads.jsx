@@ -95,9 +95,9 @@ const Leads = () => {
       </div>
 
       {/* Our Core focus section */}
-      <Container padding={false}>
-        <div className="pt-16 pb-8">
-          <div className="pb-16">
+      <Container>
+        <div >
+          <div >
             <h2 className="lg:text-[2.75rem] md:text-[2.75rem] sm:text-[1.75rem] xs:text-[1.75rem] lg:leading-[3.5rem] xs:leading-9 font-semibold text-host">
               Our core focus is to generate ORGANIC LEADS!
             </h2>
@@ -151,9 +151,9 @@ const Leads = () => {
       </Container>
 
       {/* Automated Google Leads Section */}
-      <Container padding={false}>
-        <div className="pt-16 pb-8">
-          <div className="pb-6">
+      <Container>
+        <div>
+          <div>
             <h2 className="lg:text-[2.75rem] md:text-[2.75rem] sm:text-[1.75rem] xs:text-[1.75rem] lg:leading-[3.5rem] md:leading-9 sm:leading-9 xs:leading-9 font-semibold text-host">
               Automated Google LEAD SHEET!
             </h2>
@@ -172,8 +172,8 @@ const Leads = () => {
       </Container>
 
       {/* Run & Scale Grid Section */}
-      <Container padding={false}>
-        <div className="pt-16 pb-8">
+      <Container >
+        <div>
           <ReactFitty className="text-host">
             RUN & SCALE YOUR BUSINESS
           </ReactFitty>

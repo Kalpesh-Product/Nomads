@@ -13,7 +13,6 @@ const Header = () => {
   const view = searchParams.get("view"); // could be 'map', 'list', or null
 
   const currentPath = location.pathname;
- 
 
   const isNomadOrListings =
     /^\/nomad(\/listings\/[^/]+)?$/.test(currentPath) ||
@@ -55,7 +54,7 @@ const Header = () => {
   }
 
   return (
-    <div className="flex px-4 py-3 justify-between items-center md:py-3 md:px-[7.5rem] lg:px-[7.5rem] lg:py-0 shadow-md  bg-white/80 backdrop-blur-md ">
+    <div className="flex px-4 py-3 justify-between items-center md:py-3 md:px-[7.5rem] lg:px-[7.5rem] lg:py-[0.625rem] shadow-md bg-white/80 backdrop-blur-md ">
       <div
         onClick={() => navigate("/")}
         className=" w-36 overflow-x-hidden rounded-lg flex justify-between items-center cursor-pointer">
@@ -236,7 +235,7 @@ const Header = () => {
                           <li className="flex flex-col justify-center items-center">
                             <div className="p-4 px-0 whitespace-nowrap">
                               <Link
-                              onClick={()=>setOpen(false)}
+                                onClick={() => setOpen(false)}
                                 to={`${location.pathname}?view=map`}
                                 className="group relative text-md  text-black">
                                 <span className="relative z-10 group-hover:font-bold mb-2">
@@ -245,7 +244,7 @@ const Header = () => {
                                 <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
                               </Link>
                             </div>
-                             <div className="h-[0.2px] bg-gray-300 w-full"></div>
+                            <div className="h-[0.2px] bg-gray-300 w-full"></div>
                           </li>
                         )}
 
@@ -253,7 +252,7 @@ const Header = () => {
                           <li className="flex flex-col justify-center items-center">
                             <div className="p-4 px-0 whitespace-nowrap">
                               <Link
-                               onClick={()=>setOpen(false)}
+                                onClick={() => setOpen(false)}
                                 to={`${location.pathname}`}
                                 className="group relative text-md text-black">
                                 <span className="relative z-10 group-hover:font-bold mb-2">
@@ -262,7 +261,7 @@ const Header = () => {
                                 <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
                               </Link>
                             </div>
-                              <div className="h-[0.2px] bg-gray-300 w-full"></div>
+                            <div className="h-[0.2px] bg-gray-300 w-full"></div>
                           </li>
                         )}
                       </>
@@ -286,7 +285,6 @@ const Header = () => {
                       </>
                     )}
                   </>
-
                 </ul>
               </div>
             )}

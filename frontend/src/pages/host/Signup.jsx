@@ -454,10 +454,24 @@ const HostSignup = () => {
                 handleSubmit={() => setActiveStep((prev) => prev - 1)}
               />
             )}
-            {activeStep < steps.length - 1 ? (
-              <GetStartedButton title="Next" handleSubmit={handleNext} />
+            {activeStep === 0 && (
+              <div className="flex  justify-center  items-center w-full">
+                <GetStartedButton title="Next" handleSubmit={handleNext} />
+              </div>
+            )}
+          
+       
+            {(activeStep !== 0 && activeStep < steps.length - 1 )? (
+              <div className="flex  justify-center lg:justify-end items-center w-full">
+                <GetStartedButton title="Next" handleSubmit={handleNext} />
+              </div>
             ) : (
-              <GetStartedButton title="Submit" type={"submit"} />
+              <></>
+            )}
+              {activeStep === stepFields.length -1 && (
+              <div className="flex  justify-center  items-center w-full">
+                <GetStartedButton title="Submit" type={"submit"} />
+              </div>
             )}
           </div>
         </form>

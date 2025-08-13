@@ -141,7 +141,7 @@ const Themes = () => {
               <h1 className="text-[clamp(2rem,2.5vw,5rem)] font-medium pb-2">
                 Top Theme Recommendations
               </h1>
-              <span className="text-[clamp(1.7rem,1.8vw,3rem)]">
+              <span className="text-[clamp(1rem,1.8vw,3rem)]">
                 Cherry pick features or ask us to customize anything for your
                 business growth. Fully tech ready, integrated and responsive.
               </span>
@@ -177,8 +177,8 @@ const Themes = () => {
         <Container>
           <div className="flex lg:flex-nowrap flex-wrap justify-between items-center gap-8">
             <div className="flex flex-col gap-16 w-full lg:w-[50%]">
-              <div className="text-[clamp(1rem,5vw,6rem)] leading-none">
-                <h1>Customize it your way</h1>
+              <div className="text-[clamp(2rem,5vw,6rem)] leading-none">
+                <h1 className="font-medium">Customize it your way</h1>
               </div>
               <ul className="flex flex-col gap-2">
                 <li>1000's advanced web capabilities</li>
@@ -204,14 +204,14 @@ const Themes = () => {
       {/*Website Builder */}
       <Container>
         <div className="flex flex-col justify-between items-center gap-14">
-          <div className="text-[clamp(1rem,3.8vw,4rem)] w-[70%] self-start leading-[1.2]">
-            <h1>A website builder engineered for growth</h1>
+          <div className="text-[clamp(2rem,4.3vw,4.5rem)] w-full lg:w-[70%] self-start leading-[1.2]">
+            <h1 className="font-medium">A website builder engineered for growth</h1>
           </div>
-          <div className="grid grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             {themeWebsiteGridData.map((item, index) => (
-              <div key={index} className="flex flex-col gap-4">
-                <h4 className="text-subtitle font-[500]">{item.title}</h4>
-                <p>{item.description}</p>
+              <div key={index} className="flex flex-col gap-6">
+                <h4 className="text-card-title font-medium">{item.title}</h4>
+                <p className="text-subtitle">{item.description}</p>
               </div>
             ))}
           </div>
@@ -226,16 +226,16 @@ const Themes = () => {
       {/*We're here*/}
       <Container>
         <section className="flex flex-col justify-between items-center  gap-10 mb-10">
-          <div className="text-[clamp(1rem,13.71vw,4rem)] w-[70%] self-start leading-[1.2]">
-            <h1>We're here for you</h1>
+          <div className="text-[clamp(2rem,4vw,5rem)] w-full lg:w-[70%] self-start leading-[1.2]">
+            <h1 className="font-medium">We're here for you</h1>
           </div>
-          <div className="grid grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             {supportItems.map((item, index) => (
               <div
                 className="flex flex-col gap-8 border-t-2 border-black pt-10"
                 key={index}
               >
-                <h2 className="font-semibold">{item.title}</h2>
+                <h2 className="font-semibold text-card-title">{item.title}</h2>
                 <p>{item.description}</p>
                 <span
                   className="cursor-pointer font-semibold underline hover:no-underline underline-offset-8 transition-hover duration-500 ease max-w-fit"

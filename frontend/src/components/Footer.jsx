@@ -18,8 +18,10 @@ const Footer = () => {
     {
       heading: "Corporate",
       links: [
-        { name: "Sign In", link: "/nomad/login" },
-        { name: "Sign Up", link: "/nomad/signup" },
+        // { name: "Sign In", link: "/nomad/login" },
+        // { name: "Sign Up", link: "/nomad/signup" },
+        { name: "Privacy", link: "/hosts/privacy" },
+        { name: "T&C", link: "/hosts/terms-and-conditions" },
         { name: "Contact", link: "/nomad/contact" },
         // { name: "Investor Login", link: "/login" },
       ],
@@ -36,7 +38,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="w-full bg-gray-100 text-black backdrop-blur-md  flex flex-col justify-center items-center gap-0  pb-0 md:pb-0   shadow-lg ">
+    <footer className="w-full bg-gray-100 text-black backdrop-blur-md  flex flex-col justify-center items-center gap-0 pb-0 md:pb-0   shadow-lg ">
       <div className="w-full flex flex-wrap md:flex-wrap lg:flex-nowrap justify-between items-center pt-12 pb-8 px-4 md:px-[7.5rem]">
         <div className="flex flex-col justify-center md:flex-1 md:justify-center md:items-center lg:justify-start lg:items-start mb-8 lg:mb-0">
           <div className="w-70 md:w-80 h-full">
@@ -73,7 +75,7 @@ const Footer = () => {
             {footerSections.map((section, idx) => (
               <div
                 key={idx}
-                className="flex flex-col gap-4 justify-center items-center text-start lg:justify-start lg:items-center">
+                className="flex flex-col justify-center items-center text-start lg:justify-start lg:items-center">
                 {/* <h3 className="font-semibold text-lg mb-2">
                 {section.heading.toUpperCase()}
               </h3> */}
@@ -81,7 +83,7 @@ const Footer = () => {
                   <Link
                     key={i}
                     to={linkObj.link}
-                    className="text-sm  text-black opacity-80 hover:opacity-100 hover:text-gray-500 transition-all duration-200 cursor-pointer uppercase">
+                    className="text-sm  text-black opacity-80 hover:opacity-100 hover:text-gray-500 transition-all duration-200 cursor-pointer uppercase p-4">
                     {linkObj.name}
                   </Link>
                 ))}

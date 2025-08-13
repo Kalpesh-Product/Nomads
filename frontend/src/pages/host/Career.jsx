@@ -7,123 +7,6 @@ import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import axios from "../../utils/axios";
 
-//  const jobRoles = [
-//     {
-//       title: "I. Product Management",
-//       jobs: [
-//         {
-//           id: 1,
-//           title: "UI Designer",
-//           type: "Full-Time",
-//           mode: "On-Site",
-//           location: "Goa",
-//         },
-//         {
-//           id: 2,
-//           title: "Marketing Analytics",
-//           subtitle: "(SEO/Google Analytics)",
-//           type: "Full-Time",
-//           mode: "On-Site",
-//           location: "Goa",
-//         },
-//       ],
-//     },
-//     {
-//       title: "II. Tech",
-//       jobs: [
-//         {
-//           id: 3,
-//           title: "Jr. UI/UX Developer",
-//           type: "Full-Time",
-//           mode: "On-Site",
-//           location: "Goa",
-//         },
-//         {
-//           id: 4,
-//           title: "PHP Developer",
-//           type: "Full-Time",
-//           mode: "On-Site",
-//           location: "Goa",
-//         },
-//         {
-//           id: 5,
-//           title: "Web Developer Intern",
-//           type: "Full-Time",
-//           mode: "On-Site",
-//           location: "Goa",
-//         },
-//       ],
-//     },
-//     {
-//       title: "III. Finance",
-//       jobs: [
-//         {
-//           id: 6,
-//           title: "Finance Intern",
-//           type: "Full-Time",
-//           mode: "On-Site",
-//           location: "Goa",
-//         },
-//       ],
-//     },
-//     {
-//       title: "IV. HR & EA",
-//       jobs: [
-//         {
-//           id: 7,
-//           title: "HR Generalist",
-//           type: "Full-Time",
-//           mode: "On-Site",
-//           location: "Goa",
-//         },
-//         {
-//           id: 8,
-//           title: "Executive Assistant to CEO",
-//           type: "Full-Time",
-//           mode: "On-Site",
-//           location: "Goa",
-//         },
-//       ],
-//     },
-//     {
-//       title: "V. Sales",
-//       jobs: [
-//         {
-//           id: 9,
-//           title: "Sr.Manager Sales & Business Development",
-//           type: "Full-Time",
-//           mode: "On-Site",
-//           location: "Goa",
-//         },
-//       ],
-//     },
-//     {
-//       title: "VI. Marketing",
-//       jobs: [
-//         {
-//           id: 10,
-//           title: "Social Media Executive",
-//           type: "Full-Time",
-//           mode: "On-Site",
-//           location: "Goa",
-//         },
-//       ],
-//     },
-//     {
-//       title: "VII. Internships",
-//       jobs: [
-//         {
-//           id: 11,
-//           title: "Internships Across Departments",
-//           subtitle:
-//             "- APPLY NOW *Mention your applying department in the message box",
-//           type: "Internships",
-//           mode: "On-Site",
-//           location: "Goa",
-//         },
-//       ],
-//     },
-//   ];
 
 const HostCareer = () => {
   const [openIndex, setOpenIndex] = useState(null);
@@ -161,7 +44,7 @@ const HostCareer = () => {
                   onClick={() => toggleAccordion(idx)}
                   className="w-full flex justify-between items-center py-6 text-left text-3xl font-bold focus:outline-none"
                 >
-                  {section.title}
+                  {section.categoryTitle}
                   <FaChevronDown
                     className={`text-gray-600 transition-transform duration-300 ${
                       isOpen ? "rotate-180" : ""
