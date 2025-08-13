@@ -13,6 +13,9 @@ import {
 import Container from "../../components/Container";
 import GetStartedButton from "../../components/GetStartedButton";
 import { NavLink } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import axios from "../../utils/axios"
+import toast from "react-hot-toast";
 
 const steps = ["Personal Info", "Company Info", "Services", "Review"];
 
@@ -28,9 +31,9 @@ const HostSignup = () => {
 
   const { control, handleSubmit, getValues, trigger } = useForm({
     defaultValues: {
-      fullName: "",
+      name: "",
       email: "",
-      phoneNumber: "",
+      mobile: "",
       country: "",
       state: "",
       city: "",
@@ -40,14 +43,33 @@ const HostSignup = () => {
       companyType: "",
       companyState: "",
       companyCity: "",
-      companyWebsite: "",
-      linkedinUrl: "",
-      services: [],
+      websiteUrl: "",
+      linkedInUrl: "",
+      selectedServices: [],
     },
   });
 
+   const { mutate: register, isLoading } = useMutation({
+      mutationFn: async (data) => {
+          const response = await axios.post(
+          "form/add-new-b2b-form-submission",
+          {...data,formName:"register"},
+        );
+  
+        return response.data;
+      },
+      onSuccess: (data) => {
+        toast.success("Form submitted successfully");
+        reset();
+      },
+      onError: (error) => {
+        toast.error(error.response.data.message);
+        reset();
+      },
+    });
+
   const stepFields = [
-    ["fullName", "email", "phoneNumber", "country", "state", "city"], // Step 1
+    ["name", "email", "mobile", "country", "state", "city"], // Step 1
     [
       "companyName",
       "industry",
@@ -55,10 +77,10 @@ const HostSignup = () => {
       "companyType",
       "companyState",
       "companyCity",
-      "companyWebsite",
-      "linkedinUrl",
+      "websiteUrl",
+      "linkedInUrl",
     ], // Step 2
-    ["services"], // Step 3
+    ["selectedServices"], // Step 3
     [], // Step 4
   ];
 
@@ -73,17 +95,13 @@ const HostSignup = () => {
     setActiveStep((prev) => prev + 1);
   };
 
-  const handleFinalSubmit = (data) => {
-    console.log("Final Merged Values:", data);
-  };
-
   const renderStepFields = () => {
     switch (activeStep) {
       case 0:
         return (
           <>
             <Controller
-              name="fullName"
+              name="name"
               control={control}
               rules={{ required: "Full Name is required" }}
               render={({ field, fieldState }) => (
@@ -122,7 +140,7 @@ const HostSignup = () => {
               )}
             />
             <Controller
-              name="phoneNumber"
+              name="mobile"
               control={control}
               rules={{ required: "Phone Number is required" }}
               render={({ field, fieldState }) => (
@@ -288,7 +306,7 @@ const HostSignup = () => {
               )}
             />
             <Controller
-              name="companyWebsite"
+              name="websiteUrl"
               control={control}
               rules={{ required: "Company Website is required" }}
               render={({ field, fieldState }) => (
@@ -304,7 +322,7 @@ const HostSignup = () => {
               )}
             />
             <Controller
-              name="linkedinUrl"
+              name="linkedInUrl"
               control={control}
               rules={{ required: "LinkedIn URL is required" }}
               render={({ field, fieldState }) => (
@@ -325,7 +343,7 @@ const HostSignup = () => {
       case 2:
         return (
           <Controller
-            name="services"
+            name="selectedServices"
             control={control}
             rules={{
               validate: (value) =>
@@ -444,7 +462,7 @@ const HostSignup = () => {
         )}
         <form
           className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-4"
-          onSubmit={handleSubmit(handleFinalSubmit)}
+          onSubmit={handleSubmit((data)=> register(data))}
         >
           {renderStepFields()}
           <div className="col-span-1 lg:col-span-2 flex justify-between items-center">

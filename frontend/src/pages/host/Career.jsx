@@ -18,7 +18,6 @@ const HostCareer = () => {
       return response.data;
     },
   });
-  console.log("logg")
 
   const toggleAccordion = (idx) => {
     setOpenIndex((prev) => (prev === idx ? null : idx));

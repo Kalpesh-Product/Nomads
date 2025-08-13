@@ -5,6 +5,7 @@ import Container from "../components/Container";
 import { Link,  useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import axios from "../utils/axios";
+import romans from "romans";
 
 const Career = () => {
   const [openIndex, setOpenIndex] = useState(null);
@@ -31,6 +32,7 @@ const Career = () => {
         <h3 className="text-4xl md:text-6xl font-semibold ">
           JOIN OUR TEAM
         </h3>
+        <br/>
         <h2 className="text-xl md:text-3xl font-bold mb-4">OPEN POSITION</h2>
         <div className="border-b-2 border-gray-300 w-[5%] mb-6"></div>
         {/* <Jobrole jobRoles={jobRoles}/> */}
@@ -46,7 +48,7 @@ const Career = () => {
                 <button
                   onClick={() => toggleAccordion(idx)}
                   className="w-full flex justify-between items-center py-6 text-left text-3xl font-bold focus:outline-none">
-                  {section.categoryTitle}
+                  {romans.romanize(idx+1)}.{section.categoryTitle}
                   <FaChevronDown
                     className={`text-gray-600 transition-transform duration-300 ${
                       isOpen ? "rotate-180" : ""
