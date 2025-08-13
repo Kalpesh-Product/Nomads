@@ -1,8 +1,9 @@
-import React, { useState } from "react";
-import axios from "axios";
+import { useState } from "react";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
-
+import { useMutation } from "@tanstack/react-query";
+import axiosInstance from "../../utils/axios";
+import { useForm } from "react-hook-form";
 import {
   TextField,
   Select,
@@ -40,13 +41,16 @@ const HostContact = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      await axios.post("/enquiries", formData);
+      await axiosInstance.post("/form/add-new-b2b-form-submission", {
+        ...formData,
+        formName: "enquiry",
+      });
       setShowModal(true);
       setFormData({
         name: "",
         email: "",
         mobile: "",
-        partnerstype: "",
+        partnerType: "",
         message: "",
       });
     } catch (error) {
@@ -61,6 +65,20 @@ const HostContact = () => {
     "&.Mui-focused": { color: "#1976d2" },
     "&.MuiInputLabel-shrink": { color: "#1976d2" },
   };
+
+  const {
+    handleSubmit: handlesubmitSales,
+    control: salesControl,
+    reset: salesReset,
+    formState: { errors: salesErrors },
+  } = useForm({
+    defaultValues: {
+      fullName: "",
+      mobileNumber: 0,
+      email: "",
+    },
+    mode: "onChange",
+  });
 
   return (
     <div className="bg-white text-black font-sans">
@@ -87,7 +105,7 @@ const HostContact = () => {
               <p className="text-subtitle leading-relaxed">
                 WoNo's eventual B2B2C is the largest Nomad Community being built
                 for individuals and companies who intend to work remotely. We're
-                creating the world’s first such platform and community to
+                creating the world's first such platform and community to
                 support global nomads in logistics, decisions, and long-term
                 remote work.
               </p>
@@ -159,13 +177,14 @@ const HostContact = () => {
                         "&.MuiInputLabel-shrink": {
                           color: "#1976d2",
                         },
-                      }}>
+                      }}
+                    >
                       Type of Partnership
                     </InputLabel>
                     <Select
                       labelId="partnerstype-label"
-                      name="partnerstype"
-                      value={formData.partnerstype}
+                      name="partnerType"
+                      value={formData.partnerType}
                       onChange={handleChange}
                       sx={{
                         pl: 2,
@@ -173,7 +192,8 @@ const HostContact = () => {
                         "&:focus": {
                           backgroundColor: "transparent",
                         },
-                      }}>
+                      }}
+                    >
                       <MenuItem value="" disabled>
                         Select Type
                       </MenuItem>
@@ -220,7 +240,8 @@ const HostContact = () => {
                       px: 14,
                       py: 1,
                       "&:hover": { bgcolor: "#333" },
-                    }}>
+                    }}
+                  >
                     CONNECT
                   </Button>
                 </div>
@@ -239,7 +260,8 @@ const HostContact = () => {
               title="Singapore Office"
               className="w-full h-[25rem]"
               loading="lazy"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.8288436496055!2d103.8432645747905!3d1.2760650987118065!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31da191343eb5b27%3A0x1781b571e2363017!2s10%20Anson%20Rd%2C%20Singapore%20079903!5e0!3m2!1sen!2sin!4v1723629468618!5m2!1sen!2sin"></iframe>
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.8288436496055!2d103.8432645747905!3d1.2760650987118065!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31da191343eb5b27%3A0x1781b571e2363017!2s10%20Anson%20Rd%2C%20Singapore%20079903!5e0!3m2!1sen!2sin!4v1723629468618!5m2!1sen!2sin"
+            ></iframe>
             <div className="p-4 flex gap-2 text-sm items-start">
               <FaMapMarkerAlt className="mt-1 text-black" />
               <span>
@@ -253,7 +275,8 @@ const HostContact = () => {
               title="India Office"
               className="w-full h-[25rem]"
               loading="lazy"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3844.7765664747362!2d73.83261987495516!3d15.496445985103028!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bbfc1d2e05cbef3%3A0xa643703ebcc4db43!2sBIZ%20Nest%20-%20Co-Working%20Space%2C%20Workations%20%26%20Meeting%20Zone%20in%20Goa!5e0!3m2!1sen!2sin!4v1723627911486!5m2!1sen!2sin"></iframe>
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3844.7765664747362!2d73.83261987495516!3d15.496445985103028!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bbfc1d2e05cbef3%3A0xa643703ebcc4db43!2sBIZ%20Nest%20-%20Co-Working%20Space%2C%20Workations%20%26%20Meeting%20Zone%20in%20Goa!5e0!3m2!1sen!2sin!4v1723627911486!5m2!1sen!2sin"
+            ></iframe>
             <div className="p-4 flex gap-2 text-sm items-start">
               <FaMapMarkerAlt className="mt-1 text-black" />
               <span>
@@ -272,7 +295,8 @@ const HostContact = () => {
           <div className="bg-white rounded shadow-lg w-full max-w-md p-6 relative">
             <button
               onClick={handleCloseModal}
-              className="absolute top-2 right-2 text-gray-600 hover:text-black">
+              className="absolute top-2 right-2 text-gray-600 hover:text-black"
+            >
               <AiOutlineClose size={20} />
             </button>
             <h3 className="text-lg font-bold mb-2">Success</h3>
@@ -282,7 +306,8 @@ const HostContact = () => {
             <div className="text-right">
               <button
                 onClick={handleCloseModal}
-                className="bg-black text-white px-4 py-2 rounded hover:opacity-90">
+                className="bg-black text-white px-4 py-2 rounded hover:opacity-90"
+              >
                 Close
               </button>
             </div>
