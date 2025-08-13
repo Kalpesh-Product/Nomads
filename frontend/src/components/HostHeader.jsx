@@ -8,7 +8,7 @@ import { IoCloseSharp } from "react-icons/io5";
 
 const HostHeader = () => {
   const navigate = useNavigate();
-    const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const links = [
     { name: "Modules", link: "/hosts/modules" },
     { name: "Themes", link: "/hosts/themes" },
@@ -16,7 +16,7 @@ const HostHeader = () => {
     { name: "Capital", link: "/hosts/capital" },
     { name: "Career", link: "/hosts/career" },
   ];
-    const handleNavigation = (path) => {
+  const handleNavigation = (path) => {
     navigate(path);
     setOpen(false);
   };
@@ -27,8 +27,7 @@ const HostHeader = () => {
         <div className="flex px-4 lg:px-0 justify-between items-center md:py-3  ">
           <div
             onClick={() => navigate("/")}
-            className="w-24 lg:w-36 overflow-x-hidden rounded-lg flex justify-between items-center cursor-pointer"
-          >
+            className="w-24 lg:w-36 overflow-x-hidden rounded-lg flex justify-between items-center cursor-pointer">
             <img
               src={logo}
               alt={"logo"}
@@ -43,40 +42,45 @@ const HostHeader = () => {
             ))}
           </ul>
           <div className="px-1 hidden xl:flex xl:gap-4 py-2">
-            <PrimaryButton
-              title={"Login"}
+            {/* <PrimaryButton
+              title={"SIGN IN"}
               padding={"py-2"}
               onClick={() => navigate("/hosts/login")}
               className={
                 "bg-white  flex text-black font-[500] capatilize hover:font-semibold hover:bg-white w-[7rem] px-6"
               }
-            />
+            /> */}
+            <a
+              href="https://wonofe.vercel.app"
+              className="bg-white flex items-center justify-center text-black font-[500] capitalize hover:font-semibold hover:bg-white w-[7rem] px-4 py-2 rounded-full">
+              SIGN IN
+            </a>
+
             <PrimaryButton
               title={"SIGN UP"}
               padding={"py-2"}
               handleSubmit={() => navigate("/hosts/signup")}
               className={
-                "bg-primary-blue  flex text-white font-[500] capatilize hover:font-semibold hover:bg-primary-blue transition-all w-[7rem] px-4"
+                "bg-primary-blue  flex text-white font-[500] capatilize hover:font-semibold hover:bg-blue-500 transition-all w-[7rem] px-4"
               }
             />
           </div>
           <div className="h-full px-2  lg:hidden">
             <button
               onClick={() => setOpen(true)}
-              className=" rounded-lg text-subtitle text-white"
-            >
+              className=" rounded-lg text-subtitle text-white">
               ☰
             </button>
           </div>
         </div>
       </Container>
-            <Drawer
+      <Drawer
         sx={{
           "& .MuiDrawer-paper": {
             width: {
               xs: "85%",
               sm: "400px",
-              backgroundColor : "black"
+              backgroundColor: "black",
             },
           },
         }}
@@ -93,10 +97,11 @@ const HostHeader = () => {
               </span>
             </div>
 
-   
             {links.map((item) => (
               <li key={item.id} className="items-center text-center">
-                <div onClick={() => handleNavigation(item.link)} className="py-4">
+                <div
+                  onClick={() => handleNavigation(item.link)}
+                  className="py-4">
                   <p className="text-white text-lg">{item.name}</p>
                 </div>
                 <div className="h-[0.2px] bg-gray-300"></div>

@@ -197,8 +197,7 @@ const GlobalListingsMap = () => {
                       key={cat.value}
                       type="button"
                       onClick={() => handleCategoryClick(cat.value)}
-                      className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full"
-                    >
+                      className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full">
                       {iconSrc ? (
                         <div className="h-10 w-full flex flex-col gap-0">
                           <img
@@ -221,8 +220,7 @@ const GlobalListingsMap = () => {
             {/* Search Form */}
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
-            >
+              className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center">
               <Controller
                 name="country"
                 control={control}
@@ -271,8 +269,7 @@ const GlobalListingsMap = () => {
               />
               <button
                 type="submit"
-                className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full"
-              >
+                className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full">
                 <IoSearch />
               </button>
             </form>
@@ -281,8 +278,7 @@ const GlobalListingsMap = () => {
           <div className="md:hidden flex w-full items-center justify-center my-4">
             <button
               onClick={() => setShowMobileSearch((prev) => !prev)}
-              className="bg-white shadow-md flex items-center w-full text-center justify-center font-medium text-secondary-dark border-2 px-6 py-2 rounded-full flex-col gap-2"
-            >
+              className="bg-white shadow-md flex items-center w-full text-center justify-center font-medium text-secondary-dark border-2 px-6 py-2 rounded-full flex-col gap-2">
               <span>
                 Search Results in{" "}
                 {formData?.location?.charAt(0).toUpperCase() +
@@ -300,8 +296,7 @@ const GlobalListingsMap = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex items-start justify-center md:hidden"
-            >
+              className="fixed inset-0 z-50 flex items-start justify-center md:hidden">
               <motion.div className="bg-white shadow-2xl overflow-auto p-4 rounded-b-3xl  h-screen  w-full">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-lg font-semibold">Search</h3>
@@ -310,8 +305,7 @@ const GlobalListingsMap = () => {
                       setShowMobileSearch((prev) => !prev);
                       setShowListings(false);
                     }}
-                    className="text-gray-500 text-xl"
-                  >
+                    className="text-gray-500 text-xl">
                     &times;
                   </button>
                 </div>
@@ -320,8 +314,7 @@ const GlobalListingsMap = () => {
                   animate={{ y: 0 }}
                   exit={{ y: "-100%" }}
                   transition={{ duration: 0.3, ease: "easeInOut" }}
-                  className="grid grid-cols-3 md:grid-cols-5 gap-2 mb-10"
-                >
+                  className="grid grid-cols-3 md:grid-cols-5 gap-2 mb-10">
                   {categoryOptions.map((cat) => {
                     const iconSrc = newIcons[cat.value];
 
@@ -330,8 +323,7 @@ const GlobalListingsMap = () => {
                         key={cat.value}
                         type="button"
                         onClick={() => handleCategoryClick(cat.value)}
-                        className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full"
-                      >
+                        className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full">
                         {iconSrc ? (
                           <div className="h-10 w-full flex flex-col gap-0">
                             <img
@@ -396,8 +388,7 @@ const GlobalListingsMap = () => {
                   />
                   <button
                     type="submit"
-                    className="w-full bg-[#FF5757] text-white py-3 rounded-full"
-                  >
+                    className="w-full bg-[#FF5757] text-white py-3 rounded-full">
                     <IoSearch className="inline mr-2" />
                     Search
                   </button>
@@ -442,8 +433,7 @@ const GlobalListingsMap = () => {
                             duration: 0.4,
                             delay: index * 0.1,
                             ease: "easeOut",
-                          }}
-                        >
+                          }}>
                           <ListingCard
                             item={item}
                             showVertical={true}
@@ -463,7 +453,7 @@ const GlobalListingsMap = () => {
                 </div>
               )}
             </div>
-            <div className="col-span-full lg:col-span-4 sticky top-24 h-[68%] pb-20">
+            <div className="col-span-full lg:col-span-4 sticky top-24 h-[68%] pb-10">
               <div className="rounded-xl h-full overflow-hidden">
                 {isLisitingLoading ? (
                   <SkeletonMap />
@@ -490,11 +480,12 @@ const GlobalListingsMap = () => {
           transition={{ duration: 0.3, ease: "easeInOut" }}
           className={`fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 px-6 rounded-t-3xl md:hidden ${
             showListings ? "h-[77vh]" : "h-[75vh]"
-          }`}
-        >
+          }`}>
           {!showMobileSearch && (
             <div className="flex justify-center py-2 sticky top-0 z-10 bg-white">
-              <div onClick={() => setShowListings(prev => !prev)} className="w-10 h-1 rounded-full bg-gray-400"></div>
+              <div
+                onClick={() => setShowListings((prev) => !prev)}
+                className="w-10 h-1 rounded-full bg-gray-400"></div>
             </div>
           )}
 
@@ -552,8 +543,7 @@ const GlobalListingsMap = () => {
                         <div className="mt-3 text-right">
                           <button
                             onClick={() => handleShowMoreClick(type)}
-                            className="text-primary-blue text-sm font-semibold hover:underline"
-                          >
+                            className="text-primary-blue text-sm font-semibold hover:underline">
                             View More →
                           </button>
                         </div>

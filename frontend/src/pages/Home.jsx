@@ -167,7 +167,7 @@ const Home = () => {
     },
   ];
   const amenities = [
-    { image: icons.desk, title: "PRIVATE DESK", isAvailable : true },
+    { image: icons.desk, title: "PRIVATE DESK", isAvailable: true },
     { image: icons.privatestorage, title: "Private Storage" },
     { image: icons.aircondition, title: "AIR CONDITIONing" },
     { image: icons.fastinternet, title: "High Speed Wi-Fi" },
@@ -361,23 +361,26 @@ const Home = () => {
                     Building the
                   </h1>
                 </div>
-                <div className="text-title font-medium">
-                  <h1 className="text-[clamp(1rem,7.3vw,3.3rem)] text-nowrap">
-                    Largets Community of
+                <div className="text-title ">
+                  <h1 className="text-[clamp(1rem,7.3vw,2.9rem)] text-nowrap">
+                    <span className="text-[#FF5757] uppercase font-semibold">
+                      Largest
+                    </span>{" "}
+                    <span className="font-medium">Community of</span>
                   </h1>
                 </div>
                 <div className="font-semibold">
-                  <h1 className="text-[clamp(4rem,7vw,16rem)]">NOMADS</h1>
+                  <h1 className="text-[clamp(4rem,7.5vw,16rem)]">NOMADS</h1>
                 </div>
               </div>
 
               <div className="flex flex-col gap-4 text-start text-pretty lg:text-center">
-                <p className=" text-gray-700 text-base md:text-lg">
+                <p className=" text-gray-700 text-base md:leading-7 md:text-[1.03rem]">
                   A global movement of remote workers, companies, creators,
                   entrepreneurs, hosts, investors who are redefining how the
                   world lives and works.
                 </p>
-                <p className=" text-gray-700 text-base md:text-lg">
+                <p className=" text-gray-700 text-base md:leading-7 md:text-[1.03rem]">
                   Bound by freedom, flexibility, and connection, nomads are
                   building the future—one destination at a time.
                 </p>
@@ -464,7 +467,12 @@ const Home = () => {
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3  lg:grid-cols-5 gap-x-16 md:gap-x-16 lg:gap-x-28 gap-y-10">
             {amenities.map((item, index) => (
-              <Amenities key={index} image={item.image} title={item.title} isAvailable={true} />
+              <Amenities
+                key={index}
+                image={item.image}
+                title={item.title}
+                isAvailable={true}
+              />
             ))}
           </div>
         </div>
