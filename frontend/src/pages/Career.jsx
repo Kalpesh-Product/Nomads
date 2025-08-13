@@ -46,7 +46,7 @@ const Career = () => {
                 <button
                   onClick={() => toggleAccordion(idx)}
                   className="w-full flex justify-between items-center py-6 text-left text-3xl font-bold focus:outline-none">
-                  {section.title}
+                  {section.categoryTitle}
                   <FaChevronDown
                     className={`text-gray-600 transition-transform duration-300 ${
                       isOpen ? "rotate-180" : ""
