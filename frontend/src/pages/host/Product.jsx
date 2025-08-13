@@ -177,7 +177,7 @@ const HostProduct = () => {
           </div>
         </div>
       </section>
-      <section className="w-full bg-[#E9F9FF] flex flex-col justify-center items-center gap-8 py-14 h-[80%] px-28 mt-[-2rem]">
+      <section className="w-full bg-[#E9F9FF] flex flex-col justify-center items-center gap-8 py-14 h-[80%] px-28 mb-[-2rem]">
         <ReactFitty>Few more suggestions for you</ReactFitty>
 
         <div className="grid grid-cols-2 justify-between gap-8">

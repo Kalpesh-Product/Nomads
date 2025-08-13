@@ -3,8 +3,16 @@ import JobCategory from "../../models/job-post/JobPostCategory.js";
 
 export const addNewJobPost = async (req, res, next) => {
   try {
-    const { categoryId, title, about, responsibilities, qualifications } =
-      req.body;
+    const {
+      categoryId,
+      title,
+      about,
+      responsibilities,
+      qualifications,
+      mode,
+      location,
+      type,
+    } = req.body;
 
     const category = await JobCategory.findById(categoryId).exec();
     if (!category) {
@@ -28,6 +36,9 @@ export const addNewJobPost = async (req, res, next) => {
       about: String(about || "").trim(),
       responsibilities: normalizeArray(responsibilities),
       qualifications: normalizeArray(qualifications),
+      jobMode: mode,
+      jobType: type,
+      location,
       isActive: true,
     });
 
