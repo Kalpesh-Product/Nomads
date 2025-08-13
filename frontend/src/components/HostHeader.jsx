@@ -7,11 +7,13 @@ import Container from "./Container";
 import { Drawer } from "@mui/material";
 import { IoCloseSharp } from "react-icons/io5";
 import GetStartedButton from "./GetStartedButton";
+import BnButton from "./BnButton";
 
 const HostHeader = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const links = [
+    { name: "Home", link: "/hosts" },
     { name: "Modules", link: "/hosts/modules" },
     { name: "Themes", link: "/hosts/themes" },
     { name: "Leads", link: "/hosts/leads" },
@@ -72,7 +74,7 @@ const HostHeader = () => {
           <div className="h-full px-2  lg:hidden">
             <button
               onClick={() => setOpen(true)}
-              className=" rounded-lg text-subtitle text-white"
+              className=" rounded-lg text-subtitle text-black"
             >
               ☰
             </button>
@@ -85,7 +87,7 @@ const HostHeader = () => {
             width: {
               xs: "85%",
               sm: "400px",
-              backgroundColor: "black",
+   
             },
           },
         }}
@@ -97,7 +99,7 @@ const HostHeader = () => {
           <ul className="flex flex-col gap-4 p-4 ">
             <div className="flex justify-end w-full">
               <span
-                className="text-title cursor-pointer text-secondary-light"
+                className="text-title cursor-pointer text-black"
                 onClick={() => setOpen(false)}
               >
                 <IoCloseSharp />
@@ -110,7 +112,7 @@ const HostHeader = () => {
                   onClick={() => handleNavigation(item.link)}
                   className="py-4"
                 >
-                  <p className="text-white text-lg">{item.name}</p>
+                  <p className="text-secondary-dark text-lg">{item.name}</p>
                 </div>
                 <div className="h-[0.2px] bg-gray-300"></div>
               </li>
@@ -130,9 +132,9 @@ const HostHeader = () => {
             </div>
              <div className="h-[0.2px] bg-gray-300"></div>
             <div className="flex justify-center p-4">
-              <PrimaryButton
-                title={"Sign In"}
-                externalStyles={"bg-primary-blue"}
+              <BnButton
+                title={"SIGN IN"}
+                externalStyles={"bg-[#FF5757]"}
                 handleSubmit={() => {
                   navigate("");
                   setOpen(false);
@@ -151,7 +153,7 @@ const HostHeader = () => {
                 {(new Date().getFullYear() + 1).toString().slice(-2)}
               </span>
               <span></span>
-              <span>BRIDG. All rights reserved</span>
+              <span>WoNo. All rights reserved</span>
             </div>
           </div>
         </div>

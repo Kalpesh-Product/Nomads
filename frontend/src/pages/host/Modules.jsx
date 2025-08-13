@@ -47,8 +47,10 @@ import {
   jobs,
   employeeManagement,
 } from "../../assets/icon_service_color";
+import { useNavigate } from "react-router-dom";
 
 export default function Modules() {
+  const navigate = useNavigate()
   const isMobile = useIsMobile();
   return (
     <Container>
@@ -74,7 +76,7 @@ export default function Modules() {
             </h4>
           </div>
           <div className="flex justify-end items-end">
-            <GetStartedButton title="Get Started" />
+            <GetStartedButton title="Get Started" handleSubmit={()=>navigate('/hosts/signup')}/>
           </div>
         </div>
 
@@ -204,7 +206,7 @@ export default function Modules() {
       </Container>
       <hr />
       <div className="flex justify-center w-full my-4">
-        <GetStartedButton title={"Get Started"} />
+        <GetStartedButton title={"Get Started"} handleSubmit={()=>navigate('/hosts/signup')}/>
       </div>
       <hr />
     </Container>

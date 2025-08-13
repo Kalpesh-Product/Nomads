@@ -13,6 +13,8 @@ import CompanyLogosMobile from "/hosts/leads-page/leads-companies-image-phone.pn
 
 import { GrFormCheckmark } from "react-icons/gr";
 import { ReactFitty } from "react-fitty";
+import { useNavigate } from "react-router-dom";
+import MySeperator from "../../components/MySeperator";
 
 const checklistItems = [
   "Google My Business",
@@ -69,6 +71,7 @@ const contentItems = [
 ];
 
 const Leads = () => {
+  const navigate = useNavigate()
   return (
     <div>
       {/* Top Text section */}
@@ -82,7 +85,7 @@ const Leads = () => {
             </h2>
           </div>
           <div className="flex flex-row lg:justify-end md:justify-end  sm:justify-center xs:justify-center items-center py-6">
-            <button className="bg-black text-white px-8 py-2 rounded-full">
+            <button onClick={()=>navigate('/hosts/signup')} className="bg-black text-white px-8 py-2 rounded-full">
               Get Started
             </button>
           </div>
@@ -149,6 +152,7 @@ const Leads = () => {
           </div>
         </div>
       </Container>
+      <MySeperator />
 
       {/* Automated Google Leads Section */}
       <Container>
@@ -171,6 +175,8 @@ const Leads = () => {
         </div>
       </Container>
 
+      <MySeperator />
+
       {/* Run & Scale Grid Section */}
       <Container >
         <div>
@@ -192,7 +198,7 @@ const Leads = () => {
             ))}
           </div>
           <div className="flex lg:justify-end xs:justify-center items-center lg:px-8">
-            <button className="bg-black text-white px-8 py-2 rounded-full">
+            <button onClick={()=>navigate('/hosts/signup')} className="bg-black text-white px-8 py-2 rounded-full">
               Get Started
             </button>
           </div>

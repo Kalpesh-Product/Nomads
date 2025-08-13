@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import GetStartedButton from "../../components/GetStartedButton";
 import Container from "../../components/Container";
+import MySeperator from "../../components/MySeperator";
 
 const themes = [
   {
@@ -122,14 +123,14 @@ const supportItems = [
 const Themes = () => {
   const navigate = useNavigate();
   return (
-    <div className=" flex flex-col  text-secondary-dark justify-center items-center">
+    <div className="   text-secondary-dark justify-center items-center">
       <Container>
         <section className="flex flex-col items-end justify-center gap-4 leading-[1.3] text-secondary-dark ">
           <h1 className="text-[clamp(1.62rem,4.6vw,4.5rem)] font-medium">
             Choose the best Responsive Website Theme for your business
           </h1>
 
-          <GetStartedButton />
+          <GetStartedButton handleSubmit={()=>navigate('/hosts/signup')}/>
         </section>
       </Container>
 
@@ -166,7 +167,7 @@ const Themes = () => {
               ))}
             </div>
             <div className="flex justify-center items-center">
-              <GetStartedButton />
+              <GetStartedButton handleSubmit={()=>navigate('/hosts/signup')} />
             </div>
           </div>
         </Container>
@@ -187,7 +188,7 @@ const Themes = () => {
                 <li>Full-stack web dev tools for custom functionality</li>
               </ul>
               <div className="flex justify-center lg:justify-start w-full">
-                <GetStartedButton />
+                <GetStartedButton handleSubmit={()=>navigate('/hosts/signup')}/>
               </div>
             </div>
             <div className="w-full lg:w-[50%] h-full">
@@ -200,7 +201,7 @@ const Themes = () => {
           </div>
         </Container>
       </section>
-      <hr className="border-gray-300" />
+         <MySeperator />
       {/*Website Builder */}
       <Container>
         <div className="flex flex-col justify-between items-center gap-14">
@@ -216,12 +217,12 @@ const Themes = () => {
             ))}
           </div>
           <div>
-            <GetStartedButton />
+            <GetStartedButton handleSubmit={()=>navigate('/hosts/signup')}/>
           </div>
         </div>
       </Container>
 
-      <hr className="border-t border-gray-300" />
+      <MySeperator />
 
       {/*We're here*/}
       <Container>

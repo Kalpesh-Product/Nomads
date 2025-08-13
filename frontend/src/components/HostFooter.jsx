@@ -5,6 +5,7 @@ import { FaTwitter, FaLinkedin, FaFacebook } from "react-icons/fa";
 
 import { FaGlobe, FaRupeeSign, FaFacebookF, FaInstagram } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
+import Container from "./Container";
 
 const HostFooter = () => {
   const footerSections = [
@@ -42,8 +43,8 @@ const HostFooter = () => {
     <footer className="w-full bg-gray-100 text-black backdrop-blur-md  flex flex-col justify-center items-center gap-0  pb-0 md:pb-0   shadow-lg ">
       {/* <div className="w-full flex flex-wrap md:flex-wrap lg:flex-nowrap justify-between items-center pt-12 pb-12 px-4 md:px-[7.5rem]"> */}
       <div className="w-full flex flex-wrap md:flex-wrap lg:flex-nowrap justify-between items-center pt-12 pb-8 px-4 md:px-[7.5rem]">
-        <div className="flex flex-col justify-center md:flex-1 md:justify-center md:items-center lg:justify-start lg:items-start mb-8 lg:mb-0">
-          <div className="w-70 md:w-80 h-full">
+        <div className="flex flex-col w-full lg:w-fit justify-center items-center md:flex-1 md:justify-center md:items-center lg:justify-start lg:items-start mb-8 lg:mb-0">
+          <div className="w-full md:w-80 h-full flex flex-col lg:justify-start lg:items-start justify-center items-center">
             <img
               src={logo}
               onClick={() => {
@@ -60,7 +61,8 @@ const HostFooter = () => {
               INTERNATIONAL PLAZA SINGAPORE – 079903 <br />
               <Link
                 to="mailto:response@wono.co"
-                className="text-primary-blue lowercase hover:underline">
+                className="text-primary-blue lowercase hover:underline"
+              >
                 response@wono.co
               </Link>
             </p>
@@ -72,12 +74,13 @@ const HostFooter = () => {
                 </div> */}
           </div>
         </div>
-        <div className=" ">
+        <div className="lg:w-fit w-full">
           <div className="w-full md:w-full lg:w-fit grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-x-8 lg:gap-y-0  lg:mr-5">
             {footerSections.map((section, idx) => (
               <div
                 key={idx}
-                className="flex flex-col  justify-center items-center text-start lg:justify-start lg:items-center">
+                className="flex flex-col  justify-center items-center text-start lg:justify-start lg:items-center"
+              >
                 {/* <h3 className="font-semibold text-lg mb-2">
                 {section.heading.toUpperCase()}
               </h3> */}
@@ -85,7 +88,8 @@ const HostFooter = () => {
                   <Link
                     key={i}
                     to={linkObj.link}
-                    className="text-sm  text-black opacity-80 hover:opacity-100 hover:text-gray-500 transition-all duration-200 cursor-pointer uppercase p-4">
+                    className="text-sm  text-black opacity-80 hover:opacity-100 hover:text-gray-500 transition-all duration-200 cursor-pointer uppercase p-4"
+                  >
                     {linkObj.name}
                   </Link>
                 ))}
@@ -96,15 +100,21 @@ const HostFooter = () => {
       </div>
       {/* <div className="w-full h-[0.3px] bg-secondary border-t border-white" /> */}
       {/* <div className="w-full text-center flex flex-col lg:mb-0 py-6 border-t-2 border-gray-700"> */}
-      <div className="w-full text-center flex flex-col lg:mb-0 py-6 border-t-2 border-white">
-        <div className="flex justify-center items-center flex-col md:flex-row lg:flex-row gap-2 text-small md:text-base">
-          <span>
-            &copy; Copyright {new Date().getFullYear()} -{" "}
-            {(new Date().getFullYear() + 1).toString().slice(-2)} <span></span>
-          </span>{" "}
-          <span> WONOCO PRIVATE LIMITED - SINGAPORE. All Rights Reserved.</span>
+      <Container padding={false}>
+        <div className="w-full text-center flex flex-col lg:mb-0 py-6 border-t-2 border-white">
+          <div className="flex justify-center items-center flex-col md:flex-row lg:flex-row gap-2 text-small md:text-base">
+            <span>
+              &copy; Copyright {new Date().getFullYear()} -{" "}
+              {(new Date().getFullYear() + 1).toString().slice(-2)}{" "}
+              <span></span>
+            </span>{" "}
+            <span className="text-tiny lg:text-content">
+              {" "}
+              WONOCO PRIVATE LIMITED - SINGAPORE. All Rights Reserved.
+            </span>
+          </div>
         </div>
-      </div>
+      </Container>
       {/* Footer Bottom Section */}
       <div className="w-full flex flex-col md:flex-row justify-between items-center text-[10px] md:text-xs px-4 py-4 text-gray-800 bg-gray-50 font-semibold">
         {/* Left Links */}

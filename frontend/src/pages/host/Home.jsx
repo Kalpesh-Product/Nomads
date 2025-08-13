@@ -7,13 +7,15 @@ import images from "../../assets/images";
 import FeatureCard from "../../components/FeatureCard";
 import { ReactFitty } from "react-fitty";
 import GetStartedButton from "../../components/GetStartedButton";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import MySeperator from "../../components/MySeperator";
 
 const HostHome = () => {
   // mobile screen for globe responsiveness
   const ismobile = window.innerWidth < 769;
   const isTablet = window.innerWidth < 1025;
   const isLaptop = window.innerWidth < 1441;
+  const navigate = useNavigate();
   const amenities = [
     // Group 1
     { id: 1, title: "No Code Website", icon: images.website },
@@ -123,12 +125,15 @@ const HostHome = () => {
               </p>
             </div>
             <div className="flex justify-center items-center w-full h-full my-12">
-              <div className="relative w-full text-center hover:font-semibold transition-all cursor-pointer">
-                <p className="uppercase my-0 lg:my-16">It's Completely free</p>
+              <div
+                onClick={() => navigate("signup")}
+                className="relative hover:font-semibold w-full text-center  cursor-pointer"
+              >
+                <p className="uppercase my-0  lg:my-16">It's Completely free</p>
                 <img
                   src="/blue-circle.png"
                   alt="blue circle"
-                  className="absolute -top-6 left-[22%] lg:top-8 lg:left-[41%] lg:right-6 w-48 h:16 lg:w-56 lg:h-30"
+                  className="absolute  -top-6 left-[22%] lg:top-8 lg:left-[41%] lg:right-6 w-48 h:16 lg:w-56 lg:h-30"
                 />
               </div>
             </div>
@@ -139,7 +144,10 @@ const HostHome = () => {
       <section className="bg-black">
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-2 lg:h-[70vh] font-hero">
-            <div className="min-w-full h-[50vh] lg:h-full" style={{ textAlign: "left" }}>
+            <div
+              className="min-w-full h-[50vh] lg:h-full"
+              style={{ textAlign: "left" }}
+            >
               <Canvas
                 className="canvas"
                 camera={{
@@ -168,7 +176,7 @@ const HostHome = () => {
                 “NOMAD COMMERCE”{" "}
               </p>
               <div
-               className="w-1/2 lg:w-fit"
+                className="w-1/2 lg:w-fit"
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -177,9 +185,11 @@ const HostHome = () => {
               >
                 <GetStartedButton
                   title="CONNECT WITH US"
-                  externalStyles={"bg-white text-seconadary-dark w-full text-subtitle lg:text-content"}
+                  externalStyles={
+                    "bg-white text-seconadary-dark w-full text-subtitle lg:text-content"
+                  }
                   handleSubmit={() => {
-                    navigate("/register");
+                    navigate("signup");
                     window.scrollTo({ top: 0, behavior: "instant" });
                   }}
                 />
@@ -205,6 +215,9 @@ const HostHome = () => {
         </section>
       </Container>
       {/* Key Modules */}
+      <Container padding={false}>
+        <hr className="border-t-2 border-gray-300"/>
+      </Container>
       <section>
         <Container>
           <div className="flex flex-col gap-16">
@@ -238,11 +251,15 @@ const HostHome = () => {
             </div>
 
             <div className="flex w-full justify-center lg:justify-end pr-0 lg:pr-20">
-              <GetStartedButton title={"Get Started"} />
+              <GetStartedButton
+                title={"Get Started"}
+                handleSubmit={() => navigate("signup")}
+              />
             </div>
           </div>
         </Container>
       </section>
+      <MySeperator />
       <section>
         <Container>
           <div className="flex flex-col leading-tight">
@@ -274,13 +291,17 @@ const HostHome = () => {
               ))}
             </div>
             <div className="text-center my-4">
-              <NavLink className={" hover:underline hover:text-primary-blue"}>
+              <NavLink
+                to={"themes"}
+                className={" hover:underline hover:text-primary-blue"}
+              >
                 View More
               </NavLink>
             </div>
           </div>
         </Container>
       </section>
+            <MySeperator />
       <section>
         <Container>
           <div className="flex flex-col gap-16">
