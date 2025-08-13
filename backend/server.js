@@ -24,6 +24,8 @@ import privateStayPocRoutes from "./routes/privateStayRoutes/privateStayPocRoute
 import cafeRoutes from "./routes/cafeRoutes/cafeRoutes.js";
 import cafeReviewRoutes from "./routes/cafeRoutes/cafeReviews.js";
 import cafePocRoutes from "./routes/cafeRoutes/cafePocRoutes.js";
+import workationRoutes from "./routes/workationRoutes/companyRoutes.js";
+import workationPocRoutes from "./routes/workationRoutes/pocRoutes.js";
 import formRoutes from "./routes/formRoutes.js";
 import jobRoutes from "./routes/jobRoutes.js";
 import mongoose from "mongoose";
@@ -53,6 +55,8 @@ app.use("/api/private-stay/company", privateStayCompanyRoutes);
 app.use("/api/private-stay/units", privateStayUnitRoutes);
 app.use("/api/private-stay/review", privateStayReviewRoutes);
 app.use("/api/private-stay/poc", privateStayPocRoutes);
+app.use("/api/workation/company", workationRoutes);
+app.use("/api/workation/poc", workationPocRoutes);
 app.use("/api/cafe/company", cafeRoutes);
 app.use("/api/cafe/review", cafeReviewRoutes);
 app.use("/api/cafe/poc", cafePocRoutes);
