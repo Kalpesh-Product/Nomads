@@ -1,9 +1,8 @@
-import React from 'react'
 import { Outlet } from 'react-router-dom'
 
 const NomadLayout = () => {
   return (
-    <div>
+    <div className='py-4'>
       <Outlet />
     </div>
   )

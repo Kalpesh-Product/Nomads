@@ -46,7 +46,7 @@ const SaaSFeatureBlock = ({
       }}
     >
       <div
-        className={`flex gap-2 items-start justify-between flex-col ${rowReverse ? "flex-col lg:flex-row-reverse" : "flex-col lg:flex-row"} `}
+        className={`flex gap-2 items-center w-full justify-between flex-col ${rowReverse ? "flex-col lg:flex-row-reverse" : "flex-col lg:flex-row"} `}
       >
         {/* Description Column */}
         <div
@@ -59,7 +59,7 @@ const SaaSFeatureBlock = ({
         >
           <div className="relative">
             <h1 style={{ padding: 0 }}>
-              <span className="flex flex-col items-center font-bold text-lg uppercase">
+              <span className="flex flex-col items-center font-semibold text-subtitle uppercase">
                 {title}
               </span>
             </h1>
@@ -71,7 +71,7 @@ const SaaSFeatureBlock = ({
               />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-8 py-4 md:py-5">
+          <div className="grid grid-cols-2 gap-8 gap-x-24 py-4 md:py-5 w-full">
             {description1.map((item, index) => (
               <FeatureCard key={index} icon={item.image} title={item.title} />
             ))}

@@ -1,11 +1,7 @@
 const FeatureCard = ({ title, icon }) => {
   return (
     <div
-      style={{
-        // padding: "1.5rem 0 1.5rem 0",
-        width: "100%",
-        borderRadius: "1rem",
-      }}
+      className="w-full rounded-xl"
     >
       <div className="flex justify-center items-center gap-4 py-4 flex-col border-b-4 border-y-gray-200 transition-all hover:border-black">
         <div
@@ -25,7 +21,7 @@ const FeatureCard = ({ title, icon }) => {
         </div>
 
         <p
-          className="text-secondary-dark text-tiny ;g:text-small"
+          className="text-secondary-dark text-tiny lg:text-small"
          
         >
           {title.toUpperCase()}

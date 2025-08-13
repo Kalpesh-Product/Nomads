@@ -4,7 +4,7 @@ import GetStartedButton from "../../components/GetStartedButton";
 import SaaSFeatureBlock from "../../components/SaaSFeatured";
 import FinanceImage from "../../assets/images-service/finance-final.png";
 import useIsMobile from "../../hooks/useIsMobile.js";
-import FrontendImage from "../../assets/images-service/frontend-2.png"
+import FrontendImage from "../../assets/images-service/frontend-2.png";
 import TicketsImage from "../../assets/images-service/meetings-final.jpeg";
 import SalesImage from "../../assets/images-service/sales-final.png";
 import HrImage from "../../assets/images-service/hr-img-2.jpeg";
@@ -51,7 +51,7 @@ import {
 export default function Modules() {
   const isMobile = useIsMobile();
   return (
-    <Container padding={false}>
+    <Container>
       <div className="flex flex-col gap-8 w-full">
         <div className="flex flex-col gap-8">
           <div className="text-center">
@@ -60,17 +60,18 @@ export default function Modules() {
             </h1>
           </div>
           <div>
-            <h4 className="text-lg lg:text-[1.8rem] lg:leading-[2.75rem] text-start md:text-center lg:text-center ">
-            No Code Website <span className="text-primary-blue"></span>
-            <span className="text-primary-blue">+</span> Booking Engine{" "}
-            <span className="text-primary-blue">+</span> Payment Gateway{" "}
-            <span className="text-primary-blue">+</span> Accounting{" "}
-            <span className="text-primary-blue">+</span> Reports{" "}
-            <span className="text-primary-blue">+</span> Analytics{" "}
-            <span className="text-primary-blue">+</span> HR Support{" "}
-            <span className="text-primary-blue">+</span> Customer & Client Management{" "}
-            <span className="text-primary-blue">+</span> Marketing and more.
-          </h4>
+            <h4 className="text-lg lg:text-[1.8rem] lg:leading-[2.75rem] text-start md:text-center lg:text-start ">
+              No Code Website <span className="text-primary-blue"></span>
+              <span className="text-primary-blue">+</span> Booking Engine{" "}
+              <span className="text-primary-blue">+</span> Payment Gateway{" "}
+              <span className="text-primary-blue">+</span> Accounting{" "}
+              <span className="text-primary-blue">+</span> Reports{" "}
+              <span className="text-primary-blue">+</span> Analytics{" "}
+              <span className="text-primary-blue">+</span> HR Support{" "}
+              <span className="text-primary-blue">+</span> Customer & Client
+              Management <span className="text-primary-blue">+</span> Marketing
+              and more.
+            </h4>
           </div>
           <div className="flex justify-end items-end">
             <GetStartedButton title="Get Started" />
@@ -79,10 +80,7 @@ export default function Modules() {
 
         <hr className="border-t-4" />
       </div>
-      <div
-        data-aos="fade-up"
-        className="SaaS-featured-master flex flex-col gap-4 py-0 lg:py-4"
-      >
+      <div className=" flex flex-col gap-4 py-0 lg:py-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-1">
           <div className=" flex flex-col gap-2">
             <div className="flex flex-col relative text-card-title md:text-3xl font-medium my-3 w-full">
@@ -126,92 +124,86 @@ export default function Modules() {
          lg:mt-10"
         />
       </div>
-      <div
-        data-aos="fade-up"
-        className="SaaS-featured-master"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "4rem",
-        }}
-      >
-        <SaaSFeatureBlock
-          title="Frontend"
-          description1={[
-            { title: "No Code Website", image: website },
-            { title: "Booking Engine", image: bookingEngineCM },
-            { title: "Payment Gateway", image: paymentGateway },
-            { title: "Lead Management", image: leadGenerationSM },
-            { title: "AI SEO", image: aiSeoCM },
-            { title: "Notifications", image: notifications },
-          ]}
-          image={FrontendImage}
-          width={"100%"}
-          imageFit={"fill"}
-          mobileHeight={"11rem"}
-          imagePosition={"left top"}
-          rowReverse={false}
-        />
-        <hr />
-        <SaaSFeatureBlock
-          title="Apps"
-          description1={[
-            { title: "Tickets", image: ticketRaisingCM },
-            { title: "Tasks", image: customerProfile },
-            { title: "Meeting Rooms", image: meetingRoomsCM },
-            { title: "Visitors", image: visitorCM },
-            { title: "Assets", image: eSignHR },
-            { title: "Calendar", image: calendar },
-          ]}
-          image={TicketsImage}
-          rowReverse={true}
-        />
-        <hr />
-        <SaaSFeatureBlock
-          title="Sales"
-          description1={[
-            { title: "Revenue Reports", image: reports },
-            { title: "Lead Generation", image: leadGenerationSM },
-            { title: "Sales Inventory", image: inventory },
-            { title: "Occupancy", image: occupancy },
-            { title: "Manage Clients", image: clientManagement },
-            { title: "Profiling", image: customerProfile },
-          ]}
-          image={SalesImage}
-          rowReverse={false}
-        />
-        <hr />
-        <SaaSFeatureBlock
-          title="Finance"
-          description1={[
-            { title: "P&L Report", image: profitLoss },
-            { title: "Cashflow", image: cashflowFA },
-            { title: "Invoicing", image: invoicingFA },
-            { title: "Collections", image: projectionsFA },
-            { title: "Historical Data", image: taxesFA },
-            { title: "Budgeting", image: expense },
-          ]}
-          image={FinanceImage}
-          imageFit={"cover"}
-          rowReverse={true}
-        />
-        <hr />
-        <SaaSFeatureBlock
-          title="Human Resources"
-          description1={[
-            { title: "Manage Employees", image: employeeManagement },
-            { title: "Payroll", image: payrollHR },
-            { title: "Attendance", image: attendanceHR },
-            { title: "Budgeting", image: expense },
-            { title: "Performance", image: performanceHR },
-            { title: "Jobs", image: jobs },
-          ]}
-          image={HrImage}
-          rowReverse={false}
-        />
-      </div>
+      <Container padding={false}>
+        <div data-aos="fade-up" className="flex flex-col gap-8">
+          <SaaSFeatureBlock
+            title="Frontend"
+            description1={[
+              { title: "No Code Website", image: website },
+              { title: "Booking Engine", image: bookingEngineCM },
+              { title: "Payment Gateway", image: paymentGateway },
+              { title: "Lead Management", image: leadGenerationSM },
+              { title: "AI SEO", image: aiSeoCM },
+              { title: "Notifications", image: notifications },
+            ]}
+            image={FrontendImage}
+            width={"100%"}
+            imageFit={"fill"}
+            mobileHeight={"11rem"}
+            imagePosition={"left top"}
+            rowReverse={false}
+          />
+          <hr />
+          <SaaSFeatureBlock
+            title="Apps"
+            description1={[
+              { title: "Tickets", image: ticketRaisingCM },
+              { title: "Tasks", image: customerProfile },
+              { title: "Meeting Rooms", image: meetingRoomsCM },
+              { title: "Visitors", image: visitorCM },
+              { title: "Assets", image: eSignHR },
+              { title: "Calendar", image: calendar },
+            ]}
+            image={TicketsImage}
+            rowReverse={true}
+          />
+          <hr />
+          <SaaSFeatureBlock
+            title="Sales"
+            description1={[
+              { title: "Revenue Reports", image: reports },
+              { title: "Lead Generation", image: leadGenerationSM },
+              { title: "Sales Inventory", image: inventory },
+              { title: "Occupancy", image: occupancy },
+              { title: "Manage Clients", image: clientManagement },
+              { title: "Profiling", image: customerProfile },
+            ]}
+            image={SalesImage}
+            rowReverse={false}
+          />
+          <hr />
+          <SaaSFeatureBlock
+            title="Finance"
+            description1={[
+              { title: "P&L Report", image: profitLoss },
+              { title: "Cashflow", image: cashflowFA },
+              { title: "Invoicing", image: invoicingFA },
+              { title: "Collections", image: projectionsFA },
+              { title: "Historical Data", image: taxesFA },
+              { title: "Budgeting", image: expense },
+            ]}
+            image={FinanceImage}
+            imageFit={"cover"}
+            rowReverse={true}
+          />
+          <hr />
+          <SaaSFeatureBlock
+            title="Human Resources"
+            description1={[
+              { title: "Manage Employees", image: employeeManagement },
+              { title: "Payroll", image: payrollHR },
+              { title: "Attendance", image: attendanceHR },
+              { title: "Budgeting", image: expense },
+              { title: "Performance", image: performanceHR },
+              { title: "Jobs", image: jobs },
+            ]}
+            image={HrImage}
+            rowReverse={false}
+          />
+        </div>
+      </Container>
       <hr />
-      <div>
+      <div className="flex justify-center w-full my-4">
         <GetStartedButton title={"Get Started"} />
       </div>
       <hr />
