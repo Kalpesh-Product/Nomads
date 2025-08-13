@@ -9,7 +9,7 @@ import {
 } from "react-icons/fa";
 import sliderImageOne from "../assets/main-slider-images/slider-image-1.png";
 import sliderImageTwo from "../assets/main-slider-images/slider-image-2.png";
-import logo from "../assets/WONO_LOGO_white _TP.png";
+import logo from "../assets/wono-logo-white.png";
 
 import "keen-slider/keen-slider.min.css";
 import { useKeenSlider } from "keen-slider/react";

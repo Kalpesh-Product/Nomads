@@ -7,8 +7,8 @@ import HostJobApplicationForm from "./host/HostJobApplicationForm";
 const JobDetails = () => {
   const { id } = useParams();
   const [activeTab, setActiveTab] = useState("description");
- const {pathname} = useLocation();
- const isHost = pathname.includes("host")
+  const { pathname } = useLocation();
+  const isHost = pathname.includes("host");
 
   // Ideally this would come from context, API, or match from jobRoles
   const jobTitle = "UI Designer"; // Temporary placeholder
@@ -28,7 +28,8 @@ const JobDetails = () => {
                 ? "border-b-2 border-black"
                 : "text-primary-blue"
             }`}
-            onClick={() => setActiveTab("description")}>
+            onClick={() => setActiveTab("description")}
+          >
             JOB DESCRIPTION
           </button>
           <button
@@ -37,7 +38,8 @@ const JobDetails = () => {
                 ? "border-b-2 border-black "
                 : "text-primary-blue"
             }`}
-            onClick={() => setActiveTab("apply")}>
+            onClick={() => setActiveTab("apply")}
+          >
             APPLY NOW
           </button>
         </div>
@@ -103,8 +105,10 @@ const JobDetails = () => {
               if unable to apply now
             </p>
           </div>
+        ) : isHost ? (
+          <HostJobApplicationForm />
         ) : (
-          isHost ? <HostJobApplicationForm/> : <JobApplicationForm />
+          <JobApplicationForm />
         )}
       </div>
     </Container>

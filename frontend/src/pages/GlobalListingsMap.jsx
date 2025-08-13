@@ -2,9 +2,6 @@ import { Box, MenuItem, Skeleton, TextField } from "@mui/material";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { CiSearch } from "react-icons/ci";
-import { AiFillStar } from "react-icons/ai";
-import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import Container from "../components/Container";
 import { NavLink, useNavigate } from "react-router-dom";
 import Map from "../components/Map";
@@ -100,6 +97,7 @@ const GlobalListingsMap = () => {
   const [showListings, setShowListings] = useState(false);
   const onSubmit = (data) => {
     locationData(data);
+    setShowMobileSearch(false);
   };
   const { handleSubmit, control, reset, setValue, getValues, watch } = useForm({
     defaultValues: {
@@ -411,7 +409,7 @@ const GlobalListingsMap = () => {
       </div>
       <Container padding={false}>
         <div className="">
-          <div className="font-semibold text-md  grid grid-cols-9 gap-4 min-h-screen">
+          <div className="font-semibold text-md  grid grid-cols-9 gap-4 min-h-screen pt-3">
             <div className="hidden lg:block custom-scrollbar-hide lg:col-span-5">
               {isLisitingLoading ? (
                 Array.from({ length: 4 }).map((_, i) => (
@@ -419,18 +417,6 @@ const GlobalListingsMap = () => {
                 ))
               ) : (
                 <div className="col-span-full mb-6">
-                  {/* <h2 className="text-subtitle text-secondary-dark font-semibold mb-5">
-                    Search results for{" "}
-                    {formData?.location
-                      ? formData.location.charAt(0).toUpperCase() +
-                        formData.location.slice(1)
-                      : "Unknown"},{" "}
-                    {formData?.country
-                      ? formData.country.charAt(0).toUpperCase() +
-                        formData.country.slice(1)
-                      : "Unknown"}{" "}
-                  </h2> */}
-
                   <PaginatedGrid
                     data={isLisitingLoading ? skeletonArray : listingsData}
                     allowScroll={false}
@@ -502,30 +488,18 @@ const GlobalListingsMap = () => {
           }}
           exit={{ y: "100%" }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
-          drag={!showMobileSearch && "y"}
-          dragConstraints={{ top: 0, bottom: 10 }}
-          dragElastic={0.2}
-          onDragEnd={(event, info) => {
-            if (info.offset.y > 100) {
-              // drag down to close
-              setShowListings(false);
-            } else if (info.offset.y < -100) {
-              // drag up to expand fully
-              setShowListings(true);
-            }
-          }}
           className={`fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 px-6 rounded-t-3xl md:hidden ${
             showListings ? "h-[77vh]" : "h-[75vh]"
           }`}
         >
           {!showMobileSearch && (
             <div className="flex justify-center py-2 sticky top-0 z-10 bg-white">
-              <div className="w-10 h-1 rounded-full bg-gray-400"></div>
+              <div onClick={() => setShowListings(prev => !prev)} className="w-10 h-1 rounded-full bg-gray-400"></div>
             </div>
           )}
 
           {!showMobileSearch && (
-            <div className="custom-scrollbar-hide">
+            <div className="custom-scrollbar-hide py-6">
               {isLisitingLoading ? (
                 Array.from({ length: 4 }).map((_, i) => (
                   <SkeletonCard key={i} />

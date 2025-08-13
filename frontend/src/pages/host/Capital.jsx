@@ -42,8 +42,8 @@ const Capital = () => {
   return (
     <div>
       {/* Top banner section */}
-      <Container>
-        <div>
+      <Container padding={false}>
+        <div className="pt-16 pb-11">
           <h1 className="lg:text-[2.5rem] text-host text-center lg:leading-[3rem] font-medium">
             We{" "}
             <span className="hero_animation-container">
@@ -60,19 +60,19 @@ const Capital = () => {
           <h1 className="lg:text-[2.5rem] text-host text-center lg:leading-[3rem] font-medium">
             legandary Companies.
           </h1>
-          <div className="flex lg:justify-end">
+          <div className="flex lg:justify-end pt-6">
             <GetStartedButton title="CONNECT WITH US" />
           </div>
         </div>
       </Container>
 
       {/* 4 images section */}
-      <div className="bg-black text-white">
-        <Container>
-          <div className="grid lg:grid-cols-4 grid-cols-2 gap-4">
+      <div className="bg-black text-white pt-12">
+        <Container padding={false}>
+          <div className="grid lg:grid-cols-4 grid-cols-2 gap-5">
             {investorData.map((item, index) => (
               <div key={index}>
-                <div className="uppercase">{item.title}</div>
+                <h3 className="uppercase mb-5 text-xl">{item.title}</h3>
                 <div className="rounded-[0.625rem] ">
                   <img
                     src={item.imgSrc}
@@ -80,7 +80,7 @@ const Capital = () => {
                     className="rounded-[0.625rem] "
                   />
                 </div>
-                <div>{item.content}</div>
+                <p className="py-4 pl-1 text-[0.94rem]">{item.content}</p>
               </div>
             ))}
           </div>
@@ -127,16 +127,18 @@ const Capital = () => {
 
       {/* Systematic & Seamless section */}
       <div className="bg-black text-white">
-        <Container>
+        <Container padding={false}>
           <div>
-            <h1 className="text-[3.563rem] font-normal text-center">
-              <span className="text-[#0aa9ef]">Systematic & seamless</span>{" "}
-              fundraising with accurate projections and cashflow trends.
-            </h1>
-            <div className="text-center">
-              <button className="bg-white text-black px-8 py-2 rounded-full">
-                Get Started
-              </button>
+            <div className="py-16 flex flex-col gap-10 items-center">
+              <h1 className="text-[3.563rem] font-normal text-center leading-[4.3rem]">
+                <span className="text-[#0aa9ef]">Systematic & seamless</span>{" "}
+                fundraising with accurate projections and cashflow trends.
+              </h1>
+              <div className="text-center">
+                <button className="bg-white text-black px-8 py-2 rounded-full">
+                  Get Started
+                </button>
+              </div>
             </div>
             <div>
               <img

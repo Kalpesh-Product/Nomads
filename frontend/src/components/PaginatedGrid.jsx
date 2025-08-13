@@ -43,7 +43,7 @@ const PaginatedGrid = ({
   return (
     <div className="flex justify-between flex-col rounded-xl">
 
-    <div className={`flex flex-col gap-4 ${allowScroll ? "min-h-[65vh] h-[75vh] overflow-y-auto max-h-screen" : ""} justify-between custom-scrollbar-hide`}>
+    <div className={`flex flex-col gap-4 h-full justify-between custom-scrollbar-hide`}>
       <div className={`grid ${columns} gap-2`}>
         {currentData.length ? (
           currentData.map((item, i) => renderItem(item, i))

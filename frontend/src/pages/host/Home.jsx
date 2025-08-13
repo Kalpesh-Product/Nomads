@@ -79,52 +79,58 @@ const HostHome = () => {
   ];
   return (
     <main>
-      <section className="bg-[#f7feec]">
+      <section className="bg-[#f7feec] mb-0 lg:mb-0">
         <Container>
-          <div className="flex justify-center items-center ">
-            <div className="mb-0 lg:mb-20 w-full">
-              <h1 className="font-semibold text-[clamp(1rem,6.5vw,7rem)]">
-                Introducing
-              </h1>{" "}
-            </div>
-            <div className="leading-normal w-full">
-              <div className="relative">
-                <h1 className="font-semibold text-[clamp(1rem,6.3vw,6rem)] text-nowrap">
-                  N-Commerce
-                </h1>
-                <img
-                  className="absolute w-full -bottom-6 left-0 h-1/2"
-                  src="/blue-line.png"
-                  alt="underline"
-                />
+          <div className="lg:space-y-0">
+            <div className="flex flex-col lg:flex-row justify-center items-center ">
+              <div className="mb-0 lg:mb-20 text-center w-full">
+                <h1 className="font-semibold text-[clamp(3.3rem,6.5vw,7rem)]">
+                  Introducing
+                </h1>{" "}
               </div>
-              <p className="text-[clamp(1rem,3.2vw,3rem)]">
-                "<span>Wo</span>rld <span>No</span>mad <span>Co</span>mmerce"
+              <div className="leading-normal text-center w-full">
+                <div className="relative mb-8 lg:mb-0">
+                  <h1 className="font-semibold text-[clamp(2.8rem,6.3vw,6rem)] text-nowrap">
+                    N-Commerce
+                  </h1>
+                  <img
+                    className="absolute w-full -bottom-6 left-0 h-1/2"
+                    src="/blue-line.png"
+                    alt="underline"
+                  />
+                </div>
+                <p className="text-[clamp(1.5rem,3.2vw,3rem)]">
+                  "<span className="font-semibold">Wo</span>rld{" "}
+                  <span className="font-semibold">No</span>mad{" "}
+                  <span className="font-semibold">Co</span>mmerce"
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col justify-center items-start gap-3">
+              <p className="text-subtitle lg:text-title font-semibold">
+                A simple NO CODE SaaS Platform.
+              </p>
+              <p className="text-content">
+                We support businesses in small and aspiring destinations which
+                host Nomads!
+              </p>
+              <p className="text-content">
+                SaaS Tech for Nomad supoorting businesses across the world.
+                <span className="font-medium">
+                  (Example: Co-Working, Co-Living, Hostels, Workations, Resorts,
+                  Cafes, Events etc)
+                </span>
               </p>
             </div>
-          </div>
-          <div className="flex flex-col justify-center items-start gap-3">
-            <p className="text-title">A simple NO CODE SaaS Platform.</p>
-            <p className="text-content">
-              We support businesses in small and aspiring destinations which
-              host Nomads!
-            </p>
-            <p className="text-content">
-              SaaS Tech for Nomad supoorting businesses across the world.
-              <span className="font-medium">
-                (Example: Co-Working, Co-Living, Hostels, Workations, Resorts,
-                Cafes, Events etc)
-              </span>
-            </p>
-          </div>
-          <div className="flex justify-center items-center w-full h-full my-16">
-            <div className="relative w-full text-center hover:font-semibold transition-all cursor-pointer">
-              <p className="uppercase ">It's Completely free</p>
-              <img
-                src="/blue-circle.png"
-                alt="blue circle"
-                className="absolute -top-8 left-[41%] right-6 w-56 h-30"
-              />
+            <div className="flex justify-center items-center w-full h-full my-12">
+              <div className="relative w-full text-center hover:font-semibold transition-all cursor-pointer">
+                <p className="uppercase my-0 lg:my-16">It's Completely free</p>
+                <img
+                  src="/blue-circle.png"
+                  alt="blue circle"
+                  className="absolute -top-6 left-[22%] lg:top-8 lg:left-[41%] lg:right-6 w-48 h:16 lg:w-56 lg:h-30"
+                />
+              </div>
             </div>
           </div>
         </Container>
@@ -138,7 +144,7 @@ const HostHome = () => {
                 className="canvas"
                 camera={{
                   position: [0, 0, ismobile ? 15 : 25],
-                  fov: ismobile ? 40 : isTablet ? 50 : isLaptop ? 40 : 28,
+                  fov: ismobile ? 60 : isTablet ? 50 : isLaptop ? 40 : 28,
                 }}
               >
                 <ambientLight intensity={0.5} />
@@ -188,7 +194,7 @@ const HostHome = () => {
       <Container>
         <section className="space-y-2">
           <div>
-            <h1 className="text-[clamp(2rem,4.9vw,7rem)] font-semibold text-secondary-dark">
+            <h1 className="text-[clamp(1.2rem,4.9vw,7rem)] font-semibold text-center text-secondary-dark">
               KEY MODULES FOR YOUR BUSINESS
             </h1>
           </div>
@@ -249,7 +255,7 @@ const HostHome = () => {
                 TRANSACTIONAL WEBSITE & MOBILE SITE
               </p>
             </ReactFitty>
-            <p className="text-[clamp(1rem,1.8vw,3rem)]">
+            <p className="text-[clamp(1rem,1.8vw,3rem)] my-4 lg:my-4">
               Free customizable website templates which are strategically
               tailored for managing Lifestyle Businesses like Co-Working,
               Co-Living, Hostels, Boutique Properties, Cafes etc
@@ -279,10 +285,12 @@ const HostHome = () => {
       <section>
         <Container>
           <div className="flex flex-col gap-16">
-            <h1 className="text-main-header uppercase text-center">TESTIMONIAL</h1>
+            <h1 className="text-title lg:text-main-header uppercase text-center">
+              TESTIMONIAL
+            </h1>
             <div className="flex flex-col lg:flex-row justify-between w-full items-stretch">
               {/* Left Section */}
-              <div className="flex flex-col justify-between h-96 lg:h-96 w-3/4">
+              <div className="flex flex-col justify-between h-96 lg:h-96 w-full lg:w-3/4">
                 <div>
                   <p className="text-subtitle">
                     “We went from managing 3,000 sq ft to 50,000+ sq ft in the
@@ -305,7 +313,7 @@ const HostHome = () => {
               </div>
 
               {/* Right Section */}
-              <div className="h-96 w-1/2 overflow-hidden rounded-xl">
+              <div className="h-96 w-full lg:w-1/2 overflow-hidden rounded-xl">
                 <img
                   src="/hosts/themes/Kashif_Edit.png"
                   alt="owner-image"

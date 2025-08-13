@@ -71,8 +71,6 @@ const contentItems = [
 const Leads = () => {
   return (
     <div>
-      {/* Dummy Header (To Be Removed Later) */}
-      <div className="h-20 w-full bg-black"></div>
       {/* Top Text section */}
       <Container>
         <div>
@@ -97,28 +95,30 @@ const Leads = () => {
       </div>
 
       {/* Our Core focus section */}
-      <Container>
-        <div>
-          <div>
-            <h2 className="lg:text-[2.75rem] md:text-[2.75rem] sm:text-[1.75rem] xs:text-[1.75rem] xs:leading-9 font-semibold text-host">
+      <Container padding={false}>
+        <div className="pt-16 pb-8">
+          <div className="pb-16">
+            <h2 className="lg:text-[2.75rem] md:text-[2.75rem] sm:text-[1.75rem] xs:text-[1.75rem] lg:leading-[3.5rem] xs:leading-9 font-semibold text-host">
               Our core focus is to generate ORGANIC LEADS!
             </h2>
-            <h2 className="lg:text-[2.75rem] md:text-[2.75rem] sm:text-[1.75rem] xs:text-[1.75rem] font-semibold text-host">
+            <h2 className="lg:text-[2.75rem] md:text-[2.75rem] sm:text-[1.75rem] xs:text-[1.75rem] lg:leading-[3.5rem] xs:leading-9 font-semibold text-host">
               With NO INVESTMENTS!
             </h2>
           </div>
           <div className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-1 xs:grid-cols-1">
             <div className="col-span-4">
-              <div className="p-4">
-                <ul role="list" className="list-none m-0 p-0 space-y-2">
+              <div className="px-4">
+                <ul role="list" className="list-none m-0 p-0 space-y-1.5">
                   {checklistItems.map((item, index) => (
-                    <li key={index} className="flex items-start gap-3">
+                    <li key={index} className="flex items-start gap-3 mt-0">
                       <GrFormCheckmark
                         size={20}
-                        className="mt-0.5 text-primary-blue shrink-0 text-[1.1rem]"
+                        className=" text-primary-blue shrink-0 text-[1.1rem]"
                         aria-hidden
                       />
-                      <span className="text-slate-800">{item}</span>
+                      <span className="text-slate-800 text-[1.1rem] mt-0">
+                        {item}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -151,9 +151,9 @@ const Leads = () => {
       </Container>
 
       {/* Automated Google Leads Section */}
-      <Container>
-        <div>
-          <div>
+      <Container padding={false}>
+        <div className="pt-16 pb-8">
+          <div className="pb-6">
             <h2 className="lg:text-[2.75rem] md:text-[2.75rem] sm:text-[1.75rem] xs:text-[1.75rem] lg:leading-[3.5rem] md:leading-9 sm:leading-9 xs:leading-9 font-semibold text-host">
               Automated Google LEAD SHEET!
             </h2>
@@ -161,7 +161,7 @@ const Leads = () => {
               Never miss any leads generated from our platform.
             </h2>
           </div>
-          <div className="h-[16rem]">
+          <div className="h-[16rem] pt-[1.875rem]">
             <img
               src={GoogleSheetsImage}
               alt="Google Sheets"
@@ -173,15 +173,15 @@ const Leads = () => {
 
       {/* Run & Scale Grid Section */}
       <Container padding={false}>
-        <div className="pb-8">
+        <div className="pt-16 pb-8">
           <ReactFitty className="text-host">
             RUN & SCALE YOUR BUSINESS
           </ReactFitty>
 
-          <h2 className=" lg:text-left lg:text-[2.5rem] xs:text-center xs:text-3xl font-semibold text-host pb-2">
+          <h2 className=" lg:text-left lg:text-[2.5rem] xs:text-center xs:text-3xl font-semibold text-host pb-4 border-b-2 border-gray-500 pt-2">
             Marketing
           </h2>
-          <hr />
+
           <br />
           <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {contentItems.map((item, index) => (
@@ -191,25 +191,26 @@ const Leads = () => {
               </div>
             ))}
           </div>
-          <div className="flex lg:justify-end xs:justify-center items-center">
+          <div className="flex lg:justify-end xs:justify-center items-center lg:px-8">
             <button className="bg-black text-white px-8 py-2 rounded-full">
               Get Started
             </button>
           </div>
         </div>
       </Container>
-      <Container padding={false}>
-        <hr />
-      </Container>
+
+      <div className="flex items-center justify-center h-0">
+        <hr className="w-[80%] h-0 m-0 border-t  border-gray-400" />
+      </div>
 
       {/* Get better ROI Section */}
-      <Container>
-        <div className="grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 xs:grid-cols-1">
+      <Container padding={false}>
+        <div className="grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 xs:grid-cols-1 py-8">
           <div>
             <img src={RoiImage} alt="ROI Image" />
           </div>
           <div className="flex flex-col justify-center">
-            <h2 className="text-[4rem] sm:text-[2.5rem] xs:text-[2.5rem] leading-[1.2]  text-host">
+            <h2 className="lg:text-[4rem] sm:text-[2.5rem] xs:text-[2.5rem] leading-[1.2]  text-host">
               Get better ROI from your marketing.
             </h2>
 
@@ -223,13 +224,15 @@ const Leads = () => {
         </div>
       </Container>
 
-      <hr />
+      <div className="flex items-center justify-center h-0">
+        <hr className="w-[80%] h-0 m-0 border-t  border-gray-400" />
+      </div>
 
       {/* Get a Complete View Section */}
-      <Container>
-        <div className="grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 xs:grid-cols-1">
+      <Container padding={false}>
+        <div className="grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 xs:grid-cols-1 py-8">
           <div className="flex flex-col justify-center lg:order-1 md:order-1 sm:order-2 xs:order-2">
-            <h2 className="text-[4rem] sm:text-[2.5rem] xs:text-[2.5rem] leading-[1.2]  text-host">
+            <h2 className="lg:text-[4rem] sm:text-[2.5rem] xs:text-[2.5rem] leading-[1.2]  text-host">
               Get a complete view.
             </h2>
 
@@ -245,16 +248,18 @@ const Leads = () => {
         </div>
       </Container>
 
-      <hr />
+      <div className="flex items-center justify-center h-0">
+        <hr className="w-[80%] h-0 m-0 border-t  border-gray-400" />
+      </div>
 
       {/* The finer points Section */}
-      <Container>
-        <div className="grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 xs:grid-cols-1">
+      <Container padding={false}>
+        <div className="grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 xs:grid-cols-1 py-8">
           <div>
             <img src={FinerPointsImage} alt="Finer Points" />
           </div>
           <div className="flex flex-col justify-center">
-            <h2 className="text-[4rem] sm:text-[2.5rem] xs:text-[2.5rem] leading-[1.2]  text-host">
+            <h2 className="lg:text-[4rem] sm:text-[2.5rem] xs:text-[2.5rem] leading-[1.2]  text-host">
               The finer points.
             </h2>
 
@@ -266,9 +271,6 @@ const Leads = () => {
           </div>
         </div>
       </Container>
-
-      {/* Dummy Footer (To Be Removed Later) */}
-      <div className="h-80 w-full bg-black"></div>
     </div>
   );
 };
