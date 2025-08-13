@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 import Container from "../components/Container";
-import { Link,useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const jobRoles = [
   {
@@ -134,7 +134,7 @@ const Career = () => {
 
   return (
     <Container padding={false}>
-      <div className="">
+      <div className="pt-12">
         <h3 className="text-4xl md:text-6xl font-semibold mb-6">
           JOIN OUR TEAM
         </h3>
@@ -150,8 +150,7 @@ const Career = () => {
                 {/* Accordion Header */}
                 <button
                   onClick={() => toggleAccordion(idx)}
-                  className="w-full flex justify-between items-center py-6 text-left text-3xl font-bold focus:outline-none"
-                >
+                  className="w-full flex justify-between items-center py-6 text-left text-3xl font-bold focus:outline-none">
                   {section.title}
                   <FaChevronDown
                     className={`text-gray-600 transition-transform duration-300 ${
@@ -164,8 +163,7 @@ const Career = () => {
                 <div
                   className={`transition-all duration-500 ease-in-out ${
                     isOpen ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0"
-                  } overflow-hidden`}
-                >
+                  } overflow-hidden`}>
                   <div className="space-y-4 mt-2">
                     {section.jobs.map((job, jobIdx) => (
                       <div key={job.id}>
@@ -192,8 +190,7 @@ const Career = () => {
                           </Link> */}
                               <Link
                                 to={`${customLink}/${job.id}`}
-                                className="border-2 border-gray-600 p-2 rounded-md hover:bg-black hover:text-white transition-colors"
-                              >
+                                className="border-2 border-gray-600 p-2 rounded-md hover:bg-black hover:text-white transition-colors">
                                 <FaChevronRight />
                               </Link>
                             </div>
