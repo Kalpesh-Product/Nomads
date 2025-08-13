@@ -26,13 +26,12 @@ const HostHeader = () => {
   };
 
   return (
-    <header className="bg-white/80 backdrop-blur-md text-black py-3 lg:py-0">
+    <header className="bg-white/80 backdrop-blur-md text-black py-3 lg:py-0 shadow-md">
       <Container padding={false}>
         <div className="flex  lg:px-0 justify-between items-center md:py-3  ">
           <div
             onClick={() => navigate("/")}
-            className="w-24 lg:w-36 overflow-x-hidden rounded-lg flex justify-between items-center cursor-pointer"
-          >
+            className="w-24 lg:w-36 overflow-x-hidden rounded-lg flex justify-between items-center cursor-pointer">
             <img
               src={logo}
               alt={"logo"}
@@ -57,19 +56,18 @@ const HostHeader = () => {
             /> */}
             <a
               href="https://wonofe.vercel.app"
-              className="bg-[#FF5757] flex items-center justify-center text-black font-[500] capitalize hover:font-semibold hover:bg-white w-[7rem] px-4 py-2 rounded-full"
-            >
-              SIGN IN
+              className="bg-[#FF5757] flex items-center justify-center text-white font-[500] capitalize hover:font-semibold hover:bg-red-500 w-[7rem] px-4 py-2 rounded-full">
+              Login
             </a>
 
-            <GetStartedButton
+            {/* <GetStartedButton
               title={"SIGN UP"}
               padding={"py-2"}
               handleSubmit={() => navigate("/hosts/signup")}
               className={
                 "bg-primary-blue  flex text-white font-[500] capatilize hover:font-semibold hover:bg-blue-500 transition-all w-[7rem] px-4"
               }
-            /> 
+            /> */}
           </div>
           <div className="h-full px-2  lg:hidden">
             <button
@@ -93,8 +91,7 @@ const HostHeader = () => {
         }}
         anchor="left"
         open={open}
-        onClose={() => setOpen(false)}
-      >
+        onClose={() => setOpen(false)}>
         <div className="flex flex-col h-full justify-between">
           <ul className="flex flex-col gap-4 p-4 ">
             <div className="flex justify-end w-full">
@@ -122,15 +119,15 @@ const HostHeader = () => {
                 title={"SIGN UP"}
                 padding={"py-2"}
                 handleSubmit={() => {
-                  navigate("/hosts/signup")
-                  setOpen(false)
+                  navigate("/hosts/signup");
+                  setOpen(false);
                 }}
                 className={
                   "bg-primary-blue  flex text-white font-[500] capatilize hover:font-semibold hover:bg-blue-500 transition-all w-[7rem] px-4"
                 }
               />
             </div>
-             <div className="h-[0.2px] bg-gray-300"></div>
+            <div className="h-[0.2px] bg-gray-300"></div>
             <div className="flex justify-center p-4">
               <BnButton
                 title={"SIGN IN"}

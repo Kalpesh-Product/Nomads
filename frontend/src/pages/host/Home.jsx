@@ -108,7 +108,7 @@ const HostHome = () => {
                 </p>
               </div>
             </div>
-            <div className="flex flex-col justify-center items-start gap-3">
+            <div className="flex flex-col justify-center items-start gap-3 py-12">
               <p className="text-subtitle lg:text-title font-semibold">
                 A simple NO CODE SaaS Platform.
               </p>
@@ -153,8 +153,7 @@ const HostHome = () => {
                 camera={{
                   position: [0, 0, ismobile ? 15 : 25],
                   fov: ismobile ? 50 : isTablet ? 50 : isLaptop ? 40 : 28,
-                }}
-              >
+                }}>
                 <ambientLight intensity={0.5} />
                 <pointLight position={[10, 10, 10]} />
                 <RotatingGlobe />
@@ -181,8 +180,7 @@ const HostHome = () => {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                }}
-              >
+                }}>
                 <GetStartedButton
                   title="CONNECT WITH US"
                   externalStyles={
@@ -238,8 +236,7 @@ const HostHome = () => {
               {onePartner.map((item) => (
                 <div
                   key={item.id}
-                  className="border-t-2 border-black w-full space-y-2 py-2"
-                >
+                  className="border-t-2 border-black w-full space-y-2 py-2">
                   <h1 className="text-title py-4">
                     {item.title || "Title here"}
                   </h1>
@@ -280,8 +277,7 @@ const HostHome = () => {
               {noCode.map((item) => (
                 <div
                   key={item.id}
-                  className="h-72 w-full overflow-hidden rounded-lg  shadow-lg"
-                >
+                  className="h-72 w-full overflow-hidden rounded-lg  shadow-lg">
                   <img
                     src={item.image || "/hosts/themes/cafe.webp"}
                     className="h-full w-full object-cover"
@@ -323,8 +319,7 @@ const HostHome = () => {
                 <div>
                   <h4
                     className="my-4"
-                    style={{ fontFamily: "Amsterdam", fontSize: "2rem" }}
-                  >
+                    style={{ fontFamily: "Amsterdam", fontSize: "2rem" }}>
                     Kashif Shaikh
                   </h4>
                   <p className="m-0">Co-Founder & COO</p>

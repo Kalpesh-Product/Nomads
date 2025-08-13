@@ -138,7 +138,7 @@ const Themes = () => {
       <section className="w-full bg-gray-100 flex flex-col justify-center items-center gap-8">
         <Container>
           <div className="space-y-12">
-            <div >
+            <div>
               <h1 className="text-[clamp(2rem,2.5vw,5rem)] font-medium pb-2">
                 Top Theme Recommendations
               </h1>
@@ -153,8 +153,7 @@ const Themes = () => {
                   data-aos="fade-up"
                   className="w-full h-full overflow-hidden rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.5)]"
                   onClick={() => navigate("products", { state: { image } })}
-                  key={index}
-                >
+                  key={index}>
                   <img
                     className="rounded-xl w-full h-full object-cover transition-transform duration-500 ease hover:scale-[1.2] cursor-pointer origin-center"
                     onClick={() => {
@@ -206,7 +205,9 @@ const Themes = () => {
       <Container>
         <div className="flex flex-col justify-between items-center gap-14">
           <div className="text-[clamp(2rem,4.3vw,4.5rem)] w-full lg:w-[70%] self-start leading-[1.2]">
-            <h1 className="font-medium">A website builder engineered for growth</h1>
+            <h1 className="font-medium">
+              A website builder engineered for growth
+            </h1>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             {themeWebsiteGridData.map((item, index) => (
@@ -234,8 +235,7 @@ const Themes = () => {
             {supportItems.map((item, index) => (
               <div
                 className="flex flex-col gap-8 border-t-2 border-black pt-10"
-                key={index}
-              >
+                key={index}>
                 <h2 className="font-semibold text-card-title">{item.title}</h2>
                 <p>{item.description}</p>
                 <span
@@ -243,8 +243,7 @@ const Themes = () => {
                   onClick={() => {
                     navigate(item.path);
                     window.scrollTo({ top: 0, behavior: "instant" });
-                  }}
-                >
+                  }}>
                   {item.linkText}
                 </span>
               </div>
