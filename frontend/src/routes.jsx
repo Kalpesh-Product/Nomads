@@ -90,7 +90,7 @@ const router = createBrowserRouter([
             element: <Career />,
           },
           {
-            path: "career/job/:id",
+            path: "career/job/:title",
             element: <JobDetails />,
           },
           {
@@ -120,7 +120,7 @@ const router = createBrowserRouter([
             element: <Career />,
           },
           {
-            path: "career/job/:id",
+            path: "career/job/:title",
             element: <JobDetails />,
           },
           {

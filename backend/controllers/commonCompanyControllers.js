@@ -99,7 +99,7 @@ export const getIndividualCompany = async (req, res, next) => {
         pocs,
         services,
         reviews,
-        type:"Coworking",
+        type: "Coworking",
         inclusions: company.inclusions
           .split(",")
           .map((inc) =>
@@ -131,7 +131,7 @@ export const getIndividualCompany = async (req, res, next) => {
         pocs,
         units,
         reviews,
-         type:"Coliving",
+        type: "Coliving",
         inclusions: company.inclusions
           .split(",")
           .map((inc) =>
@@ -161,7 +161,7 @@ export const getIndividualCompany = async (req, res, next) => {
         pocs,
         units,
         reviews,
-        type:"Hostel",
+        type: "Hostel",
         inclusions: company.inclusions
           .split(",")
           .map((inc) =>
@@ -193,7 +193,7 @@ export const getIndividualCompany = async (req, res, next) => {
         pocs,
         units,
         reviews,
-         type:"Private-Stay",
+        type: "Private-Stay",
         inclusions: company.inclusions
           .split(",")
           .map((inc) =>
@@ -216,7 +216,7 @@ export const getIndividualCompany = async (req, res, next) => {
         reviewCount: company.reviews,
         pocs,
         reviews,
-        type:"Cafe",
+        type: "Cafe",
         inclusions: company.inclusions
           .split(",")
           .map((inc) =>
