@@ -17,7 +17,7 @@ const GetStartedButton = ({
     <button
       disabled={disabled || isLoading}
       type={type}
-      className={`flex rounded-full items-center cursor-pointer justify-center  gap-2
+      className={`flex rounded-full items-center cursor-pointer justify-center  gap-2 
        
         ${baseBgColor} 
         ${fontSize ? fontSize : "text-content leading-5"}
