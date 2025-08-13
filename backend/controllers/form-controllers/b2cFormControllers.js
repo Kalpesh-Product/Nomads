@@ -68,15 +68,26 @@ const connectWithUsSchema = yup.object().shape({
     .string()
     .email("Please provide a valid email.")
     .required("Please provide your email."),
-  mobile: yup
-    .string()
-    .trim()
-    .required("Please provide the mobile"),
+  mobile: yup.string().trim().required("Please provide the mobile"),
   typeOfPartnerShip: yup
     .string()
     .required("Please provide the type of partnership."),
   message: yup.string().required("Please provide a brief messsage."),
   sheetName: yup.string().required("Please provide a sheet name"),
+});
+
+const nomadsSignupSchema = yup.object().shape({
+  firstName: yup.string().required("Please provide your first name"),
+  lastName: yup.string().required("Please provide your last name"),
+  email: yup
+    .string()
+    .email("Please provide a valid email")
+    .required("Please provide your email"),
+  password: yup.string().optional(),
+  mobile: yup.string().trim().required("Please provide the mobile"),
+  country: yup.string().required("Please provide your country name"),
+  sheetName: yup.string().required("Please provide a sheet name"),
+  reason: yup.string().required("Please provide the reason"),
 });
 
 function toISODateOnly(v) {
@@ -141,6 +152,23 @@ export const addB2CformSubmission = async (req, res, next) => {
           sheetName: d.sheetName,
         }),
         successMsg: "A new contact enquiry added successfully.",
+      },
+      Sign_up: {
+        schema: nomadsSignupSchema,
+        map: (d) => ({
+          // Must match Apps Script rowOrder:
+          // ["firstName","lastName","email","password","country","mobile","reason"]
+          firstName: d.firstName?.trim(),
+          lastName: d.lastName?.trim(),
+          email: d.email?.trim(),
+          password: d.password, // see hashing note below if you want to hash
+          country: d.country?.trim(),
+          mobile: d.mobile?.trim(),
+          reason: d.reason || "",
+          sheetName: d.sheetName, // Apps Script uses this to choose the sheet
+          submittedAt: new Date(),
+        }),
+        successMsg: "Sign-up saved successfully.",
       },
     };
 
