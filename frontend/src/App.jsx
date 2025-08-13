@@ -42,7 +42,8 @@ const App = () => {
         <Toaster />
       </div>
 
-      {!hideHeaderFooter && isNomad ? <Footer /> : <HostFooter />}
+      {/* {!hideHeaderFooter && isNomad ? <Footer /> : <HostFooter />} */}
+      {!hideHeaderFooter && (isNomad ? <Footer /> : <HostFooter />)}
     </div>
   );
 };
