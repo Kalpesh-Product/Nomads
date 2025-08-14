@@ -37,7 +37,7 @@ const Career = () => {
         <div className="border-b-2 border-gray-300 w-[5%] mb-6"></div>
         {/* <Jobrole jobRoles={jobRoles}/> */}
         <div className="flex flex-col gap-4">
-          {isLoading
+          {isLoading || !isHost
             ? []
             : jobRoles.filter((item)=>item.jobPosts?.length).map((section, idx) => {
                 const isOpen = openIndex === idx;
@@ -91,7 +91,15 @@ const Career = () => {
                             <FaChevronRight />
                           </Link> */}
                               <Link
-                                to={`${customLink}/${job.id}`}
+                                to={`${customLink}/${job.title.toLowerCase().replace(/\s/g,"-")}`}
+                                state={
+                                  {
+                                    about:job.about,
+                                    responsibilities:job.responsibilities,
+                                    qualifications:job.qualifications
+                                  }
+
+                                }
                                 className="border-2 border-gray-600 p-2 rounded-md hover:bg-black hover:text-white transition-colors">
                                 <FaChevronRight />
                               </Link>
