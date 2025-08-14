@@ -1,19 +1,17 @@
 import mongoose from "mongoose";
 
-const reviewSchema = new mongoose.Schema(
+const meetingReviewSchema = new mongoose.Schema(
   {
-    workation: {
+    meeting: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "workation",
+      ref: "MeetingRoom",
     },
-    businessName: {
-      type: String,
-    },
-    reviewerName: {
+    name: {
       type: String,
     },
     rating: {
       type: Number,
+      required: true,
       min: 0,
       max: 5,
     },
@@ -22,6 +20,7 @@ const reviewSchema = new mongoose.Schema(
     },
     platform: {
       type: String,
+      required: true,
     },
     reviewLink: {
       type: String,
@@ -32,5 +31,5 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
-const PrivateStayReview = mongoose.model("WorkationReview", reviewSchema);
-export default PrivateStayReview;
+const MeetingReview = mongoose.model("MeetingReview", meetingReviewSchema);
+export default MeetingReview;

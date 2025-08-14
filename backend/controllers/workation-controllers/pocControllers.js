@@ -3,7 +3,7 @@ import PointOfContact from "../../models/workations/PointOfContact.js";
 import { Readable } from "stream";
 import csvParser from "csv-parser";
 
-export const bulkInsertWorkations = async (req, res, next) => {
+export const bulkInsertWorkationPoc = async (req, res, next) => {
   try {
     const file = req.file;
     if (!file) {

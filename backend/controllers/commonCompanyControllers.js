@@ -22,6 +22,7 @@ import Cafe from "../models/cafe/Cafe.js";
 import CafePoc from "../models/cafe/PointOfContact.js";
 import CafeReview from "../models/cafe/Review.js";
 import fetchCafeData from "../utils/fetchCafeData.js";
+import fetchWorkationData from "../utils/fetchWorkationData.js";
 import { uploadFileToS3 } from "../config/s3Config.js";
 
 export const getCompanyDataLocationWise = async (req, res, next) => {
@@ -42,6 +43,9 @@ export const getCompanyDataLocationWise = async (req, res, next) => {
     } else if (category?.toLowerCase() === "cafe") {
       const cafeData = await fetchCafeData(country, state);
       return res.status(200).json(cafeData);
+    } else if (category?.toLowerCase() === "workation") {
+      const workationData = await fetchWorkationData(country, state);
+      return res.status(200).json(workationData);
     } else {
       const [
         coworkingData,
@@ -99,7 +103,7 @@ export const getIndividualCompany = async (req, res, next) => {
         pocs,
         services,
         reviews,
-        type:"Coworking",
+        type: "Coworking",
         inclusions: company.inclusions
           .split(",")
           .map((inc) =>
@@ -131,7 +135,7 @@ export const getIndividualCompany = async (req, res, next) => {
         pocs,
         units,
         reviews,
-         type:"Coliving",
+        type: "Coliving",
         inclusions: company.inclusions
           .split(",")
           .map((inc) =>
@@ -161,7 +165,7 @@ export const getIndividualCompany = async (req, res, next) => {
         pocs,
         units,
         reviews,
-        type:"Hostel",
+        type: "Hostel",
         inclusions: company.inclusions
           .split(",")
           .map((inc) =>
@@ -193,7 +197,7 @@ export const getIndividualCompany = async (req, res, next) => {
         pocs,
         units,
         reviews,
-         type:"Private-Stay",
+        type: "Private-Stay",
         inclusions: company.inclusions
           .split(",")
           .map((inc) =>
@@ -216,7 +220,7 @@ export const getIndividualCompany = async (req, res, next) => {
         reviewCount: company.reviews,
         pocs,
         reviews,
-        type:"Cafe",
+        type: "Cafe",
         inclusions: company.inclusions
           .split(",")
           .map((inc) =>
