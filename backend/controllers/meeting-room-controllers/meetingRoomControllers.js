@@ -17,7 +17,7 @@ export const bulkInsertMeetingRooms = async (req, res, next) => {
       .on("data", (row) => {
         const meetingRoom = {
           businessId: row["Business ID"]?.trim(),
-          businessName: row["Business Name"]?.trim(),
+          companyName: row["Business Name"]?.trim(),
           registeredEntityName: row["Registered Entity name"]?.trim(),
           website: row["Website"]?.trim(),
           address: row["Address"]?.trim(),
