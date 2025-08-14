@@ -22,6 +22,8 @@ export const bulkInsertMeetingRooms = async (req, res, next) => {
           website: row["Website"]?.trim(),
           address: row["Address"]?.trim(),
           city: row["City"]?.trim(),
+          country: row["Country"]?.trim() || null,
+          state: row["State"]?.trim() || null,
           country: row["Country"]?.trim(),
           state: row["State"]?.trim(),
           about: row["About"]?.trim(),
@@ -33,7 +35,7 @@ export const bulkInsertMeetingRooms = async (req, res, next) => {
           totalReviews: row["Total Reviews"]
             ? parseInt(row["Total Reviews"]?.trim())
             : 0,
-          inclusions: row["Inclusions"]
+          inclusions: row["Inclusions"],
         };
 
         meetingRooms.push(meetingRoom);
