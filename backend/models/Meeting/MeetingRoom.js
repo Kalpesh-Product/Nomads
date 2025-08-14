@@ -7,7 +7,7 @@ const meetingRoomSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    businessName: {
+    companyName: {
       type: String,
       required: true,
     },
@@ -20,11 +20,9 @@ const meetingRoomSchema = new mongoose.Schema(
     logo: {
       type: String,
     },
-    images: [
-      {
-        type: String,
-      },
-    ],
+    images: {
+      type: [{ url: String, index: Number }],
+    },
     address: {
       type: String,
     },
