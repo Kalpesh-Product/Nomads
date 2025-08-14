@@ -153,7 +153,6 @@ const Leads = () => {
           </div>
         </div>
       </Container>
-      <MySeperator />
 
       {/* Automated Google Leads Section */}
       <Container padding={false}>
@@ -176,7 +175,6 @@ const Leads = () => {
         </div>
       </Container>
 
-      <MySeperator />
 
       {/* Run & Scale Grid Section */}
       <Container padding={false}>
@@ -193,7 +191,7 @@ const Leads = () => {
           <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {contentItems.map((item, index) => (
               <div key={index} className="py-2">
-                <h2 className="text-[1.5rem] font-semibold">{item.heading}</h2>
+                <h2 className="text-[1.5rem] font-semibold text-[#212529]">{item.heading}</h2>
                 <p>{item.text}</p>
               </div>
             ))}

@@ -40,8 +40,8 @@ const Footer = () => {
   return (
     <footer className="w-full bg-gray-100 text-black backdrop-blur-md  flex flex-col justify-center items-center gap-0 pb-0 md:pb-0   shadow-lg ">
       <div className="w-full flex flex-wrap md:flex-wrap lg:flex-nowrap justify-between items-center pt-12 pb-8 px-4 md:px-[7.5rem]">
-        <div className="flex flex-col justify-center md:flex-1 md:justify-center md:items-center lg:justify-start lg:items-start mb-8 lg:mb-0">
-          <div className="w-70 md:w-80 h-full">
+        <div className="flex flex-col w-full lg:w-fit  items-center justify-center md:flex-1 md:justify-center md:items-center lg:justify-start lg:items-start mb-8 lg:mb-0">
+          <div className="w-full md:w-80 h-full flex flex-col lg:justify-start lg:items-start justify-center items-center">
             <img
               src={logo}
               onClick={() => {
@@ -70,7 +70,7 @@ const Footer = () => {
             </div> */}
           </div>
         </div>
-        <div className=" ">
+        <div className="lg:w-fit w-full">
           <div className="w-full md:w-full lg:w-fit grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-10 lg:gap-32 lg:mr-5">
             {footerSections.map((section, idx) => (
               <div

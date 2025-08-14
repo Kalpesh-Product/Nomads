@@ -211,12 +211,12 @@ const Header = () => {
             },
           },
         }}
-        anchor="right"
+        anchor="left"
         open={open}
         onClose={() => setOpen(false)}>
         <div className="flex flex-col h-full justify-between">
           <ul className="flex flex-col gap-4 p-4 ">
-            <div>
+            <div className="flex w-full justify-end text-right">
               <span
                 className="text-title cursor-pointer"
                 onClick={() => setOpen(false)}>

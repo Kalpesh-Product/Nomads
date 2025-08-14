@@ -39,14 +39,14 @@ const SaaSFeatureBlock = ({
   return (
     <div
       data-aos="fade-up"
-      className="cursor-pointer"
+      className="cursor-pointer w-full"
       style={{
         padding: "0rem 0rem",
         backgroundColor: "#fff",
       }}
     >
       <div
-        className={`flex gap-2 items-center w-full justify-between flex-col ${rowReverse ? "flex-col lg:flex-row-reverse" : "flex-col lg:flex-row"} `}
+        className={`flex gap-10 lg:gap-10 items-strech w-full justify-between flex-col ${rowReverse ? "flex-col lg:flex-row-reverse" : "flex-col lg:flex-row"} `}
       >
         {/* Description Column */}
         <div
@@ -59,11 +59,11 @@ const SaaSFeatureBlock = ({
         >
           <div className="relative">
             <h1 style={{ padding: 0 }}>
-              <span className="flex flex-col items-center font-semibold text-subtitle uppercase">
+              <span className="flex flex-col text-secondary-dark items-center font-medium text-title uppercase">
                 {title}
               </span>
             </h1>
-            <div className="w-1/4 h-[19px] absolute top-[70%] left-[38%]">
+            <div className="w-1/4 h-[19px] absolute top-[99%] left-[38%]">
               <img
                 style={{ width: "100%", height: "100%" }}
                 src="/blue-line.png"
@@ -71,7 +71,7 @@ const SaaSFeatureBlock = ({
               />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-8 gap-x-24 py-4 md:py-5 w-full">
+          <div className="grid grid-cols-2 gap-8 gap-x-12 lg:gap-x-12 py-4 md:py-5 w-full">
             {description1.map((item, index) => (
               <FeatureCard key={index} icon={item.image} title={item.title} />
             ))}

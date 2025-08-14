@@ -24,7 +24,7 @@ const GetStartedButton = ({
           hover:font-semibold transition-all
         ${fontSize ? fontSize : "text-content leading-5"}
          ${!externalStyles?.includes("text-") ? "text-primary" : ""}
-         ${padding ? padding : "px-8 py-2"} ${className}`} 
+         ${padding ? padding : "px-5 py-[0.65rem]"} ${className}`} 
          
       onClick={handleSubmit}>
       {isLoading && <CircularProgress size={16} sx={{ color: "#ffffff" }} />}

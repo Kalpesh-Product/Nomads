@@ -50,16 +50,21 @@ import {
 import { useNavigate } from "react-router-dom";
 
 export default function Modules() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const isMobile = useIsMobile();
   return (
     <Container>
       <div className="flex flex-col gap-8 w-full">
         <div className="flex flex-col gap-8">
           <div className="text-center">
-            <h1 className="text-[clamp(1.7rem,3.3vw,5rem)] text-start lg:text-start font-semibold font-comic">
+            <h1 className="text-[clamp(1.7rem,3.8vw,5rem)] text-start lg:hidden lg:text-start font-semibold font-comic">
               The ONLY Nomad Ecosystem SaaS Platform!
             </h1>
+            <div className="font-semibold font-comic hidden lg:flex w-full">
+              <ReactFitty >
+                The ONLY Nomad Ecosystem SaaS Platform!
+              </ReactFitty>
+            </div>
           </div>
           <div>
             <h4 className="text-lg lg:text-[1.8rem] lg:leading-[2.75rem] text-start md:text-center lg:text-start ">
@@ -76,7 +81,10 @@ export default function Modules() {
             </h4>
           </div>
           <div className="flex justify-end items-end">
-            <GetStartedButton title="Get Started" handleSubmit={()=>navigate('/hosts/signup')}/>
+            <GetStartedButton
+              title="Get Started"
+              handleSubmit={() => navigate("/hosts/signup")}
+            />
           </div>
         </div>
 
@@ -90,7 +98,7 @@ export default function Modules() {
               <img
                 src="/blue-line.png"
                 alt="greenUnderLine"
-                className="w-3/4 lg:w-1/4 h-6"
+                className="w-3/4 md:w-1/4 h-6"
               />
             </div>
             {isMobile && (
@@ -205,8 +213,11 @@ export default function Modules() {
         </div>
       </Container>
       <hr />
-      <div className="flex justify-center w-full my-4">
-        <GetStartedButton title={"Get Started"} handleSubmit={()=>navigate('/hosts/signup')}/>
+      <div className="flex justify-center w-full my-16">
+        <GetStartedButton
+          title={"Get Started"}
+          handleSubmit={() => navigate("/hosts/signup")}
+        />
       </div>
       <hr />
     </Container>
