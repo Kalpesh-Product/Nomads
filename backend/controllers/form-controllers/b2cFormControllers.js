@@ -156,16 +156,14 @@ export const addB2CformSubmission = async (req, res, next) => {
       Sign_up: {
         schema: nomadsSignupSchema,
         map: (d) => ({
-          // Must match Apps Script rowOrder:
-          // ["firstName","lastName","email","password","country","mobile","reason"]
           firstName: d.firstName?.trim(),
           lastName: d.lastName?.trim(),
           email: d.email?.trim(),
-          password: d.password, // see hashing note below if you want to hash
+          password: d.password, 
           country: d.country?.trim(),
           mobile: d.mobile?.trim(),
           reason: d.reason || "",
-          sheetName: d.sheetName, // Apps Script uses this to choose the sheet
+          sheetName: d.sheetName,
           submittedAt: new Date(),
         }),
         successMsg: "Sign-up saved successfully.",

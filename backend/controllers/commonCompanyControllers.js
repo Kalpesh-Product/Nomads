@@ -22,6 +22,7 @@ import Cafe from "../models/cafe/Cafe.js";
 import CafePoc from "../models/cafe/PointOfContact.js";
 import CafeReview from "../models/cafe/Review.js";
 import fetchCafeData from "../utils/fetchCafeData.js";
+import fetchWorkationData from "../utils/fetchWorkationData.js";
 import { uploadFileToS3 } from "../config/s3Config.js";
 
 export const getCompanyDataLocationWise = async (req, res, next) => {
@@ -42,6 +43,9 @@ export const getCompanyDataLocationWise = async (req, res, next) => {
     } else if (category?.toLowerCase() === "cafe") {
       const cafeData = await fetchCafeData(country, state);
       return res.status(200).json(cafeData);
+    } else if (category?.toLowerCase() === "workation") {
+      const workationData = await fetchWorkationData(country, state);
+      return res.status(200).json(workationData);
     } else {
       const [
         coworkingData,
