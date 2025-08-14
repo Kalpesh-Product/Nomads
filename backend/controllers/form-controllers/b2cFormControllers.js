@@ -172,6 +172,8 @@ export const addB2CformSubmission = async (req, res, next) => {
       },
     };
 
+    console.log("payload", req.body);
+
     const config = sheetConfig[sheetName];
     if (!config) {
       throw new Error(`Unsupported sheet name: ${sheetName}`);

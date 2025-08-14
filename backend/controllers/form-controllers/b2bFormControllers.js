@@ -325,7 +325,7 @@ export const addB2BFormSubmission = async (req, res, next) => {
       mobile: payload.mobile,
       partnerstype: payload.partnerType,
       message: payload.message,
-      formName: "enquiry",
+      formName: "connect",
     };
 
     const result = await postToAppsScript(apsBody);
