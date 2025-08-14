@@ -168,7 +168,7 @@ const enquirySchema = yup.object().shape({
     .required("Mobile number is required")
     .matches(/^[0-9]{10}$/, "Mobile number must be exactly 10 digits"),
 
-  partnerType: yup.string().trim().required("Partner Type is required"),
+  partnerstype: yup.string().trim().required("Partner Type is required"),
 
   message: yup
     .string()
@@ -323,7 +323,7 @@ export const addB2BFormSubmission = async (req, res, next) => {
       name: payload.name,
       email: payload.email,
       mobile: payload.mobile,
-      partnerstype: payload.partnerType,
+      partnerstype: payload.partnerstype,
       message: payload.message,
       formName: "connect",
     };
@@ -340,7 +340,7 @@ export const addB2BFormSubmission = async (req, res, next) => {
     const handlers = {
       jobApplication: handleJobApplication,
       register: handleRegister,
-      enquiry: handleEnquiry,
+      connect: handleEnquiry,
     };
 
     if (!formName || !handlers[formName]) {

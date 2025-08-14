@@ -49,7 +49,7 @@ const HostSignup = () => {
     },
   });
 
-   const { mutate: register, isLoading } = useMutation({
+   const { mutate: register, isLoading: isRegisterLoading } = useMutation({
       mutationFn: async (data) => {
           const response = await axios.post(
           "form/add-new-b2b-form-submission",
@@ -488,7 +488,7 @@ const HostSignup = () => {
             )}
               {activeStep === stepFields.length -1 && (
               <div className="flex  justify-center  items-center w-full">
-                <GetStartedButton title="Submit" type={"submit"} />
+                <GetStartedButton title="Submit" type={"submit"}/>
               </div>
             )}
           </div>
