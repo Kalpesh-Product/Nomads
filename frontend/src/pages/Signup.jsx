@@ -10,7 +10,7 @@ import { MuiTelInput } from "mui-tel-input";
 import { useForm, Controller } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
+import axios from "../utils/axios";
 import toast from "react-hot-toast";
 import PrimaryButton from "../components/PrimaryButton";
 import { Link } from "react-router-dom";
@@ -36,23 +36,18 @@ export default function Signup() {
       password: "",
       country: "",
       mobile: "",
+      reason: "",
     },
   });
 
   const { mutate: submitRegisteration, isPending: isRegisterationPending } =
     useMutation({
       mutationFn: async (data) => {
-        const response = await axios.post(
-          import.meta.env.VITE_ENV === "PRODUCTION"
-            ? `${import.meta.env.VITE_API_PRODUCTION_URL}/auth/signup`
-            : `${import.meta.env.VITE_API_DEVELOPMENT_URL}/auth/signup`,
-          { ...data, mobile: data.mobile.replace(/\s+/g, "") },
-          { headers: { "Content-Type": "application/json" } }
-        );
+        const response = await axios.post("form/add-new-b2c-form-submission", {...data,sheetName:"Sign_up"});
         return response.data;
       },
       onSuccess: (data) => {
-        setOpenModal(true);
+        toast.success("Sign up successful")
         reset();
       },
       onError: (error) => {
@@ -82,7 +77,8 @@ export default function Signup() {
 
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+          className="w-full grid grid-cols-1 md:grid-cols-2 gap-6"
+        >
           <div className="col-span-1">
             <Controller
               name="firstName"
@@ -160,7 +156,8 @@ export default function Signup() {
                       <InputAdornment position="end">
                         <IconButton
                           onClick={togglePasswordVisibility}
-                          edge="end">
+                          edge="end"
+                        >
                           {showPassword ? <FiEyeOff /> : <FiEye />}
                         </IconButton>
                       </InputAdornment>
@@ -229,10 +226,12 @@ export default function Signup() {
                     {...field}
                     label="What is your reason for signup?"
                     error={!!fieldState.error}
-                    variant="standard">
+                    variant="standard"
+                  >
                     <MenuItem
                       sx={{ textWrap: "wrap" }}
-                      value="have queries and want to know if WoNo can help me">
+                      value="have queries and want to know if WoNo can help me"
+                    >
                       <div className="flex items-start gap-2">
                         <BiCheck size={20} />
                         <span>Just want to know if WoNo can help me</span>
@@ -286,9 +285,9 @@ export default function Signup() {
               isLoading={isRegisterationPending}
               title={"Signup"}
               disabled={isRegisterationPending}
-               className={
-              "bg-[#FF5757]  flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[7rem] px-6"
-            }
+              className={
+                "bg-[#FF5757]  flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[7rem] px-6"
+              }
             />
           </div>
 
@@ -308,7 +307,8 @@ export default function Signup() {
           title="Registration Successful"
           height="20vh"
           width="30vw"
-          color="text-green-500">
+          color="text-green-500"
+        >
           <div className="flex flex-col space-y-4 text-pretty">
             <p>Thank you for signing up with BRIDG.</p>
 

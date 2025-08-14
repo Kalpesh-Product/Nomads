@@ -10,6 +10,7 @@ import {
 import { useLocation } from "react-router-dom";
 import GetStartedButton from "../../components/GetStartedButton";
 import { ReactFitty } from "react-fitty";
+import Container from "../../components/Container";
 
 const features = [
   "No Code Website",
@@ -110,7 +111,7 @@ const themes = [
   },
   {
     src: "/hosts/themes/cafe3.png",
-     mockup: "/hosts/themes/cafe3Product.png",
+    mockup: "/hosts/themes/cafe3Product.png",
     alt: "Cafe_3",
     tag: "cafe",
   },
@@ -127,72 +128,86 @@ const HostProduct = () => {
   const initialImage = state.image;
   const [selectedImage, setSelectedImage] = useState(initialImage);
   return (
-    <div className="flex flex-col gap-8">
-      <section className="w-full bg-black flex flex-col justify-center gap-8 py-8 h-[80vh]">
-        <div className="flex justify-around">
-          <div className="flex flex-col gap-10 justify-center text-white">
-            <h1 className="text-hero font-semibold">INCLUSIONS</h1>
-            <ul className="flex flex-col gap-2 ">
-              {features.map((feat) => (
-                <li className="flex gap-2 text-subtitle ">
-                  <span className="text-[#0AA9EF] font-bold">
-                    ✔&nbsp;&nbsp;
-                  </span>
-                  <span>{feat}</span>
-                </li>
-              ))}
-            </ul>
-            <GetStartedButton externalStyles="bg-white text-black" />
-          </div>
-          <div
-            data-aos="fade-up"
-            className="w-[50%] overflow-hidden rounded-xl"
-          >
-            <img
-              className="rounded-xl w-full h-full object-cover"
-              src={selectedImage.mockup}
-              alt={selectedImage.alt}
-            />
-          </div>
-        </div>
-      </section>
-      <section className="grid grid-cols-3 gap-12 px-28 py-6">
-        <div className="text-hero col-span-1">
-          <h1>
-            Built with confidence — <br />
-            The theme store promise
-          </h1>
-        </div>
-        <div className="col-span-2">
-          <div className="grid grid-cols-2 gap-8">
-            {perks.map((perk) => (
-              <div className="flex gap-2 items-start">
-                <div className="text-content mt-1">{perk.icon}</div>
-                <div className="flex flex-col gap-2">
-                  <h2 className="font-bold">{perk.title}</h2>
-                  <span className="text-content">{perk.description}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-      <section className="w-full bg-[#E9F9FF] flex flex-col justify-center items-center gap-8 py-14 h-[80%] px-28 mt-[-2rem]">
-        <ReactFitty>Few more suggestions for you</ReactFitty>
-
-        <div className="grid grid-cols-2 justify-between gap-8">
-          {themes.filter((theme)=> theme.tag === selectedImage.tag).map((theme) => (
-            <div className="w-full h-full overflow-hidden rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.5)] cursor-pointer" 
-            onClick={()=> setSelectedImage(theme)}>
+    <div className="flex flex-col">
+      <section className="w-full bg-black flex flex-col justify-center gap-8 ">
+        <Container>
+          <div className="flex flex-wrap gap-10 lg:flex-nowrap lg:gap-60 w-full">
+            <div className="flex flex-col gap-10 justify-center w-full text-white">
+              <h1 className="text-hero font-semibold">INCLUSIONS</h1>
+              <ul className="flex flex-col gap-2 ">
+                {features.map((feat) => (
+                  <li className="flex gap-2 text-content lg:text-subtitle ">
+                    <span className="text-[#0AA9EF] font-bold">
+                      ✔&nbsp;&nbsp;
+                    </span>
+                    <span>{feat}</span>
+                  </li>
+                ))}
+              </ul>
+              <GetStartedButton externalStyles="bg-white text-black lg:w-[70%]" />
+            </div>
+            <div
+              data-aos="fade-up"
+              className="w-full overflow-hidden rounded-xl"
+            >
               <img
-                src={theme.src}
-                alt={theme.alt}
-                className="w-full h-full object-cover hover:scale-[1.2] transition-transform duration-500 ease"
+                className="rounded-xl w-full h-full object-cover"
+                src={selectedImage.mockup}
+                alt={selectedImage.alt}
               />
             </div>
-          ))}
-        </div>
-        <GetStartedButton />
+          </div>
+        </Container>
+      </section>
+      <section>
+        <Container>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="text-hero col-span-1">
+              <h1>
+                Built with confidence — <br />
+                The theme store promise
+              </h1>
+            </div>
+            <div className="col-span-2">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {perks.map((perk) => (
+                  <div className="flex gap-2 items-start">
+                    <div className="text-content mt-1">{perk.icon}</div>
+                    <div className="flex flex-col gap-2">
+                      <h2 className="font-bold">{perk.title}</h2>
+                      <span className="text-content">{perk.description}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </Container>
+      </section>
+      <section className="bg-[#E9F9FF]">
+        <Container>
+          <div className="w-full  flex flex-col justify-center items-center gap-8">
+            <ReactFitty>Few more suggestions for you</ReactFitty>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 justify-between gap-8">
+              {themes
+                .filter((theme) => theme.tag === selectedImage.tag)
+                .map((theme) => (
+                  <div
+                    className="w-full h-full overflow-hidden rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.5)] cursor-pointer"
+                    onClick={() => setSelectedImage(theme)}
+                  >
+                    <img
+                      src={theme.src}
+                      alt={theme.alt}
+                      className="w-full h-full object-cover hover:scale-[1.2] transition-transform duration-500 ease"
+                    />
+                  </div>
+                ))}
+            </div>
+            <GetStartedButton />
+          </div>
+        </Container>
       </section>
     </div>
   );

@@ -2,8 +2,10 @@ import React from "react";
 import GetStartedButton from "../../components/GetStartedButton";
 import Container from "../../components/Container";
 import tabImageCapital from "/hosts/capital/finance-usd-3.png";
+import { useNavigate } from "react-router-dom";
 
 const Capital = () => {
+  const navigate = useNavigate()
   const investorData = [
     {
       title: "Investor Management",
@@ -60,8 +62,8 @@ const Capital = () => {
           <h1 className="lg:text-[2.5rem] text-host text-center lg:leading-[3rem] font-medium">
             legandary Companies.
           </h1>
-          <div className="flex lg:justify-end pt-6">
-            <GetStartedButton title="CONNECT WITH US" />
+          <div className="flex justify-center lg:justify-end pt-6">
+            <GetStartedButton handleSubmit={()=>navigate('/hosts/signup')} title="CONNECT WITH US" />
           </div>
         </div>
       </Container>
@@ -135,7 +137,7 @@ const Capital = () => {
                 fundraising with accurate projections and cashflow trends.
               </h1>
               <div className="text-center">
-                <button className="bg-white text-black px-8 py-2 rounded-full">
+                <button onClick={()=>navigate('/hosts/signup')} className="bg-white text-black px-8 py-2 rounded-full">
                   Get Started
                 </button>
               </div>

@@ -63,7 +63,7 @@ const jobApplicationSchema = yup
       .min(0)
       .nullable(),
     joinInDays: yup
-      .number()
+      .string()
       .typeError("How Soon You Can Join (Days) must be a number")
       .min(0)
       .required("Join-in days is required"),
@@ -81,7 +81,6 @@ const jobApplicationSchema = yup
     willingToBootstrap: yup
       .string()
       .trim()
-      .oneOf(["Yes", "No"], "Willing to bootstrap must be 'Yes' or 'No'")
       .required("Willing to bootstrap is required"),
     message: yup.string().trim().nullable(),
     remarks: yup.string().trim().default(""),
@@ -326,7 +325,7 @@ export const addB2BFormSubmission = async (req, res, next) => {
       mobile: payload.mobile,
       partnerstype: payload.partnerType,
       message: payload.message,
-      formName: "enquiry",
+      formName: "connect",
     };
 
     const result = await postToAppsScript(apsBody);

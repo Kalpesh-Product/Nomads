@@ -7,17 +7,19 @@ import images from "../../assets/images";
 import FeatureCard from "../../components/FeatureCard";
 import { ReactFitty } from "react-fitty";
 import GetStartedButton from "../../components/GetStartedButton";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import MySeperator from "../../components/MySeperator";
 
 const HostHome = () => {
   // mobile screen for globe responsiveness
   const ismobile = window.innerWidth < 769;
   const isTablet = window.innerWidth < 1025;
   const isLaptop = window.innerWidth < 1441;
+  const navigate = useNavigate();
   const amenities = [
     // Group 1
     { id: 1, title: "No Code Website", icon: images.website },
-    { id: 11, title: "Booking Engine", icon: images.bookin }, // using bookingsSaas as booking engine
+    { id: 11, title: "Booking Engine", icon: images.bookingsSaas }, // using bookingsSaas as booking engine
     { id: 2, title: "Payment Gateway", icon: images.paymentGateway },
     { id: 5, title: "Leads Management", icon: images.leadGenerationSM },
     { id: 27, title: "AI SEO", icon: images.automatedSeoSM },
@@ -82,15 +84,15 @@ const HostHome = () => {
       <section className="bg-[#f7feec] mb-0 lg:mb-0">
         <Container>
           <div className="lg:space-y-0">
-            <div className="flex flex-col lg:flex-row justify-center items-center ">
-              <div className="mb-0 lg:mb-20 text-center w-full">
-                <h1 className="font-semibold text-[clamp(3.3rem,6.5vw,7rem)]">
+            <div className="flex flex-col md:flex-row justify-center items-center ">
+              <div className="mb-0 md:mb-20 text-center w-full">
+                <h1 className="font-semibold text-[clamp(3.3rem,6.8vw,7rem)]">
                   Introducing
                 </h1>{" "}
               </div>
               <div className="leading-normal text-center w-full">
                 <div className="relative mb-8 lg:mb-0">
-                  <h1 className="font-semibold text-[clamp(2.8rem,6.3vw,6rem)] text-nowrap">
+                  <h1 className="font-semibold text-[clamp(2.8rem,6.1vw,6rem)] text-nowrap">
                     N-Commerce
                   </h1>
                   <img
@@ -106,7 +108,7 @@ const HostHome = () => {
                 </p>
               </div>
             </div>
-            <div className="flex flex-col justify-center items-start gap-3">
+            <div className="flex flex-col justify-center items-start gap-3 py-12">
               <p className="text-subtitle lg:text-title font-semibold">
                 A simple NO CODE SaaS Platform.
               </p>
@@ -123,12 +125,15 @@ const HostHome = () => {
               </p>
             </div>
             <div className="flex justify-center items-center w-full h-full my-12">
-              <div className="relative w-full text-center hover:font-semibold transition-all cursor-pointer">
-                <p className="uppercase my-0 lg:my-16">It's Completely free</p>
+              <div
+                onClick={() => navigate("signup")}
+                className="relative hover:font-semibold w-full text-center  cursor-pointer"
+              >
+                <p className="uppercase my-0  md:my-16">It's Completely free</p>
                 <img
                   src="/blue-circle.png"
                   alt="blue circle"
-                  className="absolute -top-6 left-[22%] lg:top-8 lg:left-[41%] lg:right-6 w-48 h:16 lg:w-56 lg:h-30"
+                  className="absolute  -top-6 left-[22%] md:top-8 md:left-[35%] lg:left-[41%] md:right-6 w-48 h:16 md:w-56 md:h-30"
                 />
               </div>
             </div>
@@ -138,15 +143,17 @@ const HostHome = () => {
       {/* GLOBE SECTIon */}
       <section className="bg-black">
         <Container>
-          <div className="grid grid-cols-1 lg:grid-cols-2 h-[70vh] font-hero">
-            <div className="min-w-full h-full" style={{ textAlign: "left" }}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 lg:h-[70vh] font-hero">
+            <div
+              className="min-w-full h-[50vh] lg:h-full"
+              style={{ textAlign: "left" }}
+            >
               <Canvas
                 className="canvas"
                 camera={{
                   position: [0, 0, ismobile ? 15 : 25],
-                  fov: ismobile ? 60 : isTablet ? 50 : isLaptop ? 40 : 28,
-                }}
-              >
+                  fov: ismobile ? 50 : isTablet ? 50 : isLaptop ? 40 : 28,
+                }}>
                 <ambientLight intensity={0.5} />
                 <pointLight position={[10, 10, 10]} />
                 <RotatingGlobe />
@@ -163,27 +170,27 @@ const HostHome = () => {
                   SUPPORTING THE FOUNDATION OF N-COMMERCE <br />
                 </strong>
               </h3>
-              <p className="text-primary-blue text-[clamp(1rem,6.4vw,7rem)] text-nowrap">
+              <p className="text-primary-blue text-[clamp(2.3rem,6.4vw,7rem)] text-nowrap">
                 {" "}
                 “NOMAD COMMERCE”{" "}
               </p>
               <div
+                className="w-1/2 lg:w-fit"
                 style={{
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                }}
-              >
-                <button
-                  className="hero-button"
-                  data-aos-delay="200"
-                  onClick={() => {
-                    navigate("/register");
+                }}>
+                <GetStartedButton
+                  title="CONNECT WITH US"
+                  externalStyles={
+                    "bg-white text-seconadary-dark w-full text-subtitle lg:text-content"
+                  }
+                  handleSubmit={() => {
+                    navigate("signup");
                     window.scrollTo({ top: 0, behavior: "instant" });
                   }}
-                >
-                  CONNECT
-                </button>
+                />
               </div>
             </div>
           </div>
@@ -206,6 +213,9 @@ const HostHome = () => {
         </section>
       </Container>
       {/* Key Modules */}
+      <Container padding={false}>
+        <hr className="border-t-2 border-gray-300"/>
+      </Container>
       <section>
         <Container>
           <div className="flex flex-col gap-16">
@@ -226,8 +236,7 @@ const HostHome = () => {
               {onePartner.map((item) => (
                 <div
                   key={item.id}
-                  className="border-t-2 border-black w-full space-y-2 py-2"
-                >
+                  className="border-t-2 border-black w-full space-y-2 py-2">
                   <h1 className="text-title py-4">
                     {item.title || "Title here"}
                   </h1>
@@ -238,13 +247,16 @@ const HostHome = () => {
               ))}
             </div>
 
-            <div className="flex w-full justify-end pr-20">
-              <GetStartedButton title={"Get Started"} />
+            <div className="flex w-full justify-center lg:justify-end pr-0 lg:pr-20">
+              <GetStartedButton
+                title={"Get Started"}
+                handleSubmit={() => navigate("signup")}
+              />
             </div>
           </div>
         </Container>
       </section>
-      <section>
+      <section className="bg-[#f7f7f7]">
         <Container>
           <div className="flex flex-col leading-tight">
             <ReactFitty>
@@ -264,8 +276,7 @@ const HostHome = () => {
               {noCode.map((item) => (
                 <div
                   key={item.id}
-                  className="h-72 w-full overflow-hidden rounded-lg  shadow-lg"
-                >
+                  className="h-72 w-full overflow-hidden rounded-lg  shadow-lg">
                   <img
                     src={item.image || "/hosts/themes/cafe.webp"}
                     className="h-full w-full object-cover"
@@ -275,22 +286,26 @@ const HostHome = () => {
               ))}
             </div>
             <div className="text-center my-4">
-              <NavLink className={" hover:underline hover:text-primary-blue"}>
+              <NavLink
+                to={"themes"}
+                className={" hover:underline hover:text-primary-blue"}
+              >
                 View More
               </NavLink>
             </div>
           </div>
         </Container>
       </section>
+    
       <section>
         <Container>
           <div className="flex flex-col gap-16">
-            <h1 className="text-title lg:text-main-header uppercase text-center">
+            <h1 className="text-title lg:text-[5rem] uppercase text-center font-semibold lg:font-normal">
               TESTIMONIAL
             </h1>
-            <div className="flex flex-col lg:flex-row justify-between w-full items-stretch">
+            <div className="flex flex-col gap-4 lg:gap-0 md:flex-row justify-between w-full items-stretch">
               {/* Left Section */}
-              <div className="flex flex-col justify-between h-96 lg:h-96 w-full lg:w-3/4">
+              <div className="flex flex-col justify-between h-96 lg:h-[30rem] w-full lg:w-[90%]">
                 <div>
                   <p className="text-subtitle">
                     “We went from managing 3,000 sq ft to 50,000+ sq ft in the
@@ -303,8 +318,7 @@ const HostHome = () => {
                 <div>
                   <h4
                     className="my-4"
-                    style={{ fontFamily: "Amsterdam", fontSize: "2rem" }}
-                  >
+                    style={{ fontFamily: "Amsterdam", fontSize: "2rem" }}>
                     Kashif Shaikh
                   </h4>
                   <p className="m-0">Co-Founder & COO</p>
@@ -313,13 +327,19 @@ const HostHome = () => {
               </div>
 
               {/* Right Section */}
-              <div className="h-96 w-full lg:w-1/2 overflow-hidden rounded-xl">
+              <div className="h-[30rem] w-full lg:w-1/2 overflow-hidden rounded-xl">
                 <img
                   src="/hosts/themes/Kashif_Edit.png"
                   alt="owner-image"
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-cover object-center"
                 />
               </div>
+            </div>
+             <div className="flex w-full justify-center lg:justify-center">
+              <GetStartedButton
+                title={"Get Started"}
+                handleSubmit={() => navigate("signup")}
+              />
             </div>
           </div>
         </Container>

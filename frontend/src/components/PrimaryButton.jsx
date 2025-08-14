@@ -18,10 +18,10 @@ const PrimaryButton = ({
     <button
       disabled={disabled || isLoading}
       type={type}
-      className={`flex rounded-full items-center cursor-pointer justify-center gap-2
+      className={`${className} flex rounded-full items-center cursor-pointer justify-center gap-2
         ${baseBgColor} ${hoverBgColor} text-secondary
         ${fontSize ? fontSize : "text-content leading-5"}
-        ${externalStyles} ${padding ? padding : "px-6 py-3"} ${className}`}
+        ${externalStyles} ${padding ? padding : "px-6 py-3"} `}
       onClick={handleSubmit}>
       {isLoading && <CircularProgress size={16} sx={{ color: "#ffffff" }} />}
       <span className="text-center">{title}</span>

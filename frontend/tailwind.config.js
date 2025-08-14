@@ -32,6 +32,7 @@ module.exports = {
         hero: ["Bebas Neue", "ui-sans-serif", "system-ui"],
         cursive: ["Bilbo Swash Caps"],
         play: ["Playwrite US Modern"],
+        comic : ["Comic Relief", "system-ui"]
       },
       fontSize: {
         tiny: ["0.75rem", { lineHeight: "1rem" }], // ~12px

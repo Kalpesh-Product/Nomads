@@ -10,6 +10,11 @@
 }
 
 @font-face {
+  font-family: Amsterdam;
+  src: url("../src/assets/El_Messiri/amsterdam.ttf");
+}
+
+@font-face {
   font-family: Elmessiri;
   src: url("../src/assets/El_Messiri/ElMessiri-VariableFont_wght.ttf");
 }
@@ -171,7 +176,52 @@
   font-style: normal;
 }
 
+.comic-neue-light {
+  font-family: "Comic Neue", cursive;
+  font-weight: 300;
+  font-style: normal;
+}
 
+.comic-neue-regular {
+  font-family: "Comic Neue", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.comic-neue-bold {
+  font-family: "Comic Neue", cursive;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.comic-neue-light-italic {
+  font-family: "Comic Neue", cursive;
+  font-weight: 300;
+  font-style: italic;
+}
+
+.comic-neue-regular-italic {
+  font-family: "Comic Neue", cursive;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.comic-neue-bold-italic {
+  font-family: "Comic Neue", cursive;
+  font-weight: 700;
+  font-style: italic;
+}
+.comic-relief-regular {
+  font-family: "Comic Relief", system-ui;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.comic-relief-bold {
+  font-family: "Comic Relief", system-ui;
+  font-weight: 700;
+  font-style: normal;
+}
 
 
 
@@ -341,7 +391,7 @@ body::-webkit-scrollbar {
 /* <= 768px */
 @media (max-width: 768px) {
   .hero__animation {
-    padding-left: 53px;
+    padding-left: 39px;
     padding-bottom: 9px;
     height: 60px;
     top: -5px;

@@ -11,8 +11,11 @@ import CompanyLogosDesktop from "/hosts/leads-page/leads-companies-image-desktop
 import CompanyLogosTab from "/hosts/leads-page/leads-companies-image-tab.png";
 import CompanyLogosMobile from "/hosts/leads-page/leads-companies-image-phone.png";
 
-import { GrFormCheckmark } from "react-icons/gr";
+// import { GrFormCheckmark } from "react-icons/gr";
+import { PiCheckFatFill } from "react-icons/pi";
 import { ReactFitty } from "react-fitty";
+import { useNavigate } from "react-router-dom";
+import MySeperator from "../../components/MySeperator";
 
 const checklistItems = [
   "Google My Business",
@@ -69,6 +72,7 @@ const contentItems = [
 ];
 
 const Leads = () => {
+  const navigate = useNavigate()
   return (
     <div>
       {/* Top Text section */}
@@ -82,7 +86,7 @@ const Leads = () => {
             </h2>
           </div>
           <div className="flex flex-row lg:justify-end md:justify-end  sm:justify-center xs:justify-center items-center py-6">
-            <button className="bg-black text-white px-8 py-2 rounded-full">
+            <button onClick={()=>navigate('/hosts/signup')} className="bg-black text-white px-8 py-2 rounded-full">
               Get Started
             </button>
           </div>
@@ -107,11 +111,11 @@ const Leads = () => {
           </div>
           <div className="grid lg:grid-cols-12 md:grid-cols-12 sm:grid-cols-1 xs:grid-cols-1">
             <div className="col-span-4">
-              <div className="px-4">
+              <div className="pr-4">
                 <ul role="list" className="list-none m-0 p-0 space-y-1.5">
                   {checklistItems.map((item, index) => (
                     <li key={index} className="flex items-start gap-3 mt-0">
-                      <GrFormCheckmark
+                      <PiCheckFatFill
                         size={20}
                         className=" text-primary-blue shrink-0 text-[1.1rem]"
                         aria-hidden
@@ -171,6 +175,7 @@ const Leads = () => {
         </div>
       </Container>
 
+
       {/* Run & Scale Grid Section */}
       <Container padding={false}>
         <div className="pt-16 pb-8">
@@ -186,13 +191,13 @@ const Leads = () => {
           <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {contentItems.map((item, index) => (
               <div key={index} className="py-2">
-                <h2 className="text-[1.5rem] font-semibold">{item.heading}</h2>
+                <h2 className="text-[1.5rem] font-semibold text-[#212529]">{item.heading}</h2>
                 <p>{item.text}</p>
               </div>
             ))}
           </div>
           <div className="flex lg:justify-end xs:justify-center items-center lg:px-8">
-            <button className="bg-black text-white px-8 py-2 rounded-full">
+            <button onClick={()=>navigate('/hosts/signup')} className="bg-black text-white px-8 py-2 rounded-full">
               Get Started
             </button>
           </div>
