@@ -11,7 +11,7 @@ const HostFooter = () => {
   const footerSections = [
     {
       links: [
-        { name: "Sign In", link: "/hosts/login" },
+        { name: "Sign In", link: "https://wonofe.vercel.app" },
         { name: "Sign Up", link: "/hosts/signup" },
         { name: "Contact", link: "/hosts/contact" },
       ],

@@ -11,6 +11,7 @@ const GetStartedButton = ({
   className,
   isLoading, // New prop for showing the spinner
 }) => {
+  console.log("isLoading",isLoading)
   const baseBgColor = disabled || isLoading ? "bg-gray-400" : "bg-black";
 
   return (

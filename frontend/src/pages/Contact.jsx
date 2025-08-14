@@ -12,6 +12,7 @@ import {
   Button,
   Grid,
   Box,
+  CircularProgress,
 } from "@mui/material";
 import Container from "../components/Container";
 import { Controller, useForm } from "react-hook-form";
@@ -41,11 +42,6 @@ const Contact = () => {
   });
 
   const handleCloseModal = () => setShowModal(false);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
 
   const { mutate: submitContactForm, isPending: isContactPending } =
     useMutation({
@@ -278,7 +274,13 @@ const Contact = () => {
                       "&:hover": { bgcolor: "#333" },
                     }}
                   >
-                    CONNECT
+                    {isContactPending && (
+                      <CircularProgress
+                        size={16}
+                        sx={{ color: "white", mr: 1 }}
+                      />
+                    )}
+                    {isContactPending ? "CONNECTING..." : "CONNECT"}
                   </Button>
                 </div>
               </div>

@@ -132,8 +132,7 @@ const HostHeader = () => {
               </li>
             ))}
 
-            <div className="h-[0.2px] bg-gray-300"></div>
-            <div className="flex justify-center p-4">
+             <div className="flex justify-center p-4">
               <BnButton
                 title={"Login"}
                 externalStyles={"bg-[#FF5757]"}
