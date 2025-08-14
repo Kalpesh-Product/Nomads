@@ -1,8 +1,9 @@
 import MeetingRoom from "../../models/Meeting/MeetingRoom.js";
+import MeetingPoc from "../../models/Meeting/PointOfContact.js";
 import csvParser from "csv-parser";
 import { Readable } from "stream";
 
-export const bulkInsertMeetingRooms = async (req, res, next) => {
+export const bulkInsertMeetingPoc = async (req, res, next) => {
   try {
     const file = req.file;
     if (!file) {
@@ -10,43 +11,42 @@ export const bulkInsertMeetingRooms = async (req, res, next) => {
         .status(400)
         .json({ message: "Please provide a valid CSV file" });
     }
+
+    const meetingRooms = await MeetingRoom.find().lean().exec();
+    const meetingsMap = new Map(
+      meetingRooms.map((meeting) => [meeting.businessId, meeting._id])
+    );
     const stream = Readable.from(file.buffer.toString("utf-8").trim());
-    const meetingRooms = [];
+    const meetingsPoc = [];
     stream
       .pipe(csvParser())
       .on("data", (row) => {
-        const meetingRoom = {
-          businessId: row["Business ID"]?.trim(),
-          businessName: row["Business Name"]?.trim(),
-          registeredEntityName: row["Registered Entity name"]?.trim(),
-          website: row["Website"]?.trim(),
+        const meetingId = meetingsMap.get(row["Business ID"]?.trim());
+        const poc = {
+          meeting: meetingId,
+          name: row["POC Name"]?.trim(),
+          pocDesignation: row["POC Designation"]?.trim(),
+          email: row["Email"]?.trim()?.toLowerCase(),
+          phoneNumber: row["Phone Number"]?.trim(),
+          linkedInProfile: row["LinkedIn Profile"]?.trim(),
+          languages: row["Languages"]
+            ? row["Languages"].split(",").map((lang) => lang.trim())
+            : [],
           address: row["Address"]?.trim(),
-          city: row["City"]?.trim(),
-          country: row["Country"]?.trim(),
-          state: row["State"]?.trim(),
-          about: row["About"]?.trim(),
-          totalSeats: parseInt(row["Total Seats"]) || null,
-          latitude: parseFloat(row["latitude"]?.trim()),
-          longitude: parseFloat(row["longitude"]?.trim()),
-          googleMap: row["Google map"]?.trim(),
-          ratings: parseFloat(row["Ratings"]) || null,
-          totalReviews: row["Total Reviews"]
-            ? parseInt(row["Total Reviews"]?.trim())
-            : 0,
-          inclusions: row["Inclusions"]
+          availabilityTime: row["Availibility time"]?.trim(),
+          notes: row["Notes"]?.trim(),
         };
-
-        meetingRooms.push(meetingRoom);
+        meetingsPoc.push(poc);
       })
       .on("end", async () => {
         try {
-          const businessIds = meetingRooms.map((w) => w.businessId);
-          const existing = await MeetingRoom.find({
+          const businessIds = meetingsPoc.map((w) => w.businessId);
+          const existing = await MeetingPoc.find({
             businessId: { $in: businessIds },
           });
           const existingIds = new Set(existing.map((e) => e.businessId));
 
-          const toInsert = meetingRooms.filter(
+          const toInsert = meetingsPoc.filter(
             (w) => !existingIds.has(w.businessId)
           );
 
@@ -56,7 +56,7 @@ export const bulkInsertMeetingRooms = async (req, res, next) => {
               .json({ message: "All workations already exist." });
           }
 
-          const inserted = await MeetingRoom.insertMany(toInsert);
+          const inserted = await MeetingPoc.insertMany(toInsert);
           res.status(201).json({
             message: `Successfully inserted ${inserted.length} workations.`,
             data: inserted,
