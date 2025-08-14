@@ -172,8 +172,6 @@ export const addB2CformSubmission = async (req, res, next) => {
       },
     };
 
-    console.log("payload", req.body);
-
     const config = sheetConfig[sheetName];
     if (!config) {
       throw new Error(`Unsupported sheet name: ${sheetName}`);
@@ -196,7 +194,7 @@ export const addB2CformSubmission = async (req, res, next) => {
     });
 
     const result = await response.json();
-    console.log(result);
+
     if (result.status !== "success") {
       throw new Error(result.message || "Failed to save data to Google Sheets");
     }
