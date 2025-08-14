@@ -34,9 +34,6 @@ export const bulkInsertMeetingRooms = async (req, res, next) => {
             ? parseInt(row["Total Reviews"]?.trim())
             : 0,
           inclusions: row["Inclusions"]
-            ?.split(",")
-            .map((i) => i.trim())
-            .filter(Boolean),
         };
 
         meetingRooms.push(meetingRoom);

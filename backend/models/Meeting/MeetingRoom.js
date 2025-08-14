@@ -55,6 +55,7 @@ const meetingRoomSchema = new mongoose.Schema(
       min: 0,
       max: 5,
     },
+    inclusions: String,
     totalReviews: {
       type: Number,
       default: 0,
