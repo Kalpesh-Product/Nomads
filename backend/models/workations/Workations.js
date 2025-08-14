@@ -29,11 +29,10 @@ const workationSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    images: [
-      {
-        type: String,
-      },
-    ],
+    images: {
+      type: [{ url: String, index: Number }],
+    },
+
     address: {
       type: String,
       trim: true,

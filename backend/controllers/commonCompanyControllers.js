@@ -279,6 +279,7 @@ const companyModels = {
   hostels: Hostels,
   "private-stay": PrivateStay,
   cafe: Cafe,
+  workation: Workation,
 };
 
 export const uploadCompanyImages = async (req, res, next) => {
