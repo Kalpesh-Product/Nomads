@@ -362,7 +362,7 @@ const Home = () => {
                   </h1>
                 </div>
                 <div className="text-title ">
-                  <h1 className="text-[clamp(1rem,7.3vw,2.9rem)] text-nowrap">
+                  <h1 className="text-[clamp(1rem,6.3vw,2.9rem)] text-nowrap">
                     <span className="text-[#FF5757] uppercase font-semibold">
                       Largest
                     </span>{" "}
@@ -370,7 +370,7 @@ const Home = () => {
                   </h1>
                 </div>
                 <div className="font-semibold">
-                  <h1 className="text-[clamp(4rem,7.5vw,16rem)]">NOMADS</h1>
+                  <h1 className="text-[clamp(4rem,7.3vw,16rem)]">NOMADS</h1>
                 </div>
               </div>
 

@@ -84,9 +84,9 @@ const HostHome = () => {
       <section className="bg-[#f7feec] mb-0 lg:mb-0">
         <Container>
           <div className="lg:space-y-0">
-            <div className="flex flex-col lg:flex-row justify-center items-center ">
-              <div className="mb-0 lg:mb-20 text-center w-full">
-                <h1 className="font-semibold text-[clamp(3.3rem,6.2vw,7rem)]">
+            <div className="flex flex-col md:flex-row justify-center items-center ">
+              <div className="mb-0 md:mb-20 text-center w-full">
+                <h1 className="font-semibold text-[clamp(3.3rem,6.8vw,7rem)]">
                   Introducing
                 </h1>{" "}
               </div>
@@ -129,11 +129,11 @@ const HostHome = () => {
                 onClick={() => navigate("signup")}
                 className="relative hover:font-semibold w-full text-center  cursor-pointer"
               >
-                <p className="uppercase my-0  lg:my-16">It's Completely free</p>
+                <p className="uppercase my-0  md:my-16">It's Completely free</p>
                 <img
                   src="/blue-circle.png"
                   alt="blue circle"
-                  className="absolute  -top-6 left-[22%] lg:top-8 lg:left-[41%] lg:right-6 w-48 h:16 lg:w-56 lg:h-30"
+                  className="absolute  -top-6 left-[22%] md:top-8 md:left-[35%] lg:left-[41%] md:right-6 w-48 h:16 md:w-56 md:h-30"
                 />
               </div>
             </div>
@@ -256,8 +256,7 @@ const HostHome = () => {
           </div>
         </Container>
       </section>
-      <MySeperator />
-      <section>
+      <section className="bg-[#f7f7f7]">
         <Container>
           <div className="flex flex-col leading-tight">
             <ReactFitty>
@@ -297,16 +296,16 @@ const HostHome = () => {
           </div>
         </Container>
       </section>
-            <MySeperator />
+    
       <section>
         <Container>
           <div className="flex flex-col gap-16">
-            <h1 className="text-title lg:text-main-header uppercase text-center font-semibold lg:font-normal">
+            <h1 className="text-title lg:text-[5rem] uppercase text-center font-semibold lg:font-normal">
               TESTIMONIAL
             </h1>
-            <div className="flex flex-col gap-4 lg:gap-0 lg:flex-row justify-between w-full items-stretch">
+            <div className="flex flex-col gap-4 lg:gap-0 md:flex-row justify-between w-full items-stretch">
               {/* Left Section */}
-              <div className="flex flex-col justify-between h-96 lg:h-96 w-full lg:w-3/4">
+              <div className="flex flex-col justify-between h-96 lg:h-[30rem] w-full lg:w-[90%]">
                 <div>
                   <p className="text-subtitle">
                     “We went from managing 3,000 sq ft to 50,000+ sq ft in the
@@ -328,13 +327,19 @@ const HostHome = () => {
               </div>
 
               {/* Right Section */}
-              <div className="h-96 w-full lg:w-1/2 overflow-hidden rounded-xl">
+              <div className="h-[30rem] w-full lg:w-1/2 overflow-hidden rounded-xl">
                 <img
                   src="/hosts/themes/Kashif_Edit.png"
                   alt="owner-image"
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-cover object-center"
                 />
               </div>
+            </div>
+             <div className="flex w-full justify-center lg:justify-center">
+              <GetStartedButton
+                title={"Get Started"}
+                handleSubmit={() => navigate("signup")}
+              />
             </div>
           </div>
         </Container>

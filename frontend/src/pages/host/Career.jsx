@@ -7,7 +7,6 @@ import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import axios from "../../utils/axios";
 
-
 const HostCareer = () => {
   const [openIndex, setOpenIndex] = useState(null);
 
@@ -41,11 +40,10 @@ const HostCareer = () => {
                 {/* Accordion Header */}
                 <button
                   onClick={() => toggleAccordion(idx)}
-                  className="w-full flex justify-between items-center py-6 text-left text-3xl font-bold focus:outline-none"
-                >
+                  className="w-full flex justify-between items-center py-6 text-left text-3xl font-bold focus:outline-none">
                   {section.categoryTitle}
                   <FaChevronDown
-                    className={`text-gray-600 transition-transform duration-300 ${
+                    className={`text-gray-600 transition-transform duration-300 text-sm ${
                       isOpen ? "rotate-180" : ""
                     }`}
                   />
@@ -55,8 +53,7 @@ const HostCareer = () => {
                 <div
                   className={`transition-all duration-500 ease-in-out ${
                     isOpen ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0"
-                  } overflow-hidden`}
-                >
+                  } overflow-hidden`}>
                   <div className="space-y-4 mt-2">
                     {section.jobs.map((job, jobIdx) => (
                       <div key={job.id}>
@@ -83,8 +80,7 @@ const HostCareer = () => {
                           </Link> */}
                               <Link
                                 to={`job/${job.id}`}
-                                className="border-2 border-gray-600 p-2 rounded-md hover:bg-black hover:text-white transition-colors"
-                              >
+                                className="border-2 border-gray-600 p-2 rounded-md hover:bg-black hover:text-white transition-colors">
                                 <FaChevronRight />
                               </Link>
                             </div>

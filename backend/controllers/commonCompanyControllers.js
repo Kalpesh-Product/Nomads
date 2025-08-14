@@ -22,6 +22,11 @@ import Cafe from "../models/cafe/Cafe.js";
 import CafePoc from "../models/cafe/PointOfContact.js";
 import CafeReview from "../models/cafe/Review.js";
 import fetchCafeData from "../utils/fetchCafeData.js";
+import fetchWorkationData from "../utils/fetchWorkationData.js";
+import Workation from "../models/workations/Workations.js";
+import WorkationUnits from "../models/workations/Units.js";
+import WorkationPoc from "../models/workations/PointOfContact.js";
+import WorkationReview from "../models/workations/Review.js";
 import { uploadFileToS3 } from "../config/s3Config.js";
 
 export const getCompanyDataLocationWise = async (req, res, next) => {
@@ -42,6 +47,9 @@ export const getCompanyDataLocationWise = async (req, res, next) => {
     } else if (category?.toLowerCase() === "cafe") {
       const cafeData = await fetchCafeData(country, state);
       return res.status(200).json(cafeData);
+    } else if (category?.toLowerCase() === "workation") {
+      const workationData = await fetchWorkationData(country, state);
+      return res.status(200).json(workationData);
     } else {
       const [
         coworkingData,
@@ -74,6 +82,32 @@ export const getCompanyDataLocationWise = async (req, res, next) => {
 export const getIndividualCompany = async (req, res, next) => {
   try {
     const { companyId, type } = req.query;
+    if (type?.toLowerCase() === "workation") {
+      const workationCompany = await Workation.findOne({ _id: companyId })
+        .lean()
+        .exec();
+      const [pocs, services, reviews] = await Promise.all([
+        WorkationPoc.findOne({
+          coworkingCompany: companyId,
+          isActive: true,
+        })
+          .lean()
+          .exec(),
+        WorkationUnits.findOne({ workation: companyId }).lean().exec(),
+        WorkationReview.find({ workation: companyId }).lean().exec(),
+      ]);
+
+      const companyObject = {
+        ...workationCompany,
+        reviewCount: workationCompany.reviews,
+        pocs,
+        services,
+        reviews,
+        type: "Coworking",
+        inclusions: workationCompany.inclusions,
+      };
+      return res.status(200).json(companyObject);
+    }
 
     if (type?.toLowerCase() === "coworking") {
       const company = await CoworkingCompany.findOne({ _id: companyId })

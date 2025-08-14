@@ -101,13 +101,23 @@ const MainPage = () => {
           </div>
         </article>
       </div>
-      <div className="flex justify-evenly items-center flex-row w-full ">
+      <div className="flex justify-evenly items-center flex-row w-full sm:flex-col xs:flex-col lg:flex-row md:flex-row">
         <div className="w-32"></div>
-        <div className="w-full">
-          <p className="text-center  pb-2">
+        <div className="w-full  ">
+          {/* <p className="text-center  pb-2 sm:text-tiny xs:text-tiny lg:text-content">
             &copy; Copyright {new Date().getFullYear()} -{" "}
             {(new Date().getFullYear() + 1).toString().slice(-2)} WONOCO PRIVATE
             LIMITED – SINGAPORE. All Rights Reserved.
+          </p> */}
+          <p className="text-center pb-2 sm:text-tiny xs:text-tiny lg:text-content">
+            <span className="whitespace-nowrap">
+              &copy; Copyright {new Date().getFullYear()} -{" "}
+              {(new Date().getFullYear() + 1).toString().slice(-2)}
+            </span>
+            <span className="block sm:inline">
+              {" "}
+              WONOCO PRIVATE LIMITED – SINGAPORE. All Rights Reserved.
+            </span>
           </p>
         </div>
         <div className="flex items-right justify-end gap-4  pb-2 px-6 w-32">

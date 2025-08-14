@@ -21,7 +21,7 @@ const FeatureCard = ({ title, icon }) => {
         </div>
 
         <p
-          className="text-secondary-dark text-tiny lg:text-tiny"
+          className="text-secondary-dark text-tiny lg:text-[0.6rem] font-medium"
          
         >
           {title.toUpperCase()}
