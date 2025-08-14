@@ -83,8 +83,7 @@ const HostHeader = () => {
           <div className="h-full px-2  lg:hidden">
             <button
               onClick={() => setOpen(true)}
-              className=" rounded-lg text-subtitle text-black"
-            >
+              className=" rounded-lg text-subtitle text-black">
               ☰
             </button>
           </div>
@@ -108,8 +107,7 @@ const HostHeader = () => {
             <div className="flex justify-end w-full">
               <span
                 className="text-title cursor-pointer text-black"
-                onClick={() => setOpen(false)}
-              >
+                onClick={() => setOpen(false)}>
                 <IoCloseSharp />
               </span>
             </div>
@@ -123,8 +121,7 @@ const HostHeader = () => {
               <li key={item.id} className="items-center text-center">
                 <div
                   onClick={() => handleNavigation(item.link)}
-                  className="py-4"
-                >
+                  className="py-4">
                   <p className="text-secondary-dark text-lg">{item.name}</p>
                 </div>
                 <div className="h-[0.2px] bg-gray-300"></div>

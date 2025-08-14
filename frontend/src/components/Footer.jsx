@@ -40,7 +40,7 @@ const Footer = () => {
   return (
     <footer className="w-full bg-gray-100 text-black backdrop-blur-md  flex flex-col justify-center items-center gap-0 pb-0 md:pb-0   shadow-lg ">
       <div className="w-full flex flex-wrap md:flex-wrap lg:flex-nowrap justify-between items-center pt-12 pb-8 px-4 md:px-[7.5rem]">
-        <div className="flex flex-col w-full lg:w-fit  items-center justify-center md:flex-1 md:justify-center md:items-center lg:justify-start lg:items-start mb-8 lg:mb-0">
+        <div className="flex flex-col w-full lg:w-fit justify-center items-center md:flex-1 md:justify-center md:items-center lg:justify-start lg:items-start mb-8 lg:mb-0">
           <div className="w-full md:w-80 h-full flex flex-col lg:justify-start lg:items-start justify-center items-center">
             <img
               src={logo}
@@ -63,19 +63,21 @@ const Footer = () => {
               </Link>
             </p>
             {/* <div className="flex gap-3 mt-4">
-              <FaTwitter className="bg-gray-700 p-1 rounded text-white text-xl cursor-pointer hover:text-blue-400" />
-              <FaFacebookF className="bg-gray-700 p-1 rounded text-white text-xl cursor-pointer hover:text-blue-500" />
-              <FaInstagram className="bg-gray-700 p-1 rounded text-white text-xl cursor-pointer hover:text-pink-400" />
-              <FaLinkedinIn className="bg-gray-700 p-1 rounded text-white text-xl cursor-pointer hover:text-blue-600" />
-            </div> */}
+                      <FaTwitter className="bg-gray-700 p-1 rounded text-white text-xl cursor-pointer hover:text-blue-400" />
+                      <FaFacebookF className="bg-gray-700 p-1 rounded text-white text-xl cursor-pointer hover:text-blue-500" />
+                      <FaInstagram className="bg-gray-700 p-1 rounded text-white text-xl cursor-pointer hover:text-pink-400" />
+                      <FaLinkedinIn className="bg-gray-700 p-1 rounded text-white text-xl cursor-pointer hover:text-blue-600" />
+                    </div> */}
           </div>
         </div>
         <div className="lg:w-fit w-full">
-          <div className="w-full md:w-full lg:w-fit grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-10 lg:gap-32 lg:mr-5">
+          <div className="w-full md:w-full lg:w-fit grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-x-10 lg:gap-x-8 lg:gap-y-0  lg:mr-5">
+            <div></div>
+            <div></div>
             {footerSections.map((section, idx) => (
               <div
                 key={idx}
-                className="flex flex-col justify-center items-center text-start lg:justify-start lg:items-center">
+                className="flex flex-col  justify-center items-center text-start lg:justify-start lg:items-center">
                 {/* <h3 className="font-semibold text-lg mb-2">
                 {section.heading.toUpperCase()}
               </h3> */}
@@ -99,7 +101,10 @@ const Footer = () => {
             &copy; Copyright {new Date().getFullYear()} -{" "}
             {(new Date().getFullYear() + 1).toString().slice(-2)} <span></span>
           </span>{" "}
-          <span> WONOCO PRIVATE LIMITED - SINGAPORE. All Rights Reserved.</span>
+          <span className="text-tiny lg:text-content">
+            {" "}
+            WONOCO PRIVATE LIMITED - SINGAPORE. All Rights Reserved.
+          </span>
         </div>
       </div>
       {/* Footer Bottom Section */}
