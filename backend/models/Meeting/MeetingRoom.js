@@ -59,6 +59,7 @@ const meetingRoomSchema = new mongoose.Schema(
     },
     totalReviews: {
       type: Number,
+      default: 0,
     },
   },
   {

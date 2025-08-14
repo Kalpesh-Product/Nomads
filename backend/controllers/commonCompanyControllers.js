@@ -57,12 +57,14 @@ export const getCompanyDataLocationWise = async (req, res, next) => {
         hostelData,
         privateStayData,
         cafeData,
+        workationData,
       ] = await Promise.all([
         fetchCoworkingData(country, state),
         fetchColivingData(country, state),
         fetchHostelData(country, state),
         fetchPrivateStayData(country, state),
         fetchCafeData(country, state),
+        fetchWorkationData(country, state),
       ]);
       return res
         .status(200)
@@ -72,6 +74,7 @@ export const getCompanyDataLocationWise = async (req, res, next) => {
           ...hostelData,
           ...privateStayData,
           ...cafeData,
+          ...workationData,
         ]);
     }
   } catch (error) {
@@ -86,7 +89,7 @@ export const getIndividualCompany = async (req, res, next) => {
       const workationCompany = await Workation.findOne({ _id: companyId })
         .lean()
         .exec();
-      const [pocs, services, reviews] = await Promise.all([
+      const [pocs, units, reviews] = await Promise.all([
         WorkationPoc.findOne({
           coworkingCompany: companyId,
           isActive: true,
@@ -101,7 +104,7 @@ export const getIndividualCompany = async (req, res, next) => {
         ...workationCompany,
         reviewCount: workationCompany.reviews,
         pocs,
-        services,
+        units,
         reviews,
         type: "Coworking",
         inclusions: workationCompany.inclusions,

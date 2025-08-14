@@ -30,7 +30,9 @@ export const bulkInsertMeetingRooms = async (req, res, next) => {
           longitude: parseFloat(row["longitude"]?.trim()),
           googleMap: row["Google map"]?.trim(),
           ratings: parseFloat(row["Ratings"]) || null,
-          totalReviews: parseInt(row["Total Reviews"]),
+          totalReviews: row["Total Reviews"]
+            ? parseInt(row["Total Reviews"]?.trim())
+            : 0,
           inclusions: row["Inclusions"]
             ?.split(",")
             .map((i) => i.trim())
