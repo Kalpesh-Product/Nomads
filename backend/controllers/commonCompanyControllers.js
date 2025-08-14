@@ -28,6 +28,7 @@ import WorkationUnits from "../models/workations/Units.js";
 import WorkationPoc from "../models/workations/PointOfContact.js";
 import WorkationReview from "../models/workations/Review.js";
 import { uploadFileToS3 } from "../config/s3Config.js";
+import MeetingRoom from "../models/Meeting/MeetingRoom.js";
 
 export const getCompanyDataLocationWise = async (req, res, next) => {
   try {
@@ -280,6 +281,7 @@ const companyModels = {
   "private-stay": PrivateStay,
   cafe: Cafe,
   workation: Workation,
+  meetingroom: MeetingRoom,
 };
 
 export const uploadCompanyImages = async (req, res, next) => {
