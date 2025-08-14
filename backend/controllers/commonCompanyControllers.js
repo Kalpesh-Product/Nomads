@@ -55,7 +55,7 @@ export const getCompanyDataLocationWise = async (req, res, next) => {
     } else if (category?.toLowerCase() === "workation") {
       const workationData = await fetchWorkationData(country, state);
       return res.status(200).json(workationData);
-    } else if (category?.toLowerCase() === "meeting") {
+    } else if (category?.toLowerCase() === "meetingroom") {
       const workationData = await fetchMeetingData(country, state);
       return res.status(200).json(workationData);
     } else {
@@ -274,7 +274,7 @@ export const getIndividualCompany = async (req, res, next) => {
           ),
       };
       return res.status(200).json(companyObject);
-    } else if (type?.toLowerCase() === "meeting") {
+    } else if (type?.toLowerCase() === "meetingroom") {
       const company = await MeetingRoom.findOne({ _id: companyId })
         .lean()
         .exec();

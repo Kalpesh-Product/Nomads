@@ -37,7 +37,7 @@ export default async function fetchMeetingData(country, state) {
             ? inc?.split(" ")?.join("").toLowerCase().trim()
             : inc?.trim().toLowerCase()
         ),
-      type: "meeting",
+      type: "meetingroom",
     };
   });
 }
