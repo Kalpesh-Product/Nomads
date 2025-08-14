@@ -1,16 +1,11 @@
 import React, { useEffect, useState } from "react";
-import Container from "../components/Container";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { MdLocationOn } from "react-icons/md";
 import { Controller, useForm } from "react-hook-form";
-import { MenuItem, TextField } from "@mui/material";
+import { TextField } from "@mui/material";
 import { DesktopDatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
-import PrimaryButton from "../components/PrimaryButton";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import SecondaryButton from "../components/SecondaryButton";
-import icons from "../assets/icons";
-import Amenities from "../components/Amenities";
 import ReviewCard from "../components/ReviewCard";
 import LeafRatings from "../components/LeafRatings";
 import axios from "../utils/axios";
