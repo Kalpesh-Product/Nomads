@@ -192,7 +192,7 @@ export const addB2CformSubmission = async (req, res, next) => {
     });
 
     const result = await response.json();
-    console.log(result);
+
     if (result.status !== "success") {
       throw new Error(result.message || "Failed to save data to Google Sheets");
     }
