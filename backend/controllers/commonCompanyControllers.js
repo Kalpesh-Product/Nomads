@@ -326,3 +326,45 @@ export const uploadCompanyImages = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getAllCompanyLocations = async (req, res, next) => {
+  try {
+    const models = [
+      Cafe,
+      ColivingCompany,
+      CoworkingCompany,
+      Hostels,
+      // MeetingRoom,
+      PrivateStay,
+      // Workation,
+    ];
+
+    const locationMap = new Map();
+
+    for (const model of models) {
+      const countries = await model.distinct("country");
+      const states = await model.distinct("state");
+
+      for (const ctry of countries) {
+        if (!ctry) continue;
+
+        if (!locationMap.has(ctry)) {
+          locationMap.set(ctry, {
+            country: ctry,
+            states: [],
+          });
+        }
+
+        if (states && states.length > 0) {
+          const entry = locationMap.get(ctry);
+
+          entry.states = [...new Set([...entry.states, ...states])];
+        }
+      }
+    }
+
+    return res.status(200).json([...locationMap.values()]);
+  } catch (error) {
+    next(error);
+  }
+};
