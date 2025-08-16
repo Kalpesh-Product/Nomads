@@ -130,22 +130,21 @@ const Career = () => {
   const { pathname } = useLocation();
   const isHost = pathname.includes("host");
   const customLink = isHost ? `/hosts/career/job` : `/nomad/career/job`;
-  const customRoute = isHost ? "job/get-job-posts" : "";
+  // const customRoute = isHost ? "job/get-job-posts" : "";
 
   const { data: jobRoles, isLoading } = useQuery({
     queryKey: ["jobRoles"],
     queryFn: async () => {
-      const response = await axios.get(`${customRoute}`);
+      const response = await axios.get("job/get-job-posts");
       return response.data;
     },
-    enabled: !!isHost,
   });
 
   const toggleAccordion = (idx) => {
     setOpenIndex((prev) => (prev === idx ? null : idx));
   };
 
-  const jobData = isHost ? jobRoles : jobRolesDummy;
+  // const jobData = isHost ? jobRoles : jobRolesDummy;
 
   return (
     <Container>
@@ -162,7 +161,7 @@ const Career = () => {
         <div className="flex flex-col gap-4">
           {isLoading
             ? []
-            : jobData
+            : jobRoles
                 .filter((item) => {
                   
                   return item.jobPosts?.length;
