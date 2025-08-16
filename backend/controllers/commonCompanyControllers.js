@@ -117,8 +117,13 @@ export const getIndividualCompany = async (req, res, next) => {
         pocs,
         units,
         reviews,
-        type: "Coworking",
-        inclusions: workationCompany.inclusions,
+        type: "Workation",
+        inclusions: workationCompany.inclusions.split(",")
+        .map((inc) =>
+          inc?.split(" ").length
+            ? inc?.split(" ")?.join("").toLowerCase().trim()
+            : inc?.trim().toLowerCase()
+        ),
       };
       return res.status(200).json(companyObject);
     }
