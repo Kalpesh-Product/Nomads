@@ -9,116 +9,116 @@ import romans from "romans";
 
 const jobRolesDummy = [
   {
-    title: "I. Product Management",
-    jobs: [
+    categoryTitle: "I. Product Management",
+    jobPosts: [
       {
-        id: 1,
+        _id: 1,
         title: "UI Designer",
-        type: "Full-Time",
-        mode: "On-Site",
+        jobType: "Full-Time",
+        jobMode: "On-Site",
         location: "Goa",
       },
       {
-        id: 2,
+        _id: 2,
         title: "Marketing Analytics",
         subtitle: "(SEO/Google Analytics)",
-        type: "Full-Time",
-        mode: "On-Site",
+        jobType: "Full-Time",
+        jobMode: "On-Site",
         location: "Goa",
       },
     ],
   },
   {
-    title: "II. Tech",
-    jobs: [
+    categoryTitle: "II. Tech",
+    jobPosts: [
       {
-        id: 3,
+        _id: 3,
         title: "Jr. UI/UX Developer",
-        type: "Full-Time",
-        mode: "On-Site",
+        jobType: "Full-Time",
+        jobMode: "On-Site",
         location: "Goa",
       },
       {
-        id: 4,
+        _id: 4,
         title: "PHP Developer",
-        type: "Full-Time",
-        mode: "On-Site",
+        jobType: "Full-Time",
+        jobMode: "On-Site",
         location: "Goa",
       },
       {
-        id: 5,
+        _id: 5,
         title: "Web Developer Intern",
-        type: "Full-Time",
-        mode: "On-Site",
+        jobType: "Full-Time",
+        jobMode: "On-Site",
         location: "Goa",
       },
     ],
   },
   {
-    title: "III. Finance",
-    jobs: [
+    categoryTitle: "III. Finance",
+    jobPosts: [
       {
-        id: 6,
+        _id: 6,
         title: "Finance Intern",
-        type: "Full-Time",
-        mode: "On-Site",
+        jobType: "Full-Time",
+        jobMode: "On-Site",
         location: "Goa",
       },
     ],
   },
   {
-    title: "IV. HR & EA",
-    jobs: [
+    categoryTitle: "IV. HR & EA",
+    jobPosts: [
       {
-        id: 7,
+        _id: 7,
         title: "HR Generalist",
-        type: "Full-Time",
-        mode: "On-Site",
+        jobType: "Full-Time",
+        jobMode: "On-Site",
         location: "Goa",
       },
       {
-        id: 8,
+        _id: 8,
         title: "Executive Assistant to CEO",
-        type: "Full-Time",
-        mode: "On-Site",
+        jobType: "Full-Time",
+        jobMode: "On-Site",
         location: "Goa",
       },
     ],
   },
   {
-    title: "V. Sales",
-    jobs: [
+    categoryTitle: "V. Sales",
+    jobPosts: [
       {
-        id: 9,
+        _id: 9,
         title: "Sr.Manager Sales & Business Development",
-        type: "Full-Time",
-        mode: "On-Site",
+        jobType: "Full-Time",
+        jobMode: "On-Site",
         location: "Goa",
       },
     ],
   },
   {
-    title: "VI. Marketing",
-    jobs: [
+    categoryTitle: "VI. Marketing",
+    jobPosts: [
       {
-        id: 10,
+        _id: 10,
         title: "Social Media Executive",
-        type: "Full-Time",
-        mode: "On-Site",
+        jobType: "Full-Time",
+        jobMode: "On-Site",
         location: "Goa",
       },
     ],
   },
   {
-    title: "VII. Internships",
-    jobs: [
+    categoryTitle: "VII. Internships",
+    jobPosts: [
       {
-        id: 11,
+        _id: 11,
         title: "Internships Across Departments",
         subtitle:
           "- APPLY NOW *Mention your applying department in the message box",
-        type: "Internships",
-        mode: "On-Site",
+        jobType: "Internships",
+        jobMode: "On-Site",
         location: "Goa",
       },
     ],
@@ -138,11 +138,14 @@ const Career = () => {
       const response = await axios.get(`${customRoute}`);
       return response.data;
     },
+    enabled: !!isHost,
   });
 
   const toggleAccordion = (idx) => {
     setOpenIndex((prev) => (prev === idx ? null : idx));
   };
+
+  const jobData = isHost ? jobRoles : jobRolesDummy;
 
   return (
     <Container>
@@ -157,10 +160,13 @@ const Career = () => {
         <div className="border-b-2 border-gray-300 w-[5%] mb-6"></div>
         {/* <Jobrole jobRoles={jobRoles}/> */}
         <div className="flex flex-col gap-4">
-          {isLoading || !isHost
+          {isLoading
             ? []
-            : jobRoles
-                .filter((item) => item.jobPosts?.length)
+            : jobData
+                .filter((item) => {
+                  
+                  return item.jobPosts?.length;
+                })
                 .map((section, idx) => {
                   const isOpen = openIndex === idx;
 
@@ -198,7 +204,7 @@ const Career = () => {
                                   </p>
                                   {job.title && (
                                     <p className="text-sm text-black ">
-                                      {job.subtitle}
+                                      {job?.subtitle}
                                     </p>
                                   )}
                                 </div>
