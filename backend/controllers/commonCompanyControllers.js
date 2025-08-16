@@ -393,7 +393,7 @@ export const getAllCompanyLocations = async (req, res, next) => {
       Workation,
     ];
 
-    const locationMap = new Map();
+    const locationsMap = new Map();
 
     for (const model of models) {
       const countries = await model.distinct("country");
@@ -402,22 +402,22 @@ export const getAllCompanyLocations = async (req, res, next) => {
       for (const ctry of countries) {
         if (!ctry) continue;
 
-        if (!locationMap.has(ctry)) {
-          locationMap.set(ctry, {
+        if (!locationsMap.has(ctry)) {
+          locationsMap.set(ctry, {
             country: ctry,
             states: [],
           });
         }
 
         if (states && states.length > 0) {
-          const entry = locationMap.get(ctry);
+          const entry = locationsMap.get(ctry);
 
           entry.states = [...new Set([...entry.states, ...states])];
         }
       }
     }
 
-    return res.status(200).json([...locationMap.values()]);
+    return res.status(200).json([...locationsMap.values()]);
   } catch (error) {
     next(error);
   }
