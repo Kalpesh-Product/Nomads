@@ -58,7 +58,7 @@ const workationSchema = new mongoose.Schema(
       type: Number,
     },
     googleMap: {
-      type: String, // Google Maps URL
+      type: String,
       trim: true,
     },
     ratings: {
@@ -70,11 +70,9 @@ const workationSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    inclusions: [
-      {
-        type: String,
-      },
-    ],
+    inclusions: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
