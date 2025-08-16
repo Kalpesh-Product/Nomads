@@ -89,6 +89,7 @@ const GlobalListingsList = () => {
     hostel: "Hostel",
     privateStay: "Private Stay",
     cafe: "Cafe",
+    meetingroom: "Meeting Rooms",
     // fallback for unknown types
     default: (type) => `${type[0].toUpperCase() + type.slice(1)} Spaces`,
   };
@@ -432,18 +433,28 @@ const GlobalListingsList = () => {
                     );
                   })
                   .map(([type, items]) => {
-                    const prioritizedCompanies = ["MeWo", "BIZ Nest"];
+                    const prioritizedCompanies = ["BIZ Nest", "MeWo"];
+
                     const sortedItems = [...items].sort((a, b) => {
-                      const aIsPriority = prioritizedCompanies.includes(
+                      const aPriorityIndex = prioritizedCompanies.indexOf(
                         a.companyName
                       );
-                      const bIsPriority = prioritizedCompanies.includes(
+                      const bPriorityIndex = prioritizedCompanies.indexOf(
                         b.companyName
                       );
 
-                      if (aIsPriority && !bIsPriority) return -1;
-                      if (!aIsPriority && bIsPriority) return 1;
+                      // Both are priority companies
+                      if (aPriorityIndex !== -1 && bPriorityIndex !== -1) {
+                        return aPriorityIndex - bPriorityIndex; // BIZ Nest (0) before MeWo (1)
+                      }
 
+                      // Only a is priority
+                      if (aPriorityIndex !== -1) return -1;
+
+                      // Only b is priority
+                      if (bPriorityIndex !== -1) return 1;
+
+                      // Fallback: sort by rating
                       const aRating =
                         a.reviews?.length > 0
                           ? a.reviews.reduce((sum, r) => sum + r.starCount, 0) /
