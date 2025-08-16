@@ -28,7 +28,6 @@ import Workation from "../models/workations/Workations.js";
 import WorkationUnits from "../models/workations/Units.js";
 import WorkationPoc from "../models/workations/PointOfContact.js";
 import WorkationReview from "../models/workations/Review.js";
-import MeetingRoom from "../models/Meeting/MeetingRoom.js";
 import MeetingPoc from "../models/Meeting/PointOfContact.js";
 import MeetingReview from "../models/Meeting/Review.js";
 import MeetingService from "../models/Meeting/Services.js";

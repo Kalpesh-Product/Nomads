@@ -23,6 +23,7 @@ import privateStay from "/images/privatestay-img.webp";
 import companyWorkation from "/images/workation-img.webp";
 import MuiModal from "../components/Modal";
 import renderStars from "../utils/renderStarts";
+import axios from "../utils/axios";
 
 const Home = () => {
   const destinationData = [
@@ -37,8 +38,8 @@ const Home = () => {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-    const [open, setOpen] = useState(false);
-      const [selectedReview, setSelectedReview] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [selectedReview, setSelectedReview] = useState([]);
   const formData = useSelector((state) => state.location.formValues);
   const { handleSubmit, control, reset, register, watch } = useForm({
     defaultValues: {
@@ -50,11 +51,34 @@ const Home = () => {
   const selectedCountry = watch("country");
   const selectedState = watch("location");
   // Sample options
-  const countryOptions = [
-    { label: "India", value: "india" },
-    // { label: "Bali", value: "bali" },
-  ];
-  const locationOptions = [{ label: "Goa", value: "goa" }];
+
+  const { data: locations = [], isLoading: isLocations } = useQuery({
+    queryKey: ["locations"],
+    queryFn: async () => {
+      try {
+        const response = await axios.get("common/get-all-locations");
+        return Array.isArray(response.data) ? response.data : [];
+      } catch (error) {
+        console.error(error?.response?.data?.message);
+      }
+    },
+  });
+
+  const countryOptions = locations.map((item) => ({
+    label: item.country?.charAt(0).toUpperCase() + item.country?.slice(1),
+    value: item.country?.toLowerCase(),
+  }));
+  const filteredLocation = locations.find(
+    (item) =>
+      item.country ===
+      (selectedCountry
+        ? selectedCountry.charAt(0).toUpperCase() + selectedCountry.slice(1)
+        : "")
+  );
+  const locationOptions = filteredLocation?.states?.map((item)=>({
+    label : item,
+    value : item?.toLowerCase()
+  }))
   const countOptions = [
     { label: "1 - 5", value: "1-5" },
     { label: "5 - 10", value: "5-10" },
@@ -86,35 +110,35 @@ const Home = () => {
   const reviewData = [
     {
       name: "Neelam Mulla",
-      location : "India",
+      location: "India",
       rating: 5,
       message:
         "This place provides a productive environment. Great amenities like high-speed internet, comfortable seating good location. Plus, it is a break from isolation and can boost creativity and motivation. Do consider this space if your on a workation or simply need a great space to work from. Very helpful staff as well!",
     },
     {
       name: "Shelton Rodrigues",
-      location : "USA",
+      location: "USA",
       rating: 5,
       message:
         "One of the best co-working spaces in goa, suitable for all workation and work related activities. The staff are friendly and helpful and overall an amazing experience.",
     },
     {
       name: "Sushil Pandey",
-      location : "Dubai",
+      location: "Dubai",
       rating: 5,
       message:
         "These guys have done a fantastic job with stay and food arrangements. They also provided an office area for us to work together. I appreciate a hard work the team has put to make our experience enjoyable. Highly recommended for teams planning workation in Goa! !",
     },
     {
       name: "Kamal Pandey",
-      location : "USA",
+      location: "USA",
       rating: 5,
       message:
         "BIZNest hosted our 4 days workation at artistry suites goa, the service and setup was awesome, and the team was also very helpful.",
     },
     {
       name: "Aastha Sangle",
-      location : "Dubai",
+      location: "Dubai",
       rating: 5,
       message:
         "I am extremely pleased with my workspace. It is exceptionally clean and comfortable, providing a perfect environment for productivity. The ambiance is pleasant, with ample light and well-designed interiors. The facilities, including the meeting rooms and common areas, are well-maintained and thoughtfully equipped. I genuinely enjoy being here and find it conducive to both focus and creativity. Overall, it is a great place to work and be around.",
@@ -122,7 +146,7 @@ const Home = () => {
 
     {
       name: "Pawan Sharma",
-      location : "India",
+      location: "India",
       rating: 5,
       message:
         "Biz Nest is a modern co-working space that offers a seamless working environment..with a great view, too! The founders, Abrar and Kashif, along with the team make working here a warm, friendly and productive experience. Kudos!",
@@ -500,7 +524,7 @@ const Home = () => {
           </div>
         </div>
       </Container>
-            <MuiModal open={open} onClose={() => setOpen(false)} title={"Review"}>
+      <MuiModal open={open} onClose={() => setOpen(false)} title={"Review"}>
         <div className="flex flex-col gap-4">
           {/* Reviewer Info */}
           <div className="flex items-center gap-3">
