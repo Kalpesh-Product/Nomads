@@ -3,7 +3,7 @@ import { FaMapMarkerAlt } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
 import { useMutation } from "@tanstack/react-query";
 import axiosInstance from "../../utils/axios";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import {
   TextField,
   Select,
@@ -12,51 +12,50 @@ import {
   InputLabel,
   Button,
   Box,
+  CircularProgress,
 } from "@mui/material";
-
 import Spinner from "../../components/Spinner";
 import Container from "../../components/Container";
+import axios from "../../utils/axios";
+import toast from "react-hot-toast";
 
 const HostContact = () => {
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    mobile: "",
-    partnerstype: "",
-    message: "",
+  const { control, handleSubmit, reset } = useForm({
+    defaultValues: {
+      name: "",
+      email: "",
+      mobile: "",
+      partnerstype: "",
+      message: "",
+    },
   });
+
+  const { mutate: submitContactForm, isPending: isContactPending } =
+    useMutation({
+      mutationFn: async (data) => {
+        const response = await axios.post("form/add-new-b2b-form-submission", {
+          ...data,
+          formName: "connect",
+        });
+        return response.data;
+      },
+      onSuccess: (data) => {
+        toast.success("Form submitted successfully");
+        reset();
+      },
+      onError: (error) => {
+        toast.error(error.response.data.message);
+      },
+    });
 
   const handleCloseModal = () => setShowModal(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      setLoading(true);
-      await axiosInstance.post("/form/add-new-b2b-form-submission", {
-        ...formData,
-        formName: "enquiry",
-      });
-      setShowModal(true);
-      setFormData({
-        name: "",
-        email: "",
-        mobile: "",
-        partnerType: "",
-        message: "",
-      });
-    } catch (error) {
-      console.error("Error submitting enquiry:", error);
-    } finally {
-      setLoading(false);
-    }
   };
 
   const floatingLabelSx = {
@@ -111,124 +110,177 @@ const HostContact = () => {
             </div>
 
             {/* Connect With Us - MUI Styled Form */}
-            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 0 }}>
+
+            <Box
+              component="form"
+              onSubmit={handleSubmit((data) => submitContactForm(data))}
+              sx={{ mt: 0 }}
+            >
               <h2 className="text-title font-semibold uppercase mb-6 text-center md:text-left">
                 Connect With Us
               </h2>
 
               {/* Responsive grid container */}
-              <div className="grid grid-cols-1 md:grid-cols-2 ">
+              <div className="grid grid-cols-1 md:grid-cols-2">
                 {/* Name */}
                 <div className="pt-8 pl-8">
-                  <TextField
-                    required
-                    fullWidth
-                    label="Name"
+                  <Controller
                     name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    variant="standard"
-                    InputLabelProps={{ sx: floatingLabelSx }}
+                    control={control}
+                    rules={{ required: "Name is required" }}
+                    render={({ field, fieldState }) => (
+                      <TextField
+                        {...field}
+                        required
+                        fullWidth
+                        label="Name"
+                        variant="standard"
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message}
+                        InputLabelProps={{ sx: floatingLabelSx }}
+                      />
+                    )}
                   />
                 </div>
 
                 {/* Email */}
                 <div className="pt-8 pl-8">
-                  <TextField
-                    required
-                    fullWidth
-                    label="Email"
+                  <Controller
                     name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    variant="standard"
-                    InputLabelProps={{ sx: floatingLabelSx }}
+                    control={control}
+                    rules={{
+                      required: "Email is required",
+                      pattern: {
+                        value: /^\S+@\S+$/i,
+                        message: "Enter a valid email",
+                      },
+                    }}
+                    render={({ field, fieldState }) => (
+                      <TextField
+                        {...field}
+                        required
+                        fullWidth
+                        type="email"
+                        label="Email"
+                        variant="standard"
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message}
+                        InputLabelProps={{ sx: floatingLabelSx }}
+                      />
+                    )}
                   />
                 </div>
 
                 {/* Mobile */}
                 <div className="pt-8 pl-8">
-                  <TextField
-                    required
-                    fullWidth
-                    label="Mobile Number"
+                  <Controller
                     name="mobile"
-                    type="tel"
-                    inputProps={{ pattern: "[1-9]{1}[0-9]{9}" }}
-                    value={formData.mobile}
-                    onChange={handleChange}
-                    variant="standard"
-                    InputLabelProps={{ sx: floatingLabelSx }}
+                    control={control}
+                    rules={{
+                      required: "Mobile number is required",
+                      pattern: {
+                        value: /^[1-9]{1}[0-9]{9}$/,
+                        message: "Enter a valid 10-digit mobile number",
+                      },
+                    }}
+                    render={({ field, fieldState }) => (
+                      <TextField
+                        {...field}
+                        required
+                        fullWidth
+                        type="tel"
+                        label="Mobile Number"
+                        variant="standard"
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message}
+                        InputLabelProps={{ sx: floatingLabelSx }}
+                      />
+                    )}
                   />
                 </div>
 
                 {/* Partnership Type */}
                 <div className="pt-8 pl-8">
-                  <FormControl fullWidth required variant="standard">
-                    <InputLabel
-                      id="partnerstype-label"
-                      sx={{
-                        color: "black",
-                        "&.Mui-focused": {
-                          color: "#1976d2",
-                        },
-                        "&.MuiInputLabel-shrink": {
-                          color: "#1976d2",
-                        },
-                      }}
-                    >
-                      Type of Partnership
-                    </InputLabel>
-                    <Select
-                      labelId="partnerstype-label"
-                      name="partnerType"
-                      value={formData.partnerType}
-                      onChange={handleChange}
-                      sx={{
-                        pl: 2,
-                        pt: 1,
-                        "&:focus": {
-                          backgroundColor: "transparent",
-                        },
-                      }}
-                    >
-                      <MenuItem value="" disabled>
-                        Select Type
-                      </MenuItem>
-                      <MenuItem value="B2B SaaS Technology Licensing">
-                        B2B SaaS Technology Licensing
-                      </MenuItem>
-                      <MenuItem value="Landlord Partnerships">
-                        Landlord Partnerships
-                      </MenuItem>
-                      <MenuItem value="Investment Related">
-                        Investment Related
-                      </MenuItem>
-                      <MenuItem value="Coffee Meeting to know us better">
-                        Coffee Meeting to know us better
-                      </MenuItem>
-                    </Select>
-                  </FormControl>
-                </div>
-
-                {/* Message spans full width */}
-                <div className="pt-8 pl-8 md:col-span-2">
-                  <TextField
-                    required
-                    fullWidth
-                    multiline
-                    minRows={4}
-                    label="Message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    variant="standard"
-                    InputLabelProps={{ sx: floatingLabelSx }}
+                  <Controller
+                    name="partnerstype"
+                    control={control}
+                    rules={{ required: "Please select a partnership type" }}
+                    render={({ field, fieldState }) => (
+                      <FormControl
+                        fullWidth
+                        required
+                        variant="standard"
+                        error={!!fieldState.error}
+                      >
+                        <InputLabel
+                          id="partnerstype-label"
+                          sx={{
+                            color: "black",
+                            "&.Mui-focused": { color: "#1976d2" },
+                            "&.MuiInputLabel-shrink": { color: "#1976d2" },
+                          }}
+                        >
+                          Type of Partnership
+                        </InputLabel>
+                        <Select
+                          {...field}
+                          labelId="partnerstype-label"
+                          sx={{
+                            pl: 2,
+                            pt: 1,
+                            "&:focus": { backgroundColor: "transparent" },
+                          }}
+                        >
+                          <MenuItem value="" disabled>
+                            Select Type
+                          </MenuItem>
+                          <MenuItem value="B2B SaaS Technology Licensing">
+                            B2B SaaS Technology Licensing
+                          </MenuItem>
+                          <MenuItem value="Landlord Partnerships">
+                            Landlord Partnerships
+                          </MenuItem>
+                          <MenuItem value="Investment Related">
+                            Investment Related
+                          </MenuItem>
+                          <MenuItem value="Coffee Meeting to know us better">
+                            Coffee Meeting to know us better
+                          </MenuItem>
+                        </Select>
+                        {fieldState.error && (
+                          <p style={{ color: "red", fontSize: "0.8rem" }}>
+                            {fieldState.error.message}
+                          </p>
+                        )}
+                      </FormControl>
+                    )}
                   />
                 </div>
 
-                {/* Button spans full width */}
+                {/* Message */}
+                <div className="pt-8 pl-8 md:col-span-2">
+                  <Controller
+                    name="message"
+                    control={control}
+                    rules={{ required: "Message is required" }}
+                    render={({ field, fieldState }) => (
+                      <TextField
+                        {...field}
+                        required
+                        fullWidth
+                        multiline
+                        minRows={4}
+                        label="Message"
+                        variant="standard"
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message}
+                        InputLabelProps={{ sx: floatingLabelSx }}
+                      />
+                    )}
+                  />
+                </div>
+
+                {/* Button */}
                 <div className="pt-6 md:col-span-2 text-center">
                   <Button
                     type="submit"
@@ -241,7 +293,13 @@ const HostContact = () => {
                       "&:hover": { bgcolor: "#333" },
                     }}
                   >
-                    CONNECT
+                    {isContactPending && (
+                      <CircularProgress
+                        size={16}
+                        sx={{ color: "white", mr: 1 }}
+                      />
+                    )}
+                    {isContactPending ? "CONNECTING..." : "CONNECT"}
                   </Button>
                 </div>
               </div>

@@ -14,6 +14,7 @@ const HostHeader = () => {
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const links = [
+    { name: "Host", link: "/hosts" },
     { name: "Modules", link: "/hosts/modules" },
     { name: "Themes", link: "/hosts/themes" },
     { name: "Leads", link: "/hosts/leads" },
@@ -39,27 +40,30 @@ const HostHeader = () => {
               className="w-full h-full object-contain"
             />
           </div>
-          <ul className="hidden xl:flex sm:hidden gap-8 justify-center flex-1 uppercase">
-            {links.map((link) => {
-              const isActive =
-                location.pathname === link.link ||
-                location.pathname.startsWith(link.link + "/"); // match subroutes too
-              return (
-                <li key={link.name} className="relative">
-                  <Link
-                    to={link.link}
-                    className="relative pb-1 transition-all duration-300 group"
-                  >
-                    {link.name}
-                    <span
-                      className={`absolute left-0 bottom-0 block h-[2px] bg-blue-500 transition-all duration-300
+     <ul className="hidden xl:flex sm:hidden gap-8 justify-center flex-1 uppercase">
+  {links.map((link) => {
+    const linkSegment = link.link.split("/").filter(Boolean).pop();
+    const currentSegment = location.pathname.split("/").filter(Boolean).pop();
+
+    const isActive = linkSegment === currentSegment;
+
+    return (
+      <li key={link.name} className="relative">
+        <Link
+          to={link.link}
+          className="relative pb-1 transition-all duration-300 group"
+        >
+          {link.name}
+          <span
+            className={`absolute left-0 bottom-0 block h-[2px] bg-blue-500 transition-all duration-300
               ${isActive ? "w-full" : "w-0"} group-hover:w-full`}
-                    ></span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+          ></span>
+        </Link>
+      </li>
+    );
+  })}
+</ul>
+
 
           <div className="px-1 hidden xl:flex xl:gap-4 py-2 items-center">
             <Link
@@ -128,8 +132,7 @@ const HostHeader = () => {
               </li>
             ))}
 
-            <div className="h-[0.2px] bg-gray-300"></div>
-            <div className="flex justify-center p-4">
+             <div className="flex justify-center p-4">
               <BnButton
                 title={"Login"}
                 externalStyles={"bg-[#FF5757]"}

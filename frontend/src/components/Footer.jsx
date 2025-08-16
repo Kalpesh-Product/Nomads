@@ -108,9 +108,9 @@ const Footer = () => {
         </div>
       </div>
       {/* Footer Bottom Section */}
-      <div className="w-full flex flex-col md:flex-row justify-between items-center text-[10px] md:text-xs px-4 py-4 text-gray-800 bg-gray-50 font-semibold">
+      <div className="w-full flex flex-col md:flex-row justify-center items-center text-[10px] md:text-xs px-4 py-4 text-gray-800 bg-gray-50 font-semibold">
         {/* Left Links */}
-        <div className="flex gap-3 mb-2 md:mb-0">
+        {/* <div className="flex gap-3 mb-2 md:mb-0">
           <span>Privacy</span>
           <span>·</span>
           <span>Terms</span>
@@ -118,7 +118,7 @@ const Footer = () => {
           <span>Sitemap</span>
           <span>·</span>
           <span>Company details</span>
-        </div>
+        </div> */}
 
         {/* Right Icons and Settings */}
         <div className="flex items-center gap-4">

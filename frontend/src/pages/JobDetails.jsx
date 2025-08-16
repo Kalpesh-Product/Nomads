@@ -12,7 +12,7 @@ const JobDetails = () => {
   const isHost = pathname.includes("host");
 
   return (
-    <Container padding={false}>
+    <Container>
       <div className="">
         <h2 className="text-4xl md:text-3xl font-normal text-center mb-6">
           {title?.split("-")?.length ? title?.split("-")?.join(" ")?.toUpperCase():title}

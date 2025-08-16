@@ -299,15 +299,15 @@ const HostHome = () => {
     
       <section>
         <Container>
-          <div className="flex flex-col gap-16">
-            <h1 className="text-title lg:text-[5rem] uppercase text-center font-semibold lg:font-normal">
+          <div className="flex flex-col gap-10">
+            <h1 className="text-title lg:text-[4.3rem] uppercase text-center font-semibold lg:font-medium">
               TESTIMONIAL
             </h1>
-            <div className="flex flex-col gap-4 lg:gap-0 md:flex-row justify-between w-full items-stretch">
+            <div className="flex flex-col gap-4 lg:gap-10 md:flex-row justify-between w-full items-stretch">
               {/* Left Section */}
-              <div className="flex flex-col justify-between h-96 lg:h-[30rem] w-full lg:w-[90%]">
-                <div>
-                  <p className="text-subtitle">
+              <div className="flex flex-col justify-between h-full lg:h-[26rem] w-full lg:w-[90%]">
+                <div className="w-full lg:w-[80%]">
+                  <p className="text-card-title font-medium text-[#212529] leading-normal">
                     “We went from managing 3,000 sq ft to 50,000+ sq ft in the
                     most efficient and seamless manner with tech, processes,
                     data analytics, customer & employee management and due to an
@@ -327,7 +327,7 @@ const HostHome = () => {
               </div>
 
               {/* Right Section */}
-              <div className="h-[30rem] w-full lg:w-1/2 overflow-hidden rounded-xl">
+              <div className="h-[26rem] w-full lg:w-1/2 overflow-hidden rounded-xl">
                 <img
                   src="/hosts/themes/Kashif_Edit.png"
                   alt="owner-image"
