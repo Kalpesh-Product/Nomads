@@ -19,6 +19,7 @@ import PrivateStayReview from "../models/private-stay/Reviews.js";
 import PrivateStayUnit from "../models/private-stay/Units.js";
 import fetchPrivateStayData from "../utils/fetchPrivateStayData.js";
 import Cafe from "../models/cafe/Cafe.js";
+import MeetingRoom from "../models/Meeting/MeetingRoom.js";
 import CafePoc from "../models/cafe/PointOfContact.js";
 import CafeReview from "../models/cafe/Review.js";
 import fetchCafeData from "../utils/fetchCafeData.js";
@@ -334,9 +335,9 @@ export const getAllCompanyLocations = async (req, res, next) => {
       ColivingCompany,
       CoworkingCompany,
       Hostels,
-      // MeetingRoom,
+      MeetingRoom,
       PrivateStay,
-      // Workation,
+      Workation,
     ];
 
     const locationMap = new Map();
