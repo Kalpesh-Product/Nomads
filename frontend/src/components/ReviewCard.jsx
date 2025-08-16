@@ -10,7 +10,7 @@ const ReviewCard = ({ review, handleClick }) => {
     avatar,
     duration,
     stars,
-    date,
+    location,
     message,
     reviewText,
     rating,
@@ -45,9 +45,9 @@ const ReviewCard = ({ review, handleClick }) => {
       </div>
 
       {/* Stars and Date */}
-      <div className="flex items-center gap-2 text-sm text-gray-700">
-        {renderStars(starCount || rating)}
-        <span>· {date}</span>
+      <div className="flex  items-center gap-4 text-sm text-gray-700">
+        <div className="flex gap-1">{renderStars(starCount || rating)}</div>
+        <span className="text-secondary-dark"> {location}</span>
       </div>
 
       {/* Review */}

@@ -86,30 +86,35 @@ const Home = () => {
   const reviewData = [
     {
       name: "Neelam Mulla",
+      location : "India",
       rating: 5,
       message:
         "This place provides a productive environment. Great amenities like high-speed internet, comfortable seating good location. Plus, it is a break from isolation and can boost creativity and motivation. Do consider this space if your on a workation or simply need a great space to work from. Very helpful staff as well!",
     },
     {
       name: "Shelton Rodrigues",
+      location : "USA",
       rating: 5,
       message:
         "One of the best co-working spaces in goa, suitable for all workation and work related activities. The staff are friendly and helpful and overall an amazing experience.",
     },
     {
       name: "Sushil Pandey",
+      location : "Dubai",
       rating: 5,
       message:
         "These guys have done a fantastic job with stay and food arrangements. They also provided an office area for us to work together. I appreciate a hard work the team has put to make our experience enjoyable. Highly recommended for teams planning workation in Goa! !",
     },
     {
       name: "Kamal Pandey",
+      location : "USA",
       rating: 5,
       message:
         "BIZNest hosted our 4 days workation at artistry suites goa, the service and setup was awesome, and the team was also very helpful.",
     },
     {
       name: "Aastha Sangle",
+      location : "Dubai",
       rating: 5,
       message:
         "I am extremely pleased with my workspace. It is exceptionally clean and comfortable, providing a perfect environment for productivity. The ambiance is pleasant, with ample light and well-designed interiors. The facilities, including the meeting rooms and common areas, are well-maintained and thoughtfully equipped. I genuinely enjoy being here and find it conducive to both focus and creativity. Overall, it is a great place to work and be around.",
@@ -117,6 +122,7 @@ const Home = () => {
 
     {
       name: "Pawan Sharma",
+      location : "India",
       rating: 5,
       message:
         "Biz Nest is a modern co-working space that offers a seamless working environment..with a great view, too! The founders, Abrar and Kashif, along with the team make working here a warm, friendly and productive experience. Kudos!",
