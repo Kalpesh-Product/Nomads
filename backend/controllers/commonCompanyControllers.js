@@ -118,7 +118,7 @@ export const getIndividualCompany = async (req, res, next) => {
         units,
         reviews,
         type: "Workation",
-        inclusions: workationCompany.inclusions.split(",")
+        inclusions: workationCompany.inclusions?.split(",")
         .map((inc) =>
           inc?.split(" ").length
             ? inc?.split(" ")?.join("").toLowerCase().trim()

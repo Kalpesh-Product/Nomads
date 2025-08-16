@@ -28,7 +28,7 @@ export default async function fetchWorkationData(country, state) {
       reviews: workationReviews.filter(
         (item) => item.workation?.toString() === companyId
       ),
-      inclusions: company.inclusions.split(",")
+      inclusions: company.inclusions?.split(",")
         .map((inc) =>
           inc?.split(" ").length
             ? inc?.split(" ")?.join("").toLowerCase().trim()
