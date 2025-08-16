@@ -447,7 +447,7 @@ const GlobalListingsList = () => {
                       "hostel",
                       "workation",
                       "privateStay",
-                      "meetingRoom",
+                      "meetingroom",
                       "cafe",
                       "coliving",
                     ];
