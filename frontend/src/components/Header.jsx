@@ -323,7 +323,7 @@ const Header = () => {
                 title={"Sign In"}
                 externalStyles={"bg-primary-blue"}
                 handleSubmit={() => {
-                  navigate("");
+                  navigate("login");
                   setOpen(false);
                 }}
               />
