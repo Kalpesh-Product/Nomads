@@ -19,6 +19,7 @@ import PrivateStayReview from "../models/private-stay/Reviews.js";
 import PrivateStayUnit from "../models/private-stay/Units.js";
 import fetchPrivateStayData from "../utils/fetchPrivateStayData.js";
 import Cafe from "../models/cafe/Cafe.js";
+import MeetingRoom from "../models/Meeting/MeetingRoom.js";
 import CafePoc from "../models/cafe/PointOfContact.js";
 import CafeReview from "../models/cafe/Review.js";
 import fetchCafeData from "../utils/fetchCafeData.js";
@@ -375,6 +376,48 @@ export const uploadCompanyImages = async (req, res, next) => {
     } catch (uploadError) {
       return res.status(500).json({ message: "Failed to upload image to S3" });
     }
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getAllCompanyLocations = async (req, res, next) => {
+  try {
+    const models = [
+      Cafe,
+      ColivingCompany,
+      CoworkingCompany,
+      Hostels,
+      MeetingRoom,
+      PrivateStay,
+      Workation,
+    ];
+
+    const locationMap = new Map();
+
+    for (const model of models) {
+      const countries = await model.distinct("country");
+      const states = await model.distinct("state");
+
+      for (const ctry of countries) {
+        if (!ctry) continue;
+
+        if (!locationMap.has(ctry)) {
+          locationMap.set(ctry, {
+            country: ctry,
+            states: [],
+          });
+        }
+
+        if (states && states.length > 0) {
+          const entry = locationMap.get(ctry);
+
+          entry.states = [...new Set([...entry.states, ...states])];
+        }
+      }
+    }
+
+    return res.status(200).json([...locationMap.values()]);
   } catch (error) {
     next(error);
   }
