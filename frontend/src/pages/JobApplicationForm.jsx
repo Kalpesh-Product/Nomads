@@ -18,32 +18,13 @@ import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import dayjs from "dayjs";
 import toast from "react-hot-toast";
 import GetStartedButton from "../components/GetStartedButton";
+import { useLocation } from "react-router-dom";
 
-const JobApplicationForm = () => {
-  const [formValues, setFormValues] = useState({
-    name: "",
-    email: "",
-    dateOfBirth: null,
-    mobile: "",
-    state: "",
-    experienceYears: "",
-    linkedin: "",
-    resumeLink: null,
-    currentMonthlySalary: "",
-    expectedMonthlySalary: "",
-    joinInDays: "",
-    relocateGoa: "",
-    personality: "",
-    skills: "",
-    whyConsider: "",
-    willingToBootstrap: "",
-    message: "",
-    jobPosition: "",
-    submissionDate: null,
-    submissionTime: null,
-    status: "",
-    remarks: "",
-  });
+const JobApplicationForm = ({title}) => {
+
+  const {pathname} = useLocation()
+  const isHost = pathname.includes("hosts")
+  const customLink = isHost ? "add-new-b2b-form-submission" :  "add-new-b2c-form-submission"
 
   const {
     handleSubmit,
@@ -70,7 +51,6 @@ const JobApplicationForm = () => {
       whyConsider: "",
       willingToBootstrap: "",
       message: "",
-      jobPosition: "",
       submissionDate: null,
       submissionTime: null,
       status: "",
@@ -81,10 +61,10 @@ const JobApplicationForm = () => {
   const { mutate: submitJobApplication, isLoading } = useMutation({
     mutationFn: async (data) => {
       const formatDOB = dayjs(data.dateOfBirth).format("YYYY-MM-DD");
-      const formatSubmissionDate = dayjs(data.submissionDate).format(
+      const formatSubmissionDate = dayjs(new Date()).format(
         "YYYY-MM-DD"
       );
-      const formatSubmissionTime = dayjs(data.submissionTime).format(
+      const formatSubmissionTime = dayjs(new Date()).format(
         "HH:mm:ss"
       );
 
@@ -107,7 +87,13 @@ const JobApplicationForm = () => {
       };
 
       const formData = new FormData();
+      
+      //Nomads 
+      formData.append("sheetName","")
+      // Hosts
       formData.append("formName", "jobApplication");
+      formData.append("jobPosition", title);
+      
 
       // Append all fields
       Object.keys(formattedData).forEach((key) => {
@@ -117,8 +103,9 @@ const JobApplicationForm = () => {
           formData.append(key, formattedData[key] ?? "");
         }
       });
+      
       const response = await axios.post(
-        "form/add-new-b2b-form-submission",
+        `form/${customLink}`,
         formData,
         {
           headers: {
@@ -146,7 +133,7 @@ const JobApplicationForm = () => {
       </h3>
 
       <form
-        onSubmit={handleSubmit((data) => submitJobApplication(data))}
+        onSubmit={handleSubmit((data) => isHost && submitJobApplication(data))}
         className="grid grid-cols-1 md:grid-cols-2 gap-6"
       >
         {/* Name */}
@@ -232,20 +219,6 @@ const JobApplicationForm = () => {
           )}
         />
 
-        {/* Job Position */}
-        <Controller
-          name="jobPosition"
-          control={control}
-          render={({ field }) => (
-            <TextField
-              {...field}
-              label="Job Position"
-              fullWidth
-              variant="standard"
-            />
-          )}
-        />
-
         {/* Status */}
         <Controller
           name="status"
@@ -283,19 +256,7 @@ const JobApplicationForm = () => {
           )}
         />
 
-        {/* LinkedIn */}
-        <Controller
-          name="linkedin"
-          control={control}
-          render={({ field }) => (
-            <TextField
-              {...field}
-              label="LinkedIn Profile URL"
-              fullWidth
-              variant="standard"
-            />
-          )}
-        />
+      
 
         {/* Resume Upload */}
         <Controller
@@ -324,8 +285,23 @@ const JobApplicationForm = () => {
           )}
         />
 
-        {/* Submission Date */}
+          {/* Relocate */}
         <Controller
+          name="relocateGoa"
+          control={control}
+          render={({ field }) => (
+            <FormControl fullWidth variant="standard">
+              <InputLabel>Relocate to Goa</InputLabel>
+              <Select {...field}>
+                <MenuItem value="Yes">Yes</MenuItem>
+                <MenuItem value="No">No</MenuItem>
+              </Select>
+            </FormControl>
+          )}
+        />
+
+        {/* Submission Date */}
+        {/* <Controller
           name="submissionDate"
           control={control}
           render={({ field }) => (
@@ -341,9 +317,9 @@ const JobApplicationForm = () => {
               }}
             />
           )}
-        />
+        /> */}
 
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
+        {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
           <Controller
             name="submissionTime"
             control={control}
@@ -361,7 +337,7 @@ const JobApplicationForm = () => {
               />
             )}
           />
-        </LocalizationProvider>
+        </LocalizationProvider> */}
 
         {/* Join Time */}
         <Controller
@@ -380,18 +356,18 @@ const JobApplicationForm = () => {
           )}
         />
 
-        {/* Relocate */}
+        {/* LinkedIn */}
         <Controller
-          name="relocateGoa"
+          name="linkedin"
           control={control}
           render={({ field }) => (
-            <FormControl fullWidth variant="standard">
-              <InputLabel>Relocate to Goa</InputLabel>
-              <Select {...field}>
-                <MenuItem value="Yes">Yes</MenuItem>
-                <MenuItem value="No">No</MenuItem>
-              </Select>
-            </FormControl>
+            <TextField
+              {...field}
+              label="LinkedIn Profile URL"
+              fullWidth
+              className="md:col-span-2"
+              variant="standard"
+            />
           )}
         />
 

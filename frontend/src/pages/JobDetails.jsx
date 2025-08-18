@@ -88,7 +88,7 @@ const JobDetails = () => {
               if unable to apply now
             </p>
           </div>
-        ) : <JobApplicationForm />}
+        ) : <JobApplicationForm title={title}/>}
       </div>
     </Container>
   );
