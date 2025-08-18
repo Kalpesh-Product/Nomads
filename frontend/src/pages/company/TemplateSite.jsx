@@ -38,13 +38,13 @@ const TemplateSite = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center">
-      <h1 className="text-4xl font-bold">{data.companyName}</h1>
-      <p className="mt-4 text-lg">{data.description}</p>
+      <h1 className="text-4xl font-bold">{data?.companyName || "sda"}</h1>
+      <p className="mt-4 text-lg">{data?.description}</p>
 
       {data.companyLogo && (
         <img
-          src={data.companyLogo}
-          alt={data.companyName}
+          src={data?.companyLogo}
+          alt={data?.companyName}
           className="mt-6 max-h-32 object-contain"
         />
       )}
