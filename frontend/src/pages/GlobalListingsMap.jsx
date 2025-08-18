@@ -23,8 +23,42 @@ const GlobalListingsMap = () => {
   const [favorites, setFavorites] = useState([]);
   const dispatch = useDispatch();
   const formData = useSelector((state) => state.location.formValues);
-  const countryOptions = [{ label: "India", value: "india" }];
-  const locationOptions = [{ label: "Goa", value: "goa" }];
+    const { handleSubmit, control, reset, setValue, getValues, watch } = useForm({
+    defaultValues: {
+      country: "",
+      location: "",
+      category: "",
+    },
+  });
+    const selectedCountry = watch("country");
+  const selectedState = watch("location");
+  const { data: locations = [], isLoading: isLocations } = useQuery({
+    queryKey: ["locations"],
+    queryFn: async () => {
+      try {
+        const response = await axios.get("common/get-all-locations");
+        return Array.isArray(response.data) ? response.data : [];
+      } catch (error) {
+        console.error(error?.response?.data?.message);
+      }
+    },
+  });
+
+  const countryOptions = locations.map((item) => ({
+    label: item.country?.charAt(0).toUpperCase() + item.country?.slice(1),
+    value: item.country?.toLowerCase(),
+  }));
+  const filteredLocation = locations.find(
+    (item) =>
+      item.country ===
+      (selectedCountry
+        ? selectedCountry.charAt(0).toUpperCase() + selectedCountry.slice(1)
+        : "")
+  );
+  const locationOptions = filteredLocation?.states?.map((item)=>({
+    label : item,
+    value : item?.toLowerCase()
+  }))
   const skeletonArray = Array.from({ length: 6 });
   const countOptions = [
     { label: "1 - 5", value: "1-5" },
@@ -99,15 +133,6 @@ const GlobalListingsMap = () => {
     locationData(data);
     setShowMobileSearch(false);
   };
-  const { handleSubmit, control, reset, setValue, getValues, watch } = useForm({
-    defaultValues: {
-      country: "",
-      location: "",
-      category: "",
-    },
-  });
-  const selectedCountry = watch("country");
-  const selectedState = watch("location");
   useEffect(() => {
     setValue("country", formData.country);
     setValue("location", formData.location);

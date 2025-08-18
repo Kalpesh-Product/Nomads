@@ -28,7 +28,11 @@ import Workation from "../models/workations/Workations.js";
 import WorkationUnits from "../models/workations/Units.js";
 import WorkationPoc from "../models/workations/PointOfContact.js";
 import WorkationReview from "../models/workations/Review.js";
+import MeetingPoc from "../models/Meeting/PointOfContact.js";
+import MeetingReview from "../models/Meeting/Review.js";
+import MeetingService from "../models/Meeting/Services.js";
 import { uploadFileToS3 } from "../config/s3Config.js";
+import fetchMeetingData from "../utils/fetchMeetingData.js";
 
 export const getCompanyDataLocationWise = async (req, res, next) => {
   try {
@@ -51,6 +55,9 @@ export const getCompanyDataLocationWise = async (req, res, next) => {
     } else if (category?.toLowerCase() === "workation") {
       const workationData = await fetchWorkationData(country, state);
       return res.status(200).json(workationData);
+    } else if (category?.toLowerCase() === "meetingroom") {
+      const workationData = await fetchMeetingData(country, state);
+      return res.status(200).json(workationData);
     } else {
       const [
         coworkingData,
@@ -58,12 +65,16 @@ export const getCompanyDataLocationWise = async (req, res, next) => {
         hostelData,
         privateStayData,
         cafeData,
+        workationData,
+        meetingData,
       ] = await Promise.all([
         fetchCoworkingData(country, state),
         fetchColivingData(country, state),
         fetchHostelData(country, state),
         fetchPrivateStayData(country, state),
         fetchCafeData(country, state),
+        fetchWorkationData(country, state),
+        fetchMeetingData(country, state),
       ]);
       return res
         .status(200)
@@ -73,6 +84,8 @@ export const getCompanyDataLocationWise = async (req, res, next) => {
           ...hostelData,
           ...privateStayData,
           ...cafeData,
+          ...workationData,
+          ...meetingData,
         ]);
     }
   } catch (error) {
@@ -87,7 +100,7 @@ export const getIndividualCompany = async (req, res, next) => {
       const workationCompany = await Workation.findOne({ _id: companyId })
         .lean()
         .exec();
-      const [pocs, services, reviews] = await Promise.all([
+      const [pocs, units, reviews] = await Promise.all([
         WorkationPoc.findOne({
           coworkingCompany: companyId,
           isActive: true,
@@ -102,10 +115,15 @@ export const getIndividualCompany = async (req, res, next) => {
         ...workationCompany,
         reviewCount: workationCompany.reviews,
         pocs,
-        services,
+        units,
         reviews,
-        type: "Coworking",
-        inclusions: workationCompany.inclusions,
+        type: "Workation",
+        inclusions: workationCompany.inclusions?.split(",")
+        .map((inc) =>
+          inc?.split(" ").length
+            ? inc?.split(" ")?.join("").toLowerCase().trim()
+            : inc?.trim().toLowerCase()
+        ),
       };
       return res.status(200).json(companyObject);
     }
@@ -261,6 +279,38 @@ export const getIndividualCompany = async (req, res, next) => {
           ),
       };
       return res.status(200).json(companyObject);
+    } else if (type?.toLowerCase() === "meetingroom") {
+      const company = await MeetingRoom.findOne({ _id: companyId })
+        .lean()
+        .exec();
+
+      const [pocs, services, reviews] = await Promise.all([
+        MeetingPoc.findOne({
+          meeting: company._id,
+          isActive: true,
+        })
+          .lean()
+          .exec(),
+        MeetingService.findOne({ meeting: company._id }).lean().exec(),
+        MeetingReview.find({ meeting: company._id }).lean().exec(),
+      ]);
+
+      const companyObject = {
+        ...company,
+        reviewCount: company.reviews,
+        pocs,
+        services,
+        reviews,
+        type: "Coworking",
+        inclusions: company.inclusions
+          .split(",")
+          .map((inc) =>
+            inc?.split(" ").length
+              ? inc?.split(" ")?.join("").toLowerCase().trim()
+              : inc?.trim().toLowerCase()
+          ),
+      };
+      return res.status(200).json(companyObject);
     }
 
     return res
@@ -277,6 +327,8 @@ const companyModels = {
   hostels: Hostels,
   "private-stay": PrivateStay,
   cafe: Cafe,
+  workation: Workation,
+  meetingroom: MeetingRoom,
 };
 
 export const uploadCompanyImages = async (req, res, next) => {

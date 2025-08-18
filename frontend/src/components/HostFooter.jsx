@@ -61,8 +61,7 @@ const HostFooter = () => {
               INTERNATIONAL PLAZA SINGAPORE – 079903 <br />
               <Link
                 to="mailto:response@wono.co"
-                className="text-primary-blue lowercase hover:underline"
-              >
+                className="text-primary-blue lowercase hover:underline">
                 response@wono.co
               </Link>
             </p>
@@ -79,8 +78,7 @@ const HostFooter = () => {
             {footerSections.map((section, idx) => (
               <div
                 key={idx}
-                className="flex flex-col  justify-center items-center text-start lg:justify-start lg:items-center"
-              >
+                className="flex flex-col  justify-center items-center text-start lg:justify-start lg:items-center">
                 {/* <h3 className="font-semibold text-lg mb-2">
                 {section.heading.toUpperCase()}
               </h3> */}
@@ -88,8 +86,7 @@ const HostFooter = () => {
                   <Link
                     key={i}
                     to={linkObj.link}
-                    className="text-sm  text-black opacity-80 hover:opacity-100 hover:text-gray-500 transition-all duration-200 cursor-pointer uppercase p-4"
-                  >
+                    className="text-sm  text-black opacity-80 hover:opacity-100 hover:text-gray-500 transition-all duration-200 cursor-pointer uppercase p-4">
                     {linkObj.name}
                   </Link>
                 ))}
@@ -100,7 +97,7 @@ const HostFooter = () => {
       </div>
       {/* <div className="w-full h-[0.3px] bg-secondary border-t border-white" /> */}
       {/* <div className="w-full text-center flex flex-col lg:mb-0 py-6 border-t-2 border-gray-700"> */}
-      <Container padding={false}>
+  
         <div className="w-full text-center flex flex-col lg:mb-0 py-6 border-t-2 border-white">
           <div className="flex justify-center items-center flex-col md:flex-row lg:flex-row gap-2 text-small md:text-base">
             <span>
@@ -114,19 +111,9 @@ const HostFooter = () => {
             </span>
           </div>
         </div>
-      </Container>
+
       {/* Footer Bottom Section */}
-      <div className="w-full flex flex-col md:flex-row justify-between items-center text-[10px] md:text-xs px-4 py-4 text-gray-800 bg-gray-50 font-semibold">
-        {/* Left Links */}
-        <div className="flex gap-3 mb-2 md:mb-0">
-          <span>Privacy</span>
-          <span>·</span>
-          <span>Terms</span>
-          <span>·</span>
-          <span>Sitemap</span>
-          <span>·</span>
-          <span>Company details</span>
-        </div>
+      <div className="w-full flex flex-col md:flex-row justify-center items-center text-[10px] md:text-xs px-4 py-4 text-gray-800 bg-gray-50 font-semibold">
 
         {/* Right Icons and Settings */}
         <div className="flex items-center gap-4">

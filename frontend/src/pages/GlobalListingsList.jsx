@@ -26,8 +26,42 @@ const GlobalListingsList = () => {
   const dispatch = useDispatch();
   const formData = useSelector((state) => state.location.formValues);
   const [expandedCategories, setExpandedCategories] = useState([]);
-  const countryOptions = [{ label: "India", value: "india" }];
-  const locationOptions = [{ label: "Goa", value: "goa" }];
+  const { handleSubmit, control, reset, setValue, getValues, watch } = useForm({
+    defaultValues: {
+      country: "",
+      location: "",
+      category: "",
+    },
+  });
+  const selectedCountry = watch("country");
+  const selectedState = watch("location");
+  const { data: locations = [], isLoading: isLocations } = useQuery({
+    queryKey: ["locations"],
+    queryFn: async () => {
+      try {
+        const response = await axios.get("common/get-all-locations");
+        return Array.isArray(response.data) ? response.data : [];
+      } catch (error) {
+        console.error(error?.response?.data?.message);
+      }
+    },
+  });
+
+  const countryOptions = locations.map((item) => ({
+    label: item.country?.charAt(0).toUpperCase() + item.country?.slice(1),
+    value: item.country?.toLowerCase(),
+  }));
+  const filteredLocation = locations.find(
+    (item) =>
+      item.country ===
+      (selectedCountry
+        ? selectedCountry.charAt(0).toUpperCase() + selectedCountry.slice(1)
+        : "")
+  );
+  const locationOptions = filteredLocation?.states?.map((item) => ({
+    label: item,
+    value: item?.toLowerCase(),
+  }));
   const countOptions = [
     { label: "1 - 5", value: "1-5" },
     { label: "5 - 10", value: "5-10" },
@@ -88,6 +122,7 @@ const GlobalListingsList = () => {
     coliving: "Co-Living Spaces",
     hostel: "Hostel",
     privateStay: "Private Stay",
+    meetingroom: "Meeting Rooms",
     cafe: "Cafe",
     // fallback for unknown types
     default: (type) => `${type[0].toUpperCase() + type.slice(1)} Spaces`,
@@ -104,15 +139,7 @@ const GlobalListingsList = () => {
   const onSubmit = (data) => {
     locationData(data);
   };
-  const { handleSubmit, control, reset, setValue, getValues, watch } = useForm({
-    defaultValues: {
-      country: "",
-      location: "",
-      category: "",
-    },
-  });
-  const selectedCountry = watch("country");
-  const selectedState = watch("location");
+
   useEffect(() => {
     setValue("country", formData.country);
     setValue("location", formData.location);
@@ -300,7 +327,7 @@ const GlobalListingsList = () => {
               // animate={{ y: 0 }}
               exit={{ y: "-100%" }}
               transition={{ duration: 0.3 }}
-              className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 p-4 rounded-t-3xl lg:hidden h-screen"
+              className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 p-4 rounded-t-3xl lg:hidden h-[100dvh]"
             >
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold">Search</h3>
@@ -420,7 +447,7 @@ const GlobalListingsList = () => {
                       "hostel",
                       "workation",
                       "privateStay",
-                      "meetingRoom",
+                      "meetingroom",
                       "cafe",
                       "coliving",
                     ];
@@ -432,18 +459,28 @@ const GlobalListingsList = () => {
                     );
                   })
                   .map(([type, items]) => {
-                    const prioritizedCompanies = ["MeWo", "BIZ Nest"];
+                    const prioritizedCompanies = ["BIZ Nest", "MeWo"];
+
                     const sortedItems = [...items].sort((a, b) => {
-                      const aIsPriority = prioritizedCompanies.includes(
+                      const aPriorityIndex = prioritizedCompanies.indexOf(
                         a.companyName
                       );
-                      const bIsPriority = prioritizedCompanies.includes(
+                      const bPriorityIndex = prioritizedCompanies.indexOf(
                         b.companyName
                       );
 
-                      if (aIsPriority && !bIsPriority) return -1;
-                      if (!aIsPriority && bIsPriority) return 1;
+                      // Both are priority companies
+                      if (aPriorityIndex !== -1 && bPriorityIndex !== -1) {
+                        return aPriorityIndex - bPriorityIndex; // BIZ Nest (0) before MeWo (1)
+                      }
 
+                      // Only a is priority
+                      if (aPriorityIndex !== -1) return -1;
+
+                      // Only b is priority
+                      if (bPriorityIndex !== -1) return 1;
+
+                      // Fallback: sort by rating
                       const aRating =
                         a.reviews?.length > 0
                           ? a.reviews.reduce((sum, r) => sum + r.starCount, 0) /

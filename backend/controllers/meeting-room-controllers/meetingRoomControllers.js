@@ -17,11 +17,13 @@ export const bulkInsertMeetingRooms = async (req, res, next) => {
       .on("data", (row) => {
         const meetingRoom = {
           businessId: row["Business ID"]?.trim(),
-          businessName: row["Business Name"]?.trim(),
+          companyName: row["Business Name"]?.trim(),
           registeredEntityName: row["Registered Entity name"]?.trim(),
           website: row["Website"]?.trim(),
           address: row["Address"]?.trim(),
           city: row["City"]?.trim(),
+          country: row["Country"]?.trim() || null,
+          state: row["State"]?.trim() || null,
           country: row["Country"]?.trim(),
           state: row["State"]?.trim(),
           about: row["About"]?.trim(),
@@ -30,11 +32,10 @@ export const bulkInsertMeetingRooms = async (req, res, next) => {
           longitude: parseFloat(row["longitude"]?.trim()),
           googleMap: row["Google map"]?.trim(),
           ratings: parseFloat(row["Ratings"]) || null,
-          totalReviews: parseInt(row["Total Reviews"]),
-          inclusions: row["Inclusions"]
-            ?.split(",")
-            .map((i) => i.trim())
-            .filter(Boolean),
+          totalReviews: row["Total Reviews"]
+            ? parseInt(row["Total Reviews"]?.trim())
+            : 0,
+          inclusions: row["Inclusions"],
         };
 
         meetingRooms.push(meetingRoom);

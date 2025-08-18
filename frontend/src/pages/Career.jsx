@@ -7,123 +7,6 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "../utils/axios";
 import romans from "romans";
 
-const jobRolesDummy = [
-  {
-    categoryTitle: "I. Product Management",
-    jobPosts: [
-      {
-        _id: 1,
-        title: "UI Designer",
-        jobType: "Full-Time",
-        jobMode: "On-Site",
-        location: "Goa",
-      },
-      {
-        _id: 2,
-        title: "Marketing Analytics",
-        subtitle: "(SEO/Google Analytics)",
-        jobType: "Full-Time",
-        jobMode: "On-Site",
-        location: "Goa",
-      },
-    ],
-  },
-  {
-    categoryTitle: "II. Tech",
-    jobPosts: [
-      {
-        _id: 3,
-        title: "Jr. UI/UX Developer",
-        jobType: "Full-Time",
-        jobMode: "On-Site",
-        location: "Goa",
-      },
-      {
-        _id: 4,
-        title: "PHP Developer",
-        jobType: "Full-Time",
-        jobMode: "On-Site",
-        location: "Goa",
-      },
-      {
-        _id: 5,
-        title: "Web Developer Intern",
-        jobType: "Full-Time",
-        jobMode: "On-Site",
-        location: "Goa",
-      },
-    ],
-  },
-  {
-    categoryTitle: "III. Finance",
-    jobPosts: [
-      {
-        _id: 6,
-        title: "Finance Intern",
-        jobType: "Full-Time",
-        jobMode: "On-Site",
-        location: "Goa",
-      },
-    ],
-  },
-  {
-    categoryTitle: "IV. HR & EA",
-    jobPosts: [
-      {
-        _id: 7,
-        title: "HR Generalist",
-        jobType: "Full-Time",
-        jobMode: "On-Site",
-        location: "Goa",
-      },
-      {
-        _id: 8,
-        title: "Executive Assistant to CEO",
-        jobType: "Full-Time",
-        jobMode: "On-Site",
-        location: "Goa",
-      },
-    ],
-  },
-  {
-    categoryTitle: "V. Sales",
-    jobPosts: [
-      {
-        _id: 9,
-        title: "Sr.Manager Sales & Business Development",
-        jobType: "Full-Time",
-        jobMode: "On-Site",
-        location: "Goa",
-      },
-    ],
-  },
-  {
-    categoryTitle: "VI. Marketing",
-    jobPosts: [
-      {
-        _id: 10,
-        title: "Social Media Executive",
-        jobType: "Full-Time",
-        jobMode: "On-Site",
-        location: "Goa",
-      },
-    ],
-  },
-  {
-    categoryTitle: "VII. Internships",
-    jobPosts: [
-      {
-        _id: 11,
-        title: "Internships Across Departments",
-        subtitle:
-          "- APPLY NOW *Mention your applying department in the message box",
-        jobType: "Internships",
-        jobMode: "On-Site",
-        location: "Goa",
-      },
-    ],
-  },
-];
 
 const Career = () => {
   const [openIndex, setOpenIndex] = useState(null);
@@ -132,13 +15,28 @@ const Career = () => {
   const customLink = isHost ? `/hosts/career/job` : `/nomad/career/job`;
   // const customRoute = isHost ? "job/get-job-posts" : "";
 
-  const { data: jobRoles, isLoading } = useQuery({
-    queryKey: ["jobRoles"],
-    queryFn: async () => {
-      const response = await axios.get("job/get-job-posts");
-      return response.data;
-    },
-  });
+  const categoryOrder = [
+  "Product Management",
+  "Tech",
+  "Finance",
+  "HR & EA",
+  "Sales",
+  "Marketing",
+  "Internships",
+];
+
+ const { data: jobRoles, isLoading } = useQuery({
+  queryKey: ["jobRoles"],
+  queryFn: async () => {
+    const response = await axios.get("job/get-job-posts");
+    // sort API response by category order
+    return response.data.sort(
+      (a, b) =>
+        categoryOrder.indexOf(a.categoryTitle) -
+        categoryOrder.indexOf(b.categoryTitle)
+    );
+  },
+});
 
   const toggleAccordion = (idx) => {
     setOpenIndex((prev) => (prev === idx ? null : idx));

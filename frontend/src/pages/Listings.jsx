@@ -29,8 +29,42 @@ const Listings = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const formData = useSelector((state) => state.location.formValues);
-  const countryOptions = [{ label: "India", value: "india" }];
-  const locationOptions = [{ label: "Goa", value: "goa" }];
+  const { handleSubmit, control, reset, setValue, getValues, watch } = useForm({
+    defaultValues: {
+      country: "",
+      location: "",
+      category: "",
+    },
+  });
+  const selectedCountry = watch("country");
+  const selectedState = watch("location");
+  const { data: locations = [], isLoading: isLocations } = useQuery({
+    queryKey: ["locations"],
+    queryFn: async () => {
+      try {
+        const response = await axios.get("common/get-all-locations");
+        return Array.isArray(response.data) ? response.data : [];
+      } catch (error) {
+        console.error(error?.response?.data?.message);
+      }
+    },
+  });
+
+  const countryOptions = locations.map((item) => ({
+    label: item.country?.charAt(0).toUpperCase() + item.country?.slice(1),
+    value: item.country?.toLowerCase(),
+  }));
+  const filteredLocation = locations.find(
+    (item) =>
+      item.country ===
+      (selectedCountry
+        ? selectedCountry.charAt(0).toUpperCase() + selectedCountry.slice(1)
+        : "")
+  );
+  const locationOptions = filteredLocation?.states?.map((item) => ({
+    label: item,
+    value: item?.toLowerCase(),
+  }));
   const countOptions = [
     { label: "1 - 5", value: "1-5" },
     { label: "5 - 10", value: "5-10" },
@@ -76,15 +110,6 @@ const Listings = () => {
 
   const navigate = useNavigate();
 
-  const { handleSubmit, control, reset, setValue, watch, getValues } = useForm({
-    defaultValues: {
-      country: "",
-      location: "",
-      category: "",
-    },
-  });
-  const selectedCountry = watch("country");
-  const selectedState = watch("location");
   useEffect(() => {
     setValue("country", formData.country);
     setValue("location", formData.location);
@@ -432,7 +457,6 @@ const Listings = () => {
               mapOpen ? "col-span-5" : "col-span-9"
             } font-semibold text-lg`}
           >
-          
             <PaginatedGrid
               data={isLisitingLoading ? skeletonArray : sortedListings}
               entriesPerPage={!mapOpen ? 10 : 9}

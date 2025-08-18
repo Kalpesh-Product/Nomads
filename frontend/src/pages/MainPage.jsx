@@ -52,7 +52,7 @@ const MainPage = () => {
   }, [slider]);
 
   return (
-    <main className="min-h-screen flex flex-col justify-around items-center">
+    <main className="min-h-screen flex flex-col justify-center items-center">
       <div className="grid grid-cols-1 lg:grid-cols-2 relative">
         {/* Left Column */}
         <figure className="flex flex-col w-full h-full justify-center items-center p-4 lg:p-6">
@@ -104,11 +104,7 @@ const MainPage = () => {
       <div className="flex justify-evenly items-center flex-row w-full sm:flex-col xs:flex-col lg:flex-row md:flex-row">
         <div className="w-32"></div>
         <div className="w-full  ">
-          {/* <p className="text-center  pb-2 sm:text-tiny xs:text-tiny lg:text-content">
-            &copy; Copyright {new Date().getFullYear()} -{" "}
-            {(new Date().getFullYear() + 1).toString().slice(-2)} WONOCO PRIVATE
-            LIMITED – SINGAPORE. All Rights Reserved.
-          </p> */}
+
           <p className="text-center pb-2 sm:text-tiny xs:text-tiny lg:text-content">
             <span className="whitespace-nowrap">
               &copy; Copyright {new Date().getFullYear()} -{" "}

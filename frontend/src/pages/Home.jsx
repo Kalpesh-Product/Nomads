@@ -21,6 +21,9 @@ import hostels from "/images/hostels-img.webp";
 import cafes from "/images/meetingrooms-img.webp";
 import privateStay from "/images/privatestay-img.webp";
 import companyWorkation from "/images/workation-img.webp";
+import MuiModal from "../components/Modal";
+import renderStars from "../utils/renderStarts";
+import axios from "../utils/axios";
 
 const Home = () => {
   const destinationData = [
@@ -35,6 +38,8 @@ const Home = () => {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [open, setOpen] = useState(false);
+  const [selectedReview, setSelectedReview] = useState([]);
   const formData = useSelector((state) => state.location.formValues);
   const { handleSubmit, control, reset, register, watch } = useForm({
     defaultValues: {
@@ -46,11 +51,34 @@ const Home = () => {
   const selectedCountry = watch("country");
   const selectedState = watch("location");
   // Sample options
-  const countryOptions = [
-    { label: "India", value: "india" },
-    // { label: "Bali", value: "bali" },
-  ];
-  const locationOptions = [{ label: "Goa", value: "goa" }];
+
+  const { data: locations = [], isLoading: isLocations } = useQuery({
+    queryKey: ["locations"],
+    queryFn: async () => {
+      try {
+        const response = await axios.get("common/get-all-locations");
+        return Array.isArray(response.data) ? response.data : [];
+      } catch (error) {
+        console.error(error?.response?.data?.message);
+      }
+    },
+  });
+
+  const countryOptions = locations.map((item) => ({
+    label: item.country?.charAt(0).toUpperCase() + item.country?.slice(1),
+    value: item.country?.toLowerCase(),
+  }));
+  const filteredLocation = locations.find(
+    (item) =>
+      item.country ===
+      (selectedCountry
+        ? selectedCountry.charAt(0).toUpperCase() + selectedCountry.slice(1)
+        : "")
+  );
+  const locationOptions = filteredLocation?.states?.map((item)=>({
+    label : item,
+    value : item?.toLowerCase()
+  }))
   const countOptions = [
     { label: "1 - 5", value: "1-5" },
     { label: "5 - 10", value: "5-10" },
@@ -81,59 +109,47 @@ const Home = () => {
 
   const reviewData = [
     {
-      name: "Aayushi",
-      avatar: "https://i.pravatar.cc/50?img=1",
-      duration: "3 years on Airbnb",
-      stars: 5,
-      date: "2 days ago",
+      name: "Neelam Mulla",
+      location: "India",
+      rating: 5,
       message:
-        "One of the best Airbnbs I’ve stayed at. Loved everything about it, from the stay, to the helpful staff at the place, Bhaskar, to the thoughtfulness they’ve put behind...",
+        "This place provides a productive environment. Great amenities like high-speed internet, comfortable seating good location. Plus, it is a break from isolation and can boost creativity and motivation. Do consider this space if your on a workation or simply need a great space to work from. Very helpful staff as well!",
     },
     {
-      name: "Vinay",
-      avatar: "https://i.pravatar.cc/50?img=2",
-      duration: "3 years on Airbnb",
-      stars: 5,
-      date: "2 weeks ago",
+      name: "Shelton Rodrigues",
+      location: "USA",
+      rating: 5,
       message:
-        "Our caretaker Bhaskar was really responsive and helped a lot. The stay itself is quite good and peaceful. It’s quite secured and we loved the views as well. Good neighborhood...",
+        "One of the best co-working spaces in goa, suitable for all workation and work related activities. The staff are friendly and helpful and overall an amazing experience.",
     },
     {
-      name: "Ankush",
-      avatar: "https://i.pravatar.cc/50?img=3",
-      duration: "New to Airbnb",
-      stars: 5,
-      date: "2 weeks ago",
+      name: "Sushil Pandey",
+      location: "Dubai",
+      rating: 5,
       message:
-        "My recent Airbnb stay was absolutely wonderful, thanks to the incredibly helpful host and staff. They were always available and went above and beyond to assist with anything...",
+        "These guys have done a fantastic job with stay and food arrangements. They also provided an office area for us to work together. I appreciate a hard work the team has put to make our experience enjoyable. Highly recommended for teams planning workation in Goa! !",
     },
     {
-      name: "Irine",
-      avatar: "https://i.pravatar.cc/50?img=4",
-      duration: "2 years on Airbnb",
-      stars: 5,
-      date: "April 2025",
+      name: "Kamal Pandey",
+      location: "USA",
+      rating: 5,
       message:
-        "The stay was comfortable and had everything we needed. The kitchen was well-equipped with all utensils, making things very convenient. We also received room service...",
+        "BIZNest hosted our 4 days workation at artistry suites goa, the service and setup was awesome, and the team was also very helpful.",
     },
     {
-      name: "Aayushi",
-      avatar: "https://i.pravatar.cc/50?img=1",
-      duration: "3 years on Airbnb",
-      stars: 5,
-      date: "2 days ago",
+      name: "Aastha Sangle",
+      location: "Dubai",
+      rating: 5,
       message:
-        "One of the best Airbnbs I’ve stayed at. Loved everything about it, from the stay, to the helpful staff at the place, Bhaskar, to the thoughtfulness they’ve put behind...",
+        "I am extremely pleased with my workspace. It is exceptionally clean and comfortable, providing a perfect environment for productivity. The ambiance is pleasant, with ample light and well-designed interiors. The facilities, including the meeting rooms and common areas, are well-maintained and thoughtfully equipped. I genuinely enjoy being here and find it conducive to both focus and creativity. Overall, it is a great place to work and be around.",
     },
 
     {
-      name: "Ankush",
-      avatar: "https://i.pravatar.cc/50?img=3",
-      duration: "New to Airbnb",
-      stars: 5,
-      date: "2 weeks ago",
+      name: "Pawan Sharma",
+      location: "India",
+      rating: 5,
       message:
-        "My recent Airbnb stay was absolutely wonderful, thanks to the incredibly helpful host and staff. They were always available and went above and beyond to assist with anything...",
+        "Biz Nest is a modern co-working space that offers a seamless working environment..with a great view, too! The founders, Abrar and Kashif, along with the team make working here a warm, friendly and productive experience. Kudos!",
     },
   ];
 
@@ -169,11 +185,11 @@ const Home = () => {
   const amenities = [
     { image: icons.desk, title: "PRIVATE DESK", isAvailable: true },
     { image: icons.privatestorage, title: "Private Storage" },
-    { image: icons.aircondition, title: "AIR CONDITIONing" },
+    { image: icons.aircondition, title: "AC" },
     { image: icons.fastinternet, title: "High Speed Wi-Fi" },
     { image: icons.itsupport, title: "IT SUPPORT" },
     { image: icons.teacoffee, title: "Tea & Coffee" },
-    { image: icons.receptionsupport, title: "RECEPTION SUPPORT" },
+    { image: icons.receptionsupport, title: "RECEPTION" },
     { image: icons.adminsupport, title: "ADMIN SUPPORT" },
     { image: icons.housekeeping, title: "HOUSEKEEPING" },
     { image: icons.community, title: "COMMUNITY" },
@@ -181,12 +197,12 @@ const Home = () => {
     { image: icons.generator, title: "POWER BACKUP" },
     { image: icons.meetingrooms, title: "MEETING ROOM" },
     { image: icons.cafedining, title: "CAFETERIA" },
-    { image: icons.printingservices, title: "PRINTING SERVICES" },
+    { image: icons.printingservices, title: "PRINTING" },
     { image: icons.secure, title: "CCTV SECURE" },
     { image: icons.television, title: "SMART TV" },
     { image: icons.purifiedwater, title: "PURIFIED WATER" },
     { image: icons.pool, title: "SWIMMING POOL" },
-    { image: icons.customsolutions, title: "CUSTOM SOLUTIONS" },
+    { image: icons.customsolutions, title: "SOLUTIONS" },
     // { image: icons.rentbikecar, title: "CAR / BIKE / BUS" },
     // { image: icons.television, title: "TELEVISION" },
     // { image: icons.stationery, title: "STATIONERY" },
@@ -212,7 +228,8 @@ const Home = () => {
           <div className="flex flex-col  gap-4 justify-between items-center">
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center">
+              className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
+            >
               <Controller
                 name="country"
                 control={control}
@@ -261,7 +278,8 @@ const Home = () => {
               />
               <button
                 type="submit"
-                className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full">
+                className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full"
+              >
                 <IoSearch />
               </button>
             </form>
@@ -270,7 +288,8 @@ const Home = () => {
         <div className="lg:hidden flex w-full items-center justify-center my-4">
           <button
             onClick={() => setShowMobileSearch(true)}
-            className="bg-white flex items-center w-full text-gray-400 font-medium border-2 px-6 py-3 rounded-full">
+            className="bg-white flex items-center w-full text-gray-400 font-medium border-2 px-6 py-3 rounded-full"
+          >
             <IoSearch className="inline mr-2" />
             Start Search
           </button>
@@ -280,72 +299,77 @@ const Home = () => {
       <AnimatePresence>
         {showMobileSearch && (
           <motion.div
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "100%" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl z-50 p-4 rounded-t-3xl h-[50vh] lg:hidden">
+            className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl z-50 p-4 rounded-t-3xl h-[100dvh] lg:hidden"
+          >
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold">Search</h3>
               <button
                 onClick={() => setShowMobileSearch(false)}
-                className="text-gray-500 text-xl">
+                className="text-gray-500 text-xl"
+              >
                 &times;
               </button>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <Controller
-                name="country"
-                control={control}
-                render={({ field }) => (
-                  <SearchBarCombobox
-                    value={field.value}
-                    onChange={field.onChange}
-                    options={countryOptions}
-                    label="Select Country"
-                    placeholder="Select aspiring destination"
-                    className="w-full"
-                  />
-                )}
-              />
-              <Controller
-                name="location"
-                control={control}
-                render={({ field }) => (
-                  <SearchBarCombobox
-                    value={field.value}
-                    onChange={field.onChange}
-                    label="Select Location"
-                    options={locationOptions}
-                    placeholder="Select area within country"
-                    disabled={!selectedCountry}
-                    className="w-full"
-                  />
-                )}
-              />
-              <Controller
-                name="count"
-                control={control}
-                render={({ field }) => (
-                  <SearchBarCombobox
-                    value={field.value}
-                    onChange={field.onChange}
-                    options={countOptions}
-                    label="Select Count"
-                    placeholder="Booking for no. of Nomads"
-                    disabled={!selectedState}
-                    className="w-full"
-                  />
-                )}
-              />
-              <button
-                type="submit"
-                className="w-full bg-[#FF5757] text-white py-3 rounded-full">
-                <IoSearch className="inline mr-2" />
-                Search
-              </button>
-            </form>
+            <motion.div initial={{ y: "-100%" }} animate={{ y: "0%" }}>
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <Controller
+                  name="country"
+                  control={control}
+                  render={({ field }) => (
+                    <SearchBarCombobox
+                      value={field.value}
+                      onChange={field.onChange}
+                      options={countryOptions}
+                      label="Select Country"
+                      placeholder="Select aspiring destination"
+                      className="w-full"
+                    />
+                  )}
+                />
+                <Controller
+                  name="location"
+                  control={control}
+                  render={({ field }) => (
+                    <SearchBarCombobox
+                      value={field.value}
+                      onChange={field.onChange}
+                      label="Select Location"
+                      options={locationOptions}
+                      placeholder="Select area within country"
+                      disabled={!selectedCountry}
+                      className="w-full"
+                    />
+                  )}
+                />
+                <Controller
+                  name="count"
+                  control={control}
+                  render={({ field }) => (
+                    <SearchBarCombobox
+                      value={field.value}
+                      onChange={field.onChange}
+                      options={countOptions}
+                      label="Select Count"
+                      placeholder="Booking for no. of Nomads"
+                      disabled={!selectedState}
+                      className="w-full"
+                    />
+                  )}
+                />
+                <button
+                  type="submit"
+                  className="w-full bg-[#FF5757] text-white py-3 rounded-full"
+                >
+                  <IoSearch className="inline mr-2" />
+                  Search
+                </button>
+              </form>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -362,11 +386,8 @@ const Home = () => {
                   </h1>
                 </div>
                 <div className="text-title ">
-                  <h1 className="text-[clamp(1rem,6.3vw,2.9rem)] text-nowrap">
-                    <span className="text-[#FF5757] uppercase font-semibold">
-                      Largest
-                    </span>{" "}
-                    <span className="font-medium">Community of</span>
+                  <h1 className="text-[clamp(1.8rem,3.4vw,4rem)] text-nowrap">
+                    <span className="font-medium"> Largest Community of</span>
                   </h1>
                 </div>
                 <div className="font-semibold">
@@ -437,7 +458,8 @@ const Home = () => {
                   destinationData.length % 2 !== 0
                     ? "md:col-span-2 afterPro:col-span-1"
                     : ""
-                }`}>
+                }`}
+              >
                 <div className="relative w-full rounded-xl overflow-hidden shadow-md">
                   <img
                     src={item.image}
@@ -502,6 +524,44 @@ const Home = () => {
           </div>
         </div>
       </Container>
+      <MuiModal open={open} onClose={() => setOpen(false)} title={"Review"}>
+        <div className="flex flex-col gap-4">
+          {/* Reviewer Info */}
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-primary-blue flex items-center justify-center text-white font-semibold text-lg uppercase">
+              {(
+                selectedReview?.reviewerName ||
+                selectedReview?.name ||
+                "Unknown"
+              )
+                ?.split(" ")
+                .map((n) => n[0])
+                .join("")
+                .slice(0, 2)}
+            </div>
+            <div>
+              <p className="font-semibold text-base">
+                {selectedReview?.reviewerName ||
+                  selectedReview?.name ||
+                  "Unknown"}
+              </p>
+              <p className="text-sm text-gray-500">{selectedReview?.date}</p>
+            </div>
+          </div>
+
+          {/* Star Rating */}
+          <div className="flex items-center gap-1 text-black text-sm">
+            {renderStars(selectedReview?.rating || selectedReview?.starCount)}
+          </div>
+
+          {/* Message */}
+          <div className="text-gray-800 text-sm whitespace-pre-line leading-relaxed">
+            {selectedReview?.message ||
+              selectedReview?.reviewText ||
+              selectedReview?.description}
+          </div>
+        </div>
+      </MuiModal>
     </div>
   );
 };

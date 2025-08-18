@@ -153,7 +153,8 @@ const HostHome = () => {
                 camera={{
                   position: [0, 0, ismobile ? 15 : 25],
                   fov: ismobile ? 50 : isTablet ? 50 : isLaptop ? 40 : 28,
-                }}>
+                }}
+              >
                 <ambientLight intensity={0.5} />
                 <pointLight position={[10, 10, 10]} />
                 <RotatingGlobe />
@@ -180,7 +181,8 @@ const HostHome = () => {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                }}>
+                }}
+              >
                 <GetStartedButton
                   title="CONNECT WITH US"
                   externalStyles={
@@ -214,7 +216,7 @@ const HostHome = () => {
       </Container>
       {/* Key Modules */}
       <Container padding={false}>
-        <hr className="border-t-2 border-gray-300"/>
+        <hr className="border-t-2 border-gray-300" />
       </Container>
       <section>
         <Container>
@@ -236,7 +238,8 @@ const HostHome = () => {
               {onePartner.map((item) => (
                 <div
                   key={item.id}
-                  className="border-t-2 border-black w-full space-y-2 py-2">
+                  className="border-t-2 border-black w-full space-y-2 py-2"
+                >
                   <h1 className="text-title py-4">
                     {item.title || "Title here"}
                   </h1>
@@ -276,7 +279,8 @@ const HostHome = () => {
               {noCode.map((item) => (
                 <div
                   key={item.id}
-                  className="h-72 w-full overflow-hidden rounded-lg  shadow-lg">
+                  className="h-72 w-full overflow-hidden rounded-lg  shadow-lg"
+                >
                   <img
                     src={item.image || "/hosts/themes/cafe.webp"}
                     className="h-full w-full object-cover"
@@ -296,18 +300,18 @@ const HostHome = () => {
           </div>
         </Container>
       </section>
-    
+
       <section>
         <Container>
-          <div className="flex flex-col gap-16">
-            <h1 className="text-title lg:text-[5rem] uppercase text-center font-semibold lg:font-normal">
+          <div className="flex flex-col gap-10">
+            <h1 className="text-title lg:text-[4.3rem] uppercase text-center font-semibold lg:font-medium">
               TESTIMONIAL
             </h1>
-            <div className="flex flex-col gap-4 lg:gap-0 md:flex-row justify-between w-full items-stretch">
+            <div className="flex flex-col gap-4 lg:gap-10 md:flex-row justify-between w-full items-stretch">
               {/* Left Section */}
-              <div className="flex flex-col justify-between h-96 lg:h-[30rem] w-full lg:w-[90%]">
-                <div>
-                  <p className="text-subtitle">
+              <div className="flex flex-col justify-between h-full lg:h-[26rem] w-full lg:w-[90%]">
+                <div className="w-full lg:w-[80%]">
+                  <p className="text-card-title font-medium text-[#212529] leading-normal">
                     “We went from managing 3,000 sq ft to 50,000+ sq ft in the
                     most efficient and seamless manner with tech, processes,
                     data analytics, customer & employee management and due to an
@@ -318,7 +322,8 @@ const HostHome = () => {
                 <div>
                   <h4
                     className="my-4"
-                    style={{ fontFamily: "Amsterdam", fontSize: "2rem" }}>
+                    style={{ fontFamily: "Amsterdam", fontSize: "2rem" }}
+                  >
                     Kashif Shaikh
                   </h4>
                   <p className="m-0">Co-Founder & COO</p>
@@ -327,7 +332,7 @@ const HostHome = () => {
               </div>
 
               {/* Right Section */}
-              <div className="h-[30rem] w-full lg:w-1/2 overflow-hidden rounded-xl">
+              <div className="h-[26rem] w-full lg:w-1/2 overflow-hidden rounded-xl">
                 <img
                   src="/hosts/themes/Kashif_Edit.png"
                   alt="owner-image"
@@ -335,15 +340,17 @@ const HostHome = () => {
                 />
               </div>
             </div>
-             <div className="flex w-full justify-center lg:justify-center">
-              <GetStartedButton
-                title={"Get Started"}
-                handleSubmit={() => navigate("signup")}
-              />
-            </div>
           </div>
         </Container>
       </section>
+      <MySeperator />
+      <div className="flex w-full justify-center lg:justify-center my-16">
+        <GetStartedButton
+          title={"Get Started"}
+          handleSubmit={() => navigate("signup")}
+        />
+      </div>
+      {/* <MySeperator /> */}
     </main>
   );
 };
