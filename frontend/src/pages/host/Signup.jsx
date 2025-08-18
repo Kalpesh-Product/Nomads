@@ -14,16 +14,48 @@ import Container from "../../components/Container";
 import GetStartedButton from "../../components/GetStartedButton";
 import { NavLink } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
-import axios from "../../utils/axios"
+import axios from "../../utils/axios";
 import toast from "react-hot-toast";
 
 const steps = ["Personal Info", "Company Info", "Services", "Review"];
 
+// const serviceOptions = [
+//   "Web Development",
+//   "App Development",
+//   "SEO",
+//   "Marketing",
+// ];
+
 const serviceOptions = [
-  "Web Development",
-  "App Development",
-  "SEO",
-  "Marketing",
+  {
+    category: "Department Modules",
+    items: [
+      "Tickets",
+      "Meetings",
+      "Tasks",
+      "Performance",
+      "Visitors",
+      "Calendar",
+      "Access",
+      "Profile",
+      "Finance",
+      "Sales",
+      "HR",
+      "Frontend",
+      "Admin",
+      "Maintenance",
+      "IT",
+      // "Cafe",
+    ],
+  },
+  // {
+  //   category: "Apps",
+  //   items: ["Tickets", "Meetings", "Tasks", "Performance", "Visitors"],
+  // },
+  // {
+  //   category: "General",
+  //   items: ["Calendar", "Access", "Profile"],
+  // },
 ];
 
 const HostSignup = () => {
@@ -49,24 +81,24 @@ const HostSignup = () => {
     },
   });
 
-   const { mutate: register, isLoading: isRegisterLoading } = useMutation({
-      mutationFn: async (data) => {
-          const response = await axios.post(
-          "form/add-new-b2b-form-submission",
-          {...data,formName:"register"},
-        );
-  
-        return response.data;
-      },
-      onSuccess: (data) => {
-        toast.success("Form submitted successfully");
-        reset();
-      },
-      onError: (error) => {
-        toast.error(error.response.data.message);
-        reset();
-      },
-    });
+  const { mutate: register, isLoading: isRegisterLoading } = useMutation({
+    mutationFn: async (data) => {
+      const response = await axios.post("form/add-new-b2b-form-submission", {
+        ...data,
+        formName: "register",
+      });
+
+      return response.data;
+    },
+    onSuccess: (data) => {
+      toast.success("Form submitted successfully");
+      reset();
+    },
+    onError: (error) => {
+      toast.error(error.response.data.message);
+      reset();
+    },
+  });
 
   const stepFields = [
     ["name", "email", "mobile", "country", "state", "city"], // Step 1
@@ -340,44 +372,131 @@ const HostSignup = () => {
           </>
         );
 
+      // case 2:
+      //   return (
+      //     <Controller
+      //       name="selectedServices"
+      //       control={control}
+      //       rules={{
+      //         validate: (value) =>
+      //           value.length > 0 || "Please select at least one service",
+      //       }}
+      //       render={({ field, fieldState }) => (
+      //         <Box sx={{ mt: 2 }}>
+      //           <FormGroup>
+      //             {serviceOptions.map((service) => (
+      //               <FormControlLabel
+      //                 key={service}
+      //                 control={
+      //                   <Checkbox
+      //                     checked={field.value.includes(service)}
+      //                     onChange={(e) => {
+      //                       const newValue = e.target.checked
+      //                         ? [...field.value, service]
+      //                         : field.value.filter((s) => s !== service);
+      //                       field.onChange(newValue);
+      //                     }}
+      //                   />
+      //                 }
+      //                 label={service}
+      //               />
+      //             ))}
+      //           </FormGroup>
+      //           {fieldState.error && (
+      //             <FormHelperText error>
+      //               {fieldState.error.message}
+      //             </FormHelperText>
+      //           )}
+      //         </Box>
+      //       )}
+      //     />
+      //   );
+
       case 2:
         return (
-          <Controller
-            name="selectedServices"
-            control={control}
-            rules={{
-              validate: (value) =>
-                value.length > 0 || "Please select at least one service",
-            }}
-            render={({ field, fieldState }) => (
-              <Box sx={{ mt: 2 }}>
-                <FormGroup>
-                  {serviceOptions.map((service) => (
-                    <FormControlLabel
-                      key={service}
-                      control={
-                        <Checkbox
-                          checked={field.value.includes(service)}
-                          onChange={(e) => {
-                            const newValue = e.target.checked
-                              ? [...field.value, service]
-                              : field.value.filter((s) => s !== service);
+          <>
+            <h2 className="font-semibold text-lg pt-4">
+              Please Select Your Services
+            </h2>
+            <Controller
+              name="selectedServices"
+              control={control}
+              rules={{
+                validate: (value) =>
+                  value.length > 0 || "Please select at least one service",
+              }}
+              render={({ field, fieldState }) => (
+                <Box sx={{ mt: 2 }} className="col-span-1 lg:col-span-2">
+                  {serviceOptions.map((group) => (
+                    <Box key={group.category} sx={{ mb: 3 }}>
+                      {/* <h3 className="font-semibold mb-2">{group.category}</h3> */}
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {group.items.map((service) => {
+                          const isSelected = field.value.includes(service);
+
+                          const handleToggle = () => {
+                            const newValue = isSelected
+                              ? field.value.filter((s) => s !== service)
+                              : [...field.value, service];
+
+                            console.log("Selected services:", newValue);
                             field.onChange(newValue);
-                          }}
-                        />
-                      }
-                      label={service}
-                    />
+                          };
+
+                          return (
+                            <Box
+                              key={service}
+                              onClick={handleToggle}
+                              role="checkbox"
+                              aria-checked={isSelected}
+                              tabIndex={0}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ")
+                                  handleToggle();
+                              }}
+                              sx={{
+                                border: "1px solid",
+                                borderColor: isSelected
+                                  ? "primary.main"
+                                  : "divider",
+                                borderRadius: 2,
+                                p: 2,
+                                cursor: "pointer",
+                                userSelect: "none",
+                                boxShadow: isSelected ? 3 : 0,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                              }}>
+                              <span className="font-medium">{service}</span>
+
+                              <Checkbox
+                                checked={isSelected}
+                                onChange={(e) => {
+                                  e.stopPropagation(); // prevent double toggle via card click
+                                  handleToggle();
+                                }}
+                                inputProps={{
+                                  "aria-label": `${service} checkbox`,
+                                }}
+                              />
+                            </Box>
+                          );
+                        })}
+                      </div>
+                    </Box>
                   ))}
-                </FormGroup>
-                {fieldState.error && (
-                  <FormHelperText error>
-                    {fieldState.error.message}
-                  </FormHelperText>
-                )}
-              </Box>
-            )}
-          />
+
+                  {fieldState.error && (
+                    <FormHelperText error>
+                      {fieldState.error.message}
+                    </FormHelperText>
+                  )}
+                </Box>
+              )}
+            />
+          </>
         );
 
       case 3:
@@ -448,8 +567,7 @@ const HostSignup = () => {
           textTransform: "uppercase",
           fontFamily: "Poppins",
         }}
-        activeStep={activeStep}
-      >
+        activeStep={activeStep}>
         {steps.map((label, index) => (
           <Step label={label} key={index} />
         ))}
@@ -462,8 +580,7 @@ const HostSignup = () => {
         )}
         <form
           className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-4"
-          onSubmit={handleSubmit((data)=> register(data))}
-        >
+          onSubmit={handleSubmit((data) => register(data))}>
           {renderStepFields()}
           <div className="col-span-1 lg:col-span-2 flex justify-between items-center">
             {activeStep > 0 && (
@@ -477,18 +594,17 @@ const HostSignup = () => {
                 <GetStartedButton title="Next" handleSubmit={handleNext} />
               </div>
             )}
-          
-       
-            {(activeStep !== 0 && activeStep < steps.length - 1 )? (
+
+            {activeStep !== 0 && activeStep < steps.length - 1 ? (
               <div className="flex  justify-center lg:justify-end items-center w-full">
                 <GetStartedButton title="Next" handleSubmit={handleNext} />
               </div>
             ) : (
               <></>
             )}
-              {activeStep === stepFields.length -1 && (
+            {activeStep === stepFields.length - 1 && (
               <div className="flex  justify-center  items-center w-full">
-                <GetStartedButton title="Submit" type={"submit"}/>
+                <GetStartedButton title="Submit" type={"submit"} />
               </div>
             )}
           </div>
