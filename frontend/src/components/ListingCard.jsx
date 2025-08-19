@@ -61,7 +61,7 @@ const ListingCard = ({ item, handleNavigation, showVertical=true }) => {
           </div>
           {showVertical && (
             <p className="text-tiny w-full text-right   text-gray-600">
-              {typeLabels[item.type] || "Unknown"}
+              {typeLabels[item.companyType] || "Unknown"}
             </p>
           )}
         </div>
