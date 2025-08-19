@@ -36,7 +36,7 @@ const GlobalListingsMap = () => {
     queryKey: ["locations"],
     queryFn: async () => {
       try {
-        const response = await axios.get("common/get-all-locations");
+        const response = await axios.get("company/company-locations");
         return Array.isArray(response.data) ? response.data : [];
       } catch (error) {
         console.error(error?.response?.data?.message);
@@ -71,7 +71,7 @@ const GlobalListingsMap = () => {
     // { label: "Co-Living", value: "coliving" },
     { label: "Hostels", value: "hostel" },
     { label: "Workation", value: "workation" },
-    { label: "Private Stay", value: "privateStay" },
+    { label: "Private Stay", value: "privatestay" },
     { label: "Meetings", value: "meetingRoom" },
     { label: "Cafe’s", value: "cafe" },
   ];
@@ -80,7 +80,7 @@ const GlobalListingsMap = () => {
     coworking: "Co-Working Spaces",
     coliving: "Co-Living Spaces",
     hostel: "hostel",
-    privateStay: "Private Stay",
+    privatestay: "Private Stay",
     cafe: "cafe",
     default: (type) => `${type[0].toUpperCase() + type.slice(1)} Spaces`,
   };
@@ -105,7 +105,7 @@ const GlobalListingsMap = () => {
       const { country, location, category } = formData || {};
 
       const response = await axios.get(
-        `common/location-and-type-based-company-data?country=${country}&state=${location}`
+        `company/companies?country=${country}&state=${location}`
       );
 
       // return response.data;
@@ -466,7 +466,7 @@ const GlobalListingsMap = () => {
                               navigate(`/nomad/listings/${item.companyName}`, {
                                 state: {
                                   companyId: item._id,
-                                  type: item.type,
+                                  type: item.companyType || "ss",
                                 },
                               })
                             }

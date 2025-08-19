@@ -1,43 +1,18 @@
 import express from "express";
-import cors from "cors";
-import { corsConfig } from "./config/corsConfig.js";
-import errorHandler from "./middleware/errorHandler.js";
+import mongoose from "mongoose";
 import { config } from "dotenv";
-import connectDb from "./config/db.js";
-import companyRoutes from "./routes/coworkingRoutes/companyRoutes.js";
-import pocRoutes from "./routes/coworkingRoutes/pocRoutes.js";
-import reviewRoutes from "./routes/coworkingRoutes/reviewRoutes.js";
-import serviceRoutes from "./routes/coworkingRoutes/servicesRoutes.js";
-import colivingCompanyRoutes from "./routes/colivingRoutes/companyRoutes.js";
-import colivingUnitRoutes from "./routes/colivingRoutes/colivingUnitRoutes.js";
-import colivingReviewRoutes from "./routes/colivingRoutes/reviewRoutes.js";
-import colivingPocRoutes from "./routes/colivingRoutes/colivingPocRoutes.js";
-import commonCompanyRoutes from "./routes/commonCompanyRoutes.js";
-import hostelRoutes from "./routes/hostelRoutes/hostelRoutes.js";
-import hostelReviewRoutes from "./routes/hostelRoutes/reviewRoutes.js";
-import hostelUnitRoutes from "./routes/hostelRoutes/unitsRoutes.js";
-import hostelPointOfContactRoutes from "./routes/hostelRoutes/pointOfContactRoutes.js";
-import privateStayCompanyRoutes from "./routes/privateStayRoutes/companyRoutes.js";
-import privateStayUnitRoutes from "./routes/privateStayRoutes/privateStayUnitsRoutes.js";
-import privateStayReviewRoutes from "./routes/privateStayRoutes/privateStayReviewRoutes.js";
-import privateStayPocRoutes from "./routes/privateStayRoutes/privateStayPocRoutes.js";
-import cafeRoutes from "./routes/cafeRoutes/cafeRoutes.js";
-import cafeReviewRoutes from "./routes/cafeRoutes/cafeReviews.js";
-import cafePocRoutes from "./routes/cafeRoutes/cafePocRoutes.js";
-import workationRoutes from "./routes/workationRoutes/companyRoutes.js";
-import workationPocRoutes from "./routes/workationRoutes/pocRoutes.js";
-import workationReviewRoutes from "./routes/workationRoutes/workationReviewRoutes.js";
-import workationUnitRoutes from "./routes/workationRoutes/unitRoutes.js";
-import meetingRoomRoutes from "./routes/meetingRoutes/meetingRoutes.js";
-import meetingPocRoutes from "./routes/meetingRoutes/pocRoutes.js";
-import meetingServicesRoutes from "./routes/meetingRoutes/meetingServicesRoutes.js";
-import meetingReviewRoutes from "./routes/meetingRoutes/meetingReviewRoutes.js";
+import { corsConfig } from "./config/corsConfig.js";
+import cors from "cors";
+import errorHandler from "./middlewares/errorHandler.js";
+import companyRoutes from "./routes/companyRoutes.js";
+import pocRoutes from "./routes/pocRoutes.js";
+import reviewRoutes from "./routes/ReviewRoutes.js";
 import formRoutes from "./routes/formRoutes.js";
 import jobRoutes from "./routes/jobRoutes.js";
-import mongoose from "mongoose";
+import connectDb from "./config/db.js";
 
 const app = express();
-config();
+config({ override: true });
 connectDb(process.env.MONGO_URL);
 
 app.use(cors(corsConfig));
@@ -45,36 +20,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 const PORT = process.env.PORT || 3000;
 
-app.use("/api/coworking/company", companyRoutes);
-app.use("/api/coworking/reviews", reviewRoutes);
-app.use("/api/coworking/poc", pocRoutes);
-app.use("/api/coworking/services", serviceRoutes);
-app.use("/api/coliving/company", colivingCompanyRoutes);
-app.use("/api/coliving/unit", colivingUnitRoutes);
-app.use("/api/coliving/review", colivingReviewRoutes);
-app.use("/api/coliving/poc", colivingPocRoutes);
-app.use("/api/hostel/company", hostelRoutes);
-app.use("/api/hostel/review", hostelReviewRoutes);
-app.use("/api/hostel/units", hostelUnitRoutes);
-app.use("/api/hostel/poc", hostelPointOfContactRoutes);
-app.use("/api/private-stay/company", privateStayCompanyRoutes);
-app.use("/api/private-stay/units", privateStayUnitRoutes);
-app.use("/api/private-stay/review", privateStayReviewRoutes);
-app.use("/api/private-stay/poc", privateStayPocRoutes);
-app.use("/api/workation/company", workationRoutes);
-app.use("/api/workation/poc", workationPocRoutes);
-app.use("/api/workation/review", workationReviewRoutes);
-app.use("/api/workation/unit", workationUnitRoutes);
-app.use("/api/cafe/company", cafeRoutes);
-app.use("/api/cafe/review", cafeReviewRoutes);
-app.use("/api/cafe/poc", cafePocRoutes);
-app.use("/api/meeting/company", meetingRoomRoutes);
-app.use("/api/meeting/poc", meetingPocRoutes);
-app.use("/api/meeting/services", meetingServicesRoutes);
-app.use("/api/meeting/review", meetingReviewRoutes);
-app.use("/api/common", commonCompanyRoutes);
-app.use("/api/form", formRoutes);
+app.use("/api/company", companyRoutes);
+app.use("/api/poc", pocRoutes);
+app.use("/api/review", reviewRoutes);
+app.use("/api/forms", formRoutes);
 app.use("/api/job", jobRoutes);
+
+app.all("/*splat", (req, res) => {
+  if (req.accepts("html")) {
+    res.status(404).send("<h1>404 not found</h1>");
+  } else if (req.accepts("json")) {
+    return res.status(404).json({ message: "404 not found" });
+  } else {
+    res.type("text").status(404).send("404 not found");
+  }
+});
 app.use(errorHandler);
 app.listen(
   PORT,

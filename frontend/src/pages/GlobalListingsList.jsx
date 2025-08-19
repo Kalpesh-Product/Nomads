@@ -39,7 +39,7 @@ const GlobalListingsList = () => {
     queryKey: ["locations"],
     queryFn: async () => {
       try {
-        const response = await axios.get("common/get-all-locations");
+        const response = await axios.get("company/company-locations");
         return Array.isArray(response.data) ? response.data : [];
       } catch (error) {
         console.error(error?.response?.data?.message);
@@ -73,7 +73,7 @@ const GlobalListingsList = () => {
     // { label: "Co-Living", value: "coliving" },
     { label: "Hostels", value: "hostel" },
     { label: "Workation", value: "workation" },
-    { label: "Private Stay", value: "privateStay" },
+    { label: "Private Stay", value: "privatestay" },
     { label: "Meetings", value: "meetingRoom" },
     { label: "Cafe’s", value: "cafe" },
   ];
@@ -99,7 +99,7 @@ const GlobalListingsList = () => {
       const { country, location, category } = formData || {};
 
       const response = await axios.get(
-        `common/location-and-type-based-company-data?country=${country}&state=${location}`
+        `company/companies?country=${country}&state=${location}`
       );
 
       // return response.data;
@@ -109,9 +109,9 @@ const GlobalListingsList = () => {
   });
 
   const groupedListings = listingsData?.reduce((acc, item) => {
-    if (item.type === "coliving") return acc; // skip coliving
-    if (!acc[item.type]) acc[item.type] = [];
-    acc[item.type].push(item);
+    if (item.companyType === "coliving") return acc; // skip coliving
+    if (!acc[item.companyType]) acc[item.companyType] = [];
+    acc[item.companyType].push(item);
     return acc;
   }, {});
 
@@ -121,7 +121,7 @@ const GlobalListingsList = () => {
     coworking: "Co-Working Spaces",
     coliving: "Co-Living Spaces",
     hostel: "Hostel",
-    privateStay: "Private Stay",
+    privatestay: "Private Stay",
     meetingroom: "Meeting Rooms",
     cafe: "Cafe",
     // fallback for unknown types
@@ -446,7 +446,7 @@ const GlobalListingsList = () => {
                       "coworking",
                       "hostel",
                       "workation",
-                      "privateStay",
+                      "privatestay",
                       "meetingroom",
                       "cafe",
                       "coliving",

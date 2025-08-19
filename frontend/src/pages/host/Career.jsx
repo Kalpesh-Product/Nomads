@@ -13,7 +13,7 @@ const HostCareer = () => {
   const { data: jobRoles, isLoading } = useQuery({
     queryKey: ["jobRoles"],
     queryFn: async () => {
-      const response = await axios.get("job/get-job-posts");
+      const response = await axios.get("/job/get-job-posts");
       return response.data;
     },
   });
