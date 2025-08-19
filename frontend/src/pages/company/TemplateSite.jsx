@@ -4,8 +4,8 @@ import TempHeader from './components/TempHeader'
 
 const TemplateSite = () => {
   return (
-    <div>
-      <header>
+    <div className='h-screen relative'>
+      <header className='sticky top-0 z-10'>
         <TempHeader />
       </header>
       <Outlet />
