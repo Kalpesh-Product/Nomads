@@ -341,7 +341,7 @@ const Header = () => {
                 {(new Date().getFullYear() + 1).toString().slice(-2)}
               </span>
               <span></span>
-              <span>BRIDG. All rights reserved</span>
+              <span>WoNo. All rights reserved</span>
             </div>
           </div>
         </div>
