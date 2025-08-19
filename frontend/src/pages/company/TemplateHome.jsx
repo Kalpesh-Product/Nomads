@@ -5,6 +5,11 @@ import axios from "axios";
 import { useKeenSlider } from "keen-slider/react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 import Container from "../../components/Container";
+import ProductCard from "./components/ProductCard";
+import TestimonialCard from "./components/TestimonialCard";
+import { BsEnvelope } from "react-icons/bs";
+import { MdOutlinePhone } from "react-icons/md";
+import { CiMap } from "react-icons/ci";
 
 function getTenantFromHost() {
   const hostname = window.location.hostname;
@@ -19,6 +24,25 @@ const TemplateHome = () => {
     mode: "snap",
     slides: { perView: 1 },
   });
+
+  const [testimonialRef, testimonialSlider] = useKeenSlider({
+  loop: true,
+  mode: "snap",
+  spacing: 16,
+  slides: {
+    perView: 1, // default (mobile)
+    spacing: 16,
+  },
+  breakpoints: {
+    "(min-width: 768px)": {
+      slides: { perView: 2, spacing: 24 },
+    },
+    "(min-width: 1024px)": {
+      slides: { perView: 3, spacing: 32 },
+    },
+  },
+});
+
 
   useEffect(() => {
     if (!slider) return;
@@ -56,22 +80,91 @@ const TemplateHome = () => {
     enabled: !!tenant,
   });
 
+  const heroImages = isPending ? [] : data?.heroImages
+
+  const galleryImages = isPending ? [] : data?.gallery?.slice(0, 5);
+
+  const products = [
+    { id: 1, productName: "co-working", img: "" },
+    { id: 2, productName: "co-working", img: "" },
+    { id: 3, productName: "co-working", img: "" },
+    { id: 4, productName: "co-working", img: "" },
+    { id: 5, productName: "co-working", img: "" },
+    { id: 6, productName: "co-working", img: "" },
+  ];
+  const testimonials = [
+    {
+      id: 1,
+      image: "https://randomuser.me/api/portraits/women/44.jpg",
+      name: "Sarah K.",
+      role: "UX Designer",
+      company: "Brello",
+      text: "I was looking for a way to streamline my design process and the Anima's Landing Page UI Kit was a lifesaver! The intuitive design and ease of customisation have saved me hours of time and effort. Highly recommend!",
+      rating: 4,
+    },
+    {
+      id: 2,
+      image: "https://randomuser.me/api/portraits/men/32.jpg",
+      name: "David P.",
+      role: "Product Manager",
+      company: "NextGen",
+      text: "Using this kit has improved our workflow dramatically. The team can focus more on innovation rather than setup. Super smooth experience!",
+      rating: 5,
+    },
+    {
+      id: 3,
+      image: "https://randomuser.me/api/portraits/women/68.jpg",
+      name: "Maya R.",
+      role: "Frontend Developer",
+      company: "TechFlow",
+      text: "Simple, elegant and effective. It took my project to the next level with minimal effort. Highly recommended.",
+      rating: 5,
+    },
+    {
+      id: 4,
+      image: "https://randomuser.me/api/portraits/men/77.jpg",
+      name: "Liam C.",
+      role: "Software Engineer",
+      company: "CloudCore",
+      text: "This toolkit streamlined my work. I could focus more on solving real problems instead of repetitive setup. Amazing resource!",
+      rating: 4,
+    },
+    {
+      id: 5,
+      image: "https://randomuser.me/api/portraits/women/21.jpg",
+      name: "Anna T.",
+      role: "Designer",
+      company: "PixelPro",
+      text: "Very intuitive and well thought out. My clients love the polished results I can now deliver faster than ever.",
+      rating: 5,
+    },
+    {
+      id: 6,
+      image: "https://randomuser.me/api/portraits/men/15.jpg",
+      name: "Mark R.",
+      role: "CTO",
+      company: "InnoWave",
+      text: "Highly flexible and easy to integrate. This is my go-to for building solid and scalable UI foundations.",
+      rating: 5,
+    },
+  ];
+
   if (!tenant) return <div>No tenant specified</div>;
   if (isPending) return <div>Loading site...</div>;
   if (error) return <div>Error loading site: {error.message}</div>;
 
   return (
-    <div className="w-screen">
-      <div className="relative  overflow-hidden">
+    <div className="w-screen ">
+      <div className="relative h-screen  overflow-hidden" id="hero">
         {/* Slider (only images) */}
         <div ref={sliderRef} className="keen-slider w-full h-full">
-          {slides.map((slide) => (
+          {heroImages.map((slide) => (
             <div
-              key={slide.id}
+              key={slide._id}
               className="keen-slider__slide w-full h-full relative"
             >
               <img
-                src={slide.img}
+                src={slide.url}
                 alt=""
                 className="w-full h-full object-cover"
               />
@@ -82,11 +175,11 @@ const TemplateHome = () => {
         {/* Static Overlay (independent of slides) */}
         <div className="absolute inset-0 bg-black/40 flex flex-col gap-6 justify-end items-center text-center text-white p-6 py-24 pointer-events-none">
           <h1 className="text-4xl md:text-6xl font-bold drop-shadow-lg">
-            {data.title || "Unknown"}
+            {data?.title || "Unknown"}
           </h1>
-          <p className="text-lg md:text-2xl drop-shadow-md">{data.subTitle}</p>
+          <p className="text-lg md:text-2xl drop-shadow-md">{data?.subTitle}</p>
           <button className="border-white border-2 px-8 py-2 rounded-full pointer-events-auto">
-            {data.CTAButtonText || "Click here"}
+            {data?.CTAButtonText || "Click here"}
           </button>
         </div>
 
@@ -105,10 +198,10 @@ const TemplateHome = () => {
         </button>
       </div>
 
-      <section className="bg-black">
+      <section className="bg-black py-8" id="about">
         <Container>
           <div className="flex flex-col gap-6">
-            <h1 className="text-accent">About Us</h1>
+            <h1 className="text-accent text-center text-title font-semibold">About Our Vision</h1>
             <p className="text-white">
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi
               quae iure unde consequuntur, molestias porro odio? A fuga et amet
@@ -122,7 +215,161 @@ const TemplateHome = () => {
               dicta doloribus delectus cum deleniti sequi possimus illo ad
               impedit eos excepturi minima. Eos cupiditate dignissimos
               doloremque quia tenetur!
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi
+              quae iure unde consequuntur, molestias porro odio? A fuga et amet
+              ut sed cum beatae provident animi asperiores atque qui
+              consequuntur ratione harum, veniam ex suscipit incidunt natus aut
+              quam, rem eaque. Laborum assumenda labore, in temporibus dolore
+              neque sunt quas illo, quidem voluptatibus quam modi dicta esse
+              aspernatur! Quisquam est, laborum molestias eos similique corrupti
+              nesciunt possimus magnam fuga obcaecati? Quam, accusamus obcaecati
+              numquam eligendi reiciendis qui iste consequatur ducimus neque
+              dicta doloribus delectus cum deleniti sequi possimus illo ad
+              impedit eos excepturi minima. Eos cupiditate dignissimos
+              doloremque quia tenetur!
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi
+              quae iure unde consequuntur, molestias porro odio? A fuga et amet
+              ut sed cum beatae provident animi asperiores atque qui
+              consequuntur ratione harum, veniam ex suscipit incidunt natus aut
+              quam, rem eaque. Laborum assumenda labore, in temporibus dolore
+              neque sunt quas illo, quidem voluptatibus quam modi dicta esse
+              aspernatur! Quisquam est, laborum molestias eos similique corrupti
+              nesciunt possimus magnam fuga obcaecati? Quam, accusamus obcaecati
+              numquam eligendi reiciendis qui iste consequatur ducimus neque
+              dicta doloribus delectus cum deleniti sequi possimus illo ad
+              impedit eos excepturi minima. Eos cupiditate dignissimos
+              doloremque quia tenetur!
             </p>
+          </div>
+        </Container>
+      </section>
+
+      <section id="products" className="py-8">
+        <Container >
+          <div className="flex flex-col gap-6">
+            <h1 className="uppercase text-center text-title font-semibold">Our products</h1>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {products?.map((item) => (
+                <ProductCard key={item.id} product={item} />
+              ))}
+            </div>
+          </div>
+        </Container>
+      </section>
+      <section id="gallery" className="py-8">
+        <Container>
+          <div className="flex flex-col gap-6">
+            <h1 className="uppercase text-center text-title font-semibold">Gallery</h1>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {galleryImages?.map((item) => (
+                <div key={item._id} className="h-80 overflow-hidden rounded-xl">
+                  <img
+                    src={item.url || "https://picsum.photos/id/1015/1600/900"}
+                    alt="product-image"
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </Container>
+      </section>
+      <section id="testimonials" className="py-8">
+        <Container>
+          <div className="flex flex-col gap-6">
+            <h1 className="uppercase text-center text-title font-semibold">Testimonials</h1>
+
+            <div className="relative">
+              {/* Prev */}
+              <button
+                type="button"
+                onClick={() => testimonialSlider.current?.prev()}
+                className="hidden md:flex absolute -left-4 top-1/2 -translate-y-1/2 z-10
+                     bg-black/60 text-white p-3 rounded-full hover:bg-black/80 transition"
+                aria-label="Previous testimonials"
+              >
+                <FaChevronLeft size={18} />
+              </button>
+
+              {/* Slider */}
+              <div ref={testimonialRef} className="keen-slider">
+                {testimonials?.map((t) => (
+                  <div key={t.id} className="keen-slider__slide px-10">
+                    <TestimonialCard {...t} />
+                  </div>
+                ))}
+              </div>
+
+              {/* Next */}
+              <button
+                type="button"
+                onClick={() => testimonialSlider.current?.next()}
+                className="hidden md:flex absolute -right-4 top-1/2 -translate-y-1/2 z-10
+                     bg-black/60 text-white p-3 rounded-full hover:bg-black/80 transition"
+                aria-label="Next testimonials"
+              >
+                <FaChevronRight size={18} />
+              </button>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      <section id="contact" className="py-8">
+        <Container>
+          <div className="flex flex-col gap-6">
+             <h1 className="uppercase text-center text-title font-semibold">Contact</h1>
+            <div className="flex lg:flex-nowrap flex-wrap items-stretch gap-4">
+              <iframe
+                title="India Office"
+                className="w-full h-[25rem]"
+                loading="lazy"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3844.7765664747362!2d73.83261987495516!3d15.496445985103028!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bbfc1d2e05cbef3%3A0xa643703ebcc4db43!2sBIZ%20Nest%20-%20Co-Working%20Space%2C%20Workations%20%26%20Meeting%20Zone%20in%20Goa!5e0!3m2!1sen!2sin!4v1723627911486!5m2!1sen!2sin"
+              ></iframe>
+              <div className="shadow-md w-full lg:w-1/4 p-4">
+                <div className="flex flex-col gap-4 h-full">
+                  <div className="h-16 w-full overflow-hidden">
+                    <img
+                      src="https://picsum.photos/id/1015/1600/900"
+                      alt="company-logo"
+                      className="h-full w-full object-contain"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-4 h-full justify-center items-center">
+                    <div className="flex justify-between w-full items-center">
+                      <div className="text-subtitle p-2 rounded-full border-2 border-accent">
+                     <BsEnvelope />
+                      </div>
+                      <div>
+                        <span>
+                          Lorem ipsim
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex justify-between w-full items-center">
+                      <div className="text-subtitle p-2 rounded-full border-2 border-accent">
+                        <MdOutlinePhone />
+                      </div>
+                      <div>
+                        <span>
+                          Lorem ipsim
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex justify-between w-full items-center">
+                      <div className="text-subtitle p-2 rounded-full border-2 border-accent">
+                        <CiMap />
+                      </div>
+                      <div>
+                        <span>
+                          Lorem ipsim
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </Container>
       </section>
