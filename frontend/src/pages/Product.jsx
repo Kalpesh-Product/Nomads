@@ -125,9 +125,9 @@ const Product = () => {
     mutationFn: async (data) => {
       const response = await axios.post("/form/add-new-enquiry", {
         ...data,
-        pocName: companyDetails?.pocs?.name || "Anviksha Godkar",
+        pocName: companyDetails?.poc?.name || "Anviksha Godkar",
         pocCompany: companyDetails?.companyName,
-        pocDesignation: companyDetails?.pocs?.designation,
+        pocDesignation: companyDetails?.poc?.designation,
         sheetName: "All_POC_Contact",
         mobile: data.mobileNumber,
       });
@@ -654,7 +654,7 @@ const Product = () => {
                 <div className="flex flex-col gap-4 justify-between items-center h-full w-56">
                   {/* Avatar with Initials */}
                   <div className="w-32 aspect-square rounded-full bg-primary-blue flex items-center justify-center text-white text-6xl font-semibold uppercase">
-                    {companyDetails?.pocs?.name
+                    {companyDetails?.poc?.name
                       ?.split(" ")
                       .map((n) => n[0])
                       .join("")
@@ -664,10 +664,10 @@ const Product = () => {
                   {/* Name & Designation */}
                   <div className="text-center space-y-3 h-1/2 flex flex-col justify-evenly items-center">
                     <h1 className="text-title text-gray-700 font-medium leading-10">
-                      {companyDetails?.pocs?.name || "Anviksha Godkar"}
+                      {companyDetails?.poc?.name || "Anviksha Godkar"}
                     </h1>
                     <p className="text-content">
-                      {companyDetails?.pocs?.designation ||
+                      {companyDetails?.poc?.designation ||
                         "Deputy Sales Manager"}
                     </p>
                   </div>
