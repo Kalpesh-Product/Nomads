@@ -1,10 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { ColumnsPhotoAlbum, MasonryPhotoAlbum } from "react-photo-album";
+import { ColumnsPhotoAlbum } from "react-photo-album";
 import "react-photo-album/masonry.css";
 import "react-photo-album/columns.css";
 import { useKeenSlider } from "keen-slider/react";
-import MuiModal from "../components/Modal";
 import TransparentModal from "../components/TransparentModal";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 
@@ -17,6 +16,7 @@ const ImageGallery = () => {
   const [photos, setPhotos] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   const [sliderRef, instanceRef] = useKeenSlider({
     loop: true,
@@ -25,6 +25,7 @@ const ImageGallery = () => {
 
   useEffect(() => {
     const loadImageDimensions = async () => {
+      setLoading(true);
       const promises = images.map(
         (img) =>
           new Promise((resolve) => {
@@ -51,6 +52,7 @@ const ImageGallery = () => {
 
       const loadedPhotos = await Promise.all(promises);
       setPhotos(loadedPhotos);
+      setLoading(false);
     };
 
     loadImageDimensions();
@@ -69,7 +71,6 @@ const ImageGallery = () => {
     setCurrentIndex(index);
     setIsModalOpen(true);
 
-    // Wait for the modal and slider to render
     setTimeout(() => {
       instanceRef.current?.moveToIdx(index);
     }, 0);
@@ -94,44 +95,54 @@ const ImageGallery = () => {
           {companyName || "Unknown"} Gallery
         </h1>
       </div>
-      <ColumnsPhotoAlbum
-        photos={photos}
-        spacing={8}
-        columns={(containerWidth) => {
-          if (containerWidth < 640) return 1;
-          if (containerWidth < 1024) return 2;
-          return 2;
-        }}
-        renderPhoto={({ photo, wrapperStyle, imageProps }) => {
-          const isLoaded = imageLoadStatus[photo.key];
 
-          return (
-            <div
-              style={wrapperStyle}
-              key={photo.key}
-              ref={(el) => {
-                if (el) imageRefs.current[photo.key] = el;
-              }}
-              className="relative"
-            >
-              {!isLoaded && (
-                <div className="absolute inset-0 bg-gray-200 animate-pulse rounded-md" />
-              )}
-              <img
-                {...imageProps}
-                onLoad={() =>
-                  setImageLoadStatus((prev) => ({ ...prev, [photo.key]: true }))
-                }
-                className={`rounded-md cursor-pointer transition ${
-                  isLoaded ? "opacity-100" : "opacity-0"
-                }`}
-                alt="gallery"
-              />
-            </div>
-          );
-        }}
-        onClick={({ index }) => openModal(index)} // Optional: if you keep the modal feature
-      />
+      {loading ? (
+        <div className="flex justify-center items-center h-96">
+          <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+        </div>
+      ) : (
+        <ColumnsPhotoAlbum
+          photos={photos}
+          spacing={8}
+          columns={(containerWidth) => {
+            if (containerWidth < 640) return 1;
+            if (containerWidth < 1024) return 2;
+            return 2;
+          }}
+          renderPhoto={({ photo, wrapperStyle, imageProps }) => {
+            const isLoaded = imageLoadStatus[photo.key];
+
+            return (
+              <div
+                style={wrapperStyle}
+                key={photo.key}
+                ref={(el) => {
+                  if (el) imageRefs.current[photo.key] = el;
+                }}
+                className="relative"
+              >
+                {!isLoaded && (
+                  <div className="absolute inset-0 bg-gray-200 animate-pulse rounded-md" />
+                )}
+                <img
+                  {...imageProps}
+                  onLoad={() =>
+                    setImageLoadStatus((prev) => ({
+                      ...prev,
+                      [photo.key]: true,
+                    }))
+                  }
+                  className={`rounded-md cursor-pointer transition ${
+                    isLoaded ? "opacity-100" : "opacity-0"
+                  }`}
+                  alt="gallery"
+                />
+              </div>
+            );
+          }}
+          onClick={({ index }) => openModal(index)}
+        />
+      )}
 
       <TransparentModal
         open={isModalOpen}
