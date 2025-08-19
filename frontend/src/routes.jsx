@@ -34,7 +34,7 @@ import HostFAQ from "./pages/host/FAQ";
 import Leads from "./pages/host/Leads";
 import HostProduct from "./pages/host/Product";
 import TemplateSite from "./pages/company/TemplateSite";
-
+import TemplateHome from "./pages/company/TemplateHome";
 
 const marketingRoutes = {
   path: "/",
@@ -91,7 +91,12 @@ const marketingRoutes = {
 function getTenantFromHost() {
   const hostname = window.location.hostname; // e.g. "biznest.wono.co"
   const rootDomain = "wono.co";
-  if (hostname === rootDomain || hostname === `www.${rootDomain}` || hostname === "localhost") return null;
+  if (
+    hostname === rootDomain ||
+    hostname === `www.${rootDomain}` ||
+    hostname === "localhost"
+  )
+    return null;
   return hostname.replace(`.${rootDomain}`, ""); // "biznest"
 }
 
@@ -103,7 +108,14 @@ const router = createBrowserRouter(
     ? [
         {
           path: "*",
-          element: <TemplateSite tenant={tenant} />,
+          element: <TemplateSite />,
+          children: [
+            {
+              path: "",
+              index: true,
+              element: <TemplateHome />,
+            },
+          ],
         },
       ]
     : [marketingRoutes]

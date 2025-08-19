@@ -42,7 +42,7 @@ const Listings = () => {
     queryKey: ["locations"],
     queryFn: async () => {
       try {
-        const response = await axios.get("common/get-all-locations");
+        const response = await axios.get("company/company-locations");
         return Array.isArray(response.data) ? response.data : [];
       } catch (error) {
         console.error(error?.response?.data?.message);
@@ -76,7 +76,7 @@ const Listings = () => {
     // { label: "Co-Living", value: "coliving" },
     { label: "Hostels", value: "hostel" },
     { label: "Workation", value: "workation" },
-    { label: "Private Stay", value: "privateStay" },
+    { label: "Private Stay", value: "privatestay" },
     { label: "Meetings", value: "meetingRoom" },
     { label: "Cafe’s", value: "cafe" },
   ];
@@ -93,7 +93,7 @@ const Listings = () => {
       const { country, location, category } = formData || {};
 
       const response = await axios.get(
-        `common/location-and-type-based-company-data?country=${country}&state=${location}&category=${category}`
+        `company/companies?country=${country}&state=${location}&type=${category}&category=${category}`
       );
 
       // return response.data;

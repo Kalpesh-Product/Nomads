@@ -56,7 +56,7 @@ const Home = () => {
     queryKey: ["locations"],
     queryFn: async () => {
       try {
-        const response = await axios.get("common/get-all-locations");
+        const response = await axios.get("company/company-locations");
         return Array.isArray(response.data) ? response.data : [];
       } catch (error) {
         console.error(error?.response?.data?.message);
