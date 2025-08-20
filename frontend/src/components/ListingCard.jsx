@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AiFillHeart, AiFillStar, AiOutlineHeart } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 
-const ListingCard = ({ item, handleNavigation, showVertical=true }) => {
+const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
   const navigate = useNavigate();
   const [favorites, setFavorites] = useState([]);
 
@@ -53,9 +53,16 @@ const ListingCard = ({ item, handleNavigation, showVertical=true }) => {
       <div className="h-[25%] flex flex-col gap-1 pl-4 pr-1">
         <div className="flex w-full justify-between items-center">
           <div className="w-full">
-            <p className="text-sm font-semibold">
-              { showVertical
-                ? `${item.companyName.slice(0, 9)}...`
+            <p
+              title={item.companyName || "title"}
+              className="text-sm font-semibold"
+            >
+              {showVertical
+                ? item.companyName.length > 9
+                  ? `${item.companyName.slice(0, 10)}...`
+                  : item.companyName
+                : item.companyName.length > 23
+                ? `${item.companyName.slice(0, 23)}...`
                 : item.companyName}
             </p>
           </div>

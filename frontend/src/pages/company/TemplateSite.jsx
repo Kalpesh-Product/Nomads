@@ -1,6 +1,7 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 import TempHeader from "./components/TempHeader";
+import TempFooter from "./components/TempFooter";
 
 const TemplateSite = () => {
   return (
@@ -11,7 +12,9 @@ const TemplateSite = () => {
       <main className="flex-1">
         <Outlet />
       </main>
-      <footer>footer</footer>
+      <footer>
+        <TempFooter />
+      </footer>
     </div>
   );
 };

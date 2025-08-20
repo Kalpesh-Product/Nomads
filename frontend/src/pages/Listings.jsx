@@ -77,14 +77,11 @@ const Listings = () => {
     { label: "Hostels", value: "hostel" },
     { label: "Workation", value: "workation" },
     { label: "Private Stay", value: "privatestay" },
-    { label: "Meetings", value: "meetingRoom" },
+    { label: "Meetings", value: "meetingroom" },
     { label: "Cafe’s", value: "cafe" },
   ];
   const activeCategory = searchParams.get("category");
-  const queryClient = new QueryClient();
-  useEffect(() => {
-    queryClient.invalidateQueries({ queryKey: ["listings", formData] });
-  }, [formData]);
+
   const skeletonArray = Array.from({ length: 6 });
 
   const { data: listingsData, isPending: isLisitingLoading } = useQuery({

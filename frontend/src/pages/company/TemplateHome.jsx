@@ -1,6 +1,6 @@
 // src/pages/TemplateHome.jsx
 import { useQuery } from "@tanstack/react-query";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useKeenSlider } from "keen-slider/react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
@@ -10,6 +10,10 @@ import TestimonialCard from "./components/TestimonialCard";
 import { BsEnvelope } from "react-icons/bs";
 import { MdOutlinePhone } from "react-icons/md";
 import { CiMap } from "react-icons/ci";
+import TempButton from "./components/TempButton";
+import TransparentModal from "../../components/TransparentModal";
+import ProductModalContent from "./components/ProductModalContent";
+import TempModal from "./components/TempModal";
 
 function getTenantFromHost() {
   const hostname = window.location.hostname;
@@ -19,6 +23,9 @@ function getTenantFromHost() {
 
 const TemplateHome = () => {
   const intervalRef = useRef(null);
+  const [open, setOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState([]);
+  console.log("selectedProdict ", selectedProduct);
   const [sliderRef, slider] = useKeenSlider({
     loop: true,
     mode: "snap",
@@ -26,23 +33,22 @@ const TemplateHome = () => {
   });
 
   const [testimonialRef, testimonialSlider] = useKeenSlider({
-  loop: true,
-  mode: "snap",
-  spacing: 16,
-  slides: {
-    perView: 1, // default (mobile)
+    loop: true,
+    mode: "snap",
     spacing: 16,
-  },
-  breakpoints: {
-    "(min-width: 768px)": {
-      slides: { perView: 2, spacing: 24 },
+    slides: {
+      perView: 1, // default (mobile)
+      spacing: 16,
     },
-    "(min-width: 1024px)": {
-      slides: { perView: 3, spacing: 32 },
+    breakpoints: {
+      "(min-width: 768px)": {
+        slides: { perView: 2, spacing: 24 },
+      },
+      "(min-width: 1024px)": {
+        slides: { perView: 3, spacing: 32 },
+      },
     },
-  },
-});
-
+  });
 
   useEffect(() => {
     if (!slider) return;
@@ -80,18 +86,20 @@ const TemplateHome = () => {
     enabled: !!tenant,
   });
 
-  const heroImages = isPending ? [] : data?.heroImages
+  const heroImages = isPending ? [] : data?.heroImages;
 
   const galleryImages = isPending ? [] : data?.gallery?.slice(0, 5);
+  const products = isPending ? [] : data?.products;
+  console.log("products : ", products);
 
-  const products = [
-    { id: 1, productName: "co-working", img: "" },
-    { id: 2, productName: "co-working", img: "" },
-    { id: 3, productName: "co-working", img: "" },
-    { id: 4, productName: "co-working", img: "" },
-    { id: 5, productName: "co-working", img: "" },
-    { id: 6, productName: "co-working", img: "" },
-  ];
+  // const products = [
+  //   { id: 1, productName: "co-working", img: "" },
+  //   { id: 2, productName: "co-working", img: "" },
+  //   { id: 3, productName: "co-working", img: "" },
+  //   { id: 4, productName: "co-working", img: "" },
+  //   { id: 5, productName: "co-working", img: "" },
+  //   { id: 6, productName: "co-working", img: "" },
+  // ];
   const testimonials = [
     {
       id: 1,
@@ -178,9 +186,8 @@ const TemplateHome = () => {
             {data?.title || "Unknown"}
           </h1>
           <p className="text-lg md:text-2xl drop-shadow-md">{data?.subTitle}</p>
-          <button className="border-white border-2 px-8 py-2 rounded-full pointer-events-auto">
-            {data?.CTAButtonText || "Click here"}
-          </button>
+
+          <TempButton buttonText={data?.CTAButtonText} />
         </div>
 
         {/* Prev / Next Buttons */}
@@ -201,7 +208,9 @@ const TemplateHome = () => {
       <section className="bg-black py-8" id="about">
         <Container>
           <div className="flex flex-col gap-6">
-            <h1 className="text-accent text-center text-title font-semibold">About Our Vision</h1>
+            <h1 className="text-accent text-center text-title font-semibold">
+              About Our Vision
+            </h1>
             <p className="text-white">
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi
               quae iure unde consequuntur, molestias porro odio? A fuga et amet
@@ -214,43 +223,52 @@ const TemplateHome = () => {
               numquam eligendi reiciendis qui iste consequatur ducimus neque
               dicta doloribus delectus cum deleniti sequi possimus illo ad
               impedit eos excepturi minima. Eos cupiditate dignissimos
-              doloremque quia tenetur!
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi
-              quae iure unde consequuntur, molestias porro odio? A fuga et amet
-              ut sed cum beatae provident animi asperiores atque qui
-              consequuntur ratione harum, veniam ex suscipit incidunt natus aut
-              quam, rem eaque. Laborum assumenda labore, in temporibus dolore
-              neque sunt quas illo, quidem voluptatibus quam modi dicta esse
-              aspernatur! Quisquam est, laborum molestias eos similique corrupti
-              nesciunt possimus magnam fuga obcaecati? Quam, accusamus obcaecati
-              numquam eligendi reiciendis qui iste consequatur ducimus neque
-              dicta doloribus delectus cum deleniti sequi possimus illo ad
-              impedit eos excepturi minima. Eos cupiditate dignissimos
-              doloremque quia tenetur!
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi
-              quae iure unde consequuntur, molestias porro odio? A fuga et amet
-              ut sed cum beatae provident animi asperiores atque qui
-              consequuntur ratione harum, veniam ex suscipit incidunt natus aut
-              quam, rem eaque. Laborum assumenda labore, in temporibus dolore
-              neque sunt quas illo, quidem voluptatibus quam modi dicta esse
-              aspernatur! Quisquam est, laborum molestias eos similique corrupti
-              nesciunt possimus magnam fuga obcaecati? Quam, accusamus obcaecati
-              numquam eligendi reiciendis qui iste consequatur ducimus neque
-              dicta doloribus delectus cum deleniti sequi possimus illo ad
-              impedit eos excepturi minima. Eos cupiditate dignissimos
-              doloremque quia tenetur!
+              doloremque quia tenetur! Lorem ipsum dolor sit amet consectetur
+              adipisicing elit. Excepturi quae iure unde consequuntur, molestias
+              porro odio? A fuga et amet ut sed cum beatae provident animi
+              asperiores atque qui consequuntur ratione harum, veniam ex
+              suscipit incidunt natus aut quam, rem eaque. Laborum assumenda
+              labore, in temporibus dolore neque sunt quas illo, quidem
+              voluptatibus quam modi dicta esse aspernatur! Quisquam est,
+              laborum molestias eos similique corrupti nesciunt possimus magnam
+              fuga obcaecati? Quam, accusamus obcaecati numquam eligendi
+              reiciendis qui iste consequatur ducimus neque dicta doloribus
+              delectus cum deleniti sequi possimus illo ad impedit eos excepturi
+              minima. Eos cupiditate dignissimos doloremque quia tenetur! Lorem
+              ipsum dolor sit amet consectetur adipisicing elit. Excepturi quae
+              iure unde consequuntur, molestias porro odio? A fuga et amet ut
+              sed cum beatae provident animi asperiores atque qui consequuntur
+              ratione harum, veniam ex suscipit incidunt natus aut quam, rem
+              eaque. Laborum assumenda labore, in temporibus dolore neque sunt
+              quas illo, quidem voluptatibus quam modi dicta esse aspernatur!
+              Quisquam est, laborum molestias eos similique corrupti nesciunt
+              possimus magnam fuga obcaecati? Quam, accusamus obcaecati numquam
+              eligendi reiciendis qui iste consequatur ducimus neque dicta
+              doloribus delectus cum deleniti sequi possimus illo ad impedit eos
+              excepturi minima. Eos cupiditate dignissimos doloremque quia
+              tenetur!
             </p>
           </div>
         </Container>
       </section>
 
       <section id="products" className="py-8">
-        <Container >
+        <Container>
           <div className="flex flex-col gap-6">
-            <h1 className="uppercase text-center text-title font-semibold">Our products</h1>
+            <h1 className="uppercase text-center text-title font-semibold">
+              Our products
+            </h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {products?.map((item) => (
-                <ProductCard key={item.id} product={item} />
+                <div
+                  key={item.id}
+                  onClick={() => {
+                    setSelectedProduct(item);
+                    setOpen(true);
+                  }}
+                >
+                  <ProductCard product={item} />
+                </div>
               ))}
             </div>
           </div>
@@ -259,7 +277,9 @@ const TemplateHome = () => {
       <section id="gallery" className="py-8">
         <Container>
           <div className="flex flex-col gap-6">
-            <h1 className="uppercase text-center text-title font-semibold">Gallery</h1>
+            <h1 className="uppercase text-center text-title font-semibold">
+              Gallery
+            </h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {galleryImages?.map((item) => (
                 <div key={item._id} className="h-80 overflow-hidden rounded-xl">
@@ -277,7 +297,9 @@ const TemplateHome = () => {
       <section id="testimonials" className="py-8">
         <Container>
           <div className="flex flex-col gap-6">
-            <h1 className="uppercase text-center text-title font-semibold">Testimonials</h1>
+            <h1 className="uppercase text-center text-title font-semibold">
+              Testimonials
+            </h1>
 
             <div className="relative">
               {/* Prev */}
@@ -318,7 +340,9 @@ const TemplateHome = () => {
       <section id="contact" className="py-8">
         <Container>
           <div className="flex flex-col gap-6">
-             <h1 className="uppercase text-center text-title font-semibold">Contact</h1>
+            <h1 className="uppercase text-center text-title font-semibold">
+              Contact
+            </h1>
             <div className="flex lg:flex-nowrap flex-wrap items-stretch gap-4">
               <iframe
                 title="India Office"
@@ -338,12 +362,10 @@ const TemplateHome = () => {
                   <div className="flex flex-col gap-4 h-full justify-center items-center">
                     <div className="flex justify-between w-full items-center">
                       <div className="text-subtitle p-2 rounded-full border-2 border-accent">
-                     <BsEnvelope />
+                        <BsEnvelope />
                       </div>
                       <div>
-                        <span>
-                          Lorem ipsim
-                        </span>
+                        <span>Lorem ipsim</span>
                       </div>
                     </div>
                     <div className="flex justify-between w-full items-center">
@@ -351,9 +373,7 @@ const TemplateHome = () => {
                         <MdOutlinePhone />
                       </div>
                       <div>
-                        <span>
-                          Lorem ipsim
-                        </span>
+                        <span>Lorem ipsim</span>
                       </div>
                     </div>
                     <div className="flex justify-between w-full items-center">
@@ -361,9 +381,7 @@ const TemplateHome = () => {
                         <CiMap />
                       </div>
                       <div>
-                        <span>
-                          Lorem ipsim
-                        </span>
+                        <span>Lorem ipsim</span>
                       </div>
                     </div>
                   </div>
@@ -373,6 +391,22 @@ const TemplateHome = () => {
           </div>
         </Container>
       </section>
+
+      {/* product modal */}
+      <TempModal
+        width="w-[80%] lg:w-[60%]"
+        bgColor="bg-white"
+        open={open}
+        onClose={() => setOpen(false)}
+      >
+        <ProductModalContent
+          product={selectedProduct}
+          company={isPending ? [] : data}
+          onClose={() => setOpen(false)}
+        />
+      </TempModal>
+
+      {/* product modal */}
     </div>
   );
 };
