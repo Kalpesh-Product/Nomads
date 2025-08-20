@@ -100,7 +100,7 @@ const Product = () => {
   const { mutate: submitEnquiry, isPending: isSubmitting } = useMutation({
     mutationKey: ["submitEnquiry"],
     mutationFn: async (data) => {
-      const response = await axios.post("/form/add-new-b2c-form-submission", {
+      const response = await axios.post("/forms/add-new-b2c-form-submission", {
         ...data,
         country: companyDetails?.country,
         state: companyDetails?.state,
@@ -123,7 +123,7 @@ const Product = () => {
   const { mutate: submitSales, isPending: isSubmittingSales } = useMutation({
     mutationKey: ["submitSales"],
     mutationFn: async (data) => {
-      const response = await axios.post("/form/add-new-enquiry", {
+      const response = await axios.post("/forms/add-new-enquiry", {
         ...data,
         pocName: companyDetails?.poc?.name || "Anviksha Godkar",
         pocCompany: companyDetails?.companyName,

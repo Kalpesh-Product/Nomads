@@ -10,6 +10,7 @@ import reviewRoutes from "./routes/ReviewRoutes.js";
 import formRoutes from "./routes/formRoutes.js";
 import jobRoutes from "./routes/jobRoutes.js";
 import connectDb from "./config/db.js";
+import upload from "./config/multerConfig.js";
 
 const app = express();
 config({ override: true });
