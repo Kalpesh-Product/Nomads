@@ -51,27 +51,38 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
       </div>
 
       <div className="h-[25%] flex flex-col gap-1 pl-4 pr-1">
-        <div className="flex w-full justify-between items-center">
-          <div className="w-full">
-            <p
-              title={item.companyName || "title"}
-              className="text-sm font-semibold"
-            >
-              {showVertical
-                ? item.companyName.length > 9
-                  ? `${item.companyName.slice(0, 10)}...`
-                  : item.companyName
-                : item.companyName.length > 23
-                ? `${item.companyName.slice(0, 23)}...`
-                : item.companyName}
-            </p>
-          </div>
-          {showVertical && (
-            <p className="text-tiny w-full text-right   text-gray-600">
-              {typeLabels[item.companyType] || "Unknown"}
-            </p>
-          )}
-        </div>
+     <div className="flex w-full justify-between items-center">
+  <div className="w-full">
+    {/* Mobile: show full name */}
+    <p
+      className="text-sm font-semibold block sm:hidden"
+      title={item.companyName || "title"}
+    >
+      {item.companyName}
+    </p>
+
+    {/* Tablet/Desktop: show truncated */}
+    <p
+      className="text-sm font-semibold hidden sm:block"
+      title={item.companyName || "title"}
+    >
+      {showVertical
+        ? item.companyName.length > 9
+          ? `${item.companyName.slice(0, 10)}...`
+          : item.companyName
+        : item.companyName.length > 23
+        ? `${item.companyName.slice(0, 23)}...`
+        : item.companyName}
+    </p>
+  </div>
+
+  {showVertical && (
+    <p className="text-tiny w-full text-right text-gray-600">
+      {typeLabels[item.companyType] || "Unknown"}
+    </p>
+  )}
+</div>
+
 
         <div className="flex w-full justify-between items-center">
           <p className="text-sm text-gray-600 font-medium">

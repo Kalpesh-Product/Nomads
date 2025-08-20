@@ -43,7 +43,7 @@ const fixedAmenitiesMap = {
     "CCTV Secure",
     "Swimming Pool",
   ],
-  "private-stay": [
+  "privatestay": [
     "Private Space",
     "Private Storage",
     "Television",

@@ -60,29 +60,32 @@ const ProductModalContent = ({ product, onClose, company }) => {
     <div className="relative w-full bg-white rounded-xl overflow-hidden grid grid-cols-1 md:grid-cols-2 gap-6">
       {/* Left: Image Carousel */}
       <div className="  ">
-        <div className="overflow-hidden h-full rounded-xl relative">
+        <div className="overflow-hidden h-full rounded-xl relative ">
           <img
             src={images[current]?.url}
             alt={product?.title || "Product"}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover bg-black"
           />
+          <div className="absolute inset-0 bg-black/20">
+
+          </div>
         </div>
         {/* Prev/Next buttons */}
         {images.length > 1 && (
-          <>
+          <div className="absolute inset-0">
             <button
               onClick={prevSlide}
-              className="absolute top-1/2 left-2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full"
+              className="absolute top-1/2 left-2 -translate-y-1/2 bg-white text-black p-2 rounded-full"
             >
               <FaChevronLeft size={16} />
             </button>
             <button
               onClick={nextSlide}
-              className="absolute top-1/2 right-2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full"
+              className="absolute top-1/2 right-[53%] -translate-y-1/2 bg-white text-black p-2 rounded-full"
             >
               <FaChevronRight size={16} />
             </button>
-          </>
+          </div>
         )}
       </div>
 

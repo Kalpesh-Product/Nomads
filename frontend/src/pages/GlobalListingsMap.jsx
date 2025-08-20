@@ -106,29 +106,41 @@ const GlobalListingsMap = () => {
   });
 
     // derive categoryOptions from API response
-  const categoryOptions = useMemo(() => {
-    if (!listingsData || listingsData.length === 0) return [];
-  
-    // unique companyType values
-    const uniqueTypes = [
-      ...new Set(listingsData.map((item) => item.companyType).filter(Boolean)),
-    ];
-  
-    // map them to label/value objects
-    return uniqueTypes.map((type) => {
-      const labelMap = {
-        coworking: "Co-Working",
-        coliving: "Co-Living",
-        hostel: "Hostels",
-        workation: "Workation",
-        privatestay: "Private Stay",
-        meetingroom: "Meetings",
-        cafe: "Cafe’s",
-      };
-  
-      return { label: labelMap[type] || type, value: type };
-    });
-  }, [listingsData]);
+const categoryOptions = useMemo(() => {
+  if (!listingsData || listingsData.length === 0) return [];
+
+  const uniqueTypes = [
+    ...new Set(listingsData.filter((item)=>item.companyType !== "coliving").map((item) => item.companyType).filter(Boolean)),
+  ];
+
+  const labelMap = {
+    coworking: "Co-Working",
+    // coliving: "Co-Living",
+    hostel: "Hostels",
+    workation: "Workation",
+    privatestay: "Private Stay",
+    meetingroom: "Meetings",
+    cafe: "Cafe’s",
+  };
+
+  // define desired order
+  const typeOrder = [
+    "coworking",
+    "hostel",
+    "workation",
+    "privatestay",
+    "meetingroom",
+    "cafe",
+    // "coliving",
+  ];
+
+  return uniqueTypes
+    .map((type) => ({ label: labelMap[type] || type, value: type }))
+    .sort(
+      (a, b) =>
+        typeOrder.indexOf(a.value) - typeOrder.indexOf(b.value)
+    );
+}, [listingsData]);
 
 
   const groupedListings = listingsData?.reduce((acc, item) => {
