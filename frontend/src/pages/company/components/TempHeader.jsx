@@ -38,43 +38,63 @@ const TempHeader = () => {
 
   // Only the two links you want, and absolute paths so they work from nested routes
   const headerLinks = [
-    { id: 1, text: "Destination News", to: "/nomad/destination-news" },
-    { id: 2, text: "Local Blog", to: "/nomad/local-blog" },
+    { id: 1, text: "Home", to: "hero" },
+    { id: 2, text: "About", to: "about" },
+    { id: 3, text: "Products", to: "products" },
+    { id: 4, text: "Gallery", to: "gallery" },
+    { id: 5, text: "Testimonials", to: "testimonials" },
+    { id: 6, text: "Contact", to: "contact" },
   ];
+
+  const handleScroll = (id) => {
+    const section = document.getElementById(id);
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth" });
+    }
+    setOpen(false);
+  };
 
   return (
     <div className="flex px-4 py-3 justify-between items-center md:py-3 md:px-[7.5rem] lg:px-[7.5rem] sm:px-6 xs:px-6 lg:py-[0.625rem] shadow-md bg-white/80 backdrop-blur-md ">
-      <div
-        onClick={() => navigate("/")}
-        className="w-24 lg:w-36 overflow-x-hidden rounded-lg flex justify-between items-center cursor-pointer">
-        <img src={logo} alt={"logo"} className="w-full h-full object-contain" />
+      <div className="w-full">
+        <div
+          onClick={() => navigate("/")}
+          className="w-24 lg:w-36 overflow-x-hidden rounded-lg flex justify-between items-center cursor-pointer"
+        >
+          <img
+            src={logo}
+            alt={"logo"}
+            className="w-full h-full object-contain"
+          />
+        </div>
       </div>
 
-
       {/* NEW: show the two links on listings detail pages too, while keeping /nomad hidden */}
-       <div>
-          <ul className="hidden xl:flex sm:hidden gap-8 pl-20 justify-center flex-1">
-            {headerLinks.map((item) => (
-              <li key={item.id} className="flex items-center">
-                <div className="p-4 px-0 whitespace-nowrap">
-                  <Link
-                    to={item.to}
-                    className="group relative text-md text-black">
-                    <span className="relative z-10 group-hover:font-bold mb-8">
-                      {item.text}
-                    </span>
-                    <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
-                  </Link>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
+      <div className="w-full">
+        <ul className="hidden xl:flex sm:hidden gap-8 pl-20 justify-center flex-1">
+          {headerLinks.map((item) => (
+            <li key={item.id}>
+              <button
+                onClick={() => handleScroll(item.to)}
+                className="group relative text-md text-black"
+              >
+                <span className="relative z-10 group-hover:font-bold">
+                  {item.text}
+                </span>
+                <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="hidden lg:block w-full"></div>
 
       <div className="h-full px-2  lg:hidden">
         <button
           onClick={() => setOpen(true)}
-          className=" rounded-lg text-subtitle text-black">
+          className=" rounded-lg text-subtitle text-black"
+        >
           ☰
         </button>
       </div>
@@ -90,38 +110,32 @@ const TempHeader = () => {
         }}
         anchor="left"
         open={open}
-        onClose={() => setOpen(false)}>
+        onClose={() => setOpen(false)}
+      >
         <div className="flex flex-col h-full justify-between">
           <ul className="flex flex-col gap-4 p-4 ">
             <div className="flex w-full justify-end text-right">
               <span
                 className="text-title cursor-pointer"
-                onClick={() => setOpen(false)}>
+                onClick={() => setOpen(false)}
+              >
                 <IoCloseSharp />
               </span>
             </div>
 
-      
             {headerLinks.map((item) => (
               <li key={item.id} className="items-center text-center">
-                <div onClick={() => handleNavigation(item.to)} className="py-4">
+                <div
+                  onClick={() => handleScroll(item.to)}
+                  className="py-4 cursor-pointer"
+                >
                   <p className="text-secondary-dark text-lg">{item.text}</p>
                 </div>
                 <div className="h-[0.2px] bg-gray-300"></div>
               </li>
             ))}
-            <div className="flex justify-center p-4">
-              <PrimaryButton
-                title={"Sign In"}
-                externalStyles={"bg-primary-blue"}
-                handleSubmit={() => {
-                  navigate("login");
-                  setOpen(false);
-                }}
-              />
-            </div>
           </ul>
-                
+
           {/* Footer */}
 
           <div className="w-full text-center flex flex-col gap-4 items-center py-4">

@@ -114,6 +114,7 @@ const GlobalListingsMap = () => {
     enabled: !!formData?.country && !!formData?.location, // ✅ prevents fetching on empty state
   });
 
+
   const groupedListings = listingsData?.reduce((acc, item) => {
     if (!acc[item.type]) acc[item.type] = [];
     acc[item.type].push(item);
