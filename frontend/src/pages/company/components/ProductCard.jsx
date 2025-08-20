@@ -12,7 +12,7 @@ const ProductCard = ({ product }) => {
         <img
           src={ product?.images?.[0]?.url}
           alt="img"
-          className="h-full rounded-xl overflow-hidden object-cover"
+          className="h-full w-full rounded-xl overflow-hidden object-cover"
         />
         <div className="absolute inset-0 bg-black/50 flex flex-col justify-end items-center p-8 overflow-hidden">
           <TempButton buttonText="View Details" />

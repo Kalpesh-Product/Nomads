@@ -100,62 +100,65 @@ const TemplateHome = () => {
   //   { id: 5, productName: "co-working", img: "" },
   //   { id: 6, productName: "co-working", img: "" },
   // ];
-  const testimonials = [
-    {
-      id: 1,
-      image: "https://randomuser.me/api/portraits/women/44.jpg",
-      name: "Sarah K.",
-      role: "UX Designer",
-      company: "Brello",
-      text: "I was looking for a way to streamline my design process and the Anima's Landing Page UI Kit was a lifesaver! The intuitive design and ease of customisation have saved me hours of time and effort. Highly recommend!",
-      rating: 4,
-    },
-    {
-      id: 2,
-      image: "https://randomuser.me/api/portraits/men/32.jpg",
-      name: "David P.",
-      role: "Product Manager",
-      company: "NextGen",
-      text: "Using this kit has improved our workflow dramatically. The team can focus more on innovation rather than setup. Super smooth experience!",
-      rating: 5,
-    },
-    {
-      id: 3,
-      image: "https://randomuser.me/api/portraits/women/68.jpg",
-      name: "Maya R.",
-      role: "Frontend Developer",
-      company: "TechFlow",
-      text: "Simple, elegant and effective. It took my project to the next level with minimal effort. Highly recommended.",
-      rating: 5,
-    },
-    {
-      id: 4,
-      image: "https://randomuser.me/api/portraits/men/77.jpg",
-      name: "Liam C.",
-      role: "Software Engineer",
-      company: "CloudCore",
-      text: "This toolkit streamlined my work. I could focus more on solving real problems instead of repetitive setup. Amazing resource!",
-      rating: 4,
-    },
-    {
-      id: 5,
-      image: "https://randomuser.me/api/portraits/women/21.jpg",
-      name: "Anna T.",
-      role: "Designer",
-      company: "PixelPro",
-      text: "Very intuitive and well thought out. My clients love the polished results I can now deliver faster than ever.",
-      rating: 5,
-    },
-    {
-      id: 6,
-      image: "https://randomuser.me/api/portraits/men/15.jpg",
-      name: "Mark R.",
-      role: "CTO",
-      company: "InnoWave",
-      text: "Highly flexible and easy to integrate. This is my go-to for building solid and scalable UI foundations.",
-      rating: 5,
-    },
-  ];
+
+  const testimonials = isPending ? [] : data.testimonials
+  // const testimonials = [
+  //   {
+  //     id: 1,
+  //     image: "https://randomuser.me/api/portraits/women/44.jpg",
+  //     name: "Sarah K.",
+  //     role: "UX Designer",
+  //     company: "Brello",
+  //     text: "I was looking for a way to streamline my design process and the Anima's Landing Page UI Kit was a lifesaver! The intuitive design and ease of customisation have saved me hours of time and effort. Highly recommend!",
+  //     rating: 4,
+  //   },
+  //   {
+  //     id: 2,
+  //     image: "https://randomuser.me/api/portraits/men/32.jpg",
+  //     name: "David P.",
+  //     role: "Product Manager",
+  //     company: "NextGen",
+  //     text: "Using this kit has improved our workflow dramatically. The team can focus more on innovation rather than setup. Super smooth experience!",
+  //     rating: 5,
+  //   },
+  //   {
+  //     id: 3,
+  //     image: "https://randomuser.me/api/portraits/women/68.jpg",
+  //     name: "Maya R.",
+  //     role: "Frontend Developer",
+  //     company: "TechFlow",
+  //     text: "Simple, elegant and effective. It took my project to the next level with minimal effort. Highly recommended.",
+  //     rating: 5,
+  //   },
+  //   {
+  //     id: 4,
+  //     image: "https://randomuser.me/api/portraits/men/77.jpg",
+  //     name: "Liam C.",
+  //     role: "Software Engineer",
+  //     company: "CloudCore",
+  //     text: "This toolkit streamlined my work. I could focus more on solving real problems instead of repetitive setup. Amazing resource!",
+  //     rating: 4,
+  //   },
+  //   {
+  //     id: 5,
+  //     image: "https://randomuser.me/api/portraits/women/21.jpg",
+  //     name: "Anna T.",
+  //     role: "Designer",
+  //     company: "PixelPro",
+  //     text: "Very intuitive and well thought out. My clients love the polished results I can now deliver faster than ever.",
+  //     rating: 5,
+  //   },
+  //   {
+  //     id: 6,
+  //     image: "https://randomuser.me/api/portraits/men/15.jpg",
+  //     name: "Mark R.",
+  //     role: "CTO",
+  //     company: "InnoWave",
+  //     text: "Highly flexible and easy to integrate. This is my go-to for building solid and scalable UI foundations.",
+  //     rating: 5,
+  //   },
+  // ];
+  
 
   if (!tenant) return <div>No tenant specified</div>;
   if (isPending) return <div>Loading site...</div>;
@@ -212,41 +215,7 @@ const TemplateHome = () => {
               About Our Vision
             </h1>
             <p className="text-white">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi
-              quae iure unde consequuntur, molestias porro odio? A fuga et amet
-              ut sed cum beatae provident animi asperiores atque qui
-              consequuntur ratione harum, veniam ex suscipit incidunt natus aut
-              quam, rem eaque. Laborum assumenda labore, in temporibus dolore
-              neque sunt quas illo, quidem voluptatibus quam modi dicta esse
-              aspernatur! Quisquam est, laborum molestias eos similique corrupti
-              nesciunt possimus magnam fuga obcaecati? Quam, accusamus obcaecati
-              numquam eligendi reiciendis qui iste consequatur ducimus neque
-              dicta doloribus delectus cum deleniti sequi possimus illo ad
-              impedit eos excepturi minima. Eos cupiditate dignissimos
-              doloremque quia tenetur! Lorem ipsum dolor sit amet consectetur
-              adipisicing elit. Excepturi quae iure unde consequuntur, molestias
-              porro odio? A fuga et amet ut sed cum beatae provident animi
-              asperiores atque qui consequuntur ratione harum, veniam ex
-              suscipit incidunt natus aut quam, rem eaque. Laborum assumenda
-              labore, in temporibus dolore neque sunt quas illo, quidem
-              voluptatibus quam modi dicta esse aspernatur! Quisquam est,
-              laborum molestias eos similique corrupti nesciunt possimus magnam
-              fuga obcaecati? Quam, accusamus obcaecati numquam eligendi
-              reiciendis qui iste consequatur ducimus neque dicta doloribus
-              delectus cum deleniti sequi possimus illo ad impedit eos excepturi
-              minima. Eos cupiditate dignissimos doloremque quia tenetur! Lorem
-              ipsum dolor sit amet consectetur adipisicing elit. Excepturi quae
-              iure unde consequuntur, molestias porro odio? A fuga et amet ut
-              sed cum beatae provident animi asperiores atque qui consequuntur
-              ratione harum, veniam ex suscipit incidunt natus aut quam, rem
-              eaque. Laborum assumenda labore, in temporibus dolore neque sunt
-              quas illo, quidem voluptatibus quam modi dicta esse aspernatur!
-              Quisquam est, laborum molestias eos similique corrupti nesciunt
-              possimus magnam fuga obcaecati? Quam, accusamus obcaecati numquam
-              eligendi reiciendis qui iste consequatur ducimus neque dicta
-              doloribus delectus cum deleniti sequi possimus illo ad impedit eos
-              excepturi minima. Eos cupiditate dignissimos doloremque quia
-              tenetur!
+              {data?.about || "About section here"}
             </p>
           </div>
         </Container>
@@ -316,8 +285,8 @@ const TemplateHome = () => {
               {/* Slider */}
               <div ref={testimonialRef} className="keen-slider">
                 {testimonials?.map((t) => (
-                  <div key={t.id} className="keen-slider__slide px-10">
-                    <TestimonialCard {...t} />
+                  <div key={t._id} className="keen-slider__slide px-10">
+                    <TestimonialCard item={t} />
                   </div>
                 ))}
               </div>
