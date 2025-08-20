@@ -75,10 +75,10 @@ const Home = () => {
         ? selectedCountry.charAt(0).toUpperCase() + selectedCountry.slice(1)
         : "")
   );
-  const locationOptions = filteredLocation?.states?.map((item)=>({
-    label : item,
-    value : item?.toLowerCase()
-  }))
+  const locationOptions = filteredLocation?.states?.map((item) => ({
+    label: item,
+    value: item?.toLowerCase(),
+  }));
   const countOptions = [
     { label: "1 - 5", value: "1-5" },
     { label: "5 - 10", value: "5-10" },
@@ -228,8 +228,7 @@ const Home = () => {
           <div className="flex flex-col  gap-4 justify-between items-center">
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
-            >
+              className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center">
               <Controller
                 name="country"
                 control={control}
@@ -278,8 +277,7 @@ const Home = () => {
               />
               <button
                 type="submit"
-                className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full"
-              >
+                className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full">
                 <IoSearch />
               </button>
             </form>
@@ -288,8 +286,7 @@ const Home = () => {
         <div className="lg:hidden flex w-full items-center justify-center my-4">
           <button
             onClick={() => setShowMobileSearch(true)}
-            className="bg-white flex items-center w-full text-gray-400 font-medium border-2 px-6 py-3 rounded-full"
-          >
+            className="bg-white flex items-center w-full text-gray-400 font-medium border-2 px-6 py-3 rounded-full">
             <IoSearch className="inline mr-2" />
             Start Search
           </button>
@@ -303,14 +300,12 @@ const Home = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl z-50 p-4 rounded-t-3xl h-[100dvh] lg:hidden"
-          >
+            className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl z-50 p-4 rounded-t-3xl h-[100dvh] lg:hidden">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold">Search</h3>
               <button
                 onClick={() => setShowMobileSearch(false)}
-                className="text-gray-500 text-xl"
-              >
+                className="text-gray-500 text-xl">
                 &times;
               </button>
             </div>
@@ -363,8 +358,7 @@ const Home = () => {
                 />
                 <button
                   type="submit"
-                  className="w-full bg-[#FF5757] text-white py-3 rounded-full"
-                >
+                  className="w-full bg-[#FF5757] text-white py-3 rounded-full">
                   <IoSearch className="inline mr-2" />
                   Search
                 </button>
@@ -386,12 +380,12 @@ const Home = () => {
                   </h1>
                 </div>
                 <div className="text-title ">
-                  <h1 className="text-[clamp(1.8rem,3.4vw,4rem)] text-nowrap">
+                  <h1 className="text-[clamp(1.7rem,3.4vw,4rem)] text-nowrap">
                     <span className="font-medium"> Largest Community of</span>
                   </h1>
                 </div>
                 <div className="font-semibold">
-                  <h1 className="text-[clamp(4rem,7.3vw,16rem)]">NOMADS</h1>
+                  <h1 className="text-[clamp(3.7rem,7.3vw,16rem)]">NOMADS</h1>
                 </div>
               </div>
 
@@ -458,8 +452,7 @@ const Home = () => {
                   destinationData.length % 2 !== 0
                     ? "md:col-span-2 afterPro:col-span-1"
                     : ""
-                }`}
-              >
+                }`}>
                 <div className="relative w-full rounded-xl overflow-hidden shadow-md">
                   <img
                     src={item.image}
