@@ -88,7 +88,7 @@ const MainPage = () => {
             <PrimaryButton
               title="For Nomads"
               handleSubmit={() => navigate("nomad")}
-              externalStyles="bg-[#FF5757] text-[1rem] flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[12rem] px-6"
+              externalStyles="bg-[#FF5757] text-[0.8rem] xs:text-[0.9rem] sm:text-[1rem] md:text-[1rem] lg:text-[1rem] flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[12rem] px-6"
             />
             <PrimaryButton
               title="For Hosts"
@@ -96,16 +96,15 @@ const MainPage = () => {
                 // (window.location.href = "https://www.wono.co")
                 navigate("hosts")
               }
-              externalStyles="bg-[#FF5757] text-[1rem] flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[12rem] px-6"
+              externalStyles="bg-[#FF5757] text-[0.8rem] xs:text-[0.9rem] sm:text-[1rem] md:text-[1rem] lg:text-[1rem] flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[12rem] px-6"
             />
           </div>
         </article>
       </div>
-      <div className="flex justify-evenly items-center flex-row w-full sm:flex-col xs:flex-col lg:flex-row md:flex-row">
+      <div className="flex justify-evenly items-center  w-full flex-col sm:flex-col xs:flex-col lg:flex-row md:flex-row">
         <div className="w-32"></div>
         <div className="w-full  ">
-
-          <p className="text-center pb-2 sm:text-tiny xs:text-tiny lg:text-content">
+          <p className="text-center pb-2 text-tiny sm:text-tiny xs:text-tiny md:text-content lg:text-content">
             <span className="whitespace-nowrap">
               &copy; Copyright {new Date().getFullYear()} -{" "}
               {(new Date().getFullYear() + 1).toString().slice(-2)}

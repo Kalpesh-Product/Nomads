@@ -321,10 +321,12 @@ const Header = () => {
             ))}
             <div className="flex justify-center p-4">
               <PrimaryButton
-                title={"Sign In"}
-                externalStyles={"bg-primary-blue"}
+                title={"Login"}
+                externalStyles={
+                  "bg-[#FF5757]  flex text-white font-[400] capatilize hover:bg-[#E14C4C] w-[7rem] px-6 py-2 leading-4 justify-center items-center"
+                }
                 handleSubmit={() => {
-                  navigate("login");
+                  navigate("/nomad/login");
                   setOpen(false);
                 }}
               />
