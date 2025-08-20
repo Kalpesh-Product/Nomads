@@ -1,6 +1,6 @@
 import { Box, MenuItem, Skeleton, TextField } from "@mui/material";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import Container from "../components/Container";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -66,15 +66,6 @@ const GlobalListingsMap = () => {
     { label: "10 - 25", value: "10-25" },
     { label: "25+", value: "25+" },
   ];
-  const categoryOptions = [
-    { label: "Co-Working", value: "coworking" },
-    // { label: "Co-Living", value: "coliving" },
-    { label: "Hostels", value: "hostel" },
-    { label: "Workation", value: "workation" },
-    { label: "Private Stay", value: "privatestay" },
-    { label: "Meetings", value: "meetingRoom" },
-    { label: "Cafe’s", value: "cafe" },
-  ];
   console.log("formData", formData);
   const typeLabels = {
     coworking: "Co-Working Spaces",
@@ -113,6 +104,31 @@ const GlobalListingsMap = () => {
     },
     enabled: !!formData?.country && !!formData?.location, // ✅ prevents fetching on empty state
   });
+
+    // derive categoryOptions from API response
+  const categoryOptions = useMemo(() => {
+    if (!listingsData || listingsData.length === 0) return [];
+  
+    // unique companyType values
+    const uniqueTypes = [
+      ...new Set(listingsData.map((item) => item.companyType).filter(Boolean)),
+    ];
+  
+    // map them to label/value objects
+    return uniqueTypes.map((type) => {
+      const labelMap = {
+        coworking: "Co-Working",
+        coliving: "Co-Living",
+        hostel: "Hostels",
+        workation: "Workation",
+        privatestay: "Private Stay",
+        meetingroom: "Meetings",
+        cafe: "Cafe’s",
+      };
+  
+      return { label: labelMap[type] || type, value: type };
+    });
+  }, [listingsData]);
 
 
   const groupedListings = listingsData?.reduce((acc, item) => {

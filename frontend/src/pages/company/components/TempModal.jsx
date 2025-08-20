@@ -3,15 +3,15 @@ import { Modal, IconButton } from "@mui/material";
 import { IoMdClose } from "react-icons/io";
 import { motion, AnimatePresence } from "framer-motion";
 
-const TransparentModal = ({
+const TempModal = ({
   open,
   onClose,
   title,
   children,
   headerBackground,
   bgColor="bg-black",
-  width="100vw",
-  height="100vh",
+  width="100%",
+  height="100%"
 }) => {
   const modalRef = useRef(null);
 
@@ -29,19 +29,10 @@ const TransparentModal = ({
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 90, opacity: 0 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              className={`${bgColor}  shadow-xl outline-none ${width} ${height} overflow-y-auto rounded-xl`}
+              className={`${bgColor} ${height} ${width}  shadow-xl outline-none overflow-y-auto rounded-xl`}
             >
               {/* Header */}
-              <div className="flex justify-end items-center px-4 py-2 rounded-t-md">
-                <IconButton sx={{ p: 0 }} onClick={onClose}>
-                  <IoMdClose
-                    className="text-white"
-                    style={{
-                      color: headerBackground ? "white" : "black",
-                    }}
-                  />
-                </IconButton>
-              </div>
+       
 
               {/* Content */}
               <div className="p-4">{children}</div>
@@ -53,4 +44,4 @@ const TransparentModal = ({
   );
 };
 
-export default TransparentModal;
+export default TempModal;
