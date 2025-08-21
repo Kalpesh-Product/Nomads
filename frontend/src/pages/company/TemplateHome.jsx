@@ -14,6 +14,7 @@ import TempButton from "./components/TempButton";
 import TransparentModal from "../../components/TransparentModal";
 import ProductModalContent from "./components/ProductModalContent";
 import TempModal from "./components/TempModal";
+import { useOutletContext } from "react-router-dom";
 
 function getTenantFromHost() {
   const hostname = window.location.hostname;
@@ -31,6 +32,7 @@ const TemplateHome = () => {
     mode: "snap",
     slides: { perView: 1 },
   });
+  const { data, isPending, error } = useOutletContext();
 
   const [testimonialRef, testimonialSlider] = useKeenSlider({
     loop: true,
@@ -75,22 +77,16 @@ const TemplateHome = () => {
 
   const tenant = getTenantFromHost();
 
-  const { data, isPending, error } = useQuery({
-    queryKey: ["company", tenant],
-    queryFn: async () => {
-      const res = await axios.get(
-        `https://wonotestbe.vercel.app/api/editor/get-template/${tenant}`
-      );
-      return res.data;
-    },
-    enabled: !!tenant,
-  });
-
-  const heroImages = isPending ? [] : data?.heroImages;
-
-  const galleryImages = isPending ? [] : data?.gallery?.slice(0, 5);
-  const products = isPending ? [] : data?.products;
-  console.log("products : ", products);
+  // const { data, isPending, error } = useQuery({
+  //   queryKey: ["company", tenant],
+  //   queryFn: async () => {
+  //     const res = await axios.get(
+  //       `https://wonotestbe.vercel.app/api/editor/get-template/${tenant}`
+  //     );
+  //     return res.data;
+  //   },
+  //   enabled: !!tenant,
+  // });
 
   // const products = [
   //   { id: 1, productName: "co-working", img: "" },
@@ -101,7 +97,6 @@ const TemplateHome = () => {
   //   { id: 6, productName: "co-working", img: "" },
   // ];
 
-  const testimonials = isPending ? [] : data.testimonials
   // const testimonials = [
   //   {
   //     id: 1,
@@ -158,11 +153,22 @@ const TemplateHome = () => {
   //     rating: 5,
   //   },
   // ];
-  
 
   if (!tenant) return <div>No tenant specified</div>;
   if (isPending) return <div>Loading site...</div>;
-  if (error) return <div>Error loading site: {error.message}</div>;
+  if (error) {
+    console.log("error", error);
+    return <div>Error loading site: {error.message}</div>;
+  }
+
+  console.log("data", data);
+
+  const heroImages = isPending ? [] : data?.heroImages;
+
+  const galleryImages = isPending ? [] : data?.gallery?.slice(0, 6);
+  const products = isPending ? [] : data?.products;
+  console.log("products : ", products);
+  const testimonials = isPending ? [] : data?.testimonials;
 
   return (
     <div className="w-screen ">
@@ -214,9 +220,7 @@ const TemplateHome = () => {
             <h1 className="text-accent text-center text-title font-semibold">
               About Our Vision
             </h1>
-            <p className="text-white">
-              {data?.about || "About section here"}
-            </p>
+            <p className="text-white">{data?.about || "About section here"}</p>
           </div>
         </Container>
       </section>
@@ -284,7 +288,7 @@ const TemplateHome = () => {
 
               {/* Slider */}
               <div ref={testimonialRef} className="keen-slider">
-                {testimonials?.map((t) => (
+                {testimonials.map((t) => (
                   <div key={t._id} className="keen-slider__slide px-10">
                     <TestimonialCard item={t} />
                   </div>
@@ -323,7 +327,7 @@ const TemplateHome = () => {
                 <div className="flex flex-col gap-4 h-full">
                   <div className="h-16 w-full overflow-hidden">
                     <img
-                      src="https://picsum.photos/id/1015/1600/900"
+                      src={data?.companyLogo?.url}
                       alt="company-logo"
                       className="h-full w-full object-contain"
                     />
@@ -333,24 +337,24 @@ const TemplateHome = () => {
                       <div className="text-subtitle p-2 rounded-full border-2 border-accent">
                         <BsEnvelope />
                       </div>
-                      <div>
-                        <span>Lorem ipsim</span>
+                      <div className="text-small pl-2">
+                        <span>{data.email}</span>
                       </div>
                     </div>
                     <div className="flex justify-between w-full items-center">
                       <div className="text-subtitle p-2 rounded-full border-2 border-accent">
                         <MdOutlinePhone />
                       </div>
-                      <div>
-                        <span>Lorem ipsim</span>
+                      <div className="text-small pl-2">
+                        <span>{data.phone}</span>
                       </div>
                     </div>
                     <div className="flex justify-between w-full items-center">
                       <div className="text-subtitle p-2 rounded-full border-2 border-accent">
                         <CiMap />
                       </div>
-                      <div>
-                        <span>Lorem ipsim</span>
+                      <div className="text-small pl-2">
+                        <span >{data.address}</span>
                       </div>
                     </div>
                   </div>

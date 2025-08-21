@@ -3,10 +3,10 @@ import { useNavigate, Link } from "react-router-dom";
 import { Drawer } from "@mui/material";
 import { IoCloseSharp } from "react-icons/io5";
 import PrimaryButton from "../../../components/PrimaryButton";
-import logo from "../../../assets/WONO_LOGO_Black_TP.png";
+import defaultlogo from "../../../assets/WONO_LOGO_Black_TP.png";
 import { useLocation } from "react-router-dom";
 
-const TempHeader = () => {
+const TempHeader = ({logo}) => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const view = searchParams.get("view"); // could be 'map', 'list', or null
@@ -62,9 +62,9 @@ const TempHeader = () => {
           className="w-24 lg:w-36 overflow-x-hidden rounded-lg flex justify-between items-center cursor-pointer"
         >
           <img
-            src={logo}
+            src={logo || defaultlogo}
             alt={"logo"}
-            className="w-full h-full object-contain"
+            className="w-full h-full object-cover"
           />
         </div>
       </div>
