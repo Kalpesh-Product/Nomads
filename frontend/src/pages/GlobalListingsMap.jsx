@@ -23,14 +23,14 @@ const GlobalListingsMap = () => {
   const [favorites, setFavorites] = useState([]);
   const dispatch = useDispatch();
   const formData = useSelector((state) => state.location.formValues);
-    const { handleSubmit, control, reset, setValue, getValues, watch } = useForm({
+  const { handleSubmit, control, reset, setValue, getValues, watch } = useForm({
     defaultValues: {
       country: "",
       location: "",
       category: "",
     },
   });
-    const selectedCountry = watch("country");
+  const selectedCountry = watch("country");
   const selectedState = watch("location");
   const { data: locations = [], isLoading: isLocations } = useQuery({
     queryKey: ["locations"],
@@ -55,10 +55,10 @@ const GlobalListingsMap = () => {
         ? selectedCountry.charAt(0).toUpperCase() + selectedCountry.slice(1)
         : "")
   );
-  const locationOptions = filteredLocation?.states?.map((item)=>({
-    label : item,
-    value : item?.toLowerCase()
-  }))
+  const locationOptions = filteredLocation?.states?.map((item) => ({
+    label: item,
+    value: item?.toLowerCase(),
+  }));
   const skeletonArray = Array.from({ length: 6 });
   const countOptions = [
     { label: "1 - 5", value: "1-5" },
@@ -70,9 +70,9 @@ const GlobalListingsMap = () => {
   const typeLabels = {
     coworking: "Co-Working Spaces",
     coliving: "Co-Living Spaces",
-    hostel: "hostel",
-    privatestay: "Private Stay",
-    cafe: "cafe",
+    hostel: "Hostels",
+    privatestay: "Private Stays",
+    cafe: "Cafes",
     default: (type) => `${type[0].toUpperCase() + type.slice(1)} Spaces`,
   };
   const handleShowMoreClick = (type) => {
@@ -105,43 +105,44 @@ const GlobalListingsMap = () => {
     enabled: !!formData?.country && !!formData?.location, // ✅ prevents fetching on empty state
   });
 
-    // derive categoryOptions from API response
-const categoryOptions = useMemo(() => {
-  if (!listingsData || listingsData.length === 0) return [];
+  // derive categoryOptions from API response
+  const categoryOptions = useMemo(() => {
+    if (!listingsData || listingsData.length === 0) return [];
 
-  const uniqueTypes = [
-    ...new Set(listingsData.filter((item)=>item.companyType !== "coliving").map((item) => item.companyType).filter(Boolean)),
-  ];
+    const uniqueTypes = [
+      ...new Set(
+        listingsData
+          .filter((item) => item.companyType !== "coliving")
+          .map((item) => item.companyType)
+          .filter(Boolean)
+      ),
+    ];
 
-  const labelMap = {
-    coworking: "Co-Working",
-    // coliving: "Co-Living",
-    hostel: "Hostels",
-    workation: "Workation",
-    privatestay: "Private Stay",
-    meetingroom: "Meetings",
-    cafe: "Cafe’s",
-  };
+    const labelMap = {
+      coworking: "Co-Working",
+      // coliving: "Co-Living",
+      hostel: "Hostels",
+      workation: "Workation",
+      privatestay: "Private Stay",
+      meetingroom: "Meetings",
+      cafe: "Cafe’s",
+    };
 
-  // define desired order
-  const typeOrder = [
-    "coworking",
-    "hostel",
-    "workation",
-    "privatestay",
-    "meetingroom",
-    "cafe",
-    // "coliving",
-  ];
+    // define desired order
+    const typeOrder = [
+      "coworking",
+      "hostel",
+      "workation",
+      "privatestay",
+      "meetingroom",
+      "cafe",
+      // "coliving",
+    ];
 
-  return uniqueTypes
-    .map((type) => ({ label: labelMap[type] || type, value: type }))
-    .sort(
-      (a, b) =>
-        typeOrder.indexOf(a.value) - typeOrder.indexOf(b.value)
-    );
-}, [listingsData]);
-
+    return uniqueTypes
+      .map((type) => ({ label: labelMap[type] || type, value: type }))
+      .sort((a, b) => typeOrder.indexOf(a.value) - typeOrder.indexOf(b.value));
+  }, [listingsData]);
 
   const groupedListings = listingsData?.reduce((acc, item) => {
     if (!acc[item.type]) acc[item.type] = [];

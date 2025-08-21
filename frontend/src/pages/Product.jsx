@@ -55,7 +55,7 @@ const Product = () => {
   const showMore = (companyDetails?.images?.length || 0) > 4;
   const inclusions =
     companyDetails?.inclusions?.split(",").map((item) => {
-     return item?.split(" ")?.length
+      return item?.split(" ")?.length
         ? item?.split(" ").join("")?.trim()
         : item?.trim();
     }) || [];
@@ -248,8 +248,7 @@ const Product = () => {
                           selectedImageId: item._id,
                         },
                       })
-                    }
-                  >
+                    }>
                     <img
                       src={item.url}
                       alt="company-thumbnail"
@@ -269,8 +268,7 @@ const Product = () => {
                               },
                             });
                           }}
-                          className="bg-white text-sm px-3 py-1 rounded shadow font-medium"
-                        >
+                          className="bg-white text-sm px-3 py-1 rounded shadow font-medium">
                           +{companyDetails.images.length - 4} more
                         </button>
                       </div>
@@ -313,14 +311,12 @@ const Product = () => {
                   <div className="items-center flex gap-2">
                     <div
                       onClick={() => setHeartClicked((prev) => !prev)}
-                      className="cursor-pointer relative"
-                    >
+                      className="cursor-pointer relative">
                       {heartClicked ? <IoIosHeart /> : <IoIosHeartEmpty />}
                     </div>
                     <NavLink
                       className={"text-small underline"}
-                      to={"/nomad/login"}
-                    >
+                      to={"/nomad/login"}>
                       Save
                     </NavLink>
                   </div>
@@ -404,8 +400,7 @@ const Product = () => {
                 <form
                   onSubmit={handleSubmit((data) => submitEnquiry(data))}
                   action=""
-                  className="grid grid-cols-1 lg:grid-cols-2 gap-6"
-                >
+                  className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <Controller
                     name="fullName"
                     rules={{
@@ -649,137 +644,142 @@ const Product = () => {
               />
             </div>
             <hr className="my-5 lg:my-10" />
-            <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-2 gap-10 pb-20">
-              <div className="flex flex-col lg:flex-row justify-center items-center col-span-1 border-2 shadow-md gap-4 rounded-xl p-6 w-full">
-                <div className="flex flex-col gap-4 justify-between items-center h-full w-56">
-                  {/* Avatar with Initials */}
-                  <div className="w-32 aspect-square rounded-full bg-primary-blue flex items-center justify-center text-white text-6xl font-semibold uppercase">
-                    {companyDetails?.poc?.name
-                      ?.split(" ")
-                      .map((n) => n[0])
-                      .join("")
-                      .slice(0, 2) || "AG"}
-                  </div>
 
-                  {/* Name & Designation */}
-                  <div className="text-center space-y-3 h-1/2 flex flex-col justify-evenly items-center">
-                    <h1 className="text-title text-gray-700 font-medium leading-10">
-                      {companyDetails?.poc?.name || "Anviksha Godkar"}
-                    </h1>
-                    <p className="text-content">
-                      {companyDetails?.poc?.designation ||
-                        "Deputy Sales Manager"}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="w-px h-full bg-gray-300 mx-2 my-auto" />
-                <div className="h-full w-56 flex flex-col justify-normal">
-                  <p className="text-title text-center text-gray-700 font-medium mb-8 underline uppercase">
-                    Host Details
-                  </p>
-                  <div className="flex flex-col gap-5 text-sm sm:text-base">
-                    {[
-                      "Response rate: 100%",
-                      "Speaks English, Hindi and Punjabi",
-                      "Responds within an hour",
-                      "Lives in Velha, Goa",
-                    ].map((detail, index) => (
-                      <div key={index} className="flex items-start gap-2">
-                        <FaCheck className="text-blue-500 mt-1 flex-shrink-0" />
-                        <span className="leading-snug">{detail}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-              <div className="flex w-full border-2 shadow-md rounded-xl">
-                <div className="flex flex-col  h-full gap-4 rounded-xl p-6 w-full lg:w-full justify-between">
-                  <h1 className="text-title text-gray-700 font-medium uppercase">
-                    Connect With Host
-                  </h1>
-                  <form
-                    onSubmit={handlesubmitSales((data) => submitSales(data))}
-                    className="grid grid-cols-1 gap-4"
-                  >
-                    <Controller
-                      name="fullName"
-                      control={salesControl}
-                      rules={{
-                        required: "Full Name is required",
-                        validate: {
-                          isAlphanumeric,
-                          noOnlyWhitespace,
-                        },
-                      }}
-                      render={({ field }) => (
-                        <TextField
-                          {...field}
-                          label="Full Name"
-                          fullWidth
-                          variant="standard"
-                          size="small"
-                          error={!!salesErrors?.fullName}
-                          helperText={salesErrors?.fullName?.message}
-                        />
-                      )}
-                    />
-                    <Controller
-                      name="mobileNumber"
-                      control={salesControl}
-                      rules={{
-                        required: "Mobile number is required",
-                        validate: {
-                          isValidPhoneNumber,
-                        },
-                      }}
-                      render={({ field }) => (
-                        <TextField
-                          {...field}
-                          label="Mobile Number"
-                          fullWidth
-                          value={field.value || ""}
-                          type="number"
-                          variant="standard"
-                          size="small"
-                          error={!!salesErrors?.mobileNumber}
-                          helperText={salesErrors?.mobileNumber?.message}
-                        />
-                      )}
-                    />
-                    <Controller
-                      name="email"
-                      control={salesControl}
-                      rules={{
-                        required: "Email is required",
-                        validate: { isValidEmail },
-                      }}
-                      render={({ field }) => (
-                        <TextField
-                          {...field}
-                          label="Email"
-                          fullWidth
-                          type="email"
-                          variant="standard"
-                          size="small"
-                          error={!!salesErrors?.email}
-                          helperText={salesErrors?.email?.message}
-                        />
-                      )}
-                    />
-                    <div className="flex justify-center items-center">
-                      <SecondaryButton
-                        title={"Submit"}
-                        type={"submit"}
-                        externalStyles={"mt-6 w-1/2"}
-                        disabled={isSubmittingSales}
-                        isLoading={isSubmittingSales}
-                      />
+            {["Anviksha Godkar", "John Doe"].includes(
+              companyDetails?.poc?.name || ""
+            ) && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10 pb-20">
+                <div className="flex flex-col lg:flex-row justify-center items-center col-span-1 border-2 shadow-md gap-4 rounded-xl p-6 w-full">
+                  <div className="flex flex-col gap-4 justify-between items-center h-full w-56">
+                    {/* Avatar with Initials */}
+                    <div className="w-32 aspect-square rounded-full bg-primary-blue flex items-center justify-center text-white text-6xl font-semibold uppercase">
+                      {companyDetails?.poc?.name
+                        ?.split(" ")
+                        .map((n) => n[0])
+                        .join("")
+                        .slice(0, 2) || "AG"}
                     </div>
-                  </form>
+
+                    {/* Name & Designation */}
+                    <div className="text-center space-y-3 h-1/2 flex flex-col justify-evenly items-center">
+                      <h1 className="text-title text-gray-700 font-medium leading-10">
+                        {companyDetails?.poc?.name || "Anviksha Godkar"}
+                      </h1>
+                      <p className="text-content">
+                        {companyDetails?.poc?.designation ||
+                          "Deputy Sales Manager"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="w-px h-full bg-gray-300 mx-2 my-auto" />
+                  <div className="h-full w-56 flex flex-col justify-normal">
+                    <p className="text-title text-center text-gray-700 font-medium mb-8 underline uppercase">
+                      Host Details
+                    </p>
+                    <div className="flex flex-col gap-5 text-sm sm:text-base">
+                      {[
+                        "Response rate: 100%",
+                        "Speaks English, Hindi, Marathi and Konkani",
+                        "Responds within an hour",
+                        "Lives in Velha, Goa",
+                      ].map((detail, index) => (
+                        <div key={index} className="flex items-start gap-2">
+                          <FaCheck className="text-blue-500 mt-1 flex-shrink-0" />
+                          <span className="leading-snug">{detail}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex w-full border-2 shadow-md rounded-xl">
+                  <div className="flex flex-col h-full gap-4 rounded-xl p-6 w-full lg:w-full justify-between">
+                    <h1 className="text-title text-gray-700 font-medium uppercase">
+                      Connect With Host
+                    </h1>
+                    <form
+                      onSubmit={handlesubmitSales((data) => submitSales(data))}
+                      className="grid grid-cols-1 gap-4">
+                      <Controller
+                        name="fullName"
+                        control={salesControl}
+                        rules={{
+                          required: "Full Name is required",
+                          validate: {
+                            isAlphanumeric,
+                            noOnlyWhitespace,
+                          },
+                        }}
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            label="Full Name"
+                            fullWidth
+                            variant="standard"
+                            size="small"
+                            error={!!salesErrors?.fullName}
+                            helperText={salesErrors?.fullName?.message}
+                          />
+                        )}
+                      />
+                      <Controller
+                        name="mobileNumber"
+                        control={salesControl}
+                        rules={{
+                          required: "Mobile number is required",
+                          validate: {
+                            isValidPhoneNumber,
+                          },
+                        }}
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            label="Mobile Number"
+                            fullWidth
+                            value={field.value || ""}
+                            type="number"
+                            variant="standard"
+                            size="small"
+                            error={!!salesErrors?.mobileNumber}
+                            helperText={salesErrors?.mobileNumber?.message}
+                          />
+                        )}
+                      />
+                      <Controller
+                        name="email"
+                        control={salesControl}
+                        rules={{
+                          required: "Email is required",
+                          validate: { isValidEmail },
+                        }}
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            label="Email"
+                            fullWidth
+                            type="email"
+                            variant="standard"
+                            size="small"
+                            error={!!salesErrors?.email}
+                            helperText={salesErrors?.email?.message}
+                          />
+                        )}
+                      />
+                      <div className="flex justify-center items-center">
+                        <SecondaryButton
+                          title={"Submit"}
+                          type={"submit"}
+                          externalStyles={"mt-6 w-1/2"}
+                          disabled={isSubmittingSales}
+                          isLoading={isSubmittingSales}
+                        />
+                      </div>
+                    </form>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
@@ -823,8 +823,7 @@ const Product = () => {
       </MuiModal>
       <TransparentModal
         open={showAmenities}
-        onClose={() => setShowAmenities(false)}
-      >
+        onClose={() => setShowAmenities(false)}>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 p-4">
           {(Array.isArray(companyDetails?.inclusions)
             ? companyDetails.inclusions
@@ -832,8 +831,7 @@ const Product = () => {
           ).map((item) => (
             <span
               key={item}
-              className="bg-gray-800 text-white text-sm rounded-lg px-3 py-2 text-center"
-            >
+              className="bg-gray-800 text-white text-sm rounded-lg px-3 py-2 text-center">
               {item
                 .replace(/([a-z])([A-Z])/g, "$1 $2")
                 .replace(/-/g, " ")

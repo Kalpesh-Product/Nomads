@@ -1,5 +1,6 @@
 import React from "react";
 import Container from "../components/Container";
+import NewsFetch from "../components/NewsFetch";
 
 const DestinationNews = () => {
   return (
@@ -19,6 +20,10 @@ const DestinationNews = () => {
             Stay tuned — Destination News is arriving shortly!
           </p>
         </div>
+      </div>
+
+      <div>
+        <NewsFetch />
       </div>
     </Container>
   );

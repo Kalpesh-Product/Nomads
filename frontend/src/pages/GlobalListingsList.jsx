@@ -47,8 +47,6 @@ const GlobalListingsList = () => {
     },
   });
 
-  
-
   const countryOptions = locations.map((item) => ({
     label: item.country?.charAt(0).toUpperCase() + item.country?.slice(1),
     value: item.country?.toLowerCase(),
@@ -110,45 +108,46 @@ const GlobalListingsList = () => {
     enabled: !!formData?.country && !!formData?.location, // ✅ prevents fetching on empty state
   });
 
-  console.log("location data :", listingsData)
+  console.log("location data :", listingsData);
 
   // derive categoryOptions from API response
-const categoryOptions = useMemo(() => {
-  if (!listingsData || listingsData.length === 0) return [];
+  const categoryOptions = useMemo(() => {
+    if (!listingsData || listingsData.length === 0) return [];
 
-  const uniqueTypes = [
-    ...new Set(listingsData.filter((item)=>item.companyType !== "coliving").map((item) => item.companyType).filter(Boolean)),
-  ];
+    const uniqueTypes = [
+      ...new Set(
+        listingsData
+          .filter((item) => item.companyType !== "coliving")
+          .map((item) => item.companyType)
+          .filter(Boolean)
+      ),
+    ];
 
-  const labelMap = {
-    coworking: "Co-Working",
-    coliving: "Co-Living",
-    hostel: "Hostels",
-    workation: "Workation",
-    privatestay: "Private Stay",
-    meetingroom: "Meetings",
-    cafe: "Cafe’s",
-  };
+    const labelMap = {
+      coworking: "Co-Working",
+      coliving: "Co-Living",
+      hostel: "Hostels",
+      workation: "Workation",
+      privatestay: "Private Stay",
+      meetingroom: "Meetings",
+      cafe: "Cafe’s",
+    };
 
-  // define desired order
-  const typeOrder = [
-    "coworking",
-    "hostel",
-    "workation",
-    "privatestay",
-    "meetingroom",
-    "cafe",
-    "coliving",
-  ];
+    // define desired order
+    const typeOrder = [
+      "coworking",
+      "hostel",
+      "workation",
+      "privatestay",
+      "meetingroom",
+      "cafe",
+      "coliving",
+    ];
 
-  return uniqueTypes
-    .map((type) => ({ label: labelMap[type] || type, value: type }))
-    .sort(
-      (a, b) =>
-        typeOrder.indexOf(a.value) - typeOrder.indexOf(b.value)
-    );
-}, [listingsData]);
-
+    return uniqueTypes
+      .map((type) => ({ label: labelMap[type] || type, value: type }))
+      .sort((a, b) => typeOrder.indexOf(a.value) - typeOrder.indexOf(b.value));
+  }, [listingsData]);
 
   const groupedListings = listingsData?.reduce((acc, item) => {
     if (item.companyType === "coliving") return acc; // skip coliving
@@ -162,10 +161,10 @@ const categoryOptions = useMemo(() => {
   const typeLabels = {
     coworking: "Co-Working Spaces",
     coliving: "Co-Living Spaces",
-    hostel: "Hostel",
-    privatestay: "Private Stay",
+    hostel: "Hostels",
+    privatestay: "Private Stays",
     meetingroom: "Meeting Rooms",
-    cafe: "Cafe",
+    cafe: "Cafes",
     // fallback for unknown types
     default: (type) => `${type[0].toUpperCase() + type.slice(1)} Spaces`,
   };
@@ -267,8 +266,7 @@ const categoryOptions = useMemo(() => {
                       key={cat.value}
                       type="button"
                       onClick={() => handleCategoryClick(cat.value)}
-                      className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full"
-                    >
+                      className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full">
                       {iconSrc ? (
                         <div className="h-10 w-full flex flex-col gap-0">
                           <img
@@ -290,8 +288,7 @@ const categoryOptions = useMemo(() => {
 
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
-            >
+              className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center">
               <Controller
                 name="country"
                 control={control}
@@ -340,8 +337,7 @@ const categoryOptions = useMemo(() => {
               />
               <button
                 type="submit"
-                className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full"
-              >
+                className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full">
                 <IoSearch />
               </button>
             </form>
@@ -349,8 +345,7 @@ const categoryOptions = useMemo(() => {
           <div className="flex lg:hidden w-full items-center justify-center my-4">
             <button
               onClick={() => setShowMobileSearch((prev) => !prev)}
-              className="bg-white flex items-center w-full text-center justify-center font-medium text-secondary-dark border-2 px-6 py-2 rounded-full flex-col gap-2"
-            >
+              className="bg-white flex items-center w-full text-center justify-center font-medium text-secondary-dark border-2 px-6 py-2 rounded-full flex-col gap-2">
               <span>
                 Search Results in{" "}
                 {formData?.location?.charAt(0).toUpperCase() +
@@ -369,14 +364,12 @@ const categoryOptions = useMemo(() => {
               // animate={{ y: 0 }}
               exit={{ y: "-100%" }}
               transition={{ duration: 0.3 }}
-              className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 p-4 rounded-t-3xl lg:hidden h-[100dvh]"
-            >
+              className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 p-4 rounded-t-3xl lg:hidden h-[100dvh]">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold">Search</h3>
                 <button
                   onClick={() => setShowMobileSearch(false)}
-                  className="text-gray-500 text-xl"
-                >
+                  className="text-gray-500 text-xl">
                   &times;
                 </button>
               </div>
@@ -384,8 +377,7 @@ const categoryOptions = useMemo(() => {
                 initial={{ y: "-100%" }}
                 animate={{ y: 0 }}
                 transition={{ duration: 0.3 }}
-                className="grid grid-cols-3 md:grid-cols-5 gap-2 gap-y-10 mb-16"
-              >
+                className="grid grid-cols-3 md:grid-cols-5 gap-2 gap-y-10 mb-16">
                 {categoryOptions.map((cat) => {
                   const iconSrc = newIcons[cat.value];
 
@@ -394,8 +386,7 @@ const categoryOptions = useMemo(() => {
                       key={cat.value}
                       type="button"
                       onClick={() => handleCategoryClick(cat.value)}
-                      className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full"
-                    >
+                      className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full">
                       {iconSrc ? (
                         <div className="h-10 w-full flex flex-col gap-0">
                           <img
@@ -461,8 +452,7 @@ const categoryOptions = useMemo(() => {
                 />
                 <button
                   type="submit"
-                  className="w-full bg-[#FF5757] text-white py-3 rounded-full"
-                >
+                  className="w-full bg-[#FF5757] text-white py-3 rounded-full">
                   <IoSearch className="inline mr-2" />
                   Search
                 </button>
@@ -582,8 +572,7 @@ const categoryOptions = useMemo(() => {
                           <div className="mt-3 text-right">
                             <button
                               onClick={() => handleShowMoreClick(type)}
-                              className="text-primary-blue text-sm font-semibold hover:underline"
-                            >
+                              className="text-primary-blue text-sm font-semibold hover:underline">
                               {expandedCategories.includes(type)
                                 ? "View Less ←"
                                 : "View More →"}

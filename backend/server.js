@@ -11,6 +11,7 @@ import formRoutes from "./routes/formRoutes.js";
 import jobRoutes from "./routes/jobRoutes.js";
 import connectDb from "./config/db.js";
 import upload from "./config/multerConfig.js";
+import newsRoutes from "./routes/newsRoutes.js";
 
 const app = express();
 config({ override: true });
@@ -26,6 +27,8 @@ app.use("/api/poc", pocRoutes);
 app.use("/api/review", reviewRoutes);
 app.use("/api/forms", formRoutes);
 app.use("/api/job", jobRoutes);
+
+app.use("/api/news", newsRoutes);
 
 app.all("/*splat", (req, res) => {
   if (req.accepts("html")) {
