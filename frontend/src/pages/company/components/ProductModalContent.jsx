@@ -63,7 +63,7 @@ const ProductModalContent = ({ product, onClose, company }) => {
         <div className="overflow-hidden h-full rounded-xl relative ">
           <img
             src={images[current]?.url}
-            alt={product?.title || "Product"}
+            alt={product?.name || "Product"}
             className="w-full h-full object-cover bg-black"
           />
           <div className="absolute inset-0 bg-black/20">
@@ -93,18 +93,13 @@ const ProductModalContent = ({ product, onClose, company }) => {
       <div className="  flex ">
         <div className="flex flex-col w-full">
           <h2 className="text-xl font-bold uppercase">{product?.type}</h2>
-          <p className="text-gray-600">{product?.subtitle}</p>
+          <p className="text-gray-600">{product?.name}</p>
           <p className="mt-2 font-semibold text-secondary-dark">
             {product?.cost || "Starting at INR 5,900 + GST"}
           </p>
 
           <div className="mt-4 text-sm text-gray-700 overflow-y-auto h-28 pr-2">
-            {/* {product?.description || */}
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Nemo,
-            excepturi praesentium. Sapiente neque distinctio consequuntur qui
-            iste, iure rerum pariatur exercitationem non cum. Dolorum rerum,
-            quos veniam quasi laboriosam esse blanditiis! Perferendis nulla ab
-            Lo
+            {product?.description}
           </div>
 
           {/* Form area placeholder */}
@@ -277,7 +272,7 @@ const ProductModalContent = ({ product, onClose, company }) => {
                   <TempButton
                     disabled={isPending}
                     type={"submit"}
-                    buttonText="Inquire Now"
+                    buttonText="Get Quote"
                   />
                 </div>
               </form>

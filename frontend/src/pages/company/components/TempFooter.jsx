@@ -1,35 +1,46 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const TempFooter = () => {
+const TempFooter = ({
+  address,
+  contact,
+  email,
+  phone,
+  registeredCompany,
+  logo,
+  isPending,
+}) => {
+  const scrollToSection = (id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   const quickLinks = [
-    { name: "Home", path: "/home" },
-    { name: "About", path: "/about" },
-    { name: "Products", path: "/products" },
-    { name: "Gallery", path: "/gallery" },
-    { name: "Testimonial", path: "/testimonial" },
+    { name: "Home", id: "hero" },
+    { name: "About", id: "about" },
+    { name: "Products", id: "products" },
+    { name: "Gallery", id: "gallery" },
+    { name: "Testimonials", id: "testimonials" },
   ];
 
-  const contactLinks = [
-    { label: "+91 80071 26444", href: "tel:+918007126444" },
-    { label: "response@biznest.co.in", href: "mailto:response@biznest.co.in" },
-  ];
+  const contactLinks = !isPending
+    ? [
+        { label: phone, href: `tel:${phone}` },
+        { label: email, href: `mailto:${email}` },
+      ]
+    : [];
 
   return (
     <footer className="bg-white border-t border-gray-200 text-sm text-gray-700">
       <div className="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
         {/* Left - Company Info */}
         <div>
-          <img
-            src={"https://randomuser.me/api/portraits/men/15.jpg"}
-            alt="BIZ Nest"
-            className="h-10 mx-auto md:mx-0 mb-3"
-          />
-          <p className="font-semibold">MUSTARO TECHNOSERVE PVT LTD</p>
+          <img src={logo} alt="logo" className="h-10 mx-auto md:mx-0 mb-3" />
+          <p className="font-semibold">{!isPending && registeredCompany}</p>
           <p className="mt-2 leading-relaxed text-sm">
-            Sunteck Kanaka Corporate Park, <br />
-            701 A, 701 B, 601 A, 601 B, 501 A &amp; 501 B, Patto Centre, <br />
-            Panaji, Goa 403001
+            {!isPending && address}
           </p>
         </div>
 
@@ -39,9 +50,13 @@ const TempFooter = () => {
           <ul className="space-y-1">
             {quickLinks.map((link, idx) => (
               <li key={idx}>
-                <Link to={link.path} className="hover:underline">
+                <button
+                  type="button"
+                  onClick={() => scrollToSection(link.id)}
+                  className="hover:underline"
+                >
                   {link.name}
-                </Link>
+                </button>
               </li>
             ))}
           </ul>
@@ -51,13 +66,19 @@ const TempFooter = () => {
         <div>
           <h4 className="font-semibold mb-3">Contact Us</h4>
           <ul className="space-y-1">
-            {contactLinks.map((item, idx) => (
+            {/* {contactLinks.map((item, idx) => (
               <li key={idx}>
                 <a href={item.href} className="hover:underline">
                   {item.label}
                 </a>
               </li>
-            ))}
+            ))} */}
+            <li >{phone}</li>
+            <li >
+              <a href={`mailto:${email}`} className="hover:underline">
+                {email}
+              </a>
+            </li>
           </ul>
         </div>
       </div>
