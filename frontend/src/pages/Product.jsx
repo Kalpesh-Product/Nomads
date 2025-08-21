@@ -104,7 +104,7 @@ const Product = () => {
         ...data,
         country: companyDetails?.country,
         state: companyDetails?.state,
-        companyType: companyDetails?.type,
+        companyType: companyDetails?.companyType,
         personelCount: parseInt(data?.noOfPeople),
         companyName: companyDetails?.companyName,
         sheetName: "All_Enquiry",
@@ -123,7 +123,7 @@ const Product = () => {
   const { mutate: submitSales, isPending: isSubmittingSales } = useMutation({
     mutationKey: ["submitSales"],
     mutationFn: async (data) => {
-      const response = await axios.post("/forms/add-new-enquiry", {
+      const response = await axios.post("/forms/add-new-b2c-form-submission", {
         ...data,
         pocName: companyDetails?.poc?.name || "Anviksha Godkar",
         pocCompany: companyDetails?.companyName,
