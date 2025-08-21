@@ -22,9 +22,9 @@ const DestinationNews = () => {
         </div>
       </div>
 
-      <div>
+      {/* <div>
         <NewsFetch />
-      </div>
+      </div> */}
     </Container>
   );
 };
