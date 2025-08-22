@@ -10,40 +10,88 @@ const DESTS = [
   { label: "Bangkok", country: "th", keyword: "Bangkok", lang: "en" }, // or 'th'
 ];
 
-const NewsCard = ({ a }) => (
-  <article className="border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition">
-    {a.image ? (
-      <img
-        src={a.image}
-        alt={a.title}
-        className="w-full h-44 object-cover"
-        loading="lazy"
-      />
-    ) : (
-      <div className="w-full h-44 bg-gray-100" />
-    )}
+const NewsCard = ({ a }) => {
+  const desc = a.description || a.content || "";
+  const category = a.category || a.topic || a.section || "Destinations";
 
-    <div className="p-4">
-      <h3 className="font-semibold text-lg line-clamp-2">{a.title}</h3>
-      <p className="text-sm text-gray-600 mt-2 line-clamp-3">{a.description}</p>
+  return (
+    <article className="group relative rounded-xl border bg-white transition hover:shadow-md">
+      <div className="flex flex-col sm:flex-row gap-4 p-4 ">
+        {/* Image */}
+        <a
+          href={a.url}
+          target="_blank"
+          rel="noreferrer"
+          className="sm:w-56 shrink-0 block ">
+          <div className="h-40 sm:h-36 rounded-lg overflow-hidden ">
+            {a.image ? (
+              <img
+                src={a.image}
+                alt={a.title}
+                className="block h-full w-full object-cover" // see note below
+                loading="lazy"
+              />
+            ) : (
+              <div className="h-full w-full bg-gray-100" />
+            )}
+          </div>
+        </a>
 
-      <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
-        <span className="truncate">{a.source?.name}</span>
-        <time dateTime={a.publishedAt}>
-          {a.publishedAt ? new Date(a.publishedAt).toLocaleString() : ""}
-        </time>
+        {/* Text */}
+        <div className="min-w-0 flex-1">
+          {/* <div className="flex items-center gap-2 text-xs">
+            <span className="text-xs font-medium text-orange-600">
+              {category}
+            </span>
+            <span className="text-gray-400">•</span>
+            <time className="text-gray-500" dateTime={a.publishedAt}>
+              {a.publishedAt
+                ? new Date(a.publishedAt).toLocaleDateString(undefined, {
+                    month: "short",
+                    day: "2-digit",
+                    year: "numeric",
+                  })
+                : ""}
+            </time>
+          </div> */}
+
+          <a href={a.url} target="_blank" rel="noreferrer">
+            <h3 className="mt-1 text-lg font-semibold leading-snug text-gray-900 line-clamp-2">
+              {a.title}
+            </h3>
+          </a>
+
+          <p className="mt-2 text-sm text-gray-600 line-clamp-3">{desc}</p>
+
+          <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
+            <div>
+              <span className="truncate">
+                {a.author || a.source?.name || "News Desk"}
+              </span>
+              &nbsp;|&nbsp;
+              <time className="text-gray-500" dateTime={a.publishedAt}>
+                {a.publishedAt
+                  ? new Date(a.publishedAt).toLocaleDateString(undefined, {
+                      month: "short",
+                      day: "2-digit",
+                      year: "numeric",
+                    })
+                  : ""}
+              </time>
+            </div>
+            <a
+              href={a.url}
+              target="_blank"
+              rel="noreferrer"
+              className="shrink-0 font-medium text-blue-600 hover:underline">
+              Read full story →
+            </a>
+          </div>
+        </div>
       </div>
-
-      <a
-        href={a.url}
-        target="_blank"
-        rel="noreferrer"
-        className="inline-block mt-3 text-blue-600 font-medium hover:underline">
-        Read full story →
-      </a>
-    </div>
-  </article>
-);
+    </article>
+  );
+};
 
 const NewsFetch = () => {
   const [dest, setDest] = useState(DESTS[0]);
@@ -87,18 +135,6 @@ const NewsFetch = () => {
           <label className="text-sm font-medium text-gray-700">
             Destination
           </label>
-          {/* <select
-            className="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={dest.label}
-            onChange={(e) =>
-              setDest(DESTS.find((d) => d.label === e.target.value))
-            }>
-            {DESTS.map((d) => (
-              <option key={d.label} value={d.label}>
-                {d.label}
-              </option>
-            ))}
-          </select> */}
 
           <div className="relative inline-block">
             <select
@@ -124,30 +160,15 @@ const NewsFetch = () => {
             disabled={isFetching}>
             {isFetching ? "Refreshing…" : "Refresh"}
           </button>
-
-          {isPending && <span className="text-sm text-gray-500">Loading…</span>}
-          {isError && (
-            <span className="text-sm text-red-600">Could not load news.</span>
-          )}
-
-          {/* {scope && !isPending && !isError && (
-          <span
-            className={`text-xs ml-2 rounded-full px-2 py-1 ${
-              scope.includes("city")
-                ? "bg-green-100 text-green-700"
-                : scope.includes("country")
-                ? "bg-yellow-100 text-yellow-700"
-                : "bg-gray-100 text-gray-700"
-            }`}
-            title={scope}>
-            {scope}
-          </span>
-        )} */}
         </div>
       </div>
 
       {/* Results */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
+        {isPending && <span className="text-sm text-gray-500">Loading…</span>}
+        {isError && (
+          <span className="text-sm text-red-600">Could not load news.</span>
+        )}
         {articles.map((a) => (
           <NewsCard key={a.url} a={a} />
         ))}
