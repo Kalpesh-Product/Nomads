@@ -151,25 +151,41 @@ export const getCompanyData = async (req, res, next) => {
   try {
     const { companyId } = req.params;
 
-    const [companyData, reviews, poc] = await Promise.all([
-      Company.findById(companyId).lean().exec(),
-      Review.find({ company: companyId }).lean().exec(),
-      PointOfContact.findOne({ company: companyId, isActive: true })
+    let companyQuery;
+    if (mongoose.Types.ObjectId.isValid(companyId)) {
+      // Search by ObjectId
+      companyQuery = Company.findById(companyId).lean().exec();
+    } else {
+      // Search by companyName (case-insensitive regex)
+      companyQuery = Company.findOne({
+        companyName: { $regex: new RegExp(`^${companyId}$`, "i") },
+      })
         .lean()
-        .exec(),
-    ]);
+        .exec();
+    }
+
+    const companyData = await companyQuery;
 
     if (!companyData) {
       return res.status(404).json({ error: "Company not found" });
     }
 
+    // Use the actual ObjectId of the found company
+    const companyObjectId = companyData._id;
+
+    const [reviews, poc] = await Promise.all([
+      Review.find({ company: companyObjectId }).lean().exec(),
+      PointOfContact.findOne({ company: companyObjectId, isActive: true })
+        .lean()
+        .exec(),
+    ]);
+
     return res.status(200).json({
-      ...companyData, // base fields on the top level
-      reviews, // array
-      poc, // object or null
+      ...companyData,
+      reviews,
+      poc,
     });
   } catch (error) {
-    // Log it so you’re not debugging in the dark at 2 AM
     console.error("getCompanyData error:", error);
     next(error);
   }
