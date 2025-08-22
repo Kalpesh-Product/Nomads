@@ -125,10 +125,10 @@ const NewsFetch = () => {
             {isFetching ? "Refreshing…" : "Refresh"}
           </button>
 
-          {isPending && <span className="text-sm text-gray-500">Loading…</span>}
+          {/* {isPending && <span className="text-sm text-gray-500">Loading…</span>}
           {isError && (
             <span className="text-sm text-red-600">Could not load news.</span>
-          )}
+          )} */}
 
           {/* {scope && !isPending && !isError && (
           <span
@@ -148,6 +148,10 @@ const NewsFetch = () => {
 
       {/* Results */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {isPending && <span className="text-sm text-gray-500">Loading…</span>}
+        {isError && (
+          <span className="text-sm text-red-600">Could not load news.</span>
+        )}
         {articles.map((a) => (
           <NewsCard key={a.url} a={a} />
         ))}
