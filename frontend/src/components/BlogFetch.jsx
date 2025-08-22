@@ -77,7 +77,8 @@ const BlogFetch = () => {
     refetchOnWindowFocus: false,
   });
 
-  const blogs = Array.isArray(data?.articles) ? data.articles : [];
+  //   const blogs = Array.isArray(data?.articles) ? data.articles : [];
+  const blogs = Array.isArray(data?.articles) ? data.articles.slice(0, 9) : [];
 
   return (
     <div className="my-6">
