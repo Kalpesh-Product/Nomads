@@ -2,6 +2,7 @@
 import React, { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "../utils/axios.js";
+import { IoChevronDown } from "react-icons/io5";
 
 const DESTS = [
   { label: "Goa", country: "in", keyword: "Goa", lang: "en" },
@@ -79,36 +80,57 @@ const NewsFetch = () => {
 
   return (
     <div className="my-6">
-      {/* Controls */}
-      <div className="flex items-center gap-3 mb-5">
-        <label className="text-sm font-medium text-gray-700">Destination</label>
-        <select
-          className="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          value={dest.label}
-          onChange={(e) =>
-            setDest(DESTS.find((d) => d.label === e.target.value))
-          }>
-          {DESTS.map((d) => (
-            <option key={d.label} value={d.label}>
-              {d.label}
-            </option>
-          ))}
-        </select>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-title font-semibold text-host">Destination News</h2>
+        {/* Controls */}
+        <div className="flex items-center justify-end gap-3 mb-0 ">
+          <label className="text-sm font-medium text-gray-700">
+            Destination
+          </label>
+          {/* <select
+            className="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={dest.label}
+            onChange={(e) =>
+              setDest(DESTS.find((d) => d.label === e.target.value))
+            }>
+            {DESTS.map((d) => (
+              <option key={d.label} value={d.label}>
+                {d.label}
+              </option>
+            ))}
+          </select> */}
 
-        <button
-          type="button"
-          onClick={() => refetch()}
-          className="text-xs border rounded px-2 py-1 hover:bg-gray-50"
-          disabled={isFetching}>
-          {isFetching ? "Refreshing…" : "Refresh"}
-        </button>
+          <div className="relative inline-block">
+            <select
+              className="block w-full rounded-lg border-2 border-gray-400 bg-white px-3 py-2 pr-8
+               text-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              value={dest.label}
+              onChange={(e) =>
+                setDest(DESTS.find((d) => d.label === e.target.value))
+              }>
+              {DESTS.map((d) => (
+                <option key={d.label} value={d.label}>
+                  {d.label}
+                </option>
+              ))}
+            </select>
+            <IoChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-600" />
+          </div>
 
-        {isPending && <span className="text-sm text-gray-500">Loading…</span>}
-        {isError && (
-          <span className="text-sm text-red-600">Could not load news.</span>
-        )}
+          <button
+            type="button"
+            onClick={() => refetch()}
+            className="text-xs border rounded px-2 py-1 hover:bg-gray-50"
+            disabled={isFetching}>
+            {isFetching ? "Refreshing…" : "Refresh"}
+          </button>
 
-        {scope && !isPending && !isError && (
+          {isPending && <span className="text-sm text-gray-500">Loading…</span>}
+          {isError && (
+            <span className="text-sm text-red-600">Could not load news.</span>
+          )}
+
+          {/* {scope && !isPending && !isError && (
           <span
             className={`text-xs ml-2 rounded-full px-2 py-1 ${
               scope.includes("city")
@@ -120,7 +142,8 @@ const NewsFetch = () => {
             title={scope}>
             {scope}
           </span>
-        )}
+        )} */}
+        </div>
       </div>
 
       {/* Results */}

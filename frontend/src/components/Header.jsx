@@ -134,7 +134,7 @@ const Header = () => {
             </>
 
             {/* Remaining nav links */}
-            {headerLinks.map((item, index) => (
+            {/* {headerLinks.map((item, index) => (
               <li key={item.id} className="flex items-center">
                 {!["Signup"].includes(item.text) && (
                   <div className="p-4 px-0 whitespace-nowrap">
@@ -149,7 +149,31 @@ const Header = () => {
                   </div>
                 )}
               </li>
-            ))}
+            ))} */}
+            {headerLinks.map((item) => {
+              const isActive = location.pathname === item.to;
+
+              return (
+                <li key={item.id} className="flex items-center">
+                  <div className="p-4 px-0 whitespace-nowrap">
+                    <Link
+                      to={item.to}
+                      className="group relative text-md text-black">
+                      <span
+                        className={`relative z-10 mb-8 ${
+                          isActive ? "font-bold" : "group-hover:font-bold"
+                        }`}>
+                        {item.text}
+                      </span>
+                      <span
+                        className={`absolute left-0 bottom-0 top-6 h-[2px] bg-blue-500 transition-all duration-300 ${
+                          isActive ? "w-full" : "w-0 group-hover:w-full"
+                        }`}></span>
+                    </Link>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         </div>
       )}
@@ -158,7 +182,7 @@ const Header = () => {
       {isNomadListingsDetail && (
         <div>
           <ul className="hidden xl:flex sm:hidden gap-8 pl-20 justify-center flex-1">
-            {headerLinks.map((item) => (
+            {/* {headerLinks.map((item) => (
               <li key={item.id} className="flex items-center">
                 <div className="p-4 px-0 whitespace-nowrap">
                   <Link
@@ -171,7 +195,31 @@ const Header = () => {
                   </Link>
                 </div>
               </li>
-            ))}
+            ))} */}
+            {headerLinks.map((item) => {
+              const isActive = location.pathname === item.to;
+
+              return (
+                <li key={item.id} className="flex items-center">
+                  <div className="p-4 px-0 whitespace-nowrap">
+                    <Link
+                      to={item.to}
+                      className="group relative text-md text-black">
+                      <span
+                        className={`relative z-10 mb-8 ${
+                          isActive ? "font-bold" : "group-hover:font-bold"
+                        }`}>
+                        {item.text}
+                      </span>
+                      <span
+                        className={`absolute left-0 bottom-0 top-6 h-[2px] bg-blue-500 transition-all duration-300 ${
+                          isActive ? "w-full" : "w-0 group-hover:w-full"
+                        }`}></span>
+                    </Link>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         </div>
       )}
@@ -311,14 +359,36 @@ const Header = () => {
                 </ul>
               </div>
             )}
-            {headerLinks.map((item) => (
+            {/* {headerLinks.map((item) => (
               <li key={item.id} className="items-center text-center">
                 <div onClick={() => handleNavigation(item.to)} className="py-4">
                   <p className="text-secondary-dark text-lg">{item.text}</p>
                 </div>
                 <div className="h-[0.2px] bg-gray-300"></div>
               </li>
-            ))}
+            ))} */}
+            {headerLinks.map((item) => {
+              const isActive = location.pathname === item.to;
+
+              return (
+                <li key={item.id} className="items-center text-center">
+                  <div
+                    onClick={() => handleNavigation(item.to)}
+                    className="py-4">
+                    <p
+                      className={`text-lg ${
+                        isActive
+                          ? "font-bold text-black underline decoration-2 decoration-blue-500"
+                          : "text-secondary-dark"
+                      }`}>
+                      {item.text}
+                    </p>
+                  </div>
+                  <div className="h-[0.2px] bg-gray-300"></div>
+                </li>
+              );
+            })}
+
             <div className="flex justify-center p-4">
               <PrimaryButton
                 title={"Login"}
