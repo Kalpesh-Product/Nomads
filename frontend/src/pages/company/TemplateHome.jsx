@@ -27,12 +27,15 @@ const TemplateHome = () => {
   const [open, setOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState([]);
   console.log("selectedProdict ", selectedProduct);
+  const { data, isPending, error } = useOutletContext();
+  const sliderCount =
+    data?.testimonials?.length > 3 ? 3 : data?.testimonials?.length;
   const [sliderRef, slider] = useKeenSlider({
-    loop: true,
+    loop: data?.heroImages?.length > 1,
     mode: "snap",
     slides: { perView: 1 },
   });
-  const { data, isPending, error } = useOutletContext();
+  console.log("data from layout ", data?.testimonials?.length);
 
   const [testimonialRef, testimonialSlider] = useKeenSlider({
     loop: true,
@@ -44,10 +47,10 @@ const TemplateHome = () => {
     },
     breakpoints: {
       "(min-width: 768px)": {
-        slides: { perView: 2, spacing: 24 },
+        slides: { perView: sliderCount - 1, spacing: 24 },
       },
       "(min-width: 1024px)": {
-        slides: { perView: 3, spacing: 32 },
+        slides: { perView: sliderCount, spacing: 32 },
       },
     },
   });
@@ -200,18 +203,23 @@ const TemplateHome = () => {
         </div>
 
         {/* Prev / Next Buttons */}
-        <button
-          onClick={() => slider.current?.prev()}
-          className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 p-3 rounded-full text-white hover:bg-black/70 transition"
-        >
-          <FaChevronLeft size={20} />
-        </button>
-        <button
-          onClick={() => slider.current?.next()}
-          className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 p-3 rounded-full text-white hover:bg-black/70 transition"
-        >
-          <FaChevronRight size={20} />
-        </button>
+        {data?.heroImages?.length > 1 && (
+          <button
+            onClick={() => slider.current?.prev()}
+            className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 p-3 rounded-full text-white hover:bg-black/70 transition"
+          >
+            <FaChevronLeft size={20} />
+          </button>
+        )}
+
+        {data?.heroImages?.length > 1 && (
+          <button
+            onClick={() => slider.current?.next()}
+            className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 p-3 rounded-full text-white hover:bg-black/70 transition"
+          >
+            <FaChevronRight size={20} />
+          </button>
+        )}
       </div>
 
       <section className="bg-black py-8" id="about">
@@ -316,7 +324,7 @@ const TemplateHome = () => {
             <h1 className="uppercase text-center text-title font-semibold">
               Contact
             </h1>
-            <div className="flex lg:flex-nowrap flex-wrap items-stretch gap-4">
+            <div className="flex md:flex-nowrap flex-wrap items-stretch gap-4">
               <iframe
                 title="India Office"
                 className="w-full h-[25rem]"
@@ -354,7 +362,7 @@ const TemplateHome = () => {
                         <CiMap />
                       </div>
                       <div className="text-small pl-2">
-                        <span >{data.address}</span>
+                        <span>{data.address}</span>
                       </div>
                     </div>
                   </div>

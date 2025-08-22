@@ -103,7 +103,7 @@ const fixedAmenitiesMap = {
     "Water Purifier",
     "Custom Solutions",
   ],
-  meetingrooms: [
+  meetingroom: [
     "Private Meeting Room",
     "Smart Television",
     "Air Conditioning",

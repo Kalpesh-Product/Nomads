@@ -13,8 +13,10 @@ import {
 } from "../../../utils/validators";
 import { DesktopDatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
-import SecondaryButton from "../../../components/SecondaryButton";
+import axios from "../../../utils/axios";
 import TempButton from "./TempButton";
+import { useOutletContext } from "react-router-dom";
+import toast from "react-hot-toast";
 
 // Example modal component
 const ProductModalContent = ({ product, onClose, company }) => {
@@ -36,14 +38,42 @@ const ProductModalContent = ({ product, onClose, company }) => {
     },
   });
   const selectedStartDate = watch("startDate");
+  const { data, isPending, error } = useOutletContext();
+  const companyName = data?.companyName
+  console.log("data from layout alkdlaksdjlkf;lhakf" , data)
+    const { data: companyDetails, isPending: isCompanyDetails } = useQuery({
+    queryKey: ["companyDetails", companyName],
+    queryFn: async () => {
+      const response = await axios.get(
+        `company/get-single-company-data/${companyName}`
+      );
+      return response?.data;
+    },
+    enabled: !!companyName,
+  });
 
-  const { mutate, isPending } = useMutation({
+  const { mutate, isPending : isEnquiry } = useMutation({
     mutationKey: ["enquiryForm"],
     mutationFn: async (data) => {
-      console.log(data);
+      const response = await axios.post("/forms/add-new-b2c-form-submission", {
+        ...data,
+        country: companyDetails?.country,
+        state: companyDetails?.state,
+        companyType: companyDetails?.companyType,
+        personelCount: parseInt(data?.noOfPeople),
+        companyName: companyDetails?.companyName,
+        sheetName: "All_Enquiry",
+        phone: data?.mobileNumber,
+      });
+      return response.data;
     },
-    onSuccess: () => {},
-    onError: () => {},
+    onSuccess: (data) => {
+      toast.success(data.message);
+      reset();
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message);
+    },
   });
 
   const images = product?.images || [
@@ -270,7 +300,7 @@ const ProductModalContent = ({ product, onClose, company }) => {
                 />
                 <div className="flex justify-center items-center lg:col-span-2">
                   <TempButton
-                    disabled={isPending}
+                    disabled={isEnquiry}
                     type={"submit"}
                     buttonText="Get Quote"
                   />
