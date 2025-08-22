@@ -4,6 +4,7 @@ import PointOfContact from "../models/PointOfContact.js";
 import { Readable } from "stream";
 import csvParser from "csv-parser";
 import { uploadFileToS3 } from "../config/s3Config.js";
+import mongoose from "mongoose";
 
 export const bulkInsertCompanies = async (req, res, next) => {
   try {
