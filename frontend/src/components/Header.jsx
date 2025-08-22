@@ -6,12 +6,14 @@ import PrimaryButton from "./PrimaryButton";
 import logo from "../assets/WONO_LOGO_Black_TP.png";
 import SecondaryButton from "./SecondaryButton";
 import { useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const Header = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const view = searchParams.get("view"); // could be 'map', 'list', or null
-
+  const view = searchParams.get("view");
+  console.log("view in header 🤯🤯", view)
+  const formData = useSelector((state) => state.location.formValues);
   const currentPath = location.pathname;
 
   const isNomadOrListings =
@@ -22,10 +24,13 @@ const Header = () => {
   const hideMapListLinks = isNomadOrListings;
   const isNomadHome = isNomadOrListings;
 
-  const pathRegex = /^\/nomad\/[^/]+\/[^/]+$/; // e.g., /nomad/india/goa
-  const isNomadLocation = /^\/nomad\/[^/]+\/[^/]+$/.test(location.pathname); // Matches /nomad/:country/:state
-
+  const isNomadLocation =
+  location.pathname === "/nomad/verticals" &&
+  searchParams.has("country") &&
+  searchParams.has("location");
   const isNomadListingsPage = location.pathname === "/nomad/listings";
+
+  console.log("isNmoad🎂🎂", searchParams.has("location") )
 
   // NEW: listings detail page like /nomad/listings/BIZ%20Nest
   const isNomadListingsDetail = /^\/nomad\/listings\/[^/]+$/.test(currentPath);
@@ -43,15 +48,19 @@ const Header = () => {
     { id: 2, text: "Local Blog", to: "/nomad/local-blog" },
   ];
 
-  function getListViewPath() {
-    const match = location.pathname.match(/^\/nomad\/([^/]+)\/([^/]+)/);
-    if (match) {
-      const [, country, state] = match;
-      return `/nomad/${country}/${state}`;
-    }
-    // fallback default if nothing matched
-    return "/nomad/india/goa";
+function getListViewPath() {
+  const searchParams = new URLSearchParams(location.search);
+  const country = searchParams.get("country");
+  const state = searchParams.get("location");
+
+  if (country && state) {
+    return `/nomad/verticals?country=${country}&location=${state}`;
   }
+
+  // ✅ fallback default
+  return "/nomad/verticals?country=india&location=goa";
+}
+
 
   return (
     <div className="flex px-4 py-3 justify-between items-center md:py-3 md:px-[7.5rem] lg:px-[7.5rem] sm:px-6 xs:px-6 lg:py-[0.625rem] shadow-md bg-white/80 backdrop-blur-md ">
@@ -86,7 +95,7 @@ const Header = () => {
                     <li className="flex items-center">
                       <div className="p-4 px-0 whitespace-nowrap">
                         <Link
-                          to={`${location.pathname}?view=map`}
+                          to={`${location.pathname}?country=${formData?.country}&location=${formData?.location}&view=map`}
                           className="group relative text-md  text-black">
                           <span className="relative z-10 group-hover:font-bold mb-2">
                             Map view
@@ -101,7 +110,7 @@ const Header = () => {
                     <li className="flex items-center">
                       <div className="p-4 px-0 whitespace-nowrap">
                         <Link
-                          to={`${location.pathname}`}
+                          to={`${location.pathname}?country=${formData?.country}&location=${formData?.location}`}
                           className="group relative text-md text-black">
                           <span className="relative z-10 group-hover:font-bold mb-2">
                             List view

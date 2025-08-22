@@ -169,16 +169,18 @@ const GlobalListingsMap = () => {
     setValue("count", formData.count);
   }, [formData]);
   const { mutate: locationData, isPending: isLocation } = useMutation({
-    mutationFn: async (data) => {
-      dispatch(setFormValues(data));
-    },
-    onSuccess: () => {
-      console.log("success");
-    },
-    onError: () => {
-      console.log("error");
-    },
-  });
+   mutationFn: async (data) => {
+     dispatch(setFormValues(data));
+     // use data directly here, not formData from Redux
+     navigate(`/nomad/verticals?country=${data.country}&location=${data.location}`);
+   },
+   onSuccess: () => {
+     console.log("success");
+   },
+   onError: () => {
+     console.log("error");
+   },
+ });
 
   const handleCategoryClick = (categoryValue) => {
     const formData = getValues(); // from react-hook-form

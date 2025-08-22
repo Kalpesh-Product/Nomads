@@ -86,27 +86,6 @@ const Home = () => {
     { label: "25+", value: "25+" },
   ];
 
-  // const { data: companyDetails, isPending: isCompanyDetails } = useQuery({
-  //   queryKey: ["companyDetails", companyId],
-  //   queryFn: async () => {
-  //     const response = await axios.get(
-  //       `common/individual-company?companyId=${companyId}&&type=${type}`
-  //     );
-  //     return response.data;
-  //   },
-  //   enabled: !!companyId && !!type,
-  // });
-
-  // Reviews
-  // const reviewData = isCompanyDetails
-  //   ? []
-  //   : companyDetails?.reviews.map((item) => ({
-  //       ...item,
-  //       stars: item.starCount,
-  //       message: item.description,
-  //       date: dayjs(item.createdAt).fromNow(),
-  //     }));
-
   const reviewData = [
     {
       name: "Neelam Mulla",
@@ -156,7 +135,7 @@ const Home = () => {
   const { mutate: locationData, isPending: isLocation } = useMutation({
     mutationFn: async (data) => {
       dispatch(setFormValues(data));
-      navigate(`${data.country}/${data.location}`);
+      navigate(`verticals?country=${data.country}&state=${data.location}`);
     },
     onSuccess: () => {
       console.log("success");

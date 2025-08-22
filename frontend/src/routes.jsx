@@ -51,7 +51,7 @@ const marketingRoutes = {
       element: <NomadLayout />,
       children: [
         { path: "", element: <Home /> },
-        { path: ":country/:state", element: <GlobalListings /> },
+        { path: "verticals", element: <GlobalListings /> },
         { path: "listings", element: <Listings /> },
         { path: "listings/:company", element: <Product /> },
         { path: "listings/:company/images", element: <ImageGallery /> },

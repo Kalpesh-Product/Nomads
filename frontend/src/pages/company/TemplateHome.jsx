@@ -15,6 +15,7 @@ import TransparentModal from "../../components/TransparentModal";
 import ProductModalContent from "./components/ProductModalContent";
 import TempModal from "./components/TempModal";
 import { useOutletContext } from "react-router-dom";
+import GallerySection from "./components/GallerySection";
 
 function getTenantFromHost() {
   const hostname = window.location.hostname;
@@ -168,7 +169,7 @@ const TemplateHome = () => {
 
   const heroImages = isPending ? [] : data?.heroImages;
 
-  const galleryImages = isPending ? [] : data?.gallery?.slice(0, 6);
+  const galleryImages = isPending ? [] : data?.gallery;
   const products = isPending ? [] : data?.products;
   console.log("products : ", products);
   const testimonials = isPending ? [] : data?.testimonials;
@@ -261,18 +262,11 @@ const TemplateHome = () => {
             <h1 className="uppercase text-center text-title font-semibold">
               Gallery
             </h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {galleryImages?.map((item) => (
-                <div key={item._id} className="h-80 overflow-hidden rounded-xl">
-                  <img
-                    src={item.url || "https://picsum.photos/id/1015/1600/900"}
-                    alt="product-image"
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-              ))}
-            </div>
+           <div>
+            <GallerySection gallery={galleryImages} />
+           </div>
           </div>
+          
         </Container>
       </section>
       <section id="testimonials" className="py-8">
@@ -331,7 +325,7 @@ const TemplateHome = () => {
                 loading="lazy"
                 src={data?.mapUrl}
               ></iframe>
-              <div className="shadow-md w-full lg:w-1/4 p-4">
+              <div className="shadow-md w-full lg:w-[40%] p-4">
                 <div className="flex flex-col gap-4 h-full">
                   <div className="h-16 w-full overflow-hidden">
                     <img
@@ -341,7 +335,7 @@ const TemplateHome = () => {
                     />
                   </div>
                   <div className="flex flex-col gap-4 h-full justify-center items-center">
-                    <div className="flex justify-between w-full items-center">
+                    <div className="flex gap-4 w-full items-center">
                       <div className="text-subtitle p-2 rounded-full border-2 border-accent">
                         <BsEnvelope />
                       </div>
@@ -349,7 +343,7 @@ const TemplateHome = () => {
                         <span>{data.email}</span>
                       </div>
                     </div>
-                    <div className="flex justify-between w-full items-center">
+                    <div className="flex gap-4 w-full items-center">
                       <div className="text-subtitle p-2 rounded-full border-2 border-accent">
                         <MdOutlinePhone />
                       </div>
@@ -357,8 +351,8 @@ const TemplateHome = () => {
                         <span>{data.phone}</span>
                       </div>
                     </div>
-                    <div className="flex justify-between w-full items-center">
-                      <div className="text-subtitle p-2 rounded-full border-2 border-accent">
+                    <div className="flex gap-4 w-full items-center">
+                      <div className="text-subtitle p-2 rounded-full ">
                         <CiMap />
                       </div>
                       <div className="text-small pl-2">

@@ -11,6 +11,7 @@ const TempModal = ({
   headerBackground,
   bgColor="bg-black",
   width="100%",
+  padding="p-4",
   height="100%"
 }) => {
   const modalRef = useRef(null);
@@ -35,7 +36,7 @@ const TempModal = ({
        
 
               {/* Content */}
-              <div className="p-4">{children}</div>
+              <div className={`${padding}`}>{children}</div>
             </motion.div>
           </div>
         </Modal>
