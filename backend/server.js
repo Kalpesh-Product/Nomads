@@ -12,6 +12,7 @@ import jobRoutes from "./routes/jobRoutes.js";
 import connectDb from "./config/db.js";
 import upload from "./config/multerConfig.js";
 import newsRoutes from "./routes/newsRoutes.js";
+import blogRoutes from "./routes/blogRoutes.js";
 
 const app = express();
 config({ override: true });
@@ -29,6 +30,7 @@ app.use("/api/forms", formRoutes);
 app.use("/api/job", jobRoutes);
 
 app.use("/api/news", newsRoutes);
+app.use("/api/blogs", blogRoutes); // New Blog Route
 
 app.all("/*splat", (req, res) => {
   if (req.accepts("html")) {

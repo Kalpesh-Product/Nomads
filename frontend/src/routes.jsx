@@ -35,6 +35,7 @@ import Leads from "./pages/host/Leads";
 import HostProduct from "./pages/host/Product";
 import TemplateSite from "./pages/company/TemplateSite";
 import TemplateHome from "./pages/company/TemplateHome";
+import BlogDetails from "./pages/BlogDetails";
 
 const marketingRoutes = {
   path: "/",
@@ -58,6 +59,7 @@ const marketingRoutes = {
         { path: "contact", element: <Contact /> },
         { path: "destination-news", element: <DestinationNews /> },
         { path: "local-blog", element: <LocalBlog /> },
+        { path: "local-blog/blog-details", element: <BlogDetails /> },
         { path: "career", element: <Career /> },
         { path: "career/job/:title", element: <JobDetails /> },
         { path: "login", element: <Login /> },
