@@ -82,7 +82,7 @@ const BlogFetch = () => {
 
   return (
     <div className="my-6">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-4 flex-col sm:flex-col xs:flex-col md:flex-row lg:flex-row">
         <h2 className="text-title font-semibold text-host">Local Blog</h2>
         {/* Controls */}
         <div className="flex items-center justify-end gap-3 mb-5">
@@ -105,13 +105,13 @@ const BlogFetch = () => {
             <IoChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-600" />
           </div>
 
-          <button
+          {/* <button
             type="button"
             onClick={() => refetch()}
             className="text-xs border rounded px-2 py-1 hover:bg-gray-50"
             disabled={isFetching}>
             {isFetching ? "Refreshing…" : "Refresh"}
-          </button>
+          </button> */}
 
           {/* {isPending && <span className="text-sm text-gray-500">Loading…</span>}
           {isError && (
