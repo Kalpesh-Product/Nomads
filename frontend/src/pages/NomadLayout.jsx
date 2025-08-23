@@ -1,7 +1,7 @@
 import { Outlet, useLocation } from "react-router-dom";
-import HostHeader from "../components/HostHeader";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { Toaster } from "react-hot-toast";
 
 const NomadLayout = () => {
   const location = useLocation();
@@ -13,7 +13,7 @@ const NomadLayout = () => {
       </div>
 
       <Outlet />
-
+      <Toaster />
       <Footer />
     </div>
   );

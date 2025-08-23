@@ -20,6 +20,14 @@ const Header = () => {
     setOpen(false);
   };
 
+const goToHosts = () => {
+  if (window.location.hostname.includes("localhost")) {
+    window.location.href = "http://hosts.localhost:5173";
+  } else {
+    window.location.href = "https://hosts.wono.co";
+  }
+};
+
   const headerLinks = [
     { id: 1, text: "Home", to: "/" },
     { id: 2, text: "News", to: "news" },
@@ -103,12 +111,14 @@ const Header = () => {
       <div className="hidden lg:flex pl-10 gap-10">
         <li className="flex items-center">
           <div className="p-4 px-0 whitespace-nowrap">
-            <a href="/hosts" className="group relative text-md text-black">
-              <span className="relative z-10 font-bold mb-8">
-                Become a host
-              </span>
-              <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
-            </a>
+          <button
+              onClick={goToHosts}
+              className="relative pb-1 transition-all cursor-pointer duration-300 group hover:font-bold bg-transparent border-none"
+            >
+              Become a host
+              <span className="absolute left-0 w-0 bottom-0 block h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+            </button>
+
           </div>
         </li>
 

@@ -203,7 +203,7 @@ const GlobalListingsMap = () => {
     setShowListings(false);
 
     navigate(
-      `/nomad/listings?country=${formData.country}&location=${formData.location}&category=${state.category}`,
+      `/listings?country=${formData.country}&location=${formData.location}&category=${state.category}`,
       {
         state: {
           country: formData.country,

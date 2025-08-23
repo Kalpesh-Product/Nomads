@@ -21,6 +21,14 @@ const HostHeader = () => {
     { name: "Capital", link: "capital" },
     { name: "Career", link: "career" },
   ];
+
+  const goToNomads = () => {
+    if (window.location.hostname.includes("localhost")) {
+      window.location.href = "http://nomad.localhost:5173";
+    } else {
+      window.location.href = "https://nomad.wono.co";
+    }
+  };
   const handleNavigation = (path) => {
     navigate(path);
     setOpen(false);
@@ -32,7 +40,8 @@ const HostHeader = () => {
         <div className="flex  lg:px-0 justify-between items-center md:py-3  ">
           <div
             onClick={() => navigate("/")}
-            className="w-24 lg:w-36 overflow-x-hidden rounded-lg flex justify-between items-center cursor-pointer">
+            className="w-24 lg:w-36 overflow-x-hidden rounded-lg flex justify-between items-center cursor-pointer"
+          >
             <img
               src={logo}
               alt={"logo"}
@@ -53,11 +62,13 @@ const HostHeader = () => {
                 <li key={link.name} className="relative">
                   <Link
                     to={link.link}
-                    className="relative pb-1 transition-all duration-300 group hover:font-bold ">
+                    className="relative pb-1 transition-all duration-300 group hover:font-bold "
+                  >
                     {link.name}
                     <span
                       className={`absolute left-0 bottom-0 block h-[2px] bg-blue-500 transition-all duration-300
-              ${isActive ? "w-full" : "w-0"} group-hover:w-full`}></span>
+              ${isActive ? "w-full" : "w-0"} group-hover:w-full`}
+                    ></span>
                   </Link>
                 </li>
               );
@@ -65,25 +76,26 @@ const HostHeader = () => {
           </ul>
 
           <div className="px-1 hidden xl:flex xl:gap-4 py-2 items-center">
-            <Link
-              to={"/nomad"}
-              className="relative pb-1 transition-all duration-300 group hover:font-bold">
+            <button
+              onClick={goToNomads}
+              className="relative pb-1 transition-all cursor-pointer duration-300 group hover:font-bold bg-transparent border-none"
+            >
               Become a nomad
-              <span
-                className={`absolute left-0 w-0 bottom-0 block h-[2px] bg-blue-500 transition-all duration-300
-               group-hover:w-full`}></span>
-            </Link>
+              <span className="absolute left-0 w-0 bottom-0 block h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+            </button>
 
             <a
               href="https://wonofe.vercel.app"
-              className="bg-[#FF5757] flex items-center justify-center text-white font-[500] capitalize hover:font-semibold hover:bg-red-500 w-[7rem] px-4 py-2 rounded-full">
+              className="bg-[#FF5757] flex items-center justify-center text-white font-[500] capitalize hover:font-semibold hover:bg-red-500 w-[7rem] px-4 py-2 rounded-full"
+            >
               Login
             </a>
           </div>
           <div className="h-full px-2  lg:hidden">
             <button
               onClick={() => setOpen(true)}
-              className=" rounded-lg text-subtitle text-black">
+              className=" rounded-lg text-subtitle text-black"
+            >
               ☰
             </button>
           </div>
@@ -100,13 +112,15 @@ const HostHeader = () => {
         }}
         anchor="left"
         open={open}
-        onClose={() => setOpen(false)}>
+        onClose={() => setOpen(false)}
+      >
         <div className="flex flex-col h-full justify-between">
           <ul className="flex flex-col gap-4 p-4 ">
             <div className="flex justify-end w-full">
               <span
                 className="text-title cursor-pointer text-black"
-                onClick={() => setOpen(false)}>
+                onClick={() => setOpen(false)}
+              >
                 <IoCloseSharp />
               </span>
             </div>
@@ -120,7 +134,8 @@ const HostHeader = () => {
               <li key={item.id} className="items-center text-center">
                 <div
                   onClick={() => handleNavigation(item.link)}
-                  className="py-4">
+                  className="py-4"
+                >
                   <p className="text-secondary-dark text-lg">{item.name}</p>
                 </div>
                 <div className="h-[0.2px] bg-gray-300"></div>

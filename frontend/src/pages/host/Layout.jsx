@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom'
 import HostHeader from '../../components/HostHeader'
 import HostFooter from '../../components/HostFooter'
 import Footer from '../../components/Footer'
+import { Toaster } from 'react-hot-toast'
 
 const HostLayout = () => {
   return (
@@ -11,7 +12,7 @@ const HostLayout = () => {
       </div>
 
       <Outlet />
-
+      <Toaster />
       <HostFooter />
     </div>
   )
