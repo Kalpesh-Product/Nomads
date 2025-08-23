@@ -11,16 +11,16 @@ const HostFooter = () => {
   const footerSections = [
     {
       links: [
-        { name: "Privacy", link: "/hosts/privacy" },
-        { name: "Career", link: "/hosts/career" },
-        { name: "FAQs", link: "/hosts/faq" },
+        { name: "Privacy", link: "privacy" },
+        { name: "Career", link: "career" },
+        { name: "FAQs", link: "faq" },
       ],
     },
     {
       links: [
-        { name: "Contact", link: "/hosts/contact" },
+        { name: "Contact", link: "contact" },
         { name: "Sign In", link: "https://wonofe.vercel.app" },
-        { name: "Sign Up", link: "/hosts/signup" },
+        { name: "Sign Up", link: "signup" },
       ],
     },
     // {
