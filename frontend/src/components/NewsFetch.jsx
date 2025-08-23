@@ -107,6 +107,22 @@ const NewsFetch = () => {
     [dest]
   );
 
+  // const { data, isPending, isError, refetch, isFetching } = useQuery({
+  //   queryKey: [
+  //     "gnews",
+  //     dest.label,
+  //     params.country,
+  //     params.keyword,
+  //     params.lang,
+  //   ],
+  //   queryFn: async () => {
+  //     const res = await axios.get("news", { params }); // -> /api/news
+  //     return res.data; // { totalArticles, articles, scope }
+  //   },
+  //   staleTime: 1000 * 60 * 5,
+  //   refetchOnWindowFocus: false,
+  // });
+
   const { data, isPending, isError, refetch, isFetching } = useQuery({
     queryKey: [
       "gnews",
@@ -116,8 +132,21 @@ const NewsFetch = () => {
       params.lang,
     ],
     queryFn: async () => {
-      const res = await axios.get("news", { params }); // -> /api/news
-      return res.data; // { totalArticles, articles, scope }
+      const cacheKey = `news-${dest.label}-${params.country}-${params.keyword}`;
+
+      // 1. check localStorage
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        return JSON.parse(cached);
+      }
+
+      // 2. no cache → fetch from API
+      const res = await axios.get("news", { params });
+
+      // 3. store in localStorage
+      localStorage.setItem(cacheKey, JSON.stringify(res.data));
+
+      return res.data;
     },
     staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,
