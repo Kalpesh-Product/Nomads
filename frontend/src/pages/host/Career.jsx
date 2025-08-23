@@ -10,7 +10,7 @@ import axios from "../../utils/axios";
 const HostCareer = () => {
   const [openIndex, setOpenIndex] = useState(null);
 
-  const { data: jobRoles, isLoading } = useQuery({
+  const { data: jobRoles=[], isLoading } = useQuery({
     queryKey: ["jobRoles"],
     queryFn: async () => {
       const response = await axios.get("/job/get-job-posts");
@@ -32,7 +32,7 @@ const HostCareer = () => {
         <div className="border-b-2 border-gray-300 w-[5%] mb-6"></div>
         {/* <Jobrole jobRoles={jobRoles}/> */}
         <div className="flex flex-col gap-4">
-          {jobRoles.map((section, idx) => {
+          {jobRoles?.map((section, idx) => {
             const isOpen = openIndex === idx;
 
             return (
@@ -55,7 +55,7 @@ const HostCareer = () => {
                     isOpen ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0"
                   } overflow-hidden`}>
                   <div className="space-y-4 mt-2">
-                    {section.jobs.map((job, jobIdx) => (
+                    {section?.jobPosts?.map((job, jobIdx) => (
                       <div key={job.id}>
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 ">
                           <div className="md:w-1/2 lg:w-1/2 sm:w-full xs:w-full md:py-8 lg:py-6">
@@ -70,7 +70,7 @@ const HostCareer = () => {
                           </div>
                           <div className="text-right flex items-center gap-10 sm:justify-between xs:justify-between md:justify-end lg:justify-end md:w-1/2 lg:w-1/2  sm:w-full xs:w-full">
                             <p className="text-sm font-semibold text-gray-900">
-                              {job.type} | {job.mode} | {job.location}
+                              {job.jobType || "Text"} | {job.jobMode} | {job.location}
                             </p>
                             <div className="flex justify-end mt-1">
                               {/* <Link
@@ -86,7 +86,7 @@ const HostCareer = () => {
                             </div>
                           </div>
                         </div>
-                        {section.jobs.length > 1 &&
+                        {section?.jobs?.length > 1 &&
                           jobIdx < section.jobs.length - 1 && (
                             <hr className="mt-4" />
                           )}

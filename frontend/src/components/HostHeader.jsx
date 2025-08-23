@@ -18,7 +18,7 @@ const HostHeader = () => {
     { name: "Modules", link: "modules" },
     { name: "Themes", link: "themes" },
     { name: "Leads", link: "leads" },
-    { name: "Capital", link: "capital" },
+    // { name: "Capital", link: "capital" },
     { name: "Career", link: "career" },
   ];
 
@@ -48,7 +48,7 @@ const HostHeader = () => {
               className="w-full h-full object-contain"
             />
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-10">
             <ul className="hidden xl:flex sm:hidden gap-8 justify-center flex-1 uppercase">
               {links.map((link) => {
                 const linkSegment = link.link.split("/").filter(Boolean).pop();
@@ -76,7 +76,7 @@ const HostHeader = () => {
               })}
             </ul>
 
-            <div className="px-1 hidden xl:flex xl:gap-4 py-2 items-center">
+            <div className="px-1 hidden xl:flex xl:gap-10 py-2 items-center">
               <button
                 onClick={goToNomads}
                 className="relative pb-1 transition-all cursor-pointer uppercase font-bold duration-300 group hover:font-bold bg-transparent border-none"

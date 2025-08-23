@@ -90,7 +90,10 @@ const Header = () => {
       <div className="w-full">
         <ul className="hidden xl:flex sm:hidden gap-8 justify-end flex-1">
           {headerLinks.map((item) => {
-            const isActive = location.pathname === item.to; // <-- check active
+            const isActive =
+              item.to === "/"
+                ? location.pathname === "/" // exact match for home
+                : location.pathname.startsWith(item.to);
 
             return (
               <li key={item.id} className="flex items-center">
