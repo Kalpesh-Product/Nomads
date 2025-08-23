@@ -151,7 +151,9 @@ const TemplateHome = () => {
             </h1>
            {
            about?.length > 0 ? about?.map((para)=>(
+               <>
                <p className="text-white">{para}</p>
+               <br/></>
             )) :
             "About section here"
            }
