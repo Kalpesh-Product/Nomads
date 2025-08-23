@@ -1,6 +1,7 @@
 import React from "react";
 import Container from "../components/Container";
 import NewsFetch from "../components/NewsFetch";
+import ReviewFetch from "../components/ReviewFetch";
 
 const DestinationNews = () => {
   return (
@@ -23,6 +24,7 @@ const DestinationNews = () => {
 
       <div>
         <NewsFetch />
+        <ReviewFetch />
       </div>
     </Container>
   );
