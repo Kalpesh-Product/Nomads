@@ -12,6 +12,7 @@ const RSS2JSON_BASE = "https://api.rss2json.com/v1/api.json";
 
 const RSS_FEEDS = {
   Goa: "https://www.nomadicmatt.com/feed/", // works ✅
+  // Goa: "https://www.holidify.com/blog/feed/", // Goa travel articles from Holidify
   Bali: "https://thehoneycombers.com/bali/feed/",
 
   Bangkok: "https://www.traveldudes.com/feed/", // works ✅
