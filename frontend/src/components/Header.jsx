@@ -37,8 +37,8 @@ const Header = () => {
 
   const headerLinks = [
     { id: 1, text: "Home", to: "/" },
-    { id: 2, text: "News", to: "news" },
-    { id: 3, text: "Blog", to: "blog" },
+    { id: 2, text: "News", to: "/news" },
+    { id: 3, text: "Blog", to: "/blog" },
   ];
 
   return (
@@ -112,7 +112,7 @@ const Header = () => {
                     <span
                       className={`relative z-10 mb-8 uppercase ${
                         isActive
-                          ? "font-bold text-black"
+                          ? "text-black"
                           : "group-hover:font-bold"
                       }`}
                     >
