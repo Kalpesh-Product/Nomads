@@ -27,6 +27,13 @@ const Header = () => {
       window.location.href = "https://hosts.wono.co";
     }
   };
+    const goToHostssMain = () => {
+    if (window.location.hostname.includes("localhost")) {
+      window.location.href = "http://localhost:5173";
+    } else {
+      window.location.href = "https://wono.co";
+    }
+  };
 
   const headerLinks = [
     { id: 1, text: "Home", to: "/" },
@@ -40,7 +47,7 @@ const Header = () => {
       <div className="flex items-center">
         {/* Logo */}
         <div
-          onClick={() => navigate("/")}
+          onClick={goToHostssMain}
           className="w-24 h-10 lg:w-48 overflow-x-hidden rounded-lg flex gap-8 justify-start items-start cursor-pointer"
         >
           <img src={logo} alt="logo" className="w-fit h-full object-contain" />

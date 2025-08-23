@@ -14,7 +14,7 @@ const HostHeader = () => {
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const links = [
-    { name: "Host", link: "/" },
+    { name: "Home", link: "/" },
     { name: "Modules", link: "modules" },
     { name: "Themes", link: "themes" },
     { name: "Leads", link: "leads" },
@@ -29,6 +29,13 @@ const HostHeader = () => {
       window.location.href = "https://nomad.wono.co";
     }
   };
+  const goToNomadsMain = () => {
+    if (window.location.hostname.includes("localhost")) {
+      window.location.href = "http://localhost:5173";
+    } else {
+      window.location.href = "https://wono.co";
+    }
+  };
   const handleNavigation = (path) => {
     navigate(path);
     setOpen(false);
@@ -39,7 +46,7 @@ const HostHeader = () => {
       <Container padding={false}>
         <div className="flex  lg:px-0 justify-between items-center md:py-3  ">
           <div
-            onClick={() => navigate("/")}
+            onClick={goToNomadsMain}
             className="w-24 lg:w-36 overflow-x-hidden rounded-lg flex justify-between items-center cursor-pointer"
           >
             <img
