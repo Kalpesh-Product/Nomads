@@ -24,7 +24,7 @@ const DestinationNews = () => {
 
       <div>
         <NewsFetch />
-        <ReviewFetch />
+        {/* <ReviewFetch /> */}
       </div>
     </Container>
   );

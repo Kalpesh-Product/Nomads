@@ -85,7 +85,7 @@ const BlogFetch = () => {
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-title font-semibold text-host">Local Blog</h2>
         {/* Controls */}
-        {/* <div className="flex items-center justify-end gap-3 mb-5">
+        <div className="flex items-center justify-end gap-3 mb-5">
           <label className="text-sm font-medium text-gray-700">
             Destination
           </label>
@@ -113,15 +113,19 @@ const BlogFetch = () => {
             {isFetching ? "Refreshing…" : "Refresh"}
           </button>
 
-          {isPending && <span className="text-sm text-gray-500">Loading…</span>}
+          {/* {isPending && <span className="text-sm text-gray-500">Loading…</span>}
           {isError && (
             <span className="text-sm text-red-600">Could not load blogs.</span>
-          )}
-        </div> */}
+          )} */}
+        </div>
       </div>
 
       {/* Results */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {isPending && <span className="text-sm text-gray-500">Loading…</span>}
+        {isError && (
+          <span className="text-sm text-red-600">Could not load blogs.</span>
+        )}
         {blogs.map((b) => (
           <BlogCard key={b.guid} b={b} />
         ))}
