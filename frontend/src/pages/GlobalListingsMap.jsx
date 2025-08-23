@@ -172,7 +172,7 @@ const GlobalListingsMap = () => {
    mutationFn: async (data) => {
      dispatch(setFormValues(data));
      // use data directly here, not formData from Redux
-     navigate(`/nomad/verticals?country=${data.country}&location=${data.location}`);
+     navigate(`/verticals?country=${data.country}&location=${data.location}`);
    },
    onSuccess: () => {
      console.log("success");
