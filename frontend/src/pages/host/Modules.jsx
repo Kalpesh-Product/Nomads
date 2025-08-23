@@ -61,9 +61,7 @@ export default function Modules() {
               The ONLY Nomad Ecosystem SaaS Platform!
             </h1>
             <div className="font-semibold font-comic hidden lg:flex w-full">
-              <ReactFitty >
-                The ONLY Nomad Ecosystem SaaS Platform!
-              </ReactFitty>
+              <ReactFitty>The ONLY Nomad Ecosystem SaaS Platform!</ReactFitty>
             </div>
           </div>
           <div>
@@ -83,7 +81,7 @@ export default function Modules() {
           <div className="flex justify-end items-end">
             <GetStartedButton
               title="Get Started"
-              handleSubmit={() => navigate("/hosts/signup")}
+              handleSubmit={() => navigate("/signup")}
             />
           </div>
         </div>
@@ -216,7 +214,7 @@ export default function Modules() {
       <div className="flex justify-center w-full my-16">
         <GetStartedButton
           title={"Get Started"}
-          handleSubmit={() => navigate("/hosts/signup")}
+          handleSubmit={() => navigate("/signup")}
         />
       </div>
       <hr />
