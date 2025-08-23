@@ -7,7 +7,7 @@ import {
   FaWindowMaximize,
   FaRegIdCard,
 } from "react-icons/fa6";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import GetStartedButton from "../../components/GetStartedButton";
 import { ReactFitty } from "react-fitty";
 import Container from "../../components/Container";
@@ -126,6 +126,7 @@ const themes = [
 const HostProduct = () => {
   const { state } = useLocation();
   const initialImage = state.image;
+  const navigate = useNavigate()
   const [selectedImage, setSelectedImage] = useState(initialImage);
   return (
     <div className="flex flex-col">
@@ -144,7 +145,7 @@ const HostProduct = () => {
                   </li>
                 ))}
               </ul>
-              <GetStartedButton externalStyles="bg-white text-black lg:w-[70%]" />
+              <GetStartedButton handleSubmit={()=>navigate('/signup')} externalStyles="bg-white text-black lg:w-[70%]" />
             </div>
             <div
               data-aos="fade-up"
@@ -205,7 +206,7 @@ const HostProduct = () => {
                   </div>
                 ))}
             </div>
-            <GetStartedButton />
+            <GetStartedButton handleSubmit={()=>navigate('/signup')} />
           </div>
         </Container>
       </section>

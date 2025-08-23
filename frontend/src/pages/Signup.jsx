@@ -295,7 +295,7 @@ export default function Signup() {
             <p className="text-center">
               Already have an account?&nbsp;
               <span className="underline">
-                <Link to="/nomad/login">Log In</Link>
+                <Link to="/login">Log In</Link>
               </span>
             </p>
           </div>

@@ -103,20 +103,20 @@ const supportItems = [
     description:
       "Watch tutorials and read detailed articles in Wono help center",
     linkText: "Go to FAQ →",
-    path: "/hosts/faq",
+    path: "/faq",
   },
   {
     title: "Contact Us",
     description:
       "Get support by chat or schedule a call with a Customer Care Expert",
     linkText: "Connect With us →",
-    path: "/hosts/contact",
+    path: "/contact",
   },
   {
     title: "Hire a pro",
     description: "Get help at any stage -- from site creation to online growth",
     linkText: "Browse all services →",
-    path: "/hosts/modules",
+    path: "/modules",
   },
 ];
 
@@ -130,7 +130,7 @@ const Themes = () => {
             Choose the best Responsive Website Theme for your business
           </h1>
 
-          <GetStartedButton handleSubmit={()=>navigate('/hosts/signup')}/>
+          <GetStartedButton handleSubmit={()=>navigate('/signup')}/>
         </section>
       </Container>
 
@@ -166,7 +166,7 @@ const Themes = () => {
               ))}
             </div>
             <div className="flex justify-center items-center">
-              <GetStartedButton handleSubmit={()=>navigate('/hosts/signup')} />
+              <GetStartedButton handleSubmit={()=>navigate('/signup')} />
             </div>
           </div>
         </Container>
@@ -187,7 +187,7 @@ const Themes = () => {
                 <li>Full-stack web dev tools for custom functionality</li>
               </ul>
               <div className="flex justify-center md:justify-start w-full">
-                <GetStartedButton handleSubmit={()=>navigate('/hosts/signup')}/>
+                <GetStartedButton handleSubmit={()=>navigate('/signup')}/>
               </div>
             </div>
             <div className="w-full lg:w-[50%] h-full">
@@ -218,7 +218,7 @@ const Themes = () => {
             ))}
           </div>
           <div>
-            <GetStartedButton handleSubmit={()=>navigate('/hosts/signup')}/>
+            <GetStartedButton handleSubmit={()=>navigate('/signup')}/>
           </div>
         </div>
       </Container>

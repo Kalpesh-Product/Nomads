@@ -123,7 +123,7 @@ export default function LoginPage() {
             <p className="text-center">
               New to WoNo?&nbsp;{" "}
               <span className="underline">
-                <Link to="/nomad/signup">Sign Up</Link>
+                <Link to="/signup">Sign Up</Link>
               </span>
             </p>
           </div>

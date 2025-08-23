@@ -148,7 +148,7 @@ const Header = () => {
           <PrimaryButton
             title="Login"
             padding="py-1"
-            handleSubmit={() => navigate("/nomad/login")}
+            handleSubmit={() => navigate("/login")}
             className="bg-[#FF5757] flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[7rem] px-6"
           />
         </div>
