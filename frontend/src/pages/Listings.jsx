@@ -486,7 +486,7 @@ const Listings = () => {
                       item={item}
                       showVertical={false}
                       handleNavigation={() =>
-                        navigate(`/nomad/listings/${item.companyName}`, {
+                        navigate(`/listings/${item.companyName}`, {
                           state: { companyId: item._id, type: item.type },
                         })
                       }

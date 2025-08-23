@@ -10,14 +10,14 @@ import Contact from "./pages/Contact";
 import Career from "./pages/Career";
 import JobDetails from "./pages/JobDetails";
 import GlobalListings from "./pages/GlobalListings";
-import GlobalListingsMap from "./pages/GlobalListingsMap";
 import DestinationNews from "./pages/DestinationNews";
 import LocalBlog from "./pages/LocalBlog";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ImageGallery from "./pages/ImageGallery";
+import BlogDetails from "./pages/BlogDetails";
 
-//Host Imports
+// Host imports
 import HostLayout from "./pages/host/Layout";
 import HostHome from "./pages/host/Home";
 import HostContact from "./pages/host/Contact";
@@ -33,21 +33,56 @@ import HostPrivacy from "./pages/host/Privacy";
 import HostFAQ from "./pages/host/FAQ";
 import Leads from "./pages/host/Leads";
 import HostProduct from "./pages/host/Product";
+
+// Tenant imports
 import TemplateSite from "./pages/company/TemplateSite";
 import TemplateHome from "./pages/company/TemplateHome";
-import BlogDetails from "./pages/BlogDetails";
 
-const marketingRoutes = {
-  path: "/",
-  element: <App />,
-  children: [
+function getTenantFromHost() {
+  const hostname = window.location.hostname; // e.g. "nomad.wono.co" or "nomad.localhost"
+  const rootDomain = "wono.co";
+
+  // Case 1: main site (no subdomain or localhost root)
+  if (
+    hostname === rootDomain ||
+    hostname === `www.${rootDomain}` ||
+    hostname === "localhost" ||
+    hostname.startsWith("localhost:")
+  ) {
+    return "main";
+  }
+
+  // Case 2: production subdomains (*.wono.co)
+  if (hostname.endsWith(`.${rootDomain}`)) {
+    return hostname.replace(`.${rootDomain}`, "");
+  }
+
+  // Case 3: dev subdomains (*.localhost)
+  if (hostname.endsWith(".localhost")) {
+    return hostname.replace(".localhost", "");
+  }
+
+  return null;
+}
+
+const tenant = getTenantFromHost();
+
+let routerConfig = [];
+
+if (tenant === "main") {
+  // Marketing site
+  routerConfig = [
     {
-      path: "",
-      index: true,
-      element: <MainPage />,
+      path: "/",
+      element: <App />,
+      children: [{ path: "", index: true, element: <MainPage /> }],
     },
+  ];
+} else if (tenant === "nomad") {
+  // Nomads subdomain
+  routerConfig = [
     {
-      path: "nomad",
+      path: "/",
       element: <NomadLayout />,
       children: [
         { path: "", element: <Home /> },
@@ -66,13 +101,17 @@ const marketingRoutes = {
         { path: "signup", element: <Signup /> },
       ],
     },
+  ];
+} else if (tenant === "hosts") {
+  // Hosts subdomain
+  routerConfig = [
     {
-      path: "hosts",
+      path: "/",
       element: <HostLayout />,
       children: [
         { path: "", element: <HostHome /> },
         { path: "contact", element: <HostContact /> },
-        { path: "career", element: <Career /> },
+        { path: "career", element: <HostCareer /> },
         { path: "career/job/:title", element: <JobDetails /> },
         { path: "login", element: <HostLogin /> },
         { path: "signup", element: <HostSignup /> },
@@ -87,40 +126,18 @@ const marketingRoutes = {
         { path: "faq", element: <HostFAQ /> },
       ],
     },
-  ],
-};
-
-function getTenantFromHost() {
-  const hostname = window.location.hostname; // e.g. "biznest.wono.co"
-  const rootDomain = "wono.co";
-  if (
-    hostname === rootDomain ||
-    hostname === `www.${rootDomain}` ||
-    hostname === "localhost"
-  )
-    return null;
-  return hostname.replace(`.${rootDomain}`, ""); // "biznest"
+  ];
+} else {
+  // Company tenant subdomain
+  routerConfig = [
+    {
+      path: "*",
+      element: <TemplateSite />,
+      children: [{ path: "", index: true, element: <TemplateHome /> }],
+    },
+  ];
 }
 
-const tenant = getTenantFromHost();
-
-// If tenant exists → use TemplateSite route, else → use normal marketing routes
-const router = createBrowserRouter(
-  tenant
-    ? [
-        {
-          path: "*",
-          element: <TemplateSite />,
-          children: [
-            {
-              path: "",
-              index: true,
-              element: <TemplateHome />,
-            },
-          ],
-        },
-      ]
-    : [marketingRoutes]
-);
+const router = createBrowserRouter(routerConfig);
 
 export default router;

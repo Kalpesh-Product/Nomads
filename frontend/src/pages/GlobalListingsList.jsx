@@ -220,7 +220,7 @@ const GlobalListingsList = () => {
     console.log("State to be passed:", state);
 
     navigate(
-      `/nomad/listings?country=${formData.country}&location=${formData.location}&category=${state.category}`,
+      `/listings?country=${formData.country}&location=${formData.location}&category=${state.category}`,
       {
         state: {
           country: formData.country,
@@ -558,7 +558,7 @@ const GlobalListingsList = () => {
                               showVertical={false}
                               handleNavigation={() =>
                                 navigate(
-                                  `/nomad/listings/${item.companyName}`,
+                                  `/listings/${item.companyName}`,
                                   {
                                     state: {
                                       companyId: item._id,

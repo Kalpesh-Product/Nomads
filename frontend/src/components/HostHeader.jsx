@@ -14,12 +14,12 @@ const HostHeader = () => {
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const links = [
-    { name: "Host", link: "/hosts" },
-    { name: "Modules", link: "/hosts/modules" },
-    { name: "Themes", link: "/hosts/themes" },
-    { name: "Leads", link: "/hosts/leads" },
-    { name: "Capital", link: "/hosts/capital" },
-    { name: "Career", link: "/hosts/career" },
+    { name: "Host", link: "/" },
+    { name: "Modules", link: "modules" },
+    { name: "Themes", link: "themes" },
+    { name: "Leads", link: "leads" },
+    { name: "Capital", link: "capital" },
+    { name: "Career", link: "career" },
   ];
   const handleNavigation = (path) => {
     navigate(path);

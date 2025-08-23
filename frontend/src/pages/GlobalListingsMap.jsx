@@ -495,7 +495,7 @@ const GlobalListingsMap = () => {
                             item={item}
                             showVertical={true}
                             handleNavigation={() =>
-                              navigate(`/nomad/listings/${item.companyName}`, {
+                              navigate(`/listings/${item.companyName}`, {
                                 state: {
                                   companyId: item._id,
                                   type: item.companyType || "ss",
