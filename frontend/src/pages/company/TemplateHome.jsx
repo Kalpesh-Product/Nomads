@@ -27,7 +27,6 @@ const TemplateHome = () => {
   const intervalRef = useRef(null);
   const [open, setOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState([]);
-  console.log("selectedProdict ", selectedProduct);
   const { data, isPending, error } = useOutletContext();
   const sliderCount =
     data?.testimonials?.length > 3 ? 3 : data?.testimonials?.length;
@@ -36,7 +35,6 @@ const TemplateHome = () => {
     mode: "snap",
     slides: { perView: 1 },
   });
-  console.log("data from layout ", data?.testimonials?.length);
 
   const [testimonialRef, testimonialSlider] = useKeenSlider({
     loop: true,
@@ -81,83 +79,6 @@ const TemplateHome = () => {
 
   const tenant = getTenantFromHost();
 
-  // const { data, isPending, error } = useQuery({
-  //   queryKey: ["company", tenant],
-  //   queryFn: async () => {
-  //     const res = await axios.get(
-  //       `https://wonotestbe.vercel.app/api/editor/get-template/${tenant}`
-  //     );
-  //     return res.data;
-  //   },
-  //   enabled: !!tenant,
-  // });
-
-  // const products = [
-  //   { id: 1, productName: "co-working", img: "" },
-  //   { id: 2, productName: "co-working", img: "" },
-  //   { id: 3, productName: "co-working", img: "" },
-  //   { id: 4, productName: "co-working", img: "" },
-  //   { id: 5, productName: "co-working", img: "" },
-  //   { id: 6, productName: "co-working", img: "" },
-  // ];
-
-  // const testimonials = [
-  //   {
-  //     id: 1,
-  //     image: "https://randomuser.me/api/portraits/women/44.jpg",
-  //     name: "Sarah K.",
-  //     role: "UX Designer",
-  //     company: "Brello",
-  //     text: "I was looking for a way to streamline my design process and the Anima's Landing Page UI Kit was a lifesaver! The intuitive design and ease of customisation have saved me hours of time and effort. Highly recommend!",
-  //     rating: 4,
-  //   },
-  //   {
-  //     id: 2,
-  //     image: "https://randomuser.me/api/portraits/men/32.jpg",
-  //     name: "David P.",
-  //     role: "Product Manager",
-  //     company: "NextGen",
-  //     text: "Using this kit has improved our workflow dramatically. The team can focus more on innovation rather than setup. Super smooth experience!",
-  //     rating: 5,
-  //   },
-  //   {
-  //     id: 3,
-  //     image: "https://randomuser.me/api/portraits/women/68.jpg",
-  //     name: "Maya R.",
-  //     role: "Frontend Developer",
-  //     company: "TechFlow",
-  //     text: "Simple, elegant and effective. It took my project to the next level with minimal effort. Highly recommended.",
-  //     rating: 5,
-  //   },
-  //   {
-  //     id: 4,
-  //     image: "https://randomuser.me/api/portraits/men/77.jpg",
-  //     name: "Liam C.",
-  //     role: "Software Engineer",
-  //     company: "CloudCore",
-  //     text: "This toolkit streamlined my work. I could focus more on solving real problems instead of repetitive setup. Amazing resource!",
-  //     rating: 4,
-  //   },
-  //   {
-  //     id: 5,
-  //     image: "https://randomuser.me/api/portraits/women/21.jpg",
-  //     name: "Anna T.",
-  //     role: "Designer",
-  //     company: "PixelPro",
-  //     text: "Very intuitive and well thought out. My clients love the polished results I can now deliver faster than ever.",
-  //     rating: 5,
-  //   },
-  //   {
-  //     id: 6,
-  //     image: "https://randomuser.me/api/portraits/men/15.jpg",
-  //     name: "Mark R.",
-  //     role: "CTO",
-  //     company: "InnoWave",
-  //     text: "Highly flexible and easy to integrate. This is my go-to for building solid and scalable UI foundations.",
-  //     rating: 5,
-  //   },
-  // ];
-
   if (!tenant) return <div>No tenant specified</div>;
   if (isPending) return <div>Loading site...</div>;
   if (error) {
@@ -165,10 +86,9 @@ const TemplateHome = () => {
     return <div>Error loading site: {error.message}</div>;
   }
 
-  console.log("data", data);
-
   const heroImages = isPending ? [] : data?.heroImages;
 
+  const about = isPending ? [] : data?.about
   const galleryImages = isPending ? [] : data?.gallery;
   const products = isPending ? [] : data?.products;
   console.log("products : ", products);
@@ -229,7 +149,12 @@ const TemplateHome = () => {
             <h1 className="text-accent text-center text-title font-semibold">
               About Our Vision
             </h1>
-            <p className="text-white">{data?.about || "About section here"}</p>
+           {
+           about?.length > 0 ? about?.map((para)=>(
+               <p className="text-white">{para}</p>
+            )) :
+            "About section here"
+           }
           </div>
         </Container>
       </section>
