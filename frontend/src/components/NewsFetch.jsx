@@ -116,10 +116,9 @@ const NewsFetch = () => {
       params.lang,
     ],
     queryFn: async () => {
-      const res = await axios.get("news", { params }); // -> /api/news
-      return res.data; // { totalArticles, articles, scope }
+      const res = await axios.get("news", { params }); // hits your backend
+      return res.data;
     },
-    staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,
   });
 
