@@ -27,7 +27,7 @@ const Header = () => {
       window.location.href = "https://hosts.wono.co";
     }
   };
-    const goToHostssMain = () => {
+  const goToHostssMain = () => {
     if (window.location.hostname.includes("localhost")) {
       window.location.href = "http://localhost:5173";
     } else {
@@ -64,8 +64,8 @@ const Header = () => {
                       to={`${location.pathname}?country=${formData?.country}&location=${formData?.location}&view=map`}
                       className="group relative text-md text-black"
                     >
-                      <span className="relative z-10 group-hover:font-bold mb-2">
-                        Map view
+                      <span className="relative z-10 group-hover:font-bold uppercase mb-2">
+                        MAP VIEW
                       </span>
                       <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
                     </Link>
@@ -80,7 +80,7 @@ const Header = () => {
                       to={`${location.pathname}?country=${formData?.country}&location=${formData?.location}`}
                       className="group relative text-md text-black"
                     >
-                      <span className="relative z-10 group-hover:font-bold mb-2">
+                      <span className="relative z-10 group-hover:font-bold uppercase mb-2">
                         List view
                       </span>
                       <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
@@ -111,9 +111,7 @@ const Header = () => {
                   >
                     <span
                       className={`relative z-10 mb-8 uppercase ${
-                        isActive
-                          ? "text-black"
-                          : "group-hover:font-bold"
+                        isActive ? "text-black" : "group-hover:font-bold"
                       }`}
                     >
                       {item.text}
@@ -148,6 +146,7 @@ const Header = () => {
           <PrimaryButton
             title="Login"
             padding="py-1"
+            uppercase
             handleSubmit={() => navigate("/login")}
             className="bg-[#FF5757] flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[7rem] px-6"
           />
@@ -201,8 +200,8 @@ const Header = () => {
                           to={`${location.pathname}?country=${formData?.country}&location=${formData?.location}&view=map`}
                           className="group relative text-md text-black"
                         >
-                          <span className="relative z-10 group-hover:font-bold mb-2">
-                            Map view
+                          <span className="relative z-10 group-hover:font-bold uppercase mb-2">
+                            MAP VIEW
                           </span>
                           <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
                         </Link>
@@ -218,7 +217,7 @@ const Header = () => {
                           to={`${location.pathname}?country=${formData?.country}&location=${formData?.location}`}
                           className="group relative text-md text-black"
                         >
-                          <span className="relative z-10 group-hover:font-bold mb-2">
+                          <span className="relative z-10 group-hover:font-bold uppercase mb-2">
                             List view
                           </span>
                           <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>

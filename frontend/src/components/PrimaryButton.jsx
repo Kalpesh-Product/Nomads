@@ -9,6 +9,7 @@ const PrimaryButton = ({
   disabled,
   padding,
   className,
+  uppercase=false,
   isLoading, // New prop for showing the spinner
 }) => {
   const baseBgColor = disabled || isLoading ? "bg-gray-400" : "bg-[#FF5757]";
@@ -24,7 +25,7 @@ const PrimaryButton = ({
         ${externalStyles} ${padding ? padding : "px-6 py-3"} `}
       onClick={handleSubmit}>
       {isLoading && <CircularProgress size={16} sx={{ color: "#ffffff" }} />}
-      <span className="text-center">{title}</span>
+      <span className={`${uppercase ? "uppercase" : ""} text-center`}>{title}</span>
     </button>
   );
 };

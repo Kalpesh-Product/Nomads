@@ -20,9 +20,9 @@ const Footer = () => {
       links: [
         // { name: "Sign In", link: "/nomad/login" },
         // { name: "Sign Up", link: "/nomad/signup" },
-        { name: "Privacy", link: "/hosts/privacy" },
-        { name: "T&C", link: "/hosts/terms-and-conditions" },
-        { name: "Contact", link: "contact" },
+        { name: "Privacy", link: "/privacy" },
+        { name: "T&C", link: "/terms-and-conditions" },
+        { name: "Contact", link: "/contact" },
         // { name: "Investor Login", link: "/login" },
       ],
     },

@@ -94,7 +94,7 @@ const HostHeader = () => {
 
               <a
                 href="https://wonofe.vercel.app"
-                className="bg-[#FF5757] flex items-center justify-center text-white font-[500] capitalize hover:font-semibold hover:bg-red-500 w-[7rem] px-4 py-2 rounded-full"
+                className="bg-[#FF5757] flex items-center justify-center text-white uppercase font-[500]  hover:font-semibold hover:bg-red-500 w-[7rem] px-4 py-2 rounded-full"
               >
                 Login
               </a>
