@@ -9,9 +9,9 @@ const Footer = () => {
     {
       heading: "Services",
       links: [
-        { name: "About", link: "/nomad" },
-        { name: "Career", link: "/nomad/career" },
-        { name: "FAQs", link: "/nomad" },
+        { name: "About", link: "/" },
+        { name: "Career", link: "career" },
+        { name: "FAQs", link: "/" },
         // { name: "Mortgage", link: "/mortgages" },
       ],
     },
@@ -58,7 +58,8 @@ const Footer = () => {
               INTERNATIONAL PLAZA SINGAPORE – 079903 <br />
               <Link
                 to="mailto:response@wono.co"
-                className="text-primary-blue lowercase hover:underline">
+                className="text-primary-blue lowercase hover:underline"
+              >
                 response@wono.co
               </Link>
             </p>
@@ -77,7 +78,8 @@ const Footer = () => {
             {footerSections.map((section, idx) => (
               <div
                 key={idx}
-                className="flex flex-col  justify-center items-center text-start lg:justify-start lg:items-center">
+                className="flex flex-col  justify-center items-center text-start lg:justify-start lg:items-center"
+              >
                 {/* <h3 className="font-semibold text-lg mb-2">
                 {section.heading.toUpperCase()}
               </h3> */}
@@ -85,7 +87,8 @@ const Footer = () => {
                   <Link
                     key={i}
                     to={linkObj.link}
-                    className="text-sm  text-black opacity-80 hover:opacity-100 hover:text-gray-500 transition-all duration-200 cursor-pointer uppercase p-4">
+                    className="text-sm  text-black opacity-80 hover:opacity-100 hover:text-gray-500 transition-all duration-200 cursor-pointer uppercase p-4"
+                  >
                     {linkObj.name}
                   </Link>
                 ))}

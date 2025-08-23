@@ -203,7 +203,7 @@ const GlobalListingsMap = () => {
     setShowListings(false);
 
     navigate(
-      `/nomad/listings?country=${formData.country}&location=${formData.location}&category=${state.category}`,
+      `/listings?country=${formData.country}&location=${formData.location}&category=${state.category}`,
       {
         state: {
           country: formData.country,
@@ -495,7 +495,7 @@ const GlobalListingsMap = () => {
                             item={item}
                             showVertical={true}
                             handleNavigation={() =>
-                              navigate(`/nomad/listings/${item.companyName}`, {
+                              navigate(`/listings/${item.companyName}`, {
                                 state: {
                                   companyId: item._id,
                                   type: item.companyType || "ss",

@@ -161,7 +161,7 @@ const Listings = () => {
     };
     setShowMobileSearch(false);
     navigate(
-      `/nomad/listings?country=${formData.country}&location=${formData.location}&category=${state.category}`,
+      `/listings?country=${formData.country}&location=${formData.location}&category=${state.category}`,
       {
         state: {
           country: formData.country,
@@ -486,7 +486,7 @@ const Listings = () => {
                       item={item}
                       showVertical={false}
                       handleNavigation={() =>
-                        navigate(`/nomad/listings/${item.companyName}`, {
+                        navigate(`/listings/${item.companyName}`, {
                           state: { companyId: item._id, type: item.type },
                         })
                       }

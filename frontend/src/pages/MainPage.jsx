@@ -32,6 +32,22 @@ const slides = [
 const MainPage = () => {
   const navigate = useNavigate();
   const intervalRef = useRef(null);
+  const goToNomads = () => {
+  if (window.location.hostname.includes("localhost")) {
+    window.location.href = "http://nomad.localhost:5173";
+  } else {
+    window.location.href = "https://nomad.wono.co";
+  }
+};
+
+const goToHosts = () => {
+  if (window.location.hostname.includes("localhost")) {
+    window.location.href = "http://hosts.localhost:5173";
+  } else {
+    window.location.href = "https://hosts.wono.co";
+  }
+};
+
 
   const [sliderRef, slider] = useKeenSlider({
     loop: true,
@@ -87,15 +103,12 @@ const MainPage = () => {
           <div className="flex gap-8 w-full justify-center items-center pt-4">
             <PrimaryButton
               title="For Nomads"
-              handleSubmit={() => navigate("nomad")}
+              handleSubmit={goToNomads}
               externalStyles="bg-[#FF5757] text-[0.8rem] xs:text-[0.9rem] sm:text-[1rem] md:text-[1rem] lg:text-[1rem] flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[12rem] px-6"
             />
             <PrimaryButton
               title="For Hosts"
-              handleSubmit={() =>
-                // (window.location.href = "https://www.wono.co")
-                navigate("hosts")
-              }
+              handleSubmit={goToHosts}
               externalStyles="bg-[#FF5757] text-[0.8rem] xs:text-[0.9rem] sm:text-[1rem] md:text-[1rem] lg:text-[1rem] flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[12rem] px-6"
             />
           </div>
