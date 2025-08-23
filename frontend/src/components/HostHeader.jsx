@@ -48,48 +48,50 @@ const HostHeader = () => {
               className="w-full h-full object-contain"
             />
           </div>
-          <ul className="hidden xl:flex sm:hidden gap-8 justify-center flex-1 uppercase">
-            {links.map((link) => {
-              const linkSegment = link.link.split("/").filter(Boolean).pop();
-              const currentSegment = location.pathname
-                .split("/")
-                .filter(Boolean)
-                .pop();
+          <div className="flex items-center gap-4">
+            <ul className="hidden xl:flex sm:hidden gap-8 justify-center flex-1 uppercase">
+              {links.map((link) => {
+                const linkSegment = link.link.split("/").filter(Boolean).pop();
+                const currentSegment = location.pathname
+                  .split("/")
+                  .filter(Boolean)
+                  .pop();
 
-              const isActive = linkSegment === currentSegment;
+                const isActive = linkSegment === currentSegment;
 
-              return (
-                <li key={link.name} className="relative">
-                  <Link
-                    to={link.link}
-                    className="relative pb-1 transition-all duration-300 group hover:font-bold "
-                  >
-                    {link.name}
-                    <span
-                      className={`absolute left-0 bottom-0 block h-[2px] bg-blue-500 transition-all duration-300
+                return (
+                  <li key={link.name} className="relative">
+                    <Link
+                      to={link.link}
+                      className="relative pb-1 transition-all duration-300 group hover:font-bold "
+                    >
+                      {link.name}
+                      <span
+                        className={`absolute left-0 bottom-0 block h-[2px] bg-blue-500 transition-all duration-300
               ${isActive ? "w-full" : "w-0"} group-hover:w-full`}
-                    ></span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+                      ></span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
 
-          <div className="px-1 hidden xl:flex xl:gap-4 py-2 items-center">
-            <button
-              onClick={goToNomads}
-              className="relative pb-1 transition-all cursor-pointer duration-300 group hover:font-bold bg-transparent border-none"
-            >
-              Become a nomad
-              <span className="absolute left-0 w-0 bottom-0 block h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
-            </button>
+            <div className="px-1 hidden xl:flex xl:gap-4 py-2 items-center">
+              <button
+                onClick={goToNomads}
+                className="relative pb-1 transition-all cursor-pointer uppercase font-bold duration-300 group hover:font-bold bg-transparent border-none"
+              >
+                Become a nomad
+                <span className="absolute left-0 w-0 bottom-0 block h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+              </button>
 
-            <a
-              href="https://wonofe.vercel.app"
-              className="bg-[#FF5757] flex items-center justify-center text-white font-[500] capitalize hover:font-semibold hover:bg-red-500 w-[7rem] px-4 py-2 rounded-full"
-            >
-              Login
-            </a>
+              <a
+                href="https://wonofe.vercel.app"
+                className="bg-[#FF5757] flex items-center justify-center text-white font-[500] capitalize hover:font-semibold hover:bg-red-500 w-[7rem] px-4 py-2 rounded-full"
+              >
+                Login
+              </a>
+            </div>
           </div>
           <div className="h-full px-2  lg:hidden">
             <button

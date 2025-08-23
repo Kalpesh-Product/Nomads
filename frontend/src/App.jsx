@@ -15,15 +15,10 @@ const App = () => {
   const isNomad = location.pathname.includes("/nomad");
   const isHost = location.pathname.includes("/hosts");
 
-  useEffect(() => {
-    if (contentRef.current) {
-      contentRef.current.scrollTo({ behavior: "smooth", top: "0" });
-    }
-  }, [location.pathname]);
+
 
   return (
     <div
-      ref={contentRef}
       className="flex flex-col h-screen overflow-auto justify-between relative bg-white custom-scrollbar-hide">
 
       <div

@@ -20,13 +20,13 @@ const Header = () => {
     setOpen(false);
   };
 
-const goToHosts = () => {
-  if (window.location.hostname.includes("localhost")) {
-    window.location.href = "http://hosts.localhost:5173";
-  } else {
-    window.location.href = "https://hosts.wono.co";
-  }
-};
+  const goToHosts = () => {
+    if (window.location.hostname.includes("localhost")) {
+      window.location.href = "http://hosts.localhost:5173";
+    } else {
+      window.location.href = "https://hosts.wono.co";
+    }
+  };
 
   const headerLinks = [
     { id: 1, text: "Home", to: "/" },
@@ -89,21 +89,34 @@ const goToHosts = () => {
       {/* Main Nav */}
       <div className="w-full">
         <ul className="hidden xl:flex sm:hidden gap-8 justify-end flex-1">
-          {headerLinks.map((item) => (
-            <li key={item.id} className="flex items-center">
-              <div className="p-4 px-0 whitespace-nowrap">
-                <Link
-                  to={item.to}
-                  className="group relative text-md text-black"
-                >
-                  <span className="relative z-10 mb-8 group-hover:font-bold">
-                    {item.text}
-                  </span>
-                  <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
-                </Link>
-              </div>
-            </li>
-          ))}
+          {headerLinks.map((item) => {
+            const isActive = location.pathname === item.to; // <-- check active
+
+            return (
+              <li key={item.id} className="flex items-center">
+                <div className="p-4 px-0 whitespace-nowrap">
+                  <Link
+                    to={item.to}
+                    className="group relative text-md text-black"
+                  >
+                    <span
+                      className={`relative z-10 mb-8 uppercase ${
+                        isActive
+                          ? "font-bold text-black"
+                          : "group-hover:font-bold"
+                      }`}
+                    >
+                      {item.text}
+                    </span>
+                    <span
+                      className={`absolute left-0 bottom-0 top-6 block h-[2px] bg-blue-500 transition-all duration-300 
+                ${isActive ? "w-full" : "w-0 group-hover:w-full"}`}
+                    ></span>
+                  </Link>
+                </div>
+              </li>
+            );
+          })}
         </ul>
       </div>
 
@@ -111,14 +124,13 @@ const goToHosts = () => {
       <div className="hidden lg:flex pl-10 gap-10">
         <li className="flex items-center">
           <div className="p-4 px-0 whitespace-nowrap">
-          <button
+            <button
               onClick={goToHosts}
-              className="relative pb-1 transition-all cursor-pointer duration-300 group hover:font-bold bg-transparent border-none"
+              className="relative pb-1 transition-all cursor-pointer duration-300 group font-bold bg-transparent uppercase border-none"
             >
               Become a host
               <span className="absolute left-0 w-0 bottom-0 block h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
             </button>
-
           </div>
         </li>
 
@@ -185,7 +197,6 @@ const goToHosts = () => {
                           <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
                         </Link>
                       </div>
-                    
                     </li>
                   )}
 
