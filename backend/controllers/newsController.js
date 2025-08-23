@@ -1,10 +1,10 @@
 // controllers/newsController.js
 import axios from "axios";
+import NewsCache from "../models/NewsCache.js";
 
 const BASE = "https://gnews.io/api/v4";
 const APIKEY = process.env.GNEWS_API_KEY;
 
-// Curated travel/nomad terms
 const TRAVEL_TERMS = [
   `"digital nomad"`,
   "nomads",
@@ -20,85 +20,80 @@ const TRAVEL_TERMS = [
   "backpacking",
   "hostel",
   "coliving",
-  "expat",
 ].join(" OR ");
 
-function assertKey() {
-  if (!APIKEY) {
-    const err = new Error("GNEWS_API_KEY missing");
-    err.status = 500;
-    throw err;
-  }
-}
-
 async function callGNews(path, params) {
-  assertKey();
-  try {
-    const { data } = await axios.get(`${BASE}/${path}`, {
-      params: { apikey: APIKEY, ...params },
-      timeout: 10_000,
-    });
-    return { ok: true, data };
-  } catch (e) {
-    const status = e.response?.status || 502;
-    const payload = e.response?.data;
-    console.error("GNews upstream error", { status, payload });
-    return { ok: false, status, payload };
-  }
+  const { data } = await axios.get(`${BASE}/${path}`, {
+    params: { apikey: APIKEY, ...params },
+    timeout: 10_000,
+  });
+  return data;
 }
 
 export const getNews = async (req, res, next) => {
   try {
-    let {
+    const {
       country = "",
       keyword = "",
       lang = "en",
       max = 10,
       page = 1,
-      sortby = "publishedAt",
     } = req.query;
-
     const nMax = Math.min(Math.max(Number(max) || 10, 1), 10);
 
-    // Build query: travel terms + keyword (if any)
+    // use keyword if present, otherwise country as cache key
+    const locationKey = keyword || country || "global";
+
+    // 1. check DB cache
+    const cached = await NewsCache.findOne({ location: locationKey });
+    if (cached) {
+      return res.json({
+        fromCache: true,
+        scope: cached.scope,
+        articles: cached.articles,
+      });
+    }
+
+    // 2. build query for GNews
     const query = keyword
       ? `(${TRAVEL_TERMS}) AND (${keyword})`
       : `(${TRAVEL_TERMS})`;
 
-    // 1) Search with travel+nomad query
-    let r = await callGNews("search", {
+    let data = await callGNews("search", {
       q: query,
       country: country || undefined,
       lang,
       max: nMax,
       page,
-      sortby,
+      sortby: "publishedAt",
       in: "title,description",
     });
 
-    if (r.ok && r.data?.articles?.length) {
-      return res.json({
-        scope: keyword ? "travel+keyword" : "travel",
-        ...r.data,
+    let scope = keyword ? "travel+keyword" : "travel";
+
+    // fallback to global travel if empty
+    if (!data?.articles?.length) {
+      data = await callGNews("search", {
+        q: TRAVEL_TERMS,
+        lang,
+        max: nMax,
+        page,
+        sortby: "publishedAt",
+        in: "title,description",
       });
+      scope = "global travel";
     }
 
-    // 2) If no result → try global travel news
-    r = await callGNews("search", {
-      q: TRAVEL_TERMS,
-      lang,
-      max: nMax,
-      page,
-      sortby,
-      in: "title,description",
+    // 3. save to DB
+    await NewsCache.create({
+      location: locationKey,
+      scope,
+      articles: data.articles || [],
     });
 
-    if (r.ok) return res.json({ scope: "global travel", ...r.data });
-
-    return res
-      .status(r.status || 502)
-      .json({ message: "GNews error", upstream: r.payload });
+    return res.json({ fromCache: false, scope, articles: data.articles || [] });
   } catch (err) {
+    console.error("News error", err.response?.data || err.message);
     next(err);
   }
 };
