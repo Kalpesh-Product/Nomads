@@ -22,7 +22,7 @@ const HostLayout = () => {
         <HostHeader />
       </div>
 
-      <div>
+      <div className="bg-white">
         <Outlet />
         <Toaster />
       </div>
