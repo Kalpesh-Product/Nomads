@@ -62,6 +62,16 @@ const TemplateHome = () => {
     return () => clearInterval(intervalRef.current);
   }, [slider]);
 
+  const handleScroll = (id) => {
+  const section = document.getElementById(id);
+  if (section) {
+    section.scrollIntoView({ behavior: "smooth" });
+  }
+
+  // Close the drawer slightly later
+  setTimeout(() => setOpen(false), 650);
+};
+
   const slides = [
     {
       id: 1,
@@ -88,7 +98,7 @@ const TemplateHome = () => {
 
   const heroImages = isPending ? [] : data?.heroImages;
 
-  const about = isPending ? [] : data?.about
+  const about = isPending ? [] : data?.about;
   const galleryImages = isPending ? [] : data?.gallery;
   const products = isPending ? [] : data?.products;
   console.log("products : ", products);
@@ -120,7 +130,7 @@ const TemplateHome = () => {
           </h1>
           <p className="text-lg md:text-2xl drop-shadow-md">{data?.subTitle}</p>
 
-          <TempButton buttonText={data?.CTAButtonText} />
+          <TempButton handleClick={()=>handleScroll("contact")} buttonText={data?.CTAButtonText} />
         </div>
 
         {/* Prev / Next Buttons */}
@@ -149,14 +159,16 @@ const TemplateHome = () => {
             <h1 className="text-accent text-center text-title font-semibold">
               About Our Vision
             </h1>
-           {
-           about?.length > 0 ? about?.map((para)=>(
-               <>
-               <p className="text-white">{para}</p>
-               <br/></>
-            )) :
-            "About section here"
-           }
+            <div className="text-center text-subtitle">
+              {about?.length > 0
+                ? about?.map((para) => (
+                    <>
+                      <p className="text-white">{para}</p>
+                      <br />
+                    </>
+                  ))
+                : "About section here"}
+            </div>
           </div>
         </Container>
       </section>
@@ -189,11 +201,10 @@ const TemplateHome = () => {
             <h1 className="uppercase text-center text-title font-semibold">
               Gallery
             </h1>
-           <div>
-            <GallerySection gallery={galleryImages} />
-           </div>
+            <div>
+              <GallerySection gallery={galleryImages} />
+            </div>
           </div>
-          
         </Container>
       </section>
       <section id="testimonials" className="py-8">

@@ -190,6 +190,7 @@ const GlobalListingsList = () => {
   mutationFn: async (data) => {
     dispatch(setFormValues(data));
     // use data directly here, not formData from Redux
+    setShowMobileSearch(false)
     navigate(`/verticals?country=${data.country}&location=${data.location}`);
   },
   onSuccess: () => {

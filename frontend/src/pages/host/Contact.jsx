@@ -116,14 +116,14 @@ const HostContact = () => {
               onSubmit={handleSubmit((data) => submitContactForm(data))}
               sx={{ mt: 0 }}
             >
-              <h2 className="text-title font-semibold uppercase mb-6 text-center md:text-left">
+              <h2 className="text-title font-semibold uppercase mb-4 text-center md:text-left">
                 Connect With Us
               </h2>
 
               {/* Responsive grid container */}
-              <div className="grid grid-cols-1 md:grid-cols-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Name */}
-                <div className="pt-8 pl-8">
+                <div className="pt-0 pl-0 lg:pt-0 lg:pl-0">
                   <Controller
                     name="name"
                     control={control}
@@ -144,7 +144,7 @@ const HostContact = () => {
                 </div>
 
                 {/* Email */}
-                <div className="pt-8 pl-8">
+                <div className="pt-0 pl-0 lg:pt-0 lg:pl-0">
                   <Controller
                     name="email"
                     control={control}
@@ -172,7 +172,7 @@ const HostContact = () => {
                 </div>
 
                 {/* Mobile */}
-                <div className="pt-8 pl-8">
+                <div className="pt-0 pl-0 lg:pt-0 lg:pl-0">
                   <Controller
                     name="mobile"
                     control={control}
@@ -200,65 +200,55 @@ const HostContact = () => {
                 </div>
 
                 {/* Partnership Type */}
-                <div className="pt-8 pl-8">
+                <div className="pt-0 pl-0 lg:pt-0 lg:pl-0">
                   <Controller
                     name="partnerstype"
                     control={control}
                     rules={{ required: "Please select a partnership type" }}
                     render={({ field, fieldState }) => (
-                      <FormControl
+                      <TextField
                         fullWidth
                         required
                         variant="standard"
                         error={!!fieldState.error}
+                        label={"Type of Partnership"}
+                        select
+                        helperText={fieldState?.error?.message}
+                        slotProps={{
+                          inputLabel: {
+                            sx: {
+                              color: "black", // default label color
+                              "&.Mui-focused": { color: "black" }, // keep black when focused
+                            },
+                          },
+                        }}
                       >
-                        <InputLabel
-                          id="partnerstype-label"
-                          sx={{
-                            color: "black",
-                            "&.Mui-focused": { color: "#1976d2" },
-                            "&.MuiInputLabel-shrink": { color: "#1976d2" },
-                          }}
-                        >
-                          Type of Partnership
-                        </InputLabel>
-                        <Select
-                          {...field}
-                          labelId="partnerstype-label"
-                          sx={{
-                            pl: 2,
-                            pt: 1,
-                            "&:focus": { backgroundColor: "transparent" },
-                          }}
-                        >
-                          <MenuItem value="" disabled>
-                            Select Type
-                          </MenuItem>
-                          <MenuItem value="B2B SaaS Technology Licensing">
-                            B2B SaaS Technology Licensing
-                          </MenuItem>
-                          <MenuItem value="Landlord Partnerships">
-                            Landlord Partnerships
-                          </MenuItem>
-                          <MenuItem value="Investment Related">
-                            Investment Related
-                          </MenuItem>
-                          <MenuItem value="Coffee Meeting to know us better">
-                            Coffee Meeting to know us better
-                          </MenuItem>
-                        </Select>
+                        <MenuItem value="" disabled>
+                          Select Type
+                        </MenuItem>
+                        <MenuItem value="B2B SaaS Technology Licensing">
+                          B2B SaaS Technology Licensing
+                        </MenuItem>
+                        <MenuItem value="Landlord Partnerships">
+                          Landlord Partnerships
+                        </MenuItem>
+                        <MenuItem value="Investment Related">
+                          Investment Related
+                        </MenuItem>
+                        <MenuItem value="Coffee Meeting to know us better">
+                          Coffee Meeting to know us better
+                        </MenuItem>
+
                         {fieldState.error && (
-                          <p style={{ color: "red", fontSize: "0.8rem" }}>
-                            {fieldState.error.message}
-                          </p>
+                          <p style={{ color: "red", fontSize: "0.8rem" }}></p>
                         )}
-                      </FormControl>
+                      </TextField>
                     )}
                   />
                 </div>
 
                 {/* Message */}
-                <div className="pt-8 pl-8 md:col-span-2">
+                <div className="pt-0 pl-0 lg:pt-0 lg:pl-0 md:col-span-2">
                   <Controller
                     name="message"
                     control={control}

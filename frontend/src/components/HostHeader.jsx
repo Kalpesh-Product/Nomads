@@ -44,10 +44,10 @@ const HostHeader = () => {
   return (
     <header className="bg-white/80 backdrop-blur-md text-black py-3 lg:py-0 shadow-md">
       <Container padding={false}>
-        <div className="flex  lg:px-0 justify-between items-center md:py-3  ">
+        <div className="flex  lg:px-0 justify-between items-center md:py-[0.625rem]  ">
           <div
             onClick={goToNomadsMain}
-            className="w-24 lg:w-36 overflow-x-hidden rounded-lg flex justify-between items-center cursor-pointer"
+            className="w-24 lg:w-36 h-10 overflow-x-hidden rounded-lg flex justify-between items-center cursor-pointer"
           >
             <img
               src={logo}
@@ -92,12 +92,16 @@ const HostHeader = () => {
                 <span className="absolute left-0 w-0 bottom-0 block h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
               </button>
 
-              <a
-                href="https://wonofe.vercel.app"
-                className="bg-[#FF5757] flex items-center justify-center text-white uppercase font-[500]  hover:font-semibold hover:bg-red-500 w-[7rem] px-4 py-2 rounded-full"
-              >
-                Login
-              </a>
+         
+              <PrimaryButton
+                title="Login"
+                padding="py-3"
+                uppercase
+                handleSubmit={() => {
+                  window.location.href = "https://wonofe.vercel.app"; // ✅ external redirect
+                }}
+                className="bg-[#FF5757] flex text-white font-[500] capitalize hover:bg-[#E14C4C] w-[7rem] px-4"
+              />
             </div>
           </div>
           <div className="h-full px-2  lg:hidden">
