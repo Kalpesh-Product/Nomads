@@ -155,7 +155,7 @@ const Header = () => {
                 padding="py-1"
                 uppercase
                 handleSubmit={() => navigate("/login")}
-                className="bg-[#FF5757] flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[7rem] px-6"
+                className="bg-[#FF5757] flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[7rem] px-4"
               />
             </div>
           </div>

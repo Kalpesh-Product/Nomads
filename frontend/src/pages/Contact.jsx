@@ -104,7 +104,7 @@ const Contact = () => {
               onSubmit={handleSubmit((data) => submitContactForm(data))}
               sx={{ mt: 0 }}
             >
-              <h2 className="text-title font-semibold uppercase mb-6 text-center md:text-left">
+              <h2 className="text-title font-semibold uppercase mb-4 text-center md:text-left">
                 Connect With Us
               </h2>
 
