@@ -26,4 +26,5 @@ export const corsConfig = {
     return callback(new Error(`Not allowed by CORS: ${origin}`));
   },
   credentials: true, // important if you use cookies/sessions
+  optionsSuccessStatus: 200,
 };

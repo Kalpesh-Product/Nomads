@@ -56,19 +56,17 @@ const theme = createTheme({
 });
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <ThemeProvider theme={theme}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <QueryClientProvider client={queryClient}>
-              <RouterProvider router={router}>
-                <App />
-              </RouterProvider>
-            </QueryClientProvider>
-          </LocalizationProvider>
-        </ThemeProvider>
-      </PersistGate>
-    </Provider>
-  </StrictMode>
+  <Provider store={store}>
+    <PersistGate loading={null} persistor={persistor}>
+      <ThemeProvider theme={theme}>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <QueryClientProvider client={queryClient}>
+            <RouterProvider router={router}>
+              <App />
+            </RouterProvider>
+          </QueryClientProvider>
+        </LocalizationProvider>
+      </ThemeProvider>
+    </PersistGate>
+  </Provider>
 );
