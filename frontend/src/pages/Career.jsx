@@ -28,7 +28,7 @@ const Career = () => {
  const { data: jobRoles, isLoading } = useQuery({
   queryKey: ["jobRoles"],
   queryFn: async () => {
-    const response = await axios.get("job/get-job-posts");
+    const response = await axios.get("/job/get-job-posts");
     // sort API response by category order
     return response.data.sort(
       (a, b) =>
