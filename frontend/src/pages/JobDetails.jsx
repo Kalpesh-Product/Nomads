@@ -8,14 +8,14 @@ const JobDetails = () => {
   const { title } = useParams();
   const [activeTab, setActiveTab] = useState("description");
   const { pathname, state } = useLocation();
-  const { about, responsibilities, qualifications } = state;
+  const { about, responsibilities, qualifications, jobName } = state;
   const isHost = pathname.includes("host");
 
   return (
     <Container>
       <div className="">
         <h2 className="text-4xl md:text-3xl font-normal text-center mb-6">
-          {title?.split("-")?.length ? title?.split("-")?.join(" ")?.toUpperCase():title}
+          {jobName?.split("-")?.length ? jobName?.split("-")?.join(" ")?.toUpperCase():jobName}
         </h2>
 
         {/* Tabs */}

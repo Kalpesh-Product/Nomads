@@ -348,7 +348,7 @@ const Product = () => {
               <div className="border-2 rounded-xl flex  gap-1 items-center p-4">
                 <div className="text-tiny w-full hidden lg:flex justify-center items-center">
                   <LeafWrapper height="3rem" width={"2rem"}>
-                    <div className="text-secondary-dark font-semibold flex text-subtitle flex-col leading-5  items-center">
+                    <div className="text-secondary-dark font-semibold flex lg:text-subtitle flex-col leading-5  items-center">
                       <span>Guest</span>
                       <span>Favorite</span>
                     </div>
@@ -361,10 +361,10 @@ const Product = () => {
                 </div>
                 <div className="flex w-full lg:w-1/2 gap-1 justify-end">
                   <div className="flex flex-col gap-0 justify-center items-center">
-                    <p className="text-subtitle lg:text-subtitle">
+                    <p className="text-tiny lg:text-subtitle">
                       {companyDetails?.ratings || 0}
                     </p>
-                    <span className="text-sm flex lg:text-small font-medium">
+                    <span className="text-tiny flex lg:text-small font-medium">
                       {renderStars(companyDetails?.ratings || 0)}
                     </span>
                   </div>
@@ -372,7 +372,7 @@ const Product = () => {
                   <div className="w-px h-10 bg-gray-300 mx-2 my-auto lg:hidden" />
                   <div className="text-tiny w-full flex justify-center items-center lg:hidden">
                     <LeafWrapper height="3rem" width={"2rem"}>
-                      <div className="text-secondary-dark font-semibold flex text-subtitle flex-col leading-5  items-center">
+                      <div className="text-secondary-dark font-semibold flex text-tiny lg:text-subtitle flex-col leading-5  items-center">
                         <span>Guest</span>
                         <span>Favorite</span>
                       </div>
@@ -383,12 +383,12 @@ const Product = () => {
                   <div className="w-px h-10 bg-gray-300 mx-2 my-auto" />
 
                   <div className="flex flex-col gap-4 lg:gap-0 justify-center items-center">
-                    <p className="text-subtitle lg:text-subtitle mt-1">
+                    <p className="text-tiny lg:text-subtitle mt-1">
                       {companyDetails?.reviewCount ||
                         companyDetails?.totalReviews ||
                         0}
                     </p>
-                    <span className="text-small font-medium">Reviews</span>
+                    <span className="text-tiny lg:text-small font-medium">Reviews</span>
                   </div>
                 </div>
               </div>

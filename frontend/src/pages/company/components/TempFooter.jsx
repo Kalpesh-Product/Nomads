@@ -45,7 +45,7 @@ const TempFooter = ({
         </div>
 
         {/* Middle - Quick Links */}
-        <div>
+        <div className="mx-auto">
           <h4 className="font-semibold mb-3">Quick Links</h4>
           <ul className="space-y-1">
             {quickLinks.map((link, idx) => (
@@ -85,7 +85,7 @@ const TempFooter = ({
 
       {/* Bottom bar */}
       <div className="border-t border-gray-200 py-4 text-center text-xs text-gray-500">
-        © Copyright 2025-26 BIZ Nest - All rights reserved. Powered By{" "}
+        © Copyright 2025-26 {registeredCompany || "Unknown"} - All rights reserved. Powered By{" "}
         <a href="https://wono.co" className="hover:underline">
           WoNo
         </a>

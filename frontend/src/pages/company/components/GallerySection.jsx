@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import TempModal from "../components/TempModal"; // adjust import path
 import TempButton from "./TempButton";
+import { IoMdClose } from "react-icons/io";
 
 const GallerySection = ({ gallery = [] }) => {
   const [open, setOpen] = useState(false);
@@ -40,34 +41,47 @@ const GallerySection = ({ gallery = [] }) => {
         padding="p-4"
         open={open}
         onClose={() => setOpen(false)}
-        height="h-full lg:h-[70vh]"
+        height="h-[100lvh] lg:h-[75vh]"
       >
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 items-center h-full lg:h-[30rem] md:h-full">
-          {/* Main Image */}
-          <div className="flex justify-center col-span-1 lg:col-span-4 items-center bg-black h-[30rem]">
-            <img
-              src={selectedImage}
-              alt="Selected"
-              className="w-full h-full object-contain md:object-cover"
-            />
+        <div>
+          <div className="flex justify-end mb-2">
+            <button
+              onClick={() => setOpen(false)}
+              className=" text-gray-700 transition-all text-2xl hover:bg-gray-200 font-bold z-10 flex justify-end w-fit rounded-full"
+            >
+              <IoMdClose />
+            </button>
           </div>
 
-          {/* Thumbnails */}
-          <div className="h-full lg:h-[30rem] overflow-y-auto col-span-1 bg-gray-100 p-2 custom-scrollbar-hide">
-            <div className="grid grid-cols-5  md:grid-cols-4 lg:grid-cols-1 gap-2">
-              {gallery.map((img) => (
-                <img
-                  key={img._id}
-                  src={img.url}
-                  alt="thumb"
-                  className={`w-full h-20 object-cover rounded cursor-pointer border-2 ${
-                    img.url === selectedImage
-                      ? "border-blue-500"
-                      : "border-transparent"
-                  }`}
-                  onClick={() => setSelectedImage(img.url)}
-                />
-              ))}
+          <div className="relative grid grid-cols-1 lg:grid-cols-5 gap-4 items-center h-full lg:h-[30rem] md:h-full">
+            {/* Close Button */}
+
+            {/* Main Image */}
+            <div className="flex justify-center col-span-1 lg:col-span-4 items-center bg-black h-[30rem]">
+              <img
+                src={selectedImage}
+                alt="Selected"
+                className="w-full h-full object-contain md:object-cover"
+              />
+            </div>
+
+            {/* Thumbnails */}
+            <div className="h-full lg:h-[30rem] overflow-y-auto col-span-1 bg-gray-100 p-2 custom-scrollbar-hide">
+              <div className="grid grid-cols-5  md:grid-cols-4 lg:grid-cols-1 gap-2">
+                {gallery.map((img) => (
+                  <img
+                    key={img._id}
+                    src={img.url}
+                    alt="thumb"
+                    className={`w-full h-20 object-cover rounded cursor-pointer border-2 ${
+                      img.url === selectedImage
+                        ? "border-blue-500"
+                        : "border-transparent"
+                    }`}
+                    onClick={() => setSelectedImage(img.url)}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </div>

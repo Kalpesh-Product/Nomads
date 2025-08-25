@@ -16,13 +16,13 @@ const HostLayout = () => {
   return (
     <div
       ref={contentRef}
-      className="flex flex-col gap-4 h-screen overflow-auto custom-scrollbar-hide"
+      className="flex flex-col h-screen overflow-auto custom-scrollbar-hide bg-white"
     >
       <div className="sticky top-0 w-full z-50">
         <HostHeader />
       </div>
 
-      <div>
+      <div className="">
         <Outlet />
         <Toaster />
       </div>

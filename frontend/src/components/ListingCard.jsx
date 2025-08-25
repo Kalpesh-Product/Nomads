@@ -58,7 +58,7 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
               className="text-sm font-semibold block sm:hidden"
               title={item.companyName || "Title"}
             >
-              {item.companyName.length > 16
+              {item.companyName.length > 30
                 ? `${item.companyName.slice(0, 18)}...`
                 : item.companyName || "title"}
             </p>
@@ -69,7 +69,7 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
               title={item.companyName || "title"}
             >
               {showVertical
-                ? item.companyName.length > 9
+                ? item.companyName.length > 12
                   ? `${item.companyName.slice(0, 9)}...`
                   : item.companyName
                 : item.companyName.length > 23
@@ -87,18 +87,26 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
 
         <div className="flex w-full justify-between items-center">
           <p
-            className="text-sm text-gray-600 font-medium"
-            title={`${item.city || "Unknown"}, ${item.state || "Unknown"}`}
-          >
-            {(() => {
-              const city = item.city || "Unknown";
-              const state = item.state || "Unknown";
-              const combined = `${city}, ${state}`;
-              return combined.length > 9
-                ? combined.slice(0, 14) + "..."
-                : combined;
-            })()}
-          </p>
+  className="text-sm text-gray-600 font-medium"
+  title={`${item.city || "Unknown"}, ${item.state || "Unknown"}`}
+>
+  <span className="block sm:hidden">
+    {/* Mobile: show full text */}
+    {`${item.city || "Unknown"}, ${item.state || "Unknown"}`}
+  </span>
+  <span className="hidden sm:block">
+    {/* Desktop: apply truncation */}
+    {(() => {
+      const city = item.city || "Unknown";
+      const state = item.state || "Unknown";
+      const combined = `${city}, ${state}`;
+      return combined.length > 12
+        ? combined.slice(0, 14) + "..."
+        : combined;
+    })()}
+  </span>
+</p>
+
 
           <div className="flex items-center gap-1 text-gray-600">
             <AiFillStar size={16} />
