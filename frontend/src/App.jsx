@@ -15,12 +15,8 @@ const App = () => {
   const isNomad = location.pathname.includes("/nomad");
   const isHost = location.pathname.includes("/hosts");
 
-
-
   return (
-    <div
-      className="flex flex-col h-screen overflow-auto justify-between relative bg-white custom-scrollbar-hide">
-
+    <div className="flex flex-col h-screen overflow-auto justify-between relative bg-white custom-scrollbar-hide">
       <div
         // ref={contentRef}
         className={`${
@@ -30,7 +26,7 @@ const App = () => {
         <Toaster />
       </div>
 
-     <Footer />
+      {/* <Footer /> */}
     </div>
   );
 };
