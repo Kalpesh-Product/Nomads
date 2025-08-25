@@ -3,12 +3,13 @@ export const allowedOrigins = [
   "http://localhost:5174",
   "https://wono.co",
   "https://www.wono.co",
-  "https://wononomadsfe.vercel.app"
+  "https://wononomadsfe.vercel.app",
+  "https://data-upload-alpha.vercel.app",
 ];
 
 const regexAllowedOrigins = [
-  /\.wono\.co$/,            // allow any subdomain of wono.co
-  /\.localhost:5173$/,      // allow any subdomain of localhost:5173 (for Vite dev tenant sites)
+  /\.wono\.co$/, // allow any subdomain of wono.co
+  /\.localhost:5173$/, // allow any subdomain of localhost:5173 (for Vite dev tenant sites)
 ];
 
 export const corsConfig = {
