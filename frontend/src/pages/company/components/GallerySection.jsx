@@ -41,7 +41,7 @@ const GallerySection = ({ gallery = [] }) => {
         padding="p-4"
         open={open}
         onClose={() => setOpen(false)}
-        height="h-full lg:h-[75vh]"
+        height="h-[100lvh] lg:h-[75vh]"
       >
         <div>
           <div className="flex justify-end mb-2">
