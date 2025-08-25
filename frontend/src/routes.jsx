@@ -75,7 +75,10 @@ if (tenant === "main") {
     {
       path: "/",
       element: <App />,
-      children: [{ path: "", index: true, element: <MainPage /> }],
+      children: [
+        { path: "", index: true, element: <MainPage /> },
+        // { path: "career", element: <Career /> },
+      ],
     },
   ];
 } else if (tenant === "nomad") {

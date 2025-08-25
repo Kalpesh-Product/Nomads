@@ -56,9 +56,11 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
             {/* Mobile: show full name */}
             <p
               className="text-sm font-semibold block sm:hidden"
-              title={item.companyName || "title"}
+              title={item.companyName || "Title"}
             >
-              {item.companyName}
+              {item.companyName.length > 16
+                ? `${item.companyName.slice(0, 18)}...`
+                : item.companyName || "title"}
             </p>
 
             {/* Tablet/Desktop: show truncated */}
@@ -85,17 +87,18 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
 
         <div className="flex w-full justify-between items-center">
           <p
-  className="text-sm text-gray-600 font-medium"
-  title={`${item.city || "Unknown"}, ${item.state || "Unknown"}`}
->
-  {(() => {
-    const city = item.city || "Unknown";
-    const state = item.state || "Unknown";
-    const combined = `${city}, ${state}`;
-    return combined.length > 9 ? combined.slice(0, 14) + "..." : combined;
-  })()}
-</p>
-
+            className="text-sm text-gray-600 font-medium"
+            title={`${item.city || "Unknown"}, ${item.state || "Unknown"}`}
+          >
+            {(() => {
+              const city = item.city || "Unknown";
+              const state = item.state || "Unknown";
+              const combined = `${city}, ${state}`;
+              return combined.length > 9
+                ? combined.slice(0, 14) + "..."
+                : combined;
+            })()}
+          </p>
 
           <div className="flex items-center gap-1 text-gray-600">
             <AiFillStar size={16} />
