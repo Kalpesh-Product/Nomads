@@ -265,7 +265,7 @@ const HostPrivacy = () => {
             </a>
             <span
               className="text-primary-blue cursor-pointer max-w-fit"
-              onClick={() => navigate("/hosts/contact")}
+              onClick={() => navigate("/contact")}
             >
               Contact us
             </span>
