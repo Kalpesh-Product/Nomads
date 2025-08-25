@@ -45,7 +45,7 @@ const TempFooter = ({
         </div>
 
         {/* Middle - Quick Links */}
-        <div>
+        <div className="mx-auto">
           <h4 className="font-semibold mb-3">Quick Links</h4>
           <ul className="space-y-1">
             {quickLinks.map((link, idx) => (
