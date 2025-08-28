@@ -174,11 +174,9 @@ const HostHome = () => {
                 <span className="text-white block text-[clamp(1rem,3.3vw,2.5rem)] text-center text-nowrap leading-[1.1] mt-0 lg:mt-2 font-hero">
                   SUPPORTING THE FOUNDATION OF GLOBAL N-COMMERCE
                 </span>
-                <span className="text-white block text-[clamp(0.6rem,0.65vw,2rem)] font-sans text-center leading-normal lg:leading-[1.1]">
+                <span className="text-white block text-[clamp(0.6rem,1.2vw,2rem)] font-sans text-center leading-normal lg:leading-[1.3]">
                   End-to-end solutions via licensed modules & tech automation
                   for BUSINESSES operating from aspiring destinations.
-                <span className="text-white block text-[clamp(0.6rem,1.2vw,2rem)] font-sans text-center leading-normal lg:leading-[1.3]">
-                 End-to-end solutions via licensed modules & tech automation for BUSINESSES operating from aspiring destinations.
                 </span>
               </h3>
             </div>
