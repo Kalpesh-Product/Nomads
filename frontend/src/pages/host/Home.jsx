@@ -166,15 +166,15 @@ const HostHome = () => {
               </Canvas>
             </div>
             <div className="flex flex-col justify-center text-center items-center w-full">
-              <h3 className="text-white text-[clamp(4rem,8vw,10rem)] leading-[1.1] font-hero">
+              <h3 className="text-white text-[clamp(4rem,9vw,10rem)] leading-[1.1] font-hero">
                 INTRODUCING
-                <span className="text-primary-blue block text-[clamp(3.5rem,7vw,8rem)] text-nowrap leading-[1.1] font-hero">
+                <span className="text-primary-blue block text-[clamp(3.5rem,8vw,8rem)] text-nowrap leading-[1.1] font-hero">
                   “N-COMMERCE”
                 </span>
-                <span className="text-white block text-[clamp(2.3rem,3vw,5rem)] text-center text-nowrap leading-[1.1] font-hero">
+                <span className="text-white block text-[clamp(2.3rem,4vw,5rem)] text-center text-nowrap leading-[1.1] font-hero">
                   ("Nomad Commerce")
                 </span>
-                <span className="text-white block text-[clamp(1rem,2.3vw,2.5rem)] text-center text-nowrap leading-[1.1] mt-0 lg:mt-2 font-hero">
+                <span className="text-white block text-[clamp(1rem,3.3vw,2.5rem)] text-center text-nowrap leading-[1.1] mt-0 lg:mt-2 font-hero">
                   SUPPORTING THE FOUNDATION OF GLOBAL N-COMMERCE
                 </span>
                 <span className="text-white block text-[clamp(0.6rem,0.65vw,2rem)] font-sans text-center leading-normal lg:leading-[1.1]">
