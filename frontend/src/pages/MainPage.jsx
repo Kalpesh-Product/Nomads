@@ -33,21 +33,20 @@ const MainPage = () => {
   const navigate = useNavigate();
   const intervalRef = useRef(null);
   const goToNomads = () => {
-  if (window.location.hostname.includes("localhost")) {
-    window.location.href = "http://nomad.localhost:5173";
-  } else {
-    window.location.href = "https://nomad.wono.co";
-  }
-};
+    if (window.location.hostname.includes("localhost")) {
+      window.location.href = "http://nomad.localhost:5173";
+    } else {
+      window.location.href = "https://nomad.wono.co";
+    }
+  };
 
-const goToHosts = () => {
-  if (window.location.hostname.includes("localhost")) {
-    window.location.href = "http://hosts.localhost:5173";
-  } else {
-    window.location.href = "https://hosts.wono.co";
-  }
-};
-
+  const goToHosts = () => {
+    if (window.location.hostname.includes("localhost")) {
+      window.location.href = "http://hosts.localhost:5173";
+    } else {
+      window.location.href = "https://hosts.wono.co";
+    }
+  };
 
   const [sliderRef, slider] = useKeenSlider({
     loop: true,
@@ -128,7 +127,7 @@ const goToHosts = () => {
             </span>
           </p>
         </div>
-        <div className="flex items-right justify-end gap-4  pb-2 px-6 w-32">
+        <div className="flex items-right justify-end gap-4  pb-2 px-6 w-32 pt-1">
           <FaFacebookF className="text-[12px]" />
 
           <FaXTwitter className="text-[12px]" />
