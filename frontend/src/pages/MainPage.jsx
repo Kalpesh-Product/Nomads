@@ -113,7 +113,7 @@ const MainPage = () => {
           </div>
         </article>
       </div>
-      <div className="flex justify-evenly items-center  w-full flex-col sm:flex-col xs:flex-col lg:flex-row md:flex-row">
+      <div className="flex justify-evenly items-center  w-full flex-col sm:flex-col xs:flex-col lg:flex-row md:flex-row pt-2">
         <div className="w-32"></div>
         <div className="w-full  ">
           <p className="text-center pb-2 text-tiny sm:text-tiny xs:text-tiny md:text-content lg:text-content">
@@ -127,7 +127,7 @@ const MainPage = () => {
             </span>
           </p>
         </div>
-        <div className="flex items-right justify-end gap-4  pb-2 px-6 w-32 pt-1">
+        <div className="flex items-right justify-end gap-4  pb-2 px-6 w-32 ">
           <FaFacebookF className="text-[12px]" />
 
           <FaXTwitter className="text-[12px]" />
