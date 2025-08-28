@@ -6,7 +6,6 @@ import { FaXTwitter } from "react-icons/fa6";
 
 const Footer = () => {
   const goToHostsPrivacy = () => {
-  const goToHostsPrivacy = () => {
     if (window.location.hostname.includes("localhost")) {
       window.location.href = "http://hosts.localhost:5173/privacy";
     } else {
@@ -74,7 +73,8 @@ const Footer = () => {
               INTERNATIONAL PLAZA SINGAPORE – 079903 <br />
               <Link
                 to="mailto:response@wono.co"
-                className="text-primary-blue lowercase hover:underline">
+                className="text-primary-blue lowercase hover:underline"
+              >
                 response@wono.co
               </Link>
             </p>
