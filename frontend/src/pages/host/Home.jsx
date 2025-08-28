@@ -165,19 +165,19 @@ const HostHome = () => {
                 />
               </Canvas>
             </div>
-            <div className="flex flex-col justify-center items-center w-full">
-              <h3 className="text-white text-[clamp(1rem,12vw,15rem)] leading-[1.1]">
+            <div className="flex flex-col justify-center text-center items-center w-full">
+              <h3 className="text-white text-[clamp(1rem,8vw,10rem)] leading-[1.1]">
                 INTRODUCING
-                <span className="text-primary-blue block text-[clamp(2.3rem,10vw,15rem)] text-nowrap leading-[1.1]">
+                <span className="text-primary-blue block text-[clamp(2.3rem,7vw,8rem)] text-nowrap leading-[1.1]">
                   “N-COMMERCE”
                 </span>
-                <span className="text-white block text-[clamp(2.3rem,5vw,8rem)] text-center text-nowrap leading-[1.1]">
+                <span className="text-white block text-[clamp(2.3rem,3vw,5rem)] text-center text-nowrap leading-[1.1]">
                   ("Nomad Commerce")
                 </span>
-                <span className="text-white block text-[clamp(2.3rem,3vw,4rem)] text-center text-nowrap leading-[1.1]">
+                <span className="text-white block text-[clamp(2rem,2.3vw,2.5rem)] text-center text-nowrap leading-[1.1]">
                   SUPPORTING THE FOUNDATION OF GLOBAL N-COMMERCE
                 </span>
-                <span className="text-white block text-[clamp(0.5rem,1.5vw,3rem)] text-center leading-[1.1]">
+                <span className="text-white block text-[clamp(0.5rem,1vw,2rem)] text-center leading-[1.1]">
                  End-to-end solutions via licensed modules & tech automation for BUSINESSES operating from aspiring destinations.
                 </span>
               </h3>
