@@ -2,6 +2,7 @@ import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 import { FiChevronDown } from "react-icons/fi";
 import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
+import {CircularProgress} from "@mui/material"
 
 export default function SearchBarCombobox({
   value,
@@ -77,7 +78,7 @@ export default function SearchBarCombobox({
                 className="absolute left-4  z-20 mt-1 origin-top bg-white w-72 rounded-b-2xl rounded-t-none shadow-2xl p-0">
                 <div className="max-h-60 overflow-y-auto">
                   {filteredOptions.length === 0 ? (
-                    <div className="p-3 text-gray-500">No results found</div>
+                    <div className="p-3 text-gray-500 flex justify-center items-center"><CircularProgress /></div>
                   ) : (
                     filteredOptions.map((option) => (
                       <button

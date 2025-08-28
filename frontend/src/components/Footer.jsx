@@ -5,14 +5,14 @@ import { FaGlobe, FaRupeeSign, FaFacebookF, FaInstagram } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 
 const Footer = () => {
-      const goToHostsPrivacy = () => {
+  const goToHostsPrivacy = () => {
     if (window.location.hostname.includes("localhost")) {
       window.location.href = "http://hosts.localhost:5173/privacy";
     } else {
       window.location.href = "https://hosts.wono.co/privacy";
     }
   };
-      const goToHostsTC = () => {
+  const goToHostsTC = () => {
     if (window.location.hostname.includes("localhost")) {
       window.location.href = "http://hosts.localhost:5173/terms-and-conditions";
     } else {
@@ -26,7 +26,7 @@ const Footer = () => {
       links: [
         { name: "About", link: "/" },
         { name: "Career", link: "career" },
-        { name: "FAQs", link: "/" },
+        { name: "FAQs", link: "https://hosts.wono.co/faq" },
         // { name: "Mortgage", link: "/mortgages" },
       ],
     },
@@ -90,39 +90,38 @@ const Footer = () => {
           <div className="w-full md:w-full lg:w-fit grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-x-10 lg:gap-x-8 lg:gap-y-0  lg:mr-5">
             <div></div>
             <div></div>
-        {footerSections.map((section, idx) => (
-  <div
-    key={idx}
-    className="flex flex-col justify-center items-center text-start lg:justify-start lg:items-center"
-  >
-    {section.links.map((linkObj, i) => {
-      // If linkObj.link is a function -> use <span> with onClick
-      if (typeof linkObj.link === "function") {
-        return (
-          <span
-            key={i}
-            onClick={linkObj.link}
-            className="text-sm text-black opacity-80 hover:opacity-100 hover:text-gray-500 transition-all duration-200 cursor-pointer uppercase p-4"
-          >
-            {linkObj.name}
-          </span>
-        );
-      }
+            {footerSections.map((section, idx) => (
+              <div
+                key={idx}
+                className="flex flex-col justify-center items-center text-start lg:justify-start lg:items-center"
+              >
+                {section.links.map((linkObj, i) => {
+                  // If linkObj.link is a function -> use <span> with onClick
+                  if (typeof linkObj.link === "function") {
+                    return (
+                      <span
+                        key={i}
+                        onClick={linkObj.link}
+                        className="text-sm text-black opacity-80 hover:opacity-100 hover:text-gray-500 transition-all duration-200 cursor-pointer uppercase p-4"
+                      >
+                        {linkObj.name}
+                      </span>
+                    );
+                  }
 
-      // Otherwise -> normal React Router Link
-      return (
-        <Link
-          key={i}
-          to={linkObj.link}
-          className="text-sm text-black opacity-80 hover:opacity-100 hover:text-gray-500 transition-all duration-200 cursor-pointer uppercase p-4"
-        >
-          {linkObj.name}
-        </Link>
-      );
-    })}
-  </div>
-))}
-
+                  // Otherwise -> normal React Router Link
+                  return (
+                    <Link
+                      key={i}
+                      to={linkObj.link}
+                      className="text-sm text-black opacity-80 hover:opacity-100 hover:text-gray-500 transition-all duration-200 cursor-pointer uppercase p-4"
+                    >
+                      {linkObj.name}
+                    </Link>
+                  );
+                })}
+              </div>
+            ))}
           </div>
         </div>
       </div>
