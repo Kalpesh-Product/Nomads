@@ -177,6 +177,8 @@ const HostHome = () => {
                 <span className="text-white block text-[clamp(0.6rem,0.65vw,2rem)] font-sans text-center leading-normal lg:leading-[1.1]">
                   End-to-end solutions via licensed modules & tech automation
                   for BUSINESSES operating from aspiring destinations.
+                <span className="text-white block text-[clamp(0.6rem,1.2vw,2rem)] font-sans text-center leading-normal lg:leading-[1.3]">
+                 End-to-end solutions via licensed modules & tech automation for BUSINESSES operating from aspiring destinations.
                 </span>
               </h3>
             </div>
