@@ -165,35 +165,22 @@ const HostHome = () => {
                 />
               </Canvas>
             </div>
-            <div className=" flex flex-col justify-center items-center w-full">
-              <h3 className="text-white text-[clamp(1rem,2.9vw,7rem)] text-nowrap">
-                <strong>
-                  SUPPORTING THE FOUNDATION OF N-COMMERCE <br />
-                </strong>
+            <div className="flex flex-col justify-center items-center w-full">
+              <h3 className="text-white text-[clamp(1rem,12vw,15rem)] leading-[1.1]">
+                INTRODUCING
+                <span className="text-primary-blue block text-[clamp(2.3rem,10vw,15rem)] text-nowrap leading-[1.1]">
+                  “N-COMMERCE”
+                </span>
+                <span className="text-white block text-[clamp(2.3rem,5vw,8rem)] text-center text-nowrap leading-[1.1]">
+                  ("Nomad Commerce")
+                </span>
+                <span className="text-white block text-[clamp(2.3rem,3vw,4rem)] text-center text-nowrap leading-[1.1]">
+                  SUPPORTING THE FOUNDATION OF GLOBAL N-COMMERCE
+                </span>
+                <span className="text-white block text-[clamp(0.5rem,1.5vw,3rem)] text-center leading-[1.1]">
+                 End-to-end solutions via licensed modules & tech automation for BUSINESSES operating from aspiring destinations.
+                </span>
               </h3>
-              <p className="text-primary-blue text-[clamp(2.3rem,6.4vw,7rem)] text-nowrap">
-                {" "}
-                “NOMAD COMMERCE”{" "}
-              </p>
-              <div
-                className="w-1/2 lg:w-fit"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <GetStartedButton
-                  title="CONNECT WITH US"
-                  externalStyles={
-                    "bg-white text-seconadary-dark w-full text-subtitle lg:text-content"
-                  }
-                  handleSubmit={() => {
-                    navigate("signup");
-                    window.scrollTo({ top: 0, behavior: "instant" });
-                  }}
-                />
-              </div>
             </div>
           </div>
         </Container>
