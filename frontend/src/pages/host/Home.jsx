@@ -127,8 +127,7 @@ const HostHome = () => {
             <div className="flex justify-center items-center w-full h-full my-12">
               <div
                 onClick={() => navigate("signup")}
-                className="relative hover:font-semibold w-full text-center  cursor-pointer"
-              >
+                className="relative hover:font-semibold w-full text-center  cursor-pointer">
                 <p className="uppercase my-0  md:my-16">It's Completely free</p>
                 <img
                   src="/blue-circle.png"
@@ -146,15 +145,13 @@ const HostHome = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 lg:h-[70vh] ">
             <div
               className="min-w-full h-[50vh] lg:h-full"
-              style={{ textAlign: "left" }}
-            >
+              style={{ textAlign: "left" }}>
               <Canvas
                 className="canvas"
                 camera={{
                   position: [0, 0, ismobile ? 15 : 25],
                   fov: ismobile ? 50 : isTablet ? 50 : isLaptop ? 40 : 28,
-                }}
-              >
+                }}>
                 <ambientLight intensity={0.5} />
                 <pointLight position={[10, 10, 10]} />
                 <RotatingGlobe />
@@ -178,7 +175,8 @@ const HostHome = () => {
                   SUPPORTING THE FOUNDATION OF GLOBAL N-COMMERCE
                 </span>
                 <span className="text-white block text-[clamp(0.6rem,1.2vw,2rem)] font-sans text-center leading-normal lg:leading-[1.3]">
-                 End-to-end solutions via licensed modules & tech automation for BUSINESSES operating from aspiring destinations.
+                  End-to-end solutions via licensed modules & tech automation
+                  for BUSINESSES operating from aspiring destinations.
                 </span>
               </h3>
             </div>
@@ -225,8 +223,7 @@ const HostHome = () => {
               {onePartner.map((item) => (
                 <div
                   key={item.id}
-                  className="border-t-2 border-black w-full space-y-2 py-2"
-                >
+                  className="border-t-2 border-black w-full space-y-2 py-2">
                   <h1 className="text-title py-4">
                     {item.title || "Title here"}
                   </h1>
@@ -266,8 +263,7 @@ const HostHome = () => {
               {noCode.map((item) => (
                 <div
                   key={item.id}
-                  className="h-72 w-full overflow-hidden rounded-lg  shadow-lg"
-                >
+                  className="h-72 w-full overflow-hidden rounded-lg  shadow-lg">
                   <img
                     src={item.image || "/hosts/themes/cafe.webp"}
                     className="h-full w-full object-cover"
@@ -279,8 +275,7 @@ const HostHome = () => {
             <div className="text-center my-4">
               <NavLink
                 to={"themes"}
-                className={" hover:underline hover:text-primary-blue"}
-              >
+                className={" hover:underline hover:text-primary-blue"}>
                 View More
               </NavLink>
             </div>
@@ -309,8 +304,7 @@ const HostHome = () => {
                 <div>
                   <h4
                     className="my-4"
-                    style={{ fontFamily: "Amsterdam", fontSize: "2rem" }}
-                  >
+                    style={{ fontFamily: "Amsterdam", fontSize: "2rem" }}>
                     Kashif Shaikh
                   </h4>
                   <p className="m-0">Co-Founder & COO</p>
