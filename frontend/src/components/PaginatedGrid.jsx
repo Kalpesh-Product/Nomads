@@ -1,38 +1,34 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
 
 const PaginatedGrid = ({
   data = [],
   entriesPerPage = 6,
   columns = "grid-cols-1",
   renderItem,
-  allowScroll=true
+  allowScroll = true,
 }) => {
   const localStorageKey = "verticalListingsPage";
   const formData = useSelector((state) => state.location.formValues);
+  const location = useLocation();
 
-  // Step 1: Read page from localStorage
-  const [currentPage, setCurrentPage] = useState(() => {
-    const storedPage = localStorage.getItem(localStorageKey);
-    return storedPage ? Number(storedPage) : 1;
-  });
+  const [currentPage, setCurrentPage] = useState(1);
 
-  // Step 2: Track category changes
+  // Reset page when category changes
   const prevCategoryRef = useRef(formData?.category || "");
-
   useEffect(() => {
     const currentCategory = formData?.category || "";
     if (prevCategoryRef.current !== currentCategory) {
-      setCurrentPage(1); // reset
-      localStorage.setItem(localStorageKey, "1");
+      setCurrentPage(1);
       prevCategoryRef.current = currentCategory;
     }
   }, [formData?.category]);
 
-  // Step 3: Persist page index
+  // ✅ Simple reset on route change
   useEffect(() => {
-    localStorage.setItem(localStorageKey, currentPage.toString());
-  }, [currentPage]);
+    setCurrentPage(1);
+  }, [location.pathname]);
 
   const totalPages = Math.ceil(data.length / entriesPerPage);
   const currentData = data.slice(
@@ -42,19 +38,18 @@ const PaginatedGrid = ({
 
   return (
     <div className="flex justify-between flex-col rounded-xl">
-
-    <div className={`flex flex-col gap-4 h-full justify-between custom-scrollbar-hide`}>
-      <div className={`grid ${columns} gap-2`}>
-        {currentData.length ? (
-          currentData.map((item, i) => renderItem(item, i))
-        ) : (
-          <div className="col-span-full text-center text-sm text-gray-500 border border-dotted rounded-lg p-4">
-            No items found.
-          </div>
-        )}
+      <div className="flex flex-col gap-4 h-full justify-between custom-scrollbar-hide">
+        <div className={`grid ${columns} gap-2`}>
+          {currentData.length ? (
+            currentData.map((item, i) => renderItem(item, i))
+          ) : (
+            <div className="col-span-full text-center text-sm text-gray-500 border border-dotted rounded-lg p-4">
+              No items found.
+            </div>
+          )}
+        </div>
       </div>
 
-    </div>
       {totalPages > 1 && (
         <div className="overflow-x-auto">
           <div className="flex justify-center gap-2 mt-4 w-full px-2">
