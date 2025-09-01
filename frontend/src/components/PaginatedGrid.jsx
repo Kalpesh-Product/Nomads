@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
+import ReactPaginate from "react-paginate";
 
 const PaginatedGrid = ({
   data = [],
@@ -8,32 +9,45 @@ const PaginatedGrid = ({
   columns = "grid-cols-1",
   renderItem,
   allowScroll = true,
+  persistPage = false, // NEW PROP
+  persistKey = "paginatedGridPage", // optional custom key
 }) => {
-  const localStorageKey = "verticalListingsPage";
   const formData = useSelector((state) => state.location.formValues);
   const location = useLocation();
 
-  const [currentPage, setCurrentPage] = useState(1);
+  // Initial page: restore from localStorage if persistPage=true
+  const [currentPage, setCurrentPage] = useState(() => {
+    if (persistPage) {
+      const saved = localStorage.getItem(persistKey);
+      return saved ? Number(saved) : 0;
+    }
+    return 0;
+  });
+
+  // Save to localStorage when persistPage is true
+  useEffect(() => {
+    if (persistPage) {
+      localStorage.setItem(persistKey, currentPage);
+    }
+  }, [currentPage, persistPage, persistKey]);
 
   // Reset page when category changes
   const prevCategoryRef = useRef(formData?.category || "");
   useEffect(() => {
     const currentCategory = formData?.category || "";
     if (prevCategoryRef.current !== currentCategory) {
-      setCurrentPage(1);
+      setCurrentPage(0);
       prevCategoryRef.current = currentCategory;
+      if (persistPage) {
+        localStorage.setItem(persistKey, 0);
+      }
     }
-  }, [formData?.category]);
-
-  // ✅ Simple reset on route change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [location.pathname]);
+  }, [formData?.category, persistPage, persistKey]);
 
   const totalPages = Math.ceil(data.length / entriesPerPage);
   const currentData = data.slice(
-    (currentPage - 1) * entriesPerPage,
-    currentPage * entriesPerPage
+    currentPage * entriesPerPage,
+    (currentPage + 1) * entriesPerPage
   );
 
   return (
@@ -52,24 +66,29 @@ const PaginatedGrid = ({
 
       {totalPages > 1 && (
         <div className="overflow-x-auto">
-          <div className="flex justify-center gap-2 mt-4 w-full px-2">
-            {Array.from({ length: totalPages }, (_, index) => {
-              const val = index + 1;
-              return (
-                <button
-                  key={val}
-                  onClick={() => setCurrentPage(val)}
-                  className={`h-8 w-8 flex justify-center items-center rounded-full text-sm transition shrink-0 ${
-                    currentPage === val
-                      ? "bg-black text-white"
-                      : "bg-white text-black border border-gray-300"
-                  }`}
-                >
-                  {val}
-                </button>
-              );
-            })}
-          </div>
+          <ReactPaginate
+            pageCount={totalPages}
+            forcePage={currentPage}
+            onPageChange={({ selected }) => setCurrentPage(selected)}
+            pageRangeDisplayed={3}
+            marginPagesDisplayed={1}
+            previousLabel="‹"
+            nextLabel="›"
+            breakLabel="..."
+            renderOnZeroPageCount={null}
+            containerClassName="flex justify-center gap-2 mt-4 w-full px-2"
+            pageClassName="h-8 w-8 flex justify-center items-center rounded-full text-sm border border-gray-300 bg-white text-black transition shrink-0"
+            pageLinkClassName="flex justify-center items-center w-full h-full"
+            activeClassName="bg-black text-black border-black"
+            activeLinkClassName="text-white bg-black rounded-full"
+            previousClassName="h-8 w-8 flex justify-center items-center rounded-full text-sm border border-gray-300 bg-white text-black"
+            nextClassName="h-8 w-8 flex justify-center items-center rounded-full text-sm border border-gray-300 bg-white text-black"
+            previousLinkClassName="flex justify-center items-center w-full h-full"
+            nextLinkClassName="flex justify-center items-center w-full h-full"
+            breakClassName="h-8 w-8 flex justify-center items-center rounded-full text-sm border border-gray-300 bg-white text-black"
+            breakLinkClassName="flex justify-center items-center w-full h-full"
+            disabledClassName="opacity-50 cursor-not-allowed"
+          />
         </div>
       )}
     </div>

@@ -457,6 +457,7 @@ const Listings = () => {
             <PaginatedGrid
               data={isLisitingLoading ? skeletonArray : sortedListings}
               entriesPerPage={!mapOpen ? 10 : 9}
+               persistPage={true} 
               columns={`grid-cols-1 md:grid-cols-2 ${
                 mapOpen ? "lg:grid-cols-3" : "lg:grid-cols-5"
               } gap-x-5`}
