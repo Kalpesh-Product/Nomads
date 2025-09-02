@@ -26,13 +26,6 @@ const steps = [
   "Review",
 ];
 
-// const serviceOptions = [
-//   "Web Development",
-//   "App Development",
-//   "SEO",
-//   "Marketing",
-// ];
-
 const serviceOptions = [
   {
     category: "Department Modules",
@@ -419,22 +412,6 @@ const HostSignup = () => {
                 />
               )}
             />
-            {/* <Controller
-              name="CTAButtonText"
-              control={control}
-              rules={{ required: "CTA Button Text is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="CTA Button Text"
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            /> */}
 
             <div>
               <h3 className="font-semibold mb-2">About</h3>
