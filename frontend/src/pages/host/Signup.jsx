@@ -17,6 +17,8 @@ import { useMutation } from "@tanstack/react-query";
 import axios from "../../utils/axios";
 import toast from "react-hot-toast";
 import { useFieldArray } from "react-hook-form";
+import { Country, State, City } from "country-state-city";
+import { MenuItem } from "@mui/material";
 
 const steps = [
   "Personal Info",
@@ -25,13 +27,6 @@ const steps = [
   "Services",
   "Review",
 ];
-
-// const serviceOptions = [
-//   "Web Development",
-//   "App Development",
-//   "SEO",
-//   "Marketing",
-// ];
 
 const serviceOptions = [
   {
@@ -68,39 +63,40 @@ const serviceOptions = [
 const HostSignup = () => {
   const [activeStep, setActiveStep] = useState(0);
 
-  const { control, handleSubmit, getValues, trigger, reset } = useForm({
-    defaultValues: {
-      name: "",
-      email: "",
-      mobile: "",
-      country: "",
-      state: "",
-      city: "",
-      companyName: "",
-      industry: "",
-      companySize: "",
-      companyCountry: "",
-      companyState: "",
-      companyCity: "",
-      // websiteUrl: "",
-      // linkedInUrl: "",
-      websiteTitle: "",
-      websiteSubtitle: "",
-      // CTAButtonText: "",
-      about: [{ text: "" }],
-      // productTitle: "",
-      // galleryTitle: "",
-      // testimonialTitle: "",
-      contactTitle: "",
-      mapUrl: "",
-      contactEmail: "",
-      contactPhone: "",
-      address: "",
-      registeredCompanyName: "",
-      copyrightText: "",
-      selectedServices: [],
-    },
-  });
+  const { control, handleSubmit, getValues, trigger, reset, watch, setValue } =
+    useForm({
+      defaultValues: {
+        name: "",
+        email: "",
+        mobile: "",
+        country: "",
+        state: "",
+        city: "",
+        companyName: "",
+        industry: "",
+        companySize: "",
+        companyCountry: "",
+        companyState: "",
+        companyCity: "",
+        // websiteUrl: "",
+        // linkedInUrl: "",
+        title: "",
+        subTitle: "",
+        // CTAButtonText: "",
+        about: [{ text: "" }],
+        // productTitle: "",
+        // galleryTitle: "",
+        // testimonialTitle: "",
+        contactTitle: "",
+        mapUrl: "",
+        websiteEmail: "",
+        phone: "",
+        address: "",
+        registeredCompanyName: "",
+        copyrightText: "",
+        selectedServices: [],
+      },
+    });
 
   // inside your HostSignup or CreateWebsite component:
   const {
@@ -141,8 +137,8 @@ const HostSignup = () => {
       // "linkedInUrl",
     ], // Step 2
     [
-      "websiteTitle",
-      "websiteSubtitle",
+      "title",
+      "subTitle",
       // "CTAButtonText",
       "about",
       // "productTitle",
@@ -150,8 +146,8 @@ const HostSignup = () => {
       // "testimonialTitle",
       "contactTitle",
       "mapUrl",
-      "contactEmail",
-      "contactPhone",
+      "websiteEmail",
+      "phone",
       "address",
       "registeredCompanyName",
       "copyrightText",
@@ -238,46 +234,111 @@ const HostSignup = () => {
               render={({ field, fieldState }) => (
                 <TextField
                   {...field}
+                  select
                   label="Country"
                   fullWidth
                   margin="normal"
                   variant="standard"
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
-                />
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    field.onChange(value); // update form with country name
+                    setValue("state", ""); // reset state
+                    setValue("city", ""); // reset city
+                  }}>
+                  {Country.getAllCountries().map((c) => (
+                    <MenuItem key={c.isoCode} value={c.name}>
+                      {c.name}
+                    </MenuItem>
+                  ))}
+                </TextField>
               )}
             />
+
             <Controller
               name="state"
               control={control}
               rules={{ required: "State is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="State"
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
+              render={({ field, fieldState }) => {
+                const countryName = watch("country");
+                const countryObj = Country.getAllCountries().find(
+                  (c) => c.name === countryName
+                );
+                const states = countryObj
+                  ? State.getStatesOfCountry(countryObj.isoCode)
+                  : [];
+
+                return (
+                  <TextField
+                    {...field}
+                    select
+                    label="State"
+                    fullWidth
+                    margin="normal"
+                    variant="standard"
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                    disabled={!countryObj}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      field.onChange(value); // store state name
+                      setValue("city", ""); // reset city when state changes
+                    }}>
+                    {states.map((s) => (
+                      <MenuItem key={s.isoCode} value={s.name}>
+                        {s.name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                );
+              }}
             />
+
             <Controller
               name="city"
               control={control}
               rules={{ required: "City is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="City"
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
+              render={({ field, fieldState }) => {
+                const countryName = watch("country");
+                const stateName = watch("state");
+
+                const countryObj = Country.getAllCountries().find(
+                  (c) => c.name === countryName
+                );
+                const stateObj =
+                  countryObj &&
+                  State.getStatesOfCountry(countryObj.isoCode).find(
+                    (s) => s.name === stateName
+                  );
+
+                const cities =
+                  countryObj && stateObj
+                    ? City.getCitiesOfState(
+                        countryObj.isoCode,
+                        stateObj.isoCode
+                      )
+                    : [];
+
+                return (
+                  <TextField
+                    {...field}
+                    select
+                    label="City"
+                    fullWidth
+                    margin="normal"
+                    variant="standard"
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                    disabled={!stateObj}>
+                    {cities.map((city) => (
+                      <MenuItem key={city.name} value={city.name}>
+                        {city.name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                );
+              }}
             />
           </>
         );
@@ -340,46 +401,111 @@ const HostSignup = () => {
               render={({ field, fieldState }) => (
                 <TextField
                   {...field}
+                  select
                   label="Company Country"
                   fullWidth
                   margin="normal"
                   variant="standard"
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
-                />
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    field.onChange(value); // store country name
+                    setValue("companyState", ""); // reset state
+                    setValue("companyCity", ""); // reset city
+                  }}>
+                  {Country.getAllCountries().map((c) => (
+                    <MenuItem key={c.isoCode} value={c.name}>
+                      {c.name}
+                    </MenuItem>
+                  ))}
+                </TextField>
               )}
             />
+
             <Controller
               name="companyState"
               control={control}
               rules={{ required: "Company State is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Company State"
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
+              render={({ field, fieldState }) => {
+                const countryName = watch("companyCountry");
+                const countryObj = Country.getAllCountries().find(
+                  (c) => c.name === countryName
+                );
+                const states = countryObj
+                  ? State.getStatesOfCountry(countryObj.isoCode)
+                  : [];
+
+                return (
+                  <TextField
+                    {...field}
+                    select
+                    label="Company State"
+                    fullWidth
+                    margin="normal"
+                    variant="standard"
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                    disabled={!countryObj}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      field.onChange(value); // store state name
+                      setValue("companyCity", ""); // reset city when state changes
+                    }}>
+                    {states.map((s) => (
+                      <MenuItem key={s.isoCode} value={s.name}>
+                        {s.name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                );
+              }}
             />
+
             <Controller
               name="companyCity"
               control={control}
               rules={{ required: "Company City is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Company City"
-                  fullWidth
-                  variant="standard"
-                  margin="normal"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
+              render={({ field, fieldState }) => {
+                const countryName = watch("companyCountry");
+                const stateName = watch("companyState");
+
+                const countryObj = Country.getAllCountries().find(
+                  (c) => c.name === countryName
+                );
+                const stateObj =
+                  countryObj &&
+                  State.getStatesOfCountry(countryObj.isoCode).find(
+                    (s) => s.name === stateName
+                  );
+
+                const cities =
+                  countryObj && stateObj
+                    ? City.getCitiesOfState(
+                        countryObj.isoCode,
+                        stateObj.isoCode
+                      )
+                    : [];
+
+                return (
+                  <TextField
+                    {...field}
+                    select
+                    label="Company City"
+                    fullWidth
+                    margin="normal"
+                    variant="standard"
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                    disabled={!stateObj}>
+                    {cities.map((city) => (
+                      <MenuItem key={city.name} value={city.name}>
+                        {city.name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                );
+              }}
             />
           </>
         );
@@ -388,7 +514,7 @@ const HostSignup = () => {
         return (
           <>
             <Controller
-              name="websiteTitle"
+              name="title"
               control={control}
               rules={{ required: "Website Title is required" }}
               render={({ field, fieldState }) => (
@@ -404,7 +530,7 @@ const HostSignup = () => {
               )}
             />
             <Controller
-              name="websiteSubtitle"
+              name="subTitle"
               control={control}
               rules={{ required: "Website Subtitle is required" }}
               render={({ field, fieldState }) => (
@@ -419,22 +545,6 @@ const HostSignup = () => {
                 />
               )}
             />
-            {/* <Controller
-              name="CTAButtonText"
-              control={control}
-              rules={{ required: "CTA Button Text is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="CTA Button Text"
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            /> */}
 
             <div>
               <h3 className="font-semibold mb-2">About</h3>
@@ -480,57 +590,6 @@ const HostSignup = () => {
               </button>
             </div>
 
-            {/* <Controller
-              name="productTitle"
-              control={control}
-              rules={{ required: "Product Title is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Product Title"
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
-
-            <Controller
-              name="galleryTitle"
-              control={control}
-              rules={{ required: "Gallery Title is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Gallery Title"
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
-
-            <Controller
-              name="testimonialTitle"
-              control={control}
-              rules={{ required: "Testimonial Title is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Testimonial Title"
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            /> */}
-
             <Controller
               name="contactTitle"
               control={control}
@@ -551,10 +610,33 @@ const HostSignup = () => {
             <Controller
               name="mapUrl"
               control={control}
-              rules={{ required: "Map URL is required" }}
+              rules={{
+                required: "Map URL is required",
+                validate: (val) => {
+                  const MAP_EMBED_REGEX =
+                    /^https?:\/\/(www\.)?(google\.com|maps\.google\.com)\/maps\/embed(\/v1\/[a-z]+|\?pb=|\/?\?)/i;
+
+                  const v = (val || "").trim();
+
+                  return (
+                    MAP_EMBED_REGEX.test(v) ||
+                    "Enter a valid Google Maps *embed* URL (e.g. https://www.google.com/maps/embed?pb=...)"
+                  );
+                },
+              }}
               render={({ field, fieldState }) => (
                 <TextField
                   {...field}
+                  onChange={(e) => {
+                    // auto-extract src if full iframe pasted
+                    const extractIframeSrc = (val = "") =>
+                      val.match(/src=["']([^"']+)["']/i)?.[1] || val;
+
+                    const raw = e.target.value;
+                    const cleaned = extractIframeSrc(raw).trim();
+
+                    field.onChange(cleaned);
+                  }}
                   label="Google Map Embed URL"
                   fullWidth
                   margin="normal"
@@ -566,7 +648,7 @@ const HostSignup = () => {
             />
 
             <Controller
-              name="contactEmail"
+              name="websiteEmail"
               control={control}
               rules={{
                 required: "Contact Email is required",
@@ -589,7 +671,7 @@ const HostSignup = () => {
             />
 
             <Controller
-              name="contactPhone"
+              name="phone"
               control={control}
               rules={{ required: "Contact Phone is required" }}
               render={({ field, fieldState }) => (
@@ -659,70 +741,6 @@ const HostSignup = () => {
                 />
               )}
             />
-            {/* <Controller
-              name="companySize"
-              control={control}
-              rules={{ required: "Company Size is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Company Size"
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
-            <Controller
-              name="companyCountry"
-              control={control}
-              rules={{ required: "Company Country is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Company Country"
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
-            <Controller
-              name="companyState"
-              control={control}
-              rules={{ required: "Company State is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Company State"
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
-            <Controller
-              name="companyCity"
-              control={control}
-              rules={{ required: "Company City is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Company City"
-                  fullWidth
-                  variant="standard"
-                  margin="normal"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            /> */}
           </>
         );
 
@@ -895,7 +913,10 @@ const HostSignup = () => {
         <form
           key={activeStep}
           className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-4"
-          onSubmit={handleSubmit((data) => register(data))}>
+          // onSubmit={handleSubmit((data) => register(data))}
+          onSubmit={handleSubmit((data) =>
+            register({ ...data, about: data.about.map((a) => a.text) })
+          )}>
           {renderStepFields()}
           <div className="col-span-1 lg:col-span-2 flex justify-between items-center">
             {activeStep > 0 && (
