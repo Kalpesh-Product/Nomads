@@ -90,7 +90,7 @@ const HostSignup = () => {
         contactTitle: "",
         mapUrl: "",
         contactEmail: "",
-        contactPhone: "",
+        phone: "",
         address: "",
         registeredCompanyName: "",
         copyrightText: "",
@@ -147,7 +147,7 @@ const HostSignup = () => {
       "contactTitle",
       "mapUrl",
       "contactEmail",
-      "contactPhone",
+      "phone",
       "address",
       "registeredCompanyName",
       "copyrightText",
@@ -671,7 +671,7 @@ const HostSignup = () => {
             />
 
             <Controller
-              name="contactPhone"
+              name="phone"
               control={control}
               rules={{ required: "Contact Phone is required" }}
               render={({ field, fieldState }) => (
