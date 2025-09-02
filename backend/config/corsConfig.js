@@ -18,7 +18,8 @@ export const corsConfig = {
 
     if (
       allowedOrigins.includes(origin) ||
-      regexAllowedOrigins.some((regex) => regex.test(origin))
+      regexAllowedOrigins.some((regex) => regex.test(origin)) ||
+      !origin
     ) {
       return callback(null, true);
     }

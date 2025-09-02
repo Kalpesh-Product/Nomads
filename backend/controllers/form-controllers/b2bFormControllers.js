@@ -97,58 +97,6 @@ const jobApplicationSchema = yup
   })
   .noUnknown(true, "Unknown field in payload");
 
-const registrationSchema = yup.object().shape({
-  name: yup
-    .string()
-    .trim()
-    .required("Name is required")
-    .min(2, "Name must be at least 2 characters"),
-
-  email: yup
-    .string()
-    .trim()
-    .email("Invalid email format")
-    .required("Email is required"),
-
-  mobile: yup.string().required("Mobile number is required"),
-
-  country: yup.string().trim().required("Country is required"),
-  city: yup.string().trim().required("City is required"),
-  state: yup.string().trim().required("State is required"),
-
-  companyName: yup.string().trim().required("Company Name is required"),
-  industry: yup.string().trim().required("Industry is required"),
-
-  companySize: yup.string().trim().required("Company Size is required"),
-
-  companyType: yup.string().trim().required("Company Type is required"),
-
-  companyCity: yup.string().trim().required("Company City is required"),
-  companyState: yup.string().trim().required("Company State is required"),
-
-  websiteUrl: yup
-    .string()
-    .trim()
-    .url("Invalid Website URL")
-    .nullable()
-    .notRequired(),
-
-  linkedInUrl: yup
-    .string()
-    .trim()
-    .url("Invalid LinkedIn URL")
-    .nullable()
-    .notRequired(),
-
-  selectedServices: yup
-    .array()
-    .of(yup.string().trim())
-    .min(1, "Select at least one service")
-    .required("Selected Services is required"),
-
-  formName: yup.string().trim().required("Form Name is required"),
-});
-
 const enquirySchema = yup.object().shape({
   name: yup
     .string()
@@ -291,7 +239,7 @@ export const addB2BFormSubmission = async (req, res, next) => {
   };
 
   const handleRegister = async () => {
-    const payload = await validate(registrationSchema, req.body);
+    const payload = req.body;
 
     const apsBody = {
       name: payload.name,
