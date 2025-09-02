@@ -480,57 +480,6 @@ const HostSignup = () => {
               </button>
             </div>
 
-            {/* <Controller
-              name="productTitle"
-              control={control}
-              rules={{ required: "Product Title is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Product Title"
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
-
-            <Controller
-              name="galleryTitle"
-              control={control}
-              rules={{ required: "Gallery Title is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Gallery Title"
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
-
-            <Controller
-              name="testimonialTitle"
-              control={control}
-              rules={{ required: "Testimonial Title is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Testimonial Title"
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            /> */}
-
             <Controller
               name="contactTitle"
               control={control}
@@ -659,70 +608,6 @@ const HostSignup = () => {
                 />
               )}
             />
-            {/* <Controller
-              name="companySize"
-              control={control}
-              rules={{ required: "Company Size is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Company Size"
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
-            <Controller
-              name="companyCountry"
-              control={control}
-              rules={{ required: "Company Country is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Company Country"
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
-            <Controller
-              name="companyState"
-              control={control}
-              rules={{ required: "Company State is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Company State"
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
-            <Controller
-              name="companyCity"
-              control={control}
-              rules={{ required: "Company City is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Company City"
-                  fullWidth
-                  variant="standard"
-                  margin="normal"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            /> */}
           </>
         );
 
