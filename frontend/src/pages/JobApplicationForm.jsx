@@ -134,7 +134,7 @@ const JobApplicationForm = ({title}) => {
 
       <form
         onSubmit={handleSubmit((data) => isHost && submitJobApplication(data))}
-        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:max-w-4xl mx-auto"
       >
         {/* Name */}
         <Controller
