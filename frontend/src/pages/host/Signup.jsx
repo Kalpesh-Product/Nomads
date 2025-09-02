@@ -17,6 +17,8 @@ import { useMutation } from "@tanstack/react-query";
 import axios from "../../utils/axios";
 import toast from "react-hot-toast";
 import { useFieldArray } from "react-hook-form";
+import { Country, State, City } from "country-state-city";
+import { MenuItem } from "@mui/material";
 
 const steps = [
   "Personal Info",
@@ -61,39 +63,40 @@ const serviceOptions = [
 const HostSignup = () => {
   const [activeStep, setActiveStep] = useState(0);
 
-  const { control, handleSubmit, getValues, trigger, reset } = useForm({
-    defaultValues: {
-      name: "",
-      email: "",
-      mobile: "",
-      country: "",
-      state: "",
-      city: "",
-      companyName: "",
-      industry: "",
-      companySize: "",
-      companyCountry: "",
-      companyState: "",
-      companyCity: "",
-      // websiteUrl: "",
-      // linkedInUrl: "",
-      title: "",
-      subTitle: "",
-      // CTAButtonText: "",
-      about: [{ text: "" }],
-      // productTitle: "",
-      // galleryTitle: "",
-      // testimonialTitle: "",
-      contactTitle: "",
-      mapUrl: "",
-      contactEmail: "",
-      contactPhone: "",
-      address: "",
-      registeredCompanyName: "",
-      copyrightText: "",
-      selectedServices: [],
-    },
-  });
+  const { control, handleSubmit, getValues, trigger, reset, watch, setValue } =
+    useForm({
+      defaultValues: {
+        name: "",
+        email: "",
+        mobile: "",
+        country: "",
+        state: "",
+        city: "",
+        companyName: "",
+        industry: "",
+        companySize: "",
+        companyCountry: "",
+        companyState: "",
+        companyCity: "",
+        // websiteUrl: "",
+        // linkedInUrl: "",
+        title: "",
+        subTitle: "",
+        // CTAButtonText: "",
+        about: [{ text: "" }],
+        // productTitle: "",
+        // galleryTitle: "",
+        // testimonialTitle: "",
+        contactTitle: "",
+        mapUrl: "",
+        contactEmail: "",
+        contactPhone: "",
+        address: "",
+        registeredCompanyName: "",
+        copyrightText: "",
+        selectedServices: [],
+      },
+    });
 
   // inside your HostSignup or CreateWebsite component:
   const {
@@ -231,46 +234,111 @@ const HostSignup = () => {
               render={({ field, fieldState }) => (
                 <TextField
                   {...field}
+                  select
                   label="Country"
                   fullWidth
                   margin="normal"
                   variant="standard"
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
-                />
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    field.onChange(value); // update form with country name
+                    setValue("state", ""); // reset state
+                    setValue("city", ""); // reset city
+                  }}>
+                  {Country.getAllCountries().map((c) => (
+                    <MenuItem key={c.isoCode} value={c.name}>
+                      {c.name}
+                    </MenuItem>
+                  ))}
+                </TextField>
               )}
             />
+
             <Controller
               name="state"
               control={control}
               rules={{ required: "State is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="State"
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
+              render={({ field, fieldState }) => {
+                const countryName = watch("country");
+                const countryObj = Country.getAllCountries().find(
+                  (c) => c.name === countryName
+                );
+                const states = countryObj
+                  ? State.getStatesOfCountry(countryObj.isoCode)
+                  : [];
+
+                return (
+                  <TextField
+                    {...field}
+                    select
+                    label="State"
+                    fullWidth
+                    margin="normal"
+                    variant="standard"
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                    disabled={!countryObj}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      field.onChange(value); // store state name
+                      setValue("city", ""); // reset city when state changes
+                    }}>
+                    {states.map((s) => (
+                      <MenuItem key={s.isoCode} value={s.name}>
+                        {s.name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                );
+              }}
             />
+
             <Controller
               name="city"
               control={control}
               rules={{ required: "City is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="City"
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
+              render={({ field, fieldState }) => {
+                const countryName = watch("country");
+                const stateName = watch("state");
+
+                const countryObj = Country.getAllCountries().find(
+                  (c) => c.name === countryName
+                );
+                const stateObj =
+                  countryObj &&
+                  State.getStatesOfCountry(countryObj.isoCode).find(
+                    (s) => s.name === stateName
+                  );
+
+                const cities =
+                  countryObj && stateObj
+                    ? City.getCitiesOfState(
+                        countryObj.isoCode,
+                        stateObj.isoCode
+                      )
+                    : [];
+
+                return (
+                  <TextField
+                    {...field}
+                    select
+                    label="City"
+                    fullWidth
+                    margin="normal"
+                    variant="standard"
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                    disabled={!stateObj}>
+                    {cities.map((city) => (
+                      <MenuItem key={city.name} value={city.name}>
+                        {city.name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                );
+              }}
             />
           </>
         );
@@ -333,46 +401,111 @@ const HostSignup = () => {
               render={({ field, fieldState }) => (
                 <TextField
                   {...field}
+                  select
                   label="Company Country"
                   fullWidth
                   margin="normal"
                   variant="standard"
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
-                />
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    field.onChange(value); // store country name
+                    setValue("companyState", ""); // reset state
+                    setValue("companyCity", ""); // reset city
+                  }}>
+                  {Country.getAllCountries().map((c) => (
+                    <MenuItem key={c.isoCode} value={c.name}>
+                      {c.name}
+                    </MenuItem>
+                  ))}
+                </TextField>
               )}
             />
+
             <Controller
               name="companyState"
               control={control}
               rules={{ required: "Company State is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Company State"
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
+              render={({ field, fieldState }) => {
+                const countryName = watch("companyCountry");
+                const countryObj = Country.getAllCountries().find(
+                  (c) => c.name === countryName
+                );
+                const states = countryObj
+                  ? State.getStatesOfCountry(countryObj.isoCode)
+                  : [];
+
+                return (
+                  <TextField
+                    {...field}
+                    select
+                    label="Company State"
+                    fullWidth
+                    margin="normal"
+                    variant="standard"
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                    disabled={!countryObj}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      field.onChange(value); // store state name
+                      setValue("companyCity", ""); // reset city when state changes
+                    }}>
+                    {states.map((s) => (
+                      <MenuItem key={s.isoCode} value={s.name}>
+                        {s.name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                );
+              }}
             />
+
             <Controller
               name="companyCity"
               control={control}
               rules={{ required: "Company City is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Company City"
-                  fullWidth
-                  variant="standard"
-                  margin="normal"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
+              render={({ field, fieldState }) => {
+                const countryName = watch("companyCountry");
+                const stateName = watch("companyState");
+
+                const countryObj = Country.getAllCountries().find(
+                  (c) => c.name === countryName
+                );
+                const stateObj =
+                  countryObj &&
+                  State.getStatesOfCountry(countryObj.isoCode).find(
+                    (s) => s.name === stateName
+                  );
+
+                const cities =
+                  countryObj && stateObj
+                    ? City.getCitiesOfState(
+                        countryObj.isoCode,
+                        stateObj.isoCode
+                      )
+                    : [];
+
+                return (
+                  <TextField
+                    {...field}
+                    select
+                    label="Company City"
+                    fullWidth
+                    margin="normal"
+                    variant="standard"
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                    disabled={!stateObj}>
+                    {cities.map((city) => (
+                      <MenuItem key={city.name} value={city.name}>
+                        {city.name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                );
+              }}
             />
           </>
         );
