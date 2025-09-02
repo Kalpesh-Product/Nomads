@@ -1,10 +1,6 @@
-import React, { useRef, useEffect } from "react";
+import { useRef } from "react";
 import { Outlet, useLocation } from "react-router-dom";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
 import { Toaster } from "react-hot-toast";
-import HostHeader from "./components/HostHeader";
-import HostFooter from "./components/HostFooter";
 
 const App = () => {
   const location = useLocation();

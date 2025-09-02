@@ -11,7 +11,7 @@ const GetStartedButton = ({
   className,
   isLoading, // New prop for showing the spinner
 }) => {
-  console.log("isLoading",isLoading)
+  console.log("isLoading", isLoading);
   const baseBgColor = disabled || isLoading ? "bg-gray-400" : "bg-black";
 
   return (
@@ -25,8 +25,7 @@ const GetStartedButton = ({
           hover:font-semibold transition-all
         ${fontSize ? fontSize : "text-content leading-5"}
          ${!externalStyles?.includes("text-") ? "text-primary" : ""}
-         ${padding ? padding : "px-5 py-[0.65rem]"} ${className}`} 
-         
+         ${padding ? padding : "px-5 py-[0.65rem]"} ${className}`}
       onClick={handleSubmit}>
       {isLoading && <CircularProgress size={16} sx={{ color: "#ffffff" }} />}
       <span className="text-center">{title}</span>
