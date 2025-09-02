@@ -61,7 +61,7 @@ const serviceOptions = [
 const HostSignup = () => {
   const [activeStep, setActiveStep] = useState(0);
 
-  const { control, handleSubmit, getValues, trigger } = useForm({
+  const { control, handleSubmit, getValues, trigger, reset } = useForm({
     defaultValues: {
       name: "",
       email: "",
@@ -72,7 +72,7 @@ const HostSignup = () => {
       companyName: "",
       industry: "",
       companySize: "",
-      companyType: "",
+      companyCountry: "",
       companyState: "",
       companyCity: "",
       websiteUrl: "",
@@ -106,7 +106,7 @@ const HostSignup = () => {
       "companyName",
       "industry",
       "companySize",
-      "companyType",
+      "companyCountry",
       "companyState",
       "companyCity",
       "websiteUrl",
@@ -290,13 +290,13 @@ const HostSignup = () => {
               )}
             />
             <Controller
-              name="companyType"
+              name="companyCountry"
               control={control}
-              rules={{ required: "Company Type is required" }}
+              rules={{ required: "Company Country is required" }}
               render={({ field, fieldState }) => (
                 <TextField
                   {...field}
-                  label="Company Type"
+                  label="Company Country"
                   fullWidth
                   margin="normal"
                   variant="standard"
@@ -337,80 +337,8 @@ const HostSignup = () => {
                 />
               )}
             />
-            <Controller
-              name="websiteUrl"
-              control={control}
-              rules={{ required: "Company Website is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Company Website"
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
-            <Controller
-              name="linkedInUrl"
-              control={control}
-              rules={{ required: "LinkedIn URL is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="LinkedIn URL"
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
           </>
         );
-
-      // case 2:
-      //   return (
-      //     <Controller
-      //       name="selectedServices"
-      //       control={control}
-      //       rules={{
-      //         validate: (value) =>
-      //           value.length > 0 || "Please select at least one service",
-      //       }}
-      //       render={({ field, fieldState }) => (
-      //         <Box sx={{ mt: 2 }}>
-      //           <FormGroup>
-      //             {serviceOptions.map((service) => (
-      //               <FormControlLabel
-      //                 key={service}
-      //                 control={
-      //                   <Checkbox
-      //                     checked={field.value.includes(service)}
-      //                     onChange={(e) => {
-      //                       const newValue = e.target.checked
-      //                         ? [...field.value, service]
-      //                         : field.value.filter((s) => s !== service);
-      //                       field.onChange(newValue);
-      //                     }}
-      //                   />
-      //                 }
-      //                 label={service}
-      //               />
-      //             ))}
-      //           </FormGroup>
-      //           {fieldState.error && (
-      //             <FormHelperText error>
-      //               {fieldState.error.message}
-      //             </FormHelperText>
-      //           )}
-      //         </Box>
-      //       )}
-      //     />
-      //   );
 
       case 2:
         return (
@@ -468,7 +396,8 @@ const HostSignup = () => {
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "space-between",
-                              }}>
+                              }}
+                            >
                               <span className="font-medium">{service}</span>
 
                               <Checkbox
@@ -567,7 +496,8 @@ const HostSignup = () => {
           textTransform: "uppercase",
           fontFamily: "Poppins",
         }}
-        activeStep={activeStep}>
+        activeStep={activeStep}
+      >
         {steps.map((label, index) => (
           <Step label={label} key={index} />
         ))}
@@ -579,8 +509,10 @@ const HostSignup = () => {
           </h1>
         )}
         <form
+          key={activeStep}
           className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-4"
-          onSubmit={handleSubmit((data) => register(data))}>
+          onSubmit={handleSubmit((data) => register(data))}
+        >
           {renderStepFields()}
           <div className="col-span-1 lg:col-span-2 flex justify-between items-center">
             {activeStep > 0 && (
