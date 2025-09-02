@@ -85,24 +85,8 @@ const Listings = () => {
 
   const skeletonArray = Array.from({ length: 6 });
 
-  const { data: listingsData, isPending: isLisitingLoading } = useQuery({
-    queryKey: ["listings", formData], // ✅ ensures it refetches when formData changes
-    queryFn: async () => {
-      const { country, location, category } = formData || {};
-
-      const response = await axios.get(
-        `company/companies?country=${country}&state=${location}&type=${category}&category=${category}`
-      );
-
-      // return response.data;
-      return Array.isArray(response.data) ? response.data : [];
-    },
-    enabled: !!formData?.country && !!formData?.location, // ✅ prevents fetching on empty state
-  });
-
-  // fetch all listings without category filter (for icons)
-  const { data: allListingsData = [] } = useQuery({
-    queryKey: ["listings-all", formData?.country, formData?.location],
+  const { data: listingsData = [], isPending: isLisitingLoading } = useQuery({
+    queryKey: ["listings", formData],
     queryFn: async () => {
       const { country, location } = formData || {};
       const response = await axios.get(
@@ -114,11 +98,11 @@ const Listings = () => {
   });
 
   const categoryOptions = React.useMemo(() => {
-    if (!allListingsData || allListingsData.length === 0) return [];
+    if (!listingsData || listingsData.length === 0) return [];
 
     const uniqueTypes = [
       ...new Set(
-        allListingsData
+        listingsData
           .filter((item) => item.companyType !== "coliving")
           .map((item) => item.companyType)
           .filter(Boolean)
@@ -142,13 +126,20 @@ const Listings = () => {
       "privatestay",
       "meetingroom",
       "cafe",
-      // "coliving",
     ];
 
     return uniqueTypes
       .map((type) => ({ label: labelMap[type] || type, value: type }))
       .sort((a, b) => typeOrder.indexOf(a.value) - typeOrder.indexOf(b.value));
-  }, [allListingsData]);
+  }, [listingsData]);
+
+  const filteredListings = React.useMemo(() => {
+    if (!listingsData) return [];
+    if (!formData?.category) return listingsData;
+    return listingsData.filter(
+      (item) => item.companyType === formData.category
+    );
+  }, [listingsData, formData?.category]);
 
   const toggleFavorite = (id) => {
     setFavorites((prev) =>
@@ -494,7 +485,8 @@ const Listings = () => {
               mapOpen ? "col-span-5" : "col-span-9"
             } font-semibold text-lg`}>
             <PaginatedGrid
-              data={isLisitingLoading ? skeletonArray : sortedListings}
+              // data={isLisitingLoading ? skeletonArray : sortedListings}
+              data={isLisitingLoading ? skeletonArray : filteredListings}
               entriesPerPage={!mapOpen ? 10 : 9}
               persistPage={true}
               columns={`grid-cols-1 md:grid-cols-2 ${
