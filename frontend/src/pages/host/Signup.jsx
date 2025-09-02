@@ -89,7 +89,7 @@ const HostSignup = () => {
         // testimonialTitle: "",
         contactTitle: "",
         mapUrl: "",
-        contactEmail: "",
+        websiteEmail: "",
         phone: "",
         address: "",
         registeredCompanyName: "",
@@ -146,7 +146,7 @@ const HostSignup = () => {
       // "testimonialTitle",
       "contactTitle",
       "mapUrl",
-      "contactEmail",
+      "websiteEmail",
       "phone",
       "address",
       "registeredCompanyName",
@@ -648,7 +648,7 @@ const HostSignup = () => {
             />
 
             <Controller
-              name="contactEmail"
+              name="websiteEmail"
               control={control}
               rules={{
                 required: "Contact Email is required",
