@@ -1,80 +1,94 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
+import ReactPaginate from "react-paginate";
 
 const PaginatedGrid = ({
   data = [],
   entriesPerPage = 6,
   columns = "grid-cols-1",
   renderItem,
-  allowScroll=true
+  allowScroll = true,
+  persistPage = false, // NEW PROP
+  persistKey = "paginatedGridPage", // optional custom key
 }) => {
-  const localStorageKey = "verticalListingsPage";
   const formData = useSelector((state) => state.location.formValues);
+  const location = useLocation();
 
-  // Step 1: Read page from localStorage
+  // Initial page: restore from localStorage if persistPage=true
   const [currentPage, setCurrentPage] = useState(() => {
-    const storedPage = localStorage.getItem(localStorageKey);
-    return storedPage ? Number(storedPage) : 1;
+    if (persistPage) {
+      const saved = localStorage.getItem(persistKey);
+      return saved ? Number(saved) : 0;
+    }
+    return 0;
   });
 
-  // Step 2: Track category changes
-  const prevCategoryRef = useRef(formData?.category || "");
+  // Save to localStorage when persistPage is true
+  useEffect(() => {
+    if (persistPage) {
+      localStorage.setItem(persistKey, currentPage);
+    }
+  }, [currentPage, persistPage, persistKey]);
 
+  // Reset page when category changes
+  const prevCategoryRef = useRef(formData?.category || "");
   useEffect(() => {
     const currentCategory = formData?.category || "";
     if (prevCategoryRef.current !== currentCategory) {
-      setCurrentPage(1); // reset
-      localStorage.setItem(localStorageKey, "1");
+      setCurrentPage(0);
       prevCategoryRef.current = currentCategory;
+      if (persistPage) {
+        localStorage.setItem(persistKey, 0);
+      }
     }
-  }, [formData?.category]);
-
-  // Step 3: Persist page index
-  useEffect(() => {
-    localStorage.setItem(localStorageKey, currentPage.toString());
-  }, [currentPage]);
+  }, [formData?.category, persistPage, persistKey]);
 
   const totalPages = Math.ceil(data.length / entriesPerPage);
   const currentData = data.slice(
-    (currentPage - 1) * entriesPerPage,
-    currentPage * entriesPerPage
+    currentPage * entriesPerPage,
+    (currentPage + 1) * entriesPerPage
   );
 
   return (
     <div className="flex justify-between flex-col rounded-xl">
-
-    <div className={`flex flex-col gap-4 h-full justify-between custom-scrollbar-hide`}>
-      <div className={`grid ${columns} gap-2`}>
-        {currentData.length ? (
-          currentData.map((item, i) => renderItem(item, i))
-        ) : (
-          <div className="col-span-full text-center text-sm text-gray-500 border border-dotted rounded-lg p-4">
-            No items found.
-          </div>
-        )}
+      <div className="flex flex-col gap-4 h-full justify-between custom-scrollbar-hide">
+        <div className={`grid ${columns} gap-2`}>
+          {currentData.length ? (
+            currentData.map((item, i) => renderItem(item, i))
+          ) : (
+            <div className="col-span-full text-center text-sm text-gray-500 border border-dotted rounded-lg p-4">
+              No items found.
+            </div>
+          )}
+        </div>
       </div>
 
-    </div>
       {totalPages > 1 && (
         <div className="overflow-x-auto">
-          <div className="flex justify-center gap-2 mt-4 w-full px-2">
-            {Array.from({ length: totalPages }, (_, index) => {
-              const val = index + 1;
-              return (
-                <button
-                  key={val}
-                  onClick={() => setCurrentPage(val)}
-                  className={`h-8 w-8 flex justify-center items-center rounded-full text-sm transition shrink-0 ${
-                    currentPage === val
-                      ? "bg-black text-white"
-                      : "bg-white text-black border border-gray-300"
-                  }`}
-                >
-                  {val}
-                </button>
-              );
-            })}
-          </div>
+          <ReactPaginate
+            pageCount={totalPages}
+            forcePage={currentPage}
+            onPageChange={({ selected }) => setCurrentPage(selected)}
+            pageRangeDisplayed={3}
+            marginPagesDisplayed={1}
+            previousLabel="‹"
+            nextLabel="›"
+            breakLabel="..."
+            renderOnZeroPageCount={null}
+            containerClassName="flex justify-center gap-2 mt-4 w-full px-2"
+            pageClassName="h-8 w-8 flex justify-center items-center rounded-full text-sm border border-gray-300 bg-white text-black transition shrink-0"
+            pageLinkClassName="flex justify-center items-center w-full h-full"
+            activeClassName="bg-black text-black border-black"
+            activeLinkClassName="text-white bg-black rounded-full"
+            previousClassName="h-8 w-8 flex justify-center items-center rounded-full text-sm border border-gray-300 bg-white text-black"
+            nextClassName="h-8 w-8 flex justify-center items-center rounded-full text-sm border border-gray-300 bg-white text-black"
+            previousLinkClassName="flex justify-center items-center w-full h-full"
+            nextLinkClassName="flex justify-center items-center w-full h-full"
+            breakClassName="h-8 w-8 flex justify-center items-center rounded-full text-sm border border-gray-300 bg-white text-black"
+            breakLinkClassName="flex justify-center items-center w-full h-full"
+            disabledClassName="opacity-50 cursor-not-allowed"
+          />
         </div>
       )}
     </div>

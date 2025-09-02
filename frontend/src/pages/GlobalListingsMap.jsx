@@ -172,9 +172,11 @@ const GlobalListingsMap = () => {
       dispatch(setFormValues(data));
       // use data directly here, not formData from Redux
       navigate(`/verticals?country=${data.country}&location=${data.location}`);
+       setShowMobileSearch(false);
     },
     onSuccess: () => {
       console.log("success");
+      
     },
     onError: () => {
       console.log("error");
@@ -332,7 +334,7 @@ const GlobalListingsMap = () => {
             </form>
           </div>
 
-          <div className="md:hidden flex w-full items-center justify-center my-4">
+          <div className="lg:hidden flex w-full items-center justify-center my-4">
             <button
               onClick={() => setShowMobileSearch((prev) => !prev)}
               className="bg-white shadow-md flex items-center w-full text-center justify-center font-medium text-secondary-dark border-2 px-6 py-2 rounded-full flex-col gap-2"
@@ -354,7 +356,7 @@ const GlobalListingsMap = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex items-start justify-center md:hidden"
+              className="fixed inset-0 z-50 flex items-start justify-center lg:hidden"
             >
               <motion.div className="bg-white shadow-2xl overflow-auto p-4 rounded-b-3xl  h-screen  w-full">
                 <div className="flex justify-between items-center mb-4">
@@ -463,7 +465,7 @@ const GlobalListingsMap = () => {
       </div>
       <Container padding={false}>
         <div className="">
-          <div className="font-semibold text-md  grid grid-cols-9 gap-4 min-h-screen pt-3">
+          <div className="font-semibold text-md  grid grid-cols-9 gap-4 pt-3">
             <div className="hidden lg:block custom-scrollbar-hide lg:col-span-5">
               {isLisitingLoading ? (
                 Array.from({ length: 4 }).map((_, i) => (
@@ -475,6 +477,8 @@ const GlobalListingsMap = () => {
                     data={isLisitingLoading ? skeletonArray : listingsData}
                     allowScroll={false}
                     entriesPerPage={9}
+                    persistPage={true} // 👈 persists page number
+                    persistKey="verticalsListingsPage"
                     columns={`grid-cols-1 md:grid-cols-2 lg:grid-cols-3  gap-x-5`}
                     renderItem={(item, index) =>
                       isLisitingLoading ? (
@@ -517,7 +521,7 @@ const GlobalListingsMap = () => {
                 </div>
               )}
             </div>
-            <div className="col-span-full lg:col-span-4 sticky top-24 h-[68%] pb-10">
+            <div className="col-span-full lg:col-span-4 sticky top-24 h-screen lg:h-[68%] pb-10">
               <div className="rounded-xl h-full overflow-hidden">
                 {isLisitingLoading ? (
                   <SkeletonMap />
@@ -542,7 +546,7 @@ const GlobalListingsMap = () => {
           }}
           exit={{ y: "100%" }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
-          className={`fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 px-6 rounded-t-3xl md:hidden ${
+          className={`fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 px-6 rounded-t-3xl lg:hidden ${
             showListings ? "h-[77vh]" : "h-[75vh]"
           }`}
         >
