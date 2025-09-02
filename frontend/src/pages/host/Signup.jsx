@@ -546,14 +546,15 @@ const HostSignup = () => {
               )}
             />
 
-            <div>
-              <h3 className="font-semibold mb-2">About</h3>
+            {/* <div> */}
+            <div className="col-span-1 lg:col-span-2">
+              <h3 className="font-semibold mb-2">About Company</h3>
               {aboutFields.map((field, index) => (
                 <div
                   key={field.id}
-                  className="rounded-lg border border-gray-300 p-3 mb-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium">Para #{index + 1}</span>
+                  className="rounded-lg border border-gray-300 p-3 ">
+                  <div className="flex items-center justify-between ">
+                    <span className="font-medium">Paragraph {index + 1}</span>
                     <button
                       type="button"
                       onClick={() => removeAbout(index)}
@@ -573,7 +574,7 @@ const HostSignup = () => {
                         margin="normal"
                         variant="standard"
                         multiline
-                        rows={3}
+                        rows={2}
                         error={!!fieldState.error}
                         helperText={fieldState.error?.message}
                       />
@@ -586,11 +587,11 @@ const HostSignup = () => {
                 type="button"
                 onClick={() => appendAbout({ text: "" })}
                 className="text-blue-600 text-sm">
-                + Add Para
+                + Add Paragraph
               </button>
             </div>
 
-            <Controller
+            {/* <Controller
               name="contactTitle"
               control={control}
               rules={{ required: "Contact Title is required" }}
@@ -605,7 +606,7 @@ const HostSignup = () => {
                   helperText={fieldState.error?.message}
                 />
               )}
-            />
+            /> */}
 
             <Controller
               name="mapUrl"
