@@ -311,14 +311,19 @@ const Product = () => {
                     About
                   </h1>
                   <div className="items-center flex gap-2">
-                    <div>
-                      <NavLink
-                        className={"text-small underline"}
-                        to={"/nomad/login"}
-                      >
-                        View Website
-                      </NavLink>
-                    </div>
+                    {companyDetails?.websiteTemplateLink && (
+                      <div>
+                        <a
+                          href={companyDetails?.websiteTemplateLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-small underline text-primary-blue"
+                        >
+                          View Website
+                        </a>
+                      </div>
+                    )}
+
                     <div
                       onClick={() => setHeartClicked((prev) => !prev)}
                       className="cursor-pointer relative"
