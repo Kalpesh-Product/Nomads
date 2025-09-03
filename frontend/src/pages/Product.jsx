@@ -248,7 +248,8 @@ const Product = () => {
                           selectedImageId: item._id,
                         },
                       })
-                    }>
+                    }
+                  >
                     <img
                       src={item.url}
                       alt="company-thumbnail"
@@ -268,7 +269,8 @@ const Product = () => {
                               },
                             });
                           }}
-                          className="bg-white text-sm px-3 py-1 rounded shadow font-medium">
+                          className="bg-white text-sm px-3 py-1 rounded shadow font-medium"
+                        >
                           +{companyDetails.images.length - 4} more
                         </button>
                       </div>
@@ -309,14 +311,24 @@ const Product = () => {
                     About
                   </h1>
                   <div className="items-center flex gap-2">
+                    <div>
+                      <NavLink
+                        className={"text-small underline"}
+                        to={"/nomad/login"}
+                      >
+                        View Website
+                      </NavLink>
+                    </div>
                     <div
                       onClick={() => setHeartClicked((prev) => !prev)}
-                      className="cursor-pointer relative">
+                      className="cursor-pointer relative"
+                    >
                       {heartClicked ? <IoIosHeart /> : <IoIosHeartEmpty />}
                     </div>
                     <NavLink
                       className={"text-small underline"}
-                      to={"/nomad/login"}>
+                      to={"/nomad/login"}
+                    >
                       Save
                     </NavLink>
                   </div>
@@ -388,7 +400,9 @@ const Product = () => {
                         companyDetails?.totalReviews ||
                         0}
                     </p>
-                    <span className="text-tiny lg:text-small font-medium">Reviews</span>
+                    <span className="text-tiny lg:text-small font-medium">
+                      Reviews
+                    </span>
                   </div>
                 </div>
               </div>
@@ -400,7 +414,8 @@ const Product = () => {
                 <form
                   onSubmit={handleSubmit((data) => submitEnquiry(data))}
                   action=""
-                  className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+                >
                   <Controller
                     name="fullName"
                     rules={{
@@ -700,7 +715,8 @@ const Product = () => {
                     </h1>
                     <form
                       onSubmit={handlesubmitSales((data) => submitSales(data))}
-                      className="grid grid-cols-1 gap-4">
+                      className="grid grid-cols-1 gap-4"
+                    >
                       <Controller
                         name="fullName"
                         control={salesControl}
@@ -823,7 +839,8 @@ const Product = () => {
       </MuiModal>
       <TransparentModal
         open={showAmenities}
-        onClose={() => setShowAmenities(false)}>
+        onClose={() => setShowAmenities(false)}
+      >
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 p-4">
           {(Array.isArray(companyDetails?.inclusions)
             ? companyDetails.inclusions
@@ -831,7 +848,8 @@ const Product = () => {
           ).map((item) => (
             <span
               key={item}
-              className="bg-gray-800 text-white text-sm rounded-lg px-3 py-2 text-center">
+              className="bg-gray-800 text-white text-sm rounded-lg px-3 py-2 text-center"
+            >
               {item
                 .replace(/([a-z])([A-Z])/g, "$1 $2")
                 .replace(/-/g, " ")
