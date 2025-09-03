@@ -32,7 +32,7 @@ const steps = [
 
 const serviceOptions = [
   {
-    category: "Department Modules",
+    category: "Addon Modules (Coming Soon)",
     items: [
       "Tickets",
       "Meetings",
@@ -1025,80 +1025,112 @@ const HostSignup = () => {
             <Controller
               name="selectedServices"
               control={control}
+              defaultValue={["Website Builder", "Lead Generation"]}
               rules={{
                 validate: (value) =>
                   value.length > 0 || "Please select at least one service",
               }}
-              render={({ field, fieldState }) => (
-                <Box sx={{ mt: 2 }} className="col-span-1 lg:col-span-2">
-                  {serviceOptions.map((group) => (
-                    <Box key={group.category} sx={{ mb: 3 }}>
-                      {/* <h3 className="font-semibold mb-2">{group.category}</h3> */}
+              render={({ field, fieldState }) => {
+                const mandatoryServices = [
+                  "Website Builder",
+                  "Lead Generation",
+                  "Automated Google Sheets",
+                ];
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                        {group.items.map((service) => {
-                          const isSelected = field.value.includes(service);
+                // Always merge mandatory into value
+                const valueWithMandatory = Array.from(
+                  new Set([...(field.value || []), ...mandatoryServices])
+                );
 
-                          const handleToggle = () => {
-                            const newValue = isSelected
-                              ? field.value.filter((s) => s !== service)
-                              : [...field.value, service];
+                const renderCard = (service, isMandatory) => {
+                  const isSelected = valueWithMandatory.includes(service);
 
-                            console.log("Selected services:", newValue);
-                            field.onChange(newValue);
-                          };
+                  const handleToggle = () => {
+                    if (isMandatory) return;
+                    const newValue = isSelected
+                      ? valueWithMandatory.filter((s) => s !== service)
+                      : [...valueWithMandatory, service];
 
-                          return (
-                            <Box
-                              key={service}
-                              onClick={handleToggle}
-                              role="checkbox"
-                              aria-checked={isSelected}
-                              tabIndex={0}
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter" || e.key === " ")
-                                  handleToggle();
-                              }}
-                              sx={{
-                                border: "1px solid",
-                                borderColor: isSelected
-                                  ? "primary.main"
-                                  : "divider",
-                                borderRadius: 2,
-                                p: 2,
-                                cursor: "pointer",
-                                userSelect: "none",
-                                boxShadow: isSelected ? 3 : 0,
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "space-between",
-                              }}>
-                              <span className="font-medium">{service}</span>
+                    console.log("Selected services:", newValue);
+                    field.onChange(newValue);
+                  };
 
-                              <Checkbox
-                                checked={isSelected}
-                                onChange={(e) => {
-                                  e.stopPropagation(); // prevent double toggle via card click
-                                  handleToggle();
-                                }}
-                                inputProps={{
-                                  "aria-label": `${service} checkbox`,
-                                }}
-                              />
-                            </Box>
-                          );
-                        })}
-                      </div>
+                  return (
+                    <Box
+                      key={service}
+                      onClick={handleToggle}
+                      role="checkbox"
+                      aria-checked={isSelected}
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (
+                          (e.key === "Enter" || e.key === " ") &&
+                          !isMandatory
+                        )
+                          handleToggle();
+                      }}
+                      sx={{
+                        border: "1px solid",
+                        borderColor: isSelected ? "primary.main" : "divider",
+                        borderRadius: 2,
+                        p: 2,
+                        cursor: isMandatory ? "not-allowed" : "pointer",
+                        userSelect: "none",
+                        boxShadow: isSelected ? 3 : 0,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        opacity: isMandatory ? 0.8 : 1,
+                      }}>
+                      <span className="font-medium">{service}</span>
+
+                      <Checkbox
+                        checked={isSelected}
+                        disabled={isMandatory}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          handleToggle();
+                        }}
+                        inputProps={{
+                          "aria-label": `${service} checkbox`,
+                        }}
+                      />
                     </Box>
-                  ))}
+                  );
+                };
 
-                  {fieldState.error && (
-                    <FormHelperText error>
-                      {fieldState.error.message}
-                    </FormHelperText>
-                  )}
-                </Box>
-              )}
+                return (
+                  <Box sx={{ mt: 2 }} className="col-span-1 lg:col-span-2">
+                    {/* Mandatory Section */}
+                    <h3 className="font-semibold mb-2">
+                      Your Activated Services
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
+                      {mandatoryServices.map((service) =>
+                        renderCard(service, true)
+                      )}
+                    </div>
+
+                    {/* Other Categories */}
+                    {serviceOptions.map((group) => (
+                      <Box key={group.category} sx={{ mb: 4 }}>
+                        <h3 className="font-semibold mb-2">{group.category}</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                          {group.items.map((service) =>
+                            renderCard(service, false)
+                          )}
+                        </div>
+                      </Box>
+                    ))}
+
+                    {fieldState.error && (
+                      <FormHelperText error>
+                        {fieldState.error.message}
+                      </FormHelperText>
+                    )}
+                  </Box>
+                );
+              }}
             />
           </>
         );
