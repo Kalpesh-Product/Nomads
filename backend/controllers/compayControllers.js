@@ -440,7 +440,7 @@ export const addCompanyImagesBulk = async (req, res, next) => {
   }
 };
 
-export const addWebsiteLink = async (req, res, next) => {
+export const editCompany = async (req, res, next) => {
   try {
     const { companyName, link } = req.body;
     console.log("req", companyName);
