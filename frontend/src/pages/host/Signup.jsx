@@ -736,9 +736,9 @@ const HostSignup = () => {
                       render={({ field, fieldState }) => (
                         <TextField
                           {...field}
-                          label="Name"
+                          label="Product Name"
                           fullWidth
-                          margin="normal"
+                          margin="none"
                           variant="standard"
                           error={!!fieldState.error}
                           helperText={fieldState.error?.message}
@@ -754,19 +754,24 @@ const HostSignup = () => {
                         <TextField
                           {...field}
                           select
-                          label="Type"
+                          label="Product Type"
                           fullWidth
-                          margin="normal"
+                          margin="none"
                           variant="standard"
                           error={!!fieldState.error}
                           helperText={fieldState.error?.message}>
-                          {["Coworking", "Cafe", "Meetings", "Coliving"].map(
-                            (option) => (
-                              <MenuItem key={option} value={option}>
-                                {option}
-                              </MenuItem>
-                            )
-                          )}
+                          {[
+                            "Co-working",
+                            "Hostels",
+                            "Workation",
+                            "Private Stay",
+                            "Meetings",
+                            "Cafe",
+                          ].map((option) => (
+                            <MenuItem key={option} value={option}>
+                              {option}
+                            </MenuItem>
+                          ))}
                         </TextField>
                       )}
                     />
@@ -778,7 +783,7 @@ const HostSignup = () => {
                       render={({ field, fieldState }) => (
                         <TextField
                           {...field}
-                          label="Description"
+                          label="Product Description"
                           fullWidth
                           margin="normal"
                           variant="standard"
@@ -797,7 +802,7 @@ const HostSignup = () => {
                       render={({ field, fieldState }) => (
                         <TextField
                           {...field}
-                          label="Cost"
+                          label="Product Cost"
                           fullWidth
                           margin="normal"
                           variant="standard"
