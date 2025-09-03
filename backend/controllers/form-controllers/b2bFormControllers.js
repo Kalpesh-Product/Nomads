@@ -1,8 +1,9 @@
 import { uploadFileToS3 } from "../../config/s3Config.js";
 import { randomUUID } from "crypto";
 import yup from "yup";
-import FormData from "form-data";
+import mongoose from "mongoose";
 import WebsiteTemplate from "../../models/WebsiteTemplate.js";
+import sharp from "sharp";
 
 const istNowPieces = () => {
   const tz = "Asia/Kolkata";
@@ -363,6 +364,7 @@ export const registerFormSubmission = async (req, res, next) => {
     };
 
     const sheetResult = await postToAppsScript(apsBody);
+    console.log(sheetResult);
 
     // STEP 2: normalize incoming JSON strings
     let { products, testimonials, about } = payload;
@@ -378,7 +380,7 @@ export const registerFormSubmission = async (req, res, next) => {
     session.startTransaction();
 
     try {
-      const company = "BizNest";
+      const company = req.body.companyName || null;
 
       const formatCompanyName = (name) => {
         if (!name) return "";
@@ -405,7 +407,7 @@ export const registerFormSubmission = async (req, res, next) => {
         title: payload.title,
         subTitle: payload.subTitle,
         CTAButtonText: payload.CTAButtonText,
-        about,
+        about: about?.split(",") || [],
         productTitle: payload?.productTitle,
         galleryTitle: payload?.galleryTitle,
         testimonialTitle: payload.testimonialTitle,
@@ -534,7 +536,7 @@ export const registerFormSubmission = async (req, res, next) => {
       let websiteResult;
       try {
         const submit = await fetch(
-          "http://localhost:5000/api/editor/create-website",
+          "http://localhost:5000/api/editor/create-website-template",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
