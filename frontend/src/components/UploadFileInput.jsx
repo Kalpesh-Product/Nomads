@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { TextField, IconButton, Avatar, Box } from "@mui/material";
 import { LuImageUp } from "react-icons/lu";
 import { MdDelete } from "react-icons/md";
@@ -10,21 +10,30 @@ const UploadFileInput = ({
   disabled = false,
   label = "Upload File",
   allowedExtensions = ["jpg", "jpeg", "png", "pdf", "webp"],
-  previewType = "auto", // "image", "pdf", "none", or "auto"
+  previewType = "auto",
   id,
 }) => {
   const fileInputRef = useRef(null);
-  const [previewUrl, setPreviewUrl] = useState(
-    value ? URL.createObjectURL(value) : null
-  );
+  const [previewUrl, setPreviewUrl] = useState(null);
   const [openModal, setOpenModal] = useState(false);
 
-  const getExtension = (fileName) => fileName.split(".").pop().toLowerCase();
+  const getExtension = (fileName = "") =>
+    fileName.includes(".") ? fileName.split(".").pop().toLowerCase() : "";
 
   const isImage = (ext) =>
     ["jpg", "jpeg", "png", "webp", "gif", "bmp"].includes(ext);
 
   const isPDF = (ext) => ext === "pdf";
+
+  useEffect(() => {
+    if (value instanceof File) {
+      const url = URL.createObjectURL(value);
+      setPreviewUrl(url);
+      return () => URL.revokeObjectURL(url);
+    } else {
+      setPreviewUrl(null);
+    }
+  }, [value]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -36,8 +45,6 @@ const UploadFileInput = ({
       }
 
       onChange(file);
-      setPreviewUrl(URL.createObjectURL(file));
-      fileInputRef.current.value = null;
     }
   };
 
@@ -49,7 +56,9 @@ const UploadFileInput = ({
   const acceptAttr = allowedExtensions.map((ext) => `.${ext}`).join(",");
 
   const renderPreview = () => {
-    const ext = getExtension(value.name);
+    if (!value || !previewUrl) return null;
+
+    const ext = getExtension(value.name || "");
     const type =
       previewType === "auto"
         ? isImage(ext)
@@ -64,7 +73,7 @@ const UploadFileInput = ({
         <Avatar
           src={previewUrl}
           alt="Preview"
-          sx={{ width: "100%", height: "auto", borderRadius: 2 }}
+          sx={{ width: "100%", height: 200, borderRadius: 2, mt: 1 }}
           variant="square"
         />
       );
@@ -75,12 +84,19 @@ const UploadFileInput = ({
         <iframe
           src={previewUrl}
           title="PDF Preview"
-          style={{ width: "100%", height: "500px", borderRadius: "8px" }}
+          style={{
+            width: "100%",
+            height: "300px",
+            borderRadius: "8px",
+            marginTop: "8px",
+          }}
         />
       );
     }
 
-    return <div className="text-muted text-sm">Preview not available</div>;
+    return (
+      <div className="text-gray-500 text-sm mt-1">Preview not available</div>
+    );
   };
 
   return (
@@ -118,29 +134,16 @@ const UploadFileInput = ({
         }}
       />
 
-      {/* Preview and Delete */}
-      {value && previewUrl && (
-        <>
-          <span
-            className="underline text-primary text-sm cursor-pointer w-fit"
-            onClick={() => setOpenModal(true)}>
-            Preview
-          </span>
+      {/* Inline Preview */}
+      {renderPreview()}
 
-          <MuiModal
-            open={openModal}
-            onClose={() => setOpenModal(false)}
-            title="File Preview">
-            <div className="flex flex-col gap-2">
-              <IconButton color="error" onClick={handleClear}>
-                <MdDelete />
-              </IconButton>
-              <div className="p-2 border border-gray-300 rounded-md">
-                {renderPreview()}
-              </div>
-            </div>
-          </MuiModal>
-        </>
+      {/* Delete */}
+      {value && previewUrl && (
+        <div className="flex justify-end">
+          <IconButton color="error" onClick={handleClear}>
+            <MdDelete />
+          </IconButton>
+        </div>
       )}
     </Box>
   );
