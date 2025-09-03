@@ -18,7 +18,7 @@ const tenant = getTenantFromHost()
       queryKey: ["company", tenant],
       queryFn: async () => {
         const res = await axios.get(
-          `https://wonotestbe.vercel.app/api/editor/get-template/${tenant}`
+          `https://wonotestbe.vercel.app/api/editor/get-website/${tenant}`
         );
         return res.data;
       },
