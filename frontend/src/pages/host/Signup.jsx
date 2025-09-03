@@ -19,11 +19,13 @@ import toast from "react-hot-toast";
 import { useFieldArray } from "react-hook-form";
 import { Country, State, City } from "country-state-city";
 import { MenuItem } from "@mui/material";
+import UploadFileInput from "../../components/UploadFileInput";
+import UploadMultipleFilesInput from "../../components/UploadMultipleFilesInput";
 
 const steps = [
   "Personal Info",
   "Company Info",
-  "Website Info",
+  "Create Website Info",
   "Services",
   "Review",
 ];
@@ -82,10 +84,17 @@ const HostSignup = () => {
         // linkedInUrl: "",
         title: "",
         subTitle: "",
+        companyLogo: null,
+        heroImages: [],
         // CTAButtonText: "",
-        about: [{ text: "" }],
+        // about: [{ text: "" }],
+        about: [{ text: "" }, { text: "" }], // 👈 two default paragraphs
         // productTitle: "",
         // galleryTitle: "",
+        products: [
+          { type: "", name: "", cost: "", description: "", files: [] },
+        ],
+        gallery: [],
         // testimonialTitle: "",
         contactTitle: "",
         mapUrl: "",
@@ -105,13 +114,39 @@ const HostSignup = () => {
     remove: removeAbout,
   } = useFieldArray({ control, name: "about" });
 
-  const { mutate: register, isLoading: isRegisterLoading } = useMutation({
-    mutationFn: async (data) => {
-      const response = await axios.post("forms/register-form-submission", {
-        ...data,
-        formName: "register",
-      });
+  const {
+    fields: productFields,
+    append: appendProduct,
+    remove: removeProduct,
+  } = useFieldArray({ control, name: "products" });
 
+  // const { mutate: register, isLoading: isRegisterLoading } = useMutation({
+  //   mutationFn: async (data) => {
+  //     const response = await axios.post("form/add-new-b2b-form-submission", {
+  //       ...data,
+  //       formName: "register",
+  //     });
+
+  //     return response.data;
+  //   },
+  //   onSuccess: (data) => {
+  //     toast.success("Form submitted successfully");
+  //     reset();
+  //   },
+  //   onError: (error) => {
+  //     toast.error(error.response.data.message);
+  //     reset();
+  //   },
+  // });
+  const { mutate: register, isLoading: isRegisterLoading } = useMutation({
+    mutationFn: async (fd) => {
+      const response = await axios.post(
+        "form/add-new-b2b-form-submission",
+        fd,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
       return response.data;
     },
     onSuccess: (data) => {
@@ -119,7 +154,7 @@ const HostSignup = () => {
       reset();
     },
     onError: (error) => {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Something went wrong");
       reset();
     },
   });
@@ -381,7 +416,13 @@ const HostSignup = () => {
             <Controller
               name="companySize"
               control={control}
-              rules={{ required: "Company Size is required" }}
+              rules={{
+                required: "Company Size is required",
+                pattern: {
+                  value: /^[0-9]+$/, // only digits allowed
+                  message: "Company Size must be a number",
+                },
+              }}
               render={({ field, fieldState }) => (
                 <TextField
                   {...field}
@@ -513,47 +554,108 @@ const HostSignup = () => {
       case 2:
         return (
           <>
-            <Controller
-              name="title"
-              control={control}
-              rules={{ required: "Website Title is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Website Title"
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
-            <Controller
-              name="subTitle"
-              control={control}
-              rules={{ required: "Website Subtitle is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Website Subtitle"
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
+            <div className="col-span-1 lg:col-span-2">
+              <h2 className="font-semibold mt-4 text-xl">Website Banner</h2>
+            </div>
+            <div className="col-span-1 lg:col-span-2 rounded-lg border border-gray-300 p-3 mb-2 grid grid-cols-2 gap-4">
+              <Controller
+                name="title"
+                control={control}
+                rules={{ required: "Website Title is required" }}
+                render={({ field, fieldState }) => (
+                  <TextField
+                    {...field}
+                    label="Website Title"
+                    fullWidth
+                    margin="none"
+                    variant="standard"
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                  />
+                )}
+              />
+              <Controller
+                name="subTitle"
+                control={control}
+                rules={{ required: "Website Subtitle is required" }}
+                render={({ field, fieldState }) => (
+                  <TextField
+                    {...field}
+                    label="Website Subtitle"
+                    fullWidth
+                    margin="none"
+                    variant="standard"
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                  />
+                )}
+              />
 
-            <div>
-              <h3 className="font-semibold mb-2">About</h3>
+              {/* Company Logo (single upload) */}
+              <Controller
+                name="companyLogo"
+                control={control}
+                render={({ field }) => (
+                  <Box
+                    sx={{
+                      pb: 0.5,
+                      borderBottom: "1px solid",
+                      borderColor: "divider",
+                      // nuke any borders/shadows the custom component may render
+                      "& *": {
+                        border: "0 !important",
+                        boxShadow: "none !important",
+                        background: "transparent",
+                      },
+                    }}>
+                    <UploadFileInput
+                      id="companyLogo"
+                      value={field.value}
+                      label="Company Logo"
+                      onChange={field.onChange}
+                    />
+                  </Box>
+                )}
+              />
+
+              {/* Hero Images (multiple upload) */}
+              <Controller
+                name="heroImages"
+                control={control}
+                render={({ field }) => (
+                  <Box
+                    sx={{
+                      pb: 0.5,
+                      borderBottom: "1px solid",
+                      borderColor: "divider",
+                      "& *": {
+                        border: "0 !important",
+                        boxShadow: "none !important",
+                        background: "transparent",
+                      },
+                    }}>
+                    <UploadMultipleFilesInput
+                      {...field}
+                      name="heroImages"
+                      id="heroImages"
+                      label="Carousel Images"
+                      maxFiles={5}
+                      allowedExtensions={["jpg", "jpeg", "png", "pdf", "webp"]}
+                    />
+                  </Box>
+                )}
+              />
+            </div>
+
+            {/* <div> */}
+            <div className="col-span-1 lg:col-span-2">
+              <h3 className="font-semibold mb-2 text-xl mt-4">About Company</h3>
               {aboutFields.map((field, index) => (
                 <div
                   key={field.id}
-                  className="rounded-lg border border-gray-300 p-3 mb-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium">Para #{index + 1}</span>
+                  className="rounded-lg border border-gray-300 p-3 mb-2">
+                  <div className="flex items-center justify-between ">
+                    <span className="font-medium">Paragraph {index + 1}</span>
                     <button
                       type="button"
                       onClick={() => removeAbout(index)}
@@ -568,12 +670,12 @@ const HostSignup = () => {
                     render={({ field, fieldState }) => (
                       <TextField
                         {...field}
-                        label="About Paragraph"
+                        label="Add Paragraph"
                         fullWidth
-                        margin="normal"
+                        margin="none"
                         variant="standard"
                         multiline
-                        rows={3}
+                        rows={2}
                         error={!!fieldState.error}
                         helperText={fieldState.error?.message}
                       />
@@ -586,11 +688,11 @@ const HostSignup = () => {
                 type="button"
                 onClick={() => appendAbout({ text: "" })}
                 className="text-blue-600 text-sm">
-                + Add Para
+                + Add Paragraph
               </button>
             </div>
 
-            <Controller
+            {/* <Controller
               name="contactTitle"
               control={control}
               rules={{ required: "Contact Title is required" }}
@@ -605,142 +707,312 @@ const HostSignup = () => {
                   helperText={fieldState.error?.message}
                 />
               )}
-            />
+            /> */}
 
-            <Controller
-              name="mapUrl"
-              control={control}
-              rules={{
-                required: "Map URL is required",
-                validate: (val) => {
-                  const MAP_EMBED_REGEX =
-                    /^https?:\/\/(www\.)?(google\.com|maps\.google\.com)\/maps\/embed(\/v1\/[a-z]+|\?pb=|\/?\?)/i;
+            {/* Products Section */}
+            <div className="col-span-1 lg:col-span-2">
+              <h3 className="font-semibold mb-2 text-xl mt-4">Products</h3>
 
-                  const v = (val || "").trim();
+              {productFields.map((field, index) => (
+                <div
+                  key={field.id}
+                  className="rounded-lg border border-gray-300 p-3 mb-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-medium">Product {index + 1}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeProduct(index)}
+                      className="text-sm text-red-600">
+                      Remove
+                    </button>
+                  </div>
 
-                  return (
-                    MAP_EMBED_REGEX.test(v) ||
-                    "Enter a valid Google Maps *embed* URL (e.g. https://www.google.com/maps/embed?pb=...)"
-                  );
-                },
-              }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  onChange={(e) => {
-                    // auto-extract src if full iframe pasted
-                    const extractIframeSrc = (val = "") =>
-                      val.match(/src=["']([^"']+)["']/i)?.[1] || val;
+                  {/* Grid for first 4 inputs */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Controller
+                      name={`products.${index}.name`}
+                      control={control}
+                      rules={{ required: "Name is required" }}
+                      render={({ field, fieldState }) => (
+                        <TextField
+                          {...field}
+                          label="Product Name"
+                          fullWidth
+                          margin="none"
+                          variant="standard"
+                          error={!!fieldState.error}
+                          helperText={fieldState.error?.message}
+                        />
+                      )}
+                    />
 
-                    const raw = e.target.value;
-                    const cleaned = extractIframeSrc(raw).trim();
+                    <Controller
+                      name={`products.${index}.type`}
+                      control={control}
+                      rules={{ required: "Type is required" }}
+                      render={({ field, fieldState }) => (
+                        <TextField
+                          {...field}
+                          select
+                          label="Product Type"
+                          fullWidth
+                          margin="none"
+                          variant="standard"
+                          error={!!fieldState.error}
+                          helperText={fieldState.error?.message}>
+                          {[
+                            "Co-working",
+                            "Hostels",
+                            "Workation",
+                            "Private Stay",
+                            "Meetings",
+                            "Cafe",
+                          ].map((option) => (
+                            <MenuItem key={option} value={option}>
+                              {option}
+                            </MenuItem>
+                          ))}
+                        </TextField>
+                      )}
+                    />
 
-                    field.onChange(cleaned);
-                  }}
-                  label="Google Map Embed URL"
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
+                    <Controller
+                      name={`products.${index}.description`}
+                      control={control}
+                      rules={{ required: "Description is required" }}
+                      render={({ field, fieldState }) => (
+                        <TextField
+                          {...field}
+                          label="Product Description"
+                          fullWidth
+                          margin="normal"
+                          variant="standard"
+                          // multiline
+                          // rows={2}
+                          error={!!fieldState.error}
+                          helperText={fieldState.error?.message}
+                        />
+                      )}
+                    />
 
-            <Controller
-              name="websiteEmail"
-              control={control}
-              rules={{
-                required: "Contact Email is required",
-                pattern: {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: "Invalid email format",
-                },
-              }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Contact Email"
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
+                    <Controller
+                      name={`products.${index}.cost`}
+                      control={control}
+                      rules={{ required: "Cost is required" }}
+                      render={({ field, fieldState }) => (
+                        <TextField
+                          {...field}
+                          label="Product Cost"
+                          fullWidth
+                          margin="normal"
+                          variant="standard"
+                          error={!!fieldState.error}
+                          helperText={fieldState.error?.message}
+                        />
+                      )}
+                    />
+                  </div>
 
-            <Controller
-              name="phone"
-              control={control}
-              rules={{ required: "Contact Phone is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Contact Phone"
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
+                  {/* Product Images */}
+                  <Controller
+                    name={`products.${index}.files`}
+                    control={control}
+                    render={({ field }) => (
+                      <UploadMultipleFilesInput
+                        {...field}
+                        name={`products.${index}.files`}
+                        id={`products-${index}-files`}
+                        label="Product Images"
+                        maxFiles={15}
+                        allowedExtensions={[
+                          "jpg",
+                          "jpeg",
+                          "png",
+                          "pdf",
+                          "webp",
+                        ]}
+                      />
+                    )}
+                  />
+                </div>
+              ))}
 
-            <Controller
-              name="address"
-              control={control}
-              rules={{ required: "Address is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Address"
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  // multiline
-                  // rows={3}
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
+              <button
+                type="button"
+                onClick={() =>
+                  appendProduct({
+                    type: "",
+                    name: "",
+                    cost: "",
+                    description: "",
+                    files: [],
+                  })
+                }
+                className="text-blue-600 text-sm">
+                + Add Product
+              </button>
+            </div>
 
-            <Controller
-              name="registeredCompanyName"
-              control={control}
-              rules={{ required: "Registered Company Name is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Registered Company Name"
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
+            {/* Gallery Section (already there) */}
 
-            <Controller
-              name="copyrightText"
-              control={control}
-              rules={{ required: "Copyright Text is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Copyright Text"
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                  // multiline
-                  // rows={2}
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
+            {/* Gallery Section */}
+            <div className="col-span-1 lg:col-span-2">
+              <h3 className="font-semibold mb-2 text-xl mt-4">Gallery</h3>
+              <Controller
+                name="gallery"
+                control={control}
+                render={({ field }) => (
+                  <UploadMultipleFilesInput
+                    {...field}
+                    name="gallery"
+                    id="gallery"
+                    label="Gallery Images"
+                    maxFiles={10}
+                    allowedExtensions={["jpg", "jpeg", "png", "pdf", "webp"]}
+                  />
+                )}
+              />
+            </div>
+
+            <div className="col-span-1 lg:col-span-2">
+              <h2 className="font-semibold mt-4 text-xl">Company Contact</h2>
+            </div>
+            <div className="col-span-1 lg:col-span-2 rounded-lg border border-gray-300 p-3 mb-2 grid grid-cols-2 gap-4">
+              <Controller
+                name="websiteEmail"
+                control={control}
+                rules={{
+                  required: "Contact Email is required",
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: "Invalid email format",
+                  },
+                }}
+                render={({ field, fieldState }) => (
+                  <TextField
+                    {...field}
+                    label="Contact Email"
+                    fullWidth
+                    margin="none"
+                    variant="standard"
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                  />
+                )}
+              />
+
+              <Controller
+                name="phone"
+                control={control}
+                rules={{ required: "Contact Phone is required" }}
+                render={({ field, fieldState }) => (
+                  <TextField
+                    {...field}
+                    label="Contact Phone"
+                    fullWidth
+                    margin="none"
+                    variant="standard"
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                  />
+                )}
+              />
+
+              <Controller
+                name="mapUrl"
+                control={control}
+                rules={{
+                  required: "Map URL is required",
+                  validate: (val) => {
+                    const MAP_EMBED_REGEX =
+                      /^https?:\/\/(www\.)?(google\.com|maps\.google\.com)\/maps\/embed(\/v1\/[a-z]+|\?pb=|\/?\?)/i;
+
+                    const v = (val || "").trim();
+
+                    return (
+                      MAP_EMBED_REGEX.test(v) ||
+                      "Enter a valid Google Maps *embed* URL (e.g. https://www.google.com/maps/embed?pb=...)"
+                    );
+                  },
+                }}
+                render={({ field, fieldState }) => (
+                  <TextField
+                    {...field}
+                    onChange={(e) => {
+                      // auto-extract src if full iframe pasted
+                      const extractIframeSrc = (val = "") =>
+                        val.match(/src=["']([^"']+)["']/i)?.[1] || val;
+
+                      const raw = e.target.value;
+                      const cleaned = extractIframeSrc(raw).trim();
+
+                      field.onChange(cleaned);
+                    }}
+                    label="Google Map Embed URL"
+                    fullWidth
+                    margin="normal"
+                    variant="standard"
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                  />
+                )}
+              />
+
+              <Controller
+                name="address"
+                control={control}
+                rules={{ required: "Address is required" }}
+                render={({ field, fieldState }) => (
+                  <TextField
+                    {...field}
+                    label="Address"
+                    fullWidth
+                    margin="normal"
+                    variant="standard"
+                    // multiline
+                    // rows={3}
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                  />
+                )}
+              />
+
+              <Controller
+                name="registeredCompanyName"
+                control={control}
+                rules={{ required: "Registered Company Name is required" }}
+                render={({ field, fieldState }) => (
+                  <TextField
+                    {...field}
+                    label="Registered Company Name"
+                    fullWidth
+                    margin="normal"
+                    variant="standard"
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                  />
+                )}
+              />
+
+              <Controller
+                name="copyrightText"
+                control={control}
+                rules={{ required: "Copyright Text is required" }}
+                render={({ field, fieldState }) => (
+                  <TextField
+                    {...field}
+                    label="Copyright Text"
+                    fullWidth
+                    margin="normal"
+                    variant="standard"
+                    // multiline
+                    // rows={2}
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                  />
+                )}
+              />
+            </div>
           </>
         );
 
@@ -905,18 +1177,85 @@ const HostSignup = () => {
         ))}
       </Stepper>
       <div className="max-w-5xl mx-auto w-full">
-        {activeStep !== 3 && (
+        {/* {activeStep !== 3 && (
           <h1 className="text-title text-center">
             Let's set up your free account
           </h1>
+        )} */}
+        {activeStep !== 3 && (
+          <h1 className="text-title text-center">
+            {activeStep === 0 && "Let's set up your free account"}
+            {activeStep === 1 && "Add your company details"}
+            {activeStep === 2 && "Add Your Website Content"}
+            {/* {activeStep === 3 && "Choose your services"} */}
+            {/* {activeStep === 4 && "Activate your account"} */}
+          </h1>
         )}
+
         <form
           key={activeStep}
           className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-4"
           // onSubmit={handleSubmit((data) => register(data))}
-          onSubmit={handleSubmit((data) =>
-            register({ ...data, about: data.about.map((a) => a.text) })
-          )}>
+          // onSubmit={handleSubmit((data) =>
+          //   register({ ...data, about: data.about.map((a) => a.text) })
+          // )}
+          onSubmit={handleSubmit((values) => {
+            const fd = new FormData();
+
+            // Append all simple fields (skip files/arrays)
+            Object.entries(values).forEach(([key, val]) => {
+              if (
+                key === "companyLogo" ||
+                key === "heroImages" ||
+                key === "about" ||
+                key === "gallery" ||
+                key === "products"
+              )
+                return;
+              fd.set(key, val);
+            });
+
+            // About
+            fd.set("about", JSON.stringify(values.about.map((a) => a.text)));
+
+            // Products metadata
+            const productsMeta = (values.products || []).map((p) => ({
+              type: p.type,
+              name: p.name,
+              cost: p.cost,
+              description: p.description,
+            }));
+            fd.set("products", JSON.stringify(productsMeta));
+
+            // Product images
+            (values.products || []).forEach((p, i) => {
+              (p.files || []).forEach((f) => {
+                fd.append(`productImages_${i}`, f);
+              });
+            });
+
+            // companyLogo
+            if (values.companyLogo) {
+              fd.set("companyLogo", values.companyLogo);
+            }
+
+            // heroImages
+            fd.delete("heroImages");
+            (values.heroImages || []).forEach((file) => {
+              fd.append("heroImages", file);
+            });
+
+            // gallery
+            fd.delete("gallery");
+            (values.gallery || []).forEach((file) => {
+              fd.append("gallery", file);
+            });
+
+            // formName
+            fd.set("formName", "register");
+
+            register(fd);
+          })}>
           {renderStepFields()}
           <div className="col-span-1 lg:col-span-2 flex justify-between items-center">
             {activeStep > 0 && (
