@@ -184,7 +184,7 @@ const UploadMultipleFilesInput = ({
       />
 
       {/* Chips list */}
-      {value?.length > 0 && (
+      {/* {value?.length > 0 && (
         <div className="flex flex-wrap gap-1">
           {value.map((f, i) => (
             <Chip
@@ -197,17 +197,18 @@ const UploadMultipleFilesInput = ({
             />
           ))}
         </div>
-      )}
+      )} */}
 
       {/* Preview thumbnails grid */}
       {previews.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+        // <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
           {previews.map((p, i) => (
             <div
               key={`${p.file.name}-${i}`}
               className="border rounded-md p-2 flex flex-col gap-2">
               <div
-                className="cursor-pointer"
+                className="cursor-pointer aspect-square"
                 onClick={() => {
                   setModalIndex(i);
                   setOpenModal(true);
@@ -217,7 +218,8 @@ const UploadMultipleFilesInput = ({
                   <img
                     src={p.url}
                     alt={p.file.name}
-                    className="w-full h-32 object-cover rounded"
+                    // className="w-full h-32 object-cover rounded"
+                    className="w-full h-full object-cover rounded" // 👈 smaller height (80px)
                   />
                 ) : isPDF(p.ext) ? (
                   <div className="w-full h-32 flex items-center justify-center bg-gray-100 rounded text-xs">
