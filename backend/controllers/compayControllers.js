@@ -439,3 +439,25 @@ export const addCompanyImagesBulk = async (req, res, next) => {
     next(error);
   }
 };
+
+export const editCompany = async (req, res, next) => {
+  try {
+    const { companyName, link } = req.body;
+    console.log("req", companyName);
+    console.log("link", link);
+    const company = await Company.findOneAndUpdate(
+      { companyName },
+      { websiteTemplateLink: link }
+    );
+    console.log("company", company);
+    if (!company) {
+      return res
+        .status(400)
+        .json({ message: "Failed to add website template link" });
+    }
+
+    return res.status(200).json({});
+  } catch (error) {
+    next(error);
+  }
+};
