@@ -43,7 +43,7 @@ export default function Signup() {
   const { mutate: submitRegisteration, isPending: isRegisterationPending } =
     useMutation({
       mutationFn: async (data) => {
-        const response = await axios.post("forms/add-new-b2c-form-submission", {...data,sheetName:"Sign_up"});
+        const response = await axios.post("forms/register-form-submission", {...data,sheetName:"Sign_up"});
         return response.data;
       },
       onSuccess: (data) => {
