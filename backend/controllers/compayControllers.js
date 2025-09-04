@@ -195,14 +195,13 @@ export const getCompanyData = async (req, res, next) => {
 export const getCompany = async (req, res, next) => {
   try {
     const { companyName } = req.params;
-
-    const company = await Company.findOne(companyName);
+    const company = await Company.findOne({ companyName });
 
     if (!company) {
-      return res.status(400).json({ message: "Company not found" });
+      return res.status(404).json({ message: "Company not found" });
     }
 
-    return res.status(200).json({});
+    return res.status(200).json(company);
   } catch (error) {
     next(error);
   }
