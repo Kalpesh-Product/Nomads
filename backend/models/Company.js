@@ -12,11 +12,16 @@ const companySchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
+
   registeredEntityName: {
     type: String,
     trim: true,
   },
   website: {
+    type: String,
+    trim: true,
+  },
+  websiteTemplateLink: {
     type: String,
     trim: true,
   },
@@ -85,7 +90,7 @@ const companySchema = new mongoose.Schema({
       "meetingroom",
       "privatestay",
       "hostel",
-      "cafe"
+      "cafe",
     ],
     required: true,
   },
