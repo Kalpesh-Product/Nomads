@@ -1249,6 +1249,7 @@ const HostSignup = () => {
 
             // About
             fd.set("about", JSON.stringify(values.about.map((a) => a.text)));
+            // fd.set("about", values.about.map((a) => a.text).join(","));
 
             // Products metadata
             const productsMeta = (values.products || []).map((p) => ({
