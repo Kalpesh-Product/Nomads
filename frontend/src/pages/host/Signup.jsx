@@ -32,30 +32,31 @@ const steps = [
 
 const serviceOptions = [
   {
-    category: "Addon Modules (Coming Soon)",
+    category: "Addon Apps (Coming Soon)",
     items: [
       "Tickets",
       "Meetings",
       "Tasks",
       "Performance",
       "Visitors",
-      "Calendar",
-      "Access",
-      "Profile",
+      "Assets",
+
+      // "Cafe",
+    ],
+  },
+  {
+    category: "Addon Modules (Coming Soon)",
+    items: [
       "Finance",
       "Sales",
       "HR",
-      "Frontend",
+
       "Admin",
       "Maintenance",
       "IT",
       // "Cafe",
     ],
   },
-  // {
-  //   category: "Apps",
-  //   items: ["Tickets", "Meetings", "Tasks", "Performance", "Visitors"],
-  // },
   // {
   //   category: "General",
   //   items: ["Calendar", "Access", "Profile"],
@@ -1142,9 +1143,16 @@ const HostSignup = () => {
             <div className="space-y-10">
               <div>
                 <p>
-                  An email has been sent to your email address {"<EMAIL?>"}{" "}
-                  containing all the further process for activating the account.
+                  An email has been sent to your email address&nbsp;
+                  {/* {"<EMAIL?>"} */}
+                  <strong>{watch("email")}</strong> containing all the further
+                  process for activating the account.
                 </p>
+                <p>
+                  Our team will reach out to you shortly for more details and
+                  will inform you once your website is activated.
+                </p>
+                <br />
                 <p>
                   Please let us know if there is any more queries from your
                   side, or you can contact us at : {"response@wono.co"}
@@ -1311,7 +1319,7 @@ const HostSignup = () => {
               <></>
             )}
             {activeStep === stepFields.length - 1 && (
-              <div className="flex  justify-center  items-center w-full">
+              <div className="flex  justify-center lg:justify-end  items-center w-full">
                 <GetStartedButton title="Submit" type={"submit"} />
               </div>
             )}
