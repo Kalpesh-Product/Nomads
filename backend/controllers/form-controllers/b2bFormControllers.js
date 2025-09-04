@@ -407,7 +407,7 @@ export const registerFormSubmission = async (req, res, next) => {
         title: payload.title,
         subTitle: payload.subTitle,
         CTAButtonText: payload.CTAButtonText,
-        about: about?.split(",") || [],
+        about: JSON.parse(about) || [],
         productTitle: payload?.productTitle,
         galleryTitle: payload?.galleryTitle,
         testimonialTitle: payload.testimonialTitle,
