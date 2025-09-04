@@ -142,7 +142,7 @@ const HostSignup = () => {
   const { mutate: register, isLoading: isRegisterLoading } = useMutation({
     mutationFn: async (fd) => {
       const response = await axios.post(
-        "form/add-new-b2b-form-submission",
+        "forms/register-form-submission",
         fd,
         {
           headers: { "Content-Type": "multipart/form-data" },
