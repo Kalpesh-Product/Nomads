@@ -91,6 +91,7 @@ const TemplateHome = () => {
 
   if (!tenant) return <div>No tenant specified</div>;
   if (isPending) return <div>Loading site...</div>;
+  if (!data.isActive) return <div>Website is currently inactive</div>;
   if (error) {
     console.log("error", error);
     return <div>Error loading site: {error.message}</div>;
@@ -101,7 +102,6 @@ const TemplateHome = () => {
   const about = isPending ? [] : data?.about;
   const galleryImages = isPending ? [] : data?.gallery;
   const products = isPending ? [] : data?.products;
-  console.log("products : ", products);
   const testimonials = isPending ? [] : data?.testimonials;
 
   return (
