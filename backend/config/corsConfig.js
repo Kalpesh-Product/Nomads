@@ -4,6 +4,7 @@ export const allowedOrigins = [
   "https://wono.co",
   "https://www.wono.co",
   "https://wononomadsfe.vercel.app",
+  "https://wonomasterfe.vercel.app",
   "https://data-upload-alpha.vercel.app",
 ];
 
