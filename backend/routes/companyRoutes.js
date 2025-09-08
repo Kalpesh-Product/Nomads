@@ -7,6 +7,7 @@ import {
   getUniqueDataLocations,
   addCompanyImage,
   addCompanyImagesBulk,
+  createCompany,
   editCompany,
   getCompany,
   getAllLeads,
@@ -31,6 +32,8 @@ router.post(
   upload.array("images", 10),
   addCompanyImagesBulk
 );
+
+router.post("/create-company", upload.any(), createCompany);
 router.get("/all-leads", getAllLeads);
 router.get("/leads", getCompanyLeads);
 
