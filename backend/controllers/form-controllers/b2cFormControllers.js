@@ -1,5 +1,6 @@
 import * as yup from "yup";
 import Lead from "../../models/Lead.js";
+import mongoose from "mongoose";
 
 const enquirySchema = yup.object({
   companyName: yup.string().trim().required("Please provide the company name"),
@@ -198,8 +199,13 @@ export const addB2CformSubmission = async (req, res, next) => {
     const payload = config.map(validatedData);
 
     if (sheetName === "All_Enquiry") {
+      if (companyId && !mongoose.Types.ObjectId.isValid(companyId)) {
+        return res.status(400).json({ message: "Invalid company id provided" });
+      }
+
       const leads = new Lead({
         companyName,
+        companyId,
         verticalType: companyType,
         country: country || "",
         state: state || "",
