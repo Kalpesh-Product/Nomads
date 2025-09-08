@@ -5,6 +5,7 @@ import { Readable } from "stream";
 import csvParser from "csv-parser";
 import { uploadFileToS3 } from "../config/s3Config.js";
 import mongoose from "mongoose";
+import Lead from "../models/Lead.js";
 
 export const bulkInsertCompanies = async (req, res, next) => {
   try {
@@ -458,13 +459,12 @@ export const addCompanyImagesBulk = async (req, res, next) => {
 export const editCompany = async (req, res, next) => {
   try {
     const { companyName, link } = req.body;
-    console.log("req", companyName);
-    console.log("link", link);
+
     const company = await Company.findOneAndUpdate(
       { companyName },
       { websiteTemplateLink: link }
     );
-    console.log("company", company);
+
     if (!company) {
       return res.status(400).json({
         message:
@@ -473,6 +473,39 @@ export const editCompany = async (req, res, next) => {
     }
 
     return res.status(200).json({});
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getAllLeads = async (req, res, next) => {
+  try {
+    const leads = await Lead.find();
+
+    if (!leads || !leads.length) {
+      return res.status(400).json({
+        message: "No leads found",
+      });
+    }
+
+    return res.status(200).json(leads);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getCompanyLeads = async (req, res, next) => {
+  try {
+    const { companyName } = req.query;
+    const leads = await Lead.find({ companyName });
+
+    if (!leads || !leads.length) {
+      return res.status(400).json({
+        message: "No leads found",
+      });
+    }
+
+    return res.status(200).json(leads);
   } catch (error) {
     next(error);
   }

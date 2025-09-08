@@ -1,0 +1,60 @@
+import mongoose from "mongoose";
+
+const leadSchema = new mongoose.Schema(
+  {
+    companyName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    verticalType: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    country: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    state: {
+      type: String,
+      trim: true,
+    },
+    fullName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    noOfPeople: {
+      type: Number,
+      min: 1,
+    },
+    mobileNumber: {
+      type: String,
+      match: [/^\+?[0-9]{7,15}$/, "Invalid phone number format"],
+    },
+    email: {
+      type: String,
+      lowercase: true,
+      trim: true,
+      match: [/.+\@.+\..+/, "Invalid email address"],
+    },
+    startDate: {
+      type: Date,
+      required: true,
+    },
+    endDate: {
+      type: Date,
+      validate: {
+        validator: function (value) {
+          return !this.startDate || value >= this.startDate;
+        },
+        message: "End date must be greater than or equal to start date",
+      },
+    },
+  },
+  { timestamps: true }
+);
+
+export default mongoose.model("Lead", leadSchema);

@@ -9,6 +9,8 @@ import {
   addCompanyImagesBulk,
   editCompany,
   getCompany,
+  getAllLeads,
+  getCompanyLeads,
 } from "../controllers/compayControllers.js";
 
 const router = Router();
@@ -29,5 +31,7 @@ router.post(
   upload.array("images", 10),
   addCompanyImagesBulk
 );
+router.get("/all-leads", getAllLeads);
+router.get("/leads", getCompanyLeads);
 
 export default router;

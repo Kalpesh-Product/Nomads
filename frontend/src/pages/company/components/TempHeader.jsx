@@ -67,7 +67,7 @@ const handleScroll = (id) => {
           <img
             src={logo}
             alt={"logo"}
-            className="w-full h-full object-contain"
+            className="sw-full h-full object-contain"
           />
         </div>
       </div>
