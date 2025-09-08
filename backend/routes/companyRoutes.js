@@ -7,11 +7,11 @@ import {
   getUniqueDataLocations,
   addCompanyImage,
   addCompanyImagesBulk,
-  createCompany,
   editCompany,
   getCompany,
   getAllLeads,
   getCompanyLeads,
+  createCompany,
 } from "../controllers/compayControllers.js";
 
 const router = Router();
