@@ -64,7 +64,7 @@ const NewsCard = ({ a }) => {
           <p className="mt-2 text-sm text-gray-600 line-clamp-3">{desc}</p>
 
           <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
-            <div>
+            <div className="text-right w-full">
               <span className="truncate">
                 {a.author || a.source?.name || "News Desk"}
               </span>
@@ -79,13 +79,13 @@ const NewsCard = ({ a }) => {
                   : ""}
               </time>
             </div>
-            <a
+            {/* <a
               href={a.url}
               target="_blank"
               rel="noreferrer"
               className="shrink-0 font-medium text-blue-600 hover:underline">
               Read full story →
-            </a>
+            </a> */}
           </div>
         </div>
       </div>
