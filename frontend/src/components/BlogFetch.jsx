@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "../utils/axios"; // your custom axios instance
 import { IoChevronDown } from "react-icons/io5";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import humanDate from "../utils/humanDate";
 
 const DESTS = [
@@ -25,14 +25,15 @@ const extractImageFromContent = (content) => {
 const BlogCard = ({ b }) => {
   const fallbackImg = extractImageFromContent(b.content || b.description);
   const thumbnail = b.mainImage || fallbackImg;
+  const navigate = useNavigate()
 
   return (
-    <article className="border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition">
+    <article onClick={()=>navigate("blog-details",{state:{ content: b }})} className="border rounded-xl overflow-hidden shadow-sm hover:shadow-xl cursor-pointer transition">
       {thumbnail ? (
         <img
           src={thumbnail}
           alt={b.mainTitle}
-          className="w-full h-44 object-cover"
+          className="w-full h-56 object-cover"
           loading="lazy"
         />
       ) : (
@@ -50,13 +51,13 @@ const BlogCard = ({ b }) => {
           <time dateTime={b.date}>{b.date ? humanDate(b.date) : ""}</time>
         </div>
 
-        <NavLink
+        {/* <NavLink
           to={"blog-details"}
           className={"underline"}
-          state={{ content: b }}
+      
         >
           Read full blog →
-        </NavLink>
+        </NavLink> */}
 
         {/* <a
           href={b.link}
@@ -130,7 +131,7 @@ const BlogFetch = () => {
       </div>
 
       {/* Results */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
         {isPending && <span className="text-sm text-gray-500">Loading…</span>}
         {isError && (
           <span className="text-sm text-red-600">Could not load blogs.</span>
