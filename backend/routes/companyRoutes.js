@@ -7,6 +7,7 @@ import {
   getUniqueDataLocations,
   addCompanyImage,
   addCompanyImagesBulk,
+  createCompany,
 } from "../controllers/compayControllers.js";
 
 const router = Router();
@@ -25,5 +26,7 @@ router.post(
   upload.array("images", 10),
   addCompanyImagesBulk
 );
+
+router.post("/create-company", upload.any(), createCompany);
 
 export default router;

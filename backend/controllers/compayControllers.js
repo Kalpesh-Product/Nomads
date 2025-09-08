@@ -90,6 +90,174 @@ export const bulkInsertCompanies = async (req, res, next) => {
   }
 };
 
+export const createCompany = async (req, res, next) => {
+  try {
+    const {
+      businessId,
+      companyName,
+      registeredEntityName,
+      website,
+      address,
+      city,
+      state,
+      country,
+      about,
+      totalSeats,
+      latitude,
+      longitude,
+      googleMap,
+      ratings,
+      totalReviews,
+      inclusions,
+      services,
+      units,
+      companyType,
+      poc,      // single POC object
+      reviews,  // array of reviews
+    } = req.body;
+
+    if (!businessId || !companyName) {
+      return res
+        .status(400)
+        .json({ message: "Business ID and Company Name are required" });
+    }
+
+    // Create company
+    const company = new Company({
+      businessId: businessId.trim(),
+      companyName: companyName.trim(),
+      registeredEntityName: registeredEntityName?.trim(),
+      website: website?.trim() || null,
+      address: address?.trim(),
+      city: city?.trim(),
+      state: state?.trim(),
+      country: country?.trim(),
+      about: about?.trim(),
+      totalSeats: totalSeats ? parseInt(totalSeats) : null,
+      latitude: latitude ? parseFloat(latitude) : null,
+      longitude: longitude ? parseFloat(longitude) : null,
+      googleMap: googleMap?.trim() || null,
+      ratings: ratings ? parseFloat(ratings) : 0,
+      totalReviews: totalReviews ? parseInt(totalReviews) : 0,
+      inclusions: inclusions?.trim(),
+      services: services?.trim(),
+      units: units?.trim(),
+      companyType: companyType?.trim()?.split(" ").join("").toLowerCase(),
+    });
+
+    // Save company first (needed for _id reference in POC/Reviews)
+    const savedCompany = await company.save();
+
+    /** ---------------- IMAGE UPLOAD LOGIC ---------------- **/
+
+    const formatCompanyType = (type) => {
+      const map = {
+        hostel: "hostels",
+        privatestay: "private-stay",
+        meetingroom: "meetingroom",
+        coworking: "coworking",
+        cafe: "cafe",
+        coliving: "coliving",
+        workation: "workation",
+      };
+      const key = String(type || "").toLowerCase();
+      return map[key] || "unknown";
+    };
+
+    const pathCompanyType = formatCompanyType(
+      companyType || savedCompany.companyType
+    );
+
+    const safeCompanyName =
+      (companyName || "unnamed").replace(/[^\w\- ]+/g, "").trim() || "unnamed";
+
+    const folderPath = `nomads/${pathCompanyType}/${country}/${safeCompanyName}`;
+
+    // 1️⃣ Upload Logo if provided (req.files.logo)
+    if (req.files?.logo?.[0]) {
+      const logoFile = req.files.logo[0];
+      const logoKey = `${folderPath}/logo/${logoFile.originalname}`;
+      const logoUrl = await uploadFileToS3(logoKey, logoFile);
+      savedCompany.logo = logoUrl;
+    }
+
+    // 2️⃣ Upload Images if provided (req.files.images[])
+    if (req.files?.images && req.files.images.length > 0) {
+      if (!Array.isArray(savedCompany.images)) savedCompany.images = [];
+      const startIndex = savedCompany.images.length;
+
+      const sanitizeFileName = (name) =>
+        String(name || "file")
+          .replace(/[/\\?%*:|"<>]/g, "_")
+          .replace(/\s+/g, "_");
+
+      const results = await Promise.allSettled(
+        req.files.images.map(async (file, i) => {
+          const uniqueKey = `${folderPath}/images/${sanitizeFileName(
+            file.originalname
+          )}`;
+          const uploadedUrl = await uploadFileToS3(uniqueKey, file);
+          return {
+            url: uploadedUrl,
+            index: startIndex + i + 1,
+          };
+        })
+      );
+
+      const successes = results
+        .filter((r) => r.status === "fulfilled")
+        .map((r) => r.value);
+
+      if (successes.length) {
+        savedCompany.images.push(...successes);
+      }
+    }
+
+    // Save company again with logo/images
+    await savedCompany.save({ validateBeforeSave: false });
+
+    /** ---------------- POC LOGIC ---------------- **/
+    if (poc && Object.keys(poc).length > 0) {
+      const pocDoc = new PointOfContact({
+        company: savedCompany._id,
+        name: poc.name?.trim(),
+        image: poc.image?.trim(),
+        designation: poc.designation?.trim(),
+        email: poc.email?.trim()?.toLowerCase(),
+        phoneNumber: poc.phoneNumber?.trim(),
+        linkedInProfile: poc.linkedInProfile?.trim(),
+        languages: Array.isArray(poc.languages)
+          ? poc.languages.map((lang) => lang.trim())
+          : poc.languages?.split(",").map((lang) => lang.trim()),
+        address: poc.address?.trim(),
+        availabilityTime: poc.availabilityTime?.trim(),
+      });
+      await pocDoc.save();
+    }
+
+    /** ---------------- REVIEWS LOGIC ---------------- **/
+    if (Array.isArray(reviews) && reviews.length > 0) {
+      const reviewDocs = reviews.map((review) => ({
+        company: savedCompany._id,
+        name: review.name?.trim(),
+        starCount: parseInt(review.starCount),
+        description: review.description?.trim(),
+        reviewSource: review.reviewSource?.trim(),
+        reviewLink: review.reviewLink?.trim(),
+      }));
+      await Review.insertMany(reviewDocs);
+    }
+
+    res.status(201).json({
+      message: "Company created successfully with images",
+      company: savedCompany,
+    });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
 export const getCompaniesData = async (req, res, next) => {
   try {
     const companies = await Company.find().lean().exec();
