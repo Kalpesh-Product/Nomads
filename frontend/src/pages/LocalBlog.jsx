@@ -1,8 +1,11 @@
 import React from "react";
 import Container from "../components/Container";
 import BlogFetch from "../components/BlogFetch";
+import { useQuery } from "@tanstack/react-query";
+import axios from "../utils/axios";
 
 const LocalBlog = () => {
+
   return (
     <Container padding={false}>
       {/* <div className="flex justify-center items-center h-screen lg:h-[40vh]">

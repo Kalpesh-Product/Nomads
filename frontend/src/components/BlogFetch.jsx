@@ -2,7 +2,8 @@ import React, { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "../utils/axios"; // your custom axios instance
 import { IoChevronDown } from "react-icons/io5";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import humanDate from "../utils/humanDate";
 
 const DESTS = [
   { label: "Goa", keyword: "Goa" },
@@ -23,15 +24,16 @@ const extractImageFromContent = (content) => {
 
 const BlogCard = ({ b }) => {
   const fallbackImg = extractImageFromContent(b.content || b.description);
-  const thumbnail = b.thumbnail || fallbackImg;
+  const thumbnail = b.mainImage || fallbackImg;
+  const navigate = useNavigate()
 
   return (
-    <article className="border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition">
+    <article onClick={()=>navigate("blog-details",{state:{ content: b }})} className="border rounded-xl overflow-hidden shadow-sm hover:shadow-xl cursor-pointer transition">
       {thumbnail ? (
         <img
           src={thumbnail}
-          alt={b.title}
-          className="w-full h-44 object-cover"
+          alt={b.mainTitle}
+          className="w-full h-56 object-cover"
           loading="lazy"
         />
       ) : (
@@ -39,27 +41,31 @@ const BlogCard = ({ b }) => {
       )}
 
       <div className="p-4">
-        <h3 className="font-semibold text-lg line-clamp-2">{b.title}</h3>
+        <h3 className="font-semibold text-lg line-clamp-2">{b.mainTitle}</h3>
         <p className="text-sm text-gray-600 mt-2 line-clamp-3">
-          {stripHTML(b.description)}
+          {b.mainContent}
         </p>
 
         <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
           <span className="truncate">{b.author || "Unknown"}</span>
-          <time dateTime={b.pubDate}>
-            {b.pubDate ? new Date(b.pubDate).toLocaleDateString() : ""}
-          </time>
+          <time dateTime={b.date}>{b.date ? humanDate(b.date) : ""}</time>
         </div>
 
-        {/* <NavLink to={"blog-details"} className={"underline"}>Read full blog →</NavLink> */}
+        {/* <NavLink
+          to={"blog-details"}
+          className={"underline"}
+      
+        >
+          Read full blog →
+        </NavLink> */}
 
-        <a
+        {/* <a
           href={b.link}
           target="_blank"
           rel="noreferrer"
           className="inline-block mt-3 text-blue-600 font-medium hover:underline">
           Read full blog →
-        </a>
+        </a> */}
       </div>
     </article>
   );
@@ -73,15 +79,15 @@ const BlogFetch = () => {
   const { data, isPending, isError, refetch, isFetching } = useQuery({
     queryKey: ["blogs", dest.keyword],
     queryFn: async () => {
-      const res = await axios.get("/blogs", { params }); // your backend: /api/blogs
+      const res = await axios.get("/blogs/get-blogs", { params }); // your backend: /api/blogs
       return res.data;
     },
-    staleTime: 1000 * 60 * 5,
-    refetchOnWindowFocus: false,
+    // staleTime: 1000 * 60 * 5,
+    // refetchOnWindowFocus: false,
   });
 
   //   const blogs = Array.isArray(data?.articles) ? data.articles : [];
-  const blogs = Array.isArray(data?.articles) ? data.articles.slice(0, 9) : [];
+  const blogs = Array.isArray(data) ? data.slice(0, 9) : [];
 
   return (
     <div className="my-6">
@@ -98,7 +104,8 @@ const BlogFetch = () => {
               value={dest.label}
               onChange={(e) =>
                 setDest(DESTS.find((d) => d.label === e.target.value))
-              }>
+              }
+            >
               {DESTS.map((d) => (
                 <option key={d.label} value={d.label}>
                   {d.label}
@@ -124,7 +131,7 @@ const BlogFetch = () => {
       </div>
 
       {/* Results */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
         {isPending && <span className="text-sm text-gray-500">Loading…</span>}
         {isError && (
           <span className="text-sm text-red-600">Could not load blogs.</span>
