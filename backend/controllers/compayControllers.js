@@ -504,7 +504,7 @@ export const getCompanyLeads = async (req, res, next) => {
       });
     }
 
-    const leads = await Lead.find({ _id: companyId });
+    const leads = await Lead.find({ companyId: companyId });
 
     if (!leads || !leads.length) {
       return res.status(400).json({
