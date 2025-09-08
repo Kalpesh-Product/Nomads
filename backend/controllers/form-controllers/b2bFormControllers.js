@@ -1,6 +1,9 @@
 import { uploadFileToS3 } from "../../config/s3Config.js";
 import { randomUUID } from "crypto";
 import yup from "yup";
+import mongoose from "mongoose";
+import WebsiteTemplate from "../../models/WebsiteTemplate.js";
+import sharp from "sharp";
 
 const istNowPieces = () => {
   const tz = "Asia/Kolkata";
@@ -97,58 +100,6 @@ const jobApplicationSchema = yup
   })
   .noUnknown(true, "Unknown field in payload");
 
-const registrationSchema = yup.object().shape({
-  name: yup
-    .string()
-    .trim()
-    .required("Name is required")
-    .min(2, "Name must be at least 2 characters"),
-
-  email: yup
-    .string()
-    .trim()
-    .email("Invalid email format")
-    .required("Email is required"),
-
-  mobile: yup.string().required("Mobile number is required"),
-
-  country: yup.string().trim().required("Country is required"),
-  city: yup.string().trim().required("City is required"),
-  state: yup.string().trim().required("State is required"),
-
-  companyName: yup.string().trim().required("Company Name is required"),
-  industry: yup.string().trim().required("Industry is required"),
-
-  companySize: yup.string().trim().required("Company Size is required"),
-
-  companyType: yup.string().trim().required("Company Type is required"),
-
-  companyCity: yup.string().trim().required("Company City is required"),
-  companyState: yup.string().trim().required("Company State is required"),
-
-  websiteUrl: yup
-    .string()
-    .trim()
-    .url("Invalid Website URL")
-    .nullable()
-    .notRequired(),
-
-  linkedInUrl: yup
-    .string()
-    .trim()
-    .url("Invalid LinkedIn URL")
-    .nullable()
-    .notRequired(),
-
-  selectedServices: yup
-    .array()
-    .of(yup.string().trim())
-    .min(1, "Select at least one service")
-    .required("Selected Services is required"),
-
-  formName: yup.string().trim().required("Form Name is required"),
-});
-
 const enquirySchema = yup.object().shape({
   name: yup
     .string()
@@ -179,6 +130,8 @@ const enquirySchema = yup.object().shape({
   formName: yup.string().trim().required("Form Name is required"),
 });
 
+// controllers/b2bFormController.js
+
 export const addB2BFormSubmission = async (req, res, next) => {
   const url = process.env.B2B_APPS_SCRIPT_URL;
   if (!url) {
@@ -201,7 +154,6 @@ export const addB2BFormSubmission = async (req, res, next) => {
   };
 
   const parseAppsScriptResponse = async (resp) => {
-    // Try JSON first; if not JSON, return raw text in a wrapper
     const text = await resp.text();
     try {
       return { ok: resp.ok, data: JSON.parse(text) };
@@ -290,32 +242,6 @@ export const addB2BFormSubmission = async (req, res, next) => {
     });
   };
 
-  const handleRegister = async () => {
-    const payload = await validate(registrationSchema, req.body);
-
-    const apsBody = {
-      name: payload.name,
-      email: payload.email,
-      mobile: payload.mobile,
-      country: payload.country,
-      city: payload.city,
-      state: payload.state,
-      companyName: payload.companyName,
-      industry: payload.industry,
-      companySize: payload.companySize,
-      companyType: payload.companyType,
-      companyCity: payload.companyCity,
-      companyState: payload.companyState,
-      websiteURL: payload.websiteUrl,
-      linkedinURL: payload.linkedInUrl,
-      selectedServices: payload.selectedServices,
-      formName: "register",
-    };
-
-    const result = await postToAppsScript(apsBody);
-    return res.json(result);
-  };
-
   const handleEnquiry = async () => {
     const payload = await validate(enquirySchema, req.body);
 
@@ -339,7 +265,6 @@ export const addB2BFormSubmission = async (req, res, next) => {
 
     const handlers = {
       jobApplication: handleJobApplication,
-      register: handleRegister,
       connect: handleEnquiry,
     };
 
@@ -352,7 +277,6 @@ export const addB2BFormSubmission = async (req, res, next) => {
 
     await handlers[formName]();
   } catch (err) {
-    // unify schema (ValidationError) shape -> { field: message }
     if (err?.name === "ValidationError") {
       const errors = err.inner?.length
         ? err.inner.reduce((acc, e) => {
@@ -363,13 +287,286 @@ export const addB2BFormSubmission = async (req, res, next) => {
       return res.status(400).json({ error: "Validation failed", errors });
     }
 
-    // bubble known upstream failures with status if provided
     if (err?.status === 502) {
       return res
         .status(502)
         .json({ error: "Upstream write failed", detail: err.detail });
     }
 
+    return next(err);
+  }
+};
+
+// controllers/registerController.js
+export const registerFormSubmission = async (req, res, next) => {
+  const url = process.env.B2B_APPS_SCRIPT_URL;
+  if (!url) {
+    return res
+      .status(500)
+      .json({ error: "Server misconfiguration: Web App URL not set" });
+  }
+
+  // --- helpers ------------------------------------------------------
+  const parseAppsScriptResponse = async (resp) => {
+    const text = await resp.text();
+    try {
+      return { ok: resp.ok, data: JSON.parse(text) };
+    } catch {
+      return { ok: resp.ok, data: { raw: text } };
+    }
+  };
+
+  const postToAppsScript = async (body) => {
+    const signal =
+      typeof AbortSignal?.timeout === "function"
+        ? AbortSignal.timeout(15_000)
+        : undefined;
+
+    const resp = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      signal,
+    });
+
+    const { ok, data } = await parseAppsScriptResponse(resp);
+    if (!ok || data?.error) {
+      const detail = data?.error || data?.raw || "Unknown upstream error";
+      const err = new Error("Upstream write failed");
+      err.status = 502;
+      err.detail = detail;
+      throw err;
+    }
+    return data;
+  };
+
+  try {
+    const payload = req.body;
+
+    // STEP 1: send registration data to Google Sheet
+    const apsBody = {
+      name: payload.name,
+      email: payload.email,
+      mobile: payload.mobile,
+      country: payload.country,
+      city: payload.city,
+      state: payload.state,
+      companyName: payload.companyName,
+      industry: payload.industry,
+      companySize: payload.companySize,
+      companyType: payload.companyType,
+      companyCity: payload.companyCity,
+      companyState: payload.companyState,
+      websiteURL: payload.websiteUrl,
+      linkedinURL: payload.linkedInUrl,
+      selectedServices: payload.selectedServices,
+      formName: "register",
+    };
+
+    const sheetResult = await postToAppsScript(apsBody);
+    console.log(sheetResult);
+
+    // STEP 2: normalize incoming JSON strings
+    let { products, testimonials, about } = payload;
+    products = JSON.parse(products || "[]");
+    testimonials = JSON.parse(testimonials || "[]");
+
+    for (const k of Object.keys(payload)) {
+      if (/^(products|testimonials)\.\d+\./.test(k)) delete payload[k];
+    }
+
+    // ---------------- Website Data Save Logic ----------------
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const company = req.body.companyName || null;
+
+      const formatCompanyName = (name) => {
+        if (!name) return "";
+        return name.toLowerCase().split("-")[0].replace(/\s+/g, "");
+      };
+
+      const searchKey = formatCompanyName(payload.companyName);
+      const baseFolder = `${company}/template/${searchKey}`;
+
+      let template = await WebsiteTemplate.findOne({ searchKey }).session(
+        session
+      );
+      if (template) {
+        await session.abortTransaction();
+        session.endSession();
+        return res
+          .status(400)
+          .json({ message: "Template for this company already exists" });
+      }
+
+      template = new WebsiteTemplate({
+        searchKey,
+        companyName: payload.companyName,
+        title: payload.title,
+        subTitle: payload.subTitle,
+        CTAButtonText: payload.CTAButtonText,
+        about: JSON.parse(about) || [],
+        productTitle: payload?.productTitle,
+        galleryTitle: payload?.galleryTitle,
+        testimonialTitle: payload.testimonialTitle,
+        contactTitle: payload.contactTitle,
+        mapUrl: payload.mapUrl,
+        email: payload.websiteEmail,
+        phone: payload.phone,
+        address: payload.address,
+        registeredCompanyName: payload.registeredCompanyName,
+        copyrightText: payload.copyrightText,
+        products: [],
+        testimonials: [],
+      });
+
+      // Helper: upload an array of files to S3
+      const uploadImages = async (files = [], folder) => {
+        const arr = [];
+        for (const file of files) {
+          const buffer = await sharp(file.buffer)
+            .webp({ quality: 80 })
+            .toBuffer();
+
+          const route = `${folder}/${Date.now()}_${file.originalname.replace(
+            /\s+/g,
+            "_"
+          )}`;
+          const url = await uploadFileToS3(route, {
+            buffer,
+            mimetype: "image/webp",
+          });
+          arr.push({ url });
+        }
+        return arr;
+      };
+
+      // Index multer files
+      const filesByField = {};
+      for (const f of req.files || []) {
+        if (!filesByField[f.fieldname]) filesByField[f.fieldname] = [];
+        filesByField[f.fieldname].push(f);
+      }
+
+      // companyLogo
+      if (filesByField.companyLogo && filesByField.companyLogo[0]) {
+        const logoFile = filesByField.companyLogo[0];
+        const buffer = await sharp(logoFile.buffer)
+          .webp({ quality: 80 })
+          .toBuffer();
+        const route = `${baseFolder}/companyLogo/${Date.now()}_${
+          logoFile.originalname
+        }`;
+        const url = await uploadFileToS3(route, {
+          buffer,
+          mimetype: "image/webp",
+        });
+        template.companyLogo = { url };
+      }
+
+      // heroImages
+      if (filesByField.heroImages?.length) {
+        template.heroImages = await uploadImages(
+          filesByField.heroImages,
+          `${baseFolder}/heroImages`
+        );
+      }
+
+      // gallery
+      if (filesByField.gallery?.length) {
+        template.gallery = await uploadImages(
+          filesByField.gallery,
+          `${baseFolder}/gallery`
+        );
+      }
+
+      // products
+      if (Array.isArray(products) && products.length) {
+        for (let i = 0; i < products.length; i++) {
+          const p = products[i] || {};
+          const pFiles = filesByField[`productImages_${i}`] || [];
+          const uploaded = await uploadImages(
+            pFiles,
+            `${baseFolder}/productImages/${i}`
+          );
+
+          template.products.push({
+            type: p.type,
+            name: p.name,
+            cost: p.cost,
+            description: p.description,
+            images: uploaded,
+          });
+        }
+      }
+
+      // testimonials
+      let tUploads = [];
+      if (filesByField.testimonialImages?.length) {
+        tUploads = await uploadImages(
+          filesByField.testimonialImages,
+          `${baseFolder}/testimonialImages`
+        );
+      } else {
+        for (let i = 0; i < testimonials.length; i++) {
+          const tFiles = filesByField[`testimonialImages_${i}`] || [];
+          const uploaded = await uploadImages(
+            tFiles,
+            `${baseFolder}/testimonialImages/${i}`
+          );
+          tUploads[i] = uploaded[0];
+        }
+      }
+
+      template.testimonials = (testimonials || []).map((t, i) => ({
+        image: tUploads[i],
+        name: t.name,
+        jobPosition: t.jobPosition,
+        testimony: t.testimony,
+        rating: t.rating,
+      }));
+
+      await template.save({ session });
+      await session.commitTransaction();
+      session.endSession();
+
+      // STEP 3: send Mongo saved data to external API
+      let websiteResult;
+      try {
+        const submit = await fetch(
+          "https://wonotestbe.vercel.app/api/editor/create-website-template",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(template.toObject()),
+          }
+        );
+        websiteResult = await submit.json();
+      } catch (err) {
+        console.error("create-template call failed:", err);
+        websiteResult = { error: "create-template call failed" };
+      }
+
+      // STEP 4: respond
+      return res.status(201).json({
+        message: "Registration + Website data forwarded",
+        sheetResult,
+        websiteResult,
+      });
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
+  } catch (err) {
+    if (err?.status === 502) {
+      return res
+        .status(502)
+        .json({ error: "Upstream write failed", detail: err.detail });
+    }
+    console.log(err);
     return next(err);
   }
 };

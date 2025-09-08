@@ -46,7 +46,7 @@ const Contact = () => {
   const { mutate: submitContactForm, isPending: isContactPending } =
     useMutation({
       mutationFn: async (data) => {
-        const response = await axios.post("form/add-new-b2c-form-submission", {
+        const response = await axios.post("forms/add-new-b2c-form-submission", {
           ...data,
           sheetName: "Connect_with_us",
         });
