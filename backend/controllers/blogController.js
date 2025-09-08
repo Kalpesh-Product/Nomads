@@ -98,6 +98,7 @@ export const bulkInsertBlogs = async (req, res, next) => {
             author: row["Author"] || "",
             date: row["Date"] ? new Date(row["Date"]) : null,
             destination: row["Destination"] || "",
+            source:row["Source"] || "",
             blogType: row["Type"] || "",
             sections,
           });

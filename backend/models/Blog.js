@@ -22,6 +22,9 @@ const blogSchema = new mongoose.Schema({
   blogType: {
     type: String,
   },
+  source: {
+    type: String,
+  },
   sections: [
     {
       title: String,
