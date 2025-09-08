@@ -7,6 +7,10 @@ import {
   getUniqueDataLocations,
   addCompanyImage,
   addCompanyImagesBulk,
+  editCompany,
+  getCompany,
+  getAllLeads,
+  getCompanyLeads,
   createCompany,
 } from "../controllers/compayControllers.js";
 
@@ -19,13 +23,17 @@ router.post(
 
 router.get("/companies", getCompaniesData);
 router.get("/get-single-company-data/:companyId", getCompanyData);
+router.get("/get-single-company-data/:companyName", getCompany); //check company from admin panel before adding website link after creating website.
 router.get("/company-locations", getUniqueDataLocations);
+router.patch("/update-company", editCompany);
 router.post("/add-company-image", upload.single("image"), addCompanyImage);
 router.post(
   "/bulk-add-company-images",
   upload.array("images", 10),
   addCompanyImagesBulk
 );
+router.get("/all-leads", getAllLeads);
+router.get("/leads", getCompanyLeads);
 
 router.post("/create-company", upload.any(), createCompany);
 

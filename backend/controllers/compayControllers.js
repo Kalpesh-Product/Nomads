@@ -5,6 +5,7 @@ import { Readable } from "stream";
 import csvParser from "csv-parser";
 import { uploadFileToS3 } from "../config/s3Config.js";
 import mongoose from "mongoose";
+import Lead from "../models/Lead.js";
 
 export const bulkInsertCompanies = async (req, res, next) => {
   try {
@@ -361,6 +362,21 @@ export const getCompanyData = async (req, res, next) => {
   }
 };
 
+export const getCompany = async (req, res, next) => {
+  try {
+    const { companyName } = req.params;
+    const company = await Company.findOne({ companyName });
+
+    if (!company) {
+      return res.status(404).json({ message: "Company not found" });
+    }
+
+    return res.status(200).json(company);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getUniqueDataLocations = async (req, res, next) => {
   try {
     const companies = await Company.find().lean().exec();
@@ -604,6 +620,68 @@ export const addCompanyImagesBulk = async (req, res, next) => {
         failed: failures,
       },
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const editCompany = async (req, res, next) => {
+  try {
+    const { companyName, link } = req.body;
+
+    const company = await Company.findOneAndUpdate(
+      { companyName },
+      { websiteTemplateLink: link }
+    );
+
+    if (!company) {
+      return res.status(400).json({
+        message:
+          "Failed to add website template link.Check if the company exists.",
+      });
+    }
+
+    return res.status(200).json({});
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getAllLeads = async (req, res, next) => {
+  try {
+    const leads = await Lead.find();
+
+    if (!leads || !leads.length) {
+      return res.status(400).json({
+        message: "No leads found",
+      });
+    }
+
+    return res.status(200).json(leads);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getCompanyLeads = async (req, res, next) => {
+  try {
+    const { companyId } = req.query;
+
+    if (!mongoose.Types.ObjectId.isValid(companyId)) {
+      return res.status(400).json({
+        message: "Invalid id provided",
+      });
+    }
+
+    const leads = await Lead.find({ _id: companyId });
+
+    if (!leads || !leads.length) {
+      return res.status(400).json({
+        message: "No leads found",
+      });
+    }
+
+    return res.status(200).json(leads);
   } catch (error) {
     next(error);
   }

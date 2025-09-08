@@ -1,4 +1,6 @@
 import * as yup from "yup";
+import Lead from "../../models/Lead.js";
+import mongoose from "mongoose";
 
 const enquirySchema = yup.object({
   companyName: yup.string().trim().required("Please provide the company name"),
@@ -107,7 +109,20 @@ export const addB2CformSubmission = async (req, res, next) => {
       throw new Error("B2C_APPS_SCRIPT_URL is not configured");
     }
 
-    const { sheetName } = req.body;
+    const {
+      companyName,
+      companyId,
+      companyType,
+      country,
+      state,
+      fullName,
+      personelCount,
+      phone,
+      email,
+      startDate,
+      endDate,
+      sheetName,
+    } = req.body;
 
     // Configuration for each sheet type
     const sheetConfig = {
@@ -159,7 +174,7 @@ export const addB2CformSubmission = async (req, res, next) => {
           firstName: d.firstName?.trim(),
           lastName: d.lastName?.trim(),
           email: d.email?.trim(),
-          password: d.password, 
+          password: d.password,
           country: d.country?.trim(),
           mobile: d.mobile?.trim(),
           reason: d.reason || "",
@@ -183,6 +198,28 @@ export const addB2CformSubmission = async (req, res, next) => {
 
     // Build payload
     const payload = config.map(validatedData);
+
+    if (sheetName === "All_Enquiry") {
+      if (companyId && !mongoose.Types.ObjectId.isValid(companyId)) {
+        return res.status(400).json({ message: "Invalid company id provided" });
+      }
+
+      const leads = new Lead({
+        companyName,
+        companyId,
+        verticalType: companyType,
+        country: country || "",
+        state: state || "",
+        fullName,
+        noOfPeople: personelCount,
+        mobileNumber: phone,
+        email,
+        startDate: toISODateOnly(startDate),
+        endDate: toISODateOnly(endDate),
+        sheetName,
+      });
+      await leads.save();
+    }
 
     // Send to Google Apps Script
     const response = await fetch(B2C_APPS_SCRIPT_URL, {

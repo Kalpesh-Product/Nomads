@@ -536,7 +536,7 @@ export const registerFormSubmission = async (req, res, next) => {
       let websiteResult;
       try {
         const submit = await fetch(
-          "http://localhost:5000/api/editor/create-website-template",
+          "https://wonotestbe.vercel.app/api/editor/create-website-template",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },

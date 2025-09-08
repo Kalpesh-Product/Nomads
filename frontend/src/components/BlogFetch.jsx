@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "../utils/axios"; // your custom axios instance
 import { IoChevronDown } from "react-icons/io5";
+import { NavLink } from "react-router-dom";
 
 const DESTS = [
   { label: "Goa", keyword: "Goa" },
@@ -49,6 +50,8 @@ const BlogCard = ({ b }) => {
             {b.pubDate ? new Date(b.pubDate).toLocaleDateString() : ""}
           </time>
         </div>
+
+        {/* <NavLink to={"blog-details"} className={"underline"}>Read full blog →</NavLink> */}
 
         <a
           href={b.link}

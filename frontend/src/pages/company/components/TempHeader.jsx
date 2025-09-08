@@ -65,9 +65,9 @@ const handleScroll = (id) => {
           className="w-24 h-16 lg:w-36 overflow-hidden rounded-lg flex justify-between items-center cursor-pointer"
         >
           <img
-            src={logo || defaultlogo}
+            src={logo}
             alt={"logo"}
-            className="w-full h-full object-contain"
+            className="sw-full h-full object-contain"
           />
         </div>
       </div>
