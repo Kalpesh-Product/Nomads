@@ -496,15 +496,15 @@ export const getAllLeads = async (req, res, next) => {
 
 export const getCompanyLeads = async (req, res, next) => {
   try {
-    const { companyName } = req.query;
+    const { companyId } = req.query;
 
-    if (!mongoose.Types.ObjectId.isValid(companyName)) {
+    if (!mongoose.Types.ObjectId.isValid(companyId)) {
       return res.status(400).json({
         message: "Invalid id provided",
       });
     }
 
-    const leads = await Lead.find({ companyName });
+    const leads = await Lead.find({ _id: companyId });
 
     if (!leads || !leads.length) {
       return res.status(400).json({

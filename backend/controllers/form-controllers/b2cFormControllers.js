@@ -111,6 +111,7 @@ export const addB2CformSubmission = async (req, res, next) => {
 
     const {
       companyName,
+      companyId,
       companyType,
       country,
       state,
