@@ -55,6 +55,7 @@ const ProductModalContent = ({ product, onClose, company }) => {
   const { mutate, isPending : isEnquiry } = useMutation({
     mutationKey: ["enquiryForm"],
     mutationFn: async (data) => {
+      console.log("id",companyDetails._id)
       const response = await axios.post("/forms/add-new-b2c-form-submission", {
         ...data,
         country: companyDetails?.country,
@@ -62,6 +63,7 @@ const ProductModalContent = ({ product, onClose, company }) => {
         companyType: companyDetails?.companyType,
         personelCount: parseInt(data?.noOfPeople),
         companyName: companyDetails?.companyName,
+        companyId: companyDetails?._id,
         sheetName: "All_Enquiry",
         phone: data?.mobileNumber,
         source : "website",
