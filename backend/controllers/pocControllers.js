@@ -72,3 +72,19 @@ export const bulkInsertPoc = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getPocDetails = async (req, res, next) => {
+  try {
+    const { companyId } = req.body;
+
+    const pocDetails = await PointOfContact.find({ company: companyId });
+
+    if (!pocDetails) {
+      return res.status(400).json({ message: "No POC details found" });
+    }
+
+    return res.status(200).json(pocDetails);
+  } catch (error) {
+    next(error);
+  }
+};
