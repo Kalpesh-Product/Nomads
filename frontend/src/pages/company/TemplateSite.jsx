@@ -4,6 +4,7 @@ import TempHeader from "./components/TempHeader";
 import TempFooter from "./components/TempFooter";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { Toaster } from "react-hot-toast";
 
 const TemplateSite = () => {
 
@@ -34,6 +35,7 @@ const tenant = getTenantFromHost()
       </header>
       <main className="flex-1">
         <Outlet context={{ data, isPending, error }}/>
+        <Toaster />
       </main>
       <footer>
         <TempFooter address={data?.address} contact={data?.contact} email={data?.email} phone={data?.phone} registeredCompany={data?.registeredCompanyName} logo={data?.companyLogo?.url} isPending={isPending}/>
