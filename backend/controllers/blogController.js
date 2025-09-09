@@ -57,7 +57,10 @@ const RSS_FEEDS = {
 
 export const getBlogs = async (req, res, next) => {
   try {
-    const blogs = await Blog.find().sort({ date: -1 });
+    const { keyword } = req.params;
+    const blogs = await Blog.find({
+      destination: { $regex: keyword, $options: "i" },
+    }).sort({ date: -1 });
     return res.status(200).json(blogs);
   } catch (error) {
     next(error);
@@ -98,7 +101,7 @@ export const bulkInsertBlogs = async (req, res, next) => {
             author: row["Author"] || "",
             date: row["Date"] ? new Date(row["Date"]) : null,
             destination: row["Destination"] || "",
-            source:row["Source"] || "",
+            source: row["Source"] || "",
             blogType: row["Type"] || "",
             sections,
           });
