@@ -35,6 +35,16 @@ const enquirySchema = yup.object({
     .typeError("Please provide a valid end date")
     .min(yup.ref("startDate"), "End date cannot be before the start date")
     .required("Please provide the end date"),
+  source: yup
+    .string()
+    .trim()
+    .min(1, "Please provide a valid the source")
+    .required("Please provide the source"),
+  productType: yup
+    .string()
+    .trim()
+    .min(1, "Please provide a valid the product type")
+    .required("Please provide the product type"),
   country: yup.string().trim().nullable(),
   state: yup.string().trim().nullable(),
   sheetName: yup.string().required("Please provide a sheet name"),
@@ -141,6 +151,8 @@ export const addB2CformSubmission = async (req, res, next) => {
           email: d.email,
           startDate: toISODateOnly(d.startDate),
           endDate: toISODateOnly(d.endDate),
+          source: d.source,
+          productType: d.productType,
           sheetName: d.sheetName,
         }),
         successMsg: "Enquiry added successfully",
