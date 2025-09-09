@@ -96,6 +96,7 @@ if (tenant === "main") {
         { path: "components", element: <ReusableComponents /> },
         { path: "contact", element: <Contact /> },
         { path: "news", element: <DestinationNews /> },
+        { path: "news/news-details", element: <BlogDetails /> },
         { path: "blog", element: <LocalBlog /> },
         { path: "blog/blog-details", element: <BlogDetails /> },
         { path: "career", element: <Career /> },
