@@ -49,6 +49,16 @@ const leadSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+    source: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    productType: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     endDate: {
       type: Date,
       validate: {
