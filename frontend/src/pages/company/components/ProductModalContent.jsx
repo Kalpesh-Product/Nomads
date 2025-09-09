@@ -40,7 +40,7 @@ const ProductModalContent = ({ product, onClose, company }) => {
   const selectedStartDate = watch("startDate");
   const { data, isPending, error } = useOutletContext();
   const companyName = data?.companyName
-  console.log("data from layout alkdlaksdjlkf;lhakf" , data)
+  console.log("data fromproduct" , product)
     const { data: companyDetails, isPending: isCompanyDetails } = useQuery({
     queryKey: ["companyDetails", companyName],
     queryFn: async () => {
@@ -64,6 +64,8 @@ const ProductModalContent = ({ product, onClose, company }) => {
         companyName: companyDetails?.companyName,
         sheetName: "All_Enquiry",
         phone: data?.mobileNumber,
+        source : "website",
+        productType : product?.type
       });
       return response.data;
     },

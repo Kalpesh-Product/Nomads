@@ -109,7 +109,9 @@ const Product = () => {
         companyName: companyDetails?.companyName,
         sheetName: "All_Enquiry",
         phone: data?.mobileNumber,
-        companyId : companyDetails?._id
+        companyId : companyDetails?._id,
+        source : 'B2C',
+        productType : companyDetails?.companyType
       });
       return response.data;
     },
