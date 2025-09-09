@@ -107,7 +107,7 @@ const BlogFetch = () => {
               }
             >
               {DESTS.map((d) => (
-                <option disabled={d.label !== "Goa"} key={d.label} value={d.label}>
+                <option disabled={d.label === "Bangkok"}  key={d.label} value={d.label}>
                   {d.label}
                 </option>
               ))}
