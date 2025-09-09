@@ -57,7 +57,7 @@ const RSS_FEEDS = {
 
 export const getBlogs = async (req, res, next) => {
   try {
-    const { keyword } = req.params;
+    const { keyword } = req.query;
     const blogs = await Blog.find({
       destination: { $regex: keyword, $options: "i" },
     }).sort({ date: -1 });
