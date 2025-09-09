@@ -3,6 +3,7 @@ import React, { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "../utils/axios.js";
 import { IoChevronDown } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
 
 const DESTS = [
   { label: "Goa", country: "in", keyword: "Goa", lang: "en" },
@@ -13,16 +14,22 @@ const DESTS = [
 const NewsCard = ({ a }) => {
   const desc = a.description || a.content || "";
   const category = a.category || a.topic || a.section || "Destinations";
+  const navigate = useNavigate()
 
   return (
-    <article className="group relative rounded-xl border bg-white transition hover:shadow-md">
+    <article
+      onClick={() => navigate("news-details", { state: { content: a } })}
+      className="group relative rounded-xl border bg-white transition hover:shadow-md"
+    >
       <div className="flex flex-col sm:flex-row gap-4 p-4 ">
         {/* Image */}
-        <a
+        {/* <a
           href={a.url}
           target="_blank"
           rel="noreferrer"
-          className="sm:w-56 shrink-0 block ">
+          className="sm:w-56 shrink-0 block "
+        >
+        </a> */}
           <div className="h-40 sm:h-36 rounded-lg overflow-hidden ">
             {a.image ? (
               <img
@@ -35,7 +42,6 @@ const NewsCard = ({ a }) => {
               <div className="h-full w-full bg-gray-100" />
             )}
           </div>
-        </a>
 
         {/* Text */}
         <div className="min-w-0 flex-1">
@@ -55,11 +61,10 @@ const NewsCard = ({ a }) => {
             </time>
           </div> */}
 
-          <a href={a.url} target="_blank" rel="noreferrer">
+       
             <h3 className="mt-1 text-lg font-semibold leading-snug text-gray-900 line-clamp-2">
               {a.title}
             </h3>
-          </a>
 
           <p className="mt-2 text-sm text-gray-600 line-clamp-3">{desc}</p>
 
@@ -142,7 +147,8 @@ const NewsFetch = () => {
               value={dest.label}
               onChange={(e) =>
                 setDest(DESTS.find((d) => d.label === e.target.value))
-              }>
+              }
+            >
               {DESTS.map((d) => (
                 <option key={d.label} value={d.label}>
                   {d.label}
