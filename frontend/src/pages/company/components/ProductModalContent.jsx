@@ -74,9 +74,10 @@ const ProductModalContent = ({ product, onClose, company }) => {
     onSuccess: (data) => {
       toast.success(data.message);
       reset();
+      onClose()
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message);
+      toast.error(error.response?.data?.errors?.[0]);
     },
   });
 
