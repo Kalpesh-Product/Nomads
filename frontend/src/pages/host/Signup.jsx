@@ -1257,10 +1257,75 @@ const HostSignup = () => {
           // onSubmit={handleSubmit((data) =>
           //   register({ ...data, about: data.about.map((a) => a.text) })
           // )}
+          // onSubmit={handleSubmit((values) => {
+          //   const fd = new FormData();
+
+          //   // Append all simple fields (skip files/arrays)
+          //   Object.entries(values).forEach(([key, val]) => {
+          //     if (
+          //       key === "companyLogo" ||
+          //       key === "heroImages" ||
+          //       key === "about" ||
+          //       key === "gallery" ||
+          //       key === "products"
+          //     )
+          //       return;
+          //     fd.set(key, val);
+          //   });
+
+          //   // About
+          //   fd.set("about", JSON.stringify(values.about.map((a) => a.text)));
+          //   // fd.set("about", values.about.map((a) => a.text).join(","));
+
+          //   // Products metadata
+          //   const productsMeta = (values.products || []).map((p) => ({
+          //     type: p.type,
+          //     name: p.name,
+          //     cost: p.cost,
+          //     description: p.description,
+          //   }));
+          //   fd.set("products", JSON.stringify(productsMeta));
+
+          //   // Product images
+          //   (values.products || []).forEach((p, i) => {
+          //     (p.files || []).forEach((f) => {
+          //       fd.append(`productImages_${i}`, f);
+          //     });
+          //   });
+
+          //   // companyLogo
+          //   if (values.companyLogo) {
+          //     fd.set("companyLogo", values.companyLogo);
+          //   }
+
+          //   // heroImages
+          //   fd.delete("heroImages");
+          //   (values.heroImages || []).forEach((file) => {
+          //     fd.append("heroImages", file);
+          //   });
+
+          //   // gallery
+          //   fd.delete("gallery");
+          //   (values.gallery || []).forEach((file) => {
+          //     fd.append("gallery", file);
+          //   });
+
+          //   // formName
+          //   fd.set("formName", "register");
+
+          //   register(fd);
+          // }
+
+          // )}
+
           onSubmit={handleSubmit((values) => {
             const fd = new FormData();
 
-            // Append all simple fields (skip files/arrays)
+            // Utility to ensure required fields always have something
+            const withFallback = (val, fallback) =>
+              val && val !== "" ? val : fallback;
+
+            // Append simple fields
             Object.entries(values).forEach(([key, val]) => {
               if (
                 key === "companyLogo" ||
@@ -1270,19 +1335,26 @@ const HostSignup = () => {
                 key === "products"
               )
                 return;
-              fd.set(key, val);
+
+              fd.set(key, withFallback(val, "N/A")); // 👈 fallback if empty
             });
 
-            // About
-            fd.set("about", JSON.stringify(values.about.map((a) => a.text)));
-            // fd.set("about", values.about.map((a) => a.text).join(","));
+            // About (array → join into text or fallback)
+            const aboutArray =
+              values.about?.map((a, i) =>
+                withFallback(a.text, `About ${i + 1}`)
+              ) || [];
+            fd.set("about", JSON.stringify(aboutArray));
 
-            // Products metadata
-            const productsMeta = (values.products || []).map((p) => ({
-              type: p.type,
-              name: p.name,
-              cost: p.cost,
-              description: p.description,
+            // Products metadata (with fallbacks)
+            const productsMeta = (values.products || []).map((p, i) => ({
+              type: withFallback(p.type, "Default Type"),
+              name: withFallback(p.name, `Product ${i + 1}`),
+              cost: withFallback(p.cost, "0"),
+              description: withFallback(
+                p.description,
+                "No description provided"
+              ),
             }));
             fd.set("products", JSON.stringify(productsMeta));
 
