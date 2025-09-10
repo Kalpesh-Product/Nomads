@@ -414,15 +414,20 @@ export const getCompanyData = async (req, res, next) => {
     );
 
     const filteredDetails = detailedSpaces.find((data) => {
-      const googleLat = data.location.lat.toFixed(3);
-      const googleLong = data.location.lng.toFixed(3);
-      const companyLat = companyData.latitude.toFixed(3);
-      const companyLong = companyData.longitude.toFixed(3);
+      function toTruncate(num, decimals) {
+        const factor = Math.pow(10, decimals);
+        return Math.trunc(num * factor) / factor;
+      }
+
+      const googleLat = toTruncate(data.location.lat, 3);
+      const googleLong = toTruncate(data.location.lng, 3);
+      const companyLat = toTruncate(companyData.latitude, 3);
+      const companyLong = toTruncate(companyData.longitude, 3);
 
       return companyLat === googleLat && companyLong === googleLong;
     });
 
-    const companyReviews = filteredDetails.reviews.map((review) => ({
+    const companyReviews = filteredDetails?.reviews.map((review) => ({
       company: companyData._id,
       name: review.author_name,
       starCount: review.rating,
@@ -431,20 +436,22 @@ export const getCompanyData = async (req, res, next) => {
       avatar: review.profile_photo_url,
     }));
 
-    const poc = await PointOfContact.findOne({
-      company: companyObjectId,
-      isActive: true,
-    }).lean();
+    const [reviews, poc] = await Promise.all([
+      Review.find({ company: companyObjectId }).lean().exec(),
+      PointOfContact.findOne({ company: companyObjectId, isActive: true })
+        .lean()
+        .exec(),
+    ]);
 
     const updatedCompanyData = {
       ...companyData,
-      ratings: filteredDetails.rating,
-      totalReviews: filteredDetails.user_ratings_total,
+      ratings: filteredDetails?.rating,
+      totalReviews: filteredDetails?.user_ratings_total,
     };
 
     return res.status(200).json({
       ...updatedCompanyData,
-      reviews: companyReviews,
+      reviews,
       poc,
     });
   } catch (error) {
