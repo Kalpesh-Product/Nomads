@@ -47,7 +47,7 @@ const BlogCard = ({ b }) => {
         </p>
 
         <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
-          <span className="truncate">{b.author || "Unknown"}</span>
+          <span className="truncate">{b.author || "Author"}</span>
           <time dateTime={b.date}>{b.date ? humanDate(b.date) : ""}</time>
         </div>
 
@@ -87,7 +87,7 @@ const BlogFetch = () => {
   });
 
   //   const blogs = Array.isArray(data?.articles) ? data.articles : [];
-  const blogs = Array.isArray(data) ? data.slice(0, 9) : [];
+  const blogs = Array.isArray(data) ? data : [];
 
   return (
     <div className="my-6">
