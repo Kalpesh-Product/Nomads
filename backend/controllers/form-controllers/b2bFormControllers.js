@@ -4,6 +4,7 @@ import yup from "yup";
 import mongoose from "mongoose";
 import WebsiteTemplate from "../../models/WebsiteTemplate.js";
 import sharp from "sharp";
+import { sendMail } from "../../config/mailer.js";
 
 const istNowPieces = () => {
   const tz = "Asia/Kolkata";
@@ -548,6 +549,29 @@ export const registerFormSubmission = async (req, res, next) => {
         console.error("create-template call failed:", err);
         websiteResult = { error: "create-template call failed" };
       }
+
+      //
+      // STEP 5: send confirmation email to user
+      try {
+        await sendMail({
+          to: payload.email,
+          subject: "Welcome to WONO Nomads 🎉",
+          text: `Hi ${
+            payload.name || "User"
+          }, thanks for registering with WONO Nomads!`,
+          html: `
+      <h2>Welcome to WONO Nomads</h2>
+      <p>Hi ${payload.name || "User"},</p>
+      <p>Thanks for registering with us. Our team will contact you shortly and help activate your website.</p>
+      <p>Cheers,<br/>The WONO Team</p>
+    `,
+        });
+        console.log("✅ Registration email sent to", payload.email);
+      } catch (err) {
+        console.error("❌ Failed to send email:", err.message);
+      }
+
+      //
 
       // STEP 4: respond
       return res.status(201).json({
