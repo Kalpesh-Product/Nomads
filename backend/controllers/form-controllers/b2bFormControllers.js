@@ -562,7 +562,7 @@ export const registerFormSubmission = async (req, res, next) => {
           html: `
       <h2>Welcome to WONO Nomads</h2>
       <p>Hi ${payload.name || "User"},</p>
-      <p>Thanks for registering with us. Our team will contact you shortly and and will inform you once your website is activated.</p>
+      <p>Thanks for registering with us. Our team will contact you shortly and and will inform you once your website is created.</p>
       <p>Cheers,<br/>The WONO Team</p>
     `,
         });
