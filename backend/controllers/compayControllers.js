@@ -427,14 +427,14 @@ export const getCompanyData = async (req, res, next) => {
       return companyLat === googleLat && companyLong === googleLong;
     });
 
-    const companyReviews = filteredDetails?.reviews.map((review) => ({
-      company: companyData._id,
-      name: review.author_name,
-      starCount: review.rating,
-      description: review.text,
-      reviewLink: review.author_url,
-      avatar: review.profile_photo_url,
-    }));
+    // const companyReviews = filteredDetails?.reviews.map((review) => ({
+    //   company: companyData._id,
+    //   name: review.author_name,
+    //   starCount: review.rating,
+    //   description: review.text,
+    //   reviewLink: review.author_url,
+    //   avatar: review.profile_photo_url,
+    // }));
 
     const [reviews, poc] = await Promise.all([
       Review.find({ company: companyObjectId }).lean().exec(),
