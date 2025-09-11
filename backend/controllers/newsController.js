@@ -2,6 +2,8 @@
 // import axios from "axios";
 // import NewsCache from "../models/NewsCache.js";
 import News from "../models/News.js";
+import { Readable } from "stream";
+import csvParser from "csv-parser";
 
 // const BASE = "https://gnews.io/api/v4";
 // const APIKEY = process.env.GNEWS_API_KEY;
@@ -157,7 +159,7 @@ export const bulkInsertnews = async (req, res, next) => {
         try {
           await News.insertMany(results);
           res.status(201).json({
-            message: "Blogs uploaded successfully",
+            message: "News uploaded successfully",
             count: results.length,
           });
         } catch (err) {
@@ -166,6 +168,7 @@ export const bulkInsertnews = async (req, res, next) => {
         }
       });
   } catch (error) {
+    console.log(error)
     next(error);
   }
 };
