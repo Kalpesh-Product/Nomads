@@ -12,7 +12,12 @@ const companySchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
-
+  companyId: {
+    type: String,
+    unique: true,
+    required: true,
+    trim: true,
+  },
   registeredEntityName: {
     type: String,
     trim: true,

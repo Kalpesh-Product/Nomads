@@ -96,6 +96,7 @@ export const createCompany = async (req, res, next) => {
     const {
       businessId,
       companyName,
+      companyId,
       registeredEntityName,
       website,
       address,
@@ -113,8 +114,8 @@ export const createCompany = async (req, res, next) => {
       services,
       units,
       companyType,
-      poc,      // single POC object
-      reviews,  // array of reviews
+      poc, // single POC object
+      reviews, // array of reviews
     } = req.body;
 
     if (!businessId || !companyName) {
@@ -127,6 +128,7 @@ export const createCompany = async (req, res, next) => {
     const company = new Company({
       businessId: businessId.trim(),
       companyName: companyName.trim(),
+      companyId,
       registeredEntityName: registeredEntityName?.trim(),
       website: website?.trim() || null,
       address: address?.trim(),

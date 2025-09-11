@@ -10,6 +10,12 @@ const pointOfContactSchema = new mongoose.Schema(
     name: {
       type: String,
     },
+    companyId: {
+      type: String,
+      unique: true,
+      // required: true,
+      trim: true,
+    },
     designation: {
       type: String,
     },

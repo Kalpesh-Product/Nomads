@@ -73,6 +73,37 @@ export const bulkInsertPoc = async (req, res, next) => {
   }
 };
 
+export const createPOC = async (req, res, next) => {
+  try {
+    const payload = req.body;
+
+    const pocData = {
+      name: payload.name,
+      companyId: payload.companyId,
+      designation: payload.designation,
+      email: payload.email,
+      phone: payload.phone,
+      linkedInProfile: payload.linkedInProfile,
+      languages: payload.languages || [],
+      address: payload.address,
+      profileImage: payload.profileImage,
+      isActive: payload.isActive ?? true,
+      availibilityTime: payload.availibilityTime,
+    };
+
+    const newPOC = new PointOfContact(pocData);
+    const savedPOC = await newPOC.save();
+
+    return res.status(201).json({
+      success: true,
+      message: "Point of Contact created successfully",
+      data: savedPOC,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getPocDetails = async (req, res, next) => {
   try {
     const { companyId } = req.body;
