@@ -56,31 +56,31 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
             {/* Mobile: show full name */}
             <p
               className="text-sm font-semibold block sm:hidden"
-              title={item.companyName || "Title"}
+              title={item.name || "Title"}
             >
-              {item.companyName.length > 30
-                ? `${item.companyName.slice(0, 18)}...`
-                : item.companyName || "title"}
+              {item.name.length > 30
+                ? `${item.name.slice(0, 18)}...`
+                : item.name || "title"}
             </p>
 
             {/* Tablet/Desktop: show truncated */}
             <p
               className="text-sm font-semibold hidden sm:block"
-              title={item.companyName || "title"}
+              title={item.name || "title"}
             >
               {showVertical
-                ? item.companyName.length > 12
-                  ? `${item.companyName.slice(0, 9)}...`
-                  : item.companyName
-                : item.companyName.length > 23
-                ? `${item.companyName.slice(0, 23)}...`
-                : item.companyName}
+                ? item.name.length > 12
+                  ? `${item.name.slice(0, 9)}...`
+                  : item.name
+                : item.name.length > 23
+                ? `${item.name.slice(0, 23)}...`
+                : item.name}
             </p>
           </div>
 
           {showVertical && (
             <p className="text-tiny w-full text-right text-gray-600">
-              {typeLabels[item.companyType] || "Unknown"}
+              {typeLabels[item.type] || "Unknown"}
             </p>
           )}
         </div>
@@ -111,7 +111,7 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
           <div className="flex items-center gap-1 text-gray-600">
             <AiFillStar size={16} />
             <p className="text-sm  text-gray-600 font-medium">
-              ({item.ratings || 0})
+              ({item.rating || 0})
             </p>
           </div>
           {/* <p className="text-sm font-semibold">

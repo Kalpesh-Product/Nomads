@@ -460,6 +460,93 @@ export const getCompanyData = async (req, res, next) => {
   }
 };
 
+export const getGlobalListings = async (req, res, next) => {
+  const categoryKeywordMap = {
+    coworking: "coworking space",
+    hostel: "hostel",
+    workation: "resort",
+    privatestay: "vacation rental",
+    meetingroom: "meeting room",
+    cafe: "cafe",
+  };
+
+  try {
+    const { country, state } = req.query;
+
+    // For now, hardcode Goa center (later geocode country+state → lat/lng)
+    const center = { lat: 15.4909, lng: 73.8278 };
+
+    const allResults = [];
+
+    await Promise.all(
+      Object.entries(categoryKeywordMap).map(async ([key, keyword]) => {
+        const nearbyRes = await axios.get(
+          "https://maps.googleapis.com/maps/api/place/nearbysearch/json",
+          {
+            params: {
+              location: `${center.lat},${center.lng}`,
+              radius: 5000,
+              keyword,
+              key: process.env.GOOGLE_PLACES_API_KEY,
+            },
+          }
+        );
+
+        const detailedSpaces = await Promise.all(
+          (nearbyRes.data.results || []).map(async (place) => {
+            try {
+              const detailsRes = await axios.get(
+                "https://maps.googleapis.com/maps/api/place/details/json",
+                {
+                  params: {
+                    place_id: place.place_id,
+                    key: process.env.GOOGLE_PLACES_API_KEY,
+                    fields:
+                      "name,rating,user_ratings_total,reviews,formatted_address,geometry",
+                  },
+                }
+              );
+              const details = detailsRes.data.result || {};
+
+              return {
+                id: place.place_id,
+                name: details.name ?? place.name,
+                address: details.formatted_address ?? place.vicinity,
+                rating: details.rating ?? place.rating,
+                totalReviews:
+                  details.user_ratings_total ?? place.user_ratings_total,
+                location: details.geometry?.location ?? place.geometry?.location,
+                reviews: details.reviews || [],
+                type: key, // ✅ flatten category into type
+              };
+            } catch {
+              return {
+                id: place.place_id,
+                name: place.name,
+                address: place.vicinity,
+                rating: place.rating,
+                totalReviews: place.user_ratings_total,
+                location: place.geometry?.location,
+                reviews: [],
+                type: key, // ✅ flatten category into type
+              };
+            }
+          })
+        );
+
+        allResults.push(...detailedSpaces);
+      })
+    );
+
+    res.status(200).json(allResults);
+  } catch (err) {
+    console.error("getGlobalListings error:", err);
+    next(err);
+  }
+};
+
+
+
 export const getCompany = async (req, res, next) => {
   try {
     const { companyName } = req.params;
