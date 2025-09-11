@@ -99,7 +99,7 @@ const GlobalListingsList = () => {
       const { country, location, category } = formData || {};
 
       const response = await axios.get(
-        `company/companies?country=${country}&state=${location}`
+        `company/all-companies?country=${country}&state=${location}`
       );
 
       // return response.data;
