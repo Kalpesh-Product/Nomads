@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "../utils/axios.js";
 import { IoChevronDown } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
+import humanDate from "../utils/humanDate.js";
 
 const DESTS = [
   { label: "Goa", country: "in", keyword: "Goa", lang: "en" },
@@ -17,26 +18,21 @@ const extractImageFromContent = (content) => {
 };
 
 const NewsCard = ({ a }) => {
-  const desc = a.description || a.content || "";
-  const category = a.category || a.topic || a.section || "Destinations";
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+
+  const fallbackImg = extractImageFromContent(a.content || a.description);
+  const thumbnail = a.mainImage || fallbackImg;
 
   return (
     <article
       onClick={() => navigate("news-details", { state: { content: a } })}
-      className="group relative rounded-xl border bg-white transition hover:shadow-md"
+      className="group relative rounded-xl border bg-white transition hover:shadow-md cursor-pointer"
     >
-      <div className="flex flex-col sm:flex-row gap-4 p-4 ">
+      <div className="flex flex-col sm:flex-row gap-4 p-4">
         {/* Image */}
-        {/* <a
-          href={a.url}
-          target="_blank"
-          rel="noreferrer"
-          className="sm:w-56 shrink-0 block "
-        >
-        </a> */}
-          <div className="h-40 sm:h-36 rounded-lg overflow-hidden ">
-            {a.image ? (
+        <div className="sm:w-56 shrink-0 block">
+          <div className="h-40 sm:h-36 rounded-lg overflow-hidden">
+            {thumbnail ? (
               <img
                 src={thumbnail}
                 alt={a.mainTitle}
@@ -47,31 +43,17 @@ const NewsCard = ({ a }) => {
               <div className="h-full w-full bg-gray-100" />
             )}
           </div>
+        </div>
 
         {/* Text */}
         <div className="min-w-0 flex-1">
-          {/* <div className="flex items-center gap-2 text-xs">
-            <span className="text-xs font-medium text-orange-600">
-              {category}
-            </span>
-            <span className="text-gray-400">•</span>
-            <time className="text-gray-500" dateTime={a.publishedAt}>
-              {a.publishedAt
-                ? new Date(a.publishedAt).toLocaleDateString(undefined, {
-                    month: "short",
-                    day: "2-digit",
-                    year: "numeric",
-                  })
-                : ""}
-            </time>
-          </div> */}
+          <h3 className="mt-1 text-lg font-semibold leading-snug text-gray-900 line-clamp-2">
+            {a.mainTitle}
+          </h3>
 
-       
-            <h3 className="mt-1 text-lg font-semibold leading-snug text-gray-900 line-clamp-2">
-              {a.title}
-            </h3>
-
-          <p className="mt-2 text-sm text-gray-600 line-clamp-3">{desc}</p>
+          <p className="mt-2 text-sm text-gray-600 line-clamp-3">
+            {a.mainContent}
+          </p>
 
           <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
             <span className="truncate">{a.author || "News Desk"}</span>
