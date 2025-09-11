@@ -10,6 +10,7 @@ const DESTS = [
   { label: "Goa", country: "in", keyword: "Goa", lang: "en" },
   { label: "Bali", country: "id", keyword: "Bali", lang: "en" }, // or 'id' to widen coverage
   { label: "Bangkok", country: "th", keyword: "Bangkok", lang: "en" }, // or 'th'
+    { label: "Ho Chi Minh", country: "vn", keyword: "Ho Chi Minh", lang: "en" }, // or 'th'
 ];
 
 const extractImageFromContent = (content) => {
