@@ -1,7 +1,9 @@
 // routes/newsRoutes.js
 import { Router } from "express";
-import { getNews } from "../controllers/newsController.js";
+import { getNews, bulkInsertnews } from "../controllers/newsController.js";
+import upload from "../config/multerConfig.js";
 
 const router = Router();
-router.get("/", getNews);
+router.get("/get-news", getNews);
+router.post("/bulk-insert-blogs", upload.single("blog-file"), bulkInsertnews);
 export default router;
