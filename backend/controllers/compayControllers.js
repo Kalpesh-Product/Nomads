@@ -7,6 +7,7 @@ import { uploadFileToS3 } from "../config/s3Config.js";
 import mongoose from "mongoose";
 import Lead from "../models/Lead.js";
 import axios from "axios";
+import NodeGeocoder from "node-geocoder"; // install this: npm install node-geocoder
 
 export const bulkInsertCompanies = async (req, res, next) => {
   try {
@@ -473,8 +474,19 @@ export const getGlobalListings = async (req, res, next) => {
   try {
     const { country, state } = req.query;
 
-    // For now, hardcode Goa center (later geocode country+state → lat/lng)
-    const center = { lat: 15.4909, lng: 73.8278 };
+    // ✅ Use geocoder to turn (country, state) → lat/lng
+    const geocoder = NodeGeocoder({ provider: "openstreetmap" });
+    const queryLocation = [state, country].filter(Boolean).join(", ");
+    const geoRes = await geocoder.geocode(queryLocation);
+
+    if (!geoRes.length) {
+      return res.status(400).json({ message: "Could not find coordinates" });
+    }
+
+    const center = {
+      lat: geoRes[0].latitude,
+      lng: geoRes[0].longitude,
+    };
 
     const allResults = [];
 
@@ -484,7 +496,7 @@ export const getGlobalListings = async (req, res, next) => {
           "https://maps.googleapis.com/maps/api/place/nearbysearch/json",
           {
             params: {
-              location: `${center.lat},${center.lng}`,
+              location: `${center.lat},${center.lng}`, // ✅ dynamic now
               radius: 5000,
               keyword,
               key: process.env.GOOGLE_PLACES_API_KEY,
@@ -515,9 +527,10 @@ export const getGlobalListings = async (req, res, next) => {
                 rating: details.rating ?? place.rating,
                 totalReviews:
                   details.user_ratings_total ?? place.user_ratings_total,
-                location: details.geometry?.location ?? place.geometry?.location,
+                location:
+                  details.geometry?.location ?? place.geometry?.location,
                 reviews: details.reviews || [],
-                type: key, // ✅ flatten category into type
+                type: key,
               };
             } catch {
               return {
@@ -528,7 +541,7 @@ export const getGlobalListings = async (req, res, next) => {
                 totalReviews: place.user_ratings_total,
                 location: place.geometry?.location,
                 reviews: [],
-                type: key, // ✅ flatten category into type
+                type: key,
               };
             }
           })
@@ -544,8 +557,6 @@ export const getGlobalListings = async (req, res, next) => {
     next(err);
   }
 };
-
-
 
 export const getCompany = async (req, res, next) => {
   try {
