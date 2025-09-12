@@ -31,8 +31,14 @@ dayjs.extend(relativeTime);
 
 const Product = () => {
   const location = useLocation();
+
   const navigate = useNavigate();
-  const { companyId, type } = location.state;
+  const {
+    companyId,
+    type,
+    rating: initialRating,
+    totalReviews: initialTotalReviews,
+  } = location.state;
   const [selectedReview, setSelectedReview] = useState([]);
   const [showAmenities, setShowAmenities] = useState(false);
   console.log("selected : ", selectedReview);
@@ -377,7 +383,7 @@ const Product = () => {
                 <div className="flex w-full lg:w-1/2 gap-1 justify-end">
                   <div className="flex flex-col gap-0 justify-center items-center">
                     <p className="text-tiny lg:text-subtitle">
-                      {companyDetails?.ratings || 0}
+                      {companyDetails?.ratings ?? initialRating ?? 0}
                     </p>
                     <span className="text-tiny flex lg:text-small font-medium">
                       {renderStars(companyDetails?.ratings || 0)}
@@ -402,7 +408,7 @@ const Product = () => {
                       {/* {companyDetails?.reviewCount ||
                         companyDetails?.totalReviews ||
                         0} */}
-                      {companyDetails?.totalReviews || 0}
+                      {companyDetails?.totalReviews ?? initialTotalReviews ?? 0}
                     </p>
                     <span className="text-tiny lg:text-small font-medium">
                       Reviews

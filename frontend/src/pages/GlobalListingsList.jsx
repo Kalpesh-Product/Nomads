@@ -186,21 +186,20 @@ const GlobalListingsList = () => {
     setValue("location", formData.location);
     setValue("count", formData.count);
   }, [formData]);
- const { mutate: locationData, isPending: isLocation } = useMutation({
-  mutationFn: async (data) => {
-    dispatch(setFormValues(data));
-    // use data directly here, not formData from Redux
-    setShowMobileSearch(false)
-    navigate(`/verticals?country=${data.country}&location=${data.location}`);
-  },
-  onSuccess: () => {
-    console.log("success");
-  },
-  onError: () => {
-    console.log("error");
-  },
-});
-
+  const { mutate: locationData, isPending: isLocation } = useMutation({
+    mutationFn: async (data) => {
+      dispatch(setFormValues(data));
+      // use data directly here, not formData from Redux
+      setShowMobileSearch(false);
+      navigate(`/verticals?country=${data.country}&location=${data.location}`);
+    },
+    onSuccess: () => {
+      console.log("success");
+    },
+    onError: () => {
+      console.log("error");
+    },
+  });
 
   const handleCategoryClick = (categoryValue) => {
     const formData = getValues(); // from react-hook-form
@@ -558,15 +557,14 @@ const GlobalListingsList = () => {
                               item={item}
                               showVertical={false}
                               handleNavigation={() =>
-                                navigate(
-                                  `/listings/${item.companyName}`,
-                                  {
-                                    state: {
-                                      companyId: item._id,
-                                      type: item.type,
-                                    },
-                                  }
-                                )
+                                navigate(`/listings/${item.companyName}`, {
+                                  state: {
+                                    companyId: item._id,
+                                    type: item.type,
+                                    rating: item.rating, // ✅ from Google Places
+                                    totalReviews: item.totalReviews, // ✅ from Google Places
+                                  },
+                                })
                               }
                             />
                           ))}
