@@ -1,14 +1,15 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "../utils/axios"; // your custom axios instance
 import { IoChevronDown } from "react-icons/io5";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import humanDate from "../utils/humanDate";
 
 const DESTS = [
   { label: "Goa", keyword: "Goa" },
   { label: "Bali", keyword: "Bali" },
   { label: "Bangkok", keyword: "Bangkok" },
+  { label: "Ho Chi Minh", country: "vn", keyword: "Ho Chi Minh", lang: "en" }, // or 'th'
 ];
 
 const stripHTML = (html) => {
@@ -25,10 +26,13 @@ const extractImageFromContent = (content) => {
 const BlogCard = ({ b }) => {
   const fallbackImg = extractImageFromContent(b.content || b.description);
   const thumbnail = b.mainImage || fallbackImg;
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   return (
-    <article onClick={()=>navigate("blog-details",{state:{ content: b }})} className="border rounded-xl overflow-hidden shadow-sm hover:shadow-xl cursor-pointer transition">
+    <article
+      onClick={() => navigate("blog-details", { state: { content: b } })}
+      className="border rounded-xl overflow-hidden shadow-sm hover:shadow-xl cursor-pointer transition"
+    >
       {thumbnail ? (
         <img
           src={thumbnail}

@@ -3,95 +3,71 @@ import React, { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "../utils/axios.js";
 import { IoChevronDown } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
+import humanDate from "../utils/humanDate.js";
 
 const DESTS = [
   { label: "Goa", country: "in", keyword: "Goa", lang: "en" },
   { label: "Bali", country: "id", keyword: "Bali", lang: "en" }, // or 'id' to widen coverage
   { label: "Bangkok", country: "th", keyword: "Bangkok", lang: "en" }, // or 'th'
+    { label: "Ho Chi Minh", country: "vn", keyword: "Ho Chi Minh", lang: "en" }, // or 'th'
 ];
 
+const extractImageFromContent = (content) => {
+  const match = content?.match(/<img.*?src=["'](.*?)["']/);
+  return match ? match[1] : null;
+};
+
 const NewsCard = ({ a }) => {
-  const desc = a.description || a.content || "";
-  const category = a.category || a.topic || a.section || "Destinations";
+  const navigate = useNavigate();
+
+  const fallbackImg = extractImageFromContent(a.content || a.description);
+  const thumbnail = a.mainImage || fallbackImg;
 
   return (
-    <article className="group relative rounded-xl border bg-white transition hover:shadow-md">
-      <div className="flex flex-col sm:flex-row gap-4 p-4 ">
+    <article
+      onClick={() => navigate("news-details", { state: { content: a } })}
+      className="group relative rounded-xl border bg-white transition hover:shadow-md cursor-pointer"
+    >
+      <div className="flex flex-col sm:flex-row gap-4 p-4">
         {/* Image */}
-        <a
-          href={a.url}
-          target="_blank"
-          rel="noreferrer"
-          className="sm:w-56 shrink-0 block ">
-          <div className="h-40 sm:h-36 rounded-lg overflow-hidden ">
-            {a.image ? (
+        <div className="sm:w-56 shrink-0 block">
+          <div className="h-40 sm:h-36 rounded-lg overflow-hidden">
+            {thumbnail ? (
               <img
-                src={a.image}
-                alt={a.title}
-                className="block h-full w-full object-cover" // see note below
+                src={thumbnail}
+                alt={a.mainTitle}
+                className="block h-full w-full object-cover"
                 loading="lazy"
               />
             ) : (
               <div className="h-full w-full bg-gray-100" />
             )}
           </div>
-        </a>
+        </div>
 
         {/* Text */}
         <div className="min-w-0 flex-1">
-          {/* <div className="flex items-center gap-2 text-xs">
-            <span className="text-xs font-medium text-orange-600">
-              {category}
-            </span>
-            <span className="text-gray-400">•</span>
-            <time className="text-gray-500" dateTime={a.publishedAt}>
-              {a.publishedAt
-                ? new Date(a.publishedAt).toLocaleDateString(undefined, {
-                    month: "short",
-                    day: "2-digit",
-                    year: "numeric",
-                  })
-                : ""}
-            </time>
-          </div> */}
+          <h3 className="mt-1 text-lg font-semibold leading-snug text-gray-900 line-clamp-2">
+            {a.mainTitle}
+          </h3>
 
-          <a href={a.url} target="_blank" rel="noreferrer">
-            <h3 className="mt-1 text-lg font-semibold leading-snug text-gray-900 line-clamp-2">
-              {a.title}
-            </h3>
-          </a>
-
-          <p className="mt-2 text-sm text-gray-600 line-clamp-3">{desc}</p>
+          <p className="mt-2 text-sm text-gray-600 line-clamp-3">
+            {a.mainContent}
+          </p>
 
           <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
-            <div className="text-right w-full">
-              <span className="truncate">
-                {a.author || a.source?.name || "News Desk"}
-              </span>
-              &nbsp;|&nbsp;
-              <time className="text-gray-500" dateTime={a.publishedAt}>
-                {a.publishedAt
-                  ? new Date(a.publishedAt).toLocaleDateString(undefined, {
-                      month: "short",
-                      day: "2-digit",
-                      year: "numeric",
-                    })
-                  : ""}
-              </time>
-            </div>
-            {/* <a
-              href={a.url}
-              target="_blank"
-              rel="noreferrer"
-              className="shrink-0 font-medium text-blue-600 hover:underline">
-              Read full story →
-            </a> */}
+            <span className="truncate">{a.author || "News Desk"}</span>
+            <time dateTime={a.date}>
+              {a.date ? humanDate(a.date) : ""}
+            </time>
           </div>
         </div>
       </div>
     </article>
   );
 };
+
 
 const NewsFetch = () => {
   const [dest, setDest] = useState(DESTS[0]);
@@ -111,18 +87,17 @@ const NewsFetch = () => {
     queryKey: [
       "gnews",
       dest.label,
-      params.country,
-      params.keyword,
-      params.lang,
+      params.country
     ],
     queryFn: async () => {
-      const res = await axios.get("news", { params }); // hits your backend
+      const res = await axios.get("/news/get-news", { params }); // hits your backend
       return res.data;
     },
     refetchOnWindowFocus: false,
   });
 
-  const articles = Array.isArray(data?.articles) ? data.articles : [];
+  const articles = Array.isArray(data) ? data : [];
+
   const scope = data?.scope;
 
   return (
@@ -142,7 +117,8 @@ const NewsFetch = () => {
               value={dest.label}
               onChange={(e) =>
                 setDest(DESTS.find((d) => d.label === e.target.value))
-              }>
+              }
+            >
               {DESTS.map((d) => (
                 <option key={d.label} value={d.label}>
                   {d.label}
@@ -169,7 +145,7 @@ const NewsFetch = () => {
           <span className="text-sm text-red-600">Could not load news.</span>
         )}
         {articles.map((a) => (
-          <NewsCard key={a.url} a={a} />
+          <NewsCard key={a.guid} a={a} />
         ))}
       </div>
 
