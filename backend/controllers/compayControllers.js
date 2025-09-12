@@ -6,6 +6,7 @@ import csvParser from "csv-parser";
 import { uploadFileToS3 } from "../config/s3Config.js";
 import mongoose from "mongoose";
 import Lead from "../models/Lead.js";
+import axios from "axios";
 
 export const bulkInsertCompanies = async (req, res, next) => {
   try {
@@ -113,8 +114,8 @@ export const createCompany = async (req, res, next) => {
       services,
       units,
       companyType,
-      poc,      // single POC object
-      reviews,  // array of reviews
+      poc, // single POC object
+      reviews, // array of reviews
     } = req.body;
 
     if (!businessId || !companyName) {
@@ -344,6 +345,111 @@ export const getCompanyData = async (req, res, next) => {
     // Use the actual ObjectId of the found company
     const companyObjectId = companyData._id;
 
+    // Keywords
+    const keywordMap = {
+      coworking: "coworking space",
+      hostel: "hostel",
+      privatestay: "private accommodation",
+      meetingroom: "meeting room",
+      cafe: "cafe",
+      coliving: "coliving space",
+      workation: "resort OR workation",
+    };
+
+    const keyword =
+      keywordMap[companyData.companyType?.toLowerCase()] || "coworking space";
+
+    const nearbyRes = await axios.get(
+      "https://maps.googleapis.com/maps/api/place/nearbysearch/json",
+      {
+        params: {
+          location: `${companyData.latitude},${companyData.longitude}`,
+          radius: 900000, // bump for big cities
+          keyword,
+          key: process.env.GOOGLE_PLACES_API_KEY,
+        },
+      }
+    );
+
+    const coworkingSpaces = nearbyRes.data.results || [];
+
+    // Step 2: For each space, fetch reviews from Place Details API
+    const detailedSpaces = await Promise.all(
+      coworkingSpaces.map(async (place) => {
+        try {
+          const detailsRes = await axios.get(
+            "https://maps.googleapis.com/maps/api/place/details/json",
+            {
+              params: {
+                place_id: place.place_id,
+                key: process.env.GOOGLE_PLACES_API_KEY,
+                // ✅ include geometry so details.geometry is available if needed
+                fields:
+                  "name,rating,user_ratings_total,reviews,formatted_address,geometry",
+              },
+            }
+          );
+
+          const details = detailsRes.data.result || {};
+
+          // Use lat/lng from Nearby first; fall back to Details if missing
+          const nearbyLoc = place.geometry?.location;
+          const detailsLoc = details.geometry?.location;
+          const location = nearbyLoc || detailsLoc || null;
+
+          // Top 5 five-star reviews (from the 0–5 reviews Google returns)
+          const reviews = (details.reviews || [])
+            .filter((r) => r.rating === 5)
+            .slice(0, 5);
+
+          return {
+            place_id: place.place_id,
+            name: details.name ?? place.name,
+            address: details.formatted_address ?? place.vicinity ?? "",
+            rating: details.rating ?? place.rating ?? null,
+            user_ratings_total:
+              details.user_ratings_total ?? place.user_ratings_total ?? 0,
+            location, // { lat, lng } or null
+            reviews,
+          };
+        } catch (err) {
+          // On details failure, still return basic info + location from Nearby
+          return {
+            place_id: place.place_id,
+            name: place.name,
+            address: place.vicinity ?? "",
+            rating: place.rating ?? null,
+            user_ratings_total: place.user_ratings_total ?? 0,
+            location: place.geometry?.location ?? null,
+            reviews: [],
+          };
+        }
+      })
+    );
+
+    const filteredDetails = detailedSpaces.find((data) => {
+      function toTruncate(num, decimals) {
+        const factor = Math.pow(10, decimals);
+        return Math.trunc(num * factor) / factor;
+      }
+
+      const googleLat = toTruncate(data.location.lat, 3);
+      const googleLong = toTruncate(data.location.lng, 3);
+      const companyLat = toTruncate(companyData.latitude, 3);
+      const companyLong = toTruncate(companyData.longitude, 3);
+
+      return companyLat === googleLat && companyLong === googleLong;
+    });
+
+    // const companyReviews = filteredDetails?.reviews.map((review) => ({
+    //   company: companyData._id,
+    //   name: review.author_name,
+    //   starCount: review.rating,
+    //   description: review.text,
+    //   reviewLink: review.author_url,
+    //   avatar: review.profile_photo_url,
+    // }));
+
     const [reviews, poc] = await Promise.all([
       Review.find({ company: companyObjectId }).lean().exec(),
       PointOfContact.findOne({ company: companyObjectId, isActive: true })
@@ -351,8 +457,14 @@ export const getCompanyData = async (req, res, next) => {
         .exec(),
     ]);
 
-    return res.status(200).json({
+    const updatedCompanyData = {
       ...companyData,
+      ratings: filteredDetails?.rating,
+      totalReviews: filteredDetails?.user_ratings_total,
+    };
+
+    return res.status(200).json({
+      ...updatedCompanyData,
       reviews,
       poc,
     });
