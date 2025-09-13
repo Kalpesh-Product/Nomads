@@ -78,17 +78,17 @@ export const createPOC = async (req, res, next) => {
     const payload = req.body;
 
     const pocData = {
-      name: payload.name,
-      companyId: payload.companyId,
-      designation: payload.designation,
-      email: payload.email,
-      phone: payload.phone,
-      linkedInProfile: payload.linkedInProfile,
-      languages: payload.languages || [],
-      address: payload.address,
-      profileImage: payload.profileImage,
-      isActive: payload.isActive ?? true,
-      availibilityTime: payload.availibilityTime,
+      name: payload?.name,
+      companyId: payload?.companyId,
+      designation: payload?.designation,
+      email: payload?.email,
+      phone: payload?.phone,
+      linkedInProfile: payload?.linkedInProfile,
+      languagesSpoken: payload?.languages || [],
+      address: payload?.address,
+      profileImage: payload?.profileImage,
+      isActive: payload?.isActive ?? true,
+      availibilityTime: payload?.availibilityTime,
     };
 
     const poc = await PointOfContact.findOne({ email: payload.email });
