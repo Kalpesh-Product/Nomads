@@ -393,6 +393,18 @@ export const getCompanyData = async (req, res, next) => {
       { lat: 10.88, lng: 106.6 }, // Cu Chi (Far Northwest)
       { lat: 10.61, lng: 106.74 }, // Nha Be (Far South)
     ],
+    cebu: [
+      { lat: 10.3157, lng: 123.8854 }, // Cebu City center
+      { lat: 10.7, lng: 123.8854 }, // North of Cebu — near Danao area
+      { lat: 9.95, lng: 123.8854 }, // South direction — Talisay / Carcar side
+      { lat: 10.3157, lng: 124.3 }, // East — over toward Camotes Sea / islands
+      { lat: 10.3157, lng: 123.4 }, // West — inland mountains / western Cebu
+      { lat: 10.8, lng: 124.3 }, // Northeast corner
+      { lat: 10.8, lng: 123.4 }, // Northwest corner
+      { lat: 9.95, lng: 124.3 }, // Southeast corner
+      { lat: 9.95, lng: 123.4 }, // Southwest corner
+      { lat: 10.5, lng: 123.8854 }, // mid-north-central
+    ],
   };
 
   try {
