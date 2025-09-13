@@ -527,54 +527,35 @@ export const getCompanyData = async (req, res, next) => {
       })
     );
 
-    const filteredDetails = detailedSpaces.find((data) => {
-      function toTruncate(num, decimals) {
+    // Match Google place by exact lat/lon (3 decimal precision ≈ ~100m)
+    let closestGoogle = null;
+
+    for (const place of detailedSpaces) {
+      if (!place.location) continue;
+
+      const toTruncate = (num, decimals) => {
         const factor = Math.pow(10, decimals);
         return Math.trunc(num * factor) / factor;
-      }
+      };
 
-      const googleLat = toTruncate(data.location.lat, 3);
-      const googleLong = toTruncate(data.location.lng, 3);
+      const googleLat = toTruncate(place.location.lat, 3);
+      const googleLng = toTruncate(place.location.lng, 3);
       const companyLat = toTruncate(companyData.latitude, 3);
-      const companyLong = toTruncate(companyData.longitude, 3);
+      const companyLng = toTruncate(companyData.longitude, 3);
 
-      return companyLat === googleLat && companyLong === googleLong;
-    });
+      if (googleLat === companyLat && googleLng === companyLng) {
+        closestGoogle = place;
+        break; // found the exact match, stop searching
+      }
+    }
 
-    // const companyReviews = filteredDetails?.reviews.map((review) => ({
-    //   company: companyData._id,
-    //   name: review.author_name,
-    //   starCount: review.rating,
-    //   description: review.text,
-    //   reviewLink: review.author_url,
-    //   avatar: review.profile_photo_url,
-    // }));
-
-    // Fetch local reviews & poc
+    // Fetch DB reviews & POC
     const [reviews, poc] = await Promise.all([
       Review.find({ company: companyObjectId }).lean().exec(),
       PointOfContact.findOne({ company: companyObjectId, isActive: true })
         .lean()
         .exec(),
     ]);
-
-    // Instead of strict match, pick the Google Place nearest to the company
-    let closestGoogle = null;
-    let minDistance = Infinity;
-
-    for (const place of detailedSpaces) {
-      if (!place.location) continue;
-      const dist = getDistanceFromLatLonInM(
-        companyData.latitude,
-        companyData.longitude,
-        place.location.lat,
-        place.location.lng
-      );
-      if (dist < minDistance) {
-        minDistance = dist;
-        closestGoogle = place;
-      }
-    }
 
     const updatedCompanyData = {
       ...companyData,
@@ -586,7 +567,7 @@ export const getCompanyData = async (req, res, next) => {
     return res.status(200).json({
       ...updatedCompanyData,
       reviews: [
-        ...reviews, // DB reviews
+        ...reviews,
         ...(closestGoogle?.reviews || []).map((r) => ({
           company: companyObjectId,
           name: r.author_name,
