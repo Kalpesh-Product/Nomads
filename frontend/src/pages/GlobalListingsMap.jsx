@@ -71,6 +71,7 @@ const GlobalListingsMap = () => {
     coliving: "Co-Living Spaces",
     hostel: "Hostels",
     privatestay: "Private Stays",
+    workation: "Workation",
     cafe: "Cafes",
     default: (type) => `${type[0].toUpperCase() + type.slice(1)} Spaces`,
   };
@@ -99,7 +100,7 @@ const GlobalListingsMap = () => {
       );
 
       // return response.data;
-      return Array.isArray(response.data) ? response.data : [];
+      return Array.isArray(response.data) ? response.data.filter((item)=>item.companyType !== "coliving") : [];
     },
     enabled: !!formData?.country && !!formData?.location, // ✅ prevents fetching on empty state
   });
@@ -172,11 +173,10 @@ const GlobalListingsMap = () => {
       dispatch(setFormValues(data));
       // use data directly here, not formData from Redux
       navigate(`/verticals?country=${data.country}&location=${data.location}`);
-       setShowMobileSearch(false);
+      setShowMobileSearch(false);
     },
     onSuccess: () => {
       console.log("success");
-      
     },
     onError: () => {
       console.log("error");
