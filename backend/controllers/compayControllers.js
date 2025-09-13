@@ -113,8 +113,8 @@ export const createCompany = async (req, res, next) => {
       services,
       units,
       companyType,
-      poc,      // single POC object
-      reviews,  // array of reviews
+      poc, // single POC object
+      reviews, // array of reviews
     } = req.body;
 
     if (!businessId || !companyName) {
@@ -272,10 +272,10 @@ export const getCompaniesData = async (req, res, next) => {
       return base.map((company) => ({
         ...company,
         reviews: reviews.filter(
-          (review) => review.company.toString() === company._id.toString()
+          (review) => review.company.toString() === company?._id.toString()
         ),
         poc: poc
-          .filter((p) => p.company._id.toString() === company._id.toString())
+          .filter((p) => p.company?._id.toString() === company?._id.toString())
           .find((p) => p.isActive),
       }));
     };
@@ -314,6 +314,7 @@ export const getCompaniesData = async (req, res, next) => {
 
     res.status(200).json(companyData);
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };
