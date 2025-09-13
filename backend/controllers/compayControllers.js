@@ -8,6 +8,25 @@ import mongoose from "mongoose";
 import Lead from "../models/Lead.js";
 import axios from "axios";
 
+// Utility to calculate distance between two lat/lng points in meters
+function getDistanceFromLatLonInM(lat1, lon1, lat2, lon2) {
+  const R = 6371e3; // Earth radius in meters
+  const toRad = (deg) => (deg * Math.PI) / 180;
+
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c; // distance in meters
+}
+
 export const bulkInsertCompanies = async (req, res, next) => {
   try {
     const file = req.file;
@@ -519,6 +538,7 @@ export const getCompanyData = async (req, res, next) => {
     //   avatar: review.profile_photo_url,
     // }));
 
+    // Fetch local reviews & poc
     const [reviews, poc] = await Promise.all([
       Review.find({ company: companyObjectId }).lean().exec(),
       PointOfContact.findOne({ company: companyObjectId, isActive: true })
@@ -526,15 +546,44 @@ export const getCompanyData = async (req, res, next) => {
         .exec(),
     ]);
 
+    // Instead of strict match, pick the Google Place nearest to the company
+    let closestGoogle = null;
+    let minDistance = Infinity;
+
+    for (const place of detailedSpaces) {
+      if (!place.location) continue;
+      const dist = getDistanceFromLatLonInM(
+        companyData.latitude,
+        companyData.longitude,
+        place.location.lat,
+        place.location.lng
+      );
+      if (dist < minDistance) {
+        minDistance = dist;
+        closestGoogle = place;
+      }
+    }
+
     const updatedCompanyData = {
       ...companyData,
-      ratings: filteredDetails?.rating,
-      totalReviews: filteredDetails?.user_ratings_total,
+      ratings: closestGoogle?.rating || companyData.ratings,
+      totalReviews:
+        closestGoogle?.user_ratings_total || companyData.totalReviews,
     };
 
     return res.status(200).json({
       ...updatedCompanyData,
-      reviews,
+      reviews: [
+        ...reviews, // DB reviews
+        ...(closestGoogle?.reviews || []).map((r) => ({
+          company: companyObjectId,
+          name: r.author_name,
+          starCount: r.rating,
+          description: r.text,
+          reviewLink: r.author_url,
+          avatar: r.profile_photo_url,
+        })),
+      ],
       poc,
     });
   } catch (error) {
