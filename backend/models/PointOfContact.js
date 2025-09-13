@@ -5,7 +5,7 @@ const pointOfContactSchema = new mongoose.Schema(
     company: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Company",
-      required: true,
+      // required: true,
     },
     name: {
       type: String,
@@ -21,6 +21,7 @@ const pointOfContactSchema = new mongoose.Schema(
     },
     email: {
       type: String,
+      unique: true,
     },
     phone: {
       type: String,

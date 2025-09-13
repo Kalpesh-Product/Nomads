@@ -91,6 +91,12 @@ export const createPOC = async (req, res, next) => {
       availibilityTime: payload.availibilityTime,
     };
 
+    const poc = await PointOfContact.findOne({ email: payload.email });
+
+    if (poc) {
+      return res.status(400).json({ message: "Email already exists" });
+    }
+
     const newPOC = new PointOfContact(pocData);
     const savedPOC = await newPOC.save();
 
