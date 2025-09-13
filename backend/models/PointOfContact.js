@@ -29,7 +29,7 @@ const pointOfContactSchema = new mongoose.Schema(
     linkedInProfile: {
       type: String,
     },
-    languages: {
+    languagesSpoken: {
       type: [String],
     },
     address: {
