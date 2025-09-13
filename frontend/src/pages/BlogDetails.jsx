@@ -36,54 +36,61 @@ const BlogDetails = () => {
   const location = useLocation();
   const { content } = location.state;
   console.log("content : ", content);
-  const newsContent = content?.sections
+  const newsContent = content?.sections || [];
   return (
     <div className="min-w-[70%] max-w-[80rem] lg:max-w-[70rem] mx-0 md:mx-auto p-4 lg:p-0">
       <div className="flex flex-col gap-8">
         <section className="space-y-8">
           <h1 className="text-title leading-normal font-bold">
             {content?.mainTitle ||
+              content?.title ||
               "Lorem ipsum dolor sit amet consectetur adipisicing elit."}
           </h1>
           <div className="h-96 rounded-xl w-full overflow-hidden">
             <img
               src={
-                content?.mainImage || "https://wallpapercave.com/wp/w8Lgiy5.jpg"
+                content?.mainImage ||
+                content?.image ||
+                "https://wallpapercave.com/wp/w8Lgiy5.jpg"
               }
               alt="main-image"
               className="object-cover h-full w-full"
             />
           </div>
           <p>
-            {content?.mainContent}
+            {content?.mainContent ||
+              content?.content ||
+              "Main Content goes here"}
           </p>
         </section>
         <hr />
         <section className="flex flex-col gap-8">
-          {newsContent.map((item) => (
-            <article key={item.id} className="space-y-4">
-              <h1 className="text-card-title font-bold">{item.title}</h1>
-              {item.image && (
-                <div className="h-96 rounded-xl w-full overflow-hidden">
-                  <img
-                    src={item.image}
-                    alt="main-image"
-                    className="object-cover h-full w-full"
-                  />
-                </div>
-              )}
-              <p>{item.content}</p>
-            </article>
-          ))}
+          {newsContent &&
+            newsContent.map((item) => (
+              <article key={item.id} className="space-y-4">
+                <h1 className="text-card-title font-bold">{item.title}</h1>
+                {item.image && (
+                  <div className="h-96 rounded-xl w-full overflow-hidden">
+                    <img
+                      src={item.image}
+                      alt="main-image"
+                      className="object-cover h-full w-full"
+                    />
+                  </div>
+                )}
+                <p>{item.content}</p>
+              </article>
+            ))}
         </section>
         <hr />
         <footer className="flex w-full justify-between items-center">
           <p>{content?.author || "Author"}</p>
-          <p>{humanDate(content?.date) || new Date.toLocaleString()}</p>
-          <p>{content?.source || "Source"}</p>
-          {/* <NavLink className={"underline hover:text-primary-blue"}>
-            Read full blog
-          </NavLink> */}
+          <p>{humanDate(content?.date) || new Date().toLocaleString()}</p>
+          <p>
+            {typeof content?.source === "object"
+              ? content?.source?.name || "Source"
+              : content?.source || "Source"}
+          </p>
         </footer>
       </div>
     </div>
