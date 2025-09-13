@@ -84,7 +84,7 @@ export const createPOC = async (req, res, next) => {
       email: payload?.email,
       phone: payload?.phone,
       linkedInProfile: payload?.linkedInProfile,
-      languagesSpoken: payload?.languagesSpoken || [],
+      languagesSpoken: payload?.languages || [],
       address: payload?.address,
       profileImage: payload?.profileImage,
       isActive: payload?.isActive ?? true,
