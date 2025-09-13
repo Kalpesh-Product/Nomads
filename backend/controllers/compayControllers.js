@@ -6,6 +6,7 @@ import csvParser from "csv-parser";
 import { uploadFileToS3 } from "../config/s3Config.js";
 import mongoose from "mongoose";
 import Lead from "../models/Lead.js";
+import axios from "axios";
 
 export const bulkInsertCompanies = async (req, res, next) => {
   try {
@@ -322,6 +323,59 @@ export const getCompaniesData = async (req, res, next) => {
 };
 
 export const getCompanyData = async (req, res, next) => {
+  // Array of llats & long for centres ot cover all regions
+  // Add at the top of getCompanyData
+  const regionCenters = {
+    goa: [
+      { lat: 15.4909, lng: 73.8278 }, // Panaji (North-Central)
+      { lat: 15.2993, lng: 74.124 }, // Ponda (East-Central)
+      { lat: 15.184, lng: 73.969 }, // Margao (South-Central)
+      { lat: 15.402, lng: 73.785 }, // Mapusa (Northwest)
+      { lat: 15.517, lng: 73.9116 }, // Old Goa
+      { lat: 15.272, lng: 73.958 }, // Vasco da Gama (Southwest)
+      { lat: 15.01, lng: 74.02 }, // Canacona (South Goa)
+      { lat: 15.6, lng: 73.75 }, // Pernem (Far North Goa)
+      { lat: 15.35, lng: 73.9 }, // Bambolim
+      { lat: 15.45, lng: 74.02 }, // Valpoi (Northeast Goa)
+    ],
+    bali: [
+      { lat: -8.4095, lng: 115.1889 }, // Denpasar (South)
+      { lat: -8.3405, lng: 115.092 }, // Ubud (Center)
+      { lat: -8.139, lng: 115.089 }, // Amed (East)
+      { lat: -8.72, lng: 115.175 }, // Uluwatu (Southwest tip)
+      { lat: -8.36, lng: 114.62 }, // Gilimanuk (West end)
+      { lat: -8.22, lng: 114.97 }, // Negara (West Bali)
+      { lat: -8.54, lng: 115.51 }, // Candidasa (Southeast)
+      { lat: -8.67, lng: 115.21 }, // Nusa Dua (Far South)
+      { lat: -8.3, lng: 115.6 }, // Tulamben (Northeast coast)
+      { lat: -8.45, lng: 115.25 }, // Gianyar (East-Central)
+    ],
+    bangkok: [
+      { lat: 13.7563, lng: 100.5018 }, // Bangkok center
+      { lat: 13.69, lng: 100.75 }, // Lat Krabang (East Bangkok)
+      { lat: 13.81, lng: 100.55 }, // Chatuchak (North Bangkok)
+      { lat: 13.72, lng: 100.53 }, // Silom/Sathorn
+      { lat: 13.77, lng: 100.41 }, // Thonburi (West bank)
+      { lat: 13.65, lng: 100.5 }, // Bang Na (Southeast)
+      { lat: 13.85, lng: 100.6 }, // Don Mueang (North Airport area)
+      { lat: 13.73, lng: 100.78 }, // Min Buri (Far East)
+      { lat: 13.82, lng: 100.48 }, // Nonthaburi (Northwest metro)
+      { lat: 13.55, lng: 100.6 }, // Samut Prakan (Far South)
+    ],
+    hochiminh: [
+      { lat: 10.7769, lng: 106.7009 }, // District 1 (Center)
+      { lat: 10.8231, lng: 106.6297 }, // Binh Thanh
+      { lat: 10.85, lng: 106.77 }, // Thu Duc (Northeast)
+      { lat: 10.8, lng: 106.64 }, // Go Vap (Northwest)
+      { lat: 10.75, lng: 106.65 }, // District 5 (Cholon)
+      { lat: 10.74, lng: 106.71 }, // District 7 (Phu My Hung, South)
+      { lat: 10.72, lng: 106.62 }, // District 8 (Southwest)
+      { lat: 10.77, lng: 106.58 }, // District 6 (West)
+      { lat: 10.88, lng: 106.6 }, // Cu Chi (Far Northwest)
+      { lat: 10.61, lng: 106.74 }, // Nha Be (Far South)
+    ],
+  };
+
   try {
     const { companyId } = req.params;
 
@@ -347,6 +401,124 @@ export const getCompanyData = async (req, res, next) => {
     // Use the actual ObjectId of the found company
     const companyObjectId = companyData._id;
 
+    // Keywords
+    const keywordMap = {
+      coworking: "coworking space",
+      hostel: "hostel",
+      privatestay: "private accommodation",
+      meetingroom: "meeting room",
+      cafe: "cafe",
+      coliving: "coliving space",
+      workation: "resort OR workation",
+    };
+
+    const keyword =
+      keywordMap[companyData.companyType?.toLowerCase()] || "coworking space";
+
+    // ###
+
+    // Decide centers: use multi-centers if region matches, else company coords
+    const regionKey =
+      companyData.state?.toLowerCase() || companyData.city?.toLowerCase();
+    const centers = regionCenters[regionKey] || [
+      { lat: companyData.latitude, lng: companyData.longitude },
+    ];
+
+    let coworkingSpaces = [];
+    for (const center of centers) {
+      const res = await axios.get(
+        "https://maps.googleapis.com/maps/api/place/nearbysearch/json",
+        {
+          params: {
+            location: `${center.lat},${center.lng}`,
+            radius: 50000, // ✅ max allowed by Google
+            keyword,
+            key: process.env.GOOGLE_PLACES_API_KEY,
+          },
+        }
+      );
+      coworkingSpaces.push(...(res.data.results || []));
+    }
+
+    // ###
+
+    // Step 2: For each space, fetch reviews from Place Details API
+    const detailedSpaces = await Promise.all(
+      coworkingSpaces.map(async (place) => {
+        try {
+          const detailsRes = await axios.get(
+            "https://maps.googleapis.com/maps/api/place/details/json",
+            {
+              params: {
+                place_id: place.place_id,
+                key: process.env.GOOGLE_PLACES_API_KEY,
+                // ✅ include geometry so details.geometry is available if needed
+                fields:
+                  "name,rating,user_ratings_total,reviews,formatted_address,geometry",
+              },
+            }
+          );
+
+          const details = detailsRes.data.result || {};
+
+          // Use lat/lng from Nearby first; fall back to Details if missing
+          const nearbyLoc = place.geometry?.location;
+          const detailsLoc = details.geometry?.location;
+          const location = nearbyLoc || detailsLoc || null;
+
+          // Top 5 five-star reviews (from the 0–5 reviews Google returns)
+          const reviews = (details.reviews || [])
+            .filter((r) => r.rating === 5)
+            .slice(0, 5);
+
+          return {
+            place_id: place.place_id,
+            name: details.name ?? place.name,
+            address: details.formatted_address ?? place.vicinity ?? "",
+            rating: details.rating ?? place.rating ?? null,
+            user_ratings_total:
+              details.user_ratings_total ?? place.user_ratings_total ?? 0,
+            location, // { lat, lng } or null
+            reviews,
+          };
+        } catch (err) {
+          // On details failure, still return basic info + location from Nearby
+          return {
+            place_id: place.place_id,
+            name: place.name,
+            address: place.vicinity ?? "",
+            rating: place.rating ?? null,
+            user_ratings_total: place.user_ratings_total ?? 0,
+            location: place.geometry?.location ?? null,
+            reviews: [],
+          };
+        }
+      })
+    );
+
+    const filteredDetails = detailedSpaces.find((data) => {
+      function toTruncate(num, decimals) {
+        const factor = Math.pow(10, decimals);
+        return Math.trunc(num * factor) / factor;
+      }
+
+      const googleLat = toTruncate(data.location.lat, 3);
+      const googleLong = toTruncate(data.location.lng, 3);
+      const companyLat = toTruncate(companyData.latitude, 3);
+      const companyLong = toTruncate(companyData.longitude, 3);
+
+      return companyLat === googleLat && companyLong === googleLong;
+    });
+
+    // const companyReviews = filteredDetails?.reviews.map((review) => ({
+    //   company: companyData._id,
+    //   name: review.author_name,
+    //   starCount: review.rating,
+    //   description: review.text,
+    //   reviewLink: review.author_url,
+    //   avatar: review.profile_photo_url,
+    // }));
+
     const [reviews, poc] = await Promise.all([
       Review.find({ company: companyObjectId }).lean().exec(),
       PointOfContact.findOne({ company: companyObjectId, isActive: true })
@@ -354,8 +526,14 @@ export const getCompanyData = async (req, res, next) => {
         .exec(),
     ]);
 
-    return res.status(200).json({
+    const updatedCompanyData = {
       ...companyData,
+      ratings: filteredDetails?.rating,
+      totalReviews: filteredDetails?.user_ratings_total,
+    };
+
+    return res.status(200).json({
+      ...updatedCompanyData,
       reviews,
       poc,
     });

@@ -26,8 +26,7 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
     <div
       onClick={handleNavigation}
       // className="flex flex-col gap-2 h-56 w-[95%] bg-white  rounded-lg  transition-all cursor-pointer">
-      className="flex flex-col gap-2 w-full max-w-sm bg-white rounded-lg transition-all cursor-pointer"
-    >
+      className="flex flex-col gap-2 w-full max-w-sm bg-white rounded-lg transition-all cursor-pointer">
       {/* <div className="h-full w-full overflow-hidden rounded-3xl border-2 relative"> */}
       <div className="w-full aspect-square overflow-hidden rounded-3xl relative">
         <img
@@ -40,8 +39,7 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
         />
         <div
           className="absolute top-2 right-2 cursor-pointer"
-          onClick={() => toggleFavorite(item._id)}
-        >
+          onClick={() => toggleFavorite(item._id)}>
           {favorites.includes(item._id) ? (
             <AiFillHeart className="text-white" size={22} />
           ) : (
@@ -56,8 +54,7 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
             {/* Mobile: show full name */}
             <p
               className="text-sm font-semibold block sm:hidden"
-              title={item.companyName || "Title"}
-            >
+              title={item.companyName || "Title"}>
               {item.companyName.length > 30
                 ? `${item.companyName.slice(0, 18)}...`
                 : item.companyName || "title"}
@@ -66,8 +63,7 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
             {/* Tablet/Desktop: show truncated */}
             <p
               className="text-sm font-semibold hidden sm:block"
-              title={item.companyName || "title"}
-            >
+              title={item.companyName || "title"}>
               {showVertical
                 ? item.companyName.length > 12
                   ? `${item.companyName.slice(0, 9)}...`
@@ -87,26 +83,24 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
 
         <div className="flex w-full justify-between items-center">
           <p
-  className="text-sm text-gray-600 font-medium"
-  title={`${item.city || "Unknown"}, ${item.state || "Unknown"}`}
->
-  <span className="block sm:hidden">
-    {/* Mobile: show full text */}
-    {`${item.city || "Unknown"}, ${item.state || "Unknown"}`}
-  </span>
-  <span className="hidden sm:block">
-    {/* Desktop: apply truncation */}
-    {(() => {
-      const city = item.city || "Unknown";
-      const state = item.state || "Unknown";
-      const combined = `${city}, ${state}`;
-      return combined.length > 12
-        ? combined.slice(0, 14) + "..."
-        : combined;
-    })()}
-  </span>
-</p>
-
+            className="text-sm text-gray-600 font-medium"
+            title={`${item.city || "Unknown"}, ${item.state || "Unknown"}`}>
+            <span className="block sm:hidden">
+              {/* Mobile: show full text */}
+              {`${item.city || "Unknown"}, ${item.state || "Unknown"}`}
+            </span>
+            <span className="hidden sm:block">
+              {/* Desktop: apply truncation */}
+              {(() => {
+                const city = item.city || "Unknown";
+                const state = item.state || "Unknown";
+                const combined = `${city}, ${state}`;
+                return combined.length > 12
+                  ? combined.slice(0, 14) + "..."
+                  : combined;
+              })()}
+            </span>
+          </p>
 
           <div className="flex items-center gap-1 text-gray-600">
             <AiFillStar size={16} />
