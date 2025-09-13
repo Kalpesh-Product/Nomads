@@ -96,6 +96,7 @@ export const createCompany = async (req, res, next) => {
     const {
       businessId,
       companyName,
+      companyId,
       registeredEntityName,
       website,
       address,
@@ -127,6 +128,7 @@ export const createCompany = async (req, res, next) => {
     const company = new Company({
       businessId: businessId.trim(),
       companyName: companyName.trim(),
+      companyId,
       registeredEntityName: registeredEntityName?.trim(),
       website: website?.trim() || null,
       address: address?.trim(),
