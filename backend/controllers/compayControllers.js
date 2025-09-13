@@ -527,25 +527,40 @@ export const getCompanyData = async (req, res, next) => {
       })
     );
 
-    // Match Google place by exact lat/lon (3 decimal precision ≈ ~100m)
+    // Try to match Google place by decreasing decimal precision
     let closestGoogle = null;
 
-    for (const place of detailedSpaces) {
-      if (!place.location) continue;
+    const toTruncate = (num, decimals) => {
+      const factor = Math.pow(10, decimals);
+      return Math.trunc(num * factor) / factor;
+    };
 
-      const toTruncate = (num, decimals) => {
-        const factor = Math.pow(10, decimals);
-        return Math.trunc(num * factor) / factor;
-      };
+    // First attempt: exact match (no truncation)
+    closestGoogle = detailedSpaces.find(
+      (place) =>
+        place.location &&
+        place.location.lat === companyData.latitude &&
+        place.location.lng === companyData.longitude
+    );
 
-      const googleLat = toTruncate(place.location.lat, 3);
-      const googleLng = toTruncate(place.location.lng, 3);
-      const companyLat = toTruncate(companyData.latitude, 3);
-      const companyLng = toTruncate(companyData.longitude, 3);
+    if (!closestGoogle) {
+      // Try 5 → 4 → 3 decimals
+      for (let decimals = 5; decimals >= 3; decimals--) {
+        const match = detailedSpaces.find((place) => {
+          if (!place.location) return false;
 
-      if (googleLat === companyLat && googleLng === companyLng) {
-        closestGoogle = place;
-        break; // found the exact match, stop searching
+          const googleLat = toTruncate(place.location.lat, decimals);
+          const googleLng = toTruncate(place.location.lng, decimals);
+          const companyLat = toTruncate(companyData.latitude, decimals);
+          const companyLng = toTruncate(companyData.longitude, decimals);
+
+          return googleLat === companyLat && googleLng === companyLng;
+        });
+
+        if (match) {
+          closestGoogle = match;
+          break; // stop once we find a match
+        }
       }
     }
 
