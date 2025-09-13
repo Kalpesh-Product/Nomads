@@ -18,6 +18,8 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
     hostel: "Hostel",
     privatestay: "Private Stay",
     cafe: "Cafe",
+    workation: "Workation",
+    meetingroom: "Meeting Rooms",
   };
 
   const thumbnailImage = item?.images?.[0]?.url;

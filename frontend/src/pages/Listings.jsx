@@ -71,75 +71,33 @@ const Listings = () => {
     { label: "10 - 25", value: "10-25" },
     { label: "25+", value: "25+" },
   ];
-  // const categoryOptions = [
-  //   { label: "Co-Working", value: "coworking" },
-  //   // { label: "Co-Living", value: "coliving" },
-  //   { label: "Hostels", value: "hostel" },
-  //   { label: "Workation", value: "workation" },
-  //   { label: "Private Stay", value: "privatestay" },
-  //   { label: "Meetings", value: "meetingroom" },
-  //   { label: "Cafe’s", value: "cafe" },
-  // ];
-
+  const categoryOptions = [
+    { label: "Co-Working", value: "coworking" },
+    // { label: "Co-Living", value: "coliving" },
+    { label: "Hostels", value: "hostel" },
+    { label: "Workation", value: "workation" },
+    { label: "Private Stay", value: "privatestay" },
+    { label: "Meetings", value: "meetingroom" },
+    { label: "Cafe’s", value: "cafe" },
+  ];
   const activeCategory = searchParams.get("category");
 
   const skeletonArray = Array.from({ length: 6 });
 
-  const { data: listingsData = [], isPending: isLisitingLoading } = useQuery({
-    queryKey: ["listings", formData],
+  const { data: listingsData, isPending: isLisitingLoading } = useQuery({
+    queryKey: ["listings", formData], // ✅ ensures it refetches when formData changes
     queryFn: async () => {
-      const { country, location } = formData || {};
+      const { country, location, category } = formData || {};
+
       const response = await axios.get(
-        `company/companies?country=${country}&state=${location}`
+        `company/companies?country=${country}&state=${location}&type=${category}&category=${category}`
       );
+
+      // return response.data;
       return Array.isArray(response.data) ? response.data : [];
     },
-    enabled: !!formData?.country && !!formData?.location,
+    enabled: !!formData?.country && !!formData?.location, // ✅ prevents fetching on empty state
   });
-
-  const categoryOptions = React.useMemo(() => {
-    if (!listingsData || listingsData.length === 0) return [];
-
-    const uniqueTypes = [
-      ...new Set(
-        listingsData
-          .filter((item) => item.companyType !== "coliving")
-          .map((item) => item.companyType)
-          .filter(Boolean)
-      ),
-    ];
-
-    const labelMap = {
-      coworking: "Co-Working",
-      // coliving: "Co-Living",
-      hostel: "Hostels",
-      workation: "Workation",
-      privatestay: "Private Stay",
-      meetingroom: "Meetings",
-      cafe: "Cafe’s",
-    };
-
-    const typeOrder = [
-      "coworking",
-      "hostel",
-      "workation",
-      "privatestay",
-      "meetingroom",
-      "cafe",
-    ];
-
-    return uniqueTypes
-      .map((type) => ({ label: labelMap[type] || type, value: type }))
-      .sort((a, b) => typeOrder.indexOf(a.value) - typeOrder.indexOf(b.value));
-  }, [listingsData]);
-
-  const filteredListings = React.useMemo(() => {
-    if (!listingsData) return [];
-    if (!formData?.category) return listingsData;
-    return listingsData.filter(
-      (item) => item.companyType === formData.category
-    );
-  }, [listingsData, formData?.category]);
 
   const toggleFavorite = (id) => {
     setFavorites((prev) =>
@@ -485,8 +443,7 @@ const Listings = () => {
               mapOpen ? "col-span-5" : "col-span-9"
             } font-semibold text-lg`}>
             <PaginatedGrid
-              // data={isLisitingLoading ? skeletonArray : sortedListings}
-              data={isLisitingLoading ? skeletonArray : filteredListings}
+              data={isLisitingLoading ? skeletonArray : sortedListings}
               entriesPerPage={!mapOpen ? 10 : 9}
               persistPage={true}
               columns={`grid-cols-1 md:grid-cols-2 ${
