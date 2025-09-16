@@ -36,6 +36,7 @@ const Listings = () => {
       category: "",
     },
   });
+
   const selectedCountry = watch("country");
   const selectedState = watch("location");
   const { data: locations = [], isLoading: isLocations } = useQuery({
@@ -92,6 +93,7 @@ const Listings = () => {
       const response = await axios.get(
         `company/companies?country=${country}&state=${location}`
       );
+
       return Array.isArray(response.data) ? response.data : [];
     },
     enabled: !!formData?.country && !!formData?.location,
@@ -517,9 +519,13 @@ const Listings = () => {
                       item={item}
                       showVertical={false}
                       handleNavigation={() =>
-                        navigate(`/listings/${item.companyName}`, {
-                          state: { companyId: item._id, type: item.type },
+                      {
+                        
+                           navigate(`/listings/${item.companyName}`, {
+                          state: { companyId: item.companyId, type: item.type },
                         })
+                      }
+                        
                       }
                     />
                   </motion.div>

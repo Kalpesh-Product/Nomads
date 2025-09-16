@@ -37,7 +37,7 @@ const Product = () => {
   const [showAmenities, setShowAmenities] = useState(false);
   console.log("selected : ", selectedReview);
   const [open, setOpen] = useState(false);
-  console.log("company id", companyId);
+  console.log("comp", companyId);
 
   const { data: companyDetails, isPending: isCompanyDetails } = useQuery({
     queryKey: ["companyDetails", companyId],

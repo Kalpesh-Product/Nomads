@@ -409,19 +409,23 @@ export const getCompanyData = async (req, res, next) => {
     const { companyId } = req.params;
 
     let companyQuery;
-    if (mongoose.Types.ObjectId.isValid(companyId)) {
-      // Search by ObjectId
-      companyQuery = Company.findById(companyId).lean().exec();
-    } else {
-      // Search by companyName (case-insensitive regex)
-      companyQuery = Company.findOne({
-        companyName: { $regex: new RegExp(`^${companyId}$`, "i") },
-      })
-        .lean()
-        .exec();
-    }
+    // if (mongoose.Types.ObjectId.isValid(companyId)) {
+    //   // Search by ObjectId
+    //   companyQuery = Company.findById(companyId).lean().exec();
+    // } else {
+    //   // Search by companyName (case-insensitive regex)
+    //   companyQuery = Company.findOne({
+    //     companyName: { $regex: new RegExp(`^${companyId}$`, "i") },
+    //   })
+    //     .lean()
+    //     .exec();
+    // }
 
-    const companyData = await companyQuery;
+    // const companyData = await companyQuery;
+
+    const companyData = await Company.findOne({ companyId: companyId })
+      .lean()
+      .exec();
 
     if (!companyData) {
       return res.status(404).json({ error: "Company not found" });
