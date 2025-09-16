@@ -112,9 +112,9 @@ export const createPOC = async (req, res, next) => {
 
 export const getPocDetails = async (req, res, next) => {
   try {
-    const { companyId } = req.body;
+    const { companyId } = req.query;
 
-    const pocDetails = await PointOfContact.find({ company: companyId });
+    const pocDetails = await PointOfContact.find({ companyId });
 
     if (!pocDetails) {
       return res.status(400).json({ message: "No POC details found" });
