@@ -559,7 +559,7 @@ const GlobalListingsList = () => {
                               handleNavigation={() =>
                                 navigate(`/listings/${item.companyName}`, {
                                   state: {
-                                    companyId: item._id,
+                                    companyId: item.companyId,
                                     type: item.type,
                                   },
                                 })
