@@ -100,7 +100,7 @@ const GlobalListingsMap = () => {
       );
 
       // return response.data;
-      return Array.isArray(response.data) ? response.data : [];
+      return Array.isArray(response.data) ? response.data?.filter((item)=>item?.companyType !== "privatestay") : [];
     },
     enabled: !!formData?.country && !!formData?.location, // ✅ prevents fetching on empty state
   });
@@ -123,7 +123,7 @@ const GlobalListingsMap = () => {
       coliving: "Co-Living",
       hostel: "Hostels",
       workation: "Workation",
-      privatestay: "Private Stay",
+      // privatestay: "Private Stay",
       meetingroom: "Meetings",
       cafe: "Cafe’s",
     };
