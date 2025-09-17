@@ -310,6 +310,7 @@ export const registerFormSubmission = async (req, res, next) => {
   // --- helpers ------------------------------------------------------
   const parseAppsScriptResponse = async (resp) => {
     const text = await resp.text();
+
     try {
       return { ok: resp.ok, data: JSON.parse(text) };
     } catch {
@@ -338,6 +339,7 @@ export const registerFormSubmission = async (req, res, next) => {
       err.detail = detail;
       throw err;
     }
+
     return data;
   };
 
@@ -365,7 +367,6 @@ export const registerFormSubmission = async (req, res, next) => {
     };
 
     const sheetResult = await postToAppsScript(apsBody);
-    console.log(sheetResult);
 
     // STEP 2: normalize incoming JSON strings
     let { products, testimonials, about } = payload;
@@ -414,7 +415,7 @@ export const registerFormSubmission = async (req, res, next) => {
         testimonialTitle: payload.testimonialTitle,
         contactTitle: payload.contactTitle,
         mapUrl: payload.mapUrl,
-        email: payload.websiteEmail,
+        websiteEmail: payload.websiteEmail,
         phone: payload.phone,
         address: payload.address,
         registeredCompanyName: payload.registeredCompanyName,
@@ -531,13 +532,14 @@ export const registerFormSubmission = async (req, res, next) => {
 
       await template.save({ session });
       await session.commitTransaction();
+      s;
       session.endSession();
 
       // STEP 3: send Mongo saved data to external API
       let websiteResult;
       try {
         const submit = await fetch(
-          "https://wonotestbe.vercel.app/api/editor/create-website-template",
+          `https://wonomasterbe.vercel.app/api/editor/create-website?company=${payload.companyName}`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
