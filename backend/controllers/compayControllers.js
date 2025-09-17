@@ -617,6 +617,22 @@ export const getCompany = async (req, res, next) => {
   }
 };
 
+export const getListings = async (req, res, next) => {
+  try {
+    const { companyId } = req.params;
+
+    const listings = await Company.find({ companyId: companyId }).lean().exec();
+
+    if (!listings) {
+      return res.status(404).json({ error: "Company not found" });
+    }
+
+    return res.status(200).json(listings);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getUniqueDataLocations = async (req, res, next) => {
   try {
     const companies = await Company.find().lean().exec();
