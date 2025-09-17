@@ -105,7 +105,7 @@ const Listings = () => {
     const uniqueTypes = [
       ...new Set(
         listingsData
-          .filter((item) => item.companyType !== "coliving")
+          .filter((item) => item.companyType !== "privatestay")
           .map((item) => item.companyType)
           .filter(Boolean)
       ),
@@ -113,10 +113,10 @@ const Listings = () => {
 
     const labelMap = {
       coworking: "Co-Working",
-      // coliving: "Co-Living",
+      coliving: "Co-Living",
       hostel: "Hostels",
       workation: "Workation",
-      privatestay: "Private Stay",
+      // privatestay: "Private Stay",
       meetingroom: "Meetings",
       cafe: "Cafe’s",
     };
@@ -125,7 +125,8 @@ const Listings = () => {
       "coworking",
       "hostel",
       "workation",
-      "privatestay",
+      // "privatestay",
+      "coliving",
       "meetingroom",
       "cafe",
     ];

@@ -82,9 +82,9 @@ const GlobalListingsList = () => {
     "hostel",
     "workation",
     "privateStay",
+    "coliving",
     "meetingRoom",
     "cafe",
-    "coliving",
   ];
   console.log("formData", formData);
   const handleShowMoreClick = (type) => {
@@ -117,7 +117,7 @@ const GlobalListingsList = () => {
     const uniqueTypes = [
       ...new Set(
         listingsData
-          .filter((item) => item.companyType !== "coliving")
+          .filter((item) => item.companyType !== "privatestay")
           .map((item) => item.companyType)
           .filter(Boolean)
       ),
@@ -128,7 +128,7 @@ const GlobalListingsList = () => {
       coliving: "Co-Living",
       hostel: "Hostels",
       workation: "Workation",
-      privatestay: "Private Stay",
+      // privatestay: "Private Stay",
       meetingroom: "Meetings",
       cafe: "Cafe’s",
     };
@@ -138,10 +138,10 @@ const GlobalListingsList = () => {
       "coworking",
       "hostel",
       "workation",
-      "privatestay",
+      // "privatestay",
+      "coliving",
       "meetingroom",
       "cafe",
-      "coliving",
     ];
 
     return uniqueTypes
@@ -150,7 +150,7 @@ const GlobalListingsList = () => {
   }, [listingsData]);
 
   const groupedListings = listingsData?.reduce((acc, item) => {
-    if (item.companyType === "coliving") return acc; // skip coliving
+    if (item.companyType === "privatestay") return acc; 
     if (!acc[item.companyType]) acc[item.companyType] = [];
     acc[item.companyType].push(item);
     return acc;
@@ -482,9 +482,9 @@ const GlobalListingsList = () => {
                       "hostel",
                       "workation",
                       "privatestay",
+                      "coliving",
                       "meetingroom",
                       "cafe",
-                      "coliving",
                     ];
                     const indexA = typeOrder.indexOf(typeA);
                     const indexB = typeOrder.indexOf(typeB);

@@ -70,7 +70,7 @@ const GlobalListingsMap = () => {
     coworking: "Co-Working Spaces",
     coliving: "Co-Living Spaces",
     hostel: "Hostels",
-    privatestay: "Private Stays",
+    // privatestay: "Private Stays",
     workation: "Workation",
     cafe: "Cafes",
     default: (type) => `${type[0].toUpperCase() + type.slice(1)} Spaces`,
@@ -100,7 +100,7 @@ const GlobalListingsMap = () => {
       );
 
       // return response.data;
-      return Array.isArray(response.data) ? response.data.filter((item)=>item.companyType !== "coliving") : [];
+      return Array.isArray(response.data) ? response.data : [];
     },
     enabled: !!formData?.country && !!formData?.location, // ✅ prevents fetching on empty state
   });
@@ -112,7 +112,7 @@ const GlobalListingsMap = () => {
     const uniqueTypes = [
       ...new Set(
         listingsData
-          .filter((item) => item.companyType !== "coliving")
+          .filter((item) => item.companyType !== "privatestay")
           .map((item) => item.companyType)
           .filter(Boolean)
       ),
@@ -120,7 +120,7 @@ const GlobalListingsMap = () => {
 
     const labelMap = {
       coworking: "Co-Working",
-      // coliving: "Co-Living",
+      coliving: "Co-Living",
       hostel: "Hostels",
       workation: "Workation",
       privatestay: "Private Stay",
@@ -133,10 +133,10 @@ const GlobalListingsMap = () => {
       "coworking",
       "hostel",
       "workation",
-      "privatestay",
+      // "privatestay",
+      "coliving",
       "meetingroom",
       "cafe",
-      // "coliving",
     ];
 
     return uniqueTypes
