@@ -498,7 +498,7 @@ const GlobalListingsMap = () => {
                             handleNavigation={() =>
                               navigate(`/listings/${item.companyName}`, {
                                 state: {
-                                  companyId: item._id,
+                                  companyId: item.companyId,
                                   type: item.companyType || "ss",
                                 },
                               })
@@ -593,7 +593,7 @@ const GlobalListingsMap = () => {
                             handleNavigation={() =>
                               navigate(`/listings/${item.companyName}`, {
                                 state: {
-                                  companyId: item._id,
+                                  companyId: item.companyId,
                                   type: item.companyType,
                                 },
                               })
