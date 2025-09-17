@@ -167,7 +167,7 @@ const HostSignup = () => {
     },
     onSuccess: (data) => {
       toast.success("Form submitted successfully");
-      // reset();
+      reset();
       setActiveStep((prev) => prev + 1); // 👈 go to Step 5 after submit
     },
     onError: (error) => {
@@ -1440,7 +1440,7 @@ const HostSignup = () => {
             )}
 
             {/* Go To Home button on 5th step */}
-           {/* {activeStep === stepFields.length - 1 && (
+           {activeStep === stepFields.length - 1 && (
               <div className="flex justify-center items-center w-full">
                 <GetStartedButton
                   title="Go To Home"
@@ -1449,13 +1449,8 @@ const HostSignup = () => {
                   }}
                 />
               </div>
-            )} */}
-             {activeStep > 0 &&(
-              <GetStartedButton
-                title="Back"
-                handleSubmit={() => setActiveStep((prev) => prev - 1)}
-              />
             )}
+          
           </div>
         </form>
       </div>
