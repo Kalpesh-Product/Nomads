@@ -140,10 +140,15 @@ const Listings = () => {
 
   const filteredListings = React.useMemo(() => {
     if (!listingsData) return [];
+
     if (!formData?.category) return listingsData;
-    return listingsData.filter(
+
+    const categoryResults = listingsData.filter(
       (item) => item.companyType === formData.category
     );
+
+    // ✅ If no listings match the selected category, fallback to all listings
+    return categoryResults.length > 0 ? categoryResults : listingsData;
   }, [listingsData, formData?.category]);
 
   const toggleFavorite = (id) => {
@@ -159,6 +164,23 @@ const Listings = () => {
     setValue("location", formData.location);
     setValue("category", formData.category);
   }, [formData]);
+  useEffect(() => {
+    if (formData?.category && listingsData?.length > 0) {
+      const hasCategory = listingsData.some(
+        (item) => item.companyType === formData.category
+      );
+
+      if (!hasCategory) {
+        // Reset category in Redux + URL
+        dispatch(setFormValues({ ...formData, category: "" }));
+        setSearchParams({
+          country: formData.country,
+          location: formData.location,
+        });
+      }
+    }
+  }, [listingsData, formData, dispatch, setSearchParams]);
+
   const { mutate: locationData, isPending: isLocation } = useMutation({
     mutationFn: async (data) => {
       dispatch(setFormValues(data));

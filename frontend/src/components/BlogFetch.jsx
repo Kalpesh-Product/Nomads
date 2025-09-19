@@ -10,6 +10,7 @@ const DESTS = [
   { label: "Bali", keyword: "Bali" },
   { label: "Bangkok", keyword: "Bangkok" },
   { label: "Ho Chi Minh", country: "vn", keyword: "Ho Chi Minh", lang: "en" }, // or 'th'
+  { label: "Rio", country: "br", keyword: "Rio", lang: "en" }, // or 'th'
 ];
 
 const stripHTML = (html) => {
