@@ -553,9 +553,6 @@ export const registerFormSubmission = async (req, res, next) => {
         rating: t.rating,
       }));
 
-      console.log("payload email", payload);
-      console.log("template email", template.websiteEmail);
-
       // await template.save({ session });
 
       // STEP 3: send Mongo saved data to external API
@@ -563,7 +560,7 @@ export const registerFormSubmission = async (req, res, next) => {
 
       try {
         const submit = await fetch(
-          `http://localhost:5000/api/editor/create-website?company=${payload.companyName}`,
+          `https://wonomasterbe.vercel.app/api/editor/create-website?company=${payload.companyName}`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
