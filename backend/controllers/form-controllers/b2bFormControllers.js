@@ -392,18 +392,41 @@ export const registerFormSubmission = async (req, res, next) => {
       const searchKey = formatCompanyName(payload.companyName);
       const baseFolder = `${company}/template/${searchKey}`;
 
-      let template = await WebsiteTemplate.findOne({ searchKey }).session(
-        session
-      );
-      if (template) {
-        await session.abortTransaction();
-        session.endSession();
-        return res
-          .status(400)
-          .json({ message: "Template for this company already exists" });
-      }
+      let template = {};
 
-      template = new WebsiteTemplate({
+      // let template = await WebsiteTemplate.findOne({ searchKey }).session(
+      //   session
+      // );
+      // if (template) {
+      //   await session.abortTransaction();
+      //   session.endSession();
+      //   return res
+      //     .status(400)
+      //     .json({ message: "Template for this company already exists" });
+      // }
+
+      // template = new WebsiteTemplate({
+      //   searchKey,
+      //   companyName: payload.companyName,
+      //   title: payload.title,
+      //   subTitle: payload.subTitle,
+      //   CTAButtonText: payload.CTAButtonText,
+      //   about: JSON.parse(about) || [],
+      //   productTitle: payload?.productTitle,
+      //   galleryTitle: payload?.galleryTitle,
+      //   testimonialTitle: payload.testimonialTitle,
+      //   contactTitle: payload.contactTitle,
+      //   mapUrl: payload.mapUrl,
+      //   email: payload.websiteEmail,
+      //   phone: payload.phone,
+      //   address: payload.address,
+      //   registeredCompanyName: payload.registeredCompanyName,
+      //   copyrightText: payload.copyrightText,
+      //   products: [],
+      //   testimonials: [],
+      // });
+
+      template = {
         searchKey,
         companyName: payload.companyName,
         title: payload.title,
@@ -422,7 +445,7 @@ export const registerFormSubmission = async (req, res, next) => {
         copyrightText: payload.copyrightText,
         products: [],
         testimonials: [],
-      });
+      };
 
       // Helper: upload an array of files to S3
       const uploadImages = async (files = [], folder) => {
@@ -530,23 +553,27 @@ export const registerFormSubmission = async (req, res, next) => {
         rating: t.rating,
       }));
 
-      await template.save({ session });
-      await session.commitTransaction();
-      s;
-      session.endSession();
+      console.log("payload email", payload);
+      console.log("template email", template.websiteEmail);
+
+      // await template.save({ session });
 
       // STEP 3: send Mongo saved data to external API
       let websiteResult;
+
       try {
         const submit = await fetch(
-          `https://wonomasterbe.vercel.app/api/editor/create-website?company=${payload.companyName}`,
+          `http://localhost:5000/api/editor/create-website?company=${payload.companyName}`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(template.toObject()),
+            body: JSON.stringify(template),
           }
         );
         websiteResult = await submit.json();
+        await session.commitTransaction();
+
+        session.endSession();
       } catch (err) {
         console.error("create-template call failed:", err);
         websiteResult = { error: "create-template call failed" };

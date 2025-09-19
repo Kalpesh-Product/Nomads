@@ -18,6 +18,11 @@ export const bulkInsertReviews = async (req, res, next) => {
       companies.map((item) => [item.businessId?.trim(), item._id])
     );
 
+    const companyIdMap = new Map();
+    companies.map((company) => {
+      companyIdMap.set(company.businessId, company.companyId);
+    });
+
     const reviews = [];
     const missingCompanyRows = [];
     const stream = Readable.from(file.buffer.toString("utf-8").trim());
@@ -25,9 +30,10 @@ export const bulkInsertReviews = async (req, res, next) => {
       .pipe(csvParser())
       .on("data", (row) => {
         const businessId = row["Business ID"]?.trim();
-        const companyId = companyMap.get(businessId);
+        const companyMongoId = companyMap.get(businessId);
+        const companyId = companyIdMap.get(businessId);
 
-        if (!companyId) {
+        if (!companyMongoId) {
           missingCompanyRows.push({
             row,
             reason: "Invalid Business ID",
@@ -36,7 +42,8 @@ export const bulkInsertReviews = async (req, res, next) => {
         }
 
         const formattedReviews = {
-          company: companyId,
+          company: companyMongoId,
+          companyId,
           name: row["Reviewer Name"]?.trim(),
           starCount: parseInt(row["Rating"]?.trim()),
           description: row["Review Text"]?.trim(),

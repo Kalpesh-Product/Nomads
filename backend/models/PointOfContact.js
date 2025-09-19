@@ -12,7 +12,7 @@ const pointOfContactSchema = new mongoose.Schema(
     },
     companyId: {
       type: String,
-      unique: true,
+      // unique: true,
       // required: true,
       trim: true,
     },
@@ -21,7 +21,7 @@ const pointOfContactSchema = new mongoose.Schema(
     },
     email: {
       type: String,
-      unique: true,
+      // unique: true,
     },
     phone: {
       type: String,
