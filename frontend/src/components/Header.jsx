@@ -51,8 +51,7 @@ const Header = () => {
             {/* Logo */}
             <div
               onClick={goToHostssMain}
-              className="w-24 h-10 lg:w-48 overflow-x-hidden rounded-lg flex gap-8 justify-start items-start cursor-pointer"
-            >
+              className="w-24 h-10 lg:w-48 overflow-x-hidden rounded-lg flex gap-8 justify-start items-start cursor-pointer">
               <img
                 src={logo}
                 alt="logo"
@@ -69,8 +68,7 @@ const Header = () => {
                       <div className="p-4 px-0 whitespace-nowrap">
                         <Link
                           to={`${location.pathname}?country=${formData?.country}&location=${formData?.location}&view=map`}
-                          className="group relative text-md text-black"
-                        >
+                          className="group relative text-md text-black">
                           <span className="relative z-10 group-hover:font-bold uppercase mb-2">
                             MAP VIEW
                           </span>
@@ -85,8 +83,7 @@ const Header = () => {
                       <div className="p-4 px-0 whitespace-nowrap">
                         <Link
                           to={`${location.pathname}?country=${formData?.country}&location=${formData?.location}`}
-                          className="group relative text-md text-black"
-                        >
+                          className="group relative text-md text-black">
                           <span className="relative z-10 group-hover:font-bold uppercase mb-2">
                             List view
                           </span>
@@ -114,19 +111,16 @@ const Header = () => {
                     <div className="p-4 px-0 whitespace-nowrap">
                       <Link
                         to={item.to}
-                        className="group relative text-md text-black"
-                      >
+                        className="group relative text-md text-black">
                         <span
                           className={`relative z-10 mb-8 uppercase ${
                             isActive ? "text-black" : "group-hover:font-bold"
-                          }`}
-                        >
+                          }`}>
                           {item.text}
                         </span>
                         <span
                           className={`absolute left-0 bottom-0 top-6 block h-[2px] bg-blue-500 transition-all duration-300 
-                ${isActive ? "w-full" : "w-0 group-hover:w-full"}`}
-                        ></span>
+                ${isActive ? "w-full" : "w-0 group-hover:w-full"}`}></span>
                       </Link>
                     </div>
                   </li>
@@ -141,8 +135,7 @@ const Header = () => {
               <div className="p-4 px-0 whitespace-nowrap">
                 <button
                   onClick={goToHosts}
-                  className="relative pb-1 transition-all cursor-pointer duration-300 group font-bold bg-transparent uppercase border-none"
-                >
+                  className="relative pb-1 transition-all cursor-pointer duration-300 group font-bold bg-transparent uppercase border-none">
                   Become a host
                   <span className="absolute left-0 w-0 bottom-0 block h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
                 </button>
@@ -154,7 +147,10 @@ const Header = () => {
                 title="Login"
                 padding="py-1"
                 uppercase
-                handleSubmit={() => navigate("/login")}
+                // handleSubmit={() => navigate("/login")}
+                handleSubmit={() => {
+                  window.location.href = "https://wonofe.vercel.app"; // ✅ external redirect
+                }}
                 className="bg-[#FF5757] flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[7rem] px-4"
               />
             </div>
@@ -164,8 +160,7 @@ const Header = () => {
           <div className="h-full px-2 lg:hidden">
             <button
               onClick={() => setOpen(true)}
-              className="rounded-lg text-subtitle text-black"
-            >
+              className="rounded-lg text-subtitle text-black">
               ☰
             </button>
           </div>
@@ -181,16 +176,14 @@ const Header = () => {
             }}
             anchor="left"
             open={open}
-            onClose={() => setOpen(false)}
-          >
+            onClose={() => setOpen(false)}>
             <div className="flex flex-col h-full justify-between">
               <ul className="flex flex-col gap-4 p-4 ">
                 {/* Close button */}
                 <div className="flex w-full justify-end text-right">
                   <span
                     className="text-title cursor-pointer"
-                    onClick={() => setOpen(false)}
-                  >
+                    onClick={() => setOpen(false)}>
                     <IoCloseSharp />
                   </span>
                 </div>
@@ -205,8 +198,7 @@ const Header = () => {
                             <Link
                               onClick={() => setOpen(false)}
                               to={`${location.pathname}?country=${formData?.country}&location=${formData?.location}&view=map`}
-                              className="group relative text-md text-black"
-                            >
+                              className="group relative text-md text-black">
                               <span className="relative z-10 group-hover:font-bold uppercase mb-2">
                                 MAP VIEW
                               </span>
@@ -222,8 +214,7 @@ const Header = () => {
                             <Link
                               onClick={() => setOpen(false)}
                               to={`${location.pathname}?country=${formData?.country}&location=${formData?.location}`}
-                              className="group relative text-md text-black"
-                            >
+                              className="group relative text-md text-black">
                               <span className="relative z-10 group-hover:font-bold uppercase mb-2">
                                 List view
                               </span>
@@ -245,15 +236,13 @@ const Header = () => {
                     <li key={item.id} className="items-center text-center">
                       <div
                         onClick={() => handleNavigation(item.to)}
-                        className="py-4 cursor-pointer"
-                      >
+                        className="py-4 cursor-pointer">
                         <p
                           className={`text-lg ${
                             isActive
                               ? "font-bold text-black underline decoration-2 decoration-blue-500"
                               : "text-secondary-dark"
-                          }`}
-                        >
+                          }`}>
                           {item.text}
                         </p>
                       </div>
@@ -269,9 +258,12 @@ const Header = () => {
                     externalStyles={
                       "bg-[#FF5757]  flex text-white font-[400] capatilize hover:bg-[#E14C4C] w-[7rem] px-6 py-2 leading-4 justify-center items-center"
                     }
+                    // handleSubmit={() => {
+                    //   navigate("/nomad/login");
+                    //   setOpen(false);
+                    // }}
                     handleSubmit={() => {
-                      navigate("/nomad/login");
-                      setOpen(false);
+                      window.location.href = "https://wonofe.vercel.app"; // ✅ external redirect
                     }}
                   />
                 </div>
