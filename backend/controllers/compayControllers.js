@@ -38,12 +38,23 @@ export const bulkInsertCompanies = async (req, res, next) => {
 
     const companies = [];
 
+    //fetch companies from master panel
+    const hostCompanies = await axios.get(
+      "https://wonomasterbe.vercel.app/api/hosts/companies"
+    );
+
+    const companyMap = new Map();
+    hostCompanies.data.forEach((company) => {
+      companyMap.set(company.companyName, company.companyId);
+    });
+
     const stream = Readable.from(file.buffer.toString("utf-8").trim());
     stream
       .pipe(csvParser())
       .on("data", (row) => {
         const company = {
           businessId: row["Business ID"]?.trim(),
+          companyId: companyMap.get(row["Business Name"]?.trim()) || "",
           companyName: row["Business Name"]?.trim(),
           registeredEntityName: row["Registered Entity name"]?.trim(),
           website: row["Website"]?.trim() || null,
@@ -922,14 +933,13 @@ export const getAllLeads = async (req, res, next) => {
 export const getCompanyLeads = async (req, res, next) => {
   try {
     const { companyId } = req.query;
+    let query = {};
 
-    if (!mongoose.Types.ObjectId.isValid(companyId)) {
-      return res.status(400).json({
-        message: "Invalid id provided",
-      });
+    if (companyId) {
+      query = { companyId };
     }
 
-    const leads = await Lead.find({ companyId: companyId });
+    const leads = await Lead.find(query);
 
     if (!leads || !leads.length) {
       return res.status(400).json({
