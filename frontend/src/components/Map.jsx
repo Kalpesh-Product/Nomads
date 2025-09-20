@@ -159,7 +159,7 @@ export default function Map({
     (loc) => {
       if (!disableNavigation) {
         navigate(`/listings/${loc.name}`, {
-          state: { companyId: loc?._id, type: loc?.type },
+          state: { companyId: loc?.companyId, type: loc?.type },
         });
       }
     },
