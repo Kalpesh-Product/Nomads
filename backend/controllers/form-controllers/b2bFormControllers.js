@@ -447,6 +447,7 @@ export const registerFormSubmission = async (req, res, next) => {
         testimonials: [],
       };
 
+      console.log("template text");
       // Helper: upload an array of files to S3
       const uploadImages = async (files = [], folder) => {
         const arr = [];
@@ -541,6 +542,7 @@ export const registerFormSubmission = async (req, res, next) => {
             tFiles,
             `${baseFolder}/testimonialImages/${i}`
           );
+          s;
           tUploads[i] = uploaded[0];
         }
       }
@@ -560,7 +562,7 @@ export const registerFormSubmission = async (req, res, next) => {
 
       try {
         const submit = await fetch(
-          `https://wonomasterbe.vercel.app/api/editor/create-website?company=${payload.companyName}`,
+          `http://localhost:5000/api/editor/create-website?company=${payload.companyName}`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
