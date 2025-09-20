@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "../utils/axios"; // your custom axios instance
 import { IoChevronDown } from "react-icons/io5";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import humanDate from "../utils/humanDate";
 
 const DESTS = [
@@ -77,7 +77,17 @@ const BlogCard = ({ b }) => {
 };
 
 const BlogFetch = () => {
-  const [dest, setDest] = useState(DESTS[0]);
+  // const [dest, setDest] = useState(DESTS[0]);
+    const [searchParams, setSearchParams] = useSearchParams();
+  const initialDest = DESTS.find(d => d.label === searchParams.get("dest")) || DESTS[0];
+  const [dest, setDest] = useState(initialDest);
+
+
+      const handleChange = (val) => {
+    const selected = DESTS.find((d) => d.label === val);
+    setDest(selected);
+    setSearchParams({ dest: selected.label });
+  };
 
   const params = useMemo(() => ({ keyword: dest.keyword }), [dest]);
 
@@ -107,9 +117,7 @@ const BlogFetch = () => {
             <select
               className="block w-full rounded-lg border-2 border-gray-400 bg-white px-3 py-2 pr-8 text-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
               value={dest.label}
-              onChange={(e) =>
-                setDest(DESTS.find((d) => d.label === e.target.value))
-              }
+             onChange={(e) => handleChange(e.target.value)}
             >
               {DESTS.map((d) => (
                 <option key={d.label} value={d.label}>
