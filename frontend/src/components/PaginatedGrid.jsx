@@ -11,6 +11,7 @@ const PaginatedGrid = ({
   allowScroll = true,
   persistPage = false, // NEW PROP
   persistKey = "paginatedGridPage", // optional custom key
+  resetPageKey, // number that increments on reset
 }) => {
   const formData = useSelector((state) => state.location.formValues);
   const location = useLocation();
@@ -49,6 +50,15 @@ const PaginatedGrid = ({
     currentPage * entriesPerPage,
     (currentPage + 1) * entriesPerPage
   );
+
+  useEffect(() => {
+    if (resetPageKey !== 0) {
+      setCurrentPage(0);
+      if (persistPage) {
+        localStorage.setItem(persistKey, "0");
+      }
+    }
+  }, [resetPageKey, persistPage, persistKey]);
 
   return (
     <div className="flex justify-between flex-col rounded-xl">
