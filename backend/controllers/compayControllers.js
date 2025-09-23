@@ -930,24 +930,41 @@ export const getAllLeads = async (req, res, next) => {
   }
 };
 
+// export const getCompanyLeads = async (req, res, next) => {
+//   try {
+//     const { companyId } = req.query;
+//     let query = {};
+
+//     if (companyId) {
+//       query = { companyId };
+//     }
+
+//     const leads = await Lead.find(query);
+
+//     if (!leads || !leads.length) {
+//       return res.status(400).json({
+//         message: "No leads found",
+//       });
+//     }
+
+//     return res.status(200).json(leads);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
 export const getCompanyLeads = async (req, res, next) => {
   try {
     const { companyId } = req.query;
     let query = {};
 
-    if (companyId) {
-      query = { companyId };
+    if (companyId && mongoose.Types.ObjectId.isValid(companyId)) {
+      query = { companyId: new mongoose.Types.ObjectId(companyId) };
     }
 
     const leads = await Lead.find(query);
 
-    if (!leads || !leads.length) {
-      return res.status(400).json({
-        message: "No leads found",
-      });
-    }
-
-    return res.status(200).json(leads);
+    return res.status(200).json(leads); // ✅ always return 200, even if []
   } catch (error) {
     next(error);
   }
