@@ -959,12 +959,12 @@ export const getCompanyLeads = async (req, res, next) => {
     let query = {};
 
     if (companyId && mongoose.Types.ObjectId.isValid(companyId)) {
-      query = { companyId: new mongoose.Types.ObjectId(companyId) };
+      query = { companyId: mongoose.Types.ObjectId(companyId) }; // no `new`
     }
 
     const leads = await Lead.find(query);
 
-    return res.status(200).json(leads); // ✅ always return 200, even if []
+    return res.status(200).json(leads);
   } catch (error) {
     next(error);
   }
