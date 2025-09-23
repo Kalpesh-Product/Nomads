@@ -2,6 +2,7 @@ import PointOfContact from "../models/PointOfContact.js";
 import { Readable } from "stream";
 import csvParser from "csv-parser";
 import Company from "../models/Company.js";
+import TestPointOfContact from "../models/TestPointOfContacts.js";
 
 export const bulkInsertPoc = async (req, res, next) => {
   try {
@@ -22,7 +23,7 @@ export const bulkInsertPoc = async (req, res, next) => {
     companies.map((company) => {
       companyIdMap.set(company.businessId, company.companyId);
     });
-    s;
+
     const pocs = [];
     const stream = Readable.from(file.buffer.toString("utf-8").trim());
 
@@ -60,7 +61,6 @@ export const bulkInsertPoc = async (req, res, next) => {
         pocs.push(pocData);
       })
       .on("end", async () => {
-        console.log(pocs);
         if (pocs.length === 0) {
           return res
             .status(400)
