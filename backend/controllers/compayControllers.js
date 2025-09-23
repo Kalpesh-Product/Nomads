@@ -7,6 +7,7 @@ import { uploadFileToS3 } from "../config/s3Config.js";
 import mongoose from "mongoose";
 import Lead from "../models/Lead.js";
 import axios from "axios";
+import TestListing from "../models/TestCompany.js";
 
 // Utility to calculate distance between two lat/lng points in meters
 function getDistanceFromLatLonInM(lat1, lon1, lat2, lon2) {
@@ -52,6 +53,11 @@ export const bulkInsertCompanies = async (req, res, next) => {
     stream
       .pipe(csvParser())
       .on("data", (row) => {
+        const emptyId = companyMap.get(row["Business Name"]?.trim()) || "";
+        if (emptyId === "") {
+          console.log("company name", row["Business Name"]?.trim());
+        }
+
         const company = {
           businessId: row["Business ID"]?.trim(),
           companyId: companyMap.get(row["Business Name"]?.trim()) || "",
@@ -116,6 +122,8 @@ export const bulkInsertCompanies = async (req, res, next) => {
           }
         }
       });
+
+    // return res.status(200).json({});
   } catch (error) {
     console.log(error);
     next(error);
@@ -125,8 +133,8 @@ export const bulkInsertCompanies = async (req, res, next) => {
 export const createCompany = async (req, res, next) => {
   try {
     const {
-      businessId,
       companyName,
+      companyId,
       registeredEntityName,
       website,
       address,
@@ -146,18 +154,26 @@ export const createCompany = async (req, res, next) => {
       companyType,
       poc, // single POC object
       reviews, // array of reviews
+      images,
     } = req.body;
 
-    if (!businessId || !companyName) {
-      return res
-        .status(400)
-        .json({ message: "Business ID and Company Name are required" });
+    const generateBuisnessId = () => {
+      const base = "WoNo_world";
+      const id = `${base} ${companyType} ${city} ${Date.now()}`;
+      const finalId = id.replace(/\s+/g, "_");
+
+      return finalId.trim();
+    };
+
+    if (!companyName) {
+      return res.status(400).json({ message: "Company Name are required" });
     }
 
     // Create company
     const company = new Company({
-      businessId: businessId.trim(),
+      businessId: generateBuisnessId(),
       companyName: companyName.trim(),
+      companyId,
       registeredEntityName: registeredEntityName?.trim(),
       website: website?.trim() || null,
       address: address?.trim(),
@@ -175,6 +191,7 @@ export const createCompany = async (req, res, next) => {
       services: services?.trim(),
       units: units?.trim(),
       companyType: companyType?.trim()?.split(" ").join("").toLowerCase(),
+      images,
     });
 
     // Save company first (needed for _id reference in POC/Reviews)
@@ -271,6 +288,7 @@ export const createCompany = async (req, res, next) => {
     if (Array.isArray(reviews) && reviews.length > 0) {
       const reviewDocs = reviews.map((review) => ({
         company: savedCompany._id,
+        companyId,
         name: review.name?.trim(),
         starCount: parseInt(review.starCount),
         description: review.description?.trim(),
@@ -919,7 +937,7 @@ export const getAllLeads = async (req, res, next) => {
     const leads = await Lead.find();
 
     if (!leads || !leads.length) {
-      return res.status(400).json({
+      return res.status(200).json({
         message: "No leads found",
       });
     }
@@ -942,7 +960,7 @@ export const getCompanyLeads = async (req, res, next) => {
     const leads = await Lead.find(query);
 
     if (!leads || !leads.length) {
-      return res.status(400).json({
+      return res.status(200).json({
         message: "No leads found",
       });
     }

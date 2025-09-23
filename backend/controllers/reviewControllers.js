@@ -2,6 +2,7 @@ import Review from "../models/Reviews.js";
 import { Readable } from "stream";
 import csvParser from "csv-parser";
 import Company from "../models/Company.js";
+import TestReview from "../models/TestReview.js";
 
 export const bulkInsertReviews = async (req, res, next) => {
   try {
