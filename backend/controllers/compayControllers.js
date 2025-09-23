@@ -958,14 +958,19 @@ export const getCompanyLeads = async (req, res, next) => {
     const { companyId } = req.query;
     let query = {};
 
-    if (companyId && mongoose.Types.ObjectId.isValid(companyId)) {
-      query = { companyId: mongoose.Types.ObjectId(companyId) }; // no `new`
+    if (companyId) {
+      if (mongoose.isValidObjectId(companyId)) {
+        query = { companyId: new mongoose.Types.ObjectId(companyId) }; // safest form
+      } else {
+        return res.status(400).json({ message: "Invalid companyId format" });
+      }
     }
 
     const leads = await Lead.find(query);
 
-    return res.status(200).json(leads);
+    return res.status(200).json(leads); // even [] returns 200
   } catch (error) {
-    next(error);
+    console.error("[getCompanyLeads] error:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
