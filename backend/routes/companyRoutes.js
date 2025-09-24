@@ -23,7 +23,7 @@ router.post(
 );
 
 router.get("/companies", getCompaniesData);
-router.get("/get-single-company-data/:companyId", getCompanyData);
+router.get("/get-single-company-data", getCompanyData);
 router.get("/get-listings/:companyId", getListings);
 router.get("/get-single-company-data/:companyName", getCompany); //check company from admin panel before adding website link after creating website.
 router.get("/company-locations", getUniqueDataLocations);

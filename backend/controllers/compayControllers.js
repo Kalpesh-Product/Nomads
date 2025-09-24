@@ -435,9 +435,17 @@ export const getCompanyData = async (req, res, next) => {
   };
 
   try {
-    const { companyId } = req.params;
+    const { companyId, companyType } = req.query;
 
-    let companyQuery;
+    let companyQuery = {};
+
+    if (companyId) {
+      companyQuery.companyId = companyId;
+    }
+    if (companyType) {
+      companyQuery.companyType = companyType;
+    }
+
     // if (mongoose.Types.ObjectId.isValid(companyId)) {
     //   // Search by ObjectId
     //   companyQuery = Company.findById(companyId).lean().exec();
@@ -452,9 +460,7 @@ export const getCompanyData = async (req, res, next) => {
 
     // const companyData = await companyQuery;
 
-    const companyData = await Company.findOne({ companyId: companyId })
-      .lean()
-      .exec();
+    const companyData = await Company.findOne(companyQuery).lean().exec();
 
     if (!companyData) {
       return res.status(404).json({ error: "Company not found" });

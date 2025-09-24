@@ -548,7 +548,7 @@ const Listings = () => {
                       showVertical={false}
                       handleNavigation={() => {
                         navigate(`/listings/${item.companyName}`, {
-                          state: { companyId: item.companyId, type: item.type },
+                          state: { companyId: item.companyId, type: item.companyType },
                         });
                       }}
                     />
