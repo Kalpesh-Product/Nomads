@@ -43,7 +43,7 @@ const Product = () => {
     queryKey: ["companyDetails", companyId],
     queryFn: async () => {
       const response = await axios.get(
-        `company/get-single-company-data/${companyId}`
+        `company/get-single-company-data?companyId=${companyId}&companyType=${type}`
       );
       return response?.data;
     },
