@@ -1,16 +1,18 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "../utils/axios"; // your custom axios instance
 import { IoChevronDown } from "react-icons/io5";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import humanDate from "../utils/humanDate";
+import { useSelector } from "react-redux";
 
 const DESTS = [
-  { label: "Goa", keyword: "Goa" },
-  { label: "Bali", keyword: "Bali" },
-  { label: "Bangkok", keyword: "Bangkok" },
-  { label: "Ho Chi Minh", country: "vn", keyword: "Ho Chi Minh", lang: "en" }, // or 'th'
-  { label: "Rio", country: "br", keyword: "Rio", lang: "en" }, // or 'th'
+  { label: "All", country: null, keyword: null, lang: null }, // ✅ New option
+  { label: "Goa", country: "in", keyword: "goa", lang: "en" },
+  { label: "Bali", country: "id", keyword: "bali", lang: "en" },
+  { label: "Bangkok", country: "th", keyword: "bangkok", lang: "en" },
+  { label: "Ho Chi Minh", country: "vn", keyword: "ho chi minh", lang: "en" },
+  { label: "Rio", country: "br", keyword: "rio", lang: "en" },
 ];
 
 const stripHTML = (html) => {
@@ -80,7 +82,28 @@ const BlogFetch = () => {
   // const [dest, setDest] = useState(DESTS[0]);
     const [searchParams, setSearchParams] = useSearchParams();
   const initialDest = DESTS.find(d => d.label === searchParams.get("dest")) || DESTS[0];
-  const [dest, setDest] = useState(initialDest);
+  const [dest, setDest] = useState(DESTS[0]);
+    const formData = useSelector((state) => state.location.formValues);
+  const initialized = useRef(false);
+
+    useEffect(() => {
+      if (initialized.current) return; // ✅ don’t override after first run
+      initialized.current = true;
+  
+      const selectedDest = formData?.location;
+      if (selectedDest) {
+        const found = DESTS.find((d) => d.keyword === selectedDest);
+        if (found) {
+          setDest(found);
+          setSearchParams({ dest: found.label });
+          return;
+        }
+      }
+  
+      // fallback = All
+      setDest(DESTS[0]);
+      setSearchParams({ dest: DESTS[0].label });
+    }, [formData, setSearchParams]);
 
 
       const handleChange = (val) => {
@@ -89,17 +112,38 @@ const BlogFetch = () => {
     setSearchParams({ dest: selected.label });
   };
 
-  const params = useMemo(() => ({ keyword: dest.keyword }), [dest]);
+  const params = useMemo(() => {
+    if (dest.label === "All") return null; // ✅ no params
+    return {
+      country: dest.country,
+      keyword: dest.keyword,
+      lang: dest.lang,
+      category: "general",
+      max: 10,
+    };
+  }, [dest]);
 
-  const { data, isPending, isError, refetch, isFetching } = useQuery({
-    queryKey: ["blogs", dest.keyword],
+  // const { data, isPending, isError, refetch, isFetching } = useQuery({
+  //   queryKey: ["blogs", dest.keyword],
+  //   queryFn: async () => {
+  //     const res = await axios.get("/blogs/get-blogs", { params }); 
+  //     return res.data;
+  //   },
+  // });
+
+   const { data, isPending, isError } = useQuery({
+    queryKey: ["blogs", dest.label],
     queryFn: async () => {
-      const res = await axios.get("/blogs/get-blogs", { params }); // your backend: /api/blogs
+      if (dest.label === "All") {
+        const res = await axios.get("/blogs/get-blogs"); // ✅ no params
+        return res.data;
+      }
+      const res = await axios.get("/blogs/get-blogs", { params });
       return res.data;
     },
-    // staleTime: 1000 * 60 * 5,
-    // refetchOnWindowFocus: false,
+    refetchOnWindowFocus: false,
   });
+
 
   //   const blogs = Array.isArray(data?.articles) ? data.articles : [];
   const blogs = Array.isArray(data) ? data : [];
