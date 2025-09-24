@@ -123,6 +123,7 @@ export const addB2CformSubmission = async (req, res, next) => {
     const {
       companyName,
       companyId,
+      company,
       companyType,
       country,
       state,
@@ -238,12 +239,13 @@ export const addB2CformSubmission = async (req, res, next) => {
     const payload = config.map(validatedData);
 
     if (sheetName === "All_Enquiry") {
-      if (companyId && !mongoose.Types.ObjectId.isValid(companyId)) {
+      if (company && !mongoose.Types.ObjectId.isValid(company)) {
         return res.status(400).json({ message: "Invalid company id provided" });
       }
 
       const leads = new Lead({
         companyName,
+        company,
         companyId,
         verticalType: companyType,
         country: country || "",
