@@ -37,7 +37,6 @@ const Product = () => {
   const [showAmenities, setShowAmenities] = useState(false);
   console.log("selected : ", selectedReview);
   const [open, setOpen] = useState(false);
-  console.log("comp", companyId);
 
   const { data: companyDetails, isPending: isCompanyDetails } = useQuery({
     queryKey: ["companyDetails", companyId],
@@ -45,6 +44,8 @@ const Product = () => {
       const response = await axios.get(
         `company/get-single-company-data?companyId=${companyId}&companyType=${type}`
       );
+
+      console.log("type",type)
       return response?.data;
     },
     enabled: !!companyId,

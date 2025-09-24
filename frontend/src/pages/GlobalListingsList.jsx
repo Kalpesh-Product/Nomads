@@ -560,7 +560,7 @@ const GlobalListingsList = () => {
                                 navigate(`/listings/${item.companyName}`, {
                                   state: {
                                     companyId: item.companyId,
-                                    type: item.type,
+                                    type: item.companyType,
                                   },
                                 })
                               }
