@@ -1,5 +1,5 @@
 // src/components/NewsFetch.jsx
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "../utils/axios.js";
 import { IoChevronDown } from "react-icons/io5";
@@ -8,10 +8,10 @@ import humanDate from "../utils/humanDate.js";
 
 const DESTS = [
   { label: "Goa", country: "in", keyword: "Goa", lang: "en" },
-  { label: "Bali", country: "id", keyword: "Bali", lang: "en" }, // or 'id' to widen coverage
-  { label: "Bangkok", country: "th", keyword: "Bangkok", lang: "en" }, // or 'th'
-  { label: "Ho Chi Minh", country: "vn", keyword: "Ho Chi Minh", lang: "en" }, // or 'th'
-  { label: "Rio", country: "br", keyword: "Rio", lang: "en" }, // or 'th'
+  { label: "Bali", country: "id", keyword: "Bali", lang: "en" },
+  { label: "Bangkok", country: "th", keyword: "Bangkok", lang: "en" },
+  { label: "Ho Chi Minh", country: "vn", keyword: "Ho Chi Minh", lang: "en" },
+  { label: "Rio", country: "br", keyword: "Rio", lang: "en" },
 ];
 
 const extractImageFromContent = (content) => {
@@ -68,40 +68,57 @@ const NewsCard = ({ a }) => {
 };
 
 const NewsFetch = () => {
-  // const [dest, setDest] = useState(DESTS[0]);
-    const [searchParams, setSearchParams] = useSearchParams();
-  const initialDest = DESTS.find(d => d.label === searchParams.get("dest")) || DESTS[0];
-  const [dest, setDest] = useState(initialDest);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [dest, setDest] = useState(DESTS[0]);
 
-    const handleChange = (val) => {
+  // ✅ Sync dropdown with URL params on page load
+  useEffect(() => {
+    const selectedDest = searchParams.get("dest");
+    if (selectedDest) {
+      const found = DESTS.find((d) => d.label === selectedDest);
+      if (found) {
+        setDest(found);
+      } else {
+        // fallback if query param is invalid
+        setDest(DESTS[0]);
+        setSearchParams({ dest: DESTS[0].label });
+      }
+    } else {
+      // if no param, set default in URL
+      setDest(DESTS[0]);
+      setSearchParams({ dest: DESTS[0].label });
+    }
+  }, [searchParams, setSearchParams]);
+
+  const handleChange = (val) => {
     const selected = DESTS.find((d) => d.label === val);
-    setDest(selected);
-    setSearchParams({ dest: selected.label });
+    if (selected) {
+      setDest(selected);
+      setSearchParams({ dest: selected.label });
+    }
   };
 
   const params = useMemo(
     () => ({
-      country: dest.country, // ISO-2 (in/id/th)
-      keyword: dest.keyword, // city/region (search q)
-      lang: dest.lang, // optional; omit to broaden
-      category: "general", // for top-headlines fallback
-      max: 10, // free plan cap
+      country: dest.country,
+      keyword: dest.keyword,
+      lang: dest.lang,
+      category: "general",
+      max: 10,
     }),
     [dest]
   );
 
-  const { data, isPending, isError, refetch, isFetching } = useQuery({
+  const { data, isPending, isError, isFetching } = useQuery({
     queryKey: ["gnews", dest.label, params.country],
     queryFn: async () => {
-      const res = await axios.get("/news/get-news", { params }); // hits your backend
+      const res = await axios.get("/news/get-news", { params });
       return res.data;
     },
     refetchOnWindowFocus: false,
   });
 
   const articles = Array.isArray(data) ? data : [];
-
-  const scope = data?.scope;
 
   return (
     <div className="my-6">
@@ -118,7 +135,7 @@ const NewsFetch = () => {
               className="block w-full rounded-lg border-2 border-gray-400 bg-white px-3 py-2 pr-8
                text-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
               value={dest.label}
-               onChange={(e) => handleChange(e.target.value)}
+              onChange={(e) => handleChange(e.target.value)}
             >
               {DESTS.map((d) => (
                 <option key={d.label} value={d.label}>
@@ -128,14 +145,6 @@ const NewsFetch = () => {
             </select>
             <IoChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-600" />
           </div>
-
-          {/* <button
-            type="button"
-            onClick={() => refetch()}
-            className="text-xs border rounded px-2 py-1 hover:bg-gray-50"
-            disabled={isFetching}>
-            {isFetching ? "Refreshing…" : "Refresh"}
-          </button> */}
         </div>
       </div>
 
