@@ -1,17 +1,19 @@
 // src/components/NewsFetch.jsx
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "../utils/axios.js";
 import { IoChevronDown } from "react-icons/io5";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import humanDate from "../utils/humanDate.js";
+import { useSelector } from "react-redux";
 
 const DESTS = [
-  { label: "Goa", country: "in", keyword: "Goa", lang: "en" },
-  { label: "Bali", country: "id", keyword: "Bali", lang: "en" },
-  { label: "Bangkok", country: "th", keyword: "Bangkok", lang: "en" },
-  { label: "Ho Chi Minh", country: "vn", keyword: "Ho Chi Minh", lang: "en" },
-  { label: "Rio", country: "br", keyword: "Rio", lang: "en" },
+  { label: "All", country: null, keyword: null, lang: null }, // ✅ New option
+  { label: "Goa", country: "in", keyword: "goa", lang: "en" },
+  { label: "Bali", country: "id", keyword: "bali", lang: "en" },
+  { label: "Bangkok", country: "th", keyword: "bangkok", lang: "en" },
+  { label: "Ho Chi Minh", country: "vn", keyword: "ho chi minh", lang: "en" },
+  { label: "Rio", country: "br", keyword: "rio", lang: "en" },
 ];
 
 const extractImageFromContent = (content) => {
@@ -70,25 +72,30 @@ const NewsCard = ({ a }) => {
 const NewsFetch = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [dest, setDest] = useState(DESTS[0]);
+  const formData = useSelector((state) => state.location.formValues);
+  const initialized = useRef(false);
 
   // ✅ Sync dropdown with URL params on page load
+// ✅ Sync dropdown with formData only on mount
   useEffect(() => {
-    const selectedDest = searchParams.get("dest");
+    if (initialized.current) return; // ✅ don’t override after first run
+    initialized.current = true;
+
+    const selectedDest = formData?.location;
     if (selectedDest) {
-      const found = DESTS.find((d) => d.label === selectedDest);
+      const found = DESTS.find((d) => d.keyword === selectedDest);
       if (found) {
         setDest(found);
-      } else {
-        // fallback if query param is invalid
-        setDest(DESTS[0]);
-        setSearchParams({ dest: DESTS[0].label });
+        setSearchParams({ dest: found.label });
+        return;
       }
-    } else {
-      // if no param, set default in URL
-      setDest(DESTS[0]);
-      setSearchParams({ dest: DESTS[0].label });
     }
-  }, [searchParams, setSearchParams]);
+
+    // fallback = All
+    setDest(DESTS[0]);
+    setSearchParams({ dest: DESTS[0].label });
+  }, [formData, setSearchParams]);
+
 
   const handleChange = (val) => {
     const selected = DESTS.find((d) => d.label === val);
@@ -98,20 +105,24 @@ const NewsFetch = () => {
     }
   };
 
-  const params = useMemo(
-    () => ({
+  const params = useMemo(() => {
+    if (dest.label === "All") return null; // ✅ no params
+    return {
       country: dest.country,
       keyword: dest.keyword,
       lang: dest.lang,
       category: "general",
       max: 10,
-    }),
-    [dest]
-  );
+    };
+  }, [dest]);
 
-  const { data, isPending, isError, isFetching } = useQuery({
-    queryKey: ["gnews", dest.label, params.country],
+  const { data, isPending, isError } = useQuery({
+    queryKey: ["gnews", dest.label],
     queryFn: async () => {
+      if (dest.label === "All") {
+        const res = await axios.get("/news/get-news"); // ✅ no params
+        return res.data;
+      }
       const res = await axios.get("/news/get-news", { params });
       return res.data;
     },
