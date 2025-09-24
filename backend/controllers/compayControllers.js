@@ -912,22 +912,89 @@ export const addCompanyImagesBulk = async (req, res, next) => {
 
 export const editCompany = async (req, res, next) => {
   try {
-    const { companyName, link } = req.body;
+    const { companyId } = req.params;
 
-    const company = await Company.findOneAndUpdate(
-      { companyName },
-      { websiteTemplateLink: link }
-    );
+    const {
+      companyName,
+      registeredEntityName,
+      website,
+      address,
+      city,
+      state,
+      country,
+      about,
+      totalSeats,
+      latitude,
+      longitude,
+      googleMap,
+      ratings,
+      totalReviews,
+      inclusions,
+      services,
+      units,
+      companyType,
+      reviews,
+      images,
+      websiteTemplateLink,
+    } = req.body;
 
+    const company = await Company.findOne({ companyId });
     if (!company) {
-      return res.status(400).json({
-        message:
-          "Failed to add website template link.Check if the company exists.",
-      });
+      return res.status(404).json({ message: "Company not found" });
     }
 
-    return res.status(200).json({});
+    // Update scalar fields
+    company.companyName = companyName?.trim() || company.companyName;
+    company.websiteTemplateLink =
+      websiteTemplateLink || company.websiteTemplateLink;
+    company.registeredEntityName =
+      registeredEntityName?.trim() || company.registeredEntityName;
+    company.website = website?.trim() || company.website;
+    company.address = address?.trim() || company.address;
+    company.city = city?.trim() || company.city;
+    company.state = state?.trim() || company.state;
+    company.country = country?.trim() || company.country;
+    company.about = about?.trim() || company.about;
+    company.totalSeats = totalSeats ? parseInt(totalSeats) : company.totalSeats;
+    company.latitude = latitude ? parseFloat(latitude) : company.latitude;
+    company.longitude = longitude ? parseFloat(longitude) : company.longitude;
+    company.googleMap = googleMap?.trim() || company.googleMap;
+    company.ratings = ratings ? parseFloat(ratings) : company.ratings;
+    company.totalReviews = totalReviews
+      ? parseInt(totalReviews)
+      : company.totalReviews;
+    company.inclusions = inclusions?.trim() || company.inclusions;
+    company.services = services?.trim() || company.services;
+    company.units = units?.trim() || company.units;
+    company.companyType =
+      companyType?.trim()?.split(" ").join("").toLowerCase() ||
+      company.companyType;
+    company.images = images;
+
+    await company.save();
+
+    /** ---------------- REVIEWS UPDATE LOGIC ---------------- **/
+    if (Array.isArray(reviews) && reviews.length > 0) {
+      // Dumb but simple: nuke old reviews and replace
+      await Review.deleteMany({ company: company._id });
+      const reviewDocs = reviews.map((review) => ({
+        company: company._id,
+        companyId: company.companyId,
+        name: review.name?.trim(),
+        starCount: parseInt(review.starCount),
+        description: review.description?.trim(),
+        reviewSource: review.reviewSource?.trim(),
+        reviewLink: review.reviewLink?.trim(),
+      }));
+      await Review.insertMany(reviewDocs);
+    }
+
+    res.status(200).json({
+      message: "Company updated successfully",
+      company,
+    });
   } catch (error) {
+    console.error(error);
     next(error);
   }
 };
