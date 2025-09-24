@@ -1054,11 +1054,7 @@ export const getCompanyLeads = async (req, res, next) => {
     let query = {};
 
     if (companyId) {
-      if (mongoose.isValidObjectId(companyId)) {
-        query = { companyId: new mongoose.Types.ObjectId(companyId) }; // safest form
-      } else {
-        return res.status(400).json({ message: "Invalid companyId format" });
-      }
+      query.companyId = companyId;
     }
 
     const leads = await Lead.find(query);

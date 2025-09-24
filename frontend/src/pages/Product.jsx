@@ -109,7 +109,8 @@ const Product = () => {
         companyName: companyDetails?.companyName,
         sheetName: "All_Enquiry",
         phone: data?.mobileNumber,
-        companyId: companyDetails?._id,
+        company: companyDetails?._id,
+        companyId: companyDetails?.companyId,
         source: "B2C",
         productType: companyDetails?.companyType,
       });
