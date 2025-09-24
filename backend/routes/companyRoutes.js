@@ -13,6 +13,7 @@ import {
   getCompanyLeads,
   createCompany,
   getListings,
+  addTemplateLink,
 } from "../controllers/compayControllers.js";
 
 const router = Router();
@@ -28,6 +29,7 @@ router.get("/get-listings/:companyId", getListings);
 router.get("/get-single-company-data/:companyName", getCompany); //check company from admin panel before adding website link after creating website.
 router.get("/company-locations", getUniqueDataLocations);
 router.patch("/update-company", editCompany);
+router.patch("/add-template-link", addTemplateLink);
 router.post("/add-company-image", upload.single("image"), addCompanyImage);
 router.post(
   "/bulk-add-company-images",
