@@ -310,7 +310,7 @@ export const createCompany = async (req, res, next) => {
 
 export const getCompaniesData = async (req, res, next) => {
   try {
-    const companies = await Company.find().lean().exec();
+    const companies = await Company.find({ isActive: true }).lean().exec();
     const reviews = await Review.find().lean().exec();
     const poc = await PointOfContact.find().lean().exec();
 
