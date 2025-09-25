@@ -12,6 +12,7 @@ const DESTS = [
   { label: "Goa", country: "in", keyword: "goa", lang: "en" },
   { label: "Bali", country: "id", keyword: "bali", lang: "en" },
   { label: "Bangkok", country: "th", keyword: "bangkok", lang: "en" },
+  { label: "Phuket", country: "th", keyword: "phuket", lang: "en" },
   { label: "Ho Chi Minh", country: "vn", keyword: "ho chi minh", lang: "en" },
   { label: "Rio", country: "br", keyword: "rio", lang: "en" },
 ];
