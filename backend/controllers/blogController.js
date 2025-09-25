@@ -116,7 +116,7 @@ export const bulkInsertBlogs = async (req, res, next) => {
       })
       .on("end", async () => {
         try {
-          await TestBlog.insertMany(results);
+          await Blog.insertMany(results);
           res.status(201).json({
             message: "Blogs uploaded successfully",
             count: results.length,
