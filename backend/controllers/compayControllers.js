@@ -1051,7 +1051,10 @@ export const activateProduct = async (req, res, next) => {
       });
     }
 
-    return res.status(200).json({ message: "Product activated successfully" });
+    const activeStatus = status ? "activated" : "inactivated";
+    return res
+      .status(200)
+      .json({ message: `Product ${activeStatus} successfully` });
   } catch (error) {
     next(error);
   }
