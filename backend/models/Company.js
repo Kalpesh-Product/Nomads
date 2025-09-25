@@ -107,6 +107,10 @@ const companySchema = new mongoose.Schema({
     ],
     required: true,
   },
+  isActive: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 companySchema.index({ companyType: 1 });

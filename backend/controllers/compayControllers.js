@@ -1025,28 +1025,37 @@ export const getAllLeads = async (req, res, next) => {
   }
 };
 
-// export const getCompanyLeads = async (req, res, next) => {
-//   try {
-//     const { companyId } = req.query;
-//     let query = {};
+export const activateProduct = async (req, res, next) => {
+  try {
+    const { companyId, status } = req.body;
 
-//     if (companyId) {
-//       query = { companyId };
-//     }
+    if (!companyId) {
+      return res.status(400).json({
+        message: "Company Id missing",
+      });
+    }
+    if (!status || typeof status !== "boolean") {
+      return res.status(400).json({
+        message: "Status must be true/false",
+      });
+    }
 
-//     const leads = await Lead.find(query);
+    const product = await Company.updateMany(
+      { companyId },
+      { isActive: status }
+    );
 
-//     if (!leads || !leads.length) {
-//       return res.status(400).json({
-//         message: "No leads found",
-//       });
-//     }
+    if (!product) {
+      return res.status(400).json({
+        message: "Failed to update leads",
+      });
+    }
 
-//     return res.status(200).json(leads);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+    return res.status(200).json({ message: "Product activated successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const getCompanyLeads = async (req, res, next) => {
   try {

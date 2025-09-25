@@ -8,4 +8,3 @@ router.get("/get-blogs", getBlogs);
 router.post("/bulk-insert-blogs", upload.single("blog-file"), bulkInsertBlogs);
 
 export default router;
-s;
