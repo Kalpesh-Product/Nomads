@@ -2,6 +2,7 @@ import axios from "axios";
 import { Readable } from "stream";
 import csvParser from "csv-parser";
 import Blog from "../models/Blog.js";
+import TestBlog from "../models/TestBlog.js";
 
 const RSS2JSON_BASE = "https://api.rss2json.com/v1/api.json";
 
@@ -115,7 +116,7 @@ export const bulkInsertBlogs = async (req, res, next) => {
       })
       .on("end", async () => {
         try {
-          await Blog.insertMany(results);
+          await TestBlog.insertMany(results);
           res.status(201).json({
             message: "Blogs uploaded successfully",
             count: results.length,

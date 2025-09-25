@@ -918,16 +918,9 @@ export const addCompanyImagesBulk = async (req, res, next) => {
 
 export const editCompany = async (req, res, next) => {
   try {
-    const { companyId } = req.params;
-
     const {
-      companyName,
-      registeredEntityName,
-      website,
+      businessId,
       address,
-      city,
-      state,
-      country,
       about,
       totalSeats,
       latitude,
@@ -936,30 +929,18 @@ export const editCompany = async (req, res, next) => {
       ratings,
       totalReviews,
       inclusions,
-      services,
-      units,
       companyType,
       reviews,
       images,
-      websiteTemplateLink,
     } = req.body;
 
-    const company = await Company.findOne({ companyId });
+    const company = await Company.findOne({ businessId });
     if (!company) {
       return res.status(404).json({ message: "Company not found" });
     }
 
     // Update scalar fields
-    company.companyName = companyName?.trim() || company.companyName;
-    company.websiteTemplateLink =
-      websiteTemplateLink || company.websiteTemplateLink;
-    company.registeredEntityName =
-      registeredEntityName?.trim() || company.registeredEntityName;
-    company.website = website?.trim() || company.website;
     company.address = address?.trim() || company.address;
-    company.city = city?.trim() || company.city;
-    company.state = state?.trim() || company.state;
-    company.country = country?.trim() || company.country;
     company.about = about?.trim() || company.about;
     company.totalSeats = totalSeats ? parseInt(totalSeats) : company.totalSeats;
     company.latitude = latitude ? parseFloat(latitude) : company.latitude;
@@ -970,8 +951,6 @@ export const editCompany = async (req, res, next) => {
       ? parseInt(totalReviews)
       : company.totalReviews;
     company.inclusions = inclusions?.trim() || company.inclusions;
-    company.services = services?.trim() || company.services;
-    company.units = units?.trim() || company.units;
     company.companyType =
       companyType?.trim()?.split(" ").join("").toLowerCase() ||
       company.companyType;
@@ -1001,6 +980,31 @@ export const editCompany = async (req, res, next) => {
     });
   } catch (error) {
     console.error(error);
+    next(error);
+  }
+};
+
+export const addTemplateLink = async (req, res, next) => {
+  try {
+    const { companyName, link } = req.body;
+
+    const company = await Company.findOneAndUpdate(
+      { companyName },
+      {
+        websiteTemplateLink: link,
+      }
+    );
+
+    if (!company || !company.length) {
+      return res.status(200).json({
+        message: "No leads found",
+      });
+    }
+
+    return res
+      .status(200)
+      .json({ message: "Template Link added successfully" });
+  } catch (error) {
     next(error);
   }
 };
@@ -1050,11 +1054,7 @@ export const getCompanyLeads = async (req, res, next) => {
     let query = {};
 
     if (companyId) {
-      if (mongoose.isValidObjectId(companyId)) {
-        query = { companyId: new mongoose.Types.ObjectId(companyId) }; // safest form
-      } else {
-        return res.status(400).json({ message: "Invalid companyId format" });
-      }
+      query.companyId = companyId;
     }
 
     const leads = await Lead.find(query);

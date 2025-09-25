@@ -8,6 +8,11 @@ const leadSchema = new mongoose.Schema(
       trim: true,
     },
     companyId: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    company: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Company",
       required: true,

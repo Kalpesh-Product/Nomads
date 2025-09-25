@@ -37,7 +37,6 @@ const Product = () => {
   const [showAmenities, setShowAmenities] = useState(false);
   console.log("selected : ", selectedReview);
   const [open, setOpen] = useState(false);
-  console.log("comp", companyId);
 
   const { data: companyDetails, isPending: isCompanyDetails } = useQuery({
     queryKey: ["companyDetails", companyId],
@@ -45,6 +44,8 @@ const Product = () => {
       const response = await axios.get(
         `company/get-single-company-data?companyId=${companyId}&companyType=${type}`
       );
+
+      console.log("type",type)
       return response?.data;
     },
     enabled: !!companyId,
@@ -109,7 +110,8 @@ const Product = () => {
         companyName: companyDetails?.companyName,
         sheetName: "All_Enquiry",
         phone: data?.mobileNumber,
-        companyId: companyDetails?._id,
+        company: companyDetails?._id,
+        companyId: companyDetails?.companyId,
         source: "B2C",
         productType: companyDetails?.companyType,
       });
