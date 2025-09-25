@@ -1034,7 +1034,7 @@ export const activateProduct = async (req, res, next) => {
         message: "Company Id missing",
       });
     }
-    if (!status || typeof status !== "boolean") {
+    if (typeof status !== "boolean") {
       return res.status(400).json({
         message: "Status must be true/false",
       });
