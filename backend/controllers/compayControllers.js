@@ -1027,9 +1027,9 @@ export const getAllLeads = async (req, res, next) => {
 
 export const activateProduct = async (req, res, next) => {
   try {
-    const { companyId, status } = req.body;
+    const { businessId, status } = req.body;
 
-    if (!companyId) {
+    if (!businessId) {
       return res.status(400).json({
         message: "Company Id missing",
       });
@@ -1040,8 +1040,8 @@ export const activateProduct = async (req, res, next) => {
       });
     }
 
-    const product = await Company.updateMany(
-      { companyId },
+    const product = await Company.findOneAndUpdate(
+      { businessId },
       { isActive: status }
     );
 
