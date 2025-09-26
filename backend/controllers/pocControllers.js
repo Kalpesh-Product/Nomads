@@ -53,7 +53,6 @@ export const bulkInsertPoc = async (req, res, next) => {
         pocs.push(pocData);
       })
       .on("end", async () => {
-        console.log(pocs);
         if (pocs.length === 0) {
           return res
             .status(400)
