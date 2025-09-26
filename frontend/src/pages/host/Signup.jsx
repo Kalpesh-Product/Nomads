@@ -167,12 +167,12 @@ const HostSignup = () => {
     },
     onSuccess: (data) => {
       toast.success("Form submitted successfully");
-      // reset();
+      reset();
       setActiveStep((prev) => prev + 1); // 👈 go to Step 5 after submit
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || "Something went wrong");
-      // reset();
+      reset();
       setActiveStep((prev) => prev + 1); // 👈 go to Step 5 after submit (To be removed later)
     },
   });
@@ -1451,7 +1451,6 @@ const HostSignup = () => {
               </div>
             )}
 
-           
           
           </div>
         </form>

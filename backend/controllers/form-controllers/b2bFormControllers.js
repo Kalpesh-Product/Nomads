@@ -370,8 +370,17 @@ export const registerFormSubmission = async (req, res, next) => {
 
     // STEP 2: normalize incoming JSON strings
     let { products, testimonials, about } = payload;
-    products = JSON.parse(products || "[]");
-    testimonials = JSON.parse(testimonials || "[]");
+    const safeParse = (val, fallback) => {
+      try {
+        return typeof val === "string" ? JSON.parse(val) : val || fallback;
+      } catch {
+        return fallback;
+      }
+    };
+
+    products = safeParse(products, []);
+    testimonials = safeParse(testimonials, []);
+    about = safeParse(about, []);
 
     for (const k of Object.keys(payload)) {
       if (/^(products|testimonials)\.\d+\./.test(k)) delete payload[k];
@@ -432,7 +441,7 @@ export const registerFormSubmission = async (req, res, next) => {
         title: payload.title,
         subTitle: payload.subTitle,
         CTAButtonText: payload.CTAButtonText,
-        about: JSON.parse(about) || [],
+        about,
         productTitle: payload?.productTitle,
         galleryTitle: payload?.galleryTitle,
         testimonialTitle: payload.testimonialTitle,
@@ -447,7 +456,6 @@ export const registerFormSubmission = async (req, res, next) => {
         testimonials: [],
       };
 
-      console.log("template text");
       // Helper: upload an array of files to S3
       const uploadImages = async (files = [], folder) => {
         const arr = [];
@@ -542,7 +550,7 @@ export const registerFormSubmission = async (req, res, next) => {
             tFiles,
             `${baseFolder}/testimonialImages/${i}`
           );
-          s;
+
           tUploads[i] = uploaded[0];
         }
       }
@@ -562,7 +570,7 @@ export const registerFormSubmission = async (req, res, next) => {
 
       try {
         const submit = await fetch(
-          `https://wonomasterbe.vercel.app/api/editor/create-website?company=${payload.companyName}`,
+          `http://localhost:5000/api/editor/create-website?company=${payload.companyName}`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -570,6 +578,7 @@ export const registerFormSubmission = async (req, res, next) => {
           }
         );
         websiteResult = await submit.json();
+
         await session.commitTransaction();
 
         session.endSession();

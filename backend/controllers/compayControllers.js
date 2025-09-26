@@ -988,22 +988,19 @@ export const addTemplateLink = async (req, res, next) => {
   try {
     const { companyName, link } = req.body;
 
-    const company = await Company.findOneAndUpdate(
+    const updatedCompany = await Company.updateMany(
       { companyName },
-      {
-        websiteTemplateLink: link,
-      }
+      { $set: { websiteTemplateLink: link } },
+      { new: true }
     );
 
-    if (!company || !company.length) {
-      return res.status(200).json({
-        message: "No leads found",
-      });
+    if (!updatedCompany) {
+      return res.status(404).json({ message: "No company found" });
     }
 
     return res
       .status(200)
-      .json({ message: "Template Link added successfully" });
+      .json({ message: "Template link added successfully" });
   } catch (error) {
     next(error);
   }
