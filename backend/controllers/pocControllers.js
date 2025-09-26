@@ -2,6 +2,7 @@ import PointOfContact from "../models/PointOfContact.js";
 import { Readable } from "stream";
 import csvParser from "csv-parser";
 import Company from "../models/Company.js";
+import TestPointOfContact from "../models/TestPointOfContacts.js";
 
 export const bulkInsertPoc = async (req, res, next) => {
   try {
@@ -18,6 +19,11 @@ export const bulkInsertPoc = async (req, res, next) => {
       companies.map((item) => [item.businessId?.trim(), item._id])
     );
 
+    const companyIdMap = new Map();
+    companies.map((company) => {
+      companyIdMap.set(company.businessId, company.companyId);
+    });
+
     const pocs = [];
     const stream = Readable.from(file.buffer.toString("utf-8").trim());
 
@@ -25,9 +31,10 @@ export const bulkInsertPoc = async (req, res, next) => {
       .pipe(csvParser())
       .on("data", (row) => {
         const businessId = row["Business ID"]?.trim();
-        const companyId = companyMap.get(businessId);
+        const companyMongoId = companyMap.get(businessId);
+        const companyId = companyIdMap.get(businessId);
 
-        if (!companyId) {
+        if (!companyMongoId) {
           console.warn(`No PrivateStay found for business: ${businessId}`);
           return;
         }
@@ -37,7 +44,8 @@ export const bulkInsertPoc = async (req, res, next) => {
           row["Languages"]?.trim();
 
         const pocData = {
-          company: companyId,
+          company: companyMongoId,
+          companyId: companyId,
           name: row["POC Name"]?.trim(),
           image: row["POC Image"]?.trim(),
           designation: row["POC Designation"]?.trim(),
@@ -77,17 +85,17 @@ export const createPOC = async (req, res, next) => {
     const payload = req.body;
 
     const pocData = {
-      name: payload.name,
-      companyId: payload.companyId,
-      designation: payload.designation,
-      email: payload.email,
-      phone: payload.phone,
-      linkedInProfile: payload.linkedInProfile,
-      languages: payload.languages || [],
-      address: payload.address,
-      profileImage: payload.profileImage,
-      isActive: payload.isActive ?? true,
-      availibilityTime: payload.availibilityTime,
+      name: payload?.name,
+      companyId: payload?.companyId,
+      designation: payload?.designation,
+      email: payload?.email,
+      phone: payload?.phone,
+      linkedInProfile: payload?.linkedInProfile,
+      languagesSpoken: payload?.languages || [],
+      address: payload?.address,
+      profileImage: payload?.profileImage,
+      isActive: payload?.isActive ?? true,
+      availibilityTime: payload?.availibilityTime,
     };
 
     const poc = await PointOfContact.findOne({ email: payload.email });
@@ -111,9 +119,17 @@ export const createPOC = async (req, res, next) => {
 
 export const getPocDetails = async (req, res, next) => {
   try {
-    const { companyId } = req.body;
+    const { companyId } = req.query;
+    let query = {};
 
-    const pocDetails = await PointOfContact.find({ company: companyId });
+    if (companyId) {
+      query = { companyId };
+    }
+
+    const pocDetails = await PointOfContact.find(query).populate({
+      path: "company",
+      select: "companyName",
+    });
 
     if (!pocDetails) {
       return res.status(400).json({ message: "No POC details found" });

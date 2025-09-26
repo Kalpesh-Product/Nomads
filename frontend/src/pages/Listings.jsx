@@ -24,6 +24,7 @@ import { IoSearch } from "react-icons/io5";
 import { AnimatePresence, motion } from "motion/react";
 
 const Listings = () => {
+  const [resetPageKey, setResetPageKey] = useState(0);
   const [favorites, setFavorites] = useState([]);
   const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -36,6 +37,7 @@ const Listings = () => {
       category: "",
     },
   });
+
   const selectedCountry = watch("country");
   const selectedState = watch("location");
   const { data: locations = [], isLoading: isLocations } = useQuery({
@@ -92,7 +94,10 @@ const Listings = () => {
       const response = await axios.get(
         `company/companies?country=${country}&state=${location}`
       );
-      return Array.isArray(response.data) ? response.data : [];
+
+      return Array.isArray(response.data)
+        ? response.data.filter((item) => item?.companyType !== "privatestay")
+        : [];
     },
     enabled: !!formData?.country && !!formData?.location,
   });
@@ -103,7 +108,7 @@ const Listings = () => {
     const uniqueTypes = [
       ...new Set(
         listingsData
-          .filter((item) => item.companyType !== "coliving")
+          .filter((item) => item.companyType !== "privatestay")
           .map((item) => item.companyType)
           .filter(Boolean)
       ),
@@ -111,10 +116,10 @@ const Listings = () => {
 
     const labelMap = {
       coworking: "Co-Working",
-      // coliving: "Co-Living",
+      coliving: "Co-Living",
       hostel: "Hostels",
       workation: "Workation",
-      privatestay: "Private Stay",
+      // privatestay: "Private Stay",
       meetingroom: "Meetings",
       cafe: "Cafe’s",
     };
@@ -123,7 +128,8 @@ const Listings = () => {
       "coworking",
       "hostel",
       "workation",
-      "privatestay",
+      // "privatestay",
+      "coliving",
       "meetingroom",
       "cafe",
     ];
@@ -135,10 +141,15 @@ const Listings = () => {
 
   const filteredListings = React.useMemo(() => {
     if (!listingsData) return [];
+
     if (!formData?.category) return listingsData;
-    return listingsData.filter(
+
+    const categoryResults = listingsData.filter(
       (item) => item.companyType === formData.category
     );
+
+    // ✅ If no listings match the selected category, fallback to all listings
+    return categoryResults.length > 0 ? categoryResults : listingsData;
   }, [listingsData, formData?.category]);
 
   const toggleFavorite = (id) => {
@@ -154,6 +165,23 @@ const Listings = () => {
     setValue("location", formData.location);
     setValue("category", formData.category);
   }, [formData]);
+  useEffect(() => {
+    if (formData?.category && listingsData?.length > 0) {
+      const hasCategory = listingsData.some(
+        (item) => item.companyType === formData.category
+      );
+
+      if (!hasCategory) {
+        // Reset category in Redux + URL
+        dispatch(setFormValues({ ...formData, category: "" }));
+        setSearchParams({
+          country: formData.country,
+          location: formData.location,
+        });
+      }
+    }
+  }, [listingsData, formData, dispatch, setSearchParams]);
+
   const { mutate: locationData, isPending: isLocation } = useMutation({
     mutationFn: async (data) => {
       dispatch(setFormValues(data));
@@ -216,6 +244,7 @@ const Listings = () => {
 
   const onSubmit = (data) => {
     locationData(data);
+    setResetPageKey((prev) => prev + 1); // ensures a new value every time
   };
   const [mapOpen, setMapOpen] = useState(true);
 
@@ -489,6 +518,7 @@ const Listings = () => {
               data={isLisitingLoading ? skeletonArray : filteredListings}
               entriesPerPage={!mapOpen ? 10 : 9}
               persistPage={true}
+              resetPageKey={resetPageKey}
               columns={`grid-cols-1 md:grid-cols-2 ${
                 mapOpen ? "lg:grid-cols-3" : "lg:grid-cols-5"
               } gap-x-5`}
@@ -516,11 +546,11 @@ const Listings = () => {
                     <ListingCard
                       item={item}
                       showVertical={false}
-                      handleNavigation={() =>
+                      handleNavigation={() => {
                         navigate(`/listings/${item.companyName}`, {
-                          state: { companyId: item._id, type: item.type },
-                        })
-                      }
+                          state: { companyId: item.companyId, type: item.companyType },
+                        });
+                      }}
                     />
                   </motion.div>
                 )

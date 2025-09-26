@@ -1,16 +1,20 @@
 // src/components/NewsFetch.jsx
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "../utils/axios.js";
 import { IoChevronDown } from "react-icons/io5";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import humanDate from "../utils/humanDate.js";
+import { useSelector } from "react-redux";
 
 const DESTS = [
-  { label: "Goa", country: "in", keyword: "Goa", lang: "en" },
-  { label: "Bali", country: "id", keyword: "Bali", lang: "en" }, // or 'id' to widen coverage
-  { label: "Bangkok", country: "th", keyword: "Bangkok", lang: "en" }, // or 'th'
-    { label: "Ho Chi Minh", country: "vn", keyword: "Ho Chi Minh", lang: "en" }, // or 'th'
+  { label: "All", country: null, keyword: null, lang: null }, // ✅ New option
+  { label: "Goa", country: "in", keyword: "goa", lang: "en" },
+  { label: "Bali", country: "id", keyword: "bali", lang: "en" },
+  { label: "Bangkok", country: "th", keyword: "bangkok", lang: "en" },
+  { label: "Phuket", country: "th", keyword: "phuket", lang: "en" },
+  { label: "Ho Chi Minh", country: "vn", keyword: "ho chi minh", lang: "en" },
+  { label: "Rio", country: "br", keyword: "rio", lang: "en" },
 ];
 
 const extractImageFromContent = (content) => {
@@ -58,9 +62,7 @@ const NewsCard = ({ a }) => {
 
           <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
             <span className="truncate">{a.author || "News Desk"}</span>
-            <time dateTime={a.date}>
-              {a.date ? humanDate(a.date) : ""}
-            </time>
+            <time dateTime={a.date}>{a.date ? humanDate(a.date) : ""}</time>
           </div>
         </div>
       </div>
@@ -68,37 +70,67 @@ const NewsCard = ({ a }) => {
   );
 };
 
-
 const NewsFetch = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [dest, setDest] = useState(DESTS[0]);
+  const formData = useSelector((state) => state.location.formValues);
+  const initialized = useRef(false);
 
-  const params = useMemo(
-    () => ({
-      country: dest.country, // ISO-2 (in/id/th)
-      keyword: dest.keyword, // city/region (search q)
-      lang: dest.lang, // optional; omit to broaden
-      category: "general", // for top-headlines fallback
-      max: 10, // free plan cap
-    }),
-    [dest]
-  );
+  // ✅ Sync dropdown with URL params on page load
+// ✅ Sync dropdown with formData only on mount
+  useEffect(() => {
+    if (initialized.current) return; // ✅ don’t override after first run
+    initialized.current = true;
 
-  const { data, isPending, isError, refetch, isFetching } = useQuery({
-    queryKey: [
-      "gnews",
-      dest.label,
-      params.country
-    ],
+    const selectedDest = formData?.location;
+    if (selectedDest) {
+      const found = DESTS.find((d) => d.keyword === selectedDest);
+      if (found) {
+        setDest(found);
+        setSearchParams({ dest: found.label });
+        return;
+      }
+    }
+
+    // fallback = All
+    setDest(DESTS[0]);
+    setSearchParams({ dest: DESTS[0].label });
+  }, [formData, setSearchParams]);
+
+
+  const handleChange = (val) => {
+    const selected = DESTS.find((d) => d.label === val);
+    if (selected) {
+      setDest(selected);
+      setSearchParams({ dest: selected.label });
+    }
+  };
+
+  const params = useMemo(() => {
+    if (dest.label === "All") return null; // ✅ no params
+    return {
+      country: dest.country,
+      keyword: dest.keyword,
+      lang: dest.lang,
+      category: "general",
+      max: 10,
+    };
+  }, [dest]);
+
+  const { data, isPending, isError } = useQuery({
+    queryKey: ["gnews", dest.label],
     queryFn: async () => {
-      const res = await axios.get("/news/get-news", { params }); // hits your backend
+      if (dest.label === "All") {
+        const res = await axios.get("/news/get-news"); // ✅ no params
+        return res.data;
+      }
+      const res = await axios.get("/news/get-news", { params });
       return res.data;
     },
     refetchOnWindowFocus: false,
   });
 
   const articles = Array.isArray(data) ? data : [];
-
-  const scope = data?.scope;
 
   return (
     <div className="my-6">
@@ -115,9 +147,7 @@ const NewsFetch = () => {
               className="block w-full rounded-lg border-2 border-gray-400 bg-white px-3 py-2 pr-8
                text-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
               value={dest.label}
-              onChange={(e) =>
-                setDest(DESTS.find((d) => d.label === e.target.value))
-              }
+              onChange={(e) => handleChange(e.target.value)}
             >
               {DESTS.map((d) => (
                 <option key={d.label} value={d.label}>
@@ -127,14 +157,6 @@ const NewsFetch = () => {
             </select>
             <IoChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-600" />
           </div>
-
-          {/* <button
-            type="button"
-            onClick={() => refetch()}
-            className="text-xs border rounded px-2 py-1 hover:bg-gray-50"
-            disabled={isFetching}>
-            {isFetching ? "Refreshing…" : "Refresh"}
-          </button> */}
         </div>
       </div>
 

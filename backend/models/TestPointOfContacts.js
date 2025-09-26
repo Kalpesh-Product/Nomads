@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const pointOfContactSchema = new mongoose.Schema(
+const testPointOfContactSchema = new mongoose.Schema(
   {
     company: {
       type: mongoose.Schema.Types.ObjectId,
@@ -13,7 +13,7 @@ const pointOfContactSchema = new mongoose.Schema(
     companyId: {
       type: String,
       // unique: true,
-      // required: true,
+      required: true,
       trim: true,
     },
     designation: {
@@ -51,5 +51,8 @@ const pointOfContactSchema = new mongoose.Schema(
   }
 );
 
-const PointOfContact = mongoose.model("PointOfContact", pointOfContactSchema);
-export default PointOfContact;
+const TestPointOfContact = mongoose.model(
+  "TestPointOfContact",
+  testPointOfContactSchema
+);
+export default TestPointOfContact;

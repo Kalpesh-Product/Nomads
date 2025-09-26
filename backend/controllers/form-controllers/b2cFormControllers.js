@@ -1,6 +1,7 @@
 import * as yup from "yup";
 import Lead from "../../models/Lead.js";
 import mongoose from "mongoose";
+import { sendMail } from "../../config/mailer.js"; // adjust path if different
 
 const enquirySchema = yup.object({
   companyName: yup.string().trim().required("Please provide the company name"),
@@ -122,6 +123,7 @@ export const addB2CformSubmission = async (req, res, next) => {
     const {
       companyName,
       companyId,
+      company,
       companyType,
       country,
       state,
@@ -156,6 +158,17 @@ export const addB2CformSubmission = async (req, res, next) => {
           sheetName: d.sheetName,
         }),
         successMsg: "Enquiry added successfully",
+        emailTemplate: (data) => ({
+          to: data.email,
+          subject: "Your enquiry has been received ✅",
+          text: `Hi ${data.fullName}, your enquiry has been sent to the company successfully.`,
+          html: `
+        <h2>Thank you for your enquiry</h2>
+        <p>Hi ${data.fullName},</p>
+        <p>Your enquiry for <b>${data.companyName}</b> has been successfully submitted. Our team will reach out shortly.</p>
+        <p>Cheers,<br/>The WONO Team</p>
+      `,
+        }),
       },
       All_POC_Contact: {
         schema: pocSchema,
@@ -169,6 +182,18 @@ export const addB2CformSubmission = async (req, res, next) => {
           sheetName: d.sheetName,
         }),
         successMsg: "POC added successfully",
+        emailTemplate: (data) => ({
+          to: data.email,
+          subject: "Your POC request has been sent 📩",
+          text: `Hi ${data.fullName}, your POC contact request has been shared.`,
+          html: `
+        <h2>POC Contacted</h2>
+        <p>Hi ${data.fullName},</p>
+        <p>Your request to connect with <b>${data.pocName}</b> (${data.pocDesignation} at ${data.pocCompany}) has been submitted successfully.</p>
+        <p>They will reach out to you soon.</p>
+        <p>Cheers,<br/>The WONO Team</p>
+      `,
+        }),
       },
       Connect_with_us: {
         schema: connectWithUsSchema,
@@ -214,12 +239,13 @@ export const addB2CformSubmission = async (req, res, next) => {
     const payload = config.map(validatedData);
 
     if (sheetName === "All_Enquiry") {
-      if (companyId && !mongoose.Types.ObjectId.isValid(companyId)) {
+      if (company && !mongoose.Types.ObjectId.isValid(company)) {
         return res.status(400).json({ message: "Invalid company id provided" });
       }
 
       const leads = new Lead({
         companyName,
+        company,
         companyId,
         verticalType: companyType,
         country: country || "",
@@ -248,6 +274,15 @@ export const addB2CformSubmission = async (req, res, next) => {
 
     if (result.status !== "success") {
       throw new Error(result.message || "Failed to save data to Google Sheets");
+    }
+
+    // Send confirmation email if template exists
+    if (config.emailTemplate) {
+      try {
+        await sendMail(config.emailTemplate(validatedData));
+      } catch (err) {
+        console.error("Failed to send confirmation email:", err.message);
+      }
     }
 
     res.status(201).json({

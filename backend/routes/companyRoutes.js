@@ -12,6 +12,9 @@ import {
   getAllLeads,
   getCompanyLeads,
   createCompany,
+  getListings,
+  addTemplateLink,
+  activateProduct,
 } from "../controllers/compayControllers.js";
 
 const router = Router();
@@ -22,10 +25,13 @@ router.post(
 );
 
 router.get("/companies", getCompaniesData);
-router.get("/get-single-company-data/:companyId", getCompanyData);
-router.get("/get-single-company-data/:companyName", getCompany); //check company from admin panel before adding website link after creating website.
+router.patch("/activate-product", activateProduct);
+router.get("/get-single-company-data", getCompanyData);
+router.get("/get-listings/:companyId", getListings);
+// router.get("/get-single-company-data/:companyName", getCompany); //check company from admin panel before adding website link after creating website.
 router.get("/company-locations", getUniqueDataLocations);
 router.patch("/update-company", editCompany);
+router.patch("/add-template-link", addTemplateLink);
 router.post("/add-company-image", upload.single("image"), addCompanyImage);
 router.post(
   "/bulk-add-company-images",

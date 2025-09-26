@@ -11,6 +11,7 @@ const PaginatedGrid = ({
   allowScroll = true,
   persistPage = false, // NEW PROP
   persistKey = "paginatedGridPage", // optional custom key
+  resetPageKey, // number that increments on reset
 }) => {
   const formData = useSelector((state) => state.location.formValues);
   const location = useLocation();
@@ -50,6 +51,15 @@ const PaginatedGrid = ({
     (currentPage + 1) * entriesPerPage
   );
 
+  useEffect(() => {
+    if (resetPageKey !== 0) {
+      setCurrentPage(0);
+      if (persistPage) {
+        localStorage.setItem(persistKey, "0");
+      }
+    }
+  }, [resetPageKey, persistPage, persistKey]);
+
   return (
     <div className="flex justify-between flex-col rounded-xl">
       <div className="flex flex-col gap-4 h-full justify-between custom-scrollbar-hide">
@@ -76,7 +86,7 @@ const PaginatedGrid = ({
             nextLabel="›"
             breakLabel="..."
             renderOnZeroPageCount={null}
-            containerClassName="flex justify-center gap-2 mt-4 w-full px-2"
+            containerClassName="flex justify-center gap-4 mt-10 w-full px-2"
             pageClassName="h-8 w-8 flex justify-center items-center rounded-full text-sm border border-gray-300 bg-white text-black transition shrink-0"
             pageLinkClassName="flex justify-center items-center w-full h-full"
             activeClassName="bg-black text-black border-black"

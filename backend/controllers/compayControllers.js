@@ -6,6 +6,27 @@ import csvParser from "csv-parser";
 import { uploadFileToS3 } from "../config/s3Config.js";
 import mongoose from "mongoose";
 import Lead from "../models/Lead.js";
+import axios from "axios";
+import TestListing from "../models/TestCompany.js";
+
+// Utility to calculate distance between two lat/lng points in meters
+function getDistanceFromLatLonInM(lat1, lon1, lat2, lon2) {
+  const R = 6371e3; // Earth radius in meters
+  const toRad = (deg) => (deg * Math.PI) / 180;
+
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c; // distance in meters
+}
 
 export const bulkInsertCompanies = async (req, res, next) => {
   try {
@@ -18,12 +39,28 @@ export const bulkInsertCompanies = async (req, res, next) => {
 
     const companies = [];
 
+    //fetch companies from master panel
+    const hostCompanies = await axios.get(
+      "https://wonomasterbe.vercel.app/api/hosts/companies"
+    );
+
+    const companyMap = new Map();
+    hostCompanies.data.forEach((company) => {
+      companyMap.set(company.companyName, company.companyId);
+    });
+
     const stream = Readable.from(file.buffer.toString("utf-8").trim());
     stream
       .pipe(csvParser())
       .on("data", (row) => {
+        const emptyId = companyMap.get(row["Business Name"]?.trim()) || "";
+        if (emptyId === "") {
+          console.log("company name", row["Business Name"]?.trim());
+        }
+
         const company = {
           businessId: row["Business ID"]?.trim(),
+          companyId: companyMap.get(row["Business Name"]?.trim()) || "",
           companyName: row["Business Name"]?.trim(),
           registeredEntityName: row["Registered Entity name"]?.trim(),
           website: row["Website"]?.trim() || null,
@@ -85,6 +122,8 @@ export const bulkInsertCompanies = async (req, res, next) => {
           }
         }
       });
+
+    // return res.status(200).json({});
   } catch (error) {
     console.log(error);
     next(error);
@@ -94,8 +133,8 @@ export const bulkInsertCompanies = async (req, res, next) => {
 export const createCompany = async (req, res, next) => {
   try {
     const {
-      businessId,
       companyName,
+      companyId,
       registeredEntityName,
       website,
       address,
@@ -115,18 +154,26 @@ export const createCompany = async (req, res, next) => {
       companyType,
       poc, // single POC object
       reviews, // array of reviews
+      images,
     } = req.body;
 
-    if (!businessId || !companyName) {
-      return res
-        .status(400)
-        .json({ message: "Business ID and Company Name are required" });
+    const generateBuisnessId = () => {
+      const base = "WoNo_world";
+      const id = `${base} ${companyType} ${city} ${Date.now()}`;
+      const finalId = id.replace(/\s+/g, "_");
+
+      return finalId.trim();
+    };
+
+    if (!companyName) {
+      return res.status(400).json({ message: "Company Name are required" });
     }
 
     // Create company
     const company = new Company({
-      businessId: businessId.trim(),
+      businessId: generateBuisnessId(),
       companyName: companyName.trim(),
+      companyId,
       registeredEntityName: registeredEntityName?.trim(),
       website: website?.trim() || null,
       address: address?.trim(),
@@ -144,6 +191,7 @@ export const createCompany = async (req, res, next) => {
       services: services?.trim(),
       units: units?.trim(),
       companyType: companyType?.trim()?.split(" ").join("").toLowerCase(),
+      images,
     });
 
     // Save company first (needed for _id reference in POC/Reviews)
@@ -240,6 +288,7 @@ export const createCompany = async (req, res, next) => {
     if (Array.isArray(reviews) && reviews.length > 0) {
       const reviewDocs = reviews.map((review) => ({
         company: savedCompany._id,
+        companyId,
         name: review.name?.trim(),
         starCount: parseInt(review.starCount),
         description: review.description?.trim(),
@@ -261,7 +310,7 @@ export const createCompany = async (req, res, next) => {
 
 export const getCompaniesData = async (req, res, next) => {
   try {
-    const companies = await Company.find().lean().exec();
+    const companies = await Company.find({ isActive: true }).lean().exec();
     const reviews = await Review.find().lean().exec();
     const poc = await PointOfContact.find().lean().exec();
 
@@ -320,23 +369,98 @@ export const getCompaniesData = async (req, res, next) => {
 };
 
 export const getCompanyData = async (req, res, next) => {
-  try {
-    const { companyId } = req.params;
+  // Array of llats & long for centres ot cover all regions
+  // Add at the top of getCompanyData
+  const regionCenters = {
+    goa: [
+      { lat: 15.4909, lng: 73.8278 }, // Panaji (North-Central)
+      { lat: 15.2993, lng: 74.124 }, // Ponda (East-Central)
+      { lat: 15.184, lng: 73.969 }, // Margao (South-Central)
+      { lat: 15.402, lng: 73.785 }, // Mapusa (Northwest)
+      { lat: 15.517, lng: 73.9116 }, // Old Goa
+      { lat: 15.272, lng: 73.958 }, // Vasco da Gama (Southwest)
+      { lat: 15.01, lng: 74.02 }, // Canacona (South Goa)
+      { lat: 15.6, lng: 73.75 }, // Pernem (Far North Goa)
+      { lat: 15.35, lng: 73.9 }, // Bambolim
+      { lat: 15.45, lng: 74.02 }, // Valpoi (Northeast Goa)
+    ],
+    bali: [
+      { lat: -8.4095, lng: 115.1889 }, // Denpasar (South)
+      { lat: -8.3405, lng: 115.092 }, // Ubud (Center)
+      { lat: -8.139, lng: 115.089 }, // Amed (East)
+      { lat: -8.72, lng: 115.175 }, // Uluwatu (Southwest tip)
+      { lat: -8.36, lng: 114.62 }, // Gilimanuk (West end)
+      { lat: -8.22, lng: 114.97 }, // Negara (West Bali)
+      { lat: -8.54, lng: 115.51 }, // Candidasa (Southeast)
+      { lat: -8.67, lng: 115.21 }, // Nusa Dua (Far South)
+      { lat: -8.3, lng: 115.6 }, // Tulamben (Northeast coast)
+      { lat: -8.45, lng: 115.25 }, // Gianyar (East-Central)
+    ],
+    bangkok: [
+      { lat: 13.7563, lng: 100.5018 }, // Bangkok center
+      { lat: 13.69, lng: 100.75 }, // Lat Krabang (East Bangkok)
+      { lat: 13.81, lng: 100.55 }, // Chatuchak (North Bangkok)
+      { lat: 13.72, lng: 100.53 }, // Silom/Sathorn
+      { lat: 13.77, lng: 100.41 }, // Thonburi (West bank)
+      { lat: 13.65, lng: 100.5 }, // Bang Na (Southeast)
+      { lat: 13.85, lng: 100.6 }, // Don Mueang (North Airport area)
+      { lat: 13.73, lng: 100.78 }, // Min Buri (Far East)
+      { lat: 13.82, lng: 100.48 }, // Nonthaburi (Northwest metro)
+      { lat: 13.55, lng: 100.6 }, // Samut Prakan (Far South)
+    ],
+    hochiminh: [
+      { lat: 10.7769, lng: 106.7009 }, // District 1 (Center)
+      { lat: 10.8231, lng: 106.6297 }, // Binh Thanh
+      { lat: 10.85, lng: 106.77 }, // Thu Duc (Northeast)
+      { lat: 10.8, lng: 106.64 }, // Go Vap (Northwest)
+      { lat: 10.75, lng: 106.65 }, // District 5 (Cholon)
+      { lat: 10.74, lng: 106.71 }, // District 7 (Phu My Hung, South)
+      { lat: 10.72, lng: 106.62 }, // District 8 (Southwest)
+      { lat: 10.77, lng: 106.58 }, // District 6 (West)
+      { lat: 10.88, lng: 106.6 }, // Cu Chi (Far Northwest)
+      { lat: 10.61, lng: 106.74 }, // Nha Be (Far South)
+    ],
+    cebu: [
+      { lat: 10.3157, lng: 123.8854 }, // Cebu City center
+      { lat: 10.7, lng: 123.8854 }, // North of Cebu — near Danao area
+      { lat: 9.95, lng: 123.8854 }, // South direction — Talisay / Carcar side
+      { lat: 10.3157, lng: 124.3 }, // East — over toward Camotes Sea / islands
+      { lat: 10.3157, lng: 123.4 }, // West — inland mountains / western Cebu
+      { lat: 10.8, lng: 124.3 }, // Northeast corner
+      { lat: 10.8, lng: 123.4 }, // Northwest corner
+      { lat: 9.95, lng: 124.3 }, // Southeast corner
+      { lat: 9.95, lng: 123.4 }, // Southwest corner
+      { lat: 10.5, lng: 123.8854 }, // mid-north-central
+    ],
+  };
 
-    let companyQuery;
-    if (mongoose.Types.ObjectId.isValid(companyId)) {
-      // Search by ObjectId
-      companyQuery = Company.findById(companyId).lean().exec();
-    } else {
-      // Search by companyName (case-insensitive regex)
-      companyQuery = Company.findOne({
-        companyName: { $regex: new RegExp(`^${companyId}$`, "i") },
-      })
-        .lean()
-        .exec();
+  try {
+    const { companyId, companyType } = req.query;
+
+    let companyQuery = {};
+
+    if (companyId) {
+      companyQuery.companyId = companyId;
+    }
+    if (companyType) {
+      companyQuery.companyType = companyType;
     }
 
-    const companyData = await companyQuery;
+    // if (mongoose.Types.ObjectId.isValid(companyId)) {
+    //   // Search by ObjectId
+    //   companyQuery = Company.findById(companyId).lean().exec();
+    // } else {
+    //   // Search by companyName (case-insensitive regex)
+    //   companyQuery = Company.findOne({
+    //     companyName: { $regex: new RegExp(`^${companyId}$`, "i") },
+    //   })
+    //     .lean()
+    //     .exec();
+    // }
+
+    // const companyData = await companyQuery;
+
+    const companyData = await Company.findOne(companyQuery).lean().exec();
 
     if (!companyData) {
       return res.status(404).json({ error: "Company not found" });
@@ -345,6 +469,139 @@ export const getCompanyData = async (req, res, next) => {
     // Use the actual ObjectId of the found company
     const companyObjectId = companyData._id;
 
+    // Keywords
+    const keywordMap = {
+      coworking: "coworking space",
+      hostel: "hostel",
+      privatestay: "private accommodation",
+      meetingroom: "meeting room",
+      cafe: "cafe",
+      coliving: "coliving space",
+      workation: "resort OR workation",
+    };
+
+    const keyword =
+      keywordMap[companyData.companyType?.toLowerCase()] || "coworking space";
+
+    // ###
+
+    // Decide centers: use multi-centers if region matches, else company coords
+    const regionKey =
+      companyData.state?.toLowerCase() || companyData.city?.toLowerCase();
+    const centers = regionCenters[regionKey] || [
+      { lat: companyData.latitude, lng: companyData.longitude },
+    ];
+
+    let coworkingSpaces = [];
+    for (const center of centers) {
+      const res = await axios.get(
+        "https://maps.googleapis.com/maps/api/place/nearbysearch/json",
+        {
+          params: {
+            location: `${center.lat},${center.lng}`,
+            radius: 50000, // ✅ max allowed by Google
+            keyword,
+            key: process.env.GOOGLE_PLACES_API_KEY,
+          },
+        }
+      );
+      coworkingSpaces.push(...(res.data.results || []));
+    }
+
+    // ###
+
+    // Step 2: For each space, fetch reviews from Place Details API
+    const detailedSpaces = await Promise.all(
+      coworkingSpaces.map(async (place) => {
+        try {
+          const detailsRes = await axios.get(
+            "https://maps.googleapis.com/maps/api/place/details/json",
+            {
+              params: {
+                place_id: place.place_id,
+                key: process.env.GOOGLE_PLACES_API_KEY,
+                // ✅ include geometry so details.geometry is available if needed
+                fields:
+                  "name,rating,user_ratings_total,reviews,formatted_address,geometry",
+              },
+            }
+          );
+
+          const details = detailsRes.data.result || {};
+
+          // Use lat/lng from Nearby first; fall back to Details if missing
+          const nearbyLoc = place.geometry?.location;
+          const detailsLoc = details.geometry?.location;
+          const location = nearbyLoc || detailsLoc || null;
+
+          // Top 5 five-star reviews (from the 0–5 reviews Google returns)
+          const reviews = (details.reviews || [])
+            .filter((r) => r.rating === 5)
+            .slice(0, 5);
+
+          return {
+            place_id: place.place_id,
+            name: details.name ?? place.name,
+            address: details.formatted_address ?? place.vicinity ?? "",
+            rating: details.rating ?? place.rating ?? null,
+            user_ratings_total:
+              details.user_ratings_total ?? place.user_ratings_total ?? 0,
+            location, // { lat, lng } or null
+            reviews,
+          };
+        } catch (err) {
+          // On details failure, still return basic info + location from Nearby
+          return {
+            place_id: place.place_id,
+            name: place.name,
+            address: place.vicinity ?? "",
+            rating: place.rating ?? null,
+            user_ratings_total: place.user_ratings_total ?? 0,
+            location: place.geometry?.location ?? null,
+            reviews: [],
+          };
+        }
+      })
+    );
+
+    // Try to match Google place by decreasing decimal precision
+    let closestGoogle = null;
+
+    const toTruncate = (num, decimals) => {
+      const factor = Math.pow(10, decimals);
+      return Math.trunc(num * factor) / factor;
+    };
+
+    // First attempt: exact match (no truncation)
+    closestGoogle = detailedSpaces.find(
+      (place) =>
+        place.location &&
+        place.location.lat === companyData.latitude &&
+        place.location.lng === companyData.longitude
+    );
+
+    if (!closestGoogle) {
+      // Try 5 → 4 → 3 decimals
+      for (let decimals = 5; decimals >= 3; decimals--) {
+        const match = detailedSpaces.find((place) => {
+          if (!place.location) return false;
+
+          const googleLat = toTruncate(place.location.lat, decimals);
+          const googleLng = toTruncate(place.location.lng, decimals);
+          const companyLat = toTruncate(companyData.latitude, decimals);
+          const companyLng = toTruncate(companyData.longitude, decimals);
+
+          return googleLat === companyLat && googleLng === companyLng;
+        });
+
+        if (match) {
+          closestGoogle = match;
+          break; // stop once we find a match
+        }
+      }
+    }
+
+    // Fetch DB reviews & POC
     const [reviews, poc] = await Promise.all([
       Review.find({ company: companyObjectId }).lean().exec(),
       PointOfContact.findOne({ company: companyObjectId, isActive: true })
@@ -352,9 +609,26 @@ export const getCompanyData = async (req, res, next) => {
         .exec(),
     ]);
 
-    return res.status(200).json({
+    const updatedCompanyData = {
       ...companyData,
-      reviews,
+      ratings: closestGoogle?.rating || companyData.ratings,
+      totalReviews:
+        closestGoogle?.user_ratings_total || companyData.totalReviews,
+    };
+
+    return res.status(200).json({
+      ...updatedCompanyData,
+      reviews: [
+        ...reviews,
+        ...(closestGoogle?.reviews || []).map((r) => ({
+          company: companyObjectId,
+          name: r.author_name,
+          starCount: r.rating,
+          description: r.text,
+          reviewLink: r.author_url,
+          avatar: r.profile_photo_url,
+        })),
+      ],
       poc,
     });
   } catch (error) {
@@ -373,6 +647,22 @@ export const getCompany = async (req, res, next) => {
     }
 
     return res.status(200).json(company);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getListings = async (req, res, next) => {
+  try {
+    const { companyId } = req.params;
+
+    const listings = await Company.find({ companyId: companyId }).lean().exec();
+
+    if (!listings) {
+      return res.status(404).json({ error: "Company not found" });
+    }
+
+    return res.status(200).json(listings);
   } catch (error) {
     next(error);
   }
@@ -628,21 +918,92 @@ export const addCompanyImagesBulk = async (req, res, next) => {
 
 export const editCompany = async (req, res, next) => {
   try {
+    const {
+      businessId,
+      address,
+      about,
+      totalSeats,
+      latitude,
+      longitude,
+      googleMap,
+      ratings,
+      totalReviews,
+      inclusions,
+      companyType,
+      reviews,
+      images,
+    } = req.body;
+
+    const company = await Company.findOne({ businessId });
+    if (!company) {
+      return res.status(404).json({ message: "Company not found" });
+    }
+
+    // Update scalar fields
+    company.address = address?.trim() || company.address;
+    company.about = about?.trim() || company.about;
+    company.totalSeats = totalSeats ? parseInt(totalSeats) : company.totalSeats;
+    company.latitude = latitude ? parseFloat(latitude) : company.latitude;
+    company.longitude = longitude ? parseFloat(longitude) : company.longitude;
+    company.googleMap = googleMap?.trim() || company.googleMap;
+    company.ratings = ratings ? parseFloat(ratings) : company.ratings;
+    company.totalReviews = totalReviews
+      ? parseInt(totalReviews)
+      : company.totalReviews;
+    company.inclusions = inclusions?.trim() || company.inclusions;
+    company.companyType =
+      companyType?.trim()?.split(" ").join("").toLowerCase() ||
+      company.companyType;
+    company.images = images;
+
+    await company.save();
+
+    /** ---------------- REVIEWS UPDATE LOGIC ---------------- **/
+    if (Array.isArray(reviews) && reviews.length > 0) {
+      // Dumb but simple: nuke old reviews and replace
+      await Review.deleteMany({ company: company._id });
+      const reviewDocs = reviews.map((review) => ({
+        company: company._id,
+        companyId: company.companyId,
+        name: review.name?.trim(),
+        starCount: parseInt(review.starCount),
+        description: review.description?.trim(),
+        reviewSource: review.reviewSource?.trim(),
+        reviewLink: review.reviewLink?.trim(),
+      }));
+      await Review.insertMany(reviewDocs);
+    }
+
+    res.status(200).json({
+      message: "Company updated successfully",
+      company,
+    });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
+export const addTemplateLink = async (req, res, next) => {
+  try {
     const { companyName, link } = req.body;
 
     const company = await Company.findOneAndUpdate(
       { companyName },
-      { websiteTemplateLink: link }
+      {
+        websiteTemplateLink: link,
+      }
     );
 
-    if (!company) {
-      return res.status(400).json({
-        message:
-          "Failed to add website template link.Check if the company exists.",
+    if (!company || !company.length) {
+      return res.status(200).json({
+        message: "No leads found",
       });
     }
 
-    return res.status(200).json({});
+    return res
+      .status(200)
+      .json({ message: "Template Link added successfully" });
   } catch (error) {
     next(error);
   }
@@ -653,7 +1014,7 @@ export const getAllLeads = async (req, res, next) => {
     const leads = await Lead.find();
 
     if (!leads || !leads.length) {
-      return res.status(400).json({
+      return res.status(200).json({
         message: "No leads found",
       });
     }
@@ -664,26 +1025,61 @@ export const getAllLeads = async (req, res, next) => {
   }
 };
 
-export const getCompanyLeads = async (req, res, next) => {
+export const activateProduct = async (req, res, next) => {
   try {
-    const { companyId } = req.query;
+    const { businessId, status } = req.body;
 
-    if (!mongoose.Types.ObjectId.isValid(companyId)) {
+    if (!businessId) {
       return res.status(400).json({
-        message: "Invalid id provided",
+        message: "Company Id missing",
+      });
+    }
+    if (typeof status !== "boolean") {
+      return res.status(400).json({
+        message: "Status must be true/false",
       });
     }
 
-    const leads = await Lead.find({ companyId: companyId });
+    const product = await Company.findOneAndUpdate(
+      { businessId },
+      { isActive: status }
+    );
+
+    if (!product) {
+      return res.status(400).json({
+        message: "Failed to update leads",
+      });
+    }
+
+    const activeStatus = status ? "activated" : "inactivated";
+    return res
+      .status(200)
+      .json({ message: `Product ${activeStatus} successfully` });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getCompanyLeads = async (req, res, next) => {
+  try {
+    const { companyId } = req.query;
+    let query = {};
+
+    if (companyId) {
+      query.companyId = companyId;
+    }
+
+    const leads = await Lead.find(query);
 
     if (!leads || !leads.length) {
-      return res.status(400).json({
+      return res.status(200).json({
         message: "No leads found",
       });
     }
 
     return res.status(200).json(leads);
   } catch (error) {
-    next(error);
+    console.error("[getCompanyLeads] error:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };

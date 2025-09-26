@@ -15,11 +15,12 @@ const TemplateSite = () => {
 }
 
 const tenant = getTenantFromHost()
+
    const { data, isPending, error } = useQuery({
       queryKey: ["company", tenant],
       queryFn: async () => {
         const res = await axios.get(
-          `https://wonotestbe.vercel.app/api/editor/get-website/${tenant}`
+          `https://wonomasterbe.vercel.app/api/editor/get-website/${tenant}`
         );
         return res.data;
       },

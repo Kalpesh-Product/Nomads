@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const companySchema = new mongoose.Schema({
+const testListingSchema = new mongoose.Schema({
   businessId: {
     type: String,
     required: true,
@@ -85,15 +85,6 @@ const companySchema = new mongoose.Schema({
   services: {
     type: String,
   },
-  cost: {
-    type: String,
-  },
-  description: {
-    type: String,
-  },
-  productName: {
-    type: String,
-  },
   companyType: {
     type: String,
     enum: [
@@ -107,13 +98,9 @@ const companySchema = new mongoose.Schema({
     ],
     required: true,
   },
-  isActive: {
-    type: Boolean,
-    default: false,
-  },
 });
 
-companySchema.index({ companyType: 1 });
+testListingSchema.index({ companyType: 1 });
 
-const Company = mongoose.model("Company", companySchema);
-export default Company;
+const TestListing = mongoose.model("TestListing", testListingSchema);
+export default TestListing;

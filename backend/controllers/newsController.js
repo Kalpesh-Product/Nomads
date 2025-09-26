@@ -104,14 +104,20 @@ import csvParser from "csv-parser";
 export const getNews = async (req, res, next) => {
   try {
     const { keyword } = req.query;
-    const blogs = await News.find({
-      destination: { $regex: keyword, $options: "i" },
-    }).sort({ date: -1 });
+
+    let query = {};
+    if (keyword) {
+      query.destination = { $regex: keyword, $options: "i" };
+    }
+
+    const blogs = await News.find(query).sort({ date: -1 });
+
     return res.status(200).json(blogs);
   } catch (error) {
     next(error);
   }
 };
+
 export const bulkInsertnews = async (req, res, next) => {
   try {
     const results = [];
@@ -168,7 +174,7 @@ export const bulkInsertnews = async (req, res, next) => {
         }
       });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     next(error);
   }
 };

@@ -1,15 +1,19 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "../utils/axios"; // your custom axios instance
 import { IoChevronDown } from "react-icons/io5";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import humanDate from "../utils/humanDate";
+import { useSelector } from "react-redux";
 
 const DESTS = [
-  { label: "Goa", keyword: "Goa" },
-  { label: "Bali", keyword: "Bali" },
-  { label: "Bangkok", keyword: "Bangkok" },
-  { label: "Ho Chi Minh", country: "vn", keyword: "Ho Chi Minh", lang: "en" }, // or 'th'
+  { label: "All", country: null, keyword: null, lang: null }, // ✅ New option
+  { label: "Goa", country: "in", keyword: "goa", lang: "en" },
+  { label: "Bali", country: "id", keyword: "bali", lang: "en" },
+  { label: "Bangkok", country: "th", keyword: "bangkok", lang: "en" },
+  { label: "Phuket", country: "th", keyword: "phuket", lang: "en" },
+  { label: "Ho Chi Minh", country: "vn", keyword: "ho chi minh", lang: "en" },
+  { label: "Rio", country: "br", keyword: "rio", lang: "en" },
 ];
 
 const stripHTML = (html) => {
@@ -76,18 +80,69 @@ const BlogCard = ({ b }) => {
 };
 
 const BlogFetch = () => {
+  // const [dest, setDest] = useState(DESTS[0]);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialDest =
+    DESTS.find((d) => d.label === searchParams.get("dest")) || DESTS[0];
   const [dest, setDest] = useState(DESTS[0]);
+  const formData = useSelector((state) => state.location.formValues);
+  const initialized = useRef(false);
 
-  const params = useMemo(() => ({ keyword: dest.keyword }), [dest]);
+  useEffect(() => {
+    if (initialized.current) return; // ✅ don’t override after first run
+    initialized.current = true;
 
-  const { data, isPending, isError, refetch, isFetching } = useQuery({
-    queryKey: ["blogs", dest.keyword],
+    const selectedDest = formData?.location;
+    if (selectedDest) {
+      const found = DESTS.find((d) => d.keyword === selectedDest);
+      if (found) {
+        setDest(found);
+        setSearchParams({ dest: found.label });
+        return;
+      }
+    }
+
+    // fallback = All
+    setDest(DESTS[0]);
+    setSearchParams({ dest: DESTS[0].label });
+  }, [formData, setSearchParams]);
+
+  const handleChange = (val) => {
+    const selected = DESTS.find((d) => d.label === val);
+    setDest(selected);
+    setSearchParams({ dest: selected.label });
+  };
+
+  const params = useMemo(() => {
+    if (dest.label === "All") return null; // ✅ no params
+    return {
+      country: dest.country,
+      keyword: dest.keyword,
+      lang: dest.lang,
+      category: "general",
+      max: 10,
+    };
+  }, [dest]);
+
+  // const { data, isPending, isError, refetch, isFetching } = useQuery({
+  //   queryKey: ["blogs", dest.keyword],
+  //   queryFn: async () => {
+  //     const res = await axios.get("/blogs/get-blogs", { params });
+  //     return res.data;
+  //   },
+  // });
+
+  const { data, isPending, isError } = useQuery({
+    queryKey: ["blogs", dest.label],
     queryFn: async () => {
-      const res = await axios.get("/blogs/get-blogs", { params }); // your backend: /api/blogs
+      if (dest.label === "All") {
+        const res = await axios.get("/blogs/get-blogs"); // ✅ no params
+        return res.data;
+      }
+      const res = await axios.get("/blogs/get-blogs", { params });
       return res.data;
     },
-    // staleTime: 1000 * 60 * 5,
-    // refetchOnWindowFocus: false,
+    refetchOnWindowFocus: false,
   });
 
   //   const blogs = Array.isArray(data?.articles) ? data.articles : [];
@@ -106,9 +161,7 @@ const BlogFetch = () => {
             <select
               className="block w-full rounded-lg border-2 border-gray-400 bg-white px-3 py-2 pr-8 text-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
               value={dest.label}
-              onChange={(e) =>
-                setDest(DESTS.find((d) => d.label === e.target.value))
-              }
+              onChange={(e) => handleChange(e.target.value)}
             >
               {DESTS.map((d) => (
                 <option key={d.label} value={d.label}>

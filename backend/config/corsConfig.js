@@ -9,6 +9,8 @@ export const allowedOrigins = [
   "https://wonomasterfe.vercel.app",
   "https://wonomasterbe.vercel.app",
   "https://data-upload-alpha.vercel.app",
+  "https://wonohostfe.vercel.app",
+  "https://wonohostbe.vercel.app",
 ];
 
 const regexAllowedOrigins = [
