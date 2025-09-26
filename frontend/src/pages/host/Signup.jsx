@@ -1440,7 +1440,7 @@ const HostSignup = () => {
             )}
 
             {/* Go To Home button on 5th step */}
-           {/* {activeStep === stepFields.length - 1 && (
+           {activeStep === stepFields.length - 1 && (
               <div className="flex justify-center items-center w-full">
                 <GetStartedButton
                   title="Go To Home"
@@ -1449,14 +1449,9 @@ const HostSignup = () => {
                   }}
                 />
               </div>
-            )} */}
-
-             {activeStep > 0 &&   (
-              <GetStartedButton
-                title="Back"
-                handleSubmit={() => setActiveStep((prev) => prev - 1)}
-              />
             )}
+
+           
           
           </div>
         </form>
