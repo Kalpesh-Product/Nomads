@@ -1069,12 +1069,54 @@ export const getCompanyLeads = async (req, res, next) => {
     const leads = await Lead.find(query);
 
     if (!leads || !leads.length) {
-      return res.status(200).json({
+      return res.status(400).json({
         message: "No leads found",
       });
     }
 
     return res.status(200).json(leads);
+  } catch (error) {
+    console.error("[getCompanyLeads] error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const updateLeads = async (req, res, next) => {
+  try {
+    const { status, comment, leadId } = req.body;
+
+    if ((!leadId && typeof status !== boolean) || (!leadId && !comment)) {
+      return res.status(400).json({
+        message: "Missing required fields",
+      });
+    }
+
+    const query = {};
+
+    if (comment) {
+      query.comment = comment;
+    }
+
+    if (status) {
+      query.status = status;
+    }
+
+    const leads = await Lead.findByIdAndUpdate(
+      {
+        _id: leadId,
+      },
+      query
+    );
+
+    if (!leads) {
+      return res.status(400).json({
+        message: "Failed to update lead status",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Leads updated",
+    });
   } catch (error) {
     console.error("[getCompanyLeads] error:", error);
     return res.status(500).json({ message: "Internal server error" });

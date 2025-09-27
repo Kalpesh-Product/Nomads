@@ -73,6 +73,16 @@ const leadSchema = new mongoose.Schema(
         message: "End date must be greater than or equal to start date",
       },
     },
+    comment: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    status: {
+      type: String,
+      default: "Pending",
+      enum: "Pending, Contacted, In Progress, Converted, Lost",
+    },
   },
   { timestamps: true }
 );
