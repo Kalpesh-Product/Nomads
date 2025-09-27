@@ -46,21 +46,33 @@ export const bulkInsertCompanies = async (req, res, next) => {
 
     const companyMap = new Map();
     hostCompanies.data.forEach((company) => {
-      companyMap.set(company.companyName, company.companyId);
+      const key = `${company.companyName
+        ?.trim()
+        .toLowerCase()}|${company.companyCity
+        ?.trim()
+        .toLowerCase()}|${company.companyState
+        ?.trim()
+        .toLowerCase()}|${company.companyCountry?.trim().toLowerCase()}`;
+      companyMap.set(key, company.companyId);
     });
 
     const stream = Readable.from(file.buffer.toString("utf-8").trim());
     stream
       .pipe(csvParser())
       .on("data", (row) => {
-        const emptyId = companyMap.get(row["Business Name"]?.trim()) || "";
-        if (emptyId === "") {
-          console.log("company name", row["Business Name"]?.trim());
-        }
+        const rowKey = `${row["Business Name"]?.trim()?.toLowerCase()}|${row[
+          "City"
+        ]
+          ?.trim()
+          ?.toLowerCase()}|${row["State"]?.trim()?.toLowerCase()}|${row[
+          "Country"
+        ]
+          ?.trim()
+          ?.toLowerCase()}`;
 
         const company = {
           businessId: row["Business ID"]?.trim(),
-          companyId: companyMap.get(row["Business Name"]?.trim()) || "",
+          companyId: companyMap.get(rowKey) || "",
           companyName: row["Business Name"]?.trim(),
           registeredEntityName: row["Registered Entity name"]?.trim(),
           website: row["Website"]?.trim() || null,
@@ -82,6 +94,7 @@ export const bulkInsertCompanies = async (req, res, next) => {
             ? row["Type"]?.trim()?.split(" ").join("").toLowerCase()
             : row["Type"]?.trim()?.toLowerCase(),
         };
+
         companies.push(company);
       })
       .on("end", async () => {
