@@ -14,6 +14,7 @@ const DESTS = [
   { label: "Phuket", country: "th", keyword: "phuket", lang: "en" },
   { label: "Ho Chi Minh", country: "vn", keyword: "ho chi minh", lang: "en" },
   { label: "Rio", country: "br", keyword: "rio", lang: "en" },
+  { label: "Dubai", country: "uae", keyword: "dubai", lang: "en" },
 ];
 
 const stripHTML = (html) => {
