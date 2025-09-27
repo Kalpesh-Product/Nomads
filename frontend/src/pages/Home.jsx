@@ -77,7 +77,7 @@ const filteredLocation = locations.find(
     value: item?.toLowerCase(),
   }));
 
-  console.log(countryOptions)
+
   const countOptions = [
     { label: "1 - 5", value: "1-5" },
     { label: "5 - 10", value: "5-10" },
