@@ -68,17 +68,16 @@ const Home = () => {
     label: item.country?.charAt(0).toUpperCase() + item.country?.slice(1),
     value: item.country?.toLowerCase(),
   }));
-  const filteredLocation = locations.find(
-    (item) =>
-      item.country ===
-      (selectedCountry
-        ? selectedCountry.charAt(0).toUpperCase() + selectedCountry.slice(1)
-        : "")
-  );
+const filteredLocation = locations.find(
+  (item) => item.country?.toLowerCase() === selectedCountry?.toLowerCase()
+);
+
   const locationOptions = filteredLocation?.states?.map((item) => ({
     label: item,
     value: item?.toLowerCase(),
   }));
+
+  console.log(countryOptions)
   const countOptions = [
     { label: "1 - 5", value: "1-5" },
     { label: "5 - 10", value: "5-10" },
