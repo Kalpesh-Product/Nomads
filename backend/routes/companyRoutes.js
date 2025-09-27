@@ -15,6 +15,7 @@ import {
   getListings,
   addTemplateLink,
   activateProduct,
+  updateLeads,
 } from "../controllers/compayControllers.js";
 
 const router = Router();
@@ -42,5 +43,6 @@ router.post(
 router.post("/create-company", upload.any(), createCompany);
 router.get("/all-leads", getAllLeads);
 router.get("/leads", getCompanyLeads);
+router.patch("/update-lead", updateLeads);
 
 export default router;
