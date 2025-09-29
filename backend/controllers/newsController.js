@@ -4,6 +4,7 @@
 import News from "../models/News.js";
 import { Readable } from "stream";
 import csvParser from "csv-parser";
+import TestNews from "../models/TestNews.js";
 
 // const BASE = "https://gnews.io/api/v4";
 // const APIKEY = process.env.GNEWS_API_KEY;
@@ -163,7 +164,7 @@ export const bulkInsertnews = async (req, res, next) => {
       })
       .on("end", async () => {
         try {
-          await News.insertMany(results);
+          await TestNews.insertMany(results);
           res.status(201).json({
             message: "News uploaded successfully",
             count: results.length,
