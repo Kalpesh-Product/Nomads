@@ -164,7 +164,7 @@ export const bulkInsertnews = async (req, res, next) => {
       })
       .on("end", async () => {
         try {
-          await TestNews.insertMany(results);
+          await News.insertMany(results);
           res.status(201).json({
             message: "News uploaded successfully",
             count: results.length,
