@@ -260,6 +260,8 @@ export const addB2CformSubmission = async (req, res, next) => {
         endDate: toISODateOnly(endDate),
         sheetName,
       });
+
+      console.log("lead", leads);
       await leads.save();
     }
 
