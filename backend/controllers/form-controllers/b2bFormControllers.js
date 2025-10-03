@@ -299,7 +299,8 @@ export const addB2BFormSubmission = async (req, res, next) => {
 };
 
 // controllers/registerController.js
-export const registerFormSubmission = async (req, res, next) => {
+
+export const registerFormSubmission = async (req, res) => {
   const url = process.env.B2B_APPS_SCRIPT_URL;
   if (!url) {
     return res
@@ -310,7 +311,6 @@ export const registerFormSubmission = async (req, res, next) => {
   // --- helpers ------------------------------------------------------
   const parseAppsScriptResponse = async (resp) => {
     const text = await resp.text();
-
     try {
       return { ok: resp.ok, data: JSON.parse(text) };
     } catch {
@@ -401,41 +401,7 @@ export const registerFormSubmission = async (req, res, next) => {
       const searchKey = formatCompanyName(payload.companyName);
       const baseFolder = `${company}/template/${searchKey}`;
 
-      let template = {};
-
-      // let template = await WebsiteTemplate.findOne({ searchKey }).session(
-      //   session
-      // );
-      // if (template) {
-      //   await session.abortTransaction();
-      //   session.endSession();
-      //   return res
-      //     .status(400)
-      //     .json({ message: "Template for this company already exists" });
-      // }
-
-      // template = new WebsiteTemplate({
-      //   searchKey,
-      //   companyName: payload.companyName,
-      //   title: payload.title,
-      //   subTitle: payload.subTitle,
-      //   CTAButtonText: payload.CTAButtonText,
-      //   about: JSON.parse(about) || [],
-      //   productTitle: payload?.productTitle,
-      //   galleryTitle: payload?.galleryTitle,
-      //   testimonialTitle: payload.testimonialTitle,
-      //   contactTitle: payload.contactTitle,
-      //   mapUrl: payload.mapUrl,
-      //   email: payload.websiteEmail,
-      //   phone: payload.phone,
-      //   address: payload.address,
-      //   registeredCompanyName: payload.registeredCompanyName,
-      //   copyrightText: payload.copyrightText,
-      //   products: [],
-      //   testimonials: [],
-      // });
-
-      template = {
+      let template = {
         searchKey,
         companyName: payload.companyName,
         title: payload.title,
@@ -563,14 +529,11 @@ export const registerFormSubmission = async (req, res, next) => {
         rating: t.rating,
       }));
 
-      // await template.save({ session });
-
       // STEP 3: send Mongo saved data to external API
       let websiteResult;
-
       try {
         const submit = await fetch(
-          `http://localhost:5000/api/editor/create-website?company=${payload.companyName}`,
+          `https://wononomads.vercel.app/api/editor/create-website?company=${payload.companyName}`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -580,14 +543,12 @@ export const registerFormSubmission = async (req, res, next) => {
         websiteResult = await submit.json();
 
         await session.commitTransaction();
-
         session.endSession();
       } catch (err) {
         console.error("create-template call failed:", err);
         websiteResult = { error: "create-template call failed" };
       }
 
-      //
       // STEP 5: send confirmation email to user
       try {
         await sendMail({
@@ -597,18 +558,16 @@ export const registerFormSubmission = async (req, res, next) => {
             payload.name || "User"
           }, thanks for registering with WONO Nomads!`,
           html: `
-      <h2>Welcome to WONO Nomads</h2>
-      <p>Hi ${payload.name || "User"},</p>
-      <p>Thanks for registering with us. Our team will contact you shortly and and will inform you once your website is created.</p>
-      <p>Cheers,<br/>The WONO Team</p>
-    `,
+            <h2>Welcome to WONO Nomads</h2>
+            <p>Hi ${payload.name || "User"},</p>
+            <p>Thanks for registering with us. Our team will contact you shortly and and will inform you once your website is created.</p>
+            <p>Cheers,<br/>The WONO Team</p>
+          `,
         });
         console.log("✅ Registration email sent to", payload.email);
       } catch (err) {
         console.error("❌ Failed to send email:", err.message);
       }
-
-      //
 
       // STEP 4: respond
       return res.status(201).json({
@@ -619,7 +578,10 @@ export const registerFormSubmission = async (req, res, next) => {
     } catch (error) {
       await session.abortTransaction();
       session.endSession();
-      throw error;
+      console.error("❌ Inner transaction error:", error);
+      return res
+        .status(500)
+        .json({ error: "Transaction failed", detail: error.message });
     }
   } catch (err) {
     if (err?.status === 502) {
@@ -627,7 +589,9 @@ export const registerFormSubmission = async (req, res, next) => {
         .status(502)
         .json({ error: "Upstream write failed", detail: err.detail });
     }
-    console.log(err);
-    return next(err);
+    console.error("❌ Outer error:", err);
+    return res
+      .status(500)
+      .json({ error: "Unexpected server error", detail: err.message });
   }
 };
