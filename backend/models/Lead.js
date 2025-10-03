@@ -81,7 +81,7 @@ const leadSchema = new mongoose.Schema(
     status: {
       type: String,
       default: "Pending",
-      enum: "Pending, Contacted, In Progress, Converted, Lost",
+      enum: ["Pending", "Contacted", "In Progress", "Converted", "Lost"],
     },
   },
   { timestamps: true }

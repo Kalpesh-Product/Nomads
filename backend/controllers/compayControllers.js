@@ -285,17 +285,24 @@ export const createCompany = async (req, res, next) => {
     }
 
     /** ---------------- REVIEWS LOGIC ---------------- **/
+    let savedReviews;
     if (Array.isArray(reviews) && reviews.length > 0) {
       const reviewDocs = reviews.map((review) => ({
-        company: savedCompany._id,
+        company: savedComspany._id,
         companyId,
         name: review.name?.trim(),
-        starCount: parseInt(review.starCount),
+        starCount: parseInt(review.starCount || 1),
         description: review.description?.trim(),
         reviewSource: review.reviewSource?.trim(),
         reviewLink: review.reviewLink?.trim(),
       }));
-      await Review.insertMany(reviewDocs);
+      savedReviews = await Review.insertMany(reviewDocs);
+
+      if (!savedReviews) {
+        res.status(400).json({
+          message: "Failed to add reviews",
+        });
+      }
     }
 
     res.status(201).json({
