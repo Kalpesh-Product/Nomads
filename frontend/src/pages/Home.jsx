@@ -24,6 +24,7 @@ import companyWorkation from "/images/workation-img.webp";
 import MuiModal from "../components/Modal";
 import renderStars from "../utils/renderStarts";
 import axios from "../utils/axios";
+import { Helmet } from "@dr.pogodin/react-helmet";
 
 const Home = () => {
   const destinationData = [
@@ -68,15 +69,14 @@ const Home = () => {
     label: item.country?.charAt(0).toUpperCase() + item.country?.slice(1),
     value: item.country?.toLowerCase(),
   }));
-const filteredLocation = locations.find(
-  (item) => item.country?.toLowerCase() === selectedCountry?.toLowerCase()
-);
+  const filteredLocation = locations.find(
+    (item) => item.country?.toLowerCase() === selectedCountry?.toLowerCase()
+  );
 
   const locationOptions = filteredLocation?.states?.map((item) => ({
     label: item,
     value: item?.toLowerCase(),
   }));
-
 
   const countOptions = [
     { label: "1 - 5", value: "1-5" },
@@ -200,96 +200,34 @@ const filteredLocation = locations.find(
   };
 
   return (
-    <div className="flex flex-col w-full">
-      <div className="min-w-[85%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0">
-        <div className="py-12  hidden lg:block">
-          <div className="flex flex-col  gap-4 justify-between items-center">
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center">
-              <Controller
-                name="country"
-                control={control}
-                render={({ field }) => (
-                  <SearchBarCombobox
-                    value={field.value}
-                    onChange={field.onChange}
-                    options={countryOptions}
-                    label="Select Country"
-                    placeholder="Select aspiring destination"
-                    className="w-full "
-                  />
-                )}
-              />
-              <div className="w-px h-10 bg-gray-300 mx-2 my-auto" />
-              <Controller
-                name="location"
-                control={control}
-                render={({ field }) => (
-                  <SearchBarCombobox
-                    value={field.value}
-                    onChange={field.onChange}
-                    label="Select Location"
-                    options={locationOptions}
-                    placeholder="Select area within country"
-                    disabled={!selectedCountry}
-                    className="w-full"
-                  />
-                )}
-              />
-              <div className="w-px h-10 bg-gray-300 mx-2 my-auto" />
-              <Controller
-                name="count"
-                control={control}
-                render={({ field }) => (
-                  <SearchBarCombobox
-                    value={field.value}
-                    onChange={field.onChange}
-                    options={countOptions}
-                    label="Select Count"
-                    placeholder="Booking for no. of Nomads"
-                    disabled={!selectedState}
-                    className="w-full "
-                  />
-                )}
-              />
-              <button
-                type="submit"
-                className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full">
-                <IoSearch />
-              </button>
-            </form>
-          </div>
-        </div>
-        <div className="lg:hidden flex w-full items-center justify-center my-4">
-          <button
-            onClick={() => setShowMobileSearch(true)}
-            className="bg-white flex items-center w-full text-gray-400 font-medium border-2 px-6 py-3 rounded-full">
-            <IoSearch className="inline mr-2" />
-            Start Search
-          </button>
-        </div>
-      </div>
-
-      <AnimatePresence>
-        {showMobileSearch && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl z-50 p-4 rounded-t-3xl h-[100dvh] lg:hidden">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">Search</h3>
-              <button
-                onClick={() => setShowMobileSearch(false)}
-                className="text-gray-500 text-xl">
-                &times;
-              </button>
-            </div>
-
-            <motion.div initial={{ y: "-100%" }} animate={{ y: "0%" }}>
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <>
+      <Helmet>
+        <title>Nomads | Work, Stay & Connect Globally</title>
+        <meta
+          name="description"
+          content="Join the largest global community of digital nomads. Find coworking spaces, hostels, cafes, and private stays designed for remote work and collaboration."
+        />
+        <meta
+          name="keywords"
+          content="digital nomads, coworking Goa, remote work, workation, global community"
+        />
+        <meta property="og:title" content="Nomads | Work, Stay & Connect" />
+        <meta
+          property="og:description"
+          content="Work, stay, and connect with digital nomads worldwide."
+        />
+        <meta property="og:image" content="/images/homepage.jpeg" />
+        <meta property="og:type" content="website" />
+        <link rel="canonical" href="https://wono.co/" />
+      </Helmet>
+      <div className="flex flex-col w-full">
+        <div className="min-w-[85%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0">
+          <div className="py-12  hidden lg:block">
+            <div className="flex flex-col  gap-4 justify-between items-center">
+              <form
+                onSubmit={handleSubmit(onSubmit)}
+                className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
+              >
                 <Controller
                   name="country"
                   control={control}
@@ -300,10 +238,11 @@ const filteredLocation = locations.find(
                       options={countryOptions}
                       label="Select Country"
                       placeholder="Select aspiring destination"
-                      className="w-full"
+                      className="w-full "
                     />
                   )}
                 />
+                <div className="w-px h-10 bg-gray-300 mx-2 my-auto" />
                 <Controller
                   name="location"
                   control={control}
@@ -319,6 +258,7 @@ const filteredLocation = locations.find(
                     />
                   )}
                 />
+                <div className="w-px h-10 bg-gray-300 mx-2 my-auto" />
                 <Controller
                   name="count"
                   control={control}
@@ -330,210 +270,299 @@ const filteredLocation = locations.find(
                       label="Select Count"
                       placeholder="Booking for no. of Nomads"
                       disabled={!selectedState}
-                      className="w-full"
+                      className="w-full "
                     />
                   )}
                 />
                 <button
                   type="submit"
-                  className="w-full bg-[#FF5757] text-white py-3 rounded-full">
-                  <IoSearch className="inline mr-2" />
-                  Search
+                  className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full"
+                >
+                  <IoSearch />
                 </button>
               </form>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </div>
+          </div>
+          <div className="lg:hidden flex w-full items-center justify-center my-4">
+            <button
+              onClick={() => setShowMobileSearch(true)}
+              className="bg-white flex items-center w-full text-gray-400 font-medium border-2 px-6 py-3 rounded-full"
+            >
+              <IoSearch className="inline mr-2" />
+              Start Search
+            </button>
+          </div>
+        </div>
 
-      <Container padding={false}>
-        <section className="w-full   bg-white pb-12">
-          <div className=" flex flex-col tab:flex-col lg:flex-row items-strech justify-between h-full gap-12">
-            {/* Left: Text */}
-            <div className="lg:w-1/2 flex flex-col h-full justify-between gap-5 text-center md:text-start">
-              <div className=" font-light text-primary-blue text-center font-play leading-relaxed lg:space-y-6 lg:leading-normal">
-                <div className="text-center">
-                  <h1 className="text-[clamp(1rem,13.71vw,6rem)] text-nowrap">
-                    Building the
-                  </h1>
+        <AnimatePresence>
+          {showMobileSearch && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl z-50 p-4 rounded-t-3xl h-[100dvh] lg:hidden"
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold">Search</h3>
+                <button
+                  onClick={() => setShowMobileSearch(false)}
+                  className="text-gray-500 text-xl"
+                >
+                  &times;
+                </button>
+              </div>
+
+              <motion.div initial={{ y: "-100%" }} animate={{ y: "0%" }}>
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                  <Controller
+                    name="country"
+                    control={control}
+                    render={({ field }) => (
+                      <SearchBarCombobox
+                        value={field.value}
+                        onChange={field.onChange}
+                        options={countryOptions}
+                        label="Select Country"
+                        placeholder="Select aspiring destination"
+                        className="w-full"
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="location"
+                    control={control}
+                    render={({ field }) => (
+                      <SearchBarCombobox
+                        value={field.value}
+                        onChange={field.onChange}
+                        label="Select Location"
+                        options={locationOptions}
+                        placeholder="Select area within country"
+                        disabled={!selectedCountry}
+                        className="w-full"
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="count"
+                    control={control}
+                    render={({ field }) => (
+                      <SearchBarCombobox
+                        value={field.value}
+                        onChange={field.onChange}
+                        options={countOptions}
+                        label="Select Count"
+                        placeholder="Booking for no. of Nomads"
+                        disabled={!selectedState}
+                        className="w-full"
+                      />
+                    )}
+                  />
+                  <button
+                    type="submit"
+                    className="w-full bg-[#FF5757] text-white py-3 rounded-full"
+                  >
+                    <IoSearch className="inline mr-2" />
+                    Search
+                  </button>
+                </form>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <Container padding={false}>
+          <section className="w-full   bg-white pb-12">
+            <div className=" flex flex-col tab:flex-col lg:flex-row items-strech justify-between h-full gap-12">
+              {/* Left: Text */}
+              <div className="lg:w-1/2 flex flex-col h-full justify-between gap-5 text-center md:text-start">
+                <div className=" font-light text-primary-blue text-center font-play leading-relaxed lg:space-y-6 lg:leading-normal">
+                  <div className="text-center">
+                    <h1 className="text-[clamp(1rem,13.71vw,6rem)] text-nowrap">
+                      Building the
+                    </h1>
+                  </div>
+                  <div className="text-title ">
+                    <h1 className="text-[clamp(1.7rem,3.4vw,4rem)] text-nowrap">
+                      <span className="font-medium"> Largest Community of</span>
+                    </h1>
+                  </div>
+                  <div className="font-semibold">
+                    <h1 className="text-[clamp(3.7rem,7.3vw,16rem)]">NOMADS</h1>
+                  </div>
                 </div>
-                <div className="text-title ">
-                  <h1 className="text-[clamp(1.7rem,3.4vw,4rem)] text-nowrap">
-                    <span className="font-medium"> Largest Community of</span>
-                  </h1>
-                </div>
-                <div className="font-semibold">
-                  <h1 className="text-[clamp(3.7rem,7.3vw,16rem)]">NOMADS</h1>
+
+                <div className="flex flex-col gap-4 text-start text-pretty lg:text-center">
+                  <p className=" text-gray-700 text-base md:leading-7 md:text-[1.03rem]">
+                    A global movement of remote workers, companies, creators,
+                    entrepreneurs, hosts, investors who are redefining how the
+                    world lives and works.
+                  </p>
+                  <p className=" text-gray-700 text-base md:leading-7 md:text-[1.03rem]">
+                    Bound by freedom, flexibility, and connection, nomads are
+                    building the future—one destination at a time.
+                  </p>
                 </div>
               </div>
 
-              <div className="flex flex-col gap-4 text-start text-pretty lg:text-center">
-                <p className=" text-gray-700 text-base md:leading-7 md:text-[1.03rem]">
-                  A global movement of remote workers, companies, creators,
-                  entrepreneurs, hosts, investors who are redefining how the
-                  world lives and works.
-                </p>
-                <p className=" text-gray-700 text-base md:leading-7 md:text-[1.03rem]">
-                  Bound by freedom, flexibility, and connection, nomads are
-                  building the future—one destination at a time.
-                </p>
+              {/* Right: Image */}
+              <div className="lg:w-1/2 h-[38rem]">
+                <div className="rounded-md h-full overflow-hidden shadow-lg border border-purple-200">
+                  <img
+                    src={Image}
+                    alt="Nomads working together"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               </div>
             </div>
+          </section>
+        </Container>
 
-            {/* Right: Image */}
-            <div className="lg:w-1/2 h-[38rem]">
-              <div className="rounded-md h-full overflow-hidden shadow-lg border border-purple-200">
-                <img
-                  src={Image}
-                  alt="Nomads working together"
-                  className="w-full h-full object-cover"
-                />
-              </div>
+        <section className="bg-black w-full flex flex-col gap-4 py-16 lg:py-16">
+          <div className="lg:max-w-[80rem] lg:min-w-[85%] max-w-full lg:mx-auto flex flex-col text-primary-blue  justify-center items-center leading-none">
+            <div className="flex flex-col text-center w-full font-hero px-4 md:px-0">
+              <h1 className="text-giant uppercase">Introducing</h1>
+              <h1 className="text-giant uppercase text-nowrap">N-COMMERCE</h1>
+            </div>
+
+            <p className="uppercase text-[clamp(2.5rem,7.3vw,7rem)] font-hero text-white pt-4 pb-20">
+              ("nomad commerce")
+            </p>
+            {/* <div className="flex justify-center items-end w-full">
+            <PrimaryButton title={"Partner now"} />
+          </div> */}
+            <div className="text-white w-full text-center px-4">
+              <h2 className="text-clamp-heading font-normal">
+                End-to-end Nomad solutions for working from aspiring
+                destinations
+              </h2>
             </div>
           </div>
         </section>
-      </Container>
-
-      <section className="bg-black w-full flex flex-col gap-4 py-16 lg:py-16">
-        <div className="lg:max-w-[80rem] lg:min-w-[85%] max-w-full lg:mx-auto flex flex-col text-primary-blue  justify-center items-center leading-none">
-          <div className="flex flex-col text-center w-full font-hero px-4 md:px-0">
-            <h1 className="text-giant uppercase">Introducing</h1>
-            <h1 className="text-giant uppercase text-nowrap">N-COMMERCE</h1>
-          </div>
-
-          <p className="uppercase text-[clamp(2.5rem,7.3vw,7rem)] font-hero text-white pt-4 pb-20">
-            ("nomad commerce")
-          </p>
-          {/* <div className="flex justify-center items-end w-full">
-            <PrimaryButton title={"Partner now"} />
-          </div> */}
-          <div className="text-white w-full text-center px-4">
-            <h2 className="text-clamp-heading font-normal">
-              End-to-end Nomad solutions for working from aspiring destinations
+        {/*  */}
+        <section className="w-full px-6 py-12 bg-gray-50">
+          <div className="w-full min-w-[] max-w-[79rem] mx-auto lg:px-3">
+            <h2 className="text-2xl md:text-3xl font-medium text-left mb-10 text-primary-blue uppercase">
+              Solutions for your aspiring destinations.
             </h2>
-          </div>
-        </div>
-      </section>
-      {/*  */}
-      <section className="w-full px-6 py-12 bg-gray-50">
-        <div className="w-full min-w-[] max-w-[79rem] mx-auto lg:px-3">
-          <h2 className="text-2xl md:text-3xl font-medium text-left mb-10 text-primary-blue uppercase">
-            Solutions for your aspiring destinations.
-          </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 afterPro:grid-cols-5 gap-6">
-            {destinationData.map((item, idx) => (
-              <div
-                key={idx}
-                className={`w-full sm:w-full md:w-full afterPro:w-60 flex flex-col items-center  ${
-                  idx === destinationData.length - 1 &&
-                  destinationData.length % 2 !== 0
-                    ? "md:col-span-2 afterPro:col-span-1"
-                    : ""
-                }`}>
-                <div className="relative w-full rounded-xl overflow-hidden shadow-md">
-                  <img
-                    src={item.image}
-                    alt={item.label}
-                    className="w-full h-96 object-cover"
-                  />
-                  {/* <div className="absolute top-2 left-2 bg-white text-xs font-medium text-gray-700 px-2 py-1 rounded-full shadow">
+            <div className="grid grid-cols-1 md:grid-cols-2 afterPro:grid-cols-5 gap-6">
+              {destinationData.map((item, idx) => (
+                <div
+                  key={idx}
+                  className={`w-full sm:w-full md:w-full afterPro:w-60 flex flex-col items-center  ${
+                    idx === destinationData.length - 1 &&
+                    destinationData.length % 2 !== 0
+                      ? "md:col-span-2 afterPro:col-span-1"
+                      : ""
+                  }`}
+                >
+                  <div className="relative w-full rounded-xl overflow-hidden shadow-md">
+                    <img
+                      src={item.image}
+                      alt={item.label}
+                      className="w-full h-96 object-cover"
+                    />
+                    {/* <div className="absolute top-2 left-2 bg-white text-xs font-medium text-gray-700 px-2 py-1 rounded-full shadow">
                     Guest favourite
                   </div> */}
-                  {/* <div className="absolute top-2 right-2 shadow">
+                    {/* <div className="absolute top-2 right-2 shadow">
                     <AiOutlineHeart className="text-white text-xl" />
                   </div> */}
+                  </div>
+                  <p className="mt-6 text-sm md:text-base font-medium text-gray-800 text-center uppercase">
+                    {item.label}
+                  </p>
                 </div>
-                <p className="mt-6 text-sm md:text-base font-medium text-gray-800 text-center uppercase">
-                  {item.label}
-                </p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <Container padding={false}>
-        <div className="flex flex-col gap-8 w-full border-t-2 border-gray-300 py-8">
-          <h2 className="text-2xl md:text-3xl font-medium text-left mb-10 text-primary-blue uppercase">
-            Platform Inclusions.
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3  lg:grid-cols-5 gap-x-16 md:gap-x-16 lg:gap-x-28 gap-y-10">
-            {amenities.map((item, index) => (
-              <Amenities
-                key={index}
-                image={item.image}
-                title={item.title}
-                isAvailable={true}
-              />
-            ))}
-          </div>
-        </div>
-      </Container>
-      <Container padding={false}>
-        <div className="flex flex-col gap-8 w-full border-t-2 border-gray-300 py-8">
-          <h1 className="text-title font-medium text-primary-blue uppercase">
-            Happy customers.
-          </h1>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-0 lg:p-6">
-            {reviewData.length > 0 ? (
-              reviewData.map((review, index) => (
-                <ReviewCard
-                  handleClick={() => {
-                    setSelectedReview(review);
-                    setOpen(true);
-                  }}
+        <Container padding={false}>
+          <div className="flex flex-col gap-8 w-full border-t-2 border-gray-300 py-8">
+            <h2 className="text-2xl md:text-3xl font-medium text-left mb-10 text-primary-blue uppercase">
+              Platform Inclusions.
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-3  lg:grid-cols-5 gap-x-16 md:gap-x-16 lg:gap-x-28 gap-y-10">
+              {amenities.map((item, index) => (
+                <Amenities
                   key={index}
-                  review={review}
+                  image={item.image}
+                  title={item.title}
+                  isAvailable={true}
                 />
-              ))
-            ) : (
-              <div className="col-span-full border-2 border-dotted border-gray-300 rounded-xl p-6 text-center text-sm text-gray-500 h-40 flex justify-center items-center">
-                No reviews yet.
-              </div>
-            )}
-          </div>
-        </div>
-      </Container>
-      <MuiModal open={open} onClose={() => setOpen(false)} title={"Review"}>
-        <div className="flex flex-col gap-4">
-          {/* Reviewer Info */}
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-primary-blue flex items-center justify-center text-white font-semibold text-lg uppercase">
-              {(
-                selectedReview?.reviewerName ||
-                selectedReview?.name ||
-                "Unknown"
-              )
-                ?.split(" ")
-                .map((n) => n[0])
-                .join("")
-                .slice(0, 2)}
+              ))}
             </div>
-            <div>
-              <p className="font-semibold text-base">
-                {selectedReview?.reviewerName ||
+          </div>
+        </Container>
+        <Container padding={false}>
+          <div className="flex flex-col gap-8 w-full border-t-2 border-gray-300 py-8">
+            <h1 className="text-title font-medium text-primary-blue uppercase">
+              Happy customers.
+            </h1>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-0 lg:p-6">
+              {reviewData.length > 0 ? (
+                reviewData.map((review, index) => (
+                  <ReviewCard
+                    handleClick={() => {
+                      setSelectedReview(review);
+                      setOpen(true);
+                    }}
+                    key={index}
+                    review={review}
+                  />
+                ))
+              ) : (
+                <div className="col-span-full border-2 border-dotted border-gray-300 rounded-xl p-6 text-center text-sm text-gray-500 h-40 flex justify-center items-center">
+                  No reviews yet.
+                </div>
+              )}
+            </div>
+          </div>
+        </Container>
+        <MuiModal open={open} onClose={() => setOpen(false)} title={"Review"}>
+          <div className="flex flex-col gap-4">
+            {/* Reviewer Info */}
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-primary-blue flex items-center justify-center text-white font-semibold text-lg uppercase">
+                {(
+                  selectedReview?.reviewerName ||
                   selectedReview?.name ||
-                  "Unknown"}
-              </p>
-              <p className="text-sm text-gray-500">{selectedReview?.date}</p>
+                  "Unknown"
+                )
+                  ?.split(" ")
+                  .map((n) => n[0])
+                  .join("")
+                  .slice(0, 2)}
+              </div>
+              <div>
+                <p className="font-semibold text-base">
+                  {selectedReview?.reviewerName ||
+                    selectedReview?.name ||
+                    "Unknown"}
+                </p>
+                <p className="text-sm text-gray-500">{selectedReview?.date}</p>
+              </div>
+            </div>
+
+            {/* Star Rating */}
+            <div className="flex items-center gap-1 text-black text-sm">
+              {renderStars(selectedReview?.rating || selectedReview?.starCount)}
+            </div>
+
+            {/* Message */}
+            <div className="text-gray-800 text-sm whitespace-pre-line leading-relaxed">
+              {selectedReview?.message ||
+                selectedReview?.reviewText ||
+                selectedReview?.description}
             </div>
           </div>
-
-          {/* Star Rating */}
-          <div className="flex items-center gap-1 text-black text-sm">
-            {renderStars(selectedReview?.rating || selectedReview?.starCount)}
-          </div>
-
-          {/* Message */}
-          <div className="text-gray-800 text-sm whitespace-pre-line leading-relaxed">
-            {selectedReview?.message ||
-              selectedReview?.reviewText ||
-              selectedReview?.description}
-          </div>
-        </div>
-      </MuiModal>
-    </div>
+        </MuiModal>
+      </div>
+    </>
   );
 };
 
