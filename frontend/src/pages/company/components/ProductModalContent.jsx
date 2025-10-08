@@ -40,12 +40,12 @@ const ProductModalContent = ({ product, onClose, company }) => {
   const selectedStartDate = watch("startDate");
   const { data, isPending, error } = useOutletContext();
   const companyName = data?.companyName
-  console.log("data fromproduct" , product)
+
     const { data: companyDetails, isPending: isCompanyDetails } = useQuery({
     queryKey: ["companyDetails", companyName],
     queryFn: async () => {
       const response = await axios.get(
-        `company/get-single-company-data/${companyName}`
+        `company/get-company-data/${companyName}`
       );
       return response?.data;
     },
@@ -55,7 +55,7 @@ const ProductModalContent = ({ product, onClose, company }) => {
   const { mutate, isPending : isEnquiry } = useMutation({
     mutationKey: ["enquiryForm"],
     mutationFn: async (data) => {
-      console.log("id",companyDetails._id)
+
       const response = await axios.post("/forms/add-new-b2c-form-submission", {
         ...data,
         country: companyDetails?.country,
@@ -63,7 +63,8 @@ const ProductModalContent = ({ product, onClose, company }) => {
         companyType: companyDetails?.companyType,
         personelCount: parseInt(data?.noOfPeople),
         companyName: companyDetails?.companyName,
-        companyId: companyDetails?._id,
+        companyId: companyDetails?.companyId,
+        company: companyDetails?._id,
         sheetName: "All_Enquiry",
         phone: data?.mobileNumber,
         source : "website",
@@ -77,6 +78,7 @@ const ProductModalContent = ({ product, onClose, company }) => {
       onClose()
     },
     onError: (error) => {
+      console.log("object",error)
       toast.error(error.response?.data?.errors?.[0]);
     },
   });
