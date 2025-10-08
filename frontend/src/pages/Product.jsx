@@ -45,7 +45,7 @@ const Product = () => {
         `company/get-single-company-data?companyId=${companyId}&companyType=${type}`
       );
 
-      console.log("type",type)
+      console.log("type", type);
       return response?.data;
     },
     enabled: !!companyId,
@@ -458,6 +458,7 @@ const Product = () => {
                         size="small"
                         helperText={errors?.noOfPeople?.message}
                         error={!!errors.noOfPeople}
+                        inputProps={{ min: 0 }} // ✅ Added line
                       />
                     )}
                   />
