@@ -20,6 +20,7 @@ import newIcons from "../assets/newIcons.js";
 import { IoSearch } from "react-icons/io5";
 import SearchBarCombobox from "../components/SearchBarCombobox.jsx";
 import { AnimatePresence, motion } from "motion/react";
+import { Helmet } from "@dr.pogodin/react-helmet";
 
 const GlobalListingsList = () => {
   const [favorites, setFavorites] = useState([]);
@@ -249,7 +250,27 @@ const filteredLocation = locations.find(
   });
 
   return (
-    <div className="flex flex-col gap-2 lg:gap-6">
+    <>
+    <Helmet>
+  <title>Explore Work, Stay & Cafe Spaces | Nomads</title>
+  <meta
+    name="description"
+    content="Discover top coworking spaces, hostels, cafes, and private stays in your chosen destination. Work, live, and connect with global nomads."
+  />
+  <meta
+    name="keywords"
+    content="digital nomads, coworking spaces, hostels, workation, cafes, private stays, remote work Goa"
+  />
+  <meta property="og:title" content="Explore Nomad Spaces | Nomads" />
+  <meta
+    property="og:description"
+    content="Find inspiring spaces to work, stay, and connect with other digital nomads across the globe."
+  />
+  <meta property="og:image" content="/images/homepage.jpeg" />
+  <meta property="og:type" content="website" />
+  <link rel="canonical" href="https://wono.co/verticals" />
+</Helmet>
+ <div className="flex flex-col gap-2 lg:gap-6">
       <div className="flex flex-col gap-4 justify-center items-center  w-full lg:mt-0">
         <div className="min-w-[85%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0">
           <div className="hidden lg:flex flex-col gap-4 justify-between items-center w-full h-full">
@@ -588,6 +609,8 @@ const filteredLocation = locations.find(
         </div>
       </Container>
     </div>
+    </>
+   
   );
 };
 
