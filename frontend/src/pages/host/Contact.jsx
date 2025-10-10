@@ -84,231 +84,296 @@ const HostContact = () => {
       {/* <section className="py-10 px-4 md:px-20"> */}
       <Container>
         <section className="">
-          <div className="grid md:grid-cols-2 gap-10">
+          <div className="grid md:grid-cols-1 gap-20">
             {/* About Us */}
-            <div>
-              <h2 className="text-title font-semibold uppercase mb-6">
-                About Us
-              </h2>
-              <p className="text-subtitle mb-4 leading-relaxed">
-                WoNo's B2B Software As A Service (SaaS) Licensing tools are
-                being developed post in depth discussions with 100's of
-                businesses who are trying to develop and evolve the Nomads &
-                Remote Working Ecosystem via their own niche concepts in the
-                most aspiring destinations of the world. We are currently in our
-                BETA stage and are partnering and listening to everyone who
-                wants to partner with us and we are providing them with our SaaS
-                Tools FREE of Cost in our Testing Phase.
+            <div className="space-y-6">
+              <h2 className="text-title font-semibold uppercase">About WONO</h2>
+              <p className="text-tiny leading-relaxed">
+                <strong>WONO</strong> is redefining the global future of work
+                and mobility for the growing Digital Nomad's & Nomad Businesses
+                Ecosystem.
               </p>
-              <p className="text-subtitle leading-relaxed">
-                WoNo's eventual B2B2C is the largest Nomad Community being built
-                for individuals and companies who intend to work remotely. We're
-                creating the world's first such platform and community to
-                support global nomads in logistics, decisions, and long-term
-                remote work.
+              <p className="text-tiny leading-relaxed">
+                We are building a unified digital ecosystem that connects the
+                world’s{" "}
+                <strong>
+                  remote professionals, digital nomads, and flexible enterprises
+                </strong>{" "}
+                to the spaces and services they need — anywhere, anytime.
+              </p>
+              <p className="text-tiny leading-relaxed">
+                Through our platform, Nomad's can discover and book curated
+                Nomad Businesses such as
+                <strong>
+                  {" "}
+                  co-working spaces, co-living communities, serviced apartments,
+                  hostels, workation spaces and working cafés
+                </strong>{" "}
+                — seamlessly integrated under our brand.
+              </p>
+              <p className="text-tiny leading-relaxed">
+                As global work patterns evolve, WONO empowers people and
+                companies to operate <strong>borderlessly</strong>, supporting
+                the new generation of professionals who value{" "}
+                <strong>freedom, flexibility, and community </strong>
+                over location.
+              </p>
+
+              {/* Mission */}
+              <h3 className="font-semibold uppercase mt-8">OUR MISSION</h3>
+              <ul className="list-disc ml-6 text-tiny leading-relaxed">
+                <li>
+                  To support and activate 100% of the World's Nomad Businesses
+                  under one roof
+                </li>
+                <li>
+                  To simplify the global remote work experience by connecting
+                  individuals and organizations with a trusted nomad businesses
+                  network of work, stay, and lifestyle solutions across the
+                  world.
+                </li>
+              </ul>
+
+              {/* Vision */}
+              <h3 className="font-semibold uppercase mt-8">OUR VISION</h3>
+              <ul className="list-disc ml-6 text-tiny leading-relaxed">
+                <li>
+                  To become the world’s leading platform for borderless living
+                  and working — enabling a truly global, connected, and mobile
+                  workforce.
+                </li>
+                <li>
+                  Build the LARGEST Community of NOMADS & NOMAD BUSINESS ACROSS
+                  THE WORLD!
+                </li>
+              </ul>
+
+              {/* Edge */}
+              <h3 className="font-semibold uppercase mt-8">OUR EDGE</h3>
+              <ul className="list-disc ml-6 text-tiny leading-relaxed">
+                <li>
+                  World's LARGEST Integrated curated platform combining{" "}
+                  <strong>work, stay, and travel services</strong>
+                </li>
+                <li>
+                  B2B Partnerships across major digital-nomad destinations
+                </li>
+                <li>
+                  Data-driven insights into global mobility and workforce trends
+                </li>
+                <li>
+                  Designed for both <strong>individual professionals</strong>{" "}
+                  and <strong>remote-first teams</strong>
+                </li>
+              </ul>
+
+              <p className="text-tiny leading-relaxed">
+                At WONO, we’re not just following the future of work —{" "}
+                <strong>we’re building it.</strong>
+              </p>
+
+              <p className="text-tiny font-semibold">
+                A Platform which is an Early Adaptation of our Future Lifestyle!
               </p>
             </div>
 
             {/* Connect With Us - MUI Styled Form */}
+            <div className="px-40">
+              <Box
+                component="form"
+                onSubmit={handleSubmit((data) => submitContactForm(data))}
+                sx={{ mt: 0 }}>
+                <h2 className="text-title font-semibold uppercase mb-4 text-center md:text-center">
+                  Connect With Us
+                </h2>
 
-            <Box
-              component="form"
-              onSubmit={handleSubmit((data) => submitContactForm(data))}
-              sx={{ mt: 0 }}
-            >
-              <h2 className="text-title font-semibold uppercase mb-4 text-center md:text-left">
-                Connect With Us
-              </h2>
+                {/* Responsive grid container */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Name */}
+                  <div className="pt-0 pl-0 lg:pt-0 lg:pl-0">
+                    <Controller
+                      name="name"
+                      control={control}
+                      rules={{ required: "Name is required" }}
+                      render={({ field, fieldState }) => (
+                        <TextField
+                          {...field}
+                          required
+                          fullWidth
+                          label="Name"
+                          variant="standard"
+                          error={!!fieldState.error}
+                          helperText={fieldState.error?.message}
+                          InputLabelProps={{ sx: floatingLabelSx }}
+                        />
+                      )}
+                    />
+                  </div>
 
-              {/* Responsive grid container */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Name */}
-                <div className="pt-0 pl-0 lg:pt-0 lg:pl-0">
-                  <Controller
-                    name="name"
-                    control={control}
-                    rules={{ required: "Name is required" }}
-                    render={({ field, fieldState }) => (
-                      <TextField
-                        {...field}
-                        required
-                        fullWidth
-                        label="Name"
-                        variant="standard"
-                        error={!!fieldState.error}
-                        helperText={fieldState.error?.message}
-                        InputLabelProps={{ sx: floatingLabelSx }}
-                      />
-                    )}
-                  />
-                </div>
+                  {/* Email */}
+                  <div className="pt-0 pl-0 lg:pt-0 lg:pl-0">
+                    <Controller
+                      name="email"
+                      control={control}
+                      rules={{
+                        required: "Email is required",
+                        pattern: {
+                          value: /^\S+@\S+$/i,
+                          message: "Enter a valid email",
+                        },
+                      }}
+                      render={({ field, fieldState }) => (
+                        <TextField
+                          {...field}
+                          required
+                          fullWidth
+                          type="email"
+                          label="Email"
+                          variant="standard"
+                          error={!!fieldState.error}
+                          helperText={fieldState.error?.message}
+                          InputLabelProps={{ sx: floatingLabelSx }}
+                        />
+                      )}
+                    />
+                  </div>
 
-                {/* Email */}
-                <div className="pt-0 pl-0 lg:pt-0 lg:pl-0">
-                  <Controller
-                    name="email"
-                    control={control}
-                    rules={{
-                      required: "Email is required",
-                      pattern: {
-                        value: /^\S+@\S+$/i,
-                        message: "Enter a valid email",
-                      },
-                    }}
-                    render={({ field, fieldState }) => (
-                      <TextField
-                        {...field}
-                        required
-                        fullWidth
-                        type="email"
-                        label="Email"
-                        variant="standard"
-                        error={!!fieldState.error}
-                        helperText={fieldState.error?.message}
-                        InputLabelProps={{ sx: floatingLabelSx }}
-                      />
-                    )}
-                  />
-                </div>
+                  {/* Mobile */}
+                  <div className="pt-0 pl-0 lg:pt-0 lg:pl-0">
+                    <Controller
+                      name="mobile"
+                      control={control}
+                      rules={{
+                        required: "Mobile number is required",
+                        pattern: {
+                          value: /^[1-9]{1}[0-9]{9}$/,
+                          message: "Enter a valid 10-digit mobile number",
+                        },
+                      }}
+                      render={({ field, fieldState }) => (
+                        <TextField
+                          {...field}
+                          required
+                          fullWidth
+                          type="tel"
+                          label="Mobile Number"
+                          variant="standard"
+                          error={!!fieldState.error}
+                          helperText={fieldState.error?.message}
+                          InputLabelProps={{ sx: floatingLabelSx }}
+                        />
+                      )}
+                    />
+                  </div>
 
-                {/* Mobile */}
-                <div className="pt-0 pl-0 lg:pt-0 lg:pl-0">
-                  <Controller
-                    name="mobile"
-                    control={control}
-                    rules={{
-                      required: "Mobile number is required",
-                      pattern: {
-                        value: /^[1-9]{1}[0-9]{9}$/,
-                        message: "Enter a valid 10-digit mobile number",
-                      },
-                    }}
-                    render={({ field, fieldState }) => (
-                      <TextField
-                        {...field}
-                        required
-                        fullWidth
-                        type="tel"
-                        label="Mobile Number"
-                        variant="standard"
-                        error={!!fieldState.error}
-                        helperText={fieldState.error?.message}
-                        InputLabelProps={{ sx: floatingLabelSx }}
-                      />
-                    )}
-                  />
-                </div>
-
-                {/* Partnership Type */}
-                <div className="pt-0 pl-0 lg:pt-0 lg:pl-0">
-                  <Controller
-                    name="partnerstype"
-                    control={control}
-                    rules={{ required: "Please select a partnership type" }}
-                    render={({ field, fieldState }) => (
-                      <TextField
-                        fullWidth
-                        required
-                        variant="standard"
-                        error={!!fieldState.error}
-                        label={"Type of Partnership"}
-                        select
-                        helperText={fieldState?.error?.message}
-                        slotProps={{
-                          inputLabel: {
-                            sx: {
-                              color: "black", // default label color
-                              "&.Mui-focused": { color: "black" }, // keep black when focused
+                  {/* Partnership Type */}
+                  <div className="pt-0 pl-0 lg:pt-0 lg:pl-0">
+                    <Controller
+                      name="partnerstype"
+                      control={control}
+                      rules={{ required: "Please select a partnership type" }}
+                      render={({ field, fieldState }) => (
+                        <TextField
+                          fullWidth
+                          required
+                          variant="standard"
+                          error={!!fieldState.error}
+                          label={"Type of Partnership"}
+                          select
+                          helperText={fieldState?.error?.message}
+                          slotProps={{
+                            inputLabel: {
+                              sx: {
+                                color: "black", // default label color
+                                "&.Mui-focused": { color: "black" }, // keep black when focused
+                              },
                             },
-                          },
-                        }}
-                      >
-                        <MenuItem value="" disabled>
-                          Select Type
-                        </MenuItem>
-                        <MenuItem value="B2B SaaS Technology Licensing">
-                          B2B SaaS Technology Licensing
-                        </MenuItem>
-                        <MenuItem value="Landlord Partnerships">
-                          Landlord Partnerships
-                        </MenuItem>
-                        <MenuItem value="Investment Related">
-                          Investment Related
-                        </MenuItem>
-                        <MenuItem value="Coffee Meeting to know us better">
-                          Coffee Meeting to know us better
-                        </MenuItem>
+                          }}>
+                          <MenuItem value="" disabled>
+                            Select Type
+                          </MenuItem>
+                          <MenuItem value="B2B SaaS Technology Licensing">
+                            B2B SaaS Technology Licensing
+                          </MenuItem>
+                          <MenuItem value="Landlord Partnerships">
+                            Landlord Partnerships
+                          </MenuItem>
+                          <MenuItem value="Investment Related">
+                            Investment Related
+                          </MenuItem>
+                          <MenuItem value="Coffee Meeting to know us better">
+                            Coffee Meeting to know us better
+                          </MenuItem>
 
-                        {fieldState.error && (
-                          <p style={{ color: "red", fontSize: "0.8rem" }}></p>
-                        )}
-                      </TextField>
-                    )}
-                  />
-                </div>
+                          {fieldState.error && (
+                            <p style={{ color: "red", fontSize: "0.8rem" }}></p>
+                          )}
+                        </TextField>
+                      )}
+                    />
+                  </div>
 
-                {/* Message */}
-                <div className="pt-0 pl-0 lg:pt-0 lg:pl-0 md:col-span-2">
-                  <Controller
-                    name="message"
-                    control={control}
-                    rules={{ required: "Message is required" }}
-                    render={({ field, fieldState }) => (
-                      <TextField
-                        {...field}
-                        required
-                        fullWidth
-                        multiline
-                        minRows={4}
-                        label="Message"
-                        variant="standard"
-                        error={!!fieldState.error}
-                        helperText={fieldState.error?.message}
-                        InputLabelProps={{ sx: floatingLabelSx }}
-                      />
-                    )}
-                  />
-                </div>
+                  {/* Message */}
+                  <div className="pt-0 pl-0 lg:pt-0 lg:pl-0 md:col-span-2">
+                    <Controller
+                      name="message"
+                      control={control}
+                      rules={{ required: "Message is required" }}
+                      render={({ field, fieldState }) => (
+                        <TextField
+                          {...field}
+                          required
+                          fullWidth
+                          multiline
+                          minRows={4}
+                          label="Message"
+                          variant="standard"
+                          error={!!fieldState.error}
+                          helperText={fieldState.error?.message}
+                          InputLabelProps={{ sx: floatingLabelSx }}
+                        />
+                      )}
+                    />
+                  </div>
 
-                {/* Button */}
-                <div className="pt-6 md:col-span-2 text-center">
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    sx={{
-                      bgcolor: "black",
-                      borderRadius: 20,
-                      px: 14,
-                      py: 1,
-                      "&:hover": { bgcolor: "#333" },
-                    }}
-                  >
-                    {isContactPending && (
-                      <CircularProgress
-                        size={16}
-                        sx={{ color: "white", mr: 1 }}
-                      />
-                    )}
-                    {isContactPending ? "CONNECTING..." : "CONNECT"}
-                  </Button>
+                  {/* Button */}
+                  <div className="pt-6 md:col-span-2 text-center">
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      sx={{
+                        bgcolor: "black",
+                        borderRadius: 20,
+                        px: 14,
+                        py: 1,
+                        "&:hover": { bgcolor: "#333" },
+                      }}>
+                      {isContactPending && (
+                        <CircularProgress
+                          size={16}
+                          sx={{ color: "white", mr: 1 }}
+                        />
+                      )}
+                      {isContactPending ? "CONNECTING..." : "CONNECT"}
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </Box>
+              </Box>
+            </div>
           </div>
         </section>
       </Container>
 
       {/* Maps */}
       {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-4 md:px-20 pb-10"> */}
-      <Container>
+      {/* <Container>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 ">
           <div className="shadow-md">
             <iframe
               title="Singapore Office"
               className="w-full h-[25rem]"
               loading="lazy"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.8288436496055!2d103.8432645747905!3d1.2760650987118065!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31da191343eb5b27%3A0x1781b571e2363017!2s10%20Anson%20Rd%2C%20Singapore%20079903!5e0!3m2!1sen!2sin!4v1723629468618!5m2!1sen!2sin"
-            ></iframe>
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.8288436496055!2d103.8432645747905!3d1.2760650987118065!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31da191343eb5b27%3A0x1781b571e2363017!2s10%20Anson%20Rd%2C%20Singapore%20079903!5e0!3m2!1sen!2sin!4v1723629468618!5m2!1sen!2sin"></iframe>
             <div className="p-4 flex gap-2 text-sm items-start">
               <FaMapMarkerAlt className="mt-1 text-black" />
               <span>
@@ -322,8 +387,7 @@ const HostContact = () => {
               title="India Office"
               className="w-full h-[25rem]"
               loading="lazy"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3844.7765664747362!2d73.83261987495516!3d15.496445985103028!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bbfc1d2e05cbef3%3A0xa643703ebcc4db43!2sBIZ%20Nest%20-%20Co-Working%20Space%2C%20Workations%20%26%20Meeting%20Zone%20in%20Goa!5e0!3m2!1sen!2sin!4v1723627911486!5m2!1sen!2sin"
-            ></iframe>
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3844.7765664747362!2d73.83261987495516!3d15.496445985103028!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bbfc1d2e05cbef3%3A0xa643703ebcc4db43!2sBIZ%20Nest%20-%20Co-Working%20Space%2C%20Workations%20%26%20Meeting%20Zone%20in%20Goa!5e0!3m2!1sen!2sin!4v1723627911486!5m2!1sen!2sin"></iframe>
             <div className="p-4 flex gap-2 text-sm items-start">
               <FaMapMarkerAlt className="mt-1 text-black" />
               <span>
@@ -334,7 +398,7 @@ const HostContact = () => {
             </div>
           </div>
         </div>
-      </Container>
+      </Container> */}
 
       {/* Modal */}
       {showModal && (
@@ -342,8 +406,7 @@ const HostContact = () => {
           <div className="bg-white rounded shadow-lg w-full max-w-md p-6 relative">
             <button
               onClick={handleCloseModal}
-              className="absolute top-2 right-2 text-gray-600 hover:text-black"
-            >
+              className="absolute top-2 right-2 text-gray-600 hover:text-black">
               <AiOutlineClose size={20} />
             </button>
             <h3 className="text-lg font-bold mb-2">Success</h3>
@@ -353,8 +416,7 @@ const HostContact = () => {
             <div className="text-right">
               <button
                 onClick={handleCloseModal}
-                className="bg-black text-white px-4 py-2 rounded hover:opacity-90"
-              >
+                className="bg-black text-white px-4 py-2 rounded hover:opacity-90">
                 Close
               </button>
             </div>

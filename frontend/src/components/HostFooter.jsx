@@ -59,9 +59,9 @@ const HostFooter = () => {
               alt="logo"
             />
             <p className="text-sm leading-6">
-              WONOCO PRIVATE LIMITED <br />
-              10 ANSON ROAD #33–10 <br />
-              INTERNATIONAL PLAZA SINGAPORE – 079903 <br />
+              WONOCO PRIVATE LIMITED - SINGAPORE <br />
+              {/* 10 ANSON ROAD #33–10 <br />
+              INTERNATIONAL PLAZA SINGAPORE – 079903 <br /> */}
               <Link
                 to="mailto:response@wono.co"
                 className="text-primary-blue lowercase hover:underline">
