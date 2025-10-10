@@ -237,8 +237,8 @@ export default function Signup() {
             <p>Thank you for signing up with BRIDG.</p>
             <p>
               Kindly allow us some time to evaluate your profile. Once done,
-              your Personal Assistant from BRIDG will connect with you to
-              onboard you for your Dubai Real Estate Investment process.
+              your Personal Assistant from WoNo will connect with you to onboard
+              you for your Signup process.
             </p>
             <p>Thank you again for trusting us and signing up!</p>
           </div>
