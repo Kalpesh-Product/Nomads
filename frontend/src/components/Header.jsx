@@ -147,10 +147,10 @@ const Header = () => {
                 title="Login"
                 padding="py-1"
                 uppercase
-                // handleSubmit={() => navigate("/login")}
-                handleSubmit={() => {
-                  window.location.href = "https://wonofe.vercel.app"; // ✅ external redirect
-                }}
+                handleSubmit={() => navigate("/login")}
+                // handleSubmit={() => {
+                //   window.location.href = "https://wonofe.vercel.app"; // ✅ external redirect
+                // }}
                 className="bg-[#FF5757] flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[7rem] px-4"
               />
             </div>
