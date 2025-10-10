@@ -253,7 +253,8 @@ const Product = () => {
                           selectedImageId: item._id,
                         },
                       })
-                    }>
+                    }
+                  >
                     <img
                       src={item.url}
                       alt="company-thumbnail"
@@ -273,7 +274,8 @@ const Product = () => {
                               },
                             });
                           }}
-                          className="bg-white text-sm px-3 py-1 rounded shadow font-medium">
+                          className="bg-white text-sm px-3 py-1 rounded shadow font-medium"
+                        >
                           +{companyDetails.images.length - 4} more
                         </button>
                       </div>
@@ -320,7 +322,8 @@ const Product = () => {
                           href={companyDetails?.websiteTemplateLink}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-small underline text-primary-blue">
+                          className="text-small underline text-primary-blue"
+                        >
                           View Website
                         </a>
                       </div>
@@ -328,12 +331,14 @@ const Product = () => {
 
                     <div
                       onClick={() => setHeartClicked((prev) => !prev)}
-                      className="cursor-pointer relative">
+                      className="cursor-pointer relative"
+                    >
                       {heartClicked ? <IoIosHeart /> : <IoIosHeartEmpty />}
                     </div>
                     <NavLink
                       className={"text-small underline"}
-                      to={"/nomad/login"}>
+                      to={"/nomad/login"}
+                    >
                       Save
                     </NavLink>
                   </div>
@@ -419,7 +424,8 @@ const Product = () => {
                 <form
                   onSubmit={handleSubmit((data) => submitEnquiry(data))}
                   action=""
-                  className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+                >
                   <Controller
                     name="fullName"
                     rules={{
@@ -438,6 +444,7 @@ const Product = () => {
                         variant="standard"
                         size="small"
                         helperText={errors?.fullName?.message}
+                        sx={{marginTop : 3}}
                         error={!!errors.fullName}
                       />
                     )}
@@ -447,21 +454,56 @@ const Product = () => {
                     control={control}
                     rules={{
                       required: "No. of people is required",
+                      validate: (value) =>
+                        value > 0 || "At least one person is required",
                     }}
                     render={({ field }) => (
-                      <TextField
-                        {...field}
-                        label="No. Of People"
-                        fullWidth
-                        type="number"
-                        variant="standard"
-                        size="small"
-                        helperText={errors?.noOfPeople?.message}
-                        error={!!errors.noOfPeople}
-                        inputProps={{ min: 0 }} // ✅ Added line
-                      />
+                      <div className="flex flex-col gap-1">
+                        <label className="text-sm text-gray-600 font-medium">
+                          No. Of People
+                        </label>
+                        <div className="flex items-center border-b border-gray-300 py-1 w-full max-w-xs">
+                          {/* Minus Button */}
+                          <button
+                            type="button"
+                            onClick={() =>
+                              field.onChange(
+                                Math.max(0, Number(field.value || 0) - 1)
+                              )
+                            }
+                            className="px-3 py-1 text-lg font-semibold text-gray-600 hover:text-primary-blue"
+                          >
+                            −
+                          </button>
+
+                          {/* Count Display */}
+                          <input
+                            {...field}
+                            readOnly
+                            className="w-full text-center outline-none bg-transparent text-gray-800 text-sm font-medium"
+                            value={field.value || 0}
+                          />
+
+                          {/* Plus Button */}
+                          <button
+                            type="button"
+                            onClick={() =>
+                              field.onChange(Number(field.value || 0) + 1)
+                            }
+                            className="px-3 py-1 text-lg font-semibold text-gray-600 hover:text-primary-blue"
+                          >
+                            +
+                          </button>
+                        </div>
+                        {errors?.noOfPeople && (
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.noOfPeople.message}
+                          </p>
+                        )}
+                      </div>
                     )}
                   />
+
                   <Controller
                     name="mobileNumber"
                     control={control}
@@ -720,7 +762,8 @@ const Product = () => {
                     </h1>
                     <form
                       onSubmit={handlesubmitSales((data) => submitSales(data))}
-                      className="grid grid-cols-1 gap-4">
+                      className="grid grid-cols-1 gap-4"
+                    >
                       <Controller
                         name="fullName"
                         control={salesControl}
@@ -843,7 +886,8 @@ const Product = () => {
       </MuiModal>
       <TransparentModal
         open={showAmenities}
-        onClose={() => setShowAmenities(false)}>
+        onClose={() => setShowAmenities(false)}
+      >
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 p-4">
           {(Array.isArray(companyDetails?.inclusions)
             ? companyDetails.inclusions
@@ -851,7 +895,8 @@ const Product = () => {
           ).map((item) => (
             <span
               key={item}
-              className="bg-gray-800 text-white text-sm rounded-lg px-3 py-2 text-center">
+              className="bg-gray-800 text-white text-sm rounded-lg px-3 py-2 text-center"
+            >
               {item
                 .replace(/([a-z])([A-Z])/g, "$1 $2")
                 .replace(/-/g, " ")

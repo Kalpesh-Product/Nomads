@@ -45,10 +45,14 @@ const GlobalListingsMap = () => {
     },
   });
 
-  const countryOptions = locations.map((item) => ({
-    label: item.country?.charAt(0).toUpperCase() + item.country?.slice(1),
+ const countryOptions = locations
+  .map((item) => ({
+    label: item.country
+      ? item.country.charAt(0).toUpperCase() + item.country.slice(1)
+      : "",
     value: item.country?.toLowerCase(),
-  }));
+  }))
+  .sort((a, b) => a.label.localeCompare(b.label)); 
   const filteredLocation = locations.find(
     (item) => item.country?.toLowerCase() === selectedCountry?.toLowerCase()
   );

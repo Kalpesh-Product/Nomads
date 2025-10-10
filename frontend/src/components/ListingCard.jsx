@@ -28,7 +28,8 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
     <div
       onClick={handleNavigation}
       // className="flex flex-col gap-2 h-56 w-[95%] bg-white  rounded-lg  transition-all cursor-pointer">
-      className="flex flex-col gap-2 w-full max-w-sm bg-white rounded-lg transition-all cursor-pointer">
+      className="flex flex-col gap-2 w-full max-w-sm bg-white rounded-lg transition-all cursor-pointer"
+    >
       {/* <div className="h-full w-full overflow-hidden rounded-3xl border-2 relative"> */}
       <div className="w-full aspect-square overflow-hidden rounded-3xl relative">
         <img
@@ -40,13 +41,23 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
           className="w-full h-full object-cover hover:scale-105 transition-all"
         />
         <div
-          className="absolute top-2 right-2 cursor-pointer"
-          onClick={() => toggleFavorite(item._id)}>
-          {favorites.includes(item._id) ? (
-            <AiFillHeart className="text-white" size={22} />
-          ) : (
-            <AiOutlineHeart className="text-white" size={22} />
-          )}
+          className="absolute top-2 right-2 pb-4 cursor-pointer w-full h-full pl-0"
+          onClick={() => toggleFavorite(item._id)}
+        >
+          <div className="flex flex-col items-end h-full justify-between">
+            {favorites.includes(item._id) ? (
+              <AiFillHeart className="text-white" size={22} />
+            ) : (
+              <AiOutlineHeart className="text-white" size={22} />
+            )}
+            {showVertical && (
+              <div className="bg-white rounded-lg px-2">
+                <span className="font-normal text-xs leading-normal">
+                  {item.companyType || "Test"}
+                </span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -56,7 +67,8 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
             {/* Mobile: show full name */}
             <p
               className="text-sm font-semibold block sm:hidden"
-              title={item.companyName || "Title"}>
+              title={item.companyName || "Title"}
+            >
               {item.companyName.length > 30
                 ? `${item.companyName.slice(0, 18)}...`
                 : item.companyName || "title"}
@@ -65,28 +77,31 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
             {/* Tablet/Desktop: show truncated */}
             <p
               className="text-sm font-semibold hidden sm:block"
-              title={item.companyName || "title"}>
-              {showVertical
-                ? item.companyName.length > 12
-                  ? `${item.companyName.slice(0, 9)}...`
-                  : item.companyName
+              title={item.companyName || "title"}
+            >
+              {/* {
                 : item.companyName.length > 23
                 ? `${item.companyName.slice(0, 23)}...`
-                : item.companyName}
+                : item.companyName} */}
+                {showVertical
+                ? item.companyName.length > 20
+                  ? `${item.companyName.slice(0,20)}...`
+                  : item.companyName : item.companyName}
             </p>
           </div>
 
-          {showVertical && (
+          {/* {showVertical && (
             <p className="text-tiny w-full text-right text-gray-600">
               {typeLabels[item.companyType] || "Unknown"}
             </p>
-          )}
+          )} */}
         </div>
 
         <div className="flex w-full justify-between items-center">
           <p
             className="text-sm text-gray-600 font-medium"
-            title={`${item.city || "Unknown"}, ${item.state || "Unknown"}`}>
+            title={`${item.city || "Unknown"}, ${item.state || "Unknown"}`}
+          >
             <span className="block sm:hidden">
               {/* Mobile: show full text */}
               {`${item.city || "Unknown"}, ${item.state || "Unknown"}`}
