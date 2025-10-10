@@ -47,3 +47,26 @@ export const login = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const saveListings = async (req, res, next) => {
+  try {
+    const { listingId, userId } = req.query;
+
+    if (!listingId || !userId) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const savedListings = await NomadUser.findOneAndUpdate(
+      { _id: userId },
+      { saves: { $push: listingId } }
+    );
+
+    if (!savedListings) {
+      return res.status(400).josn({ message: "Failed to save" });
+    }
+
+    return res.status(200).json({ message: "Saved successfully" });
+  } catch (error) {
+    next(error);
+  }
+};

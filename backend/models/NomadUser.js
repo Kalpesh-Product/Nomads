@@ -28,14 +28,22 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    mobile: {
+    state: {
       type: String,
       trim: true,
     },
-    reason: {
+    mobile: {
       type: String,
-      default: "",
       trim: true,
+      required: true,
+    },
+    saves: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Company",
+    },
+    likes: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Company",
     },
   },
   { timestamps: true }

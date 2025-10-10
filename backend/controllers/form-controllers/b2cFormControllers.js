@@ -102,6 +102,7 @@ const nomadsSignupSchema = yup.object().shape({
   password: yup.string().optional(),
   mobile: yup.string().trim().required("Please provide the mobile"),
   country: yup.string().required("Please provide your country name"),
+  state: yup.string().required("Please provide your state name"),
   sheetName: yup.string().required("Please provide a sheet name"),
   reason: yup.string().required("Please provide the reason"),
 });
@@ -218,6 +219,7 @@ export const addB2CformSubmission = async (req, res, next) => {
           email: d.email?.trim(),
           password: d.password,
           country: d.country?.trim(),
+          state: d.state?.trim(),
           mobile: d.mobile?.trim(),
           reason: d.reason || "",
           sheetName: d.sheetName,
@@ -264,7 +266,6 @@ export const addB2CformSubmission = async (req, res, next) => {
         sheetName,
       });
 
-      console.log("lead", leads);
       await leads.save();
     }
 
@@ -278,17 +279,27 @@ export const addB2CformSubmission = async (req, res, next) => {
         return res.status(409).json({ message: "Email already registered" });
       }
 
+      const { email, mobile, password, confirmPassword } = req.body;
+
+      if (!email || !password || !mobile) {
+        return res.status(409).json({ message: "Missing required fields" });
+      }
+
+      if (confirmPassword !== password) {
+        return res.status(400).json({ message: "Please match the password" });
+      }
+
       const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(req.body.password, salt);
+      const hashedPassword = await bcrypt.hash(password, salt);
 
       const signupEntry = new NomadUser({
         firstName: req.body.firstName?.trim(),
         lastName: req.body.lastName?.trim(),
-        email: req.body.email?.trim().toLowerCase(),
+        email: email?.trim().toLowerCase(),
         password: hashedPassword,
         country: req.body.country?.trim(),
-        mobile: req.body.mobile?.trim(),
-        reason: req.body.reason || "",
+        state: req.body.state?.trim(),
+        mobile: mobile?.trim(),
       });
 
       await signupEntry.save();
