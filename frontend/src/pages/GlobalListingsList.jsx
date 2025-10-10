@@ -34,7 +34,7 @@ const GlobalListingsList = () => {
       category: "",
     },
   });
-  const selectedCountry = watch("country");
+  const selectedCountry =  watch("country");
   const selectedState = watch("location");
   const { data: locations = [], isLoading: isLocations } = useQuery({
     queryKey: ["locations"],
