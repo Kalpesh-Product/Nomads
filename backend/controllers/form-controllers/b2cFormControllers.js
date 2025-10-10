@@ -2,6 +2,9 @@ import * as yup from "yup";
 import Lead from "../../models/Lead.js";
 import mongoose from "mongoose";
 import { sendMail } from "../../config/mailer.js"; // adjust path if different
+import User from "../../models/NomadUser.js";
+import NomadUser from "../../models/NomadUser.js";
+import bcrypt from "bcrypt";
 
 const enquirySchema = yup.object({
   companyName: yup.string().trim().required("Please provide the company name"),
@@ -263,6 +266,32 @@ export const addB2CformSubmission = async (req, res, next) => {
 
       console.log("lead", leads);
       await leads.save();
+    }
+
+    if (sheetName === "Sign_up") {
+      console.log(sheetName);
+      const existingUser = await NomadUser.findOne({
+        email: req.body.email?.trim().toLowerCase(),
+      });
+
+      if (existingUser) {
+        return res.status(409).json({ message: "Email already registered" });
+      }
+
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(req.body.password, salt);
+
+      const signupEntry = new NomadUser({
+        firstName: req.body.firstName?.trim(),
+        lastName: req.body.lastName?.trim(),
+        email: req.body.email?.trim().toLowerCase(),
+        password: hashedPassword,
+        country: req.body.country?.trim(),
+        mobile: req.body.mobile?.trim(),
+        reason: req.body.reason || "",
+      });
+
+      await signupEntry.save();
     }
 
     // Send to Google Apps Script

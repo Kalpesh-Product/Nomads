@@ -15,5 +15,5 @@ router.post(
 );
 
 router.post("/register-form-submission", upload.any(), registerFormSubmission);
-
+console.log("formss");
 export default router;
