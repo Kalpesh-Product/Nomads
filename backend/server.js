@@ -13,6 +13,7 @@ import connectDb from "./config/db.js";
 import upload from "./config/multerConfig.js";
 import newsRoutes from "./routes/newsRoutes.js";
 import blogRoutes from "./routes/blogRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 
 const app = express();
 config({ override: true });
@@ -23,6 +24,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 const PORT = process.env.PORT || 3000;
 
+app.use("/api/auth", authRoutes);
 app.use("/api/company", companyRoutes);
 app.use("/api/poc", pocRoutes);
 app.use("/api/review", reviewRoutes);
