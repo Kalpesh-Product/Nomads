@@ -13,7 +13,7 @@ export const login = async (req, res) => {
 
     const user = await NomadUser.findOne({
       email: email.trim().toLowerCase(),
-    });
+    }).lean();
 
     if (!user)
       return res.status(401).json({ message: "Invalid email provided" });
