@@ -38,6 +38,7 @@ import HostProduct from "./pages/host/Product";
 import TemplateSite from "./pages/company/TemplateSite";
 import TemplateHome from "./pages/company/TemplateHome";
 import NomadAbout from "./pages/NomadAbout";
+import Profile from "./pages/Profile";
 
 function getTenantFromHost() {
   const hostname = window.location.hostname; // e.g. "nomad.wono.co" or "nomad.localhost"
@@ -105,6 +106,7 @@ if (tenant === "main") {
         { path: "login", element: <Login /> },
         { path: "signup", element: <Signup /> },
         { path: "about", element: <NomadAbout /> },
+        { path: "profile", element: <Profile /> },
       ],
     },
   ];
