@@ -37,14 +37,18 @@ const userSchema = new mongoose.Schema(
       trim: true,
       required: true,
     },
-    saves: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Company",
-    },
-    likes: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Company",
-    },
+    saves: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Company",
+      },
+    ],
+    likes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Company",
+      },
+    ],
   },
   { timestamps: true }
 );
