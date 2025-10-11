@@ -22,7 +22,7 @@ export default function useLogout() {
         };
       });
 
-      navigate("/");
+      navigate("/login");
     } catch (error) {
       toast.error(error.message);
     }
