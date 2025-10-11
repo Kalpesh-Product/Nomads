@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { TextField, Button, Avatar } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { TextField, Button, Avatar, Tabs, Tab } from "@mui/material";
+import { FaMapMarkerAlt } from "react-icons/fa";
 import useAuth from "../hooks/useAuth";
-import useLogout from "../hooks/useLogout";
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState("profile");

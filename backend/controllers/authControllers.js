@@ -41,10 +41,8 @@ export const login = async (req, res) => {
 
     res.cookie("nomadCookie", refreshToken, {
       httpOnly: true,
-      // sameSite: "None",
-      // secure: true,
-      sameSite: "Lax", // safer for dev
-      secure: false, // only for localhost testing
+      sameSite: "None",
+      secure: true,
       maxAge: 15 * 24 * 60 * 60 * 1000,
     });
 

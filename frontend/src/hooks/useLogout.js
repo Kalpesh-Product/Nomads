@@ -10,7 +10,7 @@ export default function useLogout() {
 
   const logout = async () => {
     try {
-      await api.get("/auth/logout", {
+      await api.get("auth/logout", {
         withCredentials: true,
       });
       toast.success("Successfully logged out");

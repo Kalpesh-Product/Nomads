@@ -13,6 +13,7 @@ import { HelmetProvider } from "@dr.pogodin/react-helmet";
 import { store, persistor } from "./redux/store.js";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
+import AuthContextProvider from "./context/AuthContext.jsx";
 const queryClient = new QueryClient();
 const theme = createTheme({
   typography: {
@@ -61,6 +62,7 @@ createRoot(document.getElementById("root")).render(
     <PersistGate loading={null} persistor={persistor}>
       <ThemeProvider theme={theme}>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
+           <AuthContextProvider>
           <QueryClientProvider client={queryClient}>
             <HelmetProvider>
               <RouterProvider router={router}>
@@ -68,6 +70,7 @@ createRoot(document.getElementById("root")).render(
               </RouterProvider>
             </HelmetProvider>
           </QueryClientProvider>
+          </AuthContextProvider>
         </LocalizationProvider>
       </ThemeProvider>
     </PersistGate>
