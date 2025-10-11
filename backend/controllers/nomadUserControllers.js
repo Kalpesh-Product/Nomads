@@ -1,4 +1,37 @@
+import mongoose from "mongoose";
 import NomadUser from "../models/NomadUser.js";
+
+export const getUsers = async (req, res, next) => {
+  try {
+    const { userId } = req.query;
+    let query = {};
+
+    if (userId) {
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+        return res.status(400).json({
+          message: "Invalid Id provided",
+        });
+      }
+      query._id = userId;
+    }
+
+    const users = await NomadUser.find(query).populate([
+      { path: "saves", select: "-images" },
+      { path: "likes", select: "-images" },
+    ]);
+
+    if (!users || !users.length) {
+      return res.status(400).json({
+        message: "No users found",
+      });
+    }
+
+    return res.status(200).json(users);
+  } catch (error) {
+    console.error("[getUsers] error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 export const saveListings = async (req, res, next) => {
   try {
