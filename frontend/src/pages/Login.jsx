@@ -1,127 +1,120 @@
-import { TextField, Button } from "@mui/material";
+import { TextField, IconButton, InputAdornment } from "@mui/material";
+import { useForm, Controller } from "react-hook-form";
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import axios from "../utils/axios"; // ✅ use same axios config as signup
+import toast from "react-hot-toast";
 import PrimaryButton from "../components/PrimaryButton";
 import { Link } from "react-router-dom";
-import { Controller, useForm } from "react-hook-form";
-import axios from "axios";
-import { useMutation } from "@tanstack/react-query";
-import toast from "react-hot-toast";
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import { IconButton, InputAdornment } from "@mui/material";
-import { useState } from "react";
 
 export default function LoginPage() {
+  const [showPassword, setShowPassword] = useState(false);
+  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
+
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       email: "",
       password: "",
     },
   });
-  const [showPassword, setShowPassword] = useState(false);
-
-  const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev);
-  };
 
   const { mutate: submitLogin, isPending: isLoginPending } = useMutation({
     mutationFn: async (data) => {
-      const response = await axios.post(
-        import.meta.env.VITE_ENV === "PRODUCTION"
-          ? `${import.meta.env.VITE_API_PRODUCTION_URL}/auth/login`
-          : `${import.meta.env.VITE_API_DEVELOPMENT_URL}/auth/login`,
-        { ...data },
-        { headers: { "Content-Type": "application/json" } }
-      );
+      const payload = {
+        email: data.email,
+        password: data.password,
+      };
 
+      const response = await axios.post("/auth/login", payload);
       return response.data;
     },
     onSuccess: (data) => {
-      toast.success("Login successful");
+      toast.success(data?.message || "Login successful");
       reset();
+      // You can optionally store user data in localStorage/sessionStorage here
+      // localStorage.setItem("user", JSON.stringify(data.user));
     },
     onError: (error) => {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Invalid email or password");
     },
   });
 
-  const onSubmit = (data) => {
-    submitLogin(data);
-  };
+  const onSubmit = (data) => submitLogin(data);
 
   return (
     <div className="flex items-center justify-center flex-col gap-14 h-[55vh] md:h-[60vh] lg:h-[75vh] border-gray-300 rounded-lg p-8">
       <div className="flex flex-col items-center gap-6 w-full max-w-4xl">
         <h1 className="text-hero text-center">Login</h1>
-        <form
-          //   onSubmit={handleSubmit(onSubmit)}
-          className="w-full grid grid-cols-1 md:grid-cols-2 gap-6"
-        >
-          <div className="col-span-1">
-            <Controller
-              name="email"
-              control={control}
-              rules={{ required: "Email is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Email/Phone"
-                  type="email"
-                  fullWidth
-                  required
-                  variant="standard"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
-          </div>
-          <div className="col-span-1">
-            <Controller
-              name="password"
-              control={control}
-              rules={{ required: "Password is required" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Password"
-                  type={showPassword ? "text" : "password"}
-                  fullWidth
-                  required
-                  variant="standard"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          onClick={togglePasswordVisibility}
-                          edge="end"
-                          tabIndex={-1}
-                        >
-                          {showPassword ? <FiEyeOff /> : <FiEye />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              )}
-            />
-          </div>
 
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Email */}
+          <Controller
+            name="email"
+            control={control}
+            rules={{ required: "Email is required" }}
+            render={({ field, fieldState }) => (
+              <TextField
+                {...field}
+                label="Email"
+                type="email"
+                fullWidth
+                required
+                variant="standard"
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+              />
+            )}
+          />
+
+          {/* Password */}
+          <Controller
+            name="password"
+            control={control}
+            rules={{ required: "Password is required" }}
+            render={({ field, fieldState }) => (
+              <TextField
+                {...field}
+                label="Password"
+                type={showPassword ? "text" : "password"}
+                fullWidth
+                required
+                variant="standard"
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={togglePasswordVisibility}
+                        edge="end"
+                        tabIndex={-1}>
+                        {showPassword ? <FiEyeOff /> : <FiEye />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            )}
+          />
+
+          {/* Submit Button */}
           <div className="col-span-1 md:col-span-2 flex justify-center items-center mt-2 py-2">
             <PrimaryButton
               title={"Login"}
-              type={"submit"}
+              type="submit"
               isLoading={isLoginPending}
               disabled={isLoginPending}
-              className={
-                "bg-[#FF5757]  flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[7rem] px-6"
-              }
+              className="bg-[#FF5757] flex text-white font-[500] capitalize hover:bg-[#E14C4C] w-[7rem] px-6"
             />
           </div>
 
+          {/* Signup Link */}
           <div className="col-span-1 md:col-span-2">
             <p className="text-center">
-              New to WoNo?&nbsp;{" "}
+              New to WoNo?&nbsp;
               <span className="underline">
                 <Link to="/signup">Sign Up</Link>
               </span>
