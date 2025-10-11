@@ -1,6 +1,6 @@
-const jwt = require("jsonwebtoken");
+import jwt from "jsonwebtoken";
 
-const verifyJwt = (req, res, next) => {
+export const verifyJwt = (req, res, next) => {
   const { authorization } = req.headers;
   if (!authorization) return res.status(401).json({ message: "Unauthorized" });
 
@@ -8,17 +8,8 @@ const verifyJwt = (req, res, next) => {
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
     if (err) return res.status(403).json({ message: "Forbidden" });
 
-    req.user = decoded.userInfo.userId;
-    req.roles = decoded.userInfo.roles;
-    req.company = decoded.userInfo.company;
-    req.departments = decoded.userInfo.departments;
-    req.totalCredits = decoded.userInfo.totalMeetingCredits;
-    req.creditsBalance = decoded.userInfo.meetingCreditBalance;
-
     req.userData = decoded.userInfo;
 
     next();
   });
 };
-
-module.exports = verifyJwt;
