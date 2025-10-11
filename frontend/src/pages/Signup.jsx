@@ -230,7 +230,7 @@ export default function Signup() {
           width="30vw"
           color="text-green-500">
           <div className="flex flex-col space-y-4 text-pretty">
-            <p>Thank you for signing up with BRIDG.</p>
+            <p>Thank you for signing up with WoNo.</p>
             <p>
               Kindly allow us some time to evaluate your profile. Once done,
               your Personal Assistant from WoNo will connect with you to onboard

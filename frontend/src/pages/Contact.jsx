@@ -71,9 +71,9 @@ const Contact = () => {
     <div className="bg-white text-black font-sans">
       {/* About & Form */}
       {/* <section className="py-10 px-4 md:px-20"> */}
-      <Container>
-        <section className="">
-          <div className="grid md:grid-cols-1 gap-20">
+      <Container padding={false}>
+        <section className="min-h-[85vh] flex items-center justify-center">
+          <div className="w-full max-w-5xl">
             {/* About Us */}
             {/* <div className="space-y-6">
               <h2 className="text-title font-semibold uppercase">About WONO</h2>
