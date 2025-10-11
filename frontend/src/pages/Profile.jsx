@@ -1,11 +1,25 @@
 import React, { useState } from "react";
-import { TextField, Button, Avatar, Tabs, Tab } from "@mui/material";
-import { FaMapMarkerAlt } from "react-icons/fa";
+import { TextField, Button, Avatar } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
+import useLogout from "../hooks/useLogout";
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState("profile");
+  const navigate = useNavigate();
+  const { auth } = useAuth();
+  const logout = useLogout();
 
   const handleTabChange = (tab) => setActiveTab(tab);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/"); // redirect to login or landing page
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   return (
     <div className="bg-[#f8f9fc] min-h-screen p-6 font-sans text-[#364D59]">
@@ -54,37 +68,36 @@ const Profile = () => {
                   height: 80,
                   fontSize: "2rem",
                 }}>
-                A
+                {auth?.user?.name
+                  ? auth.user.name.charAt(0).toUpperCase()
+                  : "A"}
               </Avatar>
               <div>
-                <h3 className="text-lg font-semibold">John Doe</h3>
-                <p className="text-sm">Founder & CEO</p>
-                {/* <Button
-                  variant="contained"
-                  sx={{
-                    mt: 1,
-                    bgcolor: "#ff5757",
-                    textTransform: "none",
-                    "&:hover": { bgcolor: "#1a3b8a" },
-                  }}>
-                  Update Profile Image
-                </Button> */}
+                <h3 className="text-lg font-semibold">
+                  {auth?.user?.name || "John Doe"}
+                </h3>
+                <p className="text-sm">
+                  {auth?.user?.designation || "Founder & CEO"}
+                </p>
               </div>
             </div>
 
             <div className="text-sm mt-4 md:mt-0">
               <p>
-                <b>Email:</b> john@infuse.com
+                <b>Email:</b> {auth?.user?.email || "john@infuse.com"}
               </p>
-              {/* <p>
-                <b>Phone:</b> N/A
-              </p>
-              <p>
-                <b>Work Location:</b> Panjim Goa, India
-              </p>
-              <span className="inline-block bg-green-600 text-white text-xs px-3 py-1 rounded-full mt-2">
-                Active
-              </span> */}
+              <br />
+              <Button
+                variant="contained"
+                sx={{
+                  bgcolor: "#ff5757",
+                  textTransform: "none",
+                  px: 6,
+                  "&:hover": { bgcolor: "#1a3b8a" },
+                }}
+                onClick={handleLogout}>
+                Logout
+              </Button>
             </div>
           </div>
 
@@ -190,8 +203,6 @@ const Profile = () => {
       {activeTab === "saves" && (
         <div className="bg-white p-6 rounded-lg shadow-sm max-w-6xl mx-auto">
           <h2 className="text-xl font-bold text-[#ff5757] mb-6">MY SAVES</h2>
-
-          {/* Coworking Spaces */}
           <h3 className="text-lg font-semibold mb-3">Saved Listings</h3>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
             {[
@@ -237,8 +248,6 @@ const Profile = () => {
             ))}
           </div>
 
-          {/* Hostels */}
-          {/* <h3 className="text-lg font-semibold mb-3">Popular Hostels in Goa</h3> */}
           <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {[
               {

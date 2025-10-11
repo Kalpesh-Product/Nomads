@@ -10,7 +10,7 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import useAuth from "../hooks/useAuth";
 
 export default function LoginPage() {
-  const {auth,setAuth} = useAuth()
+  const { auth, setAuth } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
@@ -29,7 +29,7 @@ export default function LoginPage() {
       };
 
       const response = await axios.post("/auth/login", payload);
-      console.log("resp",response.data)
+      console.log("resp", response.data);
       // setAuth(response.data.accessToken)
       return response.data;
     },
