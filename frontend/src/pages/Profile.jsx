@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import { TextField, Button, Avatar, Tabs, Tab } from "@mui/material";
 import { FaMapMarkerAlt } from "react-icons/fa";
+import useAuth from "../hooks/useAuth";
 
 const Profile = () => {
+    const { auth } = useAuth();
+const user = auth.user
+console.log("userr",auth)
   const [activeTab, setActiveTab] = useState("profile");
 
   const handleTabChange = (tab) => setActiveTab(tab);

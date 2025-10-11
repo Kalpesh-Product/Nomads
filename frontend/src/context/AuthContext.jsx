@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useState } from "react";
 import { createContext } from "react";
 
@@ -15,6 +16,9 @@ export default function AuthContextProvider({ children }) {
     accessToken: "",
   });
 
+  useEffect(() => {
+    console.log("auth", auth);
+  }, [auth]);
   return (
     <AuthContext.Provider value={{ auth, setAuth }}>
       {children}

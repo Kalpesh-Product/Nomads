@@ -5,12 +5,13 @@ import { useMutation } from "@tanstack/react-query";
 import axios from "../utils/axios"; // ✅ use same axios config as signup
 import toast from "react-hot-toast";
 import PrimaryButton from "../components/PrimaryButton";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import useAuth from "../hooks/useAuth";
 
 export default function LoginPage() {
   const {auth,setAuth} = useAuth()
+  const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false);
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
@@ -28,9 +29,16 @@ export default function LoginPage() {
         password: data.password,
       };
 
-      const response = await axios.post("/auth/login", payload);
-      console.log("resp",response.data)
-      // setAuth(response.data.accessToken)
+      const response = await axios.post("auth/login", payload);
+      console.log("resp",response.data.accessToken)
+       setAuth((prevState) => {
+        return {
+          ...prevState,
+          accessToken: response?.data?.accessToken,
+          user: response.data.user,
+        };
+      });
+
       return response.data;
     },
     onSuccess: (data) => {
