@@ -15,12 +15,16 @@ import newsRoutes from "./routes/newsRoutes.js";
 import blogRoutes from "./routes/blogRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import nomadUserRoutes from "./routes/nomadUserRoutes.js";
+import cookieParser from "cookie-parser";
+import credentials from "./middlewares/credentials.js";
 
 const app = express();
 config({ override: true });
 connectDb(process.env.MONGO_URL);
 
+app.use(credentials);
 app.use(cors(corsConfig));
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 const PORT = process.env.PORT || 3000;
