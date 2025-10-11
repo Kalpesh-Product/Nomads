@@ -1,13 +1,4 @@
-import {
-  TextField,
-  Autocomplete,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  IconButton,
-  InputAdornment,
-} from "@mui/material";
+import { TextField, IconButton, InputAdornment } from "@mui/material";
 import { MuiTelInput } from "mui-tel-input";
 import { useForm, Controller } from "react-hook-form";
 import { useState } from "react";
@@ -18,55 +9,51 @@ import PrimaryButton from "../components/PrimaryButton";
 import { Link } from "react-router-dom";
 import MuiModal from "../components/Modal";
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import { Country, State } from "country-state-city";
 
 export default function Signup() {
   const [openModal, setOpenModal] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
+  const toggleConfirmPasswordVisibility = () =>
+    setShowConfirmPassword((prev) => !prev);
 
-  const { control, handleSubmit, reset, watch, setValue } = useForm({
+  const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       firstName: "",
       lastName: "",
       email: "",
       password: "",
-      country: "",
-      state: "",
+      confirmPassword: "",
       mobile: "",
-      reason: "",
     },
   });
 
-  const selectedCountry = watch("country");
+  const { mutate: submitRegistration, isPending } = useMutation({
+    mutationFn: async (data) => {
+      const payload = {
+        ...data,
+        sheetName: "Sign_up",
+      };
 
-  const { mutate: submitRegisteration, isPending: isRegisterationPending } =
-    useMutation({
-      mutationFn: async (data) => {
-        const response = await axios.post("forms/register-form-submission", {
-          ...data,
-          sheetName: "Sign_up",
-        });
-        return response.data;
-      },
-      onSuccess: () => {
-        toast.success("Sign up successful");
-        reset();
-        setOpenModal(true);
-      },
-      onError: (error) => {
-        toast.error(error.response?.data?.message || "Something went wrong");
-      },
-    });
+      const response = await axios.post(
+        "/forms/add-new-b2c-form-submission",
+        payload
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      toast.success("Sign up successful");
+      reset();
+      setOpenModal(true);
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || "Something went wrong");
+    },
+  });
 
-  const onSubmit = (data) => submitRegisteration(data);
-
-  const countries = Country.getAllCountries();
-  const selectedCountryObj = countries.find((c) => c.name === selectedCountry);
-  const states = selectedCountryObj
-    ? State.getStatesOfCountry(selectedCountryObj.isoCode)
-    : [];
+  const onSubmit = (data) => submitRegistration(data);
 
   return (
     <div className="flex items-center justify-center px-4 md:h-[60vh] lg:h-[80vh] border-gray-300 rounded-lg">
@@ -151,56 +138,65 @@ export default function Signup() {
             )}
           />
 
-          {/* Country */}
+          {/* Password */}
           <Controller
-            name="country"
+            name="password"
             control={control}
-            rules={{ required: "Country is required" }}
+            rules={{ required: "Password is required" }}
             render={({ field, fieldState }) => (
               <TextField
                 {...field}
-                select
-                label="Country"
+                label="Password"
+                type={showPassword ? "text" : "password"}
                 fullWidth
                 required
                 variant="standard"
                 error={!!fieldState.error}
                 helperText={fieldState.error?.message}
-                onChange={(e) => {
-                  field.onChange(e.target.value);
-                  setValue("state", ""); // reset state when country changes
-                }}>
-                {countries.map((c) => (
-                  <MenuItem key={c.isoCode} value={c.name}>
-                    {c.name}
-                  </MenuItem>
-                ))}
-              </TextField>
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={togglePasswordVisibility}
+                        edge="end"
+                        tabIndex={-1}>
+                        {showPassword ? <FiEyeOff /> : <FiEye />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
             )}
           />
 
-          {/* State */}
+          {/* Confirm Password */}
           <Controller
-            name="state"
+            name="confirmPassword"
             control={control}
-            rules={{ required: "State is required" }}
+            rules={{ required: "Please confirm password" }}
             render={({ field, fieldState }) => (
               <TextField
                 {...field}
-                select
-                label="State"
+                label="Confirm Password"
+                type={showConfirmPassword ? "text" : "password"}
                 fullWidth
                 required
                 variant="standard"
-                disabled={!selectedCountryObj}
                 error={!!fieldState.error}
-                helperText={fieldState.error?.message}>
-                {states.map((s) => (
-                  <MenuItem key={s.isoCode} value={s.name}>
-                    {s.name}
-                  </MenuItem>
-                ))}
-              </TextField>
+                helperText={fieldState.error?.message}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={toggleConfirmPasswordVisibility}
+                        edge="end"
+                        tabIndex={-1}>
+                        {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
             )}
           />
 
@@ -208,9 +204,9 @@ export default function Signup() {
           <div className="col-span-1 md:col-span-2 flex justify-center items-center mt-2 py-2">
             <PrimaryButton
               type="submit"
-              isLoading={isRegisterationPending}
+              isLoading={isPending}
               title="Signup"
-              disabled={isRegisterationPending}
+              disabled={isPending}
               className="bg-[#FF5757] flex text-white font-[500] capitalize hover:bg-[#E14C4C] w-[7rem] px-6"
             />
           </div>

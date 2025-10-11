@@ -24,7 +24,7 @@ const Footer = () => {
     {
       heading: "Services",
       links: [
-        { name: "About", link: "/" },
+        { name: "About", link: "/about" },
         { name: "Career", link: "career" },
         { name: "FAQs", link: "https://hosts.wono.co/faq" },
         // { name: "Mortgage", link: "/mortgages" },

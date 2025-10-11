@@ -101,10 +101,8 @@ const nomadsSignupSchema = yup.object().shape({
     .required("Please provide your email"),
   password: yup.string().optional(),
   mobile: yup.string().trim().required("Please provide the mobile"),
-  country: yup.string().required("Please provide your country name"),
-  state: yup.string().required("Please provide your state name"),
+
   sheetName: yup.string().required("Please provide a sheet name"),
-  reason: yup.string().required("Please provide the reason"),
 });
 
 function toISODateOnly(v) {
@@ -218,10 +216,9 @@ export const addB2CformSubmission = async (req, res, next) => {
           lastName: d.lastName?.trim(),
           email: d.email?.trim(),
           password: d.password,
-          country: d.country?.trim(),
-          state: d.state?.trim(),
+
           mobile: d.mobile?.trim(),
-          reason: d.reason || "",
+
           sheetName: d.sheetName,
           submittedAt: new Date(),
         }),

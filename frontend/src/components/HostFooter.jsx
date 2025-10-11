@@ -11,7 +11,7 @@ const HostFooter = () => {
   const footerSections = [
     {
       links: [
-        { name: "About", link: "/" },
+        { name: "About", link: "/about" },
         // { name: "Privacy", link: "privacy" },
         { name: "Career", link: "career" },
         { name: "FAQs", link: "faq" },

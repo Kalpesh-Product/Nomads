@@ -27,7 +27,7 @@ import HostSignup from "./pages/host/Signup";
 import Modules from "./pages/host/Modules";
 import Themes from "./pages/host/Themes";
 import Capital from "./pages/host/Capital";
-import HostAbout from "./pages/host/About";
+import HostAbout from "./pages/host/HostAbout";
 import HostTermsAndConditions from "./pages/host/TermsAndConditions";
 import HostPrivacy from "./pages/host/Privacy";
 import HostFAQ from "./pages/host/FAQ";
@@ -37,6 +37,7 @@ import HostProduct from "./pages/host/Product";
 // Tenant imports
 import TemplateSite from "./pages/company/TemplateSite";
 import TemplateHome from "./pages/company/TemplateHome";
+import NomadAbout from "./pages/NomadAbout";
 
 function getTenantFromHost() {
   const hostname = window.location.hostname; // e.g. "nomad.wono.co" or "nomad.localhost"
@@ -103,6 +104,7 @@ if (tenant === "main") {
         { path: "career/job/:title", element: <JobDetails /> },
         { path: "login", element: <Login /> },
         { path: "signup", element: <Signup /> },
+        { path: "about", element: <NomadAbout /> },
       ],
     },
   ];

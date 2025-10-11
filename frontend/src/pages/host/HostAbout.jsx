@@ -19,7 +19,7 @@ import Container from "../../components/Container";
 import axios from "../../utils/axios";
 import toast from "react-hot-toast";
 
-const HostContact = () => {
+const HostAbout = () => {
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
@@ -86,14 +86,14 @@ const HostContact = () => {
         <section className="">
           <div className="grid md:grid-cols-1 gap-20">
             {/* About Us */}
-            {/* <div className="space-y-6">
+            <div className="space-y-6">
               <h2 className="text-title font-semibold uppercase">About WONO</h2>
-              <p className="text-tiny leading-relaxed">
+              <p className="text-subtitle leading-relaxed">
                 <strong>WONO</strong> is redefining the global future of work
                 and mobility for the growing Digital Nomad's & Nomad Businesses
                 Ecosystem.
               </p>
-              <p className="text-tiny leading-relaxed">
+              <p className="text-subtitle leading-relaxed">
                 We are building a unified digital ecosystem that connects the
                 world’s{" "}
                 <strong>
@@ -101,7 +101,7 @@ const HostContact = () => {
                 </strong>{" "}
                 to the spaces and services they need — anywhere, anytime.
               </p>
-              <p className="text-tiny leading-relaxed">
+              <p className="text-subtitle leading-relaxed">
                 Through our platform, Nomad's can discover and book curated
                 Nomad Businesses such as
                 <strong>
@@ -111,7 +111,7 @@ const HostContact = () => {
                 </strong>{" "}
                 — seamlessly integrated under our brand.
               </p>
-              <p className="text-tiny leading-relaxed">
+              <p className="text-subtitle leading-relaxed">
                 As global work patterns evolve, WONO empowers people and
                 companies to operate <strong>borderlessly</strong>, supporting
                 the new generation of professionals who value{" "}
@@ -119,9 +119,11 @@ const HostContact = () => {
                 over location.
               </p>
 
-         
-              <h3 className="font-semibold uppercase mt-8">OUR MISSION</h3>
-              <ul className="list-disc ml-6 text-tiny leading-relaxed">
+              {/* Mission */}
+              <h3 className="font-semibold uppercase mt-8 text-title">
+                OUR MISSION
+              </h3>
+              <ul className="list-disc ml-6 text-subtitle leading-relaxed">
                 <li>
                   To support and activate 100% of the World's Nomad Businesses
                   under one roof
@@ -134,9 +136,11 @@ const HostContact = () => {
                 </li>
               </ul>
 
-       
-              <h3 className="font-semibold uppercase mt-8">OUR VISION</h3>
-              <ul className="list-disc ml-6 text-tiny leading-relaxed">
+              {/* Vision */}
+              <h3 className="font-semibold uppercase mt-8 text-title">
+                OUR VISION
+              </h3>
+              <ul className="list-disc ml-6 text-subtitle leading-relaxed">
                 <li>
                   To become the world’s leading platform for borderless living
                   and working — enabling a truly global, connected, and mobile
@@ -148,9 +152,11 @@ const HostContact = () => {
                 </li>
               </ul>
 
-    
-              <h3 className="font-semibold uppercase mt-8">OUR EDGE</h3>
-              <ul className="list-disc ml-6 text-tiny leading-relaxed">
+              {/* Edge */}
+              <h3 className="font-semibold uppercase mt-8 text-title">
+                OUR EDGE
+              </h3>
+              <ul className="list-disc ml-6 text-subtitle leading-relaxed">
                 <li>
                   World's LARGEST Integrated curated platform combining{" "}
                   <strong>work, stay, and travel services</strong>
@@ -167,198 +173,14 @@ const HostContact = () => {
                 </li>
               </ul>
 
-              <p className="text-tiny leading-relaxed">
+              <p className="text-subtitle leading-relaxed">
                 At WONO, we’re not just following the future of work —{" "}
                 <strong>we’re building it.</strong>
               </p>
 
-              <p className="text-tiny font-semibold">
+              <p className="text-subtitle font-semibold">
                 A Platform which is an Early Adaptation of our Future Lifestyle!
               </p>
-            </div> */}
-
-            {/* Connect With Us - MUI Styled Form */}
-            <div className="px-40">
-              <Box
-                component="form"
-                onSubmit={handleSubmit((data) => submitContactForm(data))}
-                sx={{ mt: 0 }}>
-                <h2 className="text-title font-semibold uppercase mb-4 text-center md:text-center">
-                  Connect With Us
-                </h2>
-
-                {/* Responsive grid container */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Name */}
-                  <div className="pt-0 pl-0 lg:pt-0 lg:pl-0">
-                    <Controller
-                      name="name"
-                      control={control}
-                      rules={{ required: "Name is required" }}
-                      render={({ field, fieldState }) => (
-                        <TextField
-                          {...field}
-                          required
-                          fullWidth
-                          label="Name"
-                          variant="standard"
-                          error={!!fieldState.error}
-                          helperText={fieldState.error?.message}
-                          InputLabelProps={{ sx: floatingLabelSx }}
-                        />
-                      )}
-                    />
-                  </div>
-
-                  {/* Email */}
-                  <div className="pt-0 pl-0 lg:pt-0 lg:pl-0">
-                    <Controller
-                      name="email"
-                      control={control}
-                      rules={{
-                        required: "Email is required",
-                        pattern: {
-                          value: /^\S+@\S+$/i,
-                          message: "Enter a valid email",
-                        },
-                      }}
-                      render={({ field, fieldState }) => (
-                        <TextField
-                          {...field}
-                          required
-                          fullWidth
-                          type="email"
-                          label="Email"
-                          variant="standard"
-                          error={!!fieldState.error}
-                          helperText={fieldState.error?.message}
-                          InputLabelProps={{ sx: floatingLabelSx }}
-                        />
-                      )}
-                    />
-                  </div>
-
-                  {/* Mobile */}
-                  <div className="pt-0 pl-0 lg:pt-0 lg:pl-0">
-                    <Controller
-                      name="mobile"
-                      control={control}
-                      rules={{
-                        required: "Mobile number is required",
-                        pattern: {
-                          value: /^[1-9]{1}[0-9]{9}$/,
-                          message: "Enter a valid 10-digit mobile number",
-                        },
-                      }}
-                      render={({ field, fieldState }) => (
-                        <TextField
-                          {...field}
-                          required
-                          fullWidth
-                          type="tel"
-                          label="Mobile Number"
-                          variant="standard"
-                          error={!!fieldState.error}
-                          helperText={fieldState.error?.message}
-                          InputLabelProps={{ sx: floatingLabelSx }}
-                        />
-                      )}
-                    />
-                  </div>
-
-                  {/* Partnership Type */}
-                  <div className="pt-0 pl-0 lg:pt-0 lg:pl-0">
-                    <Controller
-                      name="partnerstype"
-                      control={control}
-                      rules={{ required: "Please select a partnership type" }}
-                      render={({ field, fieldState }) => (
-                        <TextField
-                          fullWidth
-                          required
-                          variant="standard"
-                          error={!!fieldState.error}
-                          label={"Type of Partnership"}
-                          select
-                          helperText={fieldState?.error?.message}
-                          slotProps={{
-                            inputLabel: {
-                              sx: {
-                                color: "black", // default label color
-                                "&.Mui-focused": { color: "black" }, // keep black when focused
-                              },
-                            },
-                          }}>
-                          <MenuItem value="" disabled>
-                            Select Type
-                          </MenuItem>
-                          <MenuItem value="B2B SaaS Technology Licensing">
-                            B2B SaaS Technology Licensing
-                          </MenuItem>
-                          <MenuItem value="Landlord Partnerships">
-                            Landlord Partnerships
-                          </MenuItem>
-                          <MenuItem value="Investment Related">
-                            Investment Related
-                          </MenuItem>
-                          <MenuItem value="Coffee Meeting to know us better">
-                            Coffee Meeting to know us better
-                          </MenuItem>
-
-                          {fieldState.error && (
-                            <p style={{ color: "red", fontSize: "0.8rem" }}></p>
-                          )}
-                        </TextField>
-                      )}
-                    />
-                  </div>
-
-                  {/* Message */}
-                  <div className="pt-0 pl-0 lg:pt-0 lg:pl-0 md:col-span-2">
-                    <Controller
-                      name="message"
-                      control={control}
-                      rules={{ required: "Message is required" }}
-                      render={({ field, fieldState }) => (
-                        <TextField
-                          {...field}
-                          required
-                          fullWidth
-                          multiline
-                          minRows={4}
-                          label="Message"
-                          variant="standard"
-                          error={!!fieldState.error}
-                          helperText={fieldState.error?.message}
-                          InputLabelProps={{ sx: floatingLabelSx }}
-                        />
-                      )}
-                    />
-                  </div>
-
-                  {/* Button */}
-                  <div className="pt-6 md:col-span-2 text-center">
-                    <Button
-                      type="submit"
-                      variant="contained"
-                      sx={{
-                        bgcolor: "black",
-                        borderRadius: 20,
-                        px: 14,
-                        py: 1,
-                        "&:hover": { bgcolor: "#333" },
-                      }}>
-                      {isContactPending && (
-                        <CircularProgress
-                          size={16}
-                          sx={{ color: "white", mr: 1 }}
-                        />
-                      )}
-                      {isContactPending ? "CONNECTING..." : "CONNECT"}
-                    </Button>
-                  </div>
-                </div>
-              </Box>
             </div>
           </div>
         </section>
@@ -434,4 +256,4 @@ const HostContact = () => {
   );
 };
 
-export default HostContact;
+export default HostAbout;
