@@ -2,7 +2,7 @@ import { TextField, IconButton, InputAdornment } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import axios from "../utils/axios"; // ✅ use same axios config as signup
+import axios, { axiosInstance } from "../utils/axios"; // ✅ use same axios config as signup
 import toast from "react-hot-toast";
 import PrimaryButton from "../components/PrimaryButton";
 import { Link, useNavigate } from "react-router-dom";
@@ -10,8 +10,8 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import useAuth from "../hooks/useAuth";
 
 export default function LoginPage() {
-  const {auth,setAuth} = useAuth()
-  const navigate = useNavigate()
+  const { auth, setAuth } = useAuth();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
@@ -30,29 +30,36 @@ export default function LoginPage() {
       };
 
       const response = await axios.post("auth/login", payload);
-      console.log("resp",response.data.accessToken)
-       setAuth((prevState) => {
-        return {
-          ...prevState,
-          accessToken: response?.data?.accessToken,
-          user: response.data.user,
-        };
-      });
+      console.log("resp", response.data.accessToken);
+      setAuth((prevState) => ({
+        ...prevState,
+        accessToken: response?.data?.accessToken,
+        user: response.data.user,
+      }));
 
       return response.data;
     },
     onSuccess: (data) => {
       toast.success(data?.message || "Login successful");
       reset();
-      navigate("/profile")
-      // You can optionally store user data in localStorage/sessionStorage here
-      // localStorage.setItem("user", JSON.stringify(data.user));
+
+      // ✅ Redirect to profile page after login
+      navigate("/profile");
     },
     onError: (error) => {
-    
-      console.log("login error",error)
-      toast.error(error.message || "Invalid email or password");
-      
+      if (error.response) {
+        const { status, data } = error.response;
+        let message = "Something went wrong";
+
+        if (status === 400) message = "Email and password are required";
+        else if (status === 401 && data?.message) message = data.message;
+        else if (status === 500)
+          message = "Internal server error. Please try again.";
+
+        toast.error(message);
+      } else {
+        toast.error("Network error. Please check your connection.");
+      }
     },
   });
 

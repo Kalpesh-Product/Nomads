@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { TextField, Button, Avatar } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 import useLogout from "../hooks/useLogout";
 
 const Profile = () => {
@@ -15,11 +15,13 @@ const Profile = () => {
   const handleLogout = async () => {
     try {
       await logout();
-      navigate("/"); // redirect to login or landing page
+      navigate("/");
     } catch (error) {
       console.error("Logout failed:", error);
     }
   };
+
+  const user = auth?.user || {};
 
   return (
     <div className="bg-[#f8f9fc] min-h-screen p-6 font-sans text-[#364D59]">
@@ -68,23 +70,25 @@ const Profile = () => {
                   height: 80,
                   fontSize: "2rem",
                 }}>
-                {auth?.user?.name
-                  ? auth.user.name.charAt(0).toUpperCase()
-                  : "A"}
+                {user?.firstName ? user.firstName.charAt(0).toUpperCase() : "U"}
               </Avatar>
               <div>
                 <h3 className="text-lg font-semibold">
-                  {auth?.user?.name || "John Doe"}
+                  {`${user?.firstName || ""} ${user?.lastName || ""}`.trim() ||
+                    "User Name"}
                 </h3>
-                <p className="text-sm">
-                  {auth?.user?.designation || "Founder & CEO"}
+                <p className="text-sm text-gray-600">
+                  {user?.country || "N/A"}
                 </p>
               </div>
             </div>
 
             <div className="text-sm mt-4 md:mt-0">
               <p>
-                <b>Email:</b> {auth?.user?.email || "john@infuse.com"}
+                <b>Email:</b> {user?.email || "N/A"}
+              </p>
+              <p>
+                <b>Mobile:</b> {user?.mobile || "N/A"}
               </p>
               <br />
               <Button
@@ -105,25 +109,38 @@ const Profile = () => {
           <div className="mt-6 border rounded-lg p-4">
             <h3 className="font-semibold mb-4">Personal Information</h3>
             <div className="grid md:grid-cols-3 gap-4">
-              <TextField label="First Name" size="small" />
-              <TextField label="Middle Name" size="small" />
-              <TextField label="Last Name" size="small" />
-              <TextField label="Gender" size="small" />
               <TextField
-                label="Date of Birth"
-                type="date"
+                label="First Name"
                 size="small"
-                InputLabelProps={{ shrink: true }}
+                value={user?.firstName || ""}
+                InputProps={{ readOnly: true }}
               />
-              <TextField label="Mobile Phone" size="small" />
-              <TextField label="Aadhar ID" size="small" />
-              <TextField label="PAN" size="small" />
-              <TextField label="Address Line 1" size="small" />
-              <TextField label="Address Line 2" size="small" />
-              <TextField label="State" size="small" />
-              <TextField label="City" size="small" />
-              <TextField label="Pin Code" size="small" />
+              <TextField
+                label="Last Name"
+                size="small"
+                value={user?.lastName || ""}
+                InputProps={{ readOnly: true }}
+              />
+              <TextField
+                label="Email"
+                size="small"
+                value={user?.email || ""}
+                InputProps={{ readOnly: true }}
+              />
+              <TextField
+                label="Mobile"
+                size="small"
+                value={user?.mobile || ""}
+                InputProps={{ readOnly: true }}
+              />
+              <TextField
+                label="Country"
+                size="small"
+                value={user?.country || ""}
+                InputProps={{ readOnly: true }}
+              />
             </div>
+
             <div className="text-center mt-6">
               <Button
                 variant="contained"
@@ -248,6 +265,7 @@ const Profile = () => {
             ))}
           </div>
 
+          <h3 className="text-lg font-semibold mb-3">Saved Hostels</h3>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {[
               {
