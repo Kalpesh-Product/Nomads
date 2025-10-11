@@ -16,8 +16,8 @@ export const getUsers = async (req, res, next) => {
     }
 
     const users = await NomadUser.find(query).populate([
-      { path: "saves", select: "-images" },
-      { path: "likes", select: "-images" },
+      { path: "saves", select: "" },
+      { path: "likes", select: "" },
     ]);
 
     if (!users || !users.length) {
