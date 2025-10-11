@@ -2,7 +2,7 @@ import { TextField, IconButton, InputAdornment } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import axios from "../utils/axios"; // ✅ use same axios config as signup
+import axios, { axiosInstance } from "../utils/axios"; // ✅ use same axios config as signup
 import toast from "react-hot-toast";
 import PrimaryButton from "../components/PrimaryButton";
 import { Link } from "react-router-dom";
@@ -28,19 +28,32 @@ export default function LoginPage() {
         password: data.password,
       };
 
-      const response = await axios.post("/auth/login", payload);
-      console.log("resp", response.data);
-      // setAuth(response.data.accessToken)
+      const response = await axiosInstance.post("/auth/login", payload);
       return response.data;
     },
     onSuccess: (data) => {
       toast.success(data?.message || "Login successful");
       reset();
-      // You can optionally store user data in localStorage/sessionStorage here
+
+      // store user/token if needed
       // localStorage.setItem("user", JSON.stringify(data.user));
+      // setAuth(data.accessToken);
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || "Invalid email or password");
+      if (error.response) {
+        const { status, data } = error.response;
+        let message = "Something went wrong";
+
+        if (status === 400) message = "Email and password are required";
+        else if (status === 401 && data?.message) message = data.message;
+        // "Invalid email provided" or "Incorrect password provided"
+        else if (status === 500)
+          message = "Internal server error. Please try again.";
+
+        toast.error(message);
+      } else {
+        toast.error("Network error. Please check your connection.");
+      }
     },
   });
 
