@@ -5,9 +5,6 @@ import useAuth from "../hooks/useAuth";
 import useLogout from "../hooks/useLogout";
 
 const Profile = () => {
-    const { auth } = useAuth();
-const user = auth.user
-console.log("userr",auth)
   const [activeTab, setActiveTab] = useState("profile");
   const navigate = useNavigate();
   const { auth } = useAuth();

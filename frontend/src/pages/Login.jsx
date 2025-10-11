@@ -44,11 +44,15 @@ export default function LoginPage() {
     onSuccess: (data) => {
       toast.success(data?.message || "Login successful");
       reset();
+      navigate("/profile")
       // You can optionally store user data in localStorage/sessionStorage here
       // localStorage.setItem("user", JSON.stringify(data.user));
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || "Invalid email or password");
+    
+      console.log("login error",error)
+      toast.error(error.message || "Invalid email or password");
+      
     },
   });
 
