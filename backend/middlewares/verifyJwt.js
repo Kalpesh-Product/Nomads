@@ -1,6 +1,6 @@
-const jwt = require("jsonwebtoken");
+import jwt from "jsonwebtoken";
 
-const verifyJwt = (req, res, next) => {
+export const verifyJwt = (req, res, next) => {
   const { authorization } = req.headers;
   if (!authorization) return res.status(401).json({ message: "Unauthorized" });
 
@@ -13,5 +13,3 @@ const verifyJwt = (req, res, next) => {
     next();
   });
 };
-
-module.exports = verifyJwt;

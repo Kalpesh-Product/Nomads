@@ -14,6 +14,7 @@ export const login = async (req, res) => {
     const user = await NomadUser.findOne({
       email: email.trim().toLowerCase(),
     });
+
     if (!user)
       return res.status(401).json({ message: "Invalid email provided" });
 
@@ -64,7 +65,7 @@ export const login = async (req, res) => {
   }
 };
 
-const logout = async (req, res, next) => {
+export const logout = async (req, res, next) => {
   try {
     const cookies = req.cookies;
     if (!cookies?.nomadCookie) {

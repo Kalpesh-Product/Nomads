@@ -1,11 +1,9 @@
-const { allowedOrigins } = require("../config/corsConfig");
+import { allowedOrigins } from "../config/corsConfig.js";
 
-const credentials = (req, res, next) => {
+export default function credentials(req, res, next) {
   const { origin } = req.headers;
   if (allowedOrigins.includes(origin)) {
     res.setHeader("Access-Controll-Allow-Credentials", true);
   }
   next();
-};
-
-module.exports = credentials;
+}
