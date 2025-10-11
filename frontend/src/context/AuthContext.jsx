@@ -16,9 +16,7 @@ export default function AuthContextProvider({ children }) {
     accessToken: "",
   });
 
-  useEffect(() => {
-    console.log("auth", auth);
-  }, [auth]);
+
   return (
     <AuthContext.Provider value={{ auth, setAuth }}>
       {children}

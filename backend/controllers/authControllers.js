@@ -73,7 +73,7 @@ export const logout = async (req, res, next) => {
     }
 
     const refreshToken = cookies?.nomadCookie;
-    const user = await NomadUser.findOne({ refreshToken }).lean().exec();
+    const user = await NomadUser.findOne({ refreshToken }, { new: true });
     if (!user) {
       res.clearCookie("nomadCookie", {
         httpOnly: true,
@@ -83,6 +83,7 @@ export const logout = async (req, res, next) => {
       return res.sendStatus(201);
     }
 
+    console.log("refresh token", refreshToken);
     await NomadUser.findOneAndUpdate({ refreshToken }, { refreshToken: "" })
       .lean()
       .exec();

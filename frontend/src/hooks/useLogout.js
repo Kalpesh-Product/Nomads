@@ -1,7 +1,7 @@
 import useAuth from "./useAuth";
 import { useNavigate } from "react-router-dom";
 import { api } from "../utils/axios";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 
 export default function useLogout() {
   const { setAuth, auth } = useAuth();
@@ -10,7 +10,7 @@ export default function useLogout() {
 
   const logout = async () => {
     try {
-      await api.get("/api/auth/logout", {
+      await api.get("auth/logout", {
         withCredentials: true,
       });
       toast.success("Successfully logged out");
@@ -22,7 +22,7 @@ export default function useLogout() {
         };
       });
 
-      navigate("/");
+      navigate("/login");
     } catch (error) {
       toast.error(error.message);
     }
