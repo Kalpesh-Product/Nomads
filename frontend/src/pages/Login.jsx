@@ -11,7 +11,6 @@ import useAuth from "../hooks/useAuth";
 
 export default function LoginPage() {
   const { auth, setAuth } = useAuth();
-  const { auth, setAuth } = useAuth();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
@@ -32,13 +31,11 @@ export default function LoginPage() {
 
       const response = await axios.post("auth/login", payload);
       console.log("resp", response.data.accessToken);
-      setAuth((prevState) => {
-        return {
-          ...prevState,
-          accessToken: response?.data?.accessToken,
-          user: response.data.user,
-        };
-      });
+      setAuth((prevState) => ({
+        ...prevState,
+        accessToken: response?.data?.accessToken,
+        user: response.data.user,
+      }));
 
       return response.data;
     },
@@ -46,9 +43,8 @@ export default function LoginPage() {
       toast.success(data?.message || "Login successful");
       reset();
 
-      // store user/token if needed
-      // localStorage.setItem("user", JSON.stringify(data.user));
-      // setAuth(data.accessToken);
+      // ✅ Redirect to profile page after login
+      navigate("/profile");
     },
     onError: (error) => {
       if (error.response) {
@@ -57,7 +53,6 @@ export default function LoginPage() {
 
         if (status === 400) message = "Email and password are required";
         else if (status === 401 && data?.message) message = data.message;
-        // "Invalid email provided" or "Incorrect password provided"
         else if (status === 500)
           message = "Internal server error. Please try again.";
 
