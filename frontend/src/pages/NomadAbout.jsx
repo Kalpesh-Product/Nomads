@@ -18,6 +18,7 @@ import Container from "../components/Container";
 import { Controller, useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import blueUnderline from "../assets/blue_underline.png";
 
 const NomadAbout = () => {
   const [loading, setLoading] = useState(false);
@@ -76,7 +77,17 @@ const NomadAbout = () => {
           <div className="grid md:grid-cols-1 gap-20">
             {/* About Us */}
             <div className="space-y-6">
-              <h2 className="text-title font-semibold uppercase">About WONO</h2>
+              {/* <h2 className="text-title font-semibold uppercase">About WONO</h2> */}
+              <div className="flex flex-col items-center relative font-comic uppercase font-bold text-secondary-dark text-[clamp(1.5rem,4vw,3rem)] leading-tight">
+                <div className="relative inline-block">
+                  <h3 className="text-center">About WONO</h3>
+                  <img
+                    src={blueUnderline}
+                    alt=""
+                    className="absolute top-full left-1/2 -translate-x-1/2 w-full h-[40%]"
+                  />
+                </div>
+              </div>
               <p className="text-subtitle leading-relaxed">
                 <strong>WONO</strong> is redefining the global future of work
                 and mobility for the growing Digital Nomad's & Nomad Businesses
