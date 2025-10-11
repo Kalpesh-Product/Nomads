@@ -316,12 +316,32 @@ export const addB2CformSubmission = async (req, res, next) => {
     }
 
     // Send confirmation email if template exists
-    if (config.emailTemplate) {
-      try {
-        await sendMail(config.emailTemplate(validatedData));
-      } catch (err) {
-        console.error("Failed to send confirmation email:", err.message);
-      }
+    // if (config.emailTemplate) {
+    //   try {
+    //     await sendMail(config.emailTemplate(validatedData));
+    //   } catch (err) {
+    //     console.error("Failed to send confirmation email:", err.message);
+    //   }
+    // }
+
+    try {
+      const { firstName, lastName, email } = req.body;
+      const name = `${firstName} ${lastName}`;
+      await sendMail({
+        to: email,
+        subject: "Welcome to WONO Nomads 🎉",
+        text: `Hi ${name || "User"}, thanks for registering with WONO Nomads!`,
+        html: `
+         <h2>Welcome to WONO Nomads</h2>
+            <p>Hi ${payload.name || "User"},</p>
+              <p>We’re thrilled to have you with us.</p>
+    <p>Start exploring and connecting with fellow nomads today.</p>
+            <p>Cheers,<br/>The WONO Team</p>
+          `,
+      });
+      console.log("✅ Registration email sent to", email);
+    } catch (err) {
+      console.error("❌ Failed to send email:", err.message);
     }
 
     res.status(201).json({
