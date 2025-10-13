@@ -33,28 +33,66 @@ export const getUsers = async (req, res, next) => {
   }
 };
 
+// export const saveListings = async (req, res, next) => {
+//   try {
+//     const { listingId, userId } = req.body;
+
+//     if (!listingId || !userId) {
+//       return res.status(400).json({ message: "Missing required fields" });
+//     }
+
+//     // Correct $push syntax
+//     const updatedUser = await NomadUser.findByIdAndUpdate(
+//       userId,
+//       { $push: { saves: listingId } },
+//       { new: true }
+//     );
+
+//     if (!updatedUser) {
+//       return res.status(400).json({ message: "Failed to save listing" });
+//     }
+
+//     return res
+//       .status(200)
+//       .json({ message: "Saved successfully", user: updatedUser });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
 export const saveListings = async (req, res, next) => {
   try {
-    const { listingId, userId } = req.body;
+    const { listingId, userId, isSaved } = req.body;
 
-    if (!listingId || !userId) {
-      return res.status(400).json({ message: "Missing required fields" });
+    if (!listingId || !userId || typeof isSaved !== "boolean") {
+      return res.status(400).json({ message: "Missing or invalid fields" });
     }
 
-    // Correct $push syntax
-    const updatedUser = await NomadUser.findByIdAndUpdate(
-      userId,
-      { $push: { saves: listingId } },
-      { new: true }
-    );
+    let updatedUser;
+
+    if (isSaved) {
+      // Add to likes
+      updatedUser = await NomadUser.findByIdAndUpdate(
+        userId,
+        { $addToSet: { saves: listingId } },
+        { new: true }
+      );
+    } else {
+      // Remove from likes
+      updatedUser = await NomadUser.findByIdAndUpdate(
+        userId,
+        { $pull: { saves: listingId } },
+        { new: true }
+      );
+    }
 
     if (!updatedUser) {
-      return res.status(400).json({ message: "Failed to save listing" });
+      return res.status(400).json({ message: "Failed to update saves" });
     }
 
-    return res
-      .status(200)
-      .json({ message: "Saved successfully", user: updatedUser });
+    return res.status(200).json({
+      message: isSaved ? "You saved" : "You unsaved",
+    });
   } catch (error) {
     next(error);
   }
@@ -143,24 +181,38 @@ export const getLikes = async (req, res) => {
 
 export const likeListings = async (req, res, next) => {
   try {
-    const { listingId, userId } = req.body;
+    const { listingId, userId, isLiked } = req.body;
 
-    if (!listingId || !userId) {
-      return res.status(400).json({ message: "Missing required fields" });
+    if (!listingId || !userId || typeof isLiked !== "boolean") {
+      return res.status(400).json({ message: "Missing or invalid fields" });
     }
 
-    // Correct $push syntax
-    const updatedUser = await NomadUser.findByIdAndUpdate(
-      userId,
-      { $push: { likes: listingId } },
-      { new: true } // returns updated document
-    );
+    let updatedUser;
+
+    if (isLiked) {
+      // Add to likes
+      updatedUser = await NomadUser.findByIdAndUpdate(
+        userId,
+        { $addToSet: { likes: listingId } },
+        { new: true }
+      );
+    } else {
+      // Remove from likes
+      updatedUser = await NomadUser.findByIdAndUpdate(
+        userId,
+        { $pull: { likes: listingId } },
+        { new: true }
+      );
+    }
 
     if (!updatedUser) {
-      return res.status(400).json({ message: "Failed to save listing" });
+      return res.status(400).json({ message: "Failed to update likes" });
     }
 
-    return res.status(200).json({ message: "You liked the listing" });
+    return res.status(200).json({
+      message: isLiked ? "You liked" : "You unliked",
+      likes: updatedUser.likes,
+    });
   } catch (error) {
     next(error);
   }
