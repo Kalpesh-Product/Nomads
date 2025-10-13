@@ -6,6 +6,8 @@ import { useSelector } from "react-redux";
 import { Drawer } from "@mui/material";
 import { IoCloseSharp } from "react-icons/io5";
 import Container from "./Container";
+import { Avatar } from "@mui/material";
+import useAuth from "../hooks/useAuth";
 
 const Header = () => {
   const [open, setOpen] = useState(false);
@@ -14,6 +16,7 @@ const Header = () => {
   const searchParams = new URLSearchParams(location.search);
   const view = searchParams.get("view");
   const showToggle = location.pathname.includes("verticals");
+  const { auth } = useAuth();
 
   const formData = useSelector((state) => state.location.formValues);
   const handleNavigation = (path) => {
@@ -143,16 +146,29 @@ const Header = () => {
             </li>
 
             <div className="px-1 hidden xl:flex xl:gap-4 py-2">
-              <PrimaryButton
-                title="Login"
-                padding="py-1"
-                uppercase
-                handleSubmit={() => navigate("/login")}
-                // handleSubmit={() => {
-                //   window.location.href = "https://wonofe.vercel.app"; // ✅ external redirect
-                // }}
-                className="bg-[#FF5757] flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[7rem] px-4"
-              />
+              {auth?.user ? (
+                <Avatar
+                  onClick={() => navigate("/profile")}
+                  sx={{
+                    bgcolor: "#ff5757",
+                    cursor: "pointer",
+                    width: 40,
+                    height: 40,
+                    fontSize: "1rem",
+                  }}>
+                  {auth.user.firstName
+                    ? auth.user.firstName.charAt(0).toUpperCase()
+                    : "U"}
+                </Avatar>
+              ) : (
+                <PrimaryButton
+                  title="Login"
+                  padding="py-1"
+                  uppercase
+                  handleSubmit={() => navigate("/login")}
+                  className="bg-[#FF5757] flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[7rem] px-4"
+                />
+              )}
             </div>
           </div>
 

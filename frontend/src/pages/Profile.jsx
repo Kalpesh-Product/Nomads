@@ -15,7 +15,7 @@ const Profile = () => {
   const handleLogout = async () => {
     try {
       await logout();
-      navigate("/");
+      navigate("/login");
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -121,24 +121,24 @@ const Profile = () => {
                 value={user?.lastName || ""}
                 InputProps={{ readOnly: true }}
               />
-              <TextField
+              {/* <TextField
                 label="Email"
                 size="small"
                 value={user?.email || ""}
                 InputProps={{ readOnly: true }}
-              />
+              /> */}
               <TextField
                 label="Mobile"
                 size="small"
                 value={user?.mobile || ""}
                 InputProps={{ readOnly: true }}
               />
-              <TextField
+              {/* <TextField
                 label="Country"
                 size="small"
                 value={user?.country || ""}
                 InputProps={{ readOnly: true }}
-              />
+              /> */}
             </div>
 
             <div className="text-center mt-6">
