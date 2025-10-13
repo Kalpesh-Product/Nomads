@@ -326,13 +326,13 @@ export const addB2CformSubmission = async (req, res, next) => {
     }
 
     // Send confirmation email if template exists
-    if (config.emailTemplate) {
-      try {
-        await sendMail(config.emailTemplate(validatedData));
-      } catch (err) {
-        console.error("Failed to send confirmation email:", err.message);
-      }
-    }
+    // if (config.emailTemplate) {
+    //   try {
+    //     await sendMail(config.emailTemplate(validatedData));
+    //   } catch (err) {
+    //     console.error("Failed to send confirmation email:", err.message);
+    //   }
+    // }
 
     res.status(201).json({
       status: "success",

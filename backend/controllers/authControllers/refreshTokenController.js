@@ -1,7 +1,7 @@
-const jwt = require("jsonwebtoken");
-const NomadUser = require("../../models/NomadUser");
+import jwt from "jsonwebtoken";
+import NomadUser from "../../models/NomadUser.js";
 
-const refreshTokenController = async (req, res, next) => {
+export const refreshTokenController = async (req, res, next) => {
   try {
     const cookie = req.cookies;
     if (!cookie?.nomadCookie) {
@@ -35,5 +35,3 @@ const refreshTokenController = async (req, res, next) => {
     next(error);
   }
 };
-
-module.exports = refreshTokenController;
