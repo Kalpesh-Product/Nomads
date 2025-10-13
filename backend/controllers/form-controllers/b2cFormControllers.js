@@ -216,13 +216,23 @@ export const addB2CformSubmission = async (req, res, next) => {
           lastName: d.lastName?.trim(),
           email: d.email?.trim(),
           password: d.password,
-
           mobile: d.mobile?.trim(),
-
           sheetName: d.sheetName,
           submittedAt: new Date(),
         }),
         successMsg: "Sign-up saved successfully.",
+        emailTemplate: (data) => ({
+          to: data.email,
+          subject: "Welcome to WoNo 🌍",
+          text: `Hi ${data.firstName}, welcome to WoNo! Your signup was successful.`,
+          html: `
+      <h2>Welcome to WoNo!</h2>
+      <p>Hi ${data.firstName},</p>
+      <p>Thank you for signing up with <b>WoNo</b>.</p>
+      <p>We’re excited to have you onboard! Our team will review your profile and connect with you shortly to complete the onboarding process.</p>
+      <p>Cheers,<br/>The WoNo Team</p>
+    `,
+        }),
       },
     };
 
