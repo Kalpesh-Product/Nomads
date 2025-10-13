@@ -39,6 +39,7 @@ import TemplateSite from "./pages/company/TemplateSite";
 import TemplateHome from "./pages/company/TemplateHome";
 import NomadAbout from "./pages/NomadAbout";
 import Profile from "./pages/Profile";
+import PersistLogin from "./layout/PersistsLogin";
 
 function getTenantFromHost() {
   const hostname = window.location.hostname; // e.g. "nomad.wono.co" or "nomad.localhost"
@@ -84,31 +85,60 @@ if (tenant === "main") {
     },
   ];
 } else if (tenant === "nomad") {
+  console.log("nomad routes")
   // Nomads subdomain
   routerConfig = [
     {
-      path: "/",
-      element: <NomadLayout />,
+      element: <PersistLogin />,
       children: [
-        { path: "", element: <Home /> },
-        { path: "verticals", element: <GlobalListings /> },
-        { path: "listings", element: <Listings /> },
-        { path: "listings/:company", element: <Product /> },
-        { path: "listings/:company/images", element: <ImageGallery /> },
-        { path: "components", element: <ReusableComponents /> },
-        { path: "contact", element: <Contact /> },
-        { path: "news", element: <DestinationNews /> },
-        { path: "news/news-details", element: <BlogDetails /> },
-        { path: "blog", element: <LocalBlog /> },
-        { path: "blog/blog-details", element: <BlogDetails /> },
-        { path: "career", element: <Career /> },
-        { path: "career/job/:title", element: <JobDetails /> },
-        { path: "login", element: <Login /> },
-        { path: "signup", element: <Signup /> },
-        { path: "about", element: <NomadAbout /> },
-        { path: "profile", element: <Profile /> },
+        {
+          element: <NomadLayout />,
+          path: "/",
+          children: [
+            { path: "", element: <Home /> },
+            { path: "verticals", element: <GlobalListings /> },
+            { path: "listings", element: <Listings /> },
+            { path: "listings/:company", element: <Product /> },
+            { path: "listings/:company/images", element: <ImageGallery /> },
+            { path: "components", element: <ReusableComponents /> },
+            { path: "contact", element: <Contact /> },
+            { path: "news", element: <DestinationNews /> },
+            { path: "news/news-details", element: <BlogDetails /> },
+            { path: "blog", element: <LocalBlog /> },
+            { path: "blog/blog-details", element: <BlogDetails /> },
+            { path: "career", element: <Career /> },
+            { path: "career/job/:title", element: <JobDetails /> },
+            { path: "login", element: <Login /> },
+            { path: "signup", element: <Signup /> },
+            { path: "about", element: <NomadAbout /> },
+            { path: "profile", element: <Profile /> },
+          ],
+        },
       ],
     },
+    // {
+    //   path: "/",
+    //   element: <NomadLayout />,
+    //   children: [
+    //     { path: "", element: <Home /> },
+    //     { path: "verticals", element: <GlobalListings /> },
+    //     { path: "listings", element: <Listings /> },
+    //     { path: "listings/:company", element: <Product /> },
+    //     { path: "listings/:company/images", element: <ImageGallery /> },
+    //     { path: "components", element: <ReusableComponents /> },
+    //     { path: "contact", element: <Contact /> },
+    //     { path: "news", element: <DestinationNews /> },
+    //     { path: "news/news-details", element: <BlogDetails /> },
+    //     { path: "blog", element: <LocalBlog /> },
+    //     { path: "blog/blog-details", element: <BlogDetails /> },
+    //     { path: "career", element: <Career /> },
+    //     { path: "career/job/:title", element: <JobDetails /> },
+    //     { path: "login", element: <Login /> },
+    //     { path: "signup", element: <Signup /> },
+    //     { path: "about", element: <NomadAbout /> },
+    //     { path: "profile", element: <Profile /> },
+    //   ],
+    // },
   ];
 } else if (tenant === "hosts") {
   // Hosts subdomain

@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import NomadUser from "../models/NomadUser.js";
+import NomadUser from "../../models/NomadUser.js";
 
 export const login = async (req, res) => {
   try {
@@ -83,7 +83,6 @@ export const logout = async (req, res, next) => {
       return res.sendStatus(201);
     }
 
-    console.log("refresh token", refreshToken);
     await NomadUser.findOneAndUpdate({ refreshToken }, { refreshToken: "" })
       .lean()
       .exec();
