@@ -44,7 +44,10 @@ export default function Signup() {
       return response.data;
     },
     onSuccess: () => {
-      toast.success("Sign up successful");
+      toast.success(
+        "Signup successful! Please check your email for confirmation."
+      );
+
       reset();
       setOpenModal(true);
     },
