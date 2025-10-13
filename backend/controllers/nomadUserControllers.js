@@ -60,6 +60,87 @@ export const saveListings = async (req, res, next) => {
   }
 };
 
+export const getUserSaves = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid userId" });
+    }
+
+    const user = await NomadUser.findById(userId)
+      .populate({ path: "saves" })
+      .lean();
+
+    if (!user || !user.saves?.length) {
+      return res.status(200).json([]);
+    }
+
+    return res.status(200).json(user.saves);
+  } catch (error) {
+    console.error("[getLikes] error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getSaves = async (req, res) => {
+  try {
+    const users = await NomadUser.find().populate({ path: "saves" }).lean();
+
+    if (!users || users.length === 0) {
+      return res.status(200).json([]);
+    }
+
+    const allSaves = users.flatMap((user) => user.saves || []);
+
+    return res.status(200).json(allSaves);
+  } catch (error) {
+    console.error("[getSaves] error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getUserLikes = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid userId" });
+    }
+
+    const user = await NomadUser.findById(userId)
+      .populate({ path: "likes" })
+      .lean();
+
+    if (!user || !user.likes?.length) {
+      return res.status(200).json([]);
+    }
+
+    // ✅ Return a flat array of liked companies
+    return res.status(200).json(user.likes);
+  } catch (error) {
+    console.error("[getLikes] error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getLikes = async (req, res) => {
+  try {
+    const users = await NomadUser.find().populate({ path: "likes" }).lean();
+
+    if (!users || users.length === 0) {
+      return res.status(200).json([]);
+    }
+
+    const allLikes = users.flatMap((user) => user.likes || []);
+
+    return res.status(200).json(allLikes);
+  } catch (error) {
+    console.error("[getLikes] error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const likeListings = async (req, res, next) => {
   try {
     const { listingId, userId } = req.body;
