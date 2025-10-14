@@ -72,7 +72,8 @@ export default function LoginPage() {
 
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+          className="w-full grid grid-cols-1 md:grid-cols-2 gap-6"
+        >
           {/* Email */}
           <Controller
             name="email"
@@ -113,7 +114,8 @@ export default function LoginPage() {
                       <IconButton
                         onClick={togglePasswordVisibility}
                         edge="end"
-                        tabIndex={-1}>
+                        tabIndex={-1}
+                      >
                         {showPassword ? <FiEyeOff /> : <FiEye />}
                       </IconButton>
                     </InputAdornment>
