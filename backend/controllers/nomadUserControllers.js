@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import NomadUser from "../models/NomadUser.js";
+import bcrypt from "bcrypt";
 
 export const getUsers = async (req, res, next) => {
   try {
@@ -33,32 +34,88 @@ export const getUsers = async (req, res, next) => {
   }
 };
 
-// export const saveListings = async (req, res, next) => {
-//   try {
-//     const { listingId, userId } = req.body;
+export const updateProfile = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { firstName, lastName, country, state, mobile } = req.body;
 
-//     if (!listingId || !userId) {
-//       return res.status(400).json({ message: "Missing required fields" });
-//     }
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid user ID" });
+    }
 
-//     // Correct $push syntax
-//     const updatedUser = await NomadUser.findByIdAndUpdate(
-//       userId,
-//       { $push: { saves: listingId } },
-//       { new: true }
-//     );
+    const user = await NomadUser.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-//     if (!updatedUser) {
-//       return res.status(400).json({ message: "Failed to save listing" });
-//     }
+    if (firstName) user.firstName = firstName.trim();
+    if (lastName) user.lastName = lastName.trim();
+    if (country) user.country = country.trim();
+    if (state) user.state = state.trim();
+    if (mobile) user.mobile = mobile.trim();
 
-//     return res
-//       .status(200)
-//       .json({ message: "Saved successfully", user: updatedUser });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+    const updatedUser = await user.save();
+
+    return res.status(200).json({
+      message: "Profile updated successfully",
+      user: {
+        id: updatedUser._id,
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+        email: updatedUser.email,
+        country: updatedUser.country,
+        state: updatedUser.state,
+        mobile: updatedUser.mobile,
+      },
+    });
+  } catch (error) {
+    console.error("[updateProfile] error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const changePassword = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { oldPassword, newPassword } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid user ID" });
+    }
+
+    if (!oldPassword || !newPassword) {
+      return res
+        .status(400)
+        .json({ message: "Both old and new passwords are required" });
+    }
+
+    const user = await NomadUser.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Incorrect old password" });
+    }
+
+    if (newPassword.length < 6) {
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 6 characters long" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+
+    await user.save();
+
+    return res.status(200).json({ message: "Password changed successfully" });
+  } catch (error) {
+    console.error("[changePassword] error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 export const saveListings = async (req, res, next) => {
   try {

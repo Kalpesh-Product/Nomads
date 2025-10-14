@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import {
+  changePassword,
   getLikes,
   getSaves,
   getUserLikes,
@@ -8,15 +9,15 @@ import {
   getUserSaves,
   likeListings,
   saveListings,
+  updateProfile,
 } from "../controllers/nomadUserControllers.js";
 
 const router = Router();
 
 router.get("/", getUsers);
-router.patch("/save", saveListings);
-router.get("/saves/:userId", getUserSaves);
+router.patch("/profile/:userId", updateProfile);
+router.patch("/password/:userId", changePassword);
 router.patch("/like", likeListings);
-router.get("/saves", getSaves);
 router.get("/likes/:userId", getUserLikes);
 router.get("/likes", getLikes);
 
