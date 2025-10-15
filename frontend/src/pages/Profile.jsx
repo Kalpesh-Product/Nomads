@@ -120,16 +120,6 @@ const Profile = () => {
         >
           Change Password
         </button>
-        <button
-          className={`flex-1 py-3 font-semibold ${
-            activeTab === "saves"
-              ? "bg-[#ff5757] text-white"
-              : "bg-white text-[#ff5757]"
-          }`}
-          onClick={() => handleTabChange("saves")}
-        >
-          My Saves
-        </button>
       </div>
 
       {/* PROFILE TAB */}
@@ -333,37 +323,6 @@ const Profile = () => {
           >
             Submit
           </Button>
-        </div>
-      )}
-
-      {/* MY SAVES TAB */}
-      {activeTab === "saves" && (
-        <div className="bg-white p-6 rounded-lg shadow-sm max-w-6xl mx-auto">
-          <h2 className="text-xl font-bold text-[#ff5757] mb-6">MY SAVES</h2>
-          {/* Existing static saves left untouched */}
-          <h3 className="text-lg font-semibold mb-3">Saved Listings</h3>
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
-            {/* Static demo cards remain unchanged */}
-            {[
-              /* ...your mock data... */
-            ].map((space, idx) => (
-              <div
-                key={idx}
-                className="rounded-lg overflow-hidden border hover:shadow-md transition"
-              >
-                <img
-                  src={space.img}
-                  alt={space.name}
-                  className="h-40 w-full object-cover"
-                />
-                <div className="p-3">
-                  <h4 className="font-semibold text-sm">{space.name}</h4>
-                  <p className="text-xs text-gray-600">{space.location}</p>
-                  <p className="text-xs mt-1">⭐ {space.rating}</p>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       )}
     </div>

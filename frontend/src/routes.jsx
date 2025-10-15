@@ -40,6 +40,7 @@ import TemplateHome from "./pages/company/TemplateHome";
 import NomadAbout from "./pages/NomadAbout";
 import Profile from "./pages/Profile";
 import PersistLogin from "./layout/PersistsLogin";
+import Favorites from "./pages/Favorites";
 
 function getTenantFromHost() {
   const hostname = window.location.hostname; // e.g. "nomad.wono.co" or "nomad.localhost"
@@ -85,7 +86,7 @@ if (tenant === "main") {
     },
   ];
 } else if (tenant === "nomad") {
-  console.log("nomad routes")
+  console.log("nomad routes");
   // Nomads subdomain
   routerConfig = [
     {
@@ -112,6 +113,7 @@ if (tenant === "main") {
             { path: "signup", element: <Signup /> },
             { path: "about", element: <NomadAbout /> },
             { path: "profile", element: <Profile /> },
+            { path: "favorites", element: <Favorites /> },
           ],
         },
       ],

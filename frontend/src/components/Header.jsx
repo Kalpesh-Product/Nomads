@@ -17,6 +17,7 @@ import { IoCloseSharp } from "react-icons/io5";
 import Container from "./Container";
 import { FaUserTie } from "react-icons/fa6";
 import { FiLogOut } from "react-icons/fi";
+import { AiFillHeart } from "react-icons/ai";
 import useAuth from "../hooks/useAuth";
 import useLogout from "../hooks/useLogout";
 
@@ -40,6 +41,10 @@ const Header = () => {
 
   const handleProfileClick = () => {
     navigate("/profile");
+    handlePopoverClose();
+  };
+  const handleFavoriteClick = () => {
+    navigate("/favorites");
     handlePopoverClose();
   };
 
@@ -182,6 +187,13 @@ const Header = () => {
             <div className="px-1 hidden xl:flex xl:gap-4 py-2">
               {auth?.user ? (
                 <>
+                  <div className="flex justify-center items-center">
+                    <AiFillHeart
+                      className="text-[#ff5757]"
+                      size={28}
+                      onClick={handleFavoriteClick}
+                    />
+                  </div>
                   <Avatar
                     onClick={handleAvatarClick} // 🔹 open dropdown
                     sx={{
@@ -224,6 +236,18 @@ const Header = () => {
                           <ListItemText primary="Profile" />
                         </ListItem>
 
+                        <Divider />
+
+                        <ListItem
+                          button
+                          onClick={handleFavoriteClick}
+                          className="hover:text-red-600 transition-all duration-100 text-gray-500 cursor-pointer"
+                        >
+                          <ListItemIcon>
+                            <AiFillHeart className="text-gray-500" />
+                          </ListItemIcon>
+                          <ListItemText primary="Favorites" />
+                        </ListItem>
                         <Divider />
 
                         <ListItem
