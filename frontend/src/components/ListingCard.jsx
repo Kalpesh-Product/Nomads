@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   AiFillHeart,
   AiFillStar,
@@ -8,15 +8,56 @@ import {
 
 import { useNavigate } from "react-router-dom";
 
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import axiosInstance from "../utils/axios";
+import useAuth from "../hooks/useAuth";
+
 const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
   const navigate = useNavigate();
   const [favorites, setFavorites] = useState([]);
 
+  const { user } = useAuth(); // assuming your logged-in user info is available here
+  const queryClient = useQueryClient();
+
+  const { mutate: likeListing } = useMutation({
+    mutationFn: async ({ listingId, isLiked }) => {
+      const { data } = await axiosInstance.patch(`/user/like`, {
+        listingId,
+        userId: user?._id,
+        isLiked,
+      });
+      return data;
+    },
+    onSuccess: (data) => {
+      toast.success(data?.message || "Updated successfully");
+      queryClient.invalidateQueries(["userLikes", user?._id]);
+    },
+    onError: (err) => {
+      toast.error(err.response?.data?.message || "Something went wrong");
+    },
+  });
+
   const toggleFavorite = (id) => {
+    const isLiked = !favorites.includes(id);
+
+    // instant UI feedback
     setFavorites((prev) =>
-      prev.includes(id) ? prev.filter((fav) => fav !== id) : [...prev, id]
+      isLiked ? [...prev, id] : prev.filter((fav) => fav !== id)
     );
+
+    // backend sync
+    likeListing({ listingId: id, isLiked });
   };
+
+  useEffect(() => {
+    if (!user?._id) return;
+
+    axiosInstance.get(`/api/user/likes/${user._id}`).then((res) => {
+      const likedIds = res.data?.map((item) => item._id) || [];
+      setFavorites(likedIds);
+    });
+  }, [user?._id]);
 
   const typeLabels = {
     coworking: "CoWorking",
