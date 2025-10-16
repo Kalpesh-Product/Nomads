@@ -41,6 +41,8 @@ import NomadAbout from "./pages/NomadAbout";
 import Profile from "./pages/Profile";
 import PersistLogin from "./layout/PersistsLogin";
 import Favorites from "./pages/Favorites";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 function getTenantFromHost() {
   const hostname = window.location.hostname; // e.g. "nomad.wono.co" or "nomad.localhost"
@@ -110,6 +112,8 @@ if (tenant === "main") {
             { path: "career", element: <Career /> },
             { path: "career/job/:title", element: <JobDetails /> },
             { path: "login", element: <Login /> },
+            { path: "forgot-password", element: <ForgotPassword /> },
+            { path: "reset-password", element: <ResetPassword /> },
             { path: "signup", element: <Signup /> },
             { path: "about", element: <NomadAbout /> },
             { path: "profile", element: <Profile /> },
