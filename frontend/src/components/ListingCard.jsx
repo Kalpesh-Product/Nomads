@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import axiosInstance from "../utils/axios";
+import axiosPrivate from "../utils/axios";
 import useAuth from "../hooks/useAuth";
 
 const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
@@ -22,7 +22,7 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
 
   const { mutate: likeListing } = useMutation({
     mutationFn: async ({ listingId, isLiked }) => {
-      const { data } = await axiosInstance.patch(`/user/like`, {
+      const { data } = await axiosPrivate.patch(`/user/like`, {
         listingId,
         userId: user?._id,
         isLiked,
@@ -53,7 +53,7 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
   useEffect(() => {
     if (!user?._id) return;
 
-    axiosInstance.get(`/api/user/likes/${user._id}`).then((res) => {
+    axiosPrivate.get(`/api/user/likes/${user._id}`).then((res) => {
       const likedIds = res.data?.map((item) => item._id) || [];
       setFavorites(likedIds);
     });

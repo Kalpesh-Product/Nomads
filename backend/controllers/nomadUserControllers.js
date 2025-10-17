@@ -36,6 +36,7 @@ export const getUsers = async (req, res, next) => {
 
 export const updateProfile = async (req, res) => {
   try {
+    console.log("profile");
     const { userId } = req.params;
     const { firstName, lastName, country, state, mobile } = req.body;
 

@@ -2,7 +2,7 @@ import { TextField, IconButton, InputAdornment } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import axios, { axiosInstance } from "../utils/axios"; // ✅ use same axios config as signup
+import axios, { axiosPrivate } from "../utils/axios"; // ✅ use same axios config as signup
 import toast from "react-hot-toast";
 import PrimaryButton from "../components/PrimaryButton";
 import { Link, useNavigate } from "react-router-dom";

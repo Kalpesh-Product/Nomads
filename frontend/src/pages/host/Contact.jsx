@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
 import { useMutation } from "@tanstack/react-query";
-import axiosInstance from "../../utils/axios";
+import axiosPrivate from "../../utils/axios";
 import { Controller, useForm } from "react-hook-form";
 import {
   TextField,

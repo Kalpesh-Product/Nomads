@@ -1,6 +1,6 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import axiosInstance from "../utils/axios";
+import axiosPrivate from "../utils/axios";
 import ListingCard from "../components/ListingCard";
 import Container from "../components/Container";
 import useAuth from "../hooks/useAuth";
@@ -15,7 +15,7 @@ const Favorites = () => {
     queryKey: ["userLikes", userId],
     queryFn: async () => {
       if (!userId) return [];
-      const res = await axiosInstance.get(`/user/likes/${userId}`);
+      const res = await axiosPrivate.get(`/user/likes/${userId}`);
       return Array.isArray(res.data) ? res.data : [];
     },
     enabled: !!userId,

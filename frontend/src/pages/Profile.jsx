@@ -3,12 +3,16 @@ import { TextField, Button, Avatar } from "@mui/material";
 import useAuth from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import useLogout from "../hooks/useLogout";
-import axiosInstance from "../utils/axios";
+import axiosPrivate from "../utils/axios";
 import toast from "react-hot-toast";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState("profile");
   const navigate = useNavigate();
+  const axiosPrivate = useAxiosPrivate();
+  const queryClient = useQueryClient();
   const { auth, setAuth } = useAuth();
   console.log("auth.user:", auth?.user);
   const logout = useLogout();
@@ -48,22 +52,27 @@ const Profile = () => {
   };
 
   // 🔹 Save profile updates
-  const handleProfileSave = async () => {
-    try {
-      const res = await axiosInstance.patch(
+
+  const { mutate: updateProfile, isPending: isUpdatePending } = useMutation({
+    mutationKey: ["updateProfile"],
+    mutationFn: async ({ userId, profileData }) => {
+      const response = await axiosPrivate.patch(
         `/user/profile/${userId}`,
-        profileForm
+        profileData
       );
-      toast.success("Profile updated successfully");
-      setAuth((prev) => ({
-        ...prev,
-        user: { ...prev.user, ...res.data.user },
-      }));
-      setEditMode(false);
-    } catch (error) {
+      return response.data;
+    },
+    onSuccess: (data) => {
+      // Refetch the user profile query
+      queryClient.invalidateQueries({
+        queryKey: ["userProfile", data.user._id],
+      });
+      toast.success(data.message || "Profile updated successfully");
+    },
+    onError: (error) => {
       toast.error(error.response?.data?.message || "Failed to update profile");
-    }
-  };
+    },
+  });
 
   // 🔹 Handle password change
   const handlePasswordChange = (e) => {
@@ -81,7 +90,7 @@ const Profile = () => {
       return toast.error("New passwords do not match");
 
     try {
-      const res = await axiosInstance.patch(`/user/password/${userId}`, {
+      const res = await axiosPrivate.patch(`/user/password/${userId}`, {
         oldPassword,
         newPassword,
       });
@@ -201,7 +210,7 @@ const Profile = () => {
                 onChange={handleProfileChange}
                 InputProps={{ readOnly: !editMode }}
               />
-              <TextField
+              {/* <TextField
                 label="Country"
                 size="small"
                 name="country"
@@ -216,7 +225,7 @@ const Profile = () => {
                 value={profileForm.state}
                 onChange={handleProfileChange}
                 InputProps={{ readOnly: !editMode }}
-              />
+              /> */}
             </div>
 
             <div className="text-center mt-6">
@@ -231,10 +240,14 @@ const Profile = () => {
                       mr: 2,
                       "&:hover": { bgcolor: "#1a3b8a" },
                     }}
-                    onClick={handleProfileSave}
+                    onClick={() =>
+                      updateProfile({ userId, profileData: profileForm })
+                    }
+                    disabled={isUpdatePending}
                   >
-                    Save
+                    {isUpdatePending ? "Saving..." : "Save"}
                   </Button>
+
                   <Button
                     variant="outlined"
                     sx={{
