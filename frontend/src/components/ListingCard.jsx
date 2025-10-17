@@ -10,28 +10,35 @@ import { useNavigate } from "react-router-dom";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import axiosPrivate from "../utils/axios";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+
 import useAuth from "../hooks/useAuth";
 
 const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
   const navigate = useNavigate();
   const [favorites, setFavorites] = useState([]);
 
-  const { user } = useAuth(); // assuming your logged-in user info is available here
+  const { auth } = useAuth();
+  const user = auth?.user || {};
+  const userId = auth?.user?._id || auth?.user?.id;
+
   const queryClient = useQueryClient();
 
+  const axiosPrivate = useAxiosPrivate();
+
   const { mutate: likeListing } = useMutation({
-    mutationFn: async ({ listingId, isLiked }) => {
+    mutationFn: async ({ listingId, isLiked, userId }) => {
       const { data } = await axiosPrivate.patch(`/user/like`, {
         listingId,
-        userId: user?._id,
         isLiked,
+        userId,
       });
       return data;
     },
     onSuccess: (data) => {
       toast.success(data?.message || "Updated successfully");
-      queryClient.invalidateQueries(["userLikes", user?._id]);
+      // ✅ Update local favorites immediately for better UX
+      setFavorites(data.likes || []);
     },
     onError: (err) => {
       toast.error(err.response?.data?.message || "Something went wrong");
@@ -41,13 +48,13 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
   const toggleFavorite = (id) => {
     const isLiked = !favorites.includes(id);
 
-    // instant UI feedback
+    // ✅ Update local state instantly for snappy UI
     setFavorites((prev) =>
       isLiked ? [...prev, id] : prev.filter((fav) => fav !== id)
     );
 
-    // backend sync
-    likeListing({ listingId: id, isLiked });
+    // ✅ Trigger backend sync (which will respond with "You liked"/"You unliked")
+    likeListing({ listingId: id, isLiked, userId });
   };
 
   useEffect(() => {
@@ -58,6 +65,20 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
       setFavorites(likedIds);
     });
   }, [user?._id]);
+
+  // useEffect(() => {
+  //   if (!user?._id) return;
+  //   const fetchLikes = async () => {
+  //     try {
+  //       const res = await axiosPrivate.get(`/api/user/likes/${user._id}`);
+  //       const likedIds = res.data?.map((item) => item._id) || [];
+  //       setFavorites(likedIds);
+  //     } catch (err) {
+  //       console.error("Failed to load liked listings:", err);
+  //     }
+  //   };
+  //   fetchLikes();
+  // }, [user?._id]);
 
   const typeLabels = {
     coworking: "CoWorking",

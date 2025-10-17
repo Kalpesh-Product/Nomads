@@ -3,7 +3,6 @@ import { TextField, Button, Avatar } from "@mui/material";
 import useAuth from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import useLogout from "../hooks/useLogout";
-import axiosPrivate from "../utils/axios";
 import toast from "react-hot-toast";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -13,9 +12,9 @@ const Profile = () => {
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
   const queryClient = useQueryClient();
-  const { auth, setAuth } = useAuth();
-  console.log("auth.user:", auth?.user);
+  const { auth } = useAuth();
   const logout = useLogout();
+
   const user = auth?.user || {};
   const userId = auth?.user?._id || auth?.user?.id;
 
@@ -51,8 +50,7 @@ const Profile = () => {
     setProfileForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // 🔹 Save profile updates
-
+  // 🔹 Update Profile Mutation
   const { mutate: updateProfile, isPending: isUpdatePending } = useMutation({
     mutationKey: ["updateProfile"],
     mutationFn: async ({ userId, profileData }) => {
@@ -63,11 +61,11 @@ const Profile = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      // Refetch the user profile query
       queryClient.invalidateQueries({
         queryKey: ["userProfile", data.user._id],
       });
       toast.success(data.message || "Profile updated successfully");
+      setEditMode(false);
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || "Failed to update profile");
@@ -80,7 +78,30 @@ const Profile = () => {
     setPasswordForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handlePasswordSubmit = async () => {
+  // 🔹 Change Password Mutation (using TanStack)
+  const { mutate: changePassword, isPending: isPasswordPending } = useMutation({
+    mutationKey: ["changePassword"],
+    mutationFn: async ({ userId, oldPassword, newPassword }) => {
+      const response = await axiosPrivate.patch(`/user/password/${userId}`, {
+        oldPassword,
+        newPassword,
+      });
+      return response.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data.message || "Password changed successfully");
+      setPasswordForm({
+        oldPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || "Failed to change password");
+    },
+  });
+
+  const handlePasswordSubmit = () => {
     const { oldPassword, newPassword, confirmPassword } = passwordForm;
 
     if (!oldPassword || !newPassword || !confirmPassword)
@@ -89,20 +110,7 @@ const Profile = () => {
     if (newPassword !== confirmPassword)
       return toast.error("New passwords do not match");
 
-    try {
-      const res = await axiosPrivate.patch(`/user/password/${userId}`, {
-        oldPassword,
-        newPassword,
-      });
-      toast.success(res.data.message || "Password changed successfully");
-      setPasswordForm({
-        oldPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to change password");
-    }
+    changePassword({ userId, oldPassword, newPassword });
   };
 
   return (
@@ -210,22 +218,6 @@ const Profile = () => {
                 onChange={handleProfileChange}
                 InputProps={{ readOnly: !editMode }}
               />
-              {/* <TextField
-                label="Country"
-                size="small"
-                name="country"
-                value={profileForm.country}
-                onChange={handleProfileChange}
-                InputProps={{ readOnly: !editMode }}
-              />
-              <TextField
-                label="State"
-                size="small"
-                name="state"
-                value={profileForm.state}
-                onChange={handleProfileChange}
-                InputProps={{ readOnly: !editMode }}
-              /> */}
             </div>
 
             <div className="text-center mt-6">
@@ -333,8 +325,9 @@ const Profile = () => {
               "&:hover": { bgcolor: "#1a3b8a" },
             }}
             onClick={handlePasswordSubmit}
+            disabled={isPasswordPending}
           >
-            Submit
+            {isPasswordPending ? "Submitting..." : "Submit"}
           </Button>
         </div>
       )}
