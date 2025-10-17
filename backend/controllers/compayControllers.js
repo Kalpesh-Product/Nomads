@@ -122,8 +122,6 @@ export const bulkInsertCompanies = async (req, res, next) => {
           }
         }
       });
-
-    // return res.status(200).json({});
   } catch (error) {
     console.log(error);
     next(error);
