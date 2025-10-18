@@ -373,7 +373,6 @@ export const getCompaniesData = async (req, res, next) => {
       }
 
       const user = await NomadUser.findOne({ _id: userId });
-      console.log("user", user);
 
       companyData = companyData.map((data) => {
         const isLiked = user.likes.some(
@@ -384,7 +383,6 @@ export const getCompaniesData = async (req, res, next) => {
       });
     }
 
-    console.log("companyData", companyData);
     res.status(200).json(companyData);
   } catch (error) {
     console.log(error);
