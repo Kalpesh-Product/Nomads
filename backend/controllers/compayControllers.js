@@ -365,9 +365,8 @@ export const getCompaniesData = async (req, res, next) => {
       filteredCompanies = companies;
     }
 
-    const companyData = enrichCompanies(filteredCompanies);
+    let companyData = enrichCompanies(filteredCompanies);
 
-    let transformCompany = [];
     if (userId) {
       if (!mongoose.Types.ObjectId.isValid(userId)) {
         return res.status(400).json({ message: "Invalid user id provided" });
@@ -376,7 +375,7 @@ export const getCompaniesData = async (req, res, next) => {
       const user = await NomadUser.findOne({ _id: userId });
       console.log("user", user);
 
-      transformCompany = companyData.map((data) => {
+      companyData = companyData.map((data) => {
         const isLiked = user.likes.some(
           (like) => like.toString() === data._id.toString()
         );
@@ -385,9 +384,8 @@ export const getCompaniesData = async (req, res, next) => {
       });
     }
 
-    console.log("transformCompany", transformCompany);
-
-    res.status(200).json(transformCompany);
+    console.log("companyData", companyData);
+    res.status(200).json(companyData);
   } catch (error) {
     console.log(error);
     next(error);
