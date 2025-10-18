@@ -8,6 +8,7 @@ import mongoose from "mongoose";
 import Lead from "../models/Lead.js";
 import axios from "axios";
 import TestListing from "../models/TestCompany.js";
+import NomadUser from "../models/NomadUser.js";
 
 // Utility to calculate distance between two lat/lng points in meters
 function getDistanceFromLatLonInM(lat1, lon1, lat2, lon2) {
@@ -319,7 +320,7 @@ export const getCompaniesData = async (req, res, next) => {
     const reviews = await Review.find().lean().exec();
     const poc = await PointOfContact.find().lean().exec();
 
-    const { country, state, type } = req.query;
+    const { country, state, type, userId } = req.query;
 
     // Base company dataset with reviews and active POC
     const enrichCompanies = (base) => {
@@ -364,7 +365,23 @@ export const getCompaniesData = async (req, res, next) => {
       filteredCompanies = companies;
     }
 
-    const companyData = enrichCompanies(filteredCompanies);
+    let companyData = enrichCompanies(filteredCompanies);
+
+    if (userId) {
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+        return res.status(400).json({ message: "Invalid user id provided" });
+      }
+
+      const user = await NomadUser.findOne({ _id: userId });
+
+      companyData = companyData.map((data) => {
+        const isLiked = user.likes.some(
+          (like) => like.toString() === data._id.toString()
+        );
+
+        return { ...data, isLiked };
+      });
+    }
 
     res.status(200).json(companyData);
   } catch (error) {
