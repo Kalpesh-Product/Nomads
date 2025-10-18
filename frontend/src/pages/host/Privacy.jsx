@@ -7,7 +7,8 @@ const HostPrivacy = () => {
   const navigate = useNavigate();
   const sections = [
     {
-      title: "Last Updated: 2nd October 2024",
+      // title: "Last Updated: 2nd October 2024",
+      title: "",
       content: (
         <>
           <p>
@@ -18,7 +19,8 @@ const HostPrivacy = () => {
             "Service"), located at{" "}
             <span
               className="text-primary-blue underline cursor-pointer"
-              onClick={() => navigate("/hosts")}>
+              onClick={() => navigate("/hosts")}
+            >
               www.wono.co
             </span>
             , as well as your rights in relation to your personal data.
@@ -258,12 +260,14 @@ const HostPrivacy = () => {
             <span>SINGAPORE - 079903</span>
             <a
               className="text-primary-blue mt-1"
-              href="mailto:response@wono.co">
+              href="mailto:response@wono.co"
+            >
               response@wono.co
             </a>
             <span
               className="text-primary-blue cursor-pointer max-w-fit"
-              onClick={() => navigate("/contact")}>
+              onClick={() => navigate("/contact")}
+            >
               Contact us
             </span>
           </div>
