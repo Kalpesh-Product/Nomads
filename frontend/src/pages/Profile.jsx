@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import { TextField, Button, Avatar } from "@mui/material";
 import useAuth from "../hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import useLogout from "../hooks/useLogout";
 import toast from "react-hot-toast";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import Favorites from "./Favorites";
 
 const Profile = () => {
-  const [activeTab, setActiveTab] = useState("profile");
+  // const [activeTab, setActiveTab] = useState("profile");
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
   const queryClient = useQueryClient();
@@ -17,6 +18,17 @@ const Profile = () => {
 
   const user = auth?.user || {};
   const userId = auth?.user?._id || auth?.user?.id;
+
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Default tab
+  const initialTab = searchParams.get("tab") || "profile";
+  const [activeTab, setActiveTab] = useState(initialTab);
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setSearchParams({ tab }); // update URL when switching tabs
+  };
 
   const [editMode, setEditMode] = useState(false);
   const [profileForm, setProfileForm] = useState({
@@ -33,7 +45,7 @@ const Profile = () => {
     confirmPassword: "",
   });
 
-  const handleTabChange = (tab) => setActiveTab(tab);
+  // const handleTabChange = (tab) => setActiveTab(tab);
 
   const handleLogout = async () => {
     try {
@@ -136,6 +148,16 @@ const Profile = () => {
           onClick={() => handleTabChange("password")}
         >
           Change Password
+        </button>
+        <button
+          className={`flex-1 py-3 font-semibold ${
+            activeTab === "favorites"
+              ? "bg-[#ff5757] text-white"
+              : "bg-white text-[#ff5757]"
+          }`}
+          onClick={() => handleTabChange("favorites")}
+        >
+          Favorites
         </button>
       </div>
 
@@ -331,6 +353,9 @@ const Profile = () => {
           </Button>
         </div>
       )}
+
+      {/* FAVORITES TAB */}
+      {activeTab === "favorites" && <Favorites />}
     </div>
   );
 };

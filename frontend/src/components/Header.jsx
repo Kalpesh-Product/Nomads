@@ -40,11 +40,12 @@ const Header = () => {
   const openPopover = Boolean(anchorEl);
 
   const handleProfileClick = () => {
-    navigate("/profile");
+    navigate("/profile?tab=profile");
     handlePopoverClose();
   };
   const handleFavoriteClick = () => {
-    navigate("/favorites");
+    // navigate("/favorites");
+    navigate("/profile?tab=favorites");
     handlePopoverClose();
   };
 
