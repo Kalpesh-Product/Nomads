@@ -182,7 +182,8 @@ const HostContact = () => {
               <Box
                 component="form"
                 onSubmit={handleSubmit((data) => submitContactForm(data))}
-                sx={{ mt: 0 }}>
+                sx={{ mt: 0 }}
+              >
                 <h2 className="text-title font-semibold uppercase mb-4 text-center md:text-center">
                   Connect With Us
                 </h2>
@@ -278,7 +279,7 @@ const HostContact = () => {
                           required
                           variant="standard"
                           error={!!fieldState.error}
-                          label={"Type of Partnership"}
+                          label={"Reason to Connect"}
                           select
                           helperText={fieldState?.error?.message}
                           slotProps={{
@@ -288,9 +289,19 @@ const HostContact = () => {
                                 "&.Mui-focused": { color: "black" }, // keep black when focused
                               },
                             },
-                          }}>
+                          }}
+                        >
                           <MenuItem value="" disabled>
                             Select Type
+                          </MenuItem>
+                          <MenuItem value="Nomad Booking Query">
+                            Nomad Booking Query
+                          </MenuItem>
+                          <MenuItem value="Workation Booking Query">
+                            Workation Booking Query
+                          </MenuItem>
+                          <MenuItem value="Nomad & WoNo Partnerships">
+                            Nomad & WoNo Partnerships
                           </MenuItem>
                           <MenuItem value="B2B SaaS Technology Licensing">
                             B2B SaaS Technology Licensing
@@ -347,7 +358,8 @@ const HostContact = () => {
                         px: 14,
                         py: 1,
                         "&:hover": { bgcolor: "#333" },
-                      }}>
+                      }}
+                    >
                       {isContactPending && (
                         <CircularProgress
                           size={16}
@@ -406,7 +418,8 @@ const HostContact = () => {
           <div className="bg-white rounded shadow-lg w-full max-w-md p-6 relative">
             <button
               onClick={handleCloseModal}
-              className="absolute top-2 right-2 text-gray-600 hover:text-black">
+              className="absolute top-2 right-2 text-gray-600 hover:text-black"
+            >
               <AiOutlineClose size={20} />
             </button>
             <h3 className="text-lg font-bold mb-2">Success</h3>
@@ -416,7 +429,8 @@ const HostContact = () => {
             <div className="text-right">
               <button
                 onClick={handleCloseModal}
-                className="bg-black text-white px-4 py-2 rounded hover:opacity-90">
+                className="bg-black text-white px-4 py-2 rounded hover:opacity-90"
+              >
                 Close
               </button>
             </div>
