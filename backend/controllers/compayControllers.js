@@ -129,6 +129,67 @@ export const bulkInsertCompanies = async (req, res, next) => {
   }
 };
 
+export const bulkUpdateCompanyInclusions = async (req, res, next) => {
+  try {
+    const file = req.file;
+    if (!file) {
+      return res
+        .status(400)
+        .json({ message: "Please provide a valid CSV file" });
+    }
+
+    const updates = [];
+
+    const stream = Readable.from(file.buffer.toString("utf-8").trim());
+    stream
+      .pipe(csvParser())
+      .on("data", (row) => {
+        const state = row["State"]?.trim();
+        const businessId = row["Business ID"]?.trim();
+        const inclusions = row["Inclusions"]?.trim();
+
+        // Only collect Chiang Mai rows with valid Business ID and inclusions
+        if (state === "Chiang Mai" && businessId && inclusions) {
+          updates.push({
+            updateOne: {
+              filter: { businessId },
+              update: { $set: { inclusions } },
+            },
+          });
+        }
+      })
+      .on("end", async () => {
+        try {
+          if (updates.length === 0) {
+            return res.status(400).json({
+              message:
+                "No valid Chiang Mai rows with Business ID and Inclusions found in CSV",
+            });
+          }
+
+          // Perform bulkWrite operation
+          const result = await Company.bulkWrite(updates);
+
+          res.status(200).json({
+            message: "Bulk inclusions update for Chiang Mai completed",
+            totalProcessed: updates.length,
+            matchedCount: result.matchedCount,
+            modifiedCount: result.modifiedCount,
+          });
+        } catch (updateError) {
+          console.error(updateError);
+          res.status(500).json({
+            message: "Error during bulk inclusions update",
+            error: updateError.message,
+          });
+        }
+      });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
 export const createCompany = async (req, res, next) => {
   try {
     const {

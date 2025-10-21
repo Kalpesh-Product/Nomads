@@ -25,6 +25,12 @@ router.post(
   bulkInsertCompanies
 );
 
+router.patch(
+  "/bulk-update-companies",
+  upload.single("inclusions"),
+  bulkUpdateCompanyInclusions
+);
+
 router.get("/companies", getCompaniesData);
 router.patch("/activate-product", activateProduct);
 router.get("/get-single-company-data", getCompanyData);
