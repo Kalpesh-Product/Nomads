@@ -47,15 +47,16 @@ const Product = () => {
   const axiosPrivate = useAxiosPrivate();
 
   const { data: companyDetails, isPending: isCompanyDetails } = useQuery({
-    queryKey: ["companyDetails", companyId, userId], // ✅ include userId in key
+    queryKey: ["companyDetails", companyId, userId || "guest"], // safe for guests too
     queryFn: async () => {
-      const response = await axiosPrivate.get(
-        `company/get-single-company-data?companyId=${companyId}&companyType=${type}&userId=${userId}`
-      );
+      const url = userId
+        ? `company/get-single-company-data?companyId=${companyId}&companyType=${type}&userId=${userId}`
+        : `company/get-single-company-data?companyId=${companyId}&companyType=${type}`;
+      const response = await axios.get(url); // ✅ use public axios when not logged in
       return response?.data;
     },
-    enabled: !!companyId && !!userId,
-    refetchOnMount: "always", // ✅ always get fresh liked status
+    enabled: !!companyId, // ✅ allow guests to load
+    refetchOnMount: "always",
   });
 
   console.log("companuDetials ", companyDetails);
@@ -372,9 +373,9 @@ const Product = () => {
                       className="cursor-pointer relative"
                     >
                       {heartClicked ? (
-                        <IoIosHeart className="text-[#ff5757]" />
+                        <IoIosHeart className="text-[#ff5757]" size={22} />
                       ) : (
-                        <IoIosHeartEmpty />
+                        <IoIosHeartEmpty size={22} />
                       )}
                     </div>
 
