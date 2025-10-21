@@ -315,6 +315,7 @@ export const createCompany = async (req, res, next) => {
 };
 
 export const getCompaniesData = async (req, res, next) => {
+  console.log("🔥 getCompaniesData HIT");
   try {
     const companies = await Company.find({ isActive: true }).lean().exec();
     const reviews = await Review.find().lean().exec();
@@ -364,6 +365,14 @@ export const getCompaniesData = async (req, res, next) => {
     else {
       filteredCompanies = companies;
     }
+
+    // 🟡 Add these temporary debug lines here:
+    console.log("🔍 Filtering for country:", country, "state:", state);
+    console.log("✅ Matched companies count:", filteredCompanies.length);
+    console.log(
+      "Example match:",
+      filteredCompanies.length > 0 ? filteredCompanies[0].companyName : "None"
+    );
 
     let companyData = enrichCompanies(filteredCompanies);
 

@@ -17,6 +17,10 @@ import useAuth from "../hooks/useAuth";
 const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
   const navigate = useNavigate();
   const [favorites, setFavorites] = useState([]);
+  // Track initial liked state per card
+  const [isInitiallyLiked, setIsInitiallyLiked] = useState(
+    item?.isLiked || false
+  );
 
   const { auth } = useAuth();
   const user = auth?.user || {};
@@ -46,15 +50,22 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
   });
 
   const toggleFavorite = (id) => {
-    const isLiked = !favorites.includes(id);
+    // Determine the current like state based on both backend and local data
+    const isCurrentlyLiked = favorites.includes(id) || isInitiallyLiked;
+    const newLikedState = !isCurrentlyLiked; // what we’re switching to
 
-    // ✅ Update local state instantly for snappy UI
-    setFavorites((prev) =>
-      isLiked ? [...prev, id] : prev.filter((fav) => fav !== id)
-    );
+    // Optimistically update UI
+    if (newLikedState) {
+      setFavorites((prev) => [...prev, id]);
+    } else {
+      setFavorites((prev) => prev.filter((fav) => fav !== id));
+    }
 
-    // ✅ Trigger backend sync (which will respond with "You liked"/"You unliked")
-    likeListing({ listingId: id, isLiked, userId });
+    // Sync both trackers
+    setIsInitiallyLiked(newLikedState);
+
+    // Trigger backend
+    likeListing({ listingId: id, isLiked: newLikedState, userId });
   };
 
   useEffect(() => {
@@ -118,10 +129,9 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
                 toggleFavorite(item._id);
               }}
             >
-              {favorites.includes(item._id) ? (
+              {favorites.includes(item._id) || isInitiallyLiked ? (
                 <AiFillHeart className="text-[#ff5757]" size={22} />
               ) : (
-                // <AiOutlineHeart className="text-white" size={22} />
                 <AiTwotoneHeart className="text-white" size={22} />
               )}
             </button>

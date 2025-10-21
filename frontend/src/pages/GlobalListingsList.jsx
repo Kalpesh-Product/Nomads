@@ -21,6 +21,7 @@ import { IoSearch } from "react-icons/io5";
 import SearchBarCombobox from "../components/SearchBarCombobox.jsx";
 import { AnimatePresence, motion } from "motion/react";
 import { Helmet } from "@dr.pogodin/react-helmet";
+import useAuth from "../hooks/useAuth.js";
 
 const GlobalListingsList = () => {
   const [favorites, setFavorites] = useState([]);
@@ -34,6 +35,10 @@ const GlobalListingsList = () => {
       category: "",
     },
   });
+
+  const { auth } = useAuth();
+  const user = auth?.user || {};
+  const userId = auth?.user?._id || auth?.user?.id;
   const selectedCountry = watch("country");
   const selectedState = watch("location");
   const { data: locations = [], isLoading: isLocations } = useQuery({
@@ -100,13 +105,16 @@ const GlobalListingsList = () => {
       const { country, location, category } = formData || {};
 
       const response = await axios.get(
-        `company/companies?country=${country}&state=${location}`
+        `company/companies?country=${country}&state=${location}&userId=${
+          userId || ""
+        }`
       );
 
       // return response.data;
       return Array.isArray(response.data) ? response.data : [];
     },
     enabled: !!formData?.country && !!formData?.location, // ✅ prevents fetching on empty state
+    refetchOnMount: "always", // ✅ forces refetch on every mount
   });
 
   console.log("location data :", listingsData);
