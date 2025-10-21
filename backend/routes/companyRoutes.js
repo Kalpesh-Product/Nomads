@@ -16,6 +16,7 @@ import {
   addTemplateLink,
   activateProduct,
   updateLeads,
+  bulkUpdateCompanyInclusions,
 } from "../controllers/compayControllers.js";
 
 const router = Router();

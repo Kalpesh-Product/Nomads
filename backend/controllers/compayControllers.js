@@ -518,7 +518,7 @@ export const getCompanyData = async (req, res, next) => {
   };
 
   try {
-    const { companyId, companyType } = req.query;
+    const { companyId, companyType, userId } = req.query;
 
     let companyQuery = {};
 
@@ -543,7 +543,23 @@ export const getCompanyData = async (req, res, next) => {
 
     // const companyData = await companyQuery;
 
-    const companyData = await Company.findOne(companyQuery).lean().exec();
+    const company = await Company.findOne(companyQuery).lean().exec();
+
+    let companyData = company;
+
+    if (userId) {
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+        return res.status(400).json({ message: "Invalid user id provided" });
+      }
+
+      const user = await NomadUser.findOne({ _id: userId });
+
+      const isLiked = user.likes.some(
+        (like) => like.toString() === companyData._id.toString()
+      );
+
+      companyData = { ...companyData, isLiked };
+    }
 
     if (!companyData) {
       return res.status(404).json({ error: "Company not found" });
