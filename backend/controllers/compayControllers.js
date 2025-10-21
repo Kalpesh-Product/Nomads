@@ -129,6 +129,67 @@ export const bulkInsertCompanies = async (req, res, next) => {
   }
 };
 
+export const bulkUpdateCompanyInclusions = async (req, res, next) => {
+  try {
+    const file = req.file;
+    if (!file) {
+      return res
+        .status(400)
+        .json({ message: "Please provide a valid CSV file" });
+    }
+
+    const updates = [];
+
+    const stream = Readable.from(file.buffer.toString("utf-8").trim());
+    stream
+      .pipe(csvParser())
+      .on("data", (row) => {
+        const state = row["State"]?.trim();
+        const businessId = row["Business ID"]?.trim();
+        const inclusions = row["Inclusions"]?.trim();
+
+        // Only collect Chiang Mai rows with valid Business ID and inclusions
+        if (state === "Chiang Mai" && businessId && inclusions) {
+          updates.push({
+            updateOne: {
+              filter: { businessId },
+              update: { $set: { inclusions } },
+            },
+          });
+        }
+      })
+      .on("end", async () => {
+        try {
+          if (updates.length === 0) {
+            return res.status(400).json({
+              message:
+                "No valid Chiang Mai rows with Business ID and Inclusions found in CSV",
+            });
+          }
+
+          // Perform bulkWrite operation
+          const result = await Company.bulkWrite(updates);
+
+          res.status(200).json({
+            message: "Bulk inclusions update for Chiang Mai completed",
+            totalProcessed: updates.length,
+            matchedCount: result.matchedCount,
+            modifiedCount: result.modifiedCount,
+          });
+        } catch (updateError) {
+          console.error(updateError);
+          res.status(500).json({
+            message: "Error during bulk inclusions update",
+            error: updateError.message,
+          });
+        }
+      });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
 export const createCompany = async (req, res, next) => {
   try {
     const {
@@ -466,7 +527,7 @@ export const getCompanyData = async (req, res, next) => {
   };
 
   try {
-    const { companyId, companyType } = req.query;
+    const { companyId, companyType, userId } = req.query;
 
     let companyQuery = {};
 
@@ -491,7 +552,23 @@ export const getCompanyData = async (req, res, next) => {
 
     // const companyData = await companyQuery;
 
-    const companyData = await Company.findOne(companyQuery).lean().exec();
+    const company = await Company.findOne(companyQuery).lean().exec();
+
+    let companyData = company;
+
+    if (userId) {
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+        return res.status(400).json({ message: "Invalid user id provided" });
+      }
+
+      const user = await NomadUser.findOne({ _id: userId });
+
+      const isLiked = user.likes.some(
+        (like) => like.toString() === companyData._id.toString()
+      );
+
+      companyData = { ...companyData, isLiked };
+    }
 
     if (!companyData) {
       return res.status(404).json({ error: "Company not found" });

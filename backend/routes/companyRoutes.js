@@ -16,6 +16,7 @@ import {
   addTemplateLink,
   activateProduct,
   updateLeads,
+  bulkUpdateCompanyInclusions,
 } from "../controllers/compayControllers.js";
 
 const router = Router();
@@ -23,6 +24,12 @@ router.post(
   "/bulk-insert-companies",
   upload.single("companies"),
   bulkInsertCompanies
+);
+
+router.patch(
+  "/bulk-update-companies",
+  upload.single("inclusions"),
+  bulkUpdateCompanyInclusions
 );
 
 router.get("/companies", getCompaniesData);
