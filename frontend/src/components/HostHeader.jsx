@@ -158,9 +158,12 @@ const HostHeader = () => {
               <BnButton
                 title={"Login"}
                 externalStyles={"bg-[#FF5757]"}
+                // handleSubmit={() => {
+                //   navigate("/login");
+                //   setOpen(false);
+                // }}
                 handleSubmit={() => {
-                  navigate("");
-                  setOpen(false);
+                  window.location.href = "https://wonofe.vercel.app"; // ✅ external redirect
                 }}
               />
             </div>
