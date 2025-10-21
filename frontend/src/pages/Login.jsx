@@ -137,16 +137,17 @@ export default function LoginPage() {
           </div>
 
           {/* Signup Link */}
-          <div className="col-span-1 md:col-span-2 flex justify-center items-center gap-2">
-            <p className="text-center">
-              <span className="underline text-gray-600 hover:text-black ">
-                <Link to="/forgot-password">Forgot password?</Link>
-              </span>
+          <div className="col-span-1 md:col-span-2 flex flex-col md:flex-row justify-center items-center md:gap-2 text-center">
+            <p className="text-gray-600 hover:text-black underline mb-1 md:mb-0">
+              <Link to="/forgot-password">Forgot password?</Link>
             </p>
-            <p>|</p>
-            <p className="text-center">
-              New to WoNo?&nbsp;
-              <span className="underline  text-gray-600 hover:text-black ">
+
+            {/* separator only visible on md and above */}
+            <p className="hidden md:block">|</p>
+
+            <p className="text-gray-600 hover:text-black ">
+              <span>New to WoNo? </span>
+              <span className="underline">
                 <Link to="/signup">Sign Up</Link>
               </span>
             </p>

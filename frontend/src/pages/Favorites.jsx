@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 
 const Favorites = () => {
   const { auth } = useAuth();
-  const userId = auth?.user?._id;
+  const userId = auth?.user?._id || auth?.user?.id;
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate(); // ✅ consistent with Profile.jsx
 
@@ -30,7 +30,7 @@ const Favorites = () => {
 
   if (isError) {
     return (
-      <Container>
+      <Container padding={false}>
         <div className="py-8 min-h-screen text-center text-red-500">
           {error?.response?.data?.message || "Failed to load favorites."}
         </div>
@@ -39,8 +39,8 @@ const Favorites = () => {
   }
 
   return (
-    <Container>
-      <div className="py-8 min-h-screen">
+    <Container padding={false}>
+      <div className="py-4 min-h-screen">
         <h1 className="text-xl font-semibold mb-6 text-secondary-dark">
           My Favorites ❤️
         </h1>

@@ -40,11 +40,12 @@ const Header = () => {
   const openPopover = Boolean(anchorEl);
 
   const handleProfileClick = () => {
-    navigate("/profile");
+    navigate("/profile?tab=profile");
     handlePopoverClose();
   };
   const handleFavoriteClick = () => {
-    navigate("/favorites");
+    // navigate("/favorites");
+    navigate("/profile?tab=favorites");
     handlePopoverClose();
   };
 
@@ -286,6 +287,19 @@ const Header = () => {
             </button>
           </div>
 
+          {/* <Drawer
+            sx={{
+              "& .MuiDrawer-paper": {
+                width: {
+                  xs: "85%",
+                  sm: "400px",
+                },
+              },
+            }}
+            anchor="left"
+            open={open}
+            onClose={() => setOpen(false)}
+          ></Drawer> */}
           <Drawer
             sx={{
               "& .MuiDrawer-paper": {
@@ -299,8 +313,95 @@ const Header = () => {
             open={open}
             onClose={() => setOpen(false)}
           >
-            {/* ✅ Drawer code remains 100% unchanged */}
-            {/* (no modifications here) */}
+            <div className="flex flex-col h-full justify-between">
+              <ul className="flex flex-col gap-2 p-4 ">
+                <div className="flex justify-end w-full">
+                  <span
+                    className="text-title cursor-pointer text-black"
+                    onClick={() => setOpen(false)}
+                  >
+                    <IoCloseSharp />
+                  </span>
+                </div>
+
+                {headerLinks.map((item) => (
+                  <li key={item.id} className="items-center text-center">
+                    <div
+                      onClick={() => handleNavigation(item.to)}
+                      className="py-4 cursor-pointer"
+                    >
+                      <p className="text-secondary-dark text-lg">{item.text}</p>
+                    </div>
+                    <div className="h-[0.2px] bg-gray-300"></div>
+                  </li>
+                ))}
+
+                {auth?.user ? (
+                  <>
+                    <li className="items-center text-center">
+                      <div
+                        onClick={() => {
+                          handleNavigation("/profile?tab=profile");
+                        }}
+                        className="py-4 cursor-pointer"
+                      >
+                        <p className="text-secondary-dark text-lg">Profile</p>
+                      </div>
+                      <div className="h-[0.2px] bg-gray-300"></div>
+                    </li>
+                    <li className="items-center text-center">
+                      <div
+                        onClick={() => {
+                          handleNavigation("/profile?tab=favorites");
+                        }}
+                        className="py-4 cursor-pointer"
+                      >
+                        <p className="text-secondary-dark text-lg">Favorites</p>
+                      </div>
+                      <div className="h-[0.2px] bg-gray-300"></div>
+                    </li>
+
+                    <li className="items-center text-center">
+                      <div
+                        onClick={async () => {
+                          await handleSignOut();
+                          setOpen(false);
+                        }}
+                        className="py-4 cursor-pointer"
+                      >
+                        <p className="text-secondary-dark text-lg">Sign Out</p>
+                      </div>
+                      {/* <div className="h-[0.2px] bg-gray-300"></div> */}
+                    </li>
+                  </>
+                ) : (
+                  <div className="flex justify-center p-4">
+                    <PrimaryButton
+                      title="Login"
+                      padding="py-3"
+                      uppercase
+                      handleSubmit={() => {
+                        navigate("/login");
+                        setOpen(false);
+                      }}
+                      className="bg-[#FF5757] flex text-white font-[500] capitalize hover:bg-[#E14C4C] w-[7rem] px-4"
+                    />
+                  </div>
+                )}
+              </ul>
+
+              {/* Drawer Footer */}
+              <div className="w-full text-center flex flex-col gap-4 items-center py-4">
+                <div className="flex w-full flex-col gap-2 text-small md:text-small">
+                  <hr />
+                  <span>
+                    &copy; Copyright {new Date().getFullYear()} -{" "}
+                    {(new Date().getFullYear() + 1).toString().slice(-2)}
+                  </span>
+                  <span>WoNo. All rights reserved</span>
+                </div>
+              </div>
+            </div>
           </Drawer>
         </div>
       </Container>
