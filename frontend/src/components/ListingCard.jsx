@@ -103,6 +103,15 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
 
   const thumbnailImage = item?.images?.[0]?.url;
 
+  const typeMap = {
+    coworking: "Co-Working",
+    meetingroom: "Meetings",
+    privatestay: "Private Stay",
+  };
+
+  const displayType =
+    typeMap[item.companyType?.toLowerCase()] || item.companyType;
+
   return (
     <div
       onClick={handleNavigation}
@@ -139,7 +148,8 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
             {showVertical && (
               <div className="bg-white rounded-lg px-2">
                 <span className="font-normal text-xs leading-normal">
-                  {item.companyType || "Test"}
+                  {/* {item.companyType || "Test"} */}
+                  {displayType}
                 </span>
               </div>
             )}

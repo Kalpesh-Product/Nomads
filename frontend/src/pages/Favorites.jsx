@@ -59,7 +59,7 @@ const Favorites = () => {
               <ListingCard
                 key={item._id}
                 item={{ ...item, isLiked: true }} // ✅ mark as liked
-                showVertical={false}
+                showVertical={true}
                 handleNavigation={() =>
                   navigate(`/listings/${item.companyName}`, {
                     state: {
