@@ -403,6 +403,7 @@ const GlobalListingsList = () => {
                 className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 p-4 rounded-t-3xl lg:hidden h-[100dvh]"
               >
                 <div className="flex justify-between items-center mb-4">
+                  <div>&nbsp;</div>
                   <h3 className="text-lg font-semibold">Search</h3>
                   <button
                     onClick={() => setShowMobileSearch(false)}

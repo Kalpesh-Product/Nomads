@@ -65,14 +65,14 @@ const Home = () => {
     },
   });
 
- const countryOptions = locations
-  .map((item) => ({
-    label: item.country
-      ? item.country.charAt(0).toUpperCase() + item.country.slice(1)
-      : "",
-    value: item.country?.toLowerCase(),
-  }))
-  .sort((a, b) => a.label.localeCompare(b.label)); 
+  const countryOptions = locations
+    .map((item) => ({
+      label: item.country
+        ? item.country.charAt(0).toUpperCase() + item.country.slice(1)
+        : "",
+      value: item.country?.toLowerCase(),
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label));
 
   const filteredLocation = locations.find(
     (item) => item.country?.toLowerCase() === selectedCountry?.toLowerCase()
@@ -309,7 +309,8 @@ const Home = () => {
               className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl z-50 p-4 rounded-t-3xl h-[100dvh] lg:hidden"
             >
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold">Search</h3>
+                <div>&nbsp;</div>
+                <h2 className="text-lg font-semibold">Search</h2>
                 <button
                   onClick={() => setShowMobileSearch(false)}
                   className="text-gray-500 text-xl"

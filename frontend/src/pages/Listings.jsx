@@ -408,6 +408,7 @@ const Listings = () => {
           >
             <motion.div className="bg-white shadow-2xl overflow-auto p-4 rounded-b-3xl  h-screen  w-full">
               <div className="flex justify-between items-center mb-4">
+                <div>&nbsp;</div>
                 <h3 className="text-lg font-semibold">Search</h3>
                 <button
                   onClick={() => setShowMobileSearch(false)}
@@ -421,7 +422,11 @@ const Listings = () => {
                 animate={{ y: 0 }}
                 exit={{ y: "-100%" }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="grid grid-cols-3 md:grid-cols-5 gap-2 gap-y-10 mb-16"
+                className={`grid ${
+                  categoryOptions.length === 4
+                    ? "grid-cols-2" // 2 icons per row for 4 total
+                    : "grid-cols-3 md:grid-cols-5" // default layout for 6 or more
+                } gap-4 gap-y-10 mb-16 justify-items-center`}
               >
                 {categoryOptions.map((cat) => {
                   const iconSrc = newIcons[cat.value];

@@ -393,6 +393,7 @@ const GlobalListingsMap = () => {
               >
                 <motion.div className="bg-white shadow-2xl overflow-auto p-4 rounded-b-3xl  h-screen  w-full">
                   <div className="flex justify-between items-center mb-4">
+                    <div>&nbsp;</div>
                     <h3 className="text-lg font-semibold">Search</h3>
                     <button
                       onClick={() => {
