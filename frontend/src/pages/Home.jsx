@@ -308,9 +308,9 @@ const Home = () => {
               transition={{ duration: 0.3 }}
               className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl z-50 p-4 rounded-t-3xl h-[100dvh] lg:hidden"
             >
-              <div className="flex justify-between items-center mb-4">
+              <div className="flex justify-between items-center mb-10">
                 <div>&nbsp;</div>
-                <h2 className="text-lg font-semibold">Search</h2>
+                <h2 className="text-xl font-semibold">Search</h2>
                 <button
                   onClick={() => setShowMobileSearch(false)}
                   className="text-gray-500 text-xl"
@@ -320,7 +320,7 @@ const Home = () => {
               </div>
 
               <motion.div initial={{ y: "-100%" }} animate={{ y: "0%" }}>
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                   <Controller
                     name="country"
                     control={control}
@@ -367,7 +367,7 @@ const Home = () => {
                   />
                   <button
                     type="submit"
-                    className="w-full bg-[#FF5757] text-white py-3 rounded-full"
+                    className="w-full bg-[#FF5757] text-white py-5 rounded-full"
                   >
                     <IoSearch className="inline mr-2" />
                     Search

@@ -407,9 +407,9 @@ const Listings = () => {
             className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 p-0 rounded-t-3xl lg:hidden"
           >
             <motion.div className="bg-white shadow-2xl overflow-auto p-4 rounded-b-3xl  h-screen  w-full">
-              <div className="flex justify-between items-center mb-4">
+              <div className="flex justify-between items-center mb-10">
                 <div>&nbsp;</div>
-                <h3 className="text-lg font-semibold">Search</h3>
+                <h3 className="text-xl font-semibold">Search</h3>
                 <button
                   onClick={() => setShowMobileSearch(false)}
                   className="text-gray-500 text-xl"
@@ -464,7 +464,7 @@ const Listings = () => {
                 })}
               </motion.div>
 
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <Controller
                   name="country"
                   control={control}
@@ -511,7 +511,7 @@ const Listings = () => {
                 />
                 <button
                   type="submit"
-                  className="w-full bg-[#FF5757] text-white py-3 rounded-full"
+                  className="w-full bg-[#FF5757] text-white py-5 rounded-full"
                 >
                   <IoSearch className="inline mr-2" />
                   Search
