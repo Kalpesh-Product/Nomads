@@ -183,9 +183,9 @@ const Profile = () => {
                   {`${user?.firstName || ""} ${user?.lastName || ""}`.trim() ||
                     "User Name"}
                 </h3>
-                <p className="text-sm text-gray-600">
+                {/* <p className="text-sm text-gray-600">
                   {user?.country || "N/A"}
-                </p>
+                </p> */}
               </div>
             </div>
 
@@ -296,11 +296,11 @@ const Profile = () => {
 
       {/* CHANGE PASSWORD TAB */}
       {activeTab === "password" && (
-        <div className="bg-white p-6 rounded-lg shadow-sm max-w-4xl mx-auto">
-          <h2 className="text-xl font-bold text-[#ff5757] mb-4">
+        <div className="bg-white py-6 px-32 rounded-lg shadow-sm max-w-3xl mx-auto">
+          <h2 className="text-xl text-center font-bold text-[#ff5757] mb-4">
             CHANGE PASSWORD
           </h2>
-          <div className="grid md:grid-cols-2 gap-4 mb-3">
+          <div className="grid md:grid-cols-1 gap-4 mb-3">
             <TextField
               label="Current Password"
               type="password"
@@ -338,19 +338,22 @@ const Profile = () => {
               <li>Must contain at least one number or special character.</li>
             </ul>
           </div>
-
-          <Button
-            variant="contained"
-            sx={{
-              bgcolor: "#ff5757",
-              textTransform: "none",
-              "&:hover": { bgcolor: "#1a3b8a" },
-            }}
-            onClick={handlePasswordSubmit}
-            disabled={isPasswordPending}
-          >
-            {isPasswordPending ? "Submitting..." : "Submit"}
-          </Button>
+          <div className="flex justify-center items-center">
+            <Button
+              variant="contained"
+              sx={{
+                bgcolor: "#ff5757",
+                borderRadius: 9999,
+                paddingX: 5,
+                textTransform: "none",
+                "&:hover": { bgcolor: "#1a3b8a" },
+              }}
+              onClick={handlePasswordSubmit}
+              disabled={isPasswordPending}
+            >
+              {isPasswordPending ? "Submitting..." : "Submit"}
+            </Button>
+          </div>
         </div>
       )}
 
