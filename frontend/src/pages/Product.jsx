@@ -712,7 +712,7 @@ const Product = () => {
                 />
               </h1>
 
-              <p className="text-subtitle  my-4 font-medium">Guest favorite</p>
+              <p className="text-subtitle  my-4 font-medium">Guest Favorite</p>
               <span className="text-content text-center">
                 This place is a guest favourite based on <br /> ratings, reviews
                 and reliability
