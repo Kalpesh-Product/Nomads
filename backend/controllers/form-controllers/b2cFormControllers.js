@@ -138,6 +138,7 @@ export const addB2CformSubmission = async (req, res, next) => {
       startDate,
       endDate,
       sheetName,
+      name,
     } = req.body;
 
     // Configuration for each sheet type
