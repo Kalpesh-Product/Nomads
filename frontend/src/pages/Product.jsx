@@ -91,6 +91,25 @@ const Product = () => {
     },
     mode: "onChange",
   });
+
+  // 🟢 Add this useEffect below:
+  useEffect(() => {
+    if (auth?.user) {
+      const fullName = `${auth.user.firstName || ""} ${
+        auth.user.lastName || ""
+      }`.trim();
+
+      reset({
+        fullName,
+        mobileNumber: auth.user.mobile || "",
+        email: auth.user.email || "",
+        noOfPeople: 0,
+        startDate: null,
+        endDate: null,
+      });
+    }
+  }, [auth, reset]);
+
   const selectedStartDate = watch("startDate");
   const {
     handleSubmit: handlesubmitSales,
