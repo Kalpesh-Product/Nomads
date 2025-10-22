@@ -2,6 +2,9 @@ import * as yup from "yup";
 import Lead from "../../models/Lead.js";
 import mongoose from "mongoose";
 import { sendMail } from "../../config/mailer.js"; // adjust path if different
+import User from "../../models/NomadUser.js";
+import NomadUser from "../../models/NomadUser.js";
+import bcrypt from "bcrypt";
 
 const enquirySchema = yup.object({
   companyName: yup.string().trim().required("Please provide the company name"),
@@ -98,9 +101,8 @@ const nomadsSignupSchema = yup.object().shape({
     .required("Please provide your email"),
   password: yup.string().optional(),
   mobile: yup.string().trim().required("Please provide the mobile"),
-  country: yup.string().required("Please provide your country name"),
+
   sheetName: yup.string().required("Please provide a sheet name"),
-  reason: yup.string().required("Please provide the reason"),
 });
 
 function toISODateOnly(v) {
@@ -214,13 +216,23 @@ export const addB2CformSubmission = async (req, res, next) => {
           lastName: d.lastName?.trim(),
           email: d.email?.trim(),
           password: d.password,
-          country: d.country?.trim(),
           mobile: d.mobile?.trim(),
-          reason: d.reason || "",
           sheetName: d.sheetName,
           submittedAt: new Date(),
         }),
         successMsg: "Sign-up saved successfully.",
+        emailTemplate: (data) => ({
+          to: data.email,
+          subject: "Welcome to WoNo 🌍",
+          text: `Hi ${data.firstName}, welcome to WoNo! Your signup was successful.`,
+          html: `
+      <h2>Welcome to WoNo!</h2>
+      <p>Hi ${data.firstName},</p>
+      <p>Thank you for signing up with <b>WoNo</b>.</p>
+      <p>We’re excited to have you onboard! Our team will review your profile and connect with you shortly to complete the onboarding process.</p>
+      <p>Cheers,<br/>The WoNo Team</p>
+    `,
+        }),
       },
     };
 
@@ -260,7 +272,44 @@ export const addB2CformSubmission = async (req, res, next) => {
         endDate: toISODateOnly(endDate),
         sheetName,
       });
+
       await leads.save();
+    }
+
+    if (sheetName === "Sign_up") {
+      console.log(sheetName);
+      const existingUser = await NomadUser.findOne({
+        email: req.body.email?.trim().toLowerCase(),
+      });
+
+      if (existingUser) {
+        return res.status(409).json({ message: "Email already registered" });
+      }
+
+      const { email, mobile, password, confirmPassword } = req.body;
+
+      if (!email || !password || !mobile) {
+        return res.status(409).json({ message: "Missing required fields" });
+      }
+
+      if (confirmPassword !== password) {
+        return res.status(400).json({ message: "Please match the password" });
+      }
+
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+
+      const signupEntry = new NomadUser({
+        firstName: req.body.firstName?.trim(),
+        lastName: req.body.lastName?.trim(),
+        email: email?.trim().toLowerCase(),
+        password: hashedPassword,
+        country: req.body.country?.trim(),
+        state: req.body.state?.trim(),
+        mobile: mobile?.trim(),
+      });
+
+      await signupEntry.save();
     }
 
     // Send to Google Apps Script
@@ -277,13 +326,13 @@ export const addB2CformSubmission = async (req, res, next) => {
     }
 
     // Send confirmation email if template exists
-    if (config.emailTemplate) {
-      try {
-        await sendMail(config.emailTemplate(validatedData));
-      } catch (err) {
-        console.error("Failed to send confirmation email:", err.message);
-      }
-    }
+    // if (config.emailTemplate) {
+    //   try {
+    //     await sendMail(config.emailTemplate(validatedData));
+    //   } catch (err) {
+    //     console.error("Failed to send confirmation email:", err.message);
+    //   }
+    // }
 
     res.status(201).json({
       status: "success",

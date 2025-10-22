@@ -11,6 +11,11 @@ export const allowedOrigins = [
   "https://data-upload-alpha.vercel.app",
   "https://wonohostfe.vercel.app",
   "https://wonohostbe.vercel.app",
+  "http://localhost:5000",
+  "https://nomad.wono.co",
+  "https://host.wono.co",
+  "http://nomad.localhost:5173",
+  "http://host.localhost:5173",
 ];
 
 const regexAllowedOrigins = [

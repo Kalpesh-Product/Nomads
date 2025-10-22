@@ -104,6 +104,7 @@ const TemplateHome = () => {
   const products = isPending ? [] : data?.products;
   const testimonials = isPending ? [] : data?.testimonials;
 
+
   return (
     <div className="w-screen ">
       <div className="relative h-screen  overflow-hidden" id="hero">

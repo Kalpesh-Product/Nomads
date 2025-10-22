@@ -7,7 +7,8 @@ const HostPrivacy = () => {
   const navigate = useNavigate();
   const sections = [
     {
-      title: "Last Updated: 2nd October 2024",
+      // title: "Last Updated: 2nd October 2024",
+      title: "",
       content: (
         <>
           <p>
@@ -269,7 +270,7 @@ const HostPrivacy = () => {
             >
               Contact us
             </span>
-          </div> 
+          </div>
         </>
       ),
     },

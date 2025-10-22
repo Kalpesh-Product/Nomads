@@ -27,7 +27,7 @@ import HostSignup from "./pages/host/Signup";
 import Modules from "./pages/host/Modules";
 import Themes from "./pages/host/Themes";
 import Capital from "./pages/host/Capital";
-import HostAbout from "./pages/host/About";
+import HostAbout from "./pages/host/HostAbout";
 import HostTermsAndConditions from "./pages/host/TermsAndConditions";
 import HostPrivacy from "./pages/host/Privacy";
 import HostFAQ from "./pages/host/FAQ";
@@ -37,6 +37,12 @@ import HostProduct from "./pages/host/Product";
 // Tenant imports
 import TemplateSite from "./pages/company/TemplateSite";
 import TemplateHome from "./pages/company/TemplateHome";
+import NomadAbout from "./pages/NomadAbout";
+import Profile from "./pages/Profile";
+import PersistLogin from "./layout/PersistsLogin";
+import Favorites from "./pages/Favorites";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 function getTenantFromHost() {
   const hostname = window.location.hostname; // e.g. "nomad.wono.co" or "nomad.localhost"
@@ -82,29 +88,63 @@ if (tenant === "main") {
     },
   ];
 } else if (tenant === "nomad") {
+  console.log("nomad routes");
   // Nomads subdomain
   routerConfig = [
     {
-      path: "/",
-      element: <NomadLayout />,
+      element: <PersistLogin />,
       children: [
-        { path: "", element: <Home /> },
-        { path: "verticals", element: <GlobalListings /> },
-        { path: "listings", element: <Listings /> },
-        { path: "listings/:company", element: <Product /> },
-        { path: "listings/:company/images", element: <ImageGallery /> },
-        { path: "components", element: <ReusableComponents /> },
-        { path: "contact", element: <Contact /> },
-        { path: "news", element: <DestinationNews /> },
-        { path: "news/news-details", element: <BlogDetails /> },
-        { path: "blog", element: <LocalBlog /> },
-        { path: "blog/blog-details", element: <BlogDetails /> },
-        { path: "career", element: <Career /> },
-        { path: "career/job/:title", element: <JobDetails /> },
-        { path: "login", element: <Login /> },
-        { path: "signup", element: <Signup /> },
+        {
+          element: <NomadLayout />,
+          path: "/",
+          children: [
+            { path: "", element: <Home /> },
+            { path: "verticals", element: <GlobalListings /> },
+            { path: "listings", element: <Listings /> },
+            { path: "listings/:company", element: <Product /> },
+            { path: "listings/:company/images", element: <ImageGallery /> },
+            { path: "components", element: <ReusableComponents /> },
+            { path: "contact", element: <Contact /> },
+            { path: "news", element: <DestinationNews /> },
+            { path: "news/news-details", element: <BlogDetails /> },
+            { path: "blog", element: <LocalBlog /> },
+            { path: "blog/blog-details", element: <BlogDetails /> },
+            { path: "career", element: <Career /> },
+            { path: "career/job/:title", element: <JobDetails /> },
+            { path: "login", element: <Login /> },
+            { path: "forgot-password", element: <ForgotPassword /> },
+            { path: "reset-password", element: <ResetPassword /> },
+            { path: "signup", element: <Signup /> },
+            { path: "about", element: <NomadAbout /> },
+            { path: "profile", element: <Profile /> },
+            { path: "favorites", element: <Favorites /> },
+          ],
+        },
       ],
     },
+    // {
+    //   path: "/",
+    //   element: <NomadLayout />,
+    //   children: [
+    //     { path: "", element: <Home /> },
+    //     { path: "verticals", element: <GlobalListings /> },
+    //     { path: "listings", element: <Listings /> },
+    //     { path: "listings/:company", element: <Product /> },
+    //     { path: "listings/:company/images", element: <ImageGallery /> },
+    //     { path: "components", element: <ReusableComponents /> },
+    //     { path: "contact", element: <Contact /> },
+    //     { path: "news", element: <DestinationNews /> },
+    //     { path: "news/news-details", element: <BlogDetails /> },
+    //     { path: "blog", element: <LocalBlog /> },
+    //     { path: "blog/blog-details", element: <BlogDetails /> },
+    //     { path: "career", element: <Career /> },
+    //     { path: "career/job/:title", element: <JobDetails /> },
+    //     { path: "login", element: <Login /> },
+    //     { path: "signup", element: <Signup /> },
+    //     { path: "about", element: <NomadAbout /> },
+    //     { path: "profile", element: <Profile /> },
+    //   ],
+    // },
   ];
 } else if (tenant === "hosts") {
   // Hosts subdomain

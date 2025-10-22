@@ -57,11 +57,7 @@ const Listings = () => {
     value: item.country?.toLowerCase(),
   }));
   const filteredLocation = locations.find(
-    (item) =>
-      item.country ===
-      (selectedCountry
-        ? selectedCountry.charAt(0).toUpperCase() + selectedCountry.slice(1)
-        : "")
+    (item) => item.country?.toLowerCase() === selectedCountry?.toLowerCase()
   );
   const locationOptions = filteredLocation?.states?.map((item) => ({
     label: item,
@@ -289,7 +285,8 @@ const Listings = () => {
                         key={cat.value}
                         type="button"
                         onClick={() => handleCategoryClick(cat.value)}
-                        className="text-black px-4 py-2 hover:text-black transition flex items-center justify-center w-full">
+                        className="text-black px-4 py-2 hover:text-black transition flex items-center justify-center w-full"
+                      >
                         {iconSrc ? (
                           <div className="h-10 w-full flex flex-col gap-0 items-center">
                             <img
@@ -302,7 +299,8 @@ const Listings = () => {
                                 isActive
                                   ? "border-primary-blue"
                                   : "border-transparent"
-                              }`}>
+                              }`}
+                            >
                               {cat.label}
                             </span>
                           </div>
@@ -317,7 +315,8 @@ const Listings = () => {
 
               <form
                 onSubmit={handleSubmit(onSubmit)}
-                className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center">
+                className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
+              >
                 <Controller
                   name="country"
                   control={control}
@@ -366,7 +365,8 @@ const Listings = () => {
                 />
                 <button
                   type="submit"
-                  className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full">
+                  className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full"
+                >
                   <IoSearch />
                 </button>
               </form>
@@ -376,7 +376,8 @@ const Listings = () => {
         <div className="flex lg:hidden w-full items-center justify-center my-4">
           <button
             onClick={() => setShowMobileSearch((prev) => !prev)}
-            className="bg-white shadow-md flex items-center w-full text-center justify-center font-medium text-secondary-dark border-2 px-6 py-2 rounded-full flex-col gap-2">
+            className="bg-white shadow-md flex items-center w-full text-center justify-center font-medium text-secondary-dark border-2 px-6 py-2 rounded-full flex-col gap-2"
+          >
             <span>
               Search Results in{" "}
               {formData?.location?.charAt(0).toUpperCase() +
@@ -395,13 +396,15 @@ const Listings = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 p-0 rounded-t-3xl lg:hidden">
+            className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 p-0 rounded-t-3xl lg:hidden"
+          >
             <motion.div className="bg-white shadow-2xl overflow-auto p-4 rounded-b-3xl  h-screen  w-full">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold">Search</h3>
                 <button
                   onClick={() => setShowMobileSearch(false)}
-                  className="text-gray-500 text-xl">
+                  className="text-gray-500 text-xl"
+                >
                   &times;
                 </button>
               </div>
@@ -410,7 +413,8 @@ const Listings = () => {
                 animate={{ y: 0 }}
                 exit={{ y: "-100%" }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="grid grid-cols-3 md:grid-cols-5 gap-2 gap-y-10 mb-16">
+                className="grid grid-cols-3 md:grid-cols-5 gap-2 gap-y-10 mb-16"
+              >
                 {categoryOptions.map((cat) => {
                   const iconSrc = newIcons[cat.value];
                   const isActive = activeCategory === cat.value;
@@ -420,7 +424,8 @@ const Listings = () => {
                       key={cat.value}
                       type="button"
                       onClick={() => handleCategoryClick(cat.value)}
-                      className="text-black px-4 py-2 hover:text-black transition flex items-center justify-center w-full">
+                      className="text-black px-4 py-2 hover:text-black transition flex items-center justify-center w-full"
+                    >
                       {iconSrc ? (
                         <div className="h-10 w-full flex flex-col gap-0 items-center">
                           <img
@@ -433,7 +438,8 @@ const Listings = () => {
                               isActive
                                 ? "border-[#FF5757]"
                                 : "border-transparent"
-                            }`}>
+                            }`}
+                          >
                             {cat.label}
                           </span>
                         </div>
@@ -492,7 +498,8 @@ const Listings = () => {
                 />
                 <button
                   type="submit"
-                  className="w-full bg-[#FF5757] text-white py-3 rounded-full">
+                  className="w-full bg-[#FF5757] text-white py-3 rounded-full"
+                >
                   <IoSearch className="inline mr-2" />
                   Search
                 </button>
@@ -512,7 +519,8 @@ const Listings = () => {
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className={`${
               mapOpen ? "col-span-5" : "col-span-9"
-            } font-semibold text-lg`}>
+            } font-semibold text-lg`}
+          >
             <PaginatedGrid
               // data={isLisitingLoading ? skeletonArray : sortedListings}
               data={isLisitingLoading ? skeletonArray : filteredListings}
@@ -542,13 +550,17 @@ const Listings = () => {
                       duration: 0.4,
                       delay: index * 0.1,
                       ease: "easeOut",
-                    }}>
+                    }}
+                  >
                     <ListingCard
                       item={item}
                       showVertical={false}
                       handleNavigation={() => {
                         navigate(`/listings/${item.companyName}`, {
-                          state: { companyId: item.companyId, type: item.companyType },
+                          state: {
+                            companyId: item.companyId,
+                            type: item.companyType,
+                          },
                         });
                       }}
                     />
@@ -567,7 +579,8 @@ const Listings = () => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 50 }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="col-span-4 w-full overflow-hidden rounded-xl h-full">
+                className="col-span-4 w-full overflow-hidden rounded-xl h-full"
+              >
                 {isLisitingLoading ? (
                   <SkeletonMap />
                 ) : forMapsData?.length ? (
