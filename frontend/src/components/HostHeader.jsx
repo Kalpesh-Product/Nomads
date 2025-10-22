@@ -154,10 +154,10 @@ const HostHeader = () => {
               </li>
             ))}
 
-            <div className="flex justify-center p-4">
+            <div className="flex justify-center py-4">
               <BnButton
                 title={"Login"}
-                externalStyles={"bg-[#FF5757]"}
+                externalStyles="bg-[#FF5757] w-full sm:w-[7rem]" // ✅ add responsive width here
                 // handleSubmit={() => {
                 //   navigate("/login");
                 //   setOpen(false);

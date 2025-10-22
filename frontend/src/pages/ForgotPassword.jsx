@@ -20,7 +20,6 @@ export default function ForgotPassword() {
     onSuccess: (data) => {
       toast.success(data?.message || "Password reset link sent to your email");
       reset();
-      // Optional: navigate("/login");
     },
     onError: (error) => {
       toast.error(
@@ -39,33 +38,37 @@ export default function ForgotPassword() {
 
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="w-1/2 grid grid-cols-1 md:grid-cols-1 gap-6"
+          className="w-full flex flex-col items-center gap-6"
         >
-          <Controller
-            name="email"
-            control={control}
-            rules={{ required: "Email is required" }}
-            render={({ field, fieldState }) => (
-              <TextField
-                {...field}
-                label="Email"
-                type="email"
-                fullWidth
-                required
-                variant="standard"
-                error={!!fieldState.error}
-                helperText={fieldState.error?.message}
-              />
-            )}
-          />
+          {/* Email Input */}
+          <div className="w-full sm:w-1/2">
+            <Controller
+              name="email"
+              control={control}
+              rules={{ required: "Email is required" }}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  label="Email"
+                  type="email"
+                  fullWidth
+                  required
+                  variant="standard"
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                />
+              )}
+            />
+          </div>
 
-          <div className="col-span-1 md:col-span-2 flex justify-center items-center mt-2 py-2">
+          {/* Submit Button */}
+          <div className="w-full sm:w-auto flex justify-center items-center mt-2 py-2">
             <PrimaryButton
               title="Send"
               type="submit"
               isLoading={isPending}
               disabled={isPending}
-              className="bg-[#FF5757] flex text-white font-[500] capitalize hover:bg-[#E14C4C] w-[7rem] px-6"
+              className="bg-[#FF5757] flex text-white font-[500] capitalize hover:bg-[#E14C4C] w-full sm:w-[7rem] px-6"
             />
           </div>
         </form>

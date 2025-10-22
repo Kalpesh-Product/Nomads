@@ -65,7 +65,8 @@ export default function Signup() {
 
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+          className="w-full grid grid-cols-1 md:grid-cols-2 gap-6"
+        >
           {/* First Name */}
           <Controller
             name="firstName"
@@ -162,7 +163,8 @@ export default function Signup() {
                       <IconButton
                         onClick={togglePasswordVisibility}
                         edge="end"
-                        tabIndex={-1}>
+                        tabIndex={-1}
+                      >
                         {showPassword ? <FiEyeOff /> : <FiEye />}
                       </IconButton>
                     </InputAdornment>
@@ -193,7 +195,8 @@ export default function Signup() {
                       <IconButton
                         onClick={toggleConfirmPasswordVisibility}
                         edge="end"
-                        tabIndex={-1}>
+                        tabIndex={-1}
+                      >
                         {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
                       </IconButton>
                     </InputAdornment>
@@ -204,13 +207,13 @@ export default function Signup() {
           />
 
           {/* Submit Button */}
-          <div className="col-span-1 md:col-span-2 flex justify-center items-center mt-2 py-2">
+          <div className="col-span-1 md:col-span-2 flex justify-center items-center mt-2 py-2 w-full">
             <PrimaryButton
               type="submit"
               isLoading={isPending}
               title="Signup"
               disabled={isPending}
-              className="bg-[#FF5757] flex text-white font-[500] capitalize hover:bg-[#E14C4C] w-[7rem] px-6"
+              className="bg-[#FF5757] flex text-white font-[500] capitalize hover:bg-[#E14C4C] w-full sm:w-[7rem] px-6"
             />
           </div>
 
@@ -231,7 +234,8 @@ export default function Signup() {
           title="Registration Successful"
           height="20vh"
           width="30vw"
-          color="text-green-500">
+          color="text-green-500"
+        >
           <div className="flex flex-col space-y-4 text-pretty">
             <p>Thank you for signing up with WoNo.</p>
             <p>

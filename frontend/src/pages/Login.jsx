@@ -126,13 +126,13 @@ export default function LoginPage() {
           />
 
           {/* Submit Button */}
-          <div className="col-span-1 md:col-span-2 flex justify-center items-center mt-2 py-2">
+          <div className="col-span-1 md:col-span-2 flex justify-center items-center mt-2 py-2 w-full">
             <PrimaryButton
-              title={"Login"}
+              title="Login"
               type="submit"
               isLoading={isLoginPending}
               disabled={isLoginPending}
-              className="bg-[#FF5757] flex text-white font-[500] capitalize hover:bg-[#E14C4C] w-[7rem] px-6"
+              className="bg-[#FF5757] flex text-white font-[500] capitalize hover:bg-[#E14C4C] w-full sm:w-[7rem] px-6"
             />
           </div>
 

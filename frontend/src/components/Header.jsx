@@ -375,7 +375,7 @@ const Header = () => {
                     </li>
                   </>
                 ) : (
-                  <div className="flex justify-center p-4">
+                  <div className="flex justify-center py-4">
                     <PrimaryButton
                       title="Login"
                       padding="py-3"
@@ -384,7 +384,8 @@ const Header = () => {
                         navigate("/login");
                         setOpen(false);
                       }}
-                      className="bg-[#FF5757] flex text-white font-[500] capitalize hover:bg-[#E14C4C] w-[7rem] px-4"
+                      // className="bg-[#FF5757] flex text-white font-[500] capitalize hover:bg-[#E14C4C] w-[7rem] px-4"
+                      className="bg-[#FF5757] flex text-white font-[500] capitalize hover:bg-[#E14C4C] w-full sm:w-[7rem]"
                     />
                   </div>
                 )}
