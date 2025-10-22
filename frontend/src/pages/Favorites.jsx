@@ -46,7 +46,7 @@ const Favorites = () => {
 
   return (
     <Container padding={false}>
-      <div className="py-4 min-h-screen">
+      <div className="p-6 min-h-screen bg-white rounded-xl ">
         <h1 className="text-xl font-semibold mb-6 text-secondary-dark">
           My Favorites ❤️
         </h1>
@@ -54,7 +54,7 @@ const Favorites = () => {
         {isLoading ? (
           <div className="text-center text-gray-500">Loading...</div>
         ) : likedListings.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
             {likedListings.map((item) => (
               <ListingCard
                 key={item._id}
