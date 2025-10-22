@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import ListingCard from "../components/ListingCard";
@@ -17,6 +17,7 @@ const Favorites = () => {
     isLoading,
     isError,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["userLikes", userId],
     queryFn: async () => {
@@ -26,7 +27,12 @@ const Favorites = () => {
     },
     enabled: !!userId,
     staleTime: 1000 * 60 * 2, // 2 min cache (optional for performance)
+    refetchOnMount: "always", // ✅ forces refetch on every mount
   });
+
+  useEffect(() => {
+    refetch(); // ✅ refresh favorites whenever this component mounts
+  }, [refetch]);
 
   if (isError) {
     return (
@@ -52,7 +58,7 @@ const Favorites = () => {
             {likedListings.map((item) => (
               <ListingCard
                 key={item._id}
-                item={item}
+                item={{ ...item, isLiked: true }} // ✅ mark as liked
                 showVertical={false}
                 handleNavigation={() =>
                   navigate(`/listings/${item.companyName}`, {

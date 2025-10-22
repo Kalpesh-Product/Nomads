@@ -22,6 +22,7 @@ import newIcons from "../assets/newIcons.js";
 import SearchBarCombobox from "../components/SearchBarCombobox.jsx";
 import { IoSearch } from "react-icons/io5";
 import { AnimatePresence, motion } from "motion/react";
+import useAuth from "../hooks/useAuth.js";
 
 const Listings = () => {
   const [resetPageKey, setResetPageKey] = useState(0);
@@ -37,6 +38,10 @@ const Listings = () => {
       category: "",
     },
   });
+
+  const { auth } = useAuth();
+  const user = auth?.user || {};
+  const userId = auth?.user?._id || auth?.user?.id;
 
   const selectedCountry = watch("country");
   const selectedState = watch("location");
@@ -88,7 +93,9 @@ const Listings = () => {
     queryFn: async () => {
       const { country, location } = formData || {};
       const response = await axios.get(
-        `company/companies?country=${country}&state=${location}`
+        `company/companies?country=${country}&state=${location}&userId=${
+          userId || ""
+        }`
       );
 
       return Array.isArray(response.data)
@@ -96,6 +103,7 @@ const Listings = () => {
         : [];
     },
     enabled: !!formData?.country && !!formData?.location,
+    refetchOnMount: "always", // ✅ forces refetch on every mount
   });
 
   const categoryOptions = React.useMemo(() => {

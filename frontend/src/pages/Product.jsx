@@ -4,7 +4,7 @@ import { Controller, useForm } from "react-hook-form";
 import { TextField } from "@mui/material";
 import { DesktopDatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import SecondaryButton from "../components/SecondaryButton";
 import ReviewCard from "../components/ReviewCard";
 import LeafRatings from "../components/LeafRatings";
@@ -26,6 +26,8 @@ import toast from "react-hot-toast";
 import AmenitiesList from "../components/AmenitiesList";
 import { FaCheck } from "react-icons/fa";
 import TransparentModal from "../components/TransparentModal";
+import useAuth from "../hooks/useAuth";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
 dayjs.extend(relativeTime);
 
@@ -33,22 +35,28 @@ const Product = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { companyId, type } = location.state;
+  const queryClient = useQueryClient();
+  const { auth } = useAuth();
+  const userId = auth?.user?._id || auth?.user?.id;
+
   const [selectedReview, setSelectedReview] = useState([]);
   const [showAmenities, setShowAmenities] = useState(false);
   console.log("selected : ", selectedReview);
   const [open, setOpen] = useState(false);
 
-  const { data: companyDetails, isPending: isCompanyDetails } = useQuery({
-    queryKey: ["companyDetails", companyId],
-    queryFn: async () => {
-      const response = await axios.get(
-        `company/get-single-company-data?companyId=${companyId}&companyType=${type}`
-      );
+  const axiosPrivate = useAxiosPrivate();
 
-      console.log("type", type);
+  const { data: companyDetails, isPending: isCompanyDetails } = useQuery({
+    queryKey: ["companyDetails", companyId, userId || "guest"], // safe for guests too
+    queryFn: async () => {
+      const url = userId
+        ? `company/get-single-company-data?companyId=${companyId}&companyType=${type}&userId=${userId}`
+        : `company/get-single-company-data?companyId=${companyId}&companyType=${type}`;
+      const response = await axios.get(url); // ✅ use public axios when not logged in
       return response?.data;
     },
-    enabled: !!companyId,
+    enabled: !!companyId, // ✅ allow guests to load
+    refetchOnMount: "always",
   });
 
   console.log("companuDetials ", companyDetails);
@@ -178,6 +186,33 @@ const Product = () => {
 
   const mapsData = [forMapsData];
   const [heartClicked, setHeartClicked] = useState(false);
+
+  useEffect(() => {
+    if (companyDetails) {
+      setHeartClicked(companyDetails?.isLiked || false);
+    }
+  }, [companyDetails]);
+
+  const { mutate: toggleLike } = useMutation({
+    mutationFn: async (isLikedNow) => {
+      const response = await axiosPrivate.patch(`/user/like`, {
+        listingId: companyDetails?._id,
+        userId,
+        isLiked: isLikedNow,
+      });
+      return response.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data.message || "Updated successfully");
+      // Update heart state and refresh queries that depend on likes
+      setHeartClicked((prev) => !prev);
+      queryClient.invalidateQueries(["userLikes"]);
+      queryClient.invalidateQueries(["globallistings"]);
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || "Something went wrong");
+    },
+  });
 
   return (
     <div className="p-4">
@@ -330,17 +365,26 @@ const Product = () => {
                     )}
 
                     <div
-                      onClick={() => setHeartClicked((prev) => !prev)}
+                      onClick={() => {
+                        const newLiked = !heartClicked;
+                        setHeartClicked(newLiked);
+                        toggleLike(newLiked);
+                      }}
                       className="cursor-pointer relative"
                     >
-                      {heartClicked ? <IoIosHeart /> : <IoIosHeartEmpty />}
+                      {heartClicked ? (
+                        <IoIosHeart className="text-[#ff5757]" size={22} />
+                      ) : (
+                        <IoIosHeartEmpty size={22} />
+                      )}
                     </div>
-                    <NavLink
+
+                    {/* <NavLink
                       className={"text-small underline"}
                       to={"/nomad/login"}
                     >
                       Save
-                    </NavLink>
+                    </NavLink> */}
                   </div>
                 </div>
 
@@ -444,7 +488,7 @@ const Product = () => {
                         variant="standard"
                         size="small"
                         helperText={errors?.fullName?.message}
-                        sx={{marginTop : 3}}
+                        sx={{ marginTop: 3 }}
                         error={!!errors.fullName}
                       />
                     )}
