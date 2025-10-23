@@ -184,7 +184,7 @@ export const addB2CformSubmission = async (req, res, next) => {
           email: d.email,
           sheetName: d.sheetName,
         }),
-        successMsg: "POC added successfully",
+        successMsg: "Message sent successfully",
         emailTemplate: (data) => ({
           to: data.email,
           subject: "Your POC request has been sent 📩",
