@@ -127,6 +127,7 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
           }
           alt={item.companyName}
           className="w-full h-full object-cover hover:scale-105 transition-all"
+          loading="lazy"
         />
         <div className="absolute top-2 right-2 pb-4 w-full h-full pl-0 pointer-events-none">
           <div className="flex flex-col items-end h-full justify-between">
