@@ -296,7 +296,7 @@ const Profile = () => {
 
       {/* CHANGE PASSWORD TAB */}
       {activeTab === "password" && (
-        <div className="bg-white py-6 px-32 rounded-lg shadow-sm max-w-3xl mx-auto">
+        <div className="bg-white py-6 px-4 md:px-32 rounded-lg shadow-sm max-w-3xl mx-auto">
           <h2 className="text-xl text-center font-bold text-[#ff5757] mb-4">
             CHANGE PASSWORD
           </h2>
