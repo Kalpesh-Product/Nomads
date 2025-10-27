@@ -259,7 +259,7 @@ const Header = () => {
                           <ListItemIcon>
                             <FiLogOut className="text-gray-500" />
                           </ListItemIcon>
-                          <ListItemText primary="Sign Out" />
+                          <ListItemText primary="Log Out" />
                         </ListItem>
                       </List>
                     </div>
@@ -369,7 +369,7 @@ const Header = () => {
                         }}
                         className="py-4 cursor-pointer"
                       >
-                        <p className="text-secondary-dark text-lg">Sign Out</p>
+                        <p className="text-secondary-dark text-lg">Log Out</p>
                       </div>
                       {/* <div className="h-[0.2px] bg-gray-300"></div> */}
                     </li>
