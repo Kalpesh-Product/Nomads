@@ -113,7 +113,7 @@ if (tenant === "main") {
             { path: "career/job/:title", element: <JobDetails /> },
             { path: "login", element: <Login /> },
             { path: "forgot-password", element: <ForgotPassword /> },
-            { path: "reset-password", element: <ResetPassword /> },
+            { path: "reset-password/:token", element: <ResetPassword /> },
             { path: "signup", element: <Signup /> },
             { path: "about", element: <NomadAbout /> },
             { path: "profile", element: <Profile /> },

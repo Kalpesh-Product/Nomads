@@ -14,6 +14,7 @@ export default function ForgotPassword() {
 
   const { mutate: sendEmail, isPending } = useMutation({
     mutationFn: async (data) => {
+      console.log("forgot password", data);
       const response = await axios.post("auth/forgot-password", data);
       return response.data;
     },
