@@ -12,6 +12,8 @@ export default function ResetPasswordPage() {
   const { token } = useParams();
   const navigate = useNavigate();
 
+  console.log("token", token);
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -34,6 +36,8 @@ export default function ResetPasswordPage() {
         password: data.password,
         confirmPassword: data.confirmPassword,
       };
+
+      console.log("reset password", payload);
       const response = await axios.patch(
         `auth/reset-password/${token}`,
         payload

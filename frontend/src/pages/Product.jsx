@@ -157,7 +157,7 @@ const Product = () => {
     mutationFn: async (data) => {
       const response = await axios.post("/forms/add-new-b2c-form-submission", {
         ...data,
-        pocName: companyDetails?.poc?.name || "Anviksha Godkar",
+        pocName: companyDetails?.poc?.name || "Sales Team",
         pocCompany: companyDetails?.companyName,
         pocDesignation: companyDetails?.poc?.designation,
         sheetName: "All_POC_Contact",
@@ -770,9 +770,7 @@ const Product = () => {
             </div>
             <hr className="my-5 lg:my-10" />
 
-            {["Anviksha Godkar", "John Doe"].includes(
-              companyDetails?.poc?.name || ""
-            ) && (
+            {companyDetails?.poc && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10 pb-20">
                 <div className="flex flex-col lg:flex-row justify-center items-center col-span-1 border-2 shadow-md gap-4 rounded-xl p-6 w-full">
                   <div className="flex flex-col gap-4 justify-between items-center h-full w-56">
@@ -788,11 +786,10 @@ const Product = () => {
                     {/* Name & Designation */}
                     <div className="text-center space-y-3 h-1/2 flex flex-col justify-evenly items-center">
                       <h1 className="text-title text-gray-700 font-medium leading-10">
-                        {companyDetails?.poc?.name || "Anviksha Godkar"}
+                        {companyDetails?.poc?.name || "Sales Team"}
                       </h1>
                       <p className="text-content">
-                        {companyDetails?.poc?.designation ||
-                          "Deputy Sales Manager"}
+                        {companyDetails?.poc?.designation || "Sales Department"}
                       </p>
                     </div>
                   </div>
