@@ -228,6 +228,8 @@ export const createCompany = async (req, res, next) => {
       poc, // single POC object
       reviews, // array of reviews
       images,
+      cost,
+      description,
     } = req.body;
 
     const generateBuisnessId = () => {
@@ -263,6 +265,8 @@ export const createCompany = async (req, res, next) => {
       inclusions: inclusions?.trim(),
       services: services?.trim(),
       units: units?.trim(),
+      cost: cost?.trim(),
+      description: description?.trim(),
       companyType: companyType?.trim()?.split(" ").join("").toLowerCase(),
       images,
     });
@@ -360,7 +364,6 @@ export const createCompany = async (req, res, next) => {
     /** ---------------- REVIEWS LOGIC ---------------- **/
     let savedReviews;
     if (Array.isArray(reviews) && reviews.length > 0) {
-      console.log("reviews", reviews);
       const reviewDocs = reviews.map((review) => ({
         company: savedCompany._id,
         companyId,
@@ -1052,6 +1055,7 @@ export const editCompany = async (req, res, next) => {
       totalReviews,
       inclusions,
       companyType,
+      companyName,
       reviews,
       images,
     } = req.body;
@@ -1063,6 +1067,7 @@ export const editCompany = async (req, res, next) => {
 
     // Update scalar fields
     company.address = address?.trim() || company.address;
+    company.companyName = companyName?.trim() || company.companyName;
     company.about = about?.trim() || company.about;
     company.totalSeats = totalSeats ? parseInt(totalSeats) : company.totalSeats;
     company.latitude = latitude ? parseFloat(latitude) : company.latitude;
