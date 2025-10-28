@@ -916,7 +916,7 @@ const Product = () => {
                 </div>
               </>
             )}
-            <hr className="my-5 lg:my-10"  />
+            <hr className="my-5 lg:my-10" />
 
             {/* Content & Source Disclaimer */}
             <div className="text-[0.5rem] text-gray-500 leading-relaxed">
