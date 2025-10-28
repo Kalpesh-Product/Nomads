@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "../utils/axios";
+// import axios from "../utils/axios";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
 import Spinners from "../components/Spinner";
@@ -36,23 +36,23 @@ const NomadAbout = () => {
 
   const handleCloseModal = () => setShowModal(false);
 
-  const { mutate: submitContactForm, isPending: isContactPending } =
-    useMutation({
-      mutationFn: async (data) => {
-        const response = await axios.post("forms/add-new-b2c-form-submission", {
-          ...data,
-          sheetName: "Connect_with_us",
-        });
-        return response.data;
-      },
-      onSuccess: (data) => {
-        toast.success("Form submitted successfully");
-        reset();
-      },
-      onError: (error) => {
-        toast.error(error.response.data.message);
-      },
-    });
+  // const { mutate: submitContactForm, isPending: isContactPending } =
+  //   useMutation({
+  //     mutationFn: async (data) => {
+  //       const response = await axios.post("forms/add-new-b2c-form-submission", {
+  //         ...data,
+  //         sheetName: "Connect_with_us",
+  //       });
+  //       return response.data;
+  //     },
+  //     onSuccess: (data) => {
+  //       toast.success("Form submitted successfully");
+  //       reset();
+  //     },
+  //     onError: (error) => {
+  //       toast.error(error.response.data.message);
+  //     },
+  //   });
 
   const floatingLabelSx = {
     color: "black",
@@ -62,7 +62,7 @@ const NomadAbout = () => {
 
   return (
     <div className="bg-white text-[#364D59] font-sans">
-      <section className="px-6 lg:px-28 pb-4 flex flex-col gap-10">
+      <section className="px-6 lg:px-28 py-4 flex flex-col gap-10">
         {/* Header */}
         <div className="flex flex-col items-center relative font-comic uppercase font-bold text-secondary-dark text-[clamp(1.5rem,4vw,3rem)] leading-tight mb-4">
           <div className="relative inline-block">
@@ -174,7 +174,8 @@ const NomadAbout = () => {
           <div className="bg-white rounded shadow-lg w-full max-w-md p-6 relative">
             <button
               onClick={handleCloseModal}
-              className="absolute top-2 right-2 text-gray-600 hover:text-black">
+              className="absolute top-2 right-2 text-gray-600 hover:text-black"
+            >
               <AiOutlineClose size={20} />
             </button>
             <h3 className="text-lg font-bold mb-2">Success</h3>
@@ -184,7 +185,8 @@ const NomadAbout = () => {
             <div className="text-right">
               <button
                 onClick={handleCloseModal}
-                className="bg-black text-white px-4 py-2 rounded hover:opacity-90">
+                className="bg-black text-white px-4 py-2 rounded hover:opacity-90"
+              >
                 Close
               </button>
             </div>

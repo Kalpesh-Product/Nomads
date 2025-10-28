@@ -45,6 +45,11 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import ContentAndCopyright from "./pages/host/ContentAndCopyright";
 import ContentUseRemoval from "./pages/host/ContentUseRemoval";
+import NomadContentAndCopyright from "./pages/NomadContentAndCopyright";
+import NomadContentUseRemoval from "./pages/NomadContentUseRemoval";
+import NomadPrivacy from "./pages/NomadPrivacy";
+import NomadFAQ from "./pages/NomadFAQ";
+import NomadTermsAndConditions from "./pages/NomadTermsAndConditions";
 
 function getTenantFromHost() {
   const hostname = window.location.hostname; // e.g. "nomad.wono.co" or "nomad.localhost"
@@ -118,6 +123,20 @@ if (tenant === "main") {
             { path: "reset-password/:token", element: <ResetPassword /> },
             { path: "signup", element: <Signup /> },
             { path: "about", element: <NomadAbout /> },
+            {
+              path: "terms-and-conditions",
+              element: <NomadTermsAndConditions />,
+            },
+            {
+              path: "content-and-copyright",
+              element: <NomadContentAndCopyright />,
+            },
+            {
+              path: "content-use-removal",
+              element: <NomadContentUseRemoval />,
+            },
+            { path: "privacy", element: <NomadPrivacy /> },
+            { path: "faq", element: <NomadFAQ /> },
             { path: "profile", element: <Profile /> },
             { path: "favorites", element: <Favorites /> },
           ],
