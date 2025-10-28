@@ -233,6 +233,15 @@ const Product = () => {
     },
   });
 
+  const goToHostsContentCopyright = () => {
+    if (window.location.hostname.includes("localhost")) {
+      window.location.href =
+        "http://hosts.localhost:5173/content-and-copyright";
+    } else {
+      window.location.href = "https://hosts.wono.co/content-and-copyright";
+    }
+  };
+
   return (
     <div className="p-4">
       <div className="min-w-[70%] max-w-[80rem] lg:max-w-[70rem] mx-0 md:mx-auto">
@@ -910,7 +919,7 @@ const Product = () => {
             <hr className="my-5 lg:my-10" />
 
             {/* Content & Source Disclaimer */}
-            <div className="text-xs text-gray-500 leading-relaxed mt-6">
+            <div className="text-[0.5rem] text-gray-500 leading-relaxed mt-6">
               <p className="mb-2">
                 <b>Source:</b> All above content, images and details have been
                 sourced from <span className="italic">Google</span> (publicly
@@ -947,11 +956,12 @@ const Product = () => {
                 services with intent to grow them and the ecosystem.
               </p>
               <p className="mt-2">
+                Read the entire{" "}
                 <span
                   className="underline text-primary-blue cursor-pointer"
-                  onClick={() => navigate("/content-and-copyright")}
+                  onClick={goToHostsContentCopyright}
                 >
-                  Read the entire Content and Copyright Policy
+                  Content and Copyright
                 </span>{" "}
                 by clicking the link in our website footer.
               </p>

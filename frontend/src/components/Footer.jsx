@@ -152,18 +152,18 @@ const Footer = () => {
       {/* Copyright */}
       <div className="w-full flex flex-col md:flex-row justify-between items-center text-center md:text-left py-6 border-t-2 border-white px-4 md:px-[7.5rem]">
         {/* Left side — Copyright */}
-        <div className="flex flex-col md:flex-row justify-center md:justify-start items-center gap-1 text-small md:text-base text-gray-800 mb-3 md:mb-0">
+        <div className="flex flex-col md:flex-row justify-center md:justify-start items-center gap-1 text-[10px] md:text-xs font-semibold text-gray-800 mb-3 md:mb-0">
           <span>
             &copy; Copyright {new Date().getFullYear()} -{" "}
             {(new Date().getFullYear() + 1).toString().slice(-2)}
           </span>
-          <span className="text-tiny lg:text-content md:ml-2">
+          <span className="text-[10px] md:text-xs font-semibold md:ml-2">
             WONOCO PRIVATE LIMITED - SINGAPORE. All Rights Reserved.
           </span>
         </div>
 
         {/* Right side — Policy Links */}
-        <div className="flex flex-col md:flex-row justify-center md:justify-end items-center gap-4 text-xs md:text-sm text-gray-800 font-medium">
+        <div className="flex flex-col md:flex-row justify-center md:justify-end items-center gap-4 text-[10px] md:text-xs font-semibold text-gray-800 ">
           <span
             onClick={goToHostsContentCopyright}
             className="hover:opacity-100 hover:text-gray-500 uppercase text-center md:text-right cursor-pointer"

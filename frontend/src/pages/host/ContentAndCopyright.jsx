@@ -77,11 +77,8 @@ const ContentAndCopyright = () => {
             the respective websites or platforms. If any content owner believes
             that their material has been used inappropriately or without proper
             attribution, they may contact us at{" "}
-            <a
-              href="mailto:[insert official contact email]"
-              className="text-primary-blue underline"
-            >
-              [insert official contact email]
+            <a href="mailto:response@wono.co" className="text-primary-blue ">
+              response@wono.co
             </a>
             , and we will promptly review and remove or modify the content.
           </p>
@@ -111,14 +108,13 @@ const ContentAndCopyright = () => {
             disclaimer and the purpose for which the information is provided.
           </p>
           <p className="mt-3">
-            Please{" "}
+            Please click here to read the{" "}
             <span
-              className="text-primary-blue underline cursor-pointer"
+              className="text-primary-blue font-bold cursor-pointer"
               onClick={() => navigate("/content-use-removal")}
             >
-              click here
+              Content Use & Removal Policy.
             </span>{" "}
-            to read the Content Use & Removal Policy.
           </p>
         </>
       ),
@@ -126,7 +122,7 @@ const ContentAndCopyright = () => {
   ];
 
   return (
-    <div className="flex flex-col gap-10 px-6 lg:px-28 py-4 text-[#364D59]">
+    <div className="flex flex-col gap-10 px-6 lg:px-28 pb-4 pt-12 text-[#364D59]">
       {/* Header */}
       <div className="flex flex-col items-center relative font-comic uppercase font-bold text-secondary-dark text-[clamp(1.5rem,4vw,3rem)] leading-tight">
         <div className="relative inline-block">

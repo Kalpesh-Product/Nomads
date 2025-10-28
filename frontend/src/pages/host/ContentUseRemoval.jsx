@@ -356,20 +356,24 @@ const ContentUseRemoval = () => {
             For any questions or copyright-related concerns, please contact:
           </p>
           <div className="flex flex-col mt-2">
-            <a
-              href="mailto:response@wono.co"
-              className="text-primary-blue underline"
-            >
-              response@wono.co
-            </a>
-            <a
-              href="https://wono.co"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary-blue underline mt-1"
-            >
-              https://wono.co
-            </a>
+            <span>
+              <a
+                href="mailto:response@wono.co"
+                className="text-primary-blue underline"
+              >
+                response@wono.co
+              </a>
+            </span>
+            <span>
+              <a
+                href="https://wono.co"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary-blue underline mt-1"
+              >
+                https://wono.co
+              </a>
+            </span>
           </div>
         </>
       ),
@@ -377,7 +381,7 @@ const ContentUseRemoval = () => {
   ];
 
   return (
-    <div className="flex flex-col gap-10 px-6 lg:px-28 py-4 text-[#364D59]">
+    <div className="flex flex-col gap-10 px-6 lg:px-28 pb-4 pt-12 text-[#364D59]">
       {/* Header */}
       <div className="flex flex-col items-center relative font-comic uppercase font-bold text-secondary-dark text-[clamp(1.5rem,4vw,3rem)] leading-tight">
         <div className="relative inline-block">
