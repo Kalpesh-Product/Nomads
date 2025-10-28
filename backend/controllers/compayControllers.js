@@ -228,6 +228,8 @@ export const createCompany = async (req, res, next) => {
       poc, // single POC object
       reviews, // array of reviews
       images,
+      cost,
+      description,
     } = req.body;
 
     const generateBuisnessId = () => {
@@ -263,6 +265,8 @@ export const createCompany = async (req, res, next) => {
       inclusions: inclusions?.trim(),
       services: services?.trim(),
       units: units?.trim(),
+      cost: cost?.trim(),
+      description: description?.trim(),
       companyType: companyType?.trim()?.split(" ").join("").toLowerCase(),
       images,
     });
@@ -361,7 +365,7 @@ export const createCompany = async (req, res, next) => {
     let savedReviews;
     if (Array.isArray(reviews) && reviews.length > 0) {
       const reviewDocs = reviews.map((review) => ({
-        company: savedComspany._id,
+        company: savedCompany._id,
         companyId,
         name: review.name?.trim(),
         starCount: parseInt(review.starCount || 1),
@@ -372,7 +376,7 @@ export const createCompany = async (req, res, next) => {
       savedReviews = await Review.insertMany(reviewDocs);
 
       if (!savedReviews) {
-        res.status(400).json({
+        return res.status(400).json({
           message: "Failed to add reviews",
         });
       }
@@ -725,7 +729,7 @@ export const getCompanyData = async (req, res, next) => {
     // Fetch DB reviews & POC
     const [reviews, poc] = await Promise.all([
       Review.find({ company: companyObjectId }).lean().exec(),
-      PointOfContact.findOne({ company: companyObjectId, isActive: true })
+      PointOfContact.findOne({ company: companyObjectId, isRegistered: true })
         .lean()
         .exec(),
     ]);
@@ -1051,6 +1055,7 @@ export const editCompany = async (req, res, next) => {
       totalReviews,
       inclusions,
       companyType,
+      companyName,
       reviews,
       images,
     } = req.body;
@@ -1062,6 +1067,7 @@ export const editCompany = async (req, res, next) => {
 
     // Update scalar fields
     company.address = address?.trim() || company.address;
+    company.companyName = companyName?.trim() || company.companyName;
     company.about = about?.trim() || company.about;
     company.totalSeats = totalSeats ? parseInt(totalSeats) : company.totalSeats;
     company.latitude = latitude ? parseFloat(latitude) : company.latitude;

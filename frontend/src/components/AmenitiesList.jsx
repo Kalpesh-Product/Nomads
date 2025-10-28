@@ -8,6 +8,7 @@ const fixedAmenitiesMap = {
     "Private Storage",
     "Air Conditioning",
     "High Speed Wi-Fi",
+    "Wi-Fi",
     "IT Support",
     "Tea & Coffee",
     "Reception Support",
@@ -29,6 +30,7 @@ const fixedAmenitiesMap = {
     "Private Storage",
     "Air Conditioning",
     "Wi-Fi",
+    "High Speed Wi-Fi",
     "IT Support",
     "Tea & Coffee",
     "Reception Support",
@@ -49,6 +51,7 @@ const fixedAmenitiesMap = {
     "Private Storage",
     "Air Conditioning",
     "Wi-Fi",
+    "High Speed Wi-Fi",
     "IT Support",
     "Tea & Coffee",
     "Reception Support",
@@ -63,12 +66,13 @@ const fixedAmenitiesMap = {
     "CCTV Secure",
     "Swimming Pool",
   ],
-  "privatestay": [
+  privatestay: [
     "Private Space",
     "Private Storage",
     "Television",
     "Air Conditioning",
     "Wi-Fi",
+    "High Speed Wi-Fi",
     "IT Support",
     "Tea & Coffee",
     "Reception Support",
@@ -89,6 +93,7 @@ const fixedAmenitiesMap = {
     "Private Storage",
     "Air Conditioning",
     "Wi-Fi",
+    "High Speed Wi-Fi",
     "IT Support",
     "Tea & Coffee",
     "Reception Support",
@@ -108,6 +113,7 @@ const fixedAmenitiesMap = {
     "Private Storage",
     "Air Conditioning",
     "High Speed Wi-Fi",
+    "Wi-Fi",
     "IT Support",
     "Tea & Coffee",
     "Reception Support",
@@ -128,6 +134,7 @@ const fixedAmenitiesMap = {
     "Smart Television",
     "Air Conditioning",
     "High Speed Wi-Fi",
+    "Wi-Fi",
     "IT Support",
     "Tea & Coffee",
     "Reception Support",
@@ -146,15 +153,30 @@ const fixedAmenitiesMap = {
 };
 
 // Normalize key for matching
-const normalizeKey = (str) =>
-  str.toLowerCase().replace(/[\s&]/g, "").trim();
+const normalizeKey = (str) => str.toLowerCase().replace(/[\s&]/g, "").trim();
 
 export default function AmenitiesList({ type = "coworking", inclusions = [] }) {
   // Normalize all backend inclusions once
   const normalizedInclusions = inclusions.map(normalizeKey);
 
-  // Pick correct fixed amenities list based on type
-  const fixedAmenities = fixedAmenitiesMap[type?.toLowerCase()] || [];
+  const hasHighSpeedWiFi = normalizedInclusions.includes(
+    normalizeKey("High Speed Wi-Fi")
+  );
+  const hasWiFi = normalizedInclusions.includes(normalizeKey("Wi-Fi"));
+
+  // Pick correct fixed amenities list
+  let fixedAmenities = fixedAmenitiesMap[type?.toLowerCase()] || [];
+
+  // Apply exclusion rule
+  if (hasHighSpeedWiFi) {
+    fixedAmenities = fixedAmenities.filter(
+      (a) => normalizeKey(a) !== normalizeKey("Wi-Fi")
+    );
+  } else if (hasWiFi) {
+    fixedAmenities = fixedAmenities.filter(
+      (a) => normalizeKey(a) !== normalizeKey("High Speed Wi-Fi")
+    );
+  }
 
   // Sort: available first, then unavailable; both groups sorted alphabetically
   const sortedAmenities = [...fixedAmenities].sort((a, b) => {
