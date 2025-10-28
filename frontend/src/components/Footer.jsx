@@ -92,14 +92,14 @@ const Footer = () => {
     <footer className="w-full bg-gray-100 text-black flex flex-col justify-center items-center shadow-lg">
       <div className="w-full flex flex-wrap justify-between items-center pt-12 pb-8 px-4 md:px-[7.5rem]">
         {/* Left Section */}
-        <div className="flex flex-col items-center lg:items-start mb-8 lg:mb-0">
+        <div className="flex flex-col items-center md:items-center lg:items-start mb-8 lg:mb-0 w-full md:w-auto text-center lg:text-left">
           <img
             src={logo}
-            className="w-36 cursor-pointer mb-4"
+            className="w-36 cursor-pointer mb-4 mx-auto lg:mx-0"
             alt="logo"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           />
-          <p className="text-sm leading-6 text-center lg:text-left">
+          <p className="text-sm leading-6">
             WONOCO PRIVATE LIMITED - SINGAPORE
             <br />
             <Link
