@@ -360,8 +360,9 @@ export const createCompany = async (req, res, next) => {
     /** ---------------- REVIEWS LOGIC ---------------- **/
     let savedReviews;
     if (Array.isArray(reviews) && reviews.length > 0) {
+      console.log("reviews", reviews);
       const reviewDocs = reviews.map((review) => ({
-        company: savedComspany._id,
+        company: savedCompany._id,
         companyId,
         name: review.name?.trim(),
         starCount: parseInt(review.starCount || 1),
@@ -372,7 +373,7 @@ export const createCompany = async (req, res, next) => {
       savedReviews = await Review.insertMany(reviewDocs);
 
       if (!savedReviews) {
-        res.status(400).json({
+        return res.status(400).json({
           message: "Failed to add reviews",
         });
       }
@@ -725,7 +726,7 @@ export const getCompanyData = async (req, res, next) => {
     // Fetch DB reviews & POC
     const [reviews, poc] = await Promise.all([
       Review.find({ company: companyObjectId }).lean().exec(),
-      PointOfContact.findOne({ company: companyObjectId, isActive: true })
+      PointOfContact.findOne({ company: companyObjectId, isRegistered: true })
         .lean()
         .exec(),
     ]);

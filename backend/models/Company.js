@@ -107,7 +107,13 @@ const companySchema = new mongoose.Schema({
     ],
     required: true,
   },
+  //To List the company product regardless of registration
   isActive: {
+    type: Boolean,
+    default: true,
+  },
+  //POC Details can be rendered only if company is registered
+  isRegistered: {
     type: Boolean,
     default: false,
   },
