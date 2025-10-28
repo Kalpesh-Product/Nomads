@@ -163,7 +163,7 @@ const Footer = () => {
         </div>
 
         {/* Right side — Policy Links */}
-        <div className="flex flex-col md:flex-row justify-center md:justify-end items-center gap-4 text-[10px] md:text-xs font-semibold text-gray-800 ">
+        <div className="flex flex-col md:flex-row justify-center md:justify-end items-center gap-4 text-[10px] md:text-xs text-gray-800 ">
           <span
             onClick={goToHostsContentCopyright}
             className="hover:opacity-100 hover:text-gray-500 uppercase text-center md:text-right cursor-pointer"
