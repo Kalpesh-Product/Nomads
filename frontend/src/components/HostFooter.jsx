@@ -36,6 +36,7 @@ const HostFooter = () => {
         { name: "About", link: "/about" },
         { name: "Career", link: "career" },
         { name: "FAQs", link: "faq" },
+        { name: "Content and Copyright Policy", link: "content-and-copyright" },
       ],
     },
     {
@@ -43,6 +44,7 @@ const HostFooter = () => {
         { name: "Privacy", link: "privacy" },
         { name: "T&C", link: "terms-and-conditions" },
         { name: "Contact", link: "contact" },
+        { name: "Content Use & Removal Policy", link: "content-use-removal" },
       ],
     },
   ];
@@ -67,7 +69,8 @@ const HostFooter = () => {
               WONOCO PRIVATE LIMITED - SINGAPORE <br />
               <Link
                 to="mailto:response@wono.co"
-                className="text-primary-blue lowercase hover:underline">
+                className="text-primary-blue lowercase hover:underline"
+              >
                 response@wono.co
               </Link>
             </p>
@@ -80,12 +83,14 @@ const HostFooter = () => {
             {footerSections.map((section, idx) => (
               <div
                 key={idx}
-                className="flex flex-col justify-center items-center lg:items-center">
+                className="flex flex-col justify-center items-center lg:items-center"
+              >
                 {section.links.map((linkObj, i) => (
                   <Link
                     key={i}
                     to={linkObj.link}
-                    className="text-sm text-black opacity-80 hover:opacity-100 hover:text-gray-500 transition-all duration-200 cursor-pointer uppercase p-4">
+                    className="text-sm text-black opacity-80 hover:opacity-100 hover:text-gray-500 transition-all duration-200 cursor-pointer uppercase p-4"
+                  >
                     {linkObj.name}
                   </Link>
                 ))}
@@ -114,7 +119,8 @@ const HostFooter = () => {
           {/* Language Selector */}
           <div
             onClick={() => setShowLangModal(true)}
-            className="flex items-center gap-1 cursor-pointer hover:underline">
+            className="flex items-center gap-1 cursor-pointer hover:underline"
+          >
             <FaGlobe className="text-[12px]" />
             <span>{selectedLang.name}</span>
           </div>
@@ -122,7 +128,8 @@ const HostFooter = () => {
           {/* Currency Selector */}
           <div
             onClick={() => setShowCurrencyModal(true)}
-            className="px-2 py-[2px] border border-gray-700 rounded-md text-[12px] flex items-center gap-1 cursor-pointer hover:underline">
+            className="px-2 py-[2px] border border-gray-700 rounded-md text-[12px] flex items-center gap-1 cursor-pointer hover:underline"
+          >
             <FaRupeeSign className="text-[12px]" />
             <span>{selectedCurrency.code}</span>
           </div>
@@ -139,7 +146,8 @@ const HostFooter = () => {
           <div className="bg-white rounded-lg max-w-2xl w-full p-6 relative overflow-y-auto max-h-[80vh]">
             <button
               onClick={() => setShowLangModal(false)}
-              className="absolute top-3 right-3 text-gray-600 hover:text-black">
+              className="absolute top-3 right-3 text-gray-600 hover:text-black"
+            >
               <AiOutlineClose size={20} />
             </button>
             <h2 className="text-lg font-semibold mb-4">
@@ -157,7 +165,8 @@ const HostFooter = () => {
                     selectedLang.code === lang.code
                       ? "border-black"
                       : "border-gray-300"
-                  }`}>
+                  }`}
+                >
                   {lang.name}
                 </div>
               ))}
@@ -172,7 +181,8 @@ const HostFooter = () => {
           <div className="bg-white rounded-lg max-w-2xl w-full p-6 relative overflow-y-auto max-h-[80vh]">
             <button
               onClick={() => setShowCurrencyModal(false)}
-              className="absolute top-3 right-3 text-gray-600 hover:text-black">
+              className="absolute top-3 right-3 text-gray-600 hover:text-black"
+            >
               <AiOutlineClose size={20} />
             </button>
             <h2 className="text-lg font-semibold mb-4">Choose a currency</h2>
@@ -188,7 +198,8 @@ const HostFooter = () => {
                     selectedCurrency.code === cur.code
                       ? "border-black"
                       : "border-gray-300"
-                  }`}>
+                  }`}
+                >
                   <div className="font-medium">{cur.name}</div>
                   <div className="text-sm text-gray-500">
                     {cur.code} — {cur.symbol}

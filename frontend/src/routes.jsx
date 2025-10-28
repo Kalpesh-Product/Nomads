@@ -43,6 +43,8 @@ import PersistLogin from "./layout/PersistsLogin";
 import Favorites from "./pages/Favorites";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import ContentAndCopyright from "./pages/host/ContentAndCopyright";
+import ContentUseRemoval from "./pages/host/ContentUseRemoval";
 
 function getTenantFromHost() {
   const hostname = window.location.hostname; // e.g. "nomad.wono.co" or "nomad.localhost"
@@ -166,6 +168,8 @@ if (tenant === "main") {
         { path: "capital", element: <Capital /> },
         { path: "about", element: <HostAbout /> },
         { path: "terms-and-conditions", element: <HostTermsAndConditions /> },
+        { path: "content-and-copyright", element: <ContentAndCopyright /> },
+        { path: "content-use-removal", element: <ContentUseRemoval /> },
         { path: "privacy", element: <HostPrivacy /> },
         { path: "faq", element: <HostFAQ /> },
       ],

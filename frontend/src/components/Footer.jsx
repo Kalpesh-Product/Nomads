@@ -45,6 +45,21 @@ const Footer = () => {
       window.location.href = "https://hosts.wono.co/terms-and-conditions";
     }
   };
+  const goToHostsContentCopyright = () => {
+    if (window.location.hostname.includes("localhost")) {
+      window.location.href =
+        "http://hosts.localhost:5173/content-and-copyright";
+    } else {
+      window.location.href = "https://hosts.wono.co/content-and-copyright";
+    }
+  };
+  const goToHostsContentUseRemoval = () => {
+    if (window.location.hostname.includes("localhost")) {
+      window.location.href = "http://hosts.localhost:5173/content-use-removal";
+    } else {
+      window.location.href = "https://hosts.wono.co/content-use-removal";
+    }
+  };
 
   const footerSections = [
     {
@@ -53,6 +68,10 @@ const Footer = () => {
         { name: "About", link: "/about" },
         { name: "Career", link: "career" },
         { name: "FAQs", link: "https://hosts.wono.co/faq" },
+        {
+          name: "Content and Copyright Policy",
+          link: goToHostsContentCopyright,
+        },
       ],
     },
     {
@@ -61,6 +80,10 @@ const Footer = () => {
         { name: "Privacy", link: goToHostsPrivacy },
         { name: "T&C", link: goToHostsTC },
         { name: "Contact", link: "/contact" },
+        {
+          name: "Content Use & Removal Policy",
+          link: goToHostsContentUseRemoval,
+        },
       ],
     },
   ];
@@ -81,7 +104,8 @@ const Footer = () => {
             <br />
             <Link
               to="mailto:response@wono.co"
-              className="text-primary-blue lowercase hover:underline">
+              className="text-primary-blue lowercase hover:underline"
+            >
               response@wono.co
             </Link>
           </p>
@@ -93,20 +117,23 @@ const Footer = () => {
             {footerSections.map((section, idx) => (
               <div
                 key={idx}
-                className="flex flex-col items-center lg:items-start">
+                className="flex flex-col items-center lg:items-start"
+              >
                 {section.links.map((linkObj, i) =>
                   typeof linkObj.link === "function" ? (
                     <span
                       key={i}
                       onClick={linkObj.link}
-                      className="text-sm opacity-80 hover:text-gray-500 cursor-pointer uppercase p-2">
+                      className="text-sm opacity-80 hover:text-gray-500 cursor-pointer uppercase p-2"
+                    >
                       {linkObj.name}
                     </span>
                   ) : (
                     <Link
                       key={i}
                       to={linkObj.link}
-                      className="text-sm opacity-80 hover:text-gray-500 uppercase p-2">
+                      className="text-sm opacity-80 hover:text-gray-500 uppercase p-2"
+                    >
                       {linkObj.name}
                     </Link>
                   )
@@ -128,7 +155,8 @@ const Footer = () => {
         {/* Language Selector */}
         <div
           onClick={() => setShowLangModal(true)}
-          className="flex items-center gap-1 cursor-pointer hover:underline">
+          className="flex items-center gap-1 cursor-pointer hover:underline"
+        >
           <FaGlobe className="text-[12px]" />
           <span>{selectedLang.name}</span>
         </div>
@@ -136,7 +164,8 @@ const Footer = () => {
         {/* Currency Selector */}
         <div
           onClick={() => setShowCurrencyModal(true)}
-          className="px-2 py-[2px] border border-gray-700 rounded-md flex items-center gap-1 cursor-pointer hover:underline">
+          className="px-2 py-[2px] border border-gray-700 rounded-md flex items-center gap-1 cursor-pointer hover:underline"
+        >
           <FaRupeeSign className="text-[12px]" />
           <span>{selectedCurrency.code}</span>
         </div>
@@ -152,7 +181,8 @@ const Footer = () => {
           <div className="bg-white rounded-lg max-w-2xl w-full p-6 relative overflow-y-auto max-h-[80vh]">
             <button
               onClick={() => setShowLangModal(false)}
-              className="absolute top-3 right-3 text-gray-600 hover:text-black">
+              className="absolute top-3 right-3 text-gray-600 hover:text-black"
+            >
               <AiOutlineClose size={20} />
             </button>
             <h2 className="text-lg font-semibold mb-4">
@@ -170,7 +200,8 @@ const Footer = () => {
                     selectedLang.code === lang.code
                       ? "border-black"
                       : "border-gray-300"
-                  }`}>
+                  }`}
+                >
                   {lang.name}
                 </div>
               ))}
@@ -185,7 +216,8 @@ const Footer = () => {
           <div className="bg-white rounded-lg max-w-2xl w-full p-6 relative overflow-y-auto max-h-[80vh]">
             <button
               onClick={() => setShowCurrencyModal(false)}
-              className="absolute top-3 right-3 text-gray-600 hover:text-black">
+              className="absolute top-3 right-3 text-gray-600 hover:text-black"
+            >
               <AiOutlineClose size={20} />
             </button>
             <h2 className="text-lg font-semibold mb-4">Choose a currency</h2>
@@ -201,7 +233,8 @@ const Footer = () => {
                     selectedCurrency.code === cur.code
                       ? "border-black"
                       : "border-gray-300"
-                  }`}>
+                  }`}
+                >
                   <div className="font-medium">{cur.name}</div>
                   <div className="text-sm text-gray-500">
                     {cur.code} — {cur.symbol}
