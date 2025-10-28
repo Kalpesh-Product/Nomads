@@ -913,9 +913,8 @@ const Product = () => {
             <div className="text-xs text-gray-500 leading-relaxed mt-6">
               <p className="mb-2">
                 <b>Source:</b> All above content, images and details have been
-                sourced from{" "}
-                <span className="italic">[insert source name here]</span>{" "}
-                (publicly available information).
+                sourced from <span className="italic">Google</span> (publicly
+                available information).
               </p>
               <p className="mb-2">
                 <b>Content and Copyright Disclaimer:</b> WoNo is a nomad

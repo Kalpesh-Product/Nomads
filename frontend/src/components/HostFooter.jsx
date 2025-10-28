@@ -36,7 +36,7 @@ const HostFooter = () => {
         { name: "About", link: "/about" },
         { name: "Career", link: "career" },
         { name: "FAQs", link: "faq" },
-        { name: "Content and Copyright Policy", link: "content-and-copyright" },
+        // { name: "Content and Copyright Policy", link: "content-and-copyright" },
       ],
     },
     {
@@ -44,7 +44,7 @@ const HostFooter = () => {
         { name: "Privacy", link: "privacy" },
         { name: "T&C", link: "terms-and-conditions" },
         { name: "Contact", link: "contact" },
-        { name: "Content Use & Removal Policy", link: "content-use-removal" },
+        // { name: "Content Use & Removal Policy", link: "content-use-removal" },
       ],
     },
   ];
@@ -101,7 +101,7 @@ const HostFooter = () => {
       </div>
 
       {/* Copyright */}
-      <div className="w-full text-center flex flex-col py-6 border-t-2 border-white">
+      {/* <div className="w-full text-center flex flex-col py-6 border-t-2 border-white">
         <div className="flex justify-center items-center flex-col md:flex-row gap-2 text-small md:text-base">
           <span>
             &copy; Copyright {new Date().getFullYear()} -{" "}
@@ -110,6 +110,35 @@ const HostFooter = () => {
           <span className="text-tiny lg:text-content">
             WONOCO PRIVATE LIMITED - SINGAPORE. All Rights Reserved.
           </span>
+        </div>
+      </div> */}
+      {/* Copyright */}
+      <div className="w-full flex flex-col md:flex-row justify-between items-center text-center md:text-left py-6 border-t-2 border-white px-4 md:px-[7.5rem]">
+        {/* Left side — Copyright */}
+        <div className="flex flex-col md:flex-row justify-center md:justify-start items-center gap-1 text-small md:text-base text-gray-800 mb-3 md:mb-0">
+          <span>
+            &copy; Copyright {new Date().getFullYear()} -{" "}
+            {(new Date().getFullYear() + 1).toString().slice(-2)}
+          </span>
+          <span className="text-tiny lg:text-content md:ml-2">
+            WONOCO PRIVATE LIMITED - SINGAPORE. All Rights Reserved.
+          </span>
+        </div>
+
+        {/* Right side — Policy Links */}
+        <div className="flex flex-col md:flex-row justify-center md:justify-end items-center gap-4 text-xs md:text-sm text-gray-800 font-medium">
+          <Link
+            to="/content-and-copyright"
+            className="hover:opacity-100 hover:text-gray-500 uppercase text-center md:text-right"
+          >
+            Content and Copyright Policy
+          </Link>
+          <Link
+            to="/content-use-removal"
+            className="hover:opacity-100 hover:text-gray-500 uppercase text-center md:text-right"
+          >
+            Content Use & Removal Policy
+          </Link>
         </div>
       </div>
 

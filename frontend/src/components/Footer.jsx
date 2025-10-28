@@ -68,10 +68,10 @@ const Footer = () => {
         { name: "About", link: "/about" },
         { name: "Career", link: "career" },
         { name: "FAQs", link: "https://hosts.wono.co/faq" },
-        {
-          name: "Content and Copyright Policy",
-          link: goToHostsContentCopyright,
-        },
+        // {
+        //   name: "Content and Copyright Policy",
+        //   link: goToHostsContentCopyright,
+        // },
       ],
     },
     {
@@ -80,10 +80,10 @@ const Footer = () => {
         { name: "Privacy", link: goToHostsPrivacy },
         { name: "T&C", link: goToHostsTC },
         { name: "Contact", link: "/contact" },
-        {
-          name: "Content Use & Removal Policy",
-          link: goToHostsContentUseRemoval,
-        },
+        // {
+        //   name: "Content Use & Removal Policy",
+        //   link: goToHostsContentUseRemoval,
+        // },
       ],
     },
   ];
@@ -145,9 +145,38 @@ const Footer = () => {
       </div>
 
       {/* Copyright */}
-      <div className="w-full text-center py-4 border-t border-gray-200 text-sm">
+      {/* <div className="w-full text-center py-4 border-t border-gray-200 text-sm">
         © {new Date().getFullYear()} WONOCO PRIVATE LIMITED - SINGAPORE. All
         Rights Reserved.
+      </div> */}
+      {/* Copyright */}
+      <div className="w-full flex flex-col md:flex-row justify-between items-center text-center md:text-left py-6 border-t-2 border-white px-4 md:px-[7.5rem]">
+        {/* Left side — Copyright */}
+        <div className="flex flex-col md:flex-row justify-center md:justify-start items-center gap-1 text-small md:text-base text-gray-800 mb-3 md:mb-0">
+          <span>
+            &copy; Copyright {new Date().getFullYear()} -{" "}
+            {(new Date().getFullYear() + 1).toString().slice(-2)}
+          </span>
+          <span className="text-tiny lg:text-content md:ml-2">
+            WONOCO PRIVATE LIMITED - SINGAPORE. All Rights Reserved.
+          </span>
+        </div>
+
+        {/* Right side — Policy Links */}
+        <div className="flex flex-col md:flex-row justify-center md:justify-end items-center gap-4 text-xs md:text-sm text-gray-800 font-medium">
+          <span
+            onClick={goToHostsContentCopyright}
+            className="hover:opacity-100 hover:text-gray-500 uppercase text-center md:text-right cursor-pointer"
+          >
+            Content and Copyright Policy
+          </span>
+          <span
+            onClick={goToHostsContentUseRemoval}
+            className="hover:opacity-100 hover:text-gray-500 uppercase text-center md:text-right cursor-pointer"
+          >
+            Content Use & Removal Policy
+          </span>
+        </div>
       </div>
 
       {/* Bottom Bar */}
