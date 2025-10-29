@@ -24,15 +24,15 @@ const NomadContentUseRemoval = () => {
       fullName: "",
       mobile: "",
       email: "",
-      organization: "",
-      position: "",
+      companyName: "",
+      designation: "",
       urls: "",
     },
   });
 
   const { mutate: submitRemovalForm, isPending } = useMutation({
     mutationFn: async (data) => {
-      const response = await axios.post("forms/add-content-removal-request", {
+      const response = await axios.post("forms/add-new-b2c-form-submission", {
         ...data,
         sheetName: "Content_Removal_Requests",
       });
@@ -232,7 +232,7 @@ const NomadContentUseRemoval = () => {
 
             {/* Organization */}
             <Controller
-              name="organization"
+              name="companyName"
               control={control}
               rules={{ required: "Organization name is required" }}
               render={({ field, fieldState }) => (
@@ -251,7 +251,7 @@ const NomadContentUseRemoval = () => {
 
             {/* Position */}
             <Controller
-              name="position"
+              name="designation"
               control={control}
               rules={{ required: "Position is required" }}
               render={({ field, fieldState }) => (
