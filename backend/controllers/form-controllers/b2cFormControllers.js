@@ -105,6 +105,31 @@ const nomadsSignupSchema = yup.object().shape({
   sheetName: yup.string().required("Please provide a sheet name"),
 });
 
+const contentRemovalRequestsSchema = yup.object().shape({
+  fullName: yup
+    .string()
+    .trim()
+    .min(1, "Please provide a valid full name")
+    .required("Please provide your full name"),
+  mobile: yup
+    .string()
+    .trim()
+    .matches(/^\+?[0-9]{7,15}$/, "Please provide a valid mobile number")
+    .required("Please provide the mobile number"),
+  email: yup
+    .string()
+    .trim()
+    .email("Please provide a valid email address")
+    .required("Please provide your email address"),
+  companyName: yup.string().trim().required("Please provide the company name"),
+  designation: yup.string().trim().required("Please provide your designation"),
+  urls: yup
+    .string()
+    .trim()
+    .required("Please provide the URLs or links for content removal"),
+  sheetName: yup.string().required("Please provide a sheet name"),
+});
+
 function toISODateOnly(v) {
   if (!v) return "";
   const d = new Date(v);
@@ -235,6 +260,34 @@ export const addB2CformSubmission = async (req, res, next) => {
     `,
         }),
       },
+      Content_Removal_Requests: {
+        schema: contentRemovalRequestsSchema,
+        map: (d) => ({
+          fullName: d.fullName,
+          mobile: d.mobile,
+          email: d.email,
+          companyName: d.companyName,
+          designation: d.designation,
+          urls: d.urls,
+          sheetName: d.sheetName,
+          submittedAt: new Date(),
+        }),
+        successMsg:
+          "Your content removal request has been submitted successfully.",
+        emailTemplate: (data) => ({
+          to: data.email,
+          subject: "Content Removal Request Received 🧾",
+          text: `Hi ${data.fullName}, we’ve received your content removal request for ${data.companyName}. Our moderation team will review it shortly.`,
+          html: `
+      <h2>Content Removal Request Received</h2>
+      <p>Hi ${data.fullName},</p>
+      <p>We’ve received your content removal request for <b>${data.companyName}</b>.</p>
+      <p>Our moderation team will review the provided URLs and take the necessary action.</p>
+      <p>We’ll get back to you via email if we need additional details.</p>
+      <p>Cheers,<br/>The WONO Team</p>
+    `,
+        }),
+      },
     };
 
     const config = sheetConfig[sheetName];
@@ -325,15 +378,6 @@ export const addB2CformSubmission = async (req, res, next) => {
     if (result.status !== "success") {
       throw new Error(result.message || "Failed to save data to Google Sheets");
     }
-
-    // Send confirmation email if template exists
-    // if (config.emailTemplate) {
-    //   try {
-    //     await sendMail(config.emailTemplate(validatedData));
-    //   } catch (err) {
-    //     console.error("Failed to send confirmation email:", err.message);
-    //   }
-    // }
 
     res.status(201).json({
       status: "success",
