@@ -916,14 +916,13 @@ const Product = () => {
                 </div>
               </>
             )}
-            <hr className="my-5 lg:my-10" />
+            <hr className="my-5 lg:my-10"  />
 
             {/* Content & Source Disclaimer */}
-            <div className="text-[0.5rem] text-gray-500 leading-relaxed mt-6">
+            <div className="text-[0.5rem] text-gray-500 leading-relaxed">
               <p className="mb-2">
                 <b>Source:</b> All above content, images and details have been
-                sourced from <span className="italic">Google</span> (publicly
-                available information).
+                sourced from publicly available information.
               </p>
               <p className="mb-2">
                 <b>Content and Copyright Disclaimer:</b> WoNo is a nomad
