@@ -17,6 +17,7 @@ import {
   activateProduct,
   updateLeads,
   bulkUpdateCompanyInclusions,
+  inactivateProduct,
 } from "../controllers/compayControllers.js";
 
 const router = Router();
@@ -34,6 +35,7 @@ router.patch(
 
 router.get("/companies", getCompaniesData);
 router.patch("/activate-product", activateProduct);
+router.patch("/deactivate-product", inactivateProduct);
 router.get("/get-single-company-data", getCompanyData);
 router.get("/get-listings/:companyId", getListings);
 router.get("/get-company-data/:companyName", getCompany); //check company from admin panel before adding website link after creating website.

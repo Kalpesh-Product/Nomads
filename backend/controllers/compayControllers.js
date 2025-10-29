@@ -1171,14 +1171,43 @@ export const activateProduct = async (req, res, next) => {
 
     if (!product) {
       return res.status(400).json({
-        message: "Failed to update leads",
+        message: "Failed to update product",
       });
     }
 
-    const activeStatus = status ? "activated" : "inactivated";
+    const activeStatus = status ? "activated" : "deactivated";
     return res
       .status(200)
       .json({ message: `Product ${activeStatus} successfully` });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deactivateProduct = async (req, res, next) => {
+  try {
+    const { businessId } = req.body;
+
+    if (!businessId) {
+      return res.status(400).json({
+        message: "Company Id missing",
+      });
+    }
+
+    const product = await Company.findOneAndUpdate(
+      { businessId },
+      { isActive: false }
+    );
+
+    if (!product) {
+      return res.status(400).json({
+        message: "Product not found or failed to deactivate",
+      });
+    }
+
+    return res
+      .status(200)
+      .json({ message: "Product has been deactivated successfully" });
   } catch (error) {
     next(error);
   }
