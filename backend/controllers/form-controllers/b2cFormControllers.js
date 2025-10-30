@@ -331,7 +331,6 @@ export const addB2CformSubmission = async (req, res, next) => {
     }
 
     if (sheetName === "Sign_up") {
-      console.log(sheetName);
       const existingUser = await NomadUser.findOne({
         email: req.body.email?.trim().toLowerCase(),
       });
