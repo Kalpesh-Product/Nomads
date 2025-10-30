@@ -127,6 +127,11 @@ const contentRemovalRequestsSchema = yup.object().shape({
     .string()
     .trim()
     .required("Please provide the URLs or links for content removal"),
+  source: yup
+    .string()
+    .trim()
+    .oneOf(["nomad", "host"], "Source must be either 'nomad' or 'host'")
+    .required("Please provide the Source"),
   sheetName: yup.string().required("Please provide a sheet name"),
 });
 
@@ -269,6 +274,7 @@ export const addB2CformSubmission = async (req, res, next) => {
           companyName: d.companyName,
           designation: d.designation,
           urls: d.urls,
+          source: d.source,
           sheetName: d.sheetName,
           submittedAt: new Date(),
         }),
@@ -331,7 +337,6 @@ export const addB2CformSubmission = async (req, res, next) => {
     }
 
     if (sheetName === "Sign_up") {
-      console.log(sheetName);
       const existingUser = await NomadUser.findOne({
         email: req.body.email?.trim().toLowerCase(),
       });
