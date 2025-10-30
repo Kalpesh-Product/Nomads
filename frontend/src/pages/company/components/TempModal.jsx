@@ -1,18 +1,13 @@
 import React, { useRef } from "react";
-import { Modal, IconButton } from "@mui/material";
-import { IoMdClose } from "react-icons/io";
+import { Modal } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 
 const TempModal = ({
   open,
   onClose,
-  title,
   children,
-  headerBackground,
-  bgColor="bg-black",
-  width="100%",
-  padding="p-4",
-  height="100%"
+  bgColor = "bg-black",
+  width = "w-full", // keep full, we’ll clamp via prop on usage
 }) => {
   const modalRef = useRef(null);
 
@@ -20,23 +15,23 @@ const TempModal = ({
     <AnimatePresence>
       {open && (
         <Modal open={open} onClose={onClose}>
+          {/* Backdrop container */}
           <div
             ref={modalRef}
-            className="fixed inset-0 flex items-center justify-center  overflow-hidden"
+            className="fixed inset-0 flex items-center justify-center p-4"
           >
+            {/* Panel */}
             <motion.div
               key="modal"
               initial={{ y: -90, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 90, opacity: 0 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              className={`${bgColor} ${height} ${width}  shadow-xl outline-none overflow-y-auto rounded-xl`}
+              className={`${bgColor} ${width} shadow-xl outline-none rounded-xl
+                          w-full max-h-[90vh] overflow-y-auto overscroll-contain`}
+              style={{ WebkitOverflowScrolling: "touch" }} // smooth iOS scroll
             >
-              {/* Header */}
-       
-
-              {/* Content */}
-              <div className={`${padding}`}>{children}</div>
+              <div className="p-0">{children}</div>
             </motion.div>
           </div>
         </Modal>
