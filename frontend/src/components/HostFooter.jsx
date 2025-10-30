@@ -36,6 +36,7 @@ const HostFooter = () => {
         { name: "About", link: "/about" },
         { name: "Career", link: "career" },
         { name: "FAQs", link: "faq" },
+        // { name: "Content and Copyright Policy", link: "content-and-copyright" },
       ],
     },
     {
@@ -43,6 +44,7 @@ const HostFooter = () => {
         { name: "Privacy", link: "privacy" },
         { name: "T&C", link: "terms-and-conditions" },
         { name: "Contact", link: "contact" },
+        // { name: "Content Use & Removal Policy", link: "content-use-removal" },
       ],
     },
   ];
@@ -67,7 +69,8 @@ const HostFooter = () => {
               WONOCO PRIVATE LIMITED - SINGAPORE <br />
               <Link
                 to="mailto:response@wono.co"
-                className="text-primary-blue lowercase hover:underline">
+                className="text-primary-blue lowercase hover:underline"
+              >
                 response@wono.co
               </Link>
             </p>
@@ -80,12 +83,14 @@ const HostFooter = () => {
             {footerSections.map((section, idx) => (
               <div
                 key={idx}
-                className="flex flex-col justify-center items-center lg:items-center">
+                className="flex flex-col justify-center items-center lg:items-center"
+              >
                 {section.links.map((linkObj, i) => (
                   <Link
                     key={i}
                     to={linkObj.link}
-                    className="text-sm text-black opacity-80 hover:opacity-100 hover:text-gray-500 transition-all duration-200 cursor-pointer uppercase p-4">
+                    className="text-sm text-black opacity-80 hover:opacity-100 hover:text-gray-500 transition-all duration-200 cursor-pointer uppercase p-4"
+                  >
                     {linkObj.name}
                   </Link>
                 ))}
@@ -96,7 +101,7 @@ const HostFooter = () => {
       </div>
 
       {/* Copyright */}
-      <div className="w-full text-center flex flex-col py-6 border-t-2 border-white">
+      {/* <div className="w-full text-center flex flex-col py-6 border-t-2 border-white">
         <div className="flex justify-center items-center flex-col md:flex-row gap-2 text-small md:text-base">
           <span>
             &copy; Copyright {new Date().getFullYear()} -{" "}
@@ -106,6 +111,35 @@ const HostFooter = () => {
             WONOCO PRIVATE LIMITED - SINGAPORE. All Rights Reserved.
           </span>
         </div>
+      </div> */}
+      {/* Copyright */}
+      <div className="w-full flex flex-col md:flex-row justify-between items-center text-center md:text-left py-6 border-t-2 border-white px-4 md:px-[7.5rem]">
+        {/* Left side — Copyright */}
+        <div className="flex flex-col md:flex-row justify-center md:justify-start items-center gap-1 text-[10px] md:text-xs font-semibold text-gray-800 mb-3 md:mb-0">
+          <span>
+            &copy; Copyright {new Date().getFullYear()} -{" "}
+            {(new Date().getFullYear() + 1).toString().slice(-2)}
+          </span>
+          <span className="text-[10px] md:text-xs font-semibold md:ml-2">
+            WONOCO PRIVATE LIMITED - SINGAPORE. All Rights Reserved.
+          </span>
+        </div>
+
+        {/* Right side — Policy Links */}
+        <div className="flex flex-col md:flex-row justify-center md:justify-end items-center gap-4 text-[10px] md:text-xs text-gray-800 ">
+          <Link
+            to="/content-and-copyright"
+            className="hover:opacity-100 hover:text-gray-500 uppercase text-center md:text-right"
+          >
+            Content and Copyright Policy
+          </Link>
+          <Link
+            to="/content-use-removal"
+            className="hover:opacity-100 hover:text-gray-500 uppercase text-center md:text-right"
+          >
+            Content Use & Removal Policy
+          </Link>
+        </div>
       </div>
 
       {/* Bottom Bar */}
@@ -114,7 +148,8 @@ const HostFooter = () => {
           {/* Language Selector */}
           <div
             onClick={() => setShowLangModal(true)}
-            className="flex items-center gap-1 cursor-pointer hover:underline">
+            className="flex items-center gap-1 cursor-pointer hover:underline"
+          >
             <FaGlobe className="text-[12px]" />
             <span>{selectedLang.name}</span>
           </div>
@@ -122,7 +157,8 @@ const HostFooter = () => {
           {/* Currency Selector */}
           <div
             onClick={() => setShowCurrencyModal(true)}
-            className="px-2 py-[2px] border border-gray-700 rounded-md text-[12px] flex items-center gap-1 cursor-pointer hover:underline">
+            className="px-2 py-[2px] border border-gray-700 rounded-md text-[12px] flex items-center gap-1 cursor-pointer hover:underline"
+          >
             <FaRupeeSign className="text-[12px]" />
             <span>{selectedCurrency.code}</span>
           </div>
@@ -139,7 +175,8 @@ const HostFooter = () => {
           <div className="bg-white rounded-lg max-w-2xl w-full p-6 relative overflow-y-auto max-h-[80vh]">
             <button
               onClick={() => setShowLangModal(false)}
-              className="absolute top-3 right-3 text-gray-600 hover:text-black">
+              className="absolute top-3 right-3 text-gray-600 hover:text-black"
+            >
               <AiOutlineClose size={20} />
             </button>
             <h2 className="text-lg font-semibold mb-4">
@@ -157,7 +194,8 @@ const HostFooter = () => {
                     selectedLang.code === lang.code
                       ? "border-black"
                       : "border-gray-300"
-                  }`}>
+                  }`}
+                >
                   {lang.name}
                 </div>
               ))}
@@ -172,7 +210,8 @@ const HostFooter = () => {
           <div className="bg-white rounded-lg max-w-2xl w-full p-6 relative overflow-y-auto max-h-[80vh]">
             <button
               onClick={() => setShowCurrencyModal(false)}
-              className="absolute top-3 right-3 text-gray-600 hover:text-black">
+              className="absolute top-3 right-3 text-gray-600 hover:text-black"
+            >
               <AiOutlineClose size={20} />
             </button>
             <h2 className="text-lg font-semibold mb-4">Choose a currency</h2>
@@ -188,7 +227,8 @@ const HostFooter = () => {
                     selectedCurrency.code === cur.code
                       ? "border-black"
                       : "border-gray-300"
-                  }`}>
+                  }`}
+                >
                   <div className="font-medium">{cur.name}</div>
                   <div className="text-sm text-gray-500">
                     {cur.code} — {cur.symbol}

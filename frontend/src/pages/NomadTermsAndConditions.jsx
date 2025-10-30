@@ -1,9 +1,9 @@
 import React from "react";
 
 import { Link, useNavigate } from "react-router-dom";
-import blueUnderline from "../../assets/blue_underline.png";
+import blueUnderline from "../assets/blue_underline.png";
 
-const HostTermsAndConditions = () => {
+const NomadTermsAndConditions = () => {
   const navigate = useNavigate();
 
   const sections = [
@@ -257,4 +257,4 @@ const HostTermsAndConditions = () => {
   );
 };
 
-export default HostTermsAndConditions;
+export default NomadTermsAndConditions;

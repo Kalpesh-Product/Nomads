@@ -1,5 +1,5 @@
 import React from "react";
-import blueUnderline from "../../assets/blue_underline.png";
+import blueUnderline from "../assets/blue_underline.png";
 import { Link } from "react-router-dom";
 
 const faqs = [
@@ -120,7 +120,7 @@ const faqs = [
   },
 ];
 
-const HostFAQ = () => {
+const NomadFAQ = () => {
   return (
     <div className="flex flex-col gap-10 px-6 lg:px-28 pb-4 pt-12 text-[#364D59]">
       <div className="flex flex-col items-center relative font-comic uppercase font-bold text-secondary-dark text-[clamp(1.5rem,4vw,3rem)] leading-tight">
@@ -160,4 +160,4 @@ const HostFAQ = () => {
   );
 };
 
-export default HostFAQ;
+export default NomadFAQ;

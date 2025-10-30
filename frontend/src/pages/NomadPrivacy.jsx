@@ -1,9 +1,9 @@
 import React from "react";
 
 import { Link, useNavigate } from "react-router-dom";
-import blueUnderline from "../../assets/blue_underline.png";
+import blueUnderline from "../assets/blue_underline.png";
 
-const HostPrivacy = () => {
+const NomadPrivacy = () => {
   const navigate = useNavigate();
   const sections = [
     {
@@ -306,4 +306,4 @@ const HostPrivacy = () => {
   );
 };
 
-export default HostPrivacy;
+export default NomadPrivacy;
