@@ -35,6 +35,7 @@ const NomadContentUseRemoval = () => {
       const response = await axios.post("forms/add-new-b2c-form-submission", {
         ...data,
         sheetName: "Content_Removal_Requests",
+        source: "nomad",
       });
       return response.data;
     },

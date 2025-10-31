@@ -419,3 +419,37 @@ body::-webkit-scrollbar {
 }
 
 /* Custom Styling for animated loop END */
+
+
+/* 🔹 Responsive Stepper Fix (for hashed react-form-stepper classes) */
+@media (max-width: 640px) {
+  /* main container */
+  [class*="StepperContainer"] {
+    transform: scale(0.8);
+    transform-origin: center top;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* labels below circles */
+  [class*="LabelContainer"] span {
+    font-size: 0.65rem !important;
+  }
+
+  /* connector line */
+  [class*="Connector"] {
+    height: 2px !important;
+  }
+
+  /* step circles/buttons */
+  [class*="StepButton"] {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  [class*="StepperContainer"] {
+    transform: scale(0.8);
+  }
+}

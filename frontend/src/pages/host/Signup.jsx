@@ -299,7 +299,8 @@ const HostSignup = () => {
                     field.onChange(value); // update form with country name
                     setValue("state", ""); // reset state
                     setValue("city", ""); // reset city
-                  }}>
+                  }}
+                >
                   {Country.getAllCountries().map((c) => (
                     <MenuItem key={c.isoCode} value={c.name}>
                       {c.name}
@@ -337,7 +338,8 @@ const HostSignup = () => {
                       const value = e.target.value;
                       field.onChange(value); // store state name
                       setValue("city", ""); // reset city when state changes
-                    }}>
+                    }}
+                  >
                     {states.map((s) => (
                       <MenuItem key={s.isoCode} value={s.name}>
                         {s.name}
@@ -383,7 +385,8 @@ const HostSignup = () => {
                     variant="standard"
                     error={!!fieldState.error}
                     helperText={fieldState.error?.message}
-                    disabled={!stateObj}>
+                    disabled={!stateObj}
+                  >
                     {cities.map((city) => (
                       <MenuItem key={city.name} value={city.name}>
                         {city.name}
@@ -472,7 +475,8 @@ const HostSignup = () => {
                     field.onChange(value); // store country name
                     setValue("companyState", ""); // reset state
                     setValue("companyCity", ""); // reset city
-                  }}>
+                  }}
+                >
                   {Country.getAllCountries().map((c) => (
                     <MenuItem key={c.isoCode} value={c.name}>
                       {c.name}
@@ -510,7 +514,8 @@ const HostSignup = () => {
                       const value = e.target.value;
                       field.onChange(value); // store state name
                       setValue("companyCity", ""); // reset city when state changes
-                    }}>
+                    }}
+                  >
                     {states.map((s) => (
                       <MenuItem key={s.isoCode} value={s.name}>
                         {s.name}
@@ -556,7 +561,8 @@ const HostSignup = () => {
                     variant="standard"
                     error={!!fieldState.error}
                     helperText={fieldState.error?.message}
-                    disabled={!stateObj}>
+                    disabled={!stateObj}
+                  >
                     {cities.map((city) => (
                       <MenuItem key={city.name} value={city.name}>
                         {city.name}
@@ -625,7 +631,8 @@ const HostSignup = () => {
                         boxShadow: "none !important",
                         background: "transparent",
                       },
-                    }}>
+                    }}
+                  >
                     <UploadFileInput
                       id="companyLogo"
                       value={field.value}
@@ -651,7 +658,8 @@ const HostSignup = () => {
                         boxShadow: "none !important",
                         background: "transparent",
                       },
-                    }}>
+                    }}
+                  >
                     <UploadMultipleFilesInput
                       {...field}
                       name="heroImages"
@@ -671,13 +679,15 @@ const HostSignup = () => {
               {aboutFields.map((field, index) => (
                 <div
                   key={field.id}
-                  className="rounded-lg border border-gray-300 p-3 mb-2">
+                  className="rounded-lg border border-gray-300 p-3 mb-2"
+                >
                   <div className="flex items-center justify-between ">
                     <span className="font-medium">Paragraph {index + 1}</span>
                     <button
                       type="button"
                       onClick={() => removeAbout(index)}
-                      className="text-sm text-red-600">
+                      className="text-sm text-red-600"
+                    >
                       Remove
                     </button>
                   </div>
@@ -705,7 +715,8 @@ const HostSignup = () => {
               <button
                 type="button"
                 onClick={() => appendAbout({ text: "" })}
-                className="text-blue-600 text-sm">
+                className="text-blue-600 text-sm"
+              >
                 + Add Paragraph
               </button>
             </div>
@@ -734,13 +745,15 @@ const HostSignup = () => {
               {productFields.map((field, index) => (
                 <div
                   key={field.id}
-                  className="rounded-lg border border-gray-300 p-3 mb-2">
+                  className="rounded-lg border border-gray-300 p-3 mb-2"
+                >
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-medium">Product {index + 1}</span>
                     <button
                       type="button"
                       onClick={() => removeProduct(index)}
-                      className="text-sm text-red-600">
+                      className="text-sm text-red-600"
+                    >
                       Remove
                     </button>
                   </div>
@@ -777,7 +790,8 @@ const HostSignup = () => {
                           margin="none"
                           variant="standard"
                           error={!!fieldState.error}
-                          helperText={fieldState.error?.message}>
+                          helperText={fieldState.error?.message}
+                        >
                           {[
                             "Co-working",
                             "Hostels",
@@ -866,7 +880,8 @@ const HostSignup = () => {
                     files: [],
                   })
                 }
-                className="text-blue-600 text-sm">
+                className="text-blue-600 text-sm"
+              >
                 + Add Product
               </button>
             </div>
@@ -1099,7 +1114,8 @@ const HostSignup = () => {
                         alignItems: "center",
                         justifyContent: "space-between",
                         opacity: isMandatory ? 0.8 : 1,
-                      }}>
+                      }}
+                    >
                       <span className="font-medium">{service}</span>
 
                       <Checkbox
@@ -1229,7 +1245,8 @@ const HostSignup = () => {
           textTransform: "uppercase",
           fontFamily: "Poppins",
         }}
-        activeStep={activeStep}>
+        activeStep={activeStep}
+      >
         {steps.map((label, index) => (
           <Step label={label} key={index} />
         ))}
@@ -1386,7 +1403,8 @@ const HostSignup = () => {
             fd.set("formName", "register");
 
             register(fd);
-          })}>
+          })}
+        >
           {renderStepFields()}
           <div className="col-span-1 lg:col-span-2 flex justify-between items-center">
             {/* {activeStep > 0 && (
@@ -1409,7 +1427,7 @@ const HostSignup = () => {
             )}
 
             {activeStep !== 0 && activeStep < steps.length - 2 ? (
-              <div className="flex  justify-center lg:justify-end items-center w-full">
+              <div className="flex   justify-end items-center w-full">
                 <GetStartedButton title="Next" handleSubmit={handleNext} />
               </div>
             ) : (
@@ -1434,13 +1452,13 @@ const HostSignup = () => {
 
             {/* Submit button on 4th step */}
             {activeStep === stepFields.length - 2 && (
-              <div className="flex justify-center lg:justify-end items-center w-full">
+              <div className="flex justify-end items-center w-full">
                 <GetStartedButton title="Submit" type="submit" />
               </div>
             )}
 
             {/* Go To Home button on 5th step */}
-           {activeStep === stepFields.length - 1 && (
+            {activeStep === stepFields.length - 1 && (
               <div className="flex justify-center items-center w-full">
                 <GetStartedButton
                   title="Go To Home"
@@ -1450,8 +1468,6 @@ const HostSignup = () => {
                 />
               </div>
             )}
-
-          
           </div>
         </form>
       </div>
