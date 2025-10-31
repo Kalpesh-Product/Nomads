@@ -3,7 +3,7 @@ import Review from "../models/Reviews.js";
 import PointOfContact from "../models/PointOfContact.js";
 import { Readable } from "stream";
 import csvParser from "csv-parser";
-import { uploadFileToS3 } from "../config/s3Config.js";
+import { deleteFileFromS3ByUrl, uploadFileToS3 } from "../config/s3Config.js";
 import mongoose from "mongoose";
 import Lead from "../models/Lead.js";
 import axios from "axios";
@@ -1051,6 +1051,99 @@ export const addCompanyImagesBulk = async (req, res, next) => {
   }
 };
 
+// export const editCompany = async (req, res, next) => {
+//   try {
+//     const {
+//       businessId,
+//       address,
+//       about,
+//       totalSeats,
+//       latitude,
+//       longitude,
+//       googleMap,
+//       ratings,
+//       totalReviews,
+//       inclusions,
+//       companyType,
+//       companyName,
+//       reviews,
+//       images,
+//     } = req.body;
+
+//     if (!businessId) {
+//       return res.status(400).json({ message: "Missing business id" });
+//     }
+
+//     const company = await Company.findOne({ businessId });
+//     if (!company) {
+//       return res.status(404).json({ message: "Company not found" });
+//     }
+
+//     const isCompanyTypeChanged = companyType !== company.companyType;
+//     const oldCompanyType = company.companyType;
+
+//     // Update scalar fields
+//     company.address = address?.trim() || company.address;
+//     company.companyName = companyName?.trim() || company.companyName;
+//     company.about = about?.trim() || company.about;
+//     company.totalSeats = totalSeats ? parseInt(totalSeats) : company.totalSeats;
+//     company.latitude = latitude ? parseFloat(latitude) : company.latitude;
+//     company.longitude = longitude ? parseFloat(longitude) : company.longitude;
+//     company.googleMap = googleMap?.trim() || company.googleMap;
+//     company.ratings = ratings ? parseFloat(ratings) : company.ratings;
+//     company.totalReviews = totalReviews
+//       ? parseInt(totalReviews)
+//       : company.totalReviews;
+//     company.inclusions = inclusions?.trim() || company.inclusions;
+//     company.companyType =
+//       companyType?.trim()?.split(" ").join("").toLowerCase() ||
+//       company.companyType;
+
+//     const savedCompany = await company.save();
+
+//     if (savedCompany && isCompanyTypeChanged && company.images.length > 0) {
+//       console.log(
+//         "Company type changed from",
+//         oldCompanyType,
+//         "to",
+//         companyType
+//       );
+
+//       // Delete files in parallel safely
+//       await Promise.allSettled(
+//         company.images.map((img) => deleteFileFromS3ByUrl(img.url))
+//       );
+
+//       //Update the images in the DB
+//       company.images = images;
+//     }
+
+//     /** ---------------- REVIEWS UPDATE LOGIC ---------------- **/
+//     if (Array.isArray(reviews) && reviews.length > 0) {
+//       // Dumb but simple: nuke old reviews and replace
+//       await Review.deleteMany({ company: company._id });
+//       const reviewDocs = reviews.map((review) => ({
+//         company: company._id,
+//         companyId: company.companyId,
+//         name: review.name?.trim(),
+//         starCount: parseInt(review.starCount),
+//         description: review.description?.trim(),
+//         reviewSource: review.reviewSource?.trim(),
+//         reviewLink: review.reviewLink?.trim(),
+//       }));
+//       await Review.insertMany(reviewDocs);
+//     }
+
+//     res.status(200).json({
+//       message: "Company updated successfully",
+//       company,
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     next(error);
+//   }
+// };
+
 export const editCompany = async (req, res, next) => {
   try {
     const {
@@ -1067,13 +1160,24 @@ export const editCompany = async (req, res, next) => {
       companyType,
       companyName,
       reviews,
-      images,
+      existingImages = [],
+      images = [], // This comes from the remote API with all images (existing + new)
     } = req.body;
 
     const company = await Company.findOne({ businessId });
     if (!company) {
       return res.status(404).json({ message: "Company not found" });
     }
+
+    const newCompanyType = companyType
+      ?.trim()
+      ?.split(" ")
+      .join("")
+      .toLowerCase();
+    const isCompanyTypeChanged = newCompanyType !== company.companyType;
+
+    // Store old images for potential deletion
+    const oldImages = [...company.images];
 
     // Update scalar fields
     company.address = address?.trim() || company.address;
@@ -1088,16 +1192,61 @@ export const editCompany = async (req, res, next) => {
       ? parseInt(totalReviews)
       : company.totalReviews;
     company.inclusions = inclusions?.trim() || company.inclusions;
-    company.companyType =
-      companyType?.trim()?.split(" ").join("").toLowerCase() ||
-      company.companyType;
-    company.images = images;
+    company.companyType = newCompanyType || company.companyType;
 
-    await company.save();
+    // ---------- IMAGE HANDLING ----------
+    let imagesToDelete = [];
+
+    // Use 'images' from remote API (which has existing + new images)
+    // or fallback to 'existingImages' if not provided
+    const updatedImages = images.length > 0 ? images : existingImages;
+
+    if (isCompanyTypeChanged) {
+      console.log(
+        "🔄 Company type changed - will delete all old images after save"
+      );
+      // When company type changes, delete ALL old images
+      imagesToDelete = oldImages;
+      company.images = updatedImages;
+    } else {
+      // Company type stayed the same - delete only removed images
+      const updatedImageUrls = updatedImages.map((img) => img.url);
+      imagesToDelete = oldImages.filter(
+        (img) => !updatedImageUrls.includes(img.url)
+      );
+
+      if (imagesToDelete.length > 0) {
+        console.log(
+          `🗑️ Will delete ${imagesToDelete.length} removed images after save`
+        );
+      }
+
+      // Update with all images (existing + new)
+      company.images = updatedImages;
+      console.log(`📷 Updated company images: ${company.images.length} total`);
+    }
+
+    // Save company first
+    const savedCompany = await company.save();
+    console.log("✅ Company saved successfully");
+
+    // NOW delete images from S3 after successful DB save
+    if (imagesToDelete.length > 0) {
+      console.log(`🗑️ Deleting ${imagesToDelete.length} images from S3...`);
+      const deleteResults = await Promise.allSettled(
+        imagesToDelete.map((img) => deleteFileFromS3ByUrl(img.url))
+      );
+
+      const failed = deleteResults.filter((r) => r.status === "rejected");
+      if (failed.length > 0) {
+        console.warn(`⚠️ Failed to delete ${failed.length} images from S3`);
+      } else {
+        console.log("✅ All old images deleted from S3");
+      }
+    }
 
     /** ---------------- REVIEWS UPDATE LOGIC ---------------- **/
     if (Array.isArray(reviews) && reviews.length > 0) {
-      // Dumb but simple: nuke old reviews and replace
       await Review.deleteMany({ company: company._id });
       const reviewDocs = reviews.map((review) => ({
         company: company._id,
@@ -1113,10 +1262,10 @@ export const editCompany = async (req, res, next) => {
 
     res.status(200).json({
       message: "Company updated successfully",
-      company,
+      company: savedCompany,
     });
   } catch (error) {
-    console.error(error);
+    console.error("❌ Error in editCompany:", error);
     next(error);
   }
 };
