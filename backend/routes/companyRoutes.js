@@ -40,7 +40,7 @@ router.get("/get-single-company-data", getCompanyData);
 router.get("/get-listings/:companyId", getListings);
 router.get("/get-company-data/:companyName", getCompany); //check company from admin panel before adding website link after creating website.
 router.get("/company-locations", getUniqueDataLocations);
-router.patch("/update-company", editCompany);
+router.patch("/update-company", upload.any(), editCompany);
 router.patch("/add-template-link", addTemplateLink);
 router.post("/add-company-image", upload.single("image"), addCompanyImage);
 router.post(

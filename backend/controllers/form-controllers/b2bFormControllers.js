@@ -199,12 +199,14 @@ export const addB2BFormSubmission = async (req, res, next) => {
     // 3) optional resume upload
     let resumeLink = "";
     if (req.file) {
-      resumeLink = await uploadFileToS3(
+      data = await uploadFileToS3(
         `job-applications/${payload.jobPosition}/${
           payload.name + randomUUID()
         }/${req.file.originalname}`,
         req.file
       );
+
+      resumeLink = data.url;
     }
 
     // 4) forward to Apps Script
@@ -399,7 +401,7 @@ export const registerFormSubmission = async (req, res) => {
       };
 
       const searchKey = formatCompanyName(payload.companyName);
-      const baseFolder = `${company}/template/${searchKey}`;
+      const baseFolder = `hosts/template/${searchKey}`;
 
       let template = {
         searchKey,
@@ -434,11 +436,11 @@ export const registerFormSubmission = async (req, res) => {
             /\s+/g,
             "_"
           )}`;
-          const url = await uploadFileToS3(route, {
+          const data = await uploadFileToS3(route, {
             buffer,
             mimetype: "image/webp",
           });
-          arr.push({ url });
+          arr.push({ url: data.url, id: data.id });
         }
         return arr;
       };
@@ -459,11 +461,11 @@ export const registerFormSubmission = async (req, res) => {
         const route = `${baseFolder}/companyLogo/${Date.now()}_${
           logoFile.originalname
         }`;
-        const url = await uploadFileToS3(route, {
+        const data = await uploadFileToS3(route, {
           buffer,
           mimetype: "image/webp",
         });
-        template.companyLogo = { url };
+        template.companyLogo = { url: data.url, id: data.id };
       }
 
       // heroImages
@@ -533,20 +535,26 @@ export const registerFormSubmission = async (req, res) => {
       let websiteResult;
       try {
         const submit = await fetch(
-          `https://wononomads.vercel.app/api/editor/create-website?company=${payload.companyName}`,
+          `https://wonomasterbe.vercel.app/api/editor/create-website`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(template),
           }
         );
-        websiteResult = await submit.json();
+        const raw = await submit.text();
+        try {
+          websiteResult = JSON.parse(raw);
+        } catch {
+          console.error("Non-JSON response:", raw);
+          websiteResult = { message: "Invalid JSON response", raw };
+        }
 
         await session.commitTransaction();
         session.endSession();
       } catch (err) {
         console.error("create-template call failed:", err);
-        websiteResult = { error: "create-template call failed" };
+        websiteResult = { message: "create-template call failed" };
       }
 
       // STEP 5: send confirmation email to user
