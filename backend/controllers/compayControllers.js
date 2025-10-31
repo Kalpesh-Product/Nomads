@@ -303,8 +303,11 @@ export const createCompany = async (req, res, next) => {
     if (req.files?.logo?.[0]) {
       const logoFile = req.files.logo[0];
       const logoKey = `${folderPath}/logo/${logoFile.originalname}`;
-      const logoUrl = await uploadFileToS3(logoKey, logoFile);
-      savedCompany.logo = logoUrl;
+      const data = await uploadFileToS3(logoKey, logoFile);
+      savedCompany.logo = {
+        url: data.url,
+        id: data.id,
+      };
     }
 
     // 2️⃣ Upload Images if provided (req.files.images[])
@@ -322,9 +325,10 @@ export const createCompany = async (req, res, next) => {
           const uniqueKey = `${folderPath}/images/${sanitizeFileName(
             file.originalname
           )}`;
-          const uploadedUrl = await uploadFileToS3(uniqueKey, file);
+          const data = await uploadFileToS3(uniqueKey, file);
           return {
-            url: uploadedUrl,
+            url: data.url,
+            id: data.id,
             index: startIndex + i + 1,
           };
         })
@@ -889,19 +893,23 @@ export const addCompanyImage = async (req, res, next) => {
     const folderPath = `nomads/${pathCompanyType}/${company.country}/${safeCompanyName}`;
     const s3Key = `${folderPath}/${folderType}/${file.originalname}`;
 
-    let uploadedUrl;
+    let data;
     try {
-      uploadedUrl = await uploadFileToS3(s3Key, file);
+      data = await uploadFileToS3(s3Key, file);
     } catch (err) {
       return res.status(500).json({ message: "Failed to upload image to S3" });
     }
 
     if (folderType === "logo") {
-      company.logo = uploadedUrl;
+      company.logo = {
+        url: data.url,
+        id: data.id,
+      };
     } else {
       if (!Array.isArray(company.images)) company.images = [];
       company.images.push({
-        url: uploadedUrl,
+        url: data.url,
+        id: data.id,
         index: company.images.length + 1,
       });
     }
@@ -914,7 +922,8 @@ export const addCompanyImage = async (req, res, next) => {
         companyId: company._id,
         businessId: company.businessId,
         type: folderType,
-        url: uploadedUrl,
+        url: data.url,
+        id: data.id,
       },
     });
   } catch (error) {
@@ -993,9 +1002,10 @@ export const addCompanyImagesBulk = async (req, res, next) => {
         const uniqueKey = `${folderPath}/${folderType}/${sanitizeFileName(
           file.originalname
         )}`;
-        const uploadedUrl = await uploadFileToS3(uniqueKey, file);
+        const data = await uploadFileToS3(uniqueKey, file);
         return {
-          url: uploadedUrl,
+          url: data.url,
+          id: data.id,
           index: startIndex + i + 1,
           originalName: file.originalname,
           key: uniqueKey,
