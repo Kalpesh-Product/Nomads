@@ -32,11 +32,12 @@ const NewsCard = ({ a }) => {
   return (
     <article
       onClick={() => navigate("news-details", { state: { content: a } })}
-      className="group relative rounded-xl border bg-white transition hover:shadow-md cursor-pointer"
+      className="group relative rounded-xl border bg-white transition hover:shadow-md cursor-pointer overflow-hidden max-w-full"
     >
       <div className="flex flex-col sm:flex-row gap-4 p-4">
         {/* Image */}
-        <div className="sm:w-56 shrink-0 block">
+        {/* <div className="sm:w-56 shrink-0 block"> */}
+        <div className="w-full sm:w-56 shrink-0 block">
           <div className="h-40 sm:h-36 rounded-lg overflow-hidden">
             {thumbnail ? (
               <img

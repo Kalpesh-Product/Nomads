@@ -28,7 +28,7 @@ const HostContact = () => {
       name: "",
       email: "",
       mobile: "",
-      partnerstype: "",
+      partnerstype: "", // ✅ changed here
       message: "",
     },
   });
@@ -178,7 +178,7 @@ const HostContact = () => {
             </div> */}
 
             {/* Connect With Us - MUI Styled Form */}
-            <div className="px-40">
+            <div className="md:px-40">
               <Box
                 component="form"
                 onSubmit={handleSubmit((data) => submitContactForm(data))}
@@ -270,26 +270,20 @@ const HostContact = () => {
                   {/* Partnership Type */}
                   <div className="pt-0 pl-0 lg:pt-0 lg:pl-0">
                     <Controller
-                      name="partnerstype"
+                      name="partnerstype" // ✅ changed here
                       control={control}
                       rules={{ required: "Please select a partnership type" }}
                       render={({ field, fieldState }) => (
                         <TextField
+                          {...field}
                           fullWidth
                           required
                           variant="standard"
                           error={!!fieldState.error}
-                          label={"Reason to Connect"}
+                          label="Reason to Connect"
                           select
                           helperText={fieldState?.error?.message}
-                          slotProps={{
-                            inputLabel: {
-                              sx: {
-                                color: "black", // default label color
-                                "&.Mui-focused": { color: "black" }, // keep black when focused
-                              },
-                            },
-                          }}
+                          InputLabelProps={{ sx: floatingLabelSx }}
                         >
                           <MenuItem value="" disabled>
                             Select Type
@@ -315,10 +309,6 @@ const HostContact = () => {
                           <MenuItem value="Coffee Meeting to know us better">
                             Coffee Meeting to know us better
                           </MenuItem>
-
-                          {fieldState.error && (
-                            <p style={{ color: "red", fontSize: "0.8rem" }}></p>
-                          )}
                         </TextField>
                       )}
                     />

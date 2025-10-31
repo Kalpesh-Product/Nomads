@@ -7,27 +7,25 @@ import axios from "axios";
 import { Toaster } from "react-hot-toast";
 
 const TemplateSite = () => {
-
   function getTenantFromHost() {
-  const hostname = window.location.hostname;
-  const parts = hostname.split(".");
-  return parts[0] === "www" ? null : parts[0];
-}
+    const hostname = window.location.hostname;
+    const parts = hostname.split(".");
+    return parts[0] === "www" ? null : parts[0];
+  }
 
-const tenant = getTenantFromHost()
+  const tenant = getTenantFromHost();
 
-   const { data, isPending, error } = useQuery({
-      queryKey: ["company", tenant],
-      queryFn: async () => {
-        const res = await axios.get(
-          `https://wonomasterbe.vercel.app/api/editor/get-website/${tenant}`
-        );
-        return res.data;
-      },
+  const { data, isPending, error } = useQuery({
+    queryKey: ["company", tenant],
+    queryFn: async () => {
+      const res = await axios.get(
+        `https://wonomasterbe.vercel.app/api/editor/get-website/${tenant}`
+      );
+      return res.data;
+    },
 
-      enabled: !!tenant,
-    });
-
+    enabled: !!tenant,
+  });
 
   return (
     <div className="h-screen relative overflow-y-auto overflow-hidden flex flex-col custom-scrollbar-hide">
@@ -35,11 +33,19 @@ const tenant = getTenantFromHost()
         <TempHeader logo={data?.companyLogo?.url} />
       </header>
       <main className="flex-1">
-        <Outlet context={{ data, isPending, error }}/>
+        <Outlet context={{ data, isPending, error }} />
         <Toaster />
       </main>
       <footer>
-        <TempFooter address={data?.address} contact={data?.contact} email={data?.email} phone={data?.phone} registeredCompany={data?.registeredCompanyName} logo={data?.companyLogo?.url} isPending={isPending}/>
+        <TempFooter
+          address={data?.address}
+          contact={data?.contact}
+          email={data?.email}
+          phone={data?.phone}
+          registeredCompany={data?.registeredCompanyName}
+          logo={data?.companyLogo?.url}
+          isPending={isPending}
+        />
       </footer>
     </div>
   );
