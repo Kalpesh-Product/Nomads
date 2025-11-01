@@ -29,7 +29,7 @@ const slides = [
   },
 ];
 
-const MainPage = () => {
+const SiteIsDown = () => {
   const navigate = useNavigate();
   const intervalRef = useRef(null);
   const goToNomads = () => {
@@ -68,51 +68,37 @@ const MainPage = () => {
 
   return (
     <main className="min-h-[100lvh] flex flex-col justify-center items-center">
-      <div className="grid grid-cols-1 lg:grid-cols-2 relative">
+      <div className=" min-h-[90lvh]">
         {/* Left Column */}
-        <figure className="flex flex-col w-full h-full justify-center items-center p-4 lg:p-6">
+        <figure className="flex flex-col w-full h-full justify-center items-center p-4 lg:p-6 gap-10">
           <img
             src="images/main-page-1.png"
             alt="wono"
-            className="object-cover max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-3xl lg:w-full"
+            className="object-cover max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-md lg:w-full"
           />
+          <div>
+            <div>
+              <h2 className="text-title font-bold text-center py-10">
+                The system is down at the moment.
+              </h2>
+            </div>
+            <div>
+              <p className="text-subtitle text-center">
+                We're working to resolve the issue as soon as possible. Please
+                try again later.
+              </p>
+            </div>
+          </div>
         </figure>
 
         {/* Vertical Centered Dotted Separator */}
-        <div className="hidden lg:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[90%] border-l-2 border-dashed border-gray-600 z-10" />
+        {/* <div className="hidden lg:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[90%] border-l-2 border-dashed border-gray-600 z-10" /> */}
 
         {/* Right Column */}
-        <article className="flex flex-col gap-4 w-full h-full justify-center items-center p-8">
-          <div ref={sliderRef} className="keen-slider w-full">
-            {slides.map((slide, index) => (
-              <div
-                key={index}
-                className="keen-slider__slide flex flex-col items-center gap-4 text-center"
-              >
-                <img
-                  src={slide.image}
-                  alt={`Slide ${index + 1}`}
-                  className="w-full h-auto object-contain"
-                />
-                <p className="text-gray-700 text-[0.9rem] text-pretty leading-relaxed md:line-clamp-3 md:max-h-[6em] overflow-hidden">
-                  {slide.text}
-                </p>
-              </div>
-            ))}
-          </div>
-          <div className="flex gap-8 w-full justify-center items-center pt-4">
-            <PrimaryButton
-              title="For Nomads"
-              handleSubmit={goToNomads}
-              externalStyles="bg-[#FF5757] text-[0.8rem] xs:text-[0.9rem] sm:text-[1rem] md:text-[1rem] lg:text-[1rem] flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[12rem] px-6"
-            />
-            <PrimaryButton
-              title="For Hosts"
-              handleSubmit={goToHosts}
-              externalStyles="bg-[#FF5757] text-[0.8rem] xs:text-[0.9rem] sm:text-[1rem] md:text-[1rem] lg:text-[1rem] flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[12rem] px-6"
-            />
-          </div>
-        </article>
+
+        {/* <div>
+          <h2>maint</h2>
+        </div> */}
       </div>
       <div className="flex justify-evenly items-center  w-full flex-col sm:flex-col xs:flex-col lg:flex-row md:flex-row pt-2">
         <div className="w-32"></div>
@@ -139,4 +125,4 @@ const MainPage = () => {
   );
 };
 
-export default MainPage;
+export default SiteIsDown;
