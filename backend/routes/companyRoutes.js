@@ -18,6 +18,7 @@ import {
   updateLeads,
   bulkUpdateCompanyInclusions,
   deactivateProduct,
+  editCompanyImagesBulk,
 } from "../controllers/compayControllers.js";
 
 const router = Router();
@@ -47,6 +48,11 @@ router.post(
   "/bulk-add-company-images",
   upload.array("images", 10),
   addCompanyImagesBulk
+);
+router.patch(
+  "/bulk-edit-company-images",
+  upload.array("images", 10),
+  editCompanyImagesBulk
 );
 
 router.post("/create-company", upload.any(), createCompany);
