@@ -1384,7 +1384,7 @@ export const getCompanyLeads = async (req, res, next) => {
     const leads = await Lead.find(query);
 
     if (!leads || !leads.length) {
-      return res.status(400).json({
+      return res.status(200).json({
         message: "No leads found",
       });
     }
