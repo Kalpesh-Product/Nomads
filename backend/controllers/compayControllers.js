@@ -1051,6 +1051,144 @@ export const addCompanyImagesBulk = async (req, res, next) => {
   }
 };
 
+export const editCompanyImagesBulk = async (req, res, next) => {
+  try {
+    const files = req.files;
+    const { companyId, businessId, companyType = "" } = req.body;
+
+    if (!companyId || !businessId || !companyType) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    if (!files || !files.length) {
+      return res.status(400).json({ message: "No files provided" });
+    }
+
+    let company = await Company.findOne({ businessId }).exec();
+
+    if (!company) {
+      return res.status(404).json({ message: "No such company found" });
+    }
+
+    if (
+      companyType &&
+      company.companyType?.toLowerCase() !== String(companyType).toLowerCase()
+    ) {
+      return res
+        .status(400)
+        .json({ message: "companyType does not match the stored company" });
+    }
+
+    // --- STEP 1: Delete old images from S3 ---
+    if (Array.isArray(company.images) && company.images.length > 0) {
+      const deleteResults = await Promise.allSettled(
+        company.images.map(async (img) => {
+          if (img.url) {
+            try {
+              await deleteFileFromS3ByUrl(img.url);
+              return { success: true, url: img.url };
+            } catch (err) {
+              return { success: false, url: img.url, reason: err.message };
+            }
+          }
+        })
+      );
+
+      const failedDeletes = deleteResults.filter(
+        (r) => r.status === "rejected"
+      );
+      if (failedDeletes.length > 0) {
+        console.warn("Some old images failed to delete:", failedDeletes);
+      }
+    }
+
+    // Clear the old images array in DB
+    company.images = [];
+
+    // --- STEP 2: Upload new images to S3 ---
+    const formatCompanyType = (type) => {
+      const map = {
+        hostel: "hostels",
+        privatestay: "private-stay",
+        meetingroom: "meetingroom",
+        coworking: "coworking",
+        cafe: "cafe",
+        coliving: "coliving",
+        workation: "workation",
+      };
+      const key = String(type || "").toLowerCase();
+      return map[key] || "unknown";
+    };
+
+    const pathCompanyType = formatCompanyType(
+      companyType || company.companyType
+    );
+    const safeCompanyName =
+      (company.companyName || "unnamed").replace(/[^\w\- ]+/g, "").trim() ||
+      "unnamed";
+    const folderPath = `nomads/${pathCompanyType}/${company.country}/${safeCompanyName}`;
+    const folderType = "images";
+
+    const sanitizeFileName = (name) =>
+      String(name || "file")
+        .replace(/[/\\?%*:|"<>]/g, "_")
+        .replace(/\s+/g, "_");
+
+    const uploadResults = await Promise.allSettled(
+      files.map(async (file, i) => {
+        const uniqueKey = `${folderPath}/${folderType}/${sanitizeFileName(
+          file.originalname
+        )}`;
+        const data = await uploadFileToS3(uniqueKey, file);
+        return {
+          url: data.url,
+          id: data.id,
+          index: i + 1,
+          originalName: file.originalname,
+          key: uniqueKey,
+        };
+      })
+    );
+
+    const successes = [];
+    const failures = [];
+
+    for (const r of uploadResults) {
+      if (r.status === "fulfilled") successes.push(r.value);
+      else failures.push({ reason: r.reason?.message || "Unknown error" });
+    }
+
+    // --- STEP 3: Save new image list to DB ---
+    if (successes.length) {
+      company.images = successes.map((s) => ({
+        url: s.url,
+        id: s.id,
+        index: s.index,
+      }));
+      await company.save({ validateBeforeSave: false });
+    }
+
+    // --- STEP 4: Return response ---
+    return res.status(failures.length ? 207 : 200).json({
+      message:
+        failures.length && successes.length
+          ? `Replaced ${successes.length} images; ${failures.length} failed`
+          : failures.length
+          ? "All uploads failed"
+          : `Successfully replaced all images`,
+      data: {
+        companyId: company._id,
+        businessId: company.businessId,
+        type: folderType,
+        uploaded: successes,
+        failed: failures,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // export const editCompany = async (req, res, next) => {
 //   try {
 //     const {
