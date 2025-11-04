@@ -92,7 +92,6 @@ const HostHeader = () => {
                 <span className="absolute left-0 w-0 bottom-0 block h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
               </button>
 
-         
               <PrimaryButton
                 title="Login"
                 padding="py-3"
@@ -137,12 +136,12 @@ const HostHeader = () => {
                 <IoCloseSharp />
               </span>
             </div>
-            <li className="items-center text-center">
+            {/* <li className="items-center text-center">
               <div onClick={() => handleNavigation("/hosts")} className="py-4">
                 <p className="text-secondary-dark text-lg">Home</p>
               </div>
               <div className="h-[0.2px] bg-gray-300"></div>
-            </li>
+            </li> */}
             {links.map((item) => (
               <li key={item.id} className="items-center text-center">
                 <div
@@ -155,13 +154,16 @@ const HostHeader = () => {
               </li>
             ))}
 
-            <div className="flex justify-center p-4">
+            <div className="flex justify-center py-4">
               <BnButton
                 title={"Login"}
-                externalStyles={"bg-[#FF5757]"}
+                externalStyles="bg-[#FF5757] w-full sm:w-[7rem]" // ✅ add responsive width here
+                // handleSubmit={() => {
+                //   navigate("/login");
+                //   setOpen(false);
+                // }}
                 handleSubmit={() => {
-                  navigate("");
-                  setOpen(false);
+                  window.location.href = "https://wonofe.vercel.app"; // ✅ external redirect
                 }}
               />
             </div>

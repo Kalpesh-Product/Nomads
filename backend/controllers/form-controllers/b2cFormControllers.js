@@ -2,6 +2,9 @@ import * as yup from "yup";
 import Lead from "../../models/Lead.js";
 import mongoose from "mongoose";
 import { sendMail } from "../../config/mailer.js"; // adjust path if different
+import User from "../../models/NomadUser.js";
+import NomadUser from "../../models/NomadUser.js";
+import bcrypt from "bcrypt";
 
 const enquirySchema = yup.object({
   companyName: yup.string().trim().required("Please provide the company name"),
@@ -98,9 +101,38 @@ const nomadsSignupSchema = yup.object().shape({
     .required("Please provide your email"),
   password: yup.string().optional(),
   mobile: yup.string().trim().required("Please provide the mobile"),
-  country: yup.string().required("Please provide your country name"),
+
   sheetName: yup.string().required("Please provide a sheet name"),
-  reason: yup.string().required("Please provide the reason"),
+});
+
+const contentRemovalRequestsSchema = yup.object().shape({
+  fullName: yup
+    .string()
+    .trim()
+    .min(1, "Please provide a valid full name")
+    .required("Please provide your full name"),
+  mobile: yup
+    .string()
+    .trim()
+    .matches(/^\+?[0-9]{7,15}$/, "Please provide a valid mobile number")
+    .required("Please provide the mobile number"),
+  email: yup
+    .string()
+    .trim()
+    .email("Please provide a valid email address")
+    .required("Please provide your email address"),
+  companyName: yup.string().trim().required("Please provide the company name"),
+  designation: yup.string().trim().required("Please provide your designation"),
+  urls: yup
+    .string()
+    .trim()
+    .required("Please provide the URLs or links for content removal"),
+  source: yup
+    .string()
+    .trim()
+    .oneOf(["nomad", "host"], "Source must be either 'nomad' or 'host'")
+    .required("Please provide the Source"),
+  sheetName: yup.string().required("Please provide a sheet name"),
 });
 
 function toISODateOnly(v) {
@@ -136,6 +168,7 @@ export const addB2CformSubmission = async (req, res, next) => {
       startDate,
       endDate,
       sheetName,
+      name,
     } = req.body;
 
     // Configuration for each sheet type
@@ -181,7 +214,7 @@ export const addB2CformSubmission = async (req, res, next) => {
           email: d.email,
           sheetName: d.sheetName,
         }),
-        successMsg: "POC added successfully",
+        successMsg: "Message sent successfully",
         emailTemplate: (data) => ({
           to: data.email,
           subject: "Your POC request has been sent 📩",
@@ -214,13 +247,52 @@ export const addB2CformSubmission = async (req, res, next) => {
           lastName: d.lastName?.trim(),
           email: d.email?.trim(),
           password: d.password,
-          country: d.country?.trim(),
           mobile: d.mobile?.trim(),
-          reason: d.reason || "",
           sheetName: d.sheetName,
           submittedAt: new Date(),
         }),
         successMsg: "Sign-up saved successfully.",
+        emailTemplate: (data) => ({
+          to: data.email,
+          subject: "Welcome to WoNo 🌍",
+          text: `Hi ${data.firstName}, welcome to WoNo! Your signup was successful.`,
+          html: `
+      <h2>Welcome to WoNo!</h2>
+      <p>Hi ${data.firstName},</p>
+      <p>Thank you for signing up with <b>WoNo</b>.</p>
+      <p>We’re excited to have you onboard! Our team will review your profile and connect with you shortly to complete the onboarding process.</p>
+      <p>Cheers,<br/>The WoNo Team</p>
+    `,
+        }),
+      },
+      Content_Removal_Requests: {
+        schema: contentRemovalRequestsSchema,
+        map: (d) => ({
+          fullName: d.fullName,
+          mobile: d.mobile,
+          email: d.email,
+          companyName: d.companyName,
+          designation: d.designation,
+          urls: d.urls,
+          source: d.source,
+          sheetName: d.sheetName,
+          submittedAt: new Date(),
+        }),
+        successMsg:
+          "Your content removal request has been submitted successfully.",
+        emailTemplate: (data) => ({
+          to: data.email,
+          subject: "Content Removal Request Received 🧾",
+          text: `Hi ${data.fullName}, we’ve received your content removal request for ${data.companyName}. Our moderation team will review it shortly.`,
+          html: `
+      <h2>Content Removal Request Received</h2>
+      <p>Hi ${data.fullName},</p>
+      <p>We’ve received your content removal request for <b>${data.companyName}</b>.</p>
+      <p>Our moderation team will review the provided URLs and take the necessary action.</p>
+      <p>We’ll get back to you via email if we need additional details.</p>
+      <p>Cheers,<br/>The WONO Team</p>
+    `,
+        }),
       },
     };
 
@@ -261,8 +333,42 @@ export const addB2CformSubmission = async (req, res, next) => {
         sheetName,
       });
 
-      console.log("lead", leads);
       await leads.save();
+    }
+
+    if (sheetName === "Sign_up") {
+      const existingUser = await NomadUser.findOne({
+        email: req.body.email?.trim().toLowerCase(),
+      });
+
+      if (existingUser) {
+        return res.status(409).json({ message: "Email already registered" });
+      }
+
+      const { email, mobile, password, confirmPassword } = req.body;
+
+      if (!email || !password || !mobile) {
+        return res.status(409).json({ message: "Missing required fields" });
+      }
+
+      if (confirmPassword !== password) {
+        return res.status(400).json({ message: "Please match the password" });
+      }
+
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+
+      const signupEntry = new NomadUser({
+        firstName: req.body.firstName?.trim(),
+        lastName: req.body.lastName?.trim(),
+        email: email?.trim().toLowerCase(),
+        password: hashedPassword,
+        country: req.body.country?.trim(),
+        state: req.body.state?.trim(),
+        mobile: mobile?.trim(),
+      });
+
+      await signupEntry.save();
     }
 
     // Send to Google Apps Script
@@ -276,15 +382,6 @@ export const addB2CformSubmission = async (req, res, next) => {
 
     if (result.status !== "success") {
       throw new Error(result.message || "Failed to save data to Google Sheets");
-    }
-
-    // Send confirmation email if template exists
-    if (config.emailTemplate) {
-      try {
-        await sendMail(config.emailTemplate(validatedData));
-      } catch (err) {
-        console.error("Failed to send confirmation email:", err.message);
-      }
     }
 
     res.status(201).json({

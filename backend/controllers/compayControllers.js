@@ -3,11 +3,12 @@ import Review from "../models/Reviews.js";
 import PointOfContact from "../models/PointOfContact.js";
 import { Readable } from "stream";
 import csvParser from "csv-parser";
-import { uploadFileToS3 } from "../config/s3Config.js";
+import { deleteFileFromS3ByUrl, uploadFileToS3 } from "../config/s3Config.js";
 import mongoose from "mongoose";
 import Lead from "../models/Lead.js";
 import axios from "axios";
 import TestListing from "../models/TestCompany.js";
+import NomadUser from "../models/NomadUser.js";
 
 // Utility to calculate distance between two lat/lng points in meters
 function getDistanceFromLatLonInM(lat1, lon1, lat2, lon2) {
@@ -46,21 +47,33 @@ export const bulkInsertCompanies = async (req, res, next) => {
 
     const companyMap = new Map();
     hostCompanies.data.forEach((company) => {
-      companyMap.set(company.companyName, company.companyId);
+      const key = `${company.companyName
+        ?.trim()
+        .toLowerCase()}|${company.companyCity
+        ?.trim()
+        .toLowerCase()}|${company.companyState
+        ?.trim()
+        .toLowerCase()}|${company.companyCountry?.trim().toLowerCase()}`;
+      companyMap.set(key, company.companyId);
     });
 
     const stream = Readable.from(file.buffer.toString("utf-8").trim());
     stream
       .pipe(csvParser())
       .on("data", (row) => {
-        const emptyId = companyMap.get(row["Business Name"]?.trim()) || "";
-        if (emptyId === "") {
-          console.log("company name", row["Business Name"]?.trim());
-        }
+        const rowKey = `${row["Business Name"]?.trim()?.toLowerCase()}|${row[
+          "City"
+        ]
+          ?.trim()
+          ?.toLowerCase()}|${row["State"]?.trim()?.toLowerCase()}|${row[
+          "Country"
+        ]
+          ?.trim()
+          ?.toLowerCase()}`;
 
         const company = {
           businessId: row["Business ID"]?.trim(),
-          companyId: companyMap.get(row["Business Name"]?.trim()) || "",
+          companyId: companyMap.get(rowKey) || "",
           companyName: row["Business Name"]?.trim(),
           registeredEntityName: row["Registered Entity name"]?.trim(),
           website: row["Website"]?.trim() || null,
@@ -82,6 +95,7 @@ export const bulkInsertCompanies = async (req, res, next) => {
             ? row["Type"]?.trim()?.split(" ").join("").toLowerCase()
             : row["Type"]?.trim()?.toLowerCase(),
         };
+
         companies.push(company);
       })
       .on("end", async () => {
@@ -122,10 +136,69 @@ export const bulkInsertCompanies = async (req, res, next) => {
           }
         }
       });
-
-    // return res.status(200).json({});
   } catch (error) {
     console.log(error);
+    next(error);
+  }
+};
+
+export const bulkUpdateCompanyInclusions = async (req, res, next) => {
+  try {
+    const file = req.file;
+    if (!file) {
+      return res
+        .status(400)
+        .json({ message: "Please provide a valid CSV file" });
+    }
+
+    const updates = [];
+
+    const stream = Readable.from(file.buffer.toString("utf-8").trim());
+    stream
+      .pipe(csvParser())
+      .on("data", (row) => {
+        const state = row["State"]?.trim();
+        const businessId = row["Business ID"]?.trim();
+        const inclusions = row["Inclusions"]?.trim();
+
+        // Only collect Chiang Mai rows with valid Business ID and inclusions
+        if (state === "Chiang Mai" && businessId && inclusions) {
+          updates.push({
+            updateOne: {
+              filter: { businessId },
+              update: { $set: { inclusions } },
+            },
+          });
+        }
+      })
+      .on("end", async () => {
+        try {
+          if (updates.length === 0) {
+            return res.status(400).json({
+              message:
+                "No valid Chiang Mai rows with Business ID and Inclusions found in CSV",
+            });
+          }
+
+          // Perform bulkWrite operation
+          const result = await Company.bulkWrite(updates);
+
+          res.status(200).json({
+            message: "Bulk inclusions update for Chiang Mai completed",
+            totalProcessed: updates.length,
+            matchedCount: result.matchedCount,
+            modifiedCount: result.modifiedCount,
+          });
+        } catch (updateError) {
+          console.error(updateError);
+          res.status(500).json({
+            message: "Error during bulk inclusions update",
+            error: updateError.message,
+          });
+        }
+      });
+  } catch (error) {
+    console.error(error);
     next(error);
   }
 };
@@ -155,6 +228,8 @@ export const createCompany = async (req, res, next) => {
       poc, // single POC object
       reviews, // array of reviews
       images,
+      cost,
+      description,
     } = req.body;
 
     const generateBuisnessId = () => {
@@ -190,6 +265,8 @@ export const createCompany = async (req, res, next) => {
       inclusions: inclusions?.trim(),
       services: services?.trim(),
       units: units?.trim(),
+      cost: cost?.trim(),
+      description: description?.trim(),
       companyType: companyType?.trim()?.split(" ").join("").toLowerCase(),
       images,
     });
@@ -226,8 +303,11 @@ export const createCompany = async (req, res, next) => {
     if (req.files?.logo?.[0]) {
       const logoFile = req.files.logo[0];
       const logoKey = `${folderPath}/logo/${logoFile.originalname}`;
-      const logoUrl = await uploadFileToS3(logoKey, logoFile);
-      savedCompany.logo = logoUrl;
+      const data = await uploadFileToS3(logoKey, logoFile);
+      savedCompany.logo = {
+        url: data.url,
+        id: data.id,
+      };
     }
 
     // 2️⃣ Upload Images if provided (req.files.images[])
@@ -245,9 +325,10 @@ export const createCompany = async (req, res, next) => {
           const uniqueKey = `${folderPath}/images/${sanitizeFileName(
             file.originalname
           )}`;
-          const uploadedUrl = await uploadFileToS3(uniqueKey, file);
+          const data = await uploadFileToS3(uniqueKey, file);
           return {
-            url: uploadedUrl,
+            url: data.url,
+            id: data.id,
             index: startIndex + i + 1,
           };
         })
@@ -288,7 +369,7 @@ export const createCompany = async (req, res, next) => {
     let savedReviews;
     if (Array.isArray(reviews) && reviews.length > 0) {
       const reviewDocs = reviews.map((review) => ({
-        company: savedComspany._id,
+        company: savedCompany._id,
         companyId,
         name: review.name?.trim(),
         starCount: parseInt(review.starCount || 1),
@@ -299,7 +380,7 @@ export const createCompany = async (req, res, next) => {
       savedReviews = await Review.insertMany(reviewDocs);
 
       if (!savedReviews) {
-        res.status(400).json({
+        return res.status(400).json({
           message: "Failed to add reviews",
         });
       }
@@ -316,12 +397,13 @@ export const createCompany = async (req, res, next) => {
 };
 
 export const getCompaniesData = async (req, res, next) => {
+  // console.log("🔥 getCompaniesData HIT");
   try {
     const companies = await Company.find({ isActive: true }).lean().exec();
     const reviews = await Review.find().lean().exec();
     const poc = await PointOfContact.find().lean().exec();
 
-    const { country, state, type } = req.query;
+    const { country, state, type, userId } = req.query;
 
     // Base company dataset with reviews and active POC
     const enrichCompanies = (base) => {
@@ -366,7 +448,31 @@ export const getCompaniesData = async (req, res, next) => {
       filteredCompanies = companies;
     }
 
-    const companyData = enrichCompanies(filteredCompanies);
+    // 🟡 Add these temporary debug lines here:
+    // console.log("🔍 Filtering for country:", country, "state:", state);
+    // console.log("✅ Matched companies count:", filteredCompanies.length);
+    // console.log(
+    //   "Example match:",
+    //   filteredCompanies.length > 0 ? filteredCompanies[0].companyName : "None"
+    // );
+
+    let companyData = enrichCompanies(filteredCompanies);
+
+    if (userId) {
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+        return res.status(400).json({ message: "Invalid user id provided" });
+      }
+
+      const user = await NomadUser.findOne({ _id: userId });
+
+      companyData = companyData.map((data) => {
+        const isLiked = user.likes.some(
+          (like) => like.toString() === data._id.toString()
+        );
+
+        return { ...data, isLiked };
+      });
+    }
 
     res.status(200).json(companyData);
   } catch (error) {
@@ -442,7 +548,7 @@ export const getCompanyData = async (req, res, next) => {
   };
 
   try {
-    const { companyId, companyType } = req.query;
+    const { companyId, companyType, userId } = req.query;
 
     let companyQuery = {};
 
@@ -467,7 +573,23 @@ export const getCompanyData = async (req, res, next) => {
 
     // const companyData = await companyQuery;
 
-    const companyData = await Company.findOne(companyQuery).lean().exec();
+    const company = await Company.findOne(companyQuery).lean().exec();
+
+    let companyData = company;
+
+    if (userId) {
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+        return res.status(400).json({ message: "Invalid user id provided" });
+      }
+
+      const user = await NomadUser.findOne({ _id: userId });
+
+      const isLiked = user.likes.some(
+        (like) => like.toString() === companyData._id.toString()
+      );
+
+      companyData = { ...companyData, isLiked };
+    }
 
     if (!companyData) {
       return res.status(404).json({ error: "Company not found" });
@@ -611,7 +733,7 @@ export const getCompanyData = async (req, res, next) => {
     // Fetch DB reviews & POC
     const [reviews, poc] = await Promise.all([
       Review.find({ company: companyObjectId }).lean().exec(),
-      PointOfContact.findOne({ company: companyObjectId, isActive: true })
+      PointOfContact.findOne({ company: companyObjectId, isRegistered: true })
         .lean()
         .exec(),
     ]);
@@ -664,12 +786,47 @@ export const getListings = async (req, res, next) => {
     const { companyId } = req.params;
 
     const listings = await Company.find({ companyId: companyId }).lean().exec();
+    const reviews = await Review.find({ companyId }).lean().exec();
 
-    if (!listings) {
+    if (!listings || !listings.length) {
       return res.status(404).json({ error: "Company not found" });
     }
+    if (!reviews || !reviews.length) {
+      return res.status(200).json([]);
+    }
 
-    return res.status(200).json(listings);
+    // const data = listings.map((list) => {
+    //   const reviews = [];
+    //   const transformListing = reviews.map((review) => {
+    //     console.log("review", review.companyId);
+    //     if (review.companyId === companyId) {
+    //       reviews.push(review);
+    //       console.log("first");
+    //     }
+    //   });
+    //   return { ...list, reviews };
+    // });
+
+    // const data = listings.map((list) => {
+    //   const reviews = [];
+    //   const transformListing = reviews.some((review) => {
+    //     console.log("review", review.companyId);
+    //     if (review.companyId === companyId) {
+    //       reviews.push(review);
+    //       console.log("first");
+    //     }
+    //   });
+    //   return { ...list, reviews };
+    // });
+
+    const data = listings.map((list) => {
+      const totalReviews = reviews.filter(
+        (review) => review.companyId === companyId
+      );
+      return { ...list, reviews: totalReviews };
+    });
+
+    return res.status(200).json(data);
   } catch (error) {
     next(error);
   }
@@ -771,19 +928,23 @@ export const addCompanyImage = async (req, res, next) => {
     const folderPath = `nomads/${pathCompanyType}/${company.country}/${safeCompanyName}`;
     const s3Key = `${folderPath}/${folderType}/${file.originalname}`;
 
-    let uploadedUrl;
+    let data;
     try {
-      uploadedUrl = await uploadFileToS3(s3Key, file);
+      data = await uploadFileToS3(s3Key, file);
     } catch (err) {
       return res.status(500).json({ message: "Failed to upload image to S3" });
     }
 
     if (folderType === "logo") {
-      company.logo = uploadedUrl;
+      company.logo = {
+        url: data.url,
+        id: data.id,
+      };
     } else {
       if (!Array.isArray(company.images)) company.images = [];
       company.images.push({
-        url: uploadedUrl,
+        url: data.url,
+        id: data.id,
         index: company.images.length + 1,
       });
     }
@@ -796,7 +957,8 @@ export const addCompanyImage = async (req, res, next) => {
         companyId: company._id,
         businessId: company.businessId,
         type: folderType,
-        url: uploadedUrl,
+        url: data.url,
+        id: data.id,
       },
     });
   } catch (error) {
@@ -875,9 +1037,10 @@ export const addCompanyImagesBulk = async (req, res, next) => {
         const uniqueKey = `${folderPath}/${folderType}/${sanitizeFileName(
           file.originalname
         )}`;
-        const uploadedUrl = await uploadFileToS3(uniqueKey, file);
+        const data = await uploadFileToS3(uniqueKey, file);
         return {
-          url: uploadedUrl,
+          url: data.url,
+          id: data.id,
           index: startIndex + i + 1,
           originalName: file.originalname,
           key: uniqueKey,
@@ -923,6 +1086,237 @@ export const addCompanyImagesBulk = async (req, res, next) => {
   }
 };
 
+export const editCompanyImagesBulk = async (req, res, next) => {
+  try {
+    const files = req.files;
+    const { companyId, businessId, companyType = "" } = req.body;
+
+    if (!companyId || !businessId || !companyType) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    if (!files || !files.length) {
+      return res.status(400).json({ message: "No files provided" });
+    }
+
+    let company = await Company.findOne({ businessId }).exec();
+
+    if (!company) {
+      return res.status(404).json({ message: "No such company found" });
+    }
+
+    if (
+      companyType &&
+      company.companyType?.toLowerCase() !== String(companyType).toLowerCase()
+    ) {
+      return res
+        .status(400)
+        .json({ message: "companyType does not match the stored company" });
+    }
+
+    // --- STEP 1: Delete old images from S3 ---
+    if (Array.isArray(company.images) && company.images.length > 0) {
+      const deleteResults = await Promise.allSettled(
+        company.images.map(async (img) => {
+          if (img.url) {
+            try {
+              await deleteFileFromS3ByUrl(img.url);
+              return { success: true, url: img.url };
+            } catch (err) {
+              return { success: false, url: img.url, reason: err.message };
+            }
+          }
+        })
+      );
+
+      const failedDeletes = deleteResults.filter(
+        (r) => r.status === "rejected"
+      );
+      if (failedDeletes.length > 0) {
+        console.warn("Some old images failed to delete:", failedDeletes);
+      }
+    }
+
+    // Clear the old images array in DB
+    company.images = [];
+
+    // --- STEP 2: Upload new images to S3 ---
+    const formatCompanyType = (type) => {
+      const map = {
+        hostel: "hostels",
+        privatestay: "private-stay",
+        meetingroom: "meetingroom",
+        coworking: "coworking",
+        cafe: "cafe",
+        coliving: "coliving",
+        workation: "workation",
+      };
+      const key = String(type || "").toLowerCase();
+      return map[key] || "unknown";
+    };
+
+    const pathCompanyType = formatCompanyType(
+      companyType || company.companyType
+    );
+    const safeCompanyName =
+      (company.companyName || "unnamed").replace(/[^\w\- ]+/g, "").trim() ||
+      "unnamed";
+    const folderPath = `nomads/${pathCompanyType}/${company.country}/${safeCompanyName}`;
+    const folderType = "images";
+
+    const sanitizeFileName = (name) =>
+      String(name || "file")
+        .replace(/[/\\?%*:|"<>]/g, "_")
+        .replace(/\s+/g, "_");
+
+    const uploadResults = await Promise.allSettled(
+      files.map(async (file, i) => {
+        const uniqueKey = `${folderPath}/${folderType}/${sanitizeFileName(
+          file.originalname
+        )}`;
+        const data = await uploadFileToS3(uniqueKey, file);
+        return {
+          url: data.url,
+          id: data.id,
+          index: i + 1,
+          originalName: file.originalname,
+          key: uniqueKey,
+        };
+      })
+    );
+
+    const successes = [];
+    const failures = [];
+
+    for (const r of uploadResults) {
+      if (r.status === "fulfilled") successes.push(r.value);
+      else failures.push({ reason: r.reason?.message || "Unknown error" });
+    }
+
+    // --- STEP 3: Save new image list to DB ---
+    if (successes.length) {
+      company.images = successes.map((s) => ({
+        url: s.url,
+        id: s.id,
+        index: s.index,
+      }));
+      await company.save({ validateBeforeSave: false });
+    }
+
+    // --- STEP 4: Return response ---
+    return res.status(failures.length ? 207 : 200).json({
+      message:
+        failures.length && successes.length
+          ? `Replaced ${successes.length} images; ${failures.length} failed`
+          : failures.length
+          ? "All uploads failed"
+          : `Successfully replaced all images`,
+      data: {
+        companyId: company._id,
+        businessId: company.businessId,
+        type: folderType,
+        uploaded: successes,
+        failed: failures,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// export const editCompany = async (req, res, next) => {
+//   try {
+//     const {
+//       businessId,
+//       address,
+//       about,
+//       totalSeats,
+//       latitude,
+//       longitude,
+//       googleMap,
+//       ratings,
+//       totalReviews,
+//       inclusions,
+//       companyType,
+//       companyName,
+//       reviews,
+//       images,
+//     } = req.body;
+
+//     if (!businessId) {
+//       return res.status(400).json({ message: "Missing business id" });
+//     }
+
+//     const company = await Company.findOne({ businessId });
+//     if (!company) {
+//       return res.status(404).json({ message: "Company not found" });
+//     }
+
+//     const isCompanyTypeChanged = companyType !== company.companyType;
+//     const oldCompanyType = company.companyType;
+
+//     // Update scalar fields
+//     company.address = address?.trim() || company.address;
+//     company.companyName = companyName?.trim() || company.companyName;
+//     company.about = about?.trim() || company.about;
+//     company.totalSeats = totalSeats ? parseInt(totalSeats) : company.totalSeats;
+//     company.latitude = latitude ? parseFloat(latitude) : company.latitude;
+//     company.longitude = longitude ? parseFloat(longitude) : company.longitude;
+//     company.googleMap = googleMap?.trim() || company.googleMap;
+//     company.ratings = ratings ? parseFloat(ratings) : company.ratings;
+//     company.totalReviews = totalReviews
+//       ? parseInt(totalReviews)
+//       : company.totalReviews;
+//     company.inclusions = inclusions?.trim() || company.inclusions;
+//     company.companyType =
+//       companyType?.trim()?.split(" ").join("").toLowerCase() ||
+//       company.companyType;
+
+//     const savedCompany = await company.save();
+
+//     if (savedCompany && isCompanyTypeChanged && company.images.length > 0) {
+//       console.log(
+//         "Company type changed from",
+//         oldCompanyType,
+//         "to",
+//         companyType
+//       );
+
+//       // Delete files in parallel safely
+//       await Promise.allSettled(
+//         company.images.map((img) => deleteFileFromS3ByUrl(img.url))
+//       );
+
+//       //Update the images in the DB
+//       company.images = images;
+//     }
+
+//     /** ---------------- REVIEWS UPDATE LOGIC ---------------- **/
+//     if (Array.isArray(reviews) && reviews.length > 0) {
+//       // Dumb but simple: nuke old reviews and replace
+//       await Review.deleteMany({ company: company._id });
+//       const reviewDocs = reviews.map((review) => ({
+//         company: company._id,
+//         companyId: company.companyId,
+//         name: review.name?.trim(),
+//         starCount: parseInt(review.starCount),
+//         description: review.description?.trim(),
+//         reviewSource: review.reviewSource?.trim(),
+//         reviewLink: review.reviewLink?.trim(),
+//       }));
+//       await Review.insertMany(reviewDocs);
+//     }
+
+//     res.status(200).json({
+//       message: "Company updated successfully",
+//       company,
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     next(error);
+//   }
+// };
+
 export const editCompany = async (req, res, next) => {
   try {
     const {
@@ -937,8 +1331,10 @@ export const editCompany = async (req, res, next) => {
       totalReviews,
       inclusions,
       companyType,
+      companyName,
       reviews,
-      images,
+      existingImages = [],
+      images = [], // This comes from the remote API with all images (existing + new)
     } = req.body;
 
     const company = await Company.findOne({ businessId });
@@ -946,8 +1342,19 @@ export const editCompany = async (req, res, next) => {
       return res.status(404).json({ message: "Company not found" });
     }
 
+    const newCompanyType = companyType
+      ?.trim()
+      ?.split(" ")
+      .join("")
+      .toLowerCase();
+    const isCompanyTypeChanged = newCompanyType !== company.companyType;
+
+    // Store old images for potential deletion
+    const oldImages = [...company.images];
+
     // Update scalar fields
     company.address = address?.trim() || company.address;
+    company.companyName = companyName?.trim() || company.companyName;
     company.about = about?.trim() || company.about;
     company.totalSeats = totalSeats ? parseInt(totalSeats) : company.totalSeats;
     company.latitude = latitude ? parseFloat(latitude) : company.latitude;
@@ -958,16 +1365,61 @@ export const editCompany = async (req, res, next) => {
       ? parseInt(totalReviews)
       : company.totalReviews;
     company.inclusions = inclusions?.trim() || company.inclusions;
-    company.companyType =
-      companyType?.trim()?.split(" ").join("").toLowerCase() ||
-      company.companyType;
-    company.images = images;
+    company.companyType = newCompanyType || company.companyType;
 
-    await company.save();
+    // ---------- IMAGE HANDLING ----------
+    let imagesToDelete = [];
+
+    // Use 'images' from remote API (which has existing + new images)
+    // or fallback to 'existingImages' if not provided
+    const updatedImages = images.length > 0 ? images : existingImages;
+
+    if (isCompanyTypeChanged) {
+      console.log(
+        "🔄 Company type changed - will delete all old images after save"
+      );
+      // When company type changes, delete ALL old images
+      imagesToDelete = oldImages;
+      company.images = updatedImages;
+    } else {
+      // Company type stayed the same - delete only removed images
+      const updatedImageUrls = updatedImages.map((img) => img.url);
+      imagesToDelete = oldImages.filter(
+        (img) => !updatedImageUrls.includes(img.url)
+      );
+
+      if (imagesToDelete.length > 0) {
+        console.log(
+          `🗑️ Will delete ${imagesToDelete.length} removed images after save`
+        );
+      }
+
+      // Update with all images (existing + new)
+      company.images = updatedImages;
+      console.log(`📷 Updated company images: ${company.images.length} total`);
+    }
+
+    // Save company first
+    const savedCompany = await company.save();
+    console.log("✅ Company saved successfully");
+
+    // NOW delete images from S3 after successful DB save
+    if (imagesToDelete.length > 0) {
+      console.log(`🗑️ Deleting ${imagesToDelete.length} images from S3...`);
+      const deleteResults = await Promise.allSettled(
+        imagesToDelete.map((img) => deleteFileFromS3ByUrl(img.url))
+      );
+
+      const failed = deleteResults.filter((r) => r.status === "rejected");
+      if (failed.length > 0) {
+        console.warn(`⚠️ Failed to delete ${failed.length} images from S3`);
+      } else {
+        console.log("✅ All old images deleted from S3");
+      }
+    }
 
     /** ---------------- REVIEWS UPDATE LOGIC ---------------- **/
     if (Array.isArray(reviews) && reviews.length > 0) {
-      // Dumb but simple: nuke old reviews and replace
       await Review.deleteMany({ company: company._id });
       const reviewDocs = reviews.map((review) => ({
         company: company._id,
@@ -983,10 +1435,10 @@ export const editCompany = async (req, res, next) => {
 
     res.status(200).json({
       message: "Company updated successfully",
-      company,
+      company: savedCompany,
     });
   } catch (error) {
-    console.error(error);
+    console.error("❌ Error in editCompany:", error);
     next(error);
   }
 };
@@ -1051,14 +1503,43 @@ export const activateProduct = async (req, res, next) => {
 
     if (!product) {
       return res.status(400).json({
-        message: "Failed to update leads",
+        message: "Failed to update product",
       });
     }
 
-    const activeStatus = status ? "activated" : "inactivated";
+    const activeStatus = status ? "activated" : "deactivated";
     return res
       .status(200)
       .json({ message: `Product ${activeStatus} successfully` });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deactivateProduct = async (req, res, next) => {
+  try {
+    const { businessId } = req.body;
+
+    if (!businessId) {
+      return res.status(400).json({
+        message: "Company Id missing",
+      });
+    }
+
+    const product = await Company.findOneAndUpdate(
+      { businessId },
+      { isActive: false }
+    );
+
+    if (!product) {
+      return res.status(400).json({
+        message: "Product not found or failed to deactivate",
+      });
+    }
+
+    return res
+      .status(200)
+      .json({ message: "Product has been deactivated successfully" });
   } catch (error) {
     next(error);
   }
@@ -1076,7 +1557,7 @@ export const getCompanyLeads = async (req, res, next) => {
     const leads = await Lead.find(query);
 
     if (!leads || !leads.length) {
-      return res.status(400).json({
+      return res.status(200).json({
         message: "No leads found",
       });
     }

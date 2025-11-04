@@ -7,7 +7,8 @@ const HostPrivacy = () => {
   const navigate = useNavigate();
   const sections = [
     {
-      title: "Last Updated: 2nd October 2024",
+      // title: "Last Updated: 2nd October 2024",
+      title: "",
       content: (
         <>
           <p>
@@ -269,14 +270,14 @@ const HostPrivacy = () => {
             >
               Contact us
             </span>
-          </div> 
+          </div>
         </>
       ),
     },
   ];
 
   return (
-    <div className="flex flex-col gap-10 px-6 lg:px-28 py-4 text-[#364D59]">
+    <div className="flex flex-col gap-10 px-6 lg:px-28 pb-4 pt-12 text-[#364D59]">
       <div className="flex flex-col items-center relative font-comic uppercase font-bold text-secondary-dark text-[clamp(1.5rem,4vw,3rem)] leading-tight">
         <div className="relative inline-block">
           <h3 className="text-center">Privacy Policy</h3>

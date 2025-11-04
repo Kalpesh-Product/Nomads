@@ -87,7 +87,8 @@ const MainPage = () => {
             {slides.map((slide, index) => (
               <div
                 key={index}
-                className="keen-slider__slide flex flex-col items-center gap-4 text-center">
+                className="keen-slider__slide flex flex-col items-center gap-4 text-center"
+              >
                 <img
                   src={slide.image}
                   alt={`Slide ${index + 1}`}

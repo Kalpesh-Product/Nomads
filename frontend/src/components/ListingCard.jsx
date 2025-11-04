@@ -1,16 +1,95 @@
-import { useState } from "react";
-import { AiFillHeart, AiFillStar, AiOutlineHeart } from "react-icons/ai";
+import { useEffect, useState } from "react";
+import {
+  AiFillHeart,
+  AiFillStar,
+  AiOutlineHeart,
+  AiTwotoneHeart,
+} from "react-icons/ai";
+
 import { useNavigate } from "react-router-dom";
+
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+
+import useAuth from "../hooks/useAuth";
 
 const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
   const navigate = useNavigate();
   const [favorites, setFavorites] = useState([]);
+  // Track initial liked state per card
+  const [isInitiallyLiked, setIsInitiallyLiked] = useState(
+    item?.isLiked || false
+  );
+
+  const { auth } = useAuth();
+  const user = auth?.user || {};
+  const userId = auth?.user?._id || auth?.user?.id;
+
+  const queryClient = useQueryClient();
+
+  const axiosPrivate = useAxiosPrivate();
+
+  const { mutate: likeListing } = useMutation({
+    mutationFn: async ({ listingId, isLiked, userId }) => {
+      const { data } = await axiosPrivate.patch(`/user/like`, {
+        listingId,
+        isLiked,
+        userId,
+      });
+      return data;
+    },
+    onSuccess: (data) => {
+      toast.success(data?.message || "Updated successfully");
+      // ✅ Update local favorites immediately for better UX
+      setFavorites(data.likes || []);
+    },
+    onError: (err) => {
+      toast.error(err.response?.data?.message || "Something went wrong");
+    },
+  });
 
   const toggleFavorite = (id) => {
-    setFavorites((prev) =>
-      prev.includes(id) ? prev.filter((fav) => fav !== id) : [...prev, id]
-    );
+    // Determine the current like state based on both backend and local data
+    const isCurrentlyLiked = favorites.includes(id) || isInitiallyLiked;
+    const newLikedState = !isCurrentlyLiked; // what we’re switching to
+
+    // Optimistically update UI
+    if (newLikedState) {
+      setFavorites((prev) => [...prev, id]);
+    } else {
+      setFavorites((prev) => prev.filter((fav) => fav !== id));
+    }
+
+    // Sync both trackers
+    setIsInitiallyLiked(newLikedState);
+
+    // Trigger backend
+    likeListing({ listingId: id, isLiked: newLikedState, userId });
   };
+
+  useEffect(() => {
+    if (!user?._id) return;
+
+    axiosPrivate.get(`/api/user/likes/${user._id}`).then((res) => {
+      const likedIds = res.data?.map((item) => item._id) || [];
+      setFavorites(likedIds);
+    });
+  }, [user?._id]);
+
+  // useEffect(() => {
+  //   if (!user?._id) return;
+  //   const fetchLikes = async () => {
+  //     try {
+  //       const res = await axiosPrivate.get(`/api/user/likes/${user._id}`);
+  //       const likedIds = res.data?.map((item) => item._id) || [];
+  //       setFavorites(likedIds);
+  //     } catch (err) {
+  //       console.error("Failed to load liked listings:", err);
+  //     }
+  //   };
+  //   fetchLikes();
+  // }, [user?._id]);
 
   const typeLabels = {
     coworking: "CoWorking",
@@ -23,6 +102,15 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
   };
 
   const thumbnailImage = item?.images?.[0]?.url;
+
+  const typeMap = {
+    coworking: "Co-Working",
+    meetingroom: "Meetings",
+    privatestay: "Private Stay",
+  };
+
+  const displayType =
+    typeMap[item.companyType?.toLowerCase()] || item.companyType;
 
   return (
     <div
@@ -39,21 +127,30 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
           }
           alt={item.companyName}
           className="w-full h-full object-cover hover:scale-105 transition-all"
+          loading="lazy"
         />
-        <div
-          className="absolute top-2 right-2 pb-4 cursor-pointer w-full h-full pl-0"
-          onClick={() => toggleFavorite(item._id)}
-        >
+        <div className="absolute top-2 right-2 pb-4 w-full h-full pl-0 pointer-events-none">
           <div className="flex flex-col items-end h-full justify-between">
-            {favorites.includes(item._id) ? (
-              <AiFillHeart className="text-white" size={22} />
-            ) : (
-              <AiOutlineHeart className="text-white" size={22} />
-            )}
+            <button
+              type="button"
+              className="cursor-pointer pointer-events-auto"
+              onClick={(e) => {
+                e.stopPropagation(); // ✅ stop navigation only for heart
+                toggleFavorite(item._id);
+              }}
+            >
+              {favorites.includes(item._id) || isInitiallyLiked ? (
+                <AiFillHeart className="text-[#ff5757]" size={22} />
+              ) : (
+                <AiTwotoneHeart className="text-white" size={22} />
+              )}
+            </button>
+
             {showVertical && (
               <div className="bg-white rounded-lg px-2">
                 <span className="font-normal text-xs leading-normal">
-                  {item.companyType || "Test"}
+                  {/* {item.companyType || "Test"} */}
+                  {displayType}
                 </span>
               </div>
             )}
@@ -79,14 +176,16 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
               className="text-sm font-semibold hidden sm:block"
               title={item.companyName || "title"}
             >
-              {/* {
-                : item.companyName.length > 23
-                ? `${item.companyName.slice(0, 23)}...`
-                : item.companyName} */}
-                {showVertical
+              {{
+                showVertical:
+                  item.companyName.length > 23
+                    ? `${item.companyName.slice(0, 23)}...`
+                    : item.companyName,
+              }
                 ? item.companyName.length > 20
-                  ? `${item.companyName.slice(0,20)}...`
-                  : item.companyName : item.companyName}
+                  ? `${item.companyName.slice(0, 20)}...`
+                  : item.companyName
+                : item.companyName}
             </p>
           </div>
 

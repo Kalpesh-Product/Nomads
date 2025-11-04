@@ -27,7 +27,7 @@ const Contact = () => {
     name: "",
     email: "",
     mobile: "",
-    partnerstype: "",
+    typeOfPartnerShip: "",
     message: "",
   });
 
@@ -71,11 +71,11 @@ const Contact = () => {
     <div className="bg-white text-black font-sans">
       {/* About & Form */}
       {/* <section className="py-10 px-4 md:px-20"> */}
-      <Container>
-        <section className="">
-          <div className="grid md:grid-cols-1 gap-20">
+      <Container padding={false}>
+        <section className="min-h-[85vh] flex items-center justify-center">
+          <div className="w-full max-w-5xl">
             {/* About Us */}
-            <div className="space-y-6">
+            {/* <div className="space-y-6">
               <h2 className="text-title font-semibold uppercase">About WONO</h2>
               <p className="text-tiny leading-relaxed">
                 <strong>WONO</strong> is redefining the global future of work
@@ -108,7 +108,7 @@ const Contact = () => {
                 over location.
               </p>
 
-              {/* Mission */}
+          
               <h3 className="font-semibold uppercase mt-8">OUR MISSION</h3>
               <ul className="list-disc ml-6 text-tiny leading-relaxed">
                 <li>
@@ -123,7 +123,7 @@ const Contact = () => {
                 </li>
               </ul>
 
-              {/* Vision */}
+      
               <h3 className="font-semibold uppercase mt-8">OUR VISION</h3>
               <ul className="list-disc ml-6 text-tiny leading-relaxed">
                 <li>
@@ -137,7 +137,7 @@ const Contact = () => {
                 </li>
               </ul>
 
-              {/* Edge */}
+       
               <h3 className="font-semibold uppercase mt-8">OUR EDGE</h3>
               <ul className="list-disc ml-6 text-tiny leading-relaxed">
                 <li>
@@ -164,14 +164,15 @@ const Contact = () => {
               <p className="text-tiny font-semibold">
                 A Platform which is an Early Adaptation of our Future Lifestyle!
               </p>
-            </div>
+            </div> */}
 
             {/* Connect With Us - MUI Styled Form */}
-            <div className="px-40">
+            <div className="md:px-40">
               <Box
                 component="form"
                 onSubmit={handleSubmit((data) => submitContactForm(data))}
-                sx={{ mt: 0 }}>
+                sx={{ mt: 0 }}
+              >
                 <h2 className="text-title font-semibold uppercase mb-4 text-center md:text-center">
                   Connect With Us
                 </h2>
@@ -252,31 +253,35 @@ const Contact = () => {
                     />
                   </div>
 
-                  {/* Type of Partnership */}
+                  {/* Reason to Connect */}
                   <div className="pt-0 pl-0 lg:pt-0 lg:pl-0">
                     <Controller
-                      name="partnerstype"
+                      name="typeOfPartnerShip"
                       control={control}
                       rules={{ required: "Please select a partnership type" }}
                       render={({ field, fieldState }) => (
                         <TextField
+                          {...field} // ✅ This connects value, onChange, ref
                           fullWidth
                           required
                           variant="standard"
                           error={!!fieldState.error}
-                          label={"Type of Partnership"}
+                          label="Reason to Connect"
                           select
                           helperText={fieldState?.error?.message}
-                          slotProps={{
-                            inputLabel: {
-                              sx: {
-                                color: "black", // default label color
-                                "&.Mui-focused": { color: "black" }, // keep black when focused
-                              },
-                            },
-                          }}>
+                          InputLabelProps={{ sx: floatingLabelSx }}
+                        >
                           <MenuItem value="" disabled>
                             Select Type
+                          </MenuItem>
+                          <MenuItem value="Nomad Booking Query">
+                            Nomad Booking Query
+                          </MenuItem>
+                          <MenuItem value="Workation Booking Query">
+                            Workation Booking Query
+                          </MenuItem>
+                          <MenuItem value="Nomad & WoNo Partnerships">
+                            Nomad & WoNo Partnerships
                           </MenuItem>
                           <MenuItem value="B2B SaaS Technology Licensing">
                             B2B SaaS Technology Licensing
@@ -290,10 +295,6 @@ const Contact = () => {
                           <MenuItem value="Coffee Meeting to know us better">
                             Coffee Meeting to know us better
                           </MenuItem>
-
-                          {fieldState.error && (
-                            <p style={{ color: "red", fontSize: "0.8rem" }}></p>
-                          )}
                         </TextField>
                       )}
                     />
@@ -333,7 +334,8 @@ const Contact = () => {
                         px: 14,
                         py: 1,
                         "&:hover": { bgcolor: "#333" },
-                      }}>
+                      }}
+                    >
                       {isContactPending && (
                         <CircularProgress
                           size={16}
@@ -392,7 +394,8 @@ const Contact = () => {
           <div className="bg-white rounded shadow-lg w-full max-w-md p-6 relative">
             <button
               onClick={handleCloseModal}
-              className="absolute top-2 right-2 text-gray-600 hover:text-black">
+              className="absolute top-2 right-2 text-gray-600 hover:text-black"
+            >
               <AiOutlineClose size={20} />
             </button>
             <h3 className="text-lg font-bold mb-2">Success</h3>
@@ -402,7 +405,8 @@ const Contact = () => {
             <div className="text-right">
               <button
                 onClick={handleCloseModal}
-                className="bg-black text-white px-4 py-2 rounded hover:opacity-90">
+                className="bg-black text-white px-4 py-2 rounded hover:opacity-90"
+              >
                 Close
               </button>
             </div>

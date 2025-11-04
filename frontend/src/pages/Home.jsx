@@ -15,7 +15,7 @@ import { AiOutlineHeart } from "react-icons/ai";
 import SearchBarCombobox from "../components/SearchBarCombobox";
 import newIcons from "../assets/newIcons";
 import { AnimatePresence, motion } from "motion/react";
-import { useState } from "react";
+import React, { useState } from "react";
 import coworking from "/images/coworking-img.webp";
 import hostels from "/images/hostels-img.webp";
 import cafes from "/images/meetingrooms-img.webp";
@@ -25,6 +25,7 @@ import MuiModal from "../components/Modal";
 import renderStars from "../utils/renderStarts";
 import axios from "../utils/axios";
 import { Helmet } from "@dr.pogodin/react-helmet";
+import useAuth from "../hooks/useAuth"; // ensure you already have this import at top (you do ✅)
 
 const Home = () => {
   const destinationData = [
@@ -36,6 +37,10 @@ const Home = () => {
   ];
   const location = useLocation();
   // const { companyId, type } = location.state;
+
+  const { auth } = useAuth();
+  const user = auth?.user || {};
+  const userId = auth?.user?._id || auth?.user?.id;
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -65,23 +70,94 @@ const Home = () => {
     },
   });
 
- const countryOptions = locations
-  .map((item) => ({
-    label: item.country
-      ? item.country.charAt(0).toUpperCase() + item.country.slice(1)
-      : "",
-    value: item.country?.toLowerCase(),
-  }))
-  .sort((a, b) => a.label.localeCompare(b.label)); 
+  // const countryOptions = locations
+  //   .map((item) => ({
+  //     label: item.country
+  //       ? item.country.charAt(0).toUpperCase() + item.country.slice(1)
+  //       : "",
+  //     value: item.country?.toLowerCase(),
+  //   }))
+  //   .sort((a, b) => a.label.localeCompare(b.label));
 
+  // const filteredLocation = locations.find(
+  //   (item) => item.country?.toLowerCase() === selectedCountry?.toLowerCase()
+  // );
+
+  // const locationOptions = filteredLocation?.states?.map((item) => ({
+  //   label: item,
+  //   value: item?.toLowerCase(),
+  // }));
+
+  // -------------------------------------
+  // 🔒 Country & location filtering based on user email
+  // -------------------------------------
+
+  // Emails that can see special countries
+  const specialUserEmails = [
+    "allan.wono@gmail.com",
+    "muskan.wono@gmail.com",
+    "shawnsilveira.wono@gmail.com",
+    "mehak.wono@gmail.com",
+  ]; // add more if needed
+
+  // Countries only visible to special users
+  const specialCountries = ["australia"]; // lowercase preferred
+
+  // Specific restricted locations within those countries
+  const specialLocationMap = {
+    australia: ["sydney", "melbourne"], // lowercase names
+  };
+
+  // Build all countries
+  const allCountryOptions = locations
+    .map((item) => ({
+      label: item.country
+        ? item.country.charAt(0).toUpperCase() + item.country.slice(1)
+        : "",
+      value: item.country?.toLowerCase(),
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+
+  // Filter countries based on user email
+  const countryOptions = React.useMemo(() => {
+    const userEmail = user?.email?.toLowerCase();
+    const isSpecialUser = specialUserEmails.includes(userEmail);
+
+    return allCountryOptions.filter((option) => {
+      if (specialCountries.includes(option.value)) {
+        return isSpecialUser; // only show if special user
+      }
+      return true; // visible to everyone else
+    });
+  }, [allCountryOptions, user]);
+
+  // Build locations with same filtering logic
   const filteredLocation = locations.find(
     (item) => item.country?.toLowerCase() === selectedCountry?.toLowerCase()
   );
 
-  const locationOptions = filteredLocation?.states?.map((item) => ({
-    label: item,
-    value: item?.toLowerCase(),
-  }));
+  const locationOptions = React.useMemo(() => {
+    const baseLocations =
+      filteredLocation?.states?.map((item) => ({
+        label: item,
+        value: item?.toLowerCase(),
+      })) || [];
+
+    const userEmail = user?.email?.toLowerCase();
+    const isSpecialUser = specialUserEmails.includes(userEmail);
+
+    if (!selectedCountry) return baseLocations;
+
+    if (specialLocationMap[selectedCountry?.toLowerCase()]) {
+      if (isSpecialUser) return baseLocations;
+      // remove special-only locations for normal users
+      return baseLocations.filter(
+        (loc) =>
+          !specialLocationMap[selectedCountry.toLowerCase()].includes(loc.value)
+      );
+    }
+    return baseLocations;
+  }, [filteredLocation, selectedCountry, user]);
 
   const countOptions = [
     { label: "1 - 5", value: "1-5" },
@@ -308,8 +384,9 @@ const Home = () => {
               transition={{ duration: 0.3 }}
               className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl z-50 p-4 rounded-t-3xl h-[100dvh] lg:hidden"
             >
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold">Search</h3>
+              <div className="flex justify-between items-center mb-10">
+                <div>&nbsp;</div>
+                <h2 className="text-xl font-semibold">Search</h2>
                 <button
                   onClick={() => setShowMobileSearch(false)}
                   className="text-gray-500 text-xl"
@@ -319,7 +396,7 @@ const Home = () => {
               </div>
 
               <motion.div initial={{ y: "-100%" }} animate={{ y: "0%" }}>
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                   <Controller
                     name="country"
                     control={control}
@@ -366,7 +443,7 @@ const Home = () => {
                   />
                   <button
                     type="submit"
-                    className="w-full bg-[#FF5757] text-white py-3 rounded-full"
+                    className="w-full bg-[#FF5757] text-white py-5 rounded-full"
                   >
                     <IoSearch className="inline mr-2" />
                     Search

@@ -22,6 +22,7 @@ import newIcons from "../assets/newIcons.js";
 import SearchBarCombobox from "../components/SearchBarCombobox.jsx";
 import { IoSearch } from "react-icons/io5";
 import { AnimatePresence, motion } from "motion/react";
+import useAuth from "../hooks/useAuth.js";
 
 const Listings = () => {
   const [resetPageKey, setResetPageKey] = useState(0);
@@ -38,6 +39,10 @@ const Listings = () => {
     },
   });
 
+  const { auth } = useAuth();
+  const user = auth?.user || {};
+  const userId = auth?.user?._id || auth?.user?.id;
+
   const selectedCountry = watch("country");
   const selectedState = watch("location");
   const { data: locations = [], isLoading: isLocations } = useQuery({
@@ -52,17 +57,83 @@ const Listings = () => {
     },
   });
 
-  const countryOptions = locations.map((item) => ({
-    label: item.country?.charAt(0).toUpperCase() + item.country?.slice(1),
-    value: item.country?.toLowerCase(),
-  }));
+  // const countryOptions = locations
+  //   .map((item) => ({
+  //     label: item.country?.charAt(0).toUpperCase() + item.country?.slice(1),
+  //     value: item.country?.toLowerCase(),
+  //   }))
+  //   .sort((a, b) => a.label.localeCompare(b.label));
+
+  // const filteredLocation = locations.find(
+  //   (item) => item.country?.toLowerCase() === selectedCountry?.toLowerCase()
+  // );
+  // const locationOptions = filteredLocation?.states?.map((item) => ({
+  //   label: item,
+  //   value: item?.toLowerCase(),
+  // }));
+
+  // -------------------------------------
+  // 🔒 Country & location filtering based on user email
+  // -------------------------------------
+  const specialUserEmails = [
+    "allan.wono@gmail.com",
+    "muskan.wono@gmail.com",
+    "shawnsilveira.wono@gmail.com",
+    "mehak.wono@gmail.com",
+  ]; // add more if needed
+  const specialCountries = ["australia"]; // lowercase preferred
+  const specialLocationMap = {
+    australia: ["sydney", "melbourne"], // lowercase names
+  };
+
+  const allCountryOptions = locations
+    .map((item) => ({
+      label: item.country
+        ? item.country.charAt(0).toUpperCase() + item.country.slice(1)
+        : "",
+      value: item.country?.toLowerCase(),
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+
+  const countryOptions = React.useMemo(() => {
+    const userEmail = user?.email?.toLowerCase();
+    const isSpecialUser = specialUserEmails.includes(userEmail);
+
+    return allCountryOptions.filter((option) => {
+      if (specialCountries.includes(option.value)) {
+        return isSpecialUser; // only visible to special users
+      }
+      return true; // visible to everyone else (including guests)
+    });
+  }, [allCountryOptions, user]);
+
   const filteredLocation = locations.find(
     (item) => item.country?.toLowerCase() === selectedCountry?.toLowerCase()
   );
-  const locationOptions = filteredLocation?.states?.map((item) => ({
-    label: item,
-    value: item?.toLowerCase(),
-  }));
+
+  const locationOptions = React.useMemo(() => {
+    const baseLocations =
+      filteredLocation?.states?.map((item) => ({
+        label: item,
+        value: item?.toLowerCase(),
+      })) || [];
+
+    const userEmail = user?.email?.toLowerCase();
+    const isSpecialUser = specialUserEmails.includes(userEmail);
+
+    if (!selectedCountry) return baseLocations;
+
+    if (specialLocationMap[selectedCountry?.toLowerCase()]) {
+      if (isSpecialUser) return baseLocations;
+      // remove special-only locations for normal users
+      return baseLocations.filter(
+        (loc) =>
+          !specialLocationMap[selectedCountry.toLowerCase()].includes(loc.value)
+      );
+    }
+    return baseLocations;
+  }, [filteredLocation, selectedCountry, user]);
+
   const countOptions = [
     { label: "1 - 5", value: "1-5" },
     { label: "5 - 10", value: "5-10" },
@@ -88,7 +159,9 @@ const Listings = () => {
     queryFn: async () => {
       const { country, location } = formData || {};
       const response = await axios.get(
-        `company/companies?country=${country}&state=${location}`
+        `company/companies?country=${country}&state=${location}&userId=${
+          userId || ""
+        }`
       );
 
       return Array.isArray(response.data)
@@ -96,6 +169,7 @@ const Listings = () => {
         : [];
     },
     enabled: !!formData?.country && !!formData?.location,
+    refetchOnMount: "always", // ✅ forces refetch on every mount
   });
 
   const categoryOptions = React.useMemo(() => {
@@ -399,8 +473,9 @@ const Listings = () => {
             className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 p-0 rounded-t-3xl lg:hidden"
           >
             <motion.div className="bg-white shadow-2xl overflow-auto p-4 rounded-b-3xl  h-screen  w-full">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold">Search</h3>
+              <div className="flex justify-between items-center mb-10">
+                <div>&nbsp;</div>
+                <h3 className="text-xl font-semibold">Search</h3>
                 <button
                   onClick={() => setShowMobileSearch(false)}
                   className="text-gray-500 text-xl"
@@ -413,7 +488,11 @@ const Listings = () => {
                 animate={{ y: 0 }}
                 exit={{ y: "-100%" }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="grid grid-cols-3 md:grid-cols-5 gap-2 gap-y-10 mb-16"
+                className={`grid ${
+                  categoryOptions.length === 4
+                    ? "grid-cols-2" // 2 icons per row for 4 total
+                    : "grid-cols-3 md:grid-cols-5" // default layout for 6 or more
+                } gap-4 gap-y-10 mb-16 justify-items-center`}
               >
                 {categoryOptions.map((cat) => {
                   const iconSrc = newIcons[cat.value];
@@ -451,7 +530,7 @@ const Listings = () => {
                 })}
               </motion.div>
 
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <Controller
                   name="country"
                   control={control}
@@ -498,7 +577,7 @@ const Listings = () => {
                 />
                 <button
                   type="submit"
-                  className="w-full bg-[#FF5757] text-white py-3 rounded-full"
+                  className="w-full bg-[#FF5757] text-white py-5 rounded-full"
                 >
                   <IoSearch className="inline mr-2" />
                   Search

@@ -7,6 +7,14 @@ import { config } from "dotenv";
 
 config();
 
+// ✅ Add this here:
+// console.log("AWS CONFIG:", {
+//   region: process.env.PROJECT_AWS_REGION,
+//   key: process.env.PROJECT_AWS_ACCESS_KEY ? "SET" : "MISSING",
+//   secret: process.env.PROJECT_AWS_SECRET_KEY ? "SET" : "MISSING",
+//   bucket: process.env.PROJECT_S3_BUCKET_NAME,
+// });
+
 const s3Client = new S3Client({
   region: process.env.PROJECT_AWS_REGION,
   credentials: {
@@ -28,7 +36,11 @@ export async function uploadFileToS3(route, file) {
     const command = new PutObjectCommand(uploadParams);
     await s3Client.send(command);
     const fileUrl = `https://${process.env.PROJECT_S3_BUCKET_NAME}.s3.${process.env.PROJECT_AWS_REGION}.amazonaws.com/${route}`;
-    return fileUrl;
+
+    return {
+      id: route,
+      url: fileUrl,
+    };
   } catch (error) {
     throw new Error(error);
   }

@@ -4,7 +4,7 @@ import { Controller, useForm } from "react-hook-form";
 import { TextField } from "@mui/material";
 import { DesktopDatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import SecondaryButton from "../components/SecondaryButton";
 import ReviewCard from "../components/ReviewCard";
 import LeafRatings from "../components/LeafRatings";
@@ -26,6 +26,8 @@ import toast from "react-hot-toast";
 import AmenitiesList from "../components/AmenitiesList";
 import { FaCheck } from "react-icons/fa";
 import TransparentModal from "../components/TransparentModal";
+import useAuth from "../hooks/useAuth";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
 dayjs.extend(relativeTime);
 
@@ -33,22 +35,30 @@ const Product = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { companyId, type } = location.state;
+  const queryClient = useQueryClient();
+  const { auth } = useAuth();
+  const userId = auth?.user?._id || auth?.user?.id;
+
   const [selectedReview, setSelectedReview] = useState([]);
   const [showAmenities, setShowAmenities] = useState(false);
   console.log("selected : ", selectedReview);
   const [open, setOpen] = useState(false);
 
-  const { data: companyDetails, isPending: isCompanyDetails } = useQuery({
-    queryKey: ["companyDetails", companyId],
-    queryFn: async () => {
-      const response = await axios.get(
-        `company/get-single-company-data?companyId=${companyId}&companyType=${type}`
-      );
+  const axiosPrivate = useAxiosPrivate();
 
-      console.log("type", type);
+  const { data: companyDetails, isPending: isCompanyDetails } = useQuery({
+    queryKey: ["companyDetails", companyId, userId || "guest"], // safe for guests too
+    queryFn: async () => {
+      const url = userId
+        ? `company/get-single-company-data?companyId=${companyId}&companyType=${type}&userId=${userId}`
+        : `company/get-single-company-data?companyId=${companyId}&companyType=${type}`;
+      const response = await axios.get(url); // ✅ use public axios when not logged in
+
+      console.log("logox", response.data.logo.url);
       return response?.data;
     },
-    enabled: !!companyId,
+    enabled: !!companyId, // ✅ allow guests to load
+    refetchOnMount: "always",
   });
 
   console.log("companuDetials ", companyDetails);
@@ -83,6 +93,25 @@ const Product = () => {
     },
     mode: "onChange",
   });
+
+  // 🟢 Add this useEffect below:
+  useEffect(() => {
+    if (auth?.user) {
+      const fullName = `${auth.user.firstName || ""} ${
+        auth.user.lastName || ""
+      }`.trim();
+
+      reset({
+        fullName,
+        mobileNumber: auth.user.mobile || "",
+        email: auth.user.email || "",
+        noOfPeople: 0,
+        startDate: null,
+        endDate: null,
+      });
+    }
+  }, [auth, reset]);
+
   const selectedStartDate = watch("startDate");
   const {
     handleSubmit: handlesubmitSales,
@@ -130,7 +159,7 @@ const Product = () => {
     mutationFn: async (data) => {
       const response = await axios.post("/forms/add-new-b2c-form-submission", {
         ...data,
-        pocName: companyDetails?.poc?.name || "Anviksha Godkar",
+        pocName: companyDetails?.poc?.name || "Sales Team",
         pocCompany: companyDetails?.companyName,
         pocDesignation: companyDetails?.poc?.designation,
         sheetName: "All_POC_Contact",
@@ -178,6 +207,42 @@ const Product = () => {
 
   const mapsData = [forMapsData];
   const [heartClicked, setHeartClicked] = useState(false);
+
+  useEffect(() => {
+    if (companyDetails) {
+      setHeartClicked(companyDetails?.isLiked || false);
+    }
+  }, [companyDetails]);
+
+  const { mutate: toggleLike } = useMutation({
+    mutationFn: async (isLikedNow) => {
+      const response = await axiosPrivate.patch(`/user/like`, {
+        listingId: companyDetails?._id,
+        userId,
+        isLiked: isLikedNow,
+      });
+      return response.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data.message || "Updated successfully");
+      // Update heart state and refresh queries that depend on likes
+      setHeartClicked((prev) => !prev);
+      queryClient.invalidateQueries(["userLikes"]);
+      queryClient.invalidateQueries(["globallistings"]);
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || "Something went wrong");
+    },
+  });
+
+  const goToHostsContentCopyright = () => {
+    if (window.location.hostname.includes("localhost")) {
+      window.location.href =
+        "http://hosts.localhost:5173/content-and-copyright";
+    } else {
+      window.location.href = "https://hosts.wono.co/content-and-copyright";
+    }
+  };
 
   return (
     <div className="p-4">
@@ -289,10 +354,10 @@ const Product = () => {
           {/* About and Location */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
             <div className="flex flex-col gap-8">
-              {isCompanyDetails ? (
+              {/* {isCompanyDetails ? (
                 // 🔄 Skeleton while loading
                 <div className="w-full h-36 bg-gray-200 animate-pulse rounded-md" />
-              ) : !companyDetails?.logo ? (
+              ) : !companyDetails?.logo || !companyDetails?.logo?.url ? (
                 // 🚫 Fallback UI when logo is missing
                 <div className="w-full h-36 flex items-center justify-center bg-gray-100 border border-dashed border-gray-300 rounded-md">
                   <span className="text-gray-500 text-sm">
@@ -303,7 +368,36 @@ const Product = () => {
                 // ✅ Show actual logo
                 <div className="w-full h-36 overflow-hidden rounded-md">
                   <img
-                    src={companyDetails.logo}
+                    src={companyDetails?.logo?.url || companyDetails?.logo}
+                    alt="company-logo"
+                    className="h-full w-full object-contain"
+                  />
+                </div>
+              )} */}
+
+              {isCompanyDetails ? (
+                // 🔄 Skeleton while loading
+                <div className="w-full h-36 bg-gray-200 animate-pulse rounded-md" />
+              ) : !(
+                  (typeof companyDetails?.logo === "string" &&
+                    companyDetails.logo) ||
+                  companyDetails?.logo?.url
+                ) ? (
+                // 🚫 Fallback UI when logo is missing
+                <div className="w-full h-36 flex items-center justify-center bg-gray-100 border border-dashed border-gray-300 rounded-md">
+                  <span className="text-gray-500 text-sm">
+                    No company logo available
+                  </span>
+                </div>
+              ) : (
+                // ✅ Show actual logo
+                <div className="w-full h-36 overflow-hidden rounded-md">
+                  <img
+                    src={
+                      (typeof companyDetails?.logo === "string" &&
+                        companyDetails.logo) ||
+                      companyDetails?.logo?.url
+                    }
                     alt="company-logo"
                     className="h-full w-full object-contain"
                   />
@@ -330,17 +424,26 @@ const Product = () => {
                     )}
 
                     <div
-                      onClick={() => setHeartClicked((prev) => !prev)}
+                      onClick={() => {
+                        const newLiked = !heartClicked;
+                        setHeartClicked(newLiked);
+                        toggleLike(newLiked);
+                      }}
                       className="cursor-pointer relative"
                     >
-                      {heartClicked ? <IoIosHeart /> : <IoIosHeartEmpty />}
+                      {heartClicked ? (
+                        <IoIosHeart className="text-[#ff5757]" size={22} />
+                      ) : (
+                        <IoIosHeartEmpty size={22} />
+                      )}
                     </div>
-                    <NavLink
+
+                    {/* <NavLink
                       className={"text-small underline"}
                       to={"/nomad/login"}
                     >
                       Save
-                    </NavLink>
+                    </NavLink> */}
                   </div>
                 </div>
 
@@ -444,7 +547,7 @@ const Product = () => {
                         variant="standard"
                         size="small"
                         helperText={errors?.fullName?.message}
-                        sx={{marginTop : 3}}
+                        sx={{ marginTop: 3 }}
                         error={!!errors.fullName}
                       />
                     )}
@@ -668,7 +771,7 @@ const Product = () => {
                 />
               </h1>
 
-              <p className="text-subtitle  my-4 font-medium">Guest favorite</p>
+              <p className="text-subtitle  my-4 font-medium">Guest Favorite</p>
               <span className="text-content text-center">
                 This place is a guest favourite based on <br /> ratings, reviews
                 and reliability
@@ -705,144 +808,194 @@ const Product = () => {
                 disableTwoFingerScroll
               />
             </div>
-            <hr className="my-5 lg:my-10" />
 
-            {["Anviksha Godkar", "John Doe"].includes(
-              companyDetails?.poc?.name || ""
-            ) && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10 pb-20">
-                <div className="flex flex-col lg:flex-row justify-center items-center col-span-1 border-2 shadow-md gap-4 rounded-xl p-6 w-full">
-                  <div className="flex flex-col gap-4 justify-between items-center h-full w-56">
-                    {/* Avatar with Initials */}
-                    <div className="w-32 aspect-square rounded-full bg-primary-blue flex items-center justify-center text-white text-6xl font-semibold uppercase">
-                      {companyDetails?.poc?.name
-                        ?.split(" ")
-                        .map((n) => n[0])
-                        .join("")
-                        .slice(0, 2) || "AG"}
-                    </div>
-
-                    {/* Name & Designation */}
-                    <div className="text-center space-y-3 h-1/2 flex flex-col justify-evenly items-center">
-                      <h1 className="text-title text-gray-700 font-medium leading-10">
-                        {companyDetails?.poc?.name || "Anviksha Godkar"}
-                      </h1>
-                      <p className="text-content">
-                        {companyDetails?.poc?.designation ||
-                          "Deputy Sales Manager"}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="w-px h-full bg-gray-300 mx-2 my-auto" />
-                  <div className="h-full w-56 flex flex-col justify-normal">
-                    <p className="text-title text-center text-gray-700 font-medium mb-8 underline uppercase">
-                      Host Details
-                    </p>
-                    <div className="flex flex-col gap-5 text-sm sm:text-base">
-                      {[
-                        "Response rate: 100%",
-                        "Speaks English, Hindi, Marathi and Konkani",
-                        "Responds within an hour",
-                        "Lives in Velha, Goa",
-                      ].map((detail, index) => (
-                        <div key={index} className="flex items-start gap-2">
-                          <FaCheck className="text-blue-500 mt-1 flex-shrink-0" />
-                          <span className="leading-snug">{detail}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex w-full border-2 shadow-md rounded-xl">
-                  <div className="flex flex-col h-full gap-4 rounded-xl p-6 w-full lg:w-full justify-between">
-                    <h1 className="text-title text-gray-700 font-medium uppercase">
-                      Connect With Host
-                    </h1>
-                    <form
-                      onSubmit={handlesubmitSales((data) => submitSales(data))}
-                      className="grid grid-cols-1 gap-4"
-                    >
-                      <Controller
-                        name="fullName"
-                        control={salesControl}
-                        rules={{
-                          required: "Full Name is required",
-                          validate: {
-                            isAlphanumeric,
-                            noOnlyWhitespace,
-                          },
-                        }}
-                        render={({ field }) => (
-                          <TextField
-                            {...field}
-                            label="Full Name"
-                            fullWidth
-                            variant="standard"
-                            size="small"
-                            error={!!salesErrors?.fullName}
-                            helperText={salesErrors?.fullName?.message}
-                          />
-                        )}
-                      />
-                      <Controller
-                        name="mobileNumber"
-                        control={salesControl}
-                        rules={{
-                          required: "Mobile number is required",
-                          validate: {
-                            isValidPhoneNumber,
-                          },
-                        }}
-                        render={({ field }) => (
-                          <TextField
-                            {...field}
-                            label="Mobile Number"
-                            fullWidth
-                            value={field.value || ""}
-                            type="number"
-                            variant="standard"
-                            size="small"
-                            error={!!salesErrors?.mobileNumber}
-                            helperText={salesErrors?.mobileNumber?.message}
-                          />
-                        )}
-                      />
-                      <Controller
-                        name="email"
-                        control={salesControl}
-                        rules={{
-                          required: "Email is required",
-                          validate: { isValidEmail },
-                        }}
-                        render={({ field }) => (
-                          <TextField
-                            {...field}
-                            label="Email"
-                            fullWidth
-                            type="email"
-                            variant="standard"
-                            size="small"
-                            error={!!salesErrors?.email}
-                            helperText={salesErrors?.email?.message}
-                          />
-                        )}
-                      />
-                      <div className="flex justify-center items-center">
-                        <SecondaryButton
-                          title={"Submit"}
-                          type={"submit"}
-                          externalStyles={"mt-6 w-1/2"}
-                          disabled={isSubmittingSales}
-                          isLoading={isSubmittingSales}
-                        />
+            {companyDetails?.poc?.x && (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10 pt-10">
+                  <div className="flex flex-col lg:flex-row justify-center items-center col-span-1 border-2 shadow-md gap-4 rounded-xl p-6 w-full">
+                    <div className="flex flex-col gap-4 justify-between items-center h-full w-56">
+                      {/* Avatar with Initials */}
+                      <div className="w-32 aspect-square rounded-full bg-primary-blue flex items-center justify-center text-white text-6xl font-semibold uppercase">
+                        {companyDetails?.poc?.name
+                          ?.split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                          .slice(0, 2) || "AG"}
                       </div>
-                    </form>
+
+                      {/* Name & Designation */}
+                      <div className="text-center space-y-3 h-1/2 flex flex-col justify-evenly items-center">
+                        <h1 className="text-title text-gray-700 font-medium leading-10">
+                          {companyDetails?.poc?.name || "Sales Team"}
+                        </h1>
+                        <p className="text-content">
+                          {companyDetails?.poc?.designation ||
+                            "Sales Department"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="w-px h-full bg-gray-300 mx-2 my-auto" />
+                    <div className="h-full w-56 flex flex-col justify-normal">
+                      <p className="text-title text-center text-gray-700 font-medium mb-8 underline uppercase">
+                        Host Details
+                      </p>
+                      <div className="flex flex-col gap-5 text-sm sm:text-base">
+                        {[
+                          "Response rate: 100%",
+                          "Speaks English, Hindi, Marathi and Konkani",
+                          "Responds within an hour",
+                          "Lives in Velha, Goa",
+                        ].map((detail, index) => (
+                          <div key={index} className="flex items-start gap-2">
+                            <FaCheck className="text-blue-500 mt-1 flex-shrink-0" />
+                            <span className="leading-snug">{detail}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex w-full border-2 shadow-md rounded-xl">
+                    <div className="flex flex-col h-full gap-4 rounded-xl p-6 w-full lg:w-full justify-between">
+                      <h1 className="text-title text-gray-700 font-medium uppercase">
+                        Connect With Host
+                      </h1>
+                      <form
+                        onSubmit={handlesubmitSales((data) =>
+                          submitSales(data)
+                        )}
+                        className="grid grid-cols-1 gap-4"
+                      >
+                        <Controller
+                          name="fullName"
+                          control={salesControl}
+                          rules={{
+                            required: "Full Name is required",
+                            validate: {
+                              isAlphanumeric,
+                              noOnlyWhitespace,
+                            },
+                          }}
+                          render={({ field }) => (
+                            <TextField
+                              {...field}
+                              label="Full Name"
+                              fullWidth
+                              variant="standard"
+                              size="small"
+                              error={!!salesErrors?.fullName}
+                              helperText={salesErrors?.fullName?.message}
+                            />
+                          )}
+                        />
+                        <Controller
+                          name="mobileNumber"
+                          control={salesControl}
+                          rules={{
+                            required: "Mobile number is required",
+                            validate: {
+                              isValidPhoneNumber,
+                            },
+                          }}
+                          render={({ field }) => (
+                            <TextField
+                              {...field}
+                              label="Mobile Number"
+                              fullWidth
+                              value={field.value || ""}
+                              type="number"
+                              variant="standard"
+                              size="small"
+                              error={!!salesErrors?.mobileNumber}
+                              helperText={salesErrors?.mobileNumber?.message}
+                            />
+                          )}
+                        />
+                        <Controller
+                          name="email"
+                          control={salesControl}
+                          rules={{
+                            required: "Email is required",
+                            validate: { isValidEmail },
+                          }}
+                          render={({ field }) => (
+                            <TextField
+                              {...field}
+                              label="Email"
+                              fullWidth
+                              type="email"
+                              variant="standard"
+                              size="small"
+                              error={!!salesErrors?.email}
+                              helperText={salesErrors?.email?.message}
+                            />
+                          )}
+                        />
+                        <div className="flex justify-center items-center">
+                          <SecondaryButton
+                            title={"Submit"}
+                            type={"submit"}
+                            externalStyles={"mt-6 w-1/2"}
+                            disabled={isSubmittingSales}
+                            isLoading={isSubmittingSales}
+                          />
+                        </div>
+                      </form>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </>
             )}
+            <hr className="mt-5 mb-0 lg:mt-10 lg:mb-0" />
+
+            {/* Content & Source Disclaimer */}
+            <div className="text-[0.5rem] text-gray-500 leading-relaxed">
+              <p className="mb-2">
+                <b>Source:</b> All above content, images and details have been
+                sourced from publicly available information.
+              </p>
+              <p className="mb-2">
+                <b>Content and Copyright Disclaimer:</b> WoNo is a nomad
+                services and informational platform that aggregates and presents
+                publicly available information about co-working spaces,
+                co-living spaces, serviced apartments, hostels, workation
+                spaces, meeting rooms, working cafés and related lifestyle or
+                travel services. All such information displayed on its platform,
+                including images, brand names, or descriptions is shared solely
+                for informational and reference purposes to help nomads/users
+                discover and compare global nomad-friendly information and
+                services on its central platform.
+              </p>
+              <p className="mb-2">
+                WoNo does not claim ownership of any third-party logos, images,
+                descriptions, or business information displayed on the platform.
+                All trademarks, brand names, and intellectual property remain
+                the exclusive property of their respective owners and platforms.
+                The inclusion of third-party information does not imply
+                endorsement, partnership, or affiliation unless explicitly
+                stated.
+              </p>
+              <p className="mb-2">
+                The content featured from other websites and platforms on WoNo
+                is not used for direct monetization, resale, or advertising
+                gain. WoNo’s purpose is to inform and connect digital nomads and
+                remote working professionals by curating publicly available data
+                in a transparent, good-faith manner for the ease of its users
+                and to support and grow the businesses who are providing these
+                services with intent to grow them and the ecosystem.
+              </p>
+              <p className="mt-2">
+                Read the entire{" "}
+                <span
+                  className="underline text-primary-blue cursor-pointer"
+                  onClick={goToHostsContentCopyright}
+                >
+                  Content and Copyright
+                </span>{" "}
+                by clicking the link in our website footer.
+              </p>
+            </div>
           </div>
         </div>
       </div>

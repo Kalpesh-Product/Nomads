@@ -63,14 +63,14 @@ const TemplateHome = () => {
   }, [slider]);
 
   const handleScroll = (id) => {
-  const section = document.getElementById(id);
-  if (section) {
-    section.scrollIntoView({ behavior: "smooth" });
-  }
+    const section = document.getElementById(id);
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth" });
+    }
 
-  // Close the drawer slightly later
-  setTimeout(() => setOpen(false), 650);
-};
+    // Close the drawer slightly later
+    setTimeout(() => setOpen(false), 650);
+  };
 
   const slides = [
     {
@@ -104,7 +104,6 @@ const TemplateHome = () => {
   const products = isPending ? [] : data?.products;
   const testimonials = isPending ? [] : data?.testimonials;
 
-
   return (
     <div className="w-screen ">
       <div className="relative h-screen  overflow-hidden" id="hero">
@@ -131,7 +130,10 @@ const TemplateHome = () => {
           </h1>
           <p className="text-lg md:text-2xl drop-shadow-md">{data?.subTitle}</p>
 
-          <TempButton handleClick={()=>handleScroll("contact")} buttonText={data?.CTAButtonText} />
+          <TempButton
+            handleClick={() => handleScroll("contact")}
+            buttonText={data?.CTAButtonText}
+          />
         </div>
 
         {/* Prev / Next Buttons */}
