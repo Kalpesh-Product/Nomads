@@ -120,7 +120,7 @@ export const forgotPassword = async (req, res) => {
 
     // Create reset URL (frontend route)
     // const resetUrl = `${process.env.FRONTEND_PROD_LINK}/reset-password/${resetToken}`;
-    const resetUrl = `${process.env.FRONTEND_DEV_LINK}reset-password/${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_PROD_LINK}reset-password/${resetToken}`;
 
     const message = `
       <p>Hi ${user.name || ""},</p> 
