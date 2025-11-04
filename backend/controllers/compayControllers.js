@@ -799,7 +799,7 @@ export const getListings = async (req, res, next) => {
 
 export const getUniqueDataLocations = async (req, res, next) => {
   try {
-    const companies = await Company.find({ isActive: true }).lean().exec();
+    const companies = await Company.find().lean().exec();
 
     const countryMap = new Map();
 
