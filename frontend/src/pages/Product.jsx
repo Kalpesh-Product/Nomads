@@ -53,6 +53,8 @@ const Product = () => {
         ? `company/get-single-company-data?companyId=${companyId}&companyType=${type}&userId=${userId}`
         : `company/get-single-company-data?companyId=${companyId}&companyType=${type}`;
       const response = await axios.get(url); // ✅ use public axios when not logged in
+
+      console.log("logox", response.data.logo.url);
       return response?.data;
     },
     enabled: !!companyId, // ✅ allow guests to load
@@ -352,10 +354,10 @@ const Product = () => {
           {/* About and Location */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
             <div className="flex flex-col gap-8">
-              {isCompanyDetails ? (
+              {/* {isCompanyDetails ? (
                 // 🔄 Skeleton while loading
                 <div className="w-full h-36 bg-gray-200 animate-pulse rounded-md" />
-              ) : !companyDetails?.logo ? (
+              ) : !companyDetails?.logo || !companyDetails?.logo?.url ? (
                 // 🚫 Fallback UI when logo is missing
                 <div className="w-full h-36 flex items-center justify-center bg-gray-100 border border-dashed border-gray-300 rounded-md">
                   <span className="text-gray-500 text-sm">
@@ -366,7 +368,36 @@ const Product = () => {
                 // ✅ Show actual logo
                 <div className="w-full h-36 overflow-hidden rounded-md">
                   <img
-                    src={companyDetails.logo}
+                    src={companyDetails?.logo?.url || companyDetails?.logo}
+                    alt="company-logo"
+                    className="h-full w-full object-contain"
+                  />
+                </div>
+              )} */}
+
+              {isCompanyDetails ? (
+                // 🔄 Skeleton while loading
+                <div className="w-full h-36 bg-gray-200 animate-pulse rounded-md" />
+              ) : !(
+                  (typeof companyDetails?.logo === "string" &&
+                    companyDetails.logo) ||
+                  companyDetails?.logo?.url
+                ) ? (
+                // 🚫 Fallback UI when logo is missing
+                <div className="w-full h-36 flex items-center justify-center bg-gray-100 border border-dashed border-gray-300 rounded-md">
+                  <span className="text-gray-500 text-sm">
+                    No company logo available
+                  </span>
+                </div>
+              ) : (
+                // ✅ Show actual logo
+                <div className="w-full h-36 overflow-hidden rounded-md">
+                  <img
+                    src={
+                      (typeof companyDetails?.logo === "string" &&
+                        companyDetails.logo) ||
+                      companyDetails?.logo?.url
+                    }
                     alt="company-logo"
                     className="h-full w-full object-contain"
                   />
