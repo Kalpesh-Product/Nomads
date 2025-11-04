@@ -29,6 +29,119 @@ function getDistanceFromLatLonInM(lat1, lon1, lat2, lon2) {
   return R * c; // distance in meters
 }
 
+// export const bulkInsertCompanies = async (req, res, next) => {
+//   try {
+//     const file = req.file;
+//     if (!file) {
+//       return res
+//         .status(400)
+//         .json({ message: "Please provide a valid CSV file" });
+//     }
+
+//     const companies = [];
+
+//     //fetch companies from master panel
+//     const hostCompanies = await axios.get(
+//       "https://wonomasterbe.vercel.app/api/hosts/companies"
+//     );
+
+//     const companyMap = new Map();
+//     hostCompanies.data.forEach((company) => {
+//       const key = `${company.companyName
+//         ?.trim()
+//         .toLowerCase()}|${company.companyCity
+//         ?.trim()
+//         .toLowerCase()}|${company.companyState
+//         ?.trim()
+//         .toLowerCase()}|${company.companyCountry?.trim().toLowerCase()}`;
+//       companyMap.set(key, company.companyId);
+//     });
+
+//     const stream = Readable.from(file.buffer.toString("utf-8").trim());
+//     stream
+//       .pipe(csvParser())
+//       .on("data", (row) => {
+//         const rowKey = `${row["Business Name"]?.trim()?.toLowerCase()}|${row[
+//           "City"
+//         ]
+//           ?.trim()
+//           ?.toLowerCase()}|${row["State"]?.trim()?.toLowerCase()}|${row[
+//           "Country"
+//         ]
+//           ?.trim()
+//           ?.toLowerCase()}`;
+
+//         const company = {
+//           businessId: row["Business ID"]?.trim(),
+//           companyId: companyMap.get(rowKey) || "",
+//           companyName: row["Business Name"]?.trim(),
+//           registeredEntityName: row["Registered Entity name"]?.trim(),
+//           website: row["Website"]?.trim() || null,
+//           address: row["Address"]?.trim(),
+//           city: row["City"]?.trim(),
+//           state: row["State"]?.trim(),
+//           country: row["Country"]?.trim(),
+//           about: row["About"]?.trim(),
+//           totalSeats: parseInt(row["Total Seats"]?.trim()) || null,
+//           latitude: parseFloat(row["latitude"]?.trim()),
+//           longitude: parseFloat(row["longitude"]?.trim()),
+//           googleMap: row["Google map"]?.trim() || null,
+//           ratings: parseFloat(row["Ratings"]) || 0,
+//           totalReviews: parseInt(row["Total Reviews"]?.trim()) || 0,
+//           inclusions: row["Inclusions"]?.trim(),
+//           services: row["Services"]?.trim(),
+//           units: row["Units"]?.trim(),
+//           companyType: row["Type"]?.trim()?.split(" ").length
+//             ? row["Type"]?.trim()?.split(" ").join("").toLowerCase()
+//             : row["Type"]?.trim()?.toLowerCase(),
+//         };
+
+//         companies.push(company);
+//       })
+//       .on("end", async () => {
+//         try {
+//           const result = await Company.insertMany(companies);
+
+//           const insertedCount = result.length;
+//           const failedCount = companies.length - insertedCount;
+
+//           res.status(200).json({
+//             message: "Bulk insert completed",
+//             total: companies.length,
+//             inserted: insertedCount,
+//             failed: failedCount,
+//           });
+//         } catch (insertError) {
+//           if (insertError.name === "BulkWriteError") {
+//             const insertedCount = insertError.result?.nInserted || 0;
+//             const failedCount = companies.length - insertedCount;
+
+//             res.status(200).json({
+//               message: "Bulk insert completed with partial failure",
+//               total: companies.length,
+//               inserted: insertedCount,
+//               failed: failedCount,
+//               writeErrors: insertError.writeErrors?.map((e) => ({
+//                 index: e.index,
+//                 errmsg: e.errmsg,
+//                 code: e.code,
+//                 op: e.op,
+//               })),
+//             });
+//           } else {
+//             res.status(500).json({
+//               message: "Unexpected error during bulk insert",
+//               error: insertError.message,
+//             });
+//           }
+//         }
+//       });
+//   } catch (error) {
+//     console.log(error);
+//     next(error);
+//   }
+// };
+
 export const bulkInsertCompanies = async (req, res, next) => {
   try {
     const file = req.file;
@@ -56,6 +169,12 @@ export const bulkInsertCompanies = async (req, res, next) => {
         .toLowerCase()}|${company.companyCountry?.trim().toLowerCase()}`;
       companyMap.set(key, company.companyId);
     });
+
+    // Fetch existing business IDs from the database
+    const existingCompanies = await Company.find().select("businessId");
+    const existingBusinessIds = new Set(
+      existingCompanies.map((c) => c.businessId?.trim()).filter(Boolean)
+    );
 
     const stream = Readable.from(file.buffer.toString("utf-8").trim());
     stream
@@ -100,32 +219,56 @@ export const bulkInsertCompanies = async (req, res, next) => {
       })
       .on("end", async () => {
         try {
-          const result = await Company.insertMany(companies);
+          const seenInCSV = new Set();
+          const uniqueCompanies = [];
+          let skippedExisting = 0;
+          let skippedDuplicateInCSV = 0;
+
+          for (const company of companies) {
+            if (!company.businessId) continue;
+
+            const businessId = company.businessId.trim();
+
+            // Check if this business ID already exists in DB
+            if (existingBusinessIds.has(businessId)) {
+              skippedExisting++;
+              continue;
+            }
+
+            // Check for duplicates within the CSV
+            if (!seenInCSV.has(businessId)) {
+              seenInCSV.add(businessId);
+              uniqueCompanies.push(company);
+            } else {
+              // Duplicate business ID in CSV → skip
+              skippedDuplicateInCSV++;
+              continue;
+            }
+          }
+
+          const result = await Company.insertMany(uniqueCompanies);
 
           const insertedCount = result.length;
-          const failedCount = companies.length - insertedCount;
 
           res.status(200).json({
             message: "Bulk insert completed",
             total: companies.length,
             inserted: insertedCount,
-            failed: failedCount,
+            skippedExisting,
+            skippedDuplicateInCSV,
           });
         } catch (insertError) {
           if (insertError.name === "BulkWriteError") {
             const insertedCount = insertError.result?.nInserted || 0;
-            const failedCount = companies.length - insertedCount;
 
             res.status(200).json({
               message: "Bulk insert completed with partial failure",
               total: companies.length,
               inserted: insertedCount,
-              failed: failedCount,
               writeErrors: insertError.writeErrors?.map((e) => ({
                 index: e.index,
                 errmsg: e.errmsg,
                 code: e.code,
-                op: e.op,
               })),
             });
           } else {
