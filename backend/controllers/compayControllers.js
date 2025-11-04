@@ -786,12 +786,47 @@ export const getListings = async (req, res, next) => {
     const { companyId } = req.params;
 
     const listings = await Company.find({ companyId: companyId }).lean().exec();
+    const reviews = await Review.find({ companyId }).lean().exec();
 
-    if (!listings) {
+    if (!listings || !listings.length) {
       return res.status(404).json({ error: "Company not found" });
     }
+    if (!reviews || !reviews.length) {
+      return res.status(200).json([]);
+    }
 
-    return res.status(200).json(listings);
+    // const data = listings.map((list) => {
+    //   const reviews = [];
+    //   const transformListing = reviews.map((review) => {
+    //     console.log("review", review.companyId);
+    //     if (review.companyId === companyId) {
+    //       reviews.push(review);
+    //       console.log("first");
+    //     }
+    //   });
+    //   return { ...list, reviews };
+    // });
+
+    // const data = listings.map((list) => {
+    //   const reviews = [];
+    //   const transformListing = reviews.some((review) => {
+    //     console.log("review", review.companyId);
+    //     if (review.companyId === companyId) {
+    //       reviews.push(review);
+    //       console.log("first");
+    //     }
+    //   });
+    //   return { ...list, reviews };
+    // });
+
+    const data = listings.map((list) => {
+      const totalReviews = reviews.filter(
+        (review) => review.companyId === companyId
+      );
+      return { ...list, reviews: totalReviews };
+    });
+
+    return res.status(200).json(data);
   } catch (error) {
     next(error);
   }
