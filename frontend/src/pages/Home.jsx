@@ -15,7 +15,7 @@ import { AiOutlineHeart } from "react-icons/ai";
 import SearchBarCombobox from "../components/SearchBarCombobox";
 import newIcons from "../assets/newIcons";
 import { AnimatePresence, motion } from "motion/react";
-import { useState } from "react";
+import React, { useState } from "react";
 import coworking from "/images/coworking-img.webp";
 import hostels from "/images/hostels-img.webp";
 import cafes from "/images/meetingrooms-img.webp";
@@ -25,6 +25,7 @@ import MuiModal from "../components/Modal";
 import renderStars from "../utils/renderStarts";
 import axios from "../utils/axios";
 import { Helmet } from "@dr.pogodin/react-helmet";
+import useAuth from "../hooks/useAuth"; // ensure you already have this import at top (you do ✅)
 
 const Home = () => {
   const destinationData = [
@@ -36,6 +37,10 @@ const Home = () => {
   ];
   const location = useLocation();
   // const { companyId, type } = location.state;
+
+  const { auth } = useAuth();
+  const user = auth?.user || {};
+  const userId = auth?.user?._id || auth?.user?.id;
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -65,7 +70,47 @@ const Home = () => {
     },
   });
 
-  const countryOptions = locations
+  // const countryOptions = locations
+  //   .map((item) => ({
+  //     label: item.country
+  //       ? item.country.charAt(0).toUpperCase() + item.country.slice(1)
+  //       : "",
+  //     value: item.country?.toLowerCase(),
+  //   }))
+  //   .sort((a, b) => a.label.localeCompare(b.label));
+
+  // const filteredLocation = locations.find(
+  //   (item) => item.country?.toLowerCase() === selectedCountry?.toLowerCase()
+  // );
+
+  // const locationOptions = filteredLocation?.states?.map((item) => ({
+  //   label: item,
+  //   value: item?.toLowerCase(),
+  // }));
+
+  // -------------------------------------
+  // 🔒 Country & location filtering based on user email
+  // -------------------------------------
+
+  // Emails that can see special countries
+  const specialUserEmails = [
+    "allan.wono@gmail.com",
+    "muskan.wono@gmail.com",
+    "shawnsilveira.wono@gmail.com",
+    "mehak.wono@gmail.com",
+    "k@k.k",
+  ]; // add more if needed
+
+  // Countries only visible to special users
+  const specialCountries = ["australia"]; // lowercase preferred
+
+  // Specific restricted locations within those countries
+  const specialLocationMap = {
+    australia: ["sydney", "melbourne"], // lowercase names
+  };
+
+  // Build all countries
+  const allCountryOptions = locations
     .map((item) => ({
       label: item.country
         ? item.country.charAt(0).toUpperCase() + item.country.slice(1)
@@ -74,14 +119,46 @@ const Home = () => {
     }))
     .sort((a, b) => a.label.localeCompare(b.label));
 
+  // Filter countries based on user email
+  const countryOptions = React.useMemo(() => {
+    const userEmail = user?.email?.toLowerCase();
+    const isSpecialUser = specialUserEmails.includes(userEmail);
+
+    return allCountryOptions.filter((option) => {
+      if (specialCountries.includes(option.value)) {
+        return isSpecialUser; // only show if special user
+      }
+      return true; // visible to everyone else
+    });
+  }, [allCountryOptions, user]);
+
+  // Build locations with same filtering logic
   const filteredLocation = locations.find(
     (item) => item.country?.toLowerCase() === selectedCountry?.toLowerCase()
   );
 
-  const locationOptions = filteredLocation?.states?.map((item) => ({
-    label: item,
-    value: item?.toLowerCase(),
-  }));
+  const locationOptions = React.useMemo(() => {
+    const baseLocations =
+      filteredLocation?.states?.map((item) => ({
+        label: item,
+        value: item?.toLowerCase(),
+      })) || [];
+
+    const userEmail = user?.email?.toLowerCase();
+    const isSpecialUser = specialUserEmails.includes(userEmail);
+
+    if (!selectedCountry) return baseLocations;
+
+    if (specialLocationMap[selectedCountry?.toLowerCase()]) {
+      if (isSpecialUser) return baseLocations;
+      // remove special-only locations for normal users
+      return baseLocations.filter(
+        (loc) =>
+          !specialLocationMap[selectedCountry.toLowerCase()].includes(loc.value)
+      );
+    }
+    return baseLocations;
+  }, [filteredLocation, selectedCountry, user]);
 
   const countOptions = [
     { label: "1 - 5", value: "1-5" },

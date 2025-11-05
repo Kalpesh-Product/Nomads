@@ -57,20 +57,84 @@ const Listings = () => {
     },
   });
 
-  const countryOptions = locations
+  // const countryOptions = locations
+  //   .map((item) => ({
+  //     label: item.country?.charAt(0).toUpperCase() + item.country?.slice(1),
+  //     value: item.country?.toLowerCase(),
+  //   }))
+  //   .sort((a, b) => a.label.localeCompare(b.label));
+
+  // const filteredLocation = locations.find(
+  //   (item) => item.country?.toLowerCase() === selectedCountry?.toLowerCase()
+  // );
+  // const locationOptions = filteredLocation?.states?.map((item) => ({
+  //   label: item,
+  //   value: item?.toLowerCase(),
+  // }));
+
+  // -------------------------------------
+  // 🔒 Country & location filtering based on user email
+  // -------------------------------------
+  const specialUserEmails = [
+    "allan.wono@gmail.com",
+    "muskan.wono@gmail.com",
+    "shawnsilveira.wono@gmail.com",
+    "mehak.wono@gmail.com",
+    "k@k.k",
+  ]; // add more if needed
+  const specialCountries = ["australia"]; // lowercase preferred
+  const specialLocationMap = {
+    australia: ["sydney", "melbourne"], // lowercase names
+  };
+
+  const allCountryOptions = locations
     .map((item) => ({
-      label: item.country?.charAt(0).toUpperCase() + item.country?.slice(1),
+      label: item.country
+        ? item.country.charAt(0).toUpperCase() + item.country.slice(1)
+        : "",
       value: item.country?.toLowerCase(),
     }))
     .sort((a, b) => a.label.localeCompare(b.label));
 
+  const countryOptions = React.useMemo(() => {
+    const userEmail = user?.email?.toLowerCase();
+    const isSpecialUser = specialUserEmails.includes(userEmail);
+
+    return allCountryOptions.filter((option) => {
+      if (specialCountries.includes(option.value)) {
+        return isSpecialUser; // only visible to special users
+      }
+      return true; // visible to everyone else (including guests)
+    });
+  }, [allCountryOptions, user]);
+
   const filteredLocation = locations.find(
     (item) => item.country?.toLowerCase() === selectedCountry?.toLowerCase()
   );
-  const locationOptions = filteredLocation?.states?.map((item) => ({
-    label: item,
-    value: item?.toLowerCase(),
-  }));
+
+  const locationOptions = React.useMemo(() => {
+    const baseLocations =
+      filteredLocation?.states?.map((item) => ({
+        label: item,
+        value: item?.toLowerCase(),
+      })) || [];
+
+    const userEmail = user?.email?.toLowerCase();
+    const isSpecialUser = specialUserEmails.includes(userEmail);
+
+    if (!selectedCountry) return baseLocations;
+
+    if (specialLocationMap[selectedCountry?.toLowerCase()]) {
+      if (isSpecialUser) return baseLocations;
+      // remove special-only locations for normal users
+      return baseLocations.filter(
+        (loc) =>
+          !specialLocationMap[selectedCountry.toLowerCase()].includes(loc.value)
+      );
+    }
+    return baseLocations;
+  }, [filteredLocation, selectedCountry, user]);
+
   const countOptions = [
     { label: "1 - 5", value: "1-5" },
     { label: "5 - 10", value: "5-10" },
