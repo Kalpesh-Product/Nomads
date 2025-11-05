@@ -158,7 +158,7 @@ const HostSignup = () => {
   //   },
   // });
 
-  const { mutate: register, isLoading: isRegisterLoading } = useMutation({
+  const { mutate: register, isPending: isRegisterLoading } = useMutation({
     mutationFn: async (fd) => {
       const response = await axios.post("forms/register-form-submission", fd, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -1451,9 +1451,20 @@ const HostSignup = () => {
             )} */}
 
             {/* Submit button on 4th step */}
-            {activeStep === stepFields.length - 2 && (
+            {/* {activeStep === stepFields.length - 2 && (
               <div className="flex justify-end items-center w-full">
                 <GetStartedButton title="Submit" type="submit" />
+              </div>
+            )} */}
+
+            {activeStep === stepFields.length - 2 && (
+              <div className="flex justify-end items-center w-full">
+                <GetStartedButton
+                  title={isRegisterLoading ? "Submitting..." : "Submit"}
+                  type="submit"
+                  disabled={isRegisterLoading}
+                  isLoading={isRegisterLoading}
+                />
               </div>
             )}
 
