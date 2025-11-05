@@ -7,9 +7,9 @@ import { FaXTwitter } from "react-icons/fa6";
 import { AiOutlineClose } from "react-icons/ai";
 
 const languages = [
+  { code: "en-US", name: "English (US)" },
   { code: "en-IN", name: "English (IN)" },
   { code: "en-SG", name: "English (Singapore)" },
-  { code: "en-US", name: "English (US)" },
   { code: "hi-IN", name: "हिन्दी (India)" },
   { code: "es-ES", name: "Español (Spain)" },
   { code: "fr-FR", name: "Français (France)" },
@@ -17,8 +17,8 @@ const languages = [
 ];
 
 const currencies = [
-  { code: "INR", name: "Indian Rupee", symbol: "₹" },
   { code: "USD", name: "US Dollar", symbol: "$" },
+  { code: "INR", name: "Indian Rupee", symbol: "₹" },
   { code: "EUR", name: "Euro", symbol: "€" },
   { code: "AED", name: "UAE Dirham", symbol: "د.إ" },
   { code: "GBP", name: "British Pound", symbol: "£" },
@@ -195,7 +195,8 @@ const Footer = () => {
           onClick={() => setShowCurrencyModal(true)}
           className="px-2 py-[2px] border border-gray-700 rounded-md flex items-center gap-1 cursor-pointer hover:underline"
         >
-          <FaRupeeSign className="text-[12px]" />
+          {/* <FaRupeeSign className="text-[12px]" /> */}
+          <span>{selectedCurrency.symbol}</span>
           <span>{selectedCurrency.code}</span>
         </div>
 
