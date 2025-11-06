@@ -5,9 +5,14 @@ import {
   InputLabel,
   FormControl,
   Button,
+  CircularProgress,
 } from "@mui/material";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { DatePicker } from "@mui/x-date-pickers";
 import React, { useState } from "react";
+import dayjs from "dayjs";
+import toast from "react-hot-toast";
+import { useMutation } from "@tanstack/react-query";
+import axios from "../../utils/axios";
 
 const HostJobApplicationForm = () => {
   const [formValues, setFormValues] = useState({
@@ -35,6 +40,9 @@ const HostJobApplicationForm = () => {
     remarks: "",
   });
 
+  // Endpoint for hosts
+  const customLink = "add-new-b2b-form-submission";
+
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (files) {
@@ -48,10 +56,123 @@ const HostJobApplicationForm = () => {
     setFormValues((prev) => ({ ...prev, dateOfBirth: newValue }));
   };
 
+  const resetForm = () => {
+    setFormValues({
+      name: "",
+      email: "",
+      dateOfBirth: null,
+      mobile: "",
+      state: "",
+      experience: "",
+      linkedIn: "",
+      resume: null,
+      currentSalary: "",
+      expectedSalary: "",
+      joinTime: "",
+      relocate: "",
+      personality: "",
+      skills: "",
+      reason: "",
+      willing: "",
+      message: "",
+      jobPosition: "",
+      submissionDate: null,
+      submissionTime: null,
+      status: "",
+      remarks: "",
+    });
+  };
+
+  const { mutate: submitHostApplication, isLoading } = useMutation({
+    mutationFn: async () => {
+      // Mirror the formatting from JobApplicationForm
+      const formatDOB = formValues.dateOfBirth
+        ? dayjs(formValues.dateOfBirth).format("YYYY-MM-DD")
+        : "";
+
+      const formatSubmissionDate = dayjs(new Date()).format("YYYY-MM-DD");
+      const formatSubmissionTime = dayjs(new Date()).format("HH:mm:ss");
+
+      // Map local state keys to backend-expected keys
+      const formattedData = {
+        name: formValues.name,
+        email: formValues.email,
+        dateOfBirth: formValues.dateOfBirth, // kept for parity, not sent directly
+        mobile: formValues.mobile,
+        // backend uses 'location'
+        location: formValues.state || "",
+        // backend uses 'experienceYears' as an integer
+        experienceYears: formValues.experience
+          ? parseInt(formValues.experience, 10)
+          : "",
+        linkedin: formValues.linkedIn || "",
+        // backend expects 'resumeLink'; we’ll pass the file there
+        resumeLink: formValues.resume || null,
+        currentMonthlySalary: formValues.currentSalary || "",
+        expectedMonthlySalary: formValues.expectedSalary || "",
+        joinInDays: formValues.joinTime || "",
+        relocateGoa: formValues.relocate || "",
+        personality:
+          formValues.personality ||
+          "A detail-oriented and adaptable developer who enjoys solving complex problems and learning new technologies.",
+        skills:
+          formValues.skills ||
+          "Proficient in MERN stack, REST APIs, and responsive UI design; experienced with state management and database optimization.",
+        whyConsider:
+          formValues.reason ||
+          "I bring a balance of technical expertise and collaborative mindset to deliver scalable, high-quality solutions efficiently.",
+        willingToBootstrap:
+          formValues.willing ||
+          "Yes, I’m eager to contribute my skills and grow alongside the company.",
+        message:
+          formValues.message ||
+          "Excited about the opportunity to work on impactful projects and contribute to your team’s success.",
+        status: formValues.status || "",
+        remarks: formValues.remarks || "",
+
+        // normalized/derived fields
+        dob: formatDOB,
+        submissionDate: formatSubmissionDate,
+        submissionTime: formatSubmissionTime,
+      };
+
+      const formData = new FormData();
+
+      // Hosts integration fields
+      formData.append("formName", "jobApplication");
+      formData.append("jobPosition", formValues.jobPosition || "");
+      // For parity with your other form (Nomads uses sheetName, hosts don't need it, but harmless)
+      formData.append("sheetName", "");
+
+      // Append everything properly, sending file under 'resumeLink'
+      Object.keys(formattedData).forEach((key) => {
+        if (key === "resumeLink" && formattedData[key]) {
+          formData.append("resumeLink", formattedData[key]); // file
+        } else {
+          formData.append(key, formattedData[key] ?? "");
+        }
+      });
+
+      const response = await axios.post(`forms/${customLink}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      return response.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data?.message || "Application submitted");
+      resetForm();
+    },
+    onError: (error) => {
+      const msg =
+        error?.response?.data?.message ||
+        "Submission failed. Try not angering the server next time.";
+      toast.error(msg);
+    },
+  });
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formValues);
-    // Submit logic here
+    submitHostApplication();
   };
 
   return (
@@ -87,7 +208,7 @@ const HostJobApplicationForm = () => {
           slotProps={{
             textField: {
               fullWidth: true,
-              variant: "standard", // This is enough
+              variant: "standard",
             },
           }}
         />
@@ -100,6 +221,7 @@ const HostJobApplicationForm = () => {
           fullWidth
           variant="standard"
         />
+
         <FormControl fullWidth variant="standard">
           <InputLabel>State</InputLabel>
           <Select
@@ -113,6 +235,7 @@ const HostJobApplicationForm = () => {
             <MenuItem value="Karnataka">Karnataka</MenuItem>
           </Select>
         </FormControl>
+
         <TextField
           label="Experience (in years)"
           name="experience"
@@ -121,6 +244,7 @@ const HostJobApplicationForm = () => {
           fullWidth
           variant="standard"
         />
+
         <TextField
           label="Job Position"
           name="jobPosition"
@@ -129,6 +253,7 @@ const HostJobApplicationForm = () => {
           fullWidth
           variant="standard"
         />
+
         <TextField
           label="Status"
           name="status"
@@ -137,6 +262,7 @@ const HostJobApplicationForm = () => {
           fullWidth
           variant="standard"
         />
+
         <TextField
           label="Current Monthly Salary"
           name="currentSalary"
@@ -145,6 +271,7 @@ const HostJobApplicationForm = () => {
           fullWidth
           variant="standard"
         />
+
         <TextField
           label="Expected Monthly Salary"
           name="expectedSalary"
@@ -153,6 +280,7 @@ const HostJobApplicationForm = () => {
           fullWidth
           variant="standard"
         />
+
         <TextField
           label="LinkedIn Profile URL"
           name="linkedIn"
@@ -161,14 +289,13 @@ const HostJobApplicationForm = () => {
           fullWidth
           variant="standard"
         />
+
         <TextField
           variant="standard"
           fullWidth
           label="Upload Resume / CV"
           value={formValues.resume?.name || ""}
-          InputProps={{
-            readOnly: true,
-          }}
+          InputProps={{ readOnly: true }}
           onClick={() => document.getElementById("resume-upload").click()}
         />
         <input
@@ -180,28 +307,24 @@ const HostJobApplicationForm = () => {
           accept=".pdf,.doc,.docx"
         />
 
+        {/* Keeping these fields in UI for now; submission uses current date/time */}
         <DatePicker
           label="Submission Date"
           value={formValues.submissionDate}
-          onChange={handleDateChange}
+          onChange={(v) => setFormValues((p) => ({ ...p, submissionDate: v }))}
           slotProps={{
-            textField: {
-              fullWidth: true,
-              variant: "standard",
-            },
+            textField: { fullWidth: true, variant: "standard" },
           }}
         />
         <DatePicker
           label="Submission Time"
           value={formValues.submissionTime}
-          onChange={handleDateChange}
+          onChange={(v) => setFormValues((p) => ({ ...p, submissionTime: v }))}
           slotProps={{
-            textField: {
-              fullWidth: true,
-              variant: "standard",
-            },
+            textField: { fullWidth: true, variant: "standard" },
           }}
         />
+
         <FormControl fullWidth variant="standard">
           <InputLabel>How Soon Can You Join?</InputLabel>
           <Select
@@ -215,6 +338,7 @@ const HostJobApplicationForm = () => {
             <MenuItem value="30 Days">30 Days</MenuItem>
           </Select>
         </FormControl>
+
         <FormControl fullWidth variant="standard">
           <InputLabel>Relocate to Goa</InputLabel>
           <Select
@@ -238,6 +362,7 @@ const HostJobApplicationForm = () => {
           className="md:col-span-2"
           variant="standard"
         />
+
         <TextField
           label="What skill set you have for the job you have applied?"
           name="skills"
@@ -249,6 +374,7 @@ const HostJobApplicationForm = () => {
           className="md:col-span-2"
           variant="standard"
         />
+
         <TextField
           label="Why should we consider you for joining our company?"
           name="reason"
@@ -260,6 +386,7 @@ const HostJobApplicationForm = () => {
           className="md:col-span-2"
           variant="standard"
         />
+
         <TextField
           label="Are you willing to bootstrap to join a growing startup?"
           name="willing"
@@ -271,6 +398,7 @@ const HostJobApplicationForm = () => {
           className="md:col-span-2"
           variant="standard"
         />
+
         <TextField
           label="Personal Message"
           name="message"
@@ -282,7 +410,7 @@ const HostJobApplicationForm = () => {
           className="md:col-span-2"
           variant="standard"
         />
- 
+
         <TextField
           label="Remarks"
           name="remarks"
@@ -299,17 +427,19 @@ const HostJobApplicationForm = () => {
           <Button
             variant="contained"
             type="submit"
+            disabled={isLoading}
             sx={{
               backgroundColor: "black",
-              borderRadius: "9999px", // Equivalent to Tailwind's rounded-full
+              borderRadius: "9999px",
               px: 4,
               py: 1,
-              "&:hover": {
-                backgroundColor: "#333",
-              },
+              "&:hover": { backgroundColor: "#333" },
             }}
           >
-            SUBMIT
+            {isLoading && (
+              <CircularProgress size={20} sx={{ color: "white", mr: 1 }} />
+            )}
+            {isLoading ? "Submitting..." : "SUBMIT"}
           </Button>
         </div>
       </form>

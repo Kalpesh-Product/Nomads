@@ -20,11 +20,12 @@ import toast from "react-hot-toast";
 import GetStartedButton from "../components/GetStartedButton";
 import { useLocation } from "react-router-dom";
 
-const JobApplicationForm = ({title}) => {
-
-  const {pathname} = useLocation()
-  const isHost = pathname.includes("hosts")
-  const customLink = isHost ? "add-new-b2b-form-submission" :  "add-new-b2c-form-submission"
+const JobApplicationForm = ({ title }) => {
+  const { pathname } = useLocation();
+  const isHost = pathname.includes("hosts");
+  const customLink = isHost
+    ? "add-new-b2b-form-submission"
+    : "add-new-b2c-form-submission";
 
   const {
     handleSubmit,
@@ -61,12 +62,8 @@ const JobApplicationForm = ({title}) => {
   const { mutate: submitJobApplication, isLoading } = useMutation({
     mutationFn: async (data) => {
       const formatDOB = dayjs(data.dateOfBirth).format("YYYY-MM-DD");
-      const formatSubmissionDate = dayjs(new Date()).format(
-        "YYYY-MM-DD"
-      );
-      const formatSubmissionTime = dayjs(new Date()).format(
-        "HH:mm:ss"
-      );
+      const formatSubmissionDate = dayjs(new Date()).format("YYYY-MM-DD");
+      const formatSubmissionTime = dayjs(new Date()).format("HH:mm:ss");
 
       const formattedData = {
         ...data,
@@ -87,13 +84,12 @@ const JobApplicationForm = ({title}) => {
       };
 
       const formData = new FormData();
-      
-      //Nomads 
-      formData.append("sheetName","")
+
+      //Nomads
+      formData.append("sheetName", "");
       // Hosts
       formData.append("formName", "jobApplication");
       formData.append("jobPosition", title);
-      
 
       // Append all fields
       Object.keys(formattedData).forEach((key) => {
@@ -103,16 +99,12 @@ const JobApplicationForm = ({title}) => {
           formData.append(key, formattedData[key] ?? "");
         }
       });
-      
-      const response = await axios.post(
-        `form/${customLink}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+
+      const response = await axios.post(`forms/${customLink}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       return response.data;
     },
@@ -133,7 +125,7 @@ const JobApplicationForm = ({title}) => {
       </h3>
 
       <form
-        onSubmit={handleSubmit((data) => isHost && submitJobApplication(data))}
+        onSubmit={handleSubmit((data) => submitJobApplication(data))}
         className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:max-w-4xl mx-auto"
       >
         {/* Name */}
@@ -256,8 +248,6 @@ const JobApplicationForm = ({title}) => {
           )}
         />
 
-      
-
         {/* Resume Upload */}
         <Controller
           name="resumeLink"
@@ -285,7 +275,7 @@ const JobApplicationForm = ({title}) => {
           )}
         />
 
-          {/* Relocate */}
+        {/* Relocate */}
         <Controller
           name="relocateGoa"
           control={control}
@@ -478,7 +468,6 @@ const JobApplicationForm = ({title}) => {
           <Button
             variant="contained"
             type="submit"
-            
             sx={{
               backgroundColor: "black",
               borderRadius: "9999px",
