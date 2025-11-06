@@ -1020,6 +1020,7 @@ export const addCompanyImage = async (req, res, next) => {
         .json({ message: "Invalid type. Use 'logo' or 'image'." });
     }
 
+    // 1️⃣ Find company
     let company;
     if (companyId) {
       company = await Company.findById(companyId).exec();
@@ -1044,6 +1045,7 @@ export const addCompanyImage = async (req, res, next) => {
         .json({ message: "companyType does not match the stored company" });
     }
 
+    // 2️⃣ Format folder paths
     const formatCompanyType = (type) => {
       const map = {
         hostel: "hostels",
@@ -1054,7 +1056,6 @@ export const addCompanyImage = async (req, res, next) => {
         coliving: "coliving",
         workation: "workation",
       };
-
       const key = String(type || "").toLowerCase();
       return map[key] || "unknown";
     };
@@ -1071,13 +1072,16 @@ export const addCompanyImage = async (req, res, next) => {
     const folderPath = `nomads/${pathCompanyType}/${company.country}/${safeCompanyName}`;
     const s3Key = `${folderPath}/${folderType}/${file.originalname}`;
 
+    // 3️⃣ Upload to S3
     let data;
     try {
       data = await uploadFileToS3(s3Key, file);
     } catch (err) {
+      console.error("❌ S3 upload failed:", err.message);
       return res.status(500).json({ message: "Failed to upload image to S3" });
     }
 
+    // 4️⃣ Update Nomads DB
     if (folderType === "logo") {
       company.logo = {
         url: data.url,
@@ -1094,6 +1098,51 @@ export const addCompanyImage = async (req, res, next) => {
 
     await company.save({ validateBeforeSave: false });
 
+    // 5️⃣ If logo, sync to Master Panel
+    if (folderType === "logo") {
+      try {
+        const payload = {
+          companyId: company.companyId,
+          logo: data.url,
+        };
+
+        console.log("📤 Syncing logo to Master Panel:", payload);
+
+        const response = await axios.patch(
+          "https://wonomasterbe.vercel.app/api/hosts/upload-logo",
+          payload,
+          { headers: { "Content-Type": "application/json" } }
+        );
+
+        console.log(
+          "✅ Master Panel sync success:",
+          response.status,
+          response.data.message
+        );
+      } catch (masterErr) {
+        console.error(
+          "❌ Master Panel sync failed:",
+          masterErr.response?.data || masterErr.message
+        );
+
+        // Rollback: delete file from S3 and remove logo from DB
+        try {
+          await deleteFileFromS3ByUrl(data.url);
+          company.logo = "";
+          await company.save({ validateBeforeSave: false });
+        } catch (rollbackErr) {
+          console.error("⚠️ Rollback failed:", rollbackErr.message);
+        }
+
+        return res.status(500).json({
+          message:
+            "Failed to sync logo with Master Panel. Changes reverted in Nomads.",
+          error: masterErr.message,
+        });
+      }
+    }
+
+    // ✅ Success Response
     return res.status(200).json({
       message: `Successfully uploaded ${pathCompanyType} company ${folderType}`,
       data: {
@@ -1105,6 +1154,7 @@ export const addCompanyImage = async (req, res, next) => {
       },
     });
   } catch (error) {
+    console.error("❌ addCompanyImage error:", error);
     next(error);
   }
 };
