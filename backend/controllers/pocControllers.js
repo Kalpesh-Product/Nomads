@@ -3,79 +3,176 @@ import { Readable } from "stream";
 import csvParser from "csv-parser";
 import Company from "../models/Company.js";
 import TestPointOfContact from "../models/TestPointOfContacts.js";
+import axios from "axios";
 
 export const bulkInsertPoc = async (req, res, next) => {
   try {
     const file = req.file;
-
     if (!file) {
-      return res
-        .status(400)
-        .json({ message: "Please provide a valid CSV file" });
+      return res.status(400).json({
+        message: "Please provide a valid CSV file",
+      });
     }
 
     const companies = await Company.find().lean();
     const companyMap = new Map(
       companies.map((item) => [item.businessId?.trim(), item._id])
     );
+    const companyIdMap = new Map(
+      companies.map((c) => [c.businessId, c.companyId])
+    );
 
-    const companyIdMap = new Map();
-    companies.map((company) => {
-      companyIdMap.set(company.businessId, company.companyId);
+    const existingPocs = await PointOfContact.find().select("name companyId");
+    const existingPocSet = new Set(
+      existingPocs.map(
+        (poc) => `${poc.name?.trim().toLowerCase()}|${poc.companyId?.trim()}`
+      )
+    );
+
+    // CSV parsing
+    const parsedResult = await new Promise((resolve, reject) => {
+      const temp = [];
+      const seenInCSV = new Set();
+      let skippedExisting = 0;
+      let skippedDuplicateInCSV = 0;
+
+      const stream = Readable.from(file.buffer.toString("utf-8").trim());
+      stream
+        .pipe(csvParser())
+        .on("data", (row) => {
+          const businessId = row["Business ID"]?.trim();
+          const companyMongoId = companyMap.get(businessId);
+          const companyId = companyIdMap.get(businessId);
+          if (!companyMongoId) return;
+
+          const pocName = row["POC Name"]?.trim();
+          const pocKey = `${pocName?.toLowerCase()}|${companyId?.trim()}`;
+
+          if (existingPocSet.has(pocKey)) {
+            skippedExisting++;
+            return;
+          }
+          if (seenInCSV.has(pocKey)) {
+            skippedDuplicateInCSV++;
+            return;
+          }
+
+          const languages =
+            row["Languages"]?.split(",").map((lang) => lang.trim()) ||
+            row["Languages"]?.trim();
+
+          const pocData = {
+            company: companyMongoId,
+            companyId,
+            name: pocName,
+            profileImage: row["POC Image"]?.trim(),
+            designation: row["POC Designation"]?.trim(),
+            email: row["Email"]?.trim().toLowerCase(),
+            phone: row["Phone Number"]?.trim(),
+            linkedInProfile: row["LinkedIn Profile"]?.trim(),
+            languagesSpoken: languages,
+            address: row["Address"]?.trim(),
+            availabilityTime: row["Availibility time"]?.trim(),
+          };
+
+          seenInCSV.add(pocKey);
+          temp.push(pocData);
+        })
+        .on("end", () => {
+          resolve({ pocs: temp, skippedExisting, skippedDuplicateInCSV });
+        })
+        .on("error", (err) => reject(err));
     });
 
-    const pocs = [];
-    const stream = Readable.from(file.buffer.toString("utf-8").trim());
+    const { pocs, skippedExisting, skippedDuplicateInCSV } = parsedResult;
 
-    stream
-      .pipe(csvParser())
-      .on("data", (row) => {
-        const businessId = row["Business ID"]?.trim();
-        const companyMongoId = companyMap.get(businessId);
-        const companyId = companyIdMap.get(businessId);
-
-        if (!companyMongoId) {
-          console.warn(`No PrivateStay found for business: ${businessId}`);
-          return;
-        }
-
-        const languages =
-          row["Languages"]?.split(",").map((lang) => lang.trim()) ||
-          row["Languages"]?.trim();
-
-        const pocData = {
-          company: companyMongoId,
-          companyId: companyId,
-          name: row["POC Name"]?.trim(),
-          image: row["POC Image"]?.trim(),
-          designation: row["POC Designation"]?.trim(),
-          email: row["Email"]?.trim().toLowerCase(),
-          phoneNumber: row["Phone Number"]?.trim(),
-          linkedInProfile: row["LinkedIn Profile"]?.trim(),
-          languages,
-          address: row["Address"]?.trim(),
-          availabilityTime: row["Availibility time"]?.trim(),
-        };
-
-        // Basic validation
-        pocs.push(pocData);
-      })
-      .on("end", async () => {
-        if (pocs.length === 0) {
-          return res
-            .status(400)
-            .json({ message: "No valid POC data found in CSV." });
-        }
-
-        await PointOfContact.insertMany(pocs);
-        res
-          .status(201)
-          .json({ message: `${pocs.length} POCs inserted successfully.` });
-      })
-      .on("error", (err) => {
-        next(err);
+    if (!pocs.length) {
+      return res.status(400).json({
+        message: "No valid POC data found in CSV.",
+        skippedExisting,
+        skippedDuplicateInCSV,
       });
+    }
+
+    // Insert into Nomads DB
+    let nomadsStatus = "failed";
+    let masterPanelStatus = "not attempted";
+
+    try {
+      await PointOfContact.insertMany(pocs);
+      nomadsStatus = "success";
+
+      const masterPanelPocs = pocs.map((poc) => ({
+        companyId: poc.companyId,
+        name: poc.name,
+        designation: poc.designation,
+        email: poc.email,
+        phone: poc.phone,
+        linkedInProfile: poc.linkedInProfile,
+        languagesSpoken: poc.languagesSpoken,
+        address: poc.address,
+        profileImage: poc.profileImage,
+      }));
+
+      // console.log("Sending to master panel:", masterPanelPocs.length, "POCs");
+
+      // Sync with master panel
+      try {
+        const response = await axios.post(
+          "https://wonomasterbe.vercel.app/api/host-user/bulk-insert-poc",
+          { pocs: masterPanelPocs },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        masterPanelStatus = `success (${response.status})`;
+
+        return res.status(201).json({
+          message: `${pocs.length} POCs inserted successfully in both databases.`,
+          inserted: pocs.length,
+          skippedExisting,
+          skippedDuplicateInCSV,
+          statusReport: {
+            nomadsDB: nomadsStatus,
+            masterPanel: masterPanelStatus,
+          },
+        });
+      } catch (masterErr) {
+        console.error(
+          "Master panel error:",
+          masterErr.response?.data || masterErr.message
+        );
+        masterPanelStatus = `failed (${masterErr.message})`;
+
+        return res.status(201).json({
+          message: "POCs inserted in Nomads DB, but master panel sync failed.",
+          inserted: pocs.length,
+          skippedExisting,
+          skippedDuplicateInCSV,
+          statusReport: {
+            nomadsDB: nomadsStatus,
+            masterPanel: masterPanelStatus,
+          },
+        });
+      }
+    } catch (nomadsErr) {
+      nomadsStatus = `failed (${nomadsErr.message})`;
+
+      return res.status(500).json({
+        message: "Nomads DB upload failed. No data uploaded anywhere.",
+        inserted: 0,
+        skippedExisting,
+        skippedDuplicateInCSV,
+        statusReport: {
+          nomadsDB: nomadsStatus,
+          masterPanel: "not attempted",
+        },
+      });
+    }
   } catch (error) {
+    console.error("Bulk insert error:", error);
     next(error);
   }
 };
