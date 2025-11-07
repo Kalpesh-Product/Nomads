@@ -7,7 +7,11 @@ import {
 import upload from "../config/multerConfig.js";
 const router = Router();
 
-router.post("/add-new-b2c-form-submission", addB2CformSubmission);
+router.post(
+  "/add-new-b2c-form-submission",
+  upload.single("resumeLink"),
+  addB2CformSubmission
+);
 router.post(
   "/add-new-b2b-form-submission",
   upload.single("resumeLink"),

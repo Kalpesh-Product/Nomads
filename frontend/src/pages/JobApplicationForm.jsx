@@ -86,7 +86,7 @@ const JobApplicationForm = ({ title }) => {
       const formData = new FormData();
 
       //Nomads
-      formData.append("sheetName", "");
+      formData.append("sheetName", "Job_Application");
       // Hosts
       formData.append("formName", "jobApplication");
       formData.append("jobPosition", title);
@@ -110,11 +110,11 @@ const JobApplicationForm = ({ title }) => {
     },
     onSuccess: (data) => {
       toast.success(data.message);
-      reset();
+      // reset();
     },
     onError: (error) => {
       toast.error(error.response.data.message);
-      reset();
+      // reset();
     },
   });
 
