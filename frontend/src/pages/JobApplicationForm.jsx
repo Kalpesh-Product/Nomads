@@ -22,7 +22,8 @@ import { useLocation } from "react-router-dom";
 
 const JobApplicationForm = ({ title }) => {
   const { pathname } = useLocation();
-  const isHost = pathname.includes("hosts");
+  const isHost = window.location.hostname.includes("hosts");
+
   const customLink = isHost
     ? "add-new-b2b-form-submission"
     : "add-new-b2c-form-submission";

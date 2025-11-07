@@ -15,7 +15,9 @@ const JobDetails = () => {
     <Container>
       <div className="">
         <h2 className="text-4xl md:text-3xl font-normal text-center mb-6">
-          {jobName?.split("-")?.length ? jobName?.split("-")?.join(" ")?.toUpperCase():jobName}
+          {jobName?.split("-")?.length
+            ? jobName?.split("-")?.join(" ")?.toUpperCase()
+            : jobName}
         </h2>
 
         {/* Tabs */}
@@ -88,7 +90,9 @@ const JobDetails = () => {
               if unable to apply now
             </p>
           </div>
-        ) : <JobApplicationForm title={title}/>}
+        ) : (
+          <JobApplicationForm title={title} />
+        )}
       </div>
     </Container>
   );
