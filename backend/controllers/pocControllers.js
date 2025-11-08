@@ -88,7 +88,7 @@ export const bulkInsertPoc = async (req, res, next) => {
 
     if (!pocs.length) {
       return res.status(400).json({
-        message: "No valid POC data found in CSV.",
+        message: `No valid POC data found in CSV.\nCheck if the entries are already uploaded.`,
         skippedExisting,
         skippedDuplicateInCSV,
       });

@@ -22,7 +22,8 @@ import { useLocation } from "react-router-dom";
 
 const JobApplicationForm = ({ title }) => {
   const { pathname } = useLocation();
-  const isHost = pathname.includes("hosts");
+  const isHost = window.location.hostname.includes("hosts");
+
   const customLink = isHost
     ? "add-new-b2b-form-submission"
     : "add-new-b2c-form-submission";
@@ -86,7 +87,7 @@ const JobApplicationForm = ({ title }) => {
       const formData = new FormData();
 
       //Nomads
-      formData.append("sheetName", "");
+      formData.append("sheetName", "Job_Application");
       // Hosts
       formData.append("formName", "jobApplication");
       formData.append("jobPosition", title);
@@ -110,11 +111,11 @@ const JobApplicationForm = ({ title }) => {
     },
     onSuccess: (data) => {
       toast.success(data.message);
-      reset();
+      // reset();
     },
     onError: (error) => {
       toast.error(error.response.data.message);
-      reset();
+      // reset();
     },
   });
 

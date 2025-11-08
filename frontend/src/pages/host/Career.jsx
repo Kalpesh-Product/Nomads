@@ -100,12 +100,12 @@ const HostCareer = () => {
                             <FaChevronRight />
                           </Link> */}
                                 <Link
-                                  to={`job/${job.id}`}
+                                  to={`job/${job.title}`}
                                   state={{
                                     about: job.about,
                                     responsibilities: job.responsibilities,
                                     qualifications: job.qualifications,
-                                    jobName : job.title
+                                    jobName: job.title,
                                   }}
                                   className="border-2 border-gray-600 p-2 rounded-md hover:bg-black hover:text-white transition-colors"
                                 >

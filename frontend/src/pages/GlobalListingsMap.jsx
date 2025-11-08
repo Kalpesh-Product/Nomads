@@ -74,6 +74,7 @@ const GlobalListingsMap = () => {
     "shawnsilveira.wono@gmail.com",
     "mehak.wono@gmail.com",
     "k@k.k",
+    "savita.wono@gmail.com",
   ]; // add more if needed
 
   // Countries only visible to special users
@@ -382,8 +383,23 @@ const GlobalListingsMap = () => {
               {/* Search Form */}
               <form
                 onSubmit={handleSubmit(onSubmit)}
+                // className=" flex justify-around md:w-full lg:w-full border-2 bg-gray-50 rounded-full p-0 items-center"
                 className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
               >
+                {/* <Controller
+                  name="continent"
+                  control={control}
+                  render={({ field }) => (
+                    <SearchBarCombobox
+                      value={field.value}
+                      onChange={field.onChange}
+                      options={countryOptions}
+                      label="Select Continent"
+                      placeholder="Select continent"
+                      className="w-full "
+                    />
+                  )}
+                />{" "} */}
                 <Controller
                   name="country"
                   control={control}
@@ -512,6 +528,20 @@ const GlobalListingsMap = () => {
                     })}
                   </motion.div>
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                    <Controller
+                      name="continent"
+                      control={control}
+                      render={({ field }) => (
+                        <SearchBarCombobox
+                          value={field.value}
+                          onChange={field.onChange}
+                          options={countryOptions}
+                          label="Select Continent"
+                          placeholder="Select continent"
+                          className="w-full"
+                        />
+                      )}
+                    />{" "}
                     <Controller
                       name="country"
                       control={control}
