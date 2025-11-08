@@ -4,7 +4,78 @@ import mongoose from "mongoose";
 import { sendMail } from "../../config/mailer.js"; // adjust path if different
 import User from "../../models/NomadUser.js";
 import NomadUser from "../../models/NomadUser.js";
+import { randomUUID } from "crypto";
 import bcrypt from "bcrypt";
+import { uploadFileToS3 } from "../../config/s3Config.js";
+
+function istNowPieces() {
+  const tz = "Asia/Kolkata";
+  const now = new Date();
+  const submissionDate = new Intl.DateTimeFormat("en-GB", {
+    timeZone: tz,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(now);
+  const submissionTime = new Intl.DateTimeFormat("en-GB", {
+    timeZone: tz,
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  })
+    .format(now)
+    .replace(/\u202F/g, "");
+  return { submissionDate, submissionTime };
+}
+
+const jobApplicationSchema = yup.object({
+  jobPosition: yup.string().trim().required("Job Position is required"),
+  name: yup.string().trim().required("Name is required"),
+  email: yup.string().trim().email().required("Valid email is required"),
+  dob: yup
+    .string()
+    .trim()
+    .nullable()
+    .matches(/^\d{4}-\d{2}-\d{2}$/, "DOB must be YYYY-MM-DD")
+    .optional(),
+  mobile: yup
+    .string()
+    .trim()
+    .required("Mobile Number is required")
+    .matches(/^[0-9+\-\s()]{8,20}$/, "Invalid mobile number"),
+  location: yup.string().trim().required("Location is required"),
+  experienceYears: yup
+    .number()
+    .typeError("Experience (in years) must be a number")
+    .min(0)
+    .max(60)
+    .required("Experience (in years) is required"),
+  linkedin: yup.string().trim().url().nullable(),
+  currentMonthlySalary: yup
+    .number()
+    .typeError("Current Monthly Salary must be a number")
+    .min(0)
+    .nullable(),
+  expectedMonthlySalary: yup
+    .number()
+    .typeError("Expected Monthly Salary must be a number")
+    .min(0)
+    .nullable(),
+  joinInDays: yup.string().trim().required("Join-in days is required"),
+  relocateGoa: yup
+    .string()
+    .trim()
+    .oneOf(["Yes", "No"], "Relocate must be 'Yes' or 'No'")
+    .required("Relocate to Goa is required"),
+  personality: yup.string().trim().required("Tell us about yourself"),
+  skills: yup.string().trim().required("Skills are required"),
+  whyConsider: yup.string().trim().required("Why should we consider you?"),
+  willingToBootstrap: yup.string().trim().required("Willing to bootstrap?"),
+  message: yup.string().trim().nullable(),
+  remarks: yup.string().trim().nullable(),
+  sheetName: yup.string().required("Please provide a sheet name"),
+});
 
 const enquirySchema = yup.object({
   companyName: yup.string().trim().required("Please provide the company name"),
@@ -152,6 +223,79 @@ export const addB2CformSubmission = async (req, res, next) => {
       throw new Error("B2C_APPS_SCRIPT_URL is not configured");
     }
 
+    const { sheetName } = req.body;
+
+    console.log("sheetName", sheetName);
+    const isJobApp = sheetName === "Job_Application";
+
+    console.log("job application out");
+
+    if (isJobApp) {
+      console.log("job application in");
+      const payload = await jobApplicationSchema.validate(req.body, {
+        abortEarly: false,
+        stripUnknown: true,
+      });
+
+      const { submissionDate, submissionTime } = istNowPieces();
+
+      let resumeLink = "";
+      if (req.file) {
+        const data = await uploadFileToS3(
+          `job-applications/${payload.jobPosition}/${
+            payload.name
+          }_${randomUUID()}/${req.file.originalname}`,
+          req.file
+        );
+        resumeLink = data.url;
+      }
+
+      // Post to Google Apps Script
+      const apsBody = {
+        formName: "jobApplication",
+        ...payload,
+        submissionDate,
+        submissionTime,
+        resumeLink,
+      };
+
+      const resp = await fetch(B2C_APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(apsBody),
+      });
+
+      const result = await resp.text();
+      try {
+        const json = JSON.parse(result);
+        if (json.status !== "success")
+          throw new Error(json.message || "Failed to save job application");
+
+        await sendMail({
+          to: payload.email,
+          subject: `Application Received for ${payload.jobPosition} 💼`,
+          text: `Hi ${payload.name}, your application for ${payload.jobPosition} has been received.`,
+          html: `
+            <h2>Application Received</h2>
+            <p>Hi ${payload.name},</p>
+            <p>Thank you for applying for the position of <b>${payload.jobPosition}</b>.</p>
+            <p>Our HR team will review your profile and get back to you soon.</p>
+            <p>Submission Date: ${submissionDate}, Time: ${submissionTime}</p>
+            <p>Cheers,<br/>The WONO Team</p>
+          `,
+        });
+
+        return res.status(201).json({
+          status: "success",
+          message: "Job application submitted successfully",
+          submissionDate,
+          submissionTime,
+        });
+      } catch {
+        throw new Error(result || "Upstream script error");
+      }
+    }
+
     const {
       companyName,
       companyId,
@@ -167,10 +311,8 @@ export const addB2CformSubmission = async (req, res, next) => {
       productType,
       startDate,
       endDate,
-      sheetName,
       name,
     } = req.body;
-
     // Configuration for each sheet type
     const sheetConfig = {
       All_Enquiry: {
@@ -355,14 +497,15 @@ export const addB2CformSubmission = async (req, res, next) => {
         return res.status(400).json({ message: "Please match the password" });
       }
 
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
+      // const salt = await bcrypt.genSalt(10);
+      // const hashedPassword = await bcrypt.hash(password, salt);
 
       const signupEntry = new NomadUser({
         firstName: req.body.firstName?.trim(),
         lastName: req.body.lastName?.trim(),
         email: email?.trim().toLowerCase(),
-        password: hashedPassword,
+        // password:hashedPassword,
+        password,
         country: req.body.country?.trim(),
         state: req.body.state?.trim(),
         mobile: mobile?.trim(),
@@ -390,6 +533,8 @@ export const addB2CformSubmission = async (req, res, next) => {
       data: payload,
     });
   } catch (err) {
+    console.error("❌ Error in addB2CformSubmission:", err.message);
+    console.error(err.stack);
     next(err);
   }
 };

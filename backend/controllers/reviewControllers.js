@@ -160,7 +160,8 @@ export const bulkInsertReviews = async (req, res, next) => {
 
         if (reviews.length === 0) {
           return res.status(400).json({
-            message: "No valid review data found in CSV.",
+            message:
+              "No valid review data found in CSV.\nCheck if the entries are already uploaded.",
             skippedExisting,
             skippedDuplicateInCSV,
             missingCompanyCount: missingCompanyRows.length,
