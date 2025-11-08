@@ -81,6 +81,7 @@ const Listings = () => {
     "shawnsilveira.wono@gmail.com",
     "mehak.wono@gmail.com",
     "k@k.k",
+    "savita.wono@gmail.com",
   ]; // add more if needed
   const specialCountries = ["america"]; // lowercase preferred
   const specialLocationMap = {

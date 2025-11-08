@@ -70,6 +70,7 @@ const GlobalListingsList = () => {
     "shawnsilveira.wono@gmail.com",
     "mehak.wono@gmail.com",
     "k@k.k",
+    "savita.wono@gmail.com",
   ]; // add more if needed
 
   // Countries only visible to special users
