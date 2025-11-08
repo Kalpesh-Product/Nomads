@@ -78,11 +78,11 @@ const GlobalListingsMap = () => {
   ]; // add more if needed
 
   // Countries only visible to special users
-  const specialCountries = ["america"]; // lowercase preferred
+  const specialCountries = ["hungary"]; // lowercase preferred
 
   // Specific restricted locations within special countries
   const specialLocationMap = {
-    america: ["americano", "americani"], // lowercase names
+    america: ["budapest", "americani"], // lowercase names
   };
 
   const allCountryOptions = locations
