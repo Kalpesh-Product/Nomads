@@ -387,9 +387,10 @@ const GlobalListingsList = () => {
 
               <form
                 onSubmit={handleSubmit(onSubmit)}
-                className=" flex justify-around md:w-full lg:w-full border-2 bg-gray-50 rounded-full p-0 items-center"
+                // className=" flex justify-around md:w-full lg:w-full border-2 bg-gray-50 rounded-full p-0 items-center"
+                className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
               >
-                <Controller
+                {/* <Controller
                   name="continent"
                   control={control}
                   render={({ field }) => (
@@ -402,7 +403,8 @@ const GlobalListingsList = () => {
                       className="w-full "
                     />
                   )}
-                />              <Controller
+                />      */}
+                <Controller
                   name="country"
                   control={control}
                   render={({ field }) => (
@@ -539,7 +541,8 @@ const GlobalListingsList = () => {
                         className="w-full"
                       />
                     )}
-                  />               <Controller
+                  />{" "}
+                  <Controller
                     name="country"
                     control={control}
                     render={({ field }) => (
