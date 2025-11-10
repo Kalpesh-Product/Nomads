@@ -74,7 +74,7 @@ const GlobalListingsList = () => {
   ]; // add more if needed
 
   // Countries only visible to special users
-  const specialCountries = ["hungary"]; // lowercase preferred
+  const specialCountries = ["americac"]; // lowercase preferred
 
   const allCountryOptions = locations
     .map((item) => ({
@@ -101,7 +101,7 @@ const GlobalListingsList = () => {
   }, [allCountryOptions, user]);
 
   const specialLocationMap = {
-    america: ["budapest", "americani"], // lowercase names
+    america: ["americal", "americani"], // lowercase names
   };
 
   const filteredLocation = locations.find(

@@ -103,11 +103,11 @@ const Home = () => {
   ]; // add more if needed
 
   // Countries only visible to special users
-  const specialCountries = ["hungary"]; // lowercase preferred
+  const specialCountries = ["americac"]; // lowercase preferred
 
   // Specific restricted locations within those countries
   const specialLocationMap = {
-    america: ["budapest", "americani"], // lowercase names
+    america: ["americal", "americani"], // lowercase names
   };
 
   // Build all countries
