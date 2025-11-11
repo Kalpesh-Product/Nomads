@@ -49,6 +49,9 @@ const companySchema = new mongoose.Schema({
   country: {
     type: String,
   },
+  continent: {
+    type: String,
+  },
   about: {
     type: String,
     trim: true,

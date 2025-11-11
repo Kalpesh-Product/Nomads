@@ -244,6 +244,7 @@ export const createCompany = async (req, res, next) => {
       city,
       state,
       country,
+      continent,
       about,
       totalSeats,
       latitude,
@@ -285,6 +286,7 @@ export const createCompany = async (req, res, next) => {
       city: city?.trim(),
       state: state?.trim(),
       country: country?.trim(),
+      continent: continent?.trim(),
       about: about?.trim(),
       totalSeats: totalSeats ? parseInt(totalSeats) : null,
       latitude: latitude ? parseFloat(latitude) : null,
@@ -825,30 +827,6 @@ export const getListings = async (req, res, next) => {
       return res.status(200).json([]);
     }
 
-    // const data = listings.map((list) => {
-    //   const reviews = [];
-    //   const transformListing = reviews.map((review) => {
-    //     console.log("review", review.companyId);
-    //     if (review.companyId === companyId) {
-    //       reviews.push(review);
-    //       console.log("first");
-    //     }
-    //   });
-    //   return { ...list, reviews };
-    // });
-
-    // const data = listings.map((list) => {
-    //   const reviews = [];
-    //   const transformListing = reviews.some((review) => {
-    //     console.log("review", review.companyId);
-    //     if (review.companyId === companyId) {
-    //       reviews.push(review);
-    //       console.log("first");
-    //     }
-    //   });
-    //   return { ...list, reviews };
-    // });
-
     const data = listings.map((list) => {
       const totalReviews = reviews.filter(
         (review) => review.companyId === companyId
@@ -862,26 +840,74 @@ export const getListings = async (req, res, next) => {
   }
 };
 
+// export const getUniqueDataLocations = async (req, res, next) => {
+//   try {
+//     const companies = await Company.find().lean().exec();
+
+//     const countryMap = new Map();
+
+//     for (const company of companies) {
+//       const country = company.country;
+//       const state = company.state;
+
+//       if (!countryMap.has(country)) {
+//         countryMap.set(country, new Set()); // use Set for unique states
+//       }
+//       countryMap.get(country).add(state);
+//     }
+
+//     const finalizedLocations = Array.from(countryMap.entries()).map(
+//       ([country, statesSet]) => ({
+//         country,
+//         states: Array.from(statesSet), // convert Set to array
+//       })
+//     );
+
+//     return res.status(200).json(finalizedLocations);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
 export const getUniqueDataLocations = async (req, res, next) => {
   try {
-    const companies = await Company.find().lean().exec();
+    const companies = await Company.find()
+      .select("country state continent")
+      .lean()
+      .exec();
 
     const countryMap = new Map();
 
     for (const company of companies) {
-      const country = company.country;
-      const state = company.state;
+      const country = company.country?.trim();
+      const state = company.state?.trim();
+      const continent = company.continent?.trim() || "Unknown";
+
+      if (!country) continue;
 
       if (!countryMap.has(country)) {
-        countryMap.set(country, new Set()); // use Set for unique states
+        countryMap.set(country, {
+          states: new Set(),
+          continent,
+        });
       }
-      countryMap.get(country).add(state);
+
+      // if continent differs across records, prefer non-"Unknown"
+      const existing = countryMap.get(country);
+      if (continent !== "Unknown" && existing.continent === "Unknown") {
+        existing.continent = continent;
+      }
+
+      if (state) {
+        existing.states.add(state);
+      }
     }
 
     const finalizedLocations = Array.from(countryMap.entries()).map(
-      ([country, statesSet]) => ({
+      ([country, { states, continent }]) => ({
         country,
-        states: Array.from(statesSet), // convert Set to array
+        states: Array.from(states),
+        continent,
       })
     );
 
@@ -1304,99 +1330,6 @@ export const editCompanyImagesBulk = async (req, res, next) => {
     next(error);
   }
 };
-
-// export const editCompany = async (req, res, next) => {
-//   try {
-//     const {
-//       businessId,
-//       address,
-//       about,
-//       totalSeats,
-//       latitude,
-//       longitude,
-//       googleMap,
-//       ratings,
-//       totalReviews,
-//       inclusions,
-//       companyType,
-//       companyName,
-//       reviews,
-//       images,
-//     } = req.body;
-
-//     if (!businessId) {
-//       return res.status(400).json({ message: "Missing business id" });
-//     }
-
-//     const company = await Company.findOne({ businessId });
-//     if (!company) {
-//       return res.status(404).json({ message: "Company not found" });
-//     }
-
-//     const isCompanyTypeChanged = companyType !== company.companyType;
-//     const oldCompanyType = company.companyType;
-
-//     // Update scalar fields
-//     company.address = address?.trim() || company.address;
-//     company.companyName = companyName?.trim() || company.companyName;
-//     company.about = about?.trim() || company.about;
-//     company.totalSeats = totalSeats ? parseInt(totalSeats) : company.totalSeats;
-//     company.latitude = latitude ? parseFloat(latitude) : company.latitude;
-//     company.longitude = longitude ? parseFloat(longitude) : company.longitude;
-//     company.googleMap = googleMap?.trim() || company.googleMap;
-//     company.ratings = ratings ? parseFloat(ratings) : company.ratings;
-//     company.totalReviews = totalReviews
-//       ? parseInt(totalReviews)
-//       : company.totalReviews;
-//     company.inclusions = inclusions?.trim() || company.inclusions;
-//     company.companyType =
-//       companyType?.trim()?.split(" ").join("").toLowerCase() ||
-//       company.companyType;
-
-//     const savedCompany = await company.save();
-
-//     if (savedCompany && isCompanyTypeChanged && company.images.length > 0) {
-//       console.log(
-//         "Company type changed from",
-//         oldCompanyType,
-//         "to",
-//         companyType
-//       );
-
-//       // Delete files in parallel safely
-//       await Promise.allSettled(
-//         company.images.map((img) => deleteFileFromS3ByUrl(img.url))
-//       );
-
-//       //Update the images in the DB
-//       company.images = images;
-//     }
-
-//     /** ---------------- REVIEWS UPDATE LOGIC ---------------- **/
-//     if (Array.isArray(reviews) && reviews.length > 0) {
-//       // Dumb but simple: nuke old reviews and replace
-//       await Review.deleteMany({ company: company._id });
-//       const reviewDocs = reviews.map((review) => ({
-//         company: company._id,
-//         companyId: company.companyId,
-//         name: review.name?.trim(),
-//         starCount: parseInt(review.starCount),
-//         description: review.description?.trim(),
-//         reviewSource: review.reviewSource?.trim(),
-//         reviewLink: review.reviewLink?.trim(),
-//       }));
-//       await Review.insertMany(reviewDocs);
-//     }
-
-//     res.status(200).json({
-//       message: "Company updated successfully",
-//       company,
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     next(error);
-//   }
-// };
 
 export const editCompany = async (req, res, next) => {
   try {
