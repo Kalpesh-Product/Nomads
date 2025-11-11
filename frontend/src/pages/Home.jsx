@@ -396,7 +396,7 @@ const Home = () => {
                     />
                   )}
                 />
-
+                <div className="w-px h-10 bg-gray-300 mx-2 my-auto" />
                 <Controller
                   name="country"
                   control={control}
