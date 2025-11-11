@@ -385,7 +385,7 @@ const GlobalListingsList = () => {
       </Helmet>
       <div className="flex flex-col gap-2 lg:gap-6">
         <div className="flex flex-col gap-4 justify-center items-center  w-full lg:mt-0">
-          <div className="min-w-[80%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0">
+          <div className="min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0">
             <div className="hidden lg:flex flex-col gap-4 justify-between items-center w-full h-full">
               {/* the 5 icons */}
 

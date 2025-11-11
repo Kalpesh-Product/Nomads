@@ -374,7 +374,7 @@ const Home = () => {
         <link rel="canonical" href="https://wono.co/" />
       </Helmet>
       <div className="flex flex-col w-full">
-        <div className="min-w-[80%] max-w-[80rem] lg:max-w-[80rem] mx-0 lg:mx-auto px-6 sm:px-6 lg:px-0">
+        <div className="min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 lg:mx-auto px-6 sm:px-6 lg:px-0">
           <div className="py-12  hidden lg:block">
             <div className="flex flex-col  gap-4 justify-between items-center">
               <form
