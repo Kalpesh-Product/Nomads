@@ -87,6 +87,7 @@ export const bulkInsertCompanies = async (req, res, next) => {
           city: row["City"]?.trim(),
           state: row["State"]?.trim(),
           country: row["Country"]?.trim(),
+          continent: row["Continent"]?.trim(),
           about: row["About"]?.trim(),
           totalSeats: parseInt(row["Total Seats"]?.trim()) || null,
           latitude: parseFloat(row["latitude"]?.trim()),
@@ -765,7 +766,7 @@ export const getCompanyData = async (req, res, next) => {
     // Fetch DB reviews & POC
     const [reviews, poc] = await Promise.all([
       Review.find({ company: companyObjectId }).lean().exec(),
-      PointOfContact.findOne({ company: companyObjectId, isRegistered: true })
+      PointOfContact.findOne({ company: companyObjectId, isActive: true })
         .lean()
         .exec(),
     ]);
@@ -842,24 +843,43 @@ export const getListings = async (req, res, next) => {
 
 // export const getUniqueDataLocations = async (req, res, next) => {
 //   try {
-//     const companies = await Company.find().lean().exec();
+//     const companies = await Company.find()
+//       .select("country state continent")
+//       .lean()
+//       .exec();
 
 //     const countryMap = new Map();
 
 //     for (const company of companies) {
-//       const country = company.country;
-//       const state = company.state;
+//       const country = company.country?.trim();
+//       const state = company.state?.trim();
+//       const continent = company.continent?.trim() || "Unknown";
+
+//       if (!country) continue;
 
 //       if (!countryMap.has(country)) {
-//         countryMap.set(country, new Set()); // use Set for unique states
+//         countryMap.set(country, {
+//           states: new Set(),
+//           continent,
+//         });
 //       }
-//       countryMap.get(country).add(state);
+
+//       // if continent differs across records, prefer non-"Unknown"
+//       const existing = countryMap.get(country);
+//       if (continent !== "Unknown" && existing.continent === "Unknown") {
+//         existing.continent = continent;
+//       }
+
+//       if (state) {
+//         existing.states.add(state);
+//       }
 //     }
 
 //     const finalizedLocations = Array.from(countryMap.entries()).map(
-//       ([country, statesSet]) => ({
+//       ([country, { states, continent }]) => ({
 //         country,
-//         states: Array.from(statesSet), // convert Set to array
+//         states: Array.from(states),
+//         continent,
 //       })
 //     );
 
@@ -872,7 +892,7 @@ export const getListings = async (req, res, next) => {
 export const getUniqueDataLocations = async (req, res, next) => {
   try {
     const companies = await Company.find()
-      .select("country state continent")
+      .select("country state continent isPublic")
       .lean()
       .exec();
 
@@ -882,31 +902,40 @@ export const getUniqueDataLocations = async (req, res, next) => {
       const country = company.country?.trim();
       const state = company.state?.trim();
       const continent = company.continent?.trim() || "Unknown";
+      const isPublic = !!company.isPublic;
 
-      if (!country) continue;
+      if (!country || !state) continue;
 
+      // initialize country entry if missing
       if (!countryMap.has(country)) {
         countryMap.set(country, {
-          states: new Set(),
+          states: new Map(),
           continent,
         });
       }
 
-      // if continent differs across records, prefer non-"Unknown"
       const existing = countryMap.get(country);
+
+      // prefer non-"Unknown" continent if previously unknown
       if (continent !== "Unknown" && existing.continent === "Unknown") {
         existing.continent = continent;
       }
 
-      if (state) {
-        existing.states.add(state);
+      // initialize state entry if missing
+      if (!existing.states.has(state)) {
+        existing.states.set(state, { name: state, isPublic });
+      } else {
+        // if any company for this state is public, mark it true
+        const stateObj = existing.states.get(state);
+        if (isPublic) stateObj.isPublic = true;
       }
     }
 
+    // convert map structure into array form
     const finalizedLocations = Array.from(countryMap.entries()).map(
       ([country, { states, continent }]) => ({
         country,
-        states: Array.from(states),
+        states: Array.from(states.values()),
         continent,
       })
     );
