@@ -49,6 +49,18 @@ const GlobalListingsMap = () => {
     },
   });
 
+  const continentOptions = React.useMemo(() => {
+    const uniqueContinents = [
+      ...new Set(locations.map((item) => item.continent).filter(Boolean)),
+    ];
+    return uniqueContinents
+      .map((cont) => ({
+        label: cont.charAt(0).toUpperCase() + cont.slice(1),
+        value: cont.toLowerCase(),
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, [locations]);
+
   // const countryOptions = locations
   //   .map((item) => ({
   //     label: item.country
@@ -85,14 +97,28 @@ const GlobalListingsMap = () => {
     america: ["americal", "americani"], // lowercase names
   };
 
-  const allCountryOptions = locations
-    .map((item) => ({
-      label: item.country
-        ? item.country.charAt(0).toUpperCase() + item.country.slice(1)
-        : "",
-      value: item.country?.toLowerCase(),
-    }))
-    .sort((a, b) => a.label.localeCompare(b.label));
+  // 👇 Add this line before building countries
+  const selectedContinent = watch("continent");
+
+  // Build countries based on selected continent
+  const allCountryOptions = React.useMemo(() => {
+    let filtered = locations;
+    if (selectedContinent) {
+      filtered = locations.filter(
+        (item) =>
+          item.continent?.toLowerCase() === selectedContinent?.toLowerCase()
+      );
+    }
+
+    return filtered
+      .map((item) => ({
+        label: item.country
+          ? item.country.charAt(0).toUpperCase() + item.country.slice(1)
+          : "",
+        value: item.country?.toLowerCase(),
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, [locations, selectedContinent]);
 
   // Filter out restricted countries for normal users
   const countryOptions = useMemo(() => {
@@ -247,6 +273,7 @@ const GlobalListingsMap = () => {
     setShowMobileSearch(false);
   };
   useEffect(() => {
+    setValue("continent", formData.continent);
     setValue("country", formData.country);
     setValue("location", formData.location);
     setValue("count", formData.count);
@@ -383,23 +410,24 @@ const GlobalListingsMap = () => {
               {/* Search Form */}
               <form
                 onSubmit={handleSubmit(onSubmit)}
-                // className=" flex justify-around md:w-full lg:w-full border-2 bg-gray-50 rounded-full p-0 items-center"
-                className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
+                className=" flex justify-around md:w-full lg:w-full border-2 bg-gray-50 rounded-full p-0 items-center"
+                // className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
               >
-                {/* <Controller
+                <Controller
                   name="continent"
                   control={control}
                   render={({ field }) => (
                     <SearchBarCombobox
                       value={field.value}
                       onChange={field.onChange}
-                      options={countryOptions}
+                      options={continentOptions}
                       label="Select Continent"
                       placeholder="Select continent"
                       className="w-full "
                     />
                   )}
-                />{" "} */}
+                />
+
                 <Controller
                   name="country"
                   control={control}
@@ -410,6 +438,7 @@ const GlobalListingsMap = () => {
                       options={countryOptions}
                       label="Select Country"
                       placeholder="Select aspiring destination"
+                      disabled={!selectedContinent}
                       className="w-full "
                     />
                   )}
@@ -535,13 +564,14 @@ const GlobalListingsMap = () => {
                         <SearchBarCombobox
                           value={field.value}
                           onChange={field.onChange}
-                          options={countryOptions}
+                          options={continentOptions}
                           label="Select Continent"
                           placeholder="Select continent"
-                          className="w-full"
+                          className="w-full "
                         />
                       )}
-                    />{" "}
+                    />
+
                     <Controller
                       name="country"
                       control={control}
@@ -552,6 +582,7 @@ const GlobalListingsMap = () => {
                           options={countryOptions}
                           label="Select Country"
                           placeholder="Select aspiring destination"
+                          disabled={!selectedContinent}
                           className="w-full"
                         />
                       )}
