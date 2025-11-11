@@ -114,6 +114,10 @@ const companySchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  isPublic: {
+    type: Boolean,
+    default: false,
+  },
   //POC Details can be rendered only if company is registered
   isRegistered: {
     type: Boolean,
