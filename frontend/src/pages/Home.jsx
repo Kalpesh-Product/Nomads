@@ -58,14 +58,54 @@ const Home = () => {
   const selectedState = watch("location");
   // Sample options
 
+  // const { data: locations = [], isLoading: isLocations } = useQuery({
+  //   queryKey: ["locations"],
+  //   queryFn: async () => {
+  //     try {
+  //       const response = await axios.get("company/company-locations");
+  //       return Array.isArray(response.data) ? response.data : [];
+  //     } catch (error) {
+  //       console.error(error?.response?.data?.message);
+  //     }
+  //   },
+  // });
+
+  // -------------------------------------
+  // 🧠 Special users who can see all locations
+  // -------------------------------------
+  const specialUserEmails = [
+    "allan.wono@gmail.com",
+    "muskan.wono@gmail.com",
+    "shawnsilveira.wono@gmail.com",
+    "mehak.wono@gmail.com",
+    "savita.wono@gmail.com",
+    "k@k.k",
+  ];
+
+  // -------------------------------------
+  // 📍 Fetch and filter locations
+  // -------------------------------------
   const { data: locations = [], isLoading: isLocations } = useQuery({
-    queryKey: ["locations"],
+    queryKey: ["locations", user?.email],
     queryFn: async () => {
       try {
         const response = await axios.get("company/company-locations");
-        return Array.isArray(response.data) ? response.data : [];
+        const rawData = Array.isArray(response.data) ? response.data : [];
+
+        const userEmail = user?.email?.toLowerCase();
+        const isSpecialUser = specialUserEmails.includes(userEmail);
+
+        // If special user, return everything
+        if (isSpecialUser) return rawData;
+
+        // Otherwise, filter by isPublic === true
+        return rawData.map((country) => ({
+          ...country,
+          states: country.states?.filter((s) => s.isPublic) || [],
+        }));
       } catch (error) {
         console.error(error?.response?.data?.message);
+        return [];
       }
     },
   });
@@ -160,8 +200,8 @@ const Home = () => {
   const locationOptions = React.useMemo(() => {
     const baseLocations =
       filteredLocation?.states?.map((item) => ({
-        label: item,
-        value: item?.toLowerCase(),
+        label: item.name,
+        value: item.name?.toLowerCase(),
       })) || [];
     return baseLocations;
   }, [filteredLocation]);

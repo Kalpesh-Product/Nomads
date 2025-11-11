@@ -43,16 +43,39 @@ const Listings = () => {
   const user = auth?.user || {};
   const userId = auth?.user?._id || auth?.user?.id;
 
+  // 🧠 Special users who can view all countries and states
+  const specialUserEmails = [
+    "allan.wono@gmail.com",
+    "muskan.wono@gmail.com",
+    "shawnsilveira.wono@gmail.com",
+    "mehak.wono@gmail.com",
+    "savita.wono@gmail.com",
+    "k@k.k",
+  ];
+
   const selectedCountry = watch("country");
   const selectedState = watch("location");
   const { data: locations = [], isLoading: isLocations } = useQuery({
-    queryKey: ["locations"],
+    queryKey: ["locations", user?.email],
     queryFn: async () => {
       try {
         const response = await axios.get("company/company-locations");
-        return Array.isArray(response.data) ? response.data : [];
+        const rawData = Array.isArray(response.data) ? response.data : [];
+
+        const userEmail = user?.email?.toLowerCase();
+        const isSpecialUser = specialUserEmails.includes(userEmail);
+
+        // 🟢 Special users see all data
+        if (isSpecialUser) return rawData;
+
+        // 🔒 Regular users: only show states where isPublic === true
+        return rawData.map((country) => ({
+          ...country,
+          states: country.states?.filter((s) => s.isPublic) || [],
+        }));
       } catch (error) {
         console.error(error?.response?.data?.message);
+        return [];
       }
     },
   });
@@ -135,8 +158,8 @@ const Listings = () => {
   const locationOptions = React.useMemo(() => {
     return (
       filteredLocation?.states?.map((item) => ({
-        label: item,
-        value: item?.toLowerCase(),
+        label: item.name,
+        value: item.name?.toLowerCase(),
       })) || []
     );
   }, [filteredLocation]);

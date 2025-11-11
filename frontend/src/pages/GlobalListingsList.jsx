@@ -41,14 +41,49 @@ const GlobalListingsList = () => {
   const userId = auth?.user?._id || auth?.user?.id;
   const selectedCountry = watch("country");
   const selectedState = watch("location");
+
+  // 🧠 Special users who can see all locations
+  const specialUserEmails = [
+    "allan.wono@gmail.com",
+    "muskan.wono@gmail.com",
+    "shawnsilveira.wono@gmail.com",
+    "mehak.wono@gmail.com",
+    "savita.wono@gmail.com",
+    "k@k.k",
+  ];
+
+  // const { data: locations = [], isLoading: isLocations } = useQuery({
+  //   queryKey: ["locations"],
+  //   queryFn: async () => {
+  //     try {
+  //       const response = await axios.get("company/company-locations");
+  //       return Array.isArray(response.data) ? response.data : [];
+  //     } catch (error) {
+  //       console.error(error?.response?.data?.message);
+  //     }
+  //   },
+  // });
   const { data: locations = [], isLoading: isLocations } = useQuery({
-    queryKey: ["locations"],
+    queryKey: ["locations", user?.email],
     queryFn: async () => {
       try {
         const response = await axios.get("company/company-locations");
-        return Array.isArray(response.data) ? response.data : [];
+        const rawData = Array.isArray(response.data) ? response.data : [];
+
+        const userEmail = user?.email?.toLowerCase();
+        const isSpecialUser = specialUserEmails.includes(userEmail);
+
+        // If special user, show all data
+        if (isSpecialUser) return rawData;
+
+        // Otherwise, filter to show only public states
+        return rawData.map((country) => ({
+          ...country,
+          states: country.states?.filter((s) => s.isPublic) || [],
+        }));
       } catch (error) {
         console.error(error?.response?.data?.message);
+        return [];
       }
     },
   });
@@ -123,8 +158,8 @@ const GlobalListingsList = () => {
   const locationOptions = useMemo(() => {
     return (
       filteredLocation?.states?.map((item) => ({
-        label: item,
-        value: item?.toLowerCase(),
+        label: item.name,
+        value: item.name?.toLowerCase(),
       })) || []
     );
   }, [filteredLocation]);
