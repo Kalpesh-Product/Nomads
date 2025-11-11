@@ -80,22 +80,22 @@ const GlobalListingsMap = () => {
   // -------------------------------------
   // 🔒 Country & location filtering based on user email
   // -------------------------------------
-  const specialUserEmails = [
-    "allan.wono@gmail.com",
-    "muskan.wono@gmail.com",
-    "shawnsilveira.wono@gmail.com",
-    "mehak.wono@gmail.com",
-    "k@k.k",
-    "savita.wono@gmail.com",
-  ]; // add more if needed
+  // const specialUserEmails = [
+  //   "allan.wono@gmail.com",
+  //   "muskan.wono@gmail.com",
+  //   "shawnsilveira.wono@gmail.com",
+  //   "mehak.wono@gmail.com",
+  //   "k@k.k",
+  //   "savita.wono@gmail.com",
+  // ]; // add more if needed
 
   // Countries only visible to special users
-  const specialCountries = ["americac"]; // lowercase preferred
+  // const specialCountries = ["americac"]; // lowercase preferred
 
-  // Specific restricted locations within special countries
-  const specialLocationMap = {
-    america: ["americal", "americani"], // lowercase names
-  };
+  // // Specific restricted locations within special countries
+  // const specialLocationMap = {
+  //   america: ["americal", "americani"], // lowercase names
+  // };
 
   // 👇 Add this line before building countries
   const selectedContinent = watch("continent");
@@ -120,18 +120,7 @@ const GlobalListingsMap = () => {
       .sort((a, b) => a.label.localeCompare(b.label));
   }, [locations, selectedContinent]);
 
-  // Filter out restricted countries for normal users
-  const countryOptions = useMemo(() => {
-    const userEmail = user?.email?.toLowerCase();
-    const isSpecialUser = specialUserEmails.includes(userEmail);
-
-    return allCountryOptions.filter((option) => {
-      if (specialCountries.includes(option.value)) {
-        return isSpecialUser;
-      }
-      return true; // visible to everyone else (including guests)
-    });
-  }, [allCountryOptions, user]);
+  const countryOptions = useMemo(() => allCountryOptions, [allCountryOptions]);
 
   // Build location options with same restriction logic
   const filteredLocation = locations.find(
@@ -139,29 +128,13 @@ const GlobalListingsMap = () => {
   );
 
   const locationOptions = useMemo(() => {
-    const baseLocations =
+    return (
       filteredLocation?.states?.map((item) => ({
         label: item,
         value: item?.toLowerCase(),
-      })) || [];
-
-    const userEmail = user?.email?.toLowerCase();
-    const isSpecialUser = specialUserEmails.includes(userEmail);
-
-    if (!selectedCountry) return baseLocations;
-
-    if (specialLocationMap[selectedCountry?.toLowerCase()]) {
-      if (isSpecialUser) return baseLocations;
-
-      // remove special-only locations for normal users
-      return baseLocations.filter(
-        (loc) =>
-          !specialLocationMap[selectedCountry.toLowerCase()].includes(loc.value)
-      );
-    }
-
-    return baseLocations;
-  }, [filteredLocation, selectedCountry, user]);
+      })) || []
+    );
+  }, [filteredLocation]);
 
   const skeletonArray = Array.from({ length: 6 });
   const countOptions = [

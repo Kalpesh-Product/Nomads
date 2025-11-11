@@ -105,22 +105,22 @@ const Home = () => {
   // -------------------------------------
 
   // Emails that can see special countries
-  const specialUserEmails = [
-    "allan.wono@gmail.com",
-    "muskan.wono@gmail.com",
-    "shawnsilveira.wono@gmail.com",
-    "mehak.wono@gmail.com",
-    "k@k.k",
-    "savita.wono@gmail.com",
-  ]; // add more if needed
+  // const specialUserEmails = [
+  //   "allan.wono@gmail.com",
+  //   "muskan.wono@gmail.com",
+  //   "shawnsilveira.wono@gmail.com",
+  //   "mehak.wono@gmail.com",
+  //   "k@k.k",
+  //   "savita.wono@gmail.com",
+  // ]; // add more if needed
 
   // Countries only visible to special users
-  const specialCountries = ["americac"]; // lowercase preferred
+  // const specialCountries = ["americac"]; // lowercase preferred
 
-  // Specific restricted locations within those countries
-  const specialLocationMap = {
-    america: ["americal", "americani"], // lowercase names
-  };
+  // // Specific restricted locations within those countries
+  // const specialLocationMap = {
+  //   america: ["americal", "americani"], // lowercase names
+  // };
 
   // Build all countries
   // 👇 Add this line before building countries
@@ -147,17 +147,10 @@ const Home = () => {
   }, [locations, selectedContinent]);
 
   // Filter countries based on user email
-  const countryOptions = React.useMemo(() => {
-    const userEmail = user?.email?.toLowerCase();
-    const isSpecialUser = specialUserEmails.includes(userEmail);
-
-    return allCountryOptions.filter((option) => {
-      if (specialCountries.includes(option.value)) {
-        return isSpecialUser; // only show if special user
-      }
-      return true; // visible to everyone else
-    });
-  }, [allCountryOptions, user]);
+  const countryOptions = React.useMemo(
+    () => allCountryOptions,
+    [allCountryOptions]
+  );
 
   // Build locations with same filtering logic
   const filteredLocation = locations.find(
@@ -170,22 +163,8 @@ const Home = () => {
         label: item,
         value: item?.toLowerCase(),
       })) || [];
-
-    const userEmail = user?.email?.toLowerCase();
-    const isSpecialUser = specialUserEmails.includes(userEmail);
-
-    if (!selectedCountry) return baseLocations;
-
-    if (specialLocationMap[selectedCountry?.toLowerCase()]) {
-      if (isSpecialUser) return baseLocations;
-      // remove special-only locations for normal users
-      return baseLocations.filter(
-        (loc) =>
-          !specialLocationMap[selectedCountry.toLowerCase()].includes(loc.value)
-      );
-    }
     return baseLocations;
-  }, [filteredLocation, selectedCountry, user]);
+  }, [filteredLocation]);
 
   const countOptions = [
     { label: "1 - 5", value: "1-5" },
