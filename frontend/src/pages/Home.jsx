@@ -15,7 +15,7 @@ import { AiOutlineHeart } from "react-icons/ai";
 import SearchBarCombobox from "../components/SearchBarCombobox";
 import newIcons from "../assets/newIcons";
 import { AnimatePresence, motion } from "motion/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import coworking from "/images/coworking-img.webp";
 import hostels from "/images/hostels-img.webp";
 import cafes from "/images/meetingrooms-img.webp";
@@ -47,7 +47,7 @@ const Home = () => {
   const [open, setOpen] = useState(false);
   const [selectedReview, setSelectedReview] = useState([]);
   const formData = useSelector((state) => state.location.formValues);
-  const { handleSubmit, control, reset, register, watch } = useForm({
+  const { handleSubmit, control, reset, register, watch, setValue } = useForm({
     defaultValues: {
       country: "",
       location: "",
@@ -95,20 +95,45 @@ const Home = () => {
         const userEmail = user?.email?.toLowerCase();
         const isSpecialUser = specialUserEmails.includes(userEmail);
 
-        // If special user, return everything
         if (isSpecialUser) return rawData;
 
-        // Otherwise, filter by isPublic === true
-        return rawData.map((country) => ({
-          ...country,
-          states: country.states?.filter((s) => s.isPublic) || [],
-        }));
+        // 1) keep only public states per country
+        // 2) drop countries that now have zero states
+        return rawData
+          .map((country) => ({
+            ...country,
+            states: (country.states || []).filter((s) => s?.isPublic),
+          }))
+          .filter((country) => (country.states?.length || 0) > 0);
       } catch (error) {
         console.error(error?.response?.data?.message);
         return [];
       }
     },
   });
+
+  useEffect(() => {
+    // Reset country if it no longer exists
+    const countryExists = locations.some(
+      (c) => c.country?.toLowerCase() === selectedCountry?.toLowerCase()
+    );
+    if (!countryExists) {
+      setValue("country", "");
+      setValue("location", "");
+      return;
+    }
+
+    // Reset location if it no longer exists in the chosen country
+    const current = locations.find(
+      (c) => c.country?.toLowerCase() === selectedCountry?.toLowerCase()
+    );
+    const locationExists = current?.states?.some(
+      (s) => s.name?.toLowerCase() === selectedState?.toLowerCase()
+    );
+    if (!locationExists) {
+      setValue("location", "");
+    }
+  }, [locations, selectedCountry, selectedState, setValue]);
 
   const continentOptions = React.useMemo(() => {
     const uniqueContinents = [
@@ -349,7 +374,7 @@ const Home = () => {
         <link rel="canonical" href="https://wono.co/" />
       </Helmet>
       <div className="flex flex-col w-full">
-        <div className="min-w-[85%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0">
+        <div className="min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 lg:mx-auto px-6 sm:px-6 lg:px-0">
           <div className="py-12  hidden lg:block">
             <div className="flex flex-col  gap-4 justify-between items-center">
               <form
@@ -371,7 +396,7 @@ const Home = () => {
                     />
                   )}
                 />
-
+                <div className="w-px h-10 bg-gray-300 mx-2 my-auto" />
                 <Controller
                   name="country"
                   control={control}

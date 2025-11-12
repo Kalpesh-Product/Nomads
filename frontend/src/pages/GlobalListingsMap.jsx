@@ -59,14 +59,18 @@ const GlobalListingsMap = () => {
         const userEmail = user?.email?.toLowerCase();
         const isSpecialUser = specialUserEmails.includes(userEmail);
 
-        // Special users see all countries and all states
+        // 🧠 Special users see everything
         if (isSpecialUser) return rawData;
 
-        // Regular users only see public states
-        return rawData.map((country) => ({
-          ...country,
-          states: country.states?.filter((s) => s.isPublic) || [],
-        }));
+        // 🚫 Regular users:
+        // 1️⃣ Keep only public states
+        // 2️⃣ Drop countries that have zero public states
+        return rawData
+          .map((country) => ({
+            ...country,
+            states: (country.states || []).filter((s) => s?.isPublic),
+          }))
+          .filter((country) => (country.states?.length || 0) > 0);
       } catch (error) {
         console.error(error?.response?.data?.message);
         return [];
@@ -370,7 +374,7 @@ const GlobalListingsMap = () => {
       </Helmet>
       <div className="flex flex-col gap-2 lg:gap-6">
         <div className="flex flex-col gap-4 justify-center items-center  w-full lg:mt-0">
-          <div className="min-w-[85%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0">
+          <div className="min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0">
             <div className="hidden lg:flex flex-col gap-4 justify-between items-center">
               {/* the 5 icons */}
 
@@ -425,7 +429,7 @@ const GlobalListingsMap = () => {
                     />
                   )}
                 />
-
+                <div className="w-px h-10 bg-gray-300 mx-2 my-auto" />
                 <Controller
                   name="country"
                   control={control}
