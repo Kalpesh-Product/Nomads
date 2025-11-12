@@ -520,7 +520,10 @@ export const getCompaniesData = async (req, res, next) => {
 
     // 1️⃣ Build Mongo filter instead of filtering in memory
     const filter = { isActive: true };
-    if (country) filter.country = new RegExp(`^${country}$`, "i");
+    // if (country) filter.country = new RegExp(`^${country}$`, "i");
+    if (country?.trim())
+      filter.country = new RegExp(`^${country.trim()}$`, "i");
+
     if (state) filter.state = new RegExp(`^${state}$`, "i");
     if (type) filter.companyType = type.toLowerCase();
 
