@@ -528,7 +528,7 @@ export const getCompaniesData = async (req, res, next) => {
     const companies = await Company.find(filter)
       .lean()
       .select(
-        "companyName companyType country state address about website businessId registeredEntityName images reviewsCount rating"
+        "companyName companyId companyType country state address about website businessId registeredEntityName images reviewsCount rating"
       )
       .limit(100) // protect against insane payloads
       .exec();
