@@ -183,7 +183,7 @@ const Footer = () => {
       <div className="w-full flex justify-center items-center gap-4 py-4 bg-gray-50 text-xs font-semibold border-t border-gray-200">
         {/* Language Selector */}
         <div
-          onClick={() => setShowLangModal(true)}
+          // onClick={() => setShowLangModal(true)}
           className="flex items-center gap-1 cursor-pointer hover:underline"
         >
           <FaGlobe className="text-[12px]" />

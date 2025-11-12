@@ -147,7 +147,7 @@ const HostFooter = () => {
         <div className="flex items-center gap-4">
           {/* Language Selector */}
           <div
-            onClick={() => setShowLangModal(true)}
+            // onClick={() => setShowLangModal(true)}
             className="flex items-center gap-1 cursor-pointer hover:underline"
           >
             <FaGlobe className="text-[12px]" />
