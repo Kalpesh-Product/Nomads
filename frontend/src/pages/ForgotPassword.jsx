@@ -5,12 +5,20 @@ import toast from "react-hot-toast";
 import axios from "../utils/axios";
 import PrimaryButton from "../components/PrimaryButton";
 import { useNavigate } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
+import { useEffect } from "react";
 
 export default function ForgotPassword() {
+  const { auth } = useAuth();
   const navigate = useNavigate();
   const { control, handleSubmit, reset } = useForm({
     defaultValues: { email: "" },
   });
+
+  // inside your component
+  useEffect(() => {
+    if (auth?.user) navigate("/profile", { replace: true });
+  }, [auth, navigate]);
 
   const { mutate: sendEmail, isPending } = useMutation({
     mutationFn: async (data) => {
