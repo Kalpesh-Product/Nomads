@@ -190,7 +190,7 @@ const Header = () => {
                 <>
                   <div className="flex justify-center items-center">
                     <AiFillHeart
-                      className="text-[#ff5757]"
+                      className="text-[#ff5757] cursor-pointer"
                       size={28}
                       onClick={handleFavoriteClick}
                     />

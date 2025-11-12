@@ -4,6 +4,7 @@ import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import ListingCard from "../components/ListingCard";
 import Container from "../components/Container";
 import useAuth from "../hooks/useAuth";
+import { AiFillHeart } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 
 const Favorites = () => {
@@ -48,7 +49,13 @@ const Favorites = () => {
     <Container padding={false}>
       <div className="p-6 min-h-screen bg-white rounded-xl ">
         <h1 className="text-xl font-semibold mb-6 text-secondary-dark">
-          My Favorites ❤️
+          {/* My Favorites ❤️ */}
+          <span className="flex gap-2">
+            <span>My Favorites </span>
+            <span>
+              <AiFillHeart className="text-[#ff5757]" size={24} />
+            </span>
+          </span>
         </h1>
 
         {isLoading ? (

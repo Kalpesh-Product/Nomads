@@ -17,9 +17,15 @@ const NomadPrivacy = () => {
             Privacy Policy explains how we collect, use, disclose, and protect
             your personal information when you use our SaaS platform (the
             "Service"), located at{" "}
-            <span
+            {/* <span
               className="text-primary-blue underline cursor-pointer"
               onClick={() => navigate("/hosts")}
+            >
+              www.wono.co
+            </span> */}
+            <span
+              className="text-primary-blue underline cursor-pointer"
+              onClick={() => (window.location.href = "https://wono.co")}
             >
               www.wono.co
             </span>

@@ -1,21 +1,28 @@
 import { TextField, IconButton, InputAdornment } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import axios from "../utils/axios"; // ✅ use same axios config
 import toast from "react-hot-toast";
 import PrimaryButton from "../components/PrimaryButton";
 import { useNavigate, useParams } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import useAuth from "../hooks/useAuth";
 
 export default function ResetPasswordPage() {
   const { token } = useParams();
+  const { auth } = useAuth();
   const navigate = useNavigate();
 
   console.log("token", token);
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // inside your component
+  useEffect(() => {
+    if (auth?.user) navigate("/profile", { replace: true });
+  }, [auth, navigate]);
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
   const toggleConfirmPasswordVisibility = () =>
