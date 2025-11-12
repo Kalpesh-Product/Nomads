@@ -518,33 +518,31 @@ export const getCompaniesData = async (req, res, next) => {
   try {
     const { country, state, type, userId } = req.query;
 
-    // 1️⃣ Build Mongo filter instead of filtering in memory
+    // 1️⃣ Build Mongo filter
     const filter = { isActive: true };
-    // if (country) filter.country = new RegExp(`^${country}$`, "i");
-    if (country?.trim())
-      filter.country = new RegExp(`^${country.trim()}$`, "i");
 
-    if (state) filter.state = new RegExp(`^${state}$`, "i");
-    if (type) filter.companyType = type.toLowerCase();
+    // Case-insensitive partial matches for country/state
+    if (country?.trim()) filter.country = new RegExp(country.trim(), "i");
+    if (state?.trim()) filter.state = new RegExp(state.trim(), "i");
+    if (type?.trim()) filter.companyType = type.toLowerCase();
 
-    // 2️⃣ Fetch only relevant companies (lean + projection)
+    // 2️⃣ Fetch relevant companies
     const companies = await Company.find(filter)
       .lean()
       .select(
         "_id companyName companyId companyType country state city address about website businessId registeredEntityName images logo rating ratings totalReviews inclusions latitude longitude continent isRegistered isPublic"
       )
-
-      .limit(100) // protect against insane payloads
+      .limit(100)
       .exec();
 
     if (!companies.length) {
       return res.status(200).json([]);
     }
 
-    // 3️⃣ Collect company IDs for efficient lookups
+    // 3️⃣ Collect company IDs for related lookups
     const companyIds = companies.map((c) => c._id);
 
-    // 4️⃣ Fetch only matching reviews & POCs
+    // 4️⃣ Fetch reviews & active POCs only for those companies
     const [reviews, pocs] = await Promise.all([
       Review.find({ company: { $in: companyIds } })
         .lean()
@@ -557,7 +555,7 @@ export const getCompaniesData = async (req, res, next) => {
         .select("company name email phone isActive"),
     ]);
 
-    // 5️⃣ Map data efficiently without nested filters in loops
+    // 5️⃣ Map reviews & POCs efficiently
     const reviewMap = new Map();
     for (const review of reviews) {
       const key = review.company.toString();
@@ -567,17 +565,17 @@ export const getCompaniesData = async (req, res, next) => {
 
     const pocMap = new Map();
     for (const p of pocs) {
-      const key = p.company.toString();
-      if (!pocMap.has(key)) pocMap.set(key, p);
+      pocMap.set(p.company.toString(), p);
     }
 
+    // 6️⃣ Combine company data
     let companyData = companies.map((company) => ({
       ...company,
       reviews: reviewMap.get(company._id.toString()) || [],
       poc: pocMap.get(company._id.toString()) || null,
     }));
 
-    // 6️⃣ Handle user likes (if provided)
+    // 7️⃣ Handle user likes (optional)
     if (userId) {
       if (!mongoose.Types.ObjectId.isValid(userId)) {
         return res.status(400).json({ message: "Invalid user id provided" });
