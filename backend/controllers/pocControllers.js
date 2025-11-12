@@ -8,6 +8,7 @@ import axios from "axios";
 export const bulkInsertPoc = async (req, res, next) => {
   try {
     const file = req.file;
+    console.log("poc test hit");
     if (!file) {
       return res.status(400).json({
         message: "Please provide a valid CSV file",
@@ -22,7 +23,9 @@ export const bulkInsertPoc = async (req, res, next) => {
       companies.map((c) => [c.businessId, c.companyId])
     );
 
-    const existingPocs = await PointOfContact.find().select("name companyId");
+    const existingPocs = await TestPointOfContact.find().select(
+      "name companyId"
+    );
     const existingPocSet = new Set(
       existingPocs.map(
         (poc) => `${poc.name?.trim().toLowerCase()}|${poc.companyId?.trim()}`
@@ -99,7 +102,7 @@ export const bulkInsertPoc = async (req, res, next) => {
     let masterPanelStatus = "not attempted";
 
     try {
-      await PointOfContact.insertMany(pocs);
+      await TestPointOfContact.insertMany(pocs);
       nomadsStatus = "success";
 
       const masterPanelPocs = pocs.map((poc) => ({

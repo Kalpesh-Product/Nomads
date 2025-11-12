@@ -8,6 +8,7 @@ export const bulkInsertReviews = async (req, res, next) => {
   try {
     const file = req.file;
 
+    console.log("review test hit1");
     if (!file) {
       return res
         .status(400)
@@ -27,7 +28,7 @@ export const bulkInsertReviews = async (req, res, next) => {
     });
 
     // Fetch existing reviews to check for duplicates
-    const existingReviews = await Review.find().select("name company");
+    const existingReviews = await TestReview.find().select("name company");
     const existingReviewSet = new Set(
       existingReviews.map(
         (review) =>
@@ -172,7 +173,7 @@ export const bulkInsertReviews = async (req, res, next) => {
         }
 
         try {
-          const result = await Review.insertMany(reviews);
+          const result = await TestReview.insertMany(reviews);
           const insertedCount = result.length;
 
           res.status(200).json({
