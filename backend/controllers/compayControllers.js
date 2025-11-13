@@ -518,81 +518,109 @@ export const getCompaniesData = async (req, res, next) => {
   try {
     const { country, state, type, userId } = req.query;
 
-    // 1️⃣ Build Mongo filter
-    const filter = { isActive: true };
-
-    // Case-insensitive partial matches for country/state
-    if (country?.trim()) filter.country = new RegExp(country.trim(), "i");
-    if (state?.trim()) filter.state = new RegExp(state.trim(), "i");
-    if (type?.trim()) filter.companyType = type.toLowerCase();
-
-    // 2️⃣ Fetch relevant companies
-    const companies = await Company.find(filter)
+    // -----------------------------
+    // 1. Fetch all companies first
+    // (same as old behaviour)
+    // -----------------------------
+    const companies = await Company.find({ isActive: true })
       .lean()
       .select(
         "_id companyName companyId companyType country state city address about website businessId registeredEntityName images logo rating ratings totalReviews inclusions latitude longitude continent isRegistered isPublic"
       )
-      .limit(100)
       .exec();
 
-    if (!companies.length) {
-      return res.status(200).json([]);
+    // -----------------------------
+    // 2. Apply EXACT same filtering
+    // IN MEMORY (original logic)
+    // -----------------------------
+    let filtered = companies;
+
+    // type + country + state
+    if (type && country && state) {
+      filtered = companies.filter(
+        (c) =>
+          c.companyType === type.toLowerCase() &&
+          c.country?.toLowerCase() === country.toLowerCase() &&
+          c.state?.toLowerCase() === state.toLowerCase()
+      );
+    }
+    // only type
+    else if (type) {
+      filtered = companies.filter((c) => c.companyType === type.toLowerCase());
+    }
+    // only country + state
+    else if (country && state) {
+      filtered = companies.filter(
+        (c) =>
+          c.country?.toLowerCase() === country.toLowerCase() &&
+          c.state?.toLowerCase() === state.toLowerCase()
+      );
+    }
+    // nothing → all companies
+    else {
+      filtered = companies;
     }
 
-    // 3️⃣ Collect company IDs for related lookups
-    const companyIds = companies.map((c) => c._id);
+    // -----------------------------
+    // 3. Prepare IDs for reviews + POC
+    // -----------------------------
+    const ids = filtered.map((c) => c._id);
 
-    // 4️⃣ Fetch reviews & active POCs only for those companies
     const [reviews, pocs] = await Promise.all([
-      Review.find({ company: { $in: companyIds } })
-        .lean()
-        .select("company starCount reviewText userName"),
+      Review.find({ company: { $in: ids } }).lean(),
       PointOfContact.find({
-        company: { $in: companyIds },
+        company: { $in: ids },
         isActive: true,
       })
         .lean()
         .select("company name email phone isActive"),
     ]);
 
-    // 5️⃣ Map reviews & POCs efficiently
+    // -----------------------------
+    // 4. Map reviews + POCs efficiently
+    // -----------------------------
     const reviewMap = new Map();
-    for (const review of reviews) {
+    reviews.forEach((review) => {
       const key = review.company.toString();
       if (!reviewMap.has(key)) reviewMap.set(key, []);
       reviewMap.get(key).push(review);
-    }
+    });
 
     const pocMap = new Map();
-    for (const p of pocs) {
+    pocs.forEach((p) => {
       pocMap.set(p.company.toString(), p);
-    }
+    });
 
-    // 6️⃣ Combine company data
-    let companyData = companies.map((company) => ({
-      ...company,
-      reviews: reviewMap.get(company._id.toString()) || [],
-      poc: pocMap.get(company._id.toString()) || null,
+    // -----------------------------
+    // 5. Merge everything
+    // -----------------------------
+    let companyData = filtered.map((c) => ({
+      ...c,
+      reviews: reviewMap.get(c._id.toString()) || [],
+      poc: pocMap.get(c._id.toString()) || null,
     }));
 
-    // 7️⃣ Handle user likes (optional)
+    // -----------------------------
+    // 6. User likes (unchanged logic)
+    // -----------------------------
     if (userId) {
       if (!mongoose.Types.ObjectId.isValid(userId)) {
         return res.status(400).json({ message: "Invalid user id provided" });
       }
 
       const user = await NomadUser.findById(userId).lean().select("likes");
-      const userLikes = new Set((user?.likes || []).map((id) => id.toString()));
 
-      companyData = companyData.map((data) => ({
-        ...data,
-        isLiked: userLikes.has(data._id.toString()),
+      const likedSet = new Set((user?.likes || []).map((id) => id.toString()));
+
+      companyData = companyData.map((d) => ({
+        ...d,
+        isLiked: likedSet.has(d._id.toString()),
       }));
     }
 
     res.status(200).json(companyData);
   } catch (error) {
-    console.error("❌ Error in getCompaniesData:", error);
+    console.error("Error in getCompaniesData:", error);
     next(error);
   }
 };
