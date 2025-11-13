@@ -118,7 +118,7 @@ export const bulkInsertReviews = async (req, res, next) => {
       })
       .on("end", async () => {
         // Log summary of duplicates
-        console.log("\n📊 SUMMARY:");
+        console.log("\n📊 REVIEW SUMMARY:");
         console.log(`Total skipped (existing in DB): ${skippedExisting}`);
         console.log(
           `Total skipped (duplicate in CSV): ${skippedDuplicateInCSV}`
