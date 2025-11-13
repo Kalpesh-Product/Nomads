@@ -107,6 +107,9 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
     coworking: "Co-Working",
     meetingroom: "Meetings",
     privatestay: "Private Stay",
+    hostel: "Hostel",
+    coliving: "Coliving",
+    cafe: "Cafe",
   };
 
   const displayType =

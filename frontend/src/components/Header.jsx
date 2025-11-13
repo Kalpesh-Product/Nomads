@@ -20,6 +20,7 @@ import { FiLogOut } from "react-icons/fi";
 import { AiFillHeart } from "react-icons/ai";
 import useAuth from "../hooks/useAuth";
 import useLogout from "../hooks/useLogout";
+import { CircularProgress } from "@mui/material";
 
 const Header = () => {
   const [open, setOpen] = useState(false);
@@ -31,6 +32,8 @@ const Header = () => {
   const showToggle = location.pathname.includes("verticals");
   const { auth } = useAuth();
   const logout = useLogout();
+
+  const [isLogoutLoading, setIsLogoutLoading] = useState(false);
 
   const formData = useSelector((state) => state.location.formValues);
 
@@ -50,8 +53,19 @@ const Header = () => {
   };
 
   const handleSignOut = async () => {
-    await logout();
-    handlePopoverClose();
+    if (isLogoutLoading) return;
+
+    setIsLogoutLoading(true);
+
+    try {
+      await logout();
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      setIsLogoutLoading(false);
+      handlePopoverClose();
+    }
   };
 
   const handleNavigation = (path) => {
@@ -254,10 +268,18 @@ const Header = () => {
                         <ListItem
                           button
                           onClick={handleSignOut}
+                          disabled={isLogoutLoading}
                           className="hover:text-red-600 transition-all duration-100 text-gray-500 cursor-pointer"
                         >
                           <ListItemIcon>
-                            <FiLogOut className="text-gray-500" />
+                            {isLogoutLoading ? (
+                              <CircularProgress
+                                size={20}
+                                sx={{ color: "gray" }}
+                              />
+                            ) : (
+                              <FiLogOut className="text-gray-500" />
+                            )}
                           </ListItemIcon>
                           <ListItemText primary="Log Out" />
                         </ListItem>
@@ -364,13 +386,19 @@ const Header = () => {
                     <li className="items-center text-center">
                       <div
                         onClick={async () => {
+                          if (isLogoutLoading) return;
                           await handleSignOut();
                           setOpen(false);
                         }}
-                        className="py-4 cursor-pointer"
+                        className="py-4 cursor-pointer flex justify-center"
                       >
-                        <p className="text-secondary-dark text-lg">Log Out</p>
+                        {isLogoutLoading ? (
+                          <CircularProgress size={20} />
+                        ) : (
+                          <p className="text-secondary-dark text-lg">Log Out</p>
+                        )}
                       </div>
+
                       {/* <div className="h-[0.2px] bg-gray-300"></div> */}
                     </li>
                   </>
