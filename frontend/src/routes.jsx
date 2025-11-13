@@ -149,29 +149,6 @@ if (tenant === "main") {
         },
       ],
     },
-    // {
-    //   path: "/",
-    //   element: <NomadLayout />,
-    //   children: [
-    //     { path: "", element: <Home /> },
-    //     { path: "verticals", element: <GlobalListings /> },
-    //     { path: "listings", element: <Listings /> },
-    //     { path: "listings/:company", element: <Product /> },
-    //     { path: "listings/:company/images", element: <ImageGallery /> },
-    //     { path: "components", element: <ReusableComponents /> },
-    //     { path: "contact", element: <Contact /> },
-    //     { path: "news", element: <DestinationNews /> },
-    //     { path: "news/news-details", element: <BlogDetails /> },
-    //     { path: "blog", element: <LocalBlog /> },
-    //     { path: "blog/blog-details", element: <BlogDetails /> },
-    //     { path: "career", element: <Career /> },
-    //     { path: "career/job/:title", element: <JobDetails /> },
-    //     { path: "login", element: <Login /> },
-    //     { path: "signup", element: <Signup /> },
-    //     { path: "about", element: <NomadAbout /> },
-    //     { path: "profile", element: <Profile /> },
-    //   ],
-    // },
   ];
 } else if (tenant === "hosts") {
   // Hosts subdomain

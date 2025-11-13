@@ -167,12 +167,12 @@ const HostSignup = () => {
     },
     onSuccess: (data) => {
       toast.success("Form submitted successfully");
-      reset();
+      // reset();
       setActiveStep((prev) => prev + 1); // 👈 go to Step 5 after submit
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || "Something went wrong");
-      reset();
+      // reset();
       setActiveStep((prev) => prev + 1); // 👈 go to Step 5 after submit (To be removed later)
     },
   });
@@ -665,7 +665,7 @@ const HostSignup = () => {
                       name="heroImages"
                       id="heroImages"
                       label="Carousel Images"
-                      maxFiles={5}
+                      maxFiles={50}
                       allowedExtensions={["jpg", "jpeg", "png", "pdf", "webp"]}
                     />
                   </Box>
@@ -855,7 +855,7 @@ const HostSignup = () => {
                         name={`products.${index}.files`}
                         id={`products-${index}-files`}
                         label="Product Images"
-                        maxFiles={15}
+                        maxFiles={100}
                         allowedExtensions={[
                           "jpg",
                           "jpeg",
@@ -900,7 +900,7 @@ const HostSignup = () => {
                     name="gallery"
                     id="gallery"
                     label="Gallery Images"
-                    maxFiles={10}
+                    maxFiles={400}
                     allowedExtensions={["jpg", "jpeg", "png", "pdf", "webp"]}
                   />
                 )}
@@ -1469,7 +1469,7 @@ const HostSignup = () => {
             )}
 
             {/* Go To Home button on 5th step */}
-            {activeStep === stepFields.length - 1 && (
+            {/* {activeStep === stepFields.length - 1 && (
               <div className="flex justify-center items-center w-full">
                 <GetStartedButton
                   title="Go To Home"
@@ -1478,6 +1478,13 @@ const HostSignup = () => {
                   }}
                 />
               </div>
+            )} */}
+
+            {activeStep === stepFields.length - 1 && (
+              <GetStartedButton
+                title="Back"
+                handleSubmit={() => setActiveStep((prev) => prev - 1)}
+              />
             )}
           </div>
         </form>

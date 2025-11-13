@@ -452,6 +452,36 @@ export const registerFormSubmission = async (req, res) => {
         filesByField[f.fieldname].push(f);
       }
 
+      // IMAGE COUNT VALIDATION
+
+      // Hero Images: max 5
+      if (filesByField.heroImages && filesByField.heroImages.length > 5) {
+        return res.status(400).json({
+          error: "You can upload a maximum of 5 hero images.",
+        });
+      }
+
+      // Gallery Images: max 40
+      if (filesByField.gallery && filesByField.gallery.length > 40) {
+        return res.status(400).json({
+          error: "You can upload a maximum of 40 gallery images.",
+        });
+      }
+
+      // Product Images: each product max 10
+      for (const key of Object.keys(filesByField)) {
+        if (key.startsWith("productImages_")) {
+          const productNumber = Number(key.split("productImages_")[1]) + 1;
+
+          const count = filesByField[key].length;
+          if (count > 10) {
+            return res.status(400).json({
+              error: `Product ${productNumber} has ${count} images. Max allowed is 10.`,
+            });
+          }
+        }
+      }
+
       // companyLogo
       if (filesByField.companyLogo && filesByField.companyLogo[0]) {
         const logoFile = filesByField.companyLogo[0];
