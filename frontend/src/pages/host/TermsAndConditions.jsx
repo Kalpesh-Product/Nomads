@@ -14,12 +14,18 @@ const HostTermsAndConditions = () => {
           Welcome to WONOCO PRIVATE LIMITED (SINGAPORE COMPANY) ("Company",
           "we", "our", or "us"). These Terms and Conditions ("Terms") govern
           your use of our SaaS platform, located at{" "}
-          <span
+          {/* <span
             className="text-primary-blue cursor-pointer"
             onClick={() => navigate("/hosts")}
           >
             www.wono.co
-          </span>{" "}
+          </span>{" "} */}
+          <span
+            className="text-primary-blue underline cursor-pointer"
+            onClick={() => (window.location.href = "https://wono.co")}
+          >
+            www.wono.co
+          </span>
           , and any services, features, or content provided by the platform
           (collectively, the "Service").
           <br />

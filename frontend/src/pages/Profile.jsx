@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TextField, Button, Avatar } from "@mui/material";
 import useAuth from "../hooks/useAuth";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -46,6 +46,11 @@ const Profile = () => {
   });
 
   // const handleTabChange = (tab) => setActiveTab(tab);
+
+  // users cannot access this page without login
+  useEffect(() => {
+    if (!auth?.user) navigate("/login", { replace: true });
+  }, [auth, navigate]);
 
   const handleLogout = async () => {
     try {

@@ -113,27 +113,29 @@ const Home = () => {
   });
 
   useEffect(() => {
-    // Reset country if it no longer exists
     const countryExists = locations.some(
       (c) => c.country?.toLowerCase() === selectedCountry?.toLowerCase()
     );
-    if (!countryExists) {
+
+    if (!countryExists && selectedCountry) {
       setValue("country", "");
       setValue("location", "");
       return;
     }
 
-    // Reset location if it no longer exists in the chosen country
-    const current = locations.find(
-      (c) => c.country?.toLowerCase() === selectedCountry?.toLowerCase()
-    );
-    const locationExists = current?.states?.some(
-      (s) => s.name?.toLowerCase() === selectedState?.toLowerCase()
-    );
-    if (!locationExists) {
-      setValue("location", "");
+    if (countryExists) {
+      const current = locations.find(
+        (c) => c.country?.toLowerCase() === selectedCountry?.toLowerCase()
+      );
+      const locationExists = current?.states?.some(
+        (s) => s.name?.toLowerCase() === selectedState?.toLowerCase()
+      );
+
+      if (!locationExists && selectedState) {
+        setValue("location", "");
+      }
     }
-  }, [locations, selectedCountry, selectedState, setValue]);
+  }, [locations]); // ← notice: remove selectedCountry / selectedState here
 
   const continentOptions = React.useMemo(() => {
     const uniqueContinents = [

@@ -537,87 +537,169 @@ export const createCompany = async (req, res, next) => {
   }
 };
 
-export const getCompaniesData = async (req, res, next) => {
-  // console.log("🔥 getCompaniesData HIT");
-  try {
-    const companies = await Company.find({ isActive: true }).lean().exec();
-    const reviews = await Review.find().lean().exec();
-    const poc = await PointOfContact.find().lean().exec();
+// export const getCompaniesData = async (req, res, next) => {
+//   // console.log("🔥 getCompaniesData HIT");
+//   try {
+//     const companies = await Company.find({ isActive: true }).lean().exec();
+//     const reviews = await Review.find().lean().exec();
+//     const poc = await PointOfContact.find().lean().exec();
 
+//     const { country, state, type, userId } = req.query;
+
+//     // Base company dataset with reviews and active POC
+//     const enrichCompanies = (base) => {
+//       return base.map((company) => ({
+//         ...company,
+//         reviews: reviews.filter(
+//           (review) => review.company.toString() === company?._id.toString()
+//         ),
+//         poc: poc
+//           .filter((p) => p.company?._id.toString() === company?._id.toString())
+//           .find((p) => p.isActive),
+//       }));
+//     };
+
+//     let filteredCompanies = [];
+
+//     // 1. Filter by all three: type + country + state
+//     if (type && country && state) {
+//       filteredCompanies = companies.filter(
+//         (company) =>
+//           company.companyType === type?.toLowerCase() &&
+//           company.country?.toLowerCase() === country.toLowerCase() &&
+//           company.state?.toLowerCase() === state.toLowerCase()
+//       );
+//     }
+//     // 2. Filter only by type
+//     else if (type) {
+//       filteredCompanies = companies.filter(
+//         (company) => company.companyType === type
+//       );
+//     }
+//     // 3. Filter only by country and state
+//     else if (country && state) {
+//       filteredCompanies = companies.filter(
+//         (company) =>
+//           company.country?.toLowerCase() === country.toLowerCase() &&
+//           company.state?.toLowerCase() === state.toLowerCase()
+//       );
+//     }
+//     // 4. No filters → all companies
+//     else {
+//       filteredCompanies = companies;
+//     }
+
+//     // 🟡 Add these temporary debug lines here:
+//     // console.log("🔍 Filtering for country:", country, "state:", state);
+//     // console.log("✅ Matched companies count:", filteredCompanies.length);
+//     // console.log(
+//     //   "Example match:",
+//     //   filteredCompanies.length > 0 ? filteredCompanies[0].companyName : "None"
+//     // );
+
+//     let companyData = enrichCompanies(filteredCompanies);
+
+//     if (userId) {
+//       if (!mongoose.Types.ObjectId.isValid(userId)) {
+//         return res.status(400).json({ message: "Invalid user id provided" });
+//       }
+
+//       const user = await NomadUser.findOne({ _id: userId });
+
+//       companyData = companyData.map((data) => {
+//         const isLiked = user.likes.some(
+//           (like) => like.toString() === data._id.toString()
+//         );
+
+//         return { ...data, isLiked };
+//       });
+//     }
+
+//     res.status(200).json(companyData);
+//   } catch (error) {
+//     console.log(error);
+//     next(error);
+//   }
+// };
+
+export const getCompaniesData = async (req, res, next) => {
+  try {
     const { country, state, type, userId } = req.query;
 
-    // Base company dataset with reviews and active POC
-    const enrichCompanies = (base) => {
-      return base.map((company) => ({
-        ...company,
-        reviews: reviews.filter(
-          (review) => review.company.toString() === company?._id.toString()
-        ),
-        poc: poc
-          .filter((p) => p.company?._id.toString() === company?._id.toString())
-          .find((p) => p.isActive),
-      }));
-    };
+    // 1️⃣ Build Mongo filter instead of filtering in memory
+    const filter = { isActive: true };
+    if (country) filter.country = new RegExp(`^${country}$`, "i");
+    if (state) filter.state = new RegExp(`^${state}$`, "i");
+    if (type) filter.companyType = type.toLowerCase();
 
-    let filteredCompanies = [];
+    // 2️⃣ Fetch only relevant companies (lean + projection)
+    const companies = await Company.find(filter)
+      .lean()
+      .select(
+        "companyName companyId companyType country state city address about website businessId registeredEntityName images logo rating ratings totalReviews inclusions latitude longitude continent isRegistered isPublic"
+      )
 
-    // 1. Filter by all three: type + country + state
-    if (type && country && state) {
-      filteredCompanies = companies.filter(
-        (company) =>
-          company.companyType === type?.toLowerCase() &&
-          company.country?.toLowerCase() === country.toLowerCase() &&
-          company.state?.toLowerCase() === state.toLowerCase()
-      );
-    }
-    // 2. Filter only by type
-    else if (type) {
-      filteredCompanies = companies.filter(
-        (company) => company.companyType === type
-      );
-    }
-    // 3. Filter only by country and state
-    else if (country && state) {
-      filteredCompanies = companies.filter(
-        (company) =>
-          company.country?.toLowerCase() === country.toLowerCase() &&
-          company.state?.toLowerCase() === state.toLowerCase()
-      );
-    }
-    // 4. No filters → all companies
-    else {
-      filteredCompanies = companies;
+      .limit(100) // protect against insane payloads
+      .exec();
+
+    if (!companies.length) {
+      return res.status(200).json([]);
     }
 
-    // 🟡 Add these temporary debug lines here:
-    // console.log("🔍 Filtering for country:", country, "state:", state);
-    // console.log("✅ Matched companies count:", filteredCompanies.length);
-    // console.log(
-    //   "Example match:",
-    //   filteredCompanies.length > 0 ? filteredCompanies[0].companyName : "None"
-    // );
+    // 3️⃣ Collect company IDs for efficient lookups
+    const companyIds = companies.map((c) => c._id);
 
-    let companyData = enrichCompanies(filteredCompanies);
+    // 4️⃣ Fetch only matching reviews & POCs
+    const [reviews, pocs] = await Promise.all([
+      Review.find({ company: { $in: companyIds } })
+        .lean()
+        .select("company starCount reviewText userName"),
+      PointOfContact.find({
+        company: { $in: companyIds },
+        isActive: true,
+      })
+        .lean()
+        .select("company name email phone isActive"),
+    ]);
 
+    // 5️⃣ Map data efficiently without nested filters in loops
+    const reviewMap = new Map();
+    for (const review of reviews) {
+      const key = review.company.toString();
+      if (!reviewMap.has(key)) reviewMap.set(key, []);
+      reviewMap.get(key).push(review);
+    }
+
+    const pocMap = new Map();
+    for (const p of pocs) {
+      const key = p.company.toString();
+      if (!pocMap.has(key)) pocMap.set(key, p);
+    }
+
+    let companyData = companies.map((company) => ({
+      ...company,
+      reviews: reviewMap.get(company._id.toString()) || [],
+      poc: pocMap.get(company._id.toString()) || null,
+    }));
+
+    // 6️⃣ Handle user likes (if provided)
     if (userId) {
       if (!mongoose.Types.ObjectId.isValid(userId)) {
         return res.status(400).json({ message: "Invalid user id provided" });
       }
 
-      const user = await NomadUser.findOne({ _id: userId });
+      const user = await NomadUser.findById(userId).lean().select("likes");
+      const userLikes = new Set((user?.likes || []).map((id) => id.toString()));
 
-      companyData = companyData.map((data) => {
-        const isLiked = user.likes.some(
-          (like) => like.toString() === data._id.toString()
-        );
-
-        return { ...data, isLiked };
-      });
+      companyData = companyData.map((data) => ({
+        ...data,
+        isLiked: userLikes.has(data._id.toString()),
+      }));
     }
 
     res.status(200).json(companyData);
   } catch (error) {
-    console.log(error);
+    console.error("❌ Error in getCompaniesData:", error);
     next(error);
   }
 };

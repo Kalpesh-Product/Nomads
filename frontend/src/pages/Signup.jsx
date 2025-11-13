@@ -1,19 +1,22 @@
 import { TextField, IconButton, InputAdornment } from "@mui/material";
 import { MuiTelInput } from "mui-tel-input";
 import { useForm, Controller } from "react-hook-form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import axios from "../utils/axios";
 import toast from "react-hot-toast";
 import PrimaryButton from "../components/PrimaryButton";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import MuiModal from "../components/Modal";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import useAuth from "../hooks/useAuth";
 
 export default function Signup() {
   const [openModal, setOpenModal] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { auth } = useAuth();
+  const navigate = useNavigate();
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
   const toggleConfirmPasswordVisibility = () =>
@@ -29,6 +32,11 @@ export default function Signup() {
       mobile: "",
     },
   });
+
+  // inside your component
+  useEffect(() => {
+    if (auth?.user) navigate("/profile", { replace: true });
+  }, [auth, navigate]);
 
   const { mutate: submitRegistration, isPending } = useMutation({
     mutationFn: async (data) => {

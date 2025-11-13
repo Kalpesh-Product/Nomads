@@ -61,6 +61,9 @@ const Product = () => {
     refetchOnMount: "always",
   });
 
+  console.log("location.state", location.state);
+  console.log("companyId", companyId);
+
   console.log("companuDetials ", companyDetails);
   const companyImages = companyDetails?.images?.slice(0, 4) || [];
   const showMore = (companyDetails?.images?.length || 0) > 4;
