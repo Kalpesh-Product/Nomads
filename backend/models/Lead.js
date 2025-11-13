@@ -42,7 +42,6 @@ const leadSchema = new mongoose.Schema(
     },
     mobileNumber: {
       type: String,
-      match: [/^\+?[0-9]{7,15}$/, "Invalid phone number format"],
     },
     email: {
       type: String,
@@ -58,6 +57,7 @@ const leadSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      enum: ["Nomad", "Host"],
     },
     productType: {
       type: String,

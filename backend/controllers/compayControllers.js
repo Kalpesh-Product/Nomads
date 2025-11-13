@@ -105,10 +105,74 @@ export const bulkInsertCompanies = async (req, res, next) => {
 
         companies.push(company);
       })
+      // .on("end", async () => {
+      //   try {
+      //     const seenInCSV = new Set();
+      //     const uniqueCompanies = [];
+      //     let skippedExisting = 0;
+      //     let skippedDuplicateInCSV = 0;
+
+      //     for (const company of companies) {
+      //       if (!company.businessId) continue;
+
+      //       const businessId = company.businessId.trim();
+
+      //       // Check if this business ID already exists in DB
+      //       if (existingBusinessIds.has(businessId)) {
+      //         skippedExisting++;
+      //         continue;
+      //       }
+
+      //       // Check for duplicates within the CSV
+      //       if (!seenInCSV.has(businessId)) {
+      //         seenInCSV.add(businessId);
+      //         uniqueCompanies.push(company);
+      //       } else {
+      //         // Duplicate business ID in CSV → skip
+      //         skippedDuplicateInCSV++;
+      //         continue;
+      //       }
+      //     }
+
+      //     const result = await Company.insertMany(uniqueCompanies);
+
+      //     const insertedCount = result.length;
+
+      //     res.status(200).json({
+      //       message: "Bulk insert completed",
+      //       total: companies.length,
+      //       inserted: insertedCount,
+      //       skippedExisting,
+      //       skippedDuplicateInCSV,
+      //     });
+      //   } catch (insertError) {
+      //     if (insertError.name === "BulkWriteError") {
+      //       const insertedCount = insertError.result?.nInserted || 0;
+
+      //       res.status(200).json({
+      //         message: "Bulk insert completed with partial failure",
+      //         total: companies.length,
+      //         inserted: insertedCount,
+      //         writeErrors: insertError.writeErrors?.map((e) => ({
+      //           index: e.index,
+      //           errmsg: e.errmsg,
+      //           code: e.code,
+      //         })),
+      //       });
+      //     } else {
+      //       res.status(500).json({
+      //         message: "Unexpected error during bulk insert",
+      //         error: insertError.message,
+      //       });
+      //     }
+      //   }
+      // });
+
       .on("end", async () => {
         try {
           const seenInCSV = new Set();
           const uniqueCompanies = [];
+          const skippedMissingCompanyId = [];
           let skippedExisting = 0;
           let skippedDuplicateInCSV = 0;
 
@@ -117,25 +181,53 @@ export const bulkInsertCompanies = async (req, res, next) => {
 
             const businessId = company.businessId.trim();
 
-            // Check if this business ID already exists in DB
+            // Missing companyId check
+            if (!company.companyId) {
+              skippedMissingCompanyId.push({
+                businessId,
+                companyName: company.companyName,
+                city: company.city,
+                state: company.state,
+                country: company.country,
+                reason: "Missing companyId mapping from master panel",
+              });
+              continue;
+            }
+
+            // Check if already exists in DB
             if (existingBusinessIds.has(businessId)) {
               skippedExisting++;
               continue;
             }
 
-            // Check for duplicates within the CSV
-            if (!seenInCSV.has(businessId)) {
-              seenInCSV.add(businessId);
-              uniqueCompanies.push(company);
-            } else {
-              // Duplicate business ID in CSV → skip
+            // Duplicates within CSV
+            if (seenInCSV.has(businessId)) {
               skippedDuplicateInCSV++;
               continue;
             }
+
+            seenInCSV.add(businessId);
+            uniqueCompanies.push(company);
           }
 
-          const result = await Company.insertMany(uniqueCompanies);
+          // Log bad data
+          if (skippedMissingCompanyId.length) {
+            console.log(
+              "\n=== COMPANIES MISSING COMPANY ID (from master panel) ==="
+            );
+            console.table(
+              skippedMissingCompanyId.map((c) => ({
+                businessId: c.businessId,
+                companyName: c.companyName,
+                city: c.city,
+                state: c.state,
+                country: c.country,
+              }))
+            );
+          }
 
+          // Proceed with insert
+          const result = await Company.insertMany(uniqueCompanies);
           const insertedCount = result.length;
 
           res.status(200).json({
@@ -144,6 +236,8 @@ export const bulkInsertCompanies = async (req, res, next) => {
             inserted: insertedCount,
             skippedExisting,
             skippedDuplicateInCSV,
+            skippedMissingCompanyId: skippedMissingCompanyId.length,
+            missingCompanyIds: skippedMissingCompanyId,
           });
         } catch (insertError) {
           if (insertError.name === "BulkWriteError") {
@@ -160,6 +254,20 @@ export const bulkInsertCompanies = async (req, res, next) => {
               })),
             });
           } else {
+            // Log the companies that likely caused validation failure
+            console.log("\n=== VALIDATION FAILED COMPANIES ===");
+            console.table(
+              companies
+                .filter((c) => !c.companyId)
+                .map((c) => ({
+                  businessId: c.businessId,
+                  companyName: c.companyName,
+                  city: c.city,
+                  state: c.state,
+                  country: c.country,
+                }))
+            );
+
             res.status(500).json({
               message: "Unexpected error during bulk insert",
               error: insertError.message,

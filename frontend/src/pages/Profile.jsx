@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Favorites from "./Favorites";
+import { CircularProgress } from "@mui/material";
 
 const Profile = () => {
   // const [activeTab, setActiveTab] = useState("profile");
@@ -15,6 +16,8 @@ const Profile = () => {
   const queryClient = useQueryClient();
   const { auth } = useAuth();
   const logout = useLogout();
+
+  const [isLogoutLoading, setIsLogoutLoading] = useState(false);
 
   const user = auth?.user || {};
   const userId = auth?.user?._id || auth?.user?.id;
@@ -52,12 +55,29 @@ const Profile = () => {
     if (!auth?.user) navigate("/login", { replace: true });
   }, [auth, navigate]);
 
+  // const handleLogout = async () => {
+  //   try {
+  //     await logout();
+  //     navigate("/login");
+  //   } catch (error) {
+  //     console.error("Logout failed:", error);
+  //   }
+  // };
+
   const handleLogout = async () => {
+    if (isLogoutLoading) return; // Prevent double clicks
+
+    setIsLogoutLoading(true);
+
     try {
       await logout();
+      // toast.success("Logged out");
       navigate("/login");
     } catch (error) {
       console.error("Logout failed:", error);
+      toast.error("Logout failed");
+    } finally {
+      setIsLogoutLoading(false);
     }
   };
 
@@ -202,17 +222,34 @@ const Profile = () => {
                 <b>Mobile:</b> {user?.mobile || "N/A"}
               </p>
               <br />
+              {/* <Button
+                variant="contained"
+                sx={{
+                  bgcolor: "#ff5757",
+                  textTransform: "none",
+                  px: 6,
+                  "&:hover": { bgcolor: "#fc6b6b" },
+                }}
+                onClick={handleLogout}
+              >
+                Logout
+              </Button> */}
               <Button
                 variant="contained"
                 sx={{
                   bgcolor: "#ff5757",
                   textTransform: "none",
                   px: 6,
-                  "&:hover": { bgcolor: "#1a3b8a" },
+                  "&:hover": { bgcolor: "#fc6b6b" },
                 }}
                 onClick={handleLogout}
+                disabled={isLogoutLoading}
               >
-                Logout
+                {isLogoutLoading ? (
+                  <CircularProgress size={22} sx={{ color: "white" }} />
+                ) : (
+                  "Logout"
+                )}
               </Button>
             </div>
           </div>
@@ -257,7 +294,7 @@ const Profile = () => {
                       textTransform: "none",
                       px: 6,
                       mr: 2,
-                      "&:hover": { bgcolor: "#1a3b8a" },
+                      "&:hover": { bgcolor: "#fc6b6b" },
                     }}
                     onClick={() =>
                       updateProfile({ userId, profileData: profileForm })
@@ -272,8 +309,8 @@ const Profile = () => {
                     sx={{
                       textTransform: "none",
                       px: 6,
-                      color: "#364D59",
-                      borderColor: "#364D59",
+                      color: "#fc6b6b",
+                      borderColor: "#fc6b6b",
                     }}
                     onClick={() => setEditMode(false)}
                   >
@@ -287,7 +324,7 @@ const Profile = () => {
                     bgcolor: "#ff5757",
                     textTransform: "none",
                     px: 6,
-                    "&:hover": { bgcolor: "#1a3b8a" },
+                    "&:hover": { bgcolor: "#fc6b6b" },
                   }}
                   onClick={() => setEditMode(true)}
                 >
@@ -351,7 +388,7 @@ const Profile = () => {
                 borderRadius: 9999,
                 paddingX: 5,
                 textTransform: "none",
-                "&:hover": { bgcolor: "#1a3b8a" },
+                "&:hover": { bgcolor: "#fc6b6b" },
               }}
               onClick={handlePasswordSubmit}
               disabled={isPasswordPending}
