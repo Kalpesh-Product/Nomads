@@ -171,7 +171,8 @@ const HostSignup = () => {
       setActiveStep((prev) => prev + 1); // 👈 go to Step 5 after submit
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || "Something went wrong");
+      // toast.error(error.response?.data?.message || "Something went wrong");
+      toast.error(error.response?.data?.message);
       reset();
       setActiveStep((prev) => prev + 1); // 👈 go to Step 5 after submit (To be removed later)
     },
