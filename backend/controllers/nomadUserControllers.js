@@ -78,16 +78,22 @@ export const updateProfile = async (req, res) => {
 export const changePassword = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { oldPassword, newPassword } = req.body;
+    const { oldPassword, newPassword, confirmPassword } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ message: "Invalid user ID" });
     }
 
-    if (!oldPassword || !newPassword) {
+    if (!oldPassword || !newPassword || !confirmPassword) {
       return res
         .status(400)
-        .json({ message: "Both old and new passwords are required" });
+        .json({ message: "Current, new and confirm passwords are required" });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res
+        .status(400)
+        .json({ message: "New and confirm password doesn't match" });
     }
 
     const user = await NomadUser.findById(userId);
@@ -97,7 +103,7 @@ export const changePassword = async (req, res) => {
 
     const isMatch = await bcrypt.compare(oldPassword, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: "Incorrect old password" });
+      return res.status(401).json({ message: "Incorrect current password" });
     }
 
     if (newPassword.length < 6) {
@@ -106,8 +112,8 @@ export const changePassword = async (req, res) => {
         .json({ message: "Password must be at least 6 characters long" });
     }
 
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    user.password = hashedPassword;
+    // const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = newPassword;
 
     await user.save();
 

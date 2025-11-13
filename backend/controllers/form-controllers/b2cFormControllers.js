@@ -7,6 +7,7 @@ import NomadUser from "../../models/NomadUser.js";
 import { randomUUID } from "crypto";
 import bcrypt from "bcrypt";
 import { uploadFileToS3 } from "../../config/s3Config.js";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
 
 function istNowPieces() {
   const tz = "Asia/Kolkata";
@@ -43,7 +44,24 @@ const jobApplicationSchema = yup.object({
     .string()
     .trim()
     .required("Mobile Number is required")
-    .matches(/^[0-9+\-\s()]{8,20}$/, "Invalid mobile number"),
+    .test(
+      "is-valid-phone",
+      "Please provide a valid phone number",
+      function (value) {
+        if (!value) return false;
+        try {
+          const number = parsePhoneNumberFromString(value);
+          if (!number?.isValid()) return false;
+
+          // store the normalized version on the validated data
+          this.parent.mobile = number.number;
+          return true;
+        } catch {
+          return false;
+        }
+      }
+    ),
+  // .matches(/^[0-9+\-\s()]{8,20}$/, "Invalid mobile number"),
   location: yup.string().trim().required("Location is required"),
   experienceYears: yup
     .number()
@@ -99,11 +117,32 @@ const enquirySchema = yup.object({
   phone: yup
     .string()
     .trim()
-    .matches(/^\+?[0-9]{7,15}$/, "Please provide a valid phone number")
+    .test(
+      "is-valid-phone",
+      "Please provide a valid phone number",
+      function (value) {
+        if (!value) return false;
+        try {
+          const number = parsePhoneNumberFromString(value);
+          if (!number?.isValid()) return false;
+
+          // store the normalized version on the validated data
+          this.parent.phone = number.number;
+          return true;
+        } catch {
+          return false;
+        }
+      }
+    )
+    // .matches(/^\+?[0-9]{7,15}$/, "Please provide a valid phone number")
     .required("Please provide your phone number"),
   startDate: yup
     .date()
     .typeError("Please provide a valid start date")
+    .min(
+      new Date(new Date().setHours(0, 0, 0, 0)),
+      "Start date cannot be in the past"
+    )
     .required("Please provide the start date"),
   endDate: yup
     .date()
@@ -113,7 +152,7 @@ const enquirySchema = yup.object({
   source: yup
     .string()
     .trim()
-    .min(1, "Please provide a valid the source")
+    .oneOf(["Nomad", "Host"], "Source must be either 'Nomad' or 'Host'")
     .required("Please provide the source"),
   productType: yup
     .string()
@@ -136,7 +175,24 @@ const pocSchema = yup.object().shape({
   mobile: yup
     .string()
     .trim()
-    .matches(/^\+?[0-9]{7,15}$/, "Please provide a valid mobile number")
+    .test(
+      "is-valid-phone",
+      "Please provide a valid phone number",
+      function (value) {
+        if (!value) return false;
+        try {
+          const number = parsePhoneNumberFromString(value);
+          if (!number?.isValid()) return false;
+
+          // store the normalized version on the validated data
+          this.parent.mobile = number.number;
+          return true;
+        } catch {
+          return false;
+        }
+      }
+    )
+    // .matches(/^\+?[0-9]{7,15}$/, "Please provide a valid mobile number")
     .required("Please provide the mobile"),
   email: yup
     .string()
@@ -155,7 +211,27 @@ const connectWithUsSchema = yup.object().shape({
     .string()
     .email("Please provide a valid email.")
     .required("Please provide your email."),
-  mobile: yup.string().trim().required("Please provide the mobile"),
+  mobile: yup
+    .string()
+    .trim()
+    .required("Please provide the mobile")
+    .test(
+      "is-valid-phone",
+      "Please provide a valid phone number",
+      function (value) {
+        if (!value) return false;
+        try {
+          const number = parsePhoneNumberFromString(value);
+          if (!number?.isValid()) return false;
+
+          // store the normalized version on the validated data
+          this.parent.mobile = number.number;
+          return true;
+        } catch {
+          return false;
+        }
+      }
+    ),
   typeOfPartnerShip: yup
     .string()
     .required("Please provide the type of partnership."),
@@ -171,8 +247,27 @@ const nomadsSignupSchema = yup.object().shape({
     .email("Please provide a valid email")
     .required("Please provide your email"),
   password: yup.string().optional(),
-  mobile: yup.string().trim().required("Please provide the mobile"),
+  mobile: yup
+    .string()
+    .trim()
+    .required("Please provide the mobile")
+    .test(
+      "is-valid-phone",
+      "Please provide a valid phone number",
+      function (value) {
+        if (!value) return false;
+        try {
+          const number = parsePhoneNumberFromString(value);
+          if (!number?.isValid()) return false;
 
+          // store the normalized version on the validated data
+          this.parent.mobile = number.number;
+          return true;
+        } catch {
+          return false;
+        }
+      }
+    ),
   sheetName: yup.string().required("Please provide a sheet name"),
 });
 
@@ -185,7 +280,24 @@ const contentRemovalRequestsSchema = yup.object().shape({
   mobile: yup
     .string()
     .trim()
-    .matches(/^\+?[0-9]{7,15}$/, "Please provide a valid mobile number")
+    .test(
+      "is-valid-phone",
+      "Please provide a valid phone number",
+      function (value) {
+        if (!value) return false;
+        try {
+          const number = parsePhoneNumberFromString(value);
+          if (!number?.isValid()) return false;
+
+          // store the normalized version on the validated data
+          this.parent.mobile = number.number;
+          return true;
+        } catch {
+          return false;
+        }
+      }
+    )
+    // .matches(/^\+?[0-9]{7,15}$/, "Please provide a valid mobile number")
     .required("Please provide the mobile number"),
   email: yup
     .string()
@@ -224,14 +336,9 @@ export const addB2CformSubmission = async (req, res, next) => {
     }
 
     const { sheetName } = req.body;
-
-    console.log("sheetName", sheetName);
     const isJobApp = sheetName === "Job_Application";
 
-    console.log("job application out");
-
     if (isJobApp) {
-      console.log("job application in");
       const payload = await jobApplicationSchema.validate(req.body, {
         abortEarly: false,
         stripUnknown: true,
@@ -273,15 +380,14 @@ export const addB2CformSubmission = async (req, res, next) => {
 
         await sendMail({
           to: payload.email,
-          subject: `Application Received for ${payload.jobPosition} 💼`,
+          subject: `Application Received for ${payload.jobPosition}`,
           text: `Hi ${payload.name}, your application for ${payload.jobPosition} has been received.`,
           html: `
             <h2>Application Received</h2>
             <p>Hi ${payload.name},</p>
             <p>Thank you for applying for the position of <b>${payload.jobPosition}</b>.</p>
             <p>Our HR team will review your profile and get back to you soon.</p>
-            <p>Submission Date: ${submissionDate}, Time: ${submissionTime}</p>
-            <p>Cheers,<br/>The WONO Team</p>
+             <p>Cheers,<br/>The WONO Team</p>
           `,
         });
 
@@ -335,7 +441,7 @@ export const addB2CformSubmission = async (req, res, next) => {
         successMsg: "Enquiry added successfully",
         emailTemplate: (data) => ({
           to: data.email,
-          subject: "Your enquiry has been received ✅",
+          subject: "Your enquiry has been received",
           text: `Hi ${data.fullName}, your enquiry has been sent to the company successfully.`,
           html: `
         <h2>Thank you for your enquiry</h2>
@@ -359,7 +465,7 @@ export const addB2CformSubmission = async (req, res, next) => {
         successMsg: "Message sent successfully",
         emailTemplate: (data) => ({
           to: data.email,
-          subject: "Your POC request has been sent 📩",
+          subject: "Your POC request has been sent",
           text: `Hi ${data.fullName}, your POC contact request has been shared.`,
           html: `
         <h2>POC Contacted</h2>
@@ -381,6 +487,17 @@ export const addB2CformSubmission = async (req, res, next) => {
           sheetName: d.sheetName,
         }),
         successMsg: "A new contact enquiry added successfully.",
+        emailTemplate: (d) => ({
+          to: d.email,
+          subject: "We Received Your Message",
+          html: `
+        <h2>Thank You For Connecting</h2>
+        <p>Hi ${d.name},</p>
+        <p>We’ve received your message regarding <b>${d.typeOfPartnerShip}</b>.</p>
+        <p>Our team will respond shortly.</p>
+        <p>Cheers,<br/>The WONO Team</p>
+      `,
+        }),
       },
       Sign_up: {
         schema: nomadsSignupSchema,
@@ -396,7 +513,7 @@ export const addB2CformSubmission = async (req, res, next) => {
         successMsg: "Sign-up saved successfully.",
         emailTemplate: (data) => ({
           to: data.email,
-          subject: "Welcome to WoNo 🌍",
+          subject: "Welcome to WoNo",
           text: `Hi ${data.firstName}, welcome to WoNo! Your signup was successful.`,
           html: `
       <h2>Welcome to WoNo!</h2>
@@ -424,13 +541,13 @@ export const addB2CformSubmission = async (req, res, next) => {
           "Your content removal request has been submitted successfully.",
         emailTemplate: (data) => ({
           to: data.email,
-          subject: "Content Removal Request Received 🧾",
+          subject: "Content Removal Request Received",
           text: `Hi ${data.fullName}, we’ve received your content removal request for ${data.companyName}. Our moderation team will review it shortly.`,
           html: `
       <h2>Content Removal Request Received</h2>
       <p>Hi ${data.fullName},</p>
       <p>We’ve received your content removal request for <b>${data.companyName}</b>.</p>
-      <p>Our moderation team will review the provided URLs and take the necessary action.</p>
+      <p>Our team will review the provided URLs and take the necessary action.</p>
       <p>We’ll get back to you via email if we need additional details.</p>
       <p>Cheers,<br/>The WONO Team</p>
     `,
@@ -457,23 +574,7 @@ export const addB2CformSubmission = async (req, res, next) => {
         return res.status(400).json({ message: "Invalid company id provided" });
       }
 
-      const leads = new Lead({
-        companyName,
-        company,
-        companyId,
-        verticalType: companyType,
-        country: country || "",
-        state: state || "",
-        fullName,
-        noOfPeople: personelCount,
-        mobileNumber: phone,
-        email,
-        source,
-        productType,
-        startDate: toISODateOnly(startDate),
-        endDate: toISODateOnly(endDate),
-        sheetName,
-      });
+      const leads = new Lead({ ...payload, company, companyId });
 
       await leads.save();
     }
@@ -489,7 +590,7 @@ export const addB2CformSubmission = async (req, res, next) => {
 
       const { email, mobile, password, confirmPassword } = req.body;
 
-      if (!email || !password || !mobile) {
+      if (!email || !password || !mobile || !confirmPassword) {
         return res.status(409).json({ message: "Missing required fields" });
       }
 
@@ -497,19 +598,7 @@ export const addB2CformSubmission = async (req, res, next) => {
         return res.status(400).json({ message: "Please match the password" });
       }
 
-      // const salt = await bcrypt.genSalt(10);
-      // const hashedPassword = await bcrypt.hash(password, salt);
-
-      const signupEntry = new NomadUser({
-        firstName: req.body.firstName?.trim(),
-        lastName: req.body.lastName?.trim(),
-        email: email?.trim().toLowerCase(),
-        // password:hashedPassword,
-        password,
-        country: req.body.country?.trim(),
-        state: req.body.state?.trim(),
-        mobile: mobile?.trim(),
-      });
+      const signupEntry = new NomadUser(payload);
 
       await signupEntry.save();
     }
@@ -527,6 +616,17 @@ export const addB2CformSubmission = async (req, res, next) => {
       throw new Error(result.message || "Failed to save data to Google Sheets");
     }
 
+    // send email if template exists
+    if (config.emailTemplate) {
+      const emailContent = config.emailTemplate(payload);
+
+      await sendMail({
+        to: emailContent.to,
+        subject: emailContent.subject,
+        html: emailContent.html,
+      });
+    }
+
     res.status(201).json({
       status: "success",
       message: config.successMsg,
@@ -535,6 +635,12 @@ export const addB2CformSubmission = async (req, res, next) => {
   } catch (err) {
     console.error("❌ Error in addB2CformSubmission:", err.message);
     console.error(err.stack);
+
+    if (err.name === "ValidationError") {
+      return res.status(400).json({
+        message: err.errors[0], // only the first message
+      });
+    }
     next(err);
   }
 };

@@ -8,6 +8,7 @@ import axios from "axios";
 export const bulkInsertPoc = async (req, res, next) => {
   try {
     const file = req.file;
+    console.log("poc test hit");
     if (!file) {
       return res.status(400).json({
         message: "Please provide a valid CSV file",
@@ -22,7 +23,10 @@ export const bulkInsertPoc = async (req, res, next) => {
       companies.map((c) => [c.businessId, c.companyId])
     );
 
-    const existingPocs = await PointOfContact.find().select("name companyId");
+    const existingPocs = await TestPointOfContact.find().select(
+      "name companyId"
+    );
+
     const existingPocSet = new Set(
       existingPocs.map(
         (poc) => `${poc.name?.trim().toLowerCase()}|${poc.companyId?.trim()}`
@@ -33,8 +37,8 @@ export const bulkInsertPoc = async (req, res, next) => {
     const parsedResult = await new Promise((resolve, reject) => {
       const temp = [];
       const seenInCSV = new Set();
-      let skippedExisting = 0;
-      let skippedDuplicateInCSV = 0;
+      const duplicateExistingLogs = [];
+      const duplicateCSVLogs = [];
 
       const stream = Readable.from(file.buffer.toString("utf-8").trim());
       stream
@@ -46,14 +50,24 @@ export const bulkInsertPoc = async (req, res, next) => {
           if (!companyMongoId) return;
 
           const pocName = row["POC Name"]?.trim();
-          const pocKey = `${pocName?.toLowerCase()}|${companyId?.trim()}`;
+          const pocKey = `${pocName?.toLowerCase()}|${businessId?.trim()}`;
 
           if (existingPocSet.has(pocKey)) {
-            skippedExisting++;
+            duplicateExistingLogs.push({
+              businessId,
+              companyId,
+              name: pocName,
+              reason: "Already exists in DB",
+            });
             return;
           }
           if (seenInCSV.has(pocKey)) {
-            skippedDuplicateInCSV++;
+            duplicateCSVLogs.push({
+              businessId,
+              companyId,
+              name: pocName,
+              reason: "Duplicate within same CSV",
+            });
             return;
           }
 
@@ -79,18 +93,34 @@ export const bulkInsertPoc = async (req, res, next) => {
           temp.push(pocData);
         })
         .on("end", () => {
-          resolve({ pocs: temp, skippedExisting, skippedDuplicateInCSV });
+          // Log duplicates for visibility
+          if (duplicateExistingLogs.length) {
+            console.log("\n=== EXISTING POCs IN DB ===");
+            console.table(duplicateExistingLogs);
+          }
+          if (duplicateCSVLogs.length) {
+            console.log("\n=== DUPLICATES FOUND IN SAME CSV ===");
+            console.table(duplicateCSVLogs);
+          }
+
+          resolve({
+            pocs: temp,
+            duplicateExistingLogs,
+            duplicateCSVLogs,
+          });
         })
         .on("error", (err) => reject(err));
     });
 
-    const { pocs, skippedExisting, skippedDuplicateInCSV } = parsedResult;
+    const { pocs, duplicateExistingLogs, duplicateCSVLogs } = parsedResult;
 
     if (!pocs.length) {
       return res.status(400).json({
-        message: `No valid POC data found in CSV.\nCheck if the entries are already uploaded.`,
-        skippedExisting,
-        skippedDuplicateInCSV,
+        message: `No valid POC data found in CSV. Check skipped entries below.`,
+        skippedExisting: duplicateExistingLogs.length,
+        skippedDuplicateInCSV: duplicateCSVLogs.length,
+        duplicateExistingLogs,
+        duplicateCSVLogs,
       });
     }
 
@@ -99,10 +129,10 @@ export const bulkInsertPoc = async (req, res, next) => {
     let masterPanelStatus = "not attempted";
 
     try {
-      await PointOfContact.insertMany(pocs);
+      const uploadedPocs = await TestPointOfContact.insertMany(pocs);
       nomadsStatus = "success";
 
-      const masterPanelPocs = pocs.map((poc) => ({
+      const masterPanelPocs = uploadedPocs.map((poc) => ({
         companyId: poc.companyId,
         name: poc.name,
         designation: poc.designation,
@@ -114,26 +144,22 @@ export const bulkInsertPoc = async (req, res, next) => {
         profileImage: poc.profileImage,
       }));
 
-      // console.log("Sending to master panel:", masterPanelPocs.length, "POCs");
-
       // Sync with master panel
       try {
         const response = await axios.post(
-          "https://wonomasterbe.vercel.app/api/host-user/bulk-insert-poc",
+          "https://wonomasterbe.vercel.api/api/host-user/bulk-insert-poc",
           { pocs: masterPanelPocs },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
+          { headers: { "Content-Type": "application/json" } }
         );
         masterPanelStatus = `success (${response.status})`;
 
         return res.status(201).json({
           message: `${pocs.length} POCs inserted successfully in both databases.`,
           inserted: pocs.length,
-          skippedExisting,
-          skippedDuplicateInCSV,
+          skippedExisting: duplicateExistingLogs.length,
+          skippedDuplicateInCSV: duplicateCSVLogs.length,
+          duplicateExistingLogs,
+          duplicateCSVLogs,
           statusReport: {
             nomadsDB: nomadsStatus,
             masterPanel: masterPanelStatus,
@@ -149,11 +175,13 @@ export const bulkInsertPoc = async (req, res, next) => {
         return res.status(201).json({
           message: "POCs inserted in Nomads DB, but master panel sync failed.",
           inserted: pocs.length,
-          skippedExisting,
-          skippedDuplicateInCSV,
+          skippedExisting: duplicateExistingLogs.length,
+          skippedDuplicateInCSV: duplicateCSVLogs.length,
+          duplicateExistingLogs,
+          duplicateCSVLogs,
           statusReport: {
             nomadsDB: nomadsStatus,
-            masterPanel: masterPanelStatus,
+            masterPanel: masterErr.message,
           },
         });
       }
@@ -163,8 +191,10 @@ export const bulkInsertPoc = async (req, res, next) => {
       return res.status(500).json({
         message: "Nomads DB upload failed. No data uploaded anywhere.",
         inserted: 0,
-        skippedExisting,
-        skippedDuplicateInCSV,
+        skippedExisting: duplicateExistingLogs.length,
+        skippedDuplicateInCSV: duplicateCSVLogs.length,
+        duplicateExistingLogs,
+        duplicateCSVLogs,
         statusReport: {
           nomadsDB: nomadsStatus,
           masterPanel: "not attempted",
