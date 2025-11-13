@@ -666,7 +666,7 @@ const HostSignup = () => {
                       name="heroImages"
                       id="heroImages"
                       label="Carousel Images"
-                      maxFiles={50}
+                      maxFiles={5}
                       allowedExtensions={["jpg", "jpeg", "png", "pdf", "webp"]}
                     />
                   </Box>
@@ -856,7 +856,7 @@ const HostSignup = () => {
                         name={`products.${index}.files`}
                         id={`products-${index}-files`}
                         label="Product Images"
-                        maxFiles={100}
+                        maxFiles={10}
                         allowedExtensions={[
                           "jpg",
                           "jpeg",
@@ -901,7 +901,7 @@ const HostSignup = () => {
                     name="gallery"
                     id="gallery"
                     label="Gallery Images"
-                    maxFiles={400}
+                    maxFiles={40}
                     allowedExtensions={["jpg", "jpeg", "png", "pdf", "webp"]}
                   />
                 )}
