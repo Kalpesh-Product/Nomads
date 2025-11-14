@@ -18,6 +18,7 @@ import Container from "../components/Container";
 import { Controller, useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { isValidInternationalPhone } from "../utils/validators";
 
 const Contact = () => {
   const [loading, setLoading] = useState(false);
@@ -233,10 +234,7 @@ const Contact = () => {
                       control={control}
                       rules={{
                         required: "Mobile number is required",
-                        pattern: {
-                          value: /^[1-9]{1}[0-9]{9}$/,
-                          message: "Enter a valid 10-digit mobile number",
-                        },
+                        validate: isValidInternationalPhone,
                       }}
                       render={({ field, fieldState }) => (
                         <TextField

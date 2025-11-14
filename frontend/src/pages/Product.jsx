@@ -19,6 +19,7 @@ import {
   isAlphanumeric,
   isValidEmail,
   isValidPhoneNumber,
+  isValidInternationalPhone,
   noOnlyWhitespace,
 } from "../utils/validators";
 import { useSelector } from "react-redux";
@@ -616,7 +617,8 @@ const Product = () => {
                     rules={{
                       required: "Mobile number is required",
                       validate: {
-                        isValidPhoneNumber,
+                        // isValidPhoneNumber,
+                        isValidInternationalPhone,
                       },
                     }}
                     render={({ field }) => (
@@ -624,7 +626,7 @@ const Product = () => {
                         {...field}
                         label="Mobile Number"
                         fullWidth
-                        type="number"
+                        type="tel"
                         value={field.value || ""}
                         variant="standard"
                         size="small"
@@ -812,7 +814,7 @@ const Product = () => {
               />
             </div>
 
-            {companyDetails?.poc?.x && (
+            {["CMP0001", "CMP0052"].includes(companyDetails?.companyId) && (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10 pt-10">
                   <div className="flex flex-col lg:flex-row justify-center items-center col-span-1 border-2 shadow-md gap-4 rounded-xl p-6 w-full">
@@ -898,7 +900,8 @@ const Product = () => {
                           rules={{
                             required: "Mobile number is required",
                             validate: {
-                              isValidPhoneNumber,
+                              // isValidPhoneNumber,
+                              isValidInternationalPhone,
                             },
                           }}
                           render={({ field }) => (
@@ -907,7 +910,7 @@ const Product = () => {
                               label="Mobile Number"
                               fullWidth
                               value={field.value || ""}
-                              type="number"
+                              type="tel"
                               variant="standard"
                               size="small"
                               error={!!salesErrors?.mobileNumber}

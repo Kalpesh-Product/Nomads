@@ -22,13 +22,18 @@ const HostCareer = () => {
   const { data: jobRoles = [], isLoading } = useQuery({
     queryKey: ["jobRoles"],
     queryFn: async () => {
-      const response = await axios.get("/job/get-job-posts");
+      const response = await axios.get(`/job/get-job-posts?ts=${Date.now()}`, {
+        headers: { "Cache-Control": "no-cache" },
+      });
+
       return response?.data?.sort(
         (a, b) =>
           categoryOrder.indexOf(a.categoryTitle) -
           categoryOrder.indexOf(b.categoryTitle)
       );
     },
+    staleTime: 0,
+    refetchOnMount: "always",
   });
 
   const toggleAccordion = (idx) => {

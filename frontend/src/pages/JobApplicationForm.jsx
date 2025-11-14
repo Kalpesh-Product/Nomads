@@ -19,6 +19,7 @@ import dayjs from "dayjs";
 import toast from "react-hot-toast";
 import GetStartedButton from "../components/GetStartedButton";
 import { useLocation } from "react-router-dom";
+import { isValidInternationalPhone } from "../utils/validators";
 
 const JobApplicationForm = ({ title }) => {
   const { pathname } = useLocation();
@@ -172,12 +173,19 @@ const JobApplicationForm = ({ title }) => {
         <Controller
           name="mobile"
           control={control}
-          render={({ field }) => (
+          rules={{
+            required: "Mobile number is required",
+            validate: isValidInternationalPhone,
+          }}
+          render={({ field, fieldState }) => (
             <TextField
               {...field}
               label="Mobile Number"
               fullWidth
               variant="standard"
+              type="tel"
+              error={!!fieldState.error}
+              helperText={fieldState.error?.message}
             />
           )}
         />

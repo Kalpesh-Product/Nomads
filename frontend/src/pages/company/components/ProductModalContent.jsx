@@ -7,7 +7,7 @@ import { useForm, Controller } from "react-hook-form";
 import {
   isAlphanumeric,
   isValidEmail,
-  isValidPhoneNumber,
+  isValidInternationalPhone,
   noOnlyWhitespace,
 } from "../../../utils/validators";
 import { DesktopDatePicker } from "@mui/x-date-pickers";
@@ -185,7 +185,7 @@ const ProductModalContent = ({ product, onClose }) => {
               control={control}
               rules={{
                 required: "Mobile number is required",
-                validate: { isValidPhoneNumber, isAlphanumeric },
+                validate: isValidInternationalPhone,
               }}
               render={({ field }) => (
                 <TextField
@@ -199,6 +199,7 @@ const ProductModalContent = ({ product, onClose }) => {
                 />
               )}
             />
+
             <Controller
               name="email"
               control={control}

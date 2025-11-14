@@ -10,6 +10,7 @@ import { Link, useNavigate } from "react-router-dom";
 import MuiModal from "../components/Modal";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import useAuth from "../hooks/useAuth";
+import { isValidInternationalPhone } from "../utils/validators";
 
 export default function Signup() {
   const [openModal, setOpenModal] = useState(false);
@@ -60,7 +61,8 @@ export default function Signup() {
       setOpenModal(true);
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || "Something went wrong");
+      // toast.error(error.response?.data?.message || "Something went wrong");
+      toast.error(error.response?.data?.message);
     },
   });
 
@@ -134,7 +136,10 @@ export default function Signup() {
           <Controller
             name="mobile"
             control={control}
-            rules={{ required: "Mobile number is required" }}
+            rules={{
+              required: "Mobile number is required",
+              validate: isValidInternationalPhone,
+            }}
             render={({ field, fieldState }) => (
               <MuiTelInput
                 {...field}

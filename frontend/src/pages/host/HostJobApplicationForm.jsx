@@ -13,6 +13,7 @@ import dayjs from "dayjs";
 import toast from "react-hot-toast";
 import { useMutation } from "@tanstack/react-query";
 import axios from "../../utils/axios";
+import { isValidInternationalPhone } from "../../utils/validators";
 
 const HostJobApplicationForm = () => {
   const [formValues, setFormValues] = useState({
@@ -172,6 +173,13 @@ const HostJobApplicationForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    const phoneValidation = isValidInternationalPhone(formValues.mobile);
+    if (phoneValidation !== true) {
+      toast.error(phoneValidation);
+      return;
+    }
+
     submitHostApplication();
   };
 
@@ -220,6 +228,7 @@ const HostJobApplicationForm = () => {
           onChange={handleChange}
           fullWidth
           variant="standard"
+          type="tel"
         />
 
         <FormControl fullWidth variant="standard">
