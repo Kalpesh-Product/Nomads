@@ -167,6 +167,7 @@ const HostSignup = () => {
       return response.data;
     },
     onSuccess: (data) => {
+      // toast.success(data.message || "Form submitted successfully");
       toast.success(data.message || "Form submitted successfully");
       reset();
       setActiveStep((prev) => prev + 1); // 👈 go to Step 5 after submit
@@ -1492,7 +1493,6 @@ const HostSignup = () => {
             )}
 
             {/* Go To Home button on 5th step */}
-            {activeStep === stepFields.length - 1 && (
             {activeStep === stepFields.length - 1 && (
               <div className="flex justify-center items-center w-full">
                 <GetStartedButton
