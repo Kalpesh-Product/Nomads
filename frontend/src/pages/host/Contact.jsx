@@ -18,6 +18,7 @@ import Spinner from "../../components/Spinner";
 import Container from "../../components/Container";
 import axios from "../../utils/axios";
 import toast from "react-hot-toast";
+import { isValidInternationalPhone } from "../../utils/validators";
 
 const HostContact = () => {
   const [loading, setLoading] = useState(false);
@@ -246,10 +247,7 @@ const HostContact = () => {
                       control={control}
                       rules={{
                         required: "Mobile number is required",
-                        pattern: {
-                          value: /^[1-9]{1}[0-9]{9}$/,
-                          message: "Enter a valid 10-digit mobile number",
-                        },
+                        validate: isValidInternationalPhone,
                       }}
                       render={({ field, fieldState }) => (
                         <TextField

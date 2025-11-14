@@ -28,6 +28,7 @@
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.18",
     "keen-slider": "^6.8.6",
+    "libphonenumber-js": "^1.12.26",
     "lucide-react": "^0.483.0",
     "motion": "^12.9.4",
     "mui-tel-input": "^8.0.1",

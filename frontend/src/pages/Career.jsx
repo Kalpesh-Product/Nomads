@@ -28,14 +28,18 @@ const Career = () => {
   const { data: jobRoles = [], isLoading } = useQuery({
     queryKey: ["nomadJobRoles"],
     queryFn: async () => {
-      const response = await axios.get("/job/get-job-posts");
-      // sort API response by category order
+      const response = await axios.get(`/job/get-job-posts?ts=${Date.now()}`, {
+        headers: { "Cache-Control": "no-cache" },
+      });
+
       return response?.data?.sort(
         (a, b) =>
           categoryOrder.indexOf(a.categoryTitle) -
           categoryOrder.indexOf(b.categoryTitle)
       );
     },
+    staleTime: 0,
+    refetchOnMount: "always",
   });
 
   const toggleAccordion = (idx) => {
@@ -131,7 +135,7 @@ const Career = () => {
                                         about: job.about,
                                         responsibilities: job.responsibilities,
                                         qualifications: job.qualifications,
-                                        jobName : job.title
+                                        jobName: job.title,
                                       }}
                                       className="border-2 border-gray-600 p-2 rounded-md hover:bg-black hover:text-white transition-colors"
                                     >

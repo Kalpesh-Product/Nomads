@@ -21,6 +21,7 @@ import { Country, State, City } from "country-state-city";
 import { MenuItem } from "@mui/material";
 import UploadFileInput from "../../components/UploadFileInput";
 import UploadMultipleFilesInput from "../../components/UploadMultipleFilesInput";
+import { isValidInternationalPhone } from "../../utils/validators";
 
 const steps = [
   "Personal Info",
@@ -166,8 +167,9 @@ const HostSignup = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      toast.success("Form submitted successfully");
-      // reset();
+      // toast.success(data.message || "Form submitted successfully");
+      toast.success(data.message || "Form submitted successfully");
+      reset();
       setActiveStep((prev) => prev + 1); // 👈 go to Step 5 after submit
     },
     onError: (error) => {
@@ -268,10 +270,14 @@ const HostSignup = () => {
             <Controller
               name="mobile"
               control={control}
-              rules={{ required: "Phone Number is required" }}
+              rules={{
+                required: "Phone Number is required",
+                validate: isValidInternationalPhone,
+              }}
               render={({ field, fieldState }) => (
                 <TextField
                   {...field}
+                  type="tel"
                   label="Phone Number"
                   fullWidth
                   margin="normal"
@@ -281,6 +287,7 @@ const HostSignup = () => {
                 />
               )}
             />
+
             <Controller
               name="country"
               control={control}
@@ -406,7 +413,7 @@ const HostSignup = () => {
             <Controller
               name="companyName"
               control={control}
-              // rules={{ required: "Company Name is required" }}
+              rules={{ required: "Company Name is required" }}
               render={({ field, fieldState }) => (
                 <TextField
                   {...field}
@@ -1198,15 +1205,31 @@ const HostSignup = () => {
                   <div className="h-10 w-10 overflow-hidden">
                     <img src="/logos/gmailLogo.jpg" alt="gmail-logo" />
                   </div>
-                  <NavLink className={"underline"}>Open Gmail</NavLink>
+                  <NavLink
+                    to="https://mail.google.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline"
+                  >
+                    Open Gmail
+                  </NavLink>
                 </div>
+
                 <div className="flex items-center gap-2">
                   <div className="h-10 w-10 overflow-hidden">
                     <img src="/logos/outlookLogo.png" alt="outlook-logo" />
                   </div>
-                  <NavLink className={"underline"}>Open Outlook</NavLink>
+                  <NavLink
+                    to="https://outlook.live.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline"
+                  >
+                    Open Outlook
+                  </NavLink>
                 </div>
               </div>
+
               <div>
                 <p>Did not recieve an email ? Please check your spam folder.</p>
               </div>
@@ -1470,23 +1493,24 @@ const HostSignup = () => {
             )}
 
             {/* Go To Home button on 5th step */}
-            {/* {activeStep === stepFields.length - 1 && (
+            {activeStep === stepFields.length - 1 && (
               <div className="flex justify-center items-center w-full">
                 <GetStartedButton
                   title="Go To Home"
+                  type="button"
                   handleSubmit={() => {
-                    navigate("/"); // 👈 React Router navigation
+                    navigate("/");
                   }}
                 />
               </div>
-            )} */}
+            )}
 
-            {activeStep === stepFields.length - 1 && (
+            {/* {activeStep === stepFields.length - 1 && (
               <GetStartedButton
                 title="Back"
                 handleSubmit={() => setActiveStep((prev) => prev - 1)}
               />
-            )}
+            )} */}
           </div>
         </form>
       </div>

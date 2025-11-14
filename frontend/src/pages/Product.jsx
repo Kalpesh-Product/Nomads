@@ -19,6 +19,7 @@ import {
   isAlphanumeric,
   isValidEmail,
   isValidPhoneNumber,
+  isValidInternationalPhone,
   noOnlyWhitespace,
 } from "../utils/validators";
 import { useSelector } from "react-redux";
@@ -616,7 +617,8 @@ const Product = () => {
                     rules={{
                       required: "Mobile number is required",
                       validate: {
-                        isValidPhoneNumber,
+                        // isValidPhoneNumber,
+                        isValidInternationalPhone,
                       },
                     }}
                     render={({ field }) => (
@@ -624,7 +626,7 @@ const Product = () => {
                         {...field}
                         label="Mobile Number"
                         fullWidth
-                        type="number"
+                        type="tel"
                         value={field.value || ""}
                         variant="standard"
                         size="small"
@@ -679,7 +681,7 @@ const Product = () => {
                       )}
                     />
                   )} */}
-                  <Controller
+                  {/* <Controller
                     name="startDate"
                     control={control}
                     render={({ field }) => (
@@ -699,8 +701,46 @@ const Product = () => {
                         }}
                       />
                     )}
-                  />
+                  /> */}
                   <Controller
+                    name="startDate"
+                    control={control}
+                    rules={{
+                      validate: (value) => {
+                        const end = watch("endDate");
+                        if (!end || !value) return true;
+
+                        const startDate = dayjs(value);
+                        const endDate = dayjs(end);
+
+                        return (
+                          startDate.isBefore(endDate) ||
+                          "Start date must be before end date"
+                        );
+                      },
+                    }}
+                    render={({ field }) => (
+                      <DesktopDatePicker
+                        {...field}
+                        label="Start Date"
+                        disablePast
+                        format="DD-MM-YYYY"
+                        value={field.value ? dayjs(field.value) : null}
+                        onChange={field.onChange}
+                        slotProps={{
+                          textField: {
+                            size: "small",
+                            fullWidth: true,
+                            variant: "standard",
+                            error: !!errors.startDate,
+                            helperText: errors?.startDate?.message,
+                          },
+                        }}
+                      />
+                    )}
+                  />
+
+                  {/* <Controller
                     name="endDate"
                     control={control}
                     render={({ field }) => (
@@ -721,7 +761,46 @@ const Product = () => {
                         }}
                       />
                     )}
+                  /> */}
+                  <Controller
+                    name="endDate"
+                    control={control}
+                    rules={{
+                      validate: (value) => {
+                        const start = watch("startDate");
+                        if (!start || !value) return true;
+
+                        const startDate = dayjs(start);
+                        const endDate = dayjs(value);
+
+                        return (
+                          endDate.isAfter(startDate) ||
+                          "End date must be after start date"
+                        );
+                      },
+                    }}
+                    render={({ field }) => (
+                      <DesktopDatePicker
+                        {...field}
+                        label="End Date"
+                        format="DD-MM-YYYY"
+                        disablePast
+                        disabled={!selectedStartDate}
+                        value={field.value ? dayjs(field.value) : null}
+                        onChange={field.onChange}
+                        slotProps={{
+                          textField: {
+                            size: "small",
+                            fullWidth: true,
+                            variant: "standard",
+                            error: !!errors.endDate,
+                            helperText: errors?.endDate?.message,
+                          },
+                        }}
+                      />
+                    )}
                   />
+
                   <div className="flex justify-center items-center lg:col-span-2">
                     <SecondaryButton
                       disabled={isSubmitting}
@@ -812,7 +891,7 @@ const Product = () => {
               />
             </div>
 
-            {companyDetails?.poc?.x && (
+            {["CMP0001", "CMP0052"].includes(companyDetails?.companyId) && (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10 pt-10">
                   <div className="flex flex-col lg:flex-row justify-center items-center col-span-1 border-2 shadow-md gap-4 rounded-xl p-6 w-full">
@@ -898,7 +977,8 @@ const Product = () => {
                           rules={{
                             required: "Mobile number is required",
                             validate: {
-                              isValidPhoneNumber,
+                              // isValidPhoneNumber,
+                              isValidInternationalPhone,
                             },
                           }}
                           render={({ field }) => (
@@ -907,7 +987,7 @@ const Product = () => {
                               label="Mobile Number"
                               fullWidth
                               value={field.value || ""}
-                              type="number"
+                              type="tel"
                               variant="standard"
                               size="small"
                               error={!!salesErrors?.mobileNumber}

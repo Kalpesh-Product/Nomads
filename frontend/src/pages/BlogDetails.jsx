@@ -84,7 +84,7 @@ const BlogDetails = () => {
         </section>
         <hr />
         <footer className="flex w-full justify-between items-center">
-          <p>{content?.author || "Author"}</p>
+          <p>{content?.author || ""}</p>
           <p>{humanDate(content?.date) || new Date().toLocaleString()}</p>
           <p>
             {typeof content?.source === "object"

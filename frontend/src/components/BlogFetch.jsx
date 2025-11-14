@@ -234,9 +234,15 @@ const BlogFetch = () => {
 
       {/* Results */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
-        {isPending && <span className="text-sm text-gray-500">Loading…</span>}
+        {isPending && (
+          <div className="h-screen">
+            <span className="text-sm text-gray-500">Loading…</span>
+          </div>
+        )}
         {isError && (
-          <span className="text-sm text-red-600">Could not load blogs.</span>
+          <div className="h-screen">
+            <span className="text-sm text-red-600">Could not load blogs.</span>
+          </div>
         )}
         {blogs.map((b) => (
           <BlogCard key={b.guid} b={b} />

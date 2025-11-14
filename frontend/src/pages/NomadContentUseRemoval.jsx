@@ -12,6 +12,7 @@ import { Controller, useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import axios from "../utils/axios";
+import { isValidInternationalPhone } from "../utils/validators";
 
 const NomadContentUseRemoval = () => {
   const navigate = useNavigate();
@@ -187,14 +188,12 @@ const NomadContentUseRemoval = () => {
               control={control}
               rules={{
                 required: "Mobile number is required",
-                pattern: {
-                  value: /^[1-9]{1}[0-9]{9}$/,
-                  message: "Enter a valid 10-digit mobile number",
-                },
+                validate: isValidInternationalPhone,
               }}
               render={({ field, fieldState }) => (
                 <TextField
                   {...field}
+                  type="tel"
                   fullWidth
                   label="Mobile Number"
                   variant="standard"

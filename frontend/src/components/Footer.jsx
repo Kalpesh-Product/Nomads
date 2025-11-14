@@ -183,7 +183,7 @@ const Footer = () => {
       <div className="w-full flex justify-center items-center gap-4 py-4 bg-gray-50 text-xs font-semibold border-t border-gray-200">
         {/* Language Selector */}
         <div
-          // onClick={() => setShowLangModal(true)}
+          onClick={() => setShowLangModal(true)}
           className="flex items-center gap-1 cursor-pointer hover:underline"
         >
           <FaGlobe className="text-[12px]" />
@@ -219,22 +219,30 @@ const Footer = () => {
               Choose a language and region
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {languages.map((lang) => (
-                <div
-                  key={lang.code}
-                  onClick={() => {
-                    setSelectedLang(lang);
-                    setShowLangModal(false);
-                  }}
-                  className={`border rounded-md px-3 py-2 cursor-pointer hover:border-black ${
-                    selectedLang.code === lang.code
-                      ? "border-black"
-                      : "border-gray-300"
-                  }`}
-                >
-                  {lang.name}
-                </div>
-              ))}
+              {languages.map((lang, index) => {
+                const isDisabled = index !== 0; // only FIRST item enabled
+
+                return (
+                  <div
+                    key={lang.code}
+                    onClick={() => {
+                      if (isDisabled) return; // block clicks
+                      setSelectedLang(lang);
+                      setShowLangModal(false);
+                    }}
+                    className={`border rounded-md px-3 py-2 
+        ${
+          isDisabled
+            ? "opacity-40 cursor-not-allowed"
+            : "cursor-pointer hover:border-black"
+        } 
+        ${selectedLang.code === lang.code ? "border-black" : "border-gray-300"}
+      `}
+                  >
+                    {lang.name}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -252,25 +260,37 @@ const Footer = () => {
             </button>
             <h2 className="text-lg font-semibold mb-4">Choose a currency</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {currencies.map((cur) => (
-                <div
-                  key={cur.code}
-                  onClick={() => {
-                    setSelectedCurrency(cur);
-                    setShowCurrencyModal(false);
-                  }}
-                  className={`border rounded-md px-3 py-2 cursor-pointer hover:border-black ${
-                    selectedCurrency.code === cur.code
-                      ? "border-black"
-                      : "border-gray-300"
-                  }`}
-                >
-                  <div className="font-medium">{cur.name}</div>
-                  <div className="text-sm text-gray-500">
-                    {cur.code} — {cur.symbol}
+              {currencies.map((cur, index) => {
+                const isDisabled = index !== 0; // only FIRST item enabled
+
+                return (
+                  <div
+                    key={cur.code}
+                    onClick={() => {
+                      if (isDisabled) return; // block clicks
+                      setSelectedCurrency(cur);
+                      setShowCurrencyModal(false);
+                    }}
+                    className={`border rounded-md px-3 py-2 
+        ${
+          isDisabled
+            ? "opacity-40 cursor-not-allowed"
+            : "cursor-pointer hover:border-black"
+        } 
+        ${
+          selectedCurrency.code === cur.code
+            ? "border-black"
+            : "border-gray-300"
+        }
+      `}
+                  >
+                    <div className="font-medium">{cur.name}</div>
+                    <div className="text-sm text-gray-500">
+                      {cur.code} — {cur.symbol}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>

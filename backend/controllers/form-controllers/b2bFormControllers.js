@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import WebsiteTemplate from "../../models/WebsiteTemplate.js";
 import sharp from "sharp";
 import { sendMail } from "../../config/mailer.js";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
 
 const istNowPieces = () => {
   const tz = "Asia/Kolkata";
@@ -47,7 +48,24 @@ const jobApplicationSchema = yup
       .string()
       .trim()
       .required("Mobile Number is required")
-      .matches(/^[0-9+\-\s()]{8,20}$/, "Invalid mobile number"),
+      .test(
+        "is-valid-phone",
+        "Please provide a valid phone number",
+        function (value) {
+          if (!value) return false;
+          try {
+            const number = parsePhoneNumberFromString(value);
+            if (!number?.isValid()) return false;
+
+            // store the normalized version on the validated data
+            this.parent.mobile = number.number;
+            return true;
+          } catch {
+            return false;
+          }
+        }
+      ),
+    // .matches(/^[0-9+\-\s()]{8,20}$/, "Invalid mobile number"),
     location: yup.string().trim().required("Location is required"),
     experienceYears: yup
       .number()
@@ -118,7 +136,24 @@ const enquirySchema = yup.object().shape({
     .string()
     .trim()
     .required("Mobile number is required")
-    .matches(/^[0-9]{10}$/, "Mobile number must be exactly 10 digits"),
+    .test(
+      "is-valid-phone",
+      "Please provide a valid phone number",
+      function (value) {
+        if (!value) return false;
+        try {
+          const number = parsePhoneNumberFromString(value);
+          if (!number?.isValid()) return false;
+
+          // store the normalized version on the validated data
+          this.parent.mobile = number.number;
+          return true;
+        } catch {
+          return false;
+        }
+      }
+    ),
+  // .matches(/^[0-9]{10}$/, "Mobile number must be exactly 10 digits"),
 
   partnerstype: yup.string().trim().required("Partner Type is required"),
 
@@ -237,6 +272,24 @@ export const addB2BFormSubmission = async (req, res, next) => {
 
     await postToAppsScript(apsBody);
 
+    try {
+      await sendMail({
+        to: payload.email,
+        subject: `Application Received for ${payload.jobPosition}`,
+        text: `Hi ${payload.name}, your application for ${payload.jobPosition} has been received.`,
+        html: `
+            <h2>Application Received</h2>
+            <p>Hi ${payload.name},</p>
+            <p>Thank you for applying for the position of <b>${payload.jobPosition}</b>.</p>
+            <p>Our HR team will review your profile and get back to you soon.</p>
+             <p>Cheers,<br/>The WONO Team</p>
+          `,
+      });
+      console.log("✅ Application email sent to", payload.email);
+    } catch (err) {
+      console.error("❌ Failed to send email:", err.message);
+    }
+
     // 5) response
     return res.status(201).json({
       message: "Application submitted",
@@ -258,6 +311,19 @@ export const addB2BFormSubmission = async (req, res, next) => {
     };
 
     const result = await postToAppsScript(apsBody);
+
+    await sendMail({
+      to: payload.email,
+      subject: "We Received Your Message",
+      html: `
+        <h2>Thank You For Connecting</h2>
+        <p>Hi ${payload.name},</p>
+        <p>We’ve received your message regarding <b>${payload.partnerstype}</b>.</p>
+        <p>Our team will respond shortly.</p>
+        <p>Cheers,<br/>The WONO Team</p>
+      `,
+    });
+
     return res.json(result);
   };
 
@@ -280,14 +346,20 @@ export const addB2BFormSubmission = async (req, res, next) => {
 
     await handlers[formName]();
   } catch (err) {
-    if (err?.name === "ValidationError") {
-      const errors = err.inner?.length
-        ? err.inner.reduce((acc, e) => {
-            if (e.path && !acc[e.path]) acc[e.path] = e.message;
-            return acc;
-          }, {})
-        : { message: err.message };
-      return res.status(400).json({ error: "Validation failed", errors });
+    // if (err?.name === "ValidationError") {
+    //   const errors = err.inner?.length
+    //     ? err.inner.reduce((acc, e) => {
+    //         if (e.path && !acc[e.path]) acc[e.path] = e.message;
+    //         return acc;
+    //       }, {})
+    //     : { message: err.message };
+    //   return res.status(400).json({ error: "Validation failed", errors });
+    // }
+
+    if (err.name === "ValidationError") {
+      return res.status(400).json({
+        message: err.errors[0], // only the first message
+      });
     }
 
     if (err?.status === 502) {
@@ -348,6 +420,11 @@ export const registerFormSubmission = async (req, res) => {
   try {
     const payload = req.body;
 
+    try {
+      const num = parsePhoneNumberFromString(payload.mobile);
+      if (num?.isValid()) payload.mobile = num.number; // normalize
+    } catch {}
+
     // STEP 1: send registration data to Google Sheet
     const apsBody = {
       name: payload.name,
@@ -397,7 +474,13 @@ export const registerFormSubmission = async (req, res) => {
 
       const formatCompanyName = (name) => {
         if (!name) return "";
-        return name.toLowerCase().split("-")[0].replace(/\s+/g, "");
+
+        const trimmed = name.trim().toLowerCase();
+
+        const invalids = ["n/a", "na", "none", "undefined", "null", "-"];
+        if (invalids.includes(trimmed)) return "";
+
+        return trimmed.split("-")[0].replace(/\s+/g, "");
       };
 
       const searchKey = formatCompanyName(payload.companyName);
@@ -422,6 +505,7 @@ export const registerFormSubmission = async (req, res) => {
         copyrightText: payload.copyrightText,
         products: [],
         testimonials: [],
+        source: "Nomad",
       };
 
       // Helper: upload an array of files to S3
@@ -562,56 +646,63 @@ export const registerFormSubmission = async (req, res) => {
       }));
 
       // STEP 3: send Mongo saved data to external API
-      let websiteResult;
-      try {
-        const submit = await fetch(
-          `https://wonomasterbe.vercel.app/api/editor/create-website`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(template),
-          }
-        );
-        const raw = await submit.text();
-        try {
-          websiteResult = JSON.parse(raw);
-        } catch {
-          console.error("Non-JSON response:", raw);
-          websiteResult = { message: "Invalid JSON response", raw };
-        }
+      let websiteResult = "";
 
-        await session.commitTransaction();
-        session.endSession();
-      } catch (err) {
-        console.error("create-template call failed:", err);
-        websiteResult = { message: "create-template call failed" };
+      if (searchKey) {
+        try {
+          const submit = await fetch(
+            `https://wonomasterbe.vercel.app/api/editor/create-website`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(template),
+            }
+          );
+          const raw = await submit.text();
+          try {
+            websiteResult = JSON.parse(raw);
+          } catch {
+            console.error("Non-JSON response:", raw);
+            websiteResult = { message: "Invalid JSON response", raw };
+          }
+
+          await session.commitTransaction();
+          session.endSession();
+        } catch (err) {
+          console.error("create-template call failed:", err);
+          websiteResult = { message: "create-template call failed" };
+        }
       }
 
       // STEP 5: send confirmation email to user
-      try {
-        await sendMail({
-          to: payload.email,
-          subject: "Welcome to WONO Nomads 🎉",
-          text: `Hi ${
-            payload.name || "User"
-          }, thanks for registering with WONO Nomads!`,
-          html: `
+      if (payload.email) {
+        try {
+          await sendMail({
+            to: payload.email,
+            subject: "Welcome to WONO Nomads 🎉",
+            text: `Hi ${
+              payload.name || "User"
+            }, thanks for registering with WONO Nomads!`,
+            html: `
             <h2>Welcome to WONO Nomads</h2>
             <p>Hi ${payload.name || "User"},</p>
-            <p>Thanks for registering with us. Our team will contact you shortly and and will inform you once your website is created.</p>
+            <p>Thanks for registering with us. Our team will contact you shortly ${
+              searchKey && "and will inform you once your website is created"
+            }.</p>
             <p>Cheers,<br/>The WONO Team</p>
           `,
-        });
-        console.log("✅ Registration email sent to", payload.email);
-      } catch (err) {
-        console.error("❌ Failed to send email:", err.message);
+          });
+          console.log("✅ Registration email sent to", payload.email);
+        } catch (err) {
+          console.error("❌ Failed to send email:", err.message);
+        }
       }
 
+      const message = searchKey ? websiteResult : "Form submitted successfully";
       // STEP 4: respond
+      console.log("sheetResult", sheetResult);
       return res.status(201).json({
-        message: "Registration + Website data forwarded",
-        sheetResult,
-        websiteResult,
+        message: message,
       });
     } catch (error) {
       await session.abortTransaction();
@@ -622,6 +713,11 @@ export const registerFormSubmission = async (req, res) => {
         .json({ error: "Transaction failed", detail: error.message });
     }
   } catch (err) {
+    if (err.name === "ValidationError") {
+      return res.status(400).json({
+        message: err.errors[0], // only the first message
+      });
+    }
     if (err?.status === 502) {
       return res
         .status(502)

@@ -55,6 +55,11 @@ const Profile = () => {
     if (!auth?.user) navigate("/login", { replace: true });
   }, [auth, navigate]);
 
+  useEffect(() => {
+    const tab = searchParams.get("tab") || "profile";
+    setActiveTab(tab);
+  }, [searchParams]);
+
   // const handleLogout = async () => {
   //   try {
   //     await logout();
