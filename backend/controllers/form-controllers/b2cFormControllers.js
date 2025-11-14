@@ -585,13 +585,19 @@ export const addB2CformSubmission = async (req, res, next) => {
       });
 
       if (existingUser) {
-        return res.status(409).json({ message: "Email already registered" });
+        return res.status(400).json({ message: "Email already registered" });
       }
 
       const { email, mobile, password, confirmPassword } = req.body;
 
       if (!email || !password || !mobile || !confirmPassword) {
-        return res.status(409).json({ message: "Missing required fields" });
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+
+      if (password.length < 6) {
+        return res
+          .status(409)
+          .json({ message: "Password must be 6 characters long" });
       }
 
       if (confirmPassword !== password) {

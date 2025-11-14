@@ -474,7 +474,13 @@ export const registerFormSubmission = async (req, res) => {
 
       const formatCompanyName = (name) => {
         if (!name) return "";
-        return name.toLowerCase().split("-")[0].replace(/\s+/g, "");
+
+        const trimmed = name.trim().toLowerCase();
+
+        const invalids = ["n/a", "na", "none", "undefined", "null", "-"];
+        if (invalids.includes(trimmed)) return "";
+
+        return trimmed.split("-")[0].replace(/\s+/g, "");
       };
 
       const searchKey = formatCompanyName(payload.companyName);
@@ -640,29 +646,32 @@ export const registerFormSubmission = async (req, res) => {
       }));
 
       // STEP 3: send Mongo saved data to external API
-      let websiteResult;
-      try {
-        const submit = await fetch(
-          `http://localhost:5007/api/editor/create-website`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(template),
-          }
-        );
-        const raw = await submit.text();
-        try {
-          websiteResult = JSON.parse(raw);
-        } catch {
-          console.error("Non-JSON response:", raw);
-          websiteResult = { message: "Invalid JSON response", raw };
-        }
+      let websiteResult = "";
 
-        await session.commitTransaction();
-        session.endSession();
-      } catch (err) {
-        console.error("create-template call failed:", err);
-        websiteResult = { message: "create-template call failed" };
+      if (searchKey) {
+        try {
+          const submit = await fetch(
+            `http://localhost:5007/api/editor/create-website`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(template),
+            }
+          );
+          const raw = await submit.text();
+          try {
+            websiteResult = JSON.parse(raw);
+          } catch {
+            console.error("Non-JSON response:", raw);
+            websiteResult = { message: "Invalid JSON response", raw };
+          }
+
+          await session.commitTransaction();
+          session.endSession();
+        } catch (err) {
+          console.error("create-template call failed:", err);
+          websiteResult = { message: "create-template call failed" };
+        }
       }
 
       // STEP 5: send confirmation email to user
@@ -677,7 +686,9 @@ export const registerFormSubmission = async (req, res) => {
             html: `
             <h2>Welcome to WONO Nomads</h2>
             <p>Hi ${payload.name || "User"},</p>
-            <p>Thanks for registering with us. Our team will contact you shortly and and will inform you once your website is created.</p>
+            <p>Thanks for registering with us. Our team will contact you shortly ${
+              searchKey && "and will inform you once your website is created"
+            }.</p>
             <p>Cheers,<br/>The WONO Team</p>
           `,
           });
@@ -687,11 +698,11 @@ export const registerFormSubmission = async (req, res) => {
         }
       }
 
+      const message = searchKey ? websiteResult : "Form submitted successfully";
       // STEP 4: respond
+      console.log("sheetResult", sheetResult);
       return res.status(201).json({
-        message: "Registration + Website data forwarded",
-        sheetResult,
-        websiteResult,
+        message: message,
       });
     } catch (error) {
       await session.abortTransaction();
