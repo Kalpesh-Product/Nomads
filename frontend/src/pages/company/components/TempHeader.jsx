@@ -6,7 +6,7 @@ import PrimaryButton from "../../../components/PrimaryButton";
 import defaultlogo from "../../../assets/WONO_LOGO_Black_TP.png";
 import { useLocation } from "react-router-dom";
 
-const TempHeader = ({logo}) => {
+const TempHeader = ({ logo }) => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const view = searchParams.get("view"); // could be 'map', 'list', or null
@@ -46,23 +46,23 @@ const TempHeader = ({logo}) => {
     { id: 6, text: "Contact", to: "contact" },
   ];
 
-const handleScroll = (id) => {
-  const section = document.getElementById(id);
-  if (section) {
-    section.scrollIntoView({ behavior: "smooth" });
-  }
+  const handleScroll = (id) => {
+    const section = document.getElementById(id);
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth" });
+    }
 
-  // Close the drawer slightly later
-  setTimeout(() => setOpen(false), 650);
-};
-
+    // Close the drawer slightly later
+    setTimeout(() => setOpen(false), 650);
+  };
 
   return (
     <div className="flex px-4 py-3 justify-between items-center md:py-3 md:px-[7.5rem] lg:px-[7.5rem] sm:px-6 xs:px-6 lg:py-[0.625rem] shadow-md bg-white/80 backdrop-blur-md ">
       <div className="w-full">
         <div
           onClick={() => navigate("/")}
-          className="w-24 h-16 lg:w-36 overflow-hidden rounded-lg flex justify-between items-center cursor-pointer"
+          // className="w-24 h-16 lg:w-36 overflow-hidden rounded-lg flex justify-between items-center cursor-pointer"
+          className="w-24 h-16 lg:w-36 overflow-hidden  flex justify-between items-center cursor-pointer"
         >
           <img
             src={logo}
