@@ -137,14 +137,21 @@ const Profile = () => {
       return response.data;
     },
 
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       toast.success(data.message || "Password changed successfully");
+
+      // Clear form
       setPasswordForm({
         oldPassword: "",
         newPassword: "",
         confirmPassword: "",
       });
+
+      // Force logout immediately
+      await logout();
+      navigate("/login", { replace: true });
     },
+
     onError: (error) => {
       toast.error(error.response?.data?.message || "Failed to change password");
     },
