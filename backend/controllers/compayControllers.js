@@ -384,6 +384,14 @@ export const createCompany = async (req, res, next) => {
       return res.status(400).json({ message: "Company Name are required" });
     }
 
+    const companyExists = await Company.find({ companyId, companyType });
+
+    if (companyExists) {
+      return res
+        .status(400)
+        .json({ message: `${companyType} product already exists` });
+    }
+
     // Create company
     const company = new Company({
       businessId: generateBuisnessId(),
@@ -453,6 +461,12 @@ export const createCompany = async (req, res, next) => {
 
     // 2️⃣ Upload Images if provided (req.files.images[])
     if (req.files?.images && req.files.images.length > 0) {
+      if (req.files?.images && req.files.images.length > 10) {
+        return res.status(400).json({
+          message: "You can upload a maximum of 10 images for this company.",
+        });
+      }
+
       if (!Array.isArray(savedCompany.images)) savedCompany.images = [];
       const startIndex = savedCompany.images.length;
 
@@ -1066,6 +1080,7 @@ export const getListings = async (req, res, next) => {
 
     return res.status(200).json(data);
   } catch (error) {
+    console.log("error", error);
     next(error);
   }
 };
@@ -1653,6 +1668,13 @@ export const editCompany = async (req, res, next) => {
     // Use 'images' from remote API (which has existing + new images)
     // or fallback to 'existingImages' if not provided
     const updatedImages = images.length > 0 ? images : existingImages;
+
+    if (updatedImages.length > 10) {
+      console.log("updatedImages images", updatedImages.length);
+      return res.status(400).json({
+        message: `A maximum of 10 images is allowed. You sent ${updatedImages.length}.`,
+      });
+    }
 
     if (isCompanyTypeChanged) {
       console.log(
