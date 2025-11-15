@@ -168,13 +168,23 @@ const HostSignup = () => {
     },
     onSuccess: (data) => {
       // toast.success(data.message || "Form submitted successfully");
-      toast.success(data.message || "Form submitted successfully");
+      toast.success(
+        typeof data.message === "string"
+          ? data.message
+          : data.message?.message || "Form submitted successfully"
+      );
+
       reset();
       setActiveStep((prev) => prev + 1); // 👈 go to Step 5 after submit
     },
     onError: (error) => {
       // toast.error(error.response?.data?.message || "Something went wrong");
-      toast.error(error.response?.data?.message);
+      toast.error(
+        typeof error.response?.data?.message === "string"
+          ? error.response.data.message
+          : error.response?.data?.message?.message || "Something went wrong"
+      );
+
       reset();
       setActiveStep((prev) => prev + 1); // 👈 go to Step 5 after submit (To be removed later)
     },
