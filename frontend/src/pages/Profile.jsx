@@ -123,13 +123,20 @@ const Profile = () => {
   // 🔹 Change Password Mutation (using TanStack)
   const { mutate: changePassword, isPending: isPasswordPending } = useMutation({
     mutationKey: ["changePassword"],
-    mutationFn: async ({ userId, oldPassword, newPassword }) => {
+    mutationFn: async ({
+      userId,
+      oldPassword,
+      newPassword,
+      confirmPassword,
+    }) => {
       const response = await axiosPrivate.patch(`/user/password/${userId}`, {
         oldPassword,
         newPassword,
+        confirmPassword,
       });
       return response.data;
     },
+
     onSuccess: (data) => {
       toast.success(data.message || "Password changed successfully");
       setPasswordForm({
@@ -152,7 +159,7 @@ const Profile = () => {
     if (newPassword !== confirmPassword)
       return toast.error("New passwords do not match");
 
-    changePassword({ userId, oldPassword, newPassword });
+    changePassword({ userId, oldPassword, newPassword, confirmPassword });
   };
 
   return (

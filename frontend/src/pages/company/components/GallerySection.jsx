@@ -43,7 +43,7 @@ const GallerySection = ({ gallery = [] }) => {
         onClose={() => setOpen(false)}
         height="h-[100lvh] lg:h-[75vh]"
       >
-        <div>
+        <div className="lg:pb-4 lg:pl-2">
           <div className="flex justify-end mb-2">
             <button
               onClick={() => setOpen(false)}

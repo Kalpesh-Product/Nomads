@@ -28,7 +28,7 @@ const TempModal = ({
               exit={{ y: 90, opacity: 0 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
               className={`${bgColor} ${width} shadow-xl outline-none rounded-xl
-                          w-full max-h-[90vh] overflow-y-auto overscroll-contain`}
+                         w-full lg:w-[70vw] max-h-[90vh] overflow-y-auto overscroll-contain`}
               style={{ WebkitOverflowScrolling: "touch" }} // smooth iOS scroll
             >
               <div className="p-0">{children}</div>
