@@ -57,7 +57,7 @@ const leadSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      enum: ["Nomad", "Host"],
+      enum: ["nomad", "website"],
     },
     productType: {
       type: String,
