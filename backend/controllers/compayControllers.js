@@ -1036,9 +1036,18 @@ export const getCompany = async (req, res, next) => {
 export const getListings = async (req, res, next) => {
   try {
     const { companyId } = req.params;
+    const { companyType } = req.query;
+    let query = { companyId: companyId };
 
-    const listings = await Company.find({ companyId: companyId }).lean().exec();
-    const reviews = await Review.find({ companyId }).lean().exec();
+    if (companyType) {
+      query = { ...query, companyType };
+    }
+
+    const listings = await Company.find(query).lean().exec();
+    const reviews = await Review.find({ companyId })
+      .populate({ path: "company", select: "companyType" })
+      .lean()
+      .exec();
 
     if (!listings || !listings.length) {
       return res.status(404).json({ error: "Company not found" });
@@ -1048,9 +1057,10 @@ export const getListings = async (req, res, next) => {
     }
 
     const data = listings.map((list) => {
-      const totalReviews = reviews.filter(
-        (review) => review.companyId === companyId
-      );
+      const totalReviews = companyType
+        ? reviews.filter((r) => r.company.companyType === companyType)
+        : reviews;
+
       return { ...list, reviews: totalReviews };
     });
 
