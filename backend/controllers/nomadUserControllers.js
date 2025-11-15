@@ -114,8 +114,14 @@ export const changePassword = async (req, res) => {
 
     // const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = newPassword;
-
+    user.refreshToken = "";
     await user.save();
+
+    res.clearCookie("nomadCookie", {
+      httpOnly: true,
+      sameSite: "None",
+      secure: true,
+    });
 
     return res.status(200).json({ message: "Password changed successfully" });
   } catch (error) {
