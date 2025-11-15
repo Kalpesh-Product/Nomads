@@ -152,7 +152,7 @@ const enquirySchema = yup.object({
   source: yup
     .string()
     .trim()
-    .oneOf(["Nomad", "Host"], "Source must be either 'Nomad' or 'Host'")
+    .oneOf(["nomad", "website"], "Source must be either 'nomad' or 'website'")
     .required("Please provide the source"),
   productType: yup
     .string()
