@@ -50,8 +50,18 @@ const ProductModalContent = ({ product, onClose }) => {
   const { mutate, isPending: isEnquiry } = useMutation({
     mutationKey: ["enquiryForm"],
     mutationFn: async (formData) => {
+      const cleanStart = formData.startDate
+        ? dayjs(formData.startDate).format("YYYY-MM-DD")
+        : null;
+
+      const cleanEnd = formData.endDate
+        ? dayjs(formData.endDate).format("YYYY-MM-DD")
+        : null;
+
       const res = await axios.post("/forms/add-new-b2c-form-submission", {
         ...formData,
+        startDate: cleanStart,
+        endDate: cleanEnd,
         country: companyDetails?.country,
         state: companyDetails?.state,
         companyType: companyDetails?.companyType,
@@ -64,8 +74,10 @@ const ProductModalContent = ({ product, onClose }) => {
         source: "website",
         productType: product?.type,
       });
+
       return res.data;
     },
+
     onSuccess: (res) => {
       toast.success(res.message);
       reset();
