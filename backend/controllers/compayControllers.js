@@ -1336,6 +1336,7 @@ export const addCompanyImagesBulk = async (req, res, next) => {
     const { companyId, businessId, companyType = "" } = req.body;
 
     console.log("BULK UPLOAD IMAGES HIT");
+
     if (!files || !files.length) {
       return res.status(400).json({ message: "No files provided" });
     }
@@ -1362,6 +1363,13 @@ export const addCompanyImagesBulk = async (req, res, next) => {
       return res
         .status(400)
         .json({ message: "companyType does not match the stored company" });
+    }
+
+    if (company.images.length) {
+      return res.status(404).json({
+        message:
+          "Images already exist.Please update them via the reupload tab.",
+      });
     }
 
     const formatCompanyType = (type) => {
