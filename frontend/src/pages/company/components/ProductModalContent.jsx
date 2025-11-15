@@ -110,11 +110,11 @@ const ProductModalContent = ({ product, onClose }) => {
 
       {/* Left: Image Carousel */}
       <div className="relative">
-        <div className="overflow-hidden rounded-xl relative">
+        <div className="overflow-hidden rounded-xl relative h-full">
           <img
             src={images[current]?.url || images[current]}
             alt={product?.name || "Product"}
-            className="w-full h-48 md:h-full object-cover bg-black"
+            className="w-full h-48 md:h-full object-cover lg:object-contain bg-black"
           />
           <div className="absolute inset-0 bg-black/20"></div>
         </div>
