@@ -27,6 +27,16 @@ const TemplateHome = () => {
   const intervalRef = useRef(null);
   const [open, setOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState([]);
+
+  const [pageLoading, setPageLoading] = useState(true);
+
+  useEffect(() => {
+    const handleLoad = () => setPageLoading(false);
+    window.addEventListener("load", handleLoad);
+
+    return () => window.removeEventListener("load", handleLoad);
+  }, []);
+
   const { data, isPending, error } = useOutletContext();
   const sliderCount =
     data?.testimonials?.length > 3 ? 3 : data?.testimonials?.length;
@@ -90,7 +100,15 @@ const TemplateHome = () => {
   const tenant = getTenantFromHost();
 
   if (!tenant) return <div>No tenant specified</div>;
-  if (isPending) return <div>Loading site...</div>;
+  // if (isPending) return <div>Loading site...</div>;
+  if (pageLoading || isPending) {
+    return (
+      <div className="fixed inset-0 z-[9999] bg-white flex items-center justify-center">
+        <div className="animate-spin h-12 w-12 border-4 border-gray-300 border-t-primary-blue rounded-full"></div>
+      </div>
+    );
+  }
+
   if (!data.isActive) return <div>Website is currently inactive</div>;
   if (error) {
     console.log("error", error);
