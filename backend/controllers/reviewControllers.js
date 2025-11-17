@@ -28,7 +28,7 @@ export const bulkInsertReviews = async (req, res, next) => {
     });
 
     // Fetch existing reviews to check for duplicates
-    const existingReviews = await TestReview.find().select("name company");
+    const existingReviews = await Review.find().select("name company");
     const existingReviewSet = new Set(
       existingReviews.map(
         (review) =>
@@ -164,16 +164,16 @@ export const bulkInsertReviews = async (req, res, next) => {
             message:
               "No valid review data found in CSV.\nCheck if the entries are already uploaded.",
             skippedExisting,
+            duplicateExistingLogs,
             skippedDuplicateInCSV,
+            duplicateCSVLogs,
             missingCompanyCount: missingCompanyRows.length,
             missingCompanyRows,
-            duplicateExistingLogs,
-            duplicateCSVLogs,
           });
         }
 
         try {
-          const result = await TestReview.insertMany(reviews);
+          const result = await Review.insertMany(reviews);
           const insertedCount = result.length;
 
           res.status(200).json({
@@ -185,11 +185,11 @@ export const bulkInsertReviews = async (req, res, next) => {
               missingCompanyRows.length,
             inserted: insertedCount,
             skippedExisting,
+            duplicateExistingLogs,
             skippedDuplicateInCSV,
+            duplicateCSVLogs,
             missingCompanyCount: missingCompanyRows.length,
             missingCompanyRows,
-            duplicateExistingLogs,
-            duplicateCSVLogs,
           });
         } catch (insertError) {
           if (insertError.name === "BulkWriteError") {
@@ -200,11 +200,11 @@ export const bulkInsertReviews = async (req, res, next) => {
               total: reviews.length,
               inserted: insertedCount,
               skippedExisting,
+              duplicateExistingLogs,
               skippedDuplicateInCSV,
+              duplicateCSVLogs,
               missingCompanyCount: missingCompanyRows.length,
               missingCompanyRows,
-              duplicateExistingLogs,
-              duplicateCSVLogs,
               writeErrors: insertError.writeErrors?.map((e) => ({
                 index: e.index,
                 errmsg: e.errmsg,
