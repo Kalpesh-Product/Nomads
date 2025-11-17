@@ -358,6 +358,22 @@ const Header = () => {
                   </li>
                 ))}
 
+                {/* ✅ NEW: Become a host visible in mobile drawer */}
+                <li className="items-center text-center">
+                  <div
+                    onClick={() => {
+                      goToHosts();
+                      setOpen(false);
+                    }}
+                    className="py-4 cursor-pointer"
+                  >
+                    <p className="text-secondary-dark text-lg font-semibold">
+                      Become A Host
+                    </p>
+                  </div>
+                  <div className="h-[0.2px] bg-gray-300"></div>
+                </li>
+
                 {auth?.user ? (
                   <>
                     <li className="items-center text-center">
