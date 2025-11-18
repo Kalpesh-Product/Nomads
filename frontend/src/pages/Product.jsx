@@ -145,7 +145,7 @@ const Product = () => {
         phone: data?.mobileNumber,
         company: companyDetails?._id,
         companyId: companyDetails?.companyId,
-        source: "B2C",
+        source: "nomad",
         productType: companyDetails?.companyType,
       });
       return response.data;
