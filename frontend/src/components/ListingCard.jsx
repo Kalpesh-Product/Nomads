@@ -9,7 +9,7 @@ import {
 import { useNavigate } from "react-router-dom";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { toast } from "react-hot-toast";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
 import useAuth from "../hooks/useAuth";
@@ -40,7 +40,7 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
       return data;
     },
     onSuccess: (data) => {
-      toast.success(data?.message || "Updated successfully");
+      // toast.success(data?.message || "Updated successfully");
       // ✅ Update local favorites immediately for better UX
       setFavorites(data.likes || []);
     },
@@ -50,6 +50,11 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
   });
 
   const toggleFavorite = (id) => {
+    if (!userId) {
+      toast.error("You need to login to access this feature");
+      return;
+    }
+
     // Determine the current like state based on both backend and local data
     const isCurrentlyLiked = favorites.includes(id) || isInitiallyLiked;
     const newLikedState = !isCurrentlyLiked; // what we’re switching to

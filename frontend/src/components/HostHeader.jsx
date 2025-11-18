@@ -154,6 +154,22 @@ const HostHeader = () => {
               </li>
             ))}
 
+            {/* NEW: Become a nomad for mobile view */}
+            <li className="items-center text-center">
+              <div
+                onClick={() => {
+                  goToNomads();
+                  setOpen(false);
+                }}
+                className="py-4 cursor-pointer"
+              >
+                <p className="text-secondary-dark text-lg font-semibold">
+                  Become A Nomad
+                </p>
+              </div>
+              <div className="h-[0.2px] bg-gray-300"></div>
+            </li>
+
             <div className="flex justify-center py-4">
               <BnButton
                 title={"Login"}

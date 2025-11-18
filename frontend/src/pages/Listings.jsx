@@ -510,7 +510,7 @@ const Listings = () => {
                 formData?.location?.slice(1) || "Unknown"}
             </span>
             <span className="text-tiny text-gray-500">
-              {formData?.count || "N/A"} Nomads
+              {formData?.count || "1-5"} Nomads
             </span>
           </button>
         </div>

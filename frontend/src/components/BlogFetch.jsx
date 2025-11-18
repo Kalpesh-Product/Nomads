@@ -5,6 +5,7 @@ import { IoChevronDown } from "react-icons/io5";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import humanDate from "../utils/humanDate";
 import { useSelector } from "react-redux";
+import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 
 const DESTS = [
   { label: "All", country: null, keyword: null, lang: null }, // ✅ New option
@@ -166,23 +167,23 @@ const BlogFetch = () => {
             <label className="text-sm font-medium text-gray-700">
               Destination
             </label>
-            <div className="relative inline-block">
-              <select
-                className="block w-full rounded-lg border-2 border-gray-400 bg-white px-3 py-2 pr-8 text-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                value={"Select"}
+            <FormControl variant="standard" sx={{ minWidth: 140 }}>
+              {/* <InputLabel>Destination</InputLabel> */}
+              <Select
+                value={""}
                 onChange={(e) => handleChange(e.target.value)}
+                label="Destination"
               >
-                <option value={"Select"} disabled>
+                <MenuItem value="" disabled>
                   Select
-                </option>
+                </MenuItem>
                 {DESTS.map((d) => (
-                  <option key={d.label} value={d.label}>
+                  <MenuItem key={d.label} value={d.label}>
                     {d.label}
-                  </option>
+                  </MenuItem>
                 ))}
-              </select>
-              <IoChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-600" />
-            </div>
+              </Select>
+            </FormControl>
           </div>
         </div>
         <div className="text-subtitle text-gray-600 my-36">
@@ -202,20 +203,20 @@ const BlogFetch = () => {
           <label className="text-sm font-medium text-gray-700">
             Destination
           </label>
-          <div className="relative inline-block">
-            <select
-              className="block w-full rounded-lg border-2 border-gray-400 bg-white px-3 py-2 pr-8 text-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          <FormControl variant="standard" sx={{ minWidth: 140 }}>
+            {/* <InputLabel>Destination</InputLabel> */}
+            <Select
               value={dest.label}
               onChange={(e) => handleChange(e.target.value)}
+              label="Destination"
             >
               {DESTS.map((d) => (
-                <option key={d.label} value={d.label}>
+                <MenuItem key={d.label} value={d.label}>
                   {d.label}
-                </option>
+                </MenuItem>
               ))}
-            </select>
-            <IoChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-600" />
-          </div>
+            </Select>
+          </FormControl>
 
           {/* <button
             type="button"

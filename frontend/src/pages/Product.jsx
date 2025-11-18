@@ -210,13 +210,14 @@ const Product = () => {
   };
 
   const mapsData = [forMapsData];
-  const [heartClicked, setHeartClicked] = useState(false);
+  const [heartClicked, setHeartClicked] = useState(null);
 
   useEffect(() => {
-    if (companyDetails) {
+    if (!companyDetails) return;
+    if (heartClicked === null) {
       setHeartClicked(companyDetails?.isLiked || false);
     }
-  }, [companyDetails]);
+  }, [companyDetails, heartClicked]);
 
   const { mutate: toggleLike } = useMutation({
     mutationFn: async (isLikedNow) => {
@@ -228,9 +229,9 @@ const Product = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      toast.success(data.message || "Updated successfully");
+      // toast.success(data.message || "Updated successfully");
       // Update heart state and refresh queries that depend on likes
-      setHeartClicked((prev) => !prev);
+      // setHeartClicked((prev) => !prev);
       queryClient.invalidateQueries(["userLikes"]);
       queryClient.invalidateQueries(["globallistings"]);
     },
@@ -429,9 +430,16 @@ const Product = () => {
 
                     <div
                       onClick={() => {
+                        if (!userId) {
+                          toast.error(
+                            "You need to login to access this feature"
+                          );
+                          return;
+                        }
+
                         const newLiked = !heartClicked;
-                        setHeartClicked(newLiked);
-                        toggleLike(newLiked);
+                        setHeartClicked(newLiked); // optimistic update
+                        toggleLike(newLiked); // API call
                       }}
                       className="cursor-pointer relative"
                     >
