@@ -438,7 +438,7 @@ export const addB2CformSubmission = async (req, res, next) => {
           productType: d.productType,
           sheetName: d.sheetName,
         }),
-        successMsg: "Enquiry added successfully",
+        successMsg: "Your enquiry has been sent.",
         emailTemplate: (data) => ({
           to: data.email,
           subject: "Your enquiry has been received",
