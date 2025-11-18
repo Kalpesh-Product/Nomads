@@ -699,16 +699,14 @@ export const registerFormSubmission = async (req, res) => {
       }
 
       // STEP 4: respond
-      console.log("sheetResult", sheetResult);
+      // console.log("sheetResult", sheetResult);
 
       if (searchKey) {
-        console.log("searchkey1", websiteResult);
         if (websiteResult.status === 201) {
           return res.status(201).json({
             message: "Form submitted successfully",
           });
         } else {
-          console.log("website !== 201", websiteResult);
           return res.status(400).json({
             message: websiteResult.message,
           });
