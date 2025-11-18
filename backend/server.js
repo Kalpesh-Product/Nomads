@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { config } from "dotenv";
 import { corsConfig } from "./config/corsConfig.js";
 import cors from "cors";
+import multer from "multer";
 import errorHandler from "./middlewares/errorHandler.js";
 import companyRoutes from "./routes/companyRoutes.js";
 import pocRoutes from "./routes/pocRoutes.js";
@@ -26,8 +27,8 @@ connectDb(process.env.MONGO_URL);
 app.use(credentials);
 app.use(cors(corsConfig));
 app.use(cookieParser());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 const PORT = process.env.PORT || 3000;
 
 app.use("/api/auth", authRoutes);
@@ -50,6 +51,27 @@ app.all("/*splat", (req, res) => {
     res.type("text").status(404).send("404 not found");
   }
 });
+
+app.use((err, req, res, next) => {
+  // Multer: file too large
+  if (err instanceof multer.MulterError && err.code === "LIMIT_FILE_SIZE") {
+    return res.status(413).json({
+      message:
+        "Some files are too large. Please keep images under the allowed size and try again.",
+    });
+  }
+
+  // express.json() or express.urlencoded(): body too large
+  if (err.type === "entity.too.large") {
+    return res.status(413).json({
+      message:
+        "The data you’re sending is too large. Please reduce the size and try again.",
+    });
+  }
+
+  next(err);
+});
+
 app.use(errorHandler);
 app.listen(
   PORT,

@@ -8,7 +8,7 @@ import axios from "axios";
 export const bulkInsertPoc = async (req, res, next) => {
   try {
     const file = req.file;
-    console.log("poc test hit");
+
     if (!file) {
       return res.status(400).json({
         message: "Please provide a valid CSV file",
@@ -23,13 +23,16 @@ export const bulkInsertPoc = async (req, res, next) => {
       companies.map((c) => [c.businessId, c.companyId])
     );
 
-    const existingPocs = await TestPointOfContact.find().select(
-      "name companyId"
-    );
+    const existingPocs = await PointOfContact.find()
+      .populate({ path: "company", select: "businessId" })
+      .select("name email companyId");
 
     const existingPocSet = new Set(
       existingPocs.map(
-        (poc) => `${poc.name?.trim().toLowerCase()}|${poc.companyId?.trim()}`
+        (poc) =>
+          `${poc?.email
+            ?.trim()
+            .toLowerCase()}|${poc.company.businessId?.trim()}`
       )
     );
 
@@ -39,6 +42,7 @@ export const bulkInsertPoc = async (req, res, next) => {
       const seenInCSV = new Set();
       const duplicateExistingLogs = [];
       const duplicateCSVLogs = [];
+      const missingCompanyRows = [];
 
       const stream = Readable.from(file.buffer.toString("utf-8").trim());
       stream
@@ -47,10 +51,20 @@ export const bulkInsertPoc = async (req, res, next) => {
           const businessId = row["Business ID"]?.trim();
           const companyMongoId = companyMap.get(businessId);
           const companyId = companyIdMap.get(businessId);
-          if (!companyMongoId) return;
+          if (!companyMongoId) {
+            missingCompanyRows.push({
+              businessId,
+              pocName: row["POC Name"]?.trim(),
+              email: row["Email"]?.trim(),
+              reason: "Invalid Business ID - Company not found",
+            });
+
+            return;
+          }
 
           const pocName = row["POC Name"]?.trim();
-          const pocKey = `${pocName?.toLowerCase()}|${businessId?.trim()}`;
+          const email = row["Email"]?.trim() || "";
+          const pocKey = `${email?.toLowerCase()}|${businessId?.trim()}`;
 
           if (existingPocSet.has(pocKey)) {
             duplicateExistingLogs.push({
@@ -66,6 +80,7 @@ export const bulkInsertPoc = async (req, res, next) => {
               businessId,
               companyId,
               name: pocName,
+              email: email,
               reason: "Duplicate within same CSV",
             });
             return;
@@ -94,33 +109,41 @@ export const bulkInsertPoc = async (req, res, next) => {
         })
         .on("end", () => {
           // Log duplicates for visibility
-          if (duplicateExistingLogs.length) {
-            console.log("\n=== EXISTING POCs IN DB ===");
-            console.table(duplicateExistingLogs);
-          }
-          if (duplicateCSVLogs.length) {
-            console.log("\n=== DUPLICATES FOUND IN SAME CSV ===");
-            console.table(duplicateCSVLogs);
-          }
+          // if (duplicateExistingLogs.length) {
+          //   console.log("\n=== EXISTING POCs IN DB ===");
+          //   console.table(duplicateExistingLogs);
+          // }
+          // if (duplicateCSVLogs.length) {
+          //   console.log("\n=== DUPLICATES FOUND IN SAME CSV ===");
+          //   console.table(duplicateCSVLogs);
+          // }
 
           resolve({
             pocs: temp,
             duplicateExistingLogs,
             duplicateCSVLogs,
+            missingCompanyRows,
           });
         })
         .on("error", (err) => reject(err));
     });
 
-    const { pocs, duplicateExistingLogs, duplicateCSVLogs } = parsedResult;
+    const {
+      pocs,
+      duplicateExistingLogs,
+      duplicateCSVLogs,
+      missingCompanyRows,
+    } = parsedResult;
 
     if (!pocs.length) {
       return res.status(400).json({
         message: `No valid POC data found in CSV. Check skipped entries below.`,
         skippedExisting: duplicateExistingLogs.length,
-        skippedDuplicateInCSV: duplicateCSVLogs.length,
         duplicateExistingLogs,
+        skippedDuplicateInCSV: duplicateCSVLogs.length,
         duplicateCSVLogs,
+        missingCompanyCount: missingCompanyRows.length,
+        missingCompanyRows,
       });
     }
 
@@ -129,7 +152,7 @@ export const bulkInsertPoc = async (req, res, next) => {
     let masterPanelStatus = "not attempted";
 
     try {
-      const uploadedPocs = await TestPointOfContact.insertMany(pocs);
+      const uploadedPocs = await PointOfContact.insertMany(pocs);
       nomadsStatus = "success";
 
       const masterPanelPocs = uploadedPocs.map((poc) => ({
@@ -147,24 +170,45 @@ export const bulkInsertPoc = async (req, res, next) => {
       // Sync with master panel
       try {
         const response = await axios.post(
-          "https://wonomasterbe.vercel.api/api/host-user/bulk-insert-poc",
+          "https://wonomasterbe.vercel.app/api/host-user/bulk-insert-poc",
           { pocs: masterPanelPocs },
           { headers: { "Content-Type": "application/json" } }
         );
         masterPanelStatus = `success (${response.status})`;
 
         return res.status(201).json({
-          message: `${pocs.length} POCs inserted successfully in both databases.`,
+          message: "Bulk insert completed successfully",
+          total:
+            pocs.length +
+            duplicateExistingLogs.length +
+            duplicateCSVLogs.length +
+            missingCompanyRows.length,
           inserted: pocs.length,
           skippedExisting: duplicateExistingLogs.length,
-          skippedDuplicateInCSV: duplicateCSVLogs.length,
           duplicateExistingLogs,
+          skippedDuplicateInCSV: duplicateCSVLogs.length,
           duplicateCSVLogs,
+          missingCompanyCount: missingCompanyRows.length,
+          missingCompanyRows,
           statusReport: {
             nomadsDB: nomadsStatus,
             masterPanel: masterPanelStatus,
+            masterPanelLogs: response.data,
           },
         });
+
+        // return res.status(201).json({
+        //   message: `${pocs.length} POCs inserted successfully in both databases.`,
+        //   inserted: pocs.length,
+        //   skippedExisting: duplicateExistingLogs.length,
+        //   skippedDuplicateInCSV: duplicateCSVLogs.length,
+        //   duplicateExistingLogs,
+        //   duplicateCSVLogs,
+        //   statusReport: {
+        //     nomadsDB: nomadsStatus,
+        //     masterPanel: masterPanelStatus,
+        //   },
+        // });
       } catch (masterErr) {
         console.error(
           "Master panel error:",
@@ -174,32 +218,68 @@ export const bulkInsertPoc = async (req, res, next) => {
 
         return res.status(201).json({
           message: "POCs inserted in Nomads DB, but master panel sync failed.",
+          total:
+            pocs.length +
+            duplicateExistingLogs.length +
+            duplicateCSVLogs.length +
+            missingCompanyRows.length,
           inserted: pocs.length,
           skippedExisting: duplicateExistingLogs.length,
-          skippedDuplicateInCSV: duplicateCSVLogs.length,
           duplicateExistingLogs,
+          skippedDuplicateInCSV: duplicateCSVLogs.length,
           duplicateCSVLogs,
+          missingCompanyCount: missingCompanyRows.length,
+          missingCompanyRows,
           statusReport: {
             nomadsDB: nomadsStatus,
-            masterPanel: masterErr.message,
+            masterPanel: masterErr.response?.data || masterErr.message,
           },
         });
+
+        // return res.status(201).json({
+        //   message: "POCs inserted in Nomads DB, but master panel sync failed.",
+        //   inserted: pocs.length,
+        //   skippedExisting: duplicateExistingLogs.length,
+        //   skippedDuplicateInCSV: duplicateCSVLogs.length,
+        //   duplicateExistingLogs,
+        //   duplicateCSVLogs,
+        //   statusReport: {
+        //     nomadsDB: nomadsStatus,
+        //     masterPanel: masterErr.message,
+        //   },
+        // });
       }
     } catch (nomadsErr) {
       nomadsStatus = `failed (${nomadsErr.message})`;
 
       return res.status(500).json({
         message: "Nomads DB upload failed. No data uploaded anywhere.",
+        total: 0,
         inserted: 0,
         skippedExisting: duplicateExistingLogs.length,
-        skippedDuplicateInCSV: duplicateCSVLogs.length,
         duplicateExistingLogs,
+        skippedDuplicateInCSV: duplicateCSVLogs.length,
         duplicateCSVLogs,
+        missingCompanyCount: missingCompanyRows.length,
+        missingCompanyRows,
         statusReport: {
           nomadsDB: nomadsStatus,
           masterPanel: "not attempted",
         },
       });
+
+      // return res.status(500).json({
+      //   message: "Nomads DB upload failed. No data uploaded anywhere.",
+      //   inserted: 0,
+      //   skippedExisting: duplicateExistingLogs.length,
+      //   skippedDuplicateInCSV: duplicateCSVLogs.length,
+      //   duplicateExistingLogs,
+      //   duplicateCSVLogs,
+      //   statusReport: {
+      //     nomadsDB: nomadsStatus,
+      //     masterPanel: "not attempted",
+      //   },
+      // });
     }
   } catch (error) {
     console.error("Bulk insert error:", error);

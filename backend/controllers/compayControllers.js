@@ -1066,14 +1066,16 @@ export const getListings = async (req, res, next) => {
     if (!listings || !listings.length) {
       return res.status(404).json({ error: "Company not found" });
     }
-    if (!reviews || !reviews.length) {
-      return res.status(200).json([]);
-    }
+    // if (!reviews || !reviews.length) {
+    //   return res.status(200).json({message:"No reviews found"});
+    // }
 
     const data = listings.map((list) => {
-      const totalReviews = companyType
-        ? reviews.filter((r) => r.company.companyType === companyType)
-        : reviews;
+      const totalReviews = reviews.length
+        ? companyType
+          ? reviews.filter((r) => r.company.companyType === companyType)
+          : reviews
+        : [];
 
       return { ...list, reviews: totalReviews };
     });
