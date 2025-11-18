@@ -651,7 +651,7 @@ export const registerFormSubmission = async (req, res) => {
       if (searchKey) {
         try {
           const submit = await fetch(
-            `https://wonomasterbe.vercel.app/api/editor/create-website`,
+            `http://localhost:5007/api/editor/create-website`,
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -698,12 +698,22 @@ export const registerFormSubmission = async (req, res) => {
         }
       }
 
-      const message = searchKey ? websiteResult : "Form submitted successfully";
       // STEP 4: respond
       console.log("sheetResult", sheetResult);
-      return res.status(201).json({
-        message: message,
-      });
+
+      if (searchKey) {
+        console.log("searchkey1", websiteResult);
+        if (websiteResult.status === 201) {
+          return res.status(201).json({
+            message: "Form submitted successfully",
+          });
+        } else {
+          console.log("website !== 201", websiteResult);
+          return res.status(400).json({
+            message: websiteResult.message,
+          });
+        }
+      }
     } catch (error) {
       await session.abortTransaction();
       session.endSession();
