@@ -7,7 +7,7 @@ export const isValidInternationalPhone = (value) => {
   try {
     const number = parsePhoneNumberFromString(value);
     if (!number || !number.isValid()) {
-      return "Enter a valid phone number";
+      return "Enter a valid phone number with country code";
     }
     return true;
   } catch {
