@@ -326,6 +326,7 @@ const Contact = () => {
                     <Button
                       type="submit"
                       variant="contained"
+                      disabled={isContactPending}
                       sx={{
                         bgcolor: "black",
                         borderRadius: 20,
