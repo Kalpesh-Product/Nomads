@@ -61,7 +61,7 @@ const JobApplicationForm = ({ title }) => {
     },
   });
 
-  const { mutate: submitJobApplication, isLoading } = useMutation({
+  const { mutate: submitJobApplication, isPending } = useMutation({
     mutationFn: async (data) => {
       const formatDOB = dayjs(data.dateOfBirth).format("YYYY-MM-DD");
       const formatSubmissionDate = dayjs(new Date()).format("YYYY-MM-DD");
@@ -477,6 +477,7 @@ const JobApplicationForm = ({ title }) => {
           <Button
             variant="contained"
             type="submit"
+            disabled={isPending}
             sx={{
               backgroundColor: "black",
               borderRadius: "9999px",
@@ -487,10 +488,10 @@ const JobApplicationForm = ({ title }) => {
               },
             }}
           >
-            {isLoading && (
+            {isPending && (
               <CircularProgress size={20} sx={{ color: "white", mr: 1 }} />
             )}
-            {isLoading ? "Submitting..." : "SUBMIT"}
+            {isPending ? "Submitting..." : "SUBMIT"}
           </Button>
         </div>
       </form>

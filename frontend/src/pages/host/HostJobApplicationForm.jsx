@@ -84,7 +84,7 @@ const HostJobApplicationForm = () => {
     });
   };
 
-  const { mutate: submitHostApplication, isLoading } = useMutation({
+  const { mutate: submitHostApplication, isPending } = useMutation({
     mutationFn: async () => {
       // Mirror the formatting from JobApplicationForm
       const formatDOB = formValues.dateOfBirth
@@ -436,7 +436,7 @@ const HostJobApplicationForm = () => {
           <Button
             variant="contained"
             type="submit"
-            disabled={isLoading}
+            disabled={isPending}
             sx={{
               backgroundColor: "black",
               borderRadius: "9999px",
@@ -445,10 +445,10 @@ const HostJobApplicationForm = () => {
               "&:hover": { backgroundColor: "#333" },
             }}
           >
-            {isLoading && (
+            {isPending && (
               <CircularProgress size={20} sx={{ color: "white", mr: 1 }} />
             )}
-            {isLoading ? "Submitting..." : "SUBMIT"}
+            {isPending ? "Submitting..." : "SUBMIT"}
           </Button>
         </div>
       </form>
