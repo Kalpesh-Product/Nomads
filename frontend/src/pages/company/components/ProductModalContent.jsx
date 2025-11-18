@@ -279,7 +279,16 @@ const ProductModalContent = ({ product, onClose }) => {
               <TempButton
                 disabled={isEnquiry}
                 type="submit"
-                buttonText="Get Quote"
+                buttonText={
+                  isEnquiry ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <span className="animate-spin h-4 w-4 border-2 border-gray-300 border-t-transparent rounded-full"></span>
+                      Submitting…
+                    </div>
+                  ) : (
+                    "Get Quote"
+                  )
+                }
               />
             </div>
           </form>
