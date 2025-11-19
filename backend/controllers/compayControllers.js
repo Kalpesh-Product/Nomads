@@ -381,7 +381,7 @@ export const createCompany = async (req, res, next) => {
     };
 
     if (!companyName) {
-      return res.status(400).json({ message: "Company Name are required" });
+      return res.status(400).json({ message: "Company Name is required" });
     }
 
     const companyExists = await Company.find({ companyId, companyType });
