@@ -644,7 +644,10 @@ export const getCompaniesData = async (req, res, next) => {
     // 1. Fetch all companies first
     // (same as old behaviour)
     // -----------------------------
-    const companies = await Company.find({ isActive: true })
+    const companies = await Company.find({
+      isActive: true,
+      companyType: { $ne: "privatestay" },
+    })
       .lean()
       .select(
         "_id companyName companyId companyType country state city address about website businessId registeredEntityName images logo rating ratings totalReviews inclusions latitude longitude continent isRegistered isPublic"
