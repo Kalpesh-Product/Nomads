@@ -42,15 +42,19 @@ const companySchema = new mongoose.Schema({
   city: {
     type: String,
     trim: true,
+    required: true,
   },
   state: {
     type: String,
+    required: true,
   },
   country: {
     type: String,
+    required: true,
   },
   continent: {
     type: String,
+    required: true,
   },
   about: {
     type: String,

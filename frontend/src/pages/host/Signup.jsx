@@ -798,31 +798,16 @@ const HostSignup = () => {
                     <Controller
                       name={`products.${index}.type`}
                       control={control}
-                      // rules={{ required: "Type is required" }}
                       render={({ field, fieldState }) => (
                         <TextField
                           {...field}
-                          select
                           label="Product Type"
                           fullWidth
                           margin="none"
                           variant="standard"
                           error={!!fieldState.error}
                           helperText={fieldState.error?.message}
-                        >
-                          {[
-                            "Co-working",
-                            "Hostels",
-                            "Workation",
-                            "Private Stay",
-                            "Meetings",
-                            "Cafe",
-                          ].map((option) => (
-                            <MenuItem key={option} value={option}>
-                              {option}
-                            </MenuItem>
-                          ))}
-                        </TextField>
+                        />
                       )}
                     />
 

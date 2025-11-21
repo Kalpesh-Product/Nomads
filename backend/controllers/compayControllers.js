@@ -381,7 +381,7 @@ export const createCompany = async (req, res, next) => {
     };
 
     if (!companyName) {
-      return res.status(400).json({ message: "Company Name is required" });
+      return res.status(400).json({ message: "Company Name are required" });
     }
 
     const companyExists = await Company.find({ companyId, companyType });
@@ -644,7 +644,10 @@ export const getCompaniesData = async (req, res, next) => {
     // 1. Fetch all companies first
     // (same as old behaviour)
     // -----------------------------
-    const companies = await Company.find({ isActive: true })
+    const companies = await Company.find({
+      isActive: true,
+      companyType: { $ne: "privatestay" },
+    })
       .lean()
       .select(
         "_id companyName companyId companyType country state city address about website businessId registeredEntityName images logo rating ratings totalReviews inclusions latitude longitude continent isRegistered isPublic"
@@ -1053,6 +1056,7 @@ export const getListings = async (req, res, next) => {
     const { companyType } = req.query;
     let query = { companyId: companyId };
 
+    console.log("get listings");
     if (companyType) {
       query = { ...query, companyType };
     }
@@ -1066,9 +1070,6 @@ export const getListings = async (req, res, next) => {
     if (!listings || !listings.length) {
       return res.status(404).json({ error: "Company not found" });
     }
-    // if (!reviews || !reviews.length) {
-    //   return res.status(200).json({message:"No reviews found"});
-    // }
 
     const data = listings.map((list) => {
       const totalReviews = reviews.length

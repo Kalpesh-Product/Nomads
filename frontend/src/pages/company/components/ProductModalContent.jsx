@@ -120,16 +120,17 @@ const ProductModalContent = ({ product, onClose }) => {
         </div>
 
         {images.length > 1 && (
-          <div className="absolute inset-0">
+          <div className="absolute inset-0 flex items-center justify-between px-2">
             <button
               onClick={prevSlide}
-              className="absolute top-1/2 left-2 -translate-y-1/2 bg-white text-black p-2 rounded-full"
+              className="bg-white text-black p-2 rounded-full"
             >
               <FaChevronLeft size={16} />
             </button>
+
             <button
               onClick={nextSlide}
-              className="absolute top-1/2 right-[53%] -translate-y-1/2 bg-white text-black p-2 rounded-full"
+              className="bg-white text-black p-2 rounded-full"
             >
               <FaChevronRight size={16} />
             </button>

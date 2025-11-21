@@ -4,7 +4,7 @@ import {
   addB2BFormSubmission,
   registerFormSubmission,
 } from "../controllers/form-controllers/b2bFormControllers.js";
-import upload from "../config/multerConfig.js";
+import upload, { uploadImages } from "../config/multerConfig.js";
 const router = Router();
 
 router.post(
@@ -18,6 +18,10 @@ router.post(
   addB2BFormSubmission
 );
 
-router.post("/register-form-submission", upload.any(), registerFormSubmission);
+router.post(
+  "/register-form-submission",
+  uploadImages.any(),
+  registerFormSubmission
+);
 
 export default router;
