@@ -111,6 +111,11 @@ export const changePassword = async (req, res) => {
         .status(400)
         .json({ message: "Password must be at least 6 characters long" });
     }
+    if (newPassword.length > 72) {
+      return res
+        .status(400)
+        .json({ message: "Password cannot exceed 72 characters" });
+    }
 
     // const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = newPassword;

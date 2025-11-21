@@ -165,6 +165,17 @@ export const resetPassword = async (req, res) => {
     if (password !== confirmPassword)
       return res.status(400).json({ message: "Passwords do not match" });
 
+    if (password.length < 6) {
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 6 characters long" });
+    }
+    if (password.length > 72) {
+      return res
+        .status(400)
+        .json({ message: "Password cannot exceed 72 characters" });
+    }
+
     // Hash the reset token to find user
     const resetPasswordToken = crypto
       .createHash("sha256")
