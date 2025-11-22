@@ -1903,12 +1903,12 @@ export const updateLeads = async (req, res, next) => {
 
     if (!leads) {
       return res.status(400).json({
-        message: "Failed to update lead status",
+        message: "Failed to update lead",
       });
     }
 
     return res.status(200).json({
-      message: "Leads updated",
+      message: `Lead ${comment ? "comment" : "status"} updated`,
     });
   } catch (error) {
     console.error("[getCompanyLeads] error:", error);
