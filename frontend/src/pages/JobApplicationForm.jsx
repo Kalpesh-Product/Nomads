@@ -73,16 +73,16 @@ const JobApplicationForm = ({ title }) => {
         submissionTime: formatSubmissionTime,
         experienceYears: parseInt(data.experienceYears),
         dob: formatDOB,
-        personality:
-          "A detail-oriented and adaptable developer who enjoys solving complex problems and learning new technologies.",
-        skills:
-          "Proficient in MERN stack, REST APIs, and responsive UI design; experienced with state management and database optimization.",
-        whyConsider:
-          "I bring a balance of technical expertise and collaborative mindset to deliver scalable, high-quality solutions efficiently.",
-        willingToBootstrap:
-          "Yes, I’m eager to contribute my skills and grow alongside the company.",
-        message:
-          "Excited about the opportunity to work on impactful projects and contribute to your team’s success.",
+        // personality:
+        //   "A detail-oriented and adaptable developer who enjoys solving complex problems and learning new technologies.",
+        // skills:
+        //   "Proficient in MERN stack, REST APIs, and responsive UI design; experienced with state management and database optimization.",
+        // whyConsider:
+        //   "I bring a balance of technical expertise and collaborative mindset to deliver scalable, high-quality solutions efficiently.",
+        // willingToBootstrap:
+        //   "Yes, I’m eager to contribute my skills and grow alongside the company.",
+        // message:
+        //   "Excited about the opportunity to work on impactful projects and contribute to your team’s success.",
       };
 
       const formData = new FormData();
