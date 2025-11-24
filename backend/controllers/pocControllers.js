@@ -4,6 +4,7 @@ import csvParser from "csv-parser";
 import Company from "../models/Company.js";
 import TestPointOfContact from "../models/TestPointOfContacts.js";
 import axios from "axios";
+import TestListing from "../models/TestCompany.js";
 
 export const bulkInsertPoc = async (req, res, next) => {
   try {
@@ -26,6 +27,20 @@ export const bulkInsertPoc = async (req, res, next) => {
     const existingPocs = await PointOfContact.find()
       .populate({ path: "company", select: "businessId" })
       .select("name email companyId");
+
+    const brokenCompanyRefs = existingPocs.filter((p) => !p.company);
+
+    if (brokenCompanyRefs.length) {
+      console.log("\n=== POCs WITH NULL COMPANY REF ===");
+      console.table(
+        brokenCompanyRefs.map((p) => ({
+          pocId: p._id,
+          pocName: p.name,
+          email: p.email,
+          company: p.company, // will be null or undefined
+        }))
+      );
+    }
 
     const existingPocSet = new Set(
       existingPocs.map(
@@ -169,6 +184,7 @@ export const bulkInsertPoc = async (req, res, next) => {
 
       // Sync with master panel
       try {
+        // https://wonomasterbe.vercel.app
         const response = await axios.post(
           "https://wonomasterbe.vercel.app/api/host-user/bulk-insert-poc",
           { pocs: masterPanelPocs },
