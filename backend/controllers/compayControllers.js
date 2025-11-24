@@ -766,38 +766,6 @@ export const getCompaniesDataNomads = async (req, res, next) => {
     const pipeline = [
       { $match: match },
 
-      // Compute rating + reviewCount SAFELY
-      {
-        $addFields: {
-          safeReviews: { $ifNull: ["$reviews", []] },
-
-          reviewCount: {
-            $size: { $ifNull: ["$reviews", []] },
-          },
-
-          rating: {
-            $cond: [
-              { $gt: [{ $size: { $ifNull: ["$reviews", []] } }, 0] },
-              {
-                $divide: [
-                  {
-                    $sum: {
-                      $map: {
-                        input: { $ifNull: ["$reviews", []] },
-                        as: "r",
-                        in: "$$r.starCount",
-                      },
-                    },
-                  },
-                  { $size: { $ifNull: ["$reviews", []] } },
-                ],
-              },
-              0,
-            ],
-          },
-        },
-      },
-
       {
         $project: {
           companyName: 1,
@@ -809,17 +777,11 @@ export const getCompaniesDataNomads = async (req, res, next) => {
           latitude: 1,
           longitude: 1,
 
-          // shrink images
+          // your original rating fields
+          ratings: 1,
+          totalReviews: 1,
+
           images: { $slice: ["$images", 1] },
-
-          // essentials only
-          reviewCount: 1,
-          rating: 1,
-
-          // minimal reviews
-          reviews: {
-            starCount: 1,
-          },
         },
       },
 
@@ -837,15 +799,15 @@ export const getCompaniesDataNomads = async (req, res, next) => {
 
       const likedSet = new Set((user?.likes || []).map((id) => id.toString()));
 
-      companyData = companyData.map((d) => ({
-        ...d,
-        isLiked: likedSet.has(d._id.toString()),
+      companyData = companyData.map((c) => ({
+        ...c,
+        isLiked: likedSet.has(c._id.toString()),
       }));
     }
 
     return res.status(200).json(companyData);
   } catch (error) {
-    console.error("🔥 Optimized getCompaniesDataNomads Error:", error);
+    console.error("Error:", error);
     next(error);
   }
 };
