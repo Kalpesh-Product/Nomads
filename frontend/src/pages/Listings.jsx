@@ -193,7 +193,7 @@ const Listings = () => {
     queryFn: async () => {
       const { country, location } = formData || {};
       const response = await axios.get(
-        `company/companies?country=${country}&state=${location}&userId=${
+        `company/companiesn?country=${country}&state=${location}&userId=${
           userId || ""
         }`
       );

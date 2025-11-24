@@ -19,6 +19,7 @@ import {
   bulkUpdateCompanyInclusions,
   deactivateProduct,
   editCompanyImagesBulk,
+  getCompaniesDataNomads,
 } from "../controllers/compayControllers.js";
 
 const router = Router();
@@ -35,6 +36,7 @@ router.patch(
 );
 
 router.get("/companies", getCompaniesData);
+router.get("/companiesn", getCompaniesDataNomads);
 router.patch("/activate-product", activateProduct);
 router.patch("/deactivate-product", deactivateProduct);
 router.get("/get-single-company-data", getCompanyData);

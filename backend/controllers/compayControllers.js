@@ -750,6 +750,135 @@ export const getCompaniesData = async (req, res, next) => {
   }
 };
 
+export const getCompaniesDataNomads = async (req, res, next) => {
+  try {
+    const { country, state, type, userId } = req.query;
+
+    // ---------------------------------------------------------
+    // 1. Build MATCH stage (case-insensitive matching)
+    // ---------------------------------------------------------
+    const match = {
+      isActive: true,
+      companyType: { $ne: "privatestay" },
+    };
+
+    const matchExpr = [];
+
+    if (type) {
+      matchExpr.push({
+        $eq: [{ $toLower: "$companyType" }, type.toLowerCase()],
+      });
+    }
+
+    if (country) {
+      matchExpr.push({
+        $eq: [{ $toLower: "$country" }, country.toLowerCase()],
+      });
+    }
+
+    if (state) {
+      matchExpr.push({
+        $eq: [{ $toLower: "$state" }, state.toLowerCase()],
+      });
+    }
+
+    if (matchExpr.length > 0) {
+      match.$expr = { $and: matchExpr };
+    }
+
+    // ---------------------------------------------------------
+    // 2. Aggregation pipeline
+    // ---------------------------------------------------------
+    const pipeline = [
+      { $match: match },
+
+      {
+        $lookup: {
+          from: "reviews",
+          localField: "_id",
+          foreignField: "company",
+          as: "reviews",
+        },
+      },
+
+      {
+        $lookup: {
+          from: "pointofcontacts",
+          let: { compId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$company", "$$compId"] },
+                    { $eq: ["$isActive", true] },
+                  ],
+                },
+              },
+            },
+            { $project: { name: 1, email: 1, phone: 1, isActive: 1 } },
+            { $limit: 1 },
+          ],
+          as: "poc",
+        },
+      },
+
+      { $addFields: { poc: { $arrayElemAt: ["$poc", 0] } } },
+
+      {
+        $project: {
+          _id: 1,
+          companyName: 1,
+          companyId: 1,
+          companyType: 1,
+          country: 1,
+          state: 1,
+          city: 1,
+          address: 1,
+          about: 1,
+          website: 1,
+          businessId: 1,
+          registeredEntityName: 1,
+          images: 1,
+          logo: 1,
+          rating: 1,
+          ratings: 1,
+          totalReviews: 1,
+          inclusions: 1,
+          latitude: 1,
+          longitude: 1,
+          continent: 1,
+          isRegistered: 1,
+          isPublic: 1,
+          reviews: 1,
+          poc: 1,
+        },
+      },
+    ];
+
+    let companyData = await Company.aggregate(pipeline);
+
+    // ---------------------------------------------------------
+    // 3. User Likes (fast, unchanged except mapping)
+    // ---------------------------------------------------------
+    if (userId) {
+      const user = await NomadUser.findById(userId).lean().select("likes");
+
+      const likedSet = new Set((user?.likes || []).map((id) => id.toString()));
+
+      companyData = companyData.map((d) => ({
+        ...d,
+        isLiked: likedSet.has(d._id.toString()),
+      }));
+    }
+
+    return res.status(200).json(companyData);
+  } catch (error) {
+    console.error("Error in Optimized getCompaniesDataNomads:", error);
+    next(error);
+  }
+};
+
 export const getCompanyData = async (req, res, next) => {
   // Array of llats & long for centres ot cover all regions
   // Add at the top of getCompanyData
