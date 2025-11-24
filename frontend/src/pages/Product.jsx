@@ -136,6 +136,11 @@ const Product = () => {
     mutationFn: async (data) => {
       const response = await axios.post("/forms/add-new-b2c-form-submission", {
         ...data,
+        startDate: data.startDate
+          ? dayjs(data.startDate).format("YYYY-MM-DD")
+          : "",
+        endDate: data.endDate ? dayjs(data.endDate).format("YYYY-MM-DD") : "",
+
         country: companyDetails?.country,
         state: companyDetails?.state,
         companyType: companyDetails?.companyType,
