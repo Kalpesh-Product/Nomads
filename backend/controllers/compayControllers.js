@@ -754,117 +754,87 @@ export const getCompaniesDataNomads = async (req, res, next) => {
   try {
     const { country, state, type, userId } = req.query;
 
-    // ---------------------------------------------------------
-    // 1. MATCH stage (index-friendly, no $toLower)
-    //    Case-insensitivity handled via collation instead.
-    // ---------------------------------------------------------
     const match = {
       isActive: true,
       companyType: { $ne: "privatestay" },
     };
 
-    if (type) {
-      // UI sends "coworking", "hostel", "workation", "meetingroom", etc.
-      // Collation will match "meetingRoom" == "meetingroom"
-      match.companyType = type;
-    }
+    if (type) match.companyType = type;
+    if (country) match.country = country;
+    if (state) match.state = state;
 
-    if (country) {
-      match.country = country; // "india" vs "India" handled by collation
-    }
-
-    if (state) {
-      match.state = state;
-    }
-
-    // ---------------------------------------------------------
-    // 2. Aggregation pipeline
-    // ---------------------------------------------------------
     const pipeline = [
       { $match: match },
 
-      // Reviews for each company
+      // Compute rating + reviewCount SAFELY
       {
-        $lookup: {
-          from: "reviews", // ensure actual collection name matches
-          localField: "_id",
-          foreignField: "company",
-          as: "reviews",
-        },
-      },
+        $addFields: {
+          safeReviews: { $ifNull: ["$reviews", []] },
 
-      // One active POC per company
-      {
-        $lookup: {
-          from: "pointofcontacts", // ensure actual collection name matches
-          let: { compId: "$_id" },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $and: [
-                    { $eq: ["$company", "$$compId"] },
-                    { $eq: ["$isActive", true] },
-                  ],
-                },
+          reviewCount: {
+            $size: { $ifNull: ["$reviews", []] },
+          },
+
+          rating: {
+            $cond: [
+              { $gt: [{ $size: { $ifNull: ["$reviews", []] } }, 0] },
+              {
+                $divide: [
+                  {
+                    $sum: {
+                      $map: {
+                        input: { $ifNull: ["$reviews", []] },
+                        as: "r",
+                        in: "$$r.starCount",
+                      },
+                    },
+                  },
+                  { $size: { $ifNull: ["$reviews", []] } },
+                ],
               },
-            },
-            { $project: { name: 1, email: 1, phone: 1, isActive: 1 } },
-            { $limit: 1 },
-          ],
-          as: "poc",
+              0,
+            ],
+          },
         },
       },
 
-      { $addFields: { poc: { $arrayElemAt: ["$poc", 0] } } },
-
-      // Only the fields you already used
       {
         $project: {
-          _id: 1,
           companyName: 1,
           companyId: 1,
           companyType: 1,
           country: 1,
           state: 1,
           city: 1,
-          address: 1,
-          about: 1,
-          website: 1,
-          businessId: 1,
-          registeredEntityName: 1,
-          images: 1,
-          logo: 1,
-          rating: 1,
-          ratings: 1,
-          totalReviews: 1,
-          inclusions: 1,
           latitude: 1,
           longitude: 1,
-          continent: 1,
-          isRegistered: 1,
-          isPublic: 1,
-          reviews: 1, // full reviews array preserved for your cards
-          poc: 1,
+
+          // shrink images
+          images: { $slice: ["$images", 1] },
+
+          // essentials only
+          reviewCount: 1,
+          rating: 1,
+
+          // minimal reviews
+          reviews: {
+            starCount: 1,
+          },
         },
       },
+
+      { $limit: 200 },
     ];
 
-    // IMPORTANT: use collation so equality matches ignore case
     let companyData = await Company.aggregate(pipeline).collation({
       locale: "en",
-      strength: 2, // case-insensitive
+      strength: 2,
     });
 
-    // ---------------------------------------------------------
-    // 3. User Likes (same logic, minimal work)
-    // ---------------------------------------------------------
-    if (userId) {
-      if (!mongoose.Types.ObjectId.isValid(userId)) {
-        return res.status(400).json({ message: "Invalid user id provided" });
-      }
-
+    // Add likes
+    if (userId && mongoose.Types.ObjectId.isValid(userId)) {
       const user = await NomadUser.findById(userId).lean().select("likes");
+
       const likedSet = new Set((user?.likes || []).map((id) => id.toString()));
 
       companyData = companyData.map((d) => ({
@@ -875,7 +845,7 @@ export const getCompaniesDataNomads = async (req, res, next) => {
 
     return res.status(200).json(companyData);
   } catch (error) {
-    console.error("Error in Super-Optimized getCompaniesDataNomads:", error);
+    console.error("🔥 Optimized getCompaniesDataNomads Error:", error);
     next(error);
   }
 };
