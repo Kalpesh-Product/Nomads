@@ -173,7 +173,7 @@ export const bulkInsertReviews = async (req, res, next) => {
         }
 
         try {
-          const result = await Review.insertMany(creviews);
+          const result = await Review.insertMany(reviews);
           const insertedCount = result.length;
 
           res.status(200).json({
