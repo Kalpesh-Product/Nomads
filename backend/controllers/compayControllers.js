@@ -754,114 +754,85 @@ export const getCompaniesDataNomads = async (req, res, next) => {
   try {
     const { country, state, type, userId } = req.query;
 
-    // ---------------------------------------------------------
-    // 1. Build MATCH stage (case-insensitive matching)
-    // ---------------------------------------------------------
     const match = {
       isActive: true,
       companyType: { $ne: "privatestay" },
     };
 
-    const matchExpr = [];
+    if (type) match.companyType = type;
+    if (country) match.country = country;
+    if (state) match.state = state;
 
-    if (type) {
-      matchExpr.push({
-        $eq: [{ $toLower: "$companyType" }, type.toLowerCase()],
-      });
-    }
-
-    if (country) {
-      matchExpr.push({
-        $eq: [{ $toLower: "$country" }, country.toLowerCase()],
-      });
-    }
-
-    if (state) {
-      matchExpr.push({
-        $eq: [{ $toLower: "$state" }, state.toLowerCase()],
-      });
-    }
-
-    if (matchExpr.length > 0) {
-      match.$expr = { $and: matchExpr };
-    }
-
-    // ---------------------------------------------------------
-    // 2. Aggregation pipeline
-    // ---------------------------------------------------------
     const pipeline = [
       { $match: match },
 
+      // Compute rating + reviewCount SAFELY
       {
-        $lookup: {
-          from: "reviews",
-          localField: "_id",
-          foreignField: "company",
-          as: "reviews",
-        },
-      },
+        $addFields: {
+          safeReviews: { $ifNull: ["$reviews", []] },
 
-      {
-        $lookup: {
-          from: "pointofcontacts",
-          let: { compId: "$_id" },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $and: [
-                    { $eq: ["$company", "$$compId"] },
-                    { $eq: ["$isActive", true] },
-                  ],
-                },
+          reviewCount: {
+            $size: { $ifNull: ["$reviews", []] },
+          },
+
+          rating: {
+            $cond: [
+              { $gt: [{ $size: { $ifNull: ["$reviews", []] } }, 0] },
+              {
+                $divide: [
+                  {
+                    $sum: {
+                      $map: {
+                        input: { $ifNull: ["$reviews", []] },
+                        as: "r",
+                        in: "$$r.starCount",
+                      },
+                    },
+                  },
+                  { $size: { $ifNull: ["$reviews", []] } },
+                ],
               },
-            },
-            { $project: { name: 1, email: 1, phone: 1, isActive: 1 } },
-            { $limit: 1 },
-          ],
-          as: "poc",
+              0,
+            ],
+          },
         },
       },
-
-      { $addFields: { poc: { $arrayElemAt: ["$poc", 0] } } },
 
       {
         $project: {
-          _id: 1,
           companyName: 1,
           companyId: 1,
           companyType: 1,
           country: 1,
           state: 1,
           city: 1,
-          address: 1,
-          about: 1,
-          website: 1,
-          businessId: 1,
-          registeredEntityName: 1,
-          images: 1,
-          logo: 1,
-          rating: 1,
-          ratings: 1,
-          totalReviews: 1,
-          inclusions: 1,
           latitude: 1,
           longitude: 1,
-          continent: 1,
-          isRegistered: 1,
-          isPublic: 1,
-          reviews: 1,
-          poc: 1,
+
+          // shrink images
+          images: { $slice: ["$images", 1] },
+
+          // essentials only
+          reviewCount: 1,
+          rating: 1,
+
+          // minimal reviews
+          reviews: {
+            starCount: 1,
+          },
         },
       },
+
+      { $limit: 200 },
     ];
 
-    let companyData = await Company.aggregate(pipeline);
+    let companyData = await Company.aggregate(pipeline).collation({
+      locale: "en",
+      strength: 2,
+    });
 
-    // ---------------------------------------------------------
-    // 3. User Likes (fast, unchanged except mapping)
-    // ---------------------------------------------------------
-    if (userId) {
+    // Add likes
+    if (userId && mongoose.Types.ObjectId.isValid(userId)) {
       const user = await NomadUser.findById(userId).lean().select("likes");
 
       const likedSet = new Set((user?.likes || []).map((id) => id.toString()));
@@ -874,7 +845,7 @@ export const getCompaniesDataNomads = async (req, res, next) => {
 
     return res.status(200).json(companyData);
   } catch (error) {
-    console.error("Error in Optimized getCompaniesDataNomads:", error);
+    console.error("🔥 Optimized getCompaniesDataNomads Error:", error);
     next(error);
   }
 };
