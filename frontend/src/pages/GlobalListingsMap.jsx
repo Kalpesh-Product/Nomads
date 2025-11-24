@@ -335,14 +335,17 @@ const GlobalListingsMap = () => {
         name: item.companyName,
         location: item.city,
         reviews: item.reviewCount,
-        rating: item.ratings
-          ? (() => {
-              const avg =
-                item.reviews.reduce((sum, r) => sum + r.starCount, 0) /
-                item.reviews.length;
-              return avg % 1 === 0 ? avg : avg.toFixed(1);
-            })()
-          : "0",
+        // rating: item.ratings
+        //   ? (() => {
+        //       const avg =
+        //         item.reviews.reduce((sum, r) => sum + r.starCount, 0) /
+        //         item.reviews.length;
+        //       return avg % 1 === 0 ? avg : avg.toFixed(1);
+        //     })()
+        //   : "0",
+        rating: item.ratings || 0,
+        reviews: item.totalReviews || 0,
+
         image:
           item.images?.[0]?.url ||
           "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
