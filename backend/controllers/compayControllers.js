@@ -755,35 +755,26 @@ export const getCompaniesDataNomads = async (req, res, next) => {
     const { country, state, type, userId } = req.query;
 
     // ---------------------------------------------------------
-    // 1. Build MATCH stage (case-insensitive matching)
+    // 1. MATCH stage (index-friendly, no $toLower)
+    //    Case-insensitivity handled via collation instead.
     // ---------------------------------------------------------
     const match = {
       isActive: true,
       companyType: { $ne: "privatestay" },
     };
 
-    const matchExpr = [];
-
     if (type) {
-      matchExpr.push({
-        $eq: [{ $toLower: "$companyType" }, type.toLowerCase()],
-      });
+      // UI sends "coworking", "hostel", "workation", "meetingroom", etc.
+      // Collation will match "meetingRoom" == "meetingroom"
+      match.companyType = type;
     }
 
     if (country) {
-      matchExpr.push({
-        $eq: [{ $toLower: "$country" }, country.toLowerCase()],
-      });
+      match.country = country; // "india" vs "India" handled by collation
     }
 
     if (state) {
-      matchExpr.push({
-        $eq: [{ $toLower: "$state" }, state.toLowerCase()],
-      });
-    }
-
-    if (matchExpr.length > 0) {
-      match.$expr = { $and: matchExpr };
+      match.state = state;
     }
 
     // ---------------------------------------------------------
@@ -792,18 +783,20 @@ export const getCompaniesDataNomads = async (req, res, next) => {
     const pipeline = [
       { $match: match },
 
+      // Reviews for each company
       {
         $lookup: {
-          from: "reviews",
+          from: "reviews", // ensure actual collection name matches
           localField: "_id",
           foreignField: "company",
           as: "reviews",
         },
       },
 
+      // One active POC per company
       {
         $lookup: {
-          from: "pointofcontacts",
+          from: "pointofcontacts", // ensure actual collection name matches
           let: { compId: "$_id" },
           pipeline: [
             {
@@ -825,6 +818,7 @@ export const getCompaniesDataNomads = async (req, res, next) => {
 
       { $addFields: { poc: { $arrayElemAt: ["$poc", 0] } } },
 
+      // Only the fields you already used
       {
         $project: {
           _id: 1,
@@ -850,20 +844,27 @@ export const getCompaniesDataNomads = async (req, res, next) => {
           continent: 1,
           isRegistered: 1,
           isPublic: 1,
-          reviews: 1,
+          reviews: 1, // full reviews array preserved for your cards
           poc: 1,
         },
       },
     ];
 
-    let companyData = await Company.aggregate(pipeline);
+    // IMPORTANT: use collation so equality matches ignore case
+    let companyData = await Company.aggregate(pipeline).collation({
+      locale: "en",
+      strength: 2, // case-insensitive
+    });
 
     // ---------------------------------------------------------
-    // 3. User Likes (fast, unchanged except mapping)
+    // 3. User Likes (same logic, minimal work)
     // ---------------------------------------------------------
     if (userId) {
-      const user = await NomadUser.findById(userId).lean().select("likes");
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+        return res.status(400).json({ message: "Invalid user id provided" });
+      }
 
+      const user = await NomadUser.findById(userId).lean().select("likes");
       const likedSet = new Set((user?.likes || []).map((id) => id.toString()));
 
       companyData = companyData.map((d) => ({
@@ -874,7 +875,7 @@ export const getCompaniesDataNomads = async (req, res, next) => {
 
     return res.status(200).json(companyData);
   } catch (error) {
-    console.error("Error in Optimized getCompaniesDataNomads:", error);
+    console.error("Error in Super-Optimized getCompaniesDataNomads:", error);
     next(error);
   }
 };
