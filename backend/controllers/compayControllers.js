@@ -384,14 +384,15 @@ export const createCompany = async (req, res, next) => {
       return res.status(400).json({ message: "Company Name are required" });
     }
 
-    const companyExists = await Company.find({ companyId, companyType });
+    const companyExists = await Company.findOne({ companyId, companyType });
 
     if (companyExists) {
+      console.log("companyType", companyExists);
       return res
         .status(400)
         .json({ message: `${companyType} product already exists` });
     }
-
+    console.log("continent", continent);
     // Create company
     const company = new Company({
       businessId: generateBuisnessId(),
