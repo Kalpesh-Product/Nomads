@@ -97,7 +97,7 @@ const HostHeader = () => {
                 padding="py-3"
                 uppercase
                 handleSubmit={() => {
-                  window.location.href = "https://wonofe.vercel.app"; // ✅ external redirect
+                  window.location.href = "https://wonohostfe.vercel.app"; // ✅ external redirect
                 }}
                 className="bg-[#FF5757] flex text-white font-[500] capitalize hover:bg-[#E14C4C] w-[7rem] px-4"
               />
@@ -179,7 +179,7 @@ const HostHeader = () => {
                 //   setOpen(false);
                 // }}
                 handleSubmit={() => {
-                  window.location.href = "https://wonofe.vercel.app"; // ✅ external redirect
+                  window.location.href = "https://wonohostfe.vercel.app"; // ✅ external redirect
                 }}
               />
             </div>
