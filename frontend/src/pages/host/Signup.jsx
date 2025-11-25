@@ -177,16 +177,34 @@ const HostSignup = () => {
       reset();
       setActiveStep((prev) => prev + 1); // 👈 go to Step 5 after submit
     },
+    // onError: (error) => {
+    //   // toast.error(error.response?.data?.message || "Something went wrong");
+    //   toast.error(
+    //     typeof error.response?.data?.message === "string"
+    //       ? error.response.data.message
+    //       : error.response?.data?.message?.message || "Something went wrong"
+    //   );
+
+    //   reset();
+    //   setActiveStep((prev) => prev + 1); // 👈 go to Step 5 after submit (To be removed later)
+    // },
     onError: (error) => {
-      // toast.error(error.response?.data?.message || "Something went wrong");
-      toast.error(
-        typeof error.response?.data?.message === "string"
-          ? error.response.data.message
-          : error.response?.data?.message?.message || "Something went wrong"
-      );
+      let message;
+
+      if (error?.response?.status === 413) {
+        message =
+          "Your upload is too large. Please ensure that upload size is below 4.5 MB and try again.";
+      } else if (typeof error?.response?.data?.message === "string") {
+        message = error.response.data.message;
+      } else {
+        message =
+          error?.response?.data?.message?.message || "Something went wrong";
+      }
+
+      toast.error(message);
 
       reset();
-      setActiveStep((prev) => prev + 1); // 👈 go to Step 5 after submit (To be removed later)
+      setActiveStep((prev) => prev + 1); // your temporary thing
     },
   });
 
