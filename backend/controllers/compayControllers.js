@@ -372,6 +372,9 @@ export const createCompany = async (req, res, next) => {
       description,
     } = req.body;
 
+    console.log("images", images);
+    console.log("reviews", reviews);
+
     const generateBuisnessId = () => {
       const base = "WoNo_world";
       const id = `${base} ${companyType} ${city} ${Date.now()}`;
@@ -523,13 +526,14 @@ export const createCompany = async (req, res, next) => {
 
     /** ---------------- REVIEWS LOGIC ---------------- **/
     let savedReviews;
+
     if (Array.isArray(reviews) && reviews.length > 0) {
       const reviewDocs = reviews.map((review) => ({
         company: savedCompany._id,
         companyId,
         name: review.name?.trim(),
         starCount: parseInt(review.starCount || 1),
-        description: review.description?.trim(),
+        description: review.review?.trim(),
         reviewSource: review.reviewSource?.trim(),
         reviewLink: review.reviewLink?.trim(),
       }));
@@ -1135,11 +1139,12 @@ export const getListings = async (req, res, next) => {
     }
 
     const data = listings.map((list) => {
-      const totalReviews = reviews.length
-        ? companyType
-          ? reviews.filter((r) => r.company.companyType === companyType)
-          : reviews
-        : [];
+      const totalReviews =
+        reviews.length > 0
+          ? companyType
+            ? reviews.filter((r) => r?.company?.companyType === companyType)
+            : reviews
+          : [];
 
       return { ...list, reviews: totalReviews };
     });
@@ -1794,7 +1799,7 @@ export const editCompany = async (req, res, next) => {
         companyId: company.companyId,
         name: review.name?.trim(),
         starCount: parseInt(review.starCount),
-        description: review.description?.trim(),
+        description: review.review?.trim(),
         reviewSource: review.reviewSource?.trim(),
         reviewLink: review.reviewLink?.trim(),
       }));
