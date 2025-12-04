@@ -755,6 +755,21 @@ export const getCompaniesData = async (req, res, next) => {
   }
 };
 
+export const getCompaniesDataMaster = async (req, res, next) => {
+  try {
+    const companies = await Company.find(
+      { isActive: true, companyType: { $ne: "privatestay" } },
+      "_id companyName companyId companyType country state"
+    )
+      .lean()
+      .exec();
+
+    res.status(200).json(companies);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const getCompaniesDataNomads = async (req, res, next) => {
   try {
     const { country, state, type, userId } = req.query;
