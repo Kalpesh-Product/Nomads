@@ -94,25 +94,41 @@ const BlogFetch = () => {
     if (initialized.current) return;
     initialized.current = true;
 
-    const selectedDest = formData?.location;
-    if (selectedDest) {
-      const found = DESTS.find((d) => d.keyword === selectedDest);
-      if (found) {
-        setDest(found);
-        setSearchParams({ dest: found.label });
+    // 1) Priority: URL (?dest=...)
+    const urlDestLabel = searchParams.get("dest");
+    if (urlDestLabel) {
+      const foundByLabel = DESTS.find((d) => d.label === urlDestLabel);
+      if (foundByLabel) {
+        setDest(foundByLabel);
         return;
       } else {
-        // 🚫 No matching destination
+        // URL has an unknown destination -> keep original behavior (null + clear)
         setDest(null);
         setSearchParams({});
         return;
       }
     }
 
-    // 🚫 No location in formData
+    // 2) Fallback: Redux (formData.location uses keyword)
+    const selectedDest = formData?.location;
+    if (selectedDest) {
+      const foundByKeyword = DESTS.find((d) => d.keyword === selectedDest);
+      if (foundByKeyword) {
+        setDest(foundByKeyword);
+        setSearchParams({ dest: foundByKeyword.label });
+        return;
+      } else {
+        // No matching destination -> original behavior
+        setDest(null);
+        setSearchParams({});
+        return;
+      }
+    }
+
+    // 3) No location in Redux -> original behavior
     setDest(null);
     setSearchParams({});
-  }, [formData, setSearchParams]);
+  }, [formData, searchParams, setSearchParams]);
 
   const handleChange = (val) => {
     const selected = DESTS.find((d) => d.label === val);

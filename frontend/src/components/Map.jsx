@@ -159,7 +159,7 @@ export default function Map({
     (loc) => {
       if (!disableNavigation) {
         navigate(`/listings/${loc.name}`, {
-          state: { companyId: loc?.companyId, type: loc?.type },
+          state: { companyId: loc?.companyId, type: loc?.companyType },
         });
       }
     },
@@ -178,24 +178,21 @@ export default function Map({
   );
 
   if (!isLoaded) return <div>Loading...</div>;
-const clusterOptions = {
-  styles: [
-    {
-      url: `data:image/svg+xml;utf-8,
+  const clusterOptions = {
+    styles: [
+      {
+        url: `data:image/svg+xml;utf-8,
         <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30">
           <circle cx="15" cy="15" r="15" fill="rgba(37,99,235,0.7)" />
         </svg>`,
-      height: 30,
-      width: 30,
-      textColor: "#000",
-      textSize: 10, // bumped a bit so numbers don’t look squished
-      fontFamily : "poppins"
-    },
-  ],
-};
-
-
-
+        height: 30,
+        width: 30,
+        textColor: "#000",
+        textSize: 10, // bumped a bit so numbers don’t look squished
+        fontFamily: "poppins",
+      },
+    ],
+  };
 
   return (
     <GoogleMap

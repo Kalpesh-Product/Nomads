@@ -86,7 +86,13 @@ const JobDetails = () => {
             {/* Footer */}
 
             <p className="text-sm pb-8 mt-0 border-t border-gray-300 ">
-              Please send in your Resume to <strong>Email : hr@wono.co</strong>{" "}
+              Please send in your Resume to{" "}
+              <strong>
+                Email :{" "}
+                <a className="text-primary-blue" href="mailto:hr@wono.co">
+                  hr@wono.co
+                </a>
+              </strong>{" "}
               if unable to apply now
             </p>
           </div>
