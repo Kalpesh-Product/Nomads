@@ -79,50 +79,45 @@ const NewsFetch = () => {
   const formData = useSelector((state) => state.location.formValues);
   const initialized = useRef(false);
 
-  // ✅ Sync dropdown with URL params on page load
-  // ✅ Sync dropdown with formData only on mount
-  // useEffect(() => {
-  //   if (initialized.current) return; // ✅ don’t override after first run
-  //   initialized.current = true;
-
-  //   const selectedDest = formData?.location;
-  //   if (selectedDest) {
-  //     const found = DESTS.find((d) => d.keyword === selectedDest);
-  //     if (found) {
-  //       setDest(found);
-  //       setSearchParams({ dest: found.label });
-  //       return;
-  //     }
-  //   }
-
-  //   // fallback = All
-  //   setDest(DESTS[0]);
-  //   setSearchParams({ dest: DESTS[0].label });
-  // }, [formData, setSearchParams]);
-
   useEffect(() => {
-    if (initialized.current) return; // ✅ don’t override after first run
+    if (initialized.current) return;
     initialized.current = true;
 
-    const selectedDest = formData?.location;
-    if (selectedDest) {
-      const found = DESTS.find((d) => d.keyword === selectedDest);
-      if (found) {
-        setDest(found);
-        setSearchParams({ dest: found.label });
+    // 1️⃣ Priority: URL (?dest=...)
+    const urlDestLabel = searchParams.get("dest");
+    if (urlDestLabel) {
+      const foundByLabel = DESTS.find((d) => d.label === urlDestLabel);
+      if (foundByLabel) {
+        setDest(foundByLabel);
         return;
       } else {
-        // 🚫 No matching destination
+        // 🚫 Unknown destination in URL → original behavior
         setDest(null);
         setSearchParams({});
         return;
       }
     }
 
-    // 🚫 No location in formData at all
+    // 2️⃣ Fallback: Redux (keyword-based)
+    const selectedDest = formData?.location;
+    if (selectedDest) {
+      const foundByKeyword = DESTS.find((d) => d.keyword === selectedDest);
+      if (foundByKeyword) {
+        setDest(foundByKeyword);
+        setSearchParams({ dest: foundByKeyword.label });
+        return;
+      } else {
+        // 🚫 No matching destination → original behavior
+        setDest(null);
+        setSearchParams({});
+        return;
+      }
+    }
+
+    // 3️⃣ No destination at all → original behavior
     setDest(null);
     setSearchParams({});
-  }, [formData, setSearchParams]);
+  }, [formData, searchParams, setSearchParams]);
 
   const handleChange = (val) => {
     const selected = DESTS.find((d) => d.label === val);
