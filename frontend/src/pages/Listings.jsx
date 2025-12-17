@@ -51,6 +51,7 @@ const Listings = () => {
     "mehak.wono@gmail.com",
     "savita.wono@gmail.com",
     "k@k.k",
+    "vishal.wono@gmail.com",
   ];
 
   const selectedCountry = watch("country");
