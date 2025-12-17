@@ -50,6 +50,7 @@ const GlobalListingsList = () => {
     "mehak.wono@gmail.com",
     "savita.wono@gmail.com",
     "k@k.k",
+    "vishal.wono@gmail.com",
   ];
 
   // const { data: locations = [], isLoading: isLocations } = useQuery({
