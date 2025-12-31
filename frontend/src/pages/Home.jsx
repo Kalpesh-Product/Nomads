@@ -80,6 +80,8 @@ const Home = () => {
     "mehak.wono@gmail.com",
     "savita.wono@gmail.com",
     "k@k.k",
+    "gourish.wono@gmail.com",
+    "vishal.wono@gmail.com",
   ];
 
   // -------------------------------------
