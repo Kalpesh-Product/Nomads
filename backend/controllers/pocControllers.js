@@ -248,6 +248,7 @@ export const bulkInsertPoc = async (req, res, next) => {
           missingCompanyRows,
           statusReport: {
             nomadsDB: nomadsStatus,
+            masterPanelStatus,
             masterPanel: masterErr.response?.data || masterErr.message,
           },
         });
