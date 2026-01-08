@@ -257,6 +257,11 @@ const Product = () => {
   return (
     <div className="p-4">
       <div className="min-w-[70%] max-w-[80rem] lg:max-w-[70rem] mx-0 md:mx-auto">
+        <div className="pb-4">
+          <h1 className="text-title font-semibold text-secondary-dark">
+            {companyDetails?.companyName || "Unknown"}
+          </h1>
+        </div>
         <div className="flex flex-col gap-8">
           {/* Image Section */}
           {isCompanyDetails ? (
@@ -539,7 +544,7 @@ const Product = () => {
 
               <div className="shadow-md flex flex-col gap-4 p-6 rounded-xl border-2">
                 <h1 className="text-card-title text-secondary-dark font-semibold leading-normal">
-                  Enquire & Recieve Quote
+                  Enquire & Receive Quote
                 </h1>
                 <form
                   onSubmit={handleSubmit((data) => submitEnquiry(data))}
