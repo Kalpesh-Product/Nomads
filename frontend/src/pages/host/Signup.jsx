@@ -1244,7 +1244,7 @@ const HostSignup = () => {
               </div>
 
               <div>
-                <p>Did not recieve an email ? Please check your spam folder.</p>
+                <p>Did not receive an email ? Please check your spam folder.</p>
               </div>
             </div>
           </div>

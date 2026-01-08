@@ -539,7 +539,7 @@ const Product = () => {
 
               <div className="shadow-md flex flex-col gap-4 p-6 rounded-xl border-2">
                 <h1 className="text-card-title text-secondary-dark font-semibold leading-normal">
-                  Enquire & Recieve Quote
+                  Enquire & Receive Quote
                 </h1>
                 <form
                   onSubmit={handleSubmit((data) => submitEnquiry(data))}
