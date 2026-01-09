@@ -170,6 +170,16 @@ const GlobalListingsList = () => {
     );
   }, [filteredLocation]);
 
+  const selectedLocationLabel = useMemo(() => {
+    if (!formData?.location) return "";
+    const normalizedLocation = formData.location.toLowerCase();
+    return (
+      locationOptions.find(
+        (option) => option.value?.toLowerCase() === normalizedLocation
+      )?.label || formData.location
+    );
+  }, [formData?.location, locationOptions]);
+
   const countOptions = [
     { label: "1 - 5", value: "1-5" },
     { label: "5 - 10", value: "5-10" },
@@ -717,12 +727,7 @@ const GlobalListingsList = () => {
                       const showViewMore = sortedItems.length > 5;
                       const sectionTitle = `Popular ${
                         typeLabels[type] || typeLabels.default(type)
-                      } in ${
-                        formData?.location
-                          ? formData.location.charAt(0).toUpperCase() +
-                            formData.location.slice(1)
-                          : ""
-                      }`;
+                      } in ${selectedLocationLabel}`;
 
                       return (
                         <div key={type} className="col-span-full mb-6">
