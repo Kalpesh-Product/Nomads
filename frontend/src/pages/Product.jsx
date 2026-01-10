@@ -207,6 +207,7 @@ const Product = () => {
     lat: companyDetails?.latitude,
     lng: companyDetails?.longitude,
     name: companyDetails?.companyName,
+    googleMap: companyDetails?.googleMap,
     location: companyDetails?.city,
     reviews: companyDetails?.totalReviews,
     ratings: companyDetails?.ratings,
@@ -260,7 +261,7 @@ const Product = () => {
       <div className="min-w-[70%] max-w-[80rem] lg:max-w-[70rem] mx-0 md:mx-auto">
         <div className="pb-4">
           <h1 className="text-title font-semibold text-secondary-dark">
-            {companyDetails?.companyName || "Title"}
+            {companyDetails?.companyName || "Loading Title..."}
           </h1>
         </div>
         <div className="flex flex-col gap-8">

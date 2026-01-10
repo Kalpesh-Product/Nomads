@@ -157,6 +157,10 @@ export default function Map({
 
   const handleMarkerClick = useCallback(
     (loc) => {
+      if (disableNavigation && loc?.googleMap) {
+        window.open(loc.googleMap, "_blank", "noopener,noreferrer");
+        return;
+      }
       if (!disableNavigation) {
         navigate(`/listings/${encodeURIComponent(loc.name)}`, {
           state: { companyId: loc?.companyId, type: loc?.companyType },
