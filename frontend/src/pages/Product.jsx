@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate, useParams } from "react-router-dom";
 import { Controller, useForm } from "react-hook-form";
 import { TextField } from "@mui/material";
 import { DesktopDatePicker } from "@mui/x-date-pickers";
@@ -35,7 +35,12 @@ dayjs.extend(relativeTime);
 const Product = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { companyId, type } = location.state;
+  const { company } = useParams();
+  const locationState = location.state || {};
+  const { companyId: stateCompanyId, type: stateType } = locationState;
+  const companyName = company ? company.trim() : "";
+  const companyId = stateCompanyId || null;
+  const type = stateType || null;
   const queryClient = useQueryClient();
   const { auth } = useAuth();
   const userId = auth?.user?._id || auth?.user?.id;
@@ -48,17 +53,32 @@ const Product = () => {
   const axiosPrivate = useAxiosPrivate();
 
   const { data: companyDetails, isPending: isCompanyDetails } = useQuery({
-    queryKey: ["companyDetails", companyId, userId || "guest"], // safe for guests too
+    queryKey: [
+      "companyDetails",
+      companyId,
+      companyName || "unknown",
+      userId || "guest",
+    ], // safe for guests too
     queryFn: async () => {
-      const url = userId
-        ? `company/get-single-company-data?companyId=${companyId}&companyType=${type}&userId=${userId}`
-        : `company/get-single-company-data?companyId=${companyId}&companyType=${type}`;
+      const params = new URLSearchParams();
+      if (companyId) {
+        params.set("companyId", companyId);
+      } else if (companyName) {
+        params.set("companyName", companyName);
+      }
+      if (type) {
+        params.set("companyType", type);
+      }
+      if (userId) {
+        params.set("userId", userId);
+      }
+      const url = `company/get-single-company-data?${params.toString()}`;
       const response = await axios.get(url); // ✅ use public axios when not logged in
 
       console.log("logox", response.data.logo.url);
       return response?.data;
     },
-    enabled: !!companyId, // ✅ allow guests to load
+    enabled: !!companyId || !!companyName, // ✅ allow guests to load
     refetchOnMount: "always",
   });
 
@@ -95,6 +115,7 @@ const Product = () => {
       startDate: null,
       endDate: null,
     },
+
     mode: "onChange",
   });
 
@@ -206,6 +227,7 @@ const Product = () => {
     lat: companyDetails?.latitude,
     lng: companyDetails?.longitude,
     name: companyDetails?.companyName,
+    googleMap: companyDetails?.googleMap,
     location: companyDetails?.city,
     reviews: companyDetails?.totalReviews,
     ratings: companyDetails?.ratings,
@@ -259,7 +281,7 @@ const Product = () => {
       <div className="min-w-[70%] max-w-[80rem] lg:max-w-[70rem] mx-0 md:mx-auto">
         <div className="pb-4">
           <h1 className="text-title font-semibold text-secondary-dark">
-            {companyDetails?.companyName || "Unknown"}
+            {companyDetails?.companyName || "Loading Title..."}
           </h1>
         </div>
         <div className="flex flex-col gap-8">

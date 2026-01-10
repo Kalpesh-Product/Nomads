@@ -68,12 +68,15 @@ const Favorites = () => {
                 item={{ ...item, isLiked: true }} // ✅ mark as liked
                 showVertical={true}
                 handleNavigation={() =>
-                  navigate(`/listings/${item.companyName}`, {
-                    state: {
-                      companyId: item.companyId,
-                      type: item.companyType,
-                    },
-                  })
+                  navigate(
+                    `/listings/${encodeURIComponent(item.companyName)}`,
+                    {
+                      state: {
+                        companyId: item.companyId,
+                        type: item.companyType,
+                      },
+                    }
+                  )
                 }
               />
             ))}

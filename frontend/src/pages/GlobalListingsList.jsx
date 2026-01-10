@@ -742,12 +742,17 @@ const GlobalListingsList = () => {
                                 item={item}
                                 showVertical={false}
                                 handleNavigation={() =>
-                                  navigate(`/listings/${item.companyName}`, {
-                                    state: {
-                                      companyId: item.companyId,
-                                      type: item.companyType,
-                                    },
-                                  })
+                                  navigate(
+                                    `/listings/${encodeURIComponent(
+                                      item.companyName
+                                    )}`,
+                                    {
+                                      state: {
+                                        companyId: item.companyId,
+                                        type: item.companyType,
+                                      },
+                                    }
+                                  )
                                 }
                               />
                             ))}
