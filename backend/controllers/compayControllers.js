@@ -733,6 +733,11 @@ export const getCompaniesData = async (req, res, next) => {
     // -----------------------------
     // 6. User likes (unchanged logic)
     // -----------------------------
+
+    if (!companyData) {
+      return res.status(404).json({ error: "Company not found" });
+    }
+
     if (userId) {
       if (!mongoose.Types.ObjectId.isValid(userId)) {
         return res.status(400).json({ message: "Invalid user id provided" });
@@ -899,15 +904,30 @@ export const getCompanyData = async (req, res, next) => {
   };
 
   try {
-    const { companyId, companyType, userId } = req.query;
+    const { companyId, companyType, userId, companyName } = req.query;
 
     let companyQuery = {};
 
     if (companyId) {
       companyQuery.companyId = companyId;
     }
+    const normalizedCompanyName =
+      typeof companyName === "string" ? companyName.trim() : "";
+    if (!companyId && normalizedCompanyName) {
+      const escapedCompanyName = normalizedCompanyName.replace(
+        /[.*+?^${}()|[\]\\]/g,
+        "\\$&"
+      );
+      companyQuery.companyName = {
+        $regex: new RegExp(`^${escapedCompanyName}$`, "i"),
+      };
+    }
     if (companyType) {
       companyQuery.companyType = companyType;
+    }
+
+    if (Object.keys(companyQuery).length === 0) {
+      return res.status(400).json({ error: "Company identifier is required" });
     }
 
     // if (mongoose.Types.ObjectId.isValid(companyId)) {
@@ -928,6 +948,10 @@ export const getCompanyData = async (req, res, next) => {
 
     let companyData = company;
 
+    if (!companyData) {
+      return res.status(404).json({ error: "Company not found" });
+    }
+
     if (userId) {
       if (!mongoose.Types.ObjectId.isValid(userId)) {
         return res.status(400).json({ message: "Invalid user id provided" });
@@ -940,10 +964,6 @@ export const getCompanyData = async (req, res, next) => {
       );
 
       companyData = { ...companyData, isLiked };
-    }
-
-    if (!companyData) {
-      return res.status(404).json({ error: "Company not found" });
     }
 
     // Use the actual ObjectId of the found company
