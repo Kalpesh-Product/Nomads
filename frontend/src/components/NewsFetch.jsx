@@ -17,6 +17,10 @@ const DESTS = [
   { label: "Ho Chi Minh", country: "vn", keyword: "ho chi minh", lang: "en" },
   { label: "Rio", country: "br", keyword: "rio", lang: "en" },
   { label: "Dubai", country: "uae", keyword: "dubai", lang: "en" },
+  { label: "Auckland", country: "nz", keyword: "auckland", lang: "en" },
+  { label: "Western Cape", country: "za", keyword: "western cape", lang: "en" },
+  { label: "Budapest", country: "hu", keyword: "budapest", lang: "hu" },
+  { label: "Mexico City", country: "mx", keyword: "mexico city", lang: "es" },
 ];
 
 const extractImageFromContent = (content) => {
