@@ -684,12 +684,17 @@ const GlobalListingsMap = () => {
                               item={item}
                               showVertical={true}
                               handleNavigation={() =>
-                                navigate(`/listings/${item.companyName}`, {
-                                  state: {
-                                    companyId: item.companyId,
-                                    type: item.companyType || "ss",
-                                  },
-                                })
+                                navigate(
+                                  `/listings/${encodeURIComponent(
+                                    item.companyName
+                                  )}`,
+                                  {
+                                    state: {
+                                      companyId: item.companyId,
+                                      type: item.companyType || "ss",
+                                    },
+                                  }
+                                )
                               }
                             />
                           </motion.div>
@@ -782,12 +787,17 @@ const GlobalListingsMap = () => {
                               key={item._id}
                               item={item}
                               handleNavigation={() =>
-                                navigate(`/listings/${item.companyName}`, {
-                                  state: {
-                                    companyId: item.companyId,
-                                    type: item.companyType,
-                                  },
-                                })
+                                navigate(
+                                  `/listings/${encodeURIComponent(
+                                    item.companyName
+                                  )}`,
+                                  {
+                                    state: {
+                                      companyId: item.companyId,
+                                      type: item.companyType,
+                                    },
+                                  }
+                                )
                               }
                             />
                           ))}

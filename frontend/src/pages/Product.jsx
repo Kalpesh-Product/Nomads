@@ -95,6 +95,7 @@ const Product = () => {
       startDate: null,
       endDate: null,
     },
+
     mode: "onChange",
   });
 

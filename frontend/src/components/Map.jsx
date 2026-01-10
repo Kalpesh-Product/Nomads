@@ -158,7 +158,7 @@ export default function Map({
   const handleMarkerClick = useCallback(
     (loc) => {
       if (!disableNavigation) {
-        navigate(`/listings/${loc.name}`, {
+        navigate(`/listings/${encodeURIComponent(loc.name)}`, {
           state: { companyId: loc?.companyId, type: loc?.companyType },
         });
       }
