@@ -129,8 +129,8 @@ const BlogFetch = () => {
       }
     }
 
-    // 3) No location in Redux -> original behavior
-    setDest(null);
+    // 3) No location in Redux -> default to All
+    setDest(DESTS[0]);
     setSearchParams({});
   }, [formData, searchParams, setSearchParams]);
 

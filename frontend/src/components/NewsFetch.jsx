@@ -118,8 +118,8 @@ const NewsFetch = () => {
       }
     }
 
-    // 3️⃣ No destination at all → original behavior
-    setDest(null);
+    // 3️⃣ No destination at all → default to All
+    setDest(DESTS[0]);
     setSearchParams({});
   }, [formData, searchParams, setSearchParams]);
 
