@@ -37,6 +37,16 @@ const BlogDetails = () => {
   const { content } = location.state;
   console.log("content : ", content);
   const newsContent = content?.sections || [];
+
+  const goToHostsContentCopyright = () => {
+    if (window.location.hostname.includes("localhost")) {
+      window.location.href =
+        "http://hosts.localhost:5173/content-and-copyright";
+    } else {
+      window.location.href = "https://hosts.wono.co/content-and-copyright";
+    }
+  };
+
   return (
     <div className="min-w-[70%] max-w-[80rem] lg:max-w-[70rem] mx-0 md:mx-auto p-4 lg:p-0">
       <div className="flex flex-col gap-8">
@@ -92,6 +102,53 @@ const BlogDetails = () => {
               : content?.source || "Source"}
           </p>
         </footer>
+      </div>
+      <hr className="mt-5 mb-0 lg:mt-10 lg:mb-0" />
+
+      {/* Content & Source Disclaimer */}
+      <div className="text-[0.5rem] text-gray-500 leading-relaxed mt-5">
+        <p className="mb-2">
+          <b>Source:</b> All above content, images and details have been sourced
+          from publicly available information.
+        </p>
+        <p className="mb-2">
+          <b>Content and Copyright Disclaimer:</b> WoNo is a nomad services and
+          informational platform that aggregates and presents publicly available
+          information about co-working spaces, co-living spaces, serviced
+          apartments, hostels, workation spaces, meeting rooms, working cafés
+          and related lifestyle or travel services. All such information
+          displayed on its platform, including images, brand names, or
+          descriptions is shared solely for informational and reference purposes
+          to help nomads/users discover and compare global nomad-friendly
+          information and services on its central platform.
+        </p>
+        <p className="mb-2">
+          WoNo does not claim ownership of any third-party logos, images,
+          descriptions, or business information displayed on the platform. All
+          trademarks, brand names, and intellectual property remain the
+          exclusive property of their respective owners and platforms. The
+          inclusion of third-party information does not imply endorsement,
+          partnership, or affiliation unless explicitly stated.
+        </p>
+        <p className="mb-2">
+          The content featured from other websites and platforms on WoNo is not
+          used for direct monetization, resale, or advertising gain. WoNo’s
+          purpose is to inform and connect digital nomads and remote working
+          professionals by curating publicly available data in a transparent,
+          good-faith manner for the ease of its users and to support and grow
+          the businesses who are providing these services with intent to grow
+          them and the ecosystem.
+        </p>
+        <p className="mt-2">
+          Read the entire{" "}
+          <span
+            className="underline text-primary-blue cursor-pointer"
+            onClick={goToHostsContentCopyright}
+          >
+            Content and Copyright
+          </span>{" "}
+          by clicking the link in our website footer.
+        </p>
       </div>
     </div>
   );
