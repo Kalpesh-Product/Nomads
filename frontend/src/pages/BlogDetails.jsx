@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import humanDate from "../utils/humanDate";
 
@@ -38,6 +38,18 @@ const BlogDetails = () => {
   console.log("content : ", content);
   const newsContent = content?.sections || [];
 
+  const [activeImage, setActiveImage] = useState(null);
+
+  const handleImageOpen = (imageUrl) => {
+    if (imageUrl) {
+      setActiveImage(imageUrl);
+    }
+  };
+
+  const handleImageClose = () => {
+    setActiveImage(null);
+  };
+
   const goToHostsContentCopyright = () => {
     if (window.location.hostname.includes("localhost")) {
       window.location.href =
@@ -64,7 +76,14 @@ const BlogDetails = () => {
                 "https://wallpapercave.com/wp/w8Lgiy5.jpg"
               }
               alt="main-image"
-              className="object-cover h-full w-full"
+              className="object-cover h-full w-full cursor-pointer"
+              onClick={() =>
+                handleImageOpen(
+                  content?.mainImage ||
+                    content?.image ||
+                    "https://wallpapercave.com/wp/w8Lgiy5.jpg"
+                )
+              }
             />
           </div>
           <p>
@@ -84,7 +103,8 @@ const BlogDetails = () => {
                     <img
                       src={item.image}
                       alt="main-image"
-                      className="object-cover h-full w-full"
+                      className="object-cover h-full w-full cursor-pointer"
+                      onClick={() => handleImageOpen(item.image)}
                     />
                   </div>
                 )}
@@ -104,6 +124,32 @@ const BlogDetails = () => {
         </footer>
       </div>
       <hr className="mt-5 mb-0 lg:mt-10 lg:mb-0" />
+
+      {activeImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+          onClick={handleImageClose}
+        >
+          <div
+            className="relative max-h-full max-w-5xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="absolute -right-3 -top-3 rounded-full bg-white px-2 py-1 text-sm font-semibold text-gray-700 shadow"
+              onClick={handleImageClose}
+              aria-label="Close image preview"
+            >
+              ✕
+            </button>
+            <img
+              src={activeImage}
+              alt="Expanded content"
+              className="max-h-[85vh] w-full rounded-lg object-contain shadow-xl"
+            />
+          </div>
+        </div>
+      )}
 
       {/* Content & Source Disclaimer */}
       <div className="text-[0.5rem] text-gray-500 leading-relaxed mt-5">
