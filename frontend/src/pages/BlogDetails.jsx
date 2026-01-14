@@ -50,6 +50,8 @@ const BlogDetails = () => {
     setActiveImage(null);
   };
 
+  const renderContent = (text) => <p className="whitespace-pre-line">{text}</p>;
+
   const goToHostsContentCopyright = () => {
     if (window.location.hostname.includes("localhost")) {
       window.location.href =
@@ -86,11 +88,9 @@ const BlogDetails = () => {
               }
             />
           </div>
-          <p>
-            {content?.mainContent ||
-              content?.content ||
-              "Main Content goes here"}
-          </p>
+          {renderContent(
+            content?.mainContent || content?.content || "Main Content goes here"
+          )}
         </section>
         <hr />
         <section className="flex flex-col gap-8">
@@ -108,7 +108,7 @@ const BlogDetails = () => {
                     />
                   </div>
                 )}
-                <p>{item.content}</p>
+                {renderContent(item.content)}
               </article>
             ))}
         </section>
