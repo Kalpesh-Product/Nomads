@@ -21,6 +21,28 @@ const DESTS = [
   { label: "Western Cape", country: "za", keyword: "western cape", lang: "en" },
   { label: "Budapest", country: "hu", keyword: "budapest", lang: "hu" },
   { label: "Mexico City", country: "mx", keyword: "mexico city", lang: "es" },
+  { label: "Quintana Roo", country: "mx", keyword: "quintana roo", lang: "es" },
+  { label: "Tulum", country: "mx", keyword: "tulum", lang: "es" },
+
+  { label: "Montreal", country: "ca", keyword: "montreal", lang: "fr" },
+
+  // { label: "Abuja (FCT)", country: "ng", keyword: "abuja fct", lang: "en" },
+
+  { label: "Cairo Governorate", country: "eg", keyword: "cairo", lang: "ar" },
+
+  {
+    label: "North Holland",
+    country: "nl",
+    keyword: "north holland",
+    lang: "nl",
+  },
+
+  { label: "Lagos", country: "ng", keyword: "lagos", lang: "en" },
+  { label: "Lagos State", country: "ng", keyword: "lagos state", lang: "en" },
+  { label: "Lisbon", country: "pt", keyword: "lisbon", lang: "pt" },
+  { label: "Nadi", country: "fj", keyword: "nadi", lang: "en" },
+
+  { label: "Buenos Aires", country: "ar", keyword: "buenos aires", lang: "es" },
 ];
 
 const extractImageFromContent = (content) => {
