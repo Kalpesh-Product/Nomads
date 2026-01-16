@@ -119,19 +119,141 @@ export const getNews = async (req, res, next) => {
   }
 };
 
+// export const bulkInsertnews = async (req, res, next) => {
+//   try {
+//     const results = [];
+
+//     if (!req.file) {
+//       return res.status(400).json({ message: "Please upload a CSV file." });
+//     }
+
+//     const normalize = (obj) =>
+//       Object.fromEntries(
+//         Object.entries(obj).map(([k, v]) => [
+//           k.replace(/\uFEFF/g, "").trim(),
+//           typeof v === "string" ? v.trim() : v,
+//         ])
+//       );
+//     let rowNumber = 1;
+
+//     const stream = Readable.from(req.file.buffer.toString("utf-8"));
+//     stream
+//       .pipe(csvParser())
+//       .on("data", (rawRow) => {
+//         try {
+//           const row = normalize(rawRow);
+//           rowNumber++;
+
+//           const rejected = [];
+
+//           if (!row["Main Title"]) {
+//             rejected.push({ reason: `Row ${rowNumber} missing Main Title` });
+//             return;
+//           }
+
+//           if (rejected.length > 0) {
+//             return res.status(400).json(rejected);
+//           }
+//           // Build sections array
+//           const sections = [];
+//           for (let i = 1; i <= 20; i++) {
+//             const image = row[`Section ${i} Image`];
+//             const title = row[`Section ${i} Title`];
+//             const content = row[`Section ${i} Content`];
+
+//             if (image || title || content) {
+//               sections.push({
+//                 image: image || "",
+//                 title: title || "",
+//                 content: content || "",
+//               });
+//             }
+//           }
+
+//           results.push({
+//             mainTitle: row["Main Title"],
+//             mainImage: row["Main Image URL"],
+//             mainContent: row["Main Content"],
+//             author: row["Author"] || "",
+//             date: row["Date"] ? new Date(row["Date"]) : null,
+//             destination: row["Destination"] || "",
+//             source: row["Source"] || "",
+//             blogType: row["Type"] || "",
+//             sections,
+//           });
+//         } catch (err) {
+//           console.error("Error processing row:", err);
+//         }
+//       })
+//       .on("end", async () => {
+//         try {
+//           await News.insertMany(results);
+//           res.status(201).json({
+//             message: "News uploaded successfully",
+//             count: results.length,
+//           });
+//         } catch (err) {
+//           console.error("DB insert error:", err);
+//           res.status(500).json({ error: "Error saving blogs to DB" });
+//         }
+//       });
+//   } catch (error) {
+//     console.log(error);
+//     next(error);
+//   }
+// };
+
 export const bulkInsertnews = async (req, res, next) => {
   try {
-    const results = [];
-
     if (!req.file) {
       return res.status(400).json({ message: "Please upload a CSV file." });
     }
-    const stream = Readable.from(req.file.buffer.toString("utf-8"));
-    stream
+
+    const rows = [];
+    const errors = [];
+
+    const normalize = (obj) =>
+      Object.fromEntries(
+        Object.entries(obj).map(([k, v]) => [
+          k.replace(/\uFEFF/g, "").trim(),
+          typeof v === "string" ? v.trim() : v,
+        ])
+      );
+
+    let rowNumber = 1;
+
+    Readable.from(req.file.buffer.toString("utf-8"))
       .pipe(csvParser())
-      .on("data", (row) => {
-        try {
-          // Build sections array
+      .on("data", (rawRow) => {
+        rowNumber++;
+        const row = normalize(rawRow);
+
+        // STRICT validation
+        if (!row["Main Title"]) {
+          errors.push({
+            row: rowNumber,
+            field: "Main Title",
+            reason: "Required field missing",
+          });
+        }
+
+        // Add more required checks here if needed
+        // if (!row["Main Content"]) { ... }
+
+        rows.push(row);
+      })
+      .on("end", async () => {
+        // 🚫 If ANY error exists → fail entire import
+        if (errors.length > 0) {
+          return res.status(400).json({
+            message: "CSV validation failed. No data was inserted.",
+            errorCount: errors.length,
+            errors,
+          });
+        }
+
+        // Build final docs ONLY after validation passed
+        const results = rows.map((row) => {
           const sections = [];
           for (let i = 1; i <= 20; i++) {
             const image = row[`Section ${i} Image`];
@@ -147,7 +269,7 @@ export const bulkInsertnews = async (req, res, next) => {
             }
           }
 
-          results.push({
+          return {
             mainTitle: row["Main Title"],
             mainImage: row["Main Image URL"],
             mainContent: row["Main Content"],
@@ -157,25 +279,21 @@ export const bulkInsertnews = async (req, res, next) => {
             source: row["Source"] || "",
             blogType: row["Type"] || "",
             sections,
-          });
-        } catch (err) {
-          console.error("Error processing row:", err);
-        }
-      })
-      .on("end", async () => {
+          };
+        });
+
         try {
-          await News.insertMany(results);
+          await News.insertMany(results); // atomic
           res.status(201).json({
-            message: "News uploaded successfully",
+            message: "All news inserted successfully",
             count: results.length,
           });
         } catch (err) {
           console.error("DB insert error:", err);
-          res.status(500).json({ error: "Error saving blogs to DB" });
+          res.status(500).json({ error: "Error saving news to DB" });
         }
       });
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };
