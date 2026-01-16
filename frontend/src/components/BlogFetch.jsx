@@ -25,7 +25,7 @@ const DESTS = [
 
   { label: "Montreal", country: "ca", keyword: "montreal", lang: "fr" },
 
-  // { label: "Abuja (FCT)", country: "ng", keyword: "abuja fct", lang: "en" },
+  { label: "Abuja (FCT)", country: "ng", keyword: "abuja fct", lang: "en" },
 
   { label: "Cairo Governorate", country: "eg", keyword: "cairo", lang: "ar" },
 
@@ -40,9 +40,9 @@ const DESTS = [
   { label: "Lagos State", country: "ng", keyword: "lagos state", lang: "en" },
 
   { label: "Lisbon", country: "pt", keyword: "lisbon", lang: "pt" },
-  // { label: "Nadi", country: "fj", keyword: "nadi", lang: "en" },
+  { label: "Nadi", country: "fj", keyword: "nadi", lang: "en" },
 
-  // { label: "Buenos Aires", country: "ar", keyword: "buenos aires", lang: "es" },
+  { label: "Buenos Aires", country: "ar", keyword: "buenos aires", lang: "es" },
 ];
 
 const stripHTML = (html) => {
@@ -108,11 +108,20 @@ const BlogCard = ({ b }) => {
   );
 };
 
+const normalizeLabel = (label) =>
+  label ? label.replace(/\+/g, " ").trim() : label;
+
+const buildExactKeyword = (label) => {
+  if (!label) return null;
+  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return `^${escaped}$`;
+};
+
 const BlogFetch = () => {
   // const [dest, setDest] = useState(DESTS[0]);
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialDest =
-    DESTS.find((d) => d.label === searchParams.get("dest")) || DESTS[0];
+  // const initialDest =
+  //   DESTS.find((d) => d.label === searchParams.get("dest")) || DESTS[0];
   const [dest, setDest] = useState(DESTS[0]);
   const formData = useSelector((state) => state.location.formValues);
   const initialized = useRef(false);
@@ -122,9 +131,11 @@ const BlogFetch = () => {
     initialized.current = true;
 
     // 1) Priority: URL (?dest=...)
-    const urlDestLabel = searchParams.get("dest");
+    const urlDestLabel = normalizeLabel(searchParams.get("dest"));
     if (urlDestLabel) {
-      const foundByLabel = DESTS.find((d) => d.label === urlDestLabel);
+      const foundByLabel = DESTS.find(
+        (d) => d.label.toLowerCase() === urlDestLabel.toLowerCase()
+      );
       if (foundByLabel) {
         setDest(foundByLabel);
         return;
@@ -137,9 +148,11 @@ const BlogFetch = () => {
     }
 
     // 2) Fallback: Redux (formData.location uses keyword)
-    const selectedDest = formData?.location;
+    const selectedDest = normalizeLabel(formData?.location);
     if (selectedDest) {
-      const foundByKeyword = DESTS.find((d) => d.keyword === selectedDest);
+      const foundByKeyword = DESTS.find(
+        (d) => d.keyword?.toLowerCase() === selectedDest.toLowerCase()
+      );
       if (foundByKeyword) {
         setDest(foundByKeyword);
         setSearchParams({ dest: foundByKeyword.label });
@@ -167,7 +180,7 @@ const BlogFetch = () => {
     if (!dest || dest.label === "All") return null;
     return {
       country: dest.country,
-      keyword: dest.keyword,
+      keyword: buildExactKeyword(dest.label),
       lang: dest.lang,
       category: "general",
       max: 10,

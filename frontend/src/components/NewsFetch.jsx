@@ -26,7 +26,7 @@ const DESTS = [
 
   { label: "Montreal", country: "ca", keyword: "montreal", lang: "fr" },
 
-  // { label: "Abuja (FCT)", country: "ng", keyword: "abuja fct", lang: "en" },
+  { label: "Abuja (FCT)", country: "ng", keyword: "abuja fct", lang: "en" },
 
   { label: "Cairo Governorate", country: "eg", keyword: "cairo", lang: "ar" },
 
@@ -99,6 +99,15 @@ const NewsCard = ({ a }) => {
   );
 };
 
+const normalizeLabel = (label) =>
+  label ? label.replace(/\+/g, " ").trim() : label;
+
+const buildExactKeyword = (label) => {
+  if (!label) return null;
+  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return `^${escaped}$`;
+};
+
 const NewsFetch = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [dest, setDest] = useState(DESTS[0]);
@@ -110,9 +119,11 @@ const NewsFetch = () => {
     initialized.current = true;
 
     // 1️⃣ Priority: URL (?dest=...)
-    const urlDestLabel = searchParams.get("dest");
+    const urlDestLabel = normalizeLabel(searchParams.get("dest"));
     if (urlDestLabel) {
-      const foundByLabel = DESTS.find((d) => d.label === urlDestLabel);
+      const foundByLabel = DESTS.find(
+        (d) => d.label.toLowerCase() === urlDestLabel.toLowerCase()
+      );
       if (foundByLabel) {
         setDest(foundByLabel);
         return;
@@ -125,9 +136,11 @@ const NewsFetch = () => {
     }
 
     // 2️⃣ Fallback: Redux (keyword-based)
-    const selectedDest = formData?.location;
+    const selectedDest = normalizeLabel(formData?.location);
     if (selectedDest) {
-      const foundByKeyword = DESTS.find((d) => d.keyword === selectedDest);
+      const foundByKeyword = DESTS.find(
+        (d) => d.keyword?.toLowerCase() === selectedDest.toLowerCase()
+      );
       if (foundByKeyword) {
         setDest(foundByKeyword);
         setSearchParams({ dest: foundByKeyword.label });
@@ -157,7 +170,7 @@ const NewsFetch = () => {
     if (!dest || dest.label === "All") return null; // add !dest check
     return {
       country: dest.country,
-      keyword: dest.keyword,
+      keyword: buildExactKeyword(dest.label),
       lang: dest.lang,
       category: "general",
       max: 10,
