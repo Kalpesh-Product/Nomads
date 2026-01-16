@@ -25,7 +25,7 @@ const DESTS = [
 
   { label: "Montreal", country: "ca", keyword: "montreal", lang: "fr" },
 
-  // { label: "Abuja (FCT)", country: "ng", keyword: "abuja fct", lang: "en" },
+  { label: "Abuja (FCT)", country: "ng", keyword: "abuja fct", lang: "en" },
 
   { label: "Cairo Governorate", country: "eg", keyword: "cairo", lang: "ar" },
 
@@ -40,9 +40,9 @@ const DESTS = [
   { label: "Lagos State", country: "ng", keyword: "lagos state", lang: "en" },
 
   { label: "Lisbon", country: "pt", keyword: "lisbon", lang: "pt" },
-  // { label: "Nadi", country: "fj", keyword: "nadi", lang: "en" },
+  { label: "Nadi", country: "fj", keyword: "nadi", lang: "en" },
 
-  // { label: "Buenos Aires", country: "ar", keyword: "buenos aires", lang: "es" },
+  { label: "Buenos Aires", country: "ar", keyword: "buenos aires", lang: "es" },
 ];
 
 const stripHTML = (html) => {

@@ -26,7 +26,7 @@ const DESTS = [
 
   { label: "Montreal", country: "ca", keyword: "montreal", lang: "fr" },
 
-  // { label: "Abuja (FCT)", country: "ng", keyword: "abuja fct", lang: "en" },
+  { label: "Abuja (FCT)", country: "ng", keyword: "abuja fct", lang: "en" },
 
   { label: "Cairo Governorate", country: "eg", keyword: "cairo", lang: "ar" },
 
