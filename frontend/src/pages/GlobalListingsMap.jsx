@@ -137,7 +137,7 @@ const GlobalListingsMap = () => {
     if (selectedContinent) {
       filtered = locations.filter(
         (item) =>
-          item.continent?.toLowerCase() === selectedContinent?.toLowerCase()
+          item.continent?.toLowerCase() === selectedContinent?.toLowerCase(),
       );
     }
 
@@ -155,7 +155,7 @@ const GlobalListingsMap = () => {
 
   // Build location options with same restriction logic
   const filteredLocation = locations.find(
-    (item) => item.country?.toLowerCase() === selectedCountry?.toLowerCase()
+    (item) => item.country?.toLowerCase() === selectedCountry?.toLowerCase(),
   );
 
   const locationOptions = useMemo(() => {
@@ -195,7 +195,7 @@ const GlobalListingsMap = () => {
       `/nomad/listings?country=${formData.country}&location=${formData.location}&category=${type}`,
       {
         state: updatedForm,
-      }
+      },
     );
   };
   const { data: listingsData, isPending: isLisitingLoading } = useQuery({
@@ -206,7 +206,7 @@ const GlobalListingsMap = () => {
       const response = await axios.get(
         `company/companiesn?country=${country}&state=${location}&userId=${
           userId || ""
-        }`
+        }`,
       );
 
       // return response.data;
@@ -218,6 +218,13 @@ const GlobalListingsMap = () => {
     refetchOnMount: "always", // ✅ forces refetch on every mount
   });
 
+  const sortedListings = useMemo(() => {
+    if (!listingsData || listingsData.length === 0) return [];
+    return [...listingsData].sort(
+      (a, b) => (b.ratings || 0) - (a.ratings || 0),
+    );
+  }, [listingsData]);
+
   // derive categoryOptions from API response
   const categoryOptions = useMemo(() => {
     if (!listingsData || listingsData.length === 0) return [];
@@ -227,7 +234,7 @@ const GlobalListingsMap = () => {
         listingsData
           .filter((item) => item.companyType !== "privatestay")
           .map((item) => item.companyType)
-          .filter(Boolean)
+          .filter(Boolean),
       ),
     ];
 
@@ -257,7 +264,7 @@ const GlobalListingsMap = () => {
       .sort((a, b) => typeOrder.indexOf(a.value) - typeOrder.indexOf(b.value));
   }, [listingsData]);
 
-  const groupedListings = listingsData?.reduce((acc, item) => {
+  const groupedListings = sortedListings?.reduce((acc, item) => {
     if (!acc[item.companyType]) acc[item.companyType] = [];
     acc[item.companyType].push(item);
     return acc;
@@ -265,7 +272,7 @@ const GlobalListingsMap = () => {
 
   const toggleFavorite = (id) => {
     setFavorites((prev) =>
-      prev.includes(id) ? prev.filter((fav) => fav !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((fav) => fav !== id) : [...prev, id],
     );
   };
 
@@ -323,7 +330,7 @@ const GlobalListingsMap = () => {
           location: formData.location,
           category: categoryValue,
         },
-      }
+      },
     );
   };
 
@@ -648,7 +655,7 @@ const GlobalListingsMap = () => {
                 ) : (
                   <div className="col-span-full mb-6">
                     <PaginatedGrid
-                      data={isLisitingLoading ? skeletonArray : listingsData}
+                      data={isLisitingLoading ? skeletonArray : sortedListings}
                       allowScroll={false}
                       entriesPerPage={9}
                       persistPage={true} // 👈 persists page number
@@ -686,14 +693,14 @@ const GlobalListingsMap = () => {
                               handleNavigation={() =>
                                 navigate(
                                   `/listings/${encodeURIComponent(
-                                    item.companyName
+                                    item.companyName,
                                   )}`,
                                   {
                                     state: {
                                       companyId: item.companyId,
                                       type: item.companyType || "ss",
                                     },
-                                  }
+                                  },
                                 )
                               }
                             />
@@ -754,16 +761,19 @@ const GlobalListingsMap = () => {
                     const prioritizedCompanies = ["MeWo", "BIZ Nest"];
                     const sortedItems = items.sort((a, b) => {
                       const aPriority = prioritizedCompanies.includes(
-                        a.companyName
+                        a.companyName,
                       )
                         ? 0
                         : 1;
                       const bPriority = prioritizedCompanies.includes(
-                        b.companyName
+                        b.companyName,
                       )
                         ? 0
                         : 1;
-                      return aPriority - bPriority || 0;
+                      return (
+                        aPriority - bPriority ||
+                        (b.ratings || 0) - (a.ratings || 0)
+                      );
                     });
 
                     const displayItems = sortedItems.slice(0, 6);
@@ -789,14 +799,14 @@ const GlobalListingsMap = () => {
                               handleNavigation={() =>
                                 navigate(
                                   `/listings/${encodeURIComponent(
-                                    item.companyName
+                                    item.companyName,
                                   )}`,
                                   {
                                     state: {
                                       companyId: item.companyId,
                                       type: item.companyType,
                                     },
-                                  }
+                                  },
                                 )
                               }
                             />
