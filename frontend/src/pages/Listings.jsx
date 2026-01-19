@@ -138,7 +138,7 @@ const Listings = () => {
     if (selectedContinent) {
       filtered = locations.filter(
         (item) =>
-          item.continent?.toLowerCase() === selectedContinent?.toLowerCase()
+          item.continent?.toLowerCase() === selectedContinent?.toLowerCase(),
       );
     }
 
@@ -154,11 +154,11 @@ const Listings = () => {
 
   const countryOptions = React.useMemo(
     () => allCountryOptions,
-    [allCountryOptions]
+    [allCountryOptions],
   );
 
   const filteredLocation = locations.find(
-    (item) => item.country?.toLowerCase() === selectedCountry?.toLowerCase()
+    (item) => item.country?.toLowerCase() === selectedCountry?.toLowerCase(),
   );
 
   const locationOptions = React.useMemo(() => {
@@ -197,7 +197,7 @@ const Listings = () => {
       const response = await axios.get(
         `company/companiesn?country=${country}&state=${location}&userId=${
           userId || ""
-        }`
+        }`,
       );
 
       return Array.isArray(response.data)
@@ -216,7 +216,7 @@ const Listings = () => {
         listingsData
           .filter((item) => item.companyType !== "privatestay")
           .map((item) => item.companyType)
-          .filter(Boolean)
+          .filter(Boolean),
       ),
     ];
 
@@ -251,16 +251,24 @@ const Listings = () => {
     if (!formData?.category) return listingsData;
 
     const categoryResults = listingsData.filter(
-      (item) => item.companyType === formData.category
+      (item) => item.companyType === formData.category,
     );
 
     // ✅ If no listings match the selected category, fallback to all listings
-    return categoryResults.length > 0 ? categoryResults : listingsData;
+    // return categoryResults.length > 0 ? categoryResults : listingsData;
+    if (categoryResults.length === 0) return listingsData;
+
+    return [...categoryResults].sort((a, b) => {
+      const aRating = Number.parseFloat(a.ratings) || 0;
+      const bRating = Number.parseFloat(b.ratings) || 0;
+
+      return bRating - aRating;
+    });
   }, [listingsData, formData?.category]);
 
   const toggleFavorite = (id) => {
     setFavorites((prev) =>
-      prev.includes(id) ? prev.filter((fav) => fav !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((fav) => fav !== id) : [...prev, id],
     );
   };
 
@@ -275,7 +283,7 @@ const Listings = () => {
   useEffect(() => {
     if (formData?.category && listingsData?.length > 0) {
       const hasCategory = listingsData.some(
-        (item) => item.companyType === formData.category
+        (item) => item.companyType === formData.category,
       );
 
       if (!hasCategory) {
@@ -345,7 +353,7 @@ const Listings = () => {
           location: formData.location,
           category: categoryValue,
         },
-      }
+      },
     );
   };
 
@@ -712,7 +720,7 @@ const Listings = () => {
                               companyId: item.companyId,
                               type: item.companyType,
                             },
-                          }
+                          },
                         );
                       }}
                     />
