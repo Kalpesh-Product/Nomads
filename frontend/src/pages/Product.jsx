@@ -463,9 +463,10 @@ const Product = () => {
                     <div
                       onClick={() => {
                         if (!userId) {
-                          toast.error(
-                            "You need to login to access this feature"
-                          );
+                          // toast.error(
+                          //   "You need to login to access this feature"
+                          // );
+                          navigate("/login");
                           return;
                         }
 
@@ -615,7 +616,7 @@ const Product = () => {
                             type="button"
                             onClick={() =>
                               field.onChange(
-                                Math.max(0, Number(field.value || 0) - 1)
+                                Math.max(0, Number(field.value || 0) - 1),
                               )
                             }
                             className="px-3 py-1 text-lg font-semibold text-gray-600 hover:text-primary-blue"
@@ -985,7 +986,7 @@ const Product = () => {
                       </h1>
                       <form
                         onSubmit={handlesubmitSales((data) =>
-                          submitSales(data)
+                          submitSales(data),
                         )}
                         className="grid grid-cols-1 gap-4"
                       >

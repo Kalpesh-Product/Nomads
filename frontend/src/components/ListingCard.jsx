@@ -19,7 +19,7 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
   const [favorites, setFavorites] = useState([]);
   // Track initial liked state per card
   const [isInitiallyLiked, setIsInitiallyLiked] = useState(
-    item?.isLiked || false
+    item?.isLiked || false,
   );
 
   const { auth } = useAuth();
@@ -51,7 +51,8 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
 
   const toggleFavorite = (id) => {
     if (!userId) {
-      toast.error("You need to login to access this feature");
+      // toast.error("You need to login to access this feature");
+      navigate("/login");
       return;
     }
 

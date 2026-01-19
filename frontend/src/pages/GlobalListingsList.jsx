@@ -138,7 +138,7 @@ const GlobalListingsList = () => {
     if (selectedContinent) {
       filtered = locations.filter(
         (item) =>
-          item.continent?.toLowerCase() === selectedContinent?.toLowerCase()
+          item.continent?.toLowerCase() === selectedContinent?.toLowerCase(),
       );
     }
 
@@ -159,7 +159,7 @@ const GlobalListingsList = () => {
   // };
 
   const filteredLocation = locations.find(
-    (item) => item.country?.toLowerCase() === selectedCountry?.toLowerCase()
+    (item) => item.country?.toLowerCase() === selectedCountry?.toLowerCase(),
   );
   const locationOptions = useMemo(() => {
     return (
@@ -175,7 +175,7 @@ const GlobalListingsList = () => {
     const normalizedLocation = formData.location.toLowerCase();
     return (
       locationOptions.find(
-        (option) => option.value?.toLowerCase() === normalizedLocation
+        (option) => option.value?.toLowerCase() === normalizedLocation,
       )?.label || formData.location
     );
   }, [formData?.location, locationOptions]);
@@ -207,7 +207,7 @@ const GlobalListingsList = () => {
   console.log("formData", formData);
   const handleShowMoreClick = (type) => {
     setExpandedCategories((prev) =>
-      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type],
     );
   };
 
@@ -219,7 +219,7 @@ const GlobalListingsList = () => {
       const response = await axios.get(
         `company/companiesn?country=${country}&state=${location}&userId=${
           userId || ""
-        }`
+        }`,
       );
 
       // return response.data;
@@ -240,7 +240,7 @@ const GlobalListingsList = () => {
         listingsData
           .filter((item) => item.companyType !== "privatestay")
           .map((item) => item.companyType)
-          .filter(Boolean)
+          .filter(Boolean),
       ),
     ];
 
@@ -292,7 +292,7 @@ const GlobalListingsList = () => {
 
   const toggleFavorite = (id) => {
     setFavorites((prev) =>
-      prev.includes(id) ? prev.filter((fav) => fav !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((fav) => fav !== id) : [...prev, id],
     );
   };
 
@@ -349,7 +349,7 @@ const GlobalListingsList = () => {
           location: formData.location,
           category: categoryValue,
         },
-      }
+      },
     );
   };
   // Prioritize BIZ Nest and MeWo first, then sort the rest by rating descending
@@ -362,14 +362,17 @@ const GlobalListingsList = () => {
     if (!aIsPriority && bIsPriority) return 1;
 
     // If both are priority or both are not, then sort by average rating descending
-    const aRating =
-      a.reviews?.length > 0
-        ? a.reviews.reduce((sum, r) => sum + r.starCount, 0) / a.reviews.length
-        : 0;
-    const bRating =
-      b.reviews?.length > 0
-        ? b.reviews.reduce((sum, r) => sum + r.starCount, 0) / b.reviews.length
-        : 0;
+    // const aRating =
+    //   a.reviews?.length > 0
+    //     ? a.reviews.reduce((sum, r) => sum + r.starCount, 0) / a.reviews.length
+    //     : 0;
+    // const bRating =
+    //   b.reviews?.length > 0
+    //     ? b.reviews.reduce((sum, r) => sum + r.starCount, 0) / b.reviews.length
+    //     : 0;
+
+    const aRating = Number(a.ratings || 0);
+    const bRating = Number(b.ratings || 0);
 
     return bRating - aRating;
   });
@@ -684,10 +687,10 @@ const GlobalListingsList = () => {
 
                       const sortedItems = [...items].sort((a, b) => {
                         const aPriorityIndex = prioritizedCompanies.indexOf(
-                          a.companyName
+                          a.companyName,
                         );
                         const bPriorityIndex = prioritizedCompanies.indexOf(
-                          b.companyName
+                          b.companyName,
                         );
 
                         // Both are priority companies
@@ -702,20 +705,23 @@ const GlobalListingsList = () => {
                         if (bPriorityIndex !== -1) return 1;
 
                         // Fallback: sort by rating
-                        const aRating =
-                          a.reviews?.length > 0
-                            ? a.reviews.reduce(
-                                (sum, r) => sum + r.starCount,
-                                0
-                              ) / a.reviews.length
-                            : 0;
-                        const bRating =
-                          b.reviews?.length > 0
-                            ? b.reviews.reduce(
-                                (sum, r) => sum + r.starCount,
-                                0
-                              ) / b.reviews.length
-                            : 0;
+                        // const aRating =
+                        //   a.reviews?.length > 0
+                        //     ? a.reviews.reduce(
+                        //         (sum, r) => sum + r.starCount,
+                        //         0,
+                        //       ) / a.reviews.length
+                        //     : 0;
+                        // const bRating =
+                        //   b.reviews?.length > 0
+                        //     ? b.reviews.reduce(
+                        //         (sum, r) => sum + r.starCount,
+                        //         0,
+                        //       ) / b.reviews.length
+                        //     : 0;
+
+                        const aRating = Number(a.ratings || 0);
+                        const bRating = Number(b.ratings || 0);
 
                         return bRating - aRating;
                       });
@@ -744,14 +750,14 @@ const GlobalListingsList = () => {
                                 handleNavigation={() =>
                                   navigate(
                                     `/listings/${encodeURIComponent(
-                                      item.companyName
+                                      item.companyName,
                                     )}`,
                                     {
                                       state: {
                                         companyId: item.companyId,
                                         type: item.companyType,
                                       },
-                                    }
+                                    },
                                   )
                                 }
                               />
