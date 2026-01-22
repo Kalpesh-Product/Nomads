@@ -16,6 +16,7 @@ import MuiModal from "../components/Modal";
 import Map from "../components/Map";
 import LeafWrapper from "../components/LeafWrapper";
 import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
+import { FiShare2 } from "react-icons/fi";
 import {
   FaFacebookF,
   FaLinkedinIn,
@@ -587,8 +588,9 @@ const Product = () => {
                       <button
                         type="button"
                         onClick={() => setShareMenuOpen(true)}
-                        className="text-small text-gray-600 hover:text-gray-900"
+                        className="inline-flex items-center gap-2 rounded-full border border-gray-300 px-3 py-1 mr-2 text-small text-gray-600 transition hover:border-gray-400 hover:text-gray-900"
                       >
+                        <FiShare2 className="text-gray-600" size={14} />
                         Share
                       </button>
                     </div>
