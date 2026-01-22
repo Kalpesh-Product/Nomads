@@ -217,18 +217,42 @@ export const bulkInsertnews = async (req, res, next) => {
         Object.entries(obj).map(([k, v]) => [
           k.replace(/\uFEFF/g, "").trim(),
           typeof v === "string" ? v.trim() : v,
-        ])
+        ]),
       );
 
     let rowNumber = 1;
 
     Readable.from(req.file.buffer.toString("utf-8"))
       .pipe(csvParser())
+      // .on("data", (rawRow) => {
+      //   rowNumber++;
+      //   const row = normalize(rawRow);
+
+      //   // STRICT validation
+      //   if (!row["Main Title"]) {
+      //     errors.push({
+      //       row: rowNumber,
+      //       field: "Main Title",
+      //       reason: "Required field missing",
+      //     });
+      //   }
+
+      //   // Add more required checks here if needed
+      //   // if (!row["Main Content"]) { ... }
+
+      //   rows.push(row);
+      // })
       .on("data", (rawRow) => {
-        rowNumber++;
         const row = normalize(rawRow);
 
-        // STRICT validation
+        // ✅ skip completely empty rows
+        const hasAnyValue = Object.values(row).some(
+          (v) => v !== undefined && v !== null && v !== "",
+        );
+        if (!hasAnyValue) return;
+
+        rowNumber++;
+
         if (!row["Main Title"]) {
           errors.push({
             row: rowNumber,
@@ -236,9 +260,6 @@ export const bulkInsertnews = async (req, res, next) => {
             reason: "Required field missing",
           });
         }
-
-        // Add more required checks here if needed
-        // if (!row["Main Content"]) { ... }
 
         rows.push(row);
       })

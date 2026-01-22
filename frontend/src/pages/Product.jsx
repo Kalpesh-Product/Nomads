@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { NavLink, useLocation, useNavigate, useParams } from "react-router-dom";
 import { Controller, useForm } from "react-hook-form";
 import { TextField } from "@mui/material";
+import { MuiTelInput } from "mui-tel-input";
 import { DesktopDatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -15,6 +16,13 @@ import MuiModal from "../components/Modal";
 import Map from "../components/Map";
 import LeafWrapper from "../components/LeafWrapper";
 import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
+import { FiShare2 } from "react-icons/fi";
+import {
+  FaFacebookF,
+  FaLinkedinIn,
+  FaTwitter,
+  FaWhatsapp,
+} from "react-icons/fa";
 import {
   isAlphanumeric,
   isValidEmail,
@@ -49,6 +57,11 @@ const Product = () => {
   const [showAmenities, setShowAmenities] = useState(false);
   console.log("selected : ", selectedReview);
   const [open, setOpen] = useState(false);
+
+  const [shareMenuOpen, setShareMenuOpen] = useState(false);
+
+  const normalizePhoneNumber = (value) =>
+    value ? value.replace(/\s+/g, "") : "";
 
   const axiosPrivate = useAxiosPrivate();
 
@@ -110,7 +123,7 @@ const Product = () => {
     defaultValues: {
       fullName: "",
       noOfPeople: 0,
-      mobileNumber: 0,
+      mobileNumber: "",
       email: "",
       startDate: null,
       endDate: null,
@@ -236,7 +249,73 @@ const Product = () => {
       "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
   };
 
+  const shareUrl =
+    (typeof window !== "undefined" ? window.location.href : "") ||
+    companyDetails?.websiteTemplateLink ||
+    "";
+  const shareTitle = companyDetails?.companyName
+    ? `Check out ${companyDetails.companyName}`
+    : "Check out this listing";
+  const [hasCopiedLink, setHasCopiedLink] = useState(false);
+
+  const shareLinks = [
+    {
+      id: "whatsapp",
+      label: "WhatsApp",
+      href: `https://wa.me/?text=${encodeURIComponent(
+        `${shareTitle} ${shareUrl}`.trim(),
+      )}`,
+      icon: FaWhatsapp,
+      iconClassName: "text-[#25D366]",
+    },
+    {
+      id: "facebook",
+      label: "Facebook",
+      href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+        shareUrl,
+      )}`,
+      icon: FaFacebookF,
+      iconClassName: "text-[#1877F2]",
+    },
+    {
+      id: "twitter",
+      label: "X",
+      href: `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+        shareTitle,
+      )}&url=${encodeURIComponent(shareUrl)}`,
+      icon: FaTwitter,
+      iconClassName: "text-black",
+    },
+    {
+      id: "linkedin",
+      label: "LinkedIn",
+      href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
+        shareUrl,
+      )}`,
+      icon: FaLinkedinIn,
+      iconClassName: "text-[#0A66C2]",
+    },
+  ];
+
   const mapsData = [forMapsData];
+  const handleCopyShareLink = async () => {
+    if (!shareUrl) return;
+    if (navigator?.clipboard?.writeText) {
+      await navigator.clipboard.writeText(shareUrl);
+      setHasCopiedLink(true);
+      setTimeout(() => setHasCopiedLink(false), 2000);
+      return;
+    }
+
+    const fallbackInput = document.createElement("input");
+    fallbackInput.value = shareUrl;
+    document.body.appendChild(fallbackInput);
+    fallbackInput.select();
+    document.execCommand("copy");
+    document.body.removeChild(fallbackInput);
+    setHasCopiedLink(true);
+    setTimeout(() => setHasCopiedLink(false), 2000);
+  };
   const [heartClicked, setHeartClicked] = useState(null);
 
   useEffect(() => {
@@ -278,6 +357,64 @@ const Product = () => {
 
   return (
     <div className="p-4">
+      <TransparentModal
+        open={shareMenuOpen}
+        onClose={() => setShareMenuOpen(false)}
+        bgColor="bg-white"
+        width="w-full max-w-md"
+        height="h-auto max-h-[90vh]"
+      >
+        <div className="space-y-4">
+          <div>
+            <p className="text-base font-semibold text-gray-800">
+              Share this listing
+            </p>
+            <p className="text-xs text-gray-500">
+              Choose a platform to share the listing link.
+            </p>
+          </div>
+          <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-gray-400">
+              Listing URL
+            </p>
+            <div className="mt-2 flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-2">
+              <input
+                type="text"
+                readOnly
+                value={shareUrl}
+                className="w-full bg-transparent text-xs text-gray-700 outline-none"
+              />
+              <button
+                type="button"
+                onClick={handleCopyShareLink}
+                className="rounded-full bg-blue-500 px-4 py-1 text-xs font-semibold text-white transition hover:bg-blue-600"
+              >
+                {hasCopiedLink ? "Copied" : "Copy"}
+              </button>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {shareLinks.map((item) => {
+              const Icon = item.icon;
+              return (
+                <a
+                  key={item.id}
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setShareMenuOpen(false)}
+                  className="flex flex-col items-center gap-2 rounded-lg border border-gray-200 px-3 py-3 text-xs font-medium text-gray-700 transition hover:border-gray-300 hover:bg-gray-50"
+                >
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100">
+                    <Icon className={item.iconClassName} size={18} />
+                  </span>
+                  <span>{item.label}</span>
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      </TransparentModal>
       <div className="min-w-[70%] max-w-[80rem] lg:max-w-[70rem] mx-0 md:mx-auto">
         <div className="pb-4">
           <h1 className="text-title font-semibold text-secondary-dark">
@@ -447,6 +584,17 @@ const Product = () => {
                     About
                   </h1>
                   <div className="items-center flex gap-2">
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() => setShareMenuOpen(true)}
+                        className="inline-flex items-center gap-2 rounded-full border border-gray-300 px-3 py-1 mr-2 text-small text-gray-600 transition hover:border-gray-400 hover:text-gray-900"
+                      >
+                        <FiShare2 className="text-gray-600" size={14} />
+                        Share
+                      </button>
+                    </div>
+
                     {companyDetails?.websiteTemplateLink && (
                       <div>
                         <a
@@ -570,7 +718,19 @@ const Product = () => {
                   Enquire & Receive Quote
                 </h1>
                 <form
-                  onSubmit={handleSubmit((data) => submitEnquiry(data))}
+                  onSubmit={handleSubmit((data) => {
+                    const formattedMobileNumber = normalizePhoneNumber(
+                      data.mobileNumber,
+                    );
+                    console.log("Enquiry form submit:", {
+                      ...data,
+                      mobileNumber: formattedMobileNumber,
+                    });
+                    submitEnquiry({
+                      ...data,
+                      mobileNumber: formattedMobileNumber,
+                    });
+                  })}
                   action=""
                   className="grid grid-cols-1 lg:grid-cols-2 gap-6"
                 >
@@ -663,14 +823,22 @@ const Product = () => {
                       },
                     }}
                     render={({ field }) => (
-                      <TextField
+                      <MuiTelInput
                         {...field}
                         label="Mobile Number"
                         fullWidth
-                        type="tel"
-                        value={field.value || ""}
+                        defaultCountry="IN"
                         variant="standard"
                         size="small"
+                        value={field.value || ""}
+                        onChange={(value) => {
+                          const formattedValue = normalizePhoneNumber(value);
+                          field.onChange(value);
+                          console.log("Enquiry mobile input:", {
+                            raw: value,
+                            formatted: formattedValue,
+                          });
+                        }}
                         helperText={errors?.mobileNumber?.message}
                         error={!!errors.mobileNumber}
                       />
@@ -918,6 +1086,16 @@ const Product = () => {
                 </div>
               )}
             </div>
+            <div className="text-right">
+              <a
+                className="text-primary-blue text-sm font-semibold hover:underline"
+                href={companyDetails?.googleMap}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View More →
+              </a>
+            </div>
 
             <hr className="my-5 lg:my-10" />
             {/* Map */}
@@ -1074,7 +1252,7 @@ const Product = () => {
             <hr className="mt-5 mb-0 lg:mt-10 lg:mb-0" />
 
             {/* Content & Source Disclaimer */}
-            <div className="text-[0.5rem] text-gray-500 leading-relaxed">
+            <div className="text-[0.74rem] text-gray-500 leading-relaxed">
               <p className="mb-2">
                 <b>Source:</b> All above content, images and details have been
                 sourced from publicly available information.

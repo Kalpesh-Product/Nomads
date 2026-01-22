@@ -6,7 +6,7 @@ import { IoChevronDown } from "react-icons/io5";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import humanDate from "../utils/humanDate.js";
 import { useSelector } from "react-redux";
-import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { FormControl, Select, MenuItem } from "@mui/material";
 
 const DESTS = [
   { label: "All", country: null, keyword: null, lang: null }, // ✅ New option
@@ -43,12 +43,86 @@ const DESTS = [
   { label: "Nadi", country: "fj", keyword: "nadi", lang: "en" },
 
   { label: "Buenos Aires", country: "ar", keyword: "buenos aires", lang: "es" },
+  {
+    label: "Funchal (Madeira)",
+    country: "pt",
+    keyword: "funchal madeira",
+    lang: "pt",
+  },
+  {
+    label: "Canary Island",
+    country: "es",
+    keyword: "canary island",
+    lang: "es",
+  },
+  { label: "Toronto", country: "ca", keyword: "toronto", lang: "en" },
+  { label: "Vancouver", country: "ca", keyword: "vancouver", lang: "en" },
+  {
+    label: "Casablanca Settat",
+    country: "ma",
+    keyword: "casablanca settat",
+    lang: "ar",
+  },
+  { label: "Marrakech", country: "ma", keyword: "marrakech", lang: "ar" },
+  { label: "Otago Region", country: "nz", keyword: "otago region", lang: "en" },
+  {
+    label: "Santa Catarina",
+    country: "br",
+    keyword: "santa catarina",
+    lang: "pt",
+  },
+  { label: "Sao Paulo", country: "br", keyword: "sao paulo", lang: "pt" },
+  {
+    label: "San Jose Province",
+    country: "cr",
+    keyword: "san jose province",
+    lang: "es",
+  },
+  { label: "Sydney", country: "au", keyword: "sydney", lang: "en" },
+  {
+    label: "Santa Cruz de Tenerife",
+    country: "es",
+    keyword: "santa cruz de tenerife",
+    lang: "es",
+  },
+  { label: "Cebu City", country: "ph", keyword: "cebu city", lang: "en" },
+  { label: "Chiang Mai", country: "th", keyword: "chiang mai", lang: "en" },
+  { label: "Barcelona", country: "es", keyword: "barcelona", lang: "es" },
+  { label: "Lima", country: "pe", keyword: "lima", lang: "es" },
+  { label: "Santiago", country: "cl", keyword: "santiago", lang: "es" },
+  { label: "Koh Phangan", country: "th", keyword: "koh phangan", lang: "en" },
+  {
+    label: "Surigao del Norte",
+    country: "ph",
+    keyword: "surigao del norte",
+    lang: "en",
+  },
+  { label: "Gold Coast", country: "au", keyword: "gold coast", lang: "en" },
+  { label: "Fes-Meknes", country: "ma", keyword: "fes-meknes", lang: "ar" },
+  {
+    label: "Giza Governorate",
+    country: "eg",
+    keyword: "giza governorate",
+    lang: "ar",
+  },
+  { label: "Istanbul", country: "tr", keyword: "istanbul", lang: "tr" },
+  { label: "Valencia", country: "es", keyword: "valencia", lang: "es" },
+  { label: "Da Nang", country: "vn", keyword: "da nang", lang: "en" },
+  { label: "Nassau", country: "bs", keyword: "nassau", lang: "en" },
+  { label: "Victoria", country: "ca", keyword: "victoria", lang: "en" },
+  { label: "Bogotá D.C.", country: "co", keyword: "bogota d.c.", lang: "es" },
+  { label: "Medellin", country: "co", keyword: "medellin", lang: "es" },
+  { label: "Quito", country: "ec", keyword: "quito", lang: "es" },
 ];
 
 const extractImageFromContent = (content) => {
   const match = content?.match(/<img.*?src=["'](.*?)["']/);
   return match ? match[1] : null;
 };
+
+const selectClasses =
+  "text-[0.7rem] leading-6 min-h-12 px-2.5 py-1 flex items-center justify-start font-normal";
+const menuListClasses = "py-2 h-60";
 
 const NewsCard = ({ a }) => {
   const navigate = useNavigate();
@@ -122,7 +196,7 @@ const NewsFetch = () => {
     const urlDestLabel = normalizeLabel(searchParams.get("dest"));
     if (urlDestLabel) {
       const foundByLabel = DESTS.find(
-        (d) => d.label.toLowerCase() === urlDestLabel.toLowerCase()
+        (d) => d.label.toLowerCase() === urlDestLabel.toLowerCase(),
       );
       if (foundByLabel) {
         setDest(foundByLabel);
@@ -139,7 +213,7 @@ const NewsFetch = () => {
     const selectedDest = normalizeLabel(formData?.location);
     if (selectedDest) {
       const foundByKeyword = DESTS.find(
-        (d) => d.keyword?.toLowerCase() === selectedDest.toLowerCase()
+        (d) => d.keyword?.toLowerCase() === selectedDest.toLowerCase(),
       );
       if (foundByKeyword) {
         setDest(foundByKeyword);
@@ -207,6 +281,8 @@ const NewsFetch = () => {
             <FormControl variant="standard" sx={{ minWidth: 140 }}>
               {/* <InputLabel>Destination</InputLabel> */}
               <Select
+                className={selectClasses}
+                MenuProps={{ MenuListProps: { className: menuListClasses } }}
                 value={""}
                 onChange={(e) => handleChange(e.target.value)}
                 label="Destination"
@@ -215,7 +291,11 @@ const NewsFetch = () => {
                   Select
                 </MenuItem>
                 {DESTS.map((d) => (
-                  <MenuItem key={d.label} value={d.label}>
+                  <MenuItem
+                    key={d.label}
+                    value={d.label}
+                    sx={{ fontSize: "12px" }}
+                  >
                     {d.label}
                   </MenuItem>
                 ))}
@@ -245,12 +325,18 @@ const NewsFetch = () => {
           <FormControl variant="standard" sx={{ minWidth: 140 }}>
             {/* <InputLabel>Destination</InputLabel> */}
             <Select
+              className={selectClasses}
+              MenuProps={{ MenuListProps: { className: menuListClasses } }}
               value={dest.label}
               onChange={(e) => handleChange(e.target.value)}
               label="Destination"
             >
               {DESTS.map((d) => (
-                <MenuItem key={d.label} value={d.label}>
+                <MenuItem
+                  key={d.label}
+                  value={d.label}
+                  sx={{ fontSize: "12px" }}
+                >
                   {d.label}
                 </MenuItem>
               ))}
