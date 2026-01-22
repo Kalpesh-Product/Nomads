@@ -943,9 +943,14 @@ const Product = () => {
               )}
             </div>
             <div className="text-right">
-              <span className="text-primary-blue text-sm font-semibold hover:underline">
+              <a
+                className="text-primary-blue text-sm font-semibold hover:underline"
+                href={companyDetails?.googleMap}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 View More →
-              </span>
+              </a>
             </div>
 
             <hr className="my-5 lg:my-10" />
