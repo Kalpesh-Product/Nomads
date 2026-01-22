@@ -71,59 +71,167 @@ export const getBlogs = async (req, res, next) => {
     next(error);
   }
 };
+// export const bulkInsertBlogs = async (req, res, next) => {
+//   try {
+//     const results = [];
+
+//     if (!req.file) {
+//       return res.status(400).json({ message: "Please upload a CSV file." });
+//     }
+//     const stream = Readable.from(req.file.buffer.toString("utf-8"));
+//     stream
+//       .pipe(csvParser())
+//       .on("data", (row) => {
+//         try {
+//           // Build sections array
+//           const sections = [];
+//           for (let i = 1; i <= 20; i++) {
+//             const image = row[`Section ${i} Image`];
+//             const title = row[`Section ${i} Title`];
+//             const content = row[`Section ${i} Content`];
+
+//             if (image || title || content) {
+//               sections.push({
+//                 image: image || "",
+//                 title: title || "",
+//                 content: content || "",
+//               });
+//             }
+//           }
+
+//           results.push({
+//             mainTitle: row["Main Title"],
+//             mainImage: row["Main Image URL"],
+//             mainContent: row["Main Content"],
+//             author: row["Author"] || "",
+//             date: row["Date"] ? new Date(row["Date"]) : null,
+//             destination: row["Destination"] || "",
+//             source: row["Source"] || "",
+//             blogType: row["Type"] || "",
+//             sections,
+//           });
+//         } catch (err) {
+//           console.error("Error processing row:", err);
+//         }
+//       })
+//       .on("end", async () => {
+//         try {
+//           await Blog.insertMany(results);
+//           res.status(201).json({
+//             message: "Blogs uploaded successfully",
+//             count: results.length,
+//           });
+//         } catch (err) {
+//           console.error("DB insert error:", err);
+//           res.status(500).json({ error: "Error saving blogs to DB" });
+//         }
+//       });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
 export const bulkInsertBlogs = async (req, res, next) => {
   try {
-    const results = [];
-
     if (!req.file) {
       return res.status(400).json({ message: "Please upload a CSV file." });
     }
-    const stream = Readable.from(req.file.buffer.toString("utf-8"));
-    stream
+
+    const rows = [];
+    const errors = [];
+
+    // Normalize headers + values
+    const normalize = (obj) =>
+      Object.fromEntries(
+        Object.entries(obj).map(([k, v]) => [
+          k.replace(/\uFEFF/g, "").trim(),
+          typeof v === "string" ? v.trim() : v,
+        ]),
+      );
+
+    let rowNumber = 1; // header row
+
+    Readable.from(req.file.buffer.toString("utf-8"))
       .pipe(csvParser())
-      .on("data", (row) => {
-        try {
-          // Build sections array
-          const sections = [];
-          for (let i = 1; i <= 20; i++) {
-            const image = row[`Section ${i} Image`];
-            const title = row[`Section ${i} Title`];
-            const content = row[`Section ${i} Content`];
+      .on("data", (rawRow) => {
+        rowNumber++;
+        const row = normalize(rawRow);
 
-            if (image || title || content) {
-              sections.push({
-                image: image || "",
-                title: title || "",
-                content: content || "",
-              });
-            }
-          }
+        // ✅ skip completely empty rows
+        const hasAnyValue = Object.values(row).some(
+          (v) => v !== undefined && v !== null && v !== "",
+        );
+        if (!hasAnyValue) return;
 
-          results.push({
-            mainTitle: row["Main Title"],
-            mainImage: row["Main Image URL"],
-            mainContent: row["Main Content"],
-            author: row["Author"] || "",
-            date: row["Date"] ? new Date(row["Date"]) : null,
-            destination: row["Destination"] || "",
-            source: row["Source"] || "",
-            blogType: row["Type"] || "",
-            sections,
+        // 🚨 strict validation BEFORE DB
+        if (!row["Main Title"]) {
+          errors.push({
+            row: rowNumber,
+            field: "Main Title",
+            reason: "Required field missing",
           });
-        } catch (err) {
-          console.error("Error processing row:", err);
+          return;
         }
+
+        if (!row["Main Content"]) {
+          errors.push({
+            row: rowNumber,
+            field: "Main Content",
+            reason: "Required field missing",
+          });
+          return;
+        }
+
+        // Build sections
+        const sections = [];
+        for (let i = 1; i <= 20; i++) {
+          const image = row[`Section ${i} Image`];
+          const title = row[`Section ${i} Title`];
+          const content = row[`Section ${i} Content`];
+
+          if (image || title || content) {
+            sections.push({
+              image: image || "",
+              title: title || "",
+              content: content || "",
+            });
+          }
+        }
+
+        rows.push({
+          mainTitle: row["Main Title"],
+          mainImage: row["Main Image URL"] || "",
+          mainContent: row["Main Content"],
+          author: row["Author"] || "",
+          date: row["Date"] ? new Date(row["Date"]) : null,
+          destination: row["Destination"] || "",
+          source: row["Source"] || "",
+          blogType: row["Type"] || "",
+          sections,
+        });
       })
       .on("end", async () => {
+        // 🚫 fail entire import if ANY error exists
+        if (errors.length > 0) {
+          return res.status(400).json({
+            message: "CSV validation failed. No data was inserted.",
+            errorCount: errors.length,
+            errors,
+          });
+        }
+
         try {
-          await Blog.insertMany(results);
+          await Blog.insertMany(rows, { ordered: true });
           res.status(201).json({
             message: "Blogs uploaded successfully",
-            count: results.length,
+            count: rows.length,
           });
         } catch (err) {
           console.error("DB insert error:", err);
-          res.status(500).json({ error: "Error saving blogs to DB" });
+          res.status(500).json({
+            message: "Error saving blogs to DB",
+            error: err.message,
+          });
         }
       });
   } catch (error) {
