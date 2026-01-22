@@ -249,11 +249,14 @@ const Product = () => {
   };
 
   const shareUrl =
+    (typeof window !== "undefined" ? window.location.href : "") ||
     companyDetails?.websiteTemplateLink ||
-    (typeof window !== "undefined" ? window.location.href : "");
+    "";
   const shareTitle = companyDetails?.companyName
     ? `Check out ${companyDetails.companyName}`
     : "Check out this listing";
+  const [hasCopiedLink, setHasCopiedLink] = useState(false);
+
   const shareLinks = [
     {
       id: "whatsapp",
@@ -294,6 +297,24 @@ const Product = () => {
   ];
 
   const mapsData = [forMapsData];
+  const handleCopyShareLink = async () => {
+    if (!shareUrl) return;
+    if (navigator?.clipboard?.writeText) {
+      await navigator.clipboard.writeText(shareUrl);
+      setHasCopiedLink(true);
+      setTimeout(() => setHasCopiedLink(false), 2000);
+      return;
+    }
+
+    const fallbackInput = document.createElement("input");
+    fallbackInput.value = shareUrl;
+    document.body.appendChild(fallbackInput);
+    fallbackInput.select();
+    document.execCommand("copy");
+    document.body.removeChild(fallbackInput);
+    setHasCopiedLink(true);
+    setTimeout(() => setHasCopiedLink(false), 2000);
+  };
   const [heartClicked, setHeartClicked] = useState(null);
 
   useEffect(() => {
@@ -350,6 +371,26 @@ const Product = () => {
             <p className="text-xs text-gray-500">
               Choose a platform to share the listing link.
             </p>
+          </div>
+          <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-gray-400">
+              Listing URL
+            </p>
+            <div className="mt-2 flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-2">
+              <input
+                type="text"
+                readOnly
+                value={shareUrl}
+                className="w-full bg-transparent text-xs text-gray-700 outline-none"
+              />
+              <button
+                type="button"
+                onClick={handleCopyShareLink}
+                className="rounded-full bg-blue-500 px-4 py-1 text-xs font-semibold text-white transition hover:bg-blue-600"
+              >
+                {hasCopiedLink ? "Copied" : "Copy"}
+              </button>
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {shareLinks.map((item) => {
