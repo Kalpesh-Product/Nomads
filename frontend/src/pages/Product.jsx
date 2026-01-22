@@ -1074,7 +1074,7 @@ const Product = () => {
             <hr className="mt-5 mb-0 lg:mt-10 lg:mb-0" />
 
             {/* Content & Source Disclaimer */}
-            <div className="text-[0.5rem] text-gray-500 leading-relaxed">
+            <div className="text-[0.74rem] text-gray-500 leading-relaxed">
               <p className="mb-2">
                 <b>Source:</b> All above content, images and details have been
                 sourced from publicly available information.
