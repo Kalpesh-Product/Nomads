@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { NavLink, useLocation, useNavigate, useParams } from "react-router-dom";
 import { Controller, useForm } from "react-hook-form";
 import { TextField } from "@mui/material";
+import { MuiTelInput } from "mui-tel-input";
 import { DesktopDatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -49,6 +50,9 @@ const Product = () => {
   const [showAmenities, setShowAmenities] = useState(false);
   console.log("selected : ", selectedReview);
   const [open, setOpen] = useState(false);
+
+  const normalizePhoneNumber = (value) =>
+    value ? value.replace(/\s+/g, "") : "";
 
   const axiosPrivate = useAxiosPrivate();
 
@@ -110,7 +114,7 @@ const Product = () => {
     defaultValues: {
       fullName: "",
       noOfPeople: 0,
-      mobileNumber: 0,
+      mobileNumber: "",
       email: "",
       startDate: null,
       endDate: null,
@@ -570,7 +574,19 @@ const Product = () => {
                   Enquire & Receive Quote
                 </h1>
                 <form
-                  onSubmit={handleSubmit((data) => submitEnquiry(data))}
+                  onSubmit={handleSubmit((data) => {
+                    const formattedMobileNumber = normalizePhoneNumber(
+                      data.mobileNumber,
+                    );
+                    console.log("Enquiry form submit:", {
+                      ...data,
+                      mobileNumber: formattedMobileNumber,
+                    });
+                    submitEnquiry({
+                      ...data,
+                      mobileNumber: formattedMobileNumber,
+                    });
+                  })}
                   action=""
                   className="grid grid-cols-1 lg:grid-cols-2 gap-6"
                 >
@@ -663,14 +679,22 @@ const Product = () => {
                       },
                     }}
                     render={({ field }) => (
-                      <TextField
+                      <MuiTelInput
                         {...field}
                         label="Mobile Number"
                         fullWidth
-                        type="tel"
-                        value={field.value || ""}
+                        defaultCountry="IN"
                         variant="standard"
                         size="small"
+                        value={field.value || ""}
+                        onChange={(value) => {
+                          const formattedValue = normalizePhoneNumber(value);
+                          field.onChange(value);
+                          console.log("Enquiry mobile input:", {
+                            raw: value,
+                            formatted: formattedValue,
+                          });
+                        }}
                         helperText={errors?.mobileNumber?.message}
                         error={!!errors.mobileNumber}
                       />
