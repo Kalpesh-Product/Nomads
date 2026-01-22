@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { NavLink, useLocation, useNavigate, useParams } from "react-router-dom";
 import { Controller, useForm } from "react-hook-form";
 import { TextField } from "@mui/material";
@@ -16,6 +16,12 @@ import MuiModal from "../components/Modal";
 import Map from "../components/Map";
 import LeafWrapper from "../components/LeafWrapper";
 import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
+import {
+  FaFacebookF,
+  FaLinkedinIn,
+  FaTwitter,
+  FaWhatsapp,
+} from "react-icons/fa";
 import {
   isAlphanumeric,
   isValidEmail,
@@ -50,6 +56,9 @@ const Product = () => {
   const [showAmenities, setShowAmenities] = useState(false);
   console.log("selected : ", selectedReview);
   const [open, setOpen] = useState(false);
+
+  const [shareMenuOpen, setShareMenuOpen] = useState(false);
+  const shareMenuRef = useRef(null);
 
   const normalizePhoneNumber = (value) =>
     value ? value.replace(/\s+/g, "") : "";
@@ -140,6 +149,25 @@ const Product = () => {
       });
     }
   }, [auth, reset]);
+
+  useEffect(() => {
+    if (!shareMenuOpen) {
+      return;
+    }
+    const handleClickOutside = (event) => {
+      if (
+        shareMenuRef.current &&
+        !shareMenuRef.current.contains(event.target)
+      ) {
+        setShareMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [shareMenuOpen]);
 
   const selectedStartDate = watch("startDate");
   const {
@@ -239,6 +267,51 @@ const Product = () => {
       companyDetails?.images?.[0]?.url ||
       "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
   };
+
+  const shareUrl =
+    companyDetails?.websiteTemplateLink ||
+    (typeof window !== "undefined" ? window.location.href : "");
+  const shareTitle = companyDetails?.companyName
+    ? `Check out ${companyDetails.companyName}`
+    : "Check out this listing";
+  const shareLinks = [
+    {
+      id: "whatsapp",
+      label: "WhatsApp",
+      href: `https://wa.me/?text=${encodeURIComponent(
+        `${shareTitle} ${shareUrl}`.trim(),
+      )}`,
+      icon: FaWhatsapp,
+      iconClassName: "text-[#25D366]",
+    },
+    {
+      id: "facebook",
+      label: "Facebook",
+      href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+        shareUrl,
+      )}`,
+      icon: FaFacebookF,
+      iconClassName: "text-[#1877F2]",
+    },
+    {
+      id: "twitter",
+      label: "X",
+      href: `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+        shareTitle,
+      )}&url=${encodeURIComponent(shareUrl)}`,
+      icon: FaTwitter,
+      iconClassName: "text-black",
+    },
+    {
+      id: "linkedin",
+      label: "LinkedIn",
+      href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
+        shareUrl,
+      )}`,
+      icon: FaLinkedinIn,
+      iconClassName: "text-[#0A66C2]",
+    },
+  ];
 
   const mapsData = [forMapsData];
   const [heartClicked, setHeartClicked] = useState(null);
@@ -451,7 +524,45 @@ const Product = () => {
                     About
                   </h1>
                   <div className="items-center flex gap-2">
-                    <div>Share</div>
+                    <div className="relative" ref={shareMenuRef}>
+                      <button
+                        type="button"
+                        onClick={() => setShareMenuOpen((prev) => !prev)}
+                        className="text-small text-gray-600 hover:text-gray-900"
+                      >
+                        Share
+                      </button>
+                      {shareMenuOpen && (
+                        <div className="absolute right-0 mt-2 w-52 rounded-lg border border-gray-200 bg-white p-3 shadow-lg z-20">
+                          <p className="mb-2 text-[11px] uppercase text-gray-400">
+                            Share via
+                          </p>
+                          <div className="grid grid-cols-2 gap-2">
+                            {shareLinks.map((item) => {
+                              const Icon = item.icon;
+                              return (
+                                <a
+                                  key={item.id}
+                                  href={item.href}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={() => setShareMenuOpen(false)}
+                                  className="flex items-center gap-2 rounded-md border border-gray-200 px-2 py-1.5 text-xs text-gray-700 transition hover:border-gray-300 hover:bg-gray-50"
+                                >
+                                  <span className="flex h-6 w-6 items-center justify-center rounded-md bg-gray-100">
+                                    <Icon
+                                      className={item.iconClassName}
+                                      size={14}
+                                    />
+                                  </span>
+                                  <span>{item.label}</span>
+                                </a>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </div>
 
                     {companyDetails?.websiteTemplateLink && (
                       <div>
