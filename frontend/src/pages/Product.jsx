@@ -451,6 +451,8 @@ const Product = () => {
                     About
                   </h1>
                   <div className="items-center flex gap-2">
+                    <div>Share</div>
+
                     {companyDetails?.websiteTemplateLink && (
                       <div>
                         <a
