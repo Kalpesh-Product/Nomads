@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink, useLocation, useNavigate, useParams } from "react-router-dom";
 import { Controller, useForm } from "react-hook-form";
 import { TextField } from "@mui/material";
@@ -58,7 +58,6 @@ const Product = () => {
   const [open, setOpen] = useState(false);
 
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
-  const shareMenuRef = useRef(null);
 
   const normalizePhoneNumber = (value) =>
     value ? value.replace(/\s+/g, "") : "";
@@ -149,25 +148,6 @@ const Product = () => {
       });
     }
   }, [auth, reset]);
-
-  useEffect(() => {
-    if (!shareMenuOpen) {
-      return;
-    }
-    const handleClickOutside = (event) => {
-      if (
-        shareMenuRef.current &&
-        !shareMenuRef.current.contains(event.target)
-      ) {
-        setShareMenuOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [shareMenuOpen]);
 
   const selectedStartDate = watch("startDate");
   const {
@@ -355,6 +335,44 @@ const Product = () => {
 
   return (
     <div className="p-4">
+      <TransparentModal
+        open={shareMenuOpen}
+        onClose={() => setShareMenuOpen(false)}
+        bgColor="bg-white"
+        width="w-full max-w-md"
+        height="h-auto max-h-[90vh]"
+      >
+        <div className="space-y-4">
+          <div>
+            <p className="text-base font-semibold text-gray-800">
+              Share this listing
+            </p>
+            <p className="text-xs text-gray-500">
+              Choose a platform to share the listing link.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {shareLinks.map((item) => {
+              const Icon = item.icon;
+              return (
+                <a
+                  key={item.id}
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setShareMenuOpen(false)}
+                  className="flex flex-col items-center gap-2 rounded-lg border border-gray-200 px-3 py-3 text-xs font-medium text-gray-700 transition hover:border-gray-300 hover:bg-gray-50"
+                >
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100">
+                    <Icon className={item.iconClassName} size={18} />
+                  </span>
+                  <span>{item.label}</span>
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      </TransparentModal>
       <div className="min-w-[70%] max-w-[80rem] lg:max-w-[70rem] mx-0 md:mx-auto">
         <div className="pb-4">
           <h1 className="text-title font-semibold text-secondary-dark">
@@ -524,44 +542,14 @@ const Product = () => {
                     About
                   </h1>
                   <div className="items-center flex gap-2">
-                    <div className="relative" ref={shareMenuRef}>
+                    <div>
                       <button
                         type="button"
-                        onClick={() => setShareMenuOpen((prev) => !prev)}
+                        onClick={() => setShareMenuOpen(true)}
                         className="text-small text-gray-600 hover:text-gray-900"
                       >
                         Share
                       </button>
-                      {shareMenuOpen && (
-                        <div className="absolute right-0 mt-2 w-52 rounded-lg border border-gray-200 bg-white p-3 shadow-lg z-20">
-                          <p className="mb-2 text-[11px] uppercase text-gray-400">
-                            Share via
-                          </p>
-                          <div className="grid grid-cols-2 gap-2">
-                            {shareLinks.map((item) => {
-                              const Icon = item.icon;
-                              return (
-                                <a
-                                  key={item.id}
-                                  href={item.href}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  onClick={() => setShareMenuOpen(false)}
-                                  className="flex items-center gap-2 rounded-md border border-gray-200 px-2 py-1.5 text-xs text-gray-700 transition hover:border-gray-300 hover:bg-gray-50"
-                                >
-                                  <span className="flex h-6 w-6 items-center justify-center rounded-md bg-gray-100">
-                                    <Icon
-                                      className={item.iconClassName}
-                                      size={14}
-                                    />
-                                  </span>
-                                  <span>{item.label}</span>
-                                </a>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      )}
                     </div>
 
                     {companyDetails?.websiteTemplateLink && (
