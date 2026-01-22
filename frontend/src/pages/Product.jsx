@@ -942,6 +942,11 @@ const Product = () => {
                 </div>
               )}
             </div>
+            <div className="text-right">
+              <span className="text-primary-blue text-sm font-semibold hover:underline">
+                View More →
+              </span>
+            </div>
 
             <hr className="my-5 lg:my-10" />
             {/* Map */}
