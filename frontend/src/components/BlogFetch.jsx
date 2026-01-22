@@ -51,6 +51,10 @@ const stripHTML = (html) => {
   return div.textContent || div.innerText || "";
 };
 
+const selectClasses =
+  "text-[0.7rem] leading-6 min-h-12 px-2.5 py-1 flex items-center justify-start font-normal";
+const menuListClasses = "py-2 h-60";
+
 const extractImageFromContent = (content) => {
   const match = content?.match(/<img.*?src=["'](.*?)["']/);
   return match ? match[1] : null;
@@ -134,7 +138,7 @@ const BlogFetch = () => {
     const urlDestLabel = normalizeLabel(searchParams.get("dest"));
     if (urlDestLabel) {
       const foundByLabel = DESTS.find(
-        (d) => d.label.toLowerCase() === urlDestLabel.toLowerCase()
+        (d) => d.label.toLowerCase() === urlDestLabel.toLowerCase(),
       );
       if (foundByLabel) {
         setDest(foundByLabel);
@@ -151,7 +155,7 @@ const BlogFetch = () => {
     const selectedDest = normalizeLabel(formData?.location);
     if (selectedDest) {
       const foundByKeyword = DESTS.find(
-        (d) => d.keyword?.toLowerCase() === selectedDest.toLowerCase()
+        (d) => d.keyword?.toLowerCase() === selectedDest.toLowerCase(),
       );
       if (foundByKeyword) {
         setDest(foundByKeyword);
@@ -226,6 +230,8 @@ const BlogFetch = () => {
             <FormControl variant="standard" sx={{ minWidth: 140 }}>
               {/* <InputLabel>Destination</InputLabel> */}
               <Select
+                className={selectClasses}
+                MenuProps={{ MenuListProps: { className: menuListClasses } }}
                 value={""}
                 onChange={(e) => handleChange(e.target.value)}
                 label="Destination"
@@ -234,7 +240,7 @@ const BlogFetch = () => {
                   Select
                 </MenuItem>
                 {DESTS.map((d) => (
-                  <MenuItem key={d.label} value={d.label}>
+                  <MenuItem key={d.label} value={d.label} sx={(text = "22px")}>
                     {d.label}
                   </MenuItem>
                 ))}
@@ -262,12 +268,18 @@ const BlogFetch = () => {
           <FormControl variant="standard" sx={{ minWidth: 140 }}>
             {/* <InputLabel>Destination</InputLabel> */}
             <Select
+              className={selectClasses}
+              MenuProps={{ MenuListProps: { className: menuListClasses } }}
               value={dest.label}
               onChange={(e) => handleChange(e.target.value)}
               label="Destination"
             >
               {DESTS.map((d) => (
-                <MenuItem key={d.label} value={d.label}>
+                <MenuItem
+                  key={d.label}
+                  value={d.label}
+                  sx={{ fontSize: "12px" }}
+                >
                   {d.label}
                 </MenuItem>
               ))}
