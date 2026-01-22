@@ -6,7 +6,7 @@ import { IoChevronDown } from "react-icons/io5";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import humanDate from "../utils/humanDate.js";
 import { useSelector } from "react-redux";
-import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { FormControl, Select, MenuItem } from "@mui/material";
 
 const DESTS = [
   { label: "All", country: null, keyword: null, lang: null }, // ✅ New option
@@ -49,6 +49,10 @@ const extractImageFromContent = (content) => {
   const match = content?.match(/<img.*?src=["'](.*?)["']/);
   return match ? match[1] : null;
 };
+
+const selectClasses =
+  "text-[0.7rem] leading-6 min-h-12 px-2.5 py-1 flex items-center justify-start font-normal";
+const menuListClasses = "py-2 h-60";
 
 const NewsCard = ({ a }) => {
   const navigate = useNavigate();
@@ -122,7 +126,7 @@ const NewsFetch = () => {
     const urlDestLabel = normalizeLabel(searchParams.get("dest"));
     if (urlDestLabel) {
       const foundByLabel = DESTS.find(
-        (d) => d.label.toLowerCase() === urlDestLabel.toLowerCase()
+        (d) => d.label.toLowerCase() === urlDestLabel.toLowerCase(),
       );
       if (foundByLabel) {
         setDest(foundByLabel);
@@ -139,7 +143,7 @@ const NewsFetch = () => {
     const selectedDest = normalizeLabel(formData?.location);
     if (selectedDest) {
       const foundByKeyword = DESTS.find(
-        (d) => d.keyword?.toLowerCase() === selectedDest.toLowerCase()
+        (d) => d.keyword?.toLowerCase() === selectedDest.toLowerCase(),
       );
       if (foundByKeyword) {
         setDest(foundByKeyword);
@@ -207,6 +211,8 @@ const NewsFetch = () => {
             <FormControl variant="standard" sx={{ minWidth: 140 }}>
               {/* <InputLabel>Destination</InputLabel> */}
               <Select
+                className={selectClasses}
+                MenuProps={{ MenuListProps: { className: menuListClasses } }}
                 value={""}
                 onChange={(e) => handleChange(e.target.value)}
                 label="Destination"
@@ -215,7 +221,11 @@ const NewsFetch = () => {
                   Select
                 </MenuItem>
                 {DESTS.map((d) => (
-                  <MenuItem key={d.label} value={d.label}>
+                  <MenuItem
+                    key={d.label}
+                    value={d.label}
+                    sx={{ fontSize: "12px" }}
+                  >
                     {d.label}
                   </MenuItem>
                 ))}
@@ -245,12 +255,18 @@ const NewsFetch = () => {
           <FormControl variant="standard" sx={{ minWidth: 140 }}>
             {/* <InputLabel>Destination</InputLabel> */}
             <Select
+              className={selectClasses}
+              MenuProps={{ MenuListProps: { className: menuListClasses } }}
               value={dest.label}
               onChange={(e) => handleChange(e.target.value)}
               label="Destination"
             >
               {DESTS.map((d) => (
-                <MenuItem key={d.label} value={d.label}>
+                <MenuItem
+                  key={d.label}
+                  value={d.label}
+                  sx={{ fontSize: "12px" }}
+                >
                   {d.label}
                 </MenuItem>
               ))}

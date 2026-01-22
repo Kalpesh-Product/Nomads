@@ -240,7 +240,11 @@ const BlogFetch = () => {
                   Select
                 </MenuItem>
                 {DESTS.map((d) => (
-                  <MenuItem key={d.label} value={d.label} sx={(text = "22px")}>
+                  <MenuItem
+                    key={d.label}
+                    value={d.label}
+                    sx={{ fontSize: "12px" }}
+                  >
                     {d.label}
                   </MenuItem>
                 ))}
