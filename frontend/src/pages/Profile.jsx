@@ -3,11 +3,12 @@ import { TextField, Button, Avatar } from "@mui/material";
 import useAuth from "../hooks/useAuth";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import useLogout from "../hooks/useLogout";
-import toast from "react-hot-toast";
+// import toast from "react-hot-toast";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Favorites from "./Favorites";
 import { CircularProgress } from "@mui/material";
+import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 
 const Profile = () => {
   // const [activeTab, setActiveTab] = useState("profile");
@@ -80,7 +81,7 @@ const Profile = () => {
       navigate("/login");
     } catch (error) {
       console.error("Logout failed:", error);
-      toast.error("Logout failed");
+      showErrorAlert("Logout failed");
     } finally {
       setIsLogoutLoading(false);
     }
@@ -98,7 +99,7 @@ const Profile = () => {
     mutationFn: async ({ userId, profileData }) => {
       const response = await axiosPrivate.patch(
         `/user/profile/${userId}`,
-        profileData
+        profileData,
       );
       return response.data;
     },
@@ -106,11 +107,13 @@ const Profile = () => {
       queryClient.invalidateQueries({
         queryKey: ["userProfile", data.user._id],
       });
-      toast.success(data.message || "Profile updated successfully");
+      showSuccessAlert(data.message || "Profile updated successfully");
       setEditMode(false);
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || "Failed to update profile");
+      showErrorAlert(
+        error.response?.data?.message || "Failed to update profile",
+      );
     },
   });
 
@@ -138,7 +141,7 @@ const Profile = () => {
     },
 
     onSuccess: async (data) => {
-      toast.success(data.message || "Password changed successfully");
+      showSuccessAlert(data.message || "Password changed successfully");
 
       // Clear form
       setPasswordForm({
@@ -153,7 +156,9 @@ const Profile = () => {
     },
 
     onError: (error) => {
-      toast.error(error.response?.data?.message || "Failed to change password");
+      showErrorAlert(
+        error.response?.data?.message || "Failed to change password",
+      );
     },
   });
 
@@ -161,10 +166,10 @@ const Profile = () => {
     const { oldPassword, newPassword, confirmPassword } = passwordForm;
 
     if (!oldPassword || !newPassword || !confirmPassword)
-      return toast.error("All fields are required");
+      return showErrorAlert("All fields are required");
 
     if (newPassword !== confirmPassword)
-      return toast.error("New passwords do not match");
+      return showErrorAlert("New passwords do not match");
 
     changePassword({ userId, oldPassword, newPassword, confirmPassword });
   };

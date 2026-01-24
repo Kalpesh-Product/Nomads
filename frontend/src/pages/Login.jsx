@@ -3,11 +3,12 @@ import { useForm, Controller } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import axios, { axiosPrivate } from "../utils/axios"; // ✅ use same axios config as signup
-import toast from "react-hot-toast";
+// import toast from "react-hot-toast";
 import PrimaryButton from "../components/PrimaryButton";
 import { Link, useNavigate } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import useAuth from "../hooks/useAuth";
+import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 
 export default function LoginPage() {
   const { auth, setAuth } = useAuth();
@@ -45,7 +46,7 @@ export default function LoginPage() {
       return response.data;
     },
     onSuccess: (data) => {
-      toast.success(data?.message || "Login successful");
+      showSuccessAlert(data?.message || "Login successful");
       reset();
 
       // ✅ Redirect to profile page after login
@@ -61,9 +62,9 @@ export default function LoginPage() {
         else if (status === 500)
           message = "Internal server error. Please try again.";
 
-        toast.error(message);
+        showErrorAlert(message);
       } else {
-        toast.error("Network error. Please check your connection.");
+        showErrorAlert("Network error. Please check your connection.");
       }
     },
   });

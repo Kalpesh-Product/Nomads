@@ -4,13 +4,14 @@ import { useForm, Controller } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import axios from "../utils/axios";
-import toast from "react-hot-toast";
+// import toast from "react-hot-toast";
 import PrimaryButton from "../components/PrimaryButton";
 import { Link, useNavigate } from "react-router-dom";
 import MuiModal from "../components/Modal";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import useAuth from "../hooks/useAuth";
 import { isValidInternationalPhone } from "../utils/validators";
+import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 
 export default function Signup() {
   const [openModal, setOpenModal] = useState(false);
@@ -48,13 +49,13 @@ export default function Signup() {
 
       const response = await axios.post(
         "/forms/add-new-b2c-form-submission",
-        payload
+        payload,
       );
       return response.data;
     },
     onSuccess: () => {
-      toast.success(
-        "Signup successful! Please check your email for confirmation."
+      showSuccessAlert(
+        "Signup successful! Please check your email for confirmation.",
       );
 
       reset();
@@ -62,7 +63,7 @@ export default function Signup() {
     },
     onError: (error) => {
       // toast.error(error.response?.data?.message || "Something went wrong");
-      toast.error(error.response?.data?.message);
+      showErrorAlert(error.response?.data?.message);
     },
   });
 

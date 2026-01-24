@@ -10,7 +10,7 @@ import {
 import { DatePicker } from "@mui/x-date-pickers";
 import React, { useState } from "react";
 import dayjs from "dayjs";
-import toast from "react-hot-toast";
+import { showErrorAlert, showSuccessAlert } from "../../utils/alerts";
 import { useMutation } from "@tanstack/react-query";
 import axios from "../../utils/axios";
 import { isValidInternationalPhone } from "../../utils/validators";
@@ -166,14 +166,14 @@ const HostJobApplicationForm = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      toast.success(data?.message || "Application submitted");
+      showSuccessAlert(data?.message || "Application submitted");
       resetForm();
     },
     onError: (error) => {
       const msg =
         error?.response?.data?.message ||
         "Submission failed. Try not angering the server next time.";
-      toast.error(msg);
+      showErrorAlert(msg);
     },
   });
 
@@ -182,7 +182,7 @@ const HostJobApplicationForm = () => {
 
     const phoneValidation = isValidInternationalPhone(formValues.mobile);
     if (phoneValidation !== true) {
-      toast.error(phoneValidation);
+      showErrorAlert(phoneValidation);
       return;
     }
 

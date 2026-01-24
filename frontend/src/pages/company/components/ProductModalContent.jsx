@@ -15,7 +15,7 @@ import dayjs from "dayjs";
 import axios from "../../../utils/axios";
 import TempButton from "./TempButton";
 import { useOutletContext } from "react-router-dom";
-import toast from "react-hot-toast";
+import { showErrorAlert, showSuccessAlert } from "../../../utils/alerts";
 
 const ProductModalContent = ({ product, onClose }) => {
   const [current, setCurrent] = useState(0);
@@ -79,12 +79,12 @@ const ProductModalContent = ({ product, onClose }) => {
     },
 
     onSuccess: (res) => {
-      toast.success(res.message);
+      showSuccessAlert(res.message);
       reset();
       onClose();
     },
     onError: (err) => {
-      toast.error(err.response?.data?.errors?.[0]);
+      showErrorAlert(err.response?.data?.errors?.[0]);
     },
   });
 

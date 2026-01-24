@@ -16,10 +16,11 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import dayjs from "dayjs";
-import toast from "react-hot-toast";
+// import toast from "react-hot-toast";
 import GetStartedButton from "../components/GetStartedButton";
 import { useLocation } from "react-router-dom";
 import { isValidInternationalPhone } from "../utils/validators";
+import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 
 const JobApplicationForm = ({ title }) => {
   const { pathname } = useLocation();
@@ -111,11 +112,11 @@ const JobApplicationForm = ({ title }) => {
       return response.data;
     },
     onSuccess: (data) => {
-      toast.success(data.message);
+      showSuccessAlert(data.message);
       reset();
     },
     onError: (error) => {
-      toast.error(error.response.data.message);
+      showErrorAlert(error.response.data.message);
       // reset();
     },
   });

@@ -17,7 +17,7 @@ import {
 import Spinner from "../../components/Spinner";
 import Container from "../../components/Container";
 import axios from "../../utils/axios";
-import toast from "react-hot-toast";
+import { showErrorAlert, showSuccessAlert } from "../../utils/alerts";
 import { isValidInternationalPhone } from "../../utils/validators";
 
 const HostContact = () => {
@@ -44,11 +44,11 @@ const HostContact = () => {
         return response.data;
       },
       onSuccess: (data) => {
-        toast.success("Form submitted successfully");
+        showSuccessAlert("Form submitted successfully");
         reset();
       },
       onError: (error) => {
-        toast.error(error.response.data.message);
+        showErrorAlert(error.response.data.message);
       },
     });
 

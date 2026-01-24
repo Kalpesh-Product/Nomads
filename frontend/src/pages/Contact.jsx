@@ -17,8 +17,9 @@ import {
 import Container from "../components/Container";
 import { Controller, useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
-import toast from "react-hot-toast";
+// import toast from "react-hot-toast";
 import { isValidInternationalPhone } from "../utils/validators";
+import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 
 const Contact = () => {
   const [loading, setLoading] = useState(false);
@@ -54,11 +55,11 @@ const Contact = () => {
         return response.data;
       },
       onSuccess: (data) => {
-        toast.success("Form submitted successfully");
+        showSuccessAlert("Form submitted successfully");
         reset();
       },
       onError: (error) => {
-        toast.error(error.response.data.message);
+        showErrorAlert(error.response.data.message);
       },
     });
 
