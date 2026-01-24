@@ -71,9 +71,9 @@ const DESTS = [
     keyword: "santa catarina",
     lang: "pt",
   },
-  { label: "Sao Paulo", country: "br", keyword: "sao paulo", lang: "pt" },
+  { label: "São Paulo", country: "br", keyword: "sao paulo", lang: "pt" },
   {
-    label: "San Jose Province",
+    label: "San José Province",
     country: "cr",
     keyword: "san jose province",
     lang: "es",
