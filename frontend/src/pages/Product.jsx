@@ -37,6 +37,7 @@ import { FaCheck } from "react-icons/fa";
 import TransparentModal from "../components/TransparentModal";
 import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import Swal from "sweetalert2";
 
 dayjs.extend(relativeTime);
 
@@ -612,8 +613,14 @@ const Product = () => {
                       onClick={() => {
                         if (!userId) {
                           // toast.error(
-                          //   "You need to login to access this feature"
+                          //   "You need to login to access this feature",
                           // );
+                          // Swal.fire({
+                          //   title: "Error!",
+                          //   text: "Do you want to continue",
+                          //   icon: "error",
+                          //   confirmButtonText: "Cool",
+                          // });
                           navigate("/login");
                           return;
                         }
