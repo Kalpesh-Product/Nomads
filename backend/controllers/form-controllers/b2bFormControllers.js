@@ -4,7 +4,7 @@ import yup from "yup";
 import mongoose from "mongoose";
 import WebsiteTemplate from "../../models/WebsiteTemplate.js";
 import sharp from "sharp";
-import { sendMail } from "../../config/mailer.js";
+import { sendMail, sendAdminFormNotification } from "../../config/mailer.js";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 
 const istNowPieces = () => {
@@ -42,7 +42,7 @@ const jobApplicationSchema = yup
       .nullable()
       .matches(
         /^\d{4}-\d{2}-\d{2}$/,
-        "Date of Birth must be YYYY-MM-DD (use 0-padding)"
+        "Date of Birth must be YYYY-MM-DD (use 0-padding)",
       ),
     mobile: yup
       .string()
@@ -63,7 +63,7 @@ const jobApplicationSchema = yup
           } catch {
             return false;
           }
-        }
+        },
       ),
     // .matches(/^[0-9+\-\s()]{8,20}$/, "Invalid mobile number"),
     location: yup.string().trim().required("Location is required"),
@@ -151,7 +151,7 @@ const enquirySchema = yup.object().shape({
         } catch {
           return false;
         }
-      }
+      },
     ),
   // .matches(/^[0-9]{10}$/, "Mobile number must be exactly 10 digits"),
 
@@ -238,7 +238,7 @@ export const addB2BFormSubmission = async (req, res, next) => {
         `job-applications/${payload.jobPosition}/${
           payload.name + randomUUID()
         }/${req.file.originalname}`,
-        req.file
+        req.file,
       );
 
       resumeLink = data.url;
@@ -290,6 +290,12 @@ export const addB2BFormSubmission = async (req, res, next) => {
       console.error("❌ Failed to send email:", err.message);
     }
 
+    await sendAdminFormNotification({
+      subject: "New job application submitted",
+      formName: "Job_Application",
+      data: apsBody,
+    });
+
     // 5) response
     return res.status(201).json({
       message: "Application submitted",
@@ -322,6 +328,12 @@ export const addB2BFormSubmission = async (req, res, next) => {
         <p>Our team will respond shortly.</p>
         <p>Cheers,<br/>The WONO Team</p>
       `,
+    });
+
+    await sendAdminFormNotification({
+      subject: "New B2B enquiry received",
+      formName: payload.formName || "connect",
+      data: apsBody,
     });
 
     return res.json(result);
@@ -518,7 +530,7 @@ export const registerFormSubmission = async (req, res) => {
 
           const route = `${folder}/${Date.now()}_${file.originalname.replace(
             /\s+/g,
-            "_"
+            "_",
           )}`;
           const data = await uploadFileToS3(route, {
             buffer,
@@ -586,7 +598,7 @@ export const registerFormSubmission = async (req, res) => {
       if (filesByField.heroImages?.length) {
         template.heroImages = await uploadImages(
           filesByField.heroImages,
-          `${baseFolder}/heroImages`
+          `${baseFolder}/heroImages`,
         );
       }
 
@@ -594,7 +606,7 @@ export const registerFormSubmission = async (req, res) => {
       if (filesByField.gallery?.length) {
         template.gallery = await uploadImages(
           filesByField.gallery,
-          `${baseFolder}/gallery`
+          `${baseFolder}/gallery`,
         );
       }
 
@@ -605,7 +617,7 @@ export const registerFormSubmission = async (req, res) => {
           const pFiles = filesByField[`productImages_${i}`] || [];
           const uploaded = await uploadImages(
             pFiles,
-            `${baseFolder}/productImages/${i}`
+            `${baseFolder}/productImages/${i}`,
           );
 
           template.products.push({
@@ -623,14 +635,14 @@ export const registerFormSubmission = async (req, res) => {
       if (filesByField.testimonialImages?.length) {
         tUploads = await uploadImages(
           filesByField.testimonialImages,
-          `${baseFolder}/testimonialImages`
+          `${baseFolder}/testimonialImages`,
         );
       } else {
         for (let i = 0; i < testimonials.length; i++) {
           const tFiles = filesByField[`testimonialImages_${i}`] || [];
           const uploaded = await uploadImages(
             tFiles,
-            `${baseFolder}/testimonialImages/${i}`
+            `${baseFolder}/testimonialImages/${i}`,
           );
 
           tUploads[i] = uploaded[0];
@@ -656,7 +668,7 @@ export const registerFormSubmission = async (req, res) => {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(template),
-            }
+            },
           );
           const raw = await submit.text();
           try {
@@ -697,6 +709,12 @@ export const registerFormSubmission = async (req, res) => {
           console.error("❌ Failed to send email:", err.message);
         }
       }
+
+      await sendAdminFormNotification({
+        subject: "New registration received",
+        formName: payload.formName || "register",
+        data: payload,
+      });
 
       // STEP 4: respond
       // console.log("sheetResult", sheetResult);
