@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
+import "./sweetalert.css";
 import "keen-slider/keen-slider.min.css";
 import App from "./App.jsx";
 import { RouterProvider } from "react-router-dom";
@@ -62,17 +63,17 @@ createRoot(document.getElementById("root")).render(
     <PersistGate loading={null} persistor={persistor}>
       <ThemeProvider theme={theme}>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-           <AuthContextProvider>
-          <QueryClientProvider client={queryClient}>
-            <HelmetProvider>
-              <RouterProvider router={router}>
-                <App />
-              </RouterProvider>
-            </HelmetProvider>
-          </QueryClientProvider>
+          <AuthContextProvider>
+            <QueryClientProvider client={queryClient}>
+              <HelmetProvider>
+                <RouterProvider router={router}>
+                  <App />
+                </RouterProvider>
+              </HelmetProvider>
+            </QueryClientProvider>
           </AuthContextProvider>
         </LocalizationProvider>
       </ThemeProvider>
     </PersistGate>
-  </Provider>
+  </Provider>,
 );

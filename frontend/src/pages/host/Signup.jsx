@@ -15,7 +15,7 @@ import GetStartedButton from "../../components/GetStartedButton";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import axios from "../../utils/axios";
-import toast from "react-hot-toast";
+import { showErrorAlert, showSuccessAlert } from "../../utils/alerts";
 import { useFieldArray } from "react-hook-form";
 import { Country, State, City } from "country-state-city";
 import { MenuItem } from "@mui/material";
@@ -168,10 +168,10 @@ const HostSignup = () => {
     },
     onSuccess: (data) => {
       // toast.success(data.message || "Form submitted successfully");
-      toast.success(
+      showSuccessAlert(
         typeof data.message === "string"
           ? data.message
-          : data.message?.message || "Form submitted successfully"
+          : data.message?.message || "Form submitted successfully",
       );
 
       reset();
@@ -201,7 +201,7 @@ const HostSignup = () => {
           error?.response?.data?.message?.message || "Something went wrong";
       }
 
-      toast.error(message);
+      showErrorAlert(message);
 
       reset();
       setActiveStep((prev) => prev + 1); // your temporary thing
@@ -353,7 +353,7 @@ const HostSignup = () => {
               render={({ field, fieldState }) => {
                 const countryName = watch("country");
                 const countryObj = Country.getAllCountries().find(
-                  (c) => c.name === countryName
+                  (c) => c.name === countryName,
                 );
                 const states = countryObj
                   ? State.getStatesOfCountry(countryObj.isoCode)
@@ -395,19 +395,19 @@ const HostSignup = () => {
                 const stateName = watch("state");
 
                 const countryObj = Country.getAllCountries().find(
-                  (c) => c.name === countryName
+                  (c) => c.name === countryName,
                 );
                 const stateObj =
                   countryObj &&
                   State.getStatesOfCountry(countryObj.isoCode).find(
-                    (s) => s.name === stateName
+                    (s) => s.name === stateName,
                   );
 
                 const cities =
                   countryObj && stateObj
                     ? City.getCitiesOfState(
                         countryObj.isoCode,
-                        stateObj.isoCode
+                        stateObj.isoCode,
                       )
                     : [];
 
@@ -529,7 +529,7 @@ const HostSignup = () => {
               render={({ field, fieldState }) => {
                 const countryName = watch("companyCountry");
                 const countryObj = Country.getAllCountries().find(
-                  (c) => c.name === countryName
+                  (c) => c.name === countryName,
                 );
                 const states = countryObj
                   ? State.getStatesOfCountry(countryObj.isoCode)
@@ -571,19 +571,19 @@ const HostSignup = () => {
                 const stateName = watch("companyState");
 
                 const countryObj = Country.getAllCountries().find(
-                  (c) => c.name === countryName
+                  (c) => c.name === countryName,
                 );
                 const stateObj =
                   countryObj &&
                   State.getStatesOfCountry(countryObj.isoCode).find(
-                    (s) => s.name === stateName
+                    (s) => s.name === stateName,
                   );
 
                 const cities =
                   countryObj && stateObj
                     ? City.getCitiesOfState(
                         countryObj.isoCode,
-                        stateObj.isoCode
+                        stateObj.isoCode,
                       )
                     : [];
 
@@ -1093,7 +1093,7 @@ const HostSignup = () => {
 
                 // Always merge mandatory into value
                 const valueWithMandatory = Array.from(
-                  new Set([...(field.value || []), ...mandatoryServices])
+                  new Set([...(field.value || []), ...mandatoryServices]),
                 );
 
                 const renderCard = (service, isMandatory) => {
@@ -1162,7 +1162,7 @@ const HostSignup = () => {
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
                       {mandatoryServices.map((service) =>
-                        renderCard(service, true)
+                        renderCard(service, true),
                       )}
                     </div>
 
@@ -1172,7 +1172,7 @@ const HostSignup = () => {
                         <h3 className="font-semibold mb-2">{group.category}</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                           {group.items.map((service) =>
-                            renderCard(service, false)
+                            renderCard(service, false),
                           )}
                         </div>
                       </Box>
@@ -1396,7 +1396,7 @@ const HostSignup = () => {
             // About (array → join into text or fallback)
             const aboutArray =
               values.about?.map((a, i) =>
-                withFallback(a.text, `About ${i + 1}`)
+                withFallback(a.text, `About ${i + 1}`),
               ) || [];
             fd.set("about", JSON.stringify(aboutArray));
 
@@ -1407,7 +1407,7 @@ const HostSignup = () => {
               cost: withFallback(p.cost, "0"),
               description: withFallback(
                 p.description,
-                "No description provided"
+                "No description provided",
               ),
             }));
             fd.set("products", JSON.stringify(productsMeta));

@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
-import toast from "react-hot-toast";
+import { showErrorAlert, showSuccessAlert } from "../../utils/alerts";
 import axios from "../../utils/axios";
 import { isValidInternationalPhone } from "../../utils/validators";
 
@@ -41,12 +41,12 @@ const ContentUseRemoval = () => {
       return response.data;
     },
     onSuccess: () => {
-      toast.success("Your request has been submitted successfully!");
+      showSuccessAlert("Your request has been submitted successfully!");
       reset();
     },
     onError: (error) => {
-      toast.error(
-        error?.response?.data?.message || "Failed to submit the request"
+      showErrorAlert(
+        error?.response?.data?.message || "Failed to submit the request",
       );
     },
   });

@@ -31,12 +31,13 @@ import {
   noOnlyWhitespace,
 } from "../utils/validators";
 import { useSelector } from "react-redux";
-import toast from "react-hot-toast";
+// import toast from "react-hot-toast";
 import AmenitiesList from "../components/AmenitiesList";
 import { FaCheck } from "react-icons/fa";
 import TransparentModal from "../components/TransparentModal";
 import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 
 dayjs.extend(relativeTime);
 
@@ -190,11 +191,11 @@ const Product = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      toast.success(data.message);
+      showSuccessAlert(data.message);
       reset();
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message);
+      showErrorAlert(error.response?.data?.message);
     },
   });
   const { mutate: submitSales, isPending: isSubmittingSales } = useMutation({
@@ -211,11 +212,11 @@ const Product = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      toast.success(data.message);
+      showSuccessAlert(data.message);
       salesReset();
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message);
+      showErrorAlert(error.response?.data?.message);
     },
   });
 
@@ -342,7 +343,7 @@ const Product = () => {
       queryClient.invalidateQueries(["globallistings"]);
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || "Something went wrong");
+      showErrorAlert(error.response?.data?.message || "Something went wrong");
     },
   });
 
@@ -612,8 +613,14 @@ const Product = () => {
                       onClick={() => {
                         if (!userId) {
                           // toast.error(
-                          //   "You need to login to access this feature"
+                          //   "You need to login to access this feature",
                           // );
+                          // Swal.fire({
+                          //   title: "Error!",
+                          //   text: "Do you want to continue",
+                          //   icon: "error",
+                          //   confirmButtonText: "Cool",
+                          // });
                           navigate("/login");
                           return;
                         }

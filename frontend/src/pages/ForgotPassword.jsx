@@ -1,12 +1,13 @@
 import { TextField } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
-import toast from "react-hot-toast";
+// import toast from "react-hot-toast";
 import axios from "../utils/axios";
 import PrimaryButton from "../components/PrimaryButton";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import { useEffect } from "react";
+import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 
 export default function ForgotPassword() {
   const { auth } = useAuth();
@@ -27,13 +28,15 @@ export default function ForgotPassword() {
       return response.data;
     },
     onSuccess: (data) => {
-      toast.success(data?.message || "Password reset link sent to your email");
+      showSuccessAlert(
+        data?.message || "Password reset link sent to your email",
+      );
       reset();
     },
     onError: (error) => {
-      toast.error(
+      showErrorAlert(
         error.response?.data?.message ||
-          "Failed to send email. Please try again."
+          "Failed to send email. Please try again.",
       );
     },
   });

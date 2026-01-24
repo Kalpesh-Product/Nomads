@@ -1,7 +1,7 @@
 import * as yup from "yup";
 import Lead from "../../models/Lead.js";
 import mongoose from "mongoose";
-import { sendMail } from "../../config/mailer.js"; // adjust path if different
+import { sendMail, sendAdminFormNotification } from "../../config/mailer.js"; // adjust path if different
 import User from "../../models/NomadUser.js";
 import NomadUser from "../../models/NomadUser.js";
 import { randomUUID } from "crypto";
@@ -59,7 +59,7 @@ const jobApplicationSchema = yup.object({
         } catch {
           return false;
         }
-      }
+      },
     ),
   // .matches(/^[0-9+\-\s()]{8,20}$/, "Invalid mobile number"),
   location: yup.string().trim().required("Location is required"),
@@ -132,7 +132,7 @@ const enquirySchema = yup.object({
         } catch {
           return false;
         }
-      }
+      },
     )
     // .matches(/^\+?[0-9]{7,15}$/, "Please provide a valid phone number")
     .required("Please provide your phone number"),
@@ -141,7 +141,7 @@ const enquirySchema = yup.object({
     .typeError("Please provide a valid start date")
     .min(
       new Date(new Date().setHours(0, 0, 0, 0)),
-      "Start date cannot be in the past"
+      "Start date cannot be in the past",
     )
     .required("Please provide the start date"),
   endDate: yup
@@ -190,7 +190,7 @@ const pocSchema = yup.object().shape({
         } catch {
           return false;
         }
-      }
+      },
     )
     // .matches(/^\+?[0-9]{7,15}$/, "Please provide a valid mobile number")
     .required("Please provide the mobile"),
@@ -230,7 +230,7 @@ const connectWithUsSchema = yup.object().shape({
         } catch {
           return false;
         }
-      }
+      },
     ),
   typeOfPartnerShip: yup
     .string()
@@ -266,7 +266,7 @@ const nomadsSignupSchema = yup.object().shape({
         } catch {
           return false;
         }
-      }
+      },
     ),
   sheetName: yup.string().required("Please provide a sheet name"),
 });
@@ -295,7 +295,7 @@ const contentRemovalRequestsSchema = yup.object().shape({
         } catch {
           return false;
         }
-      }
+      },
     )
     // .matches(/^\+?[0-9]{7,15}$/, "Please provide a valid mobile number")
     .required("Please provide the mobile number"),
@@ -352,7 +352,7 @@ export const addB2CformSubmission = async (req, res, next) => {
           `job-applications/${payload.jobPosition}/${
             payload.name
           }_${randomUUID()}/${req.file.originalname}`,
-          req.file
+          req.file,
         );
         resumeLink = data.url;
       }
@@ -389,6 +389,12 @@ export const addB2CformSubmission = async (req, res, next) => {
             <p>Our HR team will review your profile and get back to you soon.</p>
              <p>Cheers,<br/>The WONO Team</p>
           `,
+        });
+
+        await sendAdminFormNotification({
+          subject: "New job application submitted",
+          formName: sheetName,
+          data: apsBody,
         });
 
         return res.status(201).json({
@@ -632,6 +638,12 @@ export const addB2CformSubmission = async (req, res, next) => {
         html: emailContent.html,
       });
     }
+
+    await sendAdminFormNotification({
+      subject: "New form submission received",
+      formName: sheetName,
+      data: payload,
+    });
 
     res.status(201).json({
       status: "success",

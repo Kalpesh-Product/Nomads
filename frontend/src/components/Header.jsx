@@ -94,6 +94,10 @@ const Header = () => {
     { id: 3, text: "Blog", to: "/blog" },
   ];
 
+  const shouldShowHeaderLinks =
+    location.pathname === "/verticals" ||
+    location.pathname.startsWith("/listings");
+
   return (
     <div className="shadow-md bg-white/80 backdrop-blur-md">
       <Container padding={false}>
@@ -152,37 +156,39 @@ const Header = () => {
 
           {/* Main Nav */}
           <div className="w-full">
-            <ul className="hidden xl:flex sm:hidden gap-8 justify-end flex-1">
-              {headerLinks.map((item) => {
-                const isActive =
-                  item.to === "/"
-                    ? location.pathname === "/"
-                    : location.pathname.startsWith(item.to);
+            {shouldShowHeaderLinks && (
+              <ul className="hidden xl:flex sm:hidden gap-8 justify-end flex-1">
+                {headerLinks.map((item) => {
+                  const isActive =
+                    item.to === "/"
+                      ? location.pathname === "/"
+                      : location.pathname.startsWith(item.to);
 
-                return (
-                  <li key={item.id} className="flex items-center">
-                    <div className="p-4 px-0 whitespace-nowrap">
-                      <Link
-                        to={item.to}
-                        className="group relative text-md text-black"
-                      >
-                        <span
-                          className={`relative z-10 mb-8 uppercase ${
-                            isActive ? "text-black" : "group-hover:font-bold"
-                          }`}
+                  return (
+                    <li key={item.id} className="flex items-center">
+                      <div className="p-4 px-0 whitespace-nowrap">
+                        <Link
+                          to={item.to}
+                          className="group relative text-md text-black"
                         >
-                          {item.text}
-                        </span>
-                        <span
-                          className={`absolute left-0 bottom-0 top-6 block h-[2px] bg-blue-500 transition-all duration-300 
-                ${isActive ? "w-full" : "w-0 group-hover:w-full"}`}
-                        ></span>
-                      </Link>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
+                          <span
+                            className={`relative z-10 mb-8 uppercase ${
+                              isActive ? "text-black" : "group-hover:font-bold"
+                            }`}
+                          >
+                            {item.text}
+                          </span>
+                          <span
+                            className={`absolute left-0 bottom-0 top-6 block h-[2px] bg-blue-500 transition-all duration-300 
+                  ${isActive ? "w-full" : "w-0 group-hover:w-full"}`}
+                          ></span>
+                        </Link>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </div>
 
           {/* Right Section */}
@@ -346,17 +352,20 @@ const Header = () => {
                   </span>
                 </div>
 
-                {headerLinks.map((item) => (
-                  <li key={item.id} className="items-center text-center">
-                    <div
-                      onClick={() => handleNavigation(item.to)}
-                      className="py-4 cursor-pointer"
-                    >
-                      <p className="text-secondary-dark text-lg">{item.text}</p>
-                    </div>
-                    <div className="h-[0.2px] bg-gray-300"></div>
-                  </li>
-                ))}
+                {shouldShowHeaderLinks &&
+                  headerLinks.map((item) => (
+                    <li key={item.id} className="items-center text-center">
+                      <div
+                        onClick={() => handleNavigation(item.to)}
+                        className="py-4 cursor-pointer"
+                      >
+                        <p className="text-secondary-dark text-lg">
+                          {item.text}
+                        </p>
+                      </div>
+                      <div className="h-[0.2px] bg-gray-300"></div>
+                    </li>
+                  ))}
 
                 {/* ✅ NEW: Become a host visible in mobile drawer */}
                 <li className="items-center text-center">

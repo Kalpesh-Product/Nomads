@@ -1,7 +1,7 @@
 import useAuth from "./useAuth";
 import { useNavigate } from "react-router-dom";
 import { api } from "../utils/axios";
-import toast from "react-hot-toast";
+import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 
 export default function useLogout() {
   const { setAuth, auth } = useAuth();
@@ -13,7 +13,7 @@ export default function useLogout() {
       await api.get("auth/logout", {
         withCredentials: true,
       });
-      toast.success("Logged out");
+      showSuccessAlert("Logged out");
       setAuth((prevState) => {
         return {
           ...prevState,
@@ -24,7 +24,7 @@ export default function useLogout() {
 
       navigate("/login");
     } catch (error) {
-      toast.error(error.message);
+      showErrorAlert(error.message);
     }
   };
   return logout;

@@ -4,7 +4,7 @@ import TempHeader from "./components/TempHeader";
 import TempFooter from "./components/TempFooter";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { Toaster } from "react-hot-toast";
+// import { Toaster } from "react-hot-toast";
 
 const TemplateSite = () => {
   function getTenantFromHost() {
@@ -19,7 +19,7 @@ const TemplateSite = () => {
     queryKey: ["company", tenant],
     queryFn: async () => {
       const res = await axios.get(
-        `https://wonomasterbe.vercel.app/api/editor/get-website/${tenant}`
+        `https://wonomasterbe.vercel.app/api/editor/get-website/${tenant}`,
       );
       return res.data;
     },
@@ -34,7 +34,7 @@ const TemplateSite = () => {
       </header>
       <main className="flex-1">
         <Outlet context={{ data, isPending, error }} />
-        <Toaster />
+        {/* <Toaster /> */}
       </main>
       <footer>
         <TempFooter

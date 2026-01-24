@@ -8,11 +8,11 @@ import {
 
 import { useNavigate } from "react-router-dom";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "react-hot-toast";
+import { useMutation } from "@tanstack/react-query";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
 import useAuth from "../hooks/useAuth";
+import { showErrorAlert } from "../utils/alerts";
 
 const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
   const user = auth?.user || {};
   const userId = auth?.user?._id || auth?.user?.id;
 
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
 
   const axiosPrivate = useAxiosPrivate();
 
@@ -45,7 +45,7 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
       setFavorites(data.likes || []);
     },
     onError: (err) => {
-      toast.error(err.response?.data?.message || "Something went wrong");
+      showErrorAlert(err.response?.data?.message || "Something went wrong");
     },
   });
 
