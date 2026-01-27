@@ -84,7 +84,13 @@ const ProductModalContent = ({ product, onClose }) => {
       onClose();
     },
     onError: (err) => {
-      showErrorAlert(err.response?.data?.errors?.[0]);
+      // showErrorAlert(err.response?.data?.errors?.[0]);
+      const errorMessage =
+        err?.response?.data?.message ||
+        err?.response?.data?.errors?.[0] ||
+        err?.message ||
+        "Something went wrong";
+      showErrorAlert(errorMessage);
     },
   });
 
