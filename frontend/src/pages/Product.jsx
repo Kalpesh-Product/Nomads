@@ -195,7 +195,13 @@ const Product = () => {
       reset();
     },
     onError: (error) => {
-      showErrorAlert(error.response?.data?.message);
+      // showErrorAlert(error.response?.data?.message);
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.errors?.[0] ||
+        error?.message ||
+        "Something went wrong";
+      showErrorAlert(errorMessage);
     },
   });
   const { mutate: submitSales, isPending: isSubmittingSales } = useMutation({
@@ -216,7 +222,13 @@ const Product = () => {
       salesReset();
     },
     onError: (error) => {
-      showErrorAlert(error.response?.data?.message);
+      // showErrorAlert(error.response?.data?.message);
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.errors?.[0] ||
+        error?.message ||
+        "Something went wrong";
+      showErrorAlert(errorMessage);
     },
   });
 
