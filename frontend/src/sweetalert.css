@@ -3,6 +3,11 @@
   padding: 2.5rem 2.25rem;
 }
 
+.swal2-container {
+  z-index: 2000;
+}
+
+
 .swal2-title--serif {
   font-family: "Poppins", "Times New Roman", serif;
   font-weight: 600;
