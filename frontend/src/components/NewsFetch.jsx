@@ -15,7 +15,7 @@ const DESTS = [
   { label: "Bangkok", country: "th", keyword: "bangkok", lang: "en" },
   { label: "Phuket", country: "th", keyword: "phuket", lang: "en" },
   { label: "Ho Chi Minh", country: "vn", keyword: "ho chi minh", lang: "en" },
-  { label: "Rio", country: "br", keyword: "rio", lang: "en" },
+  { label: "Rio de Janeiro", country: "br", keyword: "rio", lang: "en" },
   { label: "Dubai", country: "uae", keyword: "dubai", lang: "en" },
   { label: "Auckland", country: "nz", keyword: "auckland", lang: "en" },
   { label: "Western Cape", country: "za", keyword: "western cape", lang: "en" },
