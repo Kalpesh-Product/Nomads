@@ -29,10 +29,34 @@ const reviewSchema = new mongoose.Schema(
     reviewLink: {
       type: String,
     },
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending",
+    },
+    reviewer: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "NomadUser",
+      required: true,
+    },
+    approvedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "PointOfContact",
+    },
+    rejectedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "PointOfContact",
+    },
+    approvedDate: {
+      type: Date,
+    },
+    rejectedDate: {
+      type: Date,
+    },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const Review = mongoose.model("Review", reviewSchema);

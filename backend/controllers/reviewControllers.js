@@ -8,7 +8,6 @@ export const bulkInsertReviews = async (req, res, next) => {
   try {
     const file = req.file;
 
-    console.log("review test hit1");
     if (!file) {
       return res
         .status(400)
@@ -17,7 +16,7 @@ export const bulkInsertReviews = async (req, res, next) => {
 
     const companies = await Company.find().lean();
     const companyMap = new Map(
-      companies.map((item) => [item.businessId?.trim(), item._id])
+      companies.map((item) => [item.businessId?.trim(), item._id]),
     );
 
     const companyIdMap = new Map();
@@ -32,8 +31,8 @@ export const bulkInsertReviews = async (req, res, next) => {
     const existingReviewSet = new Set(
       existingReviews.map(
         (review) =>
-          `${review.name?.trim().toLowerCase()}|${review.company?.toString()}`
-      )
+          `${review.name?.trim().toLowerCase()}|${review.company?.toString()}`,
+      ),
     );
 
     const reviews = [];
@@ -61,7 +60,7 @@ export const bulkInsertReviews = async (req, res, next) => {
             reason: "Invalid Business ID - Company not found",
           });
           console.log(
-            `❌ Missing Company - Business ID: "${businessId}", Reviewer: "${reviewerName}"`
+            `❌ Missing Company - Business ID: "${businessId}", Reviewer: "${reviewerName}"`,
           );
           return;
         }
@@ -83,7 +82,7 @@ export const bulkInsertReviews = async (req, res, next) => {
             reason: "Already exists in database",
           });
           console.log(
-            `⚠️ Skipped (Exists in DB) - Reviewer: "${reviewerName}", Company: "${companyName}" (${companyId})`
+            `⚠️ Skipped (Exists in DB) - Reviewer: "${reviewerName}", Company: "${companyName}" (${companyId})`,
           );
           return;
         }
@@ -98,7 +97,7 @@ export const bulkInsertReviews = async (req, res, next) => {
             reason: "Duplicate within CSV",
           });
           console.log(
-            `⚠️ Skipped (Duplicate in CSV) - Reviewer: "${reviewerName}", Company: "${companyName}" (${companyId})`
+            `⚠️ Skipped (Duplicate in CSV) - Reviewer: "${reviewerName}", Company: "${companyName}" (${companyId})`,
           );
           return;
         }
@@ -111,6 +110,7 @@ export const bulkInsertReviews = async (req, res, next) => {
           description: row["Review Text"]?.trim(),
           reviewSource: row["Platform"]?.trim(),
           reviewLink: row["Review Link"]?.trim(),
+          status: "approved",
         };
 
         seenInCSV.add(reviewKey);
@@ -121,7 +121,7 @@ export const bulkInsertReviews = async (req, res, next) => {
         console.log("\n📊 REVIEW SUMMARY:");
         console.log(`Total skipped (existing in DB): ${skippedExisting}`);
         console.log(
-          `Total skipped (duplicate in CSV): ${skippedDuplicateInCSV}`
+          `Total skipped (duplicate in CSV): ${skippedDuplicateInCSV}`,
         );
         console.log(`Total missing companies: ${missingCompanyRows.length}`);
         console.log(`Total to be inserted: ${reviews.length}`);
@@ -132,7 +132,7 @@ export const bulkInsertReviews = async (req, res, next) => {
             console.log(
               `${index + 1}. Business ID: "${log.businessId}", Reviewer: "${
                 log.reviewerName
-              }"`
+              }"`,
             );
           });
         }
@@ -143,7 +143,7 @@ export const bulkInsertReviews = async (req, res, next) => {
             console.log(
               `${index + 1}. Reviewer: "${log.reviewerName}", Company: "${
                 log.companyName
-              }" (${log.companyId})`
+              }" (${log.companyId})`,
             );
           });
         }
@@ -154,7 +154,7 @@ export const bulkInsertReviews = async (req, res, next) => {
             console.log(
               `${index + 1}. Reviewer: "${log.reviewerName}", Company: "${
                 log.companyName
-              }" (${log.companyId})`
+              }" (${log.companyId})`,
             );
           });
         }
@@ -219,6 +219,107 @@ export const bulkInsertReviews = async (req, res, next) => {
           }
         }
       });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const addReview = async (req, res, next) => {
+  try {
+    const {
+      businessId,
+      name,
+      starCount,
+      description,
+      reviewSource,
+      reviewLink,
+    } = req.body;
+
+    if (!businessId) {
+      return res
+        .status(400)
+        .json({ message: "Company identifier is required" });
+    }
+
+    const parsedStarCount = starCount ? Number(starCount) : undefined;
+    if (
+      parsedStarCount !== undefined &&
+      (Number.isNaN(parsedStarCount) ||
+        parsedStarCount < 1 ||
+        parsedStarCount > 5)
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Star count must be between 1 and 5" });
+    }
+
+    const company = await Company.findOne({ businessId });
+
+    if (!company) {
+      return res.status(404).json({ message: "Company not found" });
+    }
+
+    const reviewExists = await Review.findOne({ company: company._id, name });
+
+    if (reviewExists) {
+      return res
+        .status(400)
+        .json({ message: "You can add review for same product only once" });
+    }
+
+    const review = await Review.create({
+      company: company._id,
+      companyId: company.companyId,
+      name: name?.trim(),
+      starCount: parsedStarCount,
+      description: description?.trim(),
+      reviewSource: reviewSource?.trim(),
+      reviewLink: reviewLink?.trim(),
+      status: "pending",
+      reviewer: req.userData._id,
+    });
+
+    return res.status(201).json({
+      message: "Review submitted successfully",
+      review,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateReviewStatus = async (req, res, next) => {
+  try {
+    const { reviewId } = req.params;
+    const { status, userId, date } = req.body;
+    let data = { status };
+
+    if (!reviewId) {
+      return res.status(400).json({ message: "Review id is required" });
+    }
+
+    const allowedStatuses = ["approved", "rejected"];
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({ message: "Invalid review status" });
+    }
+
+    if (status === "approved") {
+      data = { ...data, approvedBy: userId, approvedDate: new Date(date) };
+    } else {
+      data = { ...data, rejectedBy: userId, rejectedDate: new Date(date) };
+    }
+    const review = await Review.findByIdAndUpdate(reviewId, data, {
+      new: true,
+    });
+
+    if (!review) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    return res.status(200).json({
+      message: `Review ${status} successfully`,
+      review,
+    });
   } catch (error) {
     next(error);
   }
