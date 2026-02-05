@@ -81,9 +81,9 @@ export const bulkInsertReviews = async (req, res, next) => {
             companyId,
             reason: "Already exists in database",
           });
-          console.log(
-            `⚠️ Skipped (Exists in DB) - Reviewer: "${reviewerName}", Company: "${companyName}" (${companyId})`,
-          );
+          // console.log(
+          //   `⚠️ Skipped (Exists in DB) - Reviewer: "${reviewerName}", Company: "${companyName}" (${companyId})`,
+          // );
           return;
         }
 

@@ -37,7 +37,6 @@ const reviewSchema = new mongoose.Schema(
     reviewer: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "NomadUser",
-      required: true,
     },
     approvedBy: {
       type: mongoose.Schema.Types.ObjectId,

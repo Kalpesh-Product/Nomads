@@ -36,8 +36,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/user", verifyJwt, nomadUserRoutes);
 app.use("/api/company", companyRoutes);
 app.use("/api/poc", pocRoutes);
-app.use("/api/review/:reviewId", updateReviewStatus);
-app.use("/api/review", verifyJwt, reviewRoutes);
+app.use("/api/review", reviewRoutes);
 app.use("/api/forms", formRoutes);
 app.use("/api/job", jobRoutes);
 
