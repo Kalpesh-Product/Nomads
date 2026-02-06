@@ -18,10 +18,10 @@ export const bulkInsertPoc = async (req, res, next) => {
 
     const companies = await Company.find().lean();
     const companyMap = new Map(
-      companies.map((item) => [item.businessId?.trim(), item._id])
+      companies.map((item) => [item.businessId?.trim(), item._id]),
     );
     const companyIdMap = new Map(
-      companies.map((c) => [c.businessId, c.companyId])
+      companies.map((c) => [c.businessId, c.companyId]),
     );
 
     const existingPocs = await PointOfContact.find()
@@ -38,7 +38,7 @@ export const bulkInsertPoc = async (req, res, next) => {
           pocName: p.name,
           email: p.email,
           company: p.company, // will be null or undefined
-        }))
+        })),
       );
     }
 
@@ -47,8 +47,8 @@ export const bulkInsertPoc = async (req, res, next) => {
         (poc) =>
           `${poc?.email
             ?.trim()
-            .toLowerCase()}|${poc.company.businessId?.trim()}`
-      )
+            .toLowerCase()}|${poc.company.businessId?.trim()}`,
+      ),
     );
 
     // CSV parsing
@@ -188,7 +188,7 @@ export const bulkInsertPoc = async (req, res, next) => {
         const response = await axios.post(
           "https://wonomasterbe.vercel.app/api/host-user/bulk-insert-poc",
           { pocs: masterPanelPocs },
-          { headers: { "Content-Type": "application/json" } }
+          { headers: { "Content-Type": "application/json" } },
         );
         masterPanelStatus = `success (${response.status})`;
 
@@ -228,7 +228,7 @@ export const bulkInsertPoc = async (req, res, next) => {
       } catch (masterErr) {
         console.error(
           "Master panel error:",
-          masterErr.response?.data || masterErr.message
+          masterErr.response?.data || masterErr.message,
         );
         masterPanelStatus = `failed (${masterErr.message})`;
 
@@ -315,14 +315,16 @@ export const createPOC = async (req, res, next) => {
       email: payload?.email,
       phone: payload?.phone,
       linkedInProfile: payload?.linkedInProfile,
-      languagesSpoken: payload?.languages || [],
+      languagesSpoken: payload?.languagesSpoken || [],
       address: payload?.address,
       profileImage: payload?.profileImage,
       isActive: payload?.isActive ?? true,
       availibilityTime: payload?.availibilityTime,
     };
 
-    const poc = await PointOfContact.findOne({ email: payload.email });
+    const poc = await PointOfContact.findOne({
+      companyId: payload.companyId,
+    });
 
     if (poc) {
       return res.status(400).json({ message: "Email already exists" });

@@ -19,6 +19,7 @@ import nomadUserRoutes from "./routes/nomadUserRoutes.js";
 import cookieParser from "cookie-parser";
 import credentials from "./middlewares/credentials.js";
 import { verifyJwt } from "./middlewares/verifyJwt.js";
+import { updateReviewStatus } from "./controllers/reviewControllers.js";
 
 const app = express();
 config({ override: true });
@@ -77,5 +78,5 @@ app.listen(
   PORT,
   mongoose.connection.once("open", () => {
     console.log(`Server is running on port ${PORT}`);
-  })
+  }),
 );

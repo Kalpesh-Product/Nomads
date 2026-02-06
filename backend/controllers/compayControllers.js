@@ -42,7 +42,7 @@ export const bulkInsertCompanies = async (req, res, next) => {
 
     //fetch companies from master panel
     const hostCompanies = await axios.get(
-      "https://wonomasterbe.vercel.app/api/hosts/companies"
+      "https://wonomasterbe.vercel.app/api/hosts/companies",
     );
 
     const companyMap = new Map();
@@ -60,7 +60,7 @@ export const bulkInsertCompanies = async (req, res, next) => {
     // Fetch existing business IDs from the database
     const existingCompanies = await Company.find().select("businessId");
     const existingBusinessIds = new Set(
-      existingCompanies.map((c) => c.businessId?.trim()).filter(Boolean)
+      existingCompanies.map((c) => c.businessId?.trim()).filter(Boolean),
     );
 
     const stream = Readable.from(file.buffer.toString("utf-8").trim());
@@ -213,7 +213,7 @@ export const bulkInsertCompanies = async (req, res, next) => {
           // Log bad data
           if (skippedMissingCompanyId.length) {
             console.log(
-              "\n=== COMPANIES MISSING COMPANY ID (from master panel) ==="
+              "\n=== COMPANIES MISSING COMPANY ID (from master panel) ===",
             );
             console.table(
               skippedMissingCompanyId.map((c) => ({
@@ -222,7 +222,7 @@ export const bulkInsertCompanies = async (req, res, next) => {
                 city: c.city,
                 state: c.state,
                 country: c.country,
-              }))
+              })),
             );
           }
 
@@ -265,7 +265,7 @@ export const bulkInsertCompanies = async (req, res, next) => {
                   city: c.city,
                   state: c.state,
                   country: c.country,
-                }))
+                })),
             );
 
             res.status(500).json({
@@ -346,6 +346,7 @@ export const createCompany = async (req, res, next) => {
   try {
     const {
       companyName,
+      logo,
       companyId,
       registeredEntityName,
       website,
@@ -396,11 +397,15 @@ export const createCompany = async (req, res, next) => {
         .json({ message: `${companyType} product already exists` });
     }
     console.log("continent", continent);
+    console.log("inclusions", inclusions);
+    console.log("cost", cost);
+    console.log("logo", logo);
     // Create company
     const company = new Company({
       businessId: generateBuisnessId(),
       companyName: companyName.trim(),
       companyId,
+      logo,
       registeredEntityName: registeredEntityName?.trim(),
       website: website?.trim() || null,
       address: address?.trim(),
@@ -444,7 +449,7 @@ export const createCompany = async (req, res, next) => {
     };
 
     const pathCompanyType = formatCompanyType(
-      companyType || savedCompany.companyType
+      companyType || savedCompany.companyType,
     );
 
     const safeCompanyName =
@@ -482,7 +487,7 @@ export const createCompany = async (req, res, next) => {
       const results = await Promise.allSettled(
         req.files.images.map(async (file, i) => {
           const uniqueKey = `${folderPath}/images/${sanitizeFileName(
-            file.originalname
+            file.originalname,
           )}`;
           const data = await uploadFileToS3(uniqueKey, file);
           return {
@@ -490,7 +495,7 @@ export const createCompany = async (req, res, next) => {
             id: data.id,
             index: startIndex + i + 1,
           };
-        })
+        }),
       );
 
       const successes = results
@@ -655,7 +660,7 @@ export const getCompaniesData = async (req, res, next) => {
     })
       .lean()
       .select(
-        "_id companyName companyId companyType country state city address about website businessId registeredEntityName images logo rating ratings totalReviews inclusions latitude longitude continent isRegistered isPublic"
+        "_id companyName companyId companyType country state city address about website businessId registeredEntityName images logo rating ratings totalReviews inclusions latitude longitude continent isRegistered isPublic",
       )
       .exec();
 
@@ -671,7 +676,7 @@ export const getCompaniesData = async (req, res, next) => {
         (c) =>
           c.companyType === type.toLowerCase() &&
           c.country?.toLowerCase() === country.toLowerCase() &&
-          c.state?.toLowerCase() === state.toLowerCase()
+          c.state?.toLowerCase() === state.toLowerCase(),
       );
     }
     // only type
@@ -683,7 +688,7 @@ export const getCompaniesData = async (req, res, next) => {
       filtered = companies.filter(
         (c) =>
           c.country?.toLowerCase() === country.toLowerCase() &&
-          c.state?.toLowerCase() === state.toLowerCase()
+          c.state?.toLowerCase() === state.toLowerCase(),
       );
     }
     // nothing → all companies
@@ -764,7 +769,7 @@ export const getCompaniesDataMaster = async (req, res, next) => {
   try {
     const companies = await Company.find(
       { isActive: true, companyType: { $ne: "privatestay" } },
-      "_id companyName companyId companyType country state"
+      "_id companyName companyId companyType country state",
     )
       .lean()
       .exec();
@@ -916,7 +921,7 @@ export const getCompanyData = async (req, res, next) => {
     if (!companyId && normalizedCompanyName) {
       const escapedCompanyName = normalizedCompanyName.replace(
         /[.*+?^${}()|[\]\\]/g,
-        "\\$&"
+        "\\$&",
       );
       companyQuery.companyName = {
         $regex: new RegExp(`^${escapedCompanyName}$`, "i"),
@@ -960,7 +965,7 @@ export const getCompanyData = async (req, res, next) => {
       const user = await NomadUser.findOne({ _id: userId });
 
       const isLiked = user.likes.some(
-        (like) => like.toString() === companyData._id.toString()
+        (like) => like.toString() === companyData._id.toString(),
       );
 
       companyData = { ...companyData, isLiked };
@@ -1003,7 +1008,7 @@ export const getCompanyData = async (req, res, next) => {
             keyword,
             key: process.env.GOOGLE_PLACES_API_KEY,
           },
-        }
+        },
       );
       coworkingSpaces.push(...(res.data.results || []));
     }
@@ -1024,7 +1029,7 @@ export const getCompanyData = async (req, res, next) => {
                 fields:
                   "name,rating,user_ratings_total,reviews,formatted_address,geometry",
               },
-            }
+            },
           );
 
           const details = detailsRes.data.result || {};
@@ -1061,7 +1066,7 @@ export const getCompanyData = async (req, res, next) => {
             reviews: [],
           };
         }
-      })
+      }),
     );
 
     // Try to match Google place by decreasing decimal precision
@@ -1077,7 +1082,7 @@ export const getCompanyData = async (req, res, next) => {
       (place) =>
         place.location &&
         place.location.lat === companyData.latitude &&
-        place.location.lng === companyData.longitude
+        place.location.lng === companyData.longitude,
     );
 
     if (!closestGoogle) {
@@ -1287,7 +1292,7 @@ export const getUniqueDataLocations = async (req, res, next) => {
         country,
         states: Array.from(states.values()),
         continent,
-      })
+      }),
     );
 
     return res.status(200).json(finalizedLocations);
@@ -1354,7 +1359,7 @@ export const addCompanyImage = async (req, res, next) => {
 
     const folderType = normalizedType === "logo" ? "logo" : "images";
     const pathCompanyType = formatCompanyType(
-      companyType || company.companyType
+      companyType || company.companyType,
     );
 
     const safeCompanyName =
@@ -1395,7 +1400,10 @@ export const addCompanyImage = async (req, res, next) => {
       try {
         const payload = {
           companyId: company.companyId,
-          logo: data.url,
+          logo: {
+            url: data.url,
+            id: data.id,
+          },
         };
 
         console.log("📤 Syncing logo to Master Panel:", payload);
@@ -1403,18 +1411,18 @@ export const addCompanyImage = async (req, res, next) => {
         const response = await axios.patch(
           "https://wonomasterbe.vercel.app/api/hosts/upload-logo",
           payload,
-          { headers: { "Content-Type": "application/json" } }
+          { headers: { "Content-Type": "application/json" } },
         );
 
         console.log(
           "✅ Master Panel sync success:",
           response.status,
-          response.data.message
+          response.data.message,
         );
       } catch (masterErr) {
         console.error(
           "❌ Master Panel sync failed:",
-          masterErr.response?.data || masterErr.message
+          masterErr.response?.data || masterErr.message,
         );
 
         // Rollback: delete file from S3 and remove logo from DB
@@ -1508,7 +1516,7 @@ export const addCompanyImagesBulk = async (req, res, next) => {
     };
 
     const pathCompanyType = formatCompanyType(
-      companyType || company.companyType
+      companyType || company.companyType,
     );
 
     const safeCompanyName =
@@ -1529,7 +1537,7 @@ export const addCompanyImagesBulk = async (req, res, next) => {
     const results = await Promise.allSettled(
       files.map(async (file, i) => {
         const uniqueKey = `${folderPath}/${folderType}/${sanitizeFileName(
-          file.originalname
+          file.originalname,
         )}`;
         const data = await uploadFileToS3(uniqueKey, file);
         return {
@@ -1539,7 +1547,7 @@ export const addCompanyImagesBulk = async (req, res, next) => {
           originalName: file.originalname,
           key: uniqueKey,
         };
-      })
+      }),
     );
 
     // Split successes and failures
@@ -1554,7 +1562,7 @@ export const addCompanyImagesBulk = async (req, res, next) => {
     // Append successful uploads to the company doc
     if (successes.length) {
       company.images.push(
-        ...successes.map((s) => ({ url: s.url, index: s.index }))
+        ...successes.map((s) => ({ url: s.url, index: s.index })),
       );
       // Skip validators to avoid tripping on unrelated fields
       await company.save({ validateBeforeSave: false });
@@ -1565,8 +1573,8 @@ export const addCompanyImagesBulk = async (req, res, next) => {
         failures.length && successes.length
           ? `Uploaded ${successes.length} images; ${failures.length} failed`
           : failures.length
-          ? "All uploads failed"
-          : `Successfully uploaded ${successes.length} images`,
+            ? "All uploads failed"
+            : `Successfully uploaded ${successes.length} images`,
       data: {
         companyId: company._id,
         businessId: company.businessId,
@@ -1620,11 +1628,11 @@ export const editCompanyImagesBulk = async (req, res, next) => {
               return { success: false, url: img.url, reason: err.message };
             }
           }
-        })
+        }),
       );
 
       const failedDeletes = deleteResults.filter(
-        (r) => r.status === "rejected"
+        (r) => r.status === "rejected",
       );
       if (failedDeletes.length > 0) {
         console.warn("Some old images failed to delete:", failedDeletes);
@@ -1650,7 +1658,7 @@ export const editCompanyImagesBulk = async (req, res, next) => {
     };
 
     const pathCompanyType = formatCompanyType(
-      companyType || company.companyType
+      companyType || company.companyType,
     );
     const safeCompanyName =
       (company.companyName || "unnamed").replace(/[^\w\- ]+/g, "").trim() ||
@@ -1666,7 +1674,7 @@ export const editCompanyImagesBulk = async (req, res, next) => {
     const uploadResults = await Promise.allSettled(
       files.map(async (file, i) => {
         const uniqueKey = `${folderPath}/${folderType}/${sanitizeFileName(
-          file.originalname
+          file.originalname,
         )}`;
         const data = await uploadFileToS3(uniqueKey, file);
         return {
@@ -1676,7 +1684,7 @@ export const editCompanyImagesBulk = async (req, res, next) => {
           originalName: file.originalname,
           key: uniqueKey,
         };
-      })
+      }),
     );
 
     const successes = [];
@@ -1703,8 +1711,8 @@ export const editCompanyImagesBulk = async (req, res, next) => {
         failures.length && successes.length
           ? `Replaced ${successes.length} images; ${failures.length} failed`
           : failures.length
-          ? "All uploads failed"
-          : `Successfully replaced all images`,
+            ? "All uploads failed"
+            : `Successfully replaced all images`,
       data: {
         companyId: company._id,
         businessId: company.businessId,
@@ -1731,6 +1739,7 @@ export const editCompany = async (req, res, next) => {
       ratings,
       totalReviews,
       inclusions,
+      cost,
       companyType,
       companyName,
       reviews,
@@ -1784,7 +1793,7 @@ export const editCompany = async (req, res, next) => {
 
     if (isCompanyTypeChanged) {
       console.log(
-        "🔄 Company type changed - will delete all old images after save"
+        "🔄 Company type changed - will delete all old images after save",
       );
       // When company type changes, delete ALL old images
       imagesToDelete = oldImages;
@@ -1793,12 +1802,12 @@ export const editCompany = async (req, res, next) => {
       // Company type stayed the same - delete only removed images
       const updatedImageUrls = updatedImages.map((img) => img.url);
       imagesToDelete = oldImages.filter(
-        (img) => !updatedImageUrls.includes(img.url)
+        (img) => !updatedImageUrls.includes(img.url),
       );
 
       if (imagesToDelete.length > 0) {
         console.log(
-          `🗑️ Will delete ${imagesToDelete.length} removed images after save`
+          `🗑️ Will delete ${imagesToDelete.length} removed images after save`,
         );
       }
 
@@ -1815,7 +1824,7 @@ export const editCompany = async (req, res, next) => {
     if (imagesToDelete.length > 0) {
       console.log(`🗑️ Deleting ${imagesToDelete.length} images from S3...`);
       const deleteResults = await Promise.allSettled(
-        imagesToDelete.map((img) => deleteFileFromS3ByUrl(img.url))
+        imagesToDelete.map((img) => deleteFileFromS3ByUrl(img.url)),
       );
 
       const failed = deleteResults.filter((r) => r.status === "rejected");
@@ -1858,7 +1867,7 @@ export const addTemplateLink = async (req, res, next) => {
     const updatedCompany = await Company.updateMany(
       { companyName },
       { $set: { websiteTemplateLink: link } },
-      { new: true }
+      { new: true },
     );
 
     if (!updatedCompany) {
@@ -1906,7 +1915,7 @@ export const activateProduct = async (req, res, next) => {
 
     const product = await Company.findOneAndUpdate(
       { businessId },
-      { isActive: status }
+      { isActive: status },
     );
 
     if (!product) {
@@ -1936,7 +1945,7 @@ export const deactivateProduct = async (req, res, next) => {
 
     const product = await Company.findOneAndUpdate(
       { businessId },
-      { isActive: false }
+      { isActive: false },
     );
 
     if (!product) {
@@ -2001,7 +2010,7 @@ export const updateLeads = async (req, res, next) => {
       {
         _id: leadId,
       },
-      query
+      query,
     );
 
     if (!leads) {
