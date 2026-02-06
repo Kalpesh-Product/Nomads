@@ -159,7 +159,9 @@ const ImageGallery = () => {
               ) : (
                 item.label
               )}
-              {index < breadcrumbItems.length - 1 ? "  >  " : ""}
+              {index < breadcrumbItems.length - 1 ? (
+                <span className="mx-2">{">"}</span>
+              ) : null}
             </span>
           ))}
         </p>

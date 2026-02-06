@@ -487,7 +487,9 @@ const Product = () => {
                   ) : (
                     item.label
                   )}
-                  {index < items.length - 1 ? "  >  " : ""}
+                  {index < items.length - 1 ? (
+                    <span className="mx-2">{">"}</span>
+                  ) : null}
                 </span>
               ))}
           </nav>
