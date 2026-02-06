@@ -20,6 +20,6 @@ router.post(
 router.post("/", verifyJwt, addReview);
 
 // PROTECTED (if required)
-router.patch("/:reviewId", verifyJwt, updateReviewStatus);
+router.patch("/:reviewId", updateReviewStatus);
 
 export default router;
