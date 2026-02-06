@@ -143,9 +143,9 @@ const ImageGallery = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-6 flex flex-col gap-4">
+    <div className="max-w-6xl mx-auto px-4 pb-6 flex flex-col gap-4">
       <div>
-        <p className="text-sm text-gray-500">
+        <p className="text-lg text-gray-500 my-4">
           {breadcrumbItems.map((item, index) => (
             <span key={`${item.label}-${index}`}>
               {item.isLink ? (
@@ -159,7 +159,7 @@ const ImageGallery = () => {
               ) : (
                 item.label
               )}
-              {index < breadcrumbItems.length - 1 ? " > " : ""}
+              {index < breadcrumbItems.length - 1 ? "  >  " : ""}
             </span>
           ))}
         </p>

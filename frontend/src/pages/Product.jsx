@@ -463,7 +463,7 @@ const Product = () => {
       </TransparentModal>
       <div className="min-w-[70%] max-w-[80rem] lg:max-w-[70rem] mx-0 md:mx-auto">
         <div className="pb-4">
-          <nav aria-label="Breadcrumb" className="mb-2 text-sm text-gray-500">
+          <nav aria-label="Breadcrumb" className="mb-4 text-lg text-gray-500">
             {[
               { label: companyDetails?.continent, isLink: true },
               { label: companyDetails?.country, isLink: true },
@@ -487,7 +487,7 @@ const Product = () => {
                   ) : (
                     item.label
                   )}
-                  {index < items.length - 1 ? " > " : ""}
+                  {index < items.length - 1 ? "  >  " : ""}
                 </span>
               ))}
           </nav>
