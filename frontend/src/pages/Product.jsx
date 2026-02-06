@@ -102,6 +102,11 @@ const Product = () => {
   console.log("companuDetials ", companyDetails);
   const companyImages = companyDetails?.images?.slice(0, 4) || [];
   const showMore = (companyDetails?.images?.length || 0) > 4;
+  const breadcrumbState = {
+    continent: companyDetails?.continent || "Asia",
+    country: companyDetails?.country,
+    state: companyDetails?.state,
+  };
   const inclusions =
     companyDetails?.inclusions?.split(",").map((item) => {
       return item?.split(" ")?.length
@@ -495,6 +500,7 @@ const Product = () => {
                         companyName: companyDetails?.companyName,
                         images: companyDetails?.images,
                         selectedImageId: selectedImage?._id, // ✅ Fix here
+                        ...breadcrumbState,
                       },
                     })
                   }
@@ -518,6 +524,7 @@ const Product = () => {
                           companyName: companyDetails?.companyName,
                           images: companyDetails?.images,
                           selectedImageId: item._id,
+                          ...breadcrumbState,
                         },
                       })
                     }
@@ -538,6 +545,7 @@ const Product = () => {
                               state: {
                                 companyName: companyDetails?.companyName,
                                 images: companyDetails?.images,
+                                ...breadcrumbState,
                               },
                             });
                           }}

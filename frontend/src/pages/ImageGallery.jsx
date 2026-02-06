@@ -10,7 +10,14 @@ import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 
 const ImageGallery = () => {
   const location = useLocation();
-  const { images = [], companyName, selectedImageId } = location.state || {};
+  const {
+    images = [],
+    companyName,
+    selectedImageId,
+    continent = "Asia",
+    country,
+    state: companyState,
+  } = location.state || {};
   const imageRefs = useRef({});
   const [imageLoadStatus, setImageLoadStatus] = useState({});
 
@@ -46,7 +53,7 @@ const ImageGallery = () => {
                 key: img._id,
               });
             };
-          })
+          }),
       );
 
       const loadedPhotos = await Promise.all(promises);
@@ -87,9 +94,18 @@ const ImageGallery = () => {
     instanceRef.current?.next();
   };
 
+  const breadcrumbItems = [
+    continent,
+    country,
+    companyState,
+    companyName || "Unknown",
+    "Gallery",
+  ].filter(Boolean);
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-6 flex flex-col gap-4">
       <div>
+        <p className="text-sm text-gray-500">{breadcrumbItems.join(" > ")}</p>
         <h1 className="text-title font-semibold text-secondary-dark">
           {companyName || "Unknown"} Gallery
         </h1>
