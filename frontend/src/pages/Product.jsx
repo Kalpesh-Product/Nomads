@@ -430,6 +430,21 @@ const Product = () => {
       </TransparentModal>
       <div className="min-w-[70%] max-w-[80rem] lg:max-w-[70rem] mx-0 md:mx-auto">
         <div className="pb-4">
+          <nav aria-label="Breadcrumb" className="mb-2 text-sm text-gray-500">
+            {[
+              companyDetails?.continent,
+              companyDetails?.country,
+              companyDetails?.state,
+              companyDetails?.companyName || companyName,
+            ]
+              .filter(Boolean)
+              .map((item, index, items) => (
+                <span key={`${item}-${index}`}>
+                  {item}
+                  {index < items.length - 1 ? " > " : ""}
+                </span>
+              ))}
+          </nav>
           <h1 className="text-title font-semibold text-secondary-dark">
             {companyDetails?.companyName || "Loading Title..."}
           </h1>
