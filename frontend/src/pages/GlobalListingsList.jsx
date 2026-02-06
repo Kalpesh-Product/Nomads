@@ -6,7 +6,7 @@ import { CiSearch } from "react-icons/ci";
 import { AiFillStar } from "react-icons/ai";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import Container from "../components/Container";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import Map from "../components/Map";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "../utils/axios.js";
@@ -25,14 +25,17 @@ import useAuth from "../hooks/useAuth.js";
 
 const GlobalListingsList = () => {
   const [favorites, setFavorites] = useState([]);
+  const location = useLocation();
   const dispatch = useDispatch();
   const formData = useSelector((state) => state.location.formValues);
   const [expandedCategories, setExpandedCategories] = useState([]);
   const { handleSubmit, control, reset, setValue, getValues, watch } = useForm({
     defaultValues: {
+      continent: "",
       country: "",
       location: "",
       category: "",
+      count: "",
     },
   });
 
@@ -308,6 +311,36 @@ const GlobalListingsList = () => {
     setValue("location", formData.location);
     setValue("count", formData.count);
   }, [formData]);
+
+  useEffect(() => {
+    const breadcrumbFilters = location.state?.breadcrumbFilters;
+    if (!breadcrumbFilters) return;
+
+    const normalizeValue = (value) =>
+      typeof value === "string" ? value.trim().toLowerCase() : value;
+
+    const normalizedContinent = normalizeValue(breadcrumbFilters.continent);
+    const normalizedCountry = normalizeValue(breadcrumbFilters.country);
+    const normalizedLocation = normalizeValue(breadcrumbFilters.location);
+
+    if (
+      normalizedContinent === normalizeValue(formData.continent) &&
+      normalizedCountry === normalizeValue(formData.country) &&
+      normalizedLocation === normalizeValue(formData.location)
+    ) {
+      return;
+    }
+
+    const nextFormValues = {
+      ...formData,
+      continent: normalizedContinent || "",
+      country: normalizedCountry || "",
+      location: normalizedLocation || "",
+    };
+
+    dispatch(setFormValues(nextFormValues));
+  }, [dispatch, formData, location.state]);
+
   const { mutate: locationData, isPending: isLocation } = useMutation({
     mutationFn: async (data) => {
       dispatch(setFormValues(data));

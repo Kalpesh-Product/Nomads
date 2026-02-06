@@ -1,16 +1,18 @@
 // src/features/location/locationSlice.js
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   formValues: {
-    country: '',
-    location: '',
-    category: '',
+    continent: "",
+    country: "",
+    location: "",
+    category: "",
+    count: "",
   },
 };
 
 const locationSlice = createSlice({
-  name: 'location',
+  name: "location",
   initialState,
   reducers: {
     setFormValues: (state, action) => {

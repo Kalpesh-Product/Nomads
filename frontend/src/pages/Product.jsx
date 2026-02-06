@@ -30,7 +30,7 @@ import {
   isValidInternationalPhone,
   noOnlyWhitespace,
 } from "../utils/validators";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 // import toast from "react-hot-toast";
 import AmenitiesList from "../components/AmenitiesList";
 import { FaCheck } from "react-icons/fa";
@@ -38,6 +38,7 @@ import TransparentModal from "../components/TransparentModal";
 import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
+import { setFormValues } from "../features/locationSlice.js";
 
 dayjs.extend(relativeTime);
 
@@ -52,6 +53,7 @@ const Product = () => {
   const type = stateType || null;
   const queryClient = useQueryClient();
   const { auth } = useAuth();
+  const dispatch = useDispatch();
   const userId = auth?.user?._id || auth?.user?.id;
 
   const [selectedReview, setSelectedReview] = useState([]);
@@ -102,6 +104,37 @@ const Product = () => {
   console.log("companuDetials ", companyDetails);
   const companyImages = companyDetails?.images?.slice(0, 4) || [];
   const showMore = (companyDetails?.images?.length || 0) > 4;
+  const breadcrumbState = {
+    continent: companyDetails?.continent || "Asia",
+    country: companyDetails?.country,
+    state: companyDetails?.state,
+  };
+
+  const handleBreadcrumbNavigate = () => {
+    const normalizeValue = (value) =>
+      typeof value === "string" ? value.trim().toLowerCase() : value;
+
+    const normalizedContinent = normalizeValue(breadcrumbState.continent);
+    const normalizedCountry = normalizeValue(breadcrumbState.country);
+    const normalizedLocation = normalizeValue(breadcrumbState.state);
+
+    dispatch(
+      setFormValues({
+        continent: normalizedContinent || "",
+        country: normalizedCountry || "",
+        location: normalizedLocation || "",
+        category: "",
+        count: "",
+      }),
+    );
+
+    navigate(
+      `/verticals?country=${normalizedCountry || ""}&state=${
+        normalizedLocation || ""
+      }`,
+    );
+  };
+
   const inclusions =
     companyDetails?.inclusions?.split(",").map((item) => {
       return item?.split(" ")?.length
@@ -430,6 +463,36 @@ const Product = () => {
       </TransparentModal>
       <div className="min-w-[70%] max-w-[80rem] lg:max-w-[70rem] mx-0 md:mx-auto">
         <div className="pb-4">
+          <nav aria-label="Breadcrumb" className="mb-4 text-lg text-gray-500">
+            {[
+              { label: companyDetails?.continent, isLink: true },
+              { label: companyDetails?.country, isLink: true },
+              { label: companyDetails?.state, isLink: true },
+              {
+                label: companyDetails?.companyName || companyName,
+                isLink: false,
+              },
+            ]
+              .filter((item) => item.label)
+              .map((item, index, items) => (
+                <span key={`${item.label}-${index}`}>
+                  {item.isLink ? (
+                    <button
+                      type="button"
+                      onClick={handleBreadcrumbNavigate}
+                      className="text-gray-500 hover:text-gray-700 transition-colors"
+                    >
+                      {item.label}
+                    </button>
+                  ) : (
+                    item.label
+                  )}
+                  {index < items.length - 1 ? (
+                    <span className="mx-2">{">"}</span>
+                  ) : null}
+                </span>
+              ))}
+          </nav>
           <h1 className="text-title font-semibold text-secondary-dark">
             {companyDetails?.companyName || "Loading Title..."}
           </h1>
@@ -480,6 +543,7 @@ const Product = () => {
                         companyName: companyDetails?.companyName,
                         images: companyDetails?.images,
                         selectedImageId: selectedImage?._id, // ✅ Fix here
+                        ...breadcrumbState,
                       },
                     })
                   }
@@ -503,6 +567,7 @@ const Product = () => {
                           companyName: companyDetails?.companyName,
                           images: companyDetails?.images,
                           selectedImageId: item._id,
+                          ...breadcrumbState,
                         },
                       })
                     }
@@ -523,6 +588,7 @@ const Product = () => {
                               state: {
                                 companyName: companyDetails?.companyName,
                                 images: companyDetails?.images,
+                                ...breadcrumbState,
                               },
                             });
                           }}

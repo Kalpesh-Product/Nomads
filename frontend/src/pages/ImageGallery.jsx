@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { ColumnsPhotoAlbum, MasonryPhotoAlbum } from "react-photo-album";
 import "react-photo-album/masonry.css";
 import "react-photo-album/columns.css";
@@ -7,10 +7,22 @@ import { useKeenSlider } from "keen-slider/react";
 import MuiModal from "../components/Modal";
 import TransparentModal from "../components/TransparentModal";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import { useDispatch } from "react-redux";
+import { setFormValues } from "../features/locationSlice.js";
 
 const ImageGallery = () => {
   const location = useLocation();
-  const { images = [], companyName, selectedImageId } = location.state || {};
+  const navigate = useNavigate();
+  const { company: companyParam } = useParams();
+  const dispatch = useDispatch();
+  const {
+    images = [],
+    companyName,
+    selectedImageId,
+    continent = "Asia",
+    country,
+    state: companyState,
+  } = location.state || {};
   const imageRefs = useRef({});
   const [imageLoadStatus, setImageLoadStatus] = useState({});
 
@@ -46,7 +58,7 @@ const ImageGallery = () => {
                 key: img._id,
               });
             };
-          })
+          }),
       );
 
       const loadedPhotos = await Promise.all(promises);
@@ -87,9 +99,72 @@ const ImageGallery = () => {
     instanceRef.current?.next();
   };
 
+  const resolvedCompanyName = companyName || companyParam || "Unknown";
+
+  const breadcrumbItems = [
+    { label: continent, isLink: true },
+    { label: country, isLink: true },
+    { label: companyState, isLink: true },
+    {
+      label: resolvedCompanyName,
+      isLink: Boolean(companyName || companyParam),
+      onClick: () => {
+        const target = companyParam || companyName;
+        if (!target) return;
+        navigate(`/listings/${encodeURIComponent(target)}`);
+      },
+    },
+    { label: "Gallery", isLink: false },
+  ].filter((item) => item.label);
+
+  const handleBreadcrumbNavigate = () => {
+    const normalizeValue = (value) =>
+      typeof value === "string" ? value.trim().toLowerCase() : value;
+
+    const normalizedContinent = normalizeValue(continent);
+    const normalizedCountry = normalizeValue(country);
+    const normalizedLocation = normalizeValue(companyState);
+
+    dispatch(
+      setFormValues({
+        continent: normalizedContinent || "",
+        country: normalizedCountry || "",
+        location: normalizedLocation || "",
+        category: "",
+        count: "",
+      }),
+    );
+
+    navigate(
+      `/verticals?country=${normalizedCountry || ""}&state=${
+        normalizedLocation || ""
+      }`,
+    );
+  };
+
   return (
-    <div className="max-w-6xl mx-auto px-4 py-6 flex flex-col gap-4">
+    <div className="max-w-6xl mx-auto px-4 pb-6 flex flex-col gap-4">
       <div>
+        <p className="text-lg text-gray-500 my-4">
+          {breadcrumbItems.map((item, index) => (
+            <span key={`${item.label}-${index}`}>
+              {item.isLink ? (
+                <button
+                  type="button"
+                  onClick={item.onClick || handleBreadcrumbNavigate}
+                  className="text-gray-500 hover:text-gray-700 transition-colors"
+                >
+                  {item.label}
+                </button>
+              ) : (
+                item.label
+              )}
+              {index < breadcrumbItems.length - 1 ? (
+                <span className="mx-2">{">"}</span>
+              ) : null}
+            </span>
+          ))}
+        </p>
         <h1 className="text-title font-semibold text-secondary-dark">
           {companyName || "Unknown"} Gallery
         </h1>
