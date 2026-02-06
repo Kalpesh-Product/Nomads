@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { ColumnsPhotoAlbum, MasonryPhotoAlbum } from "react-photo-album";
 import "react-photo-album/masonry.css";
 import "react-photo-album/columns.css";
@@ -13,6 +13,7 @@ import { setFormValues } from "../features/locationSlice.js";
 const ImageGallery = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { company: companyParam } = useParams();
   const dispatch = useDispatch();
   const {
     images = [],
@@ -98,11 +99,21 @@ const ImageGallery = () => {
     instanceRef.current?.next();
   };
 
+  const resolvedCompanyName = companyName || companyParam || "Unknown";
+
   const breadcrumbItems = [
     { label: continent, isLink: true },
     { label: country, isLink: true },
     { label: companyState, isLink: true },
-    { label: companyName || "Unknown", isLink: false },
+    {
+      label: resolvedCompanyName,
+      isLink: Boolean(companyName || companyParam),
+      onClick: () => {
+        const target = companyParam || companyName;
+        if (!target) return;
+        navigate(`/listings/${encodeURIComponent(target)}`);
+      },
+    },
     { label: "Gallery", isLink: false },
   ].filter((item) => item.label);
 
@@ -140,7 +151,7 @@ const ImageGallery = () => {
               {item.isLink ? (
                 <button
                   type="button"
-                  onClick={handleBreadcrumbNavigate}
+                  onClick={item.onClick || handleBreadcrumbNavigate}
                   className="text-gray-500 hover:text-gray-700 transition-colors"
                 >
                   {item.label}
