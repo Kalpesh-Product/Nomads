@@ -60,6 +60,7 @@ const Product = () => {
   const [showAmenities, setShowAmenities] = useState(false);
   console.log("selected : ", selectedReview);
   const [open, setOpen] = useState(false);
+  const [isAddReviewOpen, setIsAddReviewOpen] = useState(false);
 
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
 
@@ -237,6 +238,52 @@ const Product = () => {
       showErrorAlert(errorMessage);
     },
   });
+
+  const {
+    handleSubmit: handleSubmitReview,
+    control: reviewControl,
+    reset: resetReview,
+    formState: { errors: reviewErrors },
+  } = useForm({
+    defaultValues: {
+      name: "",
+      starCount: 5,
+      description: "",
+      reviewSource: "",
+      reviewLink: "",
+    },
+    mode: "onChange",
+  });
+
+  const { mutate: submitReview, isPending: isSubmittingReview } = useMutation({
+    mutationKey: ["submitReview", companyDetails?.companyId],
+    mutationFn: async (data) => {
+      const payload = {
+        businessId: companyDetails?.companyId,
+        name: data.name?.trim(),
+        starCount: Number(data.starCount),
+        description: data.description?.trim(),
+        reviewSource: data.reviewSource?.trim(),
+        reviewLink: data.reviewLink?.trim(),
+      };
+      const response = await axios.post("http://localhost:3000/api/review", {
+        ...payload,
+      });
+      return response?.data;
+    },
+    onSuccess: () => {
+      showSuccessAlert("Review submitted successfully.");
+      resetReview();
+      setIsAddReviewOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["companyDetails"] });
+    },
+    onError: (error) => {
+      showErrorAlert(
+        error?.response?.data?.message || "Unable to submit review.",
+      );
+    },
+  });
+
   const { mutate: submitSales, isPending: isSubmittingSales } = useMutation({
     mutationKey: ["submitSales"],
     mutationFn: async (data) => {
@@ -1153,6 +1200,16 @@ const Product = () => {
                 and reliability
               </span>
             </div>
+            <div className="flex justify-end">
+              <button
+                type="button"
+                className="rounded-full border border-primary-blue text-primary-blue px-5 py-2 text-sm font-semibold hover:bg-primary-blue hover:text-white transition-colors"
+                onClick={() => setIsAddReviewOpen(true)}
+                disabled={!companyDetails?.companyId}
+              >
+                Add a review
+              </button>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-0 lg:p-0">
               {companyDetails?.reviews?.length > 0 ? (
                 companyDetails?.reviews?.slice(0, 6).map((review, index) => (
@@ -1424,6 +1481,122 @@ const Product = () => {
           </div>
         </div>
       </MuiModal>
+
+      <MuiModal
+        open={isAddReviewOpen}
+        onClose={() => setIsAddReviewOpen(false)}
+        title={"Add a review"}
+      >
+        <form
+          onSubmit={handleSubmitReview((data) => submitReview(data))}
+          className="grid grid-cols-1 gap-4"
+        >
+          <Controller
+            name="name"
+            control={reviewControl}
+            rules={{
+              required: "Name is required",
+              validate: {
+                noOnlyWhitespace,
+              },
+            }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Your Name"
+                fullWidth
+                variant="standard"
+                size="small"
+                error={!!reviewErrors?.name}
+                helperText={reviewErrors?.name?.message}
+              />
+            )}
+          />
+          <Controller
+            name="starCount"
+            control={reviewControl}
+            rules={{
+              required: "Star rating is required",
+              min: { value: 1, message: "Minimum rating is 1" },
+              max: { value: 5, message: "Maximum rating is 5" },
+            }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Star Rating (1-5)"
+                fullWidth
+                variant="standard"
+                size="small"
+                type="number"
+                inputProps={{ min: 1, max: 5 }}
+                error={!!reviewErrors?.starCount}
+                helperText={reviewErrors?.starCount?.message}
+              />
+            )}
+          />
+          <Controller
+            name="description"
+            control={reviewControl}
+            rules={{
+              required: "Review details are required",
+              validate: {
+                noOnlyWhitespace,
+              },
+            }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Review Details"
+                fullWidth
+                variant="standard"
+                size="small"
+                multiline
+                minRows={3}
+                error={!!reviewErrors?.description}
+                helperText={reviewErrors?.description?.message}
+              />
+            )}
+          />
+          <Controller
+            name="reviewSource"
+            control={reviewControl}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Review Source"
+                fullWidth
+                variant="standard"
+                size="small"
+                placeholder="Google"
+              />
+            )}
+          />
+          <Controller
+            name="reviewLink"
+            control={reviewControl}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Review Link"
+                fullWidth
+                variant="standard"
+                size="small"
+                placeholder="https://g.co/kgs/example"
+              />
+            )}
+          />
+          <div className="flex justify-end">
+            <SecondaryButton
+              title={"Submit Review"}
+              type={"submit"}
+              externalStyles={"mt-4"}
+              disabled={isSubmittingReview}
+              isLoading={isSubmittingReview}
+            />
+          </div>
+        </form>
+      </MuiModal>
+
       <TransparentModal
         open={showAmenities}
         onClose={() => setShowAmenities(false)}
