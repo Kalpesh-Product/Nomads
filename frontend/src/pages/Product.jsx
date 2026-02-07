@@ -259,14 +259,14 @@ const Product = () => {
     mutationKey: ["submitReview", companyDetails?.companyId],
     mutationFn: async (data) => {
       const payload = {
-        businessId: companyDetails?.companyId,
+        businessId: companyDetails?.businessId,
         name: data.name?.trim(),
         starCount: Number(data.starCount),
         description: data.description?.trim(),
         reviewSource: data.reviewSource?.trim(),
         reviewLink: data.reviewLink?.trim(),
       };
-      const response = await axios.post("http://localhost:3000/api/review", {
+      const response = await axios.post("/review", {
         ...payload,
       });
       return response?.data;
