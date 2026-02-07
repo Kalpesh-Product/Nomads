@@ -28,7 +28,7 @@ const MuiModal = ({
             ref={modalRef}
             className="fixed inset-0 flex items-center justify-center p-4"
           >
-            <div className="bg-white shadow-xl rounded-lg outline-none w-full max-w-4xl max-h-[100vh] overflow-y-auto">
+            <div className="bg-white shadow-xl rounded-lg outline-none w-full max-w-2xl max-h-[100vh] overflow-y-auto">
               {/* Header */}
               <div className="flex justify-between items-center px-4 py-2 rounded-t-md border-b border-borderGray">
                 <div className="text-title w-full text-center text-black">
@@ -43,7 +43,7 @@ const MuiModal = ({
               </div>
 
               {/* Content */}
-              <div className="p-4">{children}</div>
+              <div className="py-4 px-8">{children}</div>
             </div>
           </motion.div>
         </Modal>

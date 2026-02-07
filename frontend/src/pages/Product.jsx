@@ -263,8 +263,10 @@ const Product = () => {
         name: data.name?.trim(),
         starCount: Number(data.starCount),
         description: data.description?.trim(),
-        reviewSource: data.reviewSource?.trim(),
-        reviewLink: data.reviewLink?.trim(),
+        // reviewSource: data.reviewSource?.trim(),
+        // reviewLink: data.reviewLink?.trim(),
+        reviewSource: "Nomads Website",
+        reviewLink: "",
       };
       const response = await axios.post("/review", {
         ...payload,
@@ -1557,7 +1559,7 @@ const Product = () => {
               />
             )}
           />
-          <Controller
+          {/* <Controller
             name="reviewSource"
             control={reviewControl}
             render={({ field }) => (
@@ -1570,8 +1572,8 @@ const Product = () => {
                 placeholder="Google"
               />
             )}
-          />
-          <Controller
+          /> */}
+          {/* <Controller
             name="reviewLink"
             control={reviewControl}
             render={({ field }) => (
@@ -1584,8 +1586,8 @@ const Product = () => {
                 placeholder="https://g.co/kgs/example"
               />
             )}
-          />
-          <div className="flex justify-end">
+          /> */}
+          <div className="flex justify-center">
             <SecondaryButton
               title={"Submit Review"}
               type={"submit"}
