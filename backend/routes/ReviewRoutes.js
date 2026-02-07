@@ -4,6 +4,7 @@ import { verifyJwt } from "../middlewares/verifyJwt.js";
 import {
   addReview,
   bulkInsertReviews,
+  getReviewsByCompany,
   updateReviewStatus,
 } from "../controllers/reviewControllers.js";
 
@@ -15,6 +16,7 @@ router.post(
   upload.single("reviews"),
   bulkInsertReviews,
 );
+router.get("/", getReviewsByCompany);
 
 // PROTECTED
 router.post("/", verifyJwt, addReview);

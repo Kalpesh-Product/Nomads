@@ -324,3 +324,53 @@ export const updateReviewStatus = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getReviewsByCompany = async (req, res, next) => {
+  try {
+    const { companyId, companyType = "", status = "" } = req.query;
+
+    if (!companyId) {
+      return res.status(400).json({
+        message: "companyId is required",
+      });
+    }
+    let cmpQuery = {
+      companyId,
+    };
+    if (companyType) {
+      query = { ...query, companyType };
+    }
+
+    // 1️⃣ Resolve company once (cheap, indexed)
+    const company = await Company.findOne(cmpQuery).select("_id").lean();
+
+    if (!company) {
+      return res.status(404).json({ message: "Company not found" });
+    }
+
+    let query = {};
+
+    if (companyType) {
+      query = { ...query, company: company._id };
+    } else {
+      query = { ...query, companyId };
+    }
+
+    if (status) {
+      query = { ...query, status };
+    }
+
+    // 2️⃣ Fetch reviews using ObjectId (fast)
+    const reviews = await Review.find(query)
+
+      .lean()
+      .exec();
+
+    return res.status(200).json({
+      count: reviews.length,
+      data: reviews,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
