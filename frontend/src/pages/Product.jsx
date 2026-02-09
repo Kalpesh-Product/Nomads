@@ -17,6 +17,7 @@ import Map from "../components/Map";
 import LeafWrapper from "../components/LeafWrapper";
 import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
 import { FiShare2 } from "react-icons/fi";
+
 import {
   FaFacebookF,
   FaLinkedinIn,
@@ -1311,6 +1312,7 @@ const Product = () => {
                 <b>Source:</b> All above content, images and details have been
                 sourced from publicly available information.
               </p>
+
               <p className="mb-2">
                 <b>Content and Copyright Disclaimer:</b> WoNo is a nomad
                 services and informational platform that aggregates and presents

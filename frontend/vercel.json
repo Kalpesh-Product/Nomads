@@ -1,8 +1,26 @@
 {
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": ".*\\.vercel\\.app"
+        }
+      ],
+      "destination": "https://wono.co/$1",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/(.*)",
-      "has": [{ "type": "host", "value": "(?<subdomain>.+).wono.co" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "(?<subdomain>.+).wono.co"
+        }
+      ],
       "destination": "/?subdomain=:subdomain&path=$1"
     },
     {

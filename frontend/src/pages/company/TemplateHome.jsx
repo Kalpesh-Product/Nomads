@@ -109,11 +109,14 @@ const TemplateHome = () => {
     );
   }
 
-  if (!data.isActive) return <div>Website is currently inactive</div>;
   if (error) {
     console.log("error", error);
     return <div>Error loading site: {error.message}</div>;
   }
+  if (!data) {
+    return <div>Site data is currently unavailable</div>;
+  }
+  if (!data.isActive) return <div>Website is currently inactive</div>;
 
   const heroImages = isPending ? [] : data?.heroImages;
 
@@ -183,11 +186,11 @@ const TemplateHome = () => {
             <div className="text-center text-subtitle">
               {about?.length > 0
                 ? about?.map((para) => (
-                    <>
-                      <p className="text-white">{para}</p>
-                      <br />
-                    </>
-                  ))
+                  <>
+                    <p className="text-white">{para}</p>
+                    <br />
+                  </>
+                ))
                 : "About section here"}
             </div>
           </div>

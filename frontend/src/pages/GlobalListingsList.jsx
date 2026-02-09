@@ -621,7 +621,7 @@ const GlobalListingsList = () => {
                       key={cat.value}
                       type="button"
                       onClick={() => handleCategoryClick(cat.value)}
-                      className="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[30%]"
+                      className="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] lg:w-[10%]"
                     >
                       <div className="h-10 w-full flex flex-col items-center gap-1">
                         <img
@@ -832,7 +832,7 @@ const GlobalListingsList = () => {
                           {displayItems.map((item) => (
                             <div
                               key={item._id}
-                              className="w-[calc(50%-0.5rem)] md:w-[calc(20%-1rem)] flex-shrink-0 snap-start"
+                              className="w-[calc(85%-0.5rem)] md:w-[calc(33.33%-1.825rem)] lg:w-[calc(20%-1.5rem)] flex-shrink-0 snap-start"
                             >
                               <ListingCard
                                 item={item}
