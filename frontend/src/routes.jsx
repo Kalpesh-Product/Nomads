@@ -57,12 +57,13 @@ function getTenantFromHost() {
   const hostname = window.location.hostname; // e.g. "nomad.wono.co" or "nomad.localhost"
   const rootDomain = "wono.co";
 
-  // Case 1: main site (no subdomain or localhost root)
+  // Case 1: main site (no subdomain, localhost, or Vercel preview)
   if (
     hostname === rootDomain ||
     hostname === `www.${rootDomain}` ||
     hostname === "localhost" ||
-    hostname.startsWith("localhost:")
+    hostname.startsWith("localhost:") ||
+    hostname.endsWith(".vercel.app")
   ) {
     return "main";
   }

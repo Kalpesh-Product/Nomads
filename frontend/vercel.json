@@ -1,12 +1,5 @@
 {
-    "redirects": [
-    {
-      "source": "/(.*)",
-      "has": [{ "type": "host", "value": ".*\\.vercel\\.app" }],
-      "destination": "https://wono.co/$1",
-      "permanent": true
-    }
-  ],
+
   "rewrites": [
     {
       "source": "/(.*)",
