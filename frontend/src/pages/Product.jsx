@@ -136,6 +136,15 @@ const Product = () => {
     );
   };
 
+  const handleWriteReviewClick = () => {
+    if (!userId) {
+      navigate("/login");
+      return;
+    }
+
+    setIsAddReviewOpen(true);
+  };
+
   const inclusions =
     companyDetails?.inclusions?.split(",").map((item) => {
       return item?.split(" ")?.length
@@ -1264,7 +1273,7 @@ const Product = () => {
               <button
                 type="button"
                 className="rounded-full border border-primary-blue bg-primary-blue text-white px-5 py-2 text-sm font-semibold hover:bg-primary-blue hover:text-white transition-colors"
-                onClick={() => setIsAddReviewOpen(true)}
+                onClick={handleWriteReviewClick}
                 disabled={!companyDetails?.companyId}
               >
                 Write A Review
