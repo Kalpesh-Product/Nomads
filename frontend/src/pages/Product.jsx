@@ -1574,7 +1574,7 @@ const Product = () => {
         >
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-20 h-20 rounded-full bg-[#ff5757] flex items-center justify-center text-white font-semibold text-2xl uppercase">
+              <div className="w-20 h-20 rounded-full bg-primary-blue flex items-center justify-center text-white font-semibold text-2xl uppercase">
                 {(reviewerName || auth?.user?.name || "U")
                   .split(" ")
                   .map((name) => name[0])
