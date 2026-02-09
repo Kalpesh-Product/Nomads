@@ -381,6 +381,7 @@ const Home = () => {
         <div className="min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 lg:mx-auto px-6 sm:px-6 lg:px-0">
           <div className="py-12  hidden lg:block">
             <div className="flex flex-col  gap-4 justify-between items-center">
+
               <form
                 onSubmit={handleSubmit(onSubmit)}
                 className=" flex justify-around md:w-full lg:w-full border-2 bg-gray-50 rounded-full p-0 items-center"
@@ -644,9 +645,9 @@ const Home = () => {
                 <div
                   key={idx}
                   className={`w-full sm:w-full md:w-full afterPro:w-60 flex flex-col items-center  ${idx === destinationData.length - 1 &&
-                      destinationData.length % 2 !== 0
-                      ? "md:col-span-2 afterPro:col-span-1"
-                      : ""
+                    destinationData.length % 2 !== 0
+                    ? "md:col-span-2 afterPro:col-span-1"
+                    : ""
                     }`}
                 >
                   <div className="relative w-full rounded-xl overflow-hidden shadow-md">
