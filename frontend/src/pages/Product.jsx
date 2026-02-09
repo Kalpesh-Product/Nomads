@@ -1202,7 +1202,7 @@ const Product = () => {
                 and reliability
               </span>
             </div>
-            <div className="flex justify-end">
+            {/* <div className="flex justify-end">
               <button
                 type="button"
                 className="rounded-full border border-primary-blue text-primary-blue px-5 py-2 text-sm font-semibold hover:bg-primary-blue hover:text-white transition-colors"
@@ -1211,7 +1211,7 @@ const Product = () => {
               >
                 Add a review
               </button>
-            </div>
+            </div> */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-0 lg:p-0">
               {companyDetails?.reviews?.length > 0 ? (
                 companyDetails?.reviews?.slice(0, 6).map((review, index) => (
@@ -1240,6 +1240,64 @@ const Product = () => {
                 View More →
               </a>
             </div>
+
+            <hr className="my-5 lg:my-10" />
+
+            {/* <div className="flex flex-col justify-center items-center max-w-4xl mx-auto">
+              <h1 className="text-main-header font-medium mt-5">
+                <LeafRatings
+                  ratings={companyDetails?.ratings || 0}
+                  align="items-start"
+                />
+              </h1>
+
+              <p className="text-subtitle  my-4 font-medium">Guest Favorite</p>
+              <span className="text-content text-center">
+                This place is a guest favourite based on <br /> ratings, reviews
+                and reliability
+              </span>
+            </div> */}
+            <div className="flex justify-between">
+              <h1 className="text-title font-medium text-gray-700 uppercase">
+                Platform Reviews
+              </h1>
+              <button
+                type="button"
+                className="rounded-full border border-primary-blue bg-primary-blue text-white px-5 py-2 text-sm font-semibold hover:bg-primary-blue hover:text-white transition-colors"
+                onClick={() => setIsAddReviewOpen(true)}
+                disabled={!companyDetails?.companyId}
+              >
+                Write A Review
+              </button>
+            </div>
+            {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-0 lg:p-0">
+              {companyDetails?.reviews?.length > 0 ? (
+                companyDetails?.reviews?.slice(0, 6).map((review, index) => (
+                  <ReviewCard
+                    handleClick={() => {
+                      setSelectedReview(review);
+                      setOpen(true);
+                    }}
+                    key={index}
+                    review={review}
+                  />
+                ))
+              ) : (
+                <div className="col-span-full border-2 border-dotted border-gray-300 rounded-xl p-6 text-center text-sm text-gray-500 h-40 flex justify-center items-center">
+                  No reviews yet.
+                </div>
+              )}
+            </div> */}
+            {/* <div className="text-right">
+              <a
+                className="text-primary-blue text-sm font-semibold hover:underline"
+                href={companyDetails?.googleMap}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View More →
+              </a>
+            </div> */}
 
             <hr className="my-5 lg:my-10" />
             {/* Map */}
