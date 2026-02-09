@@ -195,8 +195,7 @@ const Listings = () => {
     queryFn: async () => {
       const { country, location } = formData || {};
       const response = await axios.get(
-        `company/companiesn?country=${country}&state=${location}&userId=${
-          userId || ""
+        `company/companiesn?country=${country}&state=${location}&userId=${userId || ""
         }`,
       );
 
@@ -312,23 +311,23 @@ const Listings = () => {
   const forMapsData = isLisitingLoading
     ? []
     : listingsData.map((item) => ({
-        ...item,
-        id: item._id,
-        lat: item.latitude,
-        lng: item.longitude,
-        name: item.companyName,
-        location: item.city,
-        reviews: item.reviews?.length,
-        rating: item.reviews?.length
-          ? (() => {
-              const avg =
-                item.reviews.reduce((sum, r) => sum + r.starCount, 0) /
-                item.reviews.length;
-              return avg % 1 === 0 ? avg : avg.toFixed(1);
-            })()
-          : "0",
-        image: item.images?.[0]?.url,
-      }));
+      ...item,
+      id: item._id,
+      lat: item.latitude,
+      lng: item.longitude,
+      name: item.companyName,
+      location: item.city,
+      reviews: item.reviews?.length,
+      rating: item.reviews?.length
+        ? (() => {
+          const avg =
+            item.reviews.reduce((sum, r) => sum + r.starCount, 0) /
+            item.reviews.length;
+          return avg % 1 === 0 ? avg : avg.toFixed(1);
+        })()
+        : "0",
+      image: item.images?.[0]?.url,
+    }));
 
   const handleCategoryClick = (categoryValue) => {
     const formData = getValues(); // from react-hook-form
@@ -414,11 +413,10 @@ const Listings = () => {
                               className="h-full w-full object-contain"
                             />
                             <span
-                              className={`text-sm border-b-4 ${
-                                isActive
-                                  ? "border-primary-blue"
-                                  : "border-transparent"
-                              }`}
+                              className={`text-sm border-b-4 ${isActive
+                                ? "border-primary-blue"
+                                : "border-transparent"
+                                }`}
                             >
                               {cat.label}
                             </span>
@@ -435,7 +433,7 @@ const Listings = () => {
               <form
                 onSubmit={handleSubmit(onSubmit)}
                 className=" flex justify-around md:w-full lg:w-full border-2 bg-gray-50 rounded-full p-0 items-center"
-                // className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
+              // className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
               >
                 <Controller
                   name="continent"
@@ -550,11 +548,10 @@ const Listings = () => {
                 animate={{ y: 0 }}
                 exit={{ y: "-100%" }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
-                className={`grid ${
-                  categoryOptions.length === 4
-                    ? "grid-cols-2" // 2 icons per row for 4 total
-                    : "grid-cols-3 md:grid-cols-5" // default layout for 6 or more
-                } gap-4 gap-y-10 mb-16 justify-items-center`}
+                className={`grid ${categoryOptions.length === 4
+                  ? "grid-cols-2" // 2 icons per row for 4 total
+                  : "grid-cols-3 md:grid-cols-5" // default layout for 6 or more
+                  } gap-4 gap-y-10 mb-16 justify-items-center`}
               >
                 {categoryOptions.map((cat) => {
                   const iconSrc = newIcons[cat.value];
@@ -575,11 +572,10 @@ const Listings = () => {
                             className="h-full w-full object-contain"
                           />
                           <span
-                            className={`text-sm border-b-2 ${
-                              isActive
-                                ? "border-[#FF5757]"
-                                : "border-transparent"
-                            }`}
+                            className={`text-sm border-b-2 ${isActive
+                              ? "border-[#FF5757]"
+                              : "border-transparent"
+                              }`}
                           >
                             {cat.label}
                           </span>
@@ -674,9 +670,8 @@ const Listings = () => {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -50 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className={`${
-              mapOpen ? "col-span-5" : "col-span-9"
-            } font-semibold text-lg`}
+            className={`${mapOpen ? "col-span-5" : "col-span-9"
+              } font-semibold text-lg`}
           >
             <PaginatedGrid
               // data={isLisitingLoading ? skeletonArray : sortedListings}
@@ -684,9 +679,8 @@ const Listings = () => {
               entriesPerPage={!mapOpen ? 10 : 9}
               persistPage={true}
               resetPageKey={resetPageKey}
-              columns={`grid-cols-1 md:grid-cols-2 ${
-                mapOpen ? "lg:grid-cols-3" : "lg:grid-cols-5"
-              } gap-x-5`}
+              columns={`grid-cols-2 md:grid-cols-2 ${mapOpen ? "lg:grid-cols-3" : "lg:grid-cols-4 xl:grid-cols-5"
+                } gap-4 md:gap-5`}
               renderItem={(item, index) =>
                 isLisitingLoading ? (
                   <Box key={index} className="w-full h-full">

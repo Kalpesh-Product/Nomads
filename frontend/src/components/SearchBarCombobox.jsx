@@ -20,8 +20,8 @@ export default function SearchBarCombobox({
     query === ""
       ? options
       : options.filter((option) =>
-          option.label.toLowerCase().includes(query.toLowerCase())
-        );
+        option.label.toLowerCase().includes(query.toLowerCase())
+      );
 
   const selectedLabel = options.find((opt) => opt.value === value)?.label;
 
@@ -37,9 +37,8 @@ export default function SearchBarCombobox({
     >
       {({ open, close }) => (
         <div
-          className={`relative w-full p-2 px-6 md:py-2 py-4 transition-all rounded-full ${
-            open ? "bg-white shadow-lg" : "hover:bg-white hover:shadow-lg"
-          }`}
+          className={`relative w-full p-2 px-6 md:py-2 py-4 transition-all rounded-full ${open ? "bg-white shadow-lg" : "hover:bg-white hover:shadow-lg"
+            }`}
         >
           {label && (
             <label className="block text-sm font-medium text-gray-700">
@@ -78,7 +77,7 @@ export default function SearchBarCombobox({
                 animate={{ opacity: 1, scaleY: 1 }}
                 exit={{ opacity: 0, scaleY: 0 }}
                 transition={{ duration: 0.2 }}
-                className="absolute left-4  z-20 mt-1 origin-top bg-white w-72 rounded-b-2xl rounded-t-none shadow-2xl p-0"
+                className="absolute left-0 right-0 z-30 mt-1 origin-top bg-white rounded-2xl shadow-2xl p-0 border border-gray-100"
               >
                 <div className="max-h-60 overflow-y-auto">
                   {filteredOptions.length === 0 ? (

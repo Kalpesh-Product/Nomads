@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { NavLink, useLocation, useNavigate, useParams } from "react-router-dom";
 import { Controller, useForm } from "react-hook-form";
 import { TextField } from "@mui/material";
@@ -60,6 +60,19 @@ const Product = () => {
   const [open, setOpen] = useState(false);
 
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isAboutExpanded, setIsAboutExpanded] = useState(false);
+  const carouselRef = useRef(null);
+
+  const handleScroll = (e) => {
+    const scrollLeft = e.target.scrollLeft;
+    const width = e.target.offsetWidth;
+    // We adjust the width slightly because on mobile the items are 85% + gap
+    // but the snap-center keeps them centered.
+    // Simplifying to standard index calculation:
+    const index = Math.round(scrollLeft / width);
+    setCurrentImageIndex(index);
+  };
 
   const normalizePhoneNumber = (value) =>
     value ? value.replace(/\s+/g, "") : "";
@@ -136,9 +149,8 @@ const Product = () => {
   // 🟢 Add this useEffect below:
   useEffect(() => {
     if (auth?.user) {
-      const fullName = `${auth.user.firstName || ""} ${
-        auth.user.lastName || ""
-      }`.trim();
+      const fullName = `${auth.user.firstName || ""} ${auth.user.lastName || ""
+        }`.trim();
 
       reset({
         fullName,
@@ -242,11 +254,11 @@ const Product = () => {
   const reviewData = isCompanyDetails
     ? []
     : companyDetails?.reviews?.map((item) => ({
-        ...item,
-        stars: item.starCount,
-        message: item.description,
-        date: dayjs(item.createdAt).fromNow(),
-      }));
+      ...item,
+      stars: item.starCount,
+      message: item.description,
+      date: dayjs(item.createdAt).fromNow(),
+    }));
 
   const forMapsData = {
     id: companyDetails?._id,
@@ -369,7 +381,7 @@ const Product = () => {
   };
 
   return (
-    <div className="p-4">
+    <div className="p-2 md:p-4">
       <TransparentModal
         open={shareMenuOpen}
         onClose={() => setShareMenuOpen(false)}
@@ -428,7 +440,7 @@ const Product = () => {
           </div>
         </div>
       </TransparentModal>
-      <div className="min-w-[70%] max-w-[80rem] lg:max-w-[70rem] mx-0 md:mx-auto">
+      <div className="w-full md:max-w-[75rem] xl:max-w-[85rem] mx-auto px-2 md:px-8 lg:px-12">
         <div className="pb-4">
           <h1 className="text-title font-semibold text-secondary-dark">
             {companyDetails?.companyName || "Loading Title..."}
@@ -438,7 +450,7 @@ const Product = () => {
           {/* Image Section */}
           {isCompanyDetails ? (
             // 🔄 Loading skeletons
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 overflow-hidden animate-pulse">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 overflow-hidden animate-pulse">
               {/* Main Skeleton */}
               <div className="w-full h-[28.5rem] bg-gray-200 rounded-md" />
               {/* Thumbnail Skeletons */}
@@ -465,111 +477,137 @@ const Product = () => {
             </div>
           ) : (
             // ✅ Actual image display
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 overflow-hidden">
-              {/* Main Image */}
-              <div className="w-full h-[28.5rem] overflow-hidden rounded-md">
-                <img
-                  src={
-                    companyDetails?.images?.[0]?.url ||
-                    "https://via.placeholder.com/400x200?text=No+Image+Found+"
-                  }
-                  className="w-full h-full object-cover cursor-pointer"
-                  onClick={() =>
-                    navigate("images", {
-                      state: {
-                        companyName: companyDetails?.companyName,
-                        images: companyDetails?.images,
-                        selectedImageId: selectedImage?._id, // ✅ Fix here
-                      },
-                    })
-                  }
-                  alt="Selected"
-                />
-              </div>
-
-              {/* Thumbnail Images */}
-              <div className="grid grid-cols-2 gap-1">
-                {companyDetails?.images?.slice(1, 5).map((item, index) => (
-                  <div
-                    key={item._id}
-                    className={`relative w-full h-56 overflow-hidden rounded-md cursor-pointer border-2 ${
-                      selectedImage?._id === item._id
-                        ? "border-primary-dark"
-                        : "border-transparent"
-                    }`}
+            <div className="w-full">
+              {/* Desktop Grid Layout */}
+              <div className="hidden md:grid grid-cols-2 gap-2 overflow-hidden">
+                {/* Main Image */}
+                <div className="w-full h-[28.5rem] overflow-hidden rounded-md">
+                  <img
+                    src={
+                      companyDetails?.images?.[0]?.url ||
+                      "https://via.placeholder.com/400x200?text=No+Image+Found+"
+                    }
+                    className="w-full h-full object-cover cursor-pointer hover:opacity-95 transition-opacity"
                     onClick={() =>
                       navigate("images", {
                         state: {
                           companyName: companyDetails?.companyName,
                           images: companyDetails?.images,
-                          selectedImageId: item._id,
+                          selectedImageId: selectedImage?._id,
                         },
                       })
                     }
-                  >
-                    <img
-                      src={item.url}
-                      alt="company-thumbnail"
-                      className="w-full h-full object-cover"
-                    />
+                    alt="Selected"
+                  />
+                </div>
 
-                    {/* Button on bottom right of 4th image */}
-                    {showMore && index === 3 && (
-                      <div className="absolute inset-0 bg-black/40 flex items-end justify-end p-2">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation(); // prevent selecting the image
-                            navigate("images", {
-                              state: {
-                                companyName: companyDetails?.companyName,
-                                images: companyDetails?.images,
-                              },
-                            });
-                          }}
-                          className="bg-white text-sm px-3 py-1 rounded shadow font-medium"
-                        >
-                          +{companyDetails.images.length - 4} more
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                {/* Thumbnail Images */}
+                <div className="grid grid-cols-2 gap-1 px-1">
+                  {companyDetails?.images?.slice(1, 5).map((item, index) => (
+                    <div
+                      key={item._id}
+                      className={`relative w-full h-56 overflow-hidden rounded-md cursor-pointer border-2 ${selectedImage?._id === item._id
+                        ? "border-primary-dark"
+                        : "border-transparent"
+                        }`}
+                      onClick={() =>
+                        navigate("images", {
+                          state: {
+                            companyName: companyDetails?.companyName,
+                            images: companyDetails?.images,
+                            selectedImageId: item._id,
+                          },
+                        })
+                      }
+                    >
+                      <img
+                        src={item.url}
+                        alt="company-thumbnail"
+                        className="w-full h-full object-cover"
+                      />
+
+                      {/* Button on bottom right of 4th image */}
+                      {showMore && index === 3 && (
+                        <div className="absolute inset-0 bg-black/40 flex items-end justify-end p-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation(); // prevent selecting the image
+                              navigate("images", {
+                                state: {
+                                  companyName: companyDetails?.companyName,
+                                  images: companyDetails?.images,
+                                },
+                              });
+                            }}
+                            className="bg-white text-sm px-3 py-1 rounded shadow font-medium"
+                          >
+                            +{companyDetails.images.length - 4} more
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Mobile Image Carousel */}
+              <div className="md:hidden relative group -mx-2">
+                <div
+                  ref={carouselRef}
+                  className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide"
+                  onScroll={handleScroll}
+                  style={{
+                    WebkitOverflowScrolling: "touch",
+                  }}
+                >
+                  {companyDetails?.images?.map((item, index) => (
+                    <div
+                      key={item._id}
+                      className="w-full aspect-[4/3] flex-shrink-0 snap-center overflow-hidden"
+                      onClick={() =>
+                        navigate("images", {
+                          state: {
+                            companyName: companyDetails?.companyName,
+                            images: companyDetails?.images,
+                            selectedImageId: item._id,
+                          },
+                        })
+                      }
+                    >
+                      <img
+                        src={item.url}
+                        alt={`product-img-${index}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Carousel Dots */}
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5 px-2 py-1.5 rounded-full bg-black/30 backdrop-blur-sm z-10">
+                  {companyDetails?.images?.slice(0, 8).map((_, idx) => (
+                    <div
+                      key={idx}
+                      className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${currentImageIndex === idx ? "bg-white w-4" : "bg-white/50"
+                        }`}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
           )}
 
           {/* About and Location */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
             <div className="flex flex-col gap-8">
-              {/* {isCompanyDetails ? (
-                // 🔄 Skeleton while loading
-                <div className="w-full h-36 bg-gray-200 animate-pulse rounded-md" />
-              ) : !companyDetails?.logo || !companyDetails?.logo?.url ? (
-                // 🚫 Fallback UI when logo is missing
-                <div className="w-full h-36 flex items-center justify-center bg-gray-100 border border-dashed border-gray-300 rounded-md">
-                  <span className="text-gray-500 text-sm">
-                    No company logo available
-                  </span>
-                </div>
-              ) : (
-                // ✅ Show actual logo
-                <div className="w-full h-36 overflow-hidden rounded-md">
-                  <img
-                    src={companyDetails?.logo?.url || companyDetails?.logo}
-                    alt="company-logo"
-                    className="h-full w-full object-contain"
-                  />
-                </div>
-              )} */}
-
               {isCompanyDetails ? (
                 // 🔄 Skeleton while loading
                 <div className="w-full h-36 bg-gray-200 animate-pulse rounded-md" />
               ) : !(
-                  (typeof companyDetails?.logo === "string" &&
-                    companyDetails.logo) ||
-                  companyDetails?.logo?.url
-                ) ? (
+                (typeof companyDetails?.logo === "string" &&
+                  companyDetails.logo) ||
+                companyDetails?.logo?.url
+              ) ? (
                 // 🚫 Fallback UI when logo is missing
                 <div className="w-full h-36 flex items-center justify-center bg-gray-100 border border-dashed border-gray-300 rounded-md">
                   <span className="text-gray-500 text-sm">
@@ -592,33 +630,29 @@ const Product = () => {
               )}
 
               <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <h1 className="text-title  font-medium text-gray-700 uppercase">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-y-3 gap-x-6 mb-4 mt-2">
+                  <h1 className="text-title font-medium text-gray-700 uppercase">
                     About
                   </h1>
-                  <div className="items-center flex gap-2">
-                    <div>
-                      <button
-                        type="button"
-                        onClick={() => setShareMenuOpen(true)}
-                        className="inline-flex items-center gap-2 rounded-full border border-gray-300 px-3 py-1 mr-2 text-small text-gray-600 transition hover:border-gray-400 hover:text-gray-900"
-                      >
-                        <FiShare2 className="text-gray-600" size={14} />
-                        Share
-                      </button>
-                    </div>
+                  <div className="flex items-center gap-3 md:gap-6">
+                    <button
+                      type="button"
+                      onClick={() => setShareMenuOpen(true)}
+                      className="inline-flex items-center gap-2 rounded-full border border-gray-300 px-3 md:px-4 py-1.5 text-small font-medium text-gray-600 transition hover:border-gray-400 hover:text-gray-900 bg-white shadow-sm"
+                    >
+                      <FiShare2 className="text-gray-600" size={14} />
+                      Share
+                    </button>
 
                     {companyDetails?.websiteTemplateLink && (
-                      <div>
-                        <a
-                          href={companyDetails?.websiteTemplateLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-small underline text-primary-blue"
-                        >
-                          View Website
-                        </a>
-                      </div>
+                      <a
+                        href={companyDetails?.websiteTemplateLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-small font-semibold underline text-primary-blue hover:text-blue-700 transition-colors"
+                      >
+                        View Website
+                      </a>
                     )}
 
                     <div
@@ -675,218 +709,217 @@ const Product = () => {
                   </div>
                 ) : (
                   // ✅ Actual content
-                  <p className="text-sm text-secondary-dark">
-                    {companyDetails.about.replace(/\\n/g, " ")}
-                  </p>
+                  <div>
+                    <p
+                      className={`text-sm text-secondary-dark leading-relaxed ${!isAboutExpanded ? "line-clamp-4 md:line-clamp-none" : ""
+                        }`}
+                    >
+                      {companyDetails.about.replace(/\\n/g, " ")}
+                    </p>
+                    {companyDetails.about.length > 250 && (
+                      <button
+                        onClick={() => setIsAboutExpanded(!isAboutExpanded)}
+                        className="md:hidden text-primary-blue text-xs font-semibold mt-2 hover:underline focus:outline-none"
+                      >
+                        {isAboutExpanded ? "Show less" : "Show more"}
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
             </div>
-            <div className="flex flex-col gap-4">
-              <div className="border-2 rounded-xl flex  gap-1 items-center p-4">
-                <div className="text-tiny w-full hidden lg:flex justify-center items-center">
-                  <LeafWrapper height="3rem" width={"2rem"}>
-                    <div className="text-secondary-dark font-semibold flex lg:text-subtitle flex-col leading-5  items-center">
-                      <span>Guest</span>
-                      <span>Favorite</span>
-                    </div>
-                  </LeafWrapper>
-                </div>
-                <div className="w-full hidden lg:flex">
-                  <p className="text-tiny ">
-                    One of the most loved places on WoNo, according to guests
-                  </p>
-                </div>
-                <div className="flex w-full lg:w-1/2 gap-1 justify-end">
-                  <div className="flex flex-col gap-0 justify-center items-center">
-                    <p className="text-tiny lg:text-subtitle">
-                      {companyDetails?.ratings || 0}
-                    </p>
-                    <span className="text-tiny flex lg:text-small font-medium">
-                      {renderStars(companyDetails?.ratings || 0)}
-                    </span>
-                  </div>
-                  {/* Vertical Separator */}
-                  <div className="w-px h-10 bg-gray-300 mx-2 my-auto lg:hidden" />
-                  <div className="text-tiny w-full flex justify-center items-center lg:hidden">
-                    <LeafWrapper height="3rem" width={"2rem"}>
-                      <div className="text-secondary-dark font-semibold flex text-tiny lg:text-subtitle flex-col leading-5  items-center">
-                        <span>Guest</span>
-                        <span>Favorite</span>
+
+            <div className="relative w-full">
+              <div className="w-full md:static lg:sticky lg:top-24 flex flex-col gap-6">
+                {/* Responsive Guest Favorite Card */}
+                <div className="border border-gray-200 rounded-2xl flex flex-col lg:flex-row items-center justify-between p-4 bg-white shadow-sm hover:shadow-md transition-shadow gap-4 lg:gap-0">
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full lg:w-auto text-center sm:text-left">
+                    <LeafWrapper height="2.5rem" width="1.5rem">
+                      <div className="flex flex-col items-center leading-tight">
+                        <span className="text-[10px] uppercase tracking-tighter text-gray-400">Guest</span>
+                        <span className="text-secondary-dark font-bold text-xs">Favorite</span>
                       </div>
                     </LeafWrapper>
+                    {/* Divider: Hidden on mobile (stacked vertical), visible on sm (row), hidden on tablet (stacked vertical if needed or just row), visible on lg desktop */}
+                    <div className="hidden sm:block w-px h-8 bg-gray-100 mx-2" />
+                    <p className="text-xs text-gray-500 max-w-[200px] sm:max-w-none">
+                      One of the most loved places on WoNo
+                    </p>
                   </div>
 
-                  {/* Vertical Separator */}
-                  <div className="w-px h-10 bg-gray-300 mx-2 my-auto" />
-
-                  <div className="flex flex-col gap-4 lg:gap-0 justify-center items-center">
-                    <p className="text-tiny lg:text-subtitle mt-1">
-                      {companyDetails?.reviewCount ||
-                        companyDetails?.totalReviews ||
-                        0}
-                    </p>
-                    <span className="text-tiny lg:text-small font-medium">
-                      Reviews
-                    </span>
+                  {/* Right Section: Ratings & Reviews */}
+                  <div className="flex items-center justify-center lg:justify-end gap-6 w-full lg:w-auto border-t lg:border-t-0 lg:border-l border-gray-100 pt-4 lg:pt-0 lg:pl-6">
+                    <div className="flex flex-col items-center">
+                      <span className="text-lg font-bold text-gray-900">{companyDetails?.ratings || "0"}</span>
+                      <div className="flex text-[10px] text-gray-400">
+                        {renderStars(companyDetails?.ratings || 0)}
+                      </div>
+                    </div>
+                    <div className="w-px h-8 bg-gray-100" />
+                    <div className="flex flex-col items-center">
+                      <span className="text-lg font-bold text-gray-900">
+                        {companyDetails?.reviewCount || companyDetails?.totalReviews || 0}
+                      </span>
+                      <span className="text-[10px] text-gray-400 uppercase font-medium">Reviews</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="shadow-md flex flex-col gap-4 p-6 rounded-xl border-2">
-                <h1 className="text-card-title text-secondary-dark font-semibold leading-normal">
-                  Enquire & Receive Quote
-                </h1>
-                <form
-                  onSubmit={handleSubmit((data) => {
-                    const formattedMobileNumber = normalizePhoneNumber(
-                      data.mobileNumber,
-                    );
-                    console.log("Enquiry form submit:", {
-                      ...data,
-                      mobileNumber: formattedMobileNumber,
-                    });
-                    submitEnquiry({
-                      ...data,
-                      mobileNumber: formattedMobileNumber,
-                    });
-                  })}
-                  action=""
-                  className="grid grid-cols-1 lg:grid-cols-2 gap-6"
-                >
-                  <Controller
-                    name="fullName"
-                    rules={{
-                      required: "Full Name is required",
-                      validate: {
-                        noOnlyWhitespace,
-                        isAlphanumeric,
-                      },
-                    }}
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        label="Full Name"
-                        fullWidth
-                        variant="standard"
-                        size="small"
-                        helperText={errors?.fullName?.message}
-                        sx={{ marginTop: 3 }}
-                        error={!!errors.fullName}
-                      />
-                    )}
-                  />
-                  <Controller
-                    name="noOfPeople"
-                    control={control}
-                    rules={{
-                      required: "No. of people is required",
-                      validate: (value) =>
-                        value > 0 || "At least one person is required",
-                    }}
-                    render={({ field }) => (
-                      <div className="flex flex-col gap-1">
-                        <label className="text-sm text-gray-600 font-medium">
-                          No. Of People
-                        </label>
-                        <div className="flex items-center border-b border-gray-300 py-1 w-full max-w-xs">
-                          {/* Minus Button */}
-                          <button
-                            type="button"
-                            onClick={() =>
-                              field.onChange(
-                                Math.max(0, Number(field.value || 0) - 1),
-                              )
-                            }
-                            className="px-3 py-1 text-lg font-semibold text-gray-600 hover:text-primary-blue"
-                          >
-                            −
-                          </button>
+                {/* Enquiry Form card */}
+                <div className="shadow-lg flex flex-col gap-2 md:gap-4 p-4 md:p-5 lg:p-8 rounded-2xl border border-gray-100 bg-white max-w-full">
+                  <h1 className="text-base md:text-base lg:text-xl xl:text-2xl text-secondary-dark font-bold">
+                    Enquire & Receive Quote
+                  </h1>
+                  <form
+                    onSubmit={handleSubmit((data) => {
+                      const formattedMobileNumber = normalizePhoneNumber(
+                        data.mobileNumber,
+                      );
+                      console.log("Enquiry form submit:", {
+                        ...data,
+                        mobileNumber: formattedMobileNumber,
+                      });
+                      submitEnquiry({
+                        ...data,
+                        mobileNumber: formattedMobileNumber,
+                      });
+                    })}
+                    action=""
+                    className="grid grid-cols-1 gap-y-4 md:gap-y-5"
+                  >
+                    <Controller
+                      name="fullName"
+                      rules={{
+                        required: "Full Name is required",
+                        validate: {
+                          noOnlyWhitespace,
+                          isAlphanumeric,
+                        },
+                      }}
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          label="Full Name"
+                          fullWidth
+                          variant="standard"
+                          size="small"
+                          helperText={errors?.fullName?.message}
+                          error={!!errors.fullName}
+                        />
+                      )}
+                    />
+                    <Controller
+                      name="noOfPeople"
+                      control={control}
+                      rules={{
+                        required: "No. of people is required",
+                        validate: (value) =>
+                          value > 0 || "At least one person is required",
+                      }}
+                      render={({ field }) => (
+                        <div className="flex flex-col gap-1">
+                          <label className="text-sm text-gray-600 font-medium">
+                            No. Of People
+                          </label>
+                          <div className="flex items-center border-b border-gray-300 py-1 w-full mt-auto">
+                            {/* Minus Button */}
+                            <button
+                              type="button"
+                              onClick={() =>
+                                field.onChange(
+                                  Math.max(0, Number(field.value || 0) - 1),
+                                )
+                              }
+                              className="px-3 py-1 text-lg font-semibold text-gray-600 hover:text-primary-blue"
+                            >
+                              −
+                            </button>
 
-                          {/* Count Display */}
-                          <input
-                            {...field}
-                            readOnly
-                            className="w-full text-center outline-none bg-transparent text-gray-800 text-sm font-medium"
-                            value={field.value || 0}
-                          />
+                            {/* Count Display */}
+                            <input
+                              {...field}
+                              readOnly
+                              className="w-full text-center outline-none bg-transparent text-gray-800 text-sm font-medium"
+                              value={field.value || 0}
+                            />
 
-                          {/* Plus Button */}
-                          <button
-                            type="button"
-                            onClick={() =>
-                              field.onChange(Number(field.value || 0) + 1)
-                            }
-                            className="px-3 py-1 text-lg font-semibold text-gray-600 hover:text-primary-blue"
-                          >
-                            +
-                          </button>
+                            {/* Plus Button */}
+                            <button
+                              type="button"
+                              onClick={() =>
+                                field.onChange(Number(field.value || 0) + 1)
+                              }
+                              className="px-3 py-1 text-lg font-semibold text-gray-600 hover:text-primary-blue"
+                            >
+                              +
+                            </button>
+                          </div>
+                          {errors?.noOfPeople && (
+                            <p className="text-red-500 text-xs mt-1">
+                              {errors.noOfPeople.message}
+                            </p>
+                          )}
                         </div>
-                        {errors?.noOfPeople && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.noOfPeople.message}
-                          </p>
-                        )}
-                      </div>
-                    )}
-                  />
+                      )}
+                    />
 
-                  <Controller
-                    name="mobileNumber"
-                    control={control}
-                    rules={{
-                      required: "Mobile number is required",
-                      validate: {
-                        // isValidPhoneNumber,
-                        isValidInternationalPhone,
-                      },
-                    }}
-                    render={({ field }) => (
-                      <MuiTelInput
-                        {...field}
-                        label="Mobile Number"
-                        fullWidth
-                        defaultCountry="IN"
-                        variant="standard"
-                        size="small"
-                        value={field.value || ""}
-                        onChange={(value) => {
-                          const formattedValue = normalizePhoneNumber(value);
-                          field.onChange(value);
-                          console.log("Enquiry mobile input:", {
-                            raw: value,
-                            formatted: formattedValue,
-                          });
-                        }}
-                        helperText={errors?.mobileNumber?.message}
-                        error={!!errors.mobileNumber}
-                      />
-                    )}
-                  />
-                  <Controller
-                    name="email"
-                    control={control}
-                    rules={{
-                      required: "Email is required",
-                      validate: {
-                        isValidEmail,
-                      },
-                    }}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        label="Email"
-                        fullWidth
-                        type="email"
-                        variant="standard"
-                        size="small"
-                        helperText={errors?.email?.message}
-                        error={!!errors.email}
-                      />
-                    )}
-                  />
+                    <Controller
+                      name="mobileNumber"
+                      control={control}
+                      rules={{
+                        required: "Mobile number is required",
+                        validate: {
+                          // isValidPhoneNumber,
+                          isValidInternationalPhone,
+                        },
+                      }}
+                      render={({ field }) => (
+                        <MuiTelInput
+                          {...field}
+                          label="Mobile Number"
+                          fullWidth
+                          defaultCountry="IN"
+                          variant="standard"
+                          size="small"
+                          value={field.value || ""}
+                          onChange={(value) => {
+                            const formattedValue = normalizePhoneNumber(value);
+                            field.onChange(value);
+                            console.log("Enquiry mobile input:", {
+                              raw: value,
+                              formatted: formattedValue,
+                            });
+                          }}
+                          helperText={errors?.mobileNumber?.message}
+                          error={!!errors.mobileNumber}
+                        />
+                      )}
+                    />
+                    <Controller
+                      name="email"
+                      control={control}
+                      rules={{
+                        required: "Email is required",
+                        validate: {
+                          isValidEmail,
+                        },
+                      }}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          label="Email"
+                          fullWidth
+                          type="email"
+                          variant="standard"
+                          size="small"
+                          helperText={errors?.email?.message}
+                          error={!!errors.email}
+                        />
+                      )}
+                    />
 
-                  {/* {companyDetails?.type === "coworking" && (
+                    {/* {companyDetails?.type === "coworking" && (
                     <Controller
                       name="numberOfDesks"
                       control={control}
@@ -909,7 +942,7 @@ const Product = () => {
                       )}
                     />
                   )} */}
-                  {/* <Controller
+                    {/* <Controller
                     name="startDate"
                     control={control}
                     render={({ field }) => (
@@ -930,119 +963,120 @@ const Product = () => {
                       />
                     )}
                   /> */}
-                  <Controller
-                    name="startDate"
-                    control={control}
-                    rules={{
-                      validate: (value) => {
-                        const end = watch("endDate");
-                        if (!end || !value) return true;
+                    <Controller
+                      name="startDate"
+                      control={control}
+                      rules={{
+                        validate: (value) => {
+                          const end = watch("endDate");
+                          if (!end || !value) return true;
 
-                        const startDate = dayjs(value);
-                        const endDate = dayjs(end);
+                          const startDate = dayjs(value);
+                          const endDate = dayjs(end);
 
-                        return (
-                          startDate.isBefore(endDate) ||
-                          "Start date must be before end date"
-                        );
-                      },
-                    }}
-                    render={({ field }) => (
-                      <DesktopDatePicker
-                        {...field}
-                        label="Start Date"
-                        disablePast
-                        format="DD-MM-YYYY"
-                        value={field.value ? dayjs(field.value) : null}
-                        onChange={field.onChange}
-                        slotProps={{
-                          textField: {
-                            size: "small",
-                            fullWidth: true,
-                            variant: "standard",
-                            error: !!errors.startDate,
-                            helperText: errors?.startDate?.message,
-                          },
-                        }}
-                      />
-                    )}
-                  />
-
-                  {/* <Controller
-                    name="endDate"
-                    control={control}
-                    render={({ field }) => (
-                      <DesktopDatePicker
-                        {...field}
-                        label="End Date"
-                        format="DD-MM-YYYY"
-                        disablePast
-                        disabled={!selectedStartDate}
-                        value={field.value ? dayjs(field.value) : null}
-                        onChange={field.onChange}
-                        slotProps={{
-                          textField: {
-                            size: "small",
-                            fullWidth: true,
-                            variant: "standard",
-                          },
-                        }}
-                      />
-                    )}
-                  /> */}
-                  <Controller
-                    name="endDate"
-                    control={control}
-                    rules={{
-                      validate: (value) => {
-                        const start = watch("startDate");
-                        if (!start || !value) return true;
-
-                        const startDate = dayjs(start);
-                        const endDate = dayjs(value);
-
-                        return (
-                          endDate.isAfter(startDate) ||
-                          "End date must be after start date"
-                        );
-                      },
-                    }}
-                    render={({ field }) => (
-                      <DesktopDatePicker
-                        {...field}
-                        label="End Date"
-                        format="DD-MM-YYYY"
-                        disablePast
-                        disabled={!selectedStartDate}
-                        value={field.value ? dayjs(field.value) : null}
-                        onChange={field.onChange}
-                        slotProps={{
-                          textField: {
-                            size: "small",
-                            fullWidth: true,
-                            variant: "standard",
-                            error: !!errors.endDate,
-                            helperText: errors?.endDate?.message,
-                          },
-                        }}
-                      />
-                    )}
-                  />
-
-                  <div className="flex justify-center items-center lg:col-span-2">
-                    <SecondaryButton
-                      disabled={isSubmitting}
-                      isLoading={isSubmitting}
-                      title={"Get Quote"}
-                      type={"submit"}
-                      externalStyles={"w-1/2"}
+                          return (
+                            startDate.isBefore(endDate) ||
+                            "Start date must be before end date"
+                          );
+                        },
+                      }}
+                      render={({ field }) => (
+                        <DesktopDatePicker
+                          {...field}
+                          label="Start Date"
+                          disablePast
+                          format="DD-MM-YYYY"
+                          value={field.value ? dayjs(field.value) : null}
+                          onChange={field.onChange}
+                          slotProps={{
+                            textField: {
+                              size: "small",
+                              fullWidth: true,
+                              variant: "standard",
+                              error: !!errors.startDate,
+                              helperText: errors?.startDate?.message,
+                            },
+                          }}
+                        />
+                      )}
                     />
-                  </div>
-                </form>
+
+                    {/* <Controller
+                    name="endDate"
+                    control={control}
+                    render={({ field }) => (
+                      <DesktopDatePicker
+                        {...field}
+                        label="End Date"
+                        format="DD-MM-YYYY"
+                        disablePast
+                        disabled={!selectedStartDate}
+                        value={field.value ? dayjs(field.value) : null}
+                        onChange={field.onChange}
+                        slotProps={{
+                          textField: {
+                            size: "small",
+                            fullWidth: true,
+                            variant: "standard",
+                          },
+                        }}
+                      />
+                    )}
+                  /> */}
+                    <Controller
+                      name="endDate"
+                      control={control}
+                      rules={{
+                        validate: (value) => {
+                          const start = watch("startDate");
+                          if (!start || !value) return true;
+
+                          const startDate = dayjs(start);
+                          const endDate = dayjs(value);
+
+                          return (
+                            endDate.isAfter(startDate) ||
+                            "End date must be after start date"
+                          );
+                        },
+                      }}
+                      render={({ field }) => (
+                        <DesktopDatePicker
+                          {...field}
+                          label="End Date"
+                          format="DD-MM-YYYY"
+                          disablePast
+                          disabled={!selectedStartDate}
+                          value={field.value ? dayjs(field.value) : null}
+                          onChange={field.onChange}
+                          slotProps={{
+                            textField: {
+                              size: "small",
+                              fullWidth: true,
+                              variant: "standard",
+                              error: !!errors.endDate,
+                              helperText: errors?.endDate?.message,
+                            },
+                          }}
+                        />
+                      )}
+                    />
+
+                    <div className="flex justify-center items-center mt-4 md:mt-8">
+                      <SecondaryButton
+                        disabled={isSubmitting}
+                        isLoading={isSubmitting}
+                        title={"Get Quote"}
+                        type={"submit"}
+                        externalStyles={"w-full md:w-3/4 lg:w-1/2 rounded-full py-3 shadow-lg"}
+                      />
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
-          <hr className="my-5 lg:my-10" />
+          <hr className="my-5 md:my-10" />
           {/* Inclusions */}
           <div className="flex flex-col gap-8 w-full">
             <h1 className="text-title text-gray-700 font-medium uppercase">
@@ -1071,10 +1105,10 @@ const Product = () => {
             )}
           </div>
 
-          <hr className="my-5 lg:my-10" />
+          <hr className="my-5 md:my-10" />
           <div className="flex flex-col gap-8 w-full">
-            <div className="flex flex-col justify-center items-center max-w-4xl mx-auto">
-              <h1 className="text-main-header font-medium mt-5">
+            <div className="flex flex-col justify-center items-center max-w-4xl mx-auto mb-4">
+              <h1 className="text-4xl md:text-6xl lg:text-main-header font-medium mt-5">
                 <LeafRatings
                   ratings={companyDetails?.ratings || 0}
                   align="items-start"
@@ -1087,17 +1121,18 @@ const Product = () => {
                 and reliability
               </span>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-0 lg:p-0">
+            <div className="flex overflow-x-auto gap-6 px-4 md:px-0 scrollbar-hide snap-x snap-mandatory pb-4">
               {companyDetails?.reviews?.length > 0 ? (
-                companyDetails?.reviews?.slice(0, 6).map((review, index) => (
-                  <ReviewCard
-                    handleClick={() => {
-                      setSelectedReview(review);
-                      setOpen(true);
-                    }}
-                    key={index}
-                    review={review}
-                  />
+                companyDetails.reviews.slice(0, 8).map((review, index) => (
+                  <div key={index} className="min-w-[300px] md:min-w-[400px] flex-shrink-0 snap-center h-full">
+                    <ReviewCard
+                      handleClick={() => {
+                        setSelectedReview(review);
+                        setOpen(true);
+                      }}
+                      review={review}
+                    />
+                  </div>
                 ))
               ) : (
                 <div className="col-span-full border-2 border-dotted border-gray-300 rounded-xl p-6 text-center text-sm text-gray-500 h-40 flex justify-center items-center">
@@ -1116,9 +1151,9 @@ const Product = () => {
               </a>
             </div>
 
-            <hr className="my-5 lg:my-10" />
+            <hr className="my-5 md:my-10" />
             {/* Map */}
-            <div className="w-full h-[500px] flex flex-col gap-8 rounded-xl overflow-hidden">
+            <div className="w-full h-[350px] md:h-[500px] flex flex-col gap-8 rounded-xl overflow-hidden mt-6">
               <h1 className="text-title font-medium text-gray-700 uppercase">
                 Where you'll be
               </h1>
@@ -1132,7 +1167,7 @@ const Product = () => {
             {["CMP0001", "CMP0052"].includes(companyDetails?.companyId) && (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10 pt-10">
-                  <div className="flex flex-col lg:flex-row justify-center items-center col-span-1 border-2 shadow-md gap-4 rounded-xl p-6 w-full">
+                  <div className="flex flex-col lg:flex-row justify-center items-center col-span-1 border border-gray-100 shadow-md gap-4 rounded-2xl p-6 w-full bg-white">
                     <div className="flex flex-col gap-4 justify-between items-center h-full w-56">
                       {/* Avatar with Initials */}
                       <div className="w-32 aspect-square rounded-full bg-primary-blue flex items-center justify-center text-white text-6xl font-semibold uppercase">
@@ -1155,7 +1190,7 @@ const Product = () => {
                       </div>
                     </div>
 
-                    <div className="w-px h-full bg-gray-300 mx-2 my-auto" />
+                    <div className="hidden lg:block w-px h-full bg-gray-100 mx-4" />
                     <div className="h-full w-56 flex flex-col justify-normal">
                       <p className="text-title text-center text-gray-700 font-medium mb-8 underline uppercase">
                         Host Details
@@ -1176,7 +1211,7 @@ const Product = () => {
                     </div>
                   </div>
 
-                  <div className="flex w-full border-2 shadow-md rounded-xl">
+                  <div className="flex w-full border border-gray-100 shadow-md rounded-2xl bg-white">
                     <div className="flex flex-col h-full gap-4 rounded-xl p-6 w-full lg:w-full justify-between">
                       <h1 className="text-title text-gray-700 font-medium uppercase">
                         Connect With Host
@@ -1268,7 +1303,7 @@ const Product = () => {
                 </div>
               </>
             )}
-            <hr className="mt-5 mb-0 lg:mt-10 lg:mb-0" />
+            <hr className="mt-5 mb-0 md:mt-10 md:mb-0" />
 
             {/* Content & Source Disclaimer */}
             <div className="text-[0.74rem] text-gray-500 leading-relaxed">

@@ -21,6 +21,113 @@ import PaginatedGrid from "../components/PaginatedGrid.jsx";
 import { Helmet } from "@dr.pogodin/react-helmet";
 import useAuth from "../hooks/useAuth.js";
 
+const HorizontalScrollWrapper = ({ children, title }) => {
+  const scrollRef = React.useRef(null);
+  const [showLeft, setShowLeft] = useState(false);
+  const [showRight, setShowRight] = useState(true);
+
+  const scroll = (direction) => {
+    if (scrollRef.current) {
+      const { scrollLeft, clientWidth } = scrollRef.current;
+      const scrollTo =
+        direction === "left"
+          ? scrollLeft - clientWidth * 0.8
+          : scrollLeft + clientWidth * 0.8;
+
+      scrollRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
+    }
+  };
+
+  const handleScroll = () => {
+    if (scrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+      setShowLeft(scrollLeft > 10);
+      setShowRight(scrollLeft < scrollWidth - clientWidth - 10);
+    }
+  };
+
+  useEffect(() => {
+    handleScroll();
+    window.addEventListener("resize", handleScroll);
+    return () => window.removeEventListener("resize", handleScroll);
+  }, []);
+
+  return (
+    <div className="relative group/scroll mb-6">
+      <div className="flex items-center justify-between mb-4 gap-2">
+        <h2 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight">
+          {title}
+        </h2>
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          <button
+            onClick={() => scroll("left")}
+            aria-label="Previous"
+            type="button"
+            disabled={!showLeft}
+            className={`transition-all hover:scale-105 active:scale-95 flex items-center justify-center w-[28px] h-[28px] md:w-[32px] md:h-[32px] rounded-full border border-gray-200 shadow-sm ${showLeft ? "bg-white text-gray-800 opacity-100" : "bg-gray-50 text-gray-300 opacity-50 cursor-not-allowed"
+              }`}
+            style={{ boxShadow: showLeft ? "0 2px 4px rgba(0,0,0,0.1)" : "none" }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 32 32"
+              aria-hidden="true"
+              role="presentation"
+              focusable="false"
+              style={{
+                display: "block",
+                fill: "none",
+                height: "10px",
+                width: "10px",
+                stroke: "currentcolor",
+                strokeWidth: 4,
+                overflow: "visible",
+              }}
+            >
+              <path fill="none" d="m20 28-11.3-11.3a1 1 0 0 1 0-1.4L20 4"></path>
+            </svg>
+          </button>
+          <button
+            onClick={() => scroll("right")}
+            aria-label="Next"
+            type="button"
+            disabled={!showRight}
+            className={`transition-all hover:scale-105 active:scale-95 flex items-center justify-center w-[28px] h-[28px] md:w-[32px] md:h-[32px] rounded-full border border-gray-200 shadow-sm ${showRight ? "bg-white text-gray-800 opacity-100" : "bg-gray-50 text-gray-300 opacity-50 cursor-not-allowed"
+              }`}
+            style={{ boxShadow: showRight ? "0 2px 4px rgba(0,0,0,0.1)" : "none" }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 32 32"
+              aria-hidden="true"
+              role="presentation"
+              focusable="false"
+              style={{
+                display: "block",
+                fill: "none",
+                height: "10px",
+                width: "10px",
+                stroke: "currentcolor",
+                strokeWidth: 4,
+                overflow: "visible",
+              }}
+            >
+              <path fill="none" d="m12 4 11.3 11.3a1 1 0 0 1 0 1.4L12 28"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="flex flex-nowrap overflow-x-auto snap-x snap-mandatory gap-4 md:gap-5 pb-2 custom-scrollbar-hide"
+      >
+        {children}
+      </div>
+    </div>
+  );
+};
+
 const GlobalListingsMap = () => {
   const [favorites, setFavorites] = useState([]);
   const dispatch = useDispatch();
@@ -33,6 +140,24 @@ const GlobalListingsMap = () => {
     },
   });
   const { auth } = useAuth();
+  const [showListings, setShowListings] = useState(false);
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
+
+  // Scroll lock for mobile map view
+  useEffect(() => {
+    const isMobile = window.innerWidth < 1024;
+    if (isMobile) {
+      const mainContainer = document.querySelector(".h-screen.overflow-auto");
+      if (mainContainer) {
+        mainContainer.style.overflow = "hidden";
+      }
+      return () => {
+        if (mainContainer) {
+          mainContainer.style.overflow = "auto";
+        }
+      };
+    }
+  }, []);
   const user = auth?.user || {};
   const userId = auth?.user?._id || auth?.user?.id;
 
@@ -183,29 +308,14 @@ const GlobalListingsMap = () => {
     cafe: "Cafes",
     default: (type) => `${type[0].toUpperCase() + type.slice(1)} Spaces`,
   };
-  const handleShowMoreClick = (type) => {
-    const updatedForm = {
-      ...formData,
-      category: type,
-    };
-
-    dispatch(setFormValues(updatedForm));
-
-    navigate(
-      `/nomad/listings?country=${formData.country}&location=${formData.location}&category=${type}`,
-      {
-        state: updatedForm,
-      },
-    );
-  };
+  // Removed handleShowMoreClick as it's replaced by horizontal scroll navigation
   const { data: listingsData, isPending: isLisitingLoading } = useQuery({
     queryKey: ["globallistings", formData], // ✅ ensures it refetches when formData changes
     queryFn: async () => {
       const { country, location, category } = formData || {};
 
       const response = await axios.get(
-        `company/companiesn?country=${country}&state=${location}&userId=${
-          userId || ""
+        `company/companiesn?country=${country}&state=${location}&userId=${userId || ""
         }`,
       );
 
@@ -277,8 +387,6 @@ const GlobalListingsMap = () => {
   };
 
   const navigate = useNavigate();
-  const [showMobileSearch, setShowMobileSearch] = useState(false);
-  const [showListings, setShowListings] = useState(false);
   const onSubmit = (data) => {
     locationData(data);
     setShowMobileSearch(false);
@@ -337,28 +445,28 @@ const GlobalListingsMap = () => {
   const forMapsData = isLisitingLoading
     ? []
     : listingsData.map((item) => ({
-        ...item,
-        id: item._id,
-        lat: item.latitude,
-        lng: item.longitude,
-        name: item.companyName,
-        location: item.city,
-        reviews: item.reviewCount,
-        // rating: item.ratings
-        //   ? (() => {
-        //       const avg =
-        //         item.reviews.reduce((sum, r) => sum + r.starCount, 0) /
-        //         item.reviews.length;
-        //       return avg % 1 === 0 ? avg : avg.toFixed(1);
-        //     })()
-        //   : "0",
-        rating: item.ratings || 0,
-        reviews: item.totalReviews || 0,
+      ...item,
+      id: item._id,
+      lat: item.latitude,
+      lng: item.longitude,
+      name: item.companyName,
+      location: item.city,
+      reviews: item.reviewCount,
+      // rating: item.ratings
+      //   ? (() => {
+      //       const avg =
+      //         item.reviews.reduce((sum, r) => sum + r.starCount, 0) /
+      //         item.reviews.length;
+      //       return avg % 1 === 0 ? avg : avg.toFixed(1);
+      //     })()
+      //   : "0",
+      rating: item.ratings || 0,
+      reviews: item.totalReviews || 0,
 
-        image:
-          item.images?.[0]?.url ||
-          "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
-      }));
+      image:
+        item.images?.[0]?.url ||
+        "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
+    }));
 
   return (
     <>
@@ -386,7 +494,7 @@ const GlobalListingsMap = () => {
       </Helmet>
       <div className="flex flex-col gap-2 lg:gap-6">
         <div className="flex flex-col gap-4 justify-center items-center  w-full lg:mt-0">
-          <div className="min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0">
+          <div className="w-full lg:min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-4 sm:px-6 lg:px-0">
             <div className="hidden lg:flex flex-col gap-4 justify-between items-center">
               {/* the 5 icons */}
 
@@ -425,7 +533,7 @@ const GlobalListingsMap = () => {
               <form
                 onSubmit={handleSubmit(onSubmit)}
                 className=" flex justify-around md:w-full lg:w-full border-2 bg-gray-50 rounded-full p-0 items-center"
-                // className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
+              // className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
               >
                 <Controller
                   name="continent"
@@ -498,17 +606,44 @@ const GlobalListingsMap = () => {
               </form>
             </div>
 
-            <div className="lg:hidden flex w-full items-center justify-center my-4">
+            <div className="lg:hidden w-full flex flex-col gap-4 mb-4">
+              {/* Category Selection Row - HORIZONTAL SCROLL ON MOBILE */}
+              <div className="flex overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-2">
+                {categoryOptions.map((cat) => {
+                  const iconSrc = newIcons[cat.value];
+                  return (
+                    <button
+                      key={cat.value}
+                      type="button"
+                      onClick={() => handleCategoryClick(cat.value)}
+                      className="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[30%]"
+                    >
+                      <div className="h-10 w-full flex flex-col items-center gap-1">
+                        <img
+                          src={iconSrc}
+                          alt={cat.label}
+                          className="h-full w-[90%] object-contain"
+                        />
+                        <span className="text-[10px] font-medium whitespace-nowrap">{cat.label}</span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
               <button
                 onClick={() => setShowMobileSearch((prev) => !prev)}
-                className="bg-white shadow-md flex items-center w-full text-center justify-center font-medium text-secondary-dark border-2 px-6 py-2 rounded-full flex-col gap-2"
+                className="bg-white shadow-md flex items-center w-[92%] mx-auto text-center justify-center font-medium text-secondary-dark border-2 px-6 py-2 rounded-full flex-col gap-1"
               >
-                <span>
-                  Search Results in{" "}
-                  {formData?.location?.charAt(0).toUpperCase() +
-                    formData?.location?.slice(1) || "Unknown"}
-                </span>
-                <span className="text-tiny text-gray-500">
+                <div className="flex items-center gap-2">
+                  <IoSearch className="text-primary-red" />
+                  <span className="text-sm">
+                    Search Results in{" "}
+                    {formData?.location?.charAt(0).toUpperCase() +
+                      formData?.location?.slice(1) || "Unknown"}
+                  </span>
+                </div>
+                <span className="text-[10px] text-gray-500">
                   {formData?.count || "1-5"} Nomads
                 </span>
               </button>
@@ -520,6 +655,7 @@ const GlobalListingsMap = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
                 className="fixed inset-0 z-50 flex items-start justify-center lg:hidden"
               >
                 <motion.div className="bg-white shadow-2xl overflow-auto p-4 rounded-b-3xl  h-screen  w-full">
@@ -528,48 +664,13 @@ const GlobalListingsMap = () => {
                     <h3 className="text-xl font-semibold">Search</h3>
                     <button
                       onClick={() => {
-                        setShowMobileSearch((prev) => !prev);
-                        setShowListings(false);
+                        setShowMobileSearch(false);
                       }}
-                      className="text-gray-500 text-xl"
+                      className="text-gray-500 text-xl p-2 hover:bg-gray-100 rounded-full transition-colors"
                     >
                       &times;
                     </button>
                   </div>
-                  <motion.div
-                    initial={{ y: "-100%" }}
-                    animate={{ y: 0 }}
-                    exit={{ y: "-100%" }}
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                    className="grid grid-cols-3 md:grid-cols-5 gap-2 mb-10"
-                  >
-                    {categoryOptions.map((cat) => {
-                      const iconSrc = newIcons[cat.value];
-
-                      return (
-                        <button
-                          key={cat.value}
-                          type="button"
-                          onClick={() => handleCategoryClick(cat.value)}
-                          className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full"
-                        >
-                          {iconSrc ? (
-                            <div className="h-10 w-full flex flex-col gap-0">
-                              <img
-                                src={iconSrc}
-                                alt={cat.label}
-                                className="h-full w-full object-contain"
-                              />
-                              <span className="text-sm">{cat.label}</span>
-                              <div></div>
-                            </div>
-                          ) : (
-                            cat.label // fallback if no icon found
-                          )}
-                        </button>
-                      );
-                    })}
-                  </motion.div>
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                     <Controller
                       name="continent"
@@ -643,8 +744,28 @@ const GlobalListingsMap = () => {
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Floating Search Button for Mobile */}
+          {/* {!showMobileSearch && (
+            <div className="lg:hidden fixed top-24 left-1/2 -translate-x-1/2 z-[40] w-[90%] max-w-[400px]">
+              <button
+                onClick={() => setShowMobileSearch(true)}
+                className="w-full bg-white shadow-xl rounded-full py-3 px-4 flex items-center justify-between border border-gray-100 hover:scale-[1.02] transition-transform active:scale-95"
+                style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.12)" }}
+              >
+                <div className="flex flex-col items-start overflow-hidden flex-1">
+                  <span className="text-xs font-semibold text-gray-800 truncate w-full text-left">
+                    {formData?.location || "Anywhere"} • {formData?.category || "Any type"} • {formData?.count || "Any guests"}
+                  </span>
+                </div>
+                <div className="bg-[#FF5757] p-2 rounded-full text-white ml-3 flex-shrink-0">
+                  <IoSearch size={18} />
+                </div>
+              </button>
+            </div>
+          )} */}
         </div>
-        <Container padding={false}>
+        <div className="lg:container lg:mx-auto lg:px-6">
           <div className="">
             <div className="font-semibold text-md  grid grid-cols-9 gap-4 pt-3">
               <div className="hidden lg:block custom-scrollbar-hide lg:col-span-5">
@@ -711,8 +832,8 @@ const GlobalListingsMap = () => {
                   </div>
                 )}
               </div>
-              <div className="col-span-full lg:col-span-4 sticky top-24 h-screen lg:h-[68%] pb-10">
-                <div className="rounded-xl h-full overflow-hidden">
+              <div className="col-span-full lg:col-span-4 fixed inset-0 lg:relative lg:inset-auto lg:h-[calc(100vh-100px)] lg:h-[68%] lg:pb-10 z-0">
+                <div className="h-full w-full lg:rounded-xl overflow-hidden">
                   {isLisitingLoading ? (
                     <SkeletonMap />
                   ) : forMapsData?.length ? (
@@ -726,31 +847,49 @@ const GlobalListingsMap = () => {
               </div>
             </div>
           </div>
-        </Container>
+        </div>
         {/* Listings in the bottom */}
         <AnimatePresence>
-          <motion.div
-            initial={{ y: "100%" }}
-            animate={{
-              y: showListings && !showMobileSearch ? "0%" : "80%",
-            }}
-            exit={{ y: "100%" }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className={`fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 px-6 rounded-t-3xl lg:hidden ${
-              showListings ? "h-[77vh]" : "h-[75vh]"
-            }`}
-          >
-            {!showMobileSearch && (
-              <div className="flex justify-center py-2 sticky top-0 z-10 bg-white">
-                <div
-                  onClick={() => setShowListings((prev) => !prev)}
-                  className="w-10 h-1 rounded-full bg-gray-400"
-                ></div>
+          {!showMobileSearch && (
+            <motion.div
+              drag="y"
+              dragConstraints={{ top: 0, bottom: 0 }}
+              dragElastic={0.05}
+              onDragEnd={(_, info) => {
+                const isDraggingDown = info.offset.y > 60 || info.velocity.y > 600;
+                const isDraggingUp = info.offset.y < -60 || info.velocity.y < -600;
+                if (isDraggingDown) {
+                  setShowListings(false);
+                } else if (isDraggingUp) {
+                  setShowListings(true);
+                }
+              }}
+              initial={{ y: "100%" }}
+              animate={{
+                y: showListings ? "0%" : "65%",
+              }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 30, stiffness: 300, velocity: 2 }}
+              className={`fixed bottom-0 left-0 right-0 bg-white shadow-[0_-8px_30px_rgb(0,0,0,0.12)] z-50 px-6 rounded-t-[24px] lg:hidden h-[85vh]`}
+            >
+              <div
+                className="flex justify-center py-4 sticky top-0 z-10 bg-white cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowListings((prev) => !prev);
+                }}
+              >
+                <div className="w-12 h-1.5 rounded-full bg-gray-300"></div>
               </div>
-            )}
 
-            {!showMobileSearch && (
-              <div className="custom-scrollbar-hide py-6">
+              <div
+                className={`custom-scrollbar-hide py-6 overscroll-contain transition-all duration-300 ${showListings ? "overflow-y-auto h-[calc(85vh-70px)]" : "overflow-hidden mb-10"
+                  }`}
+                style={{
+                  WebkitOverflowScrolling: "touch",
+                  touchAction: "pan-y",
+                }}
+              >
                 {isLisitingLoading ? (
                   Array.from({ length: 4 }).map((_, i) => (
                     <SkeletonCard key={i} />
@@ -776,25 +915,22 @@ const GlobalListingsMap = () => {
                       );
                     });
 
-                    const displayItems = sortedItems.slice(0, 6);
-                    const showViewMore = items.length > 5;
+                    const displayItems = sortedItems;
                     const location =
                       formData?.location?.charAt(0).toUpperCase() +
                       formData?.location?.slice(1);
 
-                    const sectionTitle = `Popular ${
-                      typeLabels[type] || typeLabels.default(type)
-                    } in ${location || ""}`;
+                    const sectionTitle = `Popular ${typeLabels[type] || typeLabels.default(type)
+                      } in ${location || ""}`;
 
                     return (
-                      <div key={type} className="col-span-full mb-6">
-                        <h2 className="text-subtitle text-secondary-dark font-semibold mb-5">
-                          {sectionTitle}
-                        </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 gap-x-5">
-                          {displayItems.map((item) => (
+                      <HorizontalScrollWrapper title={sectionTitle}>
+                        {displayItems.map((item) => (
+                          <div
+                            key={item._id}
+                            className="w-[calc(85%-0.5rem)] md:w-[calc(33.33%-1.25rem)] lg:w-[calc(20%-1.5rem)] flex-shrink-0 snap-start"
+                          >
                             <ListingCard
-                              key={item._id}
                               item={item}
                               handleNavigation={() =>
                                 navigate(
@@ -810,19 +946,9 @@ const GlobalListingsMap = () => {
                                 )
                               }
                             />
-                          ))}
-                        </div>
-                        {showViewMore && (
-                          <div className="mt-3 text-right">
-                            <button
-                              onClick={() => handleShowMoreClick(type)}
-                              className="text-primary-blue text-sm font-semibold hover:underline"
-                            >
-                              View More →
-                            </button>
                           </div>
-                        )}
-                      </div>
+                        ))}
+                      </HorizontalScrollWrapper>
                     );
                   })
                 ) : (
@@ -831,12 +957,39 @@ const GlobalListingsMap = () => {
                   </div>
                 )}
               </div>
-            )}
-          </motion.div>
+            </motion.div>
+          )}
         </AnimatePresence>
-
-        {/* Listings in the bottom */}
       </div>
+
+      {/* Floating List Toggle Button */}
+      < div className="lg:hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-[1000]" >
+        <button
+          onClick={() =>
+            navigate(
+              `/verticals?country=${formData?.country}&location=${formData?.location}`,
+            )
+          }
+          className="bg-[#222222] text-white px-5 py-3 rounded-full flex items-center gap-2 shadow-xl hover:scale-105 transition-transform active:scale-95"
+        >
+          <span className="text-sm font-semibold tracking-wide">Show list</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 32 32"
+            aria-hidden="true"
+            role="presentation"
+            focusable="false"
+            style={{
+              display: "block",
+              height: "16px",
+              width: "16px",
+              fill: "white",
+            }}
+          >
+            <path d="M7 10h18v2H7zm0 5h18v2H7zm0 5h18v2H7z"></path>
+          </svg>
+        </button>
+      </div >
     </>
   );
 };

@@ -384,7 +384,7 @@ const Home = () => {
               <form
                 onSubmit={handleSubmit(onSubmit)}
                 className=" flex justify-around md:w-full lg:w-full border-2 bg-gray-50 rounded-full p-0 items-center"
-                // className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
+              // className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
               >
                 <Controller
                   name="continent"
@@ -643,12 +643,11 @@ const Home = () => {
               {destinationData.map((item, idx) => (
                 <div
                   key={idx}
-                  className={`w-full sm:w-full md:w-full afterPro:w-60 flex flex-col items-center  ${
-                    idx === destinationData.length - 1 &&
-                    destinationData.length % 2 !== 0
+                  className={`w-full sm:w-full md:w-full afterPro:w-60 flex flex-col items-center  ${idx === destinationData.length - 1 &&
+                      destinationData.length % 2 !== 0
                       ? "md:col-span-2 afterPro:col-span-1"
                       : ""
-                  }`}
+                    }`}
                 >
                   <div className="relative w-full rounded-xl overflow-hidden shadow-md">
                     <img

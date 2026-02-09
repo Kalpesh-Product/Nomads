@@ -9,6 +9,17 @@
   }
 }
 
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
 @font-face {
   font-family: Amsterdam;
   src: url("../src/assets/El_Messiri/amsterdam.ttf");
@@ -211,6 +222,7 @@
   font-weight: 700;
   font-style: italic;
 }
+
 .comic-relief-regular {
   font-family: "Comic Relief", system-ui;
   font-weight: 400;
@@ -423,6 +435,7 @@ body::-webkit-scrollbar {
 
 /* 🔹 Responsive Stepper Fix (for hashed react-form-stepper classes) */
 @media (max-width: 640px) {
+
   /* main container */
   [class*="StepperContainer"] {
     transform: scale(0.8);
