@@ -77,7 +77,7 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
   useEffect(() => {
     if (!user?._id) return;
 
-    axiosPrivate.get(`/api/user/likes/${user._id}`).then((res) => {
+    axiosPrivate.get(`/user/likes/${user._id}`).then((res) => {
       const likedIds = res.data?.map((item) => item._id) || [];
       setFavorites(likedIds);
     });
@@ -171,7 +171,7 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
         <div className="flex w-full justify-between items-center">
           <div className="w-full">
             <p
-              className="text-sm font-semibold truncate"
+              className="text-xs md:text-sm font-semibold truncate"
               title={item.companyName || "Title"}
             >
               {item.companyName || "title"}
@@ -181,15 +181,15 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
 
         <div className="flex w-full justify-between items-center">
           <p
-            className="text-sm text-gray-600 font-medium truncate"
+            className="text-xs md:text-sm text-gray-600 font-medium truncate"
             title={`${item.city || "Unknown"}, ${item.state || "Unknown"}`}
           >
             {`${item.city || "Unknown"}, ${item.state || "Unknown"}`}
           </p>
 
           <div className="flex items-center gap-1 text-gray-600">
-            <AiFillStar size={16} />
-            <p className="text-sm  text-gray-600 font-medium">
+            <AiFillStar size={14} className="md:w-4 md:h-4" />
+            <p className="text-xs md:text-sm text-gray-600 font-medium">
               ({item.ratings || 0})
             </p>
           </div>

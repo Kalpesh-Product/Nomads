@@ -915,7 +915,8 @@ const GlobalListingsMap = () => {
                       );
                     });
 
-                    const displayItems = sortedItems;
+                    const hasMore = sortedItems.length > 5;
+                    const itemsToShow = hasMore ? sortedItems.slice(0, 5) : sortedItems;
                     const location =
                       formData?.location?.charAt(0).toUpperCase() +
                       formData?.location?.slice(1);
@@ -925,7 +926,7 @@ const GlobalListingsMap = () => {
 
                     return (
                       <HorizontalScrollWrapper title={sectionTitle}>
-                        {displayItems.map((item) => (
+                        {itemsToShow.map((item) => (
                           <div
                             key={item._id}
                             className="w-[calc(85%-0.5rem)] md:w-[calc(33.33%-1.25rem)] lg:w-[calc(20%-1.5rem)] flex-shrink-0 snap-start"
@@ -948,6 +949,37 @@ const GlobalListingsMap = () => {
                             />
                           </div>
                         ))}
+                        {hasMore && (
+                          <div className="w-[calc(85%-0.5rem)] md:w-[calc(33.33%-1.25rem)] lg:w-[calc(20%-1.5rem)] flex-shrink-0 snap-start">
+                            <button
+                              onClick={() => handleCategoryClick(type)}
+                              className="w-full aspect-square border-2 border-gray-100 rounded-3xl
+               flex flex-col items-center justify-start pt-12 gap-3
+               hover:border-primary-blue hover:shadow-md
+               transition-all bg-gray-50/30 group"
+                            >
+                              <div className="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-gray-100 transition-colors">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  strokeWidth={2}
+                                  stroke="currentColor"
+                                  className="w-8 h-8 text-gray-400 group-hover:text-gray-600"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                                  />
+                                </svg>
+                              </div>
+                              <span className="text-lg font-medium text-gray-600 group-hover:text-gray-900">
+                                View All
+                              </span>
+                            </button>
+                          </div>
+                        )}
                       </HorizontalScrollWrapper>
                     );
                   })

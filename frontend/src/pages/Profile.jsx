@@ -175,35 +175,32 @@ const Profile = () => {
   };
 
   return (
-    <div className="bg-[#f8f9fc] min-h-screen p-6 font-sans text-[#364D59]">
+    <div className="bg-[#f8f9fc] min-h-screen px-4 md:px-6 py-10 font-sans text-[#364D59]">
       {/* Tabs */}
-      <div className="flex mb-6 border rounded-lg overflow-hidden max-w-3xl mx-auto">
+      <div className="flex flex-col sm:flex-row mb-8 border rounded-lg overflow-hidden max-w-3xl mx-auto bg-white shadow-sm">
         <button
-          className={`flex-1 py-3 font-semibold ${
-            activeTab === "profile"
-              ? "bg-[#ff5757] text-white"
-              : "bg-white text-[#ff5757]"
-          }`}
+          className={`flex-1 py-3 text-sm md:text-base font-semibold transition-colors ${activeTab === "profile"
+            ? "bg-[#ff5757] text-white"
+            : "bg-white text-[#ff5757] hover:bg-red-50"
+            }`}
           onClick={() => handleTabChange("profile")}
         >
           Profile
         </button>
         <button
-          className={`flex-1 py-3 font-semibold ${
-            activeTab === "password"
-              ? "bg-[#ff5757] text-white"
-              : "bg-white text-[#ff5757]"
-          }`}
+          className={`flex-1 py-3 text-sm md:text-base font-semibold border-t sm:border-t-0 sm:border-l transition-colors ${activeTab === "password"
+            ? "bg-[#ff5757] text-white"
+            : "bg-white text-[#ff5757] hover:bg-red-50"
+            }`}
           onClick={() => handleTabChange("password")}
         >
           Change Password
         </button>
         <button
-          className={`flex-1 py-3 font-semibold ${
-            activeTab === "favorites"
-              ? "bg-[#ff5757] text-white"
-              : "bg-white text-[#ff5757]"
-          }`}
+          className={`flex-1 py-3 text-sm md:text-base font-semibold border-t sm:border-t-0 sm:border-l transition-colors ${activeTab === "favorites"
+            ? "bg-[#ff5757] text-white"
+            : "bg-white text-[#ff5757] hover:bg-red-50"
+            }`}
           onClick={() => handleTabChange("favorites")}
         >
           Favorites
@@ -215,100 +212,96 @@ const Profile = () => {
         <div className="bg-white p-6 rounded-lg shadow-sm max-w-5xl mx-auto">
           <h2 className="text-xl font-bold text-[#ff5757] mb-4">MY PROFILE</h2>
 
-          <div className="flex flex-col md:flex-row items-center justify-between border p-4 rounded-lg">
-            <div className="flex items-center gap-6">
+          <div className="flex flex-col lg:flex-row items-center justify-between border-b pb-8 mb-8 gap-6">
+            <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
               <Avatar
                 sx={{
                   bgcolor: "#ff5757",
-                  width: 80,
-                  height: 80,
-                  fontSize: "2rem",
+                  width: { xs: 80, md: 100 },
+                  height: { xs: 80, md: 100 },
+                  fontSize: { xs: "2rem", md: "2.5rem" },
+                  boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                 }}
               >
                 {user?.firstName ? user.firstName.charAt(0).toUpperCase() : "U"}
               </Avatar>
-              <div>
-                <h3 className="text-lg font-semibold">
+              <div className="flex flex-col">
+                <h3 className="text-xl md:text-2xl font-bold text-gray-800">
                   {`${user?.firstName || ""} ${user?.lastName || ""}`.trim() ||
                     "User Name"}
                 </h3>
-                {/* <p className="text-sm text-gray-600">
-                  {user?.country || "N/A"}
-                </p> */}
+                <div className="flex flex-col gap-1 mt-2 text-sm text-gray-600">
+                  <p>
+                    <span className="font-semibold text-gray-800">Email:</span>{" "}
+                    {user?.email || "N/A"}
+                  </p>
+                  <p>
+                    <span className="font-semibold text-gray-800">Mobile:</span>{" "}
+                    {user?.mobile || "N/A"}
+                  </p>
+                </div>
               </div>
             </div>
 
-            <div className="text-sm mt-4 md:mt-0">
-              <p>
-                <b>Email:</b> {user?.email || "N/A"}
-              </p>
-              <p>
-                <b>Mobile:</b> {user?.mobile || "N/A"}
-              </p>
-              <br />
-              {/* <Button
-                variant="contained"
-                sx={{
-                  bgcolor: "#ff5757",
-                  textTransform: "none",
-                  px: 6,
-                  "&:hover": { bgcolor: "#fc6b6b" },
-                }}
-                onClick={handleLogout}
-              >
-                Logout
-              </Button> */}
-              <Button
-                variant="contained"
-                sx={{
-                  bgcolor: "#ff5757",
-                  textTransform: "none",
-                  px: 6,
-                  "&:hover": { bgcolor: "#fc6b6b" },
-                }}
-                onClick={handleLogout}
-                disabled={isLogoutLoading}
-              >
-                {isLogoutLoading ? (
-                  <CircularProgress size={22} sx={{ color: "white" }} />
-                ) : (
-                  "Logout"
-                )}
-              </Button>
-            </div>
+            <Button
+              variant="contained"
+              sx={{
+                bgcolor: "#ff5757",
+                textTransform: "none",
+                px: 6,
+                py: 1,
+                borderRadius: "8px",
+                fontWeight: "600",
+                width: { xs: "100%", sm: "auto" },
+                "&:hover": { bgcolor: "#fc6b6b" },
+              }}
+              onClick={handleLogout}
+              disabled={isLogoutLoading}
+            >
+              {isLogoutLoading ? (
+                <CircularProgress size={22} sx={{ color: "white" }} />
+              ) : (
+                "Logout"
+              )}
+            </Button>
           </div>
 
           {/* Personal Info */}
-          <div className="mt-6 border rounded-lg p-4">
-            <h3 className="font-semibold mb-4">Personal Information</h3>
-            <div className="grid md:grid-cols-3 gap-4">
+          <div className="space-y-6">
+            <h3 className="text-lg font-bold text-gray-800 border-l-4 border-[#ff5757] pl-3">
+              Personal Information
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <TextField
                 label="First Name"
-                size="small"
+                fullWidth
                 name="firstName"
                 value={profileForm.firstName}
                 onChange={handleProfileChange}
                 InputProps={{ readOnly: !editMode }}
+                variant={editMode ? "outlined" : "filled"}
               />
               <TextField
                 label="Last Name"
-                size="small"
+                fullWidth
                 name="lastName"
                 value={profileForm.lastName}
                 onChange={handleProfileChange}
                 InputProps={{ readOnly: !editMode }}
+                variant={editMode ? "outlined" : "filled"}
               />
               <TextField
                 label="Mobile"
-                size="small"
+                fullWidth
                 name="mobile"
                 value={profileForm.mobile}
                 onChange={handleProfileChange}
                 InputProps={{ readOnly: !editMode }}
+                variant={editMode ? "outlined" : "filled"}
               />
             </div>
 
-            <div className="text-center mt-6">
+            <div className="flex flex-col sm:flex-row justify-center mt-8 gap-4">
               {editMode ? (
                 <>
                   <Button
@@ -316,8 +309,10 @@ const Profile = () => {
                     sx={{
                       bgcolor: "#ff5757",
                       textTransform: "none",
-                      px: 6,
-                      mr: 2,
+                      px: 8,
+                      py: 1,
+                      borderRadius: "8px",
+                      fontWeight: "600",
                       "&:hover": { bgcolor: "#fc6b6b" },
                     }}
                     onClick={() =>
@@ -332,9 +327,13 @@ const Profile = () => {
                     variant="outlined"
                     sx={{
                       textTransform: "none",
-                      px: 6,
+                      px: 8,
+                      py: 1,
+                      borderRadius: "8px",
+                      fontWeight: "600",
                       color: "#fc6b6b",
                       borderColor: "#fc6b6b",
+                      "&:hover": { borderColor: "#fc6b6b", bgcolor: "red.50" },
                     }}
                     onClick={() => setEditMode(false)}
                   >
@@ -347,7 +346,10 @@ const Profile = () => {
                   sx={{
                     bgcolor: "#ff5757",
                     textTransform: "none",
-                    px: 6,
+                    px: 10,
+                    py: 1,
+                    borderRadius: "8px",
+                    fontWeight: "600",
                     "&:hover": { bgcolor: "#fc6b6b" },
                   }}
                   onClick={() => setEditMode(true)}
@@ -362,56 +364,60 @@ const Profile = () => {
 
       {/* CHANGE PASSWORD TAB */}
       {activeTab === "password" && (
-        <div className="bg-white py-6 px-4 md:px-32 rounded-lg shadow-sm max-w-3xl mx-auto">
-          <h2 className="text-xl text-center font-bold text-[#ff5757] mb-4">
-            CHANGE PASSWORD
+        <div className="bg-white py-8 px-6 md:px-16 lg:px-24 rounded-lg shadow-sm max-w-3xl mx-auto">
+          <h2 className="text-xl text-center font-bold text-[#ff5757] mb-8 uppercase tracking-wide">
+            Change Password
           </h2>
-          <div className="grid md:grid-cols-1 gap-4 mb-3">
+          <div className="flex flex-col gap-6 mb-8">
             <TextField
               label="Current Password"
               type="password"
               fullWidth
-              size="small"
               name="oldPassword"
               value={passwordForm.oldPassword}
               onChange={handlePasswordChange}
+              variant="outlined"
             />
             <TextField
               label="New Password"
               type="password"
               fullWidth
-              size="small"
               name="newPassword"
               value={passwordForm.newPassword}
               onChange={handlePasswordChange}
+              variant="outlined"
             />
             <TextField
               label="Confirm Password"
               type="password"
               fullWidth
-              size="small"
               name="confirmPassword"
               value={passwordForm.confirmPassword}
               onChange={handlePasswordChange}
+              variant="outlined"
             />
           </div>
 
-          <div className="text-sm text-gray-700 mb-4">
-            <p className="font-semibold">Password Requirements</p>
-            <ul className="list-disc ml-5">
+          <div className="bg-gray-50 p-4 rounded-lg text-sm text-gray-700 mb-8 border-l-4 border-amber-400">
+            <p className="font-bold mb-2 text-gray-800">Password Requirements</p>
+            <ul className="list-disc ml-5 space-y-1">
               <li>Must be at least 8 characters long.</li>
               <li>Should include both uppercase and lowercase letters.</li>
               <li>Must contain at least one number or special character.</li>
             </ul>
           </div>
-          <div className="flex justify-center items-center">
+
+          <div className="flex justify-center">
             <Button
               variant="contained"
               sx={{
                 bgcolor: "#ff5757",
-                borderRadius: 9999,
-                paddingX: 5,
+                borderRadius: "8px",
+                px: 10,
+                py: 1.5,
+                fontWeight: "600",
                 textTransform: "none",
+                width: { xs: "100%", sm: "auto" },
                 "&:hover": { bgcolor: "#fc6b6b" },
               }}
               onClick={handlePasswordSubmit}

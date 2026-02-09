@@ -62,15 +62,15 @@ const NomadAbout = () => {
 
   return (
     <div className="bg-white text-[#364D59] font-sans">
-      <section className="px-6 lg:px-28 py-4 flex flex-col gap-10">
+      <section className="px-6 md:px-12 lg:px-28 py-8 md:py-12 flex flex-col gap-10">
         {/* Header */}
-        <div className="flex flex-col items-center relative font-comic uppercase font-bold text-secondary-dark text-[clamp(1.5rem,4vw,3rem)] leading-tight mb-4">
-          <div className="relative inline-block">
-            <h3 className="text-center">About WONO</h3>
+        <div className="flex flex-col items-center relative font-comic uppercase font-bold text-secondary-dark text-2xl md:text-4xl lg:text-5xl leading-tight mb-4">
+          <div className="relative inline-block text-center">
+            <h3>About WONO</h3>
             <img
               src={blueUnderline}
               alt="blue underline"
-              className="absolute top-full left-1/2 -translate-x-1/2 w-full h-[40%]"
+              className="absolute top-[85%] left-1/2 -translate-x-1/2 w-[110%] h-[40%] object-contain"
             />
           </div>
         </div>

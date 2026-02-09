@@ -63,6 +63,7 @@ const Product = () => {
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isAboutExpanded, setIsAboutExpanded] = useState(false);
+  const [isDisclaimerExpanded, setIsDisclaimerExpanded] = useState(false);
   const carouselRef = useRef(null);
 
   const handleScroll = (e) => {
@@ -635,7 +636,7 @@ const Product = () => {
                   <h1 className="text-title font-medium text-gray-700 uppercase">
                     About
                   </h1>
-                  <div className="flex items-center gap-3 md:gap-6">
+                  <div className="flex items-center gap-3 md:gap-4">
                     <button
                       type="button"
                       onClick={() => setShareMenuOpen(true)}
@@ -1080,7 +1081,7 @@ const Product = () => {
           <hr className="my-5 md:my-10" />
           {/* Inclusions */}
           <div className="flex flex-col gap-8 w-full">
-            <h1 className="text-title text-gray-700 font-medium uppercase">
+            <h1 className="text-md md:text-title text-gray-700 font-medium uppercase">
               What Inclusions does it offer
             </h1>
 
@@ -1167,7 +1168,7 @@ const Product = () => {
 
             {["CMP0001", "CMP0052"].includes(companyDetails?.companyId) && (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10 pt-10">
+                <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-10 pt-10">
                   <div className="flex flex-col lg:flex-row justify-center items-center col-span-1 border border-gray-100 shadow-md gap-4 rounded-2xl p-6 w-full bg-white">
                     <div className="flex flex-col gap-4 justify-between items-center h-full w-56">
                       {/* Avatar with Initials */}
@@ -1313,36 +1314,46 @@ const Product = () => {
                 sourced from publicly available information.
               </p>
 
-              <p className="mb-2">
-                <b>Content and Copyright Disclaimer:</b> WoNo is a nomad
-                services and informational platform that aggregates and presents
-                publicly available information about co-working spaces,
-                co-living spaces, serviced apartments, hostels, workation
-                spaces, meeting rooms, working cafés and related lifestyle or
-                travel services. All such information displayed on its platform,
-                including images, brand names, or descriptions is shared solely
-                for informational and reference purposes to help nomads/users
-                discover and compare global nomad-friendly information and
-                services on its central platform.
-              </p>
-              <p className="mb-2">
-                WoNo does not claim ownership of any third-party logos, images,
-                descriptions, or business information displayed on the platform.
-                All trademarks, brand names, and intellectual property remain
-                the exclusive property of their respective owners and platforms.
-                The inclusion of third-party information does not imply
-                endorsement, partnership, or affiliation unless explicitly
-                stated.
-              </p>
-              <p className="mb-2">
-                The content featured from other websites and platforms on WoNo
-                is not used for direct monetization, resale, or advertising
-                gain. WoNo’s purpose is to inform and connect digital nomads and
-                remote working professionals by curating publicly available data
-                in a transparent, good-faith manner for the ease of its users
-                and to support and grow the businesses who are providing these
-                services with intent to grow them and the ecosystem.
-              </p>
+              <div className={`${!isDisclaimerExpanded ? "line-clamp-[6] md:line-clamp-none overflow-hidden" : ""}`}>
+                <p className="mb-2">
+                  <b>Content and Copyright Disclaimer:</b> WoNo is a nomad
+                  services and informational platform that aggregates and presents
+                  publicly available information about co-working spaces,
+                  co-living spaces, serviced apartments, hostels, workation
+                  spaces, meeting rooms, working cafés and related lifestyle or
+                  travel services. All such information displayed on its platform,
+                  including images, brand names, or descriptions is shared solely
+                  for informational and reference purposes to help nomads/users
+                  discover and compare global nomad-friendly information and
+                  services on its central platform.
+                </p>
+                <p className="mb-2">
+                  WoNo does not claim ownership of any third-party logos, images,
+                  descriptions, or business information displayed on the platform.
+                  All trademarks, brand names, and intellectual property remain
+                  the exclusive property of their respective owners and platforms.
+                  The inclusion of third-party information does not imply
+                  endorsement, partnership, or affiliation unless explicitly
+                  stated.
+                </p>
+                <p className="mb-2">
+                  The content featured from other websites and platforms on WoNo
+                  is not used for direct monetization, resale, or advertising
+                  gain. WoNo’s purpose is to inform and connect digital nomads and
+                  remote working professionals by curating publicly available data
+                  in a transparent, good-faith manner for the ease of its users
+                  and to support and grow the businesses who are providing these
+                  services with intent to grow them and the ecosystem.
+                </p>
+              </div>
+
+              <button
+                onClick={() => setIsDisclaimerExpanded(!isDisclaimerExpanded)}
+                className="md:hidden text-primary-blue text-xs font-semibold mt-1 mb-2 hover:underline focus:outline-none"
+              >
+                {isDisclaimerExpanded ? "View less" : "View more"}
+              </button>
+
               <p className="mt-2">
                 Read the entire{" "}
                 <span
