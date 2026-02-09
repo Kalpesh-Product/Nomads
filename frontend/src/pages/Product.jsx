@@ -23,6 +23,7 @@ import {
   FaTwitter,
   FaWhatsapp,
 } from "react-icons/fa";
+import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 import {
   isAlphanumeric,
   isValidEmail,
@@ -55,6 +56,10 @@ const Product = () => {
   const { auth } = useAuth();
   const dispatch = useDispatch();
   const userId = auth?.user?._id || auth?.user?.id;
+
+  const reviewerName = `${auth?.user?.firstName || ""} ${
+    auth?.user?.lastName || ""
+  }`.trim();
 
   const [selectedReview, setSelectedReview] = useState([]);
   const [showAmenities, setShowAmenities] = useState(false);
@@ -252,6 +257,7 @@ const Product = () => {
     handleSubmit: handleSubmitReview,
     control: reviewControl,
     reset: resetReview,
+    setValue: setReviewValue,
     formState: { errors: reviewErrors },
   } = useForm({
     defaultValues: {
@@ -264,12 +270,18 @@ const Product = () => {
     mode: "onChange",
   });
 
+  useEffect(() => {
+    if (reviewerName) {
+      setReviewValue("name", reviewerName, { shouldValidate: true });
+    }
+  }, [reviewerName, setReviewValue]);
+
   const { mutate: submitReview, isPending: isSubmittingReview } = useMutation({
     mutationKey: ["submitReview", companyDetails?.companyId],
     mutationFn: async (data) => {
       const payload = {
         businessId: companyDetails?.businessId,
-        name: data.name?.trim(),
+        name: data.name?.trim() || reviewerName || "Anonymous",
         starCount: Number(data.starCount),
         description: data.description?.trim(),
         // reviewSource: data.reviewSource?.trim(),
@@ -1554,33 +1566,31 @@ const Product = () => {
       <MuiModal
         open={isAddReviewOpen}
         onClose={() => setIsAddReviewOpen(false)}
-        title={"Add a review"}
+        title={companyDetails?.companyName || "Add a review"}
       >
         <form
           onSubmit={handleSubmitReview((data) => submitReview(data))}
-          className="grid grid-cols-1 gap-4"
+          className="grid grid-cols-1 gap-6"
         >
-          <Controller
-            name="name"
-            control={reviewControl}
-            rules={{
-              required: "Name is required",
-              validate: {
-                noOnlyWhitespace,
-              },
-            }}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Your Name"
-                fullWidth
-                variant="standard"
-                size="small"
-                error={!!reviewErrors?.name}
-                helperText={reviewErrors?.name?.message}
-              />
-            )}
-          />
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-20 h-20 rounded-full bg-[#ff5757] flex items-center justify-center text-white font-semibold text-2xl uppercase">
+                {(reviewerName || auth?.user?.name || "U")
+                  .split(" ")
+                  .map((name) => name[0])
+                  .join("")
+                  .slice(0, 2)}
+              </div>
+              <div>
+                <p className="text-card-title font-semibold text-gray-900">
+                  {reviewerName || auth?.user?.name || "Unknown User"}
+                </p>
+              </div>
+            </div>
+            {/* <span className="text-sm font-semibold text-green-600">
+              Approved
+            </span> */}
+          </div>
           <Controller
             name="starCount"
             control={reviewControl}
@@ -1590,17 +1600,30 @@ const Product = () => {
               max: { value: 5, message: "Maximum rating is 5" },
             }}
             render={({ field }) => (
-              <TextField
-                {...field}
-                label="Star Rating (1-5)"
-                fullWidth
-                variant="standard"
-                size="small"
-                type="number"
-                inputProps={{ min: 1, max: 5 }}
-                error={!!reviewErrors?.starCount}
-                helperText={reviewErrors?.starCount?.message}
-              />
+              <div>
+                <div className="flex items-center gap-2">
+                  {[1, 2, 3, 4, 5].map((rating) => (
+                    <button
+                      key={rating}
+                      type="button"
+                      onClick={() => field.onChange(rating)}
+                      className="transition-transform hover:scale-105"
+                      aria-label={`Rate ${rating} star`}
+                    >
+                      {rating <= field.value ? (
+                        <AiFillStar size={56} className="text-yellow-400" />
+                      ) : (
+                        <AiOutlineStar size={56} className="text-gray-300" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+                {reviewErrors?.starCount?.message ? (
+                  <p className="text-xs text-red-600 mt-1">
+                    {reviewErrors.starCount.message}
+                  </p>
+                ) : null}
+              </div>
             )}
           />
           <Controller
@@ -1615,7 +1638,7 @@ const Product = () => {
             render={({ field }) => (
               <TextField
                 {...field}
-                label="Review Details"
+                placeholder="Share details of your own experience at this place"
                 fullWidth
                 variant="standard"
                 size="small"
