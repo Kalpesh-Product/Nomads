@@ -327,33 +327,36 @@ export const updateReviewStatus = async (req, res, next) => {
 
 export const getReviewsByCompany = async (req, res, next) => {
   try {
-    const { companyId, companyType = "", status = "" } = req.query;
+    const { companyId, companyType = "", status = "pending" } = req.query;
 
-    if (!companyId) {
-      return res.status(400).json({
-        message: "companyId is required",
-      });
+    let cmpQuery = {};
+
+    if (companyId) {
+      cmpQuery = { companyId };
     }
-    let cmpQuery = {
-      companyId,
-    };
     if (companyType) {
-      query = { ...query, companyType };
+      cmpQuery = { ...cmpQuery, companyType };
     }
 
     // 1️⃣ Resolve company once (cheap, indexed)
-    const company = await Company.findOne(cmpQuery).select("_id").lean();
+    let company;
 
-    if (!company) {
-      return res.status(404).json({ message: "Company not found" });
+    if (companyId) {
+      company = await Company.findOne(cmpQuery).select("_id").lean();
+
+      if (!company) {
+        return res.status(404).json({ message: "Company not found" });
+      }
     }
 
     let query = {};
 
+    if (companyId) {
+      query = { companyId };
+    }
+
     if (companyType) {
       query = { ...query, company: company._id };
-    } else {
-      query = { ...query, companyId };
     }
 
     if (status) {
