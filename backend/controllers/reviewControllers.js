@@ -291,8 +291,12 @@ export const addReview = async (req, res, next) => {
 export const updateReviewStatus = async (req, res, next) => {
   try {
     const { reviewId } = req.params;
-    const { status, userId, date } = req.body;
-    let data = { status };
+    const { status, userId, date, userType } = req.body;
+    let data = { status, userType };
+
+    if (!userType || !["MASTER", "HOST"].includes(userType)) {
+      return res.status(400).json({ message: "User type is invalid" });
+    }
 
     if (!reviewId) {
       return res.status(400).json({ message: "Review id is required" });
@@ -304,9 +308,17 @@ export const updateReviewStatus = async (req, res, next) => {
     }
 
     if (status === "approved") {
-      data = { ...data, approvedBy: userId, approvedDate: new Date(date) };
+      data = {
+        ...data,
+        approvedBy: { userId, userType },
+        approvedDate: new Date(date),
+      };
     } else {
-      data = { ...data, rejectedBy: userId, rejectedDate: new Date(date) };
+      data = {
+        ...data,
+        rejectedBy: { userId, userType },
+        rejectedDate: new Date(date),
+      };
     }
     const review = await Review.findByIdAndUpdate(reviewId, data, {
       new: true,
