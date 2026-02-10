@@ -533,7 +533,7 @@ const Product = () => {
       </TransparentModal>
       <div className="min-w-[70%] max-w-[80rem] lg:max-w-[70rem] mx-0 md:mx-auto">
         <div className="pb-4">
-          <nav aria-label="Breadcrumb" className="mb-4 text-lg text-gray-500">
+          <nav aria-label="Breadcrumb" className="mb-4  text-gray-500">
             {[
               { label: companyDetails?.continent, isLink: true },
               { label: companyDetails?.country, isLink: true },
@@ -1291,7 +1291,7 @@ const Product = () => {
                 Write A Review
               </button>
             </div>
-            {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-0 lg:p-0">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-0 lg:p-0">
               {companyDetails?.reviews?.length > 0 ? (
                 companyDetails?.reviews?.slice(0, 6).map((review, index) => (
                   <ReviewCard
@@ -1308,7 +1308,7 @@ const Product = () => {
                   No reviews yet.
                 </div>
               )}
-            </div> */}
+            </div>
             {/* <div className="text-right">
               <a
                 className="text-primary-blue text-sm font-semibold hover:underline"
