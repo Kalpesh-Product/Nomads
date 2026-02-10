@@ -377,7 +377,7 @@ export const getReviewsByCompany = async (req, res, next) => {
 
     // 2️⃣ Fetch reviews using ObjectId (fast)
     const reviews = await Review.find(query)
-
+      .populate("reviewer", "firstName lastName email mobile")
       .lean()
       .exec();
 
