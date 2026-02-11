@@ -362,19 +362,25 @@ export const getReviewsByCompany = async (req, res, next) => {
       }
     }
 
-    let query = {};
+    let query = {
+      $or: [
+        { status: "pending" },
+        { "approvedBy.userId": { $exists: true, $ne: null } },
+        { "rejectedBy.userId": { $exists: true, $ne: null } },
+      ],
+    };
 
     if (companyId) {
-      query = { companyId };
+      query = { ...query, companyId };
     }
 
     if (companyType) {
       query = { ...query, company: company._id };
     }
 
-    if (status) {
-      query = { ...query, status };
-    }
+    // if (status) {
+    //   query = { ...query, status };
+    // }
 
     // 2️⃣ Fetch reviews using ObjectId (fast)
     const reviews = await Review.find(query)
@@ -395,8 +401,6 @@ export const getReviewsByUser = async (req, res, next) => {
   try {
     const user = req.userData._id;
 
-    console.log("userdata", req.userData);
-
     // 1️⃣ Resolve company once (cheap, indexed)
 
     const userExists = await NomadUser.findOne({ _id: user })
@@ -406,7 +410,6 @@ export const getReviewsByUser = async (req, res, next) => {
     if (!userExists) {
       return res.status(404).json({ message: "User not found" });
     }
-    console.log("user", userExists);
 
     // 2️⃣ Fetch reviews using ObjectId (fast)
     const reviews = await Review.find({ reviewer: user })
