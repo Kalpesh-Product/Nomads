@@ -7,6 +7,7 @@ import useLogout from "../hooks/useLogout";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Favorites from "./Favorites";
+import Reviews from "./Reviews";
 import { CircularProgress } from "@mui/material";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 
@@ -207,6 +208,16 @@ const Profile = () => {
           onClick={() => handleTabChange("favorites")}
         >
           Favorites
+        </button>
+        <button
+          className={`flex-1 py-3 font-semibold ${
+            activeTab === "reviews"
+              ? "bg-[#ff5757] text-white"
+              : "bg-white text-[#ff5757]"
+          }`}
+          onClick={() => handleTabChange("reviews")}
+        >
+          Reviews
         </button>
       </div>
 
@@ -425,6 +436,7 @@ const Profile = () => {
 
       {/* FAVORITES TAB */}
       {activeTab === "favorites" && <Favorites />}
+      {activeTab === "reviews" && <Reviews />}
     </div>
   );
 };
