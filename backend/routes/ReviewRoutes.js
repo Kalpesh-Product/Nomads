@@ -5,6 +5,7 @@ import {
   addReview,
   bulkInsertReviews,
   getReviewsByCompany,
+  getReviewsByUser,
   updateReviewStatus,
 } from "../controllers/reviewControllers.js";
 
@@ -20,6 +21,7 @@ router.get("/", getReviewsByCompany);
 
 // PROTECTED
 router.post("/", verifyJwt, addReview);
+router.get("/reviews", verifyJwt, getReviewsByUser);
 
 // PROTECTED (if required)
 router.patch("/:reviewId", updateReviewStatus);

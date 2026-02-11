@@ -3,6 +3,7 @@ import { Readable } from "stream";
 import csvParser from "csv-parser";
 import Company from "../models/Company.js";
 import TestReview from "../models/TestReview.js";
+import NomadUser from "../models/NomadUser.js";
 
 export const bulkInsertReviews = async (req, res, next) => {
   try {
@@ -361,23 +362,65 @@ export const getReviewsByCompany = async (req, res, next) => {
       }
     }
 
-    let query = {};
+    let query = {
+      $or: [
+        { status: "pending" },
+        { "approvedBy.userId": { $exists: true, $ne: null } },
+        { "rejectedBy.userId": { $exists: true, $ne: null } },
+      ],
+    };
 
     if (companyId) {
-      query = { companyId };
+      query = { ...query, companyId };
     }
 
     if (companyType) {
       query = { ...query, company: company._id };
     }
 
-    if (status) {
-      query = { ...query, status };
-    }
+    // if (status) {
+    //   query = { ...query, status };
+    // }
 
     // 2️⃣ Fetch reviews using ObjectId (fast)
     const reviews = await Review.find(query)
       .populate("reviewer", "firstName lastName email mobile")
+      .lean()
+      .exec();
+
+    return res.status(200).json({
+      count: reviews.length,
+      data: reviews,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getReviewsByUser = async (req, res, next) => {
+  try {
+    const user = req.userData._id;
+
+    // 1️⃣ Resolve company once (cheap, indexed)
+
+    const userExists = await NomadUser.findOne({ _id: user })
+      .select("_id firstName lastName")
+      .lean();
+
+    if (!userExists) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // 2️⃣ Fetch reviews using ObjectId (fast)
+    const reviews = await Review.find({ reviewer: user })
+      .populate([
+        { path: "reviewer", select: "firstName lastName email mobile" },
+        {
+          path: "company",
+          select:
+            "businessId companyName companyId images logo totalReviews ratings companyType isActive isPublic ",
+        },
+      ])
       .lean()
       .exec();
 
