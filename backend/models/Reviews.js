@@ -38,14 +38,33 @@ const reviewSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "NomadUser",
     },
+    // approvedBy: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "PointOfContact",
+    // },
+    // rejectedBy: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "PointOfContact",
+    // },
     approvedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "PointOfContact",
+      userId: {
+        type: mongoose.Schema.Types.ObjectId,
+      },
+      userType: {
+        type: String,
+        enum: ["MASTER", "HOST"],
+      },
     },
     rejectedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "PointOfContact",
+      userId: {
+        type: mongoose.Schema.Types.ObjectId,
+      },
+      userType: {
+        type: String,
+        enum: ["MASTER", "HOST"],
+      },
     },
+
     approvedDate: {
       type: Date,
     },
