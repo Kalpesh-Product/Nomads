@@ -1,15 +1,17 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { AiFillStar } from "react-icons/ai";
 import Container from "../components/Container";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useAuth from "../hooks/useAuth";
 import ListingCard from "../components/ListingCard";
+import MuiModal from "../components/Modal";
 
 const Reviews = () => {
-  const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
   const { auth } = useAuth();
+  const [selectedReview, setSelectedReview] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const userId = auth?.user?._id || auth?.user?.id;
 
@@ -36,9 +38,42 @@ const Reviews = () => {
       return acc;
     }
 
-    acc.push(company);
+    acc.push({
+      ...company,
+      review,
+    });
     return acc;
   }, []);
+
+  const formattedReviewDate = useMemo(() => {
+    if (!selectedReview?.createdAt) return "";
+
+    const parsedDate = new Date(selectedReview.createdAt);
+    if (Number.isNaN(parsedDate.getTime())) return "";
+
+    return parsedDate.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  }, [selectedReview]);
+
+  const openReviewModal = (review) => {
+    setSelectedReview(review || null);
+    setIsModalOpen(true);
+  };
+
+  const closeReviewModal = () => {
+    setIsModalOpen(false);
+    setSelectedReview(null);
+  };
+  const reviewStatus = (selectedReview?.status || "pending").toLowerCase();
+
+  const statusBadgeStyles = {
+    approved: "bg-green-100 text-green-700 border-green-200",
+    rejected: "bg-red-100 text-red-700 border-red-200",
+    pending: "bg-yellow-100 text-yellow-700 border-yellow-200",
+  };
 
   if (isError) {
     return (
@@ -67,17 +102,7 @@ const Reviews = () => {
                 item={item}
                 showVertical={true}
                 imageOverlayLabel="View Review"
-                handleNavigation={() =>
-                  navigate(
-                    `/listings/${encodeURIComponent(item.companyName)}`,
-                    {
-                      state: {
-                        companyId: item.companyId,
-                        type: item.companyType,
-                      },
-                    },
-                  )
-                }
+                handleNavigation={() => openReviewModal(item.review)}
               />
             ))}
           </div>
@@ -87,6 +112,52 @@ const Reviews = () => {
           </div>
         )}
       </div>
+
+      <MuiModal open={isModalOpen} onClose={closeReviewModal} title="Review">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-gray-500">Reviewer</p>
+            <p className="text-sm font-medium text-gray-800 text-right">
+              {selectedReview?.name || "Anonymous"}
+            </p>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-gray-500">Rating</p>
+            <div className="flex items-center gap-1 text-sm text-gray-800">
+              <AiFillStar className="text-black" />
+              <span>{selectedReview?.starCount || 0}</span>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-gray-500">Status</p>
+            <span
+              className={`text-xs font-medium px-2 py-1 rounded-full border capitalize ${
+                statusBadgeStyles[reviewStatus] || statusBadgeStyles.pending
+              }`}
+            >
+              {reviewStatus}
+            </span>
+          </div>
+
+          {formattedReviewDate && (
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-gray-500">Date</p>
+              <p className="text-sm font-medium text-gray-800 text-right">
+                {formattedReviewDate}
+              </p>
+            </div>
+          )}
+
+          <div className="pt-2 border-t border-borderGray">
+            <p className="text-sm text-gray-500 mb-2">Review</p>
+            <p className="text-sm text-gray-800 whitespace-pre-line leading-relaxed">
+              {selectedReview?.description || "No review details available."}
+            </p>
+          </div>
+        </div>
+      </MuiModal>
     </Container>
   );
 };
