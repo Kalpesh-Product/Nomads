@@ -762,8 +762,8 @@ const GlobalListingsMap = () => {
                   <IoSearch size={18} />
                 </div>
               </button>
-            </div>
-          )} */}
+            </div> 
+           )} */}
         </div>
         <div className="lg:container lg:mx-auto lg:px-6">
           <div className="">
@@ -832,7 +832,7 @@ const GlobalListingsMap = () => {
                   </div>
                 )}
               </div>
-              <div className="col-span-full lg:col-span-4 fixed inset-0 lg:relative lg:inset-auto lg:h-[calc(100vh-100px)] lg:h-[68%] lg:pb-10 z-0">
+              <div className="col-span-full lg:col-span-4 fixed inset-0 lg:relative lg:inset-auto lg:h-[calc(100vh-100px)] lg:h-[68%] lg:pb-10 z-40 lg:z-0">
                 <div className="h-full w-full lg:rounded-xl overflow-hidden">
                   {isLisitingLoading ? (
                     <SkeletonMap />
@@ -866,7 +866,7 @@ const GlobalListingsMap = () => {
               }}
               initial={{ y: "100%" }}
               animate={{
-                y: showListings ? "0%" : "65%",
+                y: showListings ? "0%" : "80%",
               }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 30, stiffness: 300, velocity: 2 }}

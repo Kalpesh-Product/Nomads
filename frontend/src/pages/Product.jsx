@@ -17,6 +17,7 @@ import Map from "../components/Map";
 import LeafWrapper from "../components/LeafWrapper";
 import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
 import { FiShare2 } from "react-icons/fi";
+import { Globe } from "lucide-react";
 
 import {
   FaFacebookF,
@@ -581,7 +582,11 @@ const Product = () => {
                         alt={`product-img-${index}`}
                         className="w-full h-full object-cover"
                       />
+                      <h1 className="text-center text-title font-medium text-gray-700 uppercase">
+                        About
+                      </h1>
                     </div>
+
                   ))}
                 </div>
 
@@ -601,7 +606,7 @@ const Product = () => {
 
           {/* About and Location */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
-            <div className="flex flex-col gap-8">
+            <div className="flex flex-col gap-1">
               {isCompanyDetails ? (
                 // 🔄 Skeleton while loading
                 <div className="w-full h-36 bg-gray-200 animate-pulse rounded-md" />
@@ -632,18 +637,18 @@ const Product = () => {
               )}
 
               <div className="space-y-2">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-y-3 gap-x-6 mb-4 mt-2">
-                  <h1 className="text-title font-medium text-gray-700 uppercase">
+                <div className="flex flex-col-reverse md:flex-row md:justify-between md:items-center gap-4 mb-4 mt-2">
+                  <h1 className="text-center md:text-left text-title font-medium text-gray-700 uppercase">
                     About
                   </h1>
-                  <div className="flex items-center gap-3 md:gap-4">
+
+                  <div className="flex items-center justify-center sm:justify-start gap-3 md:gap-4">
                     <button
                       type="button"
                       onClick={() => setShareMenuOpen(true)}
-                      className="inline-flex items-center gap-2 rounded-full border border-gray-300 px-3 md:px-4 py-1.5 text-small font-medium text-gray-600 transition hover:border-gray-400 hover:text-gray-900 bg-white shadow-sm"
                     >
-                      <FiShare2 className="text-gray-600" size={14} />
-                      Share
+                      <FiShare2 className="text-gray-600" size={17} />
+
                     </button>
 
                     {companyDetails?.websiteTemplateLink && (
@@ -653,22 +658,16 @@ const Product = () => {
                         rel="noopener noreferrer"
                         className="text-small font-semibold underline text-primary-blue hover:text-blue-700 transition-colors"
                       >
-                        View Website
+                        <Globe
+                          className="text-primary-blue md:w-[24px] md:h-[24px] lg:w-[32px] lg:h-[32px]"
+                          size={20} // Default mobile size
+                        />
                       </a>
                     )}
 
                     <div
                       onClick={() => {
                         if (!userId) {
-                          // toast.error(
-                          //   "You need to login to access this feature",
-                          // );
-                          // Swal.fire({
-                          //   title: "Error!",
-                          //   text: "Do you want to continue",
-                          //   icon: "error",
-                          //   confirmButtonText: "Cool",
-                          // });
                           navigate("/login");
                           return;
                         }
@@ -685,13 +684,6 @@ const Product = () => {
                         <IoIosHeartEmpty size={22} />
                       )}
                     </div>
-
-                    {/* <NavLink
-                      className={"text-small underline"}
-                      to={"/nomad/login"}
-                    >
-                      Save
-                    </NavLink> */}
                   </div>
                 </div>
 
@@ -734,17 +726,17 @@ const Product = () => {
             <div className="relative w-full">
               <div className="w-full md:static lg:sticky lg:top-24 flex flex-col gap-6">
                 {/* Responsive Guest Favorite Card */}
-                <div className="border border-gray-200 rounded-2xl flex flex-col lg:flex-row items-center justify-between p-4 bg-white shadow-sm hover:shadow-md transition-shadow gap-4 lg:gap-0">
-                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full lg:w-auto text-center sm:text-left">
-                    <LeafWrapper height="2.5rem" width="1.5rem">
+                <div className="border border-gray-200 rounded-2xl md:rounded-3xl flex flex-col lg:flex-row items-center justify-between p-4 lg:p-8 bg-white shadow-sm hover:shadow-md transition-all gap-6 lg:gap-0">
+                  <div className="flex flex-col lg:flex-row items-center justify-center gap-3 w-full lg:w-auto text-center sm:text-left">
+                    <LeafWrapper height="4rem" width="3rem">
                       <div className="flex flex-col items-center leading-tight">
-                        <span className="text-[10px] uppercase tracking-tighter text-gray-400">Guest</span>
-                        <span className="text-secondary-dark font-bold text-xs">Favorite</span>
+                        <span className="text-[20px] uppercase tracking-tighter text-gray-400">Guest</span>
+                        <span className="text-secondary-dark font-bold text-xl">Favorite</span>
                       </div>
                     </LeafWrapper>
                     {/* Divider: Hidden on mobile (stacked vertical), visible on sm (row), hidden on tablet (stacked vertical if needed or just row), visible on lg desktop */}
-                    <div className="hidden sm:block w-px h-8 bg-gray-100 mx-2" />
-                    <p className="text-xs text-gray-500 max-w-[200px] sm:max-w-none">
+                    <div className="hidden lg:block w-px h-8 bg-gray-100 mx-2" />
+                    <p className="text-xs text-gray-500 max-w-[300px] sm:max-w-none">
                       One of the most loved places on WoNo
                     </p>
                   </div>
@@ -769,7 +761,7 @@ const Product = () => {
 
                 {/* Enquiry Form card */}
                 <div className="shadow-lg flex flex-col gap-2 md:gap-4 p-4 md:p-5 lg:p-8 rounded-2xl border border-gray-100 bg-white max-w-full">
-                  <h1 className="text-base md:text-base lg:text-xl xl:text-2xl text-secondary-dark font-bold">
+                  <h1 className="text-center md:text-base lg:text-xl xl:text-2xl text-secondary-dark font-bold">
                     Enquire & Receive Quote
                   </h1>
                   <form
@@ -1068,7 +1060,7 @@ const Product = () => {
                       <SecondaryButton
                         disabled={isSubmitting}
                         isLoading={isSubmitting}
-                        title={"Get Quote"}
+                        title={"GET QUOTE"}
                         type={"submit"}
                         externalStyles={"w-full md:w-3/4 lg:w-1/2 rounded-full py-3 shadow-lg"}
                       />
@@ -1257,16 +1249,24 @@ const Product = () => {
                             },
                           }}
                           render={({ field }) => (
-                            <TextField
+                            <MuiTelInput
                               {...field}
                               label="Mobile Number"
                               fullWidth
-                              value={field.value || ""}
-                              type="tel"
+                              defaultCountry="IN"
                               variant="standard"
                               size="small"
-                              error={!!salesErrors?.mobileNumber}
+                              value={field.value || ""}
+                              onChange={(value) => {
+                                const formattedValue = normalizePhoneNumber(value);
+                                field.onChange(value);
+                                console.log("Sales mobile input:", {
+                                  raw: value,
+                                  formatted: formattedValue,
+                                });
+                              }}
                               helperText={salesErrors?.mobileNumber?.message}
+                              error={!!salesErrors?.mobileNumber}
                             />
                           )}
                         />
@@ -1292,7 +1292,7 @@ const Product = () => {
                         />
                         <div className="flex justify-center items-center">
                           <SecondaryButton
-                            title={"Submit"}
+                            title={"SUBMIT"}
                             type={"submit"}
                             externalStyles={"mt-6 w-1/2"}
                             disabled={isSubmittingSales}
