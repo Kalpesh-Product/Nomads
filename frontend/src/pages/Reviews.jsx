@@ -113,27 +113,31 @@ const Reviews = () => {
         )}
       </div>
 
-      <MuiModal open={isModalOpen} onClose={closeReviewModal} title="Review">
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-gray-500">Reviewer</p>
-            <p className="text-sm font-medium text-gray-800 text-right">
-              {selectedReview?.name || "Anonymous"}
-            </p>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-gray-500">Rating</p>
-            <div className="flex items-center gap-1 text-sm text-gray-800">
-              <AiFillStar className="text-black" />
-              <span>{selectedReview?.starCount || 0}</span>
+      <MuiModal
+        open={isModalOpen}
+        onClose={closeReviewModal}
+        title={selectedReview?.company?.companyName || "Review"}
+      >
+        <div className="flex flex-col gap-6">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-center gap-4 min-w-0">
+              <div className="w-16 h-16 shrink-0 rounded-full bg-[#ff5757] flex items-center justify-center text-white text-3xl font-medium uppercase">
+                {(selectedReview?.name || "A").charAt(0)}
+              </div>
+              <div className="min-w-0">
+                <p className="text-2xl font-semibold text-secondary-dark truncate">
+                  {selectedReview?.name || "Anonymous"}
+                </p>
+                {formattedReviewDate && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    {formattedReviewDate}
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
 
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-gray-500">Status</p>
             <span
-              className={`text-xs font-medium px-2 py-1 rounded-full border capitalize ${
+              className={`text-xs font-medium px-3 py-1.5 rounded-full border capitalize shrink-0 ${
                 statusBadgeStyles[reviewStatus] || statusBadgeStyles.pending
               }`}
             >
@@ -141,17 +145,20 @@ const Reviews = () => {
             </span>
           </div>
 
-          {formattedReviewDate && (
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-gray-500">Date</p>
-              <p className="text-sm font-medium text-gray-800 text-right">
-                {formattedReviewDate}
-              </p>
-            </div>
-          )}
+          <div className="flex items-center gap-3 text-4xl">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <AiFillStar
+                key={index}
+                className={
+                  index < (selectedReview?.starCount || 0)
+                    ? "text-yellow-400"
+                    : "text-gray-300"
+                }
+              />
+            ))}
+          </div>
 
-          <div className="pt-2 border-t border-borderGray">
-            <p className="text-sm text-gray-500 mb-2">Review</p>
+          <div className="pt-5 border-t border-borderGray">
             <p className="text-sm text-gray-800 whitespace-pre-line leading-relaxed">
               {selectedReview?.description || "No review details available."}
             </p>
