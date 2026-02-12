@@ -1291,7 +1291,7 @@ const Product = () => {
                 Write A Review
               </button>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-0 lg:p-0">
+            {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-0 lg:p-0">
               {companyDetails?.reviews?.length > 0 ? (
                 companyDetails?.reviews?.slice(0, 6).map((review, index) => (
                   <ReviewCard
@@ -1308,7 +1308,7 @@ const Product = () => {
                   No reviews yet.
                 </div>
               )}
-            </div>
+            </div> */}
             {/* <div className="text-right">
               <a
                 className="text-primary-blue text-sm font-semibold hover:underline"
