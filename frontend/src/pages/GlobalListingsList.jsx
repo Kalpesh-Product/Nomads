@@ -613,28 +613,7 @@ const GlobalListingsList = () => {
             </div>
             <div className="lg:hidden w-full flex flex-col gap-4 mb-4">
               {/* Category Selection Row - HORIZONTAL SCROLL ON MOBILE */}
-              <div className="flex overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 flex md:justify-center">
-                {categoryOptions.map((cat) => {
-                  const iconSrc = newIcons[cat.value];
-                  return (
-                    <button
-                      key={cat.value}
-                      type="button"
-                      onClick={() => handleCategoryClick(cat.value)}
-                      className="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] lg:w-[10%]"
-                    >
-                      <div className="h-10 w-full flex flex-col items-center gap-1">
-                        <img
-                          src={iconSrc}
-                          alt={cat.label}
-                          className="h-full w-[90%] object-contain"
-                        />
-                        <span className="text-[10px] font-medium whitespace-nowrap">{cat.label}</span>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
+
 
               <button
                 onClick={() => setShowMobileSearch((prev) => !prev)}
@@ -652,6 +631,29 @@ const GlobalListingsList = () => {
                   {formData?.count || "1-5"} Nomads
                 </span>
               </button>
+            </div>
+            {/* div change */}
+            <div className="lg:hidden flex overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 flex md:justify-center">
+              {categoryOptions.map((cat) => {
+                const iconSrc = newIcons[cat.value];
+                return (
+                  <button
+                    key={cat.value}
+                    type="button"
+                    onClick={() => handleCategoryClick(cat.value)}
+                    className="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] lg:w-[10%]"
+                  >
+                    <div className="h-10 w-full flex flex-col items-center gap-1">
+                      <img
+                        src={iconSrc}
+                        alt={cat.label}
+                        className="h-full w-[90%] object-contain"
+                      />
+                      <span className="text-[10px] font-medium whitespace-nowrap">{cat.label}</span>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
           <AnimatePresence>

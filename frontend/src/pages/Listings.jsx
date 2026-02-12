@@ -512,6 +512,21 @@ const Listings = () => {
         </div>
         <div className="lg:hidden w-full flex flex-col gap-4 my-4">
           {/* Category Selection Row - HORIZONTAL SCROLL ON MOBILE */}
+
+          <button
+            onClick={() => setShowMobileSearch((prev) => !prev)}
+            className="bg-white shadow-md flex items-center w-full text-center justify-center font-medium text-secondary-dark border-2 px-6 py-2 rounded-full flex-col gap-2"
+          >
+            <span>
+              Search Results in{" "}
+              {formData?.location?.charAt(0).toUpperCase() +
+                formData?.location?.slice(1) || "Unknown"}
+            </span>
+            <span className="text-tiny text-gray-500">
+              {formData?.count || "1-5"} Nomads
+            </span>
+          </button>
+          { /*chanage  div*/}
           <div className="flex overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 flex md:justify-center">
             {categoryOptions.map((cat) => {
               const iconSrc = newIcons[cat.value];
@@ -541,19 +556,6 @@ const Listings = () => {
             })}
           </div>
 
-          <button
-            onClick={() => setShowMobileSearch((prev) => !prev)}
-            className="bg-white shadow-md flex items-center w-full text-center justify-center font-medium text-secondary-dark border-2 px-6 py-2 rounded-full flex-col gap-2"
-          >
-            <span>
-              Search Results in{" "}
-              {formData?.location?.charAt(0).toUpperCase() +
-                formData?.location?.slice(1) || "Unknown"}
-            </span>
-            <span className="text-tiny text-gray-500">
-              {formData?.count || "1-5"} Nomads
-            </span>
-          </button>
         </div>
       </div>
       <AnimatePresence>

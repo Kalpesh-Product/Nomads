@@ -606,48 +606,7 @@ const GlobalListingsMap = () => {
               </form>
             </div>
 
-            <div className="lg:hidden w-full flex flex-col gap-4 mb-4">
-              {/* Category Selection Row - HORIZONTAL SCROLL ON MOBILE */}
-              <div className="flex overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-2">
-                {categoryOptions.map((cat) => {
-                  const iconSrc = newIcons[cat.value];
-                  return (
-                    <button
-                      key={cat.value}
-                      type="button"
-                      onClick={() => handleCategoryClick(cat.value)}
-                      className="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[30%]"
-                    >
-                      <div className="h-10 w-full flex flex-col items-center gap-1">
-                        <img
-                          src={iconSrc}
-                          alt={cat.label}
-                          className="h-full w-[90%] object-contain"
-                        />
-                        <span className="text-[10px] font-medium whitespace-nowrap">{cat.label}</span>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <button
-                onClick={() => setShowMobileSearch((prev) => !prev)}
-                className="bg-white shadow-md flex items-center w-[92%] mx-auto text-center justify-center font-medium text-secondary-dark border-2 px-6 py-2 rounded-full flex-col gap-1"
-              >
-                <div className="flex items-center gap-2">
-                  <IoSearch className="text-primary-red" />
-                  <span className="text-sm">
-                    Search Results in{" "}
-                    {formData?.location?.charAt(0).toUpperCase() +
-                      formData?.location?.slice(1) || "Unknown"}
-                  </span>
-                </div>
-                <span className="text-[10px] text-gray-500">
-                  {formData?.count || "1-5"} Nomads
-                </span>
-              </button>
-            </div>
+            {/* Removed redundant static search bar - fixed floating bar is used instead */}
           </div>
           <AnimatePresence>
             {showMobileSearch && (
@@ -745,25 +704,39 @@ const GlobalListingsMap = () => {
             )}
           </AnimatePresence>
 
-          {/* Floating Search Button for Mobile */}
-          {/* {!showMobileSearch && (
-            <div className="lg:hidden fixed top-24 left-1/2 -translate-x-1/2 z-[40] w-[90%] max-w-[400px]">
+          {/* Floating Search Button & Collections for Mobile */}
+          {!showMobileSearch && (
+            <div className="lg:hidden fixed top-[70px] left-0 right-0 z-[1001] flex flex-col items-center gap-2 px-4 pointer-events-none">
+              {/* Smaller Floating Search Bar */}
               <button
                 onClick={() => setShowMobileSearch(true)}
-                className="w-full bg-white shadow-xl rounded-full py-3 px-4 flex items-center justify-between border border-gray-100 hover:scale-[1.02] transition-transform active:scale-95"
-                style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.12)" }}
+                className="pointer-events-auto w-full max-w-[320px] bg-white shadow-2xl rounded-full py-2 px-4 flex items-center justify-between border border-gray-100 hover:scale-[1.02] transition-transform active:scale-95"
+                style={{ boxShadow: "0 8px 16px rgba(0,0,0,0.15)" }}
               >
                 <div className="flex flex-col items-start overflow-hidden flex-1">
-                  <span className="text-xs font-semibold text-gray-800 truncate w-full text-left">
+                  <span className="text-[11px] font-bold text-gray-900 truncate w-full text-left">
                     {formData?.location || "Anywhere"} • {formData?.category || "Any type"} • {formData?.count || "Any guests"}
                   </span>
                 </div>
-                <div className="bg-[#FF5757] p-2 rounded-full text-white ml-3 flex-shrink-0">
-                  <IoSearch size={18} />
+                <div className="bg-[#FF5757] p-1.5 rounded-full text-white ml-2 flex-shrink-0 shadow-sm">
+                  <IoSearch size={16} />
                 </div>
               </button>
-            </div> 
-           )} */}
+
+              {/* Collection/Category Chips */}
+              <div className="pointer-events-auto w-full max-w-[450px] flex overflow-x-auto gap-2 pb-2 scrollbar-hide scroll-smooth snap-x">
+                {categoryOptions.map((cat) => (
+                  <button
+                    key={cat.value}
+                    onClick={() => handleCategoryClick(cat.value)}
+                    className="flex-shrink-0 snap-start bg-white/95 backdrop-blur-md border border-gray-200 px-4 py-1.5 rounded-full text-[11px] font-semibold text-gray-800 shadow-md hover:bg-gray-50 transition-colors"
+                  >
+                    {cat.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
         <div className="lg:container lg:mx-auto lg:px-6">
           <div className="">
@@ -870,7 +843,7 @@ const GlobalListingsMap = () => {
               }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 30, stiffness: 300, velocity: 2 }}
-              className={`fixed bottom-0 left-0 right-0 bg-white shadow-[0_-8px_30px_rgb(0,0,0,0.12)] z-50 px-6 rounded-t-[24px] lg:hidden h-[85vh]`}
+              className={`fixed bottom-0 left-0 right-0 bg-white shadow-[0_-8px_30px_rgb(0,0,0,0.12)] z-50 px-6 rounded-t-[24px] lg:hidden h-[75vh]`}
             >
               <div
                 className="flex justify-center py-4 sticky top-0 z-10 bg-white cursor-pointer"
