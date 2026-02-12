@@ -14,7 +14,12 @@ import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useAuth from "../hooks/useAuth";
 import { showErrorAlert } from "../utils/alerts";
 
-const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
+const ListingCard = ({
+  item,
+  handleNavigation,
+  showVertical = true,
+  imageOverlayLabel,
+}) => {
   const navigate = useNavigate();
   const [favorites, setFavorites] = useState([]);
   // Track initial liked state per card
@@ -138,6 +143,14 @@ const ListingCard = ({ item, handleNavigation, showVertical = true }) => {
           className="w-full h-full object-cover hover:scale-105 transition-all"
           loading="lazy"
         />
+
+        {imageOverlayLabel && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <span className="bg-black/55 text-white text-sm font-medium px-3 py-1 rounded-full">
+              {imageOverlayLabel}
+            </span>
+          </div>
+        )}
         <div className="absolute top-2 right-2 pb-4 w-full h-full pl-0 pointer-events-none">
           <div className="flex flex-col items-end h-full justify-between">
             <button

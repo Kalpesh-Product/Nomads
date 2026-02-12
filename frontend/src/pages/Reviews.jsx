@@ -66,6 +66,7 @@ const Reviews = () => {
                 key={item._id}
                 item={item}
                 showVertical={true}
+                imageOverlayLabel="View Review"
                 handleNavigation={() =>
                   navigate(
                     `/listings/${encodeURIComponent(item.companyName)}`,
