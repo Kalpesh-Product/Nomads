@@ -1,15 +1,17 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { AiFillStar } from "react-icons/ai";
 import Container from "../components/Container";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useAuth from "../hooks/useAuth";
 import ListingCard from "../components/ListingCard";
+import MuiModal from "../components/Modal";
 
 const Reviews = () => {
-  const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
   const { auth } = useAuth();
+  const [selectedReview, setSelectedReview] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const userId = auth?.user?._id || auth?.user?.id;
 
@@ -36,9 +38,42 @@ const Reviews = () => {
       return acc;
     }
 
-    acc.push(company);
+    acc.push({
+      ...company,
+      review,
+    });
     return acc;
   }, []);
+
+  const formattedReviewDate = useMemo(() => {
+    if (!selectedReview?.createdAt) return "";
+
+    const parsedDate = new Date(selectedReview.createdAt);
+    if (Number.isNaN(parsedDate.getTime())) return "";
+
+    return parsedDate.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  }, [selectedReview]);
+
+  const openReviewModal = (review) => {
+    setSelectedReview(review || null);
+    setIsModalOpen(true);
+  };
+
+  const closeReviewModal = () => {
+    setIsModalOpen(false);
+    setSelectedReview(null);
+  };
+  const reviewStatus = (selectedReview?.status || "pending").toLowerCase();
+
+  const statusBadgeStyles = {
+    approved: "bg-green-100 text-green-700 border-green-200",
+    rejected: "bg-red-100 text-red-700 border-red-200",
+    pending: "bg-yellow-100 text-yellow-700 border-yellow-200",
+  };
 
   if (isError) {
     return (
@@ -66,17 +101,8 @@ const Reviews = () => {
                 key={item._id}
                 item={item}
                 showVertical={true}
-                handleNavigation={() =>
-                  navigate(
-                    `/listings/${encodeURIComponent(item.companyName)}`,
-                    {
-                      state: {
-                        companyId: item.companyId,
-                        type: item.companyType,
-                      },
-                    },
-                  )
-                }
+                imageOverlayLabel="View Review"
+                handleNavigation={() => openReviewModal(item.review)}
               />
             ))}
           </div>
@@ -86,6 +112,59 @@ const Reviews = () => {
           </div>
         )}
       </div>
+
+      <MuiModal
+        open={isModalOpen}
+        onClose={closeReviewModal}
+        title={selectedReview?.company?.companyName || "Review"}
+      >
+        <div className="flex flex-col gap-6">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-center gap-4 min-w-0">
+              <div className="w-16 h-16 shrink-0 rounded-full bg-[#ff5757] flex items-center justify-center text-white text-3xl font-medium uppercase">
+                {(selectedReview?.name || "A").charAt(0)}
+              </div>
+              <div className="min-w-0">
+                <p className="text-2xl font-semibold text-secondary-dark truncate">
+                  {selectedReview?.name || "Anonymous"}
+                </p>
+                {formattedReviewDate && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    {formattedReviewDate}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <span
+              className={`text-xs font-medium px-3 py-1.5 rounded-full border capitalize shrink-0 ${
+                statusBadgeStyles[reviewStatus] || statusBadgeStyles.pending
+              }`}
+            >
+              {reviewStatus}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-3 text-4xl">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <AiFillStar
+                key={index}
+                className={
+                  index < (selectedReview?.starCount || 0)
+                    ? "text-yellow-400"
+                    : "text-gray-300"
+                }
+              />
+            ))}
+          </div>
+
+          <div className="pt-5 border-t border-borderGray">
+            <p className="text-sm text-gray-800 whitespace-pre-line leading-relaxed">
+              {selectedReview?.description || "No review details available."}
+            </p>
+          </div>
+        </div>
+      </MuiModal>
     </Container>
   );
 };

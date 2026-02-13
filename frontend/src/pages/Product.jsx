@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { NavLink, useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+  NavLink,
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { Controller, useForm } from "react-hook-form";
 import { TextField } from "@mui/material";
 import { MuiTelInput } from "mui-tel-input";
@@ -47,11 +53,13 @@ const Product = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { company } = useParams();
+  const [searchParams] = useSearchParams();
   const locationState = location.state || {};
   const { companyId: stateCompanyId, type: stateType } = locationState;
+  const typeFromQuery = searchParams.get("companyType")?.trim() || null;
   const companyName = company ? company.trim() : "";
   const companyId = stateCompanyId || null;
-  const type = stateType || null;
+  const type = stateType || typeFromQuery || null;
   const queryClient = useQueryClient();
   const { auth } = useAuth();
   const dispatch = useDispatch();
@@ -107,6 +115,35 @@ const Product = () => {
   console.log("location.state", location.state);
   console.log("companyId", companyId);
 
+  useEffect(() => {
+    const companyType = companyDetails?.companyType?.trim();
+    if (!companyType) return;
+
+    const params = new URLSearchParams(location.search);
+    const currentType = params.get("companyType")?.trim();
+
+    if (currentType === companyType) return;
+
+    params.set("companyType", companyType);
+
+    navigate(
+      {
+        pathname: location.pathname,
+        search: `?${params.toString()}`,
+      },
+      {
+        replace: true,
+        state: location.state,
+      },
+    );
+  }, [
+    companyDetails?.companyType,
+    location.pathname,
+    location.search,
+    location.state,
+    navigate,
+  ]);
+
   console.log("companuDetials ", companyDetails);
   const companyImages = companyDetails?.images?.slice(0, 4) || [];
   const showMore = (companyDetails?.images?.length || 0) > 4;
@@ -114,30 +151,41 @@ const Product = () => {
     continent: companyDetails?.continent || "Asia",
     country: companyDetails?.country,
     state: companyDetails?.state,
+    companyType: companyDetails?.companyType,
   };
 
-  const handleBreadcrumbNavigate = () => {
+  const handleBreadcrumbNavigate = (breadcrumbKey) => {
     const normalizeValue = (value) =>
       typeof value === "string" ? value.trim().toLowerCase() : value;
 
     const normalizedContinent = normalizeValue(breadcrumbState.continent);
     const normalizedCountry = normalizeValue(breadcrumbState.country);
     const normalizedLocation = normalizeValue(breadcrumbState.state);
+    const normalizedCategory = normalizeValue(breadcrumbState.companyType);
+
+    const isCompanyTypeClick = breadcrumbKey === "companyType";
 
     dispatch(
       setFormValues({
         continent: normalizedContinent || "",
         country: normalizedCountry || "",
         location: normalizedLocation || "",
-        category: "",
+        category: isCompanyTypeClick ? normalizedCategory || "" : "",
         count: "",
       }),
     );
 
+    if (isCompanyTypeClick) {
+      navigate(
+        `/listings?country=${normalizedCountry || ""}&location=${
+          normalizedLocation || ""
+        }&category=${normalizedCategory || ""}`,
+      );
+      return;
+    }
+
     navigate(
-      `/verticals?country=${normalizedCountry || ""}&state=${
-        normalizedLocation || ""
-      }`,
+      `/verticals?country=${normalizedCountry || ""}&state=${normalizedLocation || ""}`,
     );
   };
 
@@ -365,10 +413,17 @@ const Product = () => {
       "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
   };
 
-  const shareUrl =
-    (typeof window !== "undefined" ? window.location.href : "") ||
-    companyDetails?.websiteTemplateLink ||
-    "";
+  const shareUrl = (() => {
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      if (companyDetails?.companyType) {
+        url.searchParams.set("companyType", companyDetails.companyType);
+      }
+      return url.toString();
+    }
+
+    return companyDetails?.websiteTemplateLink || "";
+  })();
   const shareTitle = companyDetails?.companyName
     ? `Check out ${companyDetails.companyName}`
     : "Check out this listing";
@@ -535,10 +590,20 @@ const Product = () => {
         <div className="pb-4">
           <nav aria-label="Breadcrumb" className="mb-4  text-gray-500">
             {[
-              { label: companyDetails?.continent, isLink: true },
-              { label: companyDetails?.country, isLink: true },
-              { label: companyDetails?.state, isLink: true },
               {
+                key: "continent",
+                label: companyDetails?.continent,
+                isLink: true,
+              },
+              { key: "country", label: companyDetails?.country, isLink: true },
+              { key: "state", label: companyDetails?.state, isLink: true },
+              {
+                key: "companyType",
+                label: companyDetails?.companyType,
+                isLink: true,
+              },
+              {
+                key: "companyName",
                 label: companyDetails?.companyName || companyName,
                 isLink: false,
               },
@@ -549,7 +614,7 @@ const Product = () => {
                   {item.isLink ? (
                     <button
                       type="button"
-                      onClick={handleBreadcrumbNavigate}
+                      onClick={() => handleBreadcrumbNavigate(item.key)}
                       className="text-gray-500 hover:text-gray-700 transition-colors"
                     >
                       {item.label}
