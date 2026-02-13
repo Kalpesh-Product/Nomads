@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { NavLink, useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+  NavLink,
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { Controller, useForm } from "react-hook-form";
 import { TextField } from "@mui/material";
 import { MuiTelInput } from "mui-tel-input";
@@ -47,11 +53,13 @@ const Product = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { company } = useParams();
+  const [searchParams] = useSearchParams();
   const locationState = location.state || {};
   const { companyId: stateCompanyId, type: stateType } = locationState;
+  const typeFromQuery = searchParams.get("companyType")?.trim() || null;
   const companyName = company ? company.trim() : "";
   const companyId = stateCompanyId || null;
-  const type = stateType || null;
+  const type = stateType || typeFromQuery || null;
   const queryClient = useQueryClient();
   const { auth } = useAuth();
   const dispatch = useDispatch();
@@ -106,6 +114,35 @@ const Product = () => {
 
   console.log("location.state", location.state);
   console.log("companyId", companyId);
+
+  useEffect(() => {
+    const companyType = companyDetails?.companyType?.trim();
+    if (!companyType) return;
+
+    const params = new URLSearchParams(location.search);
+    const currentType = params.get("companyType")?.trim();
+
+    if (currentType === companyType) return;
+
+    params.set("companyType", companyType);
+
+    navigate(
+      {
+        pathname: location.pathname,
+        search: `?${params.toString()}`,
+      },
+      {
+        replace: true,
+        state: location.state,
+      },
+    );
+  }, [
+    companyDetails?.companyType,
+    location.pathname,
+    location.search,
+    location.state,
+    navigate,
+  ]);
 
   console.log("companuDetials ", companyDetails);
   const companyImages = companyDetails?.images?.slice(0, 4) || [];
@@ -365,10 +402,17 @@ const Product = () => {
       "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
   };
 
-  const shareUrl =
-    (typeof window !== "undefined" ? window.location.href : "") ||
-    companyDetails?.websiteTemplateLink ||
-    "";
+  const shareUrl = (() => {
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      if (companyDetails?.companyType) {
+        url.searchParams.set("companyType", companyDetails.companyType);
+      }
+      return url.toString();
+    }
+
+    return companyDetails?.websiteTemplateLink || "";
+  })();
   const shareTitle = companyDetails?.companyName
     ? `Check out ${companyDetails.companyName}`
     : "Check out this listing";
