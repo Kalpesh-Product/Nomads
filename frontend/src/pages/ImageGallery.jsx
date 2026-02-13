@@ -103,11 +103,12 @@ const ImageGallery = () => {
   const resolvedCompanyName = companyName || companyParam || "Unknown";
 
   const breadcrumbItems = [
-    { label: continent, isLink: true },
-    { label: country, isLink: true },
-    { label: companyState, isLink: true },
-    { label: companyType, isLink: true },
+    { key: "continent", label: continent, isLink: true },
+    { key: "country", label: country, isLink: true },
+    { key: "state", label: companyState, isLink: true },
+    { key: "companyType", label: companyType, isLink: true },
     {
+      key: "companyName",
       label: resolvedCompanyName,
       isLink: Boolean(companyName || companyParam),
       onClick: () => {
@@ -116,26 +117,38 @@ const ImageGallery = () => {
         navigate(`/listings/${encodeURIComponent(target)}`);
       },
     },
-    { label: "Gallery", isLink: false },
+    { key: "gallery", label: "Gallery", isLink: false },
   ].filter((item) => item.label);
 
-  const handleBreadcrumbNavigate = () => {
+  const handleBreadcrumbNavigate = (breadcrumbKey) => {
     const normalizeValue = (value) =>
       typeof value === "string" ? value.trim().toLowerCase() : value;
 
     const normalizedContinent = normalizeValue(continent);
     const normalizedCountry = normalizeValue(country);
     const normalizedLocation = normalizeValue(companyState);
+    const normalizedCategory = normalizeValue(companyType);
+
+    const isCompanyTypeClick = breadcrumbKey === "companyType";
 
     dispatch(
       setFormValues({
         continent: normalizedContinent || "",
         country: normalizedCountry || "",
         location: normalizedLocation || "",
-        category: "",
+        category: isCompanyTypeClick ? normalizedCategory || "" : "",
         count: "",
       }),
     );
+
+    if (isCompanyTypeClick) {
+      navigate(
+        `/listings?country=${normalizedCountry || ""}&location=${
+          normalizedLocation || ""
+        }&category=${normalizedCategory || ""}`,
+      );
+      return;
+    }
 
     navigate(
       `/verticals?country=${normalizedCountry || ""}&state=${
@@ -153,7 +166,9 @@ const ImageGallery = () => {
               {item.isLink ? (
                 <button
                   type="button"
-                  onClick={item.onClick || handleBreadcrumbNavigate}
+                  onClick={
+                    item.onClick || (() => handleBreadcrumbNavigate(item.key))
+                  }
                   className="text-gray-500 hover:text-gray-700 transition-colors"
                 >
                   {item.label}

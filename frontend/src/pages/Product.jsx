@@ -154,28 +154,38 @@ const Product = () => {
     companyType: companyDetails?.companyType,
   };
 
-  const handleBreadcrumbNavigate = () => {
+  const handleBreadcrumbNavigate = (breadcrumbKey) => {
     const normalizeValue = (value) =>
       typeof value === "string" ? value.trim().toLowerCase() : value;
 
     const normalizedContinent = normalizeValue(breadcrumbState.continent);
     const normalizedCountry = normalizeValue(breadcrumbState.country);
     const normalizedLocation = normalizeValue(breadcrumbState.state);
+    const normalizedCategory = normalizeValue(breadcrumbState.companyType);
+
+    const isCompanyTypeClick = breadcrumbKey === "companyType";
 
     dispatch(
       setFormValues({
         continent: normalizedContinent || "",
         country: normalizedCountry || "",
         location: normalizedLocation || "",
-        category: "",
+        category: isCompanyTypeClick ? normalizedCategory || "" : "",
         count: "",
       }),
     );
 
+    if (isCompanyTypeClick) {
+      navigate(
+        `/listings?country=${normalizedCountry || ""}&location=${
+          normalizedLocation || ""
+        }&category=${normalizedCategory || ""}`,
+      );
+      return;
+    }
+
     navigate(
-      `/verticals?country=${normalizedCountry || ""}&state=${
-        normalizedLocation || ""
-      }`,
+      `/verticals?country=${normalizedCountry || ""}&state=${normalizedLocation || ""}`,
     );
   };
 
@@ -580,11 +590,20 @@ const Product = () => {
         <div className="pb-4">
           <nav aria-label="Breadcrumb" className="mb-4  text-gray-500">
             {[
-              { label: companyDetails?.continent, isLink: true },
-              { label: companyDetails?.country, isLink: true },
-              { label: companyDetails?.state, isLink: true },
-              { label: companyDetails?.companyType, isLink: true },
               {
+                key: "continent",
+                label: companyDetails?.continent,
+                isLink: true,
+              },
+              { key: "country", label: companyDetails?.country, isLink: true },
+              { key: "state", label: companyDetails?.state, isLink: true },
+              {
+                key: "companyType",
+                label: companyDetails?.companyType,
+                isLink: true,
+              },
+              {
+                key: "companyName",
                 label: companyDetails?.companyName || companyName,
                 isLink: false,
               },
@@ -595,7 +614,7 @@ const Product = () => {
                   {item.isLink ? (
                     <button
                       type="button"
-                      onClick={handleBreadcrumbNavigate}
+                      onClick={() => handleBreadcrumbNavigate(item.key)}
                       className="text-gray-500 hover:text-gray-700 transition-colors"
                     >
                       {item.label}
