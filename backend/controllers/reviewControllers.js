@@ -418,7 +418,7 @@ export const getReviewsByUser = async (req, res, next) => {
         {
           path: "company",
           select:
-            "businessId companyName companyId images logo totalReviews ratings companyType isActive isPublic ",
+            "businessId companyName companyId images logo totalReviews ratings companyType isActive isPublic city state",
         },
       ])
       .lean()
