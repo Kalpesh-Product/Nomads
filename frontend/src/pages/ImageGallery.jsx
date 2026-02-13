@@ -22,6 +22,7 @@ const ImageGallery = () => {
     continent = "Asia",
     country,
     state: companyState,
+    companyType,
   } = location.state || {};
   const imageRefs = useRef({});
   const [imageLoadStatus, setImageLoadStatus] = useState({});
@@ -105,6 +106,7 @@ const ImageGallery = () => {
     { label: continent, isLink: true },
     { label: country, isLink: true },
     { label: companyState, isLink: true },
+    { label: companyType, isLink: true },
     {
       label: resolvedCompanyName,
       isLink: Boolean(companyName || companyParam),

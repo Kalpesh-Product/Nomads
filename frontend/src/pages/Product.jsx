@@ -151,6 +151,7 @@ const Product = () => {
     continent: companyDetails?.continent || "Asia",
     country: companyDetails?.country,
     state: companyDetails?.state,
+    companyType: companyDetails?.companyType,
   };
 
   const handleBreadcrumbNavigate = () => {
@@ -582,6 +583,7 @@ const Product = () => {
               { label: companyDetails?.continent, isLink: true },
               { label: companyDetails?.country, isLink: true },
               { label: companyDetails?.state, isLink: true },
+              { label: companyDetails?.companyType, isLink: true },
               {
                 label: companyDetails?.companyName || companyName,
                 isLink: false,
