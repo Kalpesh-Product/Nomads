@@ -12,6 +12,11 @@ const companySchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
+  companyTitle: {
+    type: String,
+    required: true,
+    trim: true,
+  },
   companyId: {
     type: String,
     required: true,

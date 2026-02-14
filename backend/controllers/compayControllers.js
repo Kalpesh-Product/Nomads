@@ -81,6 +81,7 @@ export const bulkInsertCompanies = async (req, res, next) => {
           businessId: row["Business ID"]?.trim(),
           companyId: companyMap.get(rowKey) || "",
           companyName: row["Business Name"]?.trim(),
+          companyTitle: row["Business Name"]?.trim(),
           registeredEntityName: row["Registered Entity name"]?.trim(),
           website: row["Website"]?.trim() || null,
           address: row["Address"]?.trim(),
@@ -346,6 +347,7 @@ export const createCompany = async (req, res, next) => {
   try {
     const {
       companyName,
+      companyTitle,
       logo,
       companyId,
       registeredEntityName,
@@ -373,9 +375,6 @@ export const createCompany = async (req, res, next) => {
       description,
     } = req.body;
 
-    console.log("images", images);
-    console.log("reviews", reviews);
-
     const generateBuisnessId = () => {
       const base = "WoNo_world";
       const id = `${base} ${companyType} ${city} ${Date.now()}`;
@@ -396,14 +395,12 @@ export const createCompany = async (req, res, next) => {
         .status(400)
         .json({ message: `${companyType} product already exists` });
     }
-    console.log("continent", continent);
-    console.log("inclusions", inclusions);
-    console.log("cost", cost);
-    console.log("logo", logo);
+
     // Create company
     const company = new Company({
       businessId: generateBuisnessId(),
       companyName: companyName.trim(),
+      companyTitle: companyTitle.trim(),
       companyId,
       logo,
       registeredEntityName: registeredEntityName?.trim(),
@@ -1741,6 +1738,7 @@ export const editCompany = async (req, res, next) => {
       inclusions,
       cost,
       companyType,
+      companyTitle,
       companyName,
       reviews,
       existingImages = [],
@@ -1765,6 +1763,7 @@ export const editCompany = async (req, res, next) => {
     // Update scalar fields
     company.address = address?.trim() || company.address;
     company.companyName = companyName?.trim() || company.companyName;
+    company.companyTitle = companyTitle?.trim() || company.companyTitle;
     company.about = about?.trim() || company.about;
     company.totalSeats = totalSeats ? parseInt(totalSeats) : company.totalSeats;
     company.latitude = latitude ? parseFloat(latitude) : company.latitude;
@@ -1782,7 +1781,17 @@ export const editCompany = async (req, res, next) => {
 
     // Use 'images' from remote API (which has existing + new images)
     // or fallback to 'existingImages' if not provided
-    const updatedImages = images.length > 0 ? images : existingImages;
+    // const updatedImages = images.length > 0 ? images : existingImages;
+
+    let updatedImages;
+
+    if (Array.isArray(images) && images.length > 0) {
+      updatedImages = images;
+    } else if (Array.isArray(existingImages) && existingImages.length > 0) {
+      updatedImages = existingImages;
+    } else {
+      updatedImages = company.images; // fallback to existing DB images
+    }
 
     if (updatedImages.length > 10) {
       console.log("updatedImages images", updatedImages.length);
@@ -1836,18 +1845,54 @@ export const editCompany = async (req, res, next) => {
     }
 
     /** ---------------- REVIEWS UPDATE LOGIC ---------------- **/
-    if (Array.isArray(reviews) && reviews.length > 0) {
-      await Review.deleteMany({ company: company._id });
-      const reviewDocs = reviews.map((review) => ({
+    // if (Array.isArray(reviews) && reviews.length > 0) {
+    //   await Review.deleteMany({ company: company._id });
+    //   const reviewDocs = reviews.map((review) => ({
+    //     company: company._id,
+    //     companyId: company.companyId,
+    //     name: review.name?.trim(),
+    //     starCount: parseInt(review.starCount),
+    //     description: review.review?.trim(),
+    //     reviewSource: review.reviewSource?.trim(),
+    //     reviewLink: review.reviewLink?.trim(),
+    //   }));
+    //   await Review.insertMany(reviewDocs);
+    // }
+
+    if (Array.isArray(reviews)) {
+      const existingReviews = await Review.find({ company: company._id });
+
+      const incomingIds = reviews.map((r) => r._id).filter(Boolean);
+
+      // Delete only removed ones
+      await Review.deleteMany({
         company: company._id,
-        companyId: company.companyId,
-        name: review.name?.trim(),
-        starCount: parseInt(review.starCount),
-        description: review.review?.trim(),
-        reviewSource: review.reviewSource?.trim(),
-        reviewLink: review.reviewLink?.trim(),
-      }));
-      await Review.insertMany(reviewDocs);
+        _id: { $nin: incomingIds },
+      });
+
+      // Upsert each review
+      for (const review of reviews) {
+        if (review._id) {
+          await Review.findByIdAndUpdate(review._id, review);
+        } else {
+          const reviewExists = await Review.findOne({
+            company: company._id,
+            name: review.name,
+          });
+
+          if (reviewExists) {
+            return res.status(400).json({
+              message: "You can add review to the same product only once.",
+            });
+          } else {
+            await Review.create({
+              ...review,
+              company: company._id,
+              companyId: company.companyId,
+            });
+          }
+        }
+      }
     }
 
     res.status(200).json({
