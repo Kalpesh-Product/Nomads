@@ -1738,6 +1738,7 @@ export const editCompany = async (req, res, next) => {
       inclusions,
       cost,
       companyType,
+      companyTitle,
       companyName,
       reviews,
       existingImages = [],
@@ -1762,6 +1763,7 @@ export const editCompany = async (req, res, next) => {
     // Update scalar fields
     company.address = address?.trim() || company.address;
     company.companyName = companyName?.trim() || company.companyName;
+    company.companyTitle = companyTitle?.trim() || company.companyTitle;
     company.about = about?.trim() || company.about;
     company.totalSeats = totalSeats ? parseInt(totalSeats) : company.totalSeats;
     company.latitude = latitude ? parseFloat(latitude) : company.latitude;
