@@ -90,9 +90,9 @@ const Footer = () => {
 
   return (
     <footer className="w-full bg-gray-100 text-black flex flex-col justify-center items-center shadow-lg">
-      <div className="w-full flex flex-wrap justify-between items-center pt-12 pb-8 px-4 md:px-[7.5rem]">
+      <div className="w-full flex flex-wrap justify-center lg:justify-between items-center pt-12 pb-8 px-4 md:px-[7.5rem]">
         {/* Left Section */}
-        <div className="flex flex-col items-center md:items-center lg:items-start mb-8 lg:mb-0 w-full md:w-auto text-center lg:text-left">
+        <div className="flex flex-col items-center lg:items-start mb-8 lg:mb-0 w-full lg:w-auto text-center lg:text-left">
           <img
             src={logo}
             className="w-36 cursor-pointer mb-4 mx-auto lg:mx-0"
@@ -112,8 +112,8 @@ const Footer = () => {
         </div>
 
         {/* Links Section */}
-        <div className="lg:w-fit w-full">
-          <div className="grid grid-cols-2 gap-x-10">
+        <div className="lg:w-fit w-full flex justify-center lg:justify-end">
+          <div className="grid grid-cols-2 gap-x-10 text-center lg:text-left">
             {footerSections.map((section, idx) => (
               <div
                 key={idx}
@@ -150,9 +150,9 @@ const Footer = () => {
         Rights Reserved.
       </div> */}
       {/* Copyright */}
-      <div className="w-full flex flex-col md:flex-row justify-between items-center text-center md:text-left py-6 border-t-2 border-white px-4 md:px-[7.5rem]">
+      <div className="w-full flex flex-col items-center justify-center text-center py-6 border-t-2 border-white px-4 md:px-[7.5rem] lg:flex-row lg:justify-between lg:text-left">
         {/* Left side — Copyright */}
-        <div className="flex flex-col md:flex-row justify-center md:justify-start items-center gap-1 text-[10px] md:text-xs font-semibold text-gray-800 mb-3 md:mb-0">
+        <div className="flex flex-col md:flex-row justify-center md:justify-start items-center gap-1 text-[10px] md:text-xs font-semibold text-gray-800 mb-3 lg:mb-0">
           <span>
             &copy; Copyright {new Date().getFullYear()} -{" "}
             {(new Date().getFullYear() + 1).toString().slice(-2)}
@@ -163,16 +163,16 @@ const Footer = () => {
         </div>
 
         {/* Right side — Policy Links */}
-        <div className="flex flex-col md:flex-row justify-center md:justify-end items-center gap-4 text-[10px] md:text-xs text-gray-800 ">
+        <div className="flex flex-col md:flex-row justify-center lg:justify-end items-center gap-4 text-[10px] md:text-xs text-gray-800 ">
           <span
             onClick={goToHostsContentCopyright}
-            className="hover:opacity-100 hover:text-gray-500 uppercase text-center md:text-right cursor-pointer"
+            className="hover:opacity-100 hover:text-gray-500 uppercase text-center lg:text-right cursor-pointer"
           >
             Content and Copyright Policy
           </span>
           <span
             onClick={goToHostsContentUseRemoval}
-            className="hover:opacity-100 hover:text-gray-500 uppercase text-center md:text-right cursor-pointer"
+            className="hover:opacity-100 hover:text-gray-500 uppercase text-center lg:text-right cursor-pointer"
           >
             Content Use & Removal Policy
           </span>
@@ -231,11 +231,10 @@ const Footer = () => {
                       setShowLangModal(false);
                     }}
                     className={`border rounded-md px-3 py-2 
-        ${
-          isDisabled
-            ? "opacity-40 cursor-not-allowed"
-            : "cursor-pointer hover:border-black"
-        } 
+        ${isDisabled
+                        ? "opacity-40 cursor-not-allowed"
+                        : "cursor-pointer hover:border-black"
+                      } 
         ${selectedLang.code === lang.code ? "border-black" : "border-gray-300"}
       `}
                   >
@@ -272,16 +271,14 @@ const Footer = () => {
                       setShowCurrencyModal(false);
                     }}
                     className={`border rounded-md px-3 py-2 
-        ${
-          isDisabled
-            ? "opacity-40 cursor-not-allowed"
-            : "cursor-pointer hover:border-black"
-        } 
-        ${
-          selectedCurrency.code === cur.code
-            ? "border-black"
-            : "border-gray-300"
-        }
+        ${isDisabled
+                        ? "opacity-40 cursor-not-allowed"
+                        : "cursor-pointer hover:border-black"
+                      } 
+        ${selectedCurrency.code === cur.code
+                        ? "border-black"
+                        : "border-gray-300"
+                      }
       `}
                   >
                     <div className="font-medium">{cur.name}</div>

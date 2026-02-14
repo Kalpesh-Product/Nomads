@@ -1,4 +1,4 @@
-import { Box, MenuItem, Skeleton, TextField } from "@mui/material";
+import { Box, MenuItem, Skeleton, TextField, useMediaQuery } from "@mui/material";
 import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -195,8 +195,7 @@ const Listings = () => {
     queryFn: async () => {
       const { country, location } = formData || {};
       const response = await axios.get(
-        `company/companiesn?country=${country}&state=${location}&userId=${
-          userId || ""
+        `company/companiesn?country=${country}&state=${location}&userId=${userId || ""
         }`,
       );
 
@@ -312,23 +311,23 @@ const Listings = () => {
   const forMapsData = isLisitingLoading
     ? []
     : listingsData.map((item) => ({
-        ...item,
-        id: item._id,
-        lat: item.latitude,
-        lng: item.longitude,
-        name: item.companyName,
-        location: item.city,
-        reviews: item.reviews?.length,
-        rating: item.reviews?.length
-          ? (() => {
-              const avg =
-                item.reviews.reduce((sum, r) => sum + r.starCount, 0) /
-                item.reviews.length;
-              return avg % 1 === 0 ? avg : avg.toFixed(1);
-            })()
-          : "0",
-        image: item.images?.[0]?.url,
-      }));
+      ...item,
+      id: item._id,
+      lat: item.latitude,
+      lng: item.longitude,
+      name: item.companyName,
+      location: item.city,
+      reviews: item.reviews?.length,
+      rating: item.reviews?.length
+        ? (() => {
+          const avg =
+            item.reviews.reduce((sum, r) => sum + r.starCount, 0) /
+            item.reviews.length;
+          return avg % 1 === 0 ? avg : avg.toFixed(1);
+        })()
+        : "0",
+      image: item.images?.[0]?.url,
+    }));
 
   const handleCategoryClick = (categoryValue) => {
     const formData = getValues(); // from react-hook-form
@@ -361,7 +360,10 @@ const Listings = () => {
     locationData(data);
     setResetPageKey((prev) => prev + 1); // ensures a new value every time
   };
+
   const [mapOpen, setMapOpen] = useState(true);
+  const isMobile = useMediaQuery("(max-width:767px)");
+  const isTablet = useMediaQuery("(max-width:1023px)");
 
   // Prioritize BIZ Nest and MeWo first, then sort the rest by rating descending
   const prioritizedCompanies = ["BIZ Nest", "MeWo"];
@@ -414,11 +416,10 @@ const Listings = () => {
                               className="h-full w-full object-contain"
                             />
                             <span
-                              className={`text-sm border-b-4 ${
-                                isActive
-                                  ? "border-primary-blue"
-                                  : "border-transparent"
-                              }`}
+                              className={`text-sm border-b-4 ${isActive
+                                ? "border-primary-blue"
+                                : "border-transparent"
+                                }`}
                             >
                               {cat.label}
                             </span>
@@ -435,7 +436,7 @@ const Listings = () => {
               <form
                 onSubmit={handleSubmit(onSubmit)}
                 className=" flex justify-around md:w-full lg:w-full border-2 bg-gray-50 rounded-full p-0 items-center"
-                // className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
+              // className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
               >
                 <Controller
                   name="continent"
@@ -509,7 +510,9 @@ const Listings = () => {
             </div>
           </div>
         </div>
-        <div className="flex lg:hidden w-full items-center justify-center my-4">
+        <div className="lg:hidden w-full flex flex-col gap-4 my-4">
+          {/* Category Selection Row - HORIZONTAL SCROLL ON MOBILE */}
+
           <button
             onClick={() => setShowMobileSearch((prev) => !prev)}
             className="bg-white shadow-md flex items-center w-full text-center justify-center font-medium text-secondary-dark border-2 px-6 py-2 rounded-full flex-col gap-2"
@@ -523,6 +526,36 @@ const Listings = () => {
               {formData?.count || "1-5"} Nomads
             </span>
           </button>
+          { /*chanage  div*/}
+          <div className="flex overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 flex md:justify-center">
+            {categoryOptions.map((cat) => {
+              const iconSrc = newIcons[cat.value];
+              const isActive = activeCategory === cat.value;
+              return (
+                <button
+                  key={cat.value}
+                  type="button"
+                  onClick={() => handleCategoryClick(cat.value)}
+                  className="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] lg:w-[10%]"
+                >
+                  <div className="h-10 w-full flex flex-col items-center gap-1">
+                    <img
+                      src={iconSrc}
+                      alt={cat.label}
+                      className="h-full w-[90%] object-contain"
+                    />
+                    <span
+                      className={`text-[10px] font-medium whitespace-nowrap border-b-2 ${isActive ? "border-[#FF5757]" : "border-transparent"
+                        }`}
+                    >
+                      {cat.label}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
         </div>
       </div>
       <AnimatePresence>
@@ -545,52 +578,6 @@ const Listings = () => {
                   &times;
                 </button>
               </div>
-              <motion.div
-                initial={{ y: "-100%" }}
-                animate={{ y: 0 }}
-                exit={{ y: "-100%" }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-                className={`grid ${
-                  categoryOptions.length === 4
-                    ? "grid-cols-2" // 2 icons per row for 4 total
-                    : "grid-cols-3 md:grid-cols-5" // default layout for 6 or more
-                } gap-4 gap-y-10 mb-16 justify-items-center`}
-              >
-                {categoryOptions.map((cat) => {
-                  const iconSrc = newIcons[cat.value];
-                  const isActive = activeCategory === cat.value;
-
-                  return (
-                    <button
-                      key={cat.value}
-                      type="button"
-                      onClick={() => handleCategoryClick(cat.value)}
-                      className="text-black px-4 py-2 hover:text-black transition flex items-center justify-center w-full"
-                    >
-                      {iconSrc ? (
-                        <div className="h-10 w-full flex flex-col gap-0 items-center">
-                          <img
-                            src={iconSrc}
-                            alt={cat.label}
-                            className="h-full w-full object-contain"
-                          />
-                          <span
-                            className={`text-sm border-b-2 ${
-                              isActive
-                                ? "border-[#FF5757]"
-                                : "border-transparent"
-                            }`}
-                          >
-                            {cat.label}
-                          </span>
-                        </div>
-                      ) : (
-                        cat.label
-                      )}
-                    </button>
-                  );
-                })}
-              </motion.div>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <Controller
@@ -666,6 +653,25 @@ const Listings = () => {
         )}
       </AnimatePresence>
       <Container padding={false}>
+        {/* Dynamic Header */}
+        {formData?.category && formData?.location && (
+          <div className="mb-6 mt-4 px-1">
+            <h1 className="text-lg md:text-2xl lg:text-3xl font-bold text-secondary-dark capitalize">
+              Popular {
+                {
+                  coworking: "Co-Working Spaces",
+                  coliving: "Co-Living Spaces",
+                  hostel: "Hostels",
+                  workation: "Workation",
+                  privatestay: "Private Stays",
+                  meetingroom: "Meeting Rooms",
+                  cafe: "Cafes",
+                }[formData.category] || `${formData.category} Spaces`
+              } in {formData.location}
+            </h1>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-9 gap-4">
           {/* LIST VIEW */}
           <motion.div
@@ -674,19 +680,21 @@ const Listings = () => {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -50 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className={`${
-              mapOpen ? "col-span-5" : "col-span-9"
-            } font-semibold text-lg`}
+            className={`${mapOpen ? "col-span-5" : "col-span-9"
+              } font-semibold text-lg`}
           >
             <PaginatedGrid
               // data={isLisitingLoading ? skeletonArray : sortedListings}
               data={isLisitingLoading ? skeletonArray : filteredListings}
-              entriesPerPage={!mapOpen ? 10 : 9}
+              entriesPerPage={
+                isMobile ? 10 :
+                  isTablet ? 9 :
+                    !mapOpen ? 10 : 9
+              }
               persistPage={true}
               resetPageKey={resetPageKey}
-              columns={`grid-cols-1 md:grid-cols-2 ${
-                mapOpen ? "lg:grid-cols-3" : "lg:grid-cols-5"
-              } gap-x-5`}
+              columns={`grid-cols-2 md:grid-cols-3 ${mapOpen ? "lg:grid-cols-3" : "lg:grid-cols-4 xl:grid-cols-5"
+                } gap-4 md:gap-5`}
               renderItem={(item, index) =>
                 isLisitingLoading ? (
                   <Box key={index} className="w-full h-full">
@@ -739,7 +747,7 @@ const Listings = () => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 50 }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="col-span-4 w-full overflow-hidden rounded-xl h-full"
+                className="hidden lg:block col-span-4 w-full overflow-hidden rounded-xl lg:sticky lg:top-24 lg:self-start lg:h-[calc(100vh-120px)] min-h-[500px]"
               >
                 {isLisitingLoading ? (
                   <SkeletonMap />
@@ -755,6 +763,34 @@ const Listings = () => {
           </AnimatePresence>
         </div>
       </Container>
+
+      < div className="lg:hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-[1000]" >
+        <button
+          onClick={() =>
+            navigate(
+              `/verticals?country=${formData?.country}&location=${formData?.location}&view=map`,
+            )
+          }
+          className="bg-[#222222] text-white px-5 py-3 rounded-full flex items-center gap-2 shadow-xl hover:scale-105 transition-transform active:scale-95"
+        >
+          <span className="text-sm font-semibold tracking-wide">Show map</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 32 32"
+            aria-hidden="true"
+            role="presentation"
+            focusable="false"
+            style={{
+              display: "block",
+              height: "16px",
+              width: "16px",
+              fill: "white",
+            }}
+          >
+            <path d="M31.25 3.75a2.29 2.29 0 0 0-1.01-1.44A2.29 2.29 0 0 0 28.5 2L21 3.67l-10-2L2.5 3.56A2.29 2.29 0 0 0 .7 5.8v21.95a2.28 2.28 0 0 0 1.06 1.94A2.29 2.29 0 0 0 3.5 30L11 28.33l10 2 8.49-1.89a2.29 2.29 0 0 0 1.8-2.24V4.25a2.3 2.3 0 0 0-.06-.5zM12.5 25.98l-1.51-.3L9.5 26H9.5V4.66l1.51-.33 1.49.3v21.34zm10 1.36-1.51.33-1.49-.3V6.02l1.51.3L22.5 6h.01v21.34z"></path>
+          </svg>
+        </button>
+      </div >
     </div>
   );
 };

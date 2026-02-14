@@ -3,7 +3,12 @@
   "rewrites": [
     {
       "source": "/(.*)",
-      "has": [{ "type": "host", "value": "(?<subdomain>.+).wono.co" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "(?<subdomain>.+).wono.co"
+        }
+      ],
       "destination": "/?subdomain=:subdomain&path=$1"
     },
     {

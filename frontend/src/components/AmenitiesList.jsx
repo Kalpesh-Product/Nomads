@@ -189,7 +189,7 @@ export default function AmenitiesList({ type = "coworking", inclusions = [] }) {
   });
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-24 gap-y-10">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-8 lg:gap-y-10 lg:gap-x-12">
       {sortedAmenities.map((amenity) => {
         const key = normalizeKey(amenity);
         const isAvailable = normalizedInclusions.includes(key);
@@ -198,22 +198,21 @@ export default function AmenitiesList({ type = "coworking", inclusions = [] }) {
         return (
           <div
             key={amenity}
-            className="flex flex-row gap-1 w-full lg:w-40 items-center"
+            className="flex items-center gap-3 w-full"
           >
-            <div className="h-10 w-10 overflow-hidden relative rounded">
+            <div className="h-10 w-10 flex-shrink-0 overflow-hidden relative rounded-lg bg-gray-50 p-1">
               <img
                 src={iconSrc}
                 className="h-full w-full object-contain"
                 alt={amenity}
               />
               {!isAvailable && (
-                <div className="absolute h-full w-[2px] -top-1 left-[45%] -rotate-45 bg-black" />
+                <div className="absolute h-full w-[2px] -top-1 left-[45%] -rotate-45 bg-gray-400 opacity-60" />
               )}
             </div>
             <p
-              className={`text-center text-secondary-dark w-full text-[0.89rem] uppercase ${
-                !isAvailable ? "line-through" : ""
-              }`}
+              className={`text-left text-secondary-dark font-medium leading-tight text-xs md:text-small uppercase ${!isAvailable ? "line-through text-gray-400" : ""
+                }`}
             >
               {amenity}
             </p>

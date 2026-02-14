@@ -82,7 +82,7 @@ const ListingCard = ({
   useEffect(() => {
     if (!user?._id) return;
 
-    axiosPrivate.get(`/api/user/likes/${user._id}`).then((res) => {
+    axiosPrivate.get(`/user/likes/${user._id}`).then((res) => {
       const likedIds = res.data?.map((item) => item._id) || [];
       setFavorites(likedIds);
     });
@@ -130,7 +130,7 @@ const ListingCard = ({
     <div
       onClick={handleNavigation}
       // className="flex flex-col gap-2 h-56 w-[95%] bg-white  rounded-lg  transition-all cursor-pointer">
-      className="flex flex-col gap-2 w-full max-w-sm bg-white rounded-lg transition-all cursor-pointer"
+      className="flex flex-col gap-2 w-full bg-white rounded-lg transition-all cursor-pointer"
     >
       {/* <div className="h-full w-full overflow-hidden rounded-3xl border-2 relative"> */}
       <div className="w-full aspect-square overflow-hidden rounded-3xl relative">
@@ -183,73 +183,29 @@ const ListingCard = ({
       <div className="h-[25%] flex flex-col gap-1 pl-4 pr-1">
         <div className="flex w-full justify-between items-center">
           <div className="w-full">
-            {/* Mobile: show full name */}
             <p
-              className="text-sm font-semibold block sm:hidden"
+              className="text-xs md:text-sm font-semibold truncate"
               title={item.companyName || "Title"}
             >
-              {item.companyName.length > 30
-                ? `${item.companyName.slice(0, 18)}...`
-                : item.companyName || "title"}
-            </p>
-
-            {/* Tablet/Desktop: show truncated */}
-            <p
-              className="text-sm font-semibold hidden sm:block"
-              title={item.companyName || "title"}
-            >
-              {{
-                showVertical:
-                  item.companyName.length > 23
-                    ? `${item.companyName.slice(0, 23)}...`
-                    : item.companyName,
-              }
-                ? item.companyName.length > 20
-                  ? `${item.companyName.slice(0, 20)}...`
-                  : item.companyName
-                : item.companyName}
+              {item.companyName || "title"}
             </p>
           </div>
-
-          {/* {showVertical && (
-            <p className="text-tiny w-full text-right text-gray-600">
-              {typeLabels[item.companyType] || "Unknown"}
-            </p>
-          )} */}
         </div>
 
         <div className="flex w-full justify-between items-center">
           <p
-            className="text-sm text-gray-600 font-medium"
+            className="text-xs md:text-sm text-gray-600 font-medium truncate"
             title={`${item.city || "Unknown"}, ${item.state || "Unknown"}`}
           >
-            <span className="block sm:hidden">
-              {/* Mobile: show full text */}
-              {`${item.city || "Unknown"}, ${item.state || "Unknown"}`}
-            </span>
-            <span className="hidden sm:block">
-              {/* Desktop: apply truncation */}
-              {(() => {
-                const city = item.city || "Unknown";
-                const state = item.state || "Unknown";
-                const combined = `${city}, ${state}`;
-                return combined.length > 12
-                  ? combined.slice(0, 14) + "..."
-                  : combined;
-              })()}
-            </span>
+            {`${item.city || "Unknown"}, ${item.state || "Unknown"}`}
           </p>
 
           <div className="flex items-center gap-1 text-gray-600">
-            <AiFillStar size={16} />
-            <p className="text-sm  text-gray-600 font-medium">
+            <AiFillStar size={14} className="md:w-4 md:h-4" />
+            <p className="text-xs md:text-sm text-gray-600 font-medium">
               ({item.ratings || 0})
             </p>
           </div>
-          {/* <p className="text-sm font-semibold">
-            <span className="font-normal">Reviews</span> (
-            {item.reviewCount || 0})
-          </p> */}
         </div>
       </div>
     </div>

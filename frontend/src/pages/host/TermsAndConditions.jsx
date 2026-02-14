@@ -242,7 +242,7 @@ const HostTermsAndConditions = () => {
         <img
           src={blueUnderline}
           alt=""
-          className="absolute top-[100%] w-[60%] h-[40%]"
+          className="absolute top-full left-1/2 -translate-x-1/2 w-full h-[40%]"
         />
       </div>
 

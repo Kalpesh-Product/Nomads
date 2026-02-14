@@ -169,138 +169,131 @@ const Contact = () => {
             </div> */}
 
             {/* Connect With Us - MUI Styled Form */}
-            <div className="md:px-40">
+            <div className="md:px-20 lg:px-40">
               <Box
                 component="form"
                 onSubmit={handleSubmit((data) => submitContactForm(data))}
                 sx={{ mt: 0 }}
+                className="bg-gray-50/50 p-6 md:p-10 rounded-2xl border border-gray-100 shadow-sm"
               >
-                <h2 className="text-title font-semibold uppercase mb-4 text-center md:text-center">
+                <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold uppercase mb-8 text-center">
                   Connect With Us
                 </h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                   {/* Name */}
-                  <div className="">
-                    <Controller
-                      name="name"
-                      control={control}
-                      rules={{ required: "Name is required" }}
-                      render={({ field, fieldState }) => (
-                        <TextField
-                          {...field}
-                          fullWidth
-                          label="Name"
-                          variant="standard"
-                          required
-                          error={!!fieldState.error}
-                          helperText={fieldState.error?.message}
-                          InputLabelProps={{ sx: floatingLabelSx }}
-                        />
-                      )}
-                    />
-                  </div>
+                  <Controller
+                    name="name"
+                    control={control}
+                    rules={{ required: "Name is required" }}
+                    render={({ field, fieldState }) => (
+                      <TextField
+                        {...field}
+                        fullWidth
+                        label="Name"
+                        variant="standard"
+                        required
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message}
+                        InputLabelProps={{ sx: floatingLabelSx }}
+                      />
+                    )}
+                  />
 
                   {/* Email */}
-                  <div className="">
-                    <Controller
-                      name="email"
-                      control={control}
-                      rules={{
-                        required: "Email is required",
-                        pattern: {
-                          value: /^\S+@\S+$/i,
-                          message: "Invalid email address",
-                        },
-                      }}
-                      render={({ field, fieldState }) => (
-                        <TextField
-                          {...field}
-                          fullWidth
-                          label="Email"
-                          variant="standard"
-                          required
-                          error={!!fieldState.error}
-                          helperText={fieldState.error?.message}
-                          InputLabelProps={{ sx: floatingLabelSx }}
-                        />
-                      )}
-                    />
-                  </div>
+                  <Controller
+                    name="email"
+                    control={control}
+                    rules={{
+                      required: "Email is required",
+                      pattern: {
+                        value: /^\S+@\S+$/i,
+                        message: "Invalid email address",
+                      },
+                    }}
+                    render={({ field, fieldState }) => (
+                      <TextField
+                        {...field}
+                        fullWidth
+                        label="Email"
+                        variant="standard"
+                        required
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message}
+                        InputLabelProps={{ sx: floatingLabelSx }}
+                      />
+                    )}
+                  />
 
                   {/* Mobile */}
-                  <div className="">
-                    <Controller
-                      name="mobile"
-                      control={control}
-                      rules={{
-                        required: "Mobile number is required",
-                        validate: isValidInternationalPhone,
-                      }}
-                      render={({ field, fieldState }) => (
-                        <TextField
-                          {...field}
-                          fullWidth
-                          label="Mobile Number"
-                          variant="standard"
-                          required
-                          error={!!fieldState.error}
-                          helperText={fieldState.error?.message}
-                          InputLabelProps={{ sx: floatingLabelSx }}
-                        />
-                      )}
-                    />
-                  </div>
+                  <Controller
+                    name="mobile"
+                    control={control}
+                    rules={{
+                      required: "Mobile number is required",
+                      validate: isValidInternationalPhone,
+                    }}
+                    render={({ field, fieldState }) => (
+                      <TextField
+                        {...field}
+                        fullWidth
+                        label="Mobile Number"
+                        variant="standard"
+                        required
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message}
+                        InputLabelProps={{ sx: floatingLabelSx }}
+                      />
+                    )}
+                  />
 
                   {/* Reason to Connect */}
-                  <div className="pt-0 pl-0 lg:pt-0 lg:pl-0">
-                    <Controller
-                      name="typeOfPartnerShip"
-                      control={control}
-                      rules={{ required: "Please select a partnership type" }}
-                      render={({ field, fieldState }) => (
-                        <TextField
-                          {...field} // ✅ This connects value, onChange, ref
-                          fullWidth
-                          required
-                          variant="standard"
-                          error={!!fieldState.error}
-                          label="Reason to Connect"
-                          select
-                          helperText={fieldState?.error?.message}
-                          InputLabelProps={{ sx: floatingLabelSx }}
-                        >
-                          <MenuItem value="" disabled>
-                            Select Type
-                          </MenuItem>
-                          <MenuItem value="Nomad Booking Query">
-                            Nomad Booking Query
-                          </MenuItem>
-                          <MenuItem value="Workation Booking Query">
-                            Workation Booking Query
-                          </MenuItem>
-                          <MenuItem value="Nomad & WoNo Partnerships">
-                            Nomad & WoNo Partnerships
-                          </MenuItem>
-                          <MenuItem value="B2B SaaS Technology Licensing">
-                            B2B SaaS Technology Licensing
-                          </MenuItem>
-                          <MenuItem value="Landlord Partnerships">
-                            Landlord Partnerships
-                          </MenuItem>
-                          <MenuItem value="Investment Related">
-                            Investment Related
-                          </MenuItem>
-                          <MenuItem value="Coffee Meeting to know us better">
-                            Coffee Meeting to know us better
-                          </MenuItem>
-                        </TextField>
-                      )}
-                    />
-                  </div>
+                  <Controller
+                    name="typeOfPartnerShip"
+                    control={control}
+                    rules={{ required: "Please select a partnership type" }}
+                    render={({ field, fieldState }) => (
+                      <TextField
+                        {...field}
+                        fullWidth
+                        required
+                        variant="standard"
+                        error={!!fieldState.error}
+                        label="Reason to Connect"
+                        select
+                        helperText={fieldState?.error?.message}
+                        InputLabelProps={{ sx: floatingLabelSx }}
+                      >
+                        <MenuItem value="" disabled>
+                          Select Type
+                        </MenuItem>
+                        <MenuItem value="Nomad Booking Query">
+                          Nomad Booking Query
+                        </MenuItem>
+                        <MenuItem value="Workation Booking Query">
+                          Workation Booking Query
+                        </MenuItem>
+                        <MenuItem value="Nomad & WoNo Partnerships">
+                          Nomad & WoNo Partnerships
+                        </MenuItem>
+                        <MenuItem value="B2B SaaS Technology Licensing">
+                          B2B SaaS Technology Licensing
+                        </MenuItem>
+                        <MenuItem value="Landlord Partnerships">
+                          Landlord Partnerships
+                        </MenuItem>
+                        <MenuItem value="Investment Related">
+                          Investment Related
+                        </MenuItem>
+                        <MenuItem value="Coffee Meeting to know us better">
+                          Coffee Meeting to know us better
+                        </MenuItem>
+                      </TextField>
+                    )}
+                  />
 
                   {/* Message */}
-                  <div className=" md:col-span-2">
+                  <div className="md:col-span-2">
                     <Controller
                       name="message"
                       control={control}
@@ -331,9 +324,12 @@ const Contact = () => {
                       sx={{
                         bgcolor: "black",
                         borderRadius: 20,
-                        px: 14,
-                        py: 1,
+                        px: { xs: 6, md: 14 },
+                        py: 1.5,
+                        fontSize: "1rem",
+                        fontWeight: "600",
                         "&:hover": { bgcolor: "#333" },
+                        width: { xs: "100%", md: "auto" },
                       }}
                     >
                       {isContactPending && (
