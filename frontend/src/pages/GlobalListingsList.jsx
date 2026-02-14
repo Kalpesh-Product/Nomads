@@ -7,7 +7,7 @@ import { AiFillStar } from "react-icons/ai";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import Container from "../components/Container";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+
 import Map from "../components/Map";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "../utils/axios.js";
