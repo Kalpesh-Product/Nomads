@@ -381,10 +381,11 @@ const Home = () => {
         <div className="min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 lg:mx-auto px-6 sm:px-6 lg:px-0">
           <div className="py-12  hidden lg:block">
             <div className="flex flex-col  gap-4 justify-between items-center">
+
               <form
                 onSubmit={handleSubmit(onSubmit)}
                 className=" flex justify-around md:w-full lg:w-full border-2 bg-gray-50 rounded-full p-0 items-center"
-                // className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
+              // className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
               >
                 <Controller
                   name="continent"
@@ -598,7 +599,7 @@ const Home = () => {
               </div>
 
               {/* Right: Image */}
-              <div className="lg:w-1/2 h-[38rem]">
+              <div className="lg:w-1/2 h-[40vh] md:h-[32rem] lg:h-[38rem]">
                 <div className="rounded-md h-full overflow-hidden shadow-lg border border-purple-200">
                   <img
                     src={Image}
@@ -639,16 +640,11 @@ const Home = () => {
               Solutions for your aspiring destinations.
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 afterPro:grid-cols-5 gap-6">
+            <div className="flex overflow-x-auto lg:grid lg:grid-cols-5 gap-6 pb-4 lg:pb-0 custom-scrollbar-hide snap-x">
               {destinationData.map((item, idx) => (
                 <div
                   key={idx}
-                  className={`w-full sm:w-full md:w-full afterPro:w-60 flex flex-col items-center  ${
-                    idx === destinationData.length - 1 &&
-                    destinationData.length % 2 !== 0
-                      ? "md:col-span-2 afterPro:col-span-1"
-                      : ""
-                  }`}
+                  className="flex-shrink-0 w-64 snap-start flex flex-col items-center lg:w-full"
                 >
                   <div className="relative w-full rounded-xl overflow-hidden shadow-md">
                     <img
@@ -656,12 +652,6 @@ const Home = () => {
                       alt={item.label}
                       className="w-full h-96 object-cover"
                     />
-                    {/* <div className="absolute top-2 left-2 bg-white text-xs font-medium text-gray-700 px-2 py-1 rounded-full shadow">
-                    Guest favourite
-                  </div> */}
-                    {/* <div className="absolute top-2 right-2 shadow">
-                    <AiOutlineHeart className="text-white text-xl" />
-                  </div> */}
                   </div>
                   <p className="mt-6 text-sm md:text-base font-medium text-gray-800 text-center uppercase">
                     {item.label}
@@ -677,7 +667,7 @@ const Home = () => {
             <h2 className="text-2xl md:text-3xl font-medium text-left mb-10 text-primary-blue uppercase">
               Platform Inclusions.
             </h2>
-            <div className="grid grid-cols-2 md:grid-cols-3  lg:grid-cols-5 gap-x-16 md:gap-x-16 lg:gap-x-28 gap-y-10">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-4 md:gap-x-16 lg:gap-x-28 gap-y-10">
               {amenities.map((item, index) => (
                 <Amenities
                   key={index}
@@ -694,17 +684,18 @@ const Home = () => {
             <h1 className="text-title font-medium text-primary-blue uppercase">
               Happy customers.
             </h1>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-0 lg:p-6">
+            <div className="flex overflow-x-auto lg:grid lg:grid-cols-3 gap-6 pb-6 lg:pb-0 custom-scrollbar-hide snap-x">
               {reviewData.length > 0 ? (
                 reviewData.map((review, index) => (
-                  <ReviewCard
-                    handleClick={() => {
-                      setSelectedReview(review);
-                      setOpen(true);
-                    }}
-                    key={index}
-                    review={review}
-                  />
+                  <div key={index} className="flex-shrink-0 min-w-[280px] w-[90vw] max-w-[350px] sm:w-[350px] lg:w-full snap-start">
+                    <ReviewCard
+                      handleClick={() => {
+                        setSelectedReview(review);
+                        setOpen(true);
+                      }}
+                      review={review}
+                    />
+                  </div>
                 ))
               ) : (
                 <div className="col-span-full border-2 border-dotted border-gray-300 rounded-xl p-6 text-center text-sm text-gray-500 h-40 flex justify-center items-center">

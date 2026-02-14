@@ -3,7 +3,6 @@ import { TextField, Button, Avatar } from "@mui/material";
 import useAuth from "../hooks/useAuth";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import useLogout from "../hooks/useLogout";
-// import toast from "react-hot-toast";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Favorites from "./Favorites";
@@ -12,7 +11,6 @@ import { CircularProgress } from "@mui/material";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 
 const Profile = () => {
-  // const [activeTab, setActiveTab] = useState("profile");
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
   const queryClient = useQueryClient();
@@ -26,13 +24,12 @@ const Profile = () => {
 
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Default tab
   const initialTab = searchParams.get("tab") || "profile";
   const [activeTab, setActiveTab] = useState(initialTab);
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
-    setSearchParams({ tab }); // update URL when switching tabs
+    setSearchParams({ tab });
   };
 
   const [editMode, setEditMode] = useState(false);
@@ -50,9 +47,6 @@ const Profile = () => {
     confirmPassword: "",
   });
 
-  // const handleTabChange = (tab) => setActiveTab(tab);
-
-  // users cannot access this page without login
   useEffect(() => {
     if (!auth?.user) navigate("/login", { replace: true });
   }, [auth, navigate]);
@@ -62,23 +56,11 @@ const Profile = () => {
     setActiveTab(tab);
   }, [searchParams]);
 
-  // const handleLogout = async () => {
-  //   try {
-  //     await logout();
-  //     navigate("/login");
-  //   } catch (error) {
-  //     console.error("Logout failed:", error);
-  //   }
-  // };
-
   const handleLogout = async () => {
-    if (isLogoutLoading) return; // Prevent double clicks
-
+    if (isLogoutLoading) return;
     setIsLogoutLoading(true);
-
     try {
       await logout();
-      // toast.success("Logged out");
       navigate("/login");
     } catch (error) {
       console.error("Logout failed:", error);
@@ -88,13 +70,11 @@ const Profile = () => {
     }
   };
 
-  // 🔹 Handle profile field changes
   const handleProfileChange = (e) => {
     const { name, value } = e.target;
     setProfileForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // 🔹 Update Profile Mutation
   const { mutate: updateProfile, isPending: isUpdatePending } = useMutation({
     mutationKey: ["updateProfile"],
     mutationFn: async ({ userId, profileData }) => {
@@ -118,13 +98,11 @@ const Profile = () => {
     },
   });
 
-  // 🔹 Handle password change
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
     setPasswordForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // 🔹 Change Password Mutation (using TanStack)
   const { mutate: changePassword, isPending: isPasswordPending } = useMutation({
     mutationKey: ["changePassword"],
     mutationFn: async ({
@@ -140,22 +118,16 @@ const Profile = () => {
       });
       return response.data;
     },
-
     onSuccess: async (data) => {
       showSuccessAlert(data.message || "Password changed successfully");
-
-      // Clear form
       setPasswordForm({
         oldPassword: "",
         newPassword: "",
         confirmPassword: "",
       });
-
-      // Force logout immediately
       await logout();
       navigate("/login", { replace: true });
     },
-
     onError: (error) => {
       showErrorAlert(
         error.response?.data?.message || "Failed to change password",
@@ -165,46 +137,40 @@ const Profile = () => {
 
   const handlePasswordSubmit = () => {
     const { oldPassword, newPassword, confirmPassword } = passwordForm;
-
     if (!oldPassword || !newPassword || !confirmPassword)
       return showErrorAlert("All fields are required");
-
     if (newPassword !== confirmPassword)
       return showErrorAlert("New passwords do not match");
-
     changePassword({ userId, oldPassword, newPassword, confirmPassword });
   };
 
   return (
-    <div className="bg-[#f8f9fc] min-h-screen p-6 font-sans text-[#364D59]">
-      {/* Tabs */}
-      <div className="flex mb-6 border rounded-lg overflow-hidden max-w-3xl mx-auto">
+    <div className="bg-[#f8f9fc] min-h-screen p-4 sm:p-6 font-sans text-[#364D59]">
+      {/* Tabs - Desktop style preserved, stacks on very small screens */}
+      <div className="flex flex-col sm:flex-row mb-6 border rounded-lg overflow-hidden max-w-3xl mx-auto">
         <button
-          className={`flex-1 py-3 font-semibold ${
-            activeTab === "profile"
+          className={`flex-1 py-3 font-semibold text-sm sm:text-base ${activeTab === "profile"
               ? "bg-[#ff5757] text-white"
               : "bg-white text-[#ff5757]"
-          }`}
+            }`}
           onClick={() => handleTabChange("profile")}
         >
           Profile
         </button>
         <button
-          className={`flex-1 py-3 font-semibold ${
-            activeTab === "password"
+          className={`flex-1 py-3 font-semibold text-sm sm:text-base border-t sm:border-t-0 sm:border-l ${activeTab === "password"
               ? "bg-[#ff5757] text-white"
               : "bg-white text-[#ff5757]"
-          }`}
+            }`}
           onClick={() => handleTabChange("password")}
         >
           Change Password
         </button>
         <button
-          className={`flex-1 py-3 font-semibold ${
-            activeTab === "favorites"
+          className={`flex-1 py-3 font-semibold text-sm sm:text-base border-t sm:border-t-0 sm:border-l ${activeTab === "favorites"
               ? "bg-[#ff5757] text-white"
               : "bg-white text-[#ff5757]"
-          }`}
+            }`}
           onClick={() => handleTabChange("favorites")}
         >
           Favorites
@@ -221,13 +187,14 @@ const Profile = () => {
         </button>
       </div>
 
-      {/* PROFILE TAB */}
+      {/* PROFILE TAB - Desktop layout preserved, responsive adjustments */}
       {activeTab === "profile" && (
-        <div className="bg-white p-6 rounded-lg shadow-sm max-w-5xl mx-auto">
-          <h2 className="text-xl font-bold text-[#ff5757] mb-4">MY PROFILE</h2>
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm max-w-5xl mx-auto">
+          <h2 className="text-lg sm:text-xl font-bold text-[#ff5757] mb-4">MY PROFILE</h2>
 
-          <div className="flex flex-col md:flex-row items-center justify-between border p-4 rounded-lg">
-            <div className="flex items-center gap-6">
+          {/* Profile Header - Stacks on mobile, side-by-side on desktop */}
+          <div className="flex flex-col md:flex-row items-center justify-between border p-4 rounded-lg gap-4 md:gap-0">
+            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-center sm:text-left">
               <Avatar
                 sx={{
                   bgcolor: "#ff5757",
@@ -239,63 +206,50 @@ const Profile = () => {
                 {user?.firstName ? user.firstName.charAt(0).toUpperCase() : "U"}
               </Avatar>
               <div>
-                <h3 className="text-lg font-semibold">
+                <h3 className="text-base sm:text-lg font-semibold">
                   {`${user?.firstName || ""} ${user?.lastName || ""}`.trim() ||
                     "User Name"}
                 </h3>
-                {/* <p className="text-sm text-gray-600">
-                  {user?.country || "N/A"}
-                </p> */}
               </div>
             </div>
 
-            <div className="text-sm mt-4 md:mt-0">
+            <div className="text-sm mt-2 md:mt-0 text-center md:text-left">
               <p>
                 <b>Email:</b> {user?.email || "N/A"}
               </p>
               <p>
                 <b>Mobile:</b> {user?.mobile || "N/A"}
               </p>
-              <br />
-              {/* <Button
-                variant="contained"
-                sx={{
-                  bgcolor: "#ff5757",
-                  textTransform: "none",
-                  px: 6,
-                  "&:hover": { bgcolor: "#fc6b6b" },
-                }}
-                onClick={handleLogout}
-              >
-                Logout
-              </Button> */}
-              <Button
-                variant="contained"
-                sx={{
-                  bgcolor: "#ff5757",
-                  textTransform: "none",
-                  px: 6,
-                  "&:hover": { bgcolor: "#fc6b6b" },
-                }}
-                onClick={handleLogout}
-                disabled={isLogoutLoading}
-              >
-                {isLogoutLoading ? (
-                  <CircularProgress size={22} sx={{ color: "white" }} />
-                ) : (
-                  "Logout"
-                )}
-              </Button>
+              <div className="mt-3">
+                <Button
+                  variant="contained"
+                  sx={{
+                    bgcolor: "#ff5757",
+                    textTransform: "none",
+                    px: 6,
+                    "&:hover": { bgcolor: "#fc6b6b" },
+                  }}
+                  onClick={handleLogout}
+                  disabled={isLogoutLoading}
+                >
+                  {isLogoutLoading ? (
+                    <CircularProgress size={22} sx={{ color: "white" }} />
+                  ) : (
+                    "Logout"
+                  )}
+                </Button>
+              </div>
             </div>
           </div>
 
-          {/* Personal Info */}
+          {/* Personal Info - Desktop: 3 columns, Tablet: 2 columns, Mobile: 1 column */}
           <div className="mt-6 border rounded-lg p-4">
             <h3 className="font-semibold mb-4">Personal Information</h3>
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <TextField
                 label="First Name"
                 size="small"
+                fullWidth
                 name="firstName"
                 value={profileForm.firstName}
                 onChange={handleProfileChange}
@@ -304,6 +258,7 @@ const Profile = () => {
               <TextField
                 label="Last Name"
                 size="small"
+                fullWidth
                 name="lastName"
                 value={profileForm.lastName}
                 onChange={handleProfileChange}
@@ -312,6 +267,7 @@ const Profile = () => {
               <TextField
                 label="Mobile"
                 size="small"
+                fullWidth
                 name="mobile"
                 value={profileForm.mobile}
                 onChange={handleProfileChange}
@@ -371,13 +327,13 @@ const Profile = () => {
         </div>
       )}
 
-      {/* CHANGE PASSWORD TAB */}
+      {/* CHANGE PASSWORD TAB - Desktop style preserved, responsive padding */}
       {activeTab === "password" && (
-        <div className="bg-white py-6 px-4 md:px-32 rounded-lg shadow-sm max-w-3xl mx-auto">
-          <h2 className="text-xl text-center font-bold text-[#ff5757] mb-4">
+        <div className="bg-white py-6 px-4 sm:px-8 md:px-16 lg:px-32 rounded-lg shadow-sm max-w-3xl mx-auto">
+          <h2 className="text-lg sm:text-xl text-center font-bold text-[#ff5757] mb-4">
             CHANGE PASSWORD
           </h2>
-          <div className="grid md:grid-cols-1 gap-4 mb-3">
+          <div className="grid gap-4 mb-3">
             <TextField
               label="Current Password"
               type="password"

@@ -28,7 +28,7 @@ const NomadLayout = () => {
         <Outlet />
         {/* <Toaster /> */}
       </div>
-      <Footer />
+      {(location.pathname !== "/verticals" || window.innerWidth >= 1024) && <Footer />}
     </div>
   );
 };

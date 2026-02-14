@@ -382,11 +382,11 @@ const NomadContentUseRemoval = () => {
   ];
 
   return (
-    <div className="flex flex-col gap-10 px-6 lg:px-28 pb-4 pt-12 text-[#364D59]">
+    <div className="flex flex-col gap-10 px-6 md:px-12 lg:px-28 pb-8 md:pb-12 pt-12 text-[#364D59]">
       {/* Header */}
-      <div className="flex flex-col items-center relative font-comic uppercase font-bold text-secondary-dark text-[clamp(1.5rem,4vw,3rem)] leading-tight">
-        <div className="relative inline-block">
-          <h3 className="text-center">Content Use & Removal Policy</h3>
+      <div className="flex flex-col items-center relative font-comic uppercase font-bold text-secondary-dark text-2xl md:text-4xl lg:text-5xl leading-tight">
+        <div className="relative inline-block text-center">
+          <h3>Content Use & Removal Policy</h3>
           <img
             src={blueUnderline}
             alt=""
@@ -396,11 +396,11 @@ const NomadContentUseRemoval = () => {
       </div>
 
       {/* Sections */}
-      <div>
+      <div className="space-y-8">
         {sections.map((section, i) => (
           <div key={i}>
-            <div className="flex flex-col gap-4 my-4 font-sans">
-              <h4 className="font-sans text-subtitle font-semibold">
+            <div className="flex flex-col gap-4 font-sans">
+              <h4 className="font-sans text-lg md:text-xl lg:text-2xl font-semibold">
                 {section.title}
               </h4>
               <div className="text-content">{section.content}</div>
