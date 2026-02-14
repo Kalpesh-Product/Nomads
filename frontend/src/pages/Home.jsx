@@ -599,7 +599,7 @@ const Home = () => {
               </div>
 
               {/* Right: Image */}
-              <div className="lg:w-1/2 h-[40vh] md:h-[50vh] lg:h-[38rem]">
+              <div className="lg:w-1/2 h-[40vh] md:h-[32rem] lg:h-[38rem]">
                 <div className="rounded-md h-full overflow-hidden shadow-lg border border-purple-200">
                   <img
                     src={Image}
@@ -640,7 +640,7 @@ const Home = () => {
               Solutions for your aspiring destinations.
             </h2>
 
-            <div className="flex overflow-x-auto lg:grid lg:grid-cols-5 gap-6 pb-4 lg:pb-0 scrollbar-hide snap-x">
+            <div className="flex overflow-x-auto lg:grid lg:grid-cols-5 gap-6 pb-4 lg:pb-0 custom-scrollbar-hide snap-x">
               {destinationData.map((item, idx) => (
                 <div
                   key={idx}
@@ -684,10 +684,10 @@ const Home = () => {
             <h1 className="text-title font-medium text-primary-blue uppercase">
               Happy customers.
             </h1>
-            <div className="flex overflow-x-auto lg:grid lg:grid-cols-3 gap-6 pb-6 lg:pb-0 scrollbar-hide snap-x">
+            <div className="flex overflow-x-auto lg:grid lg:grid-cols-3 gap-6 pb-6 lg:pb-0 custom-scrollbar-hide snap-x">
               {reviewData.length > 0 ? (
                 reviewData.map((review, index) => (
-                  <div key={index} className="flex-shrink-0 w-[300px] sm:w-[350px] lg:w-full snap-start">
+                  <div key={index} className="flex-shrink-0 min-w-[280px] w-[90vw] max-w-[350px] sm:w-[350px] lg:w-full snap-start">
                     <ReviewCard
                       handleClick={() => {
                         setSelectedReview(review);

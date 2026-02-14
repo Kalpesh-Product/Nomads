@@ -6,7 +6,7 @@ import { CiSearch } from "react-icons/ci";
 import { AiFillStar } from "react-icons/ai";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import Container from "../components/Container";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import Map from "../components/Map";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "../utils/axios.js";
@@ -66,7 +66,9 @@ const HorizontalScrollWrapper = ({ children, title }) => {
             aria-label="Previous"
             type="button"
             disabled={!showLeft}
-            className={`transition-all hover:scale-105 active:scale-95 flex items-center justify-center w-[28px] h-[28px] md:w-[32px] md:h-[32px] rounded-full border border-gray-200 shadow-sm ${showLeft ? "bg-white text-gray-800 opacity-100" : "bg-gray-50 text-gray-300 opacity-50 cursor-not-allowed"
+            className={`transition-all hover:scale-105 active:scale-95 flex items-center justify-center w-[28px] h-[28px] md:w-[32px] md:h-[32px] rounded-full border border-gray-200 shadow-sm ${showLeft
+              ? "bg-white text-gray-800 opacity-100"
+              : "bg-gray-50 text-gray-300 opacity-50 cursor-not-allowed"
               }`}
             style={{ boxShadow: showLeft ? "0 2px 4px rgba(0,0,0,0.1)" : "none" }}
           >
@@ -94,7 +96,9 @@ const HorizontalScrollWrapper = ({ children, title }) => {
             aria-label="Next"
             type="button"
             disabled={!showRight}
-            className={`transition-all hover:scale-105 active:scale-95 flex items-center justify-center w-[28px] h-[28px] md:w-[32px] md:h-[32px] rounded-full border border-gray-200 shadow-sm ${showRight ? "bg-white text-gray-800 opacity-100" : "bg-gray-50 text-gray-300 opacity-50 cursor-not-allowed"
+            className={`transition-all hover:scale-105 active:scale-95 flex items-center justify-center w-[28px] h-[28px] md:w-[32px] md:h-[32px] rounded-full border border-gray-200 shadow-sm ${showRight
+              ? "bg-white text-gray-800 opacity-100"
+              : "bg-gray-50 text-gray-300 opacity-50 cursor-not-allowed"
               }`}
             style={{ boxShadow: showRight ? "0 2px 4px rgba(0,0,0,0.1)" : "none" }}
           >
@@ -132,7 +136,10 @@ const HorizontalScrollWrapper = ({ children, title }) => {
 
 const GlobalListingsList = () => {
   const [favorites, setFavorites] = useState([]);
+  const [expandedCategories, setExpandedCategories] = useState([]);
+  const location = useLocation();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const formData = useSelector((state) => state.location.formValues);
   const { handleSubmit, control, reset, setValue, getValues, watch } = useForm({
     defaultValues: {
@@ -148,7 +155,7 @@ const GlobalListingsList = () => {
   const selectedCountry = watch("country");
   const selectedState = watch("location");
 
-  // 🧠 Special users who can see all locations
+  // Special users who can see all locations
   const specialUserEmails = [
     "allan.wono@gmail.com",
     "muskan.wono@gmail.com",
@@ -160,17 +167,6 @@ const GlobalListingsList = () => {
     "vishal.wono@gmail.com",
   ];
 
-  // const { data: locations = [], isLoading: isLocations } = useQuery({
-  //   queryKey: ["locations"],
-  //   queryFn: async () => {
-  //     try {
-  //       const response = await axios.get("company/company-locations");
-  //       return Array.isArray(response.data) ? response.data : [];
-  //     } catch (error) {
-  //       console.error(error?.response?.data?.message);
-  //     }
-  //   },
-  // });
   const { data: locations = [], isLoading: isLocations } = useQuery({
     queryKey: ["locations", user?.email],
     queryFn: async () => {
@@ -181,12 +177,8 @@ const GlobalListingsList = () => {
         const userEmail = user?.email?.toLowerCase();
         const isSpecialUser = specialUserEmails.includes(userEmail);
 
-        // 🧠 Special users can see everything
         if (isSpecialUser) return rawData;
 
-        // 🚫 For regular users:
-        // 1️⃣ Keep only public states
-        // 2️⃣ Drop countries that have zero public states
         return rawData
           .map((country) => ({
             ...country,
@@ -212,39 +204,14 @@ const GlobalListingsList = () => {
       .sort((a, b) => a.label.localeCompare(b.label));
   }, [locations]);
 
-  // const countryOptions = locations
-  //   .map((item) => ({
-  //     label: item.country
-  //       ? item.country.charAt(0).toUpperCase() + item.country.slice(1)
-  //       : "",
-  //     value: item.country?.toLowerCase(),
-  //   }))
-  //   .sort((a, b) => a.label.localeCompare(b.label));
-  // -------------------------------------
-  // 🔒 Country filtering based on user email
-  // -------------------------------------
-  // const specialUserEmails = [
-  //   "allan.wono@gmail.com",
-  //   "muskan.wono@gmail.com",
-  //   "shawnsilveira.wono@gmail.com",
-  //   "mehak.wono@gmail.com",
-  //   "k@k.k",
-  //   "savita.wono@gmail.com",
-  // ]; // add more if needed
-
-  // Countries only visible to special users
-  // const specialCountries = ["americac"]; // lowercase preferred
-
-  // 👇 Add this line before building countries
   const selectedContinent = watch("continent");
 
-  // Build countries based on selected continent
   const allCountryOptions = React.useMemo(() => {
     let filtered = locations;
     if (selectedContinent) {
       filtered = locations.filter(
         (item) =>
-          item.continent?.toLowerCase() === selectedContinent?.toLowerCase(),
+          item.continent?.toLowerCase() === selectedContinent?.toLowerCase()
       );
     }
 
@@ -260,12 +227,8 @@ const GlobalListingsList = () => {
 
   const countryOptions = useMemo(() => allCountryOptions, [allCountryOptions]);
 
-  // const specialLocationMap = {
-  //   america: ["americal", "americani"], // lowercase names
-  // };
-
   const filteredLocation = locations.find(
-    (item) => item.country?.toLowerCase() === selectedCountry?.toLowerCase(),
+    (item) => item.country?.toLowerCase() === selectedCountry?.toLowerCase()
   );
   const locationOptions = useMemo(() => {
     return (
@@ -281,7 +244,7 @@ const GlobalListingsList = () => {
     const normalizedLocation = formData.location.toLowerCase();
     return (
       locationOptions.find(
-        (option) => option.value?.toLowerCase() === normalizedLocation,
+        (option) => option.value?.toLowerCase() === normalizedLocation
       )?.label || formData.location
     );
   }, [formData?.location, locationOptions]);
@@ -292,15 +255,7 @@ const GlobalListingsList = () => {
     { label: "10 - 25", value: "10-25" },
     { label: "25+", value: "25+" },
   ];
-  // const categoryOptions = [
-  //   { label: "Co-Working", value: "coworking" },
-  //   // { label: "Co-Living", value: "coliving" },
-  //   { label: "Hostels", value: "hostel" },
-  //   { label: "Workation", value: "workation" },
-  //   { label: "Private Stay", value: "privatestay" },
-  //   { label: "Meetings", value: "meetingRoom" },
-  //   { label: "Cafe’s", value: "cafe" },
-  // ];
+
   const typeOrder = [
     "coworking",
     "hostel",
@@ -310,29 +265,28 @@ const GlobalListingsList = () => {
     "meetingRoom",
     "cafe",
   ];
-  console.log("formData", formData);
-  // Removed handleShowMoreClick as it's replaced by horizontal scroll
+
+  const handleShowMoreClick = (type) => {
+    setExpandedCategories((prev) =>
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
+    );
+  };
 
   const { data: listingsData, isPending: isLisitingLoading } = useQuery({
-    queryKey: ["globallistings", formData], // ✅ ensures it refetches when formData changes
+    queryKey: ["globallistings", formData],
     queryFn: async () => {
       const { country, location, category } = formData || {};
 
       const response = await axios.get(
-        `company/companiesn?country=${country}&state=${location}&userId=${userId || ""
-        }`,
+        `company/companiesn?country=${country}&state=${location}&userId=${userId || ""}`
       );
 
-      // return response.data;
       return Array.isArray(response.data) ? response.data : [];
     },
-    enabled: !!formData?.country && !!formData?.location, // ✅ prevents fetching on empty state
-    refetchOnMount: "always", // ✅ forces refetch on every mount
+    enabled: !!formData?.country && !!formData?.location,
+    refetchOnMount: "always",
   });
 
-  console.log("location data :", listingsData);
-
-  // derive categoryOptions from API response
   const categoryOptions = useMemo(() => {
     if (!listingsData || listingsData.length === 0) return [];
 
@@ -341,7 +295,7 @@ const GlobalListingsList = () => {
         listingsData
           .filter((item) => item.companyType !== "privatestay")
           .map((item) => item.companyType)
-          .filter(Boolean),
+          .filter(Boolean)
       ),
     ];
 
@@ -350,17 +304,14 @@ const GlobalListingsList = () => {
       coliving: "Co-Living",
       hostel: "Hostels",
       workation: "Workation",
-      // privatestay: "Private Stay",
       meetingroom: "Meetings",
-      cafe: "Cafe’s",
+      cafe: "Cafe's",
     };
 
-    // define desired order
     const typeOrder = [
       "coworking",
       "hostel",
       "workation",
-      // "privatestay",
       "coliving",
       "meetingroom",
       "cafe",
@@ -378,8 +329,6 @@ const GlobalListingsList = () => {
     return acc;
   }, {});
 
-  console.log("frou[ed ", groupedListings);
-
   const typeLabels = {
     coworking: "Co-Working Spaces",
     coliving: "Co-Living Spaces",
@@ -387,18 +336,17 @@ const GlobalListingsList = () => {
     privatestay: "Private Stays",
     meetingroom: "Meeting Rooms",
     cafe: "Cafes",
-    // fallback for unknown types
     default: (type) => `${type[0].toUpperCase() + type.slice(1)} Spaces`,
   };
 
   const toggleFavorite = (id) => {
     setFavorites((prev) =>
-      prev.includes(id) ? prev.filter((fav) => fav !== id) : [...prev, id],
+      prev.includes(id) ? prev.filter((fav) => fav !== id) : [...prev, id]
     );
   };
 
-  const navigate = useNavigate();
   const [showMobileSearch, setShowMobileSearch] = useState(false);
+
   const onSubmit = (data) => {
     locationData(data);
   };
@@ -408,11 +356,40 @@ const GlobalListingsList = () => {
     setValue("country", formData.country);
     setValue("location", formData.location);
     setValue("count", formData.count);
-  }, [formData]);
+  }, [formData, setValue]);
+
+  useEffect(() => {
+    const breadcrumbFilters = location.state?.breadcrumbFilters;
+    if (!breadcrumbFilters) return;
+
+    const normalizeValue = (value) =>
+      typeof value === "string" ? value.trim().toLowerCase() : value;
+
+    const normalizedContinent = normalizeValue(breadcrumbFilters.continent);
+    const normalizedCountry = normalizeValue(breadcrumbFilters.country);
+    const normalizedLocation = normalizeValue(breadcrumbFilters.location);
+
+    if (
+      normalizedContinent === normalizeValue(formData.continent) &&
+      normalizedCountry === normalizeValue(formData.country) &&
+      normalizedLocation === normalizeValue(formData.location)
+    ) {
+      return;
+    }
+
+    const nextFormValues = {
+      ...formData,
+      continent: normalizedContinent || "",
+      country: normalizedCountry || "",
+      location: normalizedLocation || "",
+    };
+
+    dispatch(setFormValues(nextFormValues));
+  }, [dispatch, formData, location.state]);
+
   const { mutate: locationData, isPending: isLocation } = useMutation({
     mutationFn: async (data) => {
       dispatch(setFormValues(data));
-      // use data directly here, not formData from Redux
       setShowMobileSearch(false);
       navigate(`/verticals?country=${data.country}&location=${data.location}`);
     },
@@ -425,7 +402,7 @@ const GlobalListingsList = () => {
   });
 
   const handleCategoryClick = (categoryValue) => {
-    const formData = getValues(); // from react-hook-form
+    const formData = getValues();
 
     if (!formData.country || !formData.location) {
       alert("Please select Country and Location first.");
@@ -433,14 +410,10 @@ const GlobalListingsList = () => {
     }
     dispatch(setFormValues({ ...formData, category: categoryValue }));
 
-    // const url = `/nomads/${formData.country}.${formData.location}/${categoryValue}`;
     const state = {
       ...formData,
       category: categoryValue,
     };
-
-    // console.log("Generated URL:", url);
-    console.log("State to be passed:", state);
 
     navigate(
       `/listings?country=${formData.country}&location=${formData.location}&category=${state.category}`,
@@ -450,10 +423,10 @@ const GlobalListingsList = () => {
           location: formData.location,
           category: categoryValue,
         },
-      },
+      }
     );
   };
-  // Prioritize BIZ Nest and MeWo first, then sort the rest by rating descending
+
   const prioritizedCompanies = ["BIZ Nest", "MeWo"];
   const sortedListings = [...(listingsData || [])].sort((a, b) => {
     const aIsPriority = prioritizedCompanies.includes(a.companyName);
@@ -462,21 +435,25 @@ const GlobalListingsList = () => {
     if (aIsPriority && !bIsPriority) return -1;
     if (!aIsPriority && bIsPriority) return 1;
 
-    // If both are priority or both are not, then sort by average rating descending
-    // const aRating =
-    //   a.reviews?.length > 0
-    //     ? a.reviews.reduce((sum, r) => sum + r.starCount, 0) / a.reviews.length
-    //     : 0;
-    // const bRating =
-    //   b.reviews?.length > 0
-    //     ? b.reviews.reduce((sum, r) => sum + r.starCount, 0) / b.reviews.length
-    //     : 0;
-
     const aRating = Number(a.ratings || 0);
     const bRating = Number(b.ratings || 0);
 
     return bRating - aRating;
   });
+
+  // Handle map navigation with validation
+  const handleShowMap = () => {
+    console.log("Show map clicked", { country: formData?.country, location: formData?.location });
+
+    if (!formData?.country || !formData?.location) {
+      alert("Please select a country and location first");
+      return;
+    }
+
+    const mapUrl = `/verticals?country=${encodeURIComponent(formData.country)}&location=${encodeURIComponent(formData.location)}&view=map`;
+    console.log("Navigating to:", mapUrl);
+    navigate(mapUrl);
+  };
 
   return (
     <>
@@ -499,23 +476,22 @@ const GlobalListingsList = () => {
         <meta property="og:type" content="website" />
         <link rel="canonical" href="https://wono.co/verticals" />
       </Helmet>
-      <div className="flex flex-col gap-2 lg:gap-6">
-        <div className="flex flex-col gap-4 justify-center items-center  w-full lg:mt-0">
-          <div className="w-full lg:min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-4 sm:px-6 lg:px-0">
-            <div className="hidden lg:flex flex-col gap-4 justify-between items-center w-full h-full">
-              {/* the 5 icons */}
 
-              <div className=" w-3/4 pb-4">
+      {/* ==================== DESKTOP VIEW (lg and above) ==================== */}
+      <div className="hidden lg:flex flex-col gap-6">
+        <div className="flex flex-col gap-4 justify-center items-center w-full">
+          <div className="min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0">
+            <div className="flex flex-col gap-4 justify-between items-center w-full h-full">
+              <div className="w-3/4 pb-4">
                 <div className="flex justify-between items-center">
                   {categoryOptions.map((cat) => {
                     const iconSrc = newIcons[cat.value];
-
                     return (
                       <button
                         key={cat.value}
                         type="button"
                         onClick={() => handleCategoryClick(cat.value)}
-                        className=" text-black  px-4 py-2   hover:text-black transition flex items-center justify-center w-full"
+                        className="text-black px-4 py-2 hover:text-black transition flex items-center justify-center w-full"
                       >
                         {iconSrc ? (
                           <div className="h-10 w-full flex flex-col gap-0">
@@ -525,10 +501,9 @@ const GlobalListingsList = () => {
                               className="h-full w-full object-contain"
                             />
                             <span className="text-sm">{cat.label}</span>
-                            <div></div>
                           </div>
                         ) : (
-                          cat.label // fallback if no icon found
+                          cat.label
                         )}
                       </button>
                     );
@@ -538,8 +513,7 @@ const GlobalListingsList = () => {
 
               <form
                 onSubmit={handleSubmit(onSubmit)}
-                className=" flex justify-around md:w-full lg:w-full border-2 bg-gray-50 rounded-full p-0 items-center"
-              // className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
+                className="flex justify-around md:w-full lg:w-full border-2 bg-gray-50 rounded-full p-0 items-center"
               >
                 <Controller
                   name="continent"
@@ -551,7 +525,7 @@ const GlobalListingsList = () => {
                       options={continentOptions}
                       label="Select Continent"
                       placeholder="Select continent"
-                      className="w-full "
+                      className="w-full"
                     />
                   )}
                 />
@@ -567,7 +541,7 @@ const GlobalListingsList = () => {
                       label="Select Country"
                       placeholder="Select aspiring destination"
                       disabled={!selectedContinent}
-                      className="w-full "
+                      className="w-full"
                     />
                   )}
                 />
@@ -599,22 +573,129 @@ const GlobalListingsList = () => {
                       label="Select Count"
                       placeholder="Booking for no. of Nomads"
                       disabled={!selectedState}
-                      className="w-full "
+                      className="w-full"
                     />
                   )}
                 />
                 <button
                   type="submit"
-                  className="w-fit h-full  bg-[#FF5757] text-white p-5 text-subtitle rounded-full"
+                  className="w-fit h-full bg-[#FF5757] text-white p-5 text-subtitle rounded-full"
                 >
                   <IoSearch />
                 </button>
               </form>
             </div>
+          </div>
+        </div>
+
+        <Container padding={false}>
+          <div className="">
+            <div className="font-semibold text-md">
+              <div className="custom-scrollbar-hide">
+                {isLisitingLoading ? (
+                  Array.from({ length: 4 }).map((_, i) => (
+                    <SkeletonCard key={i} />
+                  ))
+                ) : groupedListings && Object.keys(groupedListings).length > 0 ? (
+                  Object.entries(groupedListings)
+                    .sort(([typeA], [typeB]) => {
+                      const typeOrder = [
+                        "coworking",
+                        "hostel",
+                        "workation",
+                        "privatestay",
+                        "coliving",
+                        "meetingroom",
+                        "cafe",
+                      ];
+                      const indexA = typeOrder.indexOf(typeA);
+                      const indexB = typeOrder.indexOf(typeB);
+                      return (
+                        (indexA === -1 ? 999 : indexA) -
+                        (indexB === -1 ? 999 : indexB)
+                      );
+                    })
+                    .map(([type, items]) => {
+                      const prioritizedCompanies = ["BIZ Nest", "MeWo"];
+                      const sortedItems = [...items].sort((a, b) => {
+                        const aPriorityIndex = prioritizedCompanies.indexOf(
+                          a.companyName
+                        );
+                        const bPriorityIndex = prioritizedCompanies.indexOf(
+                          b.companyName
+                        );
+                        if (aPriorityIndex !== -1 && bPriorityIndex !== -1) {
+                          return aPriorityIndex - bPriorityIndex;
+                        }
+                        if (aPriorityIndex !== -1) return -1;
+                        if (bPriorityIndex !== -1) return 1;
+                        const aRating = Number(a.ratings || 0);
+                        const bRating = Number(b.ratings || 0);
+                        return bRating - aRating;
+                      });
+
+                      const displayItems = expandedCategories.includes(type)
+                        ? sortedItems
+                        : sortedItems.slice(0, 5);
+                      const showViewMore = sortedItems.length > 5;
+                      const sectionTitle = `Popular ${typeLabels[type] || typeLabels.default(type)} in ${selectedLocationLabel}`;
+
+                      return (
+                        <div key={type} className="col-span-full mb-6">
+                          <h2 className="text-subtitle font-semibold mb-5 text-secondary-dark">
+                            {sectionTitle}
+                          </h2>
+                          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-x-5 gap-y-0">
+                            {displayItems.map((item) => (
+                              <ListingCard
+                                key={item._id}
+                                item={item}
+                                showVertical={false}
+                                handleNavigation={() =>
+                                  navigate(
+                                    `/listings/${encodeURIComponent(item.companyName)}`,
+                                    {
+                                      state: {
+                                        companyId: item.companyId,
+                                        type: item.companyType,
+                                      },
+                                    }
+                                  )
+                                }
+                              />
+                            ))}
+                          </div>
+                          {showViewMore && (
+                            <div className="mt-3 text-right">
+                              <button
+                                onClick={() => handleShowMoreClick(type)}
+                                className="text-primary-blue text-sm font-semibold hover:underline"
+                              >
+                                {expandedCategories.includes(type)
+                                  ? "View Less ←"
+                                  : "View More →"}
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })
+                ) : (
+                  <div className="col-span-full text-center text-sm text-gray-500 border border-dotted rounded-lg p-4">
+                    No listings found.
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </Container>
+      </div>
+
+      {/* ==================== MOBILE/TABLET VIEW (below lg) ==================== */}
+      <div className="lg:hidden flex flex-col gap-2">
+        <div className="flex flex-col gap-4 justify-center items-center w-full lg:mt-0">
+          <div className="w-full lg:min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-4 sm:px-6 lg:px-0">
             <div className="lg:hidden w-full flex flex-col gap-4 mb-4">
-              {/* Category Selection Row - HORIZONTAL SCROLL ON MOBILE */}
-
-
               <button
                 onClick={() => setShowMobileSearch((prev) => !prev)}
                 className="bg-white shadow-md flex items-center w-[92%] mx-auto text-center justify-center font-medium text-secondary-dark border-2 px-6 py-2 rounded-full flex-col gap-1"
@@ -632,8 +713,8 @@ const GlobalListingsList = () => {
                 </span>
               </button>
             </div>
-            {/* div change */}
-            <div className="lg:hidden flex overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 flex md:justify-center">
+
+            <div className="lg:hidden flex overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 md:justify-center">
               {categoryOptions.map((cat) => {
                 const iconSrc = newIcons[cat.value];
                 return (
@@ -649,18 +730,19 @@ const GlobalListingsList = () => {
                         alt={cat.label}
                         className="h-full w-[90%] object-contain"
                       />
-                      <span className="text-[10px] font-medium whitespace-nowrap">{cat.label}</span>
+                      <span className="text-[10px] font-medium whitespace-nowrap">
+                        {cat.label}
+                      </span>
                     </div>
                   </button>
                 );
               })}
             </div>
           </div>
+
           <AnimatePresence>
             {showMobileSearch && (
               <motion.div
-                // initial={{ y: "-100%" }}
-                // animate={{ y: 0 }}
                 exit={{ y: "-100%" }}
                 transition={{ duration: 0.3 }}
                 className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 p-4 rounded-t-3xl lg:hidden h-[100dvh]"
@@ -687,11 +769,10 @@ const GlobalListingsList = () => {
                         options={continentOptions}
                         label="Select Continent"
                         placeholder="Select continent"
-                        className="w-full "
+                        className="w-full"
                       />
                     )}
                   />
-
                   <Controller
                     name="country"
                     control={control}
@@ -749,18 +830,16 @@ const GlobalListingsList = () => {
             )}
           </AnimatePresence>
         </div>
-        {/* <hr /> */}
+
         <Container padding={false}>
           <div className="">
             <div className="font-semibold text-md">
-              <div className=" custom-scrollbar-hide">
-                {/* Popular section */}
+              <div className="custom-scrollbar-hide">
                 {isLisitingLoading ? (
                   Array.from({ length: 4 }).map((_, i) => (
                     <SkeletonCard key={i} />
                   ))
-                ) : groupedListings &&
-                  Object.keys(groupedListings).length > 0 ? (
+                ) : groupedListings && Object.keys(groupedListings).length > 0 ? (
                   Object.entries(groupedListings)
                     .sort(([typeA], [typeB]) => {
                       const typeOrder = [
@@ -781,90 +860,63 @@ const GlobalListingsList = () => {
                     })
                     .map(([type, items]) => {
                       const prioritizedCompanies = ["BIZ Nest", "MeWo"];
-
                       const sortedItems = [...items].sort((a, b) => {
                         const aPriorityIndex = prioritizedCompanies.indexOf(
-                          a.companyName,
+                          a.companyName
                         );
                         const bPriorityIndex = prioritizedCompanies.indexOf(
-                          b.companyName,
+                          b.companyName
                         );
-
-                        // Both are priority companies
                         if (aPriorityIndex !== -1 && bPriorityIndex !== -1) {
-                          return aPriorityIndex - bPriorityIndex; // BIZ Nest (0) before MeWo (1)
+                          return aPriorityIndex - bPriorityIndex;
                         }
-
-                        // Only a is priority
                         if (aPriorityIndex !== -1) return -1;
-
-                        // Only b is priority
                         if (bPriorityIndex !== -1) return 1;
-
-                        // Fallback: sort by rating
-                        // const aRating =
-                        //   a.reviews?.length > 0
-                        //     ? a.reviews.reduce(
-                        //         (sum, r) => sum + r.starCount,
-                        //         0,
-                        //       ) / a.reviews.length
-                        //     : 0;
-                        // const bRating =
-                        //   b.reviews?.length > 0
-                        //     ? b.reviews.reduce(
-                        //         (sum, r) => sum + r.starCount,
-                        //         0,
-                        //       ) / b.reviews.length
-                        //     : 0;
-
                         const aRating = Number(a.ratings || 0);
                         const bRating = Number(b.ratings || 0);
-
                         return bRating - aRating;
                       });
 
                       const displayItems = sortedItems;
                       const hasMore = displayItems.length > 5;
-                      const itemsToShow = hasMore ? displayItems.slice(0, 5) : displayItems;
+                      const itemsToShow = hasMore
+                        ? displayItems.slice(0, 5)
+                        : displayItems;
 
-                      // We now use horizontal scroll navigation instead of View More
-                      const sectionTitle = `Popular ${typeLabels[type] || typeLabels.default(type)
-                        } in ${selectedLocationLabel}`;
+                      const sectionTitle = `Popular ${typeLabels[type] || typeLabels.default(type)} in ${selectedLocationLabel}`;
 
                       return (
-                        <HorizontalScrollWrapper title={sectionTitle}>
+                        <HorizontalScrollWrapper
+                          key={type}
+                          title={sectionTitle}
+                        >
                           {itemsToShow.map((item) => (
                             <div
                               key={item._id}
-                              className="w-[calc(85%-0.5rem)] md:w-[calc(33.33%-1.825rem)] lg:w-[calc(20%-1.5rem)] flex-shrink-0 snap-start"
+                              className="w-[calc(85%-0.5rem)] md:w-[calc(33.33%-1rem)] lg:w-[calc(20%-1.5rem)] flex-shrink-0 snap-start"
                             >
                               <ListingCard
                                 item={item}
                                 showVertical={false}
                                 handleNavigation={() =>
                                   navigate(
-                                    `/listings/${encodeURIComponent(
-                                      item.companyName,
-                                    )}`,
+                                    `/listings/${encodeURIComponent(item.companyName)}`,
                                     {
                                       state: {
                                         companyId: item.companyId,
                                         type: item.companyType,
                                       },
-                                    },
+                                    }
                                   )
                                 }
                               />
                             </div>
                           ))}
                           {hasMore && (
-                            <div className="w-[calc(85%-0.5rem)] md:w-[calc(33.33%-1.825rem)] lg:w-[calc(20%-1.5rem)] flex-shrink-0 snap-start">
+                            <div className="w-[calc(85%-0.5rem)] md:w-[calc(33.33%-1rem)] lg:w-[calc(20%-1.5rem)] flex-shrink-0 snap-start">
                               <button
                                 onClick={() => handleCategoryClick(type)}
-                                className="w-full aspect-square border-2 border-gray-100 rounded-3xl
-             flex flex-col items-center justify-start pt-12 gap-3
-             hover:border-primary-blue hover:shadow-md
-             transition-all bg-gray-50/30 group"
+                                className="w-full aspect-square border-2 border-gray-100 rounded-3xl flex flex-col items-center justify-start pt-12 gap-3 hover:border-primary-blue hover:shadow-md transition-all bg-gray-50/30 group"
                               >
                                 <div className="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-gray-100 transition-colors">
                                   <svg
@@ -902,14 +954,11 @@ const GlobalListingsList = () => {
         </Container>
       </div>
 
-      {/* Floating Map Toggle Button */}
-      < div className="lg:hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-[1000]" >
+      {/* SHOW MAP BUTTON - MOBILE ONLY */}
+      <div className="lg:hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-[1000]">
         <button
-          onClick={() =>
-            navigate(
-              `/verticals?country=${formData?.country}&location=${formData?.location}&view=map`,
-            )
-          }
+          type="button"
+          onClick={handleShowMap}
           className="bg-[#222222] text-white px-5 py-3 rounded-full flex items-center gap-2 shadow-xl hover:scale-105 transition-transform active:scale-95"
         >
           <span className="text-sm font-semibold tracking-wide">Show map</span>
@@ -929,7 +978,7 @@ const GlobalListingsList = () => {
             <path d="M31.25 3.75a2.29 2.29 0 0 0-1.01-1.44A2.29 2.29 0 0 0 28.5 2L21 3.67l-10-2L2.5 3.56A2.29 2.29 0 0 0 .7 5.8v21.95a2.28 2.28 0 0 0 1.06 1.94A2.29 2.29 0 0 0 3.5 30L11 28.33l10 2 8.49-1.89a2.29 2.29 0 0 0 1.8-2.24V4.25a2.3 2.3 0 0 0-.06-.5zM12.5 25.98l-1.51-.3L9.5 26H9.5V4.66l1.51-.33 1.49.3v21.34zm10 1.36-1.51.33-1.49-.3V6.02l1.51.3L22.5 6h.01v21.34z"></path>
           </svg>
         </button>
-      </div >
+      </div>
     </>
   );
 };
