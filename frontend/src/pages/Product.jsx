@@ -154,6 +154,19 @@ const Product = () => {
     companyType: companyDetails?.companyType,
   };
 
+  const getCompanyTypeBreadcrumbLabel = (companyType) => {
+    const companyTypeLabelMap = {
+      coworking: "Co-Working",
+      hostel: "Hostel",
+      coliving: "Co-Living",
+      meetingroom: "MeetingRooms",
+      cafe: "Cafes",
+      workation: "Workation",
+    };
+
+    return companyTypeLabelMap[companyType?.toLowerCase()] || companyType;
+  };
+
   const handleBreadcrumbNavigate = (breadcrumbKey) => {
     const normalizeValue = (value) =>
       typeof value === "string" ? value.trim().toLowerCase() : value;
@@ -599,7 +612,9 @@ const Product = () => {
               { key: "state", label: companyDetails?.state, isLink: true },
               {
                 key: "companyType",
-                label: companyDetails?.companyType,
+                label: getCompanyTypeBreadcrumbLabel(
+                  companyDetails?.companyType,
+                ),
                 isLink: true,
               },
               {
