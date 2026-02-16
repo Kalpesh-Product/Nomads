@@ -102,11 +102,28 @@ const ImageGallery = () => {
 
   const resolvedCompanyName = companyName || companyParam || "Unknown";
 
+  const getCompanyTypeBreadcrumbLabel = (value) => {
+    const companyTypeLabelMap = {
+      coworking: "Co-Working",
+      hostel: "Hostel",
+      coliving: "Co-Living",
+      meetingroom: "MeetingRooms",
+      cafe: "Cafes",
+      workation: "Workation",
+    };
+
+    return companyTypeLabelMap[value?.toLowerCase()] || value;
+  };
+
   const breadcrumbItems = [
     { key: "continent", label: continent, isLink: true },
     { key: "country", label: country, isLink: true },
     { key: "state", label: companyState, isLink: true },
-    { key: "companyType", label: companyType, isLink: true },
+    {
+      key: "companyType",
+      label: getCompanyTypeBreadcrumbLabel(companyType),
+      isLink: true,
+    },
     {
       key: "companyName",
       label: resolvedCompanyName,
