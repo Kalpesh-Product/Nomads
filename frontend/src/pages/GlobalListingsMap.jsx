@@ -639,9 +639,14 @@ const GlobalListingsMap = () => {
             >
               <div className="flex flex-col items-start overflow-hidden flex-1">
                 <span className="text-[11px] font-bold text-gray-900 truncate w-full text-left">
-                  {`${(formData?.country || "Country").charAt(0).toUpperCase() + (formData?.country || "Country").slice(1)} . ${(formData?.location || "Location").charAt(0).toUpperCase() + (formData?.location || "Location").slice(1)} . ${formData?.category
-                    ? (categoryOptions.find(c => c.value === formData.category)?.label || formData.category.charAt(0).toUpperCase() + formData.category.slice(1))
-                    : "All"
+                  {`${(formData?.country || "Country").charAt(0).toUpperCase() + (formData?.country || "Country").slice(1)} . ${formData?.location
+                    ? formData.location
+                      .split(' ')
+                      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                      .join(' ')
+                    : "Unknown"} . ${formData?.category
+                      ? (categoryOptions.find(c => c.value === formData.category)?.label || formData.category.charAt(0).toUpperCase() + formData.category.slice(1))
+                      : "All"
                     }`}
                 </span>
               </div>
@@ -846,8 +851,13 @@ const GlobalListingsMap = () => {
                 {formData?.category ? (
                   <div className="pb-20">
                     <div className="flex justify-between items-center mb-4">
-                      <h2 className="text-lg font-bold">
-                        {`Popular ${categoryOptions.find(c => c.value === formData.category)?.label || "Listings"} in ${(formData?.location || "Location").charAt(0).toUpperCase() + (formData?.location || "Location").slice(1)}`}
+                      <h2 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight">
+                        {`Popular ${categoryOptions.find(c => c.value === formData.category)?.label || "Listings"} in ${formData?.location
+                          ? formData.location
+                            .split(' ')
+                            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                            .join(' ')
+                          : "Unknown"}`}
                       </h2>
                     </div>
                     {isLisitingLoading ? (

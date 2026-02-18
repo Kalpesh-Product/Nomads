@@ -389,7 +389,150 @@ const Listings = () => {
 
   return (
     <div className="flex flex-col gap:2 lg:gap-6 ">
-      <div className="min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0">
+
+      <div className="w-full lg:min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-4 sm:px-6 lg:px-0">
+        <div className="lg:hidden w-full flex flex-col gap-4 mb-4">
+          <button
+            onClick={() => setShowMobileSearch((prev) => !prev)}
+            className="bg-white shadow-md flex items-center w-[92%] mx-auto text-center justify-center font-medium text-secondary-dark border-2 px-6 py-2 rounded-full flex-col gap-1"
+          >
+            <div className="flex items-center gap-2">
+              <IoSearch className="text-primary-red" />
+              <span className="text-[11px] font-bold text-gray-900 truncate w-full text-left">
+                {`${(formData?.country || "Country").charAt(0).toUpperCase() + (formData?.country || "Country").slice(1)} . ${formData?.location
+                  ? formData.location
+                    .split(' ')
+                    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                    .join(' ')
+                  : "Unknown"} . ${formData?.category
+                    ? (categoryOptions.find(c => c.value === formData.category)?.label || formData.category.charAt(0).toUpperCase() + formData.category.slice(1))
+                    : "All"
+                  }`}
+              </span>
+            </div>
+            <span className="text-[10px] text-gray-500">
+              {formData?.count || "1-5"} Nomads
+            </span>
+          </button>
+        </div>
+
+        <div className="lg:hidden flex overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 md:justify-center">
+          {categoryOptions.map((cat) => {
+            const iconSrc = newIcons[cat.value];
+            const isActive = formData?.category === cat.value;
+            return (
+              <button
+                key={cat.value}
+                type="button"
+                onClick={() => handleCategoryClick(cat.value)}
+                className="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] lg:w-[10%]"
+              >
+                <div className="h-10 w-full flex flex-col items-center gap-1">
+                  <img
+                    src={iconSrc}
+                    alt={cat.label}
+                    className="h-full w-[90%] object-contain"
+                  />
+                  <span className={`text-[10px] font-medium whitespace-nowrap border-b-2 ${isActive ? "border-primary-blue text-primary-blue" : "border-transparent text-black"}`}>
+                    {cat.label}
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {showMobileSearch && (
+          <motion.div
+            exit={{ y: "-100%" }}
+            transition={{ duration: 0.3 }}
+            className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 p-4 rounded-t-3xl lg:hidden h-[100dvh]"
+          >
+            <div className="flex justify-between items-center mb-10">
+              <div>&nbsp;</div>
+              <h3 className="text-xl font-semibold">Search</h3>
+              <button
+                onClick={() => setShowMobileSearch(false)}
+                className="text-gray-500 text-xl"
+              >
+                &times;
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <Controller
+                name="continent"
+                control={control}
+                render={({ field }) => (
+                  <SearchBarCombobox
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={continentOptions}
+                    label="Select Continent"
+                    placeholder="Select continent"
+                    className="w-full"
+                  />
+                )}
+              />
+              <Controller
+                name="country"
+                control={control}
+                render={({ field }) => (
+                  <SearchBarCombobox
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={countryOptions}
+                    label="Select Country"
+                    placeholder="Select aspiring destination"
+                    disabled={!selectedContinent}
+                    className="w-full"
+                  />
+                )}
+              />
+              <Controller
+                name="location"
+                control={control}
+                render={({ field }) => (
+                  <SearchBarCombobox
+                    value={field.value}
+                    onChange={field.onChange}
+                    label="Select Location"
+                    options={locationOptions}
+                    placeholder="Select area within country"
+                    disabled={!selectedCountry}
+                    className="w-full"
+                  />
+                )}
+              />
+              <Controller
+                name="count"
+                control={control}
+                render={({ field }) => (
+                  <SearchBarCombobox
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={countOptions}
+                    label="Select Count"
+                    placeholder="Booking for no. of Nomads"
+                    disabled={!selectedState}
+                    className="w-full"
+                  />
+                )}
+              />
+              <button
+                type="submit"
+                className="w-full bg-[#FF5757] text-white py-5 rounded-full"
+              >
+                <IoSearch className="inline mr-2" />
+                Search
+              </button>
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <div className="min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0 ">
         <div className="lg:flex w-full items-center justify-between hidden">
           <div className="flex flex-col gap-4 justify-center items-center  w-full mt-10 lg:mt-0">
             <div className="hidden lg:flex flex-col gap-4 justify-between items-center w-full h-full">
@@ -510,24 +653,32 @@ const Listings = () => {
             </div>
           </div>
         </div>
-        <div className="lg:hidden w-full flex flex-col gap-4 my-4">
-          {/* Category Selection Row - HORIZONTAL SCROLL ON MOBILE */}
+        {/* <div className="lg:hidden w-full flex flex-col gap-4 my-0">
+          
 
           <button
             onClick={() => setShowMobileSearch((prev) => !prev)}
             className="bg-white shadow-md flex items-center w-full text-center item-center justify-center font-medium text-secondary-dark border-2 px-6 py-2 rounded-full flex-col gap-2"
           >
             <span className="text-[11px] font-bold text-gray-900 truncate w-full text-center">
-              {`${(formData?.country || "Country").charAt(0).toUpperCase() + (formData?.country || "Country").slice(1)} . ${(formData?.location || "Location").charAt(0).toUpperCase() + (formData?.location || "Location").slice(1)} . ${formData?.category
-                ? (categoryOptions.find(c => c.value === formData.category)?.label || formData.category.charAt(0).toUpperCase() + formData.category.slice(1))
-                : "All"
-                }`}
+              <div className="flex items-center gap-2">
+                <IoSearch className="text-primary-red" />
+                {`${(formData?.country || "Country").charAt(0).toUpperCase() + (formData?.country || "Country").slice(1)} . ${formData?.location
+                  ? formData.location
+                    .split(' ')
+                    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                    .join(' ')
+                  : "Unknown"} . ${formData?.category
+                    ? (categoryOptions.find(c => c.value === formData.category)?.label || formData.category.charAt(0).toUpperCase() + formData.category.slice(1))
+                    : "All"
+                  }`}
+              </div>
             </span>
             <span className="text-tiny text-gray-500">
               {formData?.count || "1-5"} Nomads
             </span>
           </button>
-          { /*chanage  div*/}
+          
           <div className="flex overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 flex md:justify-center">
             {categoryOptions.map((cat) => {
               const iconSrc = newIcons[cat.value];
@@ -557,7 +708,7 @@ const Listings = () => {
             })}
           </div>
 
-        </div>
+        </div> */}
       </div>
       <AnimatePresence>
         {showMobileSearch && (
@@ -668,8 +819,12 @@ const Listings = () => {
                   meetingroom: "Meeting Rooms",
                   cafe: "Cafes",
                 }[formData.category] || `${formData.category} Spaces`
-              } in {formData?.location?.charAt(0).toUpperCase() +
-                formData?.location?.slice(1) || "Unknown"}
+              } in {formData?.location
+                ? formData.location
+                  .split(' ')
+                  .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                  .join(' ')
+                : "Unknown"}
             </h1>
           </div>
         )}
