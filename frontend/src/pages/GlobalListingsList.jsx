@@ -61,80 +61,7 @@ const HorizontalScrollWrapper = ({ children, title }) => {
         <h2 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight">
           {title}
         </h2>
-        <div className="flex items-center gap-1.5 flex-shrink-0">
-          <button
-            onClick={() => scroll("left")}
-            aria-label="Previous"
-            type="button"
-            disabled={!showLeft}
-            className={`transition-all hover:scale-105 active:scale-95 flex items-center justify-center w-[28px] h-[28px] md:w-[32px] md:h-[32px] rounded-full border border-gray-200 shadow-sm ${
-              showLeft
-                ? "bg-white text-gray-800 opacity-100"
-                : "bg-gray-50 text-gray-300 opacity-50 cursor-not-allowed"
-            }`}
-            style={{
-              boxShadow: showLeft ? "0 2px 4px rgba(0,0,0,0.1)" : "none",
-            }}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 32 32"
-              aria-hidden="true"
-              role="presentation"
-              focusable="false"
-              style={{
-                display: "block",
-                fill: "none",
-                height: "10px",
-                width: "10px",
-                stroke: "currentcolor",
-                strokeWidth: 4,
-                overflow: "visible",
-              }}
-            >
-              <path
-                fill="none"
-                d="m20 28-11.3-11.3a1 1 0 0 1 0-1.4L20 4"
-              ></path>
-            </svg>
-          </button>
-          <button
-            onClick={() => scroll("right")}
-            aria-label="Next"
-            type="button"
-            disabled={!showRight}
-            className={`transition-all hover:scale-105 active:scale-95 flex items-center justify-center w-[28px] h-[28px] md:w-[32px] md:h-[32px] rounded-full border border-gray-200 shadow-sm ${
-              showRight
-                ? "bg-white text-gray-800 opacity-100"
-                : "bg-gray-50 text-gray-300 opacity-50 cursor-not-allowed"
-            }`}
-            style={{
-              boxShadow: showRight ? "0 2px 4px rgba(0,0,0,0.1)" : "none",
-            }}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 32 32"
-              aria-hidden="true"
-              role="presentation"
-              focusable="false"
-              style={{
-                display: "block",
-                fill: "none",
-                height: "10px",
-                width: "10px",
-                stroke: "currentcolor",
-                strokeWidth: 4,
-                overflow: "visible",
-              }}
-            >
-              <path
-                fill="none"
-                d="m12 4 11.3 11.3a1 1 0 0 1 0 1.4L12 28"
-              ></path>
-            </svg>
-          </button>
-        </div>
+
       </div>
       <div
         ref={scrollRef}
@@ -721,10 +648,11 @@ const GlobalListingsList = () => {
               >
                 <div className="flex items-center gap-2">
                   <IoSearch className="text-primary-red" />
-                  <span className="text-sm">
-                    Search Results in{" "}
-                    {formData?.location?.charAt(0).toUpperCase() +
-                      formData?.location?.slice(1) || "Unknown"}
+                  <span className="text-[11px] font-bold text-gray-900 truncate w-full text-left">
+                    {`${(formData?.country || "Country").charAt(0).toUpperCase() + (formData?.country || "Country").slice(1)} . ${(formData?.location || "Location").charAt(0).toUpperCase() + (formData?.location || "Location").slice(1)} . ${formData?.category
+                      ? (categoryOptions.find(c => c.value === formData.category)?.label || formData.category.charAt(0).toUpperCase() + formData.category.slice(1))
+                      : "All"
+                      }`}
                   </span>
                 </div>
                 <span className="text-[10px] text-gray-500">

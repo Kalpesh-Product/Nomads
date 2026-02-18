@@ -203,6 +203,40 @@ export const getNews = async (req, res, next) => {
 //   }
 // };
 
+// POST: Create a single news item
+export const createNews = async (req, res, next) => {
+  try {
+    const news = await News.create(req.body);
+    res.status(201).json({ message: "News created", news });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// PUT: Update a single news item
+export const updateNews = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const news = await News.findByIdAndUpdate(id, req.body, { new: true });
+    if (!news) return res.status(404).json({ message: "News not found" });
+    res.status(200).json({ message: "News updated", news });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// DELETE: Remove a single news item
+export const deleteNews = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const news = await News.findByIdAndDelete(id);
+    if (!news) return res.status(404).json({ message: "News not found" });
+    res.status(200).json({ message: "News deleted" });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const bulkInsertnews = async (req, res, next) => {
   try {
     if (!req.file) {

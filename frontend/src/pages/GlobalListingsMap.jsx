@@ -1,4 +1,4 @@
-import { Box, MenuItem, Skeleton, TextField } from "@mui/material";
+import { Box, MenuItem, Skeleton, TextField, useMediaQuery } from "@mui/material";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -58,72 +58,7 @@ const HorizontalScrollWrapper = ({ children, title }) => {
         <h2 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight">
           {title}
         </h2>
-        <div className="flex items-center gap-1.5 flex-shrink-0">
-          <button
-            onClick={() => scroll("left")}
-            aria-label="Previous"
-            type="button"
-            disabled={!showLeft}
-            className={`transition-all hover:scale-105 active:scale-95 flex items-center justify-center w-[28px] h-[28px] md:w-[32px] md:h-[32px] rounded-full border border-gray-200 shadow-sm ${showLeft
-              ? "bg-white text-gray-800 opacity-100"
-              : "bg-gray-50 text-gray-300 opacity-50 cursor-not-allowed"
-              }`}
-            style={{
-              boxShadow: showLeft ? "0 2px 4px rgba(0,0,0,0.1)" : "none",
-            }}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 32 32"
-              aria-hidden="true"
-              role="presentation"
-              focusable="false"
-              style={{
-                display: "block",
-                fill: "none",
-                height: "10px",
-                width: "10px",
-                stroke: "currentcolor",
-                strokeWidth: 4,
-                overflow: "visible",
-              }}
-            >
-              <path fill="none" d="m20 28-11.3-11.3a1 1 0 0 1 0-1.4L20 4"></path>
-            </svg>
-          </button>
-          <button
-            onClick={() => scroll("right")}
-            aria-label="Next"
-            type="button"
-            disabled={!showRight}
-            className={`transition-all hover:scale-105 active:scale-95 flex items-center justify-center w-[28px] h-[28px] md:w-[32px] md:h-[32px] rounded-full border border-gray-200 shadow-sm ${showRight
-              ? "bg-white text-gray-800 opacity-100"
-              : "bg-gray-50 text-gray-300 opacity-50 cursor-not-allowed"
-              }`}
-            style={{
-              boxShadow: showRight ? "0 2px 4px rgba(0,0,0,0.1)" : "none",
-            }}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 32 32"
-              aria-hidden="true"
-              role="presentation"
-              focusable="false"
-              style={{
-                display: "block",
-                fill: "none",
-                height: "10px",
-                width: "10px",
-                stroke: "currentcolor",
-                strokeWidth: 4,
-                overflow: "visible",
-              }}
-            >
-              <path fill="none" d="m12 4 11.3 11.3a1 1 0 0 1 0 1.4L12 28"></path>
-            </svg>
-          </button>
-        </div>
+
       </div>
       <div
         ref={scrollRef}
@@ -152,6 +87,10 @@ const GlobalListingsMap = () => {
   const { auth } = useAuth();
   const user = auth?.user || {};
   const userId = auth?.user?._id || auth?.user?.id;
+
+  const isMobile = useMediaQuery("(max-width: 767px)");
+  const isTablet = useMediaQuery("(max-width: 1024px)");
+  const isMobileOrTablet = isMobile || isTablet;
 
   const selectedCountry = watch("country");
   const selectedState = watch("location");
@@ -264,8 +203,13 @@ const GlobalListingsMap = () => {
 
     dispatch(setFormValues(updatedForm));
 
+    if (isMobileOrTablet) {
+      setShowListings(true);
+      return;
+    }
+
     navigate(
-      `/nomad/listings?country=${formData.country}&location=${formData.location}&category=${type}`,
+      `/listings?country=${formData.country}&location=${formData.location}&category=${type}`,
       {
         state: updatedForm,
       }
@@ -300,6 +244,10 @@ const GlobalListingsMap = () => {
   const categoryOptions = useMemo(() => {
     if (!listingsData || listingsData.length === 0) return [];
 
+    // Add 'All' option specifically for the UI chips
+    const baseOptions = [];
+
+
     const uniqueTypes = [
       ...new Set(
         listingsData
@@ -327,9 +275,11 @@ const GlobalListingsMap = () => {
       "cafe",
     ];
 
-    return uniqueTypes
+    const result = uniqueTypes
       .map((type) => ({ label: labelMap[type] || type, value: type }))
       .sort((a, b) => typeOrder.indexOf(a.value) - typeOrder.indexOf(b.value));
+
+    return result;
   }, [listingsData]);
 
   const groupedListings = sortedListings?.reduce((acc, item) => {
@@ -403,16 +353,23 @@ const GlobalListingsMap = () => {
   });
 
   const handleCategoryClick = (categoryValue) => {
-    const formData = getValues();
+    const currentFormData = getValues();
 
-    if (!formData.country || !formData.location) {
+    if (!currentFormData.country || !currentFormData.location) {
       alert("Please select Country and Location first.");
       return;
     }
-    dispatch(setFormValues({ ...formData, category: categoryValue }));
+    dispatch(setFormValues({ ...currentFormData, category: categoryValue }));
+
+    if (isMobileOrTablet) {
+      setShowListings(true);
+      // Optional: Clear mobile search if open
+      setShowMobileSearch(false);
+      return;
+    }
 
     const state = {
-      ...formData,
+      ...currentFormData,
       category: categoryValue,
     };
 
@@ -420,11 +377,11 @@ const GlobalListingsMap = () => {
     setShowListings(false);
 
     navigate(
-      `/listings?country=${formData.country}&location=${formData.location}&category=${state.category}`,
+      `/listings?country=${currentFormData.country}&location=${currentFormData.location}&category=${state.category}`,
       {
         state: {
-          country: formData.country,
-          location: formData.location,
+          country: currentFormData.country,
+          location: currentFormData.location,
           category: categoryValue,
         },
       }
@@ -682,9 +639,10 @@ const GlobalListingsMap = () => {
             >
               <div className="flex flex-col items-start overflow-hidden flex-1">
                 <span className="text-[11px] font-bold text-gray-900 truncate w-full text-left">
-                  {formData?.location || "Anywhere"} •{" "}
-                  {formData?.category || "Any type"} •{" "}
-                  {formData?.count || "Any guests"}
+                  {`${(formData?.country || "Country").charAt(0).toUpperCase() + (formData?.country || "Country").slice(1)} . ${(formData?.location || "Location").charAt(0).toUpperCase() + (formData?.location || "Location").slice(1)} . ${formData?.category
+                    ? (categoryOptions.find(c => c.value === formData.category)?.label || formData.category.charAt(0).toUpperCase() + formData.category.slice(1))
+                    : "All"
+                    }`}
                 </span>
               </div>
               <div className="bg-[#FF5757] p-1.5 rounded-full text-white ml-2 flex-shrink-0 shadow-sm">
@@ -694,15 +652,21 @@ const GlobalListingsMap = () => {
 
             {/* Collection/Category Chips */}
             <div className="pointer-events-auto w-full max-w-[450px] flex overflow-x-auto gap-2 pb-2 scrollbar-hide scroll-smooth snap-x">
-              {categoryOptions.map((cat) => (
-                <button
-                  key={cat.value}
-                  onClick={() => handleCategoryClick(cat.value)}
-                  className="flex-shrink-0 snap-start bg-white/95 backdrop-blur-md border border-gray-200 px-4 py-1.5 rounded-full text-[11px] font-semibold text-gray-800 shadow-md hover:bg-gray-50 transition-colors"
-                >
-                  {cat.label}
-                </button>
-              ))}
+              {[{ label: "All", value: "" }, ...categoryOptions].map((cat) => {
+                const isActive = cat.value === formData?.category;
+                return (
+                  <button
+                    key={cat.value}
+                    onClick={() => handleCategoryClick(cat.value)}
+                    className={`flex-shrink-0 snap-start px-4 py-1.5 rounded-full text-[11px] font-semibold shadow-md transition-colors ${isActive
+                      ? "bg-blue-50 border border-blue-500 text-blue-600"
+                      : "bg-white/95 backdrop-blur-md border border-gray-200 text-gray-800 hover:bg-gray-50"
+                      }`}
+                  >
+                    {cat.label}
+                  </button>
+                )
+              })}
             </div>
           </div>
         )}
@@ -855,7 +819,7 @@ const GlobalListingsMap = () => {
                 stiffness: 300,
                 velocity: 2,
               }}
-              className={`fixed bottom-0 left-0 right-0 bg-white shadow-[0_-8px_30px_rgb(0,0,0,0.12)] z-50 px-6 rounded-t-[24px] lg:hidden ${showListings ? "h-[75vh]" : "h-[25vh]"
+              className={`fixed bottom-0 left-0 right-0 bg-white shadow-[0_-8px_30px_rgb(0,0,0,0.12)] z-[1100] px-6 rounded-t-[24px] lg:hidden ${showListings ? "h-[calc(100vh-180px)]" : "h-[25vh]"
                 }`}
             >
               <div
@@ -878,106 +842,158 @@ const GlobalListingsMap = () => {
                   touchAction: "pan-y",
                 }}
               >
-                {isLisitingLoading ? (
-                  Array.from({ length: 4 }).map((_, i) => (
-                    <SkeletonCard key={i} />
-                  ))
-                ) : groupedListings &&
-                  Object.keys(groupedListings).length > 0 ? (
-                  Object.entries(groupedListings).map(([type, items]) => {
-                    const prioritizedCompanies = ["MeWo", "BIZ Nest"];
-                    const sortedItems = items.sort((a, b) => {
-                      const aPriority = prioritizedCompanies.includes(
-                        a.companyName
-                      )
-                        ? 0
-                        : 1;
-                      const bPriority = prioritizedCompanies.includes(
-                        b.companyName
-                      )
-                        ? 0
-                        : 1;
-                      return (
-                        aPriority - bPriority ||
-                        (b.ratings || 0) - (a.ratings || 0)
-                      );
-                    });
-
-                    const hasMore = sortedItems.length > 5;
-                    const itemsToShow = hasMore
-                      ? sortedItems.slice(0, 5)
-                      : sortedItems;
-                    const location =
-                      formData?.location?.charAt(0).toUpperCase() +
-                      formData?.location?.slice(1);
-
-                    const sectionTitle = `Popular ${typeLabels[type] || typeLabels.default(type)
-                      } in ${location || ""}`;
-
-                    return (
-                      <HorizontalScrollWrapper
-                        key={type}
-                        title={sectionTitle}
-                      >
-                        {itemsToShow.map((item) => (
-                          <div
-                            key={item._id}
-                            className="w-[calc(85%-0.5rem)] md:w-[calc(33.33%-1.25rem)] lg:w-[calc(20%-1.5rem)] flex-shrink-0 snap-start"
-                          >
-                            <ListingCard
-                              item={item}
-                              handleNavigation={() =>
-                                navigate(
-                                  `/listings/${encodeURIComponent(
-                                    item.companyName
-                                  )}`,
-                                  {
-                                    state: {
-                                      companyId: item.companyId,
-                                      type: item.companyType,
-                                    },
+                {/* Changes Start: Conditional rendering for Drawer content */}
+                {formData?.category ? (
+                  <div className="pb-20">
+                    <div className="flex justify-between items-center mb-4">
+                      <h2 className="text-lg font-bold">
+                        {`Popular ${categoryOptions.find(c => c.value === formData.category)?.label || "Listings"} in ${(formData?.location || "Location").charAt(0).toUpperCase() + (formData?.location || "Location").slice(1)}`}
+                      </h2>
+                    </div>
+                    {isLisitingLoading ? (
+                      Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
+                    ) : (
+                      (() => {
+                        const filteredItems = listingsData.filter(item => item.companyType === formData.category);
+                        return filteredItems.length > 0 ? (
+                          <div className="pb-1">
+                            <PaginatedGrid
+                              data={filteredItems}
+                              entriesPerPage={isMobile ? 10 : 12}
+                              scrollToTop={false}
+                              columns={`grid-cols-2 md:grid-cols-3 gap-3`}
+                              renderItem={(item, index) => (
+                                <ListingCard
+                                  key={item._id}
+                                  item={item}
+                                  showVertical={true}
+                                  handleNavigation={() =>
+                                    navigate(
+                                      `/listings/${encodeURIComponent(item.companyName)}`,
+                                      {
+                                        state: {
+                                          companyId: item.companyId,
+                                          type: item.companyType || "ss",
+                                        },
+                                      }
+                                    )
                                   }
-                                )
-                              }
+                                />
+                              )}
                             />
                           </div>
-                        ))}
-                        {hasMore && (
-                          <div className="w-[calc(85%-0.5rem)] md:w-[calc(33.33%-1.25rem)] lg:w-[calc(20%-1.5rem)] flex-shrink-0 snap-start">
-                            <button
-                              onClick={() => handleShowMoreClick(type)}
-                              className="w-full aspect-square border-2 border-gray-100 rounded-3xl flex flex-col items-center justify-start pt-12 gap-3 hover:border-primary-blue hover:shadow-md transition-all bg-gray-50/30 group"
-                            >
-                              <div className="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-gray-100 transition-colors">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  strokeWidth={2}
-                                  stroke="currentColor"
-                                  className="w-8 h-8 text-gray-400 group-hover:text-gray-600"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                                  />
-                                </svg>
-                              </div>
-                              <span className="text-lg font-medium text-gray-600 group-hover:text-gray-900">
-                                View All
-                              </span>
-                            </button>
-                          </div>
-                        )}
-                      </HorizontalScrollWrapper>
-                    );
-                  })
-                ) : (
-                  <div className="col-span-full text-center text-sm text-gray-500 border border-dotted rounded-lg p-4">
-                    No listings found.
+                        ) : (
+                          <div className="text-center py-10 text-gray-500">No listings found for this category.</div>
+                        );
+                      })()
+                    )}
                   </div>
+                ) : (
+                  // Existing Grouped View
+                  <>
+                    {isLisitingLoading ? (
+                      Array.from({ length: 4 }).map((_, i) => (
+                        <SkeletonCard key={i} />
+                      ))
+                    ) : groupedListings &&
+                      Object.keys(groupedListings).length > 0 ? (
+                      Object.entries(groupedListings).map(([type, items]) => {
+                        const prioritizedCompanies = ["MeWo", "BIZ Nest"];
+                        const sortedItems = items.sort((a, b) => {
+                          const aPriority = prioritizedCompanies.includes(
+                            a.companyName
+                          )
+                            ? 0
+                            : 1;
+                          const bPriority = prioritizedCompanies.includes(
+                            b.companyName
+                          )
+                            ? 0
+                            : 1;
+                          return (
+                            aPriority - bPriority ||
+                            (b.ratings || 0) - (a.ratings || 0)
+                          );
+                        });
+
+                        const hasMore = sortedItems.length > 5;
+                        const itemsToShow = hasMore
+                          ? sortedItems.slice(0, 5)
+                          : sortedItems;
+                        const location =
+                          formData?.location?.charAt(0).toUpperCase() +
+                          formData?.location?.slice(1);
+
+                        const sectionTitle = `Popular ${typeLabels[type] || typeLabels.default(type)
+                          } in ${location || ""}`;
+
+                        return (
+                          <HorizontalScrollWrapper
+                            key={type}
+                            title={sectionTitle}
+                          >
+                            {itemsToShow.map((item) => (
+                              <div
+                                key={item._id}
+                                className="w-[calc(85%-0.5rem)] md:w-[calc(33.33%-1.25rem)] lg:w-[calc(20%-1.5rem)] flex-shrink-0 snap-start"
+                              >
+                                <ListingCard
+                                  item={item}
+                                  handleNavigation={() =>
+                                    navigate(
+                                      `/listings/${encodeURIComponent(
+                                        item.companyName
+                                      )}`,
+                                      {
+                                        state: {
+                                          companyId: item.companyId,
+                                          type: item.companyType,
+                                        },
+                                      }
+                                    )
+                                  }
+                                />
+                              </div>
+                            ))}
+                            {hasMore && (
+                              <div className="w-[calc(85%-0.5rem)] md:w-[calc(33.33%-1.25rem)] lg:w-[calc(20%-1.5rem)] flex-shrink-0 snap-start">
+                                <button
+                                  onClick={() => handleShowMoreClick(type)}
+                                  className="w-full aspect-square border-2 border-gray-100 rounded-3xl flex flex-col items-center justify-start pt-12 gap-3 hover:border-primary-blue hover:shadow-md transition-all bg-gray-50/30 group"
+                                >
+                                  <div className="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-gray-100 transition-colors">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      strokeWidth={2}
+                                      stroke="currentColor"
+                                      className="w-8 h-8 text-gray-400 group-hover:text-gray-600"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                                      />
+                                    </svg>
+                                  </div>
+                                  <span className="text-lg font-medium text-gray-600 group-hover:text-gray-900">
+                                    View All
+                                  </span>
+                                </button>
+                              </div>
+                            )}
+                          </HorizontalScrollWrapper>
+                        );
+                      })
+                    ) : (
+                      <div className="col-span-full text-center text-sm text-gray-500 border border-dotted rounded-lg p-4">
+                        No listings found.
+                      </div>
+                    )}
+                  </>
                 )}
+                {/* Changes End */}
               </div>
             </motion.div>
           )}
@@ -985,7 +1001,7 @@ const GlobalListingsMap = () => {
       </div>
 
       {/* Floating List Toggle Button (Mobile Only) */}
-      <div className="lg:hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-[1000]">
+      <div className="lg:hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-[1200]">
         <button
           onClick={() =>
             navigate(

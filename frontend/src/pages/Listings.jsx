@@ -515,12 +515,13 @@ const Listings = () => {
 
           <button
             onClick={() => setShowMobileSearch((prev) => !prev)}
-            className="bg-white shadow-md flex items-center w-full text-center justify-center font-medium text-secondary-dark border-2 px-6 py-2 rounded-full flex-col gap-2"
+            className="bg-white shadow-md flex items-center w-full text-center item-center justify-center font-medium text-secondary-dark border-2 px-6 py-2 rounded-full flex-col gap-2"
           >
-            <span>
-              Search Results in{" "}
-              {formData?.location?.charAt(0).toUpperCase() +
-                formData?.location?.slice(1) || "Unknown"}
+            <span className="text-[11px] font-bold text-gray-900 truncate w-full text-center">
+              {`${(formData?.country || "Country").charAt(0).toUpperCase() + (formData?.country || "Country").slice(1)} . ${(formData?.location || "Location").charAt(0).toUpperCase() + (formData?.location || "Location").slice(1)} . ${formData?.category
+                ? (categoryOptions.find(c => c.value === formData.category)?.label || formData.category.charAt(0).toUpperCase() + formData.category.slice(1))
+                : "All"
+                }`}
             </span>
             <span className="text-tiny text-gray-500">
               {formData?.count || "1-5"} Nomads
@@ -545,7 +546,7 @@ const Listings = () => {
                       className="h-full w-[90%] object-contain"
                     />
                     <span
-                      className={`text-[10px] font-medium whitespace-nowrap border-b-2 ${isActive ? "border-[#FF5757]" : "border-transparent"
+                      className={`text-[10px] font-medium whitespace-nowrap border-b-2 ${isActive ? "border-[#2563EB] text-[#2563EB]" : "border-transparent text-black"
                         }`}
                     >
                       {cat.label}
@@ -655,8 +656,8 @@ const Listings = () => {
       <Container padding={false}>
         {/* Dynamic Header */}
         {formData?.category && formData?.location && (
-          <div className="mb-6 mt-4 px-1">
-            <h1 className="text-lg md:text-2xl lg:text-3xl font-bold text-secondary-dark capitalize">
+          <div className="mb-4 mt-2 px-1">
+            <h1 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight">
               Popular {
                 {
                   coworking: "Co-Working Spaces",
@@ -667,7 +668,8 @@ const Listings = () => {
                   meetingroom: "Meeting Rooms",
                   cafe: "Cafes",
                 }[formData.category] || `${formData.category} Spaces`
-              } in {formData.location}
+              } in {formData?.location?.charAt(0).toUpperCase() +
+                formData?.location?.slice(1) || "Unknown"}
             </h1>
           </div>
         )}
