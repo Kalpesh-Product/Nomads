@@ -32,6 +32,10 @@ const blogSchema = new mongoose.Schema({
       image: String,
     },
   ],
+  isActive: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const News = mongoose.model("News", blogSchema);
