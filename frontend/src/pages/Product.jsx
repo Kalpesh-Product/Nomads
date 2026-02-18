@@ -1151,17 +1151,21 @@ const Product = () => {
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-0 lg:p-0">
+            <div className="flex overflow-x-auto gap-6 px-4 md:px-0 scrollbar-hide snap-x snap-mandatory pb-4">
               {companyDetails?.reviews?.length > 0 ? (
-                companyDetails?.reviews?.slice(0, 6).map((review, index) => (
-                  <ReviewCard
-                    handleClick={() => {
-                      setSelectedReview(review);
-                      setOpen(true);
-                    }}
+                companyDetails.reviews.slice(0, 8).map((review, index) => (
+                  <div
                     key={index}
-                    review={review}
-                  />
+                    className="min-w-[300px] md:min-w-[400px] flex-shrink-0 snap-center h-full"
+                  >
+                    <ReviewCard
+                      handleClick={() => {
+                        setSelectedReview(review);
+                        setOpen(true);
+                      }}
+                      review={review}
+                    />
+                  </div>
                 ))
               ) : (
                 <div className="col-span-full border-2 border-dotted border-gray-300 rounded-xl p-6 text-center text-sm text-gray-500 h-40 flex justify-center items-center">
@@ -1170,7 +1174,8 @@ const Product = () => {
               )}
             </div>
 
-            <div className="text-right">
+
+            {/* <div className="text-right">
               <a
                 className="text-primary-blue text-sm font-semibold hover:underline"
                 href={companyDetails?.googleMap}
@@ -1179,9 +1184,9 @@ const Product = () => {
               >
                 View More →
               </a>
-            </div>
+            </div> */}
 
-            <hr className="my-5 lg:my-10" />
+            {/* <hr className="my-5 lg:my-10" /> */}
             {/* <div className="flex flex-col justify-center items-center max-w-4xl mx-auto">
               <h1 className="text-main-header font-medium mt-5">
                 <LeafRatings
@@ -1196,13 +1201,10 @@ const Product = () => {
                 and reliability
               </span>
             </div> */}
-            <div className="flex justify-between">
-              <h1 className="text-title font-medium text-gray-700 uppercase">
-                Platform Reviews
-              </h1>
+            <div className="flex justify-center">
               <button
                 type="button"
-                className="rounded-full border border-primary-blue bg-primary-blue text-white px-5 py-2 text-sm font-semibold hover:bg-primary-blue hover:text-white transition-colors"
+                className="rounded-full border border-primary-blue bg-primary-blue text-white px-5 py-2 text-4xl font-semibold hover:bg-primary-blue hover:text-white transition-colors"
                 onClick={handleWriteReviewClick}
                 disabled={!companyDetails?.companyId}
               >
@@ -1802,9 +1804,10 @@ const Product = () => {
 
                 {/* Mobile/Tablet Enquiry Form */}
                 <div className="shadow-lg flex flex-col gap-2 md:gap-4 p-4 md:p-5 lg:p-8 rounded-2xl border border-gray-100 bg-white max-w-full">
-                  <h1 className="text-center md:text-base lg:text-xl xl:text-2xl text-secondary-dark font-bold">
+                  <h1 className="text-lg text-center md:text-base lg:text-xl xl:text-2xl text-secondary-dark font-bold">
                     Enquire & Receive Quote
                   </h1>
+                  <hr />
                   <form
                     onSubmit={handleSubmit((data) => {
                       const formattedMobileNumber = normalizePhoneNumber(
@@ -2031,10 +2034,11 @@ const Product = () => {
           <hr className="my-5 md:my-10" />
 
           {/* Mobile Inclusions */}
-          <div className="flex flex-col gap-8 w-full">
-            <h1 className="text-md md:text-title text-gray-700 font-medium uppercase">
+          <div className="flex flex-col gap-4 w-full">
+            <h1 className="text-lg text-center md:text-base lg:text-xl xl:text-2xl text-secondary-dark font-bold">
               What Inclusions does it offer
             </h1>
+            <hr />
             {inclusions.length === 0 ? (
               <div className="w-full border-2 border-dotted border-gray-400 rounded-lg p-6 text-center text-gray-500">
                 Inclusions not available
@@ -2090,7 +2094,7 @@ const Product = () => {
               )}
             </div>
 
-            <div className="text-right">
+            {/* <div className="text-right">
               <a
                 className="text-primary-blue text-sm font-semibold hover:underline"
                 href={companyDetails?.googleMap}
@@ -2099,17 +2103,12 @@ const Product = () => {
               >
                 View More →
               </a>
-            </div>
+            </div> */}
 
-            <hr className="my-5 md:my-10" />
-
-            <div className="flex justify-between items-center mb-6">
-              <h1 className="text-md md:text-title font-medium text-gray-700 uppercase">
-                Platform Reviews
-              </h1>
+            <div className="flex justify-center items-center mb-6">
               <button
                 type="button"
-                className="rounded-full border border-primary-blue bg-primary-blue text-white px-4 md:px-5 py-2 text-[10px] md:text-sm font-semibold hover:bg-primary-blue hover:text-white transition-colors"
+                className="rounded-full border border-primary-blue bg-primary-blue text-white px-4 md:px-5 py-2 text-2xl md:text-2xl font-semibold hover:bg-primary-blue hover:text-white transition-colors"
                 onClick={handleWriteReviewClick}
                 disabled={!companyDetails?.companyId}
               >
