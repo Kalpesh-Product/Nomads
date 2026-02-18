@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   NavLink,
   useLocation,
@@ -23,6 +23,7 @@ import Map from "../components/Map";
 import LeafWrapper from "../components/LeafWrapper";
 import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
 import { FiShare2 } from "react-icons/fi";
+import { Globe } from "lucide-react";
 import {
   FaFacebookF,
   FaLinkedinIn,
@@ -38,7 +39,6 @@ import {
   noOnlyWhitespace,
 } from "../utils/validators";
 import { useDispatch, useSelector } from "react-redux";
-// import toast from "react-hot-toast";
 import AmenitiesList from "../components/AmenitiesList";
 import { FaCheck } from "react-icons/fa";
 import TransparentModal from "../components/TransparentModal";
@@ -65,17 +65,27 @@ const Product = () => {
   const dispatch = useDispatch();
   const userId = auth?.user?._id || auth?.user?.id;
 
-  const reviewerName = `${auth?.user?.firstName || ""} ${
-    auth?.user?.lastName || ""
-  }`.trim();
+  const reviewerName = `${auth?.user?.firstName || ""} ${auth?.user?.lastName || ""
+    }`.trim();
 
   const [selectedReview, setSelectedReview] = useState([]);
   const [showAmenities, setShowAmenities] = useState(false);
-  console.log("selected : ", selectedReview);
   const [open, setOpen] = useState(false);
   const [isAddReviewOpen, setIsAddReviewOpen] = useState(false);
-
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
+
+  // Mobile specific states
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isAboutExpanded, setIsAboutExpanded] = useState(false);
+  const [isDisclaimerExpanded, setIsDisclaimerExpanded] = useState(false);
+  const carouselRef = useRef(null);
+
+  const handleScroll = (e) => {
+    const scrollLeft = e.target.scrollLeft;
+    const width = e.target.offsetWidth;
+    const index = Math.round(scrollLeft / width);
+    setCurrentImageIndex(index);
+  };
 
   const normalizePhoneNumber = (value) =>
     value ? value.replace(/\s+/g, "") : "";
@@ -88,7 +98,7 @@ const Product = () => {
       companyId,
       companyName || "unknown",
       userId || "guest",
-    ], // safe for guests too
+    ],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (companyId) {
@@ -103,17 +113,12 @@ const Product = () => {
         params.set("userId", userId);
       }
       const url = `company/get-single-company-data?${params.toString()}`;
-      const response = await axios.get(url); // ✅ use public axios when not logged in
-
-      console.log("logox", response.data.logo.url);
+      const response = await axios.get(url);
       return response?.data;
     },
-    enabled: !!companyId || !!companyName, // ✅ allow guests to load
+    enabled: !!companyId || !!companyName,
     refetchOnMount: "always",
   });
-
-  console.log("location.state", location.state);
-  console.log("companyId", companyId);
 
   useEffect(() => {
     const companyType = companyDetails?.companyType?.trim();
@@ -134,7 +139,7 @@ const Product = () => {
       {
         replace: true,
         state: location.state,
-      },
+      }
     );
   }, [
     companyDetails?.companyType,
@@ -144,7 +149,6 @@ const Product = () => {
     navigate,
   ]);
 
-  console.log("companuDetials ", companyDetails);
   const companyImages = companyDetails?.images?.slice(0, 4) || [];
   const showMore = (companyDetails?.images?.length || 0) > 4;
   const breadcrumbState = {
@@ -185,20 +189,20 @@ const Product = () => {
         location: normalizedLocation || "",
         category: isCompanyTypeClick ? normalizedCategory || "" : "",
         count: "",
-      }),
+      })
     );
 
     if (isCompanyTypeClick) {
       navigate(
-        `/listings?country=${normalizedCountry || ""}&location=${
-          normalizedLocation || ""
-        }&category=${normalizedCategory || ""}`,
+        `/listings?country=${normalizedCountry || ""}&location=${normalizedLocation || ""
+        }&category=${normalizedCategory || ""}`
       );
       return;
     }
 
     navigate(
-      `/verticals?country=${normalizedCountry || ""}&state=${normalizedLocation || ""}`,
+      `/verticals?country=${normalizedCountry || ""}&state=${normalizedLocation || ""
+      }`
     );
   };
 
@@ -207,7 +211,6 @@ const Product = () => {
       navigate("/login");
       return;
     }
-
     setIsAddReviewOpen(true);
   };
 
@@ -217,11 +220,6 @@ const Product = () => {
         ? item?.split(" ").join("")?.trim()
         : item?.trim();
     }) || [];
-
-  // const total = allAmenities.length;
-  // const columns = 6;
-  // const remainder = total % columns;
-  // const lastRowStartIndex = remainder === 0 ? -1 : total - remainder;
 
   const {
     handleSubmit,
@@ -238,16 +236,13 @@ const Product = () => {
       startDate: null,
       endDate: null,
     },
-
     mode: "onChange",
   });
 
-  // 🟢 Add this useEffect below:
   useEffect(() => {
     if (auth?.user) {
-      const fullName = `${auth.user.firstName || ""} ${
-        auth.user.lastName || ""
-      }`.trim();
+      const fullName = `${auth.user.firstName || ""} ${auth.user.lastName || ""
+        }`.trim();
 
       reset({
         fullName,
@@ -261,6 +256,7 @@ const Product = () => {
   }, [auth, reset]);
 
   const selectedStartDate = watch("startDate");
+
   const {
     handleSubmit: handlesubmitSales,
     control: salesControl,
@@ -273,45 +269,6 @@ const Product = () => {
       email: "",
     },
     mode: "onChange",
-  });
-
-  const { mutate: submitEnquiry, isPending: isSubmitting } = useMutation({
-    mutationKey: ["submitEnquiry"],
-    mutationFn: async (data) => {
-      const response = await axios.post("/forms/add-new-b2c-form-submission", {
-        ...data,
-        startDate: data.startDate
-          ? dayjs(data.startDate).format("YYYY-MM-DD")
-          : "",
-        endDate: data.endDate ? dayjs(data.endDate).format("YYYY-MM-DD") : "",
-
-        country: companyDetails?.country,
-        state: companyDetails?.state,
-        companyType: companyDetails?.companyType,
-        personelCount: parseInt(data?.noOfPeople),
-        companyName: companyDetails?.companyName,
-        sheetName: "All_Enquiry",
-        phone: data?.mobileNumber,
-        company: companyDetails?._id,
-        companyId: companyDetails?.companyId,
-        source: "nomad",
-        productType: companyDetails?.companyType,
-      });
-      return response.data;
-    },
-    onSuccess: (data) => {
-      showSuccessAlert(data.message);
-      reset();
-    },
-    onError: (error) => {
-      // showErrorAlert(error.response?.data?.message);
-      const errorMessage =
-        error?.response?.data?.message ||
-        error?.response?.data?.errors?.[0] ||
-        error?.message ||
-        "Something went wrong";
-      showErrorAlert(errorMessage);
-    },
   });
 
   const {
@@ -337,6 +294,43 @@ const Product = () => {
     }
   }, [reviewerName, setReviewValue]);
 
+  const { mutate: submitEnquiry, isPending: isSubmitting } = useMutation({
+    mutationKey: ["submitEnquiry"],
+    mutationFn: async (data) => {
+      const response = await axios.post("/forms/add-new-b2c-form-submission", {
+        ...data,
+        startDate: data.startDate
+          ? dayjs(data.startDate).format("YYYY-MM-DD")
+          : "",
+        endDate: data.endDate ? dayjs(data.endDate).format("YYYY-MM-DD") : "",
+        country: companyDetails?.country,
+        state: companyDetails?.state,
+        companyType: companyDetails?.companyType,
+        personelCount: parseInt(data?.noOfPeople),
+        companyName: companyDetails?.companyName,
+        sheetName: "All_Enquiry",
+        phone: data?.mobileNumber,
+        company: companyDetails?._id,
+        companyId: companyDetails?.companyId,
+        source: "nomad",
+        productType: companyDetails?.companyType,
+      });
+      return response.data;
+    },
+    onSuccess: (data) => {
+      showSuccessAlert(data.message);
+      reset();
+    },
+    onError: (error) => {
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.errors?.[0] ||
+        error?.message ||
+        "Something went wrong";
+      showErrorAlert(errorMessage);
+    },
+  });
+
   const { mutate: submitReview, isPending: isSubmittingReview } = useMutation({
     mutationKey: ["submitReview", companyDetails?.companyId],
     mutationFn: async (data) => {
@@ -345,8 +339,6 @@ const Product = () => {
         name: data.name?.trim() || reviewerName || "Anonymous",
         starCount: Number(data.starCount),
         description: data.description?.trim(),
-        // reviewSource: data.reviewSource?.trim(),
-        // reviewLink: data.reviewLink?.trim(),
         reviewSource: "Nomads Website",
         reviewLink: "",
       };
@@ -363,7 +355,7 @@ const Product = () => {
     },
     onError: (error) => {
       showErrorAlert(
-        error?.response?.data?.message || "Unable to submit review.",
+        error?.response?.data?.message || "Unable to submit review."
       );
     },
   });
@@ -386,7 +378,6 @@ const Product = () => {
       salesReset();
     },
     onError: (error) => {
-      // showErrorAlert(error.response?.data?.message);
       const errorMessage =
         error?.response?.data?.message ||
         error?.response?.data?.errors?.[0] ||
@@ -406,24 +397,25 @@ const Product = () => {
   const reviewData = isCompanyDetails
     ? []
     : companyDetails?.reviews?.map((item) => ({
-        ...item,
-        stars: item.starCount,
-        message: item.description,
-        date: dayjs(item.createdAt).fromNow(),
-      }));
+      ...item,
+      stars: item.starCount,
+      message: item.description,
+      date: dayjs(item.createdAt).fromNow(),
+    }));
 
   const forMapsData = {
     id: companyDetails?._id,
     lat: companyDetails?.latitude,
     lng: companyDetails?.longitude,
     name: companyDetails?.companyName,
+    companyTitle: companyDetails?.companyTitle,
     googleMap: companyDetails?.googleMap,
     location: companyDetails?.city,
     reviews: companyDetails?.totalReviews,
     ratings: companyDetails?.ratings,
     image:
       companyDetails?.images?.[0]?.url ||
-      "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
+      "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp  ",
   };
 
   const shareUrl = (() => {
@@ -434,9 +426,9 @@ const Product = () => {
       }
       return url.toString();
     }
-
     return companyDetails?.websiteTemplateLink || "";
   })();
+
   const shareTitle = companyDetails?.companyName
     ? `Check out ${companyDetails.companyName}`
     : "Check out this listing";
@@ -446,8 +438,8 @@ const Product = () => {
     {
       id: "whatsapp",
       label: "WhatsApp",
-      href: `https://wa.me/?text=${encodeURIComponent(
-        `${shareTitle} ${shareUrl}`.trim(),
+      href: `https://wa.me/?text= ${encodeURIComponent(
+        `${shareTitle} ${shareUrl}`.trim()
       )}`,
       icon: FaWhatsapp,
       iconClassName: "text-[#25D366]",
@@ -455,8 +447,8 @@ const Product = () => {
     {
       id: "facebook",
       label: "Facebook",
-      href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-        shareUrl,
+      href: `https://www.facebook.com/sharer/sharer.php?u= ${encodeURIComponent(
+        shareUrl
       )}`,
       icon: FaFacebookF,
       iconClassName: "text-[#1877F2]",
@@ -464,8 +456,8 @@ const Product = () => {
     {
       id: "twitter",
       label: "X",
-      href: `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-        shareTitle,
+      href: `https://twitter.com/intent/tweet?text= ${encodeURIComponent(
+        shareTitle
       )}&url=${encodeURIComponent(shareUrl)}`,
       icon: FaTwitter,
       iconClassName: "text-black",
@@ -473,8 +465,8 @@ const Product = () => {
     {
       id: "linkedin",
       label: "LinkedIn",
-      href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-        shareUrl,
+      href: `https://www.linkedin.com/sharing/share-offsite/?url= ${encodeURIComponent(
+        shareUrl
       )}`,
       icon: FaLinkedinIn,
       iconClassName: "text-[#0A66C2]",
@@ -482,6 +474,7 @@ const Product = () => {
   ];
 
   const mapsData = [forMapsData];
+
   const handleCopyShareLink = async () => {
     if (!shareUrl) return;
     if (navigator?.clipboard?.writeText) {
@@ -500,6 +493,7 @@ const Product = () => {
     setHasCopiedLink(true);
     setTimeout(() => setHasCopiedLink(false), 2000);
   };
+
   const [heartClicked, setHeartClicked] = useState(null);
 
   useEffect(() => {
@@ -519,9 +513,6 @@ const Product = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      // toast.success(data.message || "Updated successfully");
-      // Update heart state and refresh queries that depend on likes
-      // setHeartClicked((prev) => !prev);
       queryClient.invalidateQueries(["userLikes"]);
       queryClient.invalidateQueries(["globallistings"]);
     },
@@ -535,12 +526,13 @@ const Product = () => {
       window.location.href =
         "http://hosts.localhost:5173/content-and-copyright";
     } else {
-      window.location.href = "https://hosts.wono.co/content-and-copyright";
+      window.location.href = "https://hosts.wono.co/content-and-copyright ";
     }
   };
 
   return (
     <div className="p-4">
+      {/* Share Modal - Shared between both views */}
       <TransparentModal
         open={shareMenuOpen}
         onClose={() => setShareMenuOpen(false)}
@@ -599,9 +591,12 @@ const Product = () => {
           </div>
         </div>
       </TransparentModal>
-      <div className="min-w-[70%] max-w-[80rem] lg:max-w-[70rem] mx-0 md:mx-auto">
+
+      {/* ==================== DESKTOP VIEW (lg and above) ==================== */}
+      <div className="hidden lg:block min-w-[70%] max-w-[80rem] lg:max-w-[70rem] mx-0 md:mx-auto">
         <div className="pb-4">
-          <nav aria-label="Breadcrumb" className="mb-4  text-gray-500">
+          {/* Breadcrumb - Desktop Only */}
+          <nav aria-label="Breadcrumb" className="mb-4 text-gray-500">
             {[
               {
                 key: "continent",
@@ -644,17 +639,15 @@ const Product = () => {
               ))}
           </nav>
           <h1 className="text-title font-semibold text-secondary-dark">
-            {companyDetails?.companyName || "Loading Title..."}
+            {companyDetails?.companyTitle || "Loading Title..."}
           </h1>
         </div>
+
         <div className="flex flex-col gap-8">
-          {/* Image Section */}
+          {/* Desktop Image Section */}
           {isCompanyDetails ? (
-            // 🔄 Loading skeletons
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 overflow-hidden animate-pulse">
-              {/* Main Skeleton */}
               <div className="w-full h-[28.5rem] bg-gray-200 rounded-md" />
-              {/* Thumbnail Skeletons */}
               <div className="grid grid-cols-2 gap-1">
                 {[1, 2, 3, 4].map((_, idx) => (
                   <div
@@ -665,10 +658,9 @@ const Product = () => {
               </div>
             </div>
           ) : companyImages.length === 0 ? (
-            // 🚫 No images fallback
             <div className="flex flex-col items-center justify-center gap-4 py-10 border border-dashed border-gray-300 rounded-md">
               <img
-                src="https://via.placeholder.com/150x100?text=No+Images"
+                src="https://via.placeholder.com/150x100?text=No+Images "
                 alt="No images"
                 className="w-40 h-auto"
               />
@@ -677,14 +669,12 @@ const Product = () => {
               </p>
             </div>
           ) : (
-            // ✅ Actual image display
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 overflow-hidden">
-              {/* Main Image */}
               <div className="w-full h-[28.5rem] overflow-hidden rounded-md">
                 <img
                   src={
                     companyDetails?.images?.[0]?.url ||
-                    "https://via.placeholder.com/400x200?text=No+Image+Found+"
+                    "https://via.placeholder.com/400x200?text=No+Image+Found "
                   }
                   className="w-full h-full object-cover cursor-pointer"
                   onClick={() =>
@@ -692,7 +682,7 @@ const Product = () => {
                       state: {
                         companyName: companyDetails?.companyName,
                         images: companyDetails?.images,
-                        selectedImageId: selectedImage?._id, // ✅ Fix here
+                        selectedImageId: selectedImage?._id,
                         ...breadcrumbState,
                       },
                     })
@@ -701,16 +691,14 @@ const Product = () => {
                 />
               </div>
 
-              {/* Thumbnail Images */}
               <div className="grid grid-cols-2 gap-1">
                 {companyDetails?.images?.slice(1, 5).map((item, index) => (
                   <div
                     key={item._id}
-                    className={`relative w-full h-56 overflow-hidden rounded-md cursor-pointer border-2 ${
-                      selectedImage?._id === item._id
-                        ? "border-primary-dark"
-                        : "border-transparent"
-                    }`}
+                    className={`relative w-full h-56 overflow-hidden rounded-md cursor-pointer border-2 ${selectedImage?._id === item._id
+                      ? "border-primary-dark"
+                      : "border-transparent"
+                      }`}
                     onClick={() =>
                       navigate("images", {
                         state: {
@@ -727,13 +715,11 @@ const Product = () => {
                       alt="company-thumbnail"
                       className="w-full h-full object-cover"
                     />
-
-                    {/* Button on bottom right of 4th image */}
                     {showMore && index === 3 && (
                       <div className="absolute inset-0 bg-black/40 flex items-end justify-end p-2">
                         <button
                           onClick={(e) => {
-                            e.stopPropagation(); // prevent selecting the image
+                            e.stopPropagation();
                             navigate("images", {
                               state: {
                                 companyName: companyDetails?.companyName,
@@ -754,46 +740,22 @@ const Product = () => {
             </div>
           )}
 
-          {/* About and Location */}
+          {/* Desktop About and Location */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
             <div className="flex flex-col gap-8">
-              {/* {isCompanyDetails ? (
-                // 🔄 Skeleton while loading
-                <div className="w-full h-36 bg-gray-200 animate-pulse rounded-md" />
-              ) : !companyDetails?.logo || !companyDetails?.logo?.url ? (
-                // 🚫 Fallback UI when logo is missing
-                <div className="w-full h-36 flex items-center justify-center bg-gray-100 border border-dashed border-gray-300 rounded-md">
-                  <span className="text-gray-500 text-sm">
-                    No company logo available
-                  </span>
-                </div>
-              ) : (
-                // ✅ Show actual logo
-                <div className="w-full h-36 overflow-hidden rounded-md">
-                  <img
-                    src={companyDetails?.logo?.url || companyDetails?.logo}
-                    alt="company-logo"
-                    className="h-full w-full object-contain"
-                  />
-                </div>
-              )} */}
-
               {isCompanyDetails ? (
-                // 🔄 Skeleton while loading
                 <div className="w-full h-36 bg-gray-200 animate-pulse rounded-md" />
               ) : !(
-                  (typeof companyDetails?.logo === "string" &&
-                    companyDetails.logo) ||
-                  companyDetails?.logo?.url
-                ) ? (
-                // 🚫 Fallback UI when logo is missing
+                (typeof companyDetails?.logo === "string" &&
+                  companyDetails.logo) ||
+                companyDetails?.logo?.url
+              ) ? (
                 <div className="w-full h-36 flex items-center justify-center bg-gray-100 border border-dashed border-gray-300 rounded-md">
                   <span className="text-gray-500 text-sm">
                     No company logo available
                   </span>
                 </div>
               ) : (
-                // ✅ Show actual logo
                 <div className="w-full h-36 overflow-hidden rounded-md">
                   <img
                     src={
@@ -809,7 +771,7 @@ const Product = () => {
 
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <h1 className="text-title  font-medium text-gray-700 uppercase">
+                  <h1 className="text-title font-medium text-gray-700 uppercase">
                     About
                   </h1>
                   <div className="items-center flex gap-2">
@@ -840,22 +802,12 @@ const Product = () => {
                     <div
                       onClick={() => {
                         if (!userId) {
-                          // toast.error(
-                          //   "You need to login to access this feature",
-                          // );
-                          // Swal.fire({
-                          //   title: "Error!",
-                          //   text: "Do you want to continue",
-                          //   icon: "error",
-                          //   confirmButtonText: "Cool",
-                          // });
                           navigate("/login");
                           return;
                         }
-
                         const newLiked = !heartClicked;
-                        setHeartClicked(newLiked); // optimistic update
-                        toggleLike(newLiked); // API call
+                        setHeartClicked(newLiked);
+                        toggleLike(newLiked);
                       }}
                       className="cursor-pointer relative"
                     >
@@ -865,50 +817,41 @@ const Product = () => {
                         <IoIosHeartEmpty size={22} />
                       )}
                     </div>
-
-                    {/* <NavLink
-                      className={"text-small underline"}
-                      to={"/nomad/login"}
-                    >
-                      Save
-                    </NavLink> */}
                   </div>
                 </div>
 
                 {isCompanyDetails ? (
-                  // 🔄 Skeleton UI while loading
                   <div className="space-y-1 animate-pulse">
                     <div className="h-3 bg-gray-200 rounded w-3/4" />
                     <div className="h-3 bg-gray-200 rounded w-2/3" />
                     <div className="h-3 bg-gray-200 rounded w-1/2" />
                   </div>
                 ) : !companyDetails?.about ? (
-                  // 🚫 Fallback if no "about" content
                   <div className="place-content-center w-full h-full">
                     <p className="text-sm text-gray-500 italic">
                       Company information is not provided.
                     </p>
                   </div>
                 ) : (
-                  // ✅ Actual content
                   <p className="text-sm text-secondary-dark">
                     {companyDetails.about.replace(/\\n/g, " ")}
                   </p>
                 )}
               </div>
             </div>
+
             <div className="flex flex-col gap-4">
-              <div className="border-2 rounded-xl flex  gap-1 items-center p-4">
+              <div className="border-2 rounded-xl flex gap-1 items-center p-4">
                 <div className="text-tiny w-full hidden lg:flex justify-center items-center">
                   <LeafWrapper height="3rem" width={"2rem"}>
-                    <div className="text-secondary-dark font-semibold flex lg:text-subtitle flex-col leading-5  items-center">
+                    <div className="text-secondary-dark font-semibold flex lg:text-subtitle flex-col leading-5 items-center">
                       <span>Guest</span>
                       <span>Favorite</span>
                     </div>
                   </LeafWrapper>
                 </div>
                 <div className="w-full hidden lg:flex">
-                  <p className="text-tiny ">
+                  <p className="text-tiny">
                     One of the most loved places on WoNo, according to guests
                   </p>
                 </div>
@@ -921,20 +864,16 @@ const Product = () => {
                       {renderStars(companyDetails?.ratings || 0)}
                     </span>
                   </div>
-                  {/* Vertical Separator */}
                   <div className="w-px h-10 bg-gray-300 mx-2 my-auto lg:hidden" />
                   <div className="text-tiny w-full flex justify-center items-center lg:hidden">
                     <LeafWrapper height="3rem" width={"2rem"}>
-                      <div className="text-secondary-dark font-semibold flex text-tiny lg:text-subtitle flex-col leading-5  items-center">
+                      <div className="text-secondary-dark font-semibold flex text-tiny lg:text-subtitle flex-col leading-5 items-center">
                         <span>Guest</span>
                         <span>Favorite</span>
                       </div>
                     </LeafWrapper>
                   </div>
-
-                  {/* Vertical Separator */}
                   <div className="w-px h-10 bg-gray-300 mx-2 my-auto" />
-
                   <div className="flex flex-col gap-4 lg:gap-0 justify-center items-center">
                     <p className="text-tiny lg:text-subtitle mt-1">
                       {companyDetails?.reviewCount ||
@@ -955,18 +894,13 @@ const Product = () => {
                 <form
                   onSubmit={handleSubmit((data) => {
                     const formattedMobileNumber = normalizePhoneNumber(
-                      data.mobileNumber,
+                      data.mobileNumber
                     );
-                    console.log("Enquiry form submit:", {
-                      ...data,
-                      mobileNumber: formattedMobileNumber,
-                    });
                     submitEnquiry({
                       ...data,
                       mobileNumber: formattedMobileNumber,
                     });
                   })}
-                  action=""
                   className="grid grid-cols-1 lg:grid-cols-2 gap-6"
                 >
                   <Controller
@@ -1006,28 +940,23 @@ const Product = () => {
                           No. Of People
                         </label>
                         <div className="flex items-center border-b border-gray-300 py-1 w-full max-w-xs">
-                          {/* Minus Button */}
                           <button
                             type="button"
                             onClick={() =>
                               field.onChange(
-                                Math.max(0, Number(field.value || 0) - 1),
+                                Math.max(0, Number(field.value || 0) - 1)
                               )
                             }
                             className="px-3 py-1 text-lg font-semibold text-gray-600 hover:text-primary-blue"
                           >
                             −
                           </button>
-
-                          {/* Count Display */}
                           <input
                             {...field}
                             readOnly
                             className="w-full text-center outline-none bg-transparent text-gray-800 text-sm font-medium"
                             value={field.value || 0}
                           />
-
-                          {/* Plus Button */}
                           <button
                             type="button"
                             onClick={() =>
@@ -1053,7 +982,6 @@ const Product = () => {
                     rules={{
                       required: "Mobile number is required",
                       validate: {
-                        // isValidPhoneNumber,
                         isValidInternationalPhone,
                       },
                     }}
@@ -1067,12 +995,7 @@ const Product = () => {
                         size="small"
                         value={field.value || ""}
                         onChange={(value) => {
-                          const formattedValue = normalizePhoneNumber(value);
                           field.onChange(value);
-                          console.log("Enquiry mobile input:", {
-                            raw: value,
-                            formatted: formattedValue,
-                          });
                         }}
                         helperText={errors?.mobileNumber?.message}
                         error={!!errors.mobileNumber}
@@ -1102,50 +1025,6 @@ const Product = () => {
                     )}
                   />
 
-                  {/* {companyDetails?.type === "coworking" && (
-                    <Controller
-                      name="numberOfDesks"
-                      control={control}
-                      render={({ field }) => (
-                        <TextField
-                          {...field}
-                          label="Number of Desk"
-                          fullWidth
-                          variant="standard"
-                          size="small"
-                          select>
-                          <MenuItem value="" disabled>
-                            <em>Select Number of Desk</em>
-                          </MenuItem>
-                          <MenuItem value={2}>2</MenuItem>
-                          <MenuItem value={4}>4</MenuItem>
-                          <MenuItem value={10}>10</MenuItem>
-                          <MenuItem value={20}>20</MenuItem>
-                        </TextField>
-                      )}
-                    />
-                  )} */}
-                  {/* <Controller
-                    name="startDate"
-                    control={control}
-                    render={({ field }) => (
-                      <DesktopDatePicker
-                        {...field}
-                        label="Start Date"
-                        disablePast
-                        format="DD-MM-YYYY"
-                        value={field.value ? dayjs(field.value) : null}
-                        onChange={field.onChange}
-                        slotProps={{
-                          textField: {
-                            size: "small",
-                            fullWidth: true,
-                            variant: "standard",
-                          },
-                        }}
-                      />
-                    )}
-                  /> */}
                   <Controller
                     name="startDate"
                     control={control}
@@ -1153,10 +1032,8 @@ const Product = () => {
                       validate: (value) => {
                         const end = watch("endDate");
                         if (!end || !value) return true;
-
                         const startDate = dayjs(value);
                         const endDate = dayjs(end);
-
                         return (
                           startDate.isBefore(endDate) ||
                           "Start date must be before end date"
@@ -1184,28 +1061,6 @@ const Product = () => {
                     )}
                   />
 
-                  {/* <Controller
-                    name="endDate"
-                    control={control}
-                    render={({ field }) => (
-                      <DesktopDatePicker
-                        {...field}
-                        label="End Date"
-                        format="DD-MM-YYYY"
-                        disablePast
-                        disabled={!selectedStartDate}
-                        value={field.value ? dayjs(field.value) : null}
-                        onChange={field.onChange}
-                        slotProps={{
-                          textField: {
-                            size: "small",
-                            fullWidth: true,
-                            variant: "standard",
-                          },
-                        }}
-                      />
-                    )}
-                  /> */}
                   <Controller
                     name="endDate"
                     control={control}
@@ -1213,10 +1068,8 @@ const Product = () => {
                       validate: (value) => {
                         const start = watch("startDate");
                         if (!start || !value) return true;
-
                         const startDate = dayjs(start);
                         const endDate = dayjs(value);
-
                         return (
                           endDate.isAfter(startDate) ||
                           "End date must be after start date"
@@ -1258,13 +1111,14 @@ const Product = () => {
               </div>
             </div>
           </div>
+
           <hr className="my-5 lg:my-10" />
-          {/* Inclusions */}
+
+          {/* Desktop Inclusions */}
           <div className="flex flex-col gap-8 w-full">
             <h1 className="text-title text-gray-700 font-medium uppercase">
               What Inclusions does it offer
             </h1>
-
             {inclusions.length === 0 ? (
               <div className="w-full border-2 border-dotted border-gray-400 rounded-lg p-6 text-center text-gray-500">
                 Inclusions not available
@@ -1275,19 +1129,13 @@ const Product = () => {
                   type={companyDetails?.companyType.toLowerCase() || ""}
                   inclusions={inclusions}
                 />
-                {/* <div className="flex justify-end">
-                  <button
-                    onClick={() => setShowAmenities(true)}
-                    className="text-primary-blue text-content hover:underline"
-                  >
-                    Show more
-                  </button>
-                </div> */}
               </div>
             )}
           </div>
 
           <hr className="my-5 lg:my-10" />
+
+          {/* Desktop Reviews Section */}
           <div className="flex flex-col gap-8 w-full">
             <div className="flex flex-col justify-center items-center max-w-4xl mx-auto">
               <h1 className="text-main-header font-medium mt-5">
@@ -1296,23 +1144,13 @@ const Product = () => {
                   align="items-start"
                 />
               </h1>
-
-              <p className="text-subtitle  my-4 font-medium">Guest Favorite</p>
+              <p className="text-subtitle my-4 font-medium">Guest Favorite</p>
               <span className="text-content text-center">
                 This place is a guest favourite based on <br /> ratings, reviews
                 and reliability
               </span>
             </div>
-            {/* <div className="flex justify-end">
-              <button
-                type="button"
-                className="rounded-full border border-primary-blue text-primary-blue px-5 py-2 text-sm font-semibold hover:bg-primary-blue hover:text-white transition-colors"
-                onClick={() => setIsAddReviewOpen(true)}
-                disabled={!companyDetails?.companyId}
-              >
-                Add a review
-              </button>
-            </div> */}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-0 lg:p-0">
               {companyDetails?.reviews?.length > 0 ? (
                 companyDetails?.reviews?.slice(0, 6).map((review, index) => (
@@ -1331,6 +1169,7 @@ const Product = () => {
                 </div>
               )}
             </div>
+
             <div className="text-right">
               <a
                 className="text-primary-blue text-sm font-semibold hover:underline"
@@ -1343,7 +1182,6 @@ const Product = () => {
             </div>
 
             <hr className="my-5 lg:my-10" />
-
             {/* <div className="flex flex-col justify-center items-center max-w-4xl mx-auto">
               <h1 className="text-main-header font-medium mt-5">
                 <LeafRatings
@@ -1401,7 +1239,8 @@ const Product = () => {
             </div> */}
 
             <hr className="my-5 lg:my-10" />
-            {/* Map */}
+
+            {/* Desktop Map */}
             <div className="w-full h-[500px] flex flex-col gap-8 rounded-xl overflow-hidden">
               <h1 className="text-title font-medium text-gray-700 uppercase">
                 Where you'll be
@@ -1413,6 +1252,886 @@ const Product = () => {
               />
             </div>
 
+            {/* Desktop Host Section */}
+            {["CMP0001", "CMP0052"].includes(companyDetails?.companyId) && (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10 pt-10">
+                  <div className="flex flex-col lg:flex-row justify-center items-center col-span-1 border-2 shadow-md gap-4 rounded-xl p-6 w-full">
+                    <div className="flex flex-col gap-4 justify-between items-center h-full w-56">
+                      <div className="w-32 aspect-square rounded-full bg-primary-blue flex items-center justify-center text-white text-6xl font-semibold uppercase">
+                        {companyDetails?.poc?.name
+                          ?.split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                          .slice(0, 2) || "AG"}
+                      </div>
+                      <div className="text-center space-y-3 h-1/2 flex flex-col justify-evenly items-center">
+                        <h1 className="text-title text-gray-700 font-medium leading-10">
+                          {companyDetails?.poc?.name || "Sales Team"}
+                        </h1>
+                        <p className="text-content">
+                          {companyDetails?.poc?.designation ||
+                            "Sales Department"}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="w-px h-full bg-gray-300 mx-2 my-auto" />
+                    <div className="h-full w-56 flex flex-col justify-normal">
+                      <p className="text-title text-center text-gray-700 font-medium mb-8 underline uppercase">
+                        Host Details
+                      </p>
+                      <div className="flex flex-col gap-5 text-sm sm:text-base">
+                        {[
+                          "Response rate: 100%",
+                          "Speaks English, Hindi, Marathi and Konkani",
+                          "Responds within an hour",
+                          "Lives in Velha, Goa",
+                        ].map((detail, index) => (
+                          <div key={index} className="flex items-start gap-2">
+                            <FaCheck className="text-blue-500 mt-1 flex-shrink-0" />
+                            <span className="leading-snug">{detail}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex w-full border-2 shadow-md rounded-xl">
+                    <div className="flex flex-col h-full gap-4 rounded-xl p-6 w-full lg:w-full justify-between">
+                      <h1 className="text-title text-gray-700 font-medium uppercase">
+                        Connect With Host
+                      </h1>
+                      <form
+                        onSubmit={handlesubmitSales((data) => submitSales(data))}
+                        className="grid grid-cols-1 gap-4"
+                      >
+                        <Controller
+                          name="fullName"
+                          control={salesControl}
+                          rules={{
+                            required: "Full Name is required",
+                            validate: {
+                              isAlphanumeric,
+                              noOnlyWhitespace,
+                            },
+                          }}
+                          render={({ field }) => (
+                            <TextField
+                              {...field}
+                              label="Full Name"
+                              fullWidth
+                              variant="standard"
+                              size="small"
+                              error={!!salesErrors?.fullName}
+                              helperText={salesErrors?.fullName?.message}
+                            />
+                          )}
+                        />
+                        <Controller
+                          name="mobileNumber"
+                          control={salesControl}
+                          rules={{
+                            required: "Mobile number is required",
+                            validate: {
+                              isValidInternationalPhone,
+                            },
+                          }}
+                          render={({ field }) => (
+                            <MuiTelInput
+                              {...field}
+                              label="Mobile Number"
+                              fullWidth
+                              defaultCountry="IN"
+                              variant="standard"
+                              size="small"
+                              value={field.value || ""}
+                              onChange={(value) => {
+                                const formattedValue = normalizePhoneNumber(value);
+                                field.onChange(value);
+                                console.log("Sales mobile input:", {
+                                  raw: value,
+                                  formatted: formattedValue,
+                                });
+                              }}
+                              helperText={salesErrors?.mobileNumber?.message}
+                              error={!!salesErrors?.mobileNumber}
+                            />
+                          )}
+                        />
+                        <Controller
+                          name="email"
+                          control={salesControl}
+                          rules={{
+                            required: "Email is required",
+                            validate: { isValidEmail },
+                          }}
+                          render={({ field }) => (
+                            <TextField
+                              {...field}
+                              label="Email"
+                              fullWidth
+                              type="email"
+                              variant="standard"
+                              size="small"
+                              error={!!salesErrors?.email}
+                              helperText={salesErrors?.email?.message}
+                            />
+                          )}
+                        />
+                        <div className="flex justify-center items-center">
+                          <SecondaryButton
+                            title={"Submit"}
+                            type={"submit"}
+                            externalStyles={"mt-6 w-1/2"}
+                            disabled={isSubmittingSales}
+                            isLoading={isSubmittingSales}
+                          />
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                <hr className="mt-5 mb-0 lg:mt-10 lg:mb-0" />
+              </>
+
+            )}
+
+
+
+            {/* Desktop Disclaimer */}
+            <div className="text-[0.74rem] text-gray-500 leading-relaxed">
+              <p className="mb-2">
+                <b>Source:</b> All above content, images and details have been
+                sourced from publicly available information.
+              </p>
+              <p className="mb-2">
+                <b>Content and Copyright Disclaimer:</b> WoNo is a nomad
+                services and informational platform that aggregates and presents
+                publicly available information about co-working spaces,
+                co-living spaces, serviced apartments, hostels, workation
+                spaces, meeting rooms, working cafés and related lifestyle or
+                travel services. All such information displayed on its platform,
+                including images, brand names, or descriptions is shared solely
+                for informational and reference purposes to help nomads/users
+                discover and compare global nomad-friendly information and
+                services on its central platform.
+              </p>
+              <p className="mb-2">
+                WoNo does not claim ownership of any third-party logos, images,
+                descriptions, or business information displayed on the platform.
+                All trademarks, brand names, and intellectual property remain
+                the exclusive property of their respective owners and platforms.
+                The inclusion of third-party information does not imply
+                endorsement, partnership, or affiliation unless explicitly
+                stated.
+              </p>
+              <p className="mb-2">
+                The content featured from other websites and platforms on WoNo
+                is not used for direct monetization, resale, or advertising
+                gain. WoNo's purpose is to inform and connect digital nomads and
+                remote working professionals by curating publicly available data
+                in a transparent, good-faith manner for the ease of its users
+                and to support and grow the businesses who are providing these
+                services with intent to grow them and the ecosystem.
+              </p>
+              <p className="mt-2">
+                Read the entire{" "}
+                <span
+                  className="underline text-primary-blue cursor-pointer"
+                  onClick={goToHostsContentCopyright}
+                >
+                  Content and Copyright
+                </span>{" "}
+                by clicking the link in our website footer.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ==================== MOBILE/TABLET VIEW (below lg) ==================== */}
+      <div className="lg:hidden min-w-[70%] max-w-[80rem] lg:max-w-[70rem] mx-0 md:mx-auto">
+        <div className="pb-4">
+          {/* Breadcrumb - Mobile/Tablet */}
+          <nav aria-label="Breadcrumb" className="mb-4 text-gray-500 text-[10px] md:text-sm">
+            {[
+              {
+                key: "continent",
+                label: companyDetails?.continent,
+                isLink: true,
+              },
+              { key: "country", label: companyDetails?.country, isLink: true },
+              { key: "state", label: companyDetails?.state, isLink: true },
+              {
+                key: "companyType",
+                label: getCompanyTypeBreadcrumbLabel(
+                  companyDetails?.companyType,
+                ),
+                isLink: true,
+              },
+              {
+                key: "companyName",
+                label: companyDetails?.companyName || companyName,
+                isLink: false,
+              },
+            ]
+              .filter((item) => item.label)
+              .map((item, index, items) => (
+                <span key={`${item.label}-${index}`}>
+                  {item.isLink ? (
+                    <button
+                      type="button"
+                      onClick={() => handleBreadcrumbNavigate(item.key)}
+                      className="text-gray-500 hover:text-gray-700 transition-colors"
+                    >
+                      {item.label}
+                    </button>
+                  ) : (
+                    <span className="truncate max-w-[80px] md:max-w-none inline-block align-bottom">{item.label}</span>
+                  )}
+                  {index < items.length - 1 ? (
+                    <span className="mx-1 md:mx-2">{">"}</span>
+                  ) : null}
+                </span>
+              ))}
+          </nav>
+          <h1 className="text-title font-semibold text-secondary-dark">
+            {companyDetails?.companyName || "Loading Title..."}
+          </h1>
+        </div>
+
+        <div className="flex flex-col gap-8">
+          {/* Mobile Image Section */}
+          {isCompanyDetails ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 overflow-hidden animate-pulse">
+              <div className="w-full h-[28.5rem] bg-gray-200 rounded-md" />
+              <div className="grid grid-cols-2 gap-1">
+                {[1, 2, 3, 4].map((_, idx) => (
+                  <div
+                    key={idx}
+                    className="w-full h-56 bg-gray-200 rounded-md"
+                  />
+                ))}
+              </div>
+            </div>
+          ) : companyImages.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-4 py-10 border border-dashed border-gray-300 rounded-md">
+              <img
+                src="https://via.placeholder.com/150x100?text=No+Images "
+                alt="No images"
+                className="w-40 h-auto"
+              />
+              <p className="text-gray-500 text-sm">
+                No images have been provided by the company.
+              </p>
+            </div>
+          ) : (
+            <div className="w-full">
+              {/* Tablet Grid Layout */}
+              <div className="hidden md:grid grid-cols-2 gap-2 overflow-hidden">
+                <div className="w-full h-[28.5rem] overflow-hidden rounded-md">
+                  <img
+                    src={
+                      companyDetails?.images?.[0]?.url ||
+                      "https://via.placeholder.com/400x200?text=No+Image+Found "
+                    }
+                    className="w-full h-full object-cover cursor-pointer hover:opacity-95 transition-opacity"
+                    onClick={() =>
+                      navigate("images", {
+                        state: {
+                          companyName: companyDetails?.companyName,
+                          images: companyDetails?.images,
+                          selectedImageId: selectedImage?._id,
+                        },
+                      })
+                    }
+                    alt="Selected"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-1 px-1">
+                  {companyDetails?.images?.slice(1, 5).map((item, index) => (
+                    <div
+                      key={item._id}
+                      className={`relative w-full h-56 overflow-hidden rounded-md cursor-pointer border-2 ${selectedImage?._id === item._id
+                        ? "border-primary-dark"
+                        : "border-transparent"
+                        }`}
+                      onClick={() =>
+                        navigate("images", {
+                          state: {
+                            companyName: companyDetails?.companyName,
+                            images: companyDetails?.images,
+                            selectedImageId: item._id,
+                          },
+                        })
+                      }
+                    >
+                      <img
+                        src={item.url}
+                        alt="company-thumbnail"
+                        className="w-full h-full object-cover"
+                      />
+                      {showMore && index === 3 && (
+                        <div className="absolute inset-0 bg-black/40 flex items-end justify-end p-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate("images", {
+                                state: {
+                                  companyName: companyDetails?.companyName,
+                                  images: companyDetails?.images,
+                                },
+                              });
+                            }}
+                            className="bg-white text-sm px-3 py-1 rounded shadow font-medium"
+                          >
+                            +{companyDetails.images.length - 4} more
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Mobile Image Carousel */}
+              <div className="md:hidden relative group -mx-2">
+                <div
+                  ref={carouselRef}
+                  className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide"
+                  onScroll={handleScroll}
+                  style={{
+                    WebkitOverflowScrolling: "touch",
+                  }}
+                >
+                  {companyDetails?.images?.map((item, index) => (
+                    <div
+                      key={item._id}
+                      className="w-full aspect-[4/3] flex-shrink-0 snap-center overflow-hidden"
+                      onClick={() =>
+                        navigate("images", {
+                          state: {
+                            companyName: companyDetails?.companyName,
+                            images: companyDetails?.images,
+                            selectedImageId: item._id,
+                          },
+                        })
+                      }
+                    >
+                      <img
+                        src={item.url}
+                        alt={`product-img-${index}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5 px-2 py-1.5 rounded-full bg-black/30 backdrop-blur-sm z-10">
+                  {companyDetails?.images?.slice(0, 8).map((_, idx) => (
+                    <div
+                      key={idx}
+                      className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${currentImageIndex === idx
+                        ? "bg-white w-4"
+                        : "bg-white/50"
+                        }`}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Mobile About and Location */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
+            <div className="flex flex-col gap-1">
+              {isCompanyDetails ? (
+                <div className="w-full h-36 bg-gray-200 animate-pulse rounded-md" />
+              ) : !(
+                (typeof companyDetails?.logo === "string" &&
+                  companyDetails.logo) ||
+                companyDetails?.logo?.url
+              ) ? (
+                <div className="w-full h-36 flex items-center justify-center bg-gray-100 border border-dashed border-gray-300 rounded-md">
+                  <span className="text-gray-500 text-sm">
+                    No company logo available
+                  </span>
+                </div>
+              ) : (
+                <div className="w-full h-36 overflow-hidden rounded-md">
+                  <img
+                    src={
+                      (typeof companyDetails?.logo === "string" &&
+                        companyDetails.logo) ||
+                      companyDetails?.logo?.url
+                    }
+                    alt="company-logo"
+                    className="h-full w-full object-contain"
+                  />
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <div className="flex flex-col-reverse md:flex-row md:justify-between md:items-center gap-4 mb-4 mt-2">
+                  <h1 className="text-center md:text-left text-title font-medium text-gray-700 uppercase">
+                    About
+                  </h1>
+
+                  <div className="flex items-center justify-center sm:justify-start gap-3 md:gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setShareMenuOpen(true)}
+                    >
+                      <FiShare2 className="text-gray-600" size={17} />
+                    </button>
+
+                    {companyDetails?.websiteTemplateLink && (
+                      <a
+                        href={companyDetails?.websiteTemplateLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-small font-semibold underline text-primary-blue hover:text-blue-700 transition-colors"
+                      >
+                        <Globe
+                          className="text-primary-blue md:w-[24px] md:h-[24px] lg:w-[32px] lg:h-[32px]"
+                          size={20}
+                        />
+                      </a>
+                    )}
+
+                    <div
+                      onClick={() => {
+                        if (!userId) {
+                          navigate("/login");
+                          return;
+                        }
+                        const newLiked = !heartClicked;
+                        setHeartClicked(newLiked);
+                        toggleLike(newLiked);
+                      }}
+                      className="cursor-pointer relative"
+                    >
+                      {heartClicked ? (
+                        <IoIosHeart className="text-[#ff5757]" size={22} />
+                      ) : (
+                        <IoIosHeartEmpty size={22} />
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {isCompanyDetails ? (
+                  <div className="space-y-1 animate-pulse">
+                    <div className="h-3 bg-gray-200 rounded w-3/4" />
+                    <div className="h-3 bg-gray-200 rounded w-2/3" />
+                    <div className="h-3 bg-gray-200 rounded w-1/2" />
+                  </div>
+                ) : !companyDetails?.about ? (
+                  <div className="place-content-center w-full h-full">
+                    <p className="text-sm text-gray-500 italic">
+                      Company information is not provided.
+                    </p>
+                  </div>
+                ) : (
+                  <div>
+                    <p
+                      className={`text-sm text-secondary-dark leading-relaxed ${!isAboutExpanded
+                        ? "line-clamp-4 md:line-clamp-none"
+                        : ""
+                        }`}
+                    >
+                      {companyDetails.about.replace(/\\n/g, " ")}
+                    </p>
+                    {companyDetails.about.length > 250 && (
+                      <button
+                        onClick={() => setIsAboutExpanded(!isAboutExpanded)}
+                        className="md:hidden text-primary-blue text-xs font-semibold mt-2 hover:underline focus:outline-none"
+                      >
+                        {isAboutExpanded ? "Show less" : "Show more"}
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="relative w-full">
+              <div className="w-full md:static lg:sticky lg:top-24 flex flex-col gap-6">
+                {/* Mobile/Tablet Guest Favorite Card */}
+                <div className="border border-gray-200 rounded-2xl md:rounded-3xl flex flex-col lg:flex-row items-center justify-between p-4 lg:p-8 bg-white shadow-sm hover:shadow-md transition-all gap-6 lg:gap-0">
+                  <div className="flex flex-col lg:flex-row items-center justify-center gap-3 w-full lg:w-auto text-center sm:text-left">
+                    <LeafWrapper height="4rem" width="3rem">
+                      <div className="flex flex-col items-center leading-tight">
+                        <span className="text-[20px] uppercase tracking-tighter text-gray-400">
+                          Guest
+                        </span>
+                        <span className="text-secondary-dark font-bold text-xl">
+                          Favorite
+                        </span>
+                      </div>
+                    </LeafWrapper>
+                    <div className="hidden lg:block w-px h-8 bg-gray-100 mx-2" />
+                    <p className="text-xs text-gray-500 max-w-[300px] sm:max-w-none">
+                      One of the most loved places on WoNo
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-center lg:justify-end gap-6 w-full lg:w-auto border-t lg:border-t-0 lg:border-l border-gray-100 pt-4 lg:pt-0 lg:pl-6">
+                    <div className="flex flex-col items-center">
+                      <span className="text-lg font-bold text-gray-900">
+                        {companyDetails?.ratings || "0"}
+                      </span>
+                      <div className="flex text-[10px] text-gray-400">
+                        {renderStars(companyDetails?.ratings || 0)}
+                      </div>
+                    </div>
+                    <div className="w-px h-8 bg-gray-100" />
+                    <div className="flex flex-col items-center">
+                      <span className="text-lg font-bold text-gray-900">
+                        {companyDetails?.reviewCount ||
+                          companyDetails?.totalReviews ||
+                          0}
+                      </span>
+                      <span className="text-[10px] text-gray-400 uppercase font-medium">
+                        Reviews
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mobile/Tablet Enquiry Form */}
+                <div className="shadow-lg flex flex-col gap-2 md:gap-4 p-4 md:p-5 lg:p-8 rounded-2xl border border-gray-100 bg-white max-w-full">
+                  <h1 className="text-center md:text-base lg:text-xl xl:text-2xl text-secondary-dark font-bold">
+                    Enquire & Receive Quote
+                  </h1>
+                  <form
+                    onSubmit={handleSubmit((data) => {
+                      const formattedMobileNumber = normalizePhoneNumber(
+                        data.mobileNumber
+                      );
+                      submitEnquiry({
+                        ...data,
+                        mobileNumber: formattedMobileNumber,
+                      });
+                    })}
+                    className="grid grid-cols-1 gap-y-4 md:gap-y-5"
+                  >
+                    <Controller
+                      name="fullName"
+                      rules={{
+                        required: "Full Name is required",
+                        validate: {
+                          noOnlyWhitespace,
+                          isAlphanumeric,
+                        },
+                      }}
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          label="Full Name"
+                          fullWidth
+                          variant="standard"
+                          size="small"
+                          helperText={errors?.fullName?.message}
+                          error={!!errors.fullName}
+                        />
+                      )}
+                    />
+                    <Controller
+                      name="noOfPeople"
+                      control={control}
+                      rules={{
+                        required: "No. of people is required",
+                        validate: (value) =>
+                          value > 0 || "At least one person is required",
+                      }}
+                      render={({ field }) => (
+                        <div className="flex flex-col gap-1">
+                          <label className="text-sm text-gray-600 font-medium">
+                            No. Of People
+                          </label>
+                          <div className="flex items-center border-b border-gray-300 py-1 w-full mt-auto">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                field.onChange(
+                                  Math.max(0, Number(field.value || 0) - 1)
+                                )
+                              }
+                              className="px-3 py-1 text-lg font-semibold text-gray-600 hover:text-primary-blue"
+                            >
+                              −
+                            </button>
+                            <input
+                              {...field}
+                              readOnly
+                              className="w-full text-center outline-none bg-transparent text-gray-800 text-sm font-medium"
+                              value={field.value || 0}
+                            />
+                            <button
+                              type="button"
+                              onClick={() =>
+                                field.onChange(Number(field.value || 0) + 1)
+                              }
+                              className="px-3 py-1 text-lg font-semibold text-gray-600 hover:text-primary-blue"
+                            >
+                              +
+                            </button>
+                          </div>
+                          {errors?.noOfPeople && (
+                            <p className="text-red-500 text-xs mt-1">
+                              {errors.noOfPeople.message}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    />
+
+                    <Controller
+                      name="mobileNumber"
+                      control={control}
+                      rules={{
+                        required: "Mobile number is required",
+                        validate: {
+                          isValidInternationalPhone,
+                        },
+                      }}
+                      render={({ field }) => (
+                        <MuiTelInput
+                          {...field}
+                          label="Mobile Number"
+                          fullWidth
+                          defaultCountry="IN"
+                          variant="standard"
+                          size="small"
+                          value={field.value || ""}
+                          onChange={(value) => {
+                            field.onChange(value);
+                          }}
+                          helperText={errors?.mobileNumber?.message}
+                          error={!!errors.mobileNumber}
+                        />
+                      )}
+                    />
+                    <Controller
+                      name="email"
+                      control={control}
+                      rules={{
+                        required: "Email is required",
+                        validate: {
+                          isValidEmail,
+                        },
+                      }}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          label="Email"
+                          fullWidth
+                          type="email"
+                          variant="standard"
+                          size="small"
+                          helperText={errors?.email?.message}
+                          error={!!errors.email}
+                        />
+                      )}
+                    />
+
+                    <Controller
+                      name="startDate"
+                      control={control}
+                      rules={{
+                        validate: (value) => {
+                          const end = watch("endDate");
+                          if (!end || !value) return true;
+                          const startDate = dayjs(value);
+                          const endDate = dayjs(end);
+                          return (
+                            startDate.isBefore(endDate) ||
+                            "Start date must be before end date"
+                          );
+                        },
+                      }}
+                      render={({ field }) => (
+                        <DesktopDatePicker
+                          {...field}
+                          label="Start Date"
+                          disablePast
+                          format="DD-MM-YYYY"
+                          value={field.value ? dayjs(field.value) : null}
+                          onChange={field.onChange}
+                          slotProps={{
+                            textField: {
+                              size: "small",
+                              fullWidth: true,
+                              variant: "standard",
+                              error: !!errors.startDate,
+                              helperText: errors?.startDate?.message,
+                            },
+                          }}
+                        />
+                      )}
+                    />
+
+                    <Controller
+                      name="endDate"
+                      control={control}
+                      rules={{
+                        validate: (value) => {
+                          const start = watch("startDate");
+                          if (!start || !value) return true;
+                          const startDate = dayjs(start);
+                          const endDate = dayjs(value);
+                          return (
+                            endDate.isAfter(startDate) ||
+                            "End date must be after start date"
+                          );
+                        },
+                      }}
+                      render={({ field }) => (
+                        <DesktopDatePicker
+                          {...field}
+                          label="End Date"
+                          format="DD-MM-YYYY"
+                          disablePast
+                          disabled={!selectedStartDate}
+                          value={field.value ? dayjs(field.value) : null}
+                          onChange={field.onChange}
+                          slotProps={{
+                            textField: {
+                              size: "small",
+                              fullWidth: true,
+                              variant: "standard",
+                              error: !!errors.endDate,
+                              helperText: errors?.endDate?.message,
+                            },
+                          }}
+                        />
+                      )}
+                    />
+
+                    <div className="flex justify-center items-center mt-4 md:mt-8">
+                      <SecondaryButton
+                        disabled={isSubmitting}
+                        isLoading={isSubmitting}
+                        title={"GET QUOTE"}
+                        type={"submit"}
+                        externalStyles={
+                          "w-full md:w-3/4 lg:w-1/2 rounded-full py-3 shadow-lg"
+                        }
+                      />
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <hr className="my-5 md:my-10" />
+
+          {/* Mobile Inclusions */}
+          <div className="flex flex-col gap-8 w-full">
+            <h1 className="text-md md:text-title text-gray-700 font-medium uppercase">
+              What Inclusions does it offer
+            </h1>
+            {inclusions.length === 0 ? (
+              <div className="w-full border-2 border-dotted border-gray-400 rounded-lg p-6 text-center text-gray-500">
+                Inclusions not available
+              </div>
+            ) : (
+              <div className="flex flex-col gap-10 w-full">
+                <AmenitiesList
+                  type={companyDetails?.companyType.toLowerCase() || ""}
+                  inclusions={inclusions}
+                />
+              </div>
+            )}
+          </div>
+
+          <hr className="my-5 md:my-10" />
+
+          {/* Mobile Reviews Section */}
+          <div className="flex flex-col gap-8 w-full">
+            <div className="flex flex-col justify-center items-center max-w-4xl mx-auto mb-4">
+              <h1 className="text-4xl md:text-6xl lg:text-main-header font-medium mt-5">
+                <LeafRatings
+                  ratings={companyDetails?.ratings || 0}
+                  align="items-start"
+                />
+              </h1>
+              <p className="text-subtitle my-4 font-medium">Guest Favorite</p>
+              <span className="text-content text-center">
+                This place is a guest favourite based on <br /> ratings, reviews
+                and reliability
+              </span>
+            </div>
+
+            <div className="flex overflow-x-auto gap-6 px-4 md:px-0 scrollbar-hide snap-x snap-mandatory pb-4">
+              {companyDetails?.reviews?.length > 0 ? (
+                companyDetails.reviews.slice(0, 8).map((review, index) => (
+                  <div
+                    key={index}
+                    className="min-w-[300px] md:min-w-[400px] flex-shrink-0 snap-center h-full"
+                  >
+                    <ReviewCard
+                      handleClick={() => {
+                        setSelectedReview(review);
+                        setOpen(true);
+                      }}
+                      review={review}
+                    />
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-full border-2 border-dotted border-gray-300 rounded-xl p-6 text-center text-sm text-gray-500 h-40 flex justify-center items-center">
+                  No reviews yet.
+                </div>
+              )}
+            </div>
+
+            <div className="text-right">
+              <a
+                className="text-primary-blue text-sm font-semibold hover:underline"
+                href={companyDetails?.googleMap}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View More →
+              </a>
+            </div>
+
+            <hr className="my-5 md:my-10" />
+
+            <div className="flex justify-between items-center mb-6">
+              <h1 className="text-md md:text-title font-medium text-gray-700 uppercase">
+                Platform Reviews
+              </h1>
+              <button
+                type="button"
+                className="rounded-full border border-primary-blue bg-primary-blue text-white px-4 md:px-5 py-2 text-[10px] md:text-sm font-semibold hover:bg-primary-blue hover:text-white transition-colors"
+                onClick={handleWriteReviewClick}
+                disabled={!companyDetails?.companyId}
+              >
+                Write A Review
+              </button>
+            </div>
+
+            <hr className="my-5 lg:my-10" />
+
+            {/* Mobile Map */}
+            <div className="w-full h-[350px] md:h-[500px] flex flex-col gap-8 rounded-xl overflow-hidden mt-6">
+              <h1 className="text-title font-medium text-gray-700 uppercase">
+                Where you'll be
+              </h1>
+              <Map
+                locations={mapsData}
+                disableNavigation
+                disableTwoFingerScroll
+              />
+            </div>
+
+            {/* Host Section - Responsive: Mobile/Tablet stacked, Desktop side-by-side */}
             {["CMP0001", "CMP0052"].includes(companyDetails?.companyId) && (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10 pt-10">
@@ -1499,21 +2218,28 @@ const Product = () => {
                           rules={{
                             required: "Mobile number is required",
                             validate: {
-                              // isValidPhoneNumber,
                               isValidInternationalPhone,
                             },
                           }}
                           render={({ field }) => (
-                            <TextField
+                            <MuiTelInput
                               {...field}
                               label="Mobile Number"
                               fullWidth
-                              value={field.value || ""}
-                              type="tel"
+                              defaultCountry="IN"
                               variant="standard"
                               size="small"
-                              error={!!salesErrors?.mobileNumber}
+                              value={field.value || ""}
+                              onChange={(value) => {
+                                const formattedValue = normalizePhoneNumber(value);
+                                field.onChange(value);
+                                console.log("Sales mobile input:", {
+                                  raw: value,
+                                  formatted: formattedValue,
+                                });
+                              }}
                               helperText={salesErrors?.mobileNumber?.message}
+                              error={!!salesErrors?.mobileNumber}
                             />
                           )}
                         />
@@ -1554,42 +2280,59 @@ const Product = () => {
             )}
             <hr className="mt-5 mb-0 lg:mt-10 lg:mb-0" />
 
-            {/* Content & Source Disclaimer */}
+            {/* Mobile Disclaimer */}
             <div className="text-[0.74rem] text-gray-500 leading-relaxed">
               <p className="mb-2">
                 <b>Source:</b> All above content, images and details have been
                 sourced from publicly available information.
               </p>
-              <p className="mb-2">
-                <b>Content and Copyright Disclaimer:</b> WoNo is a nomad
-                services and informational platform that aggregates and presents
-                publicly available information about co-working spaces,
-                co-living spaces, serviced apartments, hostels, workation
-                spaces, meeting rooms, working cafés and related lifestyle or
-                travel services. All such information displayed on its platform,
-                including images, brand names, or descriptions is shared solely
-                for informational and reference purposes to help nomads/users
-                discover and compare global nomad-friendly information and
-                services on its central platform.
-              </p>
-              <p className="mb-2">
-                WoNo does not claim ownership of any third-party logos, images,
-                descriptions, or business information displayed on the platform.
-                All trademarks, brand names, and intellectual property remain
-                the exclusive property of their respective owners and platforms.
-                The inclusion of third-party information does not imply
-                endorsement, partnership, or affiliation unless explicitly
-                stated.
-              </p>
-              <p className="mb-2">
-                The content featured from other websites and platforms on WoNo
-                is not used for direct monetization, resale, or advertising
-                gain. WoNo’s purpose is to inform and connect digital nomads and
-                remote working professionals by curating publicly available data
-                in a transparent, good-faith manner for the ease of its users
-                and to support and grow the businesses who are providing these
-                services with intent to grow them and the ecosystem.
-              </p>
+
+              <div
+                className={`${!isDisclaimerExpanded
+                  ? "line-clamp-[6] md:line-clamp-none overflow-hidden"
+                  : ""
+                  }`}
+              >
+                <p className="mb-2">
+                  <b>Content and Copyright Disclaimer:</b> WoNo is a nomad
+                  services and informational platform that aggregates and
+                  presents publicly available information about co-working
+                  spaces, co-living spaces, serviced apartments, hostels,
+                  workation spaces, meeting rooms, working cafés and related
+                  lifestyle or travel services. All such information displayed
+                  on its platform, including images, brand names, or
+                  descriptions is shared solely for informational and reference
+                  purposes to help nomads/users discover and compare global
+                  nomad-friendly information and services on its central
+                  platform.
+                </p>
+                <p className="mb-2">
+                  WoNo does not claim ownership of any third-party logos, images,
+                  descriptions, or business information displayed on the
+                  platform. All trademarks, brand names, and intellectual
+                  property remain the exclusive property of their respective
+                  owners and platforms. The inclusion of third-party information
+                  does not imply endorsement, partnership, or affiliation unless
+                  explicitly stated.
+                </p>
+                <p className="mb-2">
+                  The content featured from other websites and platforms on WoNo
+                  is not used for direct monetization, resale, or advertising
+                  gain. WoNo's purpose is to inform and connect digital nomads
+                  and remote working professionals by curating publicly available
+                  data in a transparent, good-faith manner for the ease of its
+                  users and to support and grow the businesses who are providing
+                  these services with intent to grow them and the ecosystem.
+                </p>
+              </div>
+
+              <button
+                onClick={() => setIsDisclaimerExpanded(!isDisclaimerExpanded)}
+                className="md:hidden text-primary-blue text-xs font-semibold mt-1 mb-2 hover:underline focus:outline-none"
+              >
+                {isDisclaimerExpanded ? "View less" : "View more"}
+              </button>
+
               <p className="mt-2">
                 Read the entire{" "}
                 <span
@@ -1604,9 +2347,10 @@ const Product = () => {
           </div>
         </div>
       </div>
+
+      {/* Review Detail Modal */}
       <MuiModal open={open} onClose={() => setOpen(false)} title={"Review"}>
         <div className="flex flex-col gap-4">
-          {/* Reviewer Info */}
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-full bg-primary-blue flex items-center justify-center text-white font-semibold text-lg uppercase">
               {(
@@ -1628,13 +2372,9 @@ const Product = () => {
               <p className="text-sm text-gray-500">{selectedReview?.date}</p>
             </div>
           </div>
-
-          {/* Star Rating */}
           <div className="flex items-center gap-1 text-black text-sm">
             {renderStars(selectedReview?.rating || selectedReview?.starCount)}
           </div>
-
-          {/* Message */}
           <div className="text-gray-800 text-sm whitespace-pre-line leading-relaxed">
             {selectedReview?.message ||
               selectedReview?.reviewText ||
@@ -1643,6 +2383,7 @@ const Product = () => {
         </div>
       </MuiModal>
 
+      {/* Add Review Modal */}
       <MuiModal
         open={isAddReviewOpen}
         onClose={() => setIsAddReviewOpen(false)}
@@ -1667,9 +2408,6 @@ const Product = () => {
                 </p>
               </div>
             </div>
-            {/* <span className="text-sm font-semibold text-green-600">
-              Approved
-            </span> */}
           </div>
           <Controller
             name="starCount"
@@ -1729,34 +2467,6 @@ const Product = () => {
               />
             )}
           />
-          {/* <Controller
-            name="reviewSource"
-            control={reviewControl}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Review Source"
-                fullWidth
-                variant="standard"
-                size="small"
-                placeholder="Google"
-              />
-            )}
-          /> */}
-          {/* <Controller
-            name="reviewLink"
-            control={reviewControl}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Review Link"
-                fullWidth
-                variant="standard"
-                size="small"
-                placeholder="https://g.co/kgs/example"
-              />
-            )}
-          /> */}
           <div className="flex justify-center">
             <SecondaryButton
               title={"Submit Review"}
@@ -1769,6 +2479,7 @@ const Product = () => {
         </form>
       </MuiModal>
 
+      {/* Amenities Modal */}
       <TransparentModal
         open={showAmenities}
         onClose={() => setShowAmenities(false)}
@@ -1792,7 +2503,7 @@ const Product = () => {
           ))}
         </div>
       </TransparentModal>
-    </div>
+    </div >
   );
 };
 

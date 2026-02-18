@@ -1,10 +1,19 @@
 import { Router } from "express";
-import { getBlogs, bulkInsertBlogs } from "../controllers/blogController.js";
+import {
+    getBlogs,
+    bulkInsertBlogs,
+    createBlog,
+    updateBlog,
+    deleteBlog,
+} from "../controllers/blogController.js";
 import upload from "../config/multerConfig.js";
 
 const router = Router();
 
-router.get("/get-blogs", getBlogs);
-router.post("/bulk-insert-blogs", upload.single("blog-file"), bulkInsertBlogs);
+router.get("/blogs", getBlogs);
+router.post("/blogs", createBlog);
+router.put("/blogs/:id", updateBlog);
+router.delete("/blogs/:id", deleteBlog);
+router.post("/bulk-insert", upload.single("blog-file"), bulkInsertBlogs);
 
 export default router;
