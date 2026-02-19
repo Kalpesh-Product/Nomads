@@ -234,9 +234,9 @@ const HostHome = () => {
               ))}
             </div>
 
-            <div className="flex w-full justify-center lg:justify-end pr-0 lg:pr-20">
+            <div className="flex w-full justify-center lg:justify-end pr-0 lg:pr-20 pb-4">
               <GetStartedButton
-                title={"Get Started"}
+                title={"GET STARTED"}
                 handleSubmit={() => navigate("signup")}
               />
             </div>
@@ -259,11 +259,11 @@ const HostHome = () => {
               tailored for managing Lifestyle Businesses like Co-Working,
               Co-Living, Hostels, Boutique Properties, Cafes etc
             </p>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 my-4">
+            <div className="flex lg:grid lg:grid-cols-2 gap-4 my-4 overflow-x-auto scrollbar-hide">
               {noCode.map((item) => (
                 <div
                   key={item.id}
-                  className="h-72 w-full overflow-hidden rounded-lg  shadow-lg">
+                  className="h-full w-full lg:w-auto flex-shrink-0 w-72 md:w-80 overflow-hidden rounded-lg shadow-lg">
                   <img
                     src={item.image || "/hosts/themes/cafe.webp"}
                     className="h-full w-full object-cover"
@@ -293,7 +293,17 @@ const HostHome = () => {
               {/* Left Section */}
               <div className="flex flex-col justify-between h-full lg:h-[26rem] w-full lg:w-[90%]">
                 <div className="w-full lg:w-[80%]">
-                  <p className="text-card-title font-medium text-[#212529] leading-normal">
+                  {/* MOBILE & TABLET VERSION: Small text with bottom padding, hidden on Desktop */}
+                  <p className="block lg:hidden text-sm pb-8 font-medium text-[#212529] leading-normal">
+                    “We went from managing 3,000 sq ft to 50,000+ sq ft in the
+                    most efficient and seamless manner with tech, processes,
+                    data analytics, customer & employee management and due to an
+                    extraordinary extended team like WoNo which integrated with
+                    us and had no demands!”
+                  </p>
+
+                  {/* DESKTOP VERSION: Original style, hidden on Mobile & Tablet */}
+                  <p className="hidden lg:block text-card-title font-medium text-[#212529] leading-normal">
                     “We went from managing 3,000 sq ft to 50,000+ sq ft in the
                     most efficient and seamless manner with tech, processes,
                     data analytics, customer & employee management and due to an

@@ -130,12 +130,12 @@ const Themes = () => {
             Choose the best Responsive Website Theme for your business
           </h1>
 
-          <GetStartedButton handleSubmit={()=>navigate('/signup')}/>
+          <GetStartedButton handleSubmit={() => navigate('/signup')} />
         </section>
       </Container>
 
       {/*Top Recommendations */}
-      <section className="w-full bg-gray-100 flex flex-col justify-center items-center gap-8">
+      <section className="w-full bg-gray-100 lg:flex lg:flex-col justify-center items-center gap-8">
         <Container>
           <div className="space-y-12">
             <div>
@@ -147,11 +147,11 @@ const Themes = () => {
                 business growth. Fully tech ready, integrated and responsive.
               </span>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2  gap-10 ">
+            <div className="flex overflow-x-auto gap-6 snap-x snap-mandatory scrollbar-hide lg:grid lg:grid-cols-2 lg:gap-10 lg:overflow-visible">
               {themes.map((image, index) => (
                 <div
                   data-aos="fade-up"
-                  className="w-full h-full overflow-hidden rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.5)]"
+                  className="flex-shrink-0 w-[85vw] md:w-[45vw] h-full overflow-hidden rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.5)] snap-start lg:w-full"
                   onClick={() => navigate("products", { state: { image } })}
                   key={index}>
                   <img
@@ -166,7 +166,7 @@ const Themes = () => {
               ))}
             </div>
             <div className="flex justify-center items-center">
-              <GetStartedButton handleSubmit={()=>navigate('/signup')} />
+              <GetStartedButton handleSubmit={() => navigate('/signup')} />
             </div>
           </div>
         </Container>
@@ -178,7 +178,7 @@ const Themes = () => {
           <div className="flex lg:flex-nowrap flex-wrap justify-between items-center gap-8">
             <div className="flex flex-col gap-16 w-full lg:w-[50%]">
               <div className="text-[clamp(2rem,4.2vw,6rem)] md:text-[clamp(2rem,8vw,8rem)] lg:text-[clamp(2rem,4.2vw,6rem)] leading-none">
-                <h1 className="font-normal">Customize it <br className="hidden lg:block"/> your way</h1>
+                <h1 className="font-normal">Customize it <br className="hidden lg:block" /> your way</h1>
               </div>
               <ul className="flex flex-col gap-2">
                 <li>1000's advanced web capabilities</li>
@@ -187,7 +187,7 @@ const Themes = () => {
                 <li>Full-stack web dev tools for custom functionality</li>
               </ul>
               <div className="flex justify-center md:justify-start w-full">
-                <GetStartedButton handleSubmit={()=>navigate('/signup')}/>
+                <GetStartedButton handleSubmit={() => navigate('/signup')} />
               </div>
             </div>
             <div className="w-full lg:w-[50%] h-full">
@@ -200,7 +200,7 @@ const Themes = () => {
           </div>
         </Container>
       </section>
-         <MySeperator />
+      <MySeperator />
       {/*Website Builder */}
       <Container>
         <div className="flex flex-col justify-between items-center gap-14">
@@ -218,7 +218,7 @@ const Themes = () => {
             ))}
           </div>
           <div>
-            <GetStartedButton handleSubmit={()=>navigate('/signup')}/>
+            <GetStartedButton handleSubmit={() => navigate('/signup')} />
           </div>
         </div>
       </Container>

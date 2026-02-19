@@ -79,12 +79,25 @@ const Product = () => {
   const [isAboutExpanded, setIsAboutExpanded] = useState(false);
   const [isDisclaimerExpanded, setIsDisclaimerExpanded] = useState(false);
   const carouselRef = useRef(null);
+  const reviewScrollRef = useRef(null);
 
   const handleScroll = (e) => {
     const scrollLeft = e.target.scrollLeft;
     const width = e.target.offsetWidth;
     const index = Math.round(scrollLeft / width);
     setCurrentImageIndex(index);
+  };
+
+  const handleReviewScroll = (direction) => {
+    const container = reviewScrollRef.current;
+    if (!container) return;
+
+    const scrollAmount = 400; // Adjust scroll distance as needed
+    const newScrollLeft = direction === 'left'
+      ? container.scrollLeft - scrollAmount
+      : container.scrollLeft + scrollAmount;
+
+    container.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
   };
 
   const normalizePhoneNumber = (value) =>
@@ -1102,7 +1115,7 @@ const Product = () => {
                     <SecondaryButton
                       disabled={isSubmitting}
                       isLoading={isSubmitting}
-                      title={"Get Quote"}
+                      title={"GET QUOTE"}
                       type={"submit"}
                       externalStyles={"w-1/2"}
                     />
@@ -1151,29 +1164,56 @@ const Product = () => {
               </span>
             </div>
 
-            <div className="flex overflow-x-auto gap-6 px-4 md:px-0 scrollbar-hide snap-x snap-mandatory pb-4">
-              {companyDetails?.reviews?.length > 0 ? (
-                companyDetails.reviews.slice(0, 8).map((review, index) => (
-                  <div
-                    key={index}
-                    className="min-w-[300px] md:min-w-[400px] flex-shrink-0 snap-center h-full"
-                  >
-                    <ReviewCard
-                      handleClick={() => {
-                        setSelectedReview(review);
-                        setOpen(true);
-                      }}
-                      review={review}
-                    />
-                  </div>
-                ))
-              ) : (
-                <div className="col-span-full border-2 border-dotted border-gray-300 rounded-xl p-6 text-center text-sm text-gray-500 h-40 flex justify-center items-center">
-                  No reviews yet.
-                </div>
-              )}
-            </div>
+            {/* START: Updated Scrolling Container with Buttons */}
+            <div className="flex items-center justify-between w-full">
+              {/* Left Scroll Button */}
+              <button
+                type="button"
+                onClick={() => handleReviewScroll('left')}
+                className="text-white hidden border-white border-2 bg-gray-300 hover:bg-gray-600 w-12 h-12 p-0 lg:flex items-center justify-center rounded-full flex-shrink-0 mr-4"
+              >
+                <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M217.9 256L345 129c9.4-9.4 9.4-24.6 0-33.9-9.4-9.4-24.6-9.3-34 0L167 239c-9.1 9.1-9.3 23.7-.7 33.1L310.9 417c4.7 4.7 10.9 7 17 7s12.3-2.3 17-7c9.4-9.4 9.4-24.6 0-33.9L217.9 256z"></path>
+                </svg>
+              </button>
 
+              {/* Scrollable Content */}
+              <div ref={reviewScrollRef} className="flex overflow-x-auto gap-6 px-4 md:px-0 scrollbar-hide snap-x snap-mandatory pb-4 flex-1">
+
+
+
+                {companyDetails?.reviews?.length > 0 ? (
+                  companyDetails.reviews.slice(0, 8).map((review, index) => (
+                    <div
+                      key={index}
+                      className="min-w-[300px] md:min-w-[400px] flex-shrink-0 snap-center h-full"
+                    >
+                      <ReviewCard
+                        handleClick={() => {
+                          setSelectedReview(review);
+                          setOpen(true);
+                        }}
+                        review={review}
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <div className="col-span-full border-2 border-dotted border-gray-300 rounded-xl p-6 text-center text-sm text-gray-500 h-40 flex justify-center items-center">
+                    No reviews yet.
+                  </div>
+                )}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => handleReviewScroll('right')}
+                className="text-white hidden border-white border-2 bg-gray-300 hover:bg-gray-600 w-12 h-12 p-2 lg:flex items-center justify-center rounded-full flex-shrink-0 ml-4"
+              >
+                <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M294.1 256L167 129c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.3 34 0L345 239c9.1 9.1 9.3 23.7.7 33.1L201.1 417c-4.7 4.7-10.9 7-17 7s-12.3-2.3-17-7c-9.4-9.4-9.4-24.6 0-33.9l127-127.1z"></path>
+                </svg>
+              </button>
+            </div>
 
             {/* <div className="text-right">
               <a
@@ -1204,11 +1244,14 @@ const Product = () => {
             <div className="flex justify-center">
               <button
                 type="button"
-                className="rounded-full border border-primary-blue bg-primary-blue text-white px-5 py-2 text-4xl font-semibold hover:bg-primary-blue hover:text-white transition-colors"
+                className="flex rounded-full items-center cursor-pointer justify-center  gap-2
+        bg-primary-blue hover:bg-secondary-light text-primary
+        text-content leading-5
+        w-3/2 px-6 py-3 undefined"
                 onClick={handleWriteReviewClick}
                 disabled={!companyDetails?.companyId}
               >
-                Write A Review
+                WRITE A REVIEW
               </button>
             </div>
             {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-0 lg:p-0">
@@ -1382,7 +1425,7 @@ const Product = () => {
                         />
                         <div className="flex justify-center items-center">
                           <SecondaryButton
-                            title={"Submit"}
+                            title={"SUBMIT"}
                             type={"submit"}
                             externalStyles={"mt-6 w-1/2"}
                             disabled={isSubmittingSales}
@@ -2108,11 +2151,14 @@ const Product = () => {
             <div className="flex justify-center items-center mb-6">
               <button
                 type="button"
-                className="rounded-full border border-primary-blue bg-primary-blue text-white px-4 md:px-5 py-2 text-2xl md:text-2xl font-semibold hover:bg-primary-blue hover:text-white transition-colors"
+                className="flex rounded-full items-center cursor-pointer justify-center  gap-2
+        bg-primary-blue hover:bg-secondary-light text-primary
+        text-content leading-5
+        w-full md:w-3/4 lg:w-1/2 rounded-full py-3 shadow-lg px-6 py-3 undefined"
                 onClick={handleWriteReviewClick}
                 disabled={!companyDetails?.companyId}
               >
-                Write A Review
+                WRITE A REVIEW
               </button>
             </div>
 

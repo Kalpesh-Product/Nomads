@@ -425,7 +425,7 @@ const HostJobApplicationForm = () => {
           className="md:col-span-2"
           variant="standard"
         />
-
+        {/* 
         <TextField
           label="Remarks"
           name="remarks"
@@ -436,7 +436,7 @@ const HostJobApplicationForm = () => {
           rows={3}
           className="md:col-span-2"
           variant="standard"
-        />
+        /> */}
 
         <div className="md:col-span-2 text-center mt-2 pb-10">
           <Button

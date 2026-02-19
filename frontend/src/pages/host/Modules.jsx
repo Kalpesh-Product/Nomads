@@ -208,19 +208,30 @@ export default function Modules() {
             image={HrImage}
             rowReverse={false}
           /> */}
-          <div className="text-center">
+          {/* <div className="text-center">
             <h1 className="text-[clamp(1.7rem,3.8vw,5rem)] text-start lg:hidden lg:text-start font-semibold font-comic">
               … More coming soon
-            </h1>
-            {/* <div className="font-semibold font-comic hidden lg:flex w-full">
+            </h1> */}
+          {/* <div className="font-semibold font-comic hidden lg:flex w-full">
               <ReactFitty> … More coming soon</ReactFitty>
             </div> */}
-            <div className="font-semibold font-comic hidden lg:block w-full text-[clamp(1.7rem,3.99vw,5rem)]">
+          {/* <div className="font-semibold font-comic hidden lg:block w-full text-[clamp(1.7rem,3.99vw,5rem)]">
               … More coming soon
             </div>
-          </div>
+          </div> */}
         </div>
       </Container>
+      <div className="text-center">
+        <h1 className="text-[clamp(1.7rem,3.8vw,5rem)] text-start lg:hidden lg:text-start font-semibold font-comic">
+          … More coming soon
+        </h1>
+        {/* <div className="font-semibold font-comic hidden lg:flex w-full">
+              <ReactFitty> … More coming soon</ReactFitty>
+            </div> */}
+        <div className="font-semibold font-comic hidden lg:block w-full text-[clamp(1.7rem,3.99vw,5rem)]">
+          … More coming soon
+        </div>
+      </div>
       <hr />
       <div className="flex justify-center w-full my-16">
         <GetStartedButton
