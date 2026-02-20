@@ -79,7 +79,8 @@ const Product = () => {
   const [isAboutExpanded, setIsAboutExpanded] = useState(false);
   const [isDisclaimerExpanded, setIsDisclaimerExpanded] = useState(false);
   const carouselRef = useRef(null);
-  const reviewScrollRef = useRef(null);
+  const reviewScrollRef = useRef(null); // For Mobile/Tablet
+  const desktopReviewScrollRef = useRef(null); // For Desktop
 
   const handleScroll = (e) => {
     const scrollLeft = e.target.scrollLeft;
@@ -88,17 +89,17 @@ const Product = () => {
     setCurrentImageIndex(index);
   };
 
-  const handleReviewScroll = (direction) => {
-    const container = reviewScrollRef.current;
-    if (!container) return;
+  // const handleReviewScroll = (direction) => {
+  //   const container = reviewScrollRef.current;
+  //   if (!container) return;
 
-    const scrollAmount = 400; // Adjust scroll distance as needed
-    const newScrollLeft = direction === 'left'
-      ? container.scrollLeft - scrollAmount
-      : container.scrollLeft + scrollAmount;
+  //   const scrollAmount = 400; // Adjust scroll distance as needed
+  //   const newScrollLeft = direction === 'left'
+  //     ? container.scrollLeft - scrollAmount
+  //     : container.scrollLeft + scrollAmount;
 
-    container.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
-  };
+  //   container.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
+  // };
 
   const normalizePhoneNumber = (value) =>
     value ? value.replace(/\s+/g, "") : "";
@@ -132,6 +133,41 @@ const Product = () => {
     enabled: !!companyId || !!companyName,
     refetchOnMount: "always",
   });
+
+
+
+  useEffect(() => {
+    // We define the scroll logic in a helper function
+    const setupAutoScroll = (containerRef) => {
+      const container = containerRef.current;
+      if (!container || !companyDetails?.reviews?.length) return null;
+
+      const interval = setInterval(() => {
+        const { scrollLeft, offsetWidth, scrollWidth } = container;
+        const maxScroll = scrollWidth - offsetWidth;
+
+        // If we are near the end, jump to start
+        if (scrollLeft >= maxScroll - 10) {
+          container.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          container.scrollBy({ left: 300, behavior: 'smooth' });
+        }
+      }, 3000);
+
+      return interval;
+    };
+
+    // Setup auto-scroll for both Desktop and Mobile containers
+    // The hidden container won't affect anything, but the visible one will scroll.
+    const desktopInterval = setupAutoScroll(desktopReviewScrollRef);
+    const mobileInterval = setupAutoScroll(reviewScrollRef);
+
+    // Cleanup function to clear both intervals
+    return () => {
+      if (desktopInterval) clearInterval(desktopInterval);
+      if (mobileInterval) clearInterval(mobileInterval);
+    };
+  }, [companyDetails?.reviews]);
 
   useEffect(() => {
     const companyType = companyDetails?.companyType?.trim();
@@ -1164,26 +1200,11 @@ const Product = () => {
               </span>
             </div>
 
-            {/* START: Updated Scrolling Container with Buttons */}
-            <div className="flex items-center justify-between w-full">
-              {/* Left Scroll Button */}
-              <button
-                type="button"
-                onClick={() => handleReviewScroll('left')}
-                className="text-white hidden border-white border-2 bg-gray-300 hover:bg-gray-600 w-12 h-12 p-0 lg:flex items-center justify-center rounded-full flex-shrink-0 mr-4"
-              >
-                <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M217.9 256L345 129c9.4-9.4 9.4-24.6 0-33.9-9.4-9.4-24.6-9.3-34 0L167 239c-9.1 9.1-9.3 23.7-.7 33.1L310.9 417c4.7 4.7 10.9 7 17 7s12.3-2.3 17-7c9.4-9.4 9.4-24.6 0-33.9L217.9 256z"></path>
-                </svg>
-              </button>
-
-              {/* Scrollable Content */}
-              <div ref={reviewScrollRef} className="flex overflow-x-auto gap-6 px-4 md:px-0 scrollbar-hide snap-x snap-mandatory pb-4 flex-1">
-
-
-
-                {companyDetails?.reviews?.length > 0 ? (
-                  companyDetails.reviews.slice(0, 8).map((review, index) => (
+            {/* Desktop Auto-Scrolling Reviews Container */}
+            <div ref={desktopReviewScrollRef} className="flex overflow-x-auto gap-6 px-4 md:px-0 scrollbar-hide snap-x snap-mandatory pb-4 w-full items-center">
+              {companyDetails?.reviews?.length > 0 ? (
+                <>
+                  {companyDetails.reviews.slice(0, 8).map((review, index) => (
                     <div
                       key={index}
                       className="min-w-[300px] md:min-w-[400px] flex-shrink-0 snap-center h-full"
@@ -1196,26 +1217,16 @@ const Product = () => {
                         review={review}
                       />
                     </div>
-                  ))
-                ) : (
-                  <div className="col-span-full border-2 border-dotted border-gray-300 rounded-xl p-6 text-center text-sm text-gray-500 h-40 flex justify-center items-center">
-                    No reviews yet.
-                  </div>
-                )}
-              </div>
-
-              <button
-                type="button"
-                onClick={() => handleReviewScroll('right')}
-                className="text-white hidden border-white border-2 bg-gray-300 hover:bg-gray-600 w-12 h-12 p-2 lg:flex items-center justify-center rounded-full flex-shrink-0 ml-4"
-              >
-                <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M294.1 256L167 129c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.3 34 0L345 239c9.1 9.1 9.3 23.7.7 33.1L201.1 417c-4.7 4.7-10.9 7-17 7s-12.3-2.3-17-7c-9.4-9.4-9.4-24.6 0-33.9l127-127.1z"></path>
-                </svg>
-              </button>
+                  ))}
+                </>
+              ) : (
+                <div className="col-span-full border-2 border-dotted border-gray-300 rounded-xl p-6 text-center text-sm text-gray-500 h-40 flex justify-center items-center w-full">
+                  No reviews yet.
+                </div>
+              )}
             </div>
 
-            {/* <div className="text-right">
+            <div className="text-right">
               <a
                 className="text-primary-blue text-sm font-semibold hover:underline"
                 href={companyDetails?.googleMap}
@@ -1224,7 +1235,7 @@ const Product = () => {
               >
                 View More →
               </a>
-            </div> */}
+            </div>
 
             {/* <hr className="my-5 lg:my-10" /> */}
             {/* <div className="flex flex-col justify-center items-center max-w-4xl mx-auto">
@@ -2114,30 +2125,34 @@ const Product = () => {
               </span>
             </div>
 
-            <div className="flex overflow-x-auto gap-6 px-4 md:px-0 scrollbar-hide snap-x snap-mandatory pb-4">
+            <div ref={reviewScrollRef} className="flex overflow-x-auto gap-6 px-4 md:px-0 scrollbar-hide snap-x snap-mandatory pb-4 items-center">
               {companyDetails?.reviews?.length > 0 ? (
-                companyDetails.reviews.slice(0, 8).map((review, index) => (
-                  <div
-                    key={index}
-                    className="min-w-[300px] md:min-w-[400px] flex-shrink-0 snap-center h-full"
-                  >
-                    <ReviewCard
-                      handleClick={() => {
-                        setSelectedReview(review);
-                        setOpen(true);
-                      }}
-                      review={review}
-                    />
-                  </div>
-                ))
+                <>
+                  {companyDetails.reviews.slice(0, 8).map((review, index) => (
+                    <div
+                      key={index}
+                      className="min-w-[300px] md:min-w-[400px] flex-shrink-0 snap-center h-full"
+                    >
+                      <ReviewCard
+                        handleClick={() => {
+                          setSelectedReview(review);
+                          setOpen(true);
+                        }}
+                        review={review}
+                      />
+                    </div>
+                  ))}
+
+
+                </>
               ) : (
-                <div className="col-span-full border-2 border-dotted border-gray-300 rounded-xl p-6 text-center text-sm text-gray-500 h-40 flex justify-center items-center">
+                <div className="col-span-full border-2 border-dotted border-gray-300 rounded-xl p-6 text-center text-sm text-gray-500 h-40 flex justify-center items-center w-full">
                   No reviews yet.
                 </div>
               )}
             </div>
 
-            {/* <div className="text-right">
+            <div className="text-right">
               <a
                 className="text-primary-blue text-sm font-semibold hover:underline"
                 href={companyDetails?.googleMap}
@@ -2146,7 +2161,7 @@ const Product = () => {
               >
                 View More →
               </a>
-            </div> */}
+            </div>
 
             <div className="flex justify-center items-center mb-6">
               <button

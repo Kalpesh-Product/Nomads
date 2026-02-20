@@ -15,7 +15,7 @@ import { AiOutlineHeart } from "react-icons/ai";
 import SearchBarCombobox from "../components/SearchBarCombobox";
 import newIcons from "../assets/newIcons";
 import { AnimatePresence, motion } from "motion/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import coworking from "/images/coworking-img.webp";
 import hostels from "/images/hostels-img.webp";
 import cafes from "/images/meetingrooms-img.webp";
@@ -56,6 +56,10 @@ const Home = () => {
   });
   const selectedCountry = watch("country");
   const selectedState = watch("location");
+
+  const reviewScrollRef = useRef(null); // For Mobile/Tablet
+  const desktopReviewScrollRef = useRef(null); // For Desktop
+
   // Sample options
 
   // const { data: locations = [], isLoading: isLocations } = useQuery({
@@ -287,6 +291,39 @@ const Home = () => {
         "Biz Nest is a modern co-working space that offers a seamless working environment..with a great view, too! The founders, Abrar and Kashif, along with the team make working here a warm, friendly and productive experience. Kudos!",
     },
   ];
+
+  useEffect(() => {
+    // We define the scroll logic in a helper function
+    const setupAutoScroll = (containerRef) => {
+      const container = containerRef.current;
+      if (!container || !reviewData?.length) return null;
+
+      const interval = setInterval(() => {
+        const { scrollLeft, offsetWidth, scrollWidth } = container;
+        const maxScroll = scrollWidth - offsetWidth;
+
+        // If we are near the end, jump to start
+        if (scrollLeft >= maxScroll - 10) {
+          container.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          container.scrollBy({ left: 300, behavior: 'smooth' });
+        }
+      }, 3000);
+
+      return interval;
+    };
+
+    // Setup auto-scroll for both Desktop and Mobile containers
+    // The hidden container won't affect anything, but the visible one will scroll.
+    const desktopInterval = setupAutoScroll(desktopReviewScrollRef);
+    const mobileInterval = setupAutoScroll(reviewScrollRef);
+
+    // Cleanup function to clear both intervals
+    return () => {
+      if (desktopInterval) clearInterval(desktopInterval);
+      if (mobileInterval) clearInterval(mobileInterval);
+    };
+  }, [reviewData]);
 
   const { mutate: locationData, isPending: isLocation } = useMutation({
     mutationFn: async (data) => {
@@ -595,15 +632,15 @@ const Home = () => {
                 </div>
 
                 <div className="flex flex-col gap-4 text-start text-pretty lg:text-center">
-                  <p className=" text-gray-700 text-base md:leading-7 md:text-[1.03rem]">
-                    A global movement of remote workers, companies, creators,
-                    entrepreneurs, hosts, investors who are redefining how the
-                    world lives and works.
+                  <p className=" text-gray-700 text-sm md:leading-7 md:text-[1.08rem]">
+                    A global community of remote workers, creators, entrepreneurs, hosts and investors redefining how the world lives and works.
                   </p>
-                  <p className=" text-gray-700 text-base md:leading-7 md:text-[1.03rem]">
-                    Bound by freedom, flexibility, and connection, nomads are
-                    building the future—one destination at a time.
+                  <p className=" text-gray-700 text-sm md:leading-7 md:text-[1.03rem]">
+                    Driven by freedom and flexibility, nomads are shaping the future—one destination at a time.
                   </p>
+                  <b className="text-center text-x sm:text-base">
+                    Early ADOPTION of THE FUTURE LIFESTYLE!
+                  </b>
                 </div>
               </div>
 
@@ -693,7 +730,7 @@ const Home = () => {
             <h1 className="text-title font-medium text-primary-blue uppercase">
               Happy customers.
             </h1>
-            <div className="flex overflow-x-auto lg:grid lg:grid-cols-3 gap-6 pb-6 lg:pb-0 custom-scrollbar-hide snap-x">
+            <div ref={desktopReviewScrollRef} className="flex overflow-x-auto gap-6 px-4 md:px-0 scrollbar-hide snap-x snap-mandatory pb-4 w-full items-center">
               {reviewData.length > 0 ? (
                 reviewData.map((review, index) => (
                   <div
@@ -715,6 +752,16 @@ const Home = () => {
                 </div>
               )}
             </div>
+            {/* <div className="text-right">
+              <a
+                className="text-primary-blue text-sm font-semibold hover:underline"
+                // href={companyDetails?.googleMap}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View More →
+              </a>
+            </div> */}
           </div>
         </Container>
         <MuiModal open={open} onClose={() => setOpen(false)} title={"Review"}>

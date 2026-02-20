@@ -125,8 +125,8 @@ const Themes = () => {
   return (
     <div className="   text-secondary-dark justify-center items-center">
       <Container>
-        <section className="flex flex-col items-end justify-center gap-4 leading-[1.3] text-secondary-dark ">
-          <h1 className="text-[clamp(1.62rem,4.6vw,4.5rem)] font-medium">
+        <section className="flex flex-col items-center lg:items-end justify-center gap-4 leading-[1.3]">
+          <h1 className="text-xl sm:text-[clamp(1.62rem,4.6vw,4.5rem)] font-medium">
             Choose the best Responsive Website Theme for your business
           </h1>
 
@@ -176,7 +176,7 @@ const Themes = () => {
       <section>
         <Container>
           <div className="flex lg:flex-nowrap flex-wrap justify-between items-center gap-8">
-            <div className="flex flex-col gap-16 w-full lg:w-[50%]">
+            <div className="flex flex-col gap-6 sm:gap-16 w-full lg:w-[50%]">
               <div className="text-[clamp(2rem,4.2vw,6rem)] md:text-[clamp(2rem,8vw,8rem)] lg:text-[clamp(2rem,4.2vw,6rem)] leading-none">
                 <h1 className="font-normal">Customize it <br className="hidden lg:block" /> your way</h1>
               </div>
@@ -203,13 +203,13 @@ const Themes = () => {
       <MySeperator />
       {/*Website Builder */}
       <Container>
-        <div className="flex flex-col justify-between items-center gap-14">
+        <div className="flex flex-col justify-between items-center gap-6 sm:gap-14">
           <div className="text-[clamp(2rem,4.3vw,4.5rem)] md:text-[clamp(2rem,7vw,8rem)] lg:text-[clamp(2rem,4.3vw,4.5rem)] w-full lg:w-[70%] self-start leading-[1.2]">
             <h1 className="font-normal">
               A website builder engineered for growth
             </h1>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 gap-x-20">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-10 gap-x-20">
             {themeWebsiteGridData.map((item, index) => (
               <div key={index} className="flex flex-col gap-4 lg:gap-6">
                 <h4 className="text-[1.3rem] lg:text-[1.3rem] font-medium">{item.title}</h4>

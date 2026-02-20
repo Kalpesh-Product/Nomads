@@ -205,7 +205,7 @@ const HostHome = () => {
       </Container>
       <section>
         <Container>
-          <div className="flex flex-col gap-16">
+          <div className="flex flex-col sm:gap-16 gap-6">
             <div className="flex flex-col leading-tight">
               <ReactFitty>
                 <h1 className="font-semibold uppercase">

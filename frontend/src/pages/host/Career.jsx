@@ -50,7 +50,7 @@ const Career = () => {
 
   return (
     <Container>
-      <div className="py-8 md:py-12">
+      <div className="py-0 sm:py-12">
         <h3 className="text-3xl md:text-5xl lg:text-6xl font-semibold text-host mb-2">
           JOIN OUR TEAM
         </h3>
@@ -111,7 +111,7 @@ const Career = () => {
                                     </p>
                                   )}
                                 </div>
-                                <div className="flex flex-col md:flex-row items-end gap-2 md:gap-10 w-full md:w-auto justify-end">
+                                <div className="flex flex-row md:flex-row items-center gap-2 md:gap-10 w-full md:w-auto justify-end">
                                   <p className="text-xs md:text-sm font-semibold text-gray-900">
                                     {job?.jobType} | {job?.jobMode} |{" "}
                                     {job?.location}

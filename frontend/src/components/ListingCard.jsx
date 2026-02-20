@@ -185,9 +185,9 @@ const ListingCard = ({
           <div className="w-full">
             <p
               className="text-xs md:text-sm font-semibold truncate"
-              title={item.companyName || "Title"}
+              title={item.companyTitle || "Title"}
             >
-              {item.companyName || "title"}
+              {item.companyTitle || "title"}
             </p>
           </div>
         </div>
