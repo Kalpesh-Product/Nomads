@@ -294,11 +294,10 @@ const BlogFetch = () => {
 
           {/* Controls */}
           <div className="flex items-center justify-end gap-3 mb-5">
-            <label className="text-sm font-medium text-gray-700">
+            {/* <label className="text-sm font-medium text-gray-700">
               Destination
             </label>
             <FormControl variant="standard" sx={{ minWidth: 140 }}>
-              {/* <InputLabel>Destination</InputLabel> */}
               <Select
                 className={selectClasses}
                 MenuProps={{ MenuListProps: { className: menuListClasses } }}
@@ -319,12 +318,11 @@ const BlogFetch = () => {
                   </MenuItem>
                 ))}
               </Select>
-            </FormControl>
+            </FormControl> */}
           </div>
         </div>
         <div className="text-subtitle text-gray-600 my-36">
-          No blog posts available for this location. You can use the filter to
-          check blogs of other locations.
+          No blog posts available for this location.
         </div>
       </div>
     );
@@ -336,11 +334,10 @@ const BlogFetch = () => {
         <h2 className="text-title font-semibold text-host">Blog</h2>
         {/* Controls */}
         <div className="flex items-center justify-end gap-3 mb-5">
-          <label className="text-sm font-medium text-gray-700">
+          {/* <label className="text-sm font-medium text-gray-700">
             Destination
           </label>
           <FormControl variant="standard" sx={{ minWidth: 140 }}>
-            {/* <InputLabel>Destination</InputLabel> */}
             <Select
               className={selectClasses}
               MenuProps={{ MenuListProps: { className: menuListClasses } }}
@@ -358,7 +355,7 @@ const BlogFetch = () => {
                 </MenuItem>
               ))}
             </Select>
-          </FormControl>
+          </FormControl> */}
 
           {/* <button
             type="button"
