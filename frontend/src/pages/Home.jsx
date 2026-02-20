@@ -120,7 +120,7 @@ const Home = () => {
 
   useEffect(() => {
     const countryExists = locations.some(
-      (c) => c.country?.toLowerCase() === selectedCountry?.toLowerCase()
+      (c) => c.country?.toLowerCase() === selectedCountry?.toLowerCase(),
     );
 
     if (!countryExists && selectedCountry) {
@@ -131,10 +131,10 @@ const Home = () => {
 
     if (countryExists) {
       const current = locations.find(
-        (c) => c.country?.toLowerCase() === selectedCountry?.toLowerCase()
+        (c) => c.country?.toLowerCase() === selectedCountry?.toLowerCase(),
       );
       const locationExists = current?.states?.some(
-        (s) => s.name?.toLowerCase() === selectedState?.toLowerCase()
+        (s) => s.name?.toLowerCase() === selectedState?.toLowerCase(),
       );
 
       if (!locationExists && selectedState) {
@@ -205,7 +205,7 @@ const Home = () => {
     if (selectedContinent) {
       filtered = locations.filter(
         (item) =>
-          item.continent?.toLowerCase() === selectedContinent?.toLowerCase()
+          item.continent?.toLowerCase() === selectedContinent?.toLowerCase(),
       );
     }
 
@@ -222,12 +222,12 @@ const Home = () => {
   // Filter countries based on user email
   const countryOptions = React.useMemo(
     () => allCountryOptions,
-    [allCountryOptions]
+    [allCountryOptions],
   );
 
   // Build locations with same filtering logic
   const filteredLocation = locations.find(
-    (item) => item.country?.toLowerCase() === selectedCountry?.toLowerCase()
+    (item) => item.country?.toLowerCase() === selectedCountry?.toLowerCase(),
   );
 
   const locationOptions = React.useMemo(() => {
@@ -418,11 +418,10 @@ const Home = () => {
         <div className="min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 lg:mx-auto px-6 sm:px-6 lg:px-0">
           <div className="py-12  hidden lg:block">
             <div className="flex flex-col  gap-4 justify-between items-center">
-
               <form
                 onSubmit={handleSubmit(onSubmit)}
                 className=" flex justify-around md:w-full lg:w-full border-2 bg-gray-50 rounded-full p-0 items-center"
-              // className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
+                // className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
               >
                 <Controller
                   name="continent"
@@ -607,14 +606,24 @@ const Home = () => {
               {/* Left: Text */}
               <div className="lg:w-1/2 flex flex-col h-full justify-between gap-5 text-center md:text-start">
                 <div className=" font-light text-primary-blue text-center font-play leading-relaxed lg:space-y-6 lg:leading-normal">
-                  <div className="text-center">
+                  {/* <div className="text-center">
                     <h1 className="text-[clamp(1rem,13.71vw,6rem)] text-nowrap">
                       Building the
+                    </h1>
+                  </div> */}
+                  <div className="text-title ">
+                    <h1 className="text-[clamp(1.7rem,3.4vw,4rem)] text-nowrap">
+                      <span className="font-medium"> Building the</span>
+                    </h1>
+                  </div>
+                  <div className="font-semibold">
+                    <h1 className="text-[clamp(3.7rem,7.3vw,16rem)]">
+                      LARGEST
                     </h1>
                   </div>
                   <div className="text-title ">
                     <h1 className="text-[clamp(1.7rem,3.4vw,4rem)] text-nowrap">
-                      <span className="font-medium"> Largest Community of</span>
+                      <span className="font-medium"> Community of</span>
                     </h1>
                   </div>
                   <div className="font-semibold">
@@ -724,7 +733,10 @@ const Home = () => {
             <div ref={desktopReviewScrollRef} className="flex overflow-x-auto gap-6 px-4 md:px-0 scrollbar-hide snap-x snap-mandatory pb-4 w-full items-center">
               {reviewData.length > 0 ? (
                 reviewData.map((review, index) => (
-                  <div key={index} className="flex-shrink-0 min-w-[280px] w-[90vw] max-w-[350px] sm:w-[350px] lg:w-full snap-start">
+                  <div
+                    key={index}
+                    className="flex-shrink-0 min-w-[280px] w-[90vw] max-w-[350px] sm:w-[350px] lg:w-full snap-start"
+                  >
                     <ReviewCard
                       handleClick={() => {
                         setSelectedReview(review);
