@@ -18,14 +18,7 @@ const GetStartedButton = ({
     <button
       disabled={disabled || isLoading}
       type={type}
-      className={`flex rounded-full items-center cursor-pointer justify-center  gap-2 
-       
-        ${externalStyles}
-        ${baseBgColor} 
-          hover:font-semibold transition-all
-        ${fontSize ? fontSize : "text-xl leading-2"}
-         ${!externalStyles?.includes("text-") ? "text-primary" : ""}
-         ${padding ? padding : "px-10 py-2"} ${className}`}
+      className={`bg-black text-white px-10 py-3 rounded-full`}
       onClick={handleSubmit}>
       {isLoading && <CircularProgress size={16} sx={{ color: "#ffffff" }} />}
       <span className="text-center">{title}</span>
