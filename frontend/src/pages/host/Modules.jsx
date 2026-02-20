@@ -57,7 +57,7 @@ export default function Modules() {
       <div className="flex flex-col gap-8 w-full">
         <div className="flex flex-col gap-8">
           <div className="text-center">
-            <h1 className="text-[clamp(1.7rem,3.8vw,5rem)] text-start lg:hidden lg:text-start font-semibold font-comic">
+            <h1 className="text-2xl sm:text-[clamp(1.7rem,3.8vw,5rem)] text-start lg:hidden lg:text-start font-semibold font-comic">
               The ONLY Nomad Ecosystem SaaS Platform!
             </h1>
             <div className="font-semibold font-comic hidden lg:flex w-full">
@@ -78,7 +78,7 @@ export default function Modules() {
               and more.
             </h4>
           </div>
-          <div className="flex justify-end items-end">
+          <div className="flex justify-center items-center sm:justify-end">
             <GetStartedButton
               title="Get Started"
               handleSubmit={() => navigate("/signup")}
@@ -108,10 +108,10 @@ export default function Modules() {
                 />
               </div>
             )}
-            <span className="text-lg md:text-xl lg:text:2xl">
+            <span className="text-lx md:text-xl lg:text:2xl">
               Manage your business in real-time across all business verticals.
             </span>
-            <span className="text-lg md:text-xl lg:text:2xl">
+            <span className="text-lx md:text-xl lg:text:2xl">
               Operate your business in real-time with the micro most details of
               inventory, bookings, accounts, analytics, leads, sales, reports,
               tasks, logs, menu, complaints, requests etc.

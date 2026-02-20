@@ -100,8 +100,8 @@ const Leads = () => {
 
       {/* Our Core focus section */}
       <Container padding={false}>
-        <div className="pt-16 pb-8">
-          <div className="pb-16">
+        <div className="pt-6 sm:pt-16 pb-8">
+          <div className="pb-6 sm:pb-16">
             <h2 className="lg:text-[2.75rem] md:text-[2.75rem] sm:text-[1.75rem] xs:text-[1.75rem] lg:leading-[3.5rem] xs:leading-9 font-semibold text-host">
               Our core focus is to generate ORGANIC LEADS!
             </h2>
