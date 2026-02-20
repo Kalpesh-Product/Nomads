@@ -14,7 +14,7 @@ const JobDetails = () => {
   return (
     <Container>
       <div className="">
-        <h2 className="text-4xl md:text-3xl font-normal text-center mb-6">
+        <h2 className="text-xl lg:text-3xl font-normal text-center mb-6">
           {jobName?.split("-")?.length
             ? jobName?.split("-")?.join(" ")?.toUpperCase()
             : jobName}
@@ -23,21 +23,19 @@ const JobDetails = () => {
         {/* Tabs */}
         <div className="flex justify-center border-b border-gray-300 mb-8">
           <button
-            className={`px-6 py-2 font-medium w-full ${
-              activeTab === "description"
-                ? "border-b-2 border-black"
-                : "text-primary-blue"
-            }`}
+            className={` font-medium w-full ${activeTab === "description"
+              ? "border-b-2 border-black"
+              : "text-primary-blue"
+              }`}
             onClick={() => setActiveTab("description")}
           >
             JOB DESCRIPTION
           </button>
           <button
-            className={`px-6 py-2 font-medium w-full ${
-              activeTab === "apply"
-                ? "border-b-2 border-black "
-                : "text-primary-blue"
-            }`}
+            className={`px-6 py-2 font-medium w-full ${activeTab === "apply"
+              ? "border-b-2 border-black "
+              : "text-primary-blue"
+              }`}
             onClick={() => setActiveTab("apply")}
           >
             APPLY NOW
@@ -59,11 +57,11 @@ const JobDetails = () => {
               <ul className="space-y-2">
                 {responsibilities && responsibilities.length > 0
                   ? responsibilities.map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-2">
-                        <span className="text-blue-500">✔</span>
-                        <span>{item}</span>
-                      </li>
-                    ))
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="text-blue-500">✔</span>
+                      <span>{item}</span>
+                    </li>
+                  ))
                   : []}
               </ul>
             </div>
@@ -74,11 +72,11 @@ const JobDetails = () => {
               <ul className="space-y-2">
                 {qualifications && qualifications.length > 0
                   ? qualifications.map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-2">
-                        <span className="text-blue-500">✔</span>
-                        <span>{item}</span>
-                      </li>
-                    ))
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="text-blue-500">✔</span>
+                      <span>{item}</span>
+                    </li>
+                  ))
                   : []}
               </ul>
             </div>
@@ -97,7 +95,7 @@ const JobDetails = () => {
             </p>
           </div>
         ) : (
-          <JobApplicationForm title={title} />
+          <HostJobApplicationForm title={title} />
         )}
       </div>
     </Container>

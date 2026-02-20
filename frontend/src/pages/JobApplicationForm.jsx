@@ -457,7 +457,7 @@ const JobApplicationForm = ({ title }) => {
         />
 
         {/* Remarks */}
-        <Controller
+        {/* <Controller
           name="remarks"
           control={control}
           render={({ field }) => (
@@ -471,7 +471,7 @@ const JobApplicationForm = ({ title }) => {
               variant="standard"
             />
           )}
-        />
+        /> */}
 
         {/* Submit */}
         <div className="md:col-span-2 text-center mt-2 pb-10">

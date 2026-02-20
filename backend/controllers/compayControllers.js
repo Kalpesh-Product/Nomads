@@ -21,9 +21,9 @@ function getDistanceFromLatLonInM(lat1, lon1, lat2, lon2) {
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(toRad(lat1)) *
-      Math.cos(toRad(lat2)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
+    Math.cos(toRad(lat2)) *
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2);
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c; // distance in meters
@@ -50,10 +50,10 @@ export const bulkInsertCompanies = async (req, res, next) => {
       const key = `${company.companyName
         ?.trim()
         .toLowerCase()}|${company.companyCity
-        ?.trim()
-        .toLowerCase()}|${company.companyState
-        ?.trim()
-        .toLowerCase()}|${company.companyCountry?.trim().toLowerCase()}`;
+          ?.trim()
+          .toLowerCase()}|${company.companyState
+            ?.trim()
+            .toLowerCase()}|${company.companyCountry?.trim().toLowerCase()}`;
       companyMap.set(key, company.companyId);
     });
 
@@ -72,10 +72,10 @@ export const bulkInsertCompanies = async (req, res, next) => {
         ]
           ?.trim()
           ?.toLowerCase()}|${row["State"]?.trim()?.toLowerCase()}|${row[
-          "Country"
-        ]
-          ?.trim()
-          ?.toLowerCase()}`;
+            "Country"
+          ]
+            ?.trim()
+            ?.toLowerCase()}`;
 
         const company = {
           businessId: row["Business ID"]?.trim(),
@@ -796,6 +796,7 @@ export const getCompaniesDataNomads = async (req, res, next) => {
       {
         $project: {
           companyName: 1,
+          companyTitle: 1,
           companyId: 1,
           companyType: 1,
           country: 1,
@@ -815,6 +816,7 @@ export const getCompaniesDataNomads = async (req, res, next) => {
       { $limit: 200 },
     ];
 
+    console.log("pipe", pipeline)
     let companyData = await Company.aggregate(pipeline).collation({
       locale: "en",
       strength: 2,

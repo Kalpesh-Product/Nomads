@@ -102,7 +102,7 @@ const Career = () => {
                               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 ">
                                 <div className="w-full md:w-1/2 lg:w-1/2 md:py-8 lg:py-6">
                                   {/* <p className="font-medium text-subtitle"> */}
-                                  <p className="font-semibold text-xl md:text-2xl">
+                                  <p className="font-semibold lg:text-xl md:text-2xl">
                                     {jobIdx + 1}. {job.title}
                                   </p>
                                   {job.subtitle && (
@@ -111,7 +111,7 @@ const Career = () => {
                                     </p>
                                   )}
                                 </div>
-                                <div className="text-left md:text-right flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-10 w-full md:w-1/2 lg:w-1/2">
+                                <div className="flex flex-col md:flex-row items-center gap-4 md:gap-10 w-full md:w-auto justify-end">
                                   <p className="text-xs md:text-sm font-semibold text-gray-900">
                                     {job?.jobType} | {job?.jobMode} |{" "}
                                     {job?.location}
