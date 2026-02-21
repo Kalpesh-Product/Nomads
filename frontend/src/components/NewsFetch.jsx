@@ -15,7 +15,7 @@ const DESTS = [
   { label: "Bangkok", country: "th", keyword: "bangkok", lang: "en" },
   { label: "Phuket", country: "th", keyword: "phuket", lang: "en" },
   { label: "Ho Chi Minh", country: "vn", keyword: "ho chi minh", lang: "en" },
-  { label: "Rio de Janeiro", country: "br", keyword: "rio", lang: "en" },
+  { label: "Rio de Janeiro", country: "br", keyword: "rio de janeiro", lang: "en" },
   { label: "Dubai", country: "uae", keyword: "dubai", lang: "en" },
   { label: "Auckland", country: "nz", keyword: "auckland", lang: "en" },
   { label: "Western Cape", country: "za", keyword: "western cape", lang: "en" },
@@ -26,9 +26,9 @@ const DESTS = [
 
   { label: "Montreal", country: "ca", keyword: "montreal", lang: "fr" },
 
-  { label: "Abuja (FCT)", country: "ng", keyword: "abuja fct", lang: "en" },
+  { label: "Abuja (FCT)", country: "ng", keyword: "abuja (fct)", lang: "en" },
 
-  { label: "Cairo Governorate", country: "eg", keyword: "cairo", lang: "ar" },
+  { label: "Cairo Governorate", country: "eg", keyword: "cairo governorate", lang: "ar" },
 
   {
     label: "North Holland",
@@ -40,13 +40,13 @@ const DESTS = [
   { label: "Lagos", country: "ng", keyword: "lagos", lang: "en" },
   { label: "Lagos State", country: "ng", keyword: "lagos state", lang: "en" },
   { label: "Lisbon", country: "pt", keyword: "lisbon", lang: "pt" },
-  { label: "Nadi", country: "fj", keyword: "nadi", lang: "en" },
+  { label: "Fiji", country: "fj", keyword: "fiji", lang: "en" },
 
   { label: "Buenos Aires", country: "ar", keyword: "buenos aires", lang: "es" },
   {
     label: "Funchal (Madeira)",
     country: "pt",
-    keyword: "funchal madeira",
+    keyword: "funchal",
     lang: "pt",
   },
   {
@@ -60,7 +60,7 @@ const DESTS = [
   {
     label: "Casablanca Settat",
     country: "ma",
-    keyword: "casablanca settat",
+    keyword: "casablanca-settat",
     lang: "ar",
   },
   { label: "Marrakech", country: "ma", keyword: "marrakech", lang: "ar" },
@@ -75,7 +75,7 @@ const DESTS = [
   {
     label: "San José Province",
     country: "cr",
-    keyword: "san jose province",
+    keyword: "san josé province",
     lang: "es",
   },
   { label: "Sydney", country: "au", keyword: "sydney", lang: "en" },
@@ -174,12 +174,17 @@ const NewsCard = ({ a }) => {
 };
 
 const normalizeLabel = (label) =>
-  label ? label.replace(/\+/g, " ").trim() : label;
+  label
+    ? label
+      .replace(/\+/g, " ")
+      .replace(/[\u2010-\u2015\u2212\u{FE63}\u{FF0D}]/gu, "-")
+      .trim()
+    : label;
 
 const buildExactKeyword = (label) => {
   if (!label) return null;
   const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  return `^${escaped}$`;
+  return escaped; // flexible partial match — no strict ^...$ anchors
 };
 
 const NewsFetch = () => {
