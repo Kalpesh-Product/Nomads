@@ -292,38 +292,35 @@ const Home = () => {
     },
   ];
 
+  const infiniteReviews = reviewData.length ? [...reviewData, ...reviewData] : [];
+
   useEffect(() => {
-    // We define the scroll logic in a helper function
     const setupAutoScroll = (containerRef) => {
       const container = containerRef.current;
-      if (!container || !reviewData?.length) return null;
+      if (!container || !infiniteReviews.length) return null;
 
       const interval = setInterval(() => {
         const { scrollLeft, offsetWidth, scrollWidth } = container;
-        const maxScroll = scrollWidth - offsetWidth;
+        const singleSetWidth = scrollWidth / 2;           // ← key part
 
-        // If we are near the end, jump to start
-        if (scrollLeft >= maxScroll - 10) {
-          container.scrollTo({ left: 0, behavior: 'smooth' });
+        if (scrollLeft >= singleSetWidth - 10) {          // small buffer
+          container.scrollTo({ left: 0, behavior: 'auto' }); // instant reset
         } else {
           container.scrollBy({ left: 300, behavior: 'smooth' });
         }
-      }, 3000);
+      }, 3000);   // same speed as Product page
 
       return interval;
     };
 
-    // Setup auto-scroll for both Desktop and Mobile containers
-    // The hidden container won't affect anything, but the visible one will scroll.
     const desktopInterval = setupAutoScroll(desktopReviewScrollRef);
     const mobileInterval = setupAutoScroll(reviewScrollRef);
 
-    // Cleanup function to clear both intervals
     return () => {
       if (desktopInterval) clearInterval(desktopInterval);
       if (mobileInterval) clearInterval(mobileInterval);
     };
-  }, [reviewData]);
+  }, [infiniteReviews]);   // depend on infiniteReviews
 
   const { mutate: locationData, isPending: isLocation } = useMutation({
     mutationFn: async (data) => {
@@ -421,7 +418,7 @@ const Home = () => {
               <form
                 onSubmit={handleSubmit(onSubmit)}
                 className=" flex justify-around md:w-full lg:w-full border-2 bg-gray-50 rounded-full p-0 items-center"
-                // className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
+              // className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
               >
                 <Controller
                   name="continent"
@@ -730,12 +727,15 @@ const Home = () => {
             <h1 className="text-title font-medium text-primary-blue uppercase">
               Happy customers.
             </h1>
-            <div ref={desktopReviewScrollRef} className="flex overflow-x-auto gap-6 px-4 md:px-0 scrollbar-hide snap-x snap-mandatory pb-4 w-full items-center">
-              {reviewData.length > 0 ? (
-                reviewData.map((review, index) => (
+            <div
+              ref={desktopReviewScrollRef}
+              className="hidden lg:flex overflow-x-auto gap-6 px-4 md:px-0 scrollbar-hide snap-x snap-mandatory pb-4 w-full items-center"
+            >
+              {infiniteReviews.length > 0 ? (
+                infiniteReviews.map((review, index) => (
                   <div
-                    key={index}
-                    className="flex-shrink-0 min-w-[280px] w-[90vw] max-w-[350px] sm:w-[350px] lg:w-full snap-start"
+                    key={`${review.name}-${index}`}   // better key when duplicating
+                    className="min-w-[300px] md:min-w-[400px] flex-shrink-0 snap-center"
                   >
                     <ReviewCard
                       handleClick={() => {
@@ -747,9 +747,30 @@ const Home = () => {
                   </div>
                 ))
               ) : (
-                <div className="col-span-full border-2 border-dotted border-gray-300 rounded-xl p-6 text-center text-sm text-gray-500 h-40 flex justify-center items-center">
-                  No reviews yet.
-                </div>
+                <div className="...">No reviews yet.</div>
+              )}
+            </div>
+            <div
+              ref={reviewScrollRef}
+              className="lg:hidden flex overflow-x-auto gap-6 px-4 scrollbar-hide snap-x snap-mandatory pb-4 w-full items-center"
+            >
+              {infiniteReviews.length > 0 ? (
+                infiniteReviews.map((review, index) => (
+                  <div
+                    key={`${review.name}-${index}`}
+                    className="min-w-[280px] sm:min-w-[320px] md:min-w-[360px] flex-shrink-0 snap-center"
+                  >
+                    <ReviewCard
+                      handleClick={() => {
+                        setSelectedReview(review);
+                        setOpen(true);
+                      }}
+                      review={review}
+                    />
+                  </div>
+                ))
+              ) : (
+                <div className="...">No reviews yet.</div>
               )}
             </div>
             {/* <div className="text-right">

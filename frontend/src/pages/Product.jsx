@@ -134,22 +134,33 @@ const Product = () => {
     refetchOnMount: "always",
   });
 
+  const infiniteReviews = companyDetails?.reviews?.length
+    ? [...companyDetails.reviews, ...companyDetails.reviews]
+    : [];
 
 
   useEffect(() => {
-    // We define the scroll logic in a helper function
+    // Helper function for the scrolling logic
     const setupAutoScroll = (containerRef) => {
       const container = containerRef.current;
+      // We need at least one full set of reviews to loop
       if (!container || !companyDetails?.reviews?.length) return null;
 
       const interval = setInterval(() => {
         const { scrollLeft, offsetWidth, scrollWidth } = container;
-        const maxScroll = scrollWidth - offsetWidth;
 
-        // If we are near the end, jump to start
-        if (scrollLeft >= maxScroll - 10) {
-          container.scrollTo({ left: 0, behavior: 'smooth' });
+        // The width of a single review card + gap
+        // Based on your CSS: min-w-[300px] md:min-w-[400px] + gap-6 (24px)
+        // We calculate the width of one "set" of reviews.
+        const singleSetWidth = scrollWidth / 2;
+
+        // 2. Logic for continuous loop
+        // If we have scrolled past the first set (into the duplicated set), 
+        // instantly reset scroll to the beginning.
+        if (scrollLeft >= singleSetWidth) {
+          container.scrollTo({ left: 0, behavior: 'auto' }); // Instant reset, no animation
         } else {
+          // Normal smooth scroll to the right
           container.scrollBy({ left: 300, behavior: 'smooth' });
         }
       }, 3000);
@@ -157,12 +168,10 @@ const Product = () => {
       return interval;
     };
 
-    // Setup auto-scroll for both Desktop and Mobile containers
-    // The hidden container won't affect anything, but the visible one will scroll.
+    // Setup for both views
     const desktopInterval = setupAutoScroll(desktopReviewScrollRef);
     const mobileInterval = setupAutoScroll(reviewScrollRef);
 
-    // Cleanup function to clear both intervals
     return () => {
       if (desktopInterval) clearInterval(desktopInterval);
       if (mobileInterval) clearInterval(mobileInterval);
@@ -1202,11 +1211,11 @@ const Product = () => {
 
             {/* Desktop Auto-Scrolling Reviews Container */}
             <div ref={desktopReviewScrollRef} className="flex overflow-x-auto gap-6 px-4 md:px-0 scrollbar-hide snap-x snap-mandatory pb-4 w-full items-center">
-              {companyDetails?.reviews?.length > 0 ? (
+              {infiniteReviews.length > 0 ? (
                 <>
-                  {companyDetails.reviews.slice(0, 8).map((review, index) => (
+                  {infiniteReviews.map((review, index) => (
                     <div
-                      key={index}
+                      key={review._id || `${review._id}-${index}`} // Ensure unique keys for duplicates
                       className="min-w-[300px] md:min-w-[400px] flex-shrink-0 snap-center h-full"
                     >
                       <ReviewCard
@@ -1225,7 +1234,6 @@ const Product = () => {
                 </div>
               )}
             </div>
-
             <div className="text-right">
               <a
                 className="text-primary-blue text-sm font-semibold hover:underline"
@@ -2126,11 +2134,11 @@ const Product = () => {
             </div>
 
             <div ref={reviewScrollRef} className="flex overflow-x-auto gap-6 px-4 md:px-0 scrollbar-hide snap-x snap-mandatory pb-4 items-center">
-              {companyDetails?.reviews?.length > 0 ? (
+              {infiniteReviews.length > 0 ? (
                 <>
-                  {companyDetails.reviews.slice(0, 8).map((review, index) => (
+                  {infiniteReviews.map((review, index) => (
                     <div
-                      key={index}
+                      key={review._id || `${review._id}-${index}`}
                       className="min-w-[300px] md:min-w-[400px] flex-shrink-0 snap-center h-full"
                     >
                       <ReviewCard
@@ -2142,8 +2150,6 @@ const Product = () => {
                       />
                     </div>
                   ))}
-
-
                 </>
               ) : (
                 <div className="col-span-full border-2 border-dotted border-gray-300 rounded-xl p-6 text-center text-sm text-gray-500 h-40 flex justify-center items-center w-full">
