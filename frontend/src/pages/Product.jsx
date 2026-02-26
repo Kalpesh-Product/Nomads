@@ -1216,7 +1216,7 @@ const Product = () => {
                   {infiniteReviews.map((review, index) => (
                     <div
                       key={review._id || `${review._id}-${index}`} // Ensure unique keys for duplicates
-                      className="min-w-[300px] md:min-w-[400px] flex-shrink-0 snap-center h-full"
+                      className="w-full md:w-[calc((100%-3rem)/3)] flex-shrink-0 snap-center h-full"
                     >
                       <ReviewCard
                         handleClick={() => {
@@ -2139,7 +2139,7 @@ const Product = () => {
                   {infiniteReviews.map((review, index) => (
                     <div
                       key={review._id || `${review._id}-${index}`}
-                      className="min-w-[300px] md:min-w-[400px] flex-shrink-0 snap-center h-full"
+                      className="w-full flex-shrink-0 snap-center h-full"
                     >
                       <ReviewCard
                         handleClick={() => {

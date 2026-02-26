@@ -268,9 +268,9 @@ const GlobalListingsMap = () => {
 
     const typeOrder = [
       "coworking",
+      "coliving",
       "hostel",
       "workation",
-      "coliving",
       "meetingroom",
       "cafe",
     ];

@@ -231,10 +231,10 @@ const Listings = () => {
 
     const typeOrder = [
       "coworking",
+      "coliving",
       "hostel",
       "workation",
       // "privatestay",
-      "coliving",
       "meetingroom",
       "cafe",
     ];
