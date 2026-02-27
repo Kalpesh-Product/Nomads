@@ -20,7 +20,7 @@ const ReviewCard = ({ review, handleClick }) => {
   } = review;
 
   return (
-    <div className="flex flex-col gap-2 max-w-sm p-0 lg:p-4 rounded-xl pr-10">
+    <div className="flex flex-col gap-2 p-0 lg:p-4 rounded-xl">
       {/* Header */}
       <div className="flex items-center gap-3">
         {avatar ? (

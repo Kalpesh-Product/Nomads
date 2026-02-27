@@ -252,9 +252,9 @@ const GlobalListingsList = () => {
 
     const typeOrder = [
       "coworking",
+      "coliving",
       "hostel",
       "workation",
-      "coliving",
       "meetingroom",
       "cafe",
     ];
@@ -547,10 +547,10 @@ const GlobalListingsList = () => {
                     .sort(([typeA], [typeB]) => {
                       const typeOrder = [
                         "coworking",
+                        "coliving",
                         "hostel",
                         "workation",
                         "privatestay",
-                        "coliving",
                         "meetingroom",
                         "cafe",
                       ];

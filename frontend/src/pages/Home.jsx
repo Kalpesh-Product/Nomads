@@ -735,7 +735,7 @@ const Home = () => {
                 infiniteReviews.map((review, index) => (
                   <div
                     key={`${review.name}-${index}`}   // better key when duplicating
-                    className="min-w-[300px] md:min-w-[400px] flex-shrink-0 snap-center"
+                    className="w-full md:w-[calc((100%-3rem)/3)] flex-shrink-0 snap-center"
                   >
                     <ReviewCard
                       handleClick={() => {
@@ -758,7 +758,7 @@ const Home = () => {
                 infiniteReviews.map((review, index) => (
                   <div
                     key={`${review.name}-${index}`}
-                    className="min-w-[280px] sm:min-w-[320px] md:min-w-[360px] flex-shrink-0 snap-center"
+                    className="w-full flex-shrink-0 snap-center"
                   >
                     <ReviewCard
                       handleClick={() => {
