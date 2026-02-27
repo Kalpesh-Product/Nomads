@@ -134,9 +134,9 @@ const Product = () => {
     refetchOnMount: "always",
   });
 
-  const infiniteReviews = companyDetails?.reviews?.length
+  const infiniteReviews = (companyDetails?.reviews?.length > 2)
     ? [...companyDetails.reviews, ...companyDetails.reviews]
-    : [];
+    : companyDetails?.reviews || [];
 
 
   useEffect(() => {
@@ -144,7 +144,7 @@ const Product = () => {
     const setupAutoScroll = (containerRef) => {
       const container = containerRef.current;
       // We need at least one full set of reviews to loop
-      if (!container || !companyDetails?.reviews?.length) return null;
+      if (!container || (companyDetails?.reviews?.length || 0) <= 2) return null;
 
       const interval = setInterval(() => {
         const { scrollLeft, offsetWidth, scrollWidth } = container;
