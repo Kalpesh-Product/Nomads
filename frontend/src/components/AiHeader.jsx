@@ -197,7 +197,7 @@ const AiHeader = () => {
               <div className="p-4 px-0 whitespace-nowrap">
                 <button
                   onClick={goToHosts}
-                  className="relative pb-1 transition-all cursor-pointer duration-300 group font-semibold bg-transparent  border-none"
+                  className="relative pb-1 transition-all cursor-pointer duration-300 group font-semibold bg-transparent  border-none text-lg"
                 >
                    Become A Host
                   <span className="absolute left-0 w-0 bottom-0 block h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
