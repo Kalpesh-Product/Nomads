@@ -52,6 +52,8 @@ import NomadFAQ from "./pages/NomadFAQ";
 import NomadTermsAndConditions from "./pages/NomadTermsAndConditions";
 import SiteIsDown from "./pages/SiteIsDown";
 import WebsiteUnderMaintenance from "./pages/WebsiteUnderMaintenance";
+import HomeAi from "./pages/HomeAi";
+import NomadAiLayout from "./pages/NomadAiLayout";
 
 function getTenantFromHost() {
   const hostname = window.location.hostname; // e.g. "nomad.wono.co" or "nomad.localhost"
@@ -113,6 +115,7 @@ if (tenant === "main") {
           path: "/",
           children: [
             { path: "", element: <Home /> },
+
             { path: "verticals", element: <GlobalListings /> },
             { path: "listings", element: <Listings /> },
             { path: "listings/:company", element: <Product /> },
@@ -147,6 +150,11 @@ if (tenant === "main") {
             { path: "profile", element: <Profile /> },
             { path: "favorites", element: <Favorites /> },
           ],
+        },
+        {
+          element: <NomadAiLayout />,
+          path: "/",
+          children: [{ path: "home", element: <HomeAi /> }],
         },
       ],
     },

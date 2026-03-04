@@ -14,7 +14,12 @@ const DESTS = [
   { label: "Bangkok", country: "th", keyword: "bangkok", lang: "en" },
   { label: "Phuket", country: "th", keyword: "phuket", lang: "en" },
   { label: "Ho Chi Minh", country: "vn", keyword: "ho chi minh", lang: "en" },
-  { label: "Rio de Janeiro", country: "br", keyword: "rio de janeiro", lang: "en" },
+  {
+    label: "Rio de Janeiro",
+    country: "br",
+    keyword: "rio de janeiro",
+    lang: "en",
+  },
   { label: "Dubai", country: "uae", keyword: "dubai", lang: "en" },
   { label: "Auckland", country: "nz", keyword: "auckland", lang: "en" },
   { label: "Western Cape", country: "za", keyword: "western cape", lang: "en" },
@@ -27,7 +32,12 @@ const DESTS = [
 
   { label: "Abuja (FCT)", country: "ng", keyword: "abuja (fct)", lang: "en" },
 
-  { label: "Cairo Governorate", country: "eg", keyword: "cairo governorate", lang: "ar" },
+  {
+    label: "Cairo Governorate",
+    country: "eg",
+    keyword: "cairo governorate",
+    lang: "ar",
+  },
 
   {
     label: "North Holland",
@@ -44,7 +54,7 @@ const DESTS = [
 
   { label: "Buenos Aires", country: "ar", keyword: "buenos aires", lang: "es" },
   {
-    label: "Funchal (Madeira)",
+    label: "Funchal",
     country: "pt",
     keyword: "funchal",
     lang: "pt",
@@ -58,7 +68,7 @@ const DESTS = [
   { label: "Toronto", country: "ca", keyword: "toronto", lang: "en" },
   { label: "Vancouver", country: "ca", keyword: "vancouver", lang: "en" },
   {
-    label: "Casablanca Settat",
+    label: "Casablanca‑Settat",
     country: "ma",
     keyword: "casablanca-settat",
     lang: "ar",
@@ -71,7 +81,7 @@ const DESTS = [
     keyword: "santa catarina",
     lang: "pt",
   },
-  { label: "São Paulo", country: "br", keyword: "sao paulo", lang: "pt" },
+  { label: "Sao Paulo", country: "br", keyword: "sao paulo", lang: "pt" },
   {
     label: "San José Province",
     country: "cr",
@@ -98,7 +108,7 @@ const DESTS = [
     lang: "en",
   },
   { label: "Gold Coast", country: "au", keyword: "gold coast", lang: "en" },
-  { label: "Fes-Meknes", country: "ma", keyword: "fes-meknes", lang: "ar" },
+  { label: "Fes‑Meknes", country: "ma", keyword: "fes-meknes", lang: "ar" },
   {
     label: "Giza Governorate",
     country: "eg",
@@ -110,7 +120,7 @@ const DESTS = [
   { label: "Da Nang", country: "vn", keyword: "da nang", lang: "en" },
   { label: "Nassau", country: "bs", keyword: "nassau", lang: "en" },
   { label: "Victoria", country: "ca", keyword: "victoria", lang: "en" },
-  { label: "Bogotá D.C.", country: "co", keyword: "bogota d.c.", lang: "es" },
+  { label: "Bogota D.C.", country: "co", keyword: "bogota d.c.", lang: "es" },
   { label: "Medellin", country: "co", keyword: "medellin", lang: "es" },
   { label: "Quito", country: "ec", keyword: "quito", lang: "es" },
 ];
@@ -185,9 +195,9 @@ const BlogCard = ({ b }) => {
 const normalizeLabel = (label) =>
   label
     ? label
-      .replace(/\+/g, " ")
-      .replace(/[\u2010-\u2015\u2212\u{FE63}\u{FF0D}]/gu, "-")
-      .trim()
+        .replace(/\+/g, " ")
+        .replace(/[\u2010-\u2015\u2212\u{FE63}\u{FF0D}]/gu, "-")
+        .trim()
     : label;
 
 const buildExactKeyword = (label) => {
