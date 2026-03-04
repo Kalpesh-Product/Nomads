@@ -5,6 +5,7 @@ import Footer from "../components/Footer";
 import { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import AiHeader from "../components/AiHeader";
+import AiSidebar from "../components/AiSidebar";
 
 const NomadAiLayout = () => {
   const location = useLocation();
@@ -18,20 +19,24 @@ const NomadAiLayout = () => {
     }
   }, [location.pathname]);
   return (
-    <div
-      ref={contentRef}
-      className="flex flex-col gap-4 h-screen overflow-auto custom-scrollbar-hide bg-white"
-    >
-      <div className="sticky top-0 w-full z-50">
-        <AiHeader />
+    <div className="flex h-screen bg-white">
+      <AiSidebar />
+
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        <div className="sticky top-0 z-50 w-full">
+          <AiHeader />
+        </div>
+
+        <div
+          ref={contentRef}
+          className="flex-1 overflow-auto custom-scrollbar-hide"
+        >
+          <Outlet />
+          {/* <Toaster /> */}
+          {(location.pathname !== "/verticals" ||
+            window.innerWidth >= 1024) && <Footer />}
+        </div>
       </div>
-      <div>
-        <Outlet />
-        {/* <Toaster /> */}
-      </div>
-      {(location.pathname !== "/verticals" || window.innerWidth >= 1024) && (
-        <Footer />
-      )}
     </div>
   );
 };

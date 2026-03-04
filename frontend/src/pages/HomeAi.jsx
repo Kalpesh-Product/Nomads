@@ -5,7 +5,7 @@ import {
   HiOutlineUserCircle,
 } from "react-icons/hi";
 import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
-import AiSidebar from "../components/AiSidebar";
+// import AiSidebar from "../components/AiSidebar";
 
 const recommendationCards = [
   {
@@ -48,10 +48,8 @@ const recommendationCards = [
 
 const HomeAi = () => {
   return (
-    <div className="flex min-h-[calc(100vh-110px)] bg-[#f8f8f8]">
-      <AiSidebar />
-
-      <main className="flex-1 px-6 py-10 lg:px-14">
+    <div className="min-h-full bg-[#f8f8f8]">
+      <main className="px-6 py-10 lg:px-14">
         <div className="mx-auto max-w-5xl text-center">
           <h1 className="text-5xl font-medium text-black/90">Hi, Abrar</h1>
           <h2 className="mt-10 text-5xl font-normal text-black/85">
