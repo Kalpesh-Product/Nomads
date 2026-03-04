@@ -48,7 +48,7 @@ const recommendationCards = [
 
 const HomeAi = () => {
   return (
-    <div className="min-h-full bg-[#f8f8f8]">
+    <div className="min-h-full bg-white">
       <main className="px-6 py-10 lg:px-14">
         <div className="mx-auto max-w-5xl text-center">
           <h1 className="text-5xl font-medium text-black/90">Hi, Abrar</h1>

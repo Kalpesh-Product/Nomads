@@ -99,7 +99,7 @@ const AiHeader = () => {
     location.pathname.startsWith("/listings");
 
   return (
-    <div className="shadow-md bg-white/80 backdrop-blur-md">
+    <div className=" bg-white/80 backdrop-blur-md pl-4 pr-4">
       <Container padding={false}>
         <div className="flex py-3 justify-between items-center  lg:py-[0.625rem] ">
           {/* Logo */}
@@ -197,15 +197,15 @@ const AiHeader = () => {
               <div className="p-4 px-0 whitespace-nowrap">
                 <button
                   onClick={goToHosts}
-                  className="relative pb-1 transition-all cursor-pointer duration-300 group font-bold bg-transparent uppercase border-none"
+                  className="relative pb-1 transition-all cursor-pointer duration-300 group font-semibold bg-transparent  border-none"
                 >
-                  Become a host 2
+                   Become A Host
                   <span className="absolute left-0 w-0 bottom-0 block h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
                 </button>
               </div>
             </li>
 
-            <div className="px-1 hidden xl:flex xl:gap-4 py-2">
+            {/* <div className="px-1 hidden xl:flex xl:gap-4 py-2">
               {auth?.user ? (
                 <>
                   <div className="flex justify-center items-center">
@@ -216,7 +216,7 @@ const AiHeader = () => {
                     />
                   </div>
                   <Avatar
-                    onClick={handleAvatarClick} // 🔹 open dropdown
+                    onClick={handleAvatarClick} 
                     sx={{
                       bgcolor: "#ff5757",
                       cursor: "pointer",
@@ -230,7 +230,7 @@ const AiHeader = () => {
                       : "U"}
                   </Avatar>
 
-                  {/* 🔹 Popover for Profile & Logout */}
+               
                   <Popover
                     open={openPopover}
                     anchorEl={anchorEl}
@@ -302,7 +302,7 @@ const AiHeader = () => {
                   className="bg-[#FF5757] flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[7rem] px-4"
                 />
               )}
-            </div>
+            </div> */}
           </div>
 
           {/* Mobile Menu Button */}
@@ -377,13 +377,13 @@ const AiHeader = () => {
                     className="py-4 cursor-pointer"
                   >
                     <p className="text-secondary-dark text-lg font-semibold">
-                      Become A Host 2
+                      Become A Host
                     </p>
                   </div>
                   <div className="h-[0.2px] bg-gray-300"></div>
                 </li>
 
-                {auth?.user ? (
+                {/* {auth?.user ? (
                   <>
                     <li className="items-center text-center">
                       <div
@@ -423,8 +423,6 @@ const AiHeader = () => {
                           <p className="text-secondary-dark text-lg">Log Out</p>
                         )}
                       </div>
-
-                      {/* <div className="h-[0.2px] bg-gray-300"></div> */}
                     </li>
                   </>
                 ) : (
@@ -437,11 +435,10 @@ const AiHeader = () => {
                         navigate("/login");
                         setOpen(false);
                       }}
-                      // className="bg-[#FF5757] flex text-white font-[500] capitalize hover:bg-[#E14C4C] w-[7rem] px-4"
                       className="bg-[#FF5757] flex text-white font-[500] capitalize hover:bg-[#E14C4C] w-full sm:w-[7rem]"
                     />
                   </div>
-                )}
+                )} */}
               </ul>
 
               {/* Drawer Footer */}
