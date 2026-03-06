@@ -31,6 +31,24 @@ const filterOptions = {
 
 const AiSearch = () => {
   const [activeFilter, setActiveFilter] = useState(null);
+  const [orderedFilters, setOrderedFilters] = useState(filters);
+
+  const handleFilterClick = (selectedFilter) => {
+    setActiveFilter(selectedFilter);
+
+    setOrderedFilters((currentFilters) => {
+      const selectedIndex = currentFilters.indexOf(selectedFilter);
+
+      if (selectedIndex <= 0) {
+        return currentFilters;
+      }
+
+      return [
+        ...currentFilters.slice(selectedIndex),
+        ...currentFilters.slice(0, selectedIndex),
+      ];
+    });
+  };
   return (
     <div className="min-h-full bg-white">
       <main className="px-6 py-12 lg:px-14">
@@ -55,14 +73,14 @@ const AiSearch = () => {
           </div>
 
           <div className="mt-14 flex flex-wrap items-center justify-center gap-8">
-            {filters.map((filter) => {
+            {orderedFilters.map((filter) => {
               const isActive = activeFilter === filter;
 
               return (
                 <button
                   key={filter}
                   type="button"
-                  onClick={() => setActiveFilter(filter)}
+                  onClick={() => handleFilterClick(filter)}
                   className={`rounded-full border px-8 py-3 text-lg font-medium transition-colors ${
                     isActive
                       ? "border-sky-500 bg-sky-500 text-white"
