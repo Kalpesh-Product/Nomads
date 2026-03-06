@@ -68,11 +68,11 @@ const HomeAi = () => {
                   >
                     <div className="mb-4 flex items-center gap-3">
                       <Icon size={22} className="text-black/80" />
-                      <h3 className="text-[32px] font-semibold text-black/90">
+                      <h3 className="text-lg font-semibold text-black/90">
                         {card.title}
                       </h3>
                     </div>
-                    <p className="text-[18px] leading-relaxed text-black/70">
+                    <p className="text-xs leading-relaxed text-black/70">
                       {card.description}
                     </p>
                   </article>
