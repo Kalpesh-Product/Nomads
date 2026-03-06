@@ -78,12 +78,10 @@ const AiSearch = () => {
           {activeFilter && (
             <div className="mx-auto mt-8 w-full max-w-4xl">
               <ul className="w-full max-w-[220px] space-y-2">
-                {filterOptions[activeFilter].map((option, index) => (
+                {filterOptions[activeFilter].map((option) => (
                   <li
                     key={option}
-                    className={`rounded-md px-3 py-2 text-base text-black/90 ${
-                      index === 0 ? "bg-black/[0.03]" : ""
-                    }`}
+                    className="rounded-md px-3 py-2 text-base text-black/90"
                   >
                     {option}
                   </li>
