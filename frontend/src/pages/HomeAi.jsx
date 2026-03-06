@@ -51,8 +51,10 @@ const HomeAi = () => {
     <div className="min-h-full bg-white">
       <main className="px-6 py-10 lg:px-14">
         <div className="mx-auto max-w-5xl text-center">
-          <h1 className="text-5xl font-medium text-black/90">Hi, Abrar</h1>
-          <h2 className="mt-10 text-5xl font-normal text-black/85">
+          <h1 className="text-5xl font-medium text-black/90 font-play">
+            Hi, Abrar
+          </h1>
+          <h2 className="mt-10 text-3xl font-semibold text-black/85 font-play">
             Let’s Start Designing Your Nomad Lifestyle
           </h2>
 
