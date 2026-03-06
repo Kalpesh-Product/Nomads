@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { HiOutlineSearch } from "react-icons/hi";
 
 const filters = [
@@ -9,7 +9,28 @@ const filters = [
   "Continent",
 ];
 
+const filterOptions = {
+  Budget: ["Under $100", "$100 - $250", "$500 - $1,000", "$1,000+"],
+  Internet: ["Under 25 Mbps", "25 - 50 Mbps", "50 - 100 Mbps", "100+ Mbps"],
+  "Visa Duration": [
+    "Up to 30 days",
+    "31 - 90 days",
+    "3 - 6 months",
+    "6+ months",
+  ],
+  "Time Zone": ["Americas", "Europe/Africa", "Asia", "Oceania"],
+  Continent: [
+    "Asia",
+    "Europe",
+    "North America",
+    "South America",
+    "Africa",
+    "Oceania",
+  ],
+};
+
 const AiSearch = () => {
+  const [activeFilter, setActiveFilter] = useState(null);
   return (
     <div className="min-h-full bg-white">
       <main className="px-6 py-12 lg:px-14">
@@ -34,16 +55,42 @@ const AiSearch = () => {
           </div>
 
           <div className="mt-14 flex flex-wrap items-center justify-center gap-8">
-            {filters.map((filter) => (
-              <button
-                key={filter}
-                type="button"
-                className="rounded-full border border-black px-8 py-3 text-lg font-medium text-black/90 transition-colors hover:bg-sky-500 hover:text-white hover:border-sky-500 "
-              >
-                {filter}
-              </button>
-            ))}
+            {filters.map((filter) => {
+              const isActive = activeFilter === filter;
+
+              return (
+                <button
+                  key={filter}
+                  type="button"
+                  onClick={() => setActiveFilter(filter)}
+                  className={`rounded-full border px-8 py-3 text-lg font-medium transition-colors ${
+                    isActive
+                      ? "border-sky-500 bg-sky-500 text-white"
+                      : "border-black text-black/90 hover:border-sky-500 hover:bg-sky-500 hover:text-white"
+                  }`}
+                >
+                  {filter}
+                </button>
+              );
+            })}
           </div>
+
+          {activeFilter && (
+            <div className="mx-auto mt-8 w-full max-w-4xl">
+              <ul className="w-full max-w-[220px] space-y-2">
+                {filterOptions[activeFilter].map((option, index) => (
+                  <li
+                    key={option}
+                    className={`rounded-md px-3 py-2 text-base text-black/90 ${
+                      index === 0 ? "bg-black/[0.03]" : ""
+                    }`}
+                  >
+                    {option}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </main>
     </div>
