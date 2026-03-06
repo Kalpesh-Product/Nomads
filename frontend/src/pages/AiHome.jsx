@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
   HiOutlineViewGrid,
   HiOutlineHeart,
@@ -47,6 +48,7 @@ const recommendationCards = [
 ];
 
 const AiHome = () => {
+  const navigate = useNavigate();
   return (
     <div className="min-h-full bg-white">
       <main className="px-6 py-10 lg:px-14">
@@ -66,6 +68,7 @@ const AiHome = () => {
                 return (
                   <article
                     key={card.title}
+                    onClick={() => navigate("/search")}
                     className="group cursor-pointer text-center"
                   >
                     <Icon
