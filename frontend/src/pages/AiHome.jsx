@@ -46,7 +46,7 @@ const recommendationCards = [
   },
 ];
 
-const HomeAi = () => {
+const AiHome = () => {
   return (
     <div className="min-h-full bg-white">
       <main className="px-6 py-10 lg:px-14">
@@ -91,4 +91,4 @@ const HomeAi = () => {
   );
 };
 
-export default HomeAi;
+export default AiHome;
