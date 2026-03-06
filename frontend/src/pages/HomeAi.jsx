@@ -59,24 +59,21 @@ const HomeAi = () => {
           </h2>
 
           <div className="mt-16 rounded-[40px] bg-white/60 px-6 py-8 shadow-[0_0_0_1px_rgba(0,0,0,0.03)]">
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-3">
               {recommendationCards.map((card) => {
                 const Icon = card.icon;
 
                 return (
-                  <article
-                    key={card.title}
-                    className="rounded-3xl bg-[#f1f1f3] p-6 text-left shadow-[0_1px_0_rgba(255,255,255,0.7)]"
-                  >
-                    <div className="mb-4 flex items-center gap-3">
-                      <Icon size={22} className="text-black/80" />
-                      <h3 className="text-lg font-semibold text-black/90">
-                        {card.title}
-                      </h3>
+                  <article key={card.title} className="text-center">
+                    <Icon size={24} className="mx-auto text-black/80" />
+                    <h3 className="mt-2 text-lg font-bold text-black/90  leading-tight">
+                      {card.title}
+                    </h3>
+                    <div className="mt-4 rounded-3xl bg-[#f1f1f3] p-6 text-left shadow-[0_1px_0_rgba(255,255,255,0.7)]">
+                      <p className="text-xs leading-relaxed text-black/70">
+                        {card.description}
+                      </p>
                     </div>
-                    <p className="text-xs leading-relaxed text-black/70">
-                      {card.description}
-                    </p>
                   </article>
                 );
               })}
