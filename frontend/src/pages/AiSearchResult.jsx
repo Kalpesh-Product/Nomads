@@ -15,37 +15,37 @@ const destinationCards = [
     city: "Goa",
     country: "India",
     suggestions: 102,
-    image: "/images/homepage.jpeg",
+    image: "/images/goa-image.jpg",
   },
   {
     city: "Bali",
     country: "Indonesia",
     suggestions: 89,
-    image: "/images/main-page-1.png",
+    image: "/images/bali-image.jpg",
   },
   {
     city: "Bangkok",
     country: "Thailand",
     suggestions: 93,
-    image: "/images/bg-image.jpg",
+    image: "/images/bangkok-image.jpg",
   },
   {
     city: "Dubai",
     country: "United Arab Emirates",
     suggestions: 101,
-    image: "/images/main-page-1.png",
+    image: "/images/dubai-image.webp",
   },
   {
     city: "Budapest",
     country: "Hungary",
     suggestions: 78,
-    image: "/images/homepage.jpeg",
+    image: "/images/budapest-image.jpg",
   },
   {
     city: "Auckland",
     country: "New Zealand",
     suggestions: 83,
-    image: "/images/main-page-1.png",
+    image: "/images/auckland-image.jpg",
   },
 ];
 
@@ -113,15 +113,17 @@ const AiSearchResults = () => {
                 />
                 <div className="mt-2 flex items-start justify-between gap-3">
                   <div>
-                    <h3 className="text-4xl font-semibold text-black/90">
+                    <h3 className="text-[1.5rem] font-semibold text-black/90">
                       {destination.city}
                     </h3>
-                    <p className="text-3xl text-black/60">
-                      {destination.suggestions} Suggestions
-                    </p>
                   </div>
-                  <p className="mt-1 text-3xl font-semibold text-black/90">
+                  <p className="mt-1 text-[1.2rem] font-semibold text-black/90">
                     {destination.country}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[1rem] text-black/60">
+                    {destination.suggestions} Suggestions
                   </p>
                 </div>
               </article>
