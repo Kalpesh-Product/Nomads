@@ -14,36 +14,42 @@ const destinationCards = [
   {
     city: "Goa",
     country: "India",
+    continent: "Asia",
     suggestions: 102,
     image: "/images/goa-image.jpg",
   },
   {
     city: "Bali",
     country: "Indonesia",
+    continent: "Asia",
     suggestions: 89,
     image: "/images/bali-image.jpg",
   },
   {
     city: "Bangkok",
     country: "Thailand",
+    continent: "Asia",
     suggestions: 93,
     image: "/images/bangkok-image.jpg",
   },
   {
     city: "Dubai",
     country: "United Arab Emirates",
+    continent: "Asia",
     suggestions: 101,
     image: "/images/dubai-image.webp",
   },
   {
     city: "Budapest",
     country: "Hungary",
+    continent: "Europe",
     suggestions: 78,
     image: "/images/budapest-image.jpg",
   },
   {
     city: "Auckland",
     country: "New Zealand",
+    continent: "Oceania",
     suggestions: 83,
     image: "/images/auckland-image.jpg",
   },
@@ -52,6 +58,25 @@ const destinationCards = [
 const AiSearchResults = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
+
+  const handleDestinationClick = (destination) => {
+    const country = destination.country.toLowerCase();
+    const location = destination.city.toLowerCase();
+    const continent = destination.continent.toLowerCase();
+
+    navigate(
+      `/ai-listings?country=${encodeURIComponent(country)}&location=${encodeURIComponent(location)}`,
+      {
+        state: {
+          breadcrumbFilters: {
+            continent,
+            country,
+            location,
+          },
+        },
+      },
+    );
+  };
 
   const selectedFilter = state?.selectedFilter || "Budget";
   const selectedOption = state?.selectedOption || "Under $100";
@@ -110,7 +135,19 @@ const AiSearchResults = () => {
 
               <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3 ">
                 {destinationCards.map((destination) => (
-                  <article key={`${destination.city}-${destination.country}`}>
+                  <article
+                    key={`${destination.city}-${destination.country}`}
+                    className="cursor-pointer"
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => handleDestinationClick(destination)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        handleDestinationClick(destination);
+                      }
+                    }}
+                  >
                     <img
                       src={destination.image}
                       alt={`${destination.city}, ${destination.country}`}

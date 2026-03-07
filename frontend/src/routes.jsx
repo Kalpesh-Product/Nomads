@@ -161,6 +161,7 @@ if (tenant === "main") {
             { path: "home", element: <AiHome /> },
             { path: "search", element: <AiSearch /> },
             { path: "search/results", element: <AiSearchResults /> },
+            { path: "ai-listings", element: <GlobalListings /> },
           ],
         },
       ],
