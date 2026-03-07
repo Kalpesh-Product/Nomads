@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { HiOutlineSearch } from "react-icons/hi";
+import { useNavigate } from "react-router-dom";
 
 const filters = [
   "Budget",
@@ -30,6 +31,7 @@ const filterOptions = {
 };
 
 const AiSearch = () => {
+  const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState(null);
   const [orderedFilters, setOrderedFilters] = useState(filters);
 
@@ -47,6 +49,17 @@ const AiSearch = () => {
         ...currentFilters.slice(selectedIndex),
         ...currentFilters.slice(0, selectedIndex),
       ];
+    });
+  };
+
+  const handleOptionClick = (selectedOption) => {
+    if (!activeFilter) return;
+
+    navigate("/search/results", {
+      state: {
+        selectedFilter: activeFilter,
+        selectedOption,
+      },
     });
   };
   return (
@@ -97,11 +110,14 @@ const AiSearch = () => {
             <div className="mx-auto mt-8 w-full max-w-4xl">
               <ul className="w-full max-w-[220px] space-y-2">
                 {filterOptions[activeFilter].map((option) => (
-                  <li
-                    key={option}
-                    className="rounded-md px-3 py-2 text-base text-black/90"
-                  >
-                    {option}
+                  <li key={option}>
+                    <button
+                      type="button"
+                      onClick={() => handleOptionClick(option)}
+                      className="w-full rounded-md px-3 py-2 text-left text-base text-black/90"
+                    >
+                      {option}
+                    </button>
                   </li>
                 ))}
               </ul>
