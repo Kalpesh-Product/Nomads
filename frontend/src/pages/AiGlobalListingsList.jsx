@@ -357,7 +357,7 @@ const AiGlobalListingsList = () => {
     };
 
     navigate(
-      `/listings?country=${formData.country}&location=${formData.location}&category=${state.category}`,
+      `/ai-listings?country=${formData.country}&location=${formData.location}&category=${state.category}`,
       {
         state: {
           country: formData.country,
@@ -455,7 +455,7 @@ const AiGlobalListingsList = () => {
                 </div>
               </div>
 
-              <form
+              {/* <form
                 onSubmit={handleSubmit(onSubmit)}
                 className="flex justify-around md:w-full lg:w-full border-2 bg-gray-50 rounded-full p-0 items-center"
               >
@@ -527,7 +527,7 @@ const AiGlobalListingsList = () => {
                 >
                   <IoSearch />
                 </button>
-              </form>
+              </form> */}
             </div>
           </div>
         </div>
@@ -598,7 +598,7 @@ const AiGlobalListingsList = () => {
                                 showVertical={false}
                                 handleNavigation={() =>
                                   navigate(
-                                    `/listings/${encodeURIComponent(item.companyName)}`,
+                                    `/ai-listings/${encodeURIComponent(item.companyName)}`,
                                     {
                                       state: {
                                         companyId: item.companyId,
@@ -720,7 +720,7 @@ const AiGlobalListingsList = () => {
                   </button>
                 </div>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                {/* <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                   <Controller
                     name="continent"
                     control={control}
@@ -787,7 +787,7 @@ const AiGlobalListingsList = () => {
                     <IoSearch className="inline mr-2" />
                     Search
                   </button>
-                </form>
+                </form> */}
               </motion.div>
             )}
           </AnimatePresence>
@@ -863,7 +863,7 @@ const AiGlobalListingsList = () => {
                                 showVertical={false}
                                 handleNavigation={() =>
                                   navigate(
-                                    `/listings/${encodeURIComponent(item.companyName)}`,
+                                    `/ai-listings/${encodeURIComponent(item.companyName)}`,
                                     {
                                       state: {
                                         companyId: item.companyId,

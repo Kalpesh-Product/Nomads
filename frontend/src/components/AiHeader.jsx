@@ -115,7 +115,7 @@ const AiHeader = () => {
               />
             </div>
 
-            <div className="min-w-[80px] hidden lg:block">
+            {/* <div className="min-w-[80px] hidden lg:block">
               {showToggle && (
                 <ul>
                   {view !== "map" && (
@@ -125,8 +125,8 @@ const AiHeader = () => {
                           to={`${location.pathname}?country=${formData?.country}&location=${formData?.location}&view=map`}
                           className="group relative text-md text-black"
                         >
-                          <span className="relative z-10 group-hover:font-bold uppercase mb-2">
-                            MAP VIEW
+                          <span className="relative z-10 group-hover:font-bold  mb-2">
+                            Map View
                           </span>
                           <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
                         </Link>
@@ -151,7 +151,7 @@ const AiHeader = () => {
                   )}
                 </ul>
               )}
-            </div>
+            </div> */}
           </div>
 
           {/* Main Nav */}
@@ -193,13 +193,50 @@ const AiHeader = () => {
 
           {/* Right Section */}
           <div className="hidden lg:flex pl-10 gap-10">
+            <div className="min-w-[80px] hidden lg:block">
+              {showToggle && (
+                <ul>
+                  {view !== "map" && (
+                    <li className="flex items-center">
+                      <div className="p-4 px-0 whitespace-nowrap">
+                        <Link
+                          to={`${location.pathname}?country=${formData?.country}&location=${formData?.location}&view=map`}
+                          className="group relative text-md text-black"
+                        >
+                          <span className="relative z-10 group-hover:font-bold  mb-2 text-lg font-semibold">
+                            Map View
+                          </span>
+                          <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                        </Link>
+                      </div>
+                    </li>
+                  )}
+
+                  {view === "map" && (
+                    <li className="flex items-center">
+                      <div className="p-4 px-0 whitespace-nowrap">
+                        <Link
+                          to={`${location.pathname}?country=${formData?.country}&location=${formData?.location}`}
+                          className="group relative text-md text-black"
+                        >
+                          <span className="relative z-10 group-hover:font-bold  mb-2 text-lg font-semibold">
+                            List view
+                          </span>
+                          <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                        </Link>
+                      </div>
+                    </li>
+                  )}
+                </ul>
+              )}
+            </div>
             <li className="flex items-center">
               <div className="p-4 px-0 whitespace-nowrap">
                 <button
                   onClick={goToHosts}
                   className="relative pb-1 transition-all cursor-pointer duration-300 group font-semibold bg-transparent  border-none text-lg"
                 >
-                   Become A Host
+                  Become A Host
                   <span className="absolute left-0 w-0 bottom-0 block h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
                 </button>
               </div>

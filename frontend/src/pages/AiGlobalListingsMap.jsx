@@ -1,4 +1,10 @@
-import { Box, MenuItem, Skeleton, TextField, useMediaQuery } from "@mui/material";
+import {
+  Box,
+  MenuItem,
+  Skeleton,
+  TextField,
+  useMediaQuery,
+} from "@mui/material";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -58,7 +64,6 @@ const HorizontalScrollWrapper = ({ children, title }) => {
         <h2 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight">
           {title}
         </h2>
-
       </div>
       <div
         ref={scrollRef}
@@ -150,7 +155,7 @@ const AiGlobalListingsMap = () => {
     if (selectedContinent) {
       filtered = locations.filter(
         (item) =>
-          item.continent?.toLowerCase() === selectedContinent?.toLowerCase()
+          item.continent?.toLowerCase() === selectedContinent?.toLowerCase(),
       );
     }
 
@@ -167,7 +172,7 @@ const AiGlobalListingsMap = () => {
   const countryOptions = useMemo(() => allCountryOptions, [allCountryOptions]);
 
   const filteredLocation = locations.find(
-    (item) => item.country?.toLowerCase() === selectedCountry?.toLowerCase()
+    (item) => item.country?.toLowerCase() === selectedCountry?.toLowerCase(),
   );
 
   const locationOptions = useMemo(() => {
@@ -209,10 +214,10 @@ const AiGlobalListingsMap = () => {
     }
 
     navigate(
-      `/listings?country=${formData.country}&location=${formData.location}&category=${type}`,
+      `/ai-listings?country=${formData.country}&location=${formData.location}&category=${type}`,
       {
         state: updatedForm,
-      }
+      },
     );
   };
 
@@ -222,8 +227,9 @@ const AiGlobalListingsMap = () => {
       const { country, location, category } = formData || {};
 
       const response = await axios.get(
-        `company/companiesn?country=${country}&state=${location}&userId=${userId || ""
-        }`
+        `company/companiesn?country=${country}&state=${location}&userId=${
+          userId || ""
+        }`,
       );
 
       return Array.isArray(response.data)
@@ -237,7 +243,7 @@ const AiGlobalListingsMap = () => {
   const sortedListings = useMemo(() => {
     if (!listingsData || listingsData.length === 0) return [];
     return [...listingsData].sort(
-      (a, b) => (b.ratings || 0) - (a.ratings || 0)
+      (a, b) => (b.ratings || 0) - (a.ratings || 0),
     );
   }, [listingsData]);
 
@@ -247,13 +253,12 @@ const AiGlobalListingsMap = () => {
     // Add 'All' option specifically for the UI chips
     const baseOptions = [];
 
-
     const uniqueTypes = [
       ...new Set(
         listingsData
           .filter((item) => item.companyType !== "privatestay")
           .map((item) => item.companyType)
-          .filter(Boolean)
+          .filter(Boolean),
       ),
     ];
 
@@ -290,7 +295,7 @@ const AiGlobalListingsMap = () => {
 
   const toggleFavorite = (id) => {
     setFavorites((prev) =>
-      prev.includes(id) ? prev.filter((fav) => fav !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((fav) => fav !== id) : [...prev, id],
     );
   };
 
@@ -377,33 +382,33 @@ const AiGlobalListingsMap = () => {
     setShowListings(false);
 
     navigate(
-      `/listings?country=${currentFormData.country}&location=${currentFormData.location}&category=${state.category}`,
+      `/ai-listings?country=${currentFormData.country}&location=${currentFormData.location}&category=${state.category}`,
       {
         state: {
           country: currentFormData.country,
           location: currentFormData.location,
           category: categoryValue,
         },
-      }
+      },
     );
   };
 
   const forMapsData = isLisitingLoading
     ? []
     : listingsData.map((item) => ({
-      ...item,
-      id: item._id,
-      lat: item.latitude,
-      lng: item.longitude,
-      name: item.companyName,
-      location: item.city,
-      reviews: item.reviewCount,
-      rating: item.ratings || 0,
-      reviews: item.totalReviews || 0,
-      image:
-        item.images?.[0]?.url ||
-        "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
-    }));
+        ...item,
+        id: item._id,
+        lat: item.latitude,
+        lng: item.longitude,
+        name: item.companyName,
+        location: item.city,
+        reviews: item.reviewCount,
+        rating: item.ratings || 0,
+        reviews: item.totalReviews || 0,
+        image:
+          item.images?.[0]?.url ||
+          "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
+      }));
 
   return (
     <>
@@ -464,7 +469,7 @@ const AiGlobalListingsMap = () => {
                 </div>
               </div>
 
-              <form
+              {/* <form
                 onSubmit={handleSubmit(onSubmit)}
                 className="flex justify-around md:w-full lg:w-full border-2 bg-gray-50 rounded-full p-0 items-center"
               >
@@ -536,7 +541,7 @@ const AiGlobalListingsMap = () => {
                 >
                   <IoSearch />
                 </button>
-              </form>
+              </form> */}
             </div>
           </div>
         </div>
@@ -589,15 +594,15 @@ const AiGlobalListingsMap = () => {
                               showVertical={true}
                               handleNavigation={() =>
                                 navigate(
-                                  `/listings/${encodeURIComponent(
-                                    item.companyName
+                                  `/ai-listings/${encodeURIComponent(
+                                    item.companyName,
                                   )}`,
                                   {
                                     state: {
                                       companyId: item.companyId,
                                       type: item.companyType || "ss",
                                     },
-                                  }
+                                  },
                                 )
                               }
                             />
@@ -639,15 +644,26 @@ const AiGlobalListingsMap = () => {
             >
               <div className="flex flex-col items-start overflow-hidden flex-1">
                 <span className="text-[11px] font-bold text-gray-900 truncate w-full text-left">
-                  {`${(formData?.country || "Country").charAt(0).toUpperCase() + (formData?.country || "Country").slice(1)} . ${formData?.location
-                    ? formData.location
-                      .split(' ')
-                      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-                      .join(' ')
-                    : "Unknown"} . ${formData?.category
-                      ? (categoryOptions.find(c => c.value === formData.category)?.label || formData.category.charAt(0).toUpperCase() + formData.category.slice(1))
+                  {`${(formData?.country || "Country").charAt(0).toUpperCase() + (formData?.country || "Country").slice(1)} . ${
+                    formData?.location
+                      ? formData.location
+                          .split(" ")
+                          .map(
+                            (word) =>
+                              word.charAt(0).toUpperCase() +
+                              word.slice(1).toLowerCase(),
+                          )
+                          .join(" ")
+                      : "Unknown"
+                  } . ${
+                    formData?.category
+                      ? categoryOptions.find(
+                          (c) => c.value === formData.category,
+                        )?.label ||
+                        formData.category.charAt(0).toUpperCase() +
+                          formData.category.slice(1)
                       : "All"
-                    }`}
+                  }`}
                 </span>
               </div>
               <div className="bg-[#FF5757] p-1.5 rounded-full text-white ml-2 flex-shrink-0 shadow-sm">
@@ -663,14 +679,15 @@ const AiGlobalListingsMap = () => {
                   <button
                     key={cat.value}
                     onClick={() => handleCategoryClick(cat.value)}
-                    className={`flex-shrink-0 snap-start px-4 py-1.5 rounded-full text-[11px] font-semibold shadow-md transition-colors ${isActive
-                      ? "bg-blue-50 border border-blue-500 text-blue-600"
-                      : "bg-white/95 backdrop-blur-md border border-gray-200 text-gray-800 hover:bg-gray-50"
-                      }`}
+                    className={`flex-shrink-0 snap-start px-4 py-1.5 rounded-full text-[11px] font-semibold shadow-md transition-colors ${
+                      isActive
+                        ? "bg-blue-50 border border-blue-500 text-blue-600"
+                        : "bg-white/95 backdrop-blur-md border border-gray-200 text-gray-800 hover:bg-gray-50"
+                    }`}
                   >
                     {cat.label}
                   </button>
-                )
+                );
               })}
             </div>
           </div>
@@ -699,7 +716,7 @@ const AiGlobalListingsMap = () => {
                     &times;
                   </button>
                 </div>
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                {/* <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                   <Controller
                     name="continent"
                     control={control}
@@ -766,7 +783,7 @@ const AiGlobalListingsMap = () => {
                     <IoSearch className="inline mr-2" />
                     Search
                   </button>
-                </form>
+                </form> */}
               </motion.div>
             </motion.div>
           )}
@@ -824,8 +841,9 @@ const AiGlobalListingsMap = () => {
                 stiffness: 300,
                 velocity: 2,
               }}
-              className={`fixed bottom-0 left-0 right-0 bg-white shadow-[0_-8px_30px_rgb(0,0,0,0.12)] z-[1100] px-6 rounded-t-[24px] lg:hidden ${showListings ? "h-[calc(100vh-180px)]" : "h-[25vh]"
-                }`}
+              className={`fixed bottom-0 left-0 right-0 bg-white shadow-[0_-8px_30px_rgb(0,0,0,0.12)] z-[1100] px-6 rounded-t-[24px] lg:hidden ${
+                showListings ? "h-[calc(100vh-180px)]" : "h-[25vh]"
+              }`}
             >
               <div
                 className="flex justify-center py-4 sticky top-0 z-10 bg-white cursor-pointer"
@@ -838,10 +856,11 @@ const AiGlobalListingsMap = () => {
               </div>
 
               <div
-                className={`custom-scrollbar-hide py-6 overscroll-contain transition-all duration-300 ${showListings
-                  ? "overflow-y-auto h-[calc(75vh-70px)]"
-                  : "overflow-hidden mb-10"
-                  }`}
+                className={`custom-scrollbar-hide py-6 overscroll-contain transition-all duration-300 ${
+                  showListings
+                    ? "overflow-y-auto h-[calc(75vh-70px)]"
+                    : "overflow-hidden mb-10"
+                }`}
                 style={{
                   WebkitOverflowScrolling: "touch",
                   touchAction: "pan-y",
@@ -852,51 +871,61 @@ const AiGlobalListingsMap = () => {
                   <div className="pb-20">
                     <div className="flex justify-between items-center mb-4">
                       <h2 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight">
-                        {`Popular ${categoryOptions.find(c => c.value === formData.category)?.label || "Listings"} in ${formData?.location
-                          ? formData.location
-                            .split(' ')
-                            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-                            .join(' ')
-                          : "Unknown"}`}
+                        {`Popular ${categoryOptions.find((c) => c.value === formData.category)?.label || "Listings"} in ${
+                          formData?.location
+                            ? formData.location
+                                .split(" ")
+                                .map(
+                                  (word) =>
+                                    word.charAt(0).toUpperCase() +
+                                    word.slice(1).toLowerCase(),
+                                )
+                                .join(" ")
+                            : "Unknown"
+                        }`}
                       </h2>
                     </div>
-                    {isLisitingLoading ? (
-                      Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
-                    ) : (
-                      (() => {
-                        const filteredItems = listingsData.filter(item => item.companyType === formData.category);
-                        return filteredItems.length > 0 ? (
-                          <div className="pb-1">
-                            <PaginatedGrid
-                              data={filteredItems}
-                              entriesPerPage={isMobile ? 10 : 12}
-                              scrollToTop={false}
-                              columns={`grid-cols-2 md:grid-cols-3 gap-3`}
-                              renderItem={(item, index) => (
-                                <ListingCard
-                                  key={item._id}
-                                  item={item}
-                                  showVertical={true}
-                                  handleNavigation={() =>
-                                    navigate(
-                                      `/listings/${encodeURIComponent(item.companyName)}`,
-                                      {
-                                        state: {
-                                          companyId: item.companyId,
-                                          type: item.companyType || "ss",
+                    {isLisitingLoading
+                      ? Array.from({ length: 4 }).map((_, i) => (
+                          <SkeletonCard key={i} />
+                        ))
+                      : (() => {
+                          const filteredItems = listingsData.filter(
+                            (item) => item.companyType === formData.category,
+                          );
+                          return filteredItems.length > 0 ? (
+                            <div className="pb-1">
+                              <PaginatedGrid
+                                data={filteredItems}
+                                entriesPerPage={isMobile ? 10 : 12}
+                                scrollToTop={false}
+                                columns={`grid-cols-2 md:grid-cols-3 gap-3`}
+                                renderItem={(item, index) => (
+                                  <ListingCard
+                                    key={item._id}
+                                    item={item}
+                                    showVertical={true}
+                                    handleNavigation={() =>
+                                      navigate(
+                                        `/ai-listings/${encodeURIComponent(item.companyName)}`,
+                                        {
+                                          state: {
+                                            companyId: item.companyId,
+                                            type: item.companyType || "ss",
+                                          },
                                         },
-                                      }
-                                    )
-                                  }
-                                />
-                              )}
-                            />
-                          </div>
-                        ) : (
-                          <div className="text-center py-10 text-gray-500">No listings found for this category.</div>
-                        );
-                      })()
-                    )}
+                                      )
+                                    }
+                                  />
+                                )}
+                              />
+                            </div>
+                          ) : (
+                            <div className="text-center py-10 text-gray-500">
+                              No listings found for this category.
+                            </div>
+                          );
+                        })()}
                   </div>
                 ) : (
                   // Existing Grouped View
@@ -911,12 +940,12 @@ const AiGlobalListingsMap = () => {
                         const prioritizedCompanies = ["MeWo", "BIZ Nest"];
                         const sortedItems = items.sort((a, b) => {
                           const aPriority = prioritizedCompanies.includes(
-                            a.companyName
+                            a.companyName,
                           )
                             ? 0
                             : 1;
                           const bPriority = prioritizedCompanies.includes(
-                            b.companyName
+                            b.companyName,
                           )
                             ? 0
                             : 1;
@@ -934,8 +963,9 @@ const AiGlobalListingsMap = () => {
                           formData?.location?.charAt(0).toUpperCase() +
                           formData?.location?.slice(1);
 
-                        const sectionTitle = `Popular ${typeLabels[type] || typeLabels.default(type)
-                          } in ${location || ""}`;
+                        const sectionTitle = `Popular ${
+                          typeLabels[type] || typeLabels.default(type)
+                        } in ${location || ""}`;
 
                         return (
                           <HorizontalScrollWrapper
@@ -951,15 +981,15 @@ const AiGlobalListingsMap = () => {
                                   item={item}
                                   handleNavigation={() =>
                                     navigate(
-                                      `/listings/${encodeURIComponent(
-                                        item.companyName
+                                      `/ai-listings/${encodeURIComponent(
+                                        item.companyName,
                                       )}`,
                                       {
                                         state: {
                                           companyId: item.companyId,
                                           type: item.companyType,
                                         },
-                                      }
+                                      },
                                     )
                                   }
                                 />
@@ -1015,7 +1045,7 @@ const AiGlobalListingsMap = () => {
         <button
           onClick={() =>
             navigate(
-              `/verticals?country=${formData?.country}&location=${formData?.location}`
+              `/verticals?country=${formData?.country}&location=${formData?.location}`,
             )
           }
           className="bg-[#222222] text-white px-5 py-3 rounded-full flex items-center gap-2 shadow-xl hover:scale-105 transition-transform active:scale-95"
