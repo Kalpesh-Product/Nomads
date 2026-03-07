@@ -118,11 +118,11 @@ const AiSearchResults = () => {
                     />
                     <div className="mt-2 flex items-start justify-between gap-3">
                       <div>
-                        <h3 className="text-[1.5rem] font-semibold text-black/90">
+                        <h3 className="text-[1.3rem] font-semibold text-black/90">
                           {destination.city}
                         </h3>
                       </div>
-                      <p className="mt-1 text-[1.2rem] font-semibold text-black/90">
+                      <p className="mt-1 text-[1.1rem] font-semibold text-black/90">
                         {destination.country}
                       </p>
                     </div>
