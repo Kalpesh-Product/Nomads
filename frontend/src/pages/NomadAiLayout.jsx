@@ -31,7 +31,9 @@ const NomadAiLayout = () => {
           ref={contentRef}
           className="flex-1 overflow-auto custom-scrollbar-hide"
         >
-          <Outlet />
+          <div className="px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-12 min-h-[calc(100vh-200px)]">
+            <Outlet />
+          </div>
           {/* <Toaster /> */}
           {(location.pathname !== "/verticals" ||
             window.innerWidth >= 1024) && <Footer />}

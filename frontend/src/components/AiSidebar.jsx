@@ -71,7 +71,7 @@ const AiSidebar = () => {
   return (
     <aside
       className={`h-full border-r border-black/10 bg-[#efefef] transition-all duration-300 ${
-        collapsed ? "w-[84px]" : "w-[320px]"
+        collapsed ? "w-[84px]" : "w-[300px]"
       }`}
     >
       <div className="px-4 py-4">

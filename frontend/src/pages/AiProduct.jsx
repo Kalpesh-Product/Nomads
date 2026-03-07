@@ -49,7 +49,7 @@ import { setFormValues } from "../features/locationSlice.js";
 
 dayjs.extend(relativeTime);
 
-const Product = () => {
+const AiProduct = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { company } = useParams();
@@ -2596,4 +2596,4 @@ const Product = () => {
   );
 };
 
-export default Product;
+export default AiProduct;
