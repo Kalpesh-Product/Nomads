@@ -57,6 +57,7 @@ import NomadAiLayout from "./pages/NomadAiLayout";
 import AiHome from "./pages/AiHome";
 import AiSearch from "./pages/AiSearch";
 import AiSearchResults from "./pages/AiSearchResult";
+import AiGlobalListings from "./pages/AiGlobalListings";
 
 function getTenantFromHost() {
   const hostname = window.location.hostname; // e.g. "nomad.wono.co" or "nomad.localhost"
@@ -161,7 +162,7 @@ if (tenant === "main") {
             { path: "home", element: <AiHome /> },
             { path: "search", element: <AiSearch /> },
             { path: "search/results", element: <AiSearchResults /> },
-            { path: "ai-listings", element: <GlobalListings /> },
+            { path: "ai-listings", element: <AiGlobalListings /> },
           ],
         },
       ],
