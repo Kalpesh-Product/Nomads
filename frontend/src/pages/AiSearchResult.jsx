@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { HiOutlineArrowLeft, HiOutlineSearch } from "react-icons/hi";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -58,6 +58,7 @@ const destinationCards = [
 const AiSearchResults = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
+  const [typedHeading, setTypedHeading] = useState("");
 
   const handleDestinationClick = (destination) => {
     const country = destination.country.toLowerCase();
@@ -80,6 +81,26 @@ const AiSearchResults = () => {
 
   const selectedFilter = state?.selectedFilter || "Budget";
   const selectedOption = state?.selectedOption || "Under $100";
+
+  const headingText =
+    "As per your inputs, please find below the best destinations curated for you based on " +
+    `${selectedFilter.toLowerCase()} preference`;
+
+  useEffect(() => {
+    setTypedHeading("");
+
+    let currentIndex = 0;
+    const typingInterval = setInterval(() => {
+      currentIndex += 1;
+      setTypedHeading(headingText.slice(0, currentIndex));
+
+      if (currentIndex >= headingText.length) {
+        clearInterval(typingInterval);
+      }
+    }, 25);
+
+    return () => clearInterval(typingInterval);
+  }, [headingText]);
 
   return (
     <div className="min-h-full bg-white">
@@ -128,9 +149,7 @@ const AiSearchResults = () => {
               </div>
 
               <p className="mt-8 text-3xl font-medium leading-snug text-black/85 lg:text-lg">
-                As per your inputs, please find below the best destinations
-                curated for you based on {selectedFilter.toLowerCase()}{" "}
-                preference
+                {typedHeading}
               </p>
 
               <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3 ">

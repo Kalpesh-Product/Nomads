@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   HiOutlineViewGrid,
@@ -49,18 +49,58 @@ const recommendationCards = [
 
 const AiHome = () => {
   const navigate = useNavigate();
+  const [typedGreeting, setTypedGreeting] = useState("");
+  const [typedSubheading, setTypedSubheading] = useState("");
+
+  const greetingText = "hi Abrar";
+  const subheadingText = "Let’s start designing your nomad lifestyle";
+
+  useEffect(() => {
+    setTypedGreeting("");
+    setTypedSubheading("");
+
+    let greetingIndex = 0;
+    let subheadingIndex = 0;
+    let cleanupSubheading = () => {};
+
+    const greetingInterval = setInterval(() => {
+      greetingIndex += 1;
+      setTypedGreeting(greetingText.slice(0, greetingIndex));
+
+      if (greetingIndex >= greetingText.length) {
+        clearInterval(greetingInterval);
+
+        const subheadingInterval = setInterval(() => {
+          subheadingIndex += 1;
+          setTypedSubheading(subheadingText.slice(0, subheadingIndex));
+
+          if (subheadingIndex >= subheadingText.length) {
+            clearInterval(subheadingInterval);
+          }
+        }, 25);
+
+        cleanupSubheading = () => clearInterval(subheadingInterval);
+      }
+    }, 25);
+
+    return () => {
+      clearInterval(greetingInterval);
+      cleanupSubheading();
+    };
+  }, [greetingText, subheadingText]);
+
   return (
     <div className="min-h-full bg-white">
       <main className="px-6 py-10 lg:px-14">
         <div className="mx-auto max-w-5xl text-center">
           <h1 className="text-5xl font-medium text-black/90 font-play">
-            hi Abrar
+            {typedGreeting}
           </h1>
           <h2 className="mt-10 text-3xl font-semibold text-black/85 font-play">
-            Let’s start designing your nomad lifestyle
+            {typedSubheading}
           </h2>
 
-          <div className="mt-16 rounded-[40px] bg-white/60 px-6 py-8 shadow-[0_0_0_1px_rgba(0,0,0,0.03)]">
+          <div className="mt-16 rounded-[40px] bg-white/60 px-6 py-8 ">
             <div className="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-3">
               {recommendationCards.map((card) => {
                 const Icon = card.icon;

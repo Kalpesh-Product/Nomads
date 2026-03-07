@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { HiOutlineSearch } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 
@@ -35,6 +35,27 @@ const AiSearch = () => {
   const [activeFilter, setActiveFilter] = useState(null);
   const [orderedFilters, setOrderedFilters] = useState(filters);
 
+  const [typedHeading, setTypedHeading] = useState("");
+
+  const headingText =
+    "Please share the below details to find the best destinations for you";
+
+  useEffect(() => {
+    setTypedHeading("");
+
+    let currentIndex = 0;
+    const typingInterval = setInterval(() => {
+      currentIndex += 1;
+      setTypedHeading(headingText.slice(0, currentIndex));
+
+      if (currentIndex >= headingText.length) {
+        clearInterval(typingInterval);
+      }
+    }, 25);
+
+    return () => clearInterval(typingInterval);
+  }, [headingText]);
+
   const handleFilterClick = (selectedFilter) => {
     setActiveFilter(selectedFilter);
 
@@ -66,9 +87,13 @@ const AiSearch = () => {
     <div className="min-h-full bg-white">
       <main className="px-6 py-12 lg:px-14">
         <div className="mx-auto max-w-5xl">
-          <h1 className="text-center text-2xl font-medium text-black/90 ">
-            Please share the below details to find the best destinations for you
-          </h1>
+          <div className="flex justify-between">
+            <div></div>
+            <h1 className="text-left text-2xl font-medium text-black/90 w-full px-12">
+              {typedHeading}
+            </h1>
+            <div></div>
+          </div>
 
           <div className="mx-auto mt-16 flex max-w-4xl items-center rounded-full border border-black/15 bg-white px-5 py-1 shadow-[0_2px_6px_rgba(0,0,0,0.03)]">
             <input
