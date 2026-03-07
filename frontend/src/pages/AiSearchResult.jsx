@@ -65,7 +65,7 @@ const AiSearchResults = () => {
     const continent = destination.continent.toLowerCase();
 
     navigate(
-      `/ai-listings?country=${encodeURIComponent(country)}&location=${encodeURIComponent(location)}`,
+      `/ai-listings?country=${encodeURIComponent(country)}&state=${encodeURIComponent(location)}`,
       {
         state: {
           breadcrumbFilters: {
