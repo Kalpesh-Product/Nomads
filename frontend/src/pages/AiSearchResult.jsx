@@ -102,6 +102,10 @@ const AiSearchResults = () => {
   const [currentSelectedOption, setCurrentSelectedOption] =
     useState(selectedOption);
 
+  const [selectedHeadingFilter, setSelectedHeadingFilter] =
+    useState(selectedFilter);
+  const [headingAnimationKey, setHeadingAnimationKey] = useState(0);
+
   const handleDestinationClick = (destination) => {
     const country = destination.country.toLowerCase();
     const location = destination.city.toLowerCase();
@@ -140,11 +144,13 @@ const AiSearchResults = () => {
 
   const handleOptionClick = (option) => {
     setCurrentSelectedOption(option);
+    setSelectedHeadingFilter(activeFilter);
+    setHeadingAnimationKey((currentKey) => currentKey + 1);
   };
 
   const headingText =
     "As per your inputs, please find below the best destinations curated for you based on " +
-    `${activeFilter.toLowerCase()} preference`;
+    `${selectedHeadingFilter.toLowerCase()} preference`;
 
   useEffect(() => {
     setTypedHeading("");
@@ -160,7 +166,7 @@ const AiSearchResults = () => {
     }, 25);
 
     return () => clearInterval(typingInterval);
-  }, [headingText]);
+  }, [headingText, headingAnimationKey]);
 
   return (
     <div className="min-h-full bg-white">
