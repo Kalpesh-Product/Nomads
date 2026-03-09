@@ -105,6 +105,7 @@ const AiSearchResults = () => {
   const [selectedHeadingFilter, setSelectedHeadingFilter] =
     useState(selectedFilter);
   const [headingAnimationKey, setHeadingAnimationKey] = useState(0);
+  const [isFilterOptionsOpen, setIsFilterOptionsOpen] = useState(false);
 
   const handleDestinationClick = (destination) => {
     const country = destination.country.toLowerCase();
@@ -127,6 +128,9 @@ const AiSearchResults = () => {
 
   const handleFilterClick = (selectedBadge) => {
     setActiveFilter(selectedBadge);
+    setIsFilterOptionsOpen((isOpen) =>
+      selectedBadge === activeFilter ? !isOpen : true,
+    );
 
     setOrderedFilters((currentFilters) => {
       const selectedIndex = currentFilters.indexOf(selectedBadge);
@@ -146,6 +150,7 @@ const AiSearchResults = () => {
     setCurrentSelectedOption(option);
     setSelectedHeadingFilter(activeFilter);
     setHeadingAnimationKey((currentKey) => currentKey + 1);
+    setIsFilterOptionsOpen(false);
   };
 
   const headingText =
@@ -216,7 +221,7 @@ const AiSearchResults = () => {
                   })}
                 </div>
 
-                {activeFilter && (
+                {activeFilter && isFilterOptionsOpen && (
                   <div className="absolute left-0 top-full z-40 mt-4 w-full max-w-[220px]">
                     <ul className="space-y-2 rounded-lg border border-sky-400 bg-white px-2 py-2 shadow-sm">
                       {filterOptions[activeFilter].map((option) => (
@@ -236,8 +241,13 @@ const AiSearchResults = () => {
               </div>
 
               <div className="relative mt-8">
-                {activeFilter && (
-                  <div className="absolute inset-0 z-20 rounded-2xl bg-white/55 backdrop-blur-[1px]" />
+                {activeFilter && isFilterOptionsOpen && (
+                  <button
+                    type="button"
+                    aria-label="Close filter options"
+                    onClick={() => setIsFilterOptionsOpen(false)}
+                    className="absolute inset-0 z-20 rounded-2xl bg-white/55 backdrop-blur-[1px]"
+                  />
                 )}
 
                 <div className="relative z-10">
