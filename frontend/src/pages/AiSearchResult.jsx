@@ -82,6 +82,22 @@ const AiSearchResults = () => {
   const selectedFilter = state?.selectedFilter || "Budget";
   const selectedOption = state?.selectedOption || "Under $100";
 
+  const orderedFilters =
+    state?.orderedFilters && state.orderedFilters.length
+      ? state.orderedFilters
+      : (() => {
+          const selectedIndex = filters.indexOf(selectedFilter);
+
+          if (selectedIndex <= 0) {
+            return filters;
+          }
+
+          return [
+            ...filters.slice(selectedIndex),
+            ...filters.slice(0, selectedIndex),
+          ];
+        })();
+
   const headingText =
     "As per your inputs, please find below the best destinations curated for you based on " +
     `${selectedFilter.toLowerCase()} preference`;
@@ -129,7 +145,7 @@ const AiSearchResults = () => {
 
             <div className="px-28">
               <div className="mt-6 flex flex-wrap gap-6">
-                {filters.map((filter) => {
+                {orderedFilters.map((filter) => {
                   const isActive = filter === selectedFilter;
 
                   return (

@@ -80,6 +80,7 @@ const AiSearch = () => {
       state: {
         selectedFilter: activeFilter,
         selectedOption,
+        orderedFilters,
       },
     });
   };
