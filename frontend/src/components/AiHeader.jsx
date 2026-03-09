@@ -82,9 +82,9 @@ const AiHeader = () => {
   };
   const goToHostssMain = () => {
     if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://localhost:5173";
+      window.location.href = "http://nomad.localhost:5173/home";
     } else {
-      window.location.href = "https://wono.co";
+      window.location.href = "https://nomad.wono.co/home";
     }
   };
 
