@@ -133,7 +133,7 @@ const AiSearch = () => {
           </div>
 
           {activeFilter && (
-            <div className="mx-auto mt-8 w-full max-w-4xl">
+            <div className="mx-auto mt-8 w-full max-w-3xl">
               <ul className="w-full max-w-[220px] space-y-2">
                 {filterOptions[activeFilter].map((option) => (
                   <li key={option}>
