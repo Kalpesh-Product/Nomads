@@ -188,8 +188,8 @@ const AiSearchResults = () => {
                 <HiOutlineArrowLeft size={18} />
               </button>
 
-              <div className="flex flex-1 items-center rounded-full border border-black/15 bg-white px-4 py-4 shadow-[0_2px_6px_rgba(0,0,0,0.03)] ml-16 mr-32">
-                <div className="rounded-full border border-black/30 px-4 py-2 text-sm font-medium text-black/85">
+              <div className="flex flex-1 items-center rounded-full border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] ml-20 mr-36 ">
+                <div className="rounded-full border border-black/30 px-4 py-2 text-sm font-medium text-black/85 ">
                   {currentSelectedOption}
                 </div>
                 <div className="ml-auto">
@@ -199,8 +199,8 @@ const AiSearchResults = () => {
             </div>
 
             <div className="relative px-28">
-              <div className="relative z-30 mt-6">
-                <div className="flex flex-wrap gap-6">
+              <div className="relative z-30 mt-6 mx-4">
+                <div className="flex flex-wrap gap-8">
                   {orderedFilters.map((filter) => {
                     const isActive = filter === activeFilter;
 
@@ -209,7 +209,7 @@ const AiSearchResults = () => {
                         key={filter}
                         type="button"
                         onClick={() => handleFilterClick(filter)}
-                        className={`rounded-full border px-6 py-2 text-xl font-medium transition-colors lg:text-lg ${
+                        className={`rounded-full border px-6 py-2 text-md font-medium transition-colors lg:text-md ${
                           isActive
                             ? "border-sky-500 bg-sky-500 text-white"
                             : "border-black/80 bg-white text-black/90"
