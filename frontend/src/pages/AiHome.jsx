@@ -119,7 +119,7 @@ const AiHome = () => {
                       {card.title}
                     </h3>
                     <div className="mt-2 rounded-2xl bg-[#f1f1f3] p-5 text-left shadow-[0_1px_0_rgba(255,255,255,0.7)] transition-colors duration-200 group-hover:bg-sky-500">
-                      <p className="text-nano leading-relaxed text-black transition-colors duration-200 group-hover:text-white">
+                      <p className="text-nano leading-relaxed text-black/90 transition-colors duration-200 group-hover:text-white">
                         {card.description}
                       </p>
                     </div>
