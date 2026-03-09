@@ -46,7 +46,7 @@ const SidebarSection = ({ title, items, collapsed }) => (
             <button
               key={item.label}
               type="button"
-              className={`flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-[22px] transition ${
+              className={`flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-[22px] transition  ${
                 item.active
                   ? "bg-white text-black shadow-sm"
                   : "text-black/80 hover:bg-white/70"
@@ -55,7 +55,7 @@ const SidebarSection = ({ title, items, collapsed }) => (
             >
               <Icon size={18} className="shrink-0" />
               {!collapsed && (
-                <span className="text-base font-medium">{item.label}</span>
+                <span className="text-xs font-medium ">{item.label}</span>
               )}
             </button>
           );
@@ -71,7 +71,7 @@ const AiSidebar = () => {
   return (
     <aside
       className={`h-full border-r border-black/10 bg-[#efefef] transition-all duration-300 ${
-        collapsed ? "w-[84px]" : "w-[300px]"
+        collapsed ? "w-[84px]" : "w-[260px]"
       }`}
     >
       <div className="px-4 py-4">
