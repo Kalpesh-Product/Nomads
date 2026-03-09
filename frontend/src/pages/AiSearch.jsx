@@ -80,6 +80,7 @@ const AiSearch = () => {
       state: {
         selectedFilter: activeFilter,
         selectedOption,
+        orderedFilters,
       },
     });
   };
@@ -89,17 +90,17 @@ const AiSearch = () => {
         <div className="mx-auto max-w-5xl">
           <div className="flex justify-between">
             <div></div>
-            <h1 className="text-left text-2xl font-medium text-black/90 w-full px-12">
+            <h1 className="text-left text-xl font-medium text-black/90 w-full px-28">
               {typedHeading}
             </h1>
             <div></div>
           </div>
 
-          <div className="mx-auto mt-16 flex max-w-4xl items-center rounded-full border border-black/15 bg-white px-5 py-1 shadow-[0_2px_6px_rgba(0,0,0,0.03)]">
+          <div className="mx-auto mt-16 flex max-w-3xl items-center rounded-full border border-black/15  px-4 py-0 shadow-[0_2px_6px_rgba(0,0,0,0.03)] ">
             <input
               type="text"
               aria-label="Search destinations"
-              className="w-full border-none bg-transparent text-xl text-black/80 outline-none placeholder:text-black/30"
+              className="w-full border-none bg-transparent text-xl text-black/80 outline-none placeholder:text-black/30 "
             />
             <button
               type="button"
@@ -110,7 +111,7 @@ const AiSearch = () => {
             </button>
           </div>
 
-          <div className="mt-14 flex flex-wrap items-center justify-center gap-8">
+          <div className="mt-14 ml-28 flex flex-wrap items-center justify-start gap-8">
             {orderedFilters.map((filter) => {
               const isActive = activeFilter === filter;
 
@@ -119,7 +120,7 @@ const AiSearch = () => {
                   key={filter}
                   type="button"
                   onClick={() => handleFilterClick(filter)}
-                  className={`rounded-full border px-8 py-3 text-lg font-medium transition-colors ${
+                  className={`rounded-full border px-6 py-2 text-md font-medium transition-colors ${
                     isActive
                       ? "border-sky-500 bg-sky-500 text-white"
                       : "border-black text-black/90 hover:border-sky-500 hover:bg-sky-500 hover:text-white"
@@ -132,7 +133,7 @@ const AiSearch = () => {
           </div>
 
           {activeFilter && (
-            <div className="mx-auto mt-8 w-full max-w-4xl">
+            <div className="mx-auto mt-8 w-full max-w-3xl">
               <ul className="w-full max-w-[220px] space-y-2">
                 {filterOptions[activeFilter].map((option) => (
                   <li key={option}>

@@ -27,6 +27,7 @@ import PaginatedGrid from "../components/PaginatedGrid.jsx";
 import newIcons from "../assets/newIcons.js";
 import SearchBarCombobox from "../components/SearchBarCombobox.jsx";
 import { IoSearch } from "react-icons/io5";
+import { HiOutlineArrowLeft } from "react-icons/hi";
 import { AnimatePresence, motion } from "motion/react";
 import useAuth from "../hooks/useAuth.js";
 
@@ -397,6 +398,14 @@ const AiListings = () => {
   return (
     <div className="flex flex-col gap:2 lg:gap-6 ">
       <div className="w-full lg:min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-4 sm:px-6 lg:px-0">
+        <button
+          type="button"
+          onClick={() => navigate("/search/results")}
+          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500 mb-4"
+          aria-label="Go back to search results"
+        >
+          <HiOutlineArrowLeft size={18} />
+        </button>
         <div className="lg:hidden w-full flex flex-col gap-4 mb-4">
           <button
             onClick={() => setShowMobileSearch((prev) => !prev)}
