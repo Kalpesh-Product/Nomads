@@ -193,87 +193,97 @@ const AiSearchResults = () => {
               </div>
             </div>
 
-            <div className="px-28">
-              <div className="mt-6 flex flex-wrap gap-6">
-                {orderedFilters.map((filter) => {
-                  const isActive = filter === activeFilter;
+            <div className="relative px-28">
+              <div className="relative z-30 mt-6">
+                <div className="flex flex-wrap gap-6">
+                  {orderedFilters.map((filter) => {
+                    const isActive = filter === activeFilter;
 
-                  return (
-                    <button
-                      key={filter}
-                      type="button"
-                      onClick={() => handleFilterClick(filter)}
-                      className={`rounded-full border px-6 py-2 text-xl font-medium transition-colors lg:text-lg ${
-                        isActive
-                          ? "border-sky-500 bg-sky-500 text-white"
-                          : "border-black/80 bg-white text-black/90"
-                      }`}
-                    >
-                      {filter}
-                    </button>
-                  );
-                })}
+                    return (
+                      <button
+                        key={filter}
+                        type="button"
+                        onClick={() => handleFilterClick(filter)}
+                        className={`rounded-full border px-6 py-2 text-xl font-medium transition-colors lg:text-lg ${
+                          isActive
+                            ? "border-sky-500 bg-sky-500 text-white"
+                            : "border-black/80 bg-white text-black/90"
+                        }`}
+                      >
+                        {filter}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {activeFilter && (
+                  <div className="absolute left-0 top-full z-40 mt-4 w-full max-w-[220px]">
+                    <ul className="space-y-2 rounded-lg border border-sky-400 bg-white px-2 py-2 shadow-sm">
+                      {filterOptions[activeFilter].map((option) => (
+                        <li key={option}>
+                          <button
+                            type="button"
+                            onClick={() => handleOptionClick(option)}
+                            className="w-full rounded-md px-2 py-2 text-left text-sm text-black/90 hover:bg-sky-50"
+                          >
+                            {option}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
 
-              {activeFilter && (
-                <div className="mt-4 w-full max-w-[220px]">
-                  <ul className="space-y-2 rounded-lg border border-sky-400 bg-white px-2 py-2 shadow-sm">
-                    {filterOptions[activeFilter].map((option) => (
-                      <li key={option}>
-                        <button
-                          type="button"
-                          onClick={() => handleOptionClick(option)}
-                          className="w-full rounded-md px-2 py-2 text-left text-sm text-black/90 hover:bg-sky-50"
-                        >
-                          {option}
-                        </button>
-                      </li>
+              <div className="relative mt-8">
+                {activeFilter && (
+                  <div className="absolute inset-0 z-20 rounded-2xl bg-white/55 backdrop-blur-[1px]" />
+                )}
+
+                <div className="relative z-10">
+                  <p className="text-3xl font-medium leading-snug text-black/85 lg:text-lg">
+                    {typedHeading}
+                  </p>
+
+                  <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3 ">
+                    {destinationCards.map((destination) => (
+                      <article
+                        key={`${destination.city}-${destination.country}`}
+                        className="cursor-pointer"
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => handleDestinationClick(destination)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            handleDestinationClick(destination);
+                          }
+                        }}
+                      >
+                        <img
+                          src={destination.image}
+                          alt={`${destination.city}, ${destination.country}`}
+                          className="h-56 w-full rounded-2xl object-cover"
+                        />
+                        <div className="mt-2 flex items-start justify-between gap-3">
+                          <div>
+                            <h3 className="text-[1.2rem] font-semibold text-black/90">
+                              {destination.city}
+                            </h3>
+                          </div>
+                          <p className="mt-1 text-[1rem] font-semibold text-black/90">
+                            {destination.country}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-[0.9rem] text-black/60">
+                            {destination.suggestions} Suggestions
+                          </p>
+                        </div>
+                      </article>
                     ))}
-                  </ul>
+                  </div>
                 </div>
-              )}
-
-              <p className="mt-8 text-3xl font-medium leading-snug text-black/85 lg:text-lg">
-                {typedHeading}
-              </p>
-
-              <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3 ">
-                {destinationCards.map((destination) => (
-                  <article
-                    key={`${destination.city}-${destination.country}`}
-                    className="cursor-pointer"
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => handleDestinationClick(destination)}
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter" || event.key === " ") {
-                        event.preventDefault();
-                        handleDestinationClick(destination);
-                      }
-                    }}
-                  >
-                    <img
-                      src={destination.image}
-                      alt={`${destination.city}, ${destination.country}`}
-                      className="h-56 w-full rounded-2xl object-cover"
-                    />
-                    <div className="mt-2 flex items-start justify-between gap-3">
-                      <div>
-                        <h3 className="text-[1.2rem] font-semibold text-black/90">
-                          {destination.city}
-                        </h3>
-                      </div>
-                      <p className="mt-1 text-[1rem] font-semibold text-black/90">
-                        {destination.country}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-[0.9rem] text-black/60">
-                        {destination.suggestions} Suggestions
-                      </p>
-                    </div>
-                  </article>
-                ))}
               </div>
             </div>
           </div>
