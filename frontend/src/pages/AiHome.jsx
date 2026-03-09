@@ -93,10 +93,10 @@ const AiHome = () => {
     <div className="min-h-full bg-white">
       <main className="px-6 py-10 lg:px-14">
         <div className="mx-auto max-w-5xl text-center">
-          <h1 className="text-5xl font-medium text-black/90 font-play">
+          <h1 className="text-3xl font-medium text-black/90 font-play">
             {typedGreeting}
           </h1>
-          <h2 className="mt-10 text-3xl font-semibold text-black/85 font-play">
+          <h2 className="mt-10 text-xl font-semibold text-black/85 font-play">
             {typedSubheading}
           </h2>
 
@@ -115,11 +115,11 @@ const AiHome = () => {
                       size={24}
                       className="mx-auto text-black/80 transition-colors duration-200 group-hover:text-sky-500"
                     />
-                    <h3 className="mt-2 text-lg font-bold text-black/90 leading-tight transition-colors duration-200 group-hover:text-sky-500">
+                    <h3 className="mt-2 text-md font-bold text-black/90 leading-tight transition-colors duration-200 group-hover:text-sky-500">
                       {card.title}
                     </h3>
-                    <div className="mt-4 rounded-2xl bg-[#f1f1f3] p-6 text-left shadow-[0_1px_0_rgba(255,255,255,0.7)] transition-colors duration-200 group-hover:bg-sky-500">
-                      <p className="text-xs leading-relaxed text-black/70 transition-colors duration-200 group-hover:text-white">
+                    <div className="mt-2 rounded-2xl bg-[#f1f1f3] p-5 text-left shadow-[0_1px_0_rgba(255,255,255,0.7)] transition-colors duration-200 group-hover:bg-sky-500">
+                      <p className="text-nano leading-relaxed text-black transition-colors duration-200 group-hover:text-white">
                         {card.description}
                       </p>
                     </div>
