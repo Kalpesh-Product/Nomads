@@ -254,7 +254,7 @@ const AiProduct = () => {
 
     if (isCompanyTypeClick) {
       navigate(
-        `/listings?country=${normalizedCountry || ""}&location=${
+        `/ai-listings?country=${normalizedCountry || ""}&location=${
           normalizedLocation || ""
         }&category=${normalizedCategory || ""}`,
       );
@@ -262,19 +262,14 @@ const AiProduct = () => {
     }
 
     navigate(
-      `/verticals?country=${normalizedCountry || ""}&state=${
+      `/ai-verticals?country=${normalizedCountry || ""}&state=${
         normalizedLocation || ""
       }`,
     );
   };
 
   const handleBackButtonClick = () => {
-    if (companyDetails?.state) {
-      handleBreadcrumbNavigate("state");
-      return;
-    }
-
-    navigate(-1);
+    navigate("/search/results");
   };
 
   const handleWriteReviewClick = () => {
@@ -670,7 +665,7 @@ const AiProduct = () => {
           {/* Breadcrumb - Desktop Only */}
           <nav
             aria-label="Breadcrumb"
-            className="mb-4 flex items-center text-gray-500"
+            className="mb-4 flex items-center text-primary-blue"
           >
             <button
               type="button"
@@ -709,7 +704,7 @@ const AiProduct = () => {
                     <button
                       type="button"
                       onClick={() => handleBreadcrumbNavigate(item.key)}
-                      className="text-gray-500 hover:text-gray-700 transition-colors"
+                      className="text-primary-blue hover:text-primary-dark transition-colors"
                     >
                       {item.label}
                     </button>
@@ -1549,7 +1544,7 @@ const AiProduct = () => {
           {/* Breadcrumb - Mobile/Tablet */}
           <nav
             aria-label="Breadcrumb"
-            className="mb-4 flex items-center text-gray-500 text-[10px] md:text-sm"
+            className="mb-4 flex items-center text-primary-blue text-[10px] md:text-sm"
           >
             <button
               type="button"
@@ -1588,7 +1583,7 @@ const AiProduct = () => {
                     <button
                       type="button"
                       onClick={() => handleBreadcrumbNavigate(item.key)}
-                      className="text-gray-500 hover:text-gray-700 transition-colors"
+                      className="text-primary-blue hover:text-primary-dark transition-colors"
                     >
                       {item.label}
                     </button>
