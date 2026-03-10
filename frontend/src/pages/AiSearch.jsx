@@ -33,7 +33,7 @@ const filterOptions = {
 const AiSearch = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState(null);
-  const [orderedFilters, setOrderedFilters] = useState(filters);
+  // const [orderedFilters, setOrderedFilters] = useState(filters);
 
   const [typedHeading, setTypedHeading] = useState("");
 
@@ -59,18 +59,18 @@ const AiSearch = () => {
   const handleFilterClick = (selectedFilter) => {
     setActiveFilter(selectedFilter);
 
-    setOrderedFilters((currentFilters) => {
-      const selectedIndex = currentFilters.indexOf(selectedFilter);
+    // setOrderedFilters((currentFilters) => {
+    //   const selectedIndex = currentFilters.indexOf(selectedFilter);
 
-      if (selectedIndex <= 0) {
-        return currentFilters;
-      }
+    //   if (selectedIndex <= 0) {
+    //     return currentFilters;
+    //   }
 
-      return [
-        ...currentFilters.slice(selectedIndex),
-        ...currentFilters.slice(0, selectedIndex),
-      ];
-    });
+    //   return [
+    //     ...currentFilters.slice(selectedIndex),
+    //     ...currentFilters.slice(0, selectedIndex),
+    //   ];
+    // });
   };
 
   const handleOptionClick = (selectedOption) => {
@@ -80,7 +80,8 @@ const AiSearch = () => {
       state: {
         selectedFilter: activeFilter,
         selectedOption,
-        orderedFilters,
+        // orderedFilters,
+        orderedFilters: filters,
       },
     });
   };
@@ -112,7 +113,8 @@ const AiSearch = () => {
           </div>
 
           <div className="mt-6 ml-28 flex flex-wrap items-center justify-start gap-8">
-            {orderedFilters.map((filter) => {
+            {/* {orderedFilters.map((filter) => { */}
+            {filters.map((filter) => {
               const isActive = activeFilter === filter;
 
               return (
