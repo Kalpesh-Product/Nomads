@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { HiOutlineArrowLeft, HiOutlineSearch } from "react-icons/hi";
+import {
+  HiOutlineArrowLeft,
+  HiOutlineSearch,
+  HiOutlineX,
+} from "react-icons/hi";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const filters = [
@@ -190,17 +194,25 @@ const AiSearchResults = () => {
 
               <div className="flex flex-1 items-center rounded-full border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] ml-20 mr-36 ">
                 <div className="flex flex-wrap items-center gap-2">
-                  <div className="rounded-full border border-black/30 px-4 py-2 text-sm font-medium text-black/85">
+                  <div className="rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85">
                     Best For You
                   </div>
-                  <div className="rounded-full border border-black/30 px-4 py-2 text-sm font-medium text-black/85">
+                  <div className="rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85">
                     {selectedHeadingFilter}
                   </div>
-                  <div className="rounded-full border border-black/30 px-4 py-2 text-sm font-medium text-black/85">
+                  <div className="rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85">
                     {currentSelectedOption}
                   </div>
                 </div>
-                <div className="ml-auto">
+                <div className="ml-auto flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => navigate("/search")}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-black/70 transition-colors hover:bg-black/5 hover:text-black"
+                    aria-label="Clear search and go back"
+                  >
+                    <HiOutlineX size={24} />
+                  </button>
                   <HiOutlineSearch size={34} className="text-black/90" />
                 </div>
               </div>
@@ -217,7 +229,7 @@ const AiSearchResults = () => {
                         key={filter}
                         type="button"
                         onClick={() => handleFilterClick(filter)}
-                        className={`rounded-full border px-6 py-2 text-md font-medium transition-colors lg:text-md ${
+                        className={`rounded-full border px-6 py-2 text-xs font-medium transition-colors lg:text-md ${
                           isActive
                             ? "border-sky-500 bg-sky-500 text-white"
                             : "border-black/80 bg-white text-black/90"
