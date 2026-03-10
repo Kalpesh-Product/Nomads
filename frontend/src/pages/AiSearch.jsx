@@ -96,7 +96,7 @@ const AiSearch = () => {
             <div></div>
           </div>
 
-          <div className="mx-auto mt-16 flex max-w-3xl items-center rounded-full border border-black/15  px-4 py-0 shadow-[0_2px_6px_rgba(0,0,0,0.03)] ">
+          <div className=" mt-16 ml-28 flex max-w-3xl items-center rounded-full border border-black/15  px-4 py-0 shadow-[0_2px_6px_rgba(0,0,0,0.03)] ">
             <input
               type="text"
               aria-label="Search destinations"
@@ -111,7 +111,7 @@ const AiSearch = () => {
             </button>
           </div>
 
-          <div className="mt-14 ml-28 flex flex-wrap items-center justify-start gap-8">
+          <div className="mt-6 ml-28 flex flex-wrap items-center justify-start gap-8">
             {orderedFilters.map((filter) => {
               const isActive = activeFilter === filter;
 
@@ -120,7 +120,7 @@ const AiSearch = () => {
                   key={filter}
                   type="button"
                   onClick={() => handleFilterClick(filter)}
-                  className={`rounded-full border px-6 py-2 text-md font-medium transition-colors ${
+                  className={`rounded-full border px-6 py-2 text-xs font-medium transition-colors ${
                     isActive
                       ? "border-sky-500 bg-sky-500 text-white"
                       : "border-black text-black/90 hover:border-sky-500 hover:bg-sky-500 hover:text-white"
@@ -133,14 +133,14 @@ const AiSearch = () => {
           </div>
 
           {activeFilter && (
-            <div className="mx-auto mt-8 w-full max-w-3xl">
+            <div className="mx-auto mt-4 w-full max-w-3xl">
               <ul className="w-full max-w-[220px] space-y-2">
                 {filterOptions[activeFilter].map((option) => (
                   <li key={option}>
                     <button
                       type="button"
                       onClick={() => handleOptionClick(option)}
-                      className="w-full rounded-md px-3 py-2 text-left text-base text-black/90"
+                      className="w-full rounded-md px-3 py-2 text-left text-[0.9rem] text-black/90"
                     >
                       {option}
                     </button>
