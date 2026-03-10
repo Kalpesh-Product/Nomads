@@ -372,6 +372,17 @@ const AiListings = () => {
   const [mapOpen, setMapOpen] = useState(true);
   const isMobile = useMediaQuery("(max-width:767px)");
   const isTablet = useMediaQuery("(max-width:1023px)");
+  const selectedStateFromParams =
+    searchParams.get("state") || searchParams.get("location") || "";
+  const backLabel = selectedStateFromParams || formData?.location || "";
+  const selectedStateLabel = backLabel
+    ? backLabel
+        .split(" ")
+        .map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
+        )
+        .join(" ")
+    : "";
 
   // Prioritize BIZ Nest and MeWo first, then sort the rest by rating descending
   const prioritizedCompanies = ["BIZ Nest", "MeWo"];
@@ -398,14 +409,21 @@ const AiListings = () => {
   return (
     <div className="flex flex-col gap:2 lg:gap-6 ">
       <div className="w-full lg:min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-4 sm:px-6 lg:px-0">
-        <button
-          type="button"
-          onClick={() => navigate("/search/results")}
-          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500 mb-4"
-          aria-label="Go back to search results"
-        >
-          <HiOutlineArrowLeft size={18} />
-        </button>
+        <div className="mb-4 flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => navigate("/search/results")}
+            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
+            aria-label="Go back to search results"
+          >
+            <HiOutlineArrowLeft size={18} />
+          </button>
+          {selectedStateLabel && (
+            <span className="text-lg font-medium text-primary-blue">
+              {selectedStateLabel}
+            </span>
+          )}
+        </div>
         <div className="lg:hidden w-full flex flex-col gap-4 mb-4">
           <button
             onClick={() => setShowMobileSearch((prev) => !prev)}

@@ -23,7 +23,7 @@ import Map from "../components/Map";
 import LeafWrapper from "../components/LeafWrapper";
 import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
 import { FiShare2 } from "react-icons/fi";
-import { Globe } from "lucide-react";
+import { ArrowLeft, Globe } from "lucide-react";
 import {
   FaFacebookF,
   FaLinkedinIn,
@@ -254,7 +254,7 @@ const AiProduct = () => {
 
     if (isCompanyTypeClick) {
       navigate(
-        `/listings?country=${normalizedCountry || ""}&location=${
+        `/ai-listings?country=${normalizedCountry || ""}&location=${
           normalizedLocation || ""
         }&category=${normalizedCategory || ""}`,
       );
@@ -262,10 +262,14 @@ const AiProduct = () => {
     }
 
     navigate(
-      `/verticals?country=${normalizedCountry || ""}&state=${
+      `/ai-verticals?country=${normalizedCountry || ""}&state=${
         normalizedLocation || ""
       }`,
     );
+  };
+
+  const handleBackButtonClick = () => {
+    navigate("/search/results");
   };
 
   const handleWriteReviewClick = () => {
@@ -659,14 +663,26 @@ const AiProduct = () => {
       <div className="hidden lg:block min-w-[70%] max-w-[80rem] lg:max-w-[70rem] mx-0 md:mx-auto">
         <div className="pb-4">
           {/* Breadcrumb - Desktop Only */}
-          <nav aria-label="Breadcrumb" className="mb-4 text-gray-500">
+          <nav
+            aria-label="Breadcrumb"
+            className="mb-4 flex items-center text-primary-blue"
+          >
+            <button
+              type="button"
+              onClick={handleBackButtonClick}
+              aria-label="Go back"
+              className="inline-flex items-center justify-center rounded-full border border-primary-blue p-1 text-primary-blue"
+            >
+              <ArrowLeft size={16} />
+            </button>
+            <span className="mx-2">{">"}</span>
             {[
-              {
-                key: "continent",
-                label: companyDetails?.continent,
-                isLink: true,
-              },
-              { key: "country", label: companyDetails?.country, isLink: true },
+              // {
+              //   key: "continent",
+              //   label: companyDetails?.continent,
+              //   isLink: true,
+              // },
+              // { key: "country", label: companyDetails?.country, isLink: true },
               { key: "state", label: companyDetails?.state, isLink: true },
               {
                 key: "companyType",
@@ -688,7 +704,7 @@ const AiProduct = () => {
                     <button
                       type="button"
                       onClick={() => handleBreadcrumbNavigate(item.key)}
-                      className="text-gray-500 hover:text-gray-700 transition-colors"
+                      className="text-primary-blue hover:text-primary-dark transition-colors"
                     >
                       {item.label}
                     </button>
@@ -1528,8 +1544,17 @@ const AiProduct = () => {
           {/* Breadcrumb - Mobile/Tablet */}
           <nav
             aria-label="Breadcrumb"
-            className="mb-4 text-gray-500 text-[10px] md:text-sm"
+            className="mb-4 flex items-center text-primary-blue text-[10px] md:text-sm"
           >
+            <button
+              type="button"
+              onClick={handleBackButtonClick}
+              aria-label="Go back"
+              className="inline-flex items-center justify-center rounded-full border border-primary-blue p-1 text-primary-blue"
+            >
+              <ArrowLeft size={14} />
+            </button>
+            <span className="mx-1 md:mx-2">{">"}</span>
             {[
               {
                 key: "continent",
@@ -1558,7 +1583,7 @@ const AiProduct = () => {
                     <button
                       type="button"
                       onClick={() => handleBreadcrumbNavigate(item.key)}
-                      className="text-gray-500 hover:text-gray-700 transition-colors"
+                      className="text-primary-blue hover:text-primary-dark transition-colors"
                     >
                       {item.label}
                     </button>
