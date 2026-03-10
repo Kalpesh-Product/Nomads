@@ -123,7 +123,7 @@ const AiSearch = () => {
                   className={`rounded-full border px-6 py-2 text-xs font-medium transition-colors ${
                     isActive
                       ? "border-sky-500 bg-sky-500 text-white"
-                      : "border-black text-black/90 hover:border-sky-500 hover:bg-sky-500 hover:text-white"
+                      : "border-black text-black/90 hover:border-sky-500"
                   }`}
                 >
                   {filter}
