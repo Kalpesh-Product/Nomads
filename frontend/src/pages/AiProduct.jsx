@@ -661,12 +661,12 @@ const AiProduct = () => {
           {/* Breadcrumb - Desktop Only */}
           <nav aria-label="Breadcrumb" className="mb-4 text-gray-500">
             {[
-              {
-                key: "continent",
-                label: companyDetails?.continent,
-                isLink: true,
-              },
-              { key: "country", label: companyDetails?.country, isLink: true },
+              // {
+              //   key: "continent",
+              //   label: companyDetails?.continent,
+              //   isLink: true,
+              // },
+              // { key: "country", label: companyDetails?.country, isLink: true },
               { key: "state", label: companyDetails?.state, isLink: true },
               {
                 key: "companyType",
