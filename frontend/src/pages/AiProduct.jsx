@@ -23,7 +23,7 @@ import Map from "../components/Map";
 import LeafWrapper from "../components/LeafWrapper";
 import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
 import { FiShare2 } from "react-icons/fi";
-import { Globe } from "lucide-react";
+import { ArrowLeft, Globe } from "lucide-react";
 import {
   FaFacebookF,
   FaLinkedinIn,
@@ -266,6 +266,15 @@ const AiProduct = () => {
         normalizedLocation || ""
       }`,
     );
+  };
+
+  const handleBackButtonClick = () => {
+    if (companyDetails?.state) {
+      handleBreadcrumbNavigate("state");
+      return;
+    }
+
+    navigate(-1);
   };
 
   const handleWriteReviewClick = () => {
@@ -659,7 +668,19 @@ const AiProduct = () => {
       <div className="hidden lg:block min-w-[70%] max-w-[80rem] lg:max-w-[70rem] mx-0 md:mx-auto">
         <div className="pb-4">
           {/* Breadcrumb - Desktop Only */}
-          <nav aria-label="Breadcrumb" className="mb-4 text-gray-500">
+          <nav
+            aria-label="Breadcrumb"
+            className="mb-4 flex items-center text-gray-500"
+          >
+            <button
+              type="button"
+              onClick={handleBackButtonClick}
+              aria-label="Go back"
+              className="inline-flex items-center justify-center rounded-full border border-primary-blue p-1 text-primary-blue"
+            >
+              <ArrowLeft size={16} />
+            </button>
+            <span className="mx-2">{">"}</span>
             {[
               // {
               //   key: "continent",
@@ -1528,8 +1549,17 @@ const AiProduct = () => {
           {/* Breadcrumb - Mobile/Tablet */}
           <nav
             aria-label="Breadcrumb"
-            className="mb-4 text-gray-500 text-[10px] md:text-sm"
+            className="mb-4 flex items-center text-gray-500 text-[10px] md:text-sm"
           >
+            <button
+              type="button"
+              onClick={handleBackButtonClick}
+              aria-label="Go back"
+              className="inline-flex items-center justify-center rounded-full border border-primary-blue p-1 text-primary-blue"
+            >
+              <ArrowLeft size={14} />
+            </button>
+            <span className="mx-1 md:mx-2">{">"}</span>
             {[
               {
                 key: "continent",
