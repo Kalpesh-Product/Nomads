@@ -87,22 +87,22 @@ const AiSearchResults = () => {
 
   const [typedHeading, setTypedHeading] = useState("");
   const [activeFilter, setActiveFilter] = useState(selectedFilter);
-  const [orderedFilters, setOrderedFilters] = useState(
-    state?.orderedFilters && state.orderedFilters.length
-      ? state.orderedFilters
-      : (() => {
-          const selectedIndex = filters.indexOf(selectedFilter);
+  // const [orderedFilters, setOrderedFilters] = useState(
+  //   state?.orderedFilters && state.orderedFilters.length
+  //     ? state.orderedFilters
+  //     : (() => {
+  //         const selectedIndex = filters.indexOf(selectedFilter);
 
-          if (selectedIndex <= 0) {
-            return filters;
-          }
+  //         if (selectedIndex <= 0) {
+  //           return filters;
+  //         }
 
-          return [
-            ...filters.slice(selectedIndex),
-            ...filters.slice(0, selectedIndex),
-          ];
-        })(),
-  );
+  //         return [
+  //           ...filters.slice(selectedIndex),
+  //           ...filters.slice(0, selectedIndex),
+  //         ];
+  //       })(),
+  // );
   const [currentSelectedOption, setCurrentSelectedOption] =
     useState(selectedOption);
 
@@ -136,18 +136,18 @@ const AiSearchResults = () => {
       selectedBadge === activeFilter ? !isOpen : true,
     );
 
-    setOrderedFilters((currentFilters) => {
-      const selectedIndex = currentFilters.indexOf(selectedBadge);
+    // setOrderedFilters((currentFilters) => {
+    //   const selectedIndex = currentFilters.indexOf(selectedBadge);
 
-      if (selectedIndex <= 0) {
-        return currentFilters;
-      }
+    //   if (selectedIndex <= 0) {
+    //     return currentFilters;
+    //   }
 
-      return [
-        ...currentFilters.slice(selectedIndex),
-        ...currentFilters.slice(0, selectedIndex),
-      ];
-    });
+    //   return [
+    //     ...currentFilters.slice(selectedIndex),
+    //     ...currentFilters.slice(0, selectedIndex),
+    //   ];
+    // });
   };
 
   const handleOptionClick = (option) => {
@@ -221,7 +221,8 @@ const AiSearchResults = () => {
             <div className="relative px-28">
               <div className="relative z-30 mt-6 mx-4">
                 <div className="flex flex-wrap gap-8">
-                  {orderedFilters.map((filter) => {
+                  {/* {orderedFilters.map((filter) => { */}
+                  {filters.map((filter) => {
                     const isActive = filter === activeFilter;
 
                     return (
