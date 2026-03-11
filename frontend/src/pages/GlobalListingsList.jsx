@@ -61,7 +61,6 @@ const HorizontalScrollWrapper = ({ children, title }) => {
         <h2 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight">
           {title}
         </h2>
-
       </div>
       <div
         ref={scrollRef}
@@ -208,11 +207,49 @@ const GlobalListingsList = () => {
     "cafe",
   ];
 
+  const expandedCategoriesStorageKey = useMemo(() => {
+    const countryKey = (formData?.country || "").toLowerCase();
+    const locationKey = (formData?.location || "").toLowerCase();
+
+    if (!countryKey || !locationKey) return null;
+    return `verticals-expanded-categories:${countryKey}:${locationKey}`;
+  }, [formData?.country, formData?.location]);
+
   const handleShowMoreClick = (type) => {
     setExpandedCategories((prev) =>
       prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type],
     );
   };
+
+  useEffect(() => {
+    if (!expandedCategoriesStorageKey) {
+      setExpandedCategories([]);
+      return;
+    }
+
+    const savedState = sessionStorage.getItem(expandedCategoriesStorageKey);
+
+    if (!savedState) {
+      setExpandedCategories([]);
+      return;
+    }
+
+    try {
+      const parsedState = JSON.parse(savedState);
+      setExpandedCategories(Array.isArray(parsedState) ? parsedState : []);
+    } catch {
+      setExpandedCategories([]);
+    }
+  }, [expandedCategoriesStorageKey]);
+
+  useEffect(() => {
+    if (!expandedCategoriesStorageKey) return;
+
+    sessionStorage.setItem(
+      expandedCategoriesStorageKey,
+      JSON.stringify(expandedCategories),
+    );
+  }, [expandedCategories, expandedCategoriesStorageKey]);
 
   const { data: listingsData, isPending: isLisitingLoading } = useQuery({
     queryKey: ["globallistings", formData],
@@ -649,15 +686,26 @@ const GlobalListingsList = () => {
                 <div className="flex items-center gap-2">
                   <IoSearch className="text-primary-red" />
                   <span className="text-[11px] font-bold text-gray-900 truncate w-full text-left">
-                    {`${(formData?.country || "Country").charAt(0).toUpperCase() + (formData?.country || "Country").slice(1)} . ${formData?.location
-                      ? formData.location
-                        .split(' ')
-                        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-                        .join(' ')
-                      : "Unknown"} . ${formData?.category
-                        ? (categoryOptions.find(c => c.value === formData.category)?.label || formData.category.charAt(0).toUpperCase() + formData.category.slice(1))
+                    {`${(formData?.country || "Country").charAt(0).toUpperCase() + (formData?.country || "Country").slice(1)} . ${
+                      formData?.location
+                        ? formData.location
+                            .split(" ")
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() +
+                                word.slice(1).toLowerCase(),
+                            )
+                            .join(" ")
+                        : "Unknown"
+                    } . ${
+                      formData?.category
+                        ? categoryOptions.find(
+                            (c) => c.value === formData.category,
+                          )?.label ||
+                          formData.category.charAt(0).toUpperCase() +
+                            formData.category.slice(1)
                         : "All"
-                      }`}
+                    }`}
                   </span>
                 </div>
                 <span className="text-[10px] text-gray-500">

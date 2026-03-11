@@ -430,7 +430,7 @@ const Product = () => {
         ...data,
         pocName: companyDetails?.poc?.name || "Sales Team",
         pocCompany: companyDetails?.companyName,
-        pocDesignation: companyDetails?.poc?.designation,
+        pocDesignation: companyDetails?.poc?.designation || "Sales Department",
         sheetName: "All_POC_Contact",
         mobile: data.mobileNumber,
       });
