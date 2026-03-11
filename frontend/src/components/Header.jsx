@@ -94,9 +94,21 @@ const Header = () => {
     { id: 3, text: "Blog", to: "/blog" },
   ];
 
-  const shouldShowHeaderLinks =
+  const isListingsOrVerticalsRoute =
     location.pathname === "/verticals" ||
     location.pathname.startsWith("/listings");
+
+  const isHomeOnlyHeaderRoute =
+    location.pathname.startsWith("/blog") ||
+    location.pathname.startsWith("/news") ||
+    location.pathname.startsWith("/profile");
+
+  const shouldShowHeaderLinks =
+    isListingsOrVerticalsRoute || isHomeOnlyHeaderRoute;
+
+  const visibleHeaderLinks = isHomeOnlyHeaderRoute
+    ? headerLinks.filter((item) => item.to === "/")
+    : headerLinks;
 
   return (
     <div className="shadow-md bg-white/80 backdrop-blur-md">
@@ -158,7 +170,7 @@ const Header = () => {
           <div className="w-full">
             {shouldShowHeaderLinks && (
               <ul className="hidden xl:flex sm:hidden gap-8 justify-end flex-1">
-                {headerLinks.map((item) => {
+                {visibleHeaderLinks.map((item) => {
                   const isActive =
                     item.to === "/"
                       ? location.pathname === "/"
@@ -353,7 +365,7 @@ const Header = () => {
                 </div>
 
                 {shouldShowHeaderLinks &&
-                  headerLinks.map((item) => (
+                  visibleHeaderLinks.map((item) => (
                     <li key={item.id} className="items-center text-center">
                       <div
                         onClick={() => handleNavigation(item.to)}
