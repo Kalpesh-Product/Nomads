@@ -691,12 +691,12 @@ export const registerFormSubmission = async (req, res) => {
         try {
           await sendMail({
             to: payload.email,
-            subject: "Welcome to WONO Nomads 🎉",
+            subject: "Welcome to WONO 🎉",
             text: `Hi ${
               payload.name || "User"
-            }, thanks for registering with WONO Nomads!`,
+            }, thanks for registering with WONO!`,
             html: `
-            <h2>Welcome to WONO Nomads</h2>
+            <h2>Welcome to WONO</h2>
             <p>Hi ${payload.name || "User"},</p>
             <p>Thanks for registering with us. Our team will contact you shortly ${
               searchKey && "and will inform you once your website is created"
