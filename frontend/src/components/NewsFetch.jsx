@@ -123,6 +123,27 @@ const DESTS = [
   { label: "Bogota D.C.", country: "co", keyword: "bogota d.c.", lang: "es" },
   { label: "Medellin", country: "co", keyword: "medellin", lang: "es" },
   { label: "Quito", country: "ec", keyword: "quito", lang: "es" },
+  { label: "Yogyakarta", country: "id", keyword: "yogyakarta", lang: "id" },
+  { label: "Manila", country: "ph", keyword: "manila", lang: "en" },
+  {
+    label: "Kuala Lumpur",
+    country: "my",
+    keyword: "kuala lumpur",
+    lang: "ms",
+  },
+  { label: "Penang", country: "my", keyword: "penang", lang: "ms" },
+  { label: "Nairobi", country: "ke", keyword: "nairobi", lang: "en" },
+  { label: "Kigali", country: "rw", keyword: "kigali", lang: "en" },
+  { label: "Prague", country: "cz", keyword: "prague", lang: "cs" },
+  { label: "Tallinn", country: "ee", keyword: "tallinn", lang: "et" },
+  { label: "Athens", country: "gr", keyword: "athens", lang: "el" },
+  { label: "Tbilisi", country: "ge", keyword: "tbilisi", lang: "ka" },
+  {
+    label: "Miami, Florida",
+    country: "us",
+    keyword: "miami, florida",
+    lang: "en",
+  },
 ];
 
 const extractImageFromContent = (content) => {
