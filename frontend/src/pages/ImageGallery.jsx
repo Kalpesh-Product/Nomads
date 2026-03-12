@@ -18,6 +18,7 @@ const ImageGallery = () => {
   const {
     images = [],
     companyName,
+    companyTitle,
     selectedImageId,
     continent = "Asia",
     country,
@@ -100,7 +101,8 @@ const ImageGallery = () => {
     instanceRef.current?.next();
   };
 
-  const resolvedCompanyName = companyName || companyParam || "Unknown";
+  const resolvedCompanyTitle =
+    companyTitle || companyName || companyParam || "Unknown";
 
   const getCompanyTypeBreadcrumbLabel = (value) => {
     const companyTypeLabelMap = {
@@ -126,7 +128,7 @@ const ImageGallery = () => {
     },
     {
       key: "companyName",
-      label: resolvedCompanyName,
+      label: resolvedCompanyTitle,
       isLink: Boolean(companyName || companyParam),
       onClick: () => {
         const target = companyParam || companyName;
@@ -200,7 +202,8 @@ const ImageGallery = () => {
           ))}
         </p>
         <h1 className="text-title font-semibold text-secondary-dark">
-          {companyName || "Unknown"} Gallery
+          {/* {companyName || "Unknown"} Gallery */}
+          {resolvedCompanyTitle} Gallery
         </h1>
       </div>
       <ColumnsPhotoAlbum

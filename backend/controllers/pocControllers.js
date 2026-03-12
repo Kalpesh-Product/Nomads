@@ -366,3 +366,75 @@ export const getPocDetails = async (req, res, next) => {
     next(error);
   }
 };
+
+export const editPOC = async (req, res, next) => {
+  try {
+    const { pocId } = req.params;
+    const payload = req.body;
+
+    if (!pocId) {
+      return res.status(400).json({
+        success: false,
+        message: "POC id is required",
+      });
+    }
+
+    const existingPOC = await PointOfContact.findById(pocId);
+
+    if (!existingPOC) {
+      return res.status(404).json({
+        success: false,
+        message: "POC not found",
+      });
+    }
+
+    if (payload?.email) {
+      const duplicatePOC = await PointOfContact.findOne({
+        _id: { $ne: pocId },
+        companyId: payload?.companyId || existingPOC.companyId,
+        email: payload.email,
+      });
+
+      if (duplicatePOC) {
+        return res.status(400).json({
+          success: false,
+          message: "Email already exists for this company",
+        });
+      }
+    }
+
+    const updatedFields = {
+      name: payload?.name,
+      companyId: payload?.companyId,
+      designation: payload?.designation,
+      email: payload?.email,
+      phone: payload?.phone,
+      linkedInProfile: payload?.linkedInProfile,
+      languagesSpoken: payload?.languagesSpoken,
+      address: payload?.address,
+      profileImage: payload?.profileImage,
+      isActive: payload?.isActive,
+      availibilityTime: payload?.availibilityTime,
+    };
+
+    Object.keys(updatedFields).forEach((key) => {
+      if (updatedFields[key] === undefined) {
+        delete updatedFields[key];
+      }
+    });
+
+    const updatedPOC = await PointOfContact.findByIdAndUpdate(
+      pocId,
+      { $set: updatedFields },
+      { new: true, runValidators: true },
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Point of Contact updated successfully",
+      data: updatedPOC,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
