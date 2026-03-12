@@ -216,6 +216,7 @@ const Product = () => {
     country: companyDetails?.country,
     state: companyDetails?.state,
     companyType: companyDetails?.companyType,
+    companyTitle: companyDetails?.companyTitle,
   };
 
   const getCompanyTypeBreadcrumbLabel = (companyType) => {
@@ -1620,6 +1621,7 @@ const Product = () => {
                           companyName: companyDetails?.companyName,
                           images: companyDetails?.images,
                           selectedImageId: selectedImage?._id,
+                          ...breadcrumbState,
                         },
                       })
                     }
@@ -1642,6 +1644,7 @@ const Product = () => {
                             companyName: companyDetails?.companyName,
                             images: companyDetails?.images,
                             selectedImageId: item._id,
+                            ...breadcrumbState,
                           },
                         })
                       }
@@ -1660,6 +1663,7 @@ const Product = () => {
                                 state: {
                                   companyName: companyDetails?.companyName,
                                   images: companyDetails?.images,
+                                  ...breadcrumbState,
                                 },
                               });
                             }}
@@ -1694,6 +1698,7 @@ const Product = () => {
                             companyName: companyDetails?.companyName,
                             images: companyDetails?.images,
                             selectedImageId: item._id,
+                            ...breadcrumbState,
                           },
                         })
                       }
