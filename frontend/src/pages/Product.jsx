@@ -677,7 +677,7 @@ const Product = () => {
               },
               {
                 key: "companyName",
-                label: companyDetails?.companyName || companyName,
+                label: companyDetails?.companyTitle || companyName,
                 isLink: false,
               },
             ]
@@ -1547,7 +1547,7 @@ const Product = () => {
               },
               {
                 key: "companyName",
-                label: companyDetails?.companyName || companyName,
+                label: companyDetails?.companyTitle || companyName,
                 isLink: false,
               },
             ]
@@ -1574,7 +1574,7 @@ const Product = () => {
               ))}
           </nav>
           <h1 className="text-title font-semibold text-secondary-dark">
-            {companyDetails?.companyName || "Loading Title..."}
+            {companyDetails?.companyTitle || "Loading Title..."}
           </h1>
         </div>
 
