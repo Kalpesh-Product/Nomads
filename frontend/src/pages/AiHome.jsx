@@ -28,7 +28,7 @@ const recommendationCards = [
     description:
       "WoNo calculates where your income goes further and highlights destinations that help you save more while living well.",
     icon: LuCircleDollarSign,
-    path: "/search",
+    path: "/savings",
   },
   {
     title: "Budget Destinations",

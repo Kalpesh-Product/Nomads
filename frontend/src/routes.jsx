@@ -62,6 +62,7 @@ import AiListings from "./pages/AiListings";
 import AiProduct from "./pages/AiProduct";
 import AiImageGallery from "./pages/AiImageGallery";
 import AiWorldRankings from "./pages/AiWorldRankingsSearchResults";
+import AiSavingsSearch from "./pages/AiSavingsSearch";
 
 function getTenantFromHost() {
   const hostname = window.location.hostname; // e.g. "nomad.wono.co" or "nomad.localhost"
@@ -166,6 +167,7 @@ if (tenant === "main") {
             { path: "home", element: <AiHome /> },
             { path: "search", element: <AiSearch /> },
             { path: "world-rankings", element: <AiWorldRankings /> },
+            { path: "savings", element: <AiSavingsSearch /> },
             { path: "search/results", element: <AiSearchResults /> },
             { path: "ai-verticals", element: <AiGlobalListings /> },
             { path: "ai-listings", element: <AiListings /> },
