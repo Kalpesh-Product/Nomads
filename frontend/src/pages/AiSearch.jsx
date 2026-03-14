@@ -91,7 +91,7 @@ const AiSearch = () => {
         <div className="mx-auto max-w-5xl">
           <div className="flex justify-between">
             <div></div>
-            <h1 className="text-left text-xl font-medium text-black/90 w-full px-28">
+            <h1 className="text-left text-[1.43rem] font-medium text-black/90 w-full px-28">
               {typedHeading}
             </h1>
             <div></div>
