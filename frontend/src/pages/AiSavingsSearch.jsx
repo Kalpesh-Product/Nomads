@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { HiOutlineSearch } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
+import { TextField } from "@mui/material";
 
 const filters = [
   "Budget",
@@ -41,6 +42,12 @@ const AiSavingsSearch = () => {
 
   const headingText =
     "Please share the below details to find the best destinations for you";
+
+  const floatingLabelSx = {
+    color: "black",
+    "&.Mui-focused": { color: "#1976d2" },
+    "&.MuiInputLabel-shrink": { color: "#1976d2" },
+  };
 
   useEffect(() => {
     setTypedHeading("");
@@ -105,30 +112,32 @@ const AiSavingsSearch = () => {
           </div>
 
           <div className="mt-12 ml-28 flex max-w-3xl flex-col gap-3 sm:flex-row">
-            <label className="flex w-full flex-col text-sm font-medium text-black/80">
-              Monthly Income
-              <input
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                value={monthlyIncome}
-                onChange={handleNumericInputChange(setMonthlyIncome)}
-                aria-label="Monthly Income"
-                className="mt-1 rounded-md border border-black/20 px-4 py-2 text-base text-black/90 outline-none focus:border-sky-500"
-              />
-            </label>
-            <label className="flex w-full flex-col text-sm font-medium text-black/80">
-              How much you want to save
-              <input
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                value={savingsGoal}
-                onChange={handleNumericInputChange(setSavingsGoal)}
-                aria-label="How much you want to save"
-                className="mt-1 rounded-md border border-black/20 px-4 py-2 text-base text-black/90 outline-none focus:border-sky-500"
-              />
-            </label>
+            <TextField
+              type="text"
+              fullWidth
+              inputMode="numeric"
+              value={monthlyIncome}
+              onChange={handleNumericInputChange(setMonthlyIncome)}
+              label="Monthly Income (USD)"
+              variant="standard"
+              InputLabelProps={{ sx: floatingLabelSx }}
+              inputProps={{ pattern: "[0-9]*", "aria-label": "Monthly Income" }}
+            />
+
+            <TextField
+              type="text"
+              fullWidth
+              inputMode="numeric"
+              value={savingsGoal}
+              onChange={handleNumericInputChange(setSavingsGoal)}
+              label="How much you want to save (USD)"
+              variant="standard"
+              InputLabelProps={{ sx: floatingLabelSx }}
+              inputProps={{
+                pattern: "[0-9]*",
+                "aria-label": "How much you want to save",
+              }}
+            />
           </div>
 
           <div className="mt-6 ml-28 flex max-w-3xl items-center rounded-full border border-black/15 px-4 py-0 shadow-[0_2px_6px_rgba(0,0,0,0.03)]">
