@@ -111,20 +111,20 @@ const AiBudgetSearch = () => {
             <div></div>
           </div>
 
-          <div className="mt-12 ml-28 flex max-w-3xl flex-col gap-3 sm:flex-row">
+          <div className="mt-12 ml-28 flex max-w-sm flex-col gap-3 sm:flex-row justify-center">
             <TextField
               type="text"
               fullWidth
               inputMode="numeric"
               value={monthlyIncome}
               onChange={handleNumericInputChange(setMonthlyIncome)}
-              label="Monthly Income (USD)"
+              label="Enter Budget (USD)"
               variant="standard"
               InputLabelProps={{ sx: floatingLabelSx }}
-              inputProps={{ pattern: "[0-9]*", "aria-label": "Monthly Income" }}
+              inputProps={{ pattern: "[0-9]*", "aria-label": "Enter Budget" }}
             />
 
-            <TextField
+            {/* <TextField
               type="text"
               fullWidth
               inputMode="numeric"
@@ -137,7 +137,7 @@ const AiBudgetSearch = () => {
                 pattern: "[0-9]*",
                 "aria-label": "How much you want to save",
               }}
-            />
+            /> */}
           </div>
 
           <div className="mt-6 ml-28 flex max-w-3xl items-center rounded-full border border-black/15 px-4 py-0 shadow-[0_2px_6px_rgba(0,0,0,0.03)]">
@@ -150,7 +150,7 @@ const AiBudgetSearch = () => {
               type="button"
               aria-label="Search"
               className="ml-4 rounded-full  p-2 text-black/90"
-              onClick={() => navigate("/savings/results")}
+              onClick={() => navigate("/budget/results")}
             >
               <HiOutlineSearch size={36} />
             </button>

@@ -35,7 +35,7 @@ const recommendationCards = [
     description:
       "WoNo identifies high-value, low-cost destinations that offer strong amenities without high expenses.",
     icon: LuMapPinned,
-    path: "/search",
+    path: "/budget",
   },
   {
     title: "Compatible For You",

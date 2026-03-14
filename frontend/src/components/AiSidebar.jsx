@@ -17,7 +17,7 @@ const recommendationItems = [
     icon: LuCircleDollarSign,
     path: "/savings",
   },
-  { label: "Budget Destinations", icon: LuMapPinned, path: "/home" },
+  { label: "Budget Destinations", icon: LuMapPinned, path: "/budget" },
   { label: "Compatible For You", icon: HiOutlineUserCircle, path: "/home" },
   { label: "Search Old Style", icon: HiOutlineMenu, path: "/" },
 ];
