@@ -159,7 +159,8 @@ const AiSavingsSearchResults = () => {
 
   const headingText =
     "As per your inputs, please find below the best destinations curated for you based on " +
-    `${selectedHeadingFilter.toLowerCase()} preference`;
+    // `${selectedHeadingFilter.toLowerCase()} preference`;
+    `savings preference`;
 
   useEffect(() => {
     setTypedHeading("");
@@ -185,7 +186,7 @@ const AiSavingsSearchResults = () => {
             <div className="flex items-center gap-5">
               <button
                 type="button"
-                onClick={() => navigate("/search")}
+                onClick={() => navigate("/savings")}
                 className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
                 aria-label="Go back"
               >
@@ -195,19 +196,19 @@ const AiSavingsSearchResults = () => {
               <div className="flex flex-1 items-center rounded-full border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] ml-20 mr-36 ">
                 <div className="flex flex-wrap items-center gap-2">
                   <div className="rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85">
-                    Best For You
+                    Under 2100$
                   </div>
-                  <div className="rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85">
+                  {/* <div className="rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85">
                     {selectedHeadingFilter}
                   </div>
                   <div className="rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85">
                     {currentSelectedOption}
-                  </div>
+                  </div> */}
                 </div>
                 <div className="ml-auto flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => navigate("/search")}
+                    onClick={() => navigate("/savings")}
                     className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-black/70 transition-colors hover:bg-black/5 hover:text-black"
                     aria-label="Clear search and go back"
                   >
@@ -222,7 +223,7 @@ const AiSavingsSearchResults = () => {
               <div className="relative z-30 mt-6 mx-4">
                 <div className="flex flex-wrap gap-8">
                   {/* {orderedFilters.map((filter) => { */}
-                  {filters.map((filter) => {
+                  {/* {filters.map((filter) => {
                     const isActive = filter === activeFilter;
 
                     return (
@@ -239,7 +240,7 @@ const AiSavingsSearchResults = () => {
                         {filter}
                       </button>
                     );
-                  })}
+                  })} */}
                 </div>
 
                 {activeFilter && isFilterOptionsOpen && (
