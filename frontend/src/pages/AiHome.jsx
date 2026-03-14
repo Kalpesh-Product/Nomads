@@ -14,36 +14,42 @@ const recommendationCards = [
     description:
       "WoNo analyzes global data to rank the best destinations worldwide based on livability, popularity, and remote-work potential.",
     icon: HiOutlineViewGrid,
+    path: "/world-rankings",
   },
   {
     title: "Best For You",
     description:
       "WoNo evaluates your preferences and recommends destinations that best match your lifestyle and work needs.",
     icon: HiOutlineHeart,
+    path: "/search",
   },
   {
     title: "Increase Your Savings",
     description:
       "WoNo calculates where your income goes further and highlights destinations that help you save more while living well.",
     icon: LuCircleDollarSign,
+    path: "/search",
   },
   {
     title: "Budget Destinations",
     description:
       "WoNo identifies high-value, low-cost destinations that offer strong amenities without high expenses.",
     icon: LuMapPinned,
+    path: "/search",
   },
   {
     title: "Compatible For You",
     description:
       "WoNo matches destinations to your climate, culture, and community preferences for a better overall fit.",
     icon: HiOutlineUserCircle,
+    path: "/search",
   },
   {
     title: "Search Old Style",
     description:
       "WoNo lets you manually filter and sort destinations if you prefer a traditional search approach.",
     icon: HiOutlineViewGrid,
+    path: "/search",
   },
 ];
 
@@ -108,7 +114,7 @@ const AiHome = () => {
                 return (
                   <article
                     key={card.title}
-                    onClick={() => navigate("/search")}
+                    onClick={() => navigate(card.path)}
                     className="group cursor-pointer text-center"
                   >
                     <Icon
