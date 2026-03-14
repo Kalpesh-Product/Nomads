@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { HiOutlineSearch } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
+import { TextField } from "@mui/material";
 
 const filters = [
   "Budget",
@@ -30,15 +31,23 @@ const filterOptions = {
   ],
 };
 
-const AiSearch = () => {
+const AiBudgetSearch = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState(null);
+  const [monthlyIncome, setMonthlyIncome] = useState("");
+  const [savingsGoal, setSavingsGoal] = useState("");
   // const [orderedFilters, setOrderedFilters] = useState(filters);
 
   const [typedHeading, setTypedHeading] = useState("");
 
   const headingText =
     "Please share the below details to find the best destinations for you";
+
+  const floatingLabelSx = {
+    color: "black",
+    "&.Mui-focused": { color: "#1976d2" },
+    "&.MuiInputLabel-shrink": { color: "#1976d2" },
+  };
 
   useEffect(() => {
     setTypedHeading("");
@@ -85,6 +94,11 @@ const AiSearch = () => {
       },
     });
   };
+  const handleNumericInputChange = (setter) => (event) => {
+    const numericValue = event.target.value.replace(/\D/g, "");
+    setter(numericValue);
+  };
+
   return (
     <div className="min-h-full bg-white">
       <main className="px-6 py-12 lg:px-14">
@@ -97,7 +111,36 @@ const AiSearch = () => {
             <div></div>
           </div>
 
-          <div className=" mt-16 ml-28 flex max-w-3xl items-center rounded-full border border-black/15  px-4 py-0 shadow-[0_2px_6px_rgba(0,0,0,0.03)] ">
+          <div className="mt-12 ml-28 flex max-w-sm flex-col gap-3 sm:flex-row justify-center">
+            <TextField
+              type="text"
+              fullWidth
+              inputMode="numeric"
+              value={monthlyIncome}
+              onChange={handleNumericInputChange(setMonthlyIncome)}
+              label="Enter Budget (USD)"
+              variant="standard"
+              InputLabelProps={{ sx: floatingLabelSx }}
+              inputProps={{ pattern: "[0-9]*", "aria-label": "Enter Budget" }}
+            />
+
+            {/* <TextField
+              type="text"
+              fullWidth
+              inputMode="numeric"
+              value={savingsGoal}
+              onChange={handleNumericInputChange(setSavingsGoal)}
+              label="How much you want to save (USD)"
+              variant="standard"
+              InputLabelProps={{ sx: floatingLabelSx }}
+              inputProps={{
+                pattern: "[0-9]*",
+                "aria-label": "How much you want to save",
+              }}
+            /> */}
+          </div>
+
+          <div className="mt-6 ml-28 flex max-w-3xl items-center rounded-full border border-black/15 px-4 py-0 shadow-[0_2px_6px_rgba(0,0,0,0.03)]">
             <input
               type="text"
               aria-label="Search destinations"
@@ -107,6 +150,7 @@ const AiSearch = () => {
               type="button"
               aria-label="Search"
               className="ml-4 rounded-full  p-2 text-black/90"
+              onClick={() => navigate("/budget/results")}
             >
               <HiOutlineSearch size={36} />
             </button>
@@ -114,7 +158,7 @@ const AiSearch = () => {
 
           <div className="mt-6 ml-28 flex flex-wrap items-center justify-start gap-8">
             {/* {orderedFilters.map((filter) => { */}
-            {filters.map((filter) => {
+            {/* {filters.map((filter) => {
               const isActive = activeFilter === filter;
 
               return (
@@ -131,7 +175,7 @@ const AiSearch = () => {
                   {filter}
                 </button>
               );
-            })}
+            })} */}
           </div>
 
           {activeFilter && (
@@ -157,4 +201,4 @@ const AiSearch = () => {
   );
 };
 
-export default AiSearch;
+export default AiBudgetSearch;

@@ -56,11 +56,16 @@ import WebsiteUnderMaintenance from "./pages/WebsiteUnderMaintenance";
 import NomadAiLayout from "./pages/NomadAiLayout";
 import AiHome from "./pages/AiHome";
 import AiSearch from "./pages/AiSearch";
-import AiSearchResults from "./pages/AiSearchResult";
+import AiSearchResults from "./pages/AiSearchResults";
 import AiGlobalListings from "./pages/AiGlobalListings";
 import AiListings from "./pages/AiListings";
 import AiProduct from "./pages/AiProduct";
 import AiImageGallery from "./pages/AiImageGallery";
+import AiWorldRankings from "./pages/AiWorldRankingsSearchResults";
+import AiSavingsSearch from "./pages/AiSavingsSearch";
+import AiSavingsSearchResults from "./pages/AiSavingsSearchResults";
+import AiBudgetSearch from "./pages/AiBudgetSearch";
+import AiBudgetSearchResults from "./pages/AiBudgetSearchResults";
 
 function getTenantFromHost() {
   const hostname = window.location.hostname; // e.g. "nomad.wono.co" or "nomad.localhost"
@@ -164,6 +169,11 @@ if (tenant === "main") {
           children: [
             { path: "home", element: <AiHome /> },
             { path: "search", element: <AiSearch /> },
+            { path: "world-rankings", element: <AiWorldRankings /> },
+            { path: "savings", element: <AiSavingsSearch /> },
+            { path: "savings/results", element: <AiSavingsSearchResults /> },
+            { path: "budget", element: <AiBudgetSearch /> },
+            { path: "budget/results", element: <AiBudgetSearchResults /> },
             { path: "search/results", element: <AiSearchResults /> },
             { path: "ai-verticals", element: <AiGlobalListings /> },
             { path: "ai-listings", element: <AiListings /> },

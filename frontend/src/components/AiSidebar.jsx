@@ -10,12 +10,16 @@ import {
 import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
 
 const recommendationItems = [
-  { label: "World Rankings", icon: HiOutlineViewGrid },
-  { label: "Best For You", icon: HiOutlineHeart },
-  { label: "Increase Your Savings", icon: LuCircleDollarSign },
-  { label: "Budget Destinations", icon: LuMapPinned },
-  { label: "Compatible For You", icon: HiOutlineUserCircle },
-  { label: "Search Old Style", icon: HiOutlineMenu },
+  { label: "World Rankings", icon: HiOutlineViewGrid, path: "/world-rankings" },
+  { label: "Best For You", icon: HiOutlineHeart, path: "/search" },
+  {
+    label: "Increase Your Savings",
+    icon: LuCircleDollarSign,
+    path: "/savings",
+  },
+  { label: "Budget Destinations", icon: LuMapPinned, path: "/budget" },
+  { label: "Compatible For You", icon: HiOutlineUserCircle, path: "/home" },
+  { label: "Search Old Style", icon: HiOutlineMenu, path: "/" },
 ];
 
 const valueAdditionItems = [
@@ -70,7 +74,7 @@ const AiSidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
 
   const handleRecommendationClick = (item) => {
-    const targetPath = item.label === "Search Old Style" ? "/" : "/home";
+    const targetPath = item.path || "/home";
     window.location.assign(`${window.location.origin}${targetPath}`);
   };
 
