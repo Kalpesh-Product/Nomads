@@ -56,12 +56,12 @@ import WebsiteUnderMaintenance from "./pages/WebsiteUnderMaintenance";
 import NomadAiLayout from "./pages/NomadAiLayout";
 import AiHome from "./pages/AiHome";
 import AiSearch from "./pages/AiSearch";
-import AiSearchResults from "./pages/AiSearchResult";
+import AiSearchResults from "./pages/AiSearchResults";
 import AiGlobalListings from "./pages/AiGlobalListings";
 import AiListings from "./pages/AiListings";
 import AiProduct from "./pages/AiProduct";
 import AiImageGallery from "./pages/AiImageGallery";
-import AiWorldRankings from "./pages/AiWorldRankings";
+import AiWorldRankings from "./pages/AiWorldRankingsSearchResults";
 
 function getTenantFromHost() {
   const hostname = window.location.hostname; // e.g. "nomad.wono.co" or "nomad.localhost"
