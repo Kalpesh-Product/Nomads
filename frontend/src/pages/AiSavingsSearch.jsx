@@ -150,6 +150,7 @@ const AiSavingsSearch = () => {
               type="button"
               aria-label="Search"
               className="ml-4 rounded-full  p-2 text-black/90"
+              onClick={() => navigate("/savings/results")}
             >
               <HiOutlineSearch size={36} />
             </button>
