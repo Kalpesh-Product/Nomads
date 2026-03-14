@@ -33,6 +33,8 @@ const filterOptions = {
 const AiSavingsSearch = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState(null);
+  const [monthlyIncome, setMonthlyIncome] = useState("");
+  const [savingsGoal, setSavingsGoal] = useState("");
   // const [orderedFilters, setOrderedFilters] = useState(filters);
 
   const [typedHeading, setTypedHeading] = useState("");
@@ -85,6 +87,11 @@ const AiSavingsSearch = () => {
       },
     });
   };
+  const handleNumericInputChange = (setter) => (event) => {
+    const numericValue = event.target.value.replace(/\D/g, "");
+    setter(numericValue);
+  };
+
   return (
     <div className="min-h-full bg-white">
       <main className="px-6 py-12 lg:px-14">
@@ -97,7 +104,34 @@ const AiSavingsSearch = () => {
             <div></div>
           </div>
 
-          <div className=" mt-16 ml-28 flex max-w-3xl items-center rounded-full border border-black/15  px-4 py-0 shadow-[0_2px_6px_rgba(0,0,0,0.03)] ">
+          <div className="mt-12 ml-28 flex max-w-3xl flex-col gap-3 sm:flex-row">
+            <label className="flex w-full flex-col text-sm font-medium text-black/80">
+              Monthly Income
+              <input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={monthlyIncome}
+                onChange={handleNumericInputChange(setMonthlyIncome)}
+                aria-label="Monthly Income"
+                className="mt-1 rounded-md border border-black/20 px-4 py-2 text-base text-black/90 outline-none focus:border-sky-500"
+              />
+            </label>
+            <label className="flex w-full flex-col text-sm font-medium text-black/80">
+              How much you want to save
+              <input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={savingsGoal}
+                onChange={handleNumericInputChange(setSavingsGoal)}
+                aria-label="How much you want to save"
+                className="mt-1 rounded-md border border-black/20 px-4 py-2 text-base text-black/90 outline-none focus:border-sky-500"
+              />
+            </label>
+          </div>
+
+          <div className="mt-6 ml-28 flex max-w-3xl items-center rounded-full border border-black/15 px-4 py-0 shadow-[0_2px_6px_rgba(0,0,0,0.03)]">
             <input
               type="text"
               aria-label="Search destinations"
