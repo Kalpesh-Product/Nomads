@@ -21,7 +21,7 @@ const recommendationCards = [
     description:
       "WoNo evaluates your preferences and recommends destinations that best match your lifestyle and work needs.",
     icon: HiOutlineHeart,
-    path: "/compatible",
+    path: "/search",
   },
   {
     title: "Increase Your Savings",
@@ -42,14 +42,14 @@ const recommendationCards = [
     description:
       "WoNo matches destinations to your climate, culture, and community preferences for a better overall fit.",
     icon: HiOutlineUserCircle,
-    path: "/search",
+    path: "/compatible",
   },
   {
     title: "Search Old Style",
     description:
       "WoNo lets you manually filter and sort destinations if you prefer a traditional search approach.",
     icon: HiOutlineViewGrid,
-    path: "/search",
+    path: "/",
   },
 ];
 
