@@ -1,19 +1,32 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { HiOutlineSearch } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
-import { TextField } from "@mui/material";
 
 const filters = [
-  "Budget",
-  "Internet",
-  "Visa Duration",
-  "Time Zone",
-  "Continent",
+  // "Budget",
+  "Monthly Income (USD)",
+  // "Internet",
+  "How much you want to save (USD)",
+  // "Visa Duration",
+  // "Time Zone",
+  // "Continent",
 ];
 
 const filterOptions = {
-  Budget: ["Under $100", "$100 - $250", "$500 - $1,000", "$1,000+"],
-  Internet: ["Under 25 Mbps", "25 - 50 Mbps", "50 - 100 Mbps", "100+ Mbps"],
+  // Budget: ["Under $100", "$100 - $250", "$500 - $1,000", "$1,000+"],
+  "Monthly Income (USD)": [
+    // "Under $100",
+    "$1000 - $2500",
+    "$5000 - $10,000",
+    "$10,000+",
+  ],
+  // Internet: ["Under 25 Mbps", "25 - 50 Mbps", "50 - 100 Mbps", "100+ Mbps"],
+  "How much you want to save (USD)": [
+    // "Under $100",
+    "$100 - $250",
+    "$500 - $1,000",
+    "$1,000+",
+  ],
   "Visa Duration": [
     "Up to 30 days",
     "31 - 90 days",
@@ -34,8 +47,7 @@ const filterOptions = {
 const AiSavingsSearch = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState(null);
-  const [monthlyIncome, setMonthlyIncome] = useState("");
-  const [savingsGoal, setSavingsGoal] = useState("");
+  const [selectedOptions, setSelectedOptions] = useState({});
   // const [orderedFilters, setOrderedFilters] = useState(filters);
 
   const [typedHeading, setTypedHeading] = useState("");
@@ -43,11 +55,16 @@ const AiSavingsSearch = () => {
   const headingText =
     "Please share the below details to find the best destinations for you";
 
-  const floatingLabelSx = {
-    color: "black",
-    "&.Mui-focused": { color: "#1976d2" },
-    "&.MuiInputLabel-shrink": { color: "#1976d2" },
-  };
+  const selectedBadges = useMemo(
+    () =>
+      filters
+        .filter((filter) => selectedOptions[filter])
+        .map((filter) => ({
+          filter,
+          value: selectedOptions[filter],
+        })),
+    [selectedOptions],
+  );
 
   useEffect(() => {
     setTypedHeading("");
@@ -85,18 +102,18 @@ const AiSavingsSearch = () => {
   const handleOptionClick = (selectedOption) => {
     if (!activeFilter) return;
 
-    navigate("/search/results", {
+    setSelectedOptions((currentOptions) => ({
+      ...currentOptions,
+      [activeFilter]: selectedOption,
+    }));
+  };
+
+  const handleSearch = () => {
+    navigate("/savings/results", {
       state: {
-        selectedFilter: activeFilter,
-        selectedOption,
-        // orderedFilters,
-        orderedFilters: filters,
+        selectedOptions,
       },
     });
-  };
-  const handleNumericInputChange = (setter) => (event) => {
-    const numericValue = event.target.value.replace(/\D/g, "");
-    setter(numericValue);
   };
 
   return (
@@ -111,7 +128,7 @@ const AiSavingsSearch = () => {
             <div></div>
           </div>
 
-          <div className="mt-12 ml-28 flex max-w-3xl flex-col gap-3 sm:flex-row">
+          {/* <div className="mt-12 ml-28 flex max-w-3xl flex-col gap-3 sm:flex-row">
             <TextField
               type="text"
               fullWidth
@@ -138,19 +155,30 @@ const AiSavingsSearch = () => {
                 "aria-label": "How much you want to save",
               }}
             />
-          </div>
+          </div> */}
 
-          <div className="mt-6 ml-28 flex max-w-3xl items-center rounded-full border border-black/15 px-4 py-0 shadow-[0_2px_6px_rgba(0,0,0,0.03)]">
-            <input
-              type="text"
-              aria-label="Search destinations"
-              className="w-full border-none bg-transparent text-xl text-black/80 outline-none placeholder:text-black/30 "
-            />
+          <div className="mt-6 ml-28 flex max-w-3xl items-center rounded-full border border-black/15 px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)]">
+            <div className="flex w-full flex-wrap items-center gap-2">
+              {selectedBadges.length ? (
+                selectedBadges.map(({ filter, value }) => (
+                  <div
+                    key={filter}
+                    className="rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85"
+                  >
+                    {`${filter}: ${value}`}
+                  </div>
+                ))
+              ) : (
+                <span className="text-base text-black/30">
+                  {/* Select one option from each badge below */}
+                </span>
+              )}
+            </div>
             <button
               type="button"
               aria-label="Search"
               className="ml-4 rounded-full  p-2 text-black/90"
-              onClick={() => navigate("/savings/results")}
+              onClick={handleSearch}
             >
               <HiOutlineSearch size={36} />
             </button>
@@ -158,7 +186,7 @@ const AiSavingsSearch = () => {
 
           <div className="mt-6 ml-28 flex flex-wrap items-center justify-start gap-8">
             {/* {orderedFilters.map((filter) => { */}
-            {/* {filters.map((filter) => {
+            {filters.map((filter) => {
               const isActive = activeFilter === filter;
 
               return (
@@ -175,7 +203,7 @@ const AiSavingsSearch = () => {
                   {filter}
                 </button>
               );
-            })} */}
+            })}
           </div>
 
           {activeFilter && (

@@ -4,15 +4,22 @@ import { useNavigate } from "react-router-dom";
 import { TextField } from "@mui/material";
 
 const filters = [
-  "Budget",
-  "Internet",
-  "Visa Duration",
-  "Time Zone",
-  "Continent",
+  // "Budget",
+  "Enter Budget (USD)",
+  // "Internet",
+  // "Visa Duration",
+  // "Time Zone",
+  // "Continent",
 ];
 
 const filterOptions = {
-  Budget: ["Under $100", "$100 - $250", "$500 - $1,000", "$1,000+"],
+  // Budget: ["Under $100", "$100 - $250", "$500 - $1,000", "$1,000+"],
+  "Enter Budget (USD)": [
+    "Under $100",
+    "$100 - $250",
+    "$500 - $1,000",
+    "$1,000+",
+  ],
   Internet: ["Under 25 Mbps", "25 - 50 Mbps", "50 - 100 Mbps", "100+ Mbps"],
   "Visa Duration": [
     "Up to 30 days",
@@ -85,7 +92,7 @@ const AiBudgetSearch = () => {
   const handleOptionClick = (selectedOption) => {
     if (!activeFilter) return;
 
-    navigate("/search/results", {
+    navigate("/budget/results", {
       state: {
         selectedFilter: activeFilter,
         selectedOption,
@@ -112,7 +119,7 @@ const AiBudgetSearch = () => {
           </div>
 
           <div className="mt-12 ml-28 flex max-w-sm flex-col gap-3 sm:flex-row justify-center">
-            <TextField
+            {/* <TextField
               type="text"
               fullWidth
               inputMode="numeric"
@@ -122,7 +129,7 @@ const AiBudgetSearch = () => {
               variant="standard"
               InputLabelProps={{ sx: floatingLabelSx }}
               inputProps={{ pattern: "[0-9]*", "aria-label": "Enter Budget" }}
-            />
+            /> */}
 
             {/* <TextField
               type="text"
@@ -158,7 +165,7 @@ const AiBudgetSearch = () => {
 
           <div className="mt-6 ml-28 flex flex-wrap items-center justify-start gap-8">
             {/* {orderedFilters.map((filter) => { */}
-            {/* {filters.map((filter) => {
+            {filters.map((filter) => {
               const isActive = activeFilter === filter;
 
               return (
@@ -175,7 +182,7 @@ const AiBudgetSearch = () => {
                   {filter}
                 </button>
               );
-            })} */}
+            })}
           </div>
 
           {activeFilter && (

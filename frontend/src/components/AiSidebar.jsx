@@ -18,7 +18,11 @@ const recommendationItems = [
     path: "/savings",
   },
   { label: "Budget Destinations", icon: LuMapPinned, path: "/budget" },
-  { label: "Compatible For You", icon: HiOutlineUserCircle, path: "/home" },
+  {
+    label: "Compatible For You",
+    icon: HiOutlineUserCircle,
+    path: "/compatible",
+  },
   { label: "Search Old Style", icon: HiOutlineMenu, path: "/" },
 ];
 
