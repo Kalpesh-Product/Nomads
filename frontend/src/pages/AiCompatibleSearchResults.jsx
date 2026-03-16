@@ -6,33 +6,28 @@ import {
 } from "react-icons/hi";
 import { useLocation, useNavigate } from "react-router-dom";
 
-const filters = [
-  "Budget",
+const compatibleBadges = [
+  "Adventure",
+  "Gyming",
+  "Founders",
+  "Solopreners",
+  "Freelancers",
+  "Family Nomads",
+  "Party Focused",
+  "Co-Working Density",
   "Internet",
-  "Visa Duration",
-  "Time Zone",
-  "Continent",
+  "Creative Individuals",
+  "Infulencers",
+  "Yoga",
+  "Pubs",
+  "Events",
+  "Startups",
+  "Nightlife",
+  "Nature",
+  "Accessibility",
+  "Dating Scene",
+  "Work-Life Balance",
 ];
-
-const filterOptions = {
-  Budget: ["Under $100", "$100 - $250", "$500 - $1,000", "$1,000+"],
-  Internet: ["Under 25 Mbps", "25 - 50 Mbps", "50 - 100 Mbps", "100+ Mbps"],
-  "Visa Duration": [
-    "Up to 30 days",
-    "31 - 90 days",
-    "3 - 6 months",
-    "6+ months",
-  ],
-  "Time Zone": ["Americas", "Europe/Africa", "Asia", "Oceania"],
-  Continent: [
-    "Asia",
-    "Europe",
-    "North America",
-    "South America",
-    "Africa",
-    "Oceania",
-  ],
-};
 
 const destinationCards = [
   {
@@ -82,34 +77,10 @@ const destinationCards = [
 const AiCompatibleSearchResults = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
-  const selectedFilter = state?.selectedFilter || "Budget";
-  const selectedOption = state?.selectedOption || "Under $100";
-
   const [typedHeading, setTypedHeading] = useState("");
-  const [activeFilter, setActiveFilter] = useState(selectedFilter);
-  // const [orderedFilters, setOrderedFilters] = useState(
-  //   state?.orderedFilters && state.orderedFilters.length
-  //     ? state.orderedFilters
-  //     : (() => {
-  //         const selectedIndex = filters.indexOf(selectedFilter);
-
-  //         if (selectedIndex <= 0) {
-  //           return filters;
-  //         }
-
-  //         return [
-  //           ...filters.slice(selectedIndex),
-  //           ...filters.slice(0, selectedIndex),
-  //         ];
-  //       })(),
-  // );
-  const [currentSelectedOption, setCurrentSelectedOption] =
-    useState(selectedOption);
-
-  const [selectedHeadingFilter, setSelectedHeadingFilter] =
-    useState(selectedFilter);
-  const [headingAnimationKey, setHeadingAnimationKey] = useState(0);
-  const [isFilterOptionsOpen, setIsFilterOptionsOpen] = useState(false);
+  const [selectedBadges, setSelectedBadges] = useState(
+    state?.selectedBadges || [],
+  );
 
   const handleDestinationClick = (destination) => {
     const country = destination.country.toLowerCase();
@@ -130,36 +101,18 @@ const AiCompatibleSearchResults = () => {
     );
   };
 
-  const handleFilterClick = (selectedBadge) => {
-    setActiveFilter(selectedBadge);
-    setIsFilterOptionsOpen((isOpen) =>
-      selectedBadge === activeFilter ? !isOpen : true,
-    );
+  const handleBadgeClick = (selectedBadge) => {
+    setSelectedBadges((currentBadges) => {
+      if (currentBadges.includes(selectedBadge)) {
+        return currentBadges.filter((badge) => badge !== selectedBadge);
+      }
 
-    // setOrderedFilters((currentFilters) => {
-    //   const selectedIndex = currentFilters.indexOf(selectedBadge);
-
-    //   if (selectedIndex <= 0) {
-    //     return currentFilters;
-    //   }
-
-    //   return [
-    //     ...currentFilters.slice(selectedIndex),
-    //     ...currentFilters.slice(0, selectedIndex),
-    //   ];
-    // });
-  };
-
-  const handleOptionClick = (option) => {
-    setCurrentSelectedOption(option);
-    setSelectedHeadingFilter(activeFilter);
-    setHeadingAnimationKey((currentKey) => currentKey + 1);
-    setIsFilterOptionsOpen(false);
+      return [...currentBadges, selectedBadge];
+    });
   };
 
   const headingText =
-    "As per your inputs, please find below the best destinations curated for you based on " +
-    `${selectedHeadingFilter.toLowerCase()} preference`;
+    "As per your inputs, please find below the best destinations curated for you";
 
   useEffect(() => {
     setTypedHeading("");
@@ -175,7 +128,9 @@ const AiCompatibleSearchResults = () => {
     }, 25);
 
     return () => clearInterval(typingInterval);
-  }, [headingText, headingAnimationKey]);
+  }, [headingText]);
+
+  const selectedBadgesText = selectedBadges.join(", ");
 
   return (
     <div className="min-h-full bg-white">
@@ -185,7 +140,7 @@ const AiCompatibleSearchResults = () => {
             <div className="flex items-center gap-5">
               <button
                 type="button"
-                onClick={() => navigate("/search")}
+                onClick={() => navigate("/compatible")}
                 className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
                 aria-label="Go back"
               >
@@ -198,16 +153,13 @@ const AiCompatibleSearchResults = () => {
                     Best For You
                   </div>
                   <div className="rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85">
-                    {selectedHeadingFilter}
-                  </div>
-                  <div className="rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85">
-                    {currentSelectedOption}
+                    {selectedBadgesText || "No badges selected"}
                   </div>
                 </div>
                 <div className="ml-auto flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => navigate("/search")}
+                    onClick={() => navigate("/compatible")}
                     className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-black/70 transition-colors hover:bg-black/5 hover:text-black"
                     aria-label="Clear search and go back"
                   >
@@ -221,56 +173,28 @@ const AiCompatibleSearchResults = () => {
             <div className="relative px-28">
               <div className="relative z-30 mt-6 mx-4">
                 <div className="flex flex-wrap gap-8">
-                  {/* {orderedFilters.map((filter) => { */}
-                  {filters.map((filter) => {
-                    const isActive = filter === activeFilter;
+                  {compatibleBadges.map((badge) => {
+                    const isActive = selectedBadges.includes(badge);
 
                     return (
                       <button
-                        key={filter}
+                        key={badge}
                         type="button"
-                        onClick={() => handleFilterClick(filter)}
+                        onClick={() => handleBadgeClick(badge)}
                         className={`rounded-full border px-6 py-2 text-xs font-medium transition-colors lg:text-md ${
                           isActive
                             ? "border-sky-500 bg-sky-500 text-white"
                             : "border-black/80 bg-white text-black/90 hover:border-sky-500"
                         }`}
                       >
-                        {filter}
+                        {badge}
                       </button>
                     );
                   })}
                 </div>
-
-                {activeFilter && isFilterOptionsOpen && (
-                  <div className="absolute left-0 top-full z-40 mt-4 w-full max-w-[220px]">
-                    <ul className="space-y-2 rounded-lg border border-sky-400 bg-white px-2 py-2 shadow-sm">
-                      {filterOptions[activeFilter].map((option) => (
-                        <li key={option}>
-                          <button
-                            type="button"
-                            onClick={() => handleOptionClick(option)}
-                            className="w-full rounded-md px-2 py-2 text-left text-sm text-black/90 hover:bg-sky-50"
-                          >
-                            {option}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
               </div>
 
               <div className="relative mt-8">
-                {activeFilter && isFilterOptionsOpen && (
-                  <button
-                    type="button"
-                    aria-label="Close filter options"
-                    onClick={() => setIsFilterOptionsOpen(false)}
-                    className="absolute inset-0 z-20 rounded-2xl bg-white/55 backdrop-blur-[1px]"
-                  />
-                )}
-
                 <div className="relative z-10">
                   <p className="text-3xl font-medium leading-snug text-black/85 lg:text-lg">
                     {typedHeading}

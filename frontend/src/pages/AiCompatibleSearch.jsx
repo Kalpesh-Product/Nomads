@@ -2,38 +2,32 @@ import React, { useEffect, useState } from "react";
 import { HiOutlineSearch } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 
-const filters = [
-  "Budget",
+const compatibleBadges = [
+  "Adventure",
+  "Gyming",
+  "Founders",
+  "Solopreners",
+  "Freelancers",
+  "Family Nomads",
+  "Party Focused",
+  "Co-Working Density",
   "Internet",
-  "Visa Duration",
-  "Time Zone",
-  "Continent",
+  "Creative Individuals",
+  "Infulencers",
+  "Yoga",
+  "Pubs",
+  "Events",
+  "Startups",
+  "Nightlife",
+  "Nature",
+  "Accessibility",
+  "Dating Scene",
+  "Work-Life Balance",
 ];
-
-const filterOptions = {
-  Budget: ["Under $100", "$100 - $250", "$500 - $1,000", "$1,000+"],
-  Internet: ["Under 25 Mbps", "25 - 50 Mbps", "50 - 100 Mbps", "100+ Mbps"],
-  "Visa Duration": [
-    "Up to 30 days",
-    "31 - 90 days",
-    "3 - 6 months",
-    "6+ months",
-  ],
-  "Time Zone": ["Americas", "Europe/Africa", "Asia", "Oceania"],
-  Continent: [
-    "Asia",
-    "Europe",
-    "North America",
-    "South America",
-    "Africa",
-    "Oceania",
-  ],
-};
 
 const AiCompatibleSearch = () => {
   const navigate = useNavigate();
-  const [activeFilter, setActiveFilter] = useState(null);
-  // const [orderedFilters, setOrderedFilters] = useState(filters);
+  const [selectedBadges, setSelectedBadges] = useState([]);
 
   const [typedHeading, setTypedHeading] = useState("");
 
@@ -56,35 +50,28 @@ const AiCompatibleSearch = () => {
     return () => clearInterval(typingInterval);
   }, [headingText]);
 
-  const handleFilterClick = (selectedFilter) => {
-    setActiveFilter(selectedFilter);
+  const handleBadgeClick = (selectedBadge) => {
+    setSelectedBadges((currentBadges) => {
+      if (currentBadges.includes(selectedBadge)) {
+        return currentBadges.filter((badge) => badge !== selectedBadge);
+      }
 
-    // setOrderedFilters((currentFilters) => {
-    //   const selectedIndex = currentFilters.indexOf(selectedFilter);
-
-    //   if (selectedIndex <= 0) {
-    //     return currentFilters;
-    //   }
-
-    //   return [
-    //     ...currentFilters.slice(selectedIndex),
-    //     ...currentFilters.slice(0, selectedIndex),
-    //   ];
-    // });
+      return [...currentBadges, selectedBadge];
+    });
   };
 
-  const handleOptionClick = (selectedOption) => {
-    if (!activeFilter) return;
+  const handleSearch = () => {
+    if (!selectedBadges.length) return;
 
-    navigate("/search/results", {
+    navigate("/compatible/results", {
       state: {
-        selectedFilter: activeFilter,
-        selectedOption,
-        // orderedFilters,
-        orderedFilters: filters,
+        selectedBadges,
       },
     });
   };
+
+  const selectedBadgesText = selectedBadges.join(", ");
+
   return (
     <div className="min-h-full bg-white">
       <main className="px-6 py-12 lg:px-14">
@@ -101,10 +88,14 @@ const AiCompatibleSearch = () => {
             <input
               type="text"
               aria-label="Search destinations"
+              readOnly
+              value={selectedBadgesText}
+              placeholder="Select badges below"
               className="w-full border-none bg-transparent text-xl text-black/80 outline-none placeholder:text-black/30 "
             />
             <button
               type="button"
+              onClick={handleSearch}
               aria-label="Search"
               className="ml-4 rounded-full  p-2 text-black/90"
             >
@@ -113,44 +104,25 @@ const AiCompatibleSearch = () => {
           </div>
 
           <div className="mt-6 ml-28 flex flex-wrap items-center justify-start gap-8">
-            {/* {orderedFilters.map((filter) => { */}
-            {filters.map((filter) => {
-              const isActive = activeFilter === filter;
+            {compatibleBadges.map((badge) => {
+              const isActive = selectedBadges.includes(badge);
 
               return (
                 <button
-                  key={filter}
+                  key={badge}
                   type="button"
-                  onClick={() => handleFilterClick(filter)}
+                  onClick={() => handleBadgeClick(badge)}
                   className={`rounded-full border px-6 py-2 text-xs font-medium transition-colors ${
                     isActive
                       ? "border-sky-500 bg-sky-500 text-white"
                       : "border-black text-black/90 hover:border-sky-500"
                   }`}
                 >
-                  {filter}
+                  {badge}
                 </button>
               );
             })}
           </div>
-
-          {activeFilter && (
-            <div className="mx-auto mt-4 w-full max-w-3xl">
-              <ul className="w-full max-w-[220px] space-y-2">
-                {filterOptions[activeFilter].map((option) => (
-                  <li key={option}>
-                    <button
-                      type="button"
-                      onClick={() => handleOptionClick(option)}
-                      className="w-full rounded-md px-3 py-2 text-left text-[0.9rem] text-black/90"
-                    >
-                      {option}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
         </div>
       </main>
     </div>
