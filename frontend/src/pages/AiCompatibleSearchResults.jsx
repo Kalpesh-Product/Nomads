@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   HiOutlineArrowLeft,
   HiOutlineSearch,
@@ -81,6 +81,7 @@ const AiCompatibleSearchResults = () => {
   const [selectedBadges, setSelectedBadges] = useState(
     state?.selectedBadges || [],
   );
+  const badgeScrollerRef = useRef(null);
 
   const handleDestinationClick = (destination) => {
     const country = destination.country.toLowerCase();
@@ -117,6 +118,33 @@ const AiCompatibleSearchResults = () => {
 
   const headingText =
     "As per your inputs, please find below the best destinations curated for you";
+
+  useEffect(() => {
+    const badgeScroller = badgeScrollerRef.current;
+
+    if (!badgeScroller) {
+      return undefined;
+    }
+
+    let animationFrame;
+    const scrollSpeed = 0.5;
+
+    const runAutoScroll = () => {
+      if (!badgeScroller.matches(":hover")) {
+        badgeScroller.scrollLeft += scrollSpeed;
+
+        if (badgeScroller.scrollLeft >= badgeScroller.scrollWidth / 2) {
+          badgeScroller.scrollLeft = 0;
+        }
+      }
+
+      animationFrame = requestAnimationFrame(runAutoScroll);
+    };
+
+    animationFrame = requestAnimationFrame(runAutoScroll);
+
+    return () => cancelAnimationFrame(animationFrame);
+  }, []);
 
   useEffect(() => {
     setTypedHeading("");
@@ -185,26 +213,31 @@ const AiCompatibleSearchResults = () => {
             </div>
 
             <div className="relative px-28">
-              <div className="relative z-30 mt-6 mx-4">
-                <div className="flex flex-wrap gap-8">
-                  {compatibleBadges.map((badge) => {
-                    const isActive = selectedBadges.includes(badge);
+              <div
+                ref={badgeScrollerRef}
+                className="relative z-30 mt-6 mx-4 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+              >
+                <div className="flex w-max gap-8 pr-8">
+                  {[...compatibleBadges, ...compatibleBadges].map(
+                    (badge, index) => {
+                      const isActive = selectedBadges.includes(badge);
 
-                    return (
-                      <button
-                        key={badge}
-                        type="button"
-                        onClick={() => handleBadgeClick(badge)}
-                        className={`rounded-full border px-6 py-2 text-xs font-medium transition-colors lg:text-md ${
-                          isActive
-                            ? "border-sky-500 bg-sky-500 text-white"
-                            : "border-black/80 bg-white text-black/90 hover:border-sky-500"
-                        }`}
-                      >
-                        {badge}
-                      </button>
-                    );
-                  })}
+                      return (
+                        <button
+                          key={`${badge}-${index}`}
+                          type="button"
+                          onClick={() => handleBadgeClick(badge)}
+                          className={`shrink-0 rounded-full border px-6 py-2 text-xs font-medium transition-colors lg:text-md ${
+                            isActive
+                              ? "border-sky-500 bg-sky-500 text-white"
+                              : "border-black/80 bg-white text-black/90 hover:border-sky-500"
+                          }`}
+                        >
+                          {badge}
+                        </button>
+                      );
+                    },
+                  )}
                 </div>
               </div>
 

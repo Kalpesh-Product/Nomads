@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { HiOutlineSearch, HiOutlineX } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 
@@ -29,6 +29,8 @@ const AiCompatibleSearch = () => {
   const navigate = useNavigate();
   const [selectedBadges, setSelectedBadges] = useState([]);
 
+  const badgeScrollerRef = useRef(null);
+
   const [typedHeading, setTypedHeading] = useState("");
 
   const headingText =
@@ -49,6 +51,33 @@ const AiCompatibleSearch = () => {
 
     return () => clearInterval(typingInterval);
   }, [headingText]);
+
+  useEffect(() => {
+    const badgeScroller = badgeScrollerRef.current;
+
+    if (!badgeScroller) {
+      return undefined;
+    }
+
+    let animationFrame;
+    const scrollSpeed = 0.5;
+
+    const runAutoScroll = () => {
+      if (!badgeScroller.matches(":hover")) {
+        badgeScroller.scrollLeft += scrollSpeed;
+
+        if (badgeScroller.scrollLeft >= badgeScroller.scrollWidth / 2) {
+          badgeScroller.scrollLeft = 0;
+        }
+      }
+
+      animationFrame = requestAnimationFrame(runAutoScroll);
+    };
+
+    animationFrame = requestAnimationFrame(runAutoScroll);
+
+    return () => cancelAnimationFrame(animationFrame);
+  }, []);
 
   const handleBadgeClick = (selectedBadge) => {
     setSelectedBadges((currentBadges) => {
@@ -122,25 +151,32 @@ const AiCompatibleSearch = () => {
             </button>
           </div>
 
-          <div className="mt-6 ml-28 flex flex-wrap items-center justify-start gap-8">
-            {compatibleBadges.map((badge) => {
-              const isActive = selectedBadges.includes(badge);
+          <div
+            ref={badgeScrollerRef}
+            className="mt-6 ml-28 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          >
+            <div className="flex w-max items-center gap-8 pr-8">
+              {[...compatibleBadges, ...compatibleBadges].map(
+                (badge, index) => {
+                  const isActive = selectedBadges.includes(badge);
 
-              return (
-                <button
-                  key={badge}
-                  type="button"
-                  onClick={() => handleBadgeClick(badge)}
-                  className={`rounded-full border px-6 py-2 text-xs font-medium transition-colors ${
-                    isActive
-                      ? "border-sky-500 bg-sky-500 text-white"
-                      : "border-black text-black/90 hover:border-sky-500"
-                  }`}
-                >
-                  {badge}
-                </button>
-              );
-            })}
+                  return (
+                    <button
+                      key={`${badge}-${index}`}
+                      type="button"
+                      onClick={() => handleBadgeClick(badge)}
+                      className={`shrink-0 rounded-full border px-6 py-2 text-xs font-medium transition-colors ${
+                        isActive
+                          ? "border-sky-500 bg-sky-500 text-white"
+                          : "border-black text-black/90 hover:border-sky-500"
+                      }`}
+                    >
+                      {badge}
+                    </button>
+                  );
+                },
+              )}
+            </div>
           </div>
         </div>
       </main>
