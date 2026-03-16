@@ -60,7 +60,8 @@ const AiCompatibleSearch = () => {
     }
 
     let animationFrame;
-    const scrollSpeed = 0.5;
+    // const scrollSpeed = 0.5;
+    const scrollSpeed = 0;
 
     const runAutoScroll = () => {
       if (!badgeScroller.matches(":hover")) {
