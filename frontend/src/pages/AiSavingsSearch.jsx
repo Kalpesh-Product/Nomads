@@ -4,16 +4,30 @@ import { useNavigate } from "react-router-dom";
 import { TextField } from "@mui/material";
 
 const filters = [
-  "Budget",
-  "Internet",
-  "Visa Duration",
-  "Time Zone",
-  "Continent",
+  // "Budget",
+  "Monthly Income (USD)",
+  // "Internet",
+  "How much you want to save (USD)",
+  // "Visa Duration",
+  // "Time Zone",
+  // "Continent",
 ];
 
 const filterOptions = {
-  Budget: ["Under $100", "$100 - $250", "$500 - $1,000", "$1,000+"],
-  Internet: ["Under 25 Mbps", "25 - 50 Mbps", "50 - 100 Mbps", "100+ Mbps"],
+  // Budget: ["Under $100", "$100 - $250", "$500 - $1,000", "$1,000+"],
+  "Monthly Income (USD)": [
+    "Under $100",
+    "$100 - $250",
+    "$500 - $1,000",
+    "$1,000+",
+  ],
+  // Internet: ["Under 25 Mbps", "25 - 50 Mbps", "50 - 100 Mbps", "100+ Mbps"],
+  "How much you want to save (USD)": [
+    // "Under $100",
+    "$100 - $250",
+    "$500 - $1,000",
+    "$1,000+",
+  ],
   "Visa Duration": [
     "Up to 30 days",
     "31 - 90 days",
@@ -111,7 +125,7 @@ const AiSavingsSearch = () => {
             <div></div>
           </div>
 
-          <div className="mt-12 ml-28 flex max-w-3xl flex-col gap-3 sm:flex-row">
+          {/* <div className="mt-12 ml-28 flex max-w-3xl flex-col gap-3 sm:flex-row">
             <TextField
               type="text"
               fullWidth
@@ -138,7 +152,7 @@ const AiSavingsSearch = () => {
                 "aria-label": "How much you want to save",
               }}
             />
-          </div>
+          </div> */}
 
           <div className="mt-6 ml-28 flex max-w-3xl items-center rounded-full border border-black/15 px-4 py-0 shadow-[0_2px_6px_rgba(0,0,0,0.03)]">
             <input
@@ -158,7 +172,7 @@ const AiSavingsSearch = () => {
 
           <div className="mt-6 ml-28 flex flex-wrap items-center justify-start gap-8">
             {/* {orderedFilters.map((filter) => { */}
-            {/* {filters.map((filter) => {
+            {filters.map((filter) => {
               const isActive = activeFilter === filter;
 
               return (
@@ -175,7 +189,7 @@ const AiSavingsSearch = () => {
                   {filter}
                 </button>
               );
-            })} */}
+            })}
           </div>
 
           {activeFilter && (
