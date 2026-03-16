@@ -15,10 +15,10 @@ const filters = [
 const filterOptions = {
   // Budget: ["Under $100", "$100 - $250", "$500 - $1,000", "$1,000+"],
   "Monthly Income (USD)": [
-    "Under $100",
-    "$100 - $250",
-    "$500 - $1,000",
-    "$1,000+",
+    // "Under $100",
+    "$1000 - $2500",
+    "$5000 - $10,000",
+    "$10,000+",
   ],
   // Internet: ["Under 25 Mbps", "25 - 50 Mbps", "50 - 100 Mbps", "100+ Mbps"],
   "How much you want to save (USD)": [
