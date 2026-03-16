@@ -111,6 +111,10 @@ const AiCompatibleSearchResults = () => {
     });
   };
 
+  const handleClearSelection = () => {
+    setSelectedBadges([]);
+  };
+
   const headingText =
     "As per your inputs, please find below the best destinations curated for you";
 
@@ -130,8 +134,6 @@ const AiCompatibleSearchResults = () => {
     return () => clearInterval(typingInterval);
   }, [headingText]);
 
-  const selectedBadgesText = selectedBadges.join(", ");
-
   return (
     <div className="min-h-full bg-white">
       <main className="py-8">
@@ -147,21 +149,33 @@ const AiCompatibleSearchResults = () => {
                 <HiOutlineArrowLeft size={18} />
               </button>
 
-              <div className="flex flex-1 items-center rounded-full border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] ml-20 mr-36 ">
+              <div className="flex flex-1 items-center rounded-full border border-black/15 bg-white px-3 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] ml-20 mr-36 ">
                 <div className="flex flex-wrap items-center gap-2">
                   <div className="rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85">
                     Best For You
                   </div>
-                  <div className="rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85">
-                    {selectedBadgesText || "No badges selected"}
-                  </div>
+                  {selectedBadges.length ? (
+                    selectedBadges.map((badge) => (
+                      <div
+                        key={badge}
+                        className="rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85"
+                      >
+                        {badge}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="px-2 text-xs text-black/45">
+                      No badges selected
+                    </p>
+                  )}
                 </div>
                 <div className="ml-auto flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => navigate("/compatible")}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-black/70 transition-colors hover:bg-black/5 hover:text-black"
-                    aria-label="Clear search and go back"
+                    onClick={handleClearSelection}
+                    disabled={!selectedBadges.length}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-black/70 transition-colors hover:bg-black/5 hover:text-black disabled:cursor-not-allowed disabled:opacity-50"
+                    aria-label="Clear selected badges"
                   >
                     <HiOutlineX size={24} />
                   </button>

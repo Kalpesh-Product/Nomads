@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { HiOutlineSearch } from "react-icons/hi";
+import { HiOutlineSearch, HiOutlineX } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 
 const compatibleBadges = [
@@ -70,7 +70,9 @@ const AiCompatibleSearch = () => {
     });
   };
 
-  const selectedBadgesText = selectedBadges.join(", ");
+  const handleClearSelection = () => {
+    setSelectedBadges([]);
+  };
 
   return (
     <div className="min-h-full bg-white">
@@ -84,20 +86,37 @@ const AiCompatibleSearch = () => {
             <div></div>
           </div>
 
-          <div className=" mt-16 ml-28 flex max-w-3xl items-center rounded-full border border-black/15  px-4 py-0 shadow-[0_2px_6px_rgba(0,0,0,0.03)] ">
-            <input
-              type="text"
-              aria-label="Search destinations"
-              readOnly
-              value={selectedBadgesText}
-              placeholder="Select badges below"
-              className="w-full border-none bg-transparent text-xl text-black/80 outline-none placeholder:text-black/30 "
-            />
+          <div className=" mt-16 ml-28 flex max-w-3xl items-center rounded-full border border-black/15 px-3 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] ">
+            <div className="flex min-h-10 flex-1 flex-wrap items-center gap-2">
+              {selectedBadges.length ? (
+                selectedBadges.map((badge) => (
+                  <div
+                    key={badge}
+                    className="rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85"
+                  >
+                    {badge}
+                  </div>
+                ))
+              ) : (
+                <p className="px-2 text-base text-black/30">
+                  Select badges below
+                </p>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={handleClearSelection}
+              disabled={!selectedBadges.length}
+              aria-label="Clear selected badges"
+              className="mr-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-black/70 transition-colors hover:bg-black/5 hover:text-black disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <HiOutlineX size={22} />
+            </button>
             <button
               type="button"
               onClick={handleSearch}
               aria-label="Search"
-              className="ml-4 rounded-full  p-2 text-black/90"
+              className="rounded-full p-2 text-black/90"
             >
               <HiOutlineSearch size={36} />
             </button>
