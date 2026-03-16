@@ -154,7 +154,7 @@ const AiCompatibleSearch = () => {
 
           <div
             ref={badgeScrollerRef}
-            className="mt-6 ml-28 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+            className="mt-6 ml-28 max-w-3xl overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
           >
             <div className="flex w-max items-center gap-8 pr-8">
               {[...compatibleBadges, ...compatibleBadges].map(
