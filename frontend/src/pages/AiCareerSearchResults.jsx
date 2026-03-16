@@ -79,7 +79,7 @@ const destinationCards = [
   },
 ];
 
-const AiBudgetSearchResults = () => {
+const AiCareerSearchResults = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
   const selectedFilter = state?.selectedFilter || "Budget";
@@ -160,7 +160,7 @@ const AiBudgetSearchResults = () => {
   const headingText =
     "As per your inputs, please find below the best destinations curated for you based on " +
     // `${selectedHeadingFilter.toLowerCase()} preference`;
-    `budget preference`;
+    `career preference`;
 
   useEffect(() => {
     setTypedHeading("");
@@ -186,7 +186,7 @@ const AiBudgetSearchResults = () => {
             <div className="flex items-center gap-5">
               <button
                 type="button"
-                onClick={() => navigate("/budget")}
+                onClick={() => navigate("/career-search")}
                 className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
                 aria-label="Go back"
               >
@@ -208,7 +208,7 @@ const AiBudgetSearchResults = () => {
                 <div className="ml-auto flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => navigate("/budget")}
+                    onClick={() => navigate("/career-search")}
                     className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-black/70 transition-colors hover:bg-black/5 hover:text-black"
                     aria-label="Clear search and go back"
                   >
@@ -325,4 +325,4 @@ const AiBudgetSearchResults = () => {
   );
 };
 
-export default AiBudgetSearchResults;
+export default AiCareerSearchResults;

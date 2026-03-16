@@ -10,22 +10,21 @@ import {
 import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
 
 const recommendationItems = [
-  { label: "World Rankings", icon: HiOutlineViewGrid, path: "/world-rankings" },
-  { label: "Best For You", icon: HiOutlineHeart, path: "/search" },
+  { label: "World Ranking", icon: HiOutlineViewGrid, path: "/world-rankings" },
+  { label: "Work From Anywhere", icon: HiOutlineHeart, path: "/search" },
   {
     label: "Increase Your Savings",
     icon: LuCircleDollarSign,
     path: "/savings",
   },
-  { label: "Budget Destinations", icon: LuMapPinned, path: "/budget" },
+  { label: "Advance Your Career", icon: LuMapPinned, path: "/career-search" },
   {
-    label: "Compatible For You",
+    label: "Find Your Community",
     icon: HiOutlineUserCircle,
     path: "/compatible",
   },
-  { label: "Search Old Style", icon: HiOutlineMenu, path: "/" },
+  { label: "Search Old School", icon: HiOutlineMenu, path: "/" },
 ];
-
 const valueAdditionItems = [
   { label: "Visa Assist", icon: LuMapPinned },
   { label: "Become A Host", icon: HiOutlineViewGrid },

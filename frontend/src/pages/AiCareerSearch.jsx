@@ -92,7 +92,7 @@ const AiBudgetSearch = () => {
   const handleOptionClick = (selectedOption) => {
     if (!activeFilter) return;
 
-    navigate("/budget/results", {
+    navigate("/career-search/results", {
       state: {
         selectedFilter: activeFilter,
         selectedOption,
@@ -157,7 +157,7 @@ const AiBudgetSearch = () => {
               type="button"
               aria-label="Search"
               className="ml-4 rounded-full  p-2 text-black/90"
-              onClick={() => navigate("/budget/results")}
+              onClick={() => navigate("/career-search/results")}
             >
               <HiOutlineSearch size={36} />
             </button>

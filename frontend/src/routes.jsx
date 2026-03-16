@@ -64,8 +64,8 @@ import AiImageGallery from "./pages/AiImageGallery";
 import AiWorldRankings from "./pages/AiWorldRankingsSearchResults";
 import AiSavingsSearch from "./pages/AiSavingsSearch";
 import AiSavingsSearchResults from "./pages/AiSavingsSearchResults";
-import AiBudgetSearch from "./pages/AiBudgetSearch";
-import AiBudgetSearchResults from "./pages/AiBudgetSearchResults";
+import AiCareerSearch from "./pages/AiCareerSearch";
+import AiCareerSearchResults from "./pages/AiCareerSearchResults";
 import AiCompatibleSearch from "./pages/AiCompatibleSearch";
 import AiCompatibleSearchResults from "./pages/AiCompatibleSearchResults";
 
@@ -174,13 +174,16 @@ if (tenant === "main") {
             { path: "world-rankings", element: <AiWorldRankings /> },
             { path: "savings", element: <AiSavingsSearch /> },
             { path: "savings/results", element: <AiSavingsSearchResults /> },
-            { path: "budget", element: <AiBudgetSearch /> },
+            { path: "career-search", element: <AiCareerSearch /> },
             { path: "compatible", element: <AiCompatibleSearch /> },
             {
               path: "compatible/results",
               element: <AiCompatibleSearchResults />,
             },
-            { path: "budget/results", element: <AiBudgetSearchResults /> },
+            {
+              path: "career-search/results",
+              element: <AiCareerSearchResults />,
+            },
             { path: "search/results", element: <AiSearchResults /> },
             { path: "ai-verticals", element: <AiGlobalListings /> },
             { path: "ai-listings", element: <AiListings /> },
