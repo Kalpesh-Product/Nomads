@@ -21,7 +21,7 @@ const recommendationCards = [
     description:
       "WoNo evaluates your preferences and recommends destinations that best match your lifestyle and work needs.",
     icon: HiOutlineHeart,
-    path: "/search",
+    path: "/search/results",
   },
   {
     title: "Increase Your Savings",

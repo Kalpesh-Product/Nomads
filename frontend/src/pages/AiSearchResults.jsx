@@ -126,8 +126,10 @@ const destinationCards = [
 const AiSearchResults = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
-  const selectedFilter = state?.selectedFilter || "Budget";
-  const selectedOption = state?.selectedOption || "Under $100";
+  const defaultFilter = "Overall Work from anywhere Index";
+  const selectedFilter = state?.selectedFilter || defaultFilter;
+  const selectedOption =
+    state?.selectedOption || filterOptions[selectedFilter]?.[0] || "";
 
   const [typedHeading, setTypedHeading] = useState("");
   const [activeFilter, setActiveFilter] = useState(selectedFilter);
