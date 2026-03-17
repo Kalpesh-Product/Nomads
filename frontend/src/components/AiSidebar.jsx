@@ -11,7 +11,11 @@ import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
 
 const recommendationItems = [
   { label: "World Ranking", icon: HiOutlineViewGrid, path: "/world-rankings" },
-  { label: "Work From Anywhere", icon: HiOutlineHeart, path: "/search" },
+  {
+    label: "Work From Anywhere",
+    icon: HiOutlineHeart,
+    path: "/search/results",
+  },
   {
     label: "Increase Your Savings",
     icon: LuCircleDollarSign,

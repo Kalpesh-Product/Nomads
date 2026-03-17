@@ -127,6 +127,7 @@ const AiSearchResults = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
   const defaultFilter = "Overall Work from anywhere Index";
+  const isDefaultFilter = (filter) => filter === defaultFilter;
   const selectedFilter = state?.selectedFilter || defaultFilter;
   const selectedOption =
     state?.selectedOption || filterOptions[selectedFilter]?.[0] || "";
@@ -178,6 +179,13 @@ const AiSearchResults = () => {
 
   const handleFilterClick = (selectedBadge) => {
     setActiveFilter(selectedBadge);
+    if (isDefaultFilter(selectedBadge)) {
+      setCurrentSelectedOption(filterOptions[defaultFilter][0]);
+      setSelectedHeadingFilter(selectedBadge);
+      setHeadingAnimationKey((currentKey) => currentKey + 1);
+      setIsFilterOptionsOpen(false);
+      return;
+    }
     setIsFilterOptionsOpen((isOpen) =>
       selectedBadge === activeFilter ? !isOpen : true,
     );
@@ -204,8 +212,9 @@ const AiSearchResults = () => {
   };
 
   const headingText =
-    "As per your inputs, please find below the best destinations curated for you based on " +
-    `${selectedHeadingFilter.toLowerCase()} preference`;
+    // "As per your inputs, please find below the best destinations curated for you based on " +
+    // `${selectedHeadingFilter.toLowerCase()} preference`;
+    "Showing results for the selected option. Select any option to view your preferred results.";
 
   useEffect(() => {
     setTypedHeading("");
@@ -231,7 +240,7 @@ const AiSearchResults = () => {
             <div className="flex items-center gap-5">
               <button
                 type="button"
-                onClick={() => navigate("/search")}
+                onClick={() => navigate("/home")}
                 className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
                 aria-label="Go back"
               >
@@ -246,14 +255,16 @@ const AiSearchResults = () => {
                   <div className="rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85">
                     {selectedHeadingFilter}
                   </div>
-                  <div className="rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85">
-                    {currentSelectedOption}
-                  </div>
+                  {!isDefaultFilter(selectedHeadingFilter) && (
+                    <div className="rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85">
+                      {currentSelectedOption}
+                    </div>
+                  )}
                 </div>
                 <div className="ml-auto flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => navigate("/search")}
+                    onClick={() => navigate("/home")}
                     className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-black/70 transition-colors hover:bg-black/5 hover:text-black"
                     aria-label="Clear search and go back"
                   >
@@ -288,23 +299,25 @@ const AiSearchResults = () => {
                   })}
                 </div>
 
-                {activeFilter && isFilterOptionsOpen && (
-                  <div className="absolute left-0 top-full z-40 mt-4 w-full max-w-[220px]">
-                    <ul className="space-y-2 rounded-lg border border-sky-400 bg-white px-2 py-2 shadow-sm">
-                      {filterOptions[activeFilter].map((option) => (
-                        <li key={option}>
-                          <button
-                            type="button"
-                            onClick={() => handleOptionClick(option)}
-                            className="w-full rounded-md px-2 py-2 text-left text-sm text-black/90 hover:bg-sky-50"
-                          >
-                            {option}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                {activeFilter &&
+                  !isDefaultFilter(activeFilter) &&
+                  isFilterOptionsOpen && (
+                    <div className="absolute left-0 top-full z-40 mt-4 w-full max-w-[220px]">
+                      <ul className="space-y-2 rounded-lg border border-sky-400 bg-white px-2 py-2 shadow-sm">
+                        {filterOptions[activeFilter].map((option) => (
+                          <li key={option}>
+                            <button
+                              type="button"
+                              onClick={() => handleOptionClick(option)}
+                              className="w-full rounded-md px-2 py-2 text-left text-sm text-black/90 hover:bg-sky-50"
+                            >
+                              {option}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
               </div>
 
               <div className="relative mt-8">
@@ -354,7 +367,8 @@ const AiSearchResults = () => {
                         </div>
                         <div>
                           <p className="text-[0.9rem] text-black/60">
-                            {destination.suggestions} Suggestions
+                            {/* {destination.suggestions} Suggestions */}
+                            Find activation options
                           </p>
                         </div>
                       </article>

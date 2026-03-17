@@ -309,7 +309,8 @@ const AiSavingsSearchResults = () => {
                         </div>
                         <div>
                           <p className="text-[0.9rem] text-black/60">
-                            {destination.suggestions} Suggestions
+                            {/* {destination.suggestions} Suggestions */}
+                            Find activation options
                           </p>
                         </div>
                       </article>
