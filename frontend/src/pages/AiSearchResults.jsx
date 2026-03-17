@@ -7,30 +7,74 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 
 const filters = [
-  "Budget",
-  "Internet",
-  "Visa Duration",
-  "Time Zone",
-  "Continent",
+  "Overall Work from anywhere Index",
+  "Digital nomad visas",
+  "Visa-free entry length",
+  "Airport connectivity",
+  "Direct international flights",
+  "Internet speed",
+  "Global accessibility",
+  "Cost of living (live, work, eat, travel etc)",
+  "Nomad Population Index",
+  "Remote working infrastructure",
 ];
 
 const filterOptions = {
-  Budget: ["Under $100", "$100 - $250", "$500 - $1,000", "$1,000+"],
-  Internet: ["Under 25 Mbps", "25 - 50 Mbps", "50 - 100 Mbps", "100+ Mbps"],
-  "Visa Duration": [
+  "Overall Work from anywhere Index": [
+    "Very Low",
+    "Low",
+    "Moderate",
+    "High",
+    "Very High",
+  ],
+
+  "Digital nomad visas": [
+    "No visa available",
+    "Visa available",
+    "Multiple visa options",
+  ],
+
+  "Visa-free entry length": [
     "Up to 30 days",
     "31 - 90 days",
-    "3 - 6 months",
-    "6+ months",
+    "91 - 180 days",
+    "180+ days",
   ],
-  "Time Zone": ["Americas", "Europe/Africa", "Asia", "Oceania"],
-  Continent: [
-    "Asia",
-    "Europe",
-    "North America",
-    "South America",
-    "Africa",
-    "Oceania",
+
+  "Airport connectivity": ["Limited", "Moderate", "Good", "Excellent"],
+
+  "Direct international flights": ["Very Few", "Few", "Moderate", "Many"],
+
+  "Internet speed": [
+    "Under 25 Mbps",
+    "25 - 50 Mbps",
+    "50 - 100 Mbps",
+    "100+ Mbps",
+  ],
+
+  "Global accessibility": ["Low", "Moderate", "High"],
+
+  "Cost of living (live, work, eat, travel etc)": [
+    "Very Affordable",
+    "Affordable",
+    "Moderate",
+    "Expensive",
+    "Very Expensive",
+  ],
+
+  "Nomad Population Index": [
+    "Very Low",
+    "Low",
+    "Moderate",
+    "High",
+    "Very High",
+  ],
+
+  "Remote working infrastructure": [
+    "Basic",
+    "Developing",
+    "Well Developed",
+    "Highly Advanced",
   ],
 };
 
@@ -195,7 +239,7 @@ const AiSearchResults = () => {
               <div className="flex flex-1 items-center rounded-full border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] ml-20 mr-36 ">
                 <div className="flex flex-wrap items-center gap-2">
                   <div className="rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85">
-                    Best For You
+                    Work From Anywhere
                   </div>
                   <div className="rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85">
                     {selectedHeadingFilter}
@@ -220,7 +264,7 @@ const AiSearchResults = () => {
 
             <div className="relative px-28">
               <div className="relative z-30 mt-6 mx-4">
-                <div className="flex flex-wrap gap-8">
+                <div className="flex flex-wrap gap-6">
                   {/* {orderedFilters.map((filter) => { */}
                   {filters.map((filter) => {
                     const isActive = filter === activeFilter;

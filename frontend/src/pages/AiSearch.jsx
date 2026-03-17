@@ -11,7 +11,7 @@ const filters = [
   "Internet speed",
   "Global accessibility",
   "Cost of living (live, work, eat, travel etc)",
-  "Nomad Popolation Index",
+  "Nomad Population Index",
   "Remote working infrastructure",
 ];
 
@@ -58,7 +58,7 @@ const filterOptions = {
     "Very Expensive",
   ],
 
-  "Nomad Popolation Index": [
+  "Nomad Population Index": [
     "Very Low",
     "Low",
     "Moderate",
