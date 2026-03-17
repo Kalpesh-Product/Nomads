@@ -10,18 +10,18 @@ import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
 
 const recommendationCards = [
   {
-    title: "World Rankings",
+    title: "World Ranking",
     description:
       "WoNo analyzes global data to rank the best destinations worldwide based on livability, popularity, and remote-work potential.",
     icon: HiOutlineViewGrid,
     path: "/world-rankings",
   },
   {
-    title: "Best For You",
+    title: "Work From Anywhere",
     description:
       "WoNo evaluates your preferences and recommends destinations that best match your lifestyle and work needs.",
     icon: HiOutlineHeart,
-    path: "/search",
+    path: "/search/results",
   },
   {
     title: "Increase Your Savings",
@@ -31,21 +31,21 @@ const recommendationCards = [
     path: "/savings",
   },
   {
-    title: "Budget Destinations",
+    title: "Advance Your Career",
     description:
       "WoNo identifies high-value, low-cost destinations that offer strong amenities without high expenses.",
     icon: LuMapPinned,
-    path: "/budget",
+    path: "/career-search",
   },
   {
-    title: "Compatible For You",
+    title: "Find Your Community",
     description:
       "WoNo matches destinations to your climate, culture, and community preferences for a better overall fit.",
     icon: HiOutlineUserCircle,
     path: "/compatible",
   },
   {
-    title: "Search Old Style",
+    title: "Search Old School",
     description:
       "WoNo lets you manually filter and sort destinations if you prefer a traditional search approach.",
     icon: HiOutlineViewGrid,
@@ -59,7 +59,8 @@ const AiHome = () => {
   const [typedSubheading, setTypedSubheading] = useState("");
 
   const greetingText = "hi Abrar";
-  const subheadingText = "Let’s start designing your nomad lifestyle";
+  const subheadingText =
+    "Please choose your goals from below so that we can help you design your accurate nomad lifestyle.";
 
   useEffect(() => {
     setTypedGreeting("");
@@ -102,7 +103,7 @@ const AiHome = () => {
           <h1 className="text-3xl font-medium text-black/90 font-play">
             {typedGreeting}
           </h1>
-          <h2 className="mt-10 text-xl font-semibold text-black/85 font-play">
+          <h2 className="mt-10 text-lg font-semibold text-black/85 font-play">
             {typedSubheading}
           </h2>
 
