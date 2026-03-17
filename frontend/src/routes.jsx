@@ -68,6 +68,9 @@ import AiCareerSearch from "./pages/AiCareerSearch";
 import AiCareerSearchResults from "./pages/AiCareerSearchResults";
 import AiCompatibleSearch from "./pages/AiCompatibleSearch";
 import AiCompatibleSearchResults from "./pages/AiCompatibleSearchResults";
+import AiHomeLoggedIn from "./pages/AiHomeLoggedIn";
+import AiLogin from "./pages/AiLogin";
+import AiSignup from "./pages/AiSignup";
 
 function getTenantFromHost() {
   const hostname = window.location.hostname; // e.g. "nomad.wono.co" or "nomad.localhost"
@@ -170,6 +173,9 @@ if (tenant === "main") {
           path: "/",
           children: [
             { path: "home", element: <AiHome /> },
+            { path: "ai-login", element: <AiLogin /> },
+            { path: "ai-signup", element: <AiSignup /> },
+            { path: "home-logged-in", element: <AiHomeLoggedIn /> },
             { path: "search", element: <AiSearch /> },
             { path: "world-rankings", element: <AiWorldRankings /> },
             { path: "savings", element: <AiSavingsSearch /> },

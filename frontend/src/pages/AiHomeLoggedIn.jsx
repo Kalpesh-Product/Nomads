@@ -53,7 +53,7 @@ const recommendationCards = [
   },
 ];
 
-const AiHome = () => {
+const AiHomeLoggedIn = () => {
   const navigate = useNavigate();
   const [typedGreeting, setTypedGreeting] = useState("");
   const [typedSubheading, setTypedSubheading] = useState("");
@@ -148,4 +148,4 @@ const AiHome = () => {
   );
 };
 
-export default AiHome;
+export default AiHomeLoggedIn;
