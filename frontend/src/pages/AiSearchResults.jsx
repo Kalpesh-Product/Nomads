@@ -277,7 +277,7 @@ const AiSearchResults = () => {
 
             <div className="relative px-28">
               <div className="relative z-30 mt-6 mx-4">
-                <div className="flex flex-wrap gap-6">
+                <div className="flex flex-wrap gap-4">
                   {/* {orderedFilters.map((filter) => { */}
                   {filters.map((filter) => {
                     const isActive = filter === activeFilter;

@@ -103,7 +103,7 @@ const AiHome = () => {
           <h1 className="text-3xl font-medium text-black/90 font-play">
             {typedGreeting}
           </h1>
-          <h2 className="mt-10 text-xl font-semibold text-black/85 font-play">
+          <h2 className="mt-10 text-lg font-semibold text-black/85 font-play">
             {typedSubheading}
           </h2>
 
