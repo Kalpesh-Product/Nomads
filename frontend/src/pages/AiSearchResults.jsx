@@ -6,18 +6,7 @@ import {
 } from "react-icons/hi";
 import { useLocation, useNavigate } from "react-router-dom";
 
-const filters = [
-  "Overall Work from anywhere Index",
-  "Digital nomad visas",
-  "Visa-free entry length",
-  "Airport connectivity",
-  "Direct international flights",
-  "Internet speed",
-  "Global accessibility",
-  "Cost of living (live, work, eat, travel etc)",
-  "Nomad Population Index",
-  "Remote working infrastructure",
-];
+import { defaultGoal, goalFilterMap } from "../constants/aiGoalFilters";
 
 const filterOptions = {
   "Overall Work from anywhere Index": [
@@ -126,9 +115,17 @@ const destinationCards = [
 const AiSearchResults = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
-  const defaultFilter = "Overall Work from anywhere Index";
+  const selectedGoal =
+    state?.selectedGoal && goalFilterMap[state.selectedGoal]
+      ? state.selectedGoal
+      : defaultGoal;
+  const filters = goalFilterMap[selectedGoal];
+  const defaultFilter = filters[0];
   const isDefaultFilter = (filter) => filter === defaultFilter;
-  const selectedFilter = state?.selectedFilter || defaultFilter;
+  const selectedFilter =
+    state?.selectedFilter && filters.includes(state.selectedFilter)
+      ? state.selectedFilter
+      : defaultFilter;
   const selectedOption =
     state?.selectedOption || filterOptions[selectedFilter]?.[0] || "";
 
@@ -180,7 +177,14 @@ const AiSearchResults = () => {
   const handleFilterClick = (selectedBadge) => {
     setActiveFilter(selectedBadge);
     if (isDefaultFilter(selectedBadge)) {
-      setCurrentSelectedOption(filterOptions[defaultFilter][0]);
+      setCurrentSelectedOption(filterOptions[defaultFilter]?.[0] || "");
+      setSelectedHeadingFilter(selectedBadge);
+      setHeadingAnimationKey((currentKey) => currentKey + 1);
+      setIsFilterOptionsOpen(false);
+      return;
+    }
+    if (!filterOptions[selectedBadge]?.length) {
+      setCurrentSelectedOption("");
       setSelectedHeadingFilter(selectedBadge);
       setHeadingAnimationKey((currentKey) => currentKey + 1);
       setIsFilterOptionsOpen(false);
@@ -250,16 +254,17 @@ const AiSearchResults = () => {
               <div className="flex flex-1 items-center rounded-full border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] ml-20 mr-36 ">
                 <div className="flex flex-wrap items-center gap-2">
                   <div className="rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85">
-                    Work From Anywhere
+                    {selectedGoal}
                   </div>
                   <div className="rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85">
                     {selectedHeadingFilter}
                   </div>
-                  {!isDefaultFilter(selectedHeadingFilter) && (
-                    <div className="rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85">
-                      {currentSelectedOption}
-                    </div>
-                  )}
+                  {!!currentSelectedOption &&
+                    !isDefaultFilter(selectedHeadingFilter) && (
+                      <div className="rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85">
+                        {currentSelectedOption}
+                      </div>
+                    )}
                 </div>
                 <div className="ml-auto flex items-center gap-2">
                   <button
@@ -301,10 +306,11 @@ const AiSearchResults = () => {
 
                 {activeFilter &&
                   !isDefaultFilter(activeFilter) &&
+                  filterOptions[activeFilter]?.length &&
                   isFilterOptionsOpen && (
                     <div className="absolute left-0 top-full z-40 mt-4 w-full max-w-[220px]">
                       <ul className="space-y-2 rounded-lg border border-sky-400 bg-white px-2 py-2 shadow-sm">
-                        {filterOptions[activeFilter].map((option) => (
+                        {(filterOptions[activeFilter] || []).map((option) => (
                           <li key={option}>
                             <button
                               type="button"
