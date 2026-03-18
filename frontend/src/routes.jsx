@@ -53,6 +53,25 @@ import NomadTermsAndConditions from "./pages/NomadTermsAndConditions";
 import SiteIsDown from "./pages/SiteIsDown";
 import WebsiteUnderMaintenance from "./pages/WebsiteUnderMaintenance";
 
+import NomadAiLayout from "./pages/NomadAiLayout";
+import AiHome from "./pages/AiHome";
+import AiSearch from "./pages/AiSearch";
+import AiSearchResults from "./pages/AiSearchResults";
+import AiGlobalListings from "./pages/AiGlobalListings";
+import AiListings from "./pages/AiListings";
+import AiProduct from "./pages/AiProduct";
+import AiImageGallery from "./pages/AiImageGallery";
+import AiWorldRankings from "./pages/AiWorldRankingsSearchResults";
+import AiSavingsSearch from "./pages/AiSavingsSearch";
+import AiSavingsSearchResults from "./pages/AiSavingsSearchResults";
+import AiCareerSearch from "./pages/AiCareerSearch";
+import AiCareerSearchResults from "./pages/AiCareerSearchResults";
+import AiCompatibleSearch from "./pages/AiCompatibleSearch";
+import AiCompatibleSearchResults from "./pages/AiCompatibleSearchResults";
+import AiHomeLoggedIn from "./pages/AiHomeLoggedIn";
+import AiLogin from "./pages/AiLogin";
+import AiSignup from "./pages/AiSignup";
+
 function getTenantFromHost() {
   const hostname = window.location.hostname; // e.g. "nomad.wono.co" or "nomad.localhost"
   const rootDomain = "wono.co";
@@ -113,6 +132,7 @@ if (tenant === "main") {
           path: "/",
           children: [
             { path: "", element: <Home /> },
+
             { path: "verticals", element: <GlobalListings /> },
             { path: "listings", element: <Listings /> },
             { path: "listings/:company", element: <Product /> },
@@ -146,6 +166,38 @@ if (tenant === "main") {
             { path: "faq", element: <NomadFAQ /> },
             { path: "profile", element: <Profile /> },
             { path: "favorites", element: <Favorites /> },
+          ],
+        },
+        {
+          element: <NomadAiLayout />,
+          path: "/",
+          children: [
+            { path: "home", element: <AiHome /> },
+            { path: "ai-login", element: <AiLogin /> },
+            { path: "ai-signup", element: <AiSignup /> },
+            { path: "home-logged-in", element: <AiHomeLoggedIn /> },
+            { path: "search", element: <AiSearch /> },
+            { path: "world-rankings", element: <AiWorldRankings /> },
+            { path: "savings", element: <AiSavingsSearch /> },
+            { path: "savings/results", element: <AiSavingsSearchResults /> },
+            { path: "career-search", element: <AiCareerSearch /> },
+            { path: "compatible", element: <AiCompatibleSearch /> },
+            {
+              path: "compatible/results",
+              element: <AiCompatibleSearchResults />,
+            },
+            {
+              path: "career-search/results",
+              element: <AiCareerSearchResults />,
+            },
+            { path: "search/results", element: <AiSearchResults /> },
+            { path: "ai-verticals", element: <AiGlobalListings /> },
+            { path: "ai-listings", element: <AiListings /> },
+            { path: "ai-listings/:company", element: <AiProduct /> },
+            {
+              path: "ai-listings/:company/images",
+              element: <AiImageGallery />,
+            },
           ],
         },
       ],

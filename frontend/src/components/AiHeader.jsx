@@ -22,7 +22,7 @@ import useAuth from "../hooks/useAuth";
 import useLogout from "../hooks/useLogout";
 import { CircularProgress } from "@mui/material";
 
-const Header = () => {
+const AiHeader = () => {
   const [open, setOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null); // 🔹 for avatar dropdown
   const navigate = useNavigate();
@@ -82,9 +82,9 @@ const Header = () => {
   };
   const goToHostssMain = () => {
     if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://localhost:5173";
+      window.location.href = "http://nomad.localhost:5173/home";
     } else {
-      window.location.href = "https://wono.co";
+      window.location.href = "https://nomad.wono.co/home";
     }
   };
 
@@ -94,24 +94,12 @@ const Header = () => {
     { id: 3, text: "Blog", to: "/blog" },
   ];
 
-  const isListingsOrVerticalsRoute =
+  const shouldShowHeaderLinks =
     location.pathname === "/verticals" ||
     location.pathname.startsWith("/listings");
 
-  const isHomeOnlyHeaderRoute =
-    location.pathname.startsWith("/blog") ||
-    location.pathname.startsWith("/news") ||
-    location.pathname.startsWith("/profile");
-
-  const shouldShowHeaderLinks =
-    isListingsOrVerticalsRoute || isHomeOnlyHeaderRoute;
-
-  const visibleHeaderLinks = isHomeOnlyHeaderRoute
-    ? headerLinks.filter((item) => item.to === "/")
-    : headerLinks;
-
   return (
-    <div className="shadow-md bg-white/80 backdrop-blur-md">
+    <div className=" bg-white/80 backdrop-blur-md pl-4 pr-4">
       <Container padding={false}>
         <div className="flex py-3 justify-between items-center  lg:py-[0.625rem] ">
           {/* Logo */}
@@ -127,7 +115,7 @@ const Header = () => {
               />
             </div>
 
-            <div className="min-w-[80px] hidden lg:block">
+            {/* <div className="min-w-[80px] hidden lg:block">
               {showToggle && (
                 <ul>
                   {view !== "map" && (
@@ -137,8 +125,8 @@ const Header = () => {
                           to={`${location.pathname}?country=${formData?.country}&location=${formData?.location}&view=map`}
                           className="group relative text-md text-black"
                         >
-                          <span className="relative z-10 group-hover:font-bold uppercase mb-2">
-                            MAP VIEW
+                          <span className="relative z-10 group-hover:font-bold  mb-2">
+                            Map View
                           </span>
                           <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
                         </Link>
@@ -163,14 +151,14 @@ const Header = () => {
                   )}
                 </ul>
               )}
-            </div>
+            </div> */}
           </div>
 
           {/* Main Nav */}
           <div className="w-full">
             {shouldShowHeaderLinks && (
               <ul className="hidden xl:flex sm:hidden gap-8 justify-end flex-1">
-                {visibleHeaderLinks.map((item) => {
+                {headerLinks.map((item) => {
                   const isActive =
                     item.to === "/"
                       ? location.pathname === "/"
@@ -205,19 +193,56 @@ const Header = () => {
 
           {/* Right Section */}
           <div className="hidden lg:flex pl-10 gap-10">
+            <div className="min-w-[80px] hidden lg:block">
+              {showToggle && (
+                <ul>
+                  {view !== "map" && (
+                    <li className="flex items-center">
+                      <div className="p-4 px-0 whitespace-nowrap">
+                        <Link
+                          to={`${location.pathname}?country=${formData?.country}&location=${formData?.location}&view=map`}
+                          className="group relative text-md text-black"
+                        >
+                          <span className="relative z-10 group-hover:font-bold  mb-2 text-lg font-semibold">
+                            Map View
+                          </span>
+                          <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                        </Link>
+                      </div>
+                    </li>
+                  )}
+
+                  {view === "map" && (
+                    <li className="flex items-center">
+                      <div className="p-4 px-0 whitespace-nowrap">
+                        <Link
+                          to={`${location.pathname}?country=${formData?.country}&location=${formData?.location}`}
+                          className="group relative text-md text-black"
+                        >
+                          <span className="relative z-10 group-hover:font-bold  mb-2 text-lg font-semibold">
+                            List view
+                          </span>
+                          <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                        </Link>
+                      </div>
+                    </li>
+                  )}
+                </ul>
+              )}
+            </div>
             <li className="flex items-center">
               <div className="p-4 px-0 whitespace-nowrap">
                 <button
                   onClick={goToHosts}
-                  className="relative pb-1 transition-all cursor-pointer duration-300 group font-bold bg-transparent uppercase border-none"
+                  className="relative pb-1 transition-all cursor-pointer duration-300 group font-semibold bg-transparent border-none text-lg text-blue-500"
                 >
-                  Become a host
-                  <span className="absolute left-0 w-0 bottom-0 block h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                  Become A Host
+                  <span className="absolute left-0 w-0 bottom-0 block h-[2px] bg-black transition-all duration-300 group-hover:w-full"></span>
                 </button>
               </div>
             </li>
 
-            <div className="px-1 hidden xl:flex xl:gap-4 py-2">
+            {/* <div className="px-1 hidden xl:flex xl:gap-4 py-2">
               {auth?.user ? (
                 <>
                   <div className="flex justify-center items-center">
@@ -228,7 +253,7 @@ const Header = () => {
                     />
                   </div>
                   <Avatar
-                    onClick={handleAvatarClick} // 🔹 open dropdown
+                    onClick={handleAvatarClick} 
                     sx={{
                       bgcolor: "#ff5757",
                       cursor: "pointer",
@@ -242,7 +267,7 @@ const Header = () => {
                       : "U"}
                   </Avatar>
 
-                  {/* 🔹 Popover for Profile & Logout */}
+               
                   <Popover
                     open={openPopover}
                     anchorEl={anchorEl}
@@ -314,7 +339,7 @@ const Header = () => {
                   className="bg-[#FF5757] flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[7rem] px-4"
                 />
               )}
-            </div>
+            </div> */}
           </div>
 
           {/* Mobile Menu Button */}
@@ -365,7 +390,7 @@ const Header = () => {
                 </div>
 
                 {shouldShowHeaderLinks &&
-                  visibleHeaderLinks.map((item) => (
+                  headerLinks.map((item) => (
                     <li key={item.id} className="items-center text-center">
                       <div
                         onClick={() => handleNavigation(item.to)}
@@ -395,7 +420,7 @@ const Header = () => {
                   <div className="h-[0.2px] bg-gray-300"></div>
                 </li>
 
-                {auth?.user ? (
+                {/* {auth?.user ? (
                   <>
                     <li className="items-center text-center">
                       <div
@@ -435,8 +460,6 @@ const Header = () => {
                           <p className="text-secondary-dark text-lg">Log Out</p>
                         )}
                       </div>
-
-                      {/* <div className="h-[0.2px] bg-gray-300"></div> */}
                     </li>
                   </>
                 ) : (
@@ -449,11 +472,10 @@ const Header = () => {
                         navigate("/login");
                         setOpen(false);
                       }}
-                      // className="bg-[#FF5757] flex text-white font-[500] capitalize hover:bg-[#E14C4C] w-[7rem] px-4"
                       className="bg-[#FF5757] flex text-white font-[500] capitalize hover:bg-[#E14C4C] w-full sm:w-[7rem]"
                     />
                   </div>
-                )}
+                )} */}
               </ul>
 
               {/* Drawer Footer */}
@@ -475,4 +497,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default AiHeader;

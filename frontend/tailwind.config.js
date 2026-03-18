@@ -32,9 +32,10 @@ module.exports = {
         hero: ["Bebas Neue", "ui-sans-serif", "system-ui"],
         cursive: ["Bilbo Swash Caps"],
         play: ["Playwrite US Modern"],
-        comic : ["Comic Relief", "system-ui"]
+        comic: ["Comic Relief", "system-ui"],
       },
       fontSize: {
+        nano: ["0.65rem", { lineHeight: "0.75rem" }], // ~10px
         tiny: ["0.75rem", { lineHeight: "1rem" }], // ~12px
         small: ["0.875rem", { lineHeight: "1.5rem" }], // 16px
         content: ["1rem", { lineHeight: "1.5rem" }], // 16px

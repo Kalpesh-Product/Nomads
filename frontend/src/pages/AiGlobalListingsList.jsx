@@ -73,7 +73,7 @@ const HorizontalScrollWrapper = ({ children, title }) => {
   );
 };
 
-const GlobalListingsList = () => {
+const AiGlobalListingsList = () => {
   const [favorites, setFavorites] = useState([]);
   const [expandedCategories, setExpandedCategories] = useState([]);
   const location = useLocation();
@@ -207,49 +207,11 @@ const GlobalListingsList = () => {
     "cafe",
   ];
 
-  const expandedCategoriesStorageKey = useMemo(() => {
-    const countryKey = (formData?.country || "").toLowerCase();
-    const locationKey = (formData?.location || "").toLowerCase();
-
-    if (!countryKey || !locationKey) return null;
-    return `verticals-expanded-categories:${countryKey}:${locationKey}`;
-  }, [formData?.country, formData?.location]);
-
   const handleShowMoreClick = (type) => {
     setExpandedCategories((prev) =>
       prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type],
     );
   };
-
-  useEffect(() => {
-    if (!expandedCategoriesStorageKey) {
-      setExpandedCategories([]);
-      return;
-    }
-
-    const savedState = sessionStorage.getItem(expandedCategoriesStorageKey);
-
-    if (!savedState) {
-      setExpandedCategories([]);
-      return;
-    }
-
-    try {
-      const parsedState = JSON.parse(savedState);
-      setExpandedCategories(Array.isArray(parsedState) ? parsedState : []);
-    } catch {
-      setExpandedCategories([]);
-    }
-  }, [expandedCategoriesStorageKey]);
-
-  useEffect(() => {
-    if (!expandedCategoriesStorageKey) return;
-
-    sessionStorage.setItem(
-      expandedCategoriesStorageKey,
-      JSON.stringify(expandedCategories),
-    );
-  }, [expandedCategories, expandedCategoriesStorageKey]);
 
   const { data: listingsData, isPending: isLisitingLoading } = useQuery({
     queryKey: ["globallistings", formData],
@@ -395,7 +357,7 @@ const GlobalListingsList = () => {
     };
 
     navigate(
-      `/listings?country=${formData.country}&location=${formData.location}&category=${state.category}`,
+      `/ai-listings?country=${formData.country}&location=${formData.location}&category=${state.category}`,
       {
         state: {
           country: formData.country,
@@ -493,7 +455,7 @@ const GlobalListingsList = () => {
                 </div>
               </div>
 
-              <form
+              {/* <form
                 onSubmit={handleSubmit(onSubmit)}
                 className="flex justify-around md:w-full lg:w-full border-2 bg-gray-50 rounded-full p-0 items-center"
               >
@@ -565,7 +527,7 @@ const GlobalListingsList = () => {
                 >
                   <IoSearch />
                 </button>
-              </form>
+              </form> */}
             </div>
           </div>
         </div>
@@ -636,7 +598,7 @@ const GlobalListingsList = () => {
                                 showVertical={false}
                                 handleNavigation={() =>
                                   navigate(
-                                    `/listings/${encodeURIComponent(item.companyName)}`,
+                                    `/ai-listings/${encodeURIComponent(item.companyName)}`,
                                     {
                                       state: {
                                         companyId: item.companyId,
@@ -758,7 +720,7 @@ const GlobalListingsList = () => {
                   </button>
                 </div>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                {/* <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                   <Controller
                     name="continent"
                     control={control}
@@ -825,7 +787,7 @@ const GlobalListingsList = () => {
                     <IoSearch className="inline mr-2" />
                     Search
                   </button>
-                </form>
+                </form> */}
               </motion.div>
             )}
           </AnimatePresence>
@@ -901,7 +863,7 @@ const GlobalListingsList = () => {
                                 showVertical={false}
                                 handleNavigation={() =>
                                   navigate(
-                                    `/listings/${encodeURIComponent(item.companyName)}`,
+                                    `/ai-listings/${encodeURIComponent(item.companyName)}`,
                                     {
                                       state: {
                                         companyId: item.companyId,
@@ -984,4 +946,4 @@ const GlobalListingsList = () => {
   );
 };
 
-export default GlobalListingsList;
+export default AiGlobalListingsList;

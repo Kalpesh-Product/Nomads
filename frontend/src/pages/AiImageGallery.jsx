@@ -10,7 +10,7 @@ import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { useDispatch } from "react-redux";
 import { setFormValues } from "../features/locationSlice.js";
 
-const ImageGallery = () => {
+const AiImageGallery = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { company: companyParam } = useParams();
@@ -18,7 +18,6 @@ const ImageGallery = () => {
   const {
     images = [],
     companyName,
-    companyTitle,
     selectedImageId,
     continent = "Asia",
     country,
@@ -101,8 +100,7 @@ const ImageGallery = () => {
     instanceRef.current?.next();
   };
 
-  const resolvedCompanyTitle =
-    companyTitle || companyName || companyParam || "Unknown";
+  const resolvedCompanyName = companyName || companyParam || "Unknown";
 
   const getCompanyTypeBreadcrumbLabel = (value) => {
     const companyTypeLabelMap = {
@@ -128,7 +126,7 @@ const ImageGallery = () => {
     },
     {
       key: "companyName",
-      label: resolvedCompanyTitle,
+      label: resolvedCompanyName,
       isLink: Boolean(companyName || companyParam),
       onClick: () => {
         const target = companyParam || companyName;
@@ -202,8 +200,7 @@ const ImageGallery = () => {
           ))}
         </p>
         <h1 className="text-title font-semibold text-secondary-dark">
-          {/* {companyName || "Unknown"} Gallery */}
-          {resolvedCompanyTitle} Gallery
+          {companyName || "Unknown"} Gallery
         </h1>
       </div>
       <ColumnsPhotoAlbum
@@ -284,4 +281,4 @@ const ImageGallery = () => {
   );
 };
 
-export default ImageGallery;
+export default AiImageGallery;

@@ -125,12 +125,12 @@ const Themes = () => {
   return (
     <div className="   text-secondary-dark justify-center items-center">
       <Container>
-        <section className="flex flex-col items-center lg:items-end justify-center gap-4 leading-[1.3]">
-          <h1 className="text-xl sm:text-[clamp(1.62rem,4.6vw,4.5rem)] font-medium">
+        <section className="flex flex-col items-end justify-center gap-4 leading-[1.3] text-secondary-dark ">
+          <h1 className="text-[clamp(1.62rem,4.6vw,4.5rem)] font-medium">
             Choose the best Responsive Website Theme for your business
           </h1>
 
-          <GetStartedButton handleSubmit={() => navigate('/signup')} />
+          <GetStartedButton handleSubmit={() => navigate("/signup")} />
         </section>
       </Container>
 
@@ -153,7 +153,8 @@ const Themes = () => {
                   data-aos="fade-up"
                   className="flex-shrink-0 w-[85vw] md:w-[45vw] h-full overflow-hidden rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.5)] snap-start lg:w-full"
                   onClick={() => navigate("products", { state: { image } })}
-                  key={index}>
+                  key={index}
+                >
                   <img
                     className="rounded-xl w-full h-full object-cover transition-transform duration-500 ease hover:scale-[1.2] cursor-pointer origin-center"
                     onClick={() => {
@@ -166,7 +167,7 @@ const Themes = () => {
               ))}
             </div>
             <div className="flex justify-center items-center">
-              <GetStartedButton handleSubmit={() => navigate('/signup')} />
+              <GetStartedButton handleSubmit={() => navigate("/signup")} />
             </div>
           </div>
         </Container>
@@ -178,7 +179,9 @@ const Themes = () => {
           <div className="flex lg:flex-nowrap flex-wrap justify-between items-center gap-8">
             <div className="flex flex-col gap-6 sm:gap-16 w-full lg:w-[50%]">
               <div className="text-[clamp(2rem,4.2vw,6rem)] md:text-[clamp(2rem,8vw,8rem)] lg:text-[clamp(2rem,4.2vw,6rem)] leading-none">
-                <h1 className="font-normal">Customize it <br className="hidden lg:block" /> your way</h1>
+                <h1 className="font-normal">
+                  Customize it <br className="hidden lg:block" /> your way
+                </h1>
               </div>
               <ul className="flex flex-col gap-2">
                 <li>1000's advanced web capabilities</li>
@@ -187,7 +190,7 @@ const Themes = () => {
                 <li>Full-stack web dev tools for custom functionality</li>
               </ul>
               <div className="flex justify-center md:justify-start w-full">
-                <GetStartedButton handleSubmit={() => navigate('/signup')} />
+                <GetStartedButton handleSubmit={() => navigate("/signup")} />
               </div>
             </div>
             <div className="w-full lg:w-[50%] h-full">
@@ -212,13 +215,15 @@ const Themes = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-10 gap-x-20">
             {themeWebsiteGridData.map((item, index) => (
               <div key={index} className="flex flex-col gap-4 lg:gap-6">
-                <h4 className="text-[1.3rem] lg:text-[1.3rem] font-medium">{item.title}</h4>
+                <h4 className="text-[1.3rem] lg:text-[1.3rem] font-medium">
+                  {item.title}
+                </h4>
                 <p className="text-content">{item.description}</p>
               </div>
             ))}
           </div>
           <div>
-            <GetStartedButton handleSubmit={() => navigate('/signup')} />
+            <GetStartedButton handleSubmit={() => navigate("/signup")} />
           </div>
         </div>
       </Container>
@@ -235,7 +240,8 @@ const Themes = () => {
             {supportItems.map((item, index) => (
               <div
                 className="flex flex-col gap-8 border-t-2 border-black pt-10"
-                key={index}>
+                key={index}
+              >
                 <h2 className="font-medium text-content">{item.title}</h2>
                 <p>{item.description}</p>
                 <span
@@ -243,7 +249,8 @@ const Themes = () => {
                   onClick={() => {
                     navigate(item.path);
                     window.scrollTo({ top: 0, behavior: "instant" });
-                  }}>
+                  }}
+                >
                   {item.linkText}
                 </span>
               </div>

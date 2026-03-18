@@ -366,3 +366,89 @@ export const getPocDetails = async (req, res, next) => {
     next(error);
   }
 };
+
+export const editPOC = async (req, res, next) => {
+  try {
+    const { companyId } = req.params;
+    const payload = req.body;
+
+    if (!companyId) {
+      return res.status(400).json({
+        success: false,
+        message: "companyId is required",
+      });
+    }
+
+    const existingPOCs = await PointOfContact.find({ companyId }).select("_id");
+
+    if (!existingPOCs.length) {
+      return res.status(404).json({
+        success: false,
+        message: "No POC entries found for this companyId",
+      });
+    }
+
+    const normalizedEmail = payload?.email?.trim()?.toLowerCase();
+    const sourceCompanyId = companyId;
+    const targetCompanyId = payload?.companyId || sourceCompanyId;
+
+    const updatedFields = {
+      name: payload?.name,
+      companyId: payload?.companyId,
+      designation: payload?.designation,
+      email: normalizedEmail || payload?.email,
+      phone: payload?.phone,
+      linkedInProfile: payload?.linkedInProfile,
+      languagesSpoken: payload?.languagesSpoken,
+      address: payload?.address,
+      profileImage: payload?.profileImage,
+      isActive: payload?.isActive,
+      availibilityTime: payload?.availibilityTime,
+    };
+
+    Object.keys(updatedFields).forEach((key) => {
+      if (updatedFields[key] === undefined) {
+        delete updatedFields[key];
+      }
+    });
+
+    const sourceCompanyPocIds = existingPOCs.map((poc) => poc._id);
+
+    if (normalizedEmail) {
+      const duplicatePOC = await PointOfContact.findOne({
+        _id: { $nin: sourceCompanyPocIds },
+        companyId: targetCompanyId,
+        email: normalizedEmail,
+      });
+
+      if (duplicatePOC) {
+        return res.status(400).json({
+          success: false,
+          message: "Email already exists for this company",
+        });
+      }
+    }
+
+    const updateResult = await PointOfContact.updateMany(
+      { companyId: sourceCompanyId },
+      { $set: updatedFields },
+      { runValidators: true },
+    );
+
+    const updatedPOCs = await PointOfContact.find({
+      companyId: targetCompanyId,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Point of Contact entries updated successfully",
+      sourceCompanyId,
+      updatedCompanyId: targetCompanyId,
+      matchedCount: updateResult.matchedCount,
+      updatedCount: updateResult.modifiedCount,
+      data: updatedPOCs,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

@@ -23,7 +23,7 @@ import Map from "../components/Map";
 import LeafWrapper from "../components/LeafWrapper";
 import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
 import { FiShare2 } from "react-icons/fi";
-import { Globe } from "lucide-react";
+import { ArrowLeft, Globe } from "lucide-react";
 import {
   FaFacebookF,
   FaLinkedinIn,
@@ -49,7 +49,7 @@ import { setFormValues } from "../features/locationSlice.js";
 
 dayjs.extend(relativeTime);
 
-const Product = () => {
+const AiProduct = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { company } = useParams();
@@ -216,7 +216,6 @@ const Product = () => {
     country: companyDetails?.country,
     state: companyDetails?.state,
     companyType: companyDetails?.companyType,
-    companyTitle: companyDetails?.companyTitle,
   };
 
   const getCompanyTypeBreadcrumbLabel = (companyType) => {
@@ -255,7 +254,7 @@ const Product = () => {
 
     if (isCompanyTypeClick) {
       navigate(
-        `/listings?country=${normalizedCountry || ""}&location=${
+        `/ai-listings?country=${normalizedCountry || ""}&location=${
           normalizedLocation || ""
         }&category=${normalizedCategory || ""}`,
       );
@@ -263,10 +262,14 @@ const Product = () => {
     }
 
     navigate(
-      `/verticals?country=${normalizedCountry || ""}&state=${
+      `/ai-verticals?country=${normalizedCountry || ""}&state=${
         normalizedLocation || ""
       }`,
     );
+  };
+
+  const handleBackButtonClick = () => {
+    navigate("/search/results");
   };
 
   const handleWriteReviewClick = () => {
@@ -431,7 +434,7 @@ const Product = () => {
         ...data,
         pocName: companyDetails?.poc?.name || "Sales Team",
         pocCompany: companyDetails?.companyName,
-        pocDesignation: companyDetails?.poc?.designation || "Sales Department",
+        pocDesignation: companyDetails?.poc?.designation,
         sheetName: "All_POC_Contact",
         mobile: data.mobileNumber,
       });
@@ -660,14 +663,26 @@ const Product = () => {
       <div className="hidden lg:block min-w-[70%] max-w-[80rem] lg:max-w-[70rem] mx-0 md:mx-auto">
         <div className="pb-4">
           {/* Breadcrumb - Desktop Only */}
-          <nav aria-label="Breadcrumb" className="mb-4 text-gray-500">
+          <nav
+            aria-label="Breadcrumb"
+            className="mb-4 flex items-center text-primary-blue"
+          >
+            <button
+              type="button"
+              onClick={handleBackButtonClick}
+              aria-label="Go back"
+              className="inline-flex items-center justify-center rounded-full border border-primary-blue p-1 text-primary-blue"
+            >
+              <ArrowLeft size={16} />
+            </button>
+            <span className="mx-2">{">"}</span>
             {[
-              {
-                key: "continent",
-                label: companyDetails?.continent,
-                isLink: true,
-              },
-              { key: "country", label: companyDetails?.country, isLink: true },
+              // {
+              //   key: "continent",
+              //   label: companyDetails?.continent,
+              //   isLink: true,
+              // },
+              // { key: "country", label: companyDetails?.country, isLink: true },
               { key: "state", label: companyDetails?.state, isLink: true },
               {
                 key: "companyType",
@@ -678,7 +693,7 @@ const Product = () => {
               },
               {
                 key: "companyName",
-                label: companyDetails?.companyTitle || companyName,
+                label: companyDetails?.companyName || companyName,
                 isLink: false,
               },
             ]
@@ -689,7 +704,7 @@ const Product = () => {
                     <button
                       type="button"
                       onClick={() => handleBreadcrumbNavigate(item.key)}
-                      className="text-gray-500 hover:text-gray-700 transition-colors"
+                      className="text-primary-blue hover:text-primary-dark transition-colors"
                     >
                       {item.label}
                     </button>
@@ -1529,8 +1544,17 @@ const Product = () => {
           {/* Breadcrumb - Mobile/Tablet */}
           <nav
             aria-label="Breadcrumb"
-            className="mb-4 text-gray-500 text-[10px] md:text-sm"
+            className="mb-4 flex items-center text-primary-blue text-[10px] md:text-sm"
           >
+            <button
+              type="button"
+              onClick={handleBackButtonClick}
+              aria-label="Go back"
+              className="inline-flex items-center justify-center rounded-full border border-primary-blue p-1 text-primary-blue"
+            >
+              <ArrowLeft size={14} />
+            </button>
+            <span className="mx-1 md:mx-2">{">"}</span>
             {[
               {
                 key: "continent",
@@ -1548,7 +1572,7 @@ const Product = () => {
               },
               {
                 key: "companyName",
-                label: companyDetails?.companyTitle || companyName,
+                label: companyDetails?.companyName || companyName,
                 isLink: false,
               },
             ]
@@ -1559,7 +1583,7 @@ const Product = () => {
                     <button
                       type="button"
                       onClick={() => handleBreadcrumbNavigate(item.key)}
-                      className="text-gray-500 hover:text-gray-700 transition-colors"
+                      className="text-primary-blue hover:text-primary-dark transition-colors"
                     >
                       {item.label}
                     </button>
@@ -1575,7 +1599,7 @@ const Product = () => {
               ))}
           </nav>
           <h1 className="text-title font-semibold text-secondary-dark">
-            {companyDetails?.companyTitle || "Loading Title..."}
+            {companyDetails?.companyName || "Loading Title..."}
           </h1>
         </div>
 
@@ -1621,7 +1645,6 @@ const Product = () => {
                           companyName: companyDetails?.companyName,
                           images: companyDetails?.images,
                           selectedImageId: selectedImage?._id,
-                          ...breadcrumbState,
                         },
                       })
                     }
@@ -1644,7 +1667,6 @@ const Product = () => {
                             companyName: companyDetails?.companyName,
                             images: companyDetails?.images,
                             selectedImageId: item._id,
-                            ...breadcrumbState,
                           },
                         })
                       }
@@ -1663,7 +1685,6 @@ const Product = () => {
                                 state: {
                                   companyName: companyDetails?.companyName,
                                   images: companyDetails?.images,
-                                  ...breadcrumbState,
                                 },
                               });
                             }}
@@ -1698,7 +1719,6 @@ const Product = () => {
                             companyName: companyDetails?.companyName,
                             images: companyDetails?.images,
                             selectedImageId: item._id,
-                            ...breadcrumbState,
                           },
                         })
                       }
@@ -2601,4 +2621,4 @@ const Product = () => {
   );
 };
 
-export default Product;
+export default AiProduct;
