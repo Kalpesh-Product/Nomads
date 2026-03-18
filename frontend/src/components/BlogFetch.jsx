@@ -113,6 +113,28 @@ const DESTS = [
   { label: "Bogotá D.C.", country: "co", keyword: "bogota d.c.", lang: "es" },
   { label: "Medellin", country: "co", keyword: "medellin", lang: "es" },
   { label: "Quito", country: "ec", keyword: "quito", lang: "es" },
+
+  // ----------- NEW DESTINATIONS -----------
+
+  // Asia
+  { label: "Colombo", country: "lk", keyword: "colombo", lang: "en" },
+
+  // Europe
+  { label: "Krakow", country: "pl", keyword: "krakow", lang: "pl" },
+  { label: "Sofia", country: "bg", keyword: "sofia", lang: "bg" },
+  { label: "Bucharest", country: "ro", keyword: "bucharest", lang: "ro" },
+  { label: "Bologna", country: "it", keyword: "bologna", lang: "it" },
+  { label: "Porto", country: "pt", keyword: "porto", lang: "pt" },
+  { label: "Belgrade", country: "rs", keyword: "belgrade", lang: "sr" },
+
+  // North America
+  { label: "Pittsburgh", country: "us", keyword: "pittsburgh", lang: "en" },
+  { label: "Austin", country: "us", keyword: "austin", lang: "en" },
+  { label: "Oaxaca", country: "mx", keyword: "oaxaca", lang: "es" },
+
+  // South America
+  { label: "Cali", country: "co", keyword: "cali", lang: "es" },
+  { label: "Montevideo", country: "uy", keyword: "montevideo", lang: "es" },
 ];
 
 const stripHTML = (html) => {
