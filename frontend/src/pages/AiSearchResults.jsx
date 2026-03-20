@@ -64,6 +64,9 @@ const destinationCards = [
   },
 ];
 
+const searchBarBadgeClassName =
+  "inline-flex min-h-[40px] min-w-[5rem] items-center rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85";
+
 const DropdownBadge = ({
   label,
   options,
@@ -76,11 +79,11 @@ const DropdownBadge = ({
   const menuAlignment = align === "right" ? "right-0" : "left-0";
 
   return (
-    <div className="relative">
+    <div className="relative min-w-[20rem]">
       <button
         type="button"
         onClick={onToggle}
-        className={`inline-flex min-h-[44px] items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${
+        className={`inline-flex min-h-[44px] min-w-[20rem] items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${
           isOpen
             ? "border-sky-500 bg-sky-500 text-white"
             : "border-black/20 bg-white text-black/85 hover:border-sky-500"
@@ -88,18 +91,16 @@ const DropdownBadge = ({
         aria-haspopup="listbox"
         aria-expanded={isOpen}
       >
-        <span className="max-w-[12rem] truncate sm:max-w-none">
-          {selectedValue}
-        </span>
+        <span className="truncate">{selectedValue}</span>
         <HiOutlineChevronDown
           size={18}
-          className={`transition-transform ${isOpen ? "rotate-180" : ""}`}
+          className={`shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`}
         />
       </button>
 
       {isOpen && (
         <div
-          className={`absolute top-full z-40 mt-3 w-[18rem] max-w-[calc(100vw-4rem)] rounded-2xl border border-sky-100 bg-white p-2 shadow-[0_12px_30px_rgba(15,23,42,0.12)] ${menuAlignment}`}
+          className={`absolute top-full z-40 mt-3 min-w-[11rem] w-full max-w-[calc(100vw-4rem)] rounded-2xl border border-sky-100 bg-white p-2 shadow-[0_12px_30px_rgba(15,23,42,0.12)] ${menuAlignment}`}
         >
           <ul
             className="max-h-72 overflow-y-auto"
@@ -163,6 +164,11 @@ const AiSearchResults = () => {
       (destination) => destination.continent === selectedContinent,
     );
   }, [selectedContinent]);
+
+  const searchBarBadges = useMemo(
+    () => [selectedGoal, selectedContinent, selectedGoalOption],
+    [selectedContinent, selectedGoal, selectedGoalOption],
+  );
 
   const handleDestinationClick = (destination) => {
     const country = destination.country.toLowerCase();
@@ -258,9 +264,14 @@ const AiSearchResults = () => {
 
               <div className="ml-20 mr-36 flex flex-1 items-center rounded-full border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)]">
                 <div className="flex flex-wrap items-center gap-2">
-                  <div className="rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85">
-                    {selectedGoal}
-                  </div>
+                  {searchBarBadges.map((badgeLabel, index) => (
+                    <div
+                      key={`${badgeLabel}-${index}`}
+                      className={searchBarBadgeClassName}
+                    >
+                      <span className="truncate">{badgeLabel}</span>
+                    </div>
+                  ))}
                 </div>
                 <div className="ml-auto flex items-center gap-2">
                   <button
