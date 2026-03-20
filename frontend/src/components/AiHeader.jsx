@@ -181,7 +181,7 @@ const AiHeader = () => {
                 </ul>
               )}
             </div>
-            {!isLoggedIn && (
+            {/* {!isLoggedIn && (
               <div className="flex items-center gap-3">
                 <button
                   type="button"
@@ -198,7 +198,7 @@ const AiHeader = () => {
                   Sign up for free
                 </button>
               </div>
-            )}
+            )} */}
 
             <li className="flex items-center">
               <div className="p-4 px-0 whitespace-nowrap">
