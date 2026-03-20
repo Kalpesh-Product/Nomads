@@ -7,6 +7,8 @@ import {
 } from "react-icons/hi";
 import { useLocation, useNavigate } from "react-router-dom";
 
+import { aiDestinationCards } from "../constants/aiDestinationCards";
+
 import { defaultGoal, goalFilterMap } from "../constants/aiGoalFilters";
 
 const continentOptions = [
@@ -19,50 +21,7 @@ const continentOptions = [
   "Oceania",
 ];
 
-const destinationCards = [
-  {
-    city: "Goa",
-    country: "India",
-    continent: "Asia",
-    suggestions: 102,
-    image: "/images/goa-image.jpg",
-  },
-  {
-    city: "Bali",
-    country: "Indonesia",
-    continent: "Asia",
-    suggestions: 89,
-    image: "/images/bali-image.jpg",
-  },
-  {
-    city: "Bangkok",
-    country: "Thailand",
-    continent: "Asia",
-    suggestions: 93,
-    image: "/images/bangkok-image.jpg",
-  },
-  {
-    city: "Dubai",
-    country: "United Arab Emirates",
-    continent: "Asia",
-    suggestions: 101,
-    image: "/images/dubai-image.webp",
-  },
-  {
-    city: "Budapest",
-    country: "Hungary",
-    continent: "Europe",
-    suggestions: 78,
-    image: "/images/budapest-image.jpg",
-  },
-  {
-    city: "Auckland",
-    country: "New Zealand",
-    continent: "Oceania",
-    suggestions: 83,
-    image: "/images/auckland-image.jpg",
-  },
-];
+const destinationCards = aiDestinationCards;
 
 const searchBarBadgeClassName =
   "inline-flex min-h-[40px] min-w-[5rem] items-center rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85";
