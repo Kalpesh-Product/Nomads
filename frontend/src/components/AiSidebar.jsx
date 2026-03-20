@@ -9,6 +9,7 @@ import {
   HiOutlineHeart,
   HiOutlineUserCircle,
   HiOutlineKey,
+  HiOutlineLogout,
 } from "react-icons/hi";
 import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
 
@@ -50,8 +51,9 @@ const profileItems = [
   { label: "Favorites", icon: HiOutlineHeart },
   { label: "Reviews", icon: LuCircleDollarSign },
   { label: "Change Password", icon: HiOutlineKey },
-  { label: "Sign Out", icon: HiOutlineKey },
 ];
+
+const signOutItem = [{ label: "Sign Out", icon: HiOutlineLogout }];
 
 const SidebarSection = ({
   title,
@@ -176,14 +178,17 @@ const AiSidebar = () => {
         onToggle={() => setIsValueAdditionsOpen((prev) => !prev)}
       />
       {isLoggedIn && (
-        <SidebarSection
-          title="Profile"
-          items={profileItems}
-          collapsed={collapsed}
-          isExpandable
-          isOpen={isProfileOpen}
-          onToggle={() => setIsProfileOpen((prev) => !prev)}
-        />
+        <>
+          <SidebarSection
+            title="Profile"
+            items={profileItems}
+            collapsed={collapsed}
+            isExpandable
+            isOpen={isProfileOpen}
+            onToggle={() => setIsProfileOpen((prev) => !prev)}
+          />
+          <SidebarSection items={signOutItem} collapsed={collapsed} />
+        </>
       )}
     </aside>
   );
