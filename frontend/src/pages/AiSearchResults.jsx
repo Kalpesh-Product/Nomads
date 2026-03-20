@@ -23,6 +23,8 @@ const continentOptions = [
 
 const destinationCards = aiDestinationCards;
 
+const INITIAL_VISIBLE_DESTINATIONS = 18;
+
 const searchBarBadgeClassName =
   "inline-flex min-h-[40px] min-w-[5rem] items-center rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85";
 
@@ -112,6 +114,7 @@ const AiSearchResults = () => {
   const [selectedGoalOption, setSelectedGoalOption] = useState(selectedFilter);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [headingAnimationKey, setHeadingAnimationKey] = useState(0);
+  const [showAllDestinations, setShowAllDestinations] = useState(false);
   const dropdownContainerRef = useRef(null);
 
   const filteredDestinations = useMemo(() => {
@@ -140,6 +143,18 @@ const AiSearchResults = () => {
     () => [selectedGoal, selectedContinent, selectedGoalOption],
     [selectedContinent, selectedGoal, selectedGoalOption],
   );
+
+  const visibleDestinations = useMemo(() => {
+    if (showAllDestinations) {
+      return rankedDestinations;
+    }
+
+    return rankedDestinations.slice(0, INITIAL_VISIBLE_DESTINATIONS);
+  }, [rankedDestinations, showAllDestinations]);
+
+  const shouldShowViewMore =
+    rankedDestinations.length > INITIAL_VISIBLE_DESTINATIONS &&
+    !showAllDestinations;
 
   const handleDestinationClick = (destination) => {
     const country = destination.country.toLowerCase();
@@ -218,6 +233,10 @@ const AiSearchResults = () => {
     setSelectedGoalOption(selectedFilter);
   }, [selectedFilter]);
 
+  useEffect(() => {
+    setShowAllDestinations(false);
+  }, [selectedContinent, selectedGoalOption]);
+
   return (
     <div className="min-h-full bg-white">
       <main className="py-8">
@@ -289,7 +308,7 @@ const AiSearchResults = () => {
                   </p>
 
                   <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
-                    {rankedDestinations.map((destination) => (
+                    {visibleDestinations.map((destination) => (
                       <article
                         key={`${destination.city}-${destination.country}`}
                         className="cursor-pointer"
@@ -336,6 +355,16 @@ const AiSearchResults = () => {
                       </article>
                     ))}
                   </div>
+
+                  {shouldShowViewMore && (
+                    <button
+                      type="button"
+                      onClick={() => setShowAllDestinations(true)}
+                      className="mx-auto mt-8 block text-center text-base font-semibold text-sky-600 transition-colors hover:text-sky-700"
+                    >
+                      View More
+                    </button>
+                  )}
 
                   {!rankedDestinations.length && (
                     <div className="mt-10 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-500">
