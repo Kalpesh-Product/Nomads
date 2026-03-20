@@ -1,12 +1,18 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   HiOutlineViewGrid,
   HiOutlineHeart,
   HiOutlineUserCircle,
 } from "react-icons/hi";
 import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
-// import AiSidebar from "../components/AiSidebar";
+
+const gatedRecommendationTitles = new Set([
+  "Work From Anywhere",
+  "Increase Your Savings",
+  "Advance Your Career",
+  "Find Your Community",
+]);
 
 const recommendationCards = [
   {
@@ -55,10 +61,16 @@ const recommendationCards = [
 
 const AiHome = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [typedGreeting, setTypedGreeting] = useState("");
   const [typedSubheading, setTypedSubheading] = useState("");
 
-  const greetingText = "hi Abrar";
+  const isLoggedIn = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get("login") === "true";
+  }, [location.search]);
+
+  const greetingText = isLoggedIn ? "hi Abrar" : "Meet Wono";
   const subheadingText =
     "Please choose your goals from below so that we can help you design your accurate nomad lifestyle.";
 
@@ -96,6 +108,28 @@ const AiHome = () => {
     };
   }, [greetingText, subheadingText]);
 
+  const handleCardClick = (card) => {
+    const params = new URLSearchParams(location.search);
+
+    if (!isLoggedIn && gatedRecommendationTitles.has(card.title)) {
+      navigate(`/ai-login${location.search}`);
+      return;
+    }
+
+    navigate(
+      {
+        pathname: card.path,
+        search: params.toString() ? `?${params.toString()}` : "",
+      },
+      {
+        state:
+          card.path === "/search/results"
+            ? { selectedGoal: card.title }
+            : undefined,
+      },
+    );
+  };
+
   return (
     <div className="min-h-full bg-white">
       <main className="px-6 py-10 lg:px-14">
@@ -115,14 +149,7 @@ const AiHome = () => {
                 return (
                   <article
                     key={card.title}
-                    onClick={() =>
-                      navigate(card.path, {
-                        state:
-                          card.path === "/search/results"
-                            ? { selectedGoal: card.title }
-                            : undefined,
-                      })
-                    }
+                    onClick={() => handleCardClick(card)}
                     className="group cursor-pointer text-center"
                   >
                     <Icon

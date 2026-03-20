@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   HiOutlineMenu,
   HiOutlineViewGrid,
@@ -8,6 +9,13 @@ import {
   HiOutlineKey,
 } from "react-icons/hi";
 import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
+
+const gatedRecommendationLabels = new Set([
+  "Work From Anywhere",
+  "Increase Your Savings",
+  "Advance Your Career",
+  "Find Your Community",
+]);
 
 const recommendationItems = [
   { label: "World Ranking", icon: HiOutlineViewGrid, path: "/world-rankings" },
@@ -80,9 +88,26 @@ const SidebarSection = ({ title, items, collapsed, onItemClick }) => (
 const AiSidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
 
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const isLoggedIn = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get("login") === "true";
+  }, [location.search]);
+
   const handleRecommendationClick = (item) => {
-    const targetPath = item.path || "/home";
-    window.location.assign(`${window.location.origin}${targetPath}`);
+    const params = new URLSearchParams(location.search);
+
+    if (!isLoggedIn && gatedRecommendationLabels.has(item.label)) {
+      navigate(`/ai-login${location.search}`);
+      return;
+    }
+
+    navigate({
+      pathname: item.path || "/home",
+      search: params.toString() ? `?${params.toString()}` : "",
+    });
   };
 
   return (
@@ -113,11 +138,13 @@ const AiSidebar = () => {
         items={valueAdditionItems}
         collapsed={collapsed}
       />
-      <SidebarSection
-        title="Profile"
-        items={profileItems}
-        collapsed={collapsed}
-      />
+      {isLoggedIn && (
+        <SidebarSection
+          title="Profile"
+          items={profileItems}
+          collapsed={collapsed}
+        />
+      )}
     </aside>
   );
 };
