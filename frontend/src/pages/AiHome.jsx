@@ -71,8 +71,9 @@ const AiHome = () => {
   }, [location.search]);
 
   const greetingText = isLoggedIn ? "hi Abrar" : "Meet Wono";
-  const subheadingText =
-    "Please choose your goals from below so that we can help you design your accurate nomad lifestyle.";
+  const subheadingText = isLoggedIn
+    ? "Please choose your goals from below so that we can help you design your accurate nomad lifestyle."
+    : "AI-Powered Living For The Modern Nomad";
 
   useEffect(() => {
     setTypedGreeting("");
