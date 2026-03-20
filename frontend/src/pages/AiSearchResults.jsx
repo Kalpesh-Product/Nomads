@@ -165,6 +165,18 @@ const AiSearchResults = () => {
     );
   }, [selectedContinent]);
 
+  const rankedDestinations = useMemo(() => {
+    const sortedSpeeds = filteredDestinations
+      .map((destination) => destination.suggestions)
+      .sort((left, right) => right - left);
+
+    return filteredDestinations.map((destination, index) => ({
+      ...destination,
+      rankLabel: `Rank ${index + 1}`,
+      speedLabel: `${sortedSpeeds[index]} Mbps`,
+    }));
+  }, [filteredDestinations]);
+
   const searchBarBadges = useMemo(
     () => [selectedGoal, selectedContinent, selectedGoalOption],
     [selectedContinent, selectedGoal, selectedGoalOption],
@@ -318,7 +330,7 @@ const AiSearchResults = () => {
                   </p>
 
                   <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
-                    {filteredDestinations.map((destination) => (
+                    {rankedDestinations.map((destination) => (
                       <article
                         key={`${destination.city}-${destination.country}`}
                         className="cursor-pointer"
@@ -332,11 +344,21 @@ const AiSearchResults = () => {
                           }
                         }}
                       >
-                        <img
-                          src={destination.image}
-                          alt={`${destination.city}, ${destination.country}`}
-                          className="h-56 w-full rounded-2xl object-cover"
-                        />
+                        <div className="relative overflow-hidden rounded-2xl">
+                          <img
+                            src={destination.image}
+                            alt={`${destination.city}, ${destination.country}`}
+                            className="h-56 w-full rounded-2xl object-cover"
+                          />
+                          <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-black/75 via-black/25 to-transparent px-4 py-3 text-white">
+                            <span className="rounded-full bg-black/45 px-3 py-1 text-xs font-semibold tracking-wide backdrop-blur-sm">
+                              {destination.speedLabel}
+                            </span>
+                            <span className="rounded-full bg-black/45 px-3 py-1 text-xs font-semibold tracking-wide backdrop-blur-sm">
+                              {destination.rankLabel}
+                            </span>
+                          </div>
+                        </div>
                         <div className="mt-2 flex items-start justify-between gap-3">
                           <div>
                             <h3 className="text-[1.2rem] font-semibold text-black/90">
@@ -356,7 +378,7 @@ const AiSearchResults = () => {
                     ))}
                   </div>
 
-                  {!filteredDestinations.length && (
+                  {!rankedDestinations.length && (
                     <div className="mt-10 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-500">
                       No destinations are available for {selectedContinent}{" "}
                       right now.
