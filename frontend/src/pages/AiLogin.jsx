@@ -45,7 +45,7 @@ export default function AiLogin() {
   return (
     <>
       <div className="flex items-center justify-center flex-col gap-14 h-[55vh] md:h-[60vh] lg:h-[75vh] border-gray-300 rounded-lg p-8">
-        <p className="min-h-[3rem] max-w-4xl text-left text-xl font-medium leading-relaxed text-black sm:min-h-[3.5rem]">
+        <p className="min-h-[3rem] max-w-4xl text-left text-[1.4rem] font-medium leading-relaxed text-gray-900 sm:min-h-[3.5rem]">
           {typedMessage}
         </p>
         <div className="flex flex-col items-center gap-6 w-full max-w-4xl">

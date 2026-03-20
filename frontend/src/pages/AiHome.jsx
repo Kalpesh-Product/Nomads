@@ -175,7 +175,7 @@ const AiHome = () => {
         </main>
       </div>
       <div className="bg-gray-100 py-6 text-center text-sm text-gray-600">
-        WoNo AI can make mistakes. Crosscheck your response.
+        WoNo AI can make mistakes. Check important info. See Cookie Preferences.
       </div>
     </>
   );
