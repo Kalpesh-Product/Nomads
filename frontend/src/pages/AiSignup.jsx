@@ -44,12 +44,7 @@ export default function AiSignup() {
             name="firstName"
             control={control}
             render={({ field }) => (
-              <TextField
-                {...field}
-                label="First Name"
-                fullWidth
-                variant="standard"
-              />
+              <TextField {...field} label="Name" fullWidth variant="standard" />
             )}
           />
 
@@ -59,7 +54,7 @@ export default function AiSignup() {
             render={({ field }) => (
               <TextField
                 {...field}
-                label="Last Name"
+                label="Email"
                 fullWidth
                 variant="standard"
               />
@@ -72,7 +67,7 @@ export default function AiSignup() {
             render={({ field }) => (
               <TextField
                 {...field}
-                label="Email"
+                label="Country"
                 type="email"
                 fullWidth
                 variant="standard"
