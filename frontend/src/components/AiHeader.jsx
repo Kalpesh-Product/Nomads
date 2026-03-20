@@ -1,73 +1,24 @@
 import React, { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
-import PrimaryButton from "./PrimaryButton";
 import logo from "../assets/WONO_LOGO_Black_TP.png";
 import { useSelector } from "react-redux";
-import {
-  Drawer,
-  Avatar,
-  Popover,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Divider,
-} from "@mui/material";
+import { Drawer } from "@mui/material";
 import { IoCloseSharp } from "react-icons/io5";
 import Container from "./Container";
-import { FaUserTie } from "react-icons/fa6";
-import { FiLogOut } from "react-icons/fi";
-import { AiFillHeart } from "react-icons/ai";
 import useAuth from "../hooks/useAuth";
-import useLogout from "../hooks/useLogout";
-import { CircularProgress } from "@mui/material";
 
 const AiHeader = () => {
   const [open, setOpen] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null); // 🔹 for avatar dropdown
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const view = searchParams.get("view");
   const showToggle = location.pathname.includes("verticals");
   const { auth } = useAuth();
-  const logout = useLogout();
-
-  const [isLogoutLoading, setIsLogoutLoading] = useState(false);
+  const isLoggedIn =
+    Boolean(auth?.user) || searchParams.get("login") === "true";
 
   const formData = useSelector((state) => state.location.formValues);
-
-  // 🔹 Avatar dropdown handlers
-  const handleAvatarClick = (event) => setAnchorEl(event.currentTarget);
-  const handlePopoverClose = () => setAnchorEl(null);
-  const openPopover = Boolean(anchorEl);
-
-  const handleProfileClick = () => {
-    navigate("/profile?tab=profile");
-    handlePopoverClose();
-  };
-  const handleFavoriteClick = () => {
-    // navigate("/favorites");
-    navigate("/profile?tab=favorites");
-    handlePopoverClose();
-  };
-
-  const handleSignOut = async () => {
-    if (isLogoutLoading) return;
-
-    setIsLogoutLoading(true);
-
-    try {
-      await logout();
-      navigate("/login");
-    } catch (error) {
-      console.error("Logout failed:", error);
-    } finally {
-      setIsLogoutLoading(false);
-      handlePopoverClose();
-    }
-  };
-
   const handleNavigation = (path) => {
     navigate(path);
     setOpen(false);
@@ -192,7 +143,7 @@ const AiHeader = () => {
           </div>
 
           {/* Right Section */}
-          <div className="hidden lg:flex pl-10 gap-10">
+          <div className="hidden lg:flex items-center pl-10 gap-6">
             <div className="min-w-[80px] hidden lg:block">
               {showToggle && (
                 <ul>
@@ -230,6 +181,25 @@ const AiHeader = () => {
                 </ul>
               )}
             </div>
+            {!isLoggedIn && (
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => navigate(`/ai-login${location.search}`)}
+                  className="rounded-full bg-black px-4 py-2 text-base font-semibold text-white transition hover:bg-black/80 min-w-32"
+                >
+                  Log in
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate(`/ai-signup${location.search}`)}
+                  className="rounded-full border border-black/10 bg-white px-4 py-2 text-base font-semibold text-black transition hover:border-black/20 hover:bg-black/5 min-w-52"
+                >
+                  Sign up for free
+                </button>
+              </div>
+            )}
+
             <li className="flex items-center">
               <div className="p-4 px-0 whitespace-nowrap">
                 <button
@@ -241,105 +211,6 @@ const AiHeader = () => {
                 </button>
               </div>
             </li>
-
-            {/* <div className="px-1 hidden xl:flex xl:gap-4 py-2">
-              {auth?.user ? (
-                <>
-                  <div className="flex justify-center items-center">
-                    <AiFillHeart
-                      className="text-[#ff5757] cursor-pointer"
-                      size={28}
-                      onClick={handleFavoriteClick}
-                    />
-                  </div>
-                  <Avatar
-                    onClick={handleAvatarClick} 
-                    sx={{
-                      bgcolor: "#ff5757",
-                      cursor: "pointer",
-                      width: 40,
-                      height: 40,
-                      fontSize: "1rem",
-                    }}
-                  >
-                    {auth.user.firstName
-                      ? auth.user.firstName.charAt(0).toUpperCase()
-                      : "U"}
-                  </Avatar>
-
-               
-                  <Popover
-                    open={openPopover}
-                    anchorEl={anchorEl}
-                    onClose={handlePopoverClose}
-                    anchorOrigin={{
-                      vertical: "bottom",
-                      horizontal: "center",
-                    }}
-                    transformOrigin={{
-                      vertical: "top",
-                      horizontal: "center",
-                    }}
-                  >
-                    <div className="p-4 w-48">
-                      <List>
-                        <ListItem
-                          button
-                          onClick={handleProfileClick}
-                          className="hover:text-red-600 transition-all duration-100 text-gray-500 cursor-pointer"
-                        >
-                          <ListItemIcon>
-                            <FaUserTie className="text-gray-500" />
-                          </ListItemIcon>
-                          <ListItemText primary="Profile" />
-                        </ListItem>
-
-                        <Divider />
-
-                        <ListItem
-                          button
-                          onClick={handleFavoriteClick}
-                          className="hover:text-red-600 transition-all duration-100 text-gray-500 cursor-pointer"
-                        >
-                          <ListItemIcon>
-                            <AiFillHeart className="text-gray-500" />
-                          </ListItemIcon>
-                          <ListItemText primary="Favorites" />
-                        </ListItem>
-                        <Divider />
-
-                        <ListItem
-                          button
-                          onClick={handleSignOut}
-                          disabled={isLogoutLoading}
-                          className="hover:text-red-600 transition-all duration-100 text-gray-500 cursor-pointer"
-                        >
-                          <ListItemIcon>
-                            {isLogoutLoading ? (
-                              <CircularProgress
-                                size={20}
-                                sx={{ color: "gray" }}
-                              />
-                            ) : (
-                              <FiLogOut className="text-gray-500" />
-                            )}
-                          </ListItemIcon>
-                          <ListItemText primary="Log Out" />
-                        </ListItem>
-                      </List>
-                    </div>
-                  </Popover>
-                </>
-              ) : (
-                <PrimaryButton
-                  title="Login"
-                  padding="py-1"
-                  uppercase
-                  handleSubmit={() => navigate("/login")}
-                  className="bg-[#FF5757] flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[7rem] px-4"
-                />
-              )}
-            </div> */}
           </div>
 
           {/* Mobile Menu Button */}

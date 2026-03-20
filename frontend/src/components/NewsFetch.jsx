@@ -123,6 +123,28 @@ const DESTS = [
   { label: "Bogota D.C.", country: "co", keyword: "bogota d.c.", lang: "es" },
   { label: "Medellin", country: "co", keyword: "medellin", lang: "es" },
   { label: "Quito", country: "ec", keyword: "quito", lang: "es" },
+
+  // ----------- NEW DESTINATIONS -----------
+
+  // Asia
+  { label: "Colombo", country: "lk", keyword: "colombo", lang: "en" },
+
+  // Europe
+  { label: "Krakow", country: "pl", keyword: "krakow", lang: "pl" },
+  { label: "Sofia", country: "bg", keyword: "sofia", lang: "bg" },
+  { label: "Bucharest", country: "ro", keyword: "bucharest", lang: "ro" },
+  { label: "Bologna", country: "it", keyword: "bologna", lang: "it" },
+  { label: "Porto", country: "pt", keyword: "porto", lang: "pt" },
+  { label: "Belgrade", country: "rs", keyword: "belgrade", lang: "sr" },
+
+  // North America
+  { label: "Pittsburgh", country: "us", keyword: "pittsburgh", lang: "en" },
+  { label: "Austin", country: "us", keyword: "austin", lang: "en" },
+  { label: "Oaxaca", country: "mx", keyword: "oaxaca", lang: "es" },
+
+  // South America
+  { label: "Cali", country: "co", keyword: "cali", lang: "es" },
+  { label: "Montevideo", country: "uy", keyword: "montevideo", lang: "es" },
   { label: "Yogyakarta", country: "id", keyword: "yogyakarta", lang: "id" },
   { label: "Manila", country: "ph", keyword: "manila", lang: "en" },
   {
@@ -142,6 +164,13 @@ const DESTS = [
     label: "Miami, Florida",
     country: "us",
     keyword: "miami, florida",
+    lang: "en",
+  },
+  { label: "Kraków", country: "pl", keyword: "kraków", lang: "pl" },
+  {
+    label: "Austin, Texas",
+    country: "us",
+    keyword: "austin, texas",
     lang: "en",
   },
 ];
@@ -207,9 +236,9 @@ const NewsCard = ({ a }) => {
 const normalizeLabel = (label) =>
   label
     ? label
-        .replace(/\+/g, " ")
-        .replace(/[\u2010-\u2015\u2212\u{FE63}\u{FF0D}]/gu, "-")
-        .trim()
+      .replace(/\+/g, " ")
+      .replace(/[\u2010-\u2015\u2212\u{FE63}\u{FF0D}]/gu, "-")
+      .trim()
     : label;
 
 const buildExactKeyword = (label) => {

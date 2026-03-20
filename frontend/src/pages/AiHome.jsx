@@ -1,12 +1,18 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   HiOutlineViewGrid,
   HiOutlineHeart,
   HiOutlineUserCircle,
 } from "react-icons/hi";
 import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
-// import AiSidebar from "../components/AiSidebar";
+
+const gatedRecommendationTitles = new Set([
+  "Work From Anywhere",
+  "Increase Your Savings",
+  "Advance Your Career",
+  "Find Your Community",
+]);
 
 const recommendationCards = [
   {
@@ -55,12 +61,19 @@ const recommendationCards = [
 
 const AiHome = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [typedGreeting, setTypedGreeting] = useState("");
   const [typedSubheading, setTypedSubheading] = useState("");
 
-  const greetingText = "hi Abrar";
-  const subheadingText =
-    "Please choose your goals from below so that we can help you design your accurate nomad lifestyle.";
+  const isLoggedIn = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get("login") === "true";
+  }, [location.search]);
+
+  const greetingText = isLoggedIn ? "hi Abrar" : "Meet Wono";
+  const subheadingText = isLoggedIn
+    ? "Please choose your goals from below so that we can help you design your accurate nomad lifestyle."
+    : "AI-Powered Living For The Modern Nomad";
 
   useEffect(() => {
     setTypedGreeting("");
@@ -96,9 +109,31 @@ const AiHome = () => {
     };
   }, [greetingText, subheadingText]);
 
+  const handleCardClick = (card) => {
+    const params = new URLSearchParams(location.search);
+
+    if (!isLoggedIn && gatedRecommendationTitles.has(card.title)) {
+      navigate(`/ai-login${location.search}`);
+      return;
+    }
+
+    navigate(
+      {
+        pathname: card.path,
+        search: params.toString() ? `?${params.toString()}` : "",
+      },
+      {
+        state:
+          card.path === "/search/results"
+            ? { selectedGoal: card.title }
+            : undefined,
+      },
+    );
+  };
+
   return (
-    <div className="min-h-full bg-white">
-      <main className="px-6 py-10 lg:px-14">
+    <div className="flex min-h-[calc(100vh-100px)] flex-col bg-white">
+      <main className="flex-1 px-6 py-10 lg:px-14">
         <div className="mx-auto max-w-5xl text-center">
           <h1 className="text-3xl font-medium text-black/90 font-play">
             {typedGreeting}
@@ -107,7 +142,7 @@ const AiHome = () => {
             {typedSubheading}
           </h2>
 
-          <div className="mt-16 rounded-[40px] bg-white/60 px-6 py-8 ">
+          <div className="mt-16 rounded-[40px] px-6 py-8">
             <div className="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-3">
               {recommendationCards.map((card) => {
                 const Icon = card.icon;
@@ -115,14 +150,7 @@ const AiHome = () => {
                 return (
                   <article
                     key={card.title}
-                    onClick={() =>
-                      navigate(card.path, {
-                        state:
-                          card.path === "/search/results"
-                            ? { selectedGoal: card.title }
-                            : undefined,
-                      })
-                    }
+                    onClick={() => handleCardClick(card)}
                     className="group cursor-pointer text-center"
                   >
                     <Icon
@@ -144,6 +172,10 @@ const AiHome = () => {
           </div>
         </div>
       </main>
+
+      <div className="sticky bottom-0 z-10  bg-white/95 py-6 text-center text-sm text-gray-600 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+        WoNo AI can make mistakes. Check important info. See Cookie Preferences.
+      </div>
     </div>
   );
 };
