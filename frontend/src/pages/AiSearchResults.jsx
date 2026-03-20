@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   HiOutlineArrowLeft,
+  HiOutlineChevronDown,
   HiOutlineSearch,
   HiOutlineX,
 } from "react-icons/hi";
@@ -8,64 +9,15 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import { defaultGoal, goalFilterMap } from "../constants/aiGoalFilters";
 
-const filterOptions = {
-  "Overall Work from anywhere Index": [
-    "Very Low",
-    "Low",
-    "Moderate",
-    "High",
-    "Very High",
-  ],
-
-  "Digital nomad visas": [
-    "No visa available",
-    "Visa available",
-    "Multiple visa options",
-  ],
-
-  "Visa-free entry length": [
-    "Up to 30 days",
-    "31 - 90 days",
-    "91 - 180 days",
-    "180+ days",
-  ],
-
-  "Airport connectivity": ["Limited", "Moderate", "Good", "Excellent"],
-
-  "Direct international flights": ["Very Few", "Few", "Moderate", "Many"],
-
-  "Internet speed": [
-    "Under 25 Mbps",
-    "25 - 50 Mbps",
-    "50 - 100 Mbps",
-    "100+ Mbps",
-  ],
-
-  "Global accessibility": ["Low", "Moderate", "High"],
-
-  "Cost of living (live, work, eat, travel etc)": [
-    "Very Affordable",
-    "Affordable",
-    "Moderate",
-    "Expensive",
-    "Very Expensive",
-  ],
-
-  "Nomad Population Index": [
-    "Very Low",
-    "Low",
-    "Moderate",
-    "High",
-    "Very High",
-  ],
-
-  "Remote working infrastructure": [
-    "Basic",
-    "Developing",
-    "Well Developed",
-    "Highly Advanced",
-  ],
-};
+const continentOptions = [
+  "World",
+  "Africa",
+  "Asia",
+  "Europe",
+  "North America",
+  "South America",
+  "Oceania",
+];
 
 const destinationCards = [
   {
@@ -112,6 +64,76 @@ const destinationCards = [
   },
 ];
 
+const DropdownBadge = ({
+  label,
+  options,
+  selectedValue,
+  isOpen,
+  onToggle,
+  onSelect,
+  align = "left",
+}) => {
+  const menuAlignment = align === "right" ? "right-0" : "left-0";
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={onToggle}
+        className={`inline-flex min-h-[44px] items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${
+          isOpen
+            ? "border-sky-500 bg-sky-500 text-white"
+            : "border-black/20 bg-white text-black/85 hover:border-sky-500"
+        }`}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+      >
+        <span className="max-w-[12rem] truncate sm:max-w-none">
+          {selectedValue}
+        </span>
+        <HiOutlineChevronDown
+          size={18}
+          className={`transition-transform ${isOpen ? "rotate-180" : ""}`}
+        />
+      </button>
+
+      {isOpen && (
+        <div
+          className={`absolute top-full z-40 mt-3 w-[18rem] max-w-[calc(100vw-4rem)] rounded-2xl border border-sky-100 bg-white p-2 shadow-[0_12px_30px_rgba(15,23,42,0.12)] ${menuAlignment}`}
+        >
+          <ul
+            className="max-h-72 overflow-y-auto"
+            role="listbox"
+            aria-label={label}
+          >
+            {options.map((option) => {
+              const isSelected = option === selectedValue;
+
+              return (
+                <li key={option}>
+                  <button
+                    type="button"
+                    onClick={() => onSelect(option)}
+                    className={`flex w-full items-center rounded-xl px-3 py-2 text-left text-sm transition-colors ${
+                      isSelected
+                        ? "bg-sky-50 font-medium text-sky-600"
+                        : "text-black/80 hover:bg-slate-50"
+                    }`}
+                    role="option"
+                    aria-selected={isSelected}
+                  >
+                    {option}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const AiSearchResults = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
@@ -119,41 +141,28 @@ const AiSearchResults = () => {
     state?.selectedGoal && goalFilterMap[state.selectedGoal]
       ? state.selectedGoal
       : defaultGoal;
-  const filters = goalFilterMap[selectedGoal];
-  const defaultFilter = filters[0];
-  const isDefaultFilter = (filter) => filter === defaultFilter;
+  const goalOptions = goalFilterMap[selectedGoal] || goalFilterMap[defaultGoal];
   const selectedFilter =
-    state?.selectedFilter && filters.includes(state.selectedFilter)
+    state?.selectedFilter && goalOptions.includes(state.selectedFilter)
       ? state.selectedFilter
-      : defaultFilter;
-  const selectedOption =
-    state?.selectedOption || filterOptions[selectedFilter]?.[0] || "";
+      : goalOptions[0];
 
   const [typedHeading, setTypedHeading] = useState("");
-  const [activeFilter, setActiveFilter] = useState(selectedFilter);
-  // const [orderedFilters, setOrderedFilters] = useState(
-  //   state?.orderedFilters && state.orderedFilters.length
-  //     ? state.orderedFilters
-  //     : (() => {
-  //         const selectedIndex = filters.indexOf(selectedFilter);
-
-  //         if (selectedIndex <= 0) {
-  //           return filters;
-  //         }
-
-  //         return [
-  //           ...filters.slice(selectedIndex),
-  //           ...filters.slice(0, selectedIndex),
-  //         ];
-  //       })(),
-  // );
-  const [currentSelectedOption, setCurrentSelectedOption] =
-    useState(selectedOption);
-
-  const [selectedHeadingFilter, setSelectedHeadingFilter] =
-    useState(selectedFilter);
+  const [selectedContinent, setSelectedContinent] = useState("World");
+  const [selectedGoalOption, setSelectedGoalOption] = useState(selectedFilter);
+  const [openDropdown, setOpenDropdown] = useState(null);
   const [headingAnimationKey, setHeadingAnimationKey] = useState(0);
-  const [isFilterOptionsOpen, setIsFilterOptionsOpen] = useState(false);
+  const dropdownContainerRef = useRef(null);
+
+  const filteredDestinations = useMemo(() => {
+    if (selectedContinent === "World") {
+      return destinationCards;
+    }
+
+    return destinationCards.filter(
+      (destination) => destination.continent === selectedContinent,
+    );
+  }, [selectedContinent]);
 
   const handleDestinationClick = (destination) => {
     const country = destination.country.toLowerCase();
@@ -174,50 +183,25 @@ const AiSearchResults = () => {
     );
   };
 
-  const handleFilterClick = (selectedBadge) => {
-    setActiveFilter(selectedBadge);
-    if (isDefaultFilter(selectedBadge)) {
-      setCurrentSelectedOption(filterOptions[defaultFilter]?.[0] || "");
-      setSelectedHeadingFilter(selectedBadge);
-      setHeadingAnimationKey((currentKey) => currentKey + 1);
-      setIsFilterOptionsOpen(false);
-      return;
-    }
-    if (!filterOptions[selectedBadge]?.length) {
-      setCurrentSelectedOption("");
-      setSelectedHeadingFilter(selectedBadge);
-      setHeadingAnimationKey((currentKey) => currentKey + 1);
-      setIsFilterOptionsOpen(false);
-      return;
-    }
-    setIsFilterOptionsOpen((isOpen) =>
-      selectedBadge === activeFilter ? !isOpen : true,
+  const handleDropdownToggle = (dropdownKey) => {
+    setOpenDropdown((currentDropdown) =>
+      currentDropdown === dropdownKey ? null : dropdownKey,
     );
-
-    // setOrderedFilters((currentFilters) => {
-    //   const selectedIndex = currentFilters.indexOf(selectedBadge);
-
-    //   if (selectedIndex <= 0) {
-    //     return currentFilters;
-    //   }
-
-    //   return [
-    //     ...currentFilters.slice(selectedIndex),
-    //     ...currentFilters.slice(0, selectedIndex),
-    //   ];
-    // });
   };
 
-  const handleOptionClick = (option) => {
-    setCurrentSelectedOption(option);
-    setSelectedHeadingFilter(activeFilter);
+  const handleContinentSelect = (continent) => {
+    setSelectedContinent(continent);
+    setOpenDropdown(null);
     setHeadingAnimationKey((currentKey) => currentKey + 1);
-    setIsFilterOptionsOpen(false);
+  };
+
+  const handleGoalOptionSelect = (option) => {
+    setSelectedGoalOption(option);
+    setOpenDropdown(null);
+    setHeadingAnimationKey((currentKey) => currentKey + 1);
   };
 
   const headingText =
-    // "As per your inputs, please find below the best destinations curated for you based on " +
-    // `${selectedHeadingFilter.toLowerCase()} preference`;
     "Showing results for the selected option. Select any option to view your preferred results.";
 
   useEffect(() => {
@@ -236,11 +220,32 @@ const AiSearchResults = () => {
     return () => clearInterval(typingInterval);
   }, [headingText, headingAnimationKey]);
 
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (
+        dropdownContainerRef.current &&
+        !dropdownContainerRef.current.contains(event.target)
+      ) {
+        setOpenDropdown(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, []);
+
+  useEffect(() => {
+    setSelectedGoalOption(selectedFilter);
+  }, [selectedFilter]);
+
   return (
     <div className="min-h-full bg-white">
       <main className="py-8">
-        <div className="min-w-[75%] max-w-[80rem] lg:max-w-[80rem] mx-0 px-6 sm:px-6 lg:mx-auto lg:px-0">
-          <div className=" rounded-[10px] bg-white py-6 px-4">
+        <div className="mx-0 min-w-[75%] max-w-[80rem] px-6 sm:px-6 lg:mx-auto lg:max-w-[80rem] lg:px-0">
+          <div className="rounded-[10px] bg-white px-4 py-6">
             <div className="flex items-center gap-5">
               <button
                 type="button"
@@ -251,20 +256,11 @@ const AiSearchResults = () => {
                 <HiOutlineArrowLeft size={18} />
               </button>
 
-              <div className="flex flex-1 items-center rounded-full border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] ml-20 mr-36 ">
+              <div className="ml-20 mr-36 flex flex-1 items-center rounded-full border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)]">
                 <div className="flex flex-wrap items-center gap-2">
                   <div className="rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85">
                     {selectedGoal}
                   </div>
-                  <div className="rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85">
-                    {selectedHeadingFilter}
-                  </div>
-                  {!!currentSelectedOption &&
-                    !isDefaultFilter(selectedHeadingFilter) && (
-                      <div className="rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85">
-                        {currentSelectedOption}
-                      </div>
-                    )}
                 </div>
                 <div className="ml-auto flex items-center gap-2">
                   <button
@@ -281,68 +277,37 @@ const AiSearchResults = () => {
             </div>
 
             <div className="relative px-28">
-              <div className="relative z-30 mt-6 mx-4">
-                <div className="flex flex-wrap gap-4">
-                  {/* {orderedFilters.map((filter) => { */}
-                  {filters.map((filter) => {
-                    const isActive = filter === activeFilter;
+              <div
+                ref={dropdownContainerRef}
+                className="relative z-30 mx-4 mt-6 flex flex-wrap gap-4"
+              >
+                <DropdownBadge
+                  label="Continent"
+                  options={continentOptions}
+                  selectedValue={selectedContinent}
+                  isOpen={openDropdown === "continent"}
+                  onToggle={() => handleDropdownToggle("continent")}
+                  onSelect={handleContinentSelect}
+                />
 
-                    return (
-                      <button
-                        key={filter}
-                        type="button"
-                        onClick={() => handleFilterClick(filter)}
-                        className={`rounded-full border px-6 py-2 text-xs font-medium transition-colors lg:text-md ${
-                          isActive
-                            ? "border-sky-500 bg-sky-500 text-white"
-                            : "border-black/80 bg-white text-black/90 hover:border-sky-500"
-                        }`}
-                      >
-                        {filter}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {activeFilter &&
-                  !isDefaultFilter(activeFilter) &&
-                  filterOptions[activeFilter]?.length &&
-                  isFilterOptionsOpen && (
-                    <div className="absolute left-0 top-full z-40 mt-4 w-full max-w-[220px]">
-                      <ul className="space-y-2 rounded-lg border border-sky-400 bg-white px-2 py-2 shadow-sm">
-                        {(filterOptions[activeFilter] || []).map((option) => (
-                          <li key={option}>
-                            <button
-                              type="button"
-                              onClick={() => handleOptionClick(option)}
-                              className="w-full rounded-md px-2 py-2 text-left text-sm text-black/90 hover:bg-sky-50"
-                            >
-                              {option}
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+                <DropdownBadge
+                  label={selectedGoal}
+                  options={goalOptions}
+                  selectedValue={selectedGoalOption}
+                  isOpen={openDropdown === "goalOption"}
+                  onToggle={() => handleDropdownToggle("goalOption")}
+                  onSelect={handleGoalOptionSelect}
+                />
               </div>
 
               <div className="relative mt-8">
-                {activeFilter && isFilterOptionsOpen && (
-                  <button
-                    type="button"
-                    aria-label="Close filter options"
-                    onClick={() => setIsFilterOptionsOpen(false)}
-                    className="absolute inset-0 z-20 rounded-2xl bg-white/55 backdrop-blur-[1px]"
-                  />
-                )}
-
                 <div className="relative z-10">
                   <p className="text-3xl font-medium leading-snug text-black/85 lg:text-lg">
                     {typedHeading}
                   </p>
 
-                  <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3 ">
-                    {destinationCards.map((destination) => (
+                  <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
+                    {filteredDestinations.map((destination) => (
                       <article
                         key={`${destination.city}-${destination.country}`}
                         className="cursor-pointer"
@@ -373,13 +338,19 @@ const AiSearchResults = () => {
                         </div>
                         <div>
                           <p className="text-[0.9rem] text-black/60">
-                            {/* {destination.suggestions} Suggestions */}
                             Find activation options
                           </p>
                         </div>
                       </article>
                     ))}
                   </div>
+
+                  {!filteredDestinations.length && (
+                    <div className="mt-10 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-500">
+                      No destinations are available for {selectedContinent}{" "}
+                      right now.
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
