@@ -50,6 +50,7 @@ const profileItems = [
   { label: "Favorites", icon: HiOutlineHeart },
   { label: "Reviews", icon: LuCircleDollarSign },
   { label: "Change Password", icon: HiOutlineKey },
+  { label: "Sign Out", icon: HiOutlineKey },
 ];
 
 const SidebarSection = ({
@@ -114,6 +115,7 @@ const SidebarSection = ({
 
 const AiSidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const [isRecommendationsOpen, setIsRecommendationsOpen] = useState(true);
   const [isValueAdditionsOpen, setIsValueAdditionsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
@@ -160,6 +162,9 @@ const AiSidebar = () => {
         title="Nomad Recommendations"
         items={recommendationItems}
         collapsed={collapsed}
+        isExpandable
+        isOpen={isRecommendationsOpen}
+        onToggle={() => setIsRecommendationsOpen((prev) => !prev)}
         onItemClick={handleRecommendationClick}
       />
       <SidebarSection
