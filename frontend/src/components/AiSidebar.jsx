@@ -41,9 +41,20 @@ const recommendationItems = [
   { label: "Search Old School", icon: HiOutlineMenu, path: "/" },
 ];
 const valueAdditionItems = [
-  { label: "Visa Assist", icon: LuMapPinned },
+  { label: "VISA Support", icon: LuMapPinned },
+  { label: "Help you get activated", icon: HiOutlineKey },
+  { label: "Company Setup", icon: HiOutlineCog },
+  { label: "Apply for Job", icon: HiOutlineUserCircle },
+  { label: "Consultation", icon: LuCircleDollarSign },
   { label: "Become A Host", icon: HiOutlineViewGrid },
 ];
+
+const loggedOutPrompt = {
+  title: "Get responses tailored to you",
+  description:
+    "Log in to get answers based on saved chats, plus create images and upload files.",
+  actionLabel: "Log in",
+};
 
 const profileItems = [
   { label: "Abrar Shaikh", icon: HiOutlineUserCircle, active: true },
@@ -143,9 +154,13 @@ const AiSidebar = () => {
     });
   };
 
+  const handleLogInClick = () => {
+    navigate(`/ai-login${location.search}`);
+  };
+
   return (
     <aside
-      className={`h-full border-r border-black/10 bg-[#efefef] transition-all duration-300 ${
+      className={`flex h-full flex-col border-r border-black/10 bg-[#efefef] transition-all duration-300 ${
         collapsed ? "w-[70px]" : "w-[260px]"
       }`}
     >
@@ -177,7 +192,7 @@ const AiSidebar = () => {
         isOpen={isValueAdditionsOpen}
         onToggle={() => setIsValueAdditionsOpen((prev) => !prev)}
       />
-      {isLoggedIn && (
+      {isLoggedIn ? (
         <>
           <SidebarSection
             title="Profile"
@@ -189,6 +204,26 @@ const AiSidebar = () => {
           />
           <SidebarSection items={signOutItem} collapsed={collapsed} />
         </>
+      ) : (
+        !collapsed && (
+          <div className="mt-auto px-4 pb-4 pt-10">
+            <div className="rounded-[28px]   p-4 shadow-sm">
+              <h3 className="text-[13px] font-semibold leading-tight text-black/90">
+                {loggedOutPrompt.title}
+              </h3>
+              <p className="mt-4 text-nano leading-7 text-black/55">
+                {loggedOutPrompt.description}
+              </p>
+              <button
+                type="button"
+                onClick={handleLogInClick}
+                className="mt-6 w-full rounded-full border border-black/10 bg-white px-4 py-3 text-base font-semibold text-black transition hover:bg-black hover:text-white"
+              >
+                {loggedOutPrompt.actionLabel}
+              </button>
+            </div>
+          </div>
+        )
       )}
     </aside>
   );

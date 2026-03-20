@@ -144,6 +144,13 @@ const DESTS = [
     keyword: "miami, florida",
     lang: "en",
   },
+  { label: "Kraków", country: "pl", keyword: "kraków", lang: "pl" },
+  {
+    label: "Austin, Texas",
+    country: "us",
+    keyword: "austin, texas",
+    lang: "en",
+  },
 ];
 
 const extractImageFromContent = (content) => {

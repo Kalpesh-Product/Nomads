@@ -1,10 +1,11 @@
-import { TextField, IconButton, InputAdornment } from "@mui/material";
+import { TextField, IconButton, InputAdornment, MenuItem } from "@mui/material";
 import { MuiTelInput } from "mui-tel-input";
 import { Controller, useForm } from "react-hook-form";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import PrimaryButton from "../components/PrimaryButton";
 import { Link, useNavigate } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import { Country } from "country-state-city";
 
 export default function AiSignup() {
   const [showPassword, setShowPassword] = useState(false);
@@ -15,20 +16,41 @@ export default function AiSignup() {
   const toggleConfirmPasswordVisibility = () =>
     setShowConfirmPassword((prev) => !prev);
 
-  const { control } = useForm({
+  const { control, handleSubmit, setValue, watch } = useForm({
     defaultValues: {
       firstName: "",
       lastName: "",
       email: "",
+      country: "India",
       password: "",
       confirmPassword: "",
-      mobile: "",
+      mobile: "+91",
     },
   });
 
-  const handleSignup = (event) => {
-    event.preventDefault();
+  const selectedCountryName = watch("country");
+
+  const countries = useMemo(() => Country.getAllCountries(), []);
+  const selectedCountry = useMemo(
+    () =>
+      countries.find((country) => country.name === selectedCountryName) ||
+      countries.find((country) => country.isoCode === "IN"),
+    [countries, selectedCountryName],
+  );
+
+  const handleSignup = () => {
     navigate("/ai-login");
+  };
+
+  const handleCountryChange = (countryName, onChange) => {
+    const country = countries.find((item) => item.name === countryName);
+    const phonePrefix = country?.phonecode ? `+${country.phonecode}` : "";
+
+    onChange(countryName);
+    setValue("mobile", phonePrefix, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
   };
 
   return (
@@ -37,14 +59,19 @@ export default function AiSignup() {
         <h1 className="text-hero">Signup</h1>
 
         <form
-          onSubmit={handleSignup}
+          onSubmit={handleSubmit(handleSignup)}
           className="w-full grid grid-cols-1 md:grid-cols-2 gap-6"
         >
           <Controller
             name="firstName"
             control={control}
             render={({ field }) => (
-              <TextField {...field} label="Name" fullWidth variant="standard" />
+              <TextField
+                {...field}
+                label="Full Name"
+                fullWidth
+                variant="standard"
+              />
             )}
           />
 
@@ -62,16 +89,25 @@ export default function AiSignup() {
           />
 
           <Controller
-            name="email"
+            name="country"
             control={control}
             render={({ field }) => (
               <TextField
                 {...field}
+                select
                 label="Country"
-                type="email"
                 fullWidth
                 variant="standard"
-              />
+                onChange={(event) =>
+                  handleCountryChange(event.target.value, field.onChange)
+                }
+              >
+                {countries.map((country) => (
+                  <MenuItem key={country.isoCode} value={country.name}>
+                    {country.name}
+                  </MenuItem>
+                ))}
+              </TextField>
             )}
           />
 
@@ -83,7 +119,8 @@ export default function AiSignup() {
                 {...field}
                 label="Mobile"
                 fullWidth
-                defaultCountry="IN"
+                defaultCountry={selectedCountry?.isoCode || "IN"}
+                forceCallingCode
                 variant="standard"
                 onChange={(value) => field.onChange(value)}
               />
