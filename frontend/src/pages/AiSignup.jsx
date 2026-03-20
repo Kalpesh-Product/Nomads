@@ -153,7 +153,7 @@ export default function AiSignup() {
             <PrimaryButton
               type="submit"
               title="Signup"
-              className="bg-[#FF5757] flex text-white font-[500] capitalize hover:bg-[#E14C4C] w-full sm:w-[7rem] px-6"
+              className="bg-primary-blue flex text-white font-[500] capitalize hover:bg-primary-light w-full sm:w-[7rem] px-6"
             />
           </div>
 
