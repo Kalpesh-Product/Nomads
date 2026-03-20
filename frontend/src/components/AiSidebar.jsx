@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
+  HiChevronDown,
+  HiChevronRight,
   HiOutlineMenu,
   HiOutlineViewGrid,
   HiOutlineCog,
@@ -50,43 +52,70 @@ const profileItems = [
   { label: "Change Password", icon: HiOutlineKey },
 ];
 
-const SidebarSection = ({ title, items, collapsed, onItemClick }) => (
-  <div className="px-4 pt-3">
-    <div className="border-t border-black/10 pt-2">
-      {!collapsed && (
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-black/80">
-          {title}
-        </h3>
-      )}
-      <div className="mt-2 space-y-1">
-        {items.map((item) => {
-          const Icon = item.icon;
-          return (
-            <button
-              key={item.label}
-              type="button"
-              onClick={() => onItemClick?.(item)}
-              className={`flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-[22px] transition  ${
-                item.active
-                  ? "bg-white text-black shadow-sm"
-                  : "text-black/80 hover:bg-white/70"
-              }`}
-              title={collapsed ? item.label : ""}
-            >
-              <Icon size={18} className="shrink-0" />
-              {!collapsed && (
-                <span className="text-xs font-medium ">{item.label}</span>
-              )}
-            </button>
-          );
-        })}
+const SidebarSection = ({
+  title,
+  items,
+  collapsed,
+  isExpandable = false,
+  isOpen = true,
+  onToggle,
+  onItemClick,
+}) => {
+  const ChevronIcon = isOpen ? HiChevronDown : HiChevronRight;
+
+  return (
+    <div className="px-4 pt-3">
+      <div className="border-t border-black/10 pt-2">
+        {collapsed ? null : isExpandable ? (
+          <button
+            type="button"
+            onClick={onToggle}
+            className="flex w-full items-center justify-between text-left text-xs font-semibold uppercase tracking-wide text-black/80 transition hover:text-black"
+            aria-expanded={isOpen}
+            aria-label={`${isOpen ? "Collapse" : "Expand"} ${title}`}
+          >
+            <span>{title}</span>
+            <ChevronIcon size={16} className="shrink-0" />
+          </button>
+        ) : (
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-black/80">
+            {title}
+          </h3>
+        )}
+        {(!isExpandable || isOpen) && (
+          <div className="mt-2 space-y-1">
+            {items.map((item) => {
+              const Icon = item.icon;
+              return (
+                <button
+                  key={item.label}
+                  type="button"
+                  onClick={() => onItemClick?.(item)}
+                  className={`flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-[22px] transition  ${
+                    item.active
+                      ? "bg-white text-black shadow-sm"
+                      : "text-black/80 hover:bg-white/70"
+                  }`}
+                  title={collapsed ? item.label : ""}
+                >
+                  <Icon size={18} className="shrink-0" />
+                  {!collapsed && (
+                    <span className="text-xs font-medium ">{item.label}</span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const AiSidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const [isValueAdditionsOpen, setIsValueAdditionsOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -137,12 +166,18 @@ const AiSidebar = () => {
         title="Value Additions"
         items={valueAdditionItems}
         collapsed={collapsed}
+        isExpandable
+        isOpen={isValueAdditionsOpen}
+        onToggle={() => setIsValueAdditionsOpen((prev) => !prev)}
       />
       {isLoggedIn && (
         <SidebarSection
           title="Profile"
           items={profileItems}
           collapsed={collapsed}
+          isExpandable
+          isOpen={isProfileOpen}
+          onToggle={() => setIsProfileOpen((prev) => !prev)}
         />
       )}
     </aside>
