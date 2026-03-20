@@ -1,30 +1,21 @@
 import { TextField, IconButton, InputAdornment } from "@mui/material";
 import { MuiTelInput } from "mui-tel-input";
-import { useForm, Controller } from "react-hook-form";
-import { useEffect, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
-import axios from "../utils/axios";
-// import toast from "react-hot-toast";
+import { Controller, useForm } from "react-hook-form";
+import { useState } from "react";
 import PrimaryButton from "../components/PrimaryButton";
 import { Link, useNavigate } from "react-router-dom";
-import MuiModal from "../components/Modal";
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import useAuth from "../hooks/useAuth";
-import { isValidInternationalPhone } from "../utils/validators";
-import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 
 export default function AiSignup() {
-  const [openModal, setOpenModal] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const { auth } = useAuth();
   const navigate = useNavigate();
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
   const toggleConfirmPasswordVisibility = () =>
     setShowConfirmPassword((prev) => !prev);
 
-  const { control, handleSubmit, reset } = useForm({
+  const { control } = useForm({
     defaultValues: {
       firstName: "",
       lastName: "",
@@ -35,39 +26,10 @@ export default function AiSignup() {
     },
   });
 
-  // inside your component
-  useEffect(() => {
-    if (auth?.user) navigate("/profile", { replace: true });
-  }, [auth, navigate]);
-
-  const { mutate: submitRegistration, isPending } = useMutation({
-    mutationFn: async (data) => {
-      const payload = {
-        ...data,
-        sheetName: "Sign_up",
-      };
-
-      const response = await axios.post(
-        "/forms/add-new-b2c-form-submission",
-        payload,
-      );
-      return response.data;
-    },
-    onSuccess: () => {
-      showSuccessAlert(
-        "Signup successful! Please check your email for confirmation.",
-      );
-
-      reset();
-      setOpenModal(true);
-    },
-    onError: (error) => {
-      // toast.error(error.response?.data?.message || "Something went wrong");
-      showErrorAlert(error.response?.data?.message);
-    },
-  });
-
-  const onSubmit = (data) => submitRegistration(data);
+  const handleSignup = (event) => {
+    event.preventDefault();
+    navigate("/ai-login");
+  };
 
   return (
     <div className="flex items-center justify-center px-4 md:h-[60vh] lg:h-[80vh] border-gray-300 rounded-lg">
@@ -75,103 +37,74 @@ export default function AiSignup() {
         <h1 className="text-hero">Signup</h1>
 
         <form
-          //   onSubmit={handleSubmit(onSubmit)}
-          onSubmit={(e) => e.preventDefault()}
+          onSubmit={handleSignup}
           className="w-full grid grid-cols-1 md:grid-cols-2 gap-6"
         >
-          {/* First Name */}
           <Controller
             name="firstName"
             control={control}
-            // rules={{ required: "First name is required" }}
-            render={({ field, fieldState }) => (
+            render={({ field }) => (
               <TextField
                 {...field}
                 label="First Name"
                 fullWidth
-                // required
                 variant="standard"
-                // error={!!fieldState.error}
-                // helperText={fieldState.error?.message}
               />
             )}
           />
 
-          {/* Last Name */}
           <Controller
             name="lastName"
             control={control}
-            // rules={{ required: "Last name is required" }}
-            render={({ field, fieldState }) => (
+            render={({ field }) => (
               <TextField
                 {...field}
                 label="Last Name"
                 fullWidth
-                // required
                 variant="standard"
-                // error={!!fieldState.error}
-                // helperText={fieldState.error?.message}
               />
             )}
           />
 
-          {/* Email */}
           <Controller
             name="email"
             control={control}
-            // rules={{ required: "Email is required" }}
-            render={({ field, fieldState }) => (
+            render={({ field }) => (
               <TextField
                 {...field}
                 label="Email"
                 type="email"
                 fullWidth
-                // required
                 variant="standard"
-                // error={!!fieldState.error}
-                // helperText={fieldState.error?.message}
               />
             )}
           />
 
-          {/* Mobile */}
           <Controller
             name="mobile"
             control={control}
-            // rules={{
-            //   required: "Mobile number is required",
-            //   validate: isValidInternationalPhone,
-            // }}
-            render={({ field, fieldState }) => (
+            render={({ field }) => (
               <MuiTelInput
                 {...field}
                 label="Mobile"
                 fullWidth
-                // required
                 defaultCountry="IN"
                 variant="standard"
-                // error={!!fieldState.error}
-                // helperText={fieldState.error?.message}
                 onChange={(value) => field.onChange(value)}
               />
             )}
           />
 
-          {/* Password */}
           <Controller
             name="password"
             control={control}
-            // rules={{ required: "Password is required" }}
-            render={({ field, fieldState }) => (
+            render={({ field }) => (
               <TextField
                 {...field}
                 label="Password"
                 type={showPassword ? "text" : "password"}
                 fullWidth
-                // required
                 variant="standard"
-                // error={!!fieldState.error}
-                // helperText={fieldState.error?.message}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
@@ -189,21 +122,16 @@ export default function AiSignup() {
             )}
           />
 
-          {/* Confirm Password */}
           <Controller
             name="confirmPassword"
             control={control}
-            // rules={{ required: "Please confirm password" }}
-            render={({ field, fieldState }) => (
+            render={({ field }) => (
               <TextField
                 {...field}
                 label="Confirm Password"
                 type={showConfirmPassword ? "text" : "password"}
                 fullWidth
-                // required
                 variant="standard"
-                // error={!!fieldState.error}
-                // helperText={fieldState.error?.message}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
@@ -221,57 +149,23 @@ export default function AiSignup() {
             )}
           />
 
-          {/* Submit Button */}
-          {/* <div className="col-span-1 md:col-span-2 flex justify-center items-center mt-2 py-2 w-full">
-            <PrimaryButton
-              type="submit"
-              isLoading={isPending}
-              title="Signup"
-              disabled={isPending}
-              className="bg-[#FF5757] flex text-white font-[500] capitalize hover:bg-[#E14C4C] w-full sm:w-[7rem] px-6"
-            />
-          </div>
- */}
           <div className="col-span-1 md:col-span-2 flex justify-center items-center mt-2 py-2 w-full">
             <PrimaryButton
-              //   type="submit"
-              //   isLoading={isPending}
+              type="submit"
               title="Signup"
-              onClick={() => navigate("/home-logged-in")}
-              //   disabled={isPending}
               className="bg-[#FF5757] flex text-white font-[500] capitalize hover:bg-[#E14C4C] w-full sm:w-[7rem] px-6"
             />
           </div>
 
-          {/* Login Link */}
           <div className="col-span-1 md:col-span-2">
             <p className="text-center">
               Already have an account?&nbsp;
               <span className="underline">
-                <Link to="/login">Log In</Link>
+                <Link to="/ai-login">Log In</Link>
               </span>
             </p>
           </div>
         </form>
-
-        <MuiModal
-          open={openModal}
-          onClose={() => setOpenModal(false)}
-          title="Registration Successful"
-          height="20vh"
-          width="30vw"
-          color="text-green-500"
-        >
-          <div className="flex flex-col space-y-4 text-pretty">
-            <p>Thank you for signing up with WoNo.</p>
-            <p>
-              Kindly allow us some time to evaluate your profile. Once done,
-              your Personal Assistant from WoNo will connect with you to onboard
-              you for your Signup process.
-            </p>
-            <p>Thank you again for trusting us and signing up!</p>
-          </div>
-        </MuiModal>
       </div>
     </div>
   );
