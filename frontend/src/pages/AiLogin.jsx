@@ -1,14 +1,34 @@
 import { TextField, IconButton, InputAdornment } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PrimaryButton from "../components/PrimaryButton";
 import { Link, useNavigate } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 
+const LOGIN_PROMPT =
+  "Log in to unlock all features and get the most out of your Nomad experience.";
+
 export default function AiLogin() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [typedMessage, setTypedMessage] = useState("");
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
+
+  useEffect(() => {
+    setTypedMessage("");
+
+    let currentIndex = 0;
+    const typingInterval = setInterval(() => {
+      currentIndex += 1;
+      setTypedMessage(LOGIN_PROMPT.slice(0, currentIndex));
+
+      if (currentIndex >= LOGIN_PROMPT.length) {
+        clearInterval(typingInterval);
+      }
+    }, 25);
+
+    return () => clearInterval(typingInterval);
+  }, []);
 
   const { control } = useForm({
     defaultValues: {
@@ -23,79 +43,84 @@ export default function AiLogin() {
   };
 
   return (
-    <div className="flex items-center justify-center flex-col gap-14 h-[55vh] md:h-[60vh] lg:h-[75vh] border-gray-300 rounded-lg p-8">
-      <div className="flex flex-col items-center gap-6 w-full max-w-4xl">
-        <h1 className="text-hero text-center">Login</h1>
+    <>
+      <div className="flex items-center justify-center flex-col gap-14 h-[55vh] md:h-[60vh] lg:h-[75vh] border-gray-300 rounded-lg p-8">
+        <p className="min-h-[3rem] max-w-4xl text-left text-xl font-medium leading-relaxed text-black sm:min-h-[3.5rem]">
+          {typedMessage}
+        </p>
+        <div className="flex flex-col items-center gap-6 w-full max-w-4xl">
+          <h1 className="text-hero text-center">Login</h1>
 
-        <form
-          onSubmit={handleLogin}
-          className="w-full grid grid-cols-1 md:grid-cols-2 gap-6"
-        >
-          <Controller
-            name="email"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Email"
-                type="email"
-                fullWidth
-                variant="standard"
-              />
-            )}
-          />
-
-          <Controller
-            name="password"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Password"
-                type={showPassword ? "text" : "password"}
-                fullWidth
-                variant="standard"
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={togglePasswordVisibility}
-                        edge="end"
-                        tabIndex={-1}
-                      >
-                        {showPassword ? <FiEyeOff /> : <FiEye />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            )}
-          />
-
-          <div className="col-span-1 md:col-span-2 flex justify-center items-center mt-2 py-2 w-full">
-            <PrimaryButton
-              title="Login"
-              type="submit"
-              className="bg-primary-blue flex text-white font-[500] capitalize hover:bg-primary-light w-full sm:w-[7rem] px-6"
+          <form
+            onSubmit={handleLogin}
+            className="w-full grid grid-cols-1 md:grid-cols-2 gap-6"
+          >
+            <Controller
+              name="email"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Email"
+                  type="email"
+                  fullWidth
+                  variant="standard"
+                />
+              )}
             />
-          </div>
 
-          <div className="col-span-1 md:col-span-2 flex flex-col md:flex-row justify-center items-center md:gap-2 text-center">
-            <p className="text-gray-600 hover:text-black underline mb-1 md:mb-0">
-              <Link to="/forgot-password">Forgot password?</Link>
-            </p>
+            <Controller
+              name="password"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Password"
+                  type={showPassword ? "text" : "password"}
+                  fullWidth
+                  variant="standard"
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={togglePasswordVisibility}
+                          edge="end"
+                          tabIndex={-1}
+                        >
+                          {showPassword ? <FiEyeOff /> : <FiEye />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              )}
+            />
 
-            <p className="hidden md:block">|</p>
+            <div className="col-span-1 md:col-span-2 flex justify-center items-center mt-2 py-2 w-full">
+              <PrimaryButton
+                title="Login"
+                type="submit"
+                className="bg-primary-blue flex text-white font-[500] capitalize hover:bg-primary-light w-full sm:w-[7rem] px-6"
+              />
+            </div>
 
-            <p className="text-gray-600 hover:text-black ">
-              <span>New to WoNo? </span>
-              <span className="underline">
-                <Link to="/ai-signup">Sign Up</Link>
-              </span>
-            </p>
-          </div>
-        </form>
+            <div className="col-span-1 md:col-span-2 flex flex-col md:flex-row justify-center items-center md:gap-2 text-center">
+              <p className="text-gray-600 hover:text-black underline mb-1 md:mb-0">
+                <Link to="/forgot-password">Forgot password?</Link>
+              </p>
+
+              <p className="hidden md:block">|</p>
+
+              <p className="text-gray-600 hover:text-black ">
+                <span>New to WoNo? </span>
+                <span className="underline">
+                  <Link to="/ai-signup">Sign Up</Link>
+                </span>
+              </p>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
