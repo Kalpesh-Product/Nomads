@@ -1,7 +1,7 @@
 import { TextField, IconButton, InputAdornment } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
-import PrimaryButton from "../components/PrimaryButton";
+
 import { Link, useNavigate } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import AiPrimaryButton from "../components/AiPrimaryButton";
@@ -45,11 +45,13 @@ export default function AiLogin() {
 
   return (
     <>
-      <div className="flex items-center justify-center flex-col gap-14 h-[55vh] md:h-[60vh] lg:h-[75vh] border-gray-300 rounded-lg p-8">
-        <p className="min-h-[3rem] w-full max-w-5xl self-start text-left text-[1.4rem] font-medium leading-relaxed text-gray-900 sm:min-h-[3.5rem] px-16">
-          {typedMessage}
-        </p>
-        <div className="flex flex-col items-center gap-6 w-full max-w-4xl">
+      <div className="flex min-h-[55vh] flex-col items-center justify-center gap-10 rounded-lg border-gray-300 px-6 py-8 md:min-h-[60vh] lg:min-h-[75vh]">
+        <div className="w-full max-w-4xl">
+          <p className="mx-auto min-h-[3rem] w-full text-center font-play text-[1.4rem] leading-relaxed text-gray-900 sm:min-h-[3.5rem] sm:text-[1.4rem]">
+            {typedMessage}
+          </p>
+        </div>
+        <div className="flex w-full max-w-4xl flex-col items-center gap-6">
           <h1 className="text-hero text-center">Login</h1>
 
           <form

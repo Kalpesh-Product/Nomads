@@ -76,7 +76,7 @@ const AiHome = () => {
     : "AI-Powered Living For The Modern Nomad";
   const loggedOutNoteText = isLoggedIn
     ? ""
-    : "World rankings and old-style search are available without logging in. Log in to view the rest.";
+    : "World ranking and search old school are available without logging in. Log in to view the rest.";
 
   useEffect(() => {
     setTypedGreeting("");
