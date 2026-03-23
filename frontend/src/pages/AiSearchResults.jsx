@@ -40,11 +40,11 @@ const DropdownBadge = ({
   const menuAlignment = align === "right" ? "right-0" : "left-0";
 
   return (
-    <div className="relative min-w-[20rem]">
+    <div className="relative w-full min-w-0 flex-1">
       <button
         type="button"
         onClick={onToggle}
-        className={`inline-flex min-h-[44px] min-w-[20rem] items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${
+        className={`flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${
           isOpen
             ? "border-sky-500 bg-sky-500 text-white"
             : "border-black/20 bg-white text-black/85 hover:border-sky-500"
@@ -253,7 +253,7 @@ const AiSearchResults = () => {
                 <HiOutlineArrowLeft size={18} />
               </button>
 
-              <div className="ml-20 mr-36 flex flex-1 items-center rounded-full border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)]">
+              <div className="ml-12 mr-36 flex flex-1 items-center rounded-full border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)]">
                 <div className="flex flex-wrap items-center gap-2">
                   {searchBarBadges.map((badgeLabel, index) => (
                     <div
@@ -278,10 +278,10 @@ const AiSearchResults = () => {
               </div>
             </div>
 
-            <div className="relative px-28">
+            <div className="relative ml-[6.25rem] mr-36 mt-6">
               <div
                 ref={dropdownContainerRef}
-                className="relative z-30 mx-4 mt-6 flex flex-wrap gap-4"
+                className="relative z-30 flex w-full flex-col gap-4 sm:flex-row sm:items-stretch"
               >
                 <DropdownBadge
                   label="Continent"
