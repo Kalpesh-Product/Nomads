@@ -40,11 +40,11 @@ const DropdownBadge = ({
   const menuAlignment = align === "right" ? "right-0" : "left-0";
 
   return (
-    <div className="relative min-w-[20rem]">
+    <div className="relative w-full min-w-0 flex-1">
       <button
         type="button"
         onClick={onToggle}
-        className={`inline-flex min-h-[44px] min-w-[20rem] items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${
+        className={`flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${
           isOpen
             ? "border-sky-500 bg-sky-500 text-white"
             : "border-black/20 bg-white text-black/85 hover:border-sky-500"
@@ -104,20 +104,25 @@ const AiSearchResults = () => {
       ? state.selectedGoal
       : defaultGoal;
   const goalOptions = goalFilterMap[selectedGoal] || goalFilterMap[defaultGoal];
-  const selectedFilter =
-    state?.selectedFilter && goalOptions.includes(state.selectedFilter)
-      ? state.selectedFilter
-      : goalOptions[0];
+  const selectedFilter = null;
 
   const [typedHeading, setTypedHeading] = useState("");
-  const [selectedContinent, setSelectedContinent] = useState("World");
+  const [selectedContinent, setSelectedContinent] = useState(null);
   const [selectedGoalOption, setSelectedGoalOption] = useState(selectedFilter);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [headingAnimationKey, setHeadingAnimationKey] = useState(0);
   const [showAllDestinations, setShowAllDestinations] = useState(false);
   const dropdownContainerRef = useRef(null);
 
+  const hasSelectedContinent = Boolean(selectedContinent);
+  const hasSelectedGoalOption = Boolean(selectedGoalOption);
+  const hasSelectedFilters = hasSelectedContinent && hasSelectedGoalOption;
+
   const filteredDestinations = useMemo(() => {
+    if (!hasSelectedFilters) {
+      return [];
+    }
+
     if (selectedContinent === "World") {
       return destinationCards;
     }
@@ -125,7 +130,7 @@ const AiSearchResults = () => {
     return destinationCards.filter(
       (destination) => destination.continent === selectedContinent,
     );
-  }, [selectedContinent]);
+  }, [hasSelectedFilters, selectedContinent]);
 
   const rankedDestinations = useMemo(() => {
     const sortedSpeeds = filteredDestinations
@@ -139,10 +144,22 @@ const AiSearchResults = () => {
     }));
   }, [filteredDestinations]);
 
-  const searchBarBadges = useMemo(
-    () => [selectedGoal, selectedContinent, selectedGoalOption],
-    [selectedContinent, selectedGoal, selectedGoalOption],
-  );
+  const searchBarBadges = useMemo(() => {
+    const badges = [selectedGoal];
+
+    if (hasSelectedContinent || hasSelectedGoalOption) {
+      badges.push(selectedContinent || "Select from below");
+      badges.push(selectedGoalOption || "Select from below");
+    }
+
+    return badges;
+  }, [
+    hasSelectedContinent,
+    hasSelectedGoalOption,
+    selectedContinent,
+    selectedGoal,
+    selectedGoalOption,
+  ]);
 
   const visibleDestinations = useMemo(() => {
     if (showAllDestinations) {
@@ -194,8 +211,9 @@ const AiSearchResults = () => {
     setHeadingAnimationKey((currentKey) => currentKey + 1);
   };
 
-  const headingText =
-    "Showing results for the selected option. Select any option to view your preferred results.";
+  const headingText = hasSelectedFilters
+    ? "Showing results for the selected option. Select any option to view your preferred results."
+    : "Select one option from each badge above to view matching destinations.";
 
   useEffect(() => {
     setTypedHeading("");
@@ -253,7 +271,7 @@ const AiSearchResults = () => {
                 <HiOutlineArrowLeft size={18} />
               </button>
 
-              <div className="ml-20 mr-36 flex flex-1 items-center rounded-full border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)]">
+              <div className="ml-12 mr-36 flex flex-1 items-center rounded-full border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)]">
                 <div className="flex flex-wrap items-center gap-2">
                   {searchBarBadges.map((badgeLabel, index) => (
                     <div
@@ -278,15 +296,15 @@ const AiSearchResults = () => {
               </div>
             </div>
 
-            <div className="relative px-28">
+            <div className="relative ml-[6.25rem] mr-36 mt-6">
               <div
                 ref={dropdownContainerRef}
-                className="relative z-30 mx-4 mt-6 flex flex-wrap gap-4"
+                className="relative z-30 flex w-full flex-col gap-4 sm:flex-row sm:items-stretch"
               >
                 <DropdownBadge
                   label="Continent"
                   options={continentOptions}
-                  selectedValue={selectedContinent}
+                  selectedValue={selectedContinent || "Select from below"}
                   isOpen={openDropdown === "continent"}
                   onToggle={() => handleDropdownToggle("continent")}
                   onSelect={handleContinentSelect}
@@ -295,7 +313,7 @@ const AiSearchResults = () => {
                 <DropdownBadge
                   label={selectedGoal}
                   options={goalOptions}
-                  selectedValue={selectedGoalOption}
+                  selectedValue={selectedGoalOption || "Select from below"}
                   isOpen={openDropdown === "goalOption"}
                   onToggle={() => handleDropdownToggle("goalOption")}
                   onSelect={handleGoalOptionSelect}
@@ -304,58 +322,65 @@ const AiSearchResults = () => {
 
               <div className="relative mt-8">
                 <div className="relative z-10">
-                  <p className="text-3xl font-medium leading-snug text-black/85 lg:text-lg">
+                  <p className="text-3xl font-medium leading-snug text-black/85 lg:text-lg font-play">
                     {typedHeading}
                   </p>
 
-                  <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
-                    {visibleDestinations.map((destination) => (
-                      <article
-                        key={`${destination.city}-${destination.country}`}
-                        className="cursor-pointer"
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => handleDestinationClick(destination)}
-                        onKeyDown={(event) => {
-                          if (event.key === "Enter" || event.key === " ") {
-                            event.preventDefault();
-                            handleDestinationClick(destination);
-                          }
-                        }}
-                      >
-                        <div className="relative overflow-hidden rounded-2xl">
-                          <img
-                            src={destination.image}
-                            alt={`${destination.city}, ${destination.country}`}
-                            className="h-56 w-full rounded-2xl object-cover"
-                          />
-                          <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-black/75 via-black/25 to-transparent px-4 py-3 text-white">
-                            <span className="rounded-full bg-black/45 px-3 py-1 text-xs font-semibold tracking-wide backdrop-blur-sm">
-                              {destination.speedLabel}
-                            </span>
-                            <span className="rounded-full bg-black/45 px-3 py-1 text-xs font-semibold tracking-wide backdrop-blur-sm">
-                              {destination.rankLabel}
-                            </span>
+                  {hasSelectedFilters ? (
+                    <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
+                      {visibleDestinations.map((destination) => (
+                        <article
+                          key={`${destination.city}-${destination.country}`}
+                          className="cursor-pointer"
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => handleDestinationClick(destination)}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === " ") {
+                              event.preventDefault();
+                              handleDestinationClick(destination);
+                            }
+                          }}
+                        >
+                          <div className="relative overflow-hidden rounded-2xl">
+                            <img
+                              src={destination.image}
+                              alt={`${destination.city}, ${destination.country}`}
+                              className="h-56 w-full rounded-2xl object-cover"
+                            />
+                            <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-black/75 via-black/25 to-transparent px-4 py-3 text-white">
+                              <span className="rounded-full bg-black/45 px-3 py-1 text-xs font-semibold tracking-wide backdrop-blur-sm">
+                                {destination.speedLabel}
+                              </span>
+                              <span className="rounded-full bg-black/45 px-3 py-1 text-xs font-semibold tracking-wide backdrop-blur-sm">
+                                {destination.rankLabel}
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                        <div className="mt-2 flex items-start justify-between gap-3">
+                          <div className="mt-2 flex items-start justify-between gap-3">
+                            <div>
+                              <h3 className="text-[1.2rem] font-semibold text-black/90">
+                                {destination.city}
+                              </h3>
+                            </div>
+                            <p className="mt-1 text-[1rem] font-semibold text-black/90">
+                              {destination.country}
+                            </p>
+                          </div>
                           <div>
-                            <h3 className="text-[1.2rem] font-semibold text-black/90">
-                              {destination.city}
-                            </h3>
+                            <p className="text-[0.9rem] text-black/60">
+                              Find activation options
+                            </p>
                           </div>
-                          <p className="mt-1 text-[1rem] font-semibold text-black/90">
-                            {destination.country}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-[0.9rem] text-black/60">
-                            Find activation options
-                          </p>
-                        </div>
-                      </article>
-                    ))}
-                  </div>
+                        </article>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="mt-10 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-500">
+                      Results will appear here after you select both filters
+                      above.
+                    </div>
+                  )}
 
                   {shouldShowViewMore && (
                     <button
@@ -367,7 +392,7 @@ const AiSearchResults = () => {
                     </button>
                   )}
 
-                  {!rankedDestinations.length && (
+                  {hasSelectedFilters && !rankedDestinations.length && (
                     <div className="mt-10 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-500">
                       No destinations are available for {selectedContinent}{" "}
                       right now.

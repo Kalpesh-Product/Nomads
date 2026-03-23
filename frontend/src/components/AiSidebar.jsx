@@ -6,7 +6,7 @@ import {
 } from "../hooks/useNomadLoginState";
 import {
   HiChevronDown,
-  HiChevronRight,
+  HiChevronUp,
   HiOutlineMenu,
   HiOutlineViewGrid,
   HiOutlineCog,
@@ -79,7 +79,7 @@ const SidebarSection = ({
   onToggle,
   onItemClick,
 }) => {
-  const ChevronIcon = isOpen ? HiChevronDown : HiChevronRight;
+  const ChevronIcon = isOpen ? HiChevronUp : HiChevronDown;
 
   return (
     <div className="px-4 pt-3">

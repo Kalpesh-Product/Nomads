@@ -66,20 +66,28 @@ const AiHome = () => {
   const [typedGreeting, setTypedGreeting] = useState("");
   const [typedSubheading, setTypedSubheading] = useState("");
 
+  const [typedLoggedOutNote, setTypedLoggedOutNote] = useState("");
+
   const isLoggedIn = useNomadLoginState();
 
   const greetingText = isLoggedIn ? "hi Abrar" : "Meet Wono";
   const subheadingText = isLoggedIn
     ? "Please choose your goals from below so that we can help you design your accurate nomad lifestyle."
     : "AI-Powered Living For The Modern Nomad";
+  const loggedOutNoteText = isLoggedIn
+    ? ""
+    : "World ranking and search old school are available without logging in. Log in to view the rest.";
 
   useEffect(() => {
     setTypedGreeting("");
     setTypedSubheading("");
+    setTypedLoggedOutNote("");
 
     let greetingIndex = 0;
     let subheadingIndex = 0;
+    let loggedOutNoteIndex = 0;
     let cleanupSubheading = () => {};
+    let cleanupLoggedOutNote = () => {};
 
     const greetingInterval = setInterval(() => {
       greetingIndex += 1;
@@ -94,6 +102,23 @@ const AiHome = () => {
 
           if (subheadingIndex >= subheadingText.length) {
             clearInterval(subheadingInterval);
+
+            if (!loggedOutNoteText) {
+              return;
+            }
+
+            const loggedOutNoteInterval = setInterval(() => {
+              loggedOutNoteIndex += 1;
+              setTypedLoggedOutNote(
+                loggedOutNoteText.slice(0, loggedOutNoteIndex),
+              );
+
+              if (loggedOutNoteIndex >= loggedOutNoteText.length) {
+                clearInterval(loggedOutNoteInterval);
+              }
+            }, 25);
+
+            cleanupLoggedOutNote = () => clearInterval(loggedOutNoteInterval);
           }
         }, 25);
 
@@ -104,8 +129,9 @@ const AiHome = () => {
     return () => {
       clearInterval(greetingInterval);
       cleanupSubheading();
+      cleanupLoggedOutNote();
     };
-  }, [greetingText, subheadingText]);
+  }, [greetingText, loggedOutNoteText, subheadingText]);
 
   const handleCardClick = (card) => {
     const params = new URLSearchParams(location.search);
@@ -139,6 +165,11 @@ const AiHome = () => {
           <h2 className="mt-10 text-lg font-semibold text-black/85 font-play">
             {typedSubheading}
           </h2>
+          {!isLoggedIn ? (
+            <p className="mt-3 text-lg font-semibold text-black/85 font-play">
+              {typedLoggedOutNote}
+            </p>
+          ) : null}
 
           <div className="mt-16 rounded-[40px] px-6 py-8">
             <div className="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-3">
@@ -171,7 +202,7 @@ const AiHome = () => {
         </div>
       </main>
 
-      <div className="sticky bottom-0 z-10  bg-white/95 py-6 text-center text-sm text-gray-600 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+      <div className="sticky bottom-0 z-10  bg-white/95 py-6 text-center text-nano text-gray-600 backdrop-blur supports-[backdrop-filter]:bg-white/80">
         WoNo AI can make mistakes. Check important info. See Cookie Preferences.
       </div>
     </div>
