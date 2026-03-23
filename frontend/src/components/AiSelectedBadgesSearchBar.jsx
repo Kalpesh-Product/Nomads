@@ -35,7 +35,7 @@ const AiSelectedBadgesSearchBar = ({
         )}
       </div>
 
-      <div className="flex min-h-[58px] flex-1 items-center rounded-full border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)]">
+      <div className="flex min-h-[58px] w-full max-w-[50rem] items-center rounded-full border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] xl:max-w-[52rem]">
         <div className="flex flex-1 flex-wrap items-center gap-2 overflow-hidden">
           {visibleBadges.map((badgeLabel, index) => (
             <div key={`${badgeLabel}-${index}`} className={badgeClassName}>

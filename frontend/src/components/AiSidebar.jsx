@@ -25,22 +25,22 @@ const gatedRecommendationLabels = new Set([
 ]);
 
 const recommendationItems = [
-  { label: "World Ranking", icon: HiOutlineViewGrid, path: "/world-rankings" },
+  { label: "World Ranking", icon: HiOutlineViewGrid, path: "/home" },
   {
     label: "Work From Anywhere",
     icon: HiOutlineHeart,
-    path: "/search/results",
+    path: "/search/home",
   },
   {
     label: "Increase Your Savings",
     icon: LuCircleDollarSign,
-    path: "/savings",
+    path: "/home",
   },
-  { label: "Advance Your Career", icon: LuMapPinned, path: "/career-search" },
+  { label: "Advance Your Career", icon: LuMapPinned, path: "/home" },
   {
     label: "Find Your Community",
     icon: HiOutlineUserCircle,
-    path: "/compatible",
+    path: "/home",
   },
   { label: "Search Old School", icon: HiOutlineMenu, path: "/" },
 ];

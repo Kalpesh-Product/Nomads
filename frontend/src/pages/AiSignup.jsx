@@ -6,6 +6,7 @@ import PrimaryButton from "../components/PrimaryButton";
 import { Link, useNavigate } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { Country } from "country-state-city";
+import AiPrimaryButton from "../components/AiPrimaryButton";
 
 export default function AiSignup() {
   const [showPassword, setShowPassword] = useState(false);
@@ -182,7 +183,7 @@ export default function AiSignup() {
           />
 
           <div className="col-span-1 md:col-span-2 flex justify-center items-center mt-2 py-2 w-full">
-            <PrimaryButton
+            <AiPrimaryButton
               type="submit"
               title="Signup"
               className="bg-primary-blue flex text-white font-[500] capitalize hover:bg-primary-light w-full sm:w-[7rem] px-6"

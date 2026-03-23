@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import PrimaryButton from "../components/PrimaryButton";
 import { Link, useNavigate } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import AiPrimaryButton from "../components/AiPrimaryButton";
 
 const LOGIN_PROMPT =
   "Log in to unlock all features and get the most out of your Nomad experience.";
@@ -97,7 +98,7 @@ export default function AiLogin() {
             />
 
             <div className="col-span-1 md:col-span-2 flex justify-center items-center mt-2 py-2 w-full">
-              <PrimaryButton
+              <AiPrimaryButton
                 title="Login"
                 type="submit"
                 className="bg-primary-blue flex text-white font-[500] capitalize hover:bg-primary-light w-full sm:w-[7rem] px-6"
