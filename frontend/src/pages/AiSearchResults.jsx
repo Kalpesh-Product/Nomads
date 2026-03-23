@@ -170,6 +170,7 @@ const AiSearchResults = () => {
             country,
             location,
           },
+          searchBarBadges,
         },
       },
     );

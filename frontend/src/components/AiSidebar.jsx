@@ -1,5 +1,9 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import {
+  clearStoredLoginState,
+  readStoredLoginState,
+} from "../hooks/useNomadLoginState";
 import {
   HiChevronDown,
   HiChevronRight,
@@ -21,22 +25,22 @@ const gatedRecommendationLabels = new Set([
 ]);
 
 const recommendationItems = [
-  { label: "World Ranking", icon: HiOutlineViewGrid, path: "/world-rankings" },
+  { label: "World Ranking", icon: HiOutlineViewGrid, path: "/home" },
   {
     label: "Work From Anywhere",
     icon: HiOutlineHeart,
-    path: "/search/results",
+    path: "/search/home",
   },
   {
     label: "Increase Your Savings",
     icon: LuCircleDollarSign,
-    path: "/savings",
+    path: "/home",
   },
-  { label: "Advance Your Career", icon: LuMapPinned, path: "/career-search" },
+  { label: "Advance Your Career", icon: LuMapPinned, path: "/home" },
   {
     label: "Find Your Community",
     icon: HiOutlineUserCircle,
-    path: "/compatible",
+    path: "/home",
   },
   { label: "Search Old School", icon: HiOutlineMenu, path: "/" },
 ];
@@ -135,10 +139,9 @@ const AiSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const isLoggedIn = useMemo(() => {
-    const params = new URLSearchParams(location.search);
-    return params.get("login") === "true";
-  }, [location.search]);
+  const searchParams = new URLSearchParams(location.search);
+  const isLoggedIn =
+    searchParams.get("login") === "true" || readStoredLoginState();
 
   const handleRecommendationClick = (item) => {
     const params = new URLSearchParams(location.search);
@@ -156,6 +159,19 @@ const AiSidebar = () => {
 
   const handleLogInClick = () => {
     navigate(`/ai-login${location.search}`);
+  };
+
+  const handleSignOutClick = () => {
+    const nextSearchParams = new URLSearchParams(location.search);
+    nextSearchParams.delete("login");
+    clearStoredLoginState();
+
+    navigate({
+      pathname: location.pathname,
+      search: nextSearchParams.toString()
+        ? `?${nextSearchParams.toString()}`
+        : "",
+    });
   };
 
   return (
@@ -202,7 +218,11 @@ const AiSidebar = () => {
             isOpen={isProfileOpen}
             onToggle={() => setIsProfileOpen((prev) => !prev)}
           />
-          <SidebarSection items={signOutItem} collapsed={collapsed} />
+          <SidebarSection
+            items={signOutItem}
+            collapsed={collapsed}
+            onItemClick={handleSignOutClick}
+          />
         </>
       ) : (
         !collapsed && (
@@ -217,7 +237,7 @@ const AiSidebar = () => {
               <button
                 type="button"
                 onClick={handleLogInClick}
-                className="mt-6 w-full rounded-full border border-black/10 bg-white px-4 py-3 text-base font-semibold text-black transition hover:bg-black hover:text-white"
+                className="mt-6 w-full rounded-full border border-black/10 bg-white px-3 py-2 text-base font-semibold text-black transition hover:bg-black hover:text-white"
               >
                 {loggedOutPrompt.actionLabel}
               </button>

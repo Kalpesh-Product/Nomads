@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   HiOutlineViewGrid,
@@ -6,6 +6,7 @@ import {
   HiOutlineUserCircle,
 } from "react-icons/hi";
 import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
+import useNomadLoginState from "../hooks/useNomadLoginState";
 
 const gatedRecommendationTitles = new Set([
   "Work From Anywhere",
@@ -65,10 +66,7 @@ const AiHome = () => {
   const [typedGreeting, setTypedGreeting] = useState("");
   const [typedSubheading, setTypedSubheading] = useState("");
 
-  const isLoggedIn = useMemo(() => {
-    const params = new URLSearchParams(location.search);
-    return params.get("login") === "true";
-  }, [location.search]);
+  const isLoggedIn = useNomadLoginState();
 
   const greetingText = isLoggedIn ? "hi Abrar" : "Meet Wono";
   const subheadingText = isLoggedIn

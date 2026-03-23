@@ -7,6 +7,8 @@ import { IoCloseSharp } from "react-icons/io5";
 import Container from "./Container";
 import useAuth from "../hooks/useAuth";
 
+import useNomadLoginState from "../hooks/useNomadLoginState";
+
 const AiHeader = () => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
@@ -15,8 +17,8 @@ const AiHeader = () => {
   const view = searchParams.get("view");
   const showToggle = location.pathname.includes("verticals");
   const { auth } = useAuth();
-  const isLoggedIn =
-    Boolean(auth?.user) || searchParams.get("login") === "true";
+  const hasNomadLoginState = useNomadLoginState();
+  const isLoggedIn = Boolean(auth?.user) || hasNomadLoginState;
 
   const formData = useSelector((state) => state.location.formValues);
   const handleNavigation = (path) => {
@@ -181,24 +183,24 @@ const AiHeader = () => {
                 </ul>
               )}
             </div>
-            {/* {!isLoggedIn && (
+            {!isLoggedIn && (
               <div className="flex items-center gap-3">
                 <button
                   type="button"
                   onClick={() => navigate(`/ai-login${location.search}`)}
-                  className="rounded-full bg-black px-4 py-2 text-base font-semibold text-white transition hover:bg-black/80 min-w-32"
+                  className="rounded-full bg-black px-4 py-2 text-sm font-semibold text-white transition hover:bg-black/80 min-w-28"
                 >
                   Log in
                 </button>
                 <button
                   type="button"
                   onClick={() => navigate(`/ai-signup${location.search}`)}
-                  className="rounded-full border border-black/10 bg-white px-4 py-2 text-base font-semibold text-black transition hover:border-black/20 hover:bg-black/5 min-w-52"
+                  className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-black transition hover:border-black/20 hover:bg-black/5 min-w-48"
                 >
                   Sign up for free
                 </button>
               </div>
-            )} */}
+            )}
 
             <li className="flex items-center">
               <div className="p-4 px-0 whitespace-nowrap">
