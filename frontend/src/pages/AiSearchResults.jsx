@@ -213,7 +213,7 @@ const AiSearchResults = () => {
 
   const headingText = hasSelectedFilters
     ? "Showing results for the selected option. Select any option to view your preferred results."
-    : "Select one option from each badge below to view matching destinations.";
+    : "Select one option from each badge above to view matching destinations.";
 
   useEffect(() => {
     setTypedHeading("");
@@ -322,7 +322,7 @@ const AiSearchResults = () => {
 
               <div className="relative mt-8">
                 <div className="relative z-10">
-                  <p className="text-3xl font-medium leading-snug text-black/85 lg:text-lg">
+                  <p className="text-3xl font-medium leading-snug text-black/85 lg:text-lg font-play">
                     {typedHeading}
                   </p>
 
