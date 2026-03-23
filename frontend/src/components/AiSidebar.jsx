@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import useNomadLoginState from "../hooks/useNomadLoginState";
 import {
   HiChevronDown,
   HiChevronRight,
@@ -135,10 +136,7 @@ const AiSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const isLoggedIn = useMemo(() => {
-    const params = new URLSearchParams(location.search);
-    return params.get("login") === "true";
-  }, [location.search]);
+  const isLoggedIn = useNomadLoginState();
 
   const handleRecommendationClick = (item) => {
     const params = new URLSearchParams(location.search);

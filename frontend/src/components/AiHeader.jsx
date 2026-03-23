@@ -7,6 +7,8 @@ import { IoCloseSharp } from "react-icons/io5";
 import Container from "./Container";
 import useAuth from "../hooks/useAuth";
 
+import useNomadLoginState from "../hooks/useNomadLoginState";
+
 const AiHeader = () => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
@@ -15,8 +17,8 @@ const AiHeader = () => {
   const view = searchParams.get("view");
   const showToggle = location.pathname.includes("verticals");
   const { auth } = useAuth();
-  const isLoggedIn =
-    Boolean(auth?.user) || searchParams.get("login") === "true";
+  const hasNomadLoginState = useNomadLoginState();
+  const isLoggedIn = Boolean(auth?.user) || hasNomadLoginState;
 
   const formData = useSelector((state) => state.location.formValues);
   const handleNavigation = (path) => {
