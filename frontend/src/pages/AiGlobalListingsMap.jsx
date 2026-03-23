@@ -22,6 +22,7 @@ import ListingCard from "../components/ListingCard.jsx";
 import newIcons from "../assets/newIcons.js";
 import { IoSearch } from "react-icons/io5";
 import SearchBarCombobox from "../components/SearchBarCombobox.jsx";
+import AiSelectedBadgesSearchBar from "../components/AiSelectedBadgesSearchBar.jsx";
 import { AnimatePresence, motion } from "motion/react";
 import PaginatedGrid from "../components/PaginatedGrid.jsx";
 import { Helmet } from "@dr.pogodin/react-helmet";
@@ -99,6 +100,18 @@ const AiGlobalListingsMap = () => {
 
   const selectedCountry = watch("country");
   const selectedState = watch("location");
+
+  const [persistedSearchBarBadges, setPersistedSearchBarBadges] = useState([]);
+
+  const searchBarBadges = useMemo(() => {
+    const locationStateBadges = location.state?.searchBarBadges;
+
+    if (Array.isArray(locationStateBadges) && locationStateBadges.length > 0) {
+      return locationStateBadges.filter(Boolean);
+    }
+
+    return persistedSearchBarBadges;
+  }, [location.state, persistedSearchBarBadges]);
 
   const specialUserEmails = [
     "allan.wono@gmail.com",
@@ -183,6 +196,16 @@ const AiGlobalListingsMap = () => {
       })) || []
     );
   }, [filteredLocation]);
+
+  const selectedLocationLabel = useMemo(() => {
+    if (!formData?.location) return "";
+    const normalizedLocation = formData.location.toLowerCase();
+    return (
+      locationOptions.find(
+        (option) => option.value?.toLowerCase() === normalizedLocation,
+      )?.label || formData.location
+    );
+  }, [formData?.location, locationOptions]);
 
   const skeletonArray = Array.from({ length: 6 });
   const countOptions = [
@@ -308,6 +331,31 @@ const AiGlobalListingsMap = () => {
   };
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const savedBadges = window.sessionStorage.getItem("aiSearchBarBadges");
+    if (!savedBadges) return;
+
+    try {
+      const parsedBadges = JSON.parse(savedBadges);
+      if (Array.isArray(parsedBadges)) {
+        setPersistedSearchBarBadges(parsedBadges.filter(Boolean));
+      }
+    } catch (error) {
+      console.error("Failed to restore AI search badges", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || searchBarBadges.length === 0) return;
+
+    window.sessionStorage.setItem(
+      "aiSearchBarBadges",
+      JSON.stringify(searchBarBadges),
+    );
+  }, [searchBarBadges]);
+
+  useEffect(() => {
     setValue("continent", formData.continent);
     setValue("country", formData.country);
     setValue("location", formData.location);
@@ -388,6 +436,7 @@ const AiGlobalListingsMap = () => {
           country: currentFormData.country,
           location: currentFormData.location,
           category: categoryValue,
+          searchBarBadges,
         },
       },
     );
@@ -545,6 +594,14 @@ const AiGlobalListingsMap = () => {
             </div>
           </div>
         </div>
+
+        <AiSelectedBadgesSearchBar
+          badges={searchBarBadges}
+          stateLabel={selectedLocationLabel}
+          onBack={() => navigate("/search/results")}
+          onClear={() => navigate("/search/results")}
+          className="mb-8"
+        />
 
         <Container padding={false}>
           <div className="">

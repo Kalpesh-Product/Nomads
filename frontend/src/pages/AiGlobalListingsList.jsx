@@ -20,6 +20,7 @@ import ListingCard from "../components/ListingCard.jsx";
 import newIcons from "../assets/newIcons.js";
 import { IoSearch } from "react-icons/io5";
 import SearchBarCombobox from "../components/SearchBarCombobox.jsx";
+import AiSelectedBadgesSearchBar from "../components/AiSelectedBadgesSearchBar.jsx";
 import { AnimatePresence, motion } from "motion/react";
 import { Helmet } from "@dr.pogodin/react-helmet";
 import useAuth from "../hooks/useAuth.js";
@@ -95,6 +96,18 @@ const AiGlobalListingsList = () => {
   const userId = auth?.user?._id || auth?.user?.id;
   const selectedCountry = watch("country");
   const selectedState = watch("location");
+
+  const [persistedSearchBarBadges, setPersistedSearchBarBadges] = useState([]);
+
+  const searchBarBadges = useMemo(() => {
+    const locationStateBadges = location.state?.searchBarBadges;
+
+    if (Array.isArray(locationStateBadges) && locationStateBadges.length > 0) {
+      return locationStateBadges.filter(Boolean);
+    }
+
+    return persistedSearchBarBadges;
+  }, [location.state, persistedSearchBarBadges]);
 
   // Special users who can see all locations
   const specialUserEmails = [
@@ -293,6 +306,31 @@ const AiGlobalListingsList = () => {
   };
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const savedBadges = window.sessionStorage.getItem("aiSearchBarBadges");
+    if (!savedBadges) return;
+
+    try {
+      const parsedBadges = JSON.parse(savedBadges);
+      if (Array.isArray(parsedBadges)) {
+        setPersistedSearchBarBadges(parsedBadges.filter(Boolean));
+      }
+    } catch (error) {
+      console.error("Failed to restore AI search badges", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || searchBarBadges.length === 0) return;
+
+    window.sessionStorage.setItem(
+      "aiSearchBarBadges",
+      JSON.stringify(searchBarBadges),
+    );
+  }, [searchBarBadges]);
+
+  useEffect(() => {
     setValue("continent", formData.continent);
     setValue("country", formData.country);
     setValue("location", formData.location);
@@ -363,6 +401,7 @@ const AiGlobalListingsList = () => {
           country: formData.country,
           location: formData.location,
           category: categoryValue,
+          searchBarBadges,
         },
       },
     );
@@ -531,6 +570,14 @@ const AiGlobalListingsList = () => {
             </div>
           </div>
         </div>
+
+        <AiSelectedBadgesSearchBar
+          badges={searchBarBadges}
+          stateLabel={selectedLocationLabel}
+          onBack={() => navigate("/search/results")}
+          onClear={() => navigate("/search/results")}
+          className="mb-8"
+        />
 
         <Container padding={false}>
           <div className="">

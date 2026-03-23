@@ -5,14 +5,14 @@ import {
   TextField,
   useMediaQuery,
 } from "@mui/material";
-import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
-import React, { useEffect, useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import React, { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { CiSearch } from "react-icons/ci";
 import { AiFillStar } from "react-icons/ai";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import Container from "../components/Container";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Map from "../components/Map";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "../utils/axios.js";
@@ -26,6 +26,7 @@ import ListingCard from "../components/ListingCard.jsx";
 import PaginatedGrid from "../components/PaginatedGrid.jsx";
 import newIcons from "../assets/newIcons.js";
 import SearchBarCombobox from "../components/SearchBarCombobox.jsx";
+import AiSelectedBadgesSearchBar from "../components/AiSelectedBadgesSearchBar.jsx";
 import { IoSearch } from "react-icons/io5";
 import { HiOutlineArrowLeft } from "react-icons/hi";
 import { AnimatePresence, motion } from "motion/react";
@@ -37,6 +38,7 @@ const AiListings = () => {
   const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
   const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const location = useLocation();
   const formData = useSelector((state) => state.location.formValues);
   const { handleSubmit, control, reset, setValue, getValues, watch } = useForm({
     defaultValues: {
@@ -64,6 +66,18 @@ const AiListings = () => {
 
   const selectedCountry = watch("country");
   const selectedState = watch("location");
+
+  const [persistedSearchBarBadges, setPersistedSearchBarBadges] = useState([]);
+
+  const searchBarBadges = useMemo(() => {
+    const locationStateBadges = location.state?.searchBarBadges;
+
+    if (Array.isArray(locationStateBadges) && locationStateBadges.length > 0) {
+      return locationStateBadges.filter(Boolean);
+    }
+
+    return persistedSearchBarBadges;
+  }, [location.state, persistedSearchBarBadges]);
   const { data: locations = [], isLoading: isLocations } = useQuery({
     queryKey: ["locations", user?.email],
     queryFn: async () => {
@@ -282,6 +296,31 @@ const AiListings = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const savedBadges = window.sessionStorage.getItem("aiSearchBarBadges");
+    if (!savedBadges) return;
+
+    try {
+      const parsedBadges = JSON.parse(savedBadges);
+      if (Array.isArray(parsedBadges)) {
+        setPersistedSearchBarBadges(parsedBadges.filter(Boolean));
+      }
+    } catch (error) {
+      console.error("Failed to restore AI search badges", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || searchBarBadges.length === 0) return;
+
+    window.sessionStorage.setItem(
+      "aiSearchBarBadges",
+      JSON.stringify(searchBarBadges),
+    );
+  }, [searchBarBadges]);
+
+  useEffect(() => {
     setValue("continent", formData.continent);
     setValue("country", formData.country);
     setValue("location", formData.location);
@@ -359,6 +398,7 @@ const AiListings = () => {
           country: formData.country,
           location: formData.location,
           category: categoryValue,
+          searchBarBadges,
         },
       },
     );
@@ -409,7 +449,7 @@ const AiListings = () => {
   return (
     <div className="flex flex-col gap:2 lg:gap-6 ">
       <div className="w-full lg:min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-4 sm:px-6 lg:px-0">
-        <div className="mb-4 flex items-center gap-3">
+        <div className="mb-4 flex items-center gap-3 lg:hidden">
           <button
             type="button"
             onClick={() => navigate("/search/results")}
@@ -424,6 +464,13 @@ const AiListings = () => {
             </span>
           )}
         </div>
+        <AiSelectedBadgesSearchBar
+          badges={searchBarBadges}
+          stateLabel={selectedStateLabel}
+          onBack={() => navigate("/search/results")}
+          onClear={() => navigate("/search/results")}
+          className="mb-4"
+        />
         <div className="lg:hidden w-full flex flex-col gap-4 mb-4">
           <button
             onClick={() => setShowMobileSearch((prev) => !prev)}
@@ -975,6 +1022,9 @@ const AiListings = () => {
           onClick={() =>
             navigate(
               `/verticals?country=${formData?.country}&location=${formData?.location}&view=map`,
+              {
+                state: { searchBarBadges },
+              },
             )
           }
           className="bg-[#222222] text-white px-5 py-3 rounded-full flex items-center gap-2 shadow-xl hover:scale-105 transition-transform active:scale-95"
