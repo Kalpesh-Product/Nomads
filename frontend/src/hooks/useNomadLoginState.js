@@ -5,12 +5,20 @@ const STORAGE_KEY = "nomad-login-query";
 
 const canUseSessionStorage = () => typeof window !== "undefined";
 
-const readStoredLoginState = () => {
+export const readStoredLoginState = () => {
   if (!canUseSessionStorage()) {
     return false;
   }
 
   return window.sessionStorage.getItem(STORAGE_KEY) === "true";
+};
+
+export const clearStoredLoginState = () => {
+  if (!canUseSessionStorage()) {
+    return;
+  }
+
+  window.sessionStorage.removeItem(STORAGE_KEY);
 };
 
 export default function useNomadLoginState() {

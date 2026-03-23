@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import useNomadLoginState from "../hooks/useNomadLoginState";
+import {
+  clearStoredLoginState,
+  readStoredLoginState,
+} from "../hooks/useNomadLoginState";
 import {
   HiChevronDown,
   HiChevronRight,
@@ -136,7 +139,9 @@ const AiSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const isLoggedIn = useNomadLoginState();
+  const searchParams = new URLSearchParams(location.search);
+  const isLoggedIn =
+    searchParams.get("login") === "true" || readStoredLoginState();
 
   const handleRecommendationClick = (item) => {
     const params = new URLSearchParams(location.search);
@@ -154,6 +159,19 @@ const AiSidebar = () => {
 
   const handleLogInClick = () => {
     navigate(`/ai-login${location.search}`);
+  };
+
+  const handleSignOutClick = () => {
+    const nextSearchParams = new URLSearchParams(location.search);
+    nextSearchParams.delete("login");
+    clearStoredLoginState();
+
+    navigate({
+      pathname: location.pathname,
+      search: nextSearchParams.toString()
+        ? `?${nextSearchParams.toString()}`
+        : "",
+    });
   };
 
   return (
@@ -200,7 +218,11 @@ const AiSidebar = () => {
             isOpen={isProfileOpen}
             onToggle={() => setIsProfileOpen((prev) => !prev)}
           />
-          <SidebarSection items={signOutItem} collapsed={collapsed} />
+          <SidebarSection
+            items={signOutItem}
+            collapsed={collapsed}
+            onItemClick={handleSignOutClick}
+          />
         </>
       ) : (
         !collapsed && (
