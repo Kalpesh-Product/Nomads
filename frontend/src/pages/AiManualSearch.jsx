@@ -307,7 +307,7 @@ const AiManualSearch = () => {
               className="relative mt-6 lg:ml-[6.25rem] lg:mr-36"
               ref={dropdownContainerRef}
             >
-              <div className="relative z-30 grid w-full grid-cols-1 gap-4 sm:grid-cols-2 sm:items-stretch">
+              <div className="relative z-30 grid w-full grid-cols-1 gap-4 sm:grid-cols-2 sm:items-stretch lg:grid-cols-4">
                 <DropdownBadge
                   label="Continent"
                   options={continentOptions}
