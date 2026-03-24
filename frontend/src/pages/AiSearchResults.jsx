@@ -259,9 +259,9 @@ const AiSearchResults = () => {
   return (
     <div className="min-h-full bg-white">
       <main className="py-8">
-        <div className="mx-0 min-w-[75%] max-w-[80rem] px-6 sm:px-6 lg:mx-auto lg:max-w-[80rem] lg:px-0">
+        <div className="mx-0 w-full max-w-[80rem] px-4 sm:px-6 lg:mx-auto lg:max-w-[80rem] lg:px-0 lg:min-w-[75%]">
           <div className="rounded-[10px] bg-white px-4 py-6">
-            <div className="flex items-center gap-5">
+            <div className="flex items-center gap-3 sm:gap-5">
               <button
                 type="button"
                 onClick={() => navigate("/home")}
@@ -271,7 +271,7 @@ const AiSearchResults = () => {
                 <HiOutlineArrowLeft size={18} />
               </button>
 
-              <div className="ml-12 mr-36 flex flex-1 items-center rounded-full border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)]">
+              <div className="flex w-full flex-1 items-center rounded-[30px] border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] lg:ml-12 lg:mr-36">
                 <div className="flex flex-wrap items-center gap-2">
                   {searchBarBadges.map((badgeLabel, index) => (
                     <div
@@ -296,7 +296,7 @@ const AiSearchResults = () => {
               </div>
             </div>
 
-            <div className="relative ml-[6.25rem] mr-36 mt-6">
+            <div className="relative mt-6 lg:ml-[6.25rem] lg:mr-36">
               <div
                 ref={dropdownContainerRef}
                 className="relative z-30 flex w-full flex-col gap-4 sm:flex-row sm:items-stretch"
