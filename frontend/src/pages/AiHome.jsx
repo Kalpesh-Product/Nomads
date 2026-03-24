@@ -56,7 +56,7 @@ const recommendationCards = [
     description:
       "WoNo lets you manually filter and sort destinations if you prefer a traditional search approach.",
     icon: HiOutlineViewGrid,
-    path: "/",
+    path: "/manual-search",
   },
 ];
 

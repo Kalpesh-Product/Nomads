@@ -43,7 +43,7 @@ const recommendationItems = [
     icon: HiOutlineUserCircle,
     path: "/home",
   },
-  { label: "Search Old School", icon: HiOutlineMenu, path: "/" },
+  { label: "Search Old School", icon: HiOutlineMenu, path: "/manual-search" },
 ];
 const valueAdditionItems = [
   { label: "VISA Support", icon: LuMapPinned, path: "/visa-support" },
