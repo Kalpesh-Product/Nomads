@@ -71,6 +71,9 @@ import AiCompatibleSearchResults from "./pages/AiCompatibleSearchResults";
 import AiHomeLoggedIn from "./pages/AiHomeLoggedIn";
 import AiLogin from "./pages/AiLogin";
 import AiSignup from "./pages/AiSignup";
+import AiVisaSupport from "./pages/AiVisaSupport";
+import AiHelpGetActivated from "./pages/AiHelpGetActivated";
+import AiConsultation from "./pages/AiConsultation";
 
 function getTenantFromHost() {
   const hostname = window.location.hostname; // e.g. "nomad.wono.co" or "nomad.localhost"
@@ -198,6 +201,12 @@ if (tenant === "main") {
               path: "ai-listings/:company/images",
               element: <AiImageGallery />,
             },
+            { path: "visa-support", element: <AiVisaSupport /> },
+            {
+              path: "help-you-get-activated",
+              element: <AiHelpGetActivated />,
+            },
+            { path: "consultation", element: <AiConsultation /> },
           ],
         },
       ],

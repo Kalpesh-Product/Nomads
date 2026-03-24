@@ -45,11 +45,15 @@ const recommendationItems = [
   { label: "Search Old School", icon: HiOutlineMenu, path: "/" },
 ];
 const valueAdditionItems = [
-  { label: "VISA Support", icon: LuMapPinned },
-  { label: "Help you get activated", icon: HiOutlineKey },
+  { label: "VISA Support", icon: LuMapPinned, path: "/visa-support" },
+  {
+    label: "Help you get activated",
+    icon: HiOutlineKey,
+    path: "/help-you-get-activated",
+  },
   { label: "Company Setup", icon: HiOutlineCog },
   { label: "Apply for Job", icon: HiOutlineUserCircle },
-  { label: "Consultation", icon: LuCircleDollarSign },
+  { label: "Consultation", icon: LuCircleDollarSign, path: "/consultation" },
   { label: "Become A Host", icon: HiOutlineViewGrid },
 ];
 
@@ -157,6 +161,16 @@ const AiSidebar = () => {
     });
   };
 
+  const handleValueAdditionClick = (item) => {
+    if (!item.path) return;
+
+    const params = new URLSearchParams(location.search);
+    navigate({
+      pathname: item.path,
+      search: params.toString() ? `?${params.toString()}` : "",
+    });
+  };
+
   const handleLogInClick = () => {
     navigate(`/ai-login${location.search}`);
   };
@@ -207,6 +221,7 @@ const AiSidebar = () => {
         isExpandable
         isOpen={isValueAdditionsOpen}
         onToggle={() => setIsValueAdditionsOpen((prev) => !prev)}
+        onItemClick={handleValueAdditionClick}
       />
       {isLoggedIn ? (
         <>
