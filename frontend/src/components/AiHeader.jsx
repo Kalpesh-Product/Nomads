@@ -4,12 +4,13 @@ import logo from "../assets/WONO_LOGO_Black_TP.png";
 import { useSelector } from "react-redux";
 import { Drawer } from "@mui/material";
 import { IoCloseSharp } from "react-icons/io5";
+import { HiOutlineMenu } from "react-icons/hi";
 import Container from "./Container";
 import useAuth from "../hooks/useAuth";
 
 import useNomadLoginState from "../hooks/useNomadLoginState";
 
-const AiHeader = () => {
+const AiHeader = ({ onMobileSidebarToggle }) => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -57,6 +58,14 @@ const AiHeader = () => {
         <div className="flex py-3 justify-between items-center  lg:py-[0.625rem] ">
           {/* Logo */}
           <div className="flex items-center">
+            <button
+              type="button"
+              onClick={() => onMobileSidebarToggle?.()}
+              className="mr-2 rounded p-1 text-black sm:hidden"
+              aria-label="Open sidebar"
+            >
+              <HiOutlineMenu size={24} />
+            </button>
             <div
               onClick={goToHostssMain}
               className="w-24 h-10 lg:w-48 overflow-x-hidden rounded-lg flex gap-8 justify-start items-start cursor-pointer"
@@ -206,7 +215,7 @@ const AiHeader = () => {
               <div className="p-4 px-0 whitespace-nowrap">
                 <button
                   onClick={goToHosts}
-                  className="relative pb-1 transition-all cursor-pointer duration-300 group font-semibold bg-transparent border-none text-lg text-blue-500"
+                  className="relative pb-1 transition-all cursor-pointer duration-300 group font-semibold bg-transparent border-none text-sm text-blue-500"
                 >
                   Become A Host
                   <span className="absolute left-0 w-0 bottom-0 block h-[2px] bg-black transition-all duration-300 group-hover:w-full"></span>
@@ -216,10 +225,12 @@ const AiHeader = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="h-full px-2 lg:hidden">
+          <div className="h-full px-2 lg:hidden sm:hidden">
             <button
               onClick={() => setOpen(true)}
-              className="rounded-lg text-subtitle text-black"
+              className={`rounded-lg text-subtitle text-black ${
+                onMobileSidebarToggle ? "hidden" : ""
+              }`}
             >
               ☰
             </button>

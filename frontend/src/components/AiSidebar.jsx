@@ -8,6 +8,7 @@ import {
   HiChevronDown,
   HiChevronUp,
   HiOutlineMenu,
+  HiX,
   HiOutlineViewGrid,
   HiOutlineCog,
   HiOutlineHeart,
@@ -45,11 +46,15 @@ const recommendationItems = [
   { label: "Search Old School", icon: HiOutlineMenu, path: "/" },
 ];
 const valueAdditionItems = [
-  { label: "VISA Support", icon: LuMapPinned },
-  { label: "Help you get activated", icon: HiOutlineKey },
+  { label: "VISA Support", icon: LuMapPinned, path: "/visa-support" },
+  {
+    label: "Help you get activated",
+    icon: HiOutlineKey,
+    path: "/help-you-get-activated",
+  },
   { label: "Company Setup", icon: HiOutlineCog },
   { label: "Apply for Job", icon: HiOutlineUserCircle },
-  { label: "Consultation", icon: LuCircleDollarSign },
+  { label: "Consultation", icon: LuCircleDollarSign, path: "/consultation" },
   { label: "Become A Host", icon: HiOutlineViewGrid },
 ];
 
@@ -130,7 +135,7 @@ const SidebarSection = ({
   );
 };
 
-const AiSidebar = () => {
+const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [isRecommendationsOpen, setIsRecommendationsOpen] = useState(true);
   const [isValueAdditionsOpen, setIsValueAdditionsOpen] = useState(false);
@@ -157,6 +162,16 @@ const AiSidebar = () => {
     });
   };
 
+  const handleValueAdditionClick = (item) => {
+    if (!item.path) return;
+
+    const params = new URLSearchParams(location.search);
+    navigate({
+      pathname: item.path,
+      search: params.toString() ? `?${params.toString()}` : "",
+    });
+  };
+
   const handleLogInClick = () => {
     navigate(`/ai-login${location.search}`);
   };
@@ -174,27 +189,47 @@ const AiSidebar = () => {
     });
   };
 
+  const isCollapsed = isMobileOverlay ? false : collapsed;
+
   return (
     <aside
       className={`flex h-full flex-col border-r border-black/10 bg-[#efefef] transition-all duration-300 ${
-        collapsed ? "w-[70px]" : "w-[260px]"
+        isMobileOverlay
+          ? "w-[calc(100%-52px)] max-w-[320px]"
+          : isCollapsed
+            ? "w-[70px]"
+            : "w-[260px]"
       }`}
+      onClick={(event) => {
+        if (isMobileOverlay) event.stopPropagation();
+      }}
     >
       <div className="px-4 py-4">
-        <button
-          type="button"
-          onClick={() => setCollapsed((prev) => !prev)}
-          className="rounded p-1 text-black/80 hover:bg-black/5"
-          aria-label="Toggle sidebar"
-        >
-          <HiOutlineMenu size={24} />
-        </button>
+        {isMobileOverlay ? (
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded p-1 text-black/80 hover:bg-black/5"
+            aria-label="Close sidebar"
+          >
+            <HiX size={24} />
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setCollapsed((prev) => !prev)}
+            className="rounded p-1 text-black/80 hover:bg-black/5"
+            aria-label="Toggle sidebar"
+          >
+            <HiOutlineMenu size={24} />
+          </button>
+        )}
       </div>
 
       <SidebarSection
         title="Nomad Recommendations"
         items={recommendationItems}
-        collapsed={collapsed}
+        collapsed={isCollapsed}
         isExpandable
         isOpen={isRecommendationsOpen}
         onToggle={() => setIsRecommendationsOpen((prev) => !prev)}
@@ -203,29 +238,30 @@ const AiSidebar = () => {
       <SidebarSection
         title="Value Additions"
         items={valueAdditionItems}
-        collapsed={collapsed}
+        collapsed={isCollapsed}
         isExpandable
         isOpen={isValueAdditionsOpen}
         onToggle={() => setIsValueAdditionsOpen((prev) => !prev)}
+        onItemClick={handleValueAdditionClick}
       />
       {isLoggedIn ? (
         <>
           <SidebarSection
             title="Profile"
             items={profileItems}
-            collapsed={collapsed}
+            collapsed={isCollapsed}
             isExpandable
             isOpen={isProfileOpen}
             onToggle={() => setIsProfileOpen((prev) => !prev)}
           />
           <SidebarSection
             items={signOutItem}
-            collapsed={collapsed}
+            collapsed={isCollapsed}
             onItemClick={handleSignOutClick}
           />
         </>
       ) : (
-        !collapsed && (
+        !isCollapsed && (
           <div className="mt-auto px-4 pb-4 pt-10">
             <div className="rounded-[28px]   p-4 shadow-sm">
               <h3 className="text-[13px] font-semibold leading-tight text-black/90">
