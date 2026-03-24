@@ -171,7 +171,7 @@ const AiHome = () => {
             </p>
           ) : null}
 
-          <div className="mt-16 rounded-[40px] px-2 py-4 md:px-6 md:py-8">
+          <div className="mt-4 rounded-[40px] px-2 py-4 md:px-6 md:py-8">
             <div className="grid grid-cols-2 gap-4 md:grid-cols-2 md:gap-10 xl:grid-cols-3">
               {recommendationCards.map((card) => {
                 const Icon = card.icon;
