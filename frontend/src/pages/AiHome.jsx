@@ -171,8 +171,8 @@ const AiHome = () => {
             </p>
           ) : null}
 
-          <div className="mt-16 rounded-[40px] px-6 py-8">
-            <div className="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-16 rounded-[40px] px-2 py-4 md:px-6 md:py-8">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-2 md:gap-10 xl:grid-cols-3">
               {recommendationCards.map((card) => {
                 const Icon = card.icon;
 
@@ -180,7 +180,7 @@ const AiHome = () => {
                   <article
                     key={card.title}
                     onClick={() => handleCardClick(card)}
-                    className="group cursor-pointer text-center"
+                    className="group cursor-pointer rounded-2xl bg-[#f1f1f3] px-3 py-5 text-center transition-colors duration-200 hover:bg-[#e8e8ed] md:rounded-none md:bg-transparent md:px-0 md:py-0 md:hover:bg-transparent"
                   >
                     <Icon
                       size={24}
@@ -189,7 +189,7 @@ const AiHome = () => {
                     <h3 className="mt-2 text-md font-bold text-black/90 leading-tight transition-colors duration-200 group-hover:text-sky-500">
                       {card.title}
                     </h3>
-                    <div className="mt-2 rounded-2xl bg-[#f1f1f3] p-5 text-left shadow-[0_1px_0_rgba(255,255,255,0.7)] transition-colors duration-200 group-hover:bg-sky-500">
+                    <div className="mt-2 hidden rounded-2xl bg-[#f1f1f3] p-5 text-left shadow-[0_1px_0_rgba(255,255,255,0.7)] transition-colors duration-200 group-hover:bg-sky-500 md:block">
                       <p className="text-nano leading-relaxed text-black/90 transition-colors duration-200 group-hover:text-white">
                         {card.description}
                       </p>
