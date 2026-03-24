@@ -369,7 +369,7 @@ const AiManualSearch = () => {
                 />
               </div>
 
-              <div className="relative mt-8">
+              {/* <div className="relative mt-8">
                 <p className="text-3xl font-medium leading-snug text-black/85 lg:text-lg font-play">
                   Select one option from each badge above to view matching
                   destinations.
@@ -379,7 +379,7 @@ const AiManualSearch = () => {
                   Results will appear in list view after you complete all
                   filters and click search.
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
