@@ -2,7 +2,7 @@ import { Outlet, useLocation } from "react-router-dom";
 
 import Footer from "../components/Footer";
 // import { Toaster } from "react-hot-toast";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import AiHeader from "../components/AiHeader";
 import AiSidebar from "../components/AiSidebar";
@@ -10,6 +10,7 @@ import AiSidebar from "../components/AiSidebar";
 const NomadAiLayout = () => {
   const location = useLocation();
   const contentRef = useRef(null);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const formData = useSelector((state) => state.location.formValues);
   console.log("formData from layout : ", formData);
@@ -18,13 +19,35 @@ const NomadAiLayout = () => {
       contentRef.current.scrollTo({ behavior: "smooth", top: "0" });
     }
   }, [location.pathname]);
+
+  useEffect(() => {
+    setIsMobileSidebarOpen(false);
+  }, [location.pathname, location.search]);
+
   return (
     <div className="flex h-screen bg-white">
-      <AiSidebar />
+      <div className="hidden sm:block">
+        <AiSidebar />
+      </div>
+
+      {isMobileSidebarOpen && (
+        <div
+          className="fixed inset-0 z-[70] bg-black/35 sm:hidden"
+          onClick={() => setIsMobileSidebarOpen(false)}
+          aria-hidden="true"
+        >
+          <AiSidebar
+            isMobileOverlay
+            onClose={() => setIsMobileSidebarOpen(false)}
+          />
+        </div>
+      )}
 
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <div className="sticky top-0 z-50 w-full">
-          <AiHeader />
+          <AiHeader
+            onMobileSidebarToggle={() => setIsMobileSidebarOpen(true)}
+          />
         </div>
 
         <div
