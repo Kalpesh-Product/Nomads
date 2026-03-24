@@ -202,11 +202,11 @@ const AiManualSearch = () => {
 
   const searchBarBadges = [
     "Manual Search",
-    selectedContinent ? continentLabel : "Continent",
-    selectedCountry ? countryLabel : "Country",
-    selectedLocation ? locationLabel : "Location",
-    selectedCount ? `${countLabel} Nomads` : "Count",
-  ];
+    selectedContinent && continentLabel,
+    selectedCountry && countryLabel,
+    selectedLocation && locationLabel,
+    selectedCount && `${countLabel} Nomads`,
+  ].filter(Boolean);
 
   const handleDropdownToggle = (dropdownKey) => {
     setOpenDropdown((current) =>
@@ -273,9 +273,14 @@ const AiManualSearch = () => {
 
               <div className="flex w-full flex-1 items-center rounded-[30px] border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] lg:ml-12 lg:mr-36">
                 <div className="flex flex-wrap items-center gap-2">
-                  <div className={searchBarBadgeClassName}>
-                    <span className="truncate">Manual Search</span>
-                  </div>
+                  {searchBarBadges.map((badgeLabel, index) => (
+                    <div
+                      key={`${badgeLabel}-${index}`}
+                      className={searchBarBadgeClassName}
+                    >
+                      <span className="truncate">{badgeLabel}</span>
+                    </div>
+                  ))}
                 </div>
                 <div className="ml-auto flex items-center gap-2">
                   <button
