@@ -1,32 +1,26 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import React, { useMemo, useRef, useState, useEffect } from "react";
 import {
   HiOutlineArrowLeft,
   HiOutlineChevronDown,
   HiOutlineSearch,
   HiOutlineX,
 } from "react-icons/hi";
-import { useLocation, useNavigate } from "react-router-dom";
-
-import { aiDestinationCards } from "../constants/aiDestinationCards";
-
-import { defaultGoal, goalFilterMap } from "../constants/aiGoalFilters";
-
-const continentOptions = [
-  "World",
-  "Africa",
-  "Asia",
-  "Europe",
-  "North America",
-  "South America",
-  "Oceania",
-];
-
-const destinationCards = aiDestinationCards;
-
-const INITIAL_VISIBLE_DESTINATIONS = 18;
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { setFormValues } from "../features/locationSlice";
+import useAuth from "../hooks/useAuth";
+import axios from "../utils/axios";
 
 const searchBarBadgeClassName =
   "inline-flex min-h-[40px] min-w-[5rem] items-center rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85";
+
+const countOptions = [
+  { label: "1 - 5", value: "1-5" },
+  { label: "5 - 10", value: "5-10" },
+  { label: "10 - 25", value: "10-25" },
+  { label: "25+", value: "25+" },
+];
 
 const DropdownBadge = ({
   label,
@@ -35,19 +29,20 @@ const DropdownBadge = ({
   isOpen,
   onToggle,
   onSelect,
-  align = "left",
+  disabled = false,
 }) => {
-  const menuAlignment = align === "right" ? "right-0" : "left-0";
-
   return (
     <div className="relative w-full min-w-0 flex-1">
       <button
         type="button"
         onClick={onToggle}
+        disabled={disabled}
         className={`flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${
-          isOpen
-            ? "border-sky-500 bg-sky-500 text-white"
-            : "border-black/20 bg-white text-black/85 hover:border-sky-500"
+          disabled
+            ? "cursor-not-allowed border-black/10 bg-black/[0.03] text-black/35"
+            : isOpen
+              ? "border-sky-500 bg-sky-500 text-white"
+              : "border-black/20 bg-white text-black/85 hover:border-sky-500"
         }`}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
@@ -59,23 +54,21 @@ const DropdownBadge = ({
         />
       </button>
 
-      {isOpen && (
-        <div
-          className={`absolute top-full z-40 mt-3 min-w-[11rem] w-full max-w-[calc(100vw-4rem)] rounded-2xl border border-sky-100 bg-white p-2 shadow-[0_12px_30px_rgba(15,23,42,0.12)] ${menuAlignment}`}
-        >
+      {isOpen && !disabled && (
+        <div className="absolute top-full z-40 mt-3 w-full min-w-[11rem] max-w-[calc(100vw-4rem)] rounded-2xl border border-sky-100 bg-white p-2 shadow-[0_12px_30px_rgba(15,23,42,0.12)]">
           <ul
             className="max-h-72 overflow-y-auto"
             role="listbox"
             aria-label={label}
           >
             {options.map((option) => {
-              const isSelected = option === selectedValue;
+              const isSelected = option.value === selectedValue;
 
               return (
-                <li key={option}>
+                <li key={option.value}>
                   <button
                     type="button"
-                    onClick={() => onSelect(option)}
+                    onClick={() => onSelect(option.value)}
                     className={`flex w-full items-center rounded-xl px-3 py-2 text-left text-sm transition-colors ${
                       isSelected
                         ? "bg-sky-50 font-medium text-sky-600"
@@ -84,7 +77,7 @@ const DropdownBadge = ({
                     role="option"
                     aria-selected={isSelected}
                   >
-                    {option}
+                    {option.label}
                   </button>
                 </li>
               );
@@ -98,138 +91,156 @@ const DropdownBadge = ({
 
 const AiManualSearch = () => {
   const navigate = useNavigate();
-  const { state } = useLocation();
-  const selectedGoal =
-    state?.selectedGoal && goalFilterMap[state.selectedGoal]
-      ? state.selectedGoal
-      : defaultGoal;
-  const goalOptions = goalFilterMap[selectedGoal] || goalFilterMap[defaultGoal];
-  const selectedFilter = null;
-
-  const [typedHeading, setTypedHeading] = useState("");
-  const [selectedContinent, setSelectedContinent] = useState(null);
-  const [selectedGoalOption, setSelectedGoalOption] = useState(selectedFilter);
-  const [openDropdown, setOpenDropdown] = useState(null);
-  const [headingAnimationKey, setHeadingAnimationKey] = useState(0);
-  const [showAllDestinations, setShowAllDestinations] = useState(false);
+  const dispatch = useDispatch();
   const dropdownContainerRef = useRef(null);
+  const { auth } = useAuth();
 
-  const hasSelectedContinent = Boolean(selectedContinent);
-  const hasSelectedGoalOption = Boolean(selectedGoalOption);
-  const hasSelectedFilters = hasSelectedContinent && hasSelectedGoalOption;
+  const [openDropdown, setOpenDropdown] = useState(null);
+  const [selectedContinent, setSelectedContinent] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState("");
+  const [selectedCount, setSelectedCount] = useState("");
 
-  const filteredDestinations = useMemo(() => {
-    if (!hasSelectedFilters) {
-      return [];
-    }
+  const user = auth?.user || {};
 
-    if (selectedContinent === "World") {
-      return destinationCards;
-    }
+  const specialUserEmails = [
+    "allan.wono@gmail.com",
+    "muskan.wono@gmail.com",
+    "shawnsilveira.wono@gmail.com",
+    "mehak.wono@gmail.com",
+    "savita.wono@gmail.com",
+    "k@k.k",
+    "gourish.wono@gmail.com",
+    "vishal.wono@gmail.com",
+  ];
 
-    return destinationCards.filter(
-      (destination) => destination.continent === selectedContinent,
+  const { data: locations = [] } = useQuery({
+    queryKey: ["locations", user?.email],
+    queryFn: async () => {
+      try {
+        const response = await axios.get("company/company-locations");
+        const rawData = Array.isArray(response.data) ? response.data : [];
+
+        const userEmail = user?.email?.toLowerCase();
+        const isSpecialUser = specialUserEmails.includes(userEmail);
+
+        if (isSpecialUser) return rawData;
+
+        return rawData
+          .map((country) => ({
+            ...country,
+            states: (country.states || []).filter((state) => state?.isPublic),
+          }))
+          .filter((country) => (country.states?.length || 0) > 0);
+      } catch (error) {
+        console.error(error?.response?.data?.message);
+        return [];
+      }
+    },
+  });
+
+  const continentOptions = useMemo(() => {
+    const uniqueContinents = [
+      ...new Set(locations.map((item) => item.continent).filter(Boolean)),
+    ];
+
+    return uniqueContinents
+      .map((continent) => ({
+        label: continent.charAt(0).toUpperCase() + continent.slice(1),
+        value: continent.toLowerCase(),
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, [locations]);
+
+  const countryOptions = useMemo(() => {
+    const filtered = selectedContinent
+      ? locations.filter(
+          (item) =>
+            item.continent?.toLowerCase() === selectedContinent?.toLowerCase(),
+        )
+      : locations;
+
+    return filtered
+      .map((item) => ({
+        label: item.country
+          ? item.country.charAt(0).toUpperCase() + item.country.slice(1)
+          : "",
+        value: item.country?.toLowerCase(),
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, [locations, selectedContinent]);
+
+  const locationOptions = useMemo(() => {
+    const countryData = locations.find(
+      (item) => item.country?.toLowerCase() === selectedCountry?.toLowerCase(),
     );
-  }, [hasSelectedFilters, selectedContinent]);
 
-  const rankedDestinations = useMemo(() => {
-    const sortedSpeeds = filteredDestinations
-      .map((destination) => destination.suggestions)
-      .sort((left, right) => right - left);
+    return (
+      countryData?.states?.map((item) => ({
+        label: item.name,
+        value: item.name?.toLowerCase(),
+      })) || []
+    );
+  }, [locations, selectedCountry]);
 
-    return filteredDestinations.map((destination, index) => ({
-      ...destination,
-      rankLabel: `Rank ${index + 1}`,
-      speedLabel: `${sortedSpeeds[index]} Mbps`,
-    }));
-  }, [filteredDestinations]);
+  const continentLabel =
+    continentOptions.find((option) => option.value === selectedContinent)
+      ?.label || "Continent";
+  const countryLabel =
+    countryOptions.find((option) => option.value === selectedCountry)?.label ||
+    "Country";
+  const locationLabel =
+    locationOptions.find((option) => option.value === selectedLocation)
+      ?.label || "Location";
+  const countLabel =
+    countOptions.find((option) => option.value === selectedCount)?.label ||
+    "Count";
 
-  const searchBarBadges = useMemo(() => {
-    const badges = [selectedGoal];
+  const hasAllSelections = Boolean(
+    selectedContinent && selectedCountry && selectedLocation && selectedCount,
+  );
 
-    if (hasSelectedContinent || hasSelectedGoalOption) {
-      badges.push(selectedContinent || "Select from below");
-      badges.push(selectedGoalOption || "Select from below");
-    }
+  const searchBarBadges = [
+    "Manual Search",
+    selectedContinent ? continentLabel : "Continent",
+    selectedCountry ? countryLabel : "Country",
+    selectedLocation ? locationLabel : "Location",
+    selectedCount ? `${countLabel} Nomads` : "Count",
+  ];
 
-    return badges;
-  }, [
-    hasSelectedContinent,
-    hasSelectedGoalOption,
-    selectedContinent,
-    selectedGoal,
-    selectedGoalOption,
-  ]);
+  const handleDropdownToggle = (dropdownKey) => {
+    setOpenDropdown((current) =>
+      current === dropdownKey ? null : dropdownKey,
+    );
+  };
 
-  const visibleDestinations = useMemo(() => {
-    if (showAllDestinations) {
-      return rankedDestinations;
-    }
+  const handleSearch = () => {
+    if (!hasAllSelections) return;
 
-    return rankedDestinations.slice(0, INITIAL_VISIBLE_DESTINATIONS);
-  }, [rankedDestinations, showAllDestinations]);
+    const formValues = {
+      continent: selectedContinent,
+      country: selectedCountry,
+      location: selectedLocation,
+      category: "",
+      count: selectedCount,
+    };
 
-  const shouldShowViewMore =
-    rankedDestinations.length > INITIAL_VISIBLE_DESTINATIONS &&
-    !showAllDestinations;
-
-  const handleDestinationClick = (destination) => {
-    const country = destination.country.toLowerCase();
-    const location = destination.city.toLowerCase();
-    const continent = destination.continent.toLowerCase();
+    dispatch(setFormValues(formValues));
 
     navigate(
-      `/ai-verticals?country=${encodeURIComponent(country)}&state=${encodeURIComponent(location)}`,
+      `/ai-verticals?country=${encodeURIComponent(selectedCountry)}&location=${encodeURIComponent(selectedLocation)}`,
       {
         state: {
           breadcrumbFilters: {
-            continent,
-            country,
-            location,
+            continent: selectedContinent,
+            country: selectedCountry,
+            location: selectedLocation,
           },
           searchBarBadges,
         },
       },
     );
   };
-
-  const handleDropdownToggle = (dropdownKey) => {
-    setOpenDropdown((currentDropdown) =>
-      currentDropdown === dropdownKey ? null : dropdownKey,
-    );
-  };
-
-  const handleContinentSelect = (continent) => {
-    setSelectedContinent(continent);
-    setOpenDropdown(null);
-    setHeadingAnimationKey((currentKey) => currentKey + 1);
-  };
-
-  const handleGoalOptionSelect = (option) => {
-    setSelectedGoalOption(option);
-    setOpenDropdown(null);
-    setHeadingAnimationKey((currentKey) => currentKey + 1);
-  };
-
-  const headingText = hasSelectedFilters
-    ? "Showing results for the selected option. Select any option to view your preferred results."
-    : "Select one option from each badge above to view matching destinations.";
-
-  useEffect(() => {
-    setTypedHeading("");
-
-    let currentIndex = 0;
-    const typingInterval = setInterval(() => {
-      currentIndex += 1;
-      setTypedHeading(headingText.slice(0, currentIndex));
-
-      if (currentIndex >= headingText.length) {
-        clearInterval(typingInterval);
-      }
-    }, 25);
-
-    return () => clearInterval(typingInterval);
-  }, [headingText, headingAnimationKey]);
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
@@ -242,19 +253,8 @@ const AiManualSearch = () => {
     };
 
     document.addEventListener("mousedown", handleOutsideClick);
-
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-    };
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
-
-  useEffect(() => {
-    setSelectedGoalOption(selectedFilter);
-  }, [selectedFilter]);
-
-  useEffect(() => {
-    setShowAllDestinations(false);
-  }, [selectedContinent, selectedGoalOption]);
 
   return (
     <div className="min-h-full bg-white">
@@ -273,14 +273,9 @@ const AiManualSearch = () => {
 
               <div className="flex w-full flex-1 items-center rounded-[30px] border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] lg:ml-12 lg:mr-36">
                 <div className="flex flex-wrap items-center gap-2">
-                  {searchBarBadges.map((badgeLabel, index) => (
-                    <div
-                      key={`${badgeLabel}-${index}`}
-                      className={searchBarBadgeClassName}
-                    >
-                      <span className="truncate">{badgeLabel}</span>
-                    </div>
-                  ))}
+                  <div className={searchBarBadgeClassName}>
+                    <span className="truncate">Manual Search</span>
+                  </div>
                 </div>
                 <div className="ml-auto flex items-center gap-2">
                   <button
@@ -291,113 +286,98 @@ const AiManualSearch = () => {
                   >
                     <HiOutlineX size={24} />
                   </button>
-                  <HiOutlineSearch size={34} className="text-black/90" />
+                  <button
+                    type="button"
+                    onClick={handleSearch}
+                    className={`inline-flex items-center justify-center rounded-full p-1 transition-colors ${
+                      hasAllSelections
+                        ? "text-black/90 hover:text-sky-600"
+                        : "cursor-not-allowed text-black/35"
+                    }`}
+                    aria-label="Search listings"
+                    disabled={!hasAllSelections}
+                  >
+                    <HiOutlineSearch size={34} />
+                  </button>
                 </div>
               </div>
             </div>
 
-            <div className="relative mt-6 lg:ml-[6.25rem] lg:mr-36">
-              <div
-                ref={dropdownContainerRef}
-                className="relative z-30 flex w-full flex-col gap-4 sm:flex-row sm:items-stretch"
-              >
+            <div
+              className="relative mt-6 lg:ml-[6.25rem] lg:mr-36"
+              ref={dropdownContainerRef}
+            >
+              <div className="relative z-30 grid w-full grid-cols-1 gap-4 sm:grid-cols-2 sm:items-stretch">
                 <DropdownBadge
                   label="Continent"
                   options={continentOptions}
-                  selectedValue={selectedContinent || "Select from below"}
+                  selectedValue={
+                    selectedContinent ? continentLabel : "Select Continent"
+                  }
                   isOpen={openDropdown === "continent"}
                   onToggle={() => handleDropdownToggle("continent")}
-                  onSelect={handleContinentSelect}
+                  onSelect={(value) => {
+                    setSelectedContinent(value);
+                    setSelectedCountry("");
+                    setSelectedLocation("");
+                    setOpenDropdown(null);
+                  }}
                 />
 
                 <DropdownBadge
-                  label={selectedGoal}
-                  options={goalOptions}
-                  selectedValue={selectedGoalOption || "Select from below"}
-                  isOpen={openDropdown === "goalOption"}
-                  onToggle={() => handleDropdownToggle("goalOption")}
-                  onSelect={handleGoalOptionSelect}
+                  label="Country"
+                  options={countryOptions}
+                  selectedValue={
+                    selectedCountry ? countryLabel : "Select Country"
+                  }
+                  isOpen={openDropdown === "country"}
+                  onToggle={() => handleDropdownToggle("country")}
+                  onSelect={(value) => {
+                    setSelectedCountry(value);
+                    setSelectedLocation("");
+                    setOpenDropdown(null);
+                  }}
+                  disabled={!selectedContinent}
+                />
+
+                <DropdownBadge
+                  label="Location"
+                  options={locationOptions}
+                  selectedValue={
+                    selectedLocation ? locationLabel : "Select Location"
+                  }
+                  isOpen={openDropdown === "location"}
+                  onToggle={() => handleDropdownToggle("location")}
+                  onSelect={(value) => {
+                    setSelectedLocation(value);
+                    setOpenDropdown(null);
+                  }}
+                  disabled={!selectedCountry}
+                />
+
+                <DropdownBadge
+                  label="Count"
+                  options={countOptions}
+                  selectedValue={selectedCount ? countLabel : "Select Count"}
+                  isOpen={openDropdown === "count"}
+                  onToggle={() => handleDropdownToggle("count")}
+                  onSelect={(value) => {
+                    setSelectedCount(value);
+                    setOpenDropdown(null);
+                  }}
+                  disabled={!selectedLocation}
                 />
               </div>
 
               <div className="relative mt-8">
-                <div className="relative z-10">
-                  <p className="text-3xl font-medium leading-snug text-black/85 lg:text-lg font-play">
-                    {typedHeading}
-                  </p>
+                <p className="text-3xl font-medium leading-snug text-black/85 lg:text-lg font-play">
+                  Select one option from each badge above to view matching
+                  destinations.
+                </p>
 
-                  {hasSelectedFilters ? (
-                    <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
-                      {visibleDestinations.map((destination) => (
-                        <article
-                          key={`${destination.city}-${destination.country}`}
-                          className="cursor-pointer"
-                          role="button"
-                          tabIndex={0}
-                          onClick={() => handleDestinationClick(destination)}
-                          onKeyDown={(event) => {
-                            if (event.key === "Enter" || event.key === " ") {
-                              event.preventDefault();
-                              handleDestinationClick(destination);
-                            }
-                          }}
-                        >
-                          <div className="relative overflow-hidden rounded-2xl">
-                            <img
-                              src={destination.image}
-                              alt={`${destination.city}, ${destination.country}`}
-                              className="h-56 w-full rounded-2xl object-cover"
-                            />
-                            <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-black/75 via-black/25 to-transparent px-4 py-3 text-white">
-                              <span className="rounded-full bg-black/45 px-3 py-1 text-xs font-semibold tracking-wide backdrop-blur-sm">
-                                {destination.speedLabel}
-                              </span>
-                              <span className="rounded-full bg-black/45 px-3 py-1 text-xs font-semibold tracking-wide backdrop-blur-sm">
-                                {destination.rankLabel}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="mt-2 flex items-start justify-between gap-3">
-                            <div>
-                              <h3 className="text-[1.2rem] font-semibold text-black/90">
-                                {destination.city}
-                              </h3>
-                            </div>
-                            <p className="mt-1 text-[1rem] font-semibold text-black/90">
-                              {destination.country}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-[0.9rem] text-black/60">
-                              Find activation options
-                            </p>
-                          </div>
-                        </article>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="mt-10 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-500">
-                      Results will appear here after you select both filters
-                      above.
-                    </div>
-                  )}
-
-                  {shouldShowViewMore && (
-                    <button
-                      type="button"
-                      onClick={() => setShowAllDestinations(true)}
-                      className="mx-auto mt-8 block text-center text-base font-semibold text-sky-600 transition-colors hover:text-sky-700"
-                    >
-                      View More
-                    </button>
-                  )}
-
-                  {hasSelectedFilters && !rankedDestinations.length && (
-                    <div className="mt-10 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-500">
-                      No destinations are available for {selectedContinent}{" "}
-                      right now.
-                    </div>
-                  )}
+                <div className="mt-10 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-500">
+                  Results will appear in list view after you complete all
+                  filters and click search.
                 </div>
               </div>
             </div>
