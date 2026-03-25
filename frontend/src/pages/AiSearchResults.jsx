@@ -153,8 +153,8 @@ const AiSearchResults = () => {
     const badges = [selectedGoal];
 
     if (hasSelectedContinent || hasSelectedGoalOption) {
-      badges.push(selectedContinent || "Select from below");
-      badges.push(selectedGoalOption || "Select from below");
+      badges.push(selectedContinent || "Select Location");
+      badges.push(selectedGoalOption || "Select Attribute");
     }
 
     return badges;
@@ -312,7 +312,7 @@ const AiSearchResults = () => {
                 <DropdownBadge
                   label="Continent"
                   options={continentOptions}
-                  selectedValue={selectedContinent || "Select from below"}
+                  selectedValue={selectedContinent || "Select Location"}
                   isOpen={openDropdown === "continent"}
                   onToggle={() => handleDropdownToggle("continent")}
                   onSelect={handleContinentSelect}
@@ -321,7 +321,7 @@ const AiSearchResults = () => {
                 <DropdownBadge
                   label={selectedGoal}
                   options={goalOptions}
-                  selectedValue={selectedGoalOption || "Select from below"}
+                  selectedValue={selectedGoalOption || "Select Attribute"}
                   isOpen={openDropdown === "goalOption"}
                   onToggle={() => handleDropdownToggle("goalOption")}
                   onSelect={handleGoalOptionSelect}

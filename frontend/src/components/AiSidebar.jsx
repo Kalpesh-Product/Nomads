@@ -244,7 +244,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         onItemClick={handleRecommendationClick}
       />
       <SidebarSection
-        title="Value Additions"
+        title="Value Added Services"
         items={valueAdditionItems}
         collapsed={isCollapsed}
         isExpandable
