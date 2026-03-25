@@ -1,7 +1,7 @@
 export const goalFilterMap = {
   "World Ranking": [
-    "Overall World Ranking Index",
-    "Safety World Ranking Index",
+    "Overall Ranking Index",
+    "Safety Ranking Index",
     "Nomad Population Index",
     "Healthcare Cost Index",
     "Air quality Index",
