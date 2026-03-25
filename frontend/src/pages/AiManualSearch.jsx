@@ -272,7 +272,7 @@ const AiManualSearch = () => {
               </button>
             </div>
 
-            <div className="mt-4 flex w-full items-center rounded-[30px] border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] lg:ml-12 lg:mr-36">
+            <div className="mt-4 flex w-full items-center rounded-[30px] border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] lg:ml-[6.25rem] lg:mr-36">
               <div className="flex flex-wrap items-center gap-2">
                 {searchBarBadges.map((badgeLabel, index) => (
                   <div
