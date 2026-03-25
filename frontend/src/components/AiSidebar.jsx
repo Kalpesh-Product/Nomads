@@ -26,22 +26,22 @@ const gatedRecommendationLabels = new Set([
 ]);
 
 const recommendationItems = [
-  { label: "World Ranking", icon: HiOutlineViewGrid, path: "/home" },
+  { label: "World Ranking", icon: HiOutlineViewGrid, path: "/search/results" },
   {
     label: "Work From Anywhere",
     icon: HiOutlineHeart,
-    path: "/search/home",
+    path: "/search/results",
   },
   {
     label: "Increase Your Savings",
     icon: LuCircleDollarSign,
-    path: "/home",
+    path: "/search/results",
   },
-  { label: "Advance Your Career", icon: LuMapPinned, path: "/home" },
+  { label: "Advance Your Career", icon: LuMapPinned, path: "/search/results" },
   {
     label: "Find Your Community",
     icon: HiOutlineUserCircle,
-    path: "/home",
+    path: "/search/results",
   },
   { label: "Search Old School", icon: HiOutlineMenu, path: "/manual-search" },
 ];
@@ -156,10 +156,18 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
       return;
     }
 
-    navigate({
-      pathname: item.path || "/home",
-      search: params.toString() ? `?${params.toString()}` : "",
-    });
+    navigate(
+      {
+        pathname: item.path || "/search/results",
+        search: params.toString() ? `?${params.toString()}` : "",
+      },
+      {
+        state:
+          item.path === "/search/results"
+            ? { selectedGoal: item.label }
+            : undefined,
+      },
+    );
   };
 
   const handleValueAdditionClick = (item) => {
