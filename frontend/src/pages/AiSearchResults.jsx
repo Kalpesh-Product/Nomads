@@ -9,7 +9,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import { aiDestinationCards } from "../constants/aiDestinationCards";
 
-import { defaultGoal, goalFilterMap } from "../constants/aiGoalFilters";
+import {
+  defaultGoal,
+  getGoalOptionMetricLabel,
+  goalFilterMap,
+} from "../constants/aiGoalFilters";
 
 const continentOptions = [
   "World",
@@ -133,6 +137,7 @@ const AiSearchResults = () => {
   }, [hasSelectedFilters, selectedContinent]);
 
   const rankedDestinations = useMemo(() => {
+    const goalOptionMetricLabel = getGoalOptionMetricLabel(selectedGoalOption);
     const sortedSpeeds = filteredDestinations
       .map((destination) => destination.suggestions)
       .sort((left, right) => right - left);
@@ -140,9 +145,9 @@ const AiSearchResults = () => {
     return filteredDestinations.map((destination, index) => ({
       ...destination,
       rankLabel: `Rank ${index + 1}`,
-      speedLabel: `${sortedSpeeds[index]} Mbps`,
+      speedLabel: `${sortedSpeeds[index]} ${goalOptionMetricLabel}`,
     }));
-  }, [filteredDestinations]);
+  }, [filteredDestinations, selectedGoalOption]);
 
   const searchBarBadges = useMemo(() => {
     const badges = [selectedGoal];

@@ -61,3 +61,58 @@ export const goalFilterMap = {
 };
 
 export const defaultGoal = "Work From Anywhere";
+
+const goalOptionBadgeLabelMap = {
+  "Internet Speed Index": "Mbps",
+  "Internet speed": "Mbps",
+  "Cost of living": "Index",
+  "Healthcare Cost Index": "Index",
+  "Healthcare Cost": "Index",
+  "Overall Ranking Index": "Score",
+  "Safety Ranking Index": "Score",
+  "Nomad Population Index": "Score",
+  "Air quality Index": "AQI",
+  "Visa Flexibility": "Score",
+  "Startup ecosystems (No of startups)": "Startups",
+  "Remote working infrastructure": "Score",
+  "Overall Work from anywhere Index": "Score",
+  "Digital nomad visas": "Countries",
+  "Visa-free entry length": "Days",
+  "Visa On Arrival": "Countries",
+  "Airport connectivity": "Score",
+  "Direct international flights": "Routes",
+  "Global accessibility": "Score",
+  "Overall Savings Index": "Score",
+  "Lower taxes (company, personal, nomad)": "%",
+  "Purchasing Power": "Index",
+  "Inflation Stability": "Score",
+  "Startup setup cost": "USD",
+  "Overall for Career Index": "Score",
+  "Venture capital presence": "Score",
+  "Startup incubators & Accelerators": "Hubs",
+  "Tech talent density": "Index",
+  "Conferences and events": "Events",
+  "Remote job availability": "Openings",
+  "Founder Nomads": "Score",
+  "Overall Compatibility Index": "Score",
+  "Meetups and events": "Events",
+  "Solo Nomad Traveller": "Score",
+  "Family Nomad Traveller": "Score",
+  "Girl Nomad Traveller": "Score",
+  "Couple Nomad Travellers": "Score",
+  "Party & Events Nomad Traveller": "Score",
+  "Founder Nomad Traveller": "Score",
+  "Nature Nomad Travelling": "Score",
+  "Adventure Nomad Travelling": "Score",
+  "Nightlife & Pubs": "Score",
+  Yoga: "Score",
+  "Nomad community presence": "Score",
+};
+
+export const getGoalOptionMetricLabel = (goalOption) => {
+  if (!goalOption) {
+    return "Mbps";
+  }
+
+  return goalOptionBadgeLabelMap[goalOption] || "Score";
+};
