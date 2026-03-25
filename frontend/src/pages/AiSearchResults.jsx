@@ -322,7 +322,7 @@ const AiSearchResults = () => {
 
               <div className="relative mt-8">
                 <div className="relative z-10">
-                  <p className="text-3xl font-medium leading-snug text-black/85 lg:text-lg font-play">
+                  <p className="text-sm font-medium leading-snug text-black/85 lg:text-lg font-play">
                     {typedHeading}
                   </p>
 

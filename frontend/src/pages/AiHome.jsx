@@ -157,12 +157,12 @@ const AiHome = () => {
 
   return (
     <div className="flex min-h-[calc(100vh-100px)] flex-col bg-white">
-      <main className="flex-1 px-6 py-10 lg:px-14">
+      <main className="flex-1 px-3 py-10 sm:px-6 lg:px-14">
         <div className="mx-auto max-w-5xl text-center">
           <h1 className="text-3xl font-medium text-black/90 font-play">
             {typedGreeting}
           </h1>
-          <h2 className="mt-10 text-lg font-semibold text-black/85 font-play">
+          <h2 className="mt-10 text-sm font-semibold text-black/85 font-play sm:text-lg">
             {typedSubheading}
           </h2>
           {!isLoggedIn ? (
@@ -186,7 +186,7 @@ const AiHome = () => {
                       size={24}
                       className="mx-auto text-black/80 transition-colors duration-200 group-hover:text-sky-500"
                     />
-                    <h3 className="mt-2 text-md font-bold text-black/90 leading-tight transition-colors duration-200 group-hover:text-sky-500">
+                    <h3 className="mt-2 text-nano md:text-md font-bold text-black/90 leading-tight transition-colors duration-200 group-hover:text-sky-500">
                       {card.title}
                     </h3>
                     <div className="mt-2 hidden rounded-2xl bg-[#f1f1f3] p-5 text-left shadow-[0_1px_0_rgba(255,255,255,0.7)] transition-colors duration-200 group-hover:bg-sky-500 md:block">
