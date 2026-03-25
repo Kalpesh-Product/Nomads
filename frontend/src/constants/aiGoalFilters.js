@@ -65,7 +65,7 @@ export const defaultGoal = "Work From Anywhere";
 const goalOptionBadgeLabelMap = {
   "Internet Speed Index": "Mbps",
   "Internet speed": "Mbps",
-  "Cost of living": "Index",
+  "Cost of living": "Dollars",
   "Healthcare Cost Index": "Index",
   "Healthcare Cost": "Index",
   "Overall Ranking Index": "Score",

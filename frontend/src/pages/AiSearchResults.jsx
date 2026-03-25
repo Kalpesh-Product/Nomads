@@ -216,6 +216,9 @@ const AiSearchResults = () => {
     setHeadingAnimationKey((currentKey) => currentKey + 1);
   };
 
+  const isPrimaryGoalOptionSelected =
+    hasSelectedGoalOption && selectedGoalOption === goalOptions[0];
+
   const headingText = hasSelectedFilters
     ? "Showing results for the selected option. Select any option to view your preferred results."
     : "Select one option from each badge above to view matching destinations.";
@@ -353,10 +356,18 @@ const AiSearchResults = () => {
                               alt={`${destination.city}, ${destination.country}`}
                               className="h-56 w-full rounded-2xl object-cover"
                             />
-                            <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-black/75 via-black/25 to-transparent px-4 py-3 text-white">
-                              <span className="rounded-full bg-black/45 px-3 py-1 text-xs font-semibold tracking-wide backdrop-blur-sm">
-                                {destination.speedLabel}
-                              </span>
+                            <div
+                              className={`pointer-events-none absolute inset-x-0 bottom-0 flex items-end gap-3 bg-gradient-to-t from-black/75 via-black/25 to-transparent px-4 py-3 text-white ${
+                                isPrimaryGoalOptionSelected
+                                  ? "justify-end"
+                                  : "justify-between"
+                              }`}
+                            >
+                              {!isPrimaryGoalOptionSelected && (
+                                <span className="rounded-full bg-black/45 px-3 py-1 text-xs font-semibold tracking-wide backdrop-blur-sm">
+                                  {destination.speedLabel}
+                                </span>
+                              )}
                               <span className="rounded-full bg-black/45 px-3 py-1 text-xs font-semibold tracking-wide backdrop-blur-sm">
                                 {destination.rankLabel}
                               </span>
