@@ -166,7 +166,7 @@ const AiHome = () => {
             {typedSubheading}
           </h2>
           {!isLoggedIn ? (
-            <p className="mt-3 text-lg font-semibold text-black/85 font-play">
+            <p className="mt-3 text-sm sm:text-lg font-semibold text-black/85 font-play">
               {typedLoggedOutNote}
             </p>
           ) : null}
