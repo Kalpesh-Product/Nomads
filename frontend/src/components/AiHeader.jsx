@@ -9,6 +9,7 @@ import Container from "./Container";
 import useAuth from "../hooks/useAuth";
 
 import useNomadLoginState from "../hooks/useNomadLoginState";
+import AiContainer from "./AiContainer";
 
 const AiHeader = ({ onMobileSidebarToggle }) => {
   const [open, setOpen] = useState(false);
@@ -54,7 +55,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
 
   return (
     <div className=" bg-white/80 backdrop-blur-md pl-4 pr-4">
-      <Container padding={false}>
+      <AiContainer padding={false}>
         <div className="flex py-3 justify-between items-center  lg:py-[0.625rem] ">
           {/* Logo */}
           <div className="flex items-center">
@@ -376,7 +377,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
             </div>
           </Drawer>
         </div>
-      </Container>
+      </AiContainer>
     </div>
   );
 };
