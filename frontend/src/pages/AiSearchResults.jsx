@@ -261,7 +261,7 @@ const AiSearchResults = () => {
       <main className="py-8">
         <div className="mx-0 w-full max-w-[80rem] px-1 sm:px-6 lg:mx-auto lg:max-w-[80rem] lg:px-0 lg:min-w-[75%]">
           <div className="rounded-[10px] bg-white px-4 py-6">
-            <div className="flex items-center gap-3 sm:gap-5">
+            <div className="flex">
               <button
                 type="button"
                 onClick={() => navigate("/home")}
@@ -270,29 +270,29 @@ const AiSearchResults = () => {
               >
                 <HiOutlineArrowLeft size={18} />
               </button>
+            </div>
 
-              <div className="flex w-full flex-1 items-center rounded-[30px] border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] lg:ml-12 lg:mr-36">
-                <div className="flex flex-wrap items-center gap-2">
-                  {searchBarBadges.map((badgeLabel, index) => (
-                    <div
-                      key={`${badgeLabel}-${index}`}
-                      className={searchBarBadgeClassName}
-                    >
-                      <span className="truncate">{badgeLabel}</span>
-                    </div>
-                  ))}
-                </div>
-                <div className="ml-auto flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => navigate("/home")}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-black/70 transition-colors hover:bg-black/5 hover:text-black"
-                    aria-label="Clear search and go back"
+            <div className="mt-4 flex w-full items-center rounded-[30px] border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] lg:ml-12 lg:mr-36">
+              <div className="flex flex-wrap items-center gap-2">
+                {searchBarBadges.map((badgeLabel, index) => (
+                  <div
+                    key={`${badgeLabel}-${index}`}
+                    className={searchBarBadgeClassName}
                   >
-                    <HiOutlineX size={24} />
-                  </button>
-                  <HiOutlineSearch size={34} className="text-black/90" />
-                </div>
+                    <span className="truncate">{badgeLabel}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="ml-auto flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => navigate("/home")}
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-black/70 transition-colors hover:bg-black/5 hover:text-black"
+                  aria-label="Clear search and go back"
+                >
+                  <HiOutlineX size={24} />
+                </button>
+                <HiOutlineSearch size={34} className="text-black/90" />
               </div>
             </div>
 
