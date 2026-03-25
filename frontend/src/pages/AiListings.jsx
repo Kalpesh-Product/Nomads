@@ -266,6 +266,37 @@ const AiListings = () => {
       .sort((a, b) => typeOrder.indexOf(a.value) - typeOrder.indexOf(b.value));
   }, [listingsData]);
 
+  const categoryBadgeLabel = useMemo(() => {
+    if (!formData?.category) return "";
+
+    const matchedCategory = categoryOptions.find(
+      (category) => category.value === formData.category,
+    );
+
+    if (matchedCategory?.label) return matchedCategory.label;
+
+    const fallbackLabelMap = {
+      coworking: "Co-Working",
+      coliving: "Co-Living",
+      hostel: "Hostels",
+      workation: "Workation",
+      meetingroom: "Meetings",
+      cafe: "Cafe’s",
+    };
+
+    return (
+      fallbackLabelMap[formData.category] ||
+      `${formData.category.charAt(0).toUpperCase()}${formData.category.slice(1)}`
+    );
+  }, [categoryOptions, formData?.category]);
+
+  const badgesWithCategory = useMemo(() => {
+    const baseBadges = searchBarBadges.filter(Boolean);
+    if (!categoryBadgeLabel) return baseBadges;
+
+    return [...baseBadges, categoryBadgeLabel];
+  }, [searchBarBadges, categoryBadgeLabel]);
+
   const filteredListings = React.useMemo(() => {
     if (!listingsData) return [];
 
@@ -465,7 +496,7 @@ const AiListings = () => {
           )}
         </div>
         <AiSelectedBadgesSearchBar
-          badges={searchBarBadges}
+          badges={badgesWithCategory}
           stateLabel={selectedStateLabel}
           onBack={() => navigate("/search/results")}
           onClear={() => navigate("/search/results")}
