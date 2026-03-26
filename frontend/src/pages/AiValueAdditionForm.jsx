@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   Box,
   Button,
@@ -12,6 +12,7 @@ import { useMutation } from "@tanstack/react-query";
 import axios from "../utils/axios";
 import { isValidInternationalPhone } from "../utils/validators";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
+import { Country } from "country-state-city";
 
 const floatingLabelSx = {
   color: "black",
@@ -26,23 +27,31 @@ const AiValueAdditionForm = ({
   options,
   sheetName,
   extraFields = [],
+  includeNationality = true,
 }) => {
   const defaultValues = {
     fullName: "",
     gender: "",
     dateOfBirth: "",
-    nationality: "",
     email: "",
     contactNumber: "",
     comments: "",
     [selectFieldName]: "",
   };
 
+  if (includeNationality) {
+    defaultValues.nationality = "";
+  }
+
   extraFields.forEach(({ name }) => {
     defaultValues[name] = "";
   });
 
-  const { control, handleSubmit, reset } = useForm({ defaultValues });
+  const { control, handleSubmit, reset, setValue, watch } = useForm({
+    defaultValues,
+  });
+  const countries = useMemo(() => Country.getAllCountries(), []);
+  const selectedResidence = watch("currentResidence");
 
   const { mutate: submitForm, isPending } = useMutation({
     mutationFn: async (data) => {
@@ -60,6 +69,21 @@ const AiValueAdditionForm = ({
       showErrorAlert(error?.response?.data?.message || "Failed to submit form");
     },
   });
+
+  const handleCurrentResidenceChange = (countryName, onChange) => {
+    const selectedCountry = countries.find(
+      (country) => country.name === countryName,
+    );
+    const phonePrefix = selectedCountry?.phonecode
+      ? `+${selectedCountry.phonecode}`
+      : "";
+
+    onChange(countryName);
+    setValue("contactNumber", phonePrefix, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+  };
 
   return (
     <div className="bg-white text-black font-sans">
@@ -84,7 +108,7 @@ const AiValueAdditionForm = ({
                     <TextField
                       {...field}
                       fullWidth
-                      label="Full Name (as per Passport)"
+                      label="Full Name"
                       variant="standard"
                       required
                       error={!!fieldState.error}
@@ -139,23 +163,84 @@ const AiValueAdditionForm = ({
                   )}
                 />
 
-                <Controller
-                  name="nationality"
-                  control={control}
-                  rules={{ required: "Nationality is required" }}
-                  render={({ field, fieldState }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label="Nationality"
-                      variant="standard"
-                      required
-                      error={!!fieldState.error}
-                      helperText={fieldState.error?.message}
-                      InputLabelProps={{ sx: floatingLabelSx }}
+                {includeNationality && (
+                  <Controller
+                    name="nationality"
+                    control={control}
+                    rules={{ required: "Nationality is required" }}
+                    render={({ field, fieldState }) => (
+                      <TextField
+                        {...field}
+                        fullWidth
+                        label="Nationality"
+                        variant="standard"
+                        required
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message}
+                        InputLabelProps={{ sx: floatingLabelSx }}
+                      />
+                    )}
+                  />
+                )}
+
+                {extraFields.map(
+                  ({ name, label, type = "text", required = false }) => (
+                    <Controller
+                      key={name}
+                      name={name}
+                      control={control}
+                      rules={
+                        required
+                          ? { required: `${label} is required` }
+                          : undefined
+                      }
+                      render={({ field, fieldState }) => (
+                        <TextField
+                          {...field}
+                          fullWidth
+                          label={label}
+                          variant="standard"
+                          type={type === "country" ? undefined : type}
+                          select={type === "country"}
+                          required={required}
+                          error={!!fieldState.error}
+                          helperText={fieldState.error?.message}
+                          value={field.value || ""}
+                          onChange={(event) => {
+                            if (name === "currentResidence") {
+                              handleCurrentResidenceChange(
+                                event.target.value,
+                                field.onChange,
+                              );
+                              return;
+                            }
+                            field.onChange(event.target.value);
+                          }}
+                          InputLabelProps={{
+                            ...(type === "date" ? { shrink: true } : {}),
+                            sx: floatingLabelSx,
+                          }}
+                        >
+                          {type === "country" && (
+                            <>
+                              <MenuItem value="" disabled>
+                                Select Country
+                              </MenuItem>
+                              {countries.map((country) => (
+                                <MenuItem
+                                  key={country.isoCode}
+                                  value={country.name}
+                                >
+                                  {country.name}
+                                </MenuItem>
+                              ))}
+                            </>
+                          )}
+                        </TextField>
+                      )}
                     />
-                  )}
-                />
+                  ),
+                )}
 
                 <Controller
                   name="email"
@@ -194,6 +279,11 @@ const AiValueAdditionForm = ({
                       fullWidth
                       label="Contact Number"
                       variant="standard"
+                      placeholder={
+                        selectedResidence
+                          ? "Country code is prefilled based on residence"
+                          : ""
+                      }
                       required
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
@@ -201,37 +291,6 @@ const AiValueAdditionForm = ({
                     />
                   )}
                 />
-
-                {extraFields.map(
-                  ({ name, label, type = "text", required = false }) => (
-                    <Controller
-                      key={name}
-                      name={name}
-                      control={control}
-                      rules={
-                        required
-                          ? { required: `${label} is required` }
-                          : undefined
-                      }
-                      render={({ field, fieldState }) => (
-                        <TextField
-                          {...field}
-                          fullWidth
-                          label={label}
-                          variant="standard"
-                          type={type}
-                          required={required}
-                          error={!!fieldState.error}
-                          helperText={fieldState.error?.message}
-                          InputLabelProps={{
-                            ...(type === "date" ? { shrink: true } : {}),
-                            sx: floatingLabelSx,
-                          }}
-                        />
-                      )}
-                    />
-                  ),
-                )}
 
                 <Controller
                   name={selectFieldName}

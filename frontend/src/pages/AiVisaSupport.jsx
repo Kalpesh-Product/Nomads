@@ -1,5 +1,18 @@
-import React from "react";
-import AiValueAdditionForm from "./AiValueAdditionForm";
+import React, { useMemo } from "react";
+import { Box, Button, CircularProgress, TextField } from "@mui/material";
+import { Controller, useForm } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
+import { Country } from "country-state-city";
+import Container from "../components/Container";
+import axios from "../utils/axios";
+import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
+import { isValidInternationalPhone } from "../utils/validators";
+
+const floatingLabelSx = {
+  color: "black",
+  "&.Mui-focused": { color: "#1976d2" },
+  "&.MuiInputLabel-shrink": { color: "#1976d2" },
+};
 
 const visaSupportOptions = [
   "Free Services - Visa eligibility check",
@@ -12,27 +25,340 @@ const visaSupportOptions = [
   "Paid Services - End-to-End Visa Processing (Appointment booking / Submission tracking)",
 ];
 
-const AiVisaSupport = () => (
-  <AiValueAdditionForm
-    title="Visa Support"
-    selectLabel="Service Required"
-    selectFieldName="serviceRequired"
-    options={visaSupportOptions}
-    sheetName="AI_Visa_Support"
-    extraFields={[
-      {
-        name: "passportValidity",
-        label: "Passport Validity (expiry date)",
-        type: "date",
-        required: true,
-      },
-      {
-        name: "currentResidence",
-        label: "Current City/Country of Residence",
-        required: true,
-      },
-    ]}
-  />
-);
+const defaultValues = {
+  fullName: "",
+  gender: "",
+  dateOfBirth: "",
+  passportValidity: "",
+  currentResidence: "",
+  destination: "",
+  email: "",
+  contactNumber: "",
+  serviceRequired: "",
+  comments: "",
+};
+
+const AiVisaSupport = () => {
+  const { control, handleSubmit, reset, setValue, watch } = useForm({
+    defaultValues,
+  });
+  const countries = useMemo(() => Country.getAllCountries(), []);
+  const selectedResidence = watch("currentResidence");
+
+  const { mutate: submitForm, isPending } = useMutation({
+    mutationFn: async (data) => {
+      const response = await axios.post("forms/add-new-b2c-form-submission", {
+        ...data,
+        sheetName: "AI_Visa_Support",
+      });
+      return response.data;
+    },
+    onSuccess: () => {
+      showSuccessAlert("Form submitted successfully");
+      reset(defaultValues);
+    },
+    onError: (error) => {
+      showErrorAlert(error?.response?.data?.message || "Failed to submit form");
+    },
+  });
+
+  const handleResidenceChange = (countryName, onChange) => {
+    const country = countries.find((item) => item.name === countryName);
+    const phonePrefix = country?.phonecode ? `+${country.phonecode}` : "";
+
+    onChange(countryName);
+    setValue("contactNumber", phonePrefix, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+  };
+
+  return (
+    <div className="bg-white text-black font-sans">
+      <Container padding={false}>
+        <section className="min-h-[85vh] flex items-center justify-center py-8">
+          <div className="w-full max-w-5xl md:px-20 lg:px-40">
+            <Box
+              component="form"
+              onSubmit={handleSubmit((data) => submitForm(data))}
+              className="bg-gray-50/50 p-6 md:p-10 rounded-2xl border border-gray-100 shadow-sm"
+            >
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold uppercase mb-8 text-center">
+                Visa Support
+              </h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                <Controller
+                  name="fullName"
+                  control={control}
+                  rules={{ required: "Full name is required" }}
+                  render={({ field, fieldState }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Full Name"
+                      variant="standard"
+                      required
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                      InputLabelProps={{ sx: floatingLabelSx }}
+                    />
+                  )}
+                />
+
+                <Controller
+                  name="gender"
+                  control={control}
+                  rules={{ required: "Gender is required" }}
+                  render={({ field, fieldState }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Gender"
+                      variant="standard"
+                      required
+                      select
+                      SelectProps={{ native: true }}
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                      InputLabelProps={{ sx: floatingLabelSx }}
+                    >
+                      <option value="">Select Gender</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </TextField>
+                  )}
+                />
+
+                <Controller
+                  name="dateOfBirth"
+                  control={control}
+                  rules={{ required: "Date of birth is required" }}
+                  render={({ field, fieldState }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Date of Birth"
+                      variant="standard"
+                      type="date"
+                      required
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                      InputLabelProps={{ shrink: true, sx: floatingLabelSx }}
+                    />
+                  )}
+                />
+
+                <Controller
+                  name="passportValidity"
+                  control={control}
+                  rules={{ required: "Passport Validity is required" }}
+                  render={({ field, fieldState }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Passport Validity"
+                      variant="standard"
+                      type="date"
+                      required
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                      InputLabelProps={{ shrink: true, sx: floatingLabelSx }}
+                    />
+                  )}
+                />
+
+                <Controller
+                  name="currentResidence"
+                  control={control}
+                  rules={{
+                    required: "Current City/Country of Residence is required",
+                  }}
+                  render={({ field, fieldState }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Current City/Country of Residence"
+                      variant="standard"
+                      select
+                      SelectProps={{ native: true }}
+                      required
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                      InputLabelProps={{ sx: floatingLabelSx }}
+                      onChange={(event) =>
+                        handleResidenceChange(
+                          event.target.value,
+                          field.onChange,
+                        )
+                      }
+                    >
+                      <option value="">Select Country</option>
+                      {countries.map((country) => (
+                        <option key={country.isoCode} value={country.name}>
+                          {country.name}
+                        </option>
+                      ))}
+                    </TextField>
+                  )}
+                />
+
+                <Controller
+                  name="destination"
+                  control={control}
+                  rules={{ required: "Destination is required" }}
+                  render={({ field, fieldState }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Destination"
+                      variant="standard"
+                      select
+                      SelectProps={{ native: true }}
+                      required
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                      InputLabelProps={{ sx: floatingLabelSx }}
+                      onChange={(event) => field.onChange(event.target.value)}
+                    >
+                      <option value="">Select Country</option>
+                      {countries.map((country) => (
+                        <option key={country.isoCode} value={country.name}>
+                          {country.name}
+                        </option>
+                      ))}
+                    </TextField>
+                  )}
+                />
+
+                <Controller
+                  name="email"
+                  control={control}
+                  rules={{
+                    required: "Email is required",
+                    pattern: {
+                      value: /^\S+@\S+$/i,
+                      message: "Invalid email address",
+                    },
+                  }}
+                  render={({ field, fieldState }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Email Address"
+                      variant="standard"
+                      required
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                      InputLabelProps={{ sx: floatingLabelSx }}
+                    />
+                  )}
+                />
+
+                <Controller
+                  name="contactNumber"
+                  control={control}
+                  rules={{
+                    required: "Contact number is required",
+                    validate: isValidInternationalPhone,
+                  }}
+                  render={({ field, fieldState }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Contact Number"
+                      variant="standard"
+                      placeholder={
+                        selectedResidence
+                          ? "Country code is prefilled based on residence"
+                          : ""
+                      }
+                      required
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                      InputLabelProps={{ sx: floatingLabelSx }}
+                    />
+                  )}
+                />
+
+                <Controller
+                  name="serviceRequired"
+                  control={control}
+                  rules={{ required: "Services Required is required" }}
+                  render={({ field, fieldState }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Services Required"
+                      variant="standard"
+                      required
+                      select
+                      SelectProps={{ native: true }}
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                      InputLabelProps={{ sx: floatingLabelSx }}
+                    >
+                      <option value="">Select an option</option>
+                      {visaSupportOptions.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </TextField>
+                  )}
+                />
+
+                <div className="md:col-span-2">
+                  <Controller
+                    name="comments"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        fullWidth
+                        multiline
+                        minRows={4}
+                        label="Comments"
+                        variant="standard"
+                        InputLabelProps={{ sx: floatingLabelSx }}
+                      />
+                    )}
+                  />
+                </div>
+
+                <div className="pt-6 md:col-span-2 text-center">
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    disabled={isPending}
+                    sx={{
+                      bgcolor: "black",
+                      borderRadius: 20,
+                      px: { xs: 6, md: 14 },
+                      py: 1.5,
+                      fontSize: "1rem",
+                      fontWeight: "600",
+                      "&:hover": { bgcolor: "#333" },
+                      width: { xs: "100%", md: "auto" },
+                    }}
+                  >
+                    {isPending && (
+                      <CircularProgress
+                        size={16}
+                        sx={{ color: "white", mr: 1 }}
+                      />
+                    )}
+                    {isPending ? "SUBMITTING..." : "SUBMIT"}
+                  </Button>
+                </div>
+              </div>
+            </Box>
+          </div>
+        </section>
+      </Container>
+    </div>
+  );
+};
 
 export default AiVisaSupport;
