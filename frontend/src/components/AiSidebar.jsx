@@ -193,6 +193,12 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     nextSearchParams.delete("login");
     clearStoredLoginState();
 
+    if (isMobileOverlay) {
+      onClose?.();
+      navigate("/home");
+      return;
+    }
+
     navigate({
       pathname: location.pathname,
       search: nextSearchParams.toString()

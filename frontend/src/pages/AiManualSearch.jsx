@@ -258,7 +258,7 @@ const AiManualSearch = () => {
 
   return (
     <div className="min-h-full bg-white">
-      <main className="">
+      <main className="pb-8">
         <div className="mx-0 w-full max-w-[80rem] px-1 sm:px-6 lg:mx-auto lg:max-w-[80rem] lg:px-0 lg:min-w-[75%]">
           <div className="rounded-[10px] bg-white px-4 pb-6">
             <div className="flex">
