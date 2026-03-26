@@ -1,10 +1,13 @@
 import React from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import Container from "../components/Container";
 
 const AiVisaSupportThankYou = () => {
   const [searchParams] = useSearchParams();
   const choice = searchParams.get("choice");
+  const selectedState = searchParams.get("state");
+  const selectedCountry = searchParams.get("country");
+  const selectedDestinationLabel = searchParams.get("destination");
 
   const message =
     choice === "get-back-to-me"
@@ -20,6 +23,14 @@ const AiVisaSupportThankYou = () => {
               Thank You
             </h1>
             <p className="text-lg leading-relaxed">{message}</p>
+            {selectedState && selectedCountry && selectedDestinationLabel ? (
+              <Link
+                to={`/ai-verticals?country=${encodeURIComponent(selectedCountry)}&state=${encodeURIComponent(selectedState)}`}
+                className="mt-6 inline-block text-lg font-semibold text-[#0A66C2] underline underline-offset-4 hover:text-[#084f95]"
+              >
+                Go To {selectedDestinationLabel}
+              </Link>
+            ) : null}
           </div>
         </section>
       </Container>

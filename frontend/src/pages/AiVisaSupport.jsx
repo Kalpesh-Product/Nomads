@@ -5,6 +5,7 @@ import { Country } from "country-state-city";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import Container from "../components/Container";
+import { aiDestinationCards } from "../constants/aiDestinationCards";
 
 const floatingLabelSx = {
   color: "black",
@@ -42,9 +43,17 @@ const AiVisaSupport = () => {
     defaultValues,
   });
   const countries = useMemo(() => Country.getAllCountries(), []);
+  const destinationOptions = useMemo(
+    () =>
+      aiDestinationCards.map((destination) => ({
+        state: destination.city,
+        country: destination.country,
+      })),
+    [],
+  );
   const selectedResidence = watch("currentResidence");
 
-  const handleFormSubmit = async () => {
+  const handleFormSubmit = async (formValues) => {
     const result = await Swal.fire({
       title: "Form Submitted",
       text: "Form submitted. Would you like us to get back to you or help yourself?",
@@ -56,7 +65,16 @@ const AiVisaSupport = () => {
     });
 
     const choice = result.isConfirmed ? "get-back-to-me" : "help-needed";
-    navigate(`/visa-support/thank-you?choice=${choice}`);
+    const selectedDestination = destinationOptions.find(
+      (option) => option.state === formValues.destination,
+    );
+    const destinationState = selectedDestination?.state?.toLowerCase() || "";
+    const destinationCountry =
+      selectedDestination?.country?.toLowerCase() || "";
+
+    navigate(
+      `/visa-support/thank-you?choice=${choice}&state=${encodeURIComponent(destinationState)}&country=${encodeURIComponent(destinationCountry)}&destination=${encodeURIComponent(formValues.destination || "")}`,
+    );
     reset(defaultValues);
   };
 
@@ -191,10 +209,13 @@ const AiVisaSupport = () => {
                       InputLabelProps={{ sx: floatingLabelSx }}
                       onChange={(event) => field.onChange(event.target.value)}
                     >
-                      <MenuItem value="">Select Country</MenuItem>
-                      {countries.map((country) => (
-                        <MenuItem key={country.isoCode} value={country.name}>
-                          {country.name}
+                      <MenuItem value="">Select State</MenuItem>
+                      {destinationOptions.map((destinationOption) => (
+                        <MenuItem
+                          key={`${destinationOption.state}-${destinationOption.country}`}
+                          value={destinationOption.state}
+                        >
+                          {destinationOption.state}
                         </MenuItem>
                       ))}
                     </TextField>
