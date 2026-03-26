@@ -9,10 +9,11 @@ import {
 import { Controller, useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { Country } from "country-state-city";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 import Container from "../components/Container";
 import axios from "../utils/axios";
-import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
-import { isValidInternationalPhone } from "../utils/validators";
+import { showErrorAlert } from "../utils/alerts";
 
 const floatingLabelSx = {
   color: "black",
@@ -45,6 +46,7 @@ const defaultValues = {
 };
 
 const AiVisaSupport = () => {
+  const navigate = useNavigate();
   const { control, handleSubmit, reset, setValue, watch } = useForm({
     defaultValues,
   });
@@ -59,8 +61,19 @@ const AiVisaSupport = () => {
       });
       return response.data;
     },
-    onSuccess: () => {
-      showSuccessAlert("Form submitted successfully");
+    onSuccess: async () => {
+      const result = await Swal.fire({
+        title: "Form Submitted",
+        text: "Form Submitted. Would You Like us to et back to you or Search Yourself",
+        icon: "success",
+        showCancelButton: true,
+        confirmButtonText: "Get Back to Me",
+        cancelButtonText: "Help Needed",
+        reverseButtons: true,
+      });
+
+      const choice = result.isConfirmed ? "get-back-to-me" : "help-needed";
+      navigate(`/visa-support/thank-you?choice=${choice}`);
       reset(defaultValues);
     },
     onError: (error) => {
@@ -97,16 +110,12 @@ const AiVisaSupport = () => {
                 <Controller
                   name="fullName"
                   control={control}
-                  rules={{ required: "Full name is required" }}
-                  render={({ field, fieldState }) => (
+                  render={({ field }) => (
                     <TextField
                       {...field}
                       fullWidth
                       label="Full Name"
                       variant="standard"
-                      required
-                      error={!!fieldState.error}
-                      helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
                     />
                   )}
@@ -115,17 +124,13 @@ const AiVisaSupport = () => {
                 <Controller
                   name="gender"
                   control={control}
-                  rules={{ required: "Gender is required" }}
-                  render={({ field, fieldState }) => (
+                  render={({ field }) => (
                     <TextField
                       {...field}
                       fullWidth
                       label="Gender"
                       variant="standard"
-                      required
                       select
-                      error={!!fieldState.error}
-                      helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
                     >
                       <MenuItem value="">Select Gender</MenuItem>
@@ -139,17 +144,13 @@ const AiVisaSupport = () => {
                 <Controller
                   name="dateOfBirth"
                   control={control}
-                  rules={{ required: "Date of birth is required" }}
-                  render={({ field, fieldState }) => (
+                  render={({ field }) => (
                     <TextField
                       {...field}
                       fullWidth
                       label="Date of Birth"
                       variant="standard"
                       type="date"
-                      required
-                      error={!!fieldState.error}
-                      helperText={fieldState.error?.message}
                       InputLabelProps={{ shrink: true, sx: floatingLabelSx }}
                     />
                   )}
@@ -158,17 +159,13 @@ const AiVisaSupport = () => {
                 <Controller
                   name="passportValidity"
                   control={control}
-                  rules={{ required: "Passport Validity is required" }}
-                  render={({ field, fieldState }) => (
+                  render={({ field }) => (
                     <TextField
                       {...field}
                       fullWidth
                       label="Passport Validity"
                       variant="standard"
                       type="date"
-                      required
-                      error={!!fieldState.error}
-                      helperText={fieldState.error?.message}
                       InputLabelProps={{ shrink: true, sx: floatingLabelSx }}
                     />
                   )}
@@ -177,19 +174,13 @@ const AiVisaSupport = () => {
                 <Controller
                   name="currentResidence"
                   control={control}
-                  rules={{
-                    required: "Current City/Country of Residence is required",
-                  }}
-                  render={({ field, fieldState }) => (
+                  render={({ field }) => (
                     <TextField
                       {...field}
                       fullWidth
                       label="Current City/Country of Residence"
                       variant="standard"
                       select
-                      required
-                      error={!!fieldState.error}
-                      helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
                       onChange={(event) =>
                         handleResidenceChange(
@@ -211,17 +202,13 @@ const AiVisaSupport = () => {
                 <Controller
                   name="destination"
                   control={control}
-                  rules={{ required: "Destination is required" }}
-                  render={({ field, fieldState }) => (
+                  render={({ field }) => (
                     <TextField
                       {...field}
                       fullWidth
                       label="Destination"
                       variant="standard"
                       select
-                      required
-                      error={!!fieldState.error}
-                      helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
                       onChange={(event) => field.onChange(event.target.value)}
                     >
@@ -238,22 +225,12 @@ const AiVisaSupport = () => {
                 <Controller
                   name="email"
                   control={control}
-                  rules={{
-                    required: "Email is required",
-                    pattern: {
-                      value: /^\S+@\S+$/i,
-                      message: "Invalid email address",
-                    },
-                  }}
-                  render={({ field, fieldState }) => (
+                  render={({ field }) => (
                     <TextField
                       {...field}
                       fullWidth
                       label="Email Address"
                       variant="standard"
-                      required
-                      error={!!fieldState.error}
-                      helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
                     />
                   )}
@@ -262,11 +239,7 @@ const AiVisaSupport = () => {
                 <Controller
                   name="contactNumber"
                   control={control}
-                  rules={{
-                    required: "Contact number is required",
-                    validate: isValidInternationalPhone,
-                  }}
-                  render={({ field, fieldState }) => (
+                  render={({ field }) => (
                     <TextField
                       {...field}
                       fullWidth
@@ -277,9 +250,6 @@ const AiVisaSupport = () => {
                           ? "Country code is prefilled based on residence"
                           : ""
                       }
-                      required
-                      error={!!fieldState.error}
-                      helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
                     />
                   )}
@@ -288,17 +258,13 @@ const AiVisaSupport = () => {
                 <Controller
                   name="serviceRequired"
                   control={control}
-                  rules={{ required: "Services Required is required" }}
-                  render={({ field, fieldState }) => (
+                  render={({ field }) => (
                     <TextField
                       {...field}
                       fullWidth
                       label="Services Required"
                       variant="standard"
-                      required
                       select
-                      error={!!fieldState.error}
-                      helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
                     >
                       <MenuItem value="">Select an option</MenuItem>
