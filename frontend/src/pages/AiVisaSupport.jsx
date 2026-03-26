@@ -1,5 +1,11 @@
 import React, { useMemo } from "react";
-import { Box, Button, CircularProgress, TextField } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  MenuItem,
+  TextField,
+} from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { Country } from "country-state-city";
@@ -118,15 +124,14 @@ const AiVisaSupport = () => {
                       variant="standard"
                       required
                       select
-                      SelectProps={{ native: true }}
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
                     >
-                      <option value="">Select Gender</option>
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
-                      <option value="Other">Other</option>
+                      <MenuItem value="">Select Gender</MenuItem>
+                      <MenuItem value="Male">Male</MenuItem>
+                      <MenuItem value="Female">Female</MenuItem>
+                      <MenuItem value="Other">Other</MenuItem>
                     </TextField>
                   )}
                 />
@@ -182,7 +187,6 @@ const AiVisaSupport = () => {
                       label="Current City/Country of Residence"
                       variant="standard"
                       select
-                      SelectProps={{ native: true }}
                       required
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
@@ -194,11 +198,11 @@ const AiVisaSupport = () => {
                         )
                       }
                     >
-                      <option value="">Select Country</option>
+                      <MenuItem value="">Select Country</MenuItem>
                       {countries.map((country) => (
-                        <option key={country.isoCode} value={country.name}>
+                        <MenuItem key={country.isoCode} value={country.name}>
                           {country.name}
-                        </option>
+                        </MenuItem>
                       ))}
                     </TextField>
                   )}
@@ -215,18 +219,17 @@ const AiVisaSupport = () => {
                       label="Destination"
                       variant="standard"
                       select
-                      SelectProps={{ native: true }}
                       required
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
                       onChange={(event) => field.onChange(event.target.value)}
                     >
-                      <option value="">Select Country</option>
+                      <MenuItem value="">Select Country</MenuItem>
                       {countries.map((country) => (
-                        <option key={country.isoCode} value={country.name}>
+                        <MenuItem key={country.isoCode} value={country.name}>
                           {country.name}
-                        </option>
+                        </MenuItem>
                       ))}
                     </TextField>
                   )}
@@ -294,16 +297,15 @@ const AiVisaSupport = () => {
                       variant="standard"
                       required
                       select
-                      SelectProps={{ native: true }}
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
                     >
-                      <option value="">Select an option</option>
+                      <MenuItem value="">Select an option</MenuItem>
                       {visaSupportOptions.map((option) => (
-                        <option key={option} value={option}>
+                        <MenuItem key={option} value={option}>
                           {option}
-                        </option>
+                        </MenuItem>
                       ))}
                     </TextField>
                   )}
