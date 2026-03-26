@@ -1,19 +1,10 @@
 import React, { useMemo } from "react";
-import {
-  Box,
-  Button,
-  CircularProgress,
-  MenuItem,
-  TextField,
-} from "@mui/material";
+import { Box, Button, MenuItem, TextField } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
 import { Country } from "country-state-city";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import Container from "../components/Container";
-import axios from "../utils/axios";
-import { showErrorAlert } from "../utils/alerts";
 
 const floatingLabelSx = {
   color: "black",
@@ -53,33 +44,21 @@ const AiVisaSupport = () => {
   const countries = useMemo(() => Country.getAllCountries(), []);
   const selectedResidence = watch("currentResidence");
 
-  const { mutate: submitForm, isPending } = useMutation({
-    mutationFn: async (data) => {
-      const response = await axios.post("forms/add-new-b2c-form-submission", {
-        ...data,
-        sheetName: "AI_Visa_Support",
-      });
-      return response.data;
-    },
-    onSuccess: async () => {
-      const result = await Swal.fire({
-        title: "Form Submitted",
-        text: "Form Submitted. Would You Like us to et back to you or Search Yourself",
-        icon: "success",
-        showCancelButton: true,
-        confirmButtonText: "Get Back to Me",
-        cancelButtonText: "Help Needed",
-        reverseButtons: true,
-      });
+  const handleFormSubmit = async () => {
+    const result = await Swal.fire({
+      title: "Form Submitted",
+      text: "Form submitted. Would you like us to get back to you or help yourself?",
+      icon: "success",
+      showCancelButton: true,
+      confirmButtonText: "Get Back to Me",
+      cancelButtonText: "Help Needed",
+      reverseButtons: true,
+    });
 
-      const choice = result.isConfirmed ? "get-back-to-me" : "help-needed";
-      navigate(`/visa-support/thank-you?choice=${choice}`);
-      reset(defaultValues);
-    },
-    onError: (error) => {
-      showErrorAlert(error?.response?.data?.message || "Failed to submit form");
-    },
-  });
+    const choice = result.isConfirmed ? "get-back-to-me" : "help-needed";
+    navigate(`/visa-support/thank-you?choice=${choice}`);
+    reset(defaultValues);
+  };
 
   const handleResidenceChange = (countryName, onChange) => {
     const country = countries.find((item) => item.name === countryName);
@@ -99,7 +78,7 @@ const AiVisaSupport = () => {
           <div className="w-full max-w-5xl md:px-20 lg:px-40">
             <Box
               component="form"
-              onSubmit={handleSubmit((data) => submitForm(data))}
+              onSubmit={handleSubmit(handleFormSubmit)}
               className="bg-gray-50/50 p-6 md:p-10 rounded-2xl border border-gray-100 shadow-sm"
             >
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold uppercase mb-8 text-center">
@@ -299,7 +278,6 @@ const AiVisaSupport = () => {
                   <Button
                     type="submit"
                     variant="contained"
-                    disabled={isPending}
                     sx={{
                       bgcolor: "black",
                       borderRadius: 20,
@@ -311,13 +289,7 @@ const AiVisaSupport = () => {
                       width: { xs: "100%", md: "auto" },
                     }}
                   >
-                    {isPending && (
-                      <CircularProgress
-                        size={16}
-                        sx={{ color: "white", mr: 1 }}
-                      />
-                    )}
-                    {isPending ? "SUBMITTING..." : "SUBMIT"}
+                    SUBMIT
                   </Button>
                 </div>
               </div>
