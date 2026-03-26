@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import logo from "../assets/WONO_LOGO_Black_TP.png";
 import { useSelector } from "react-redux";
-import { Drawer } from "@mui/material";
+import { Drawer, Avatar } from "@mui/material";
 import { IoCloseSharp } from "react-icons/io5";
 import { HiOutlineMenu } from "react-icons/hi";
 import Container from "./Container";
@@ -226,7 +226,21 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="h-full px-2 lg:hidden sm:hidden">
+          <div className="h-full px-2 lg:hidden sm:hidden flex items-center gap-2">
+            {isLoggedIn && (
+              <Avatar
+                className="bg-primary-blue"
+                sx={{
+                  width: 32,
+                  height: 32,
+                  fontSize: "0.9rem",
+                  fontWeight: 600,
+                  backgroundColor: "#0ba9ef",
+                }}
+              >
+                A
+              </Avatar>
+            )}
             <button
               onClick={() => setOpen(true)}
               className={`rounded-lg text-subtitle text-black ${
