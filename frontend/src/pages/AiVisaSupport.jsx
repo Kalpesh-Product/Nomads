@@ -56,12 +56,13 @@ const AiVisaSupport = () => {
   const handleFormSubmit = async (formValues) => {
     const result = await Swal.fire({
       title: "Form Submitted",
-      text: "Form submitted. Would you like us to get back to you or help yourself?",
+      text: "Form submitted. Would you like us to get back to you or search yourself?",
       icon: "success",
       showCancelButton: true,
       confirmButtonText: "Get Back to Me",
-      cancelButtonText: "Help Needed",
+      cancelButtonText: "Search Myself",
       reverseButtons: true,
+      confirmButtonColor: "#0BA9EF",
     });
 
     const choice = result.isConfirmed ? "get-back-to-me" : "help-needed";
@@ -119,6 +120,20 @@ const AiVisaSupport = () => {
                 />
 
                 <Controller
+                  name="email"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Email Address"
+                      variant="standard"
+                      InputLabelProps={{ sx: floatingLabelSx }}
+                    />
+                  )}
+                />
+
+                {/* <Controller
                   name="gender"
                   control={control}
                   render={({ field }) => (
@@ -136,7 +151,7 @@ const AiVisaSupport = () => {
                       <MenuItem value="Other">Other</MenuItem>
                     </TextField>
                   )}
-                />
+                /> */}
 
                 <Controller
                   name="dateOfBirth"
@@ -219,20 +234,6 @@ const AiVisaSupport = () => {
                         </MenuItem>
                       ))}
                     </TextField>
-                  )}
-                />
-
-                <Controller
-                  name="email"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label="Email Address"
-                      variant="standard"
-                      InputLabelProps={{ sx: floatingLabelSx }}
-                    />
                   )}
                 />
 

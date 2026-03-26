@@ -12,7 +12,7 @@ const AiVisaSupportThankYou = () => {
   const message =
     choice === "get-back-to-me"
       ? "Thanks for submitting your request. Our team will get back to you shortly."
-      : "Thanks for submitting your request. We’ll help you with resources so you can continue your visa search confidently.";
+      : "Thanks for submitting your request. Use the link below to continue your search confidently.";
 
   return (
     <div className="bg-white text-black font-sans">
@@ -26,7 +26,7 @@ const AiVisaSupportThankYou = () => {
             {selectedState && selectedCountry && selectedDestinationLabel ? (
               <Link
                 to={`/ai-verticals?country=${encodeURIComponent(selectedCountry)}&state=${encodeURIComponent(selectedState)}`}
-                className="mt-6 inline-block text-lg font-semibold text-[#0A66C2] underline underline-offset-4 hover:text-[#084f95]"
+                className="mt-6 inline-block text-lg font-semibold text-primary-blue underline underline-offset-4 hover:text-[#084f95]"
               >
                 Go To {selectedDestinationLabel}
               </Link>
