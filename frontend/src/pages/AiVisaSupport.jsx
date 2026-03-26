@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Box, Button, MenuItem, TextField } from "@mui/material";
+import { Box, Button, ListSubheader, MenuItem, TextField } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { Country } from "country-state-city";
 import Swal from "sweetalert2";
@@ -13,16 +13,20 @@ const floatingLabelSx = {
   "&.MuiInputLabel-shrink": { color: "#1976d2" },
 };
 
-const visaSupportOptions = [
-  "Free Services - Visa eligibility check",
-  "Free Services - Required documents checklist",
-  "Free Services - Processing timeline",
-  "Free Services - Recommended visa type",
-  "Free Services - Estimated approval chances",
-  "Paid Services - Visa Consultation (1-on-1 expert call / Personalized visa strategy / Country comparison)",
-  "Paid Services - Application Support (Form filling assistance / Document review / SOP / cover letter drafting)",
-  "Paid Services - End-to-End Visa Processing (Appointment booking / Submission tracking)",
-];
+const visaSupportOptions = {
+  "Free Services": [
+    "Visa eligibility check",
+    "Required documents checklist",
+    "Processing timeline",
+    "Recommended visa type",
+    "Estimated approval chances",
+  ],
+  "Paid Services": [
+    "Visa Consultation (1-on-1 expert call / Personalized visa strategy / Country comparison)",
+    "Application Support (Form filling assistance / Document review / SOP / cover letter drafting)",
+    "End-to-End Visa Processing (Appointment booking / Submission tracking)",
+  ],
+};
 
 const defaultValues = {
   fullName: "",
@@ -269,11 +273,25 @@ const AiVisaSupport = () => {
                       InputLabelProps={{ sx: floatingLabelSx }}
                     >
                       <MenuItem value="">Select an option</MenuItem>
-                      {visaSupportOptions.map((option) => (
-                        <MenuItem key={option} value={option}>
-                          {option}
-                        </MenuItem>
-                      ))}
+                      {Object.entries(visaSupportOptions).map(
+                        ([category, options]) => [
+                          <ListSubheader
+                            key={`${category}-header`}
+                            disableSticky
+                            sx={{ color: "#111827", fontWeight: 600 }}
+                          >
+                            {category}
+                          </ListSubheader>,
+                          ...options.map((option) => (
+                            <MenuItem
+                              key={`${category}-${option}`}
+                              value={`${category} - ${option}`}
+                            >
+                              {option}
+                            </MenuItem>
+                          )),
+                        ],
+                      )}
                     </TextField>
                   )}
                 />
