@@ -266,10 +266,10 @@ const AiSearchResults = () => {
 
   return (
     <div className="min-h-full bg-white">
-      <main className="py-8">
+      <main className="pb-8">
         <div className="mx-0 w-full max-w-[80rem] px-1 sm:px-6 lg:mx-auto lg:max-w-[80rem] lg:px-0 lg:min-w-[75%]">
-          <div className="rounded-[10px] bg-white px-4 py-6">
-            <div className="flex">
+          <div className="rounded-[10px] bg-white px-4 pb-6">
+            <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => navigate("/home")}
@@ -278,9 +278,12 @@ const AiSearchResults = () => {
               >
                 <HiOutlineArrowLeft size={18} />
               </button>
+              <span className="text-sm font-semibold text-primary-blue sm:hidden">
+                {selectedGoal}
+              </span>
             </div>
 
-            <div className="mt-4 flex max-w-4xl items-center rounded-[30px] border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] lg:ml-[6.25rem] lg:mr-36">
+            <div className="mt-4 hidden max-w-4xl items-center rounded-[30px] border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] sm:flex lg:ml-[6.25rem] lg:mr-36">
               <div className="flex flex-wrap items-center gap-2">
                 {searchBarBadges.map((badgeLabel, index) => (
                   <div
@@ -335,7 +338,7 @@ const AiSearchResults = () => {
                   </p>
 
                   {hasSelectedFilters ? (
-                    <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
+                    <div className="mt-8 grid grid-cols-2 gap-3 md:mt-10 md:gap-4 xl:grid-cols-3">
                       {visibleDestinations.map((destination) => (
                         <article
                           key={`${destination.city}-${destination.country}`}
@@ -350,41 +353,41 @@ const AiSearchResults = () => {
                             }
                           }}
                         >
-                          <div className="relative overflow-hidden rounded-2xl">
+                          <div className="relative overflow-hidden rounded-xl md:rounded-2xl">
                             <img
                               src={destination.image}
                               alt={`${destination.city}, ${destination.country}`}
-                              className="h-56 w-full rounded-2xl object-cover"
+                              className="aspect-square w-full rounded-xl object-cover md:rounded-2xl"
                             />
                             <div
-                              className={`pointer-events-none absolute inset-x-0 bottom-0 flex items-end gap-3 bg-gradient-to-t from-black/75 via-black/25 to-transparent px-4 py-3 text-white ${
+                              className={`pointer-events-none absolute inset-x-0 bottom-0 flex items-end gap-1.5 bg-gradient-to-t from-black/75 via-black/25 to-transparent px-2 py-2 text-white md:gap-3 md:px-4 md:py-3 ${
                                 isPrimaryGoalOptionSelected
                                   ? "justify-end"
                                   : "justify-between"
                               }`}
                             >
                               {!isPrimaryGoalOptionSelected && (
-                                <span className="rounded-full bg-black/45 px-3 py-1 text-xs font-semibold tracking-wide backdrop-blur-sm">
+                                <span className="rounded-full bg-black/45 px-2 py-0.5 text-[0.7rem] font-semibold tracking-wide backdrop-blur-sm md:px-3 md:py-1 md:text-xs">
                                   {destination.speedLabel}
                                 </span>
                               )}
-                              <span className="rounded-full bg-black/45 px-3 py-1 text-xs font-semibold tracking-wide backdrop-blur-sm">
+                              <span className="rounded-full bg-black/45 px-2 py-0.5 text-[0.7rem] font-semibold tracking-wide backdrop-blur-sm md:px-3 md:py-1 md:text-xs">
                                 {destination.rankLabel}
                               </span>
                             </div>
                           </div>
-                          <div className="mt-2 flex items-start justify-between gap-3">
-                            <div>
-                              <h3 className="text-[1.2rem] font-semibold text-black/90">
+                          <div className="mt-1.5 flex items-start justify-between gap-2 md:mt-2 md:gap-3">
+                            <div className="min-w-0">
+                              <h3 className="truncate text-[1.05rem] font-semibold leading-tight text-black/90 md:text-[1.2rem]">
                                 {destination.city}
                               </h3>
                             </div>
-                            <p className="mt-1 text-[1rem] font-semibold text-black/90">
+                            <p className="truncate text-[0.95rem] font-semibold leading-tight text-black/90 md:mt-1 md:text-[1rem]">
                               {destination.country}
                             </p>
                           </div>
                           <div>
-                            <p className="text-[0.9rem] text-black/60">
+                            <p className="text-[0.82rem] text-black/60 md:text-[0.9rem]">
                               Find activation options
                             </p>
                           </div>
@@ -392,10 +395,12 @@ const AiSearchResults = () => {
                       ))}
                     </div>
                   ) : (
-                    <div className="mt-10 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-500">
+                    <>
+                      {/* <div className="mt-10 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-500">
                       Results will appear here after you select both filters
                       above.
-                    </div>
+                    </div> */}
+                    </>
                   )}
 
                   {shouldShowViewMore && (

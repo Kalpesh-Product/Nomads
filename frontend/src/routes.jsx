@@ -72,6 +72,7 @@ import AiHomeLoggedIn from "./pages/AiHomeLoggedIn";
 import AiLogin from "./pages/AiLogin";
 import AiSignup from "./pages/AiSignup";
 import AiVisaSupport from "./pages/AiVisaSupport";
+import AiVisaSupportThankYou from "./pages/AiVisaSupportThankYou";
 import AiHelpGetActivated from "./pages/AiHelpGetActivated";
 import AiConsultation from "./pages/AiConsultation";
 import AiManualSearch from "./pages/AiManualSearch";
@@ -204,6 +205,10 @@ if (tenant === "main") {
               element: <AiImageGallery />,
             },
             { path: "visa-support", element: <AiVisaSupport /> },
+            {
+              path: "visa-support/thank-you",
+              element: <AiVisaSupportThankYou />,
+            },
             {
               path: "help-you-get-activated",
               element: <AiHelpGetActivated />,

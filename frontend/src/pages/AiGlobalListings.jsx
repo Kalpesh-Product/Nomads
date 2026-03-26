@@ -10,7 +10,8 @@ const AiGlobalListings = () => {
   const view = params.get("view");
 
   return (
-    <div className="pt-4 lg:pt-6">
+    // <div className="pt-4 lg:pt-6">
+    <div className="">
       {view === "map" ? <AiGlobalListingsMap /> : <AiGlobalListingsList />}
     </div>
   );

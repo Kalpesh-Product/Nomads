@@ -15,6 +15,11 @@ const gatedRecommendationTitles = new Set([
   "Find Your Community",
 ]);
 
+const freeRecommendationTitles = new Set([
+  "World Ranking",
+  "Search Old School",
+]);
+
 const recommendationCards = [
   {
     title: "World Ranking",
@@ -165,36 +170,48 @@ const AiHome = () => {
           <h2 className="mt-10 text-sm font-semibold text-black/85 font-play sm:text-lg">
             {typedSubheading}
           </h2>
-          {!isLoggedIn ? (
+          {/* {!isLoggedIn ? (
             <p className="mt-3 text-sm sm:text-lg font-semibold text-black/85 font-play">
               {typedLoggedOutNote}
             </p>
-          ) : null}
+          ) : null} */}
 
           <div className="mt-4 rounded-[40px] px-2 py-4 md:px-6 md:py-8">
             <div className="grid grid-cols-2 gap-4 md:grid-cols-2 md:gap-10 xl:grid-cols-3">
               {recommendationCards.map((card) => {
                 const Icon = card.icon;
 
+                const loggedOutCardText = freeRecommendationTitles.has(
+                  card.title,
+                )
+                  ? "Available For Free"
+                  : "Login Required";
+
                 return (
-                  <article
-                    key={card.title}
-                    onClick={() => handleCardClick(card)}
-                    className="group cursor-pointer rounded-2xl bg-[#f1f1f3] px-3 py-5 text-center transition-colors duration-200 hover:bg-[#e8e8ed] md:rounded-none md:bg-transparent md:px-0 md:py-0 md:hover:bg-transparent"
-                  >
-                    <Icon
-                      size={24}
-                      className="mx-auto text-black/80 transition-colors duration-200 group-hover:text-sky-500"
-                    />
-                    <h3 className="mt-2 text-nano md:text-md font-bold text-black/90 leading-tight transition-colors duration-200 group-hover:text-sky-500">
-                      {card.title}
-                    </h3>
-                    <div className="mt-2 hidden rounded-2xl bg-[#f1f1f3] p-5 text-left shadow-[0_1px_0_rgba(255,255,255,0.7)] transition-colors duration-200 group-hover:bg-sky-500 md:block">
-                      <p className="text-nano leading-relaxed text-black/90 transition-colors duration-200 group-hover:text-white">
-                        {card.description}
+                  <div key={card.title}>
+                    <article
+                      onClick={() => handleCardClick(card)}
+                      className="group cursor-pointer rounded-2xl bg-[#f1f1f3] px-3 py-5 text-center transition-colors duration-200 hover:bg-[#e8e8ed] md:rounded-none md:bg-transparent md:px-0 md:py-0 md:hover:bg-transparent"
+                    >
+                      <Icon
+                        size={24}
+                        className="mx-auto text-black/80 transition-colors duration-200 group-hover:text-sky-500"
+                      />
+                      <h3 className="mt-2 text-nano sm:text-nano md:text-md lg:text-md font-bold text-black/90 leading-tight transition-colors duration-200 group-hover:text-sky-500">
+                        {card.title}
+                      </h3>
+                      <div className="mt-2 hidden rounded-2xl bg-[#f1f1f3] p-5 text-left shadow-[0_1px_0_rgba(255,255,255,0.7)] transition-colors duration-200 group-hover:bg-sky-500 md:block">
+                        <p className="text-nano leading-relaxed text-black/90 transition-colors duration-200 group-hover:text-white">
+                          {card.description}
+                        </p>
+                      </div>
+                    </article>
+                    {!isLoggedIn ? (
+                      <p className="mt-2 text-[10px] font-semibold uppercase tracking-wide text-black/70 md:text-xs">
+                        {loggedOutCardText}
                       </p>
-                    </div>
-                  </article>
+                    ) : null}
+                  </div>
                 );
               })}
             </div>

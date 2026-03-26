@@ -55,8 +55,9 @@ const valueAdditionItems = [
   { label: "Company Setup", icon: HiOutlineCog },
   { label: "Apply for Job", icon: HiOutlineUserCircle },
   { label: "Consultation", icon: LuCircleDollarSign, path: "/consultation" },
-  { label: "Become A Host", icon: HiOutlineViewGrid },
 ];
+
+const becomeHostItem = [{ label: "Become A Host", icon: HiOutlineViewGrid }];
 
 const loggedOutPrompt = {
   title: "Get responses tailored to you",
@@ -88,12 +89,14 @@ const SidebarSection = ({
 
   return (
     <div className="px-4 pt-3">
-      <div className="border-t border-black/10 pt-2">
+      <div className="border-t border-black/10 pt-3">
         {collapsed ? null : isExpandable ? (
           <button
             type="button"
             onClick={onToggle}
-            className="flex w-full items-center justify-between text-left text-xs font-semibold uppercase tracking-wide text-black/80 transition hover:text-black"
+            className={`flex w-full items-center justify-between text-left text-xs font-semibold uppercase tracking-wide text-black/80 transition hover:text-black ${
+              isOpen ? "border-b border-black/10 pb-3" : ""
+            }`}
             aria-expanded={isOpen}
             aria-label={`${isOpen ? "Collapse" : "Expand"} ${title}`}
           >
@@ -263,31 +266,43 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
             onToggle={() => setIsProfileOpen((prev) => !prev)}
           />
           <SidebarSection
+            items={becomeHostItem}
+            collapsed={isCollapsed}
+            onItemClick={handleValueAdditionClick}
+          />
+          <SidebarSection
             items={signOutItem}
             collapsed={isCollapsed}
             onItemClick={handleSignOutClick}
           />
         </>
       ) : (
-        !isCollapsed && (
-          <div className="mt-auto px-4 pb-4 pt-10">
-            <div className="rounded-[28px]   p-4 shadow-sm">
-              <h3 className="text-[13px] font-semibold leading-tight text-black/90">
-                {loggedOutPrompt.title}
-              </h3>
-              <p className="mt-4 text-nano leading-7 text-black/55">
-                {loggedOutPrompt.description}
-              </p>
-              <button
-                type="button"
-                onClick={handleLogInClick}
-                className="mt-6 w-full rounded-full border border-black/10 bg-white px-3 py-2 text-base font-semibold text-black transition hover:bg-black hover:text-white"
-              >
-                {loggedOutPrompt.actionLabel}
-              </button>
+        <>
+          <SidebarSection
+            items={becomeHostItem}
+            collapsed={isCollapsed}
+            onItemClick={handleValueAdditionClick}
+          />
+          {!isCollapsed && (
+            <div className="mt-auto px-4 pb-4 pt-10">
+              <div className="rounded-[28px]   p-4 shadow-sm">
+                <h3 className="text-[13px] font-semibold leading-tight text-black/90">
+                  {loggedOutPrompt.title}
+                </h3>
+                <p className="mt-4 text-nano leading-7 text-black/55">
+                  {loggedOutPrompt.description}
+                </p>
+                <button
+                  type="button"
+                  onClick={handleLogInClick}
+                  className="mt-6 w-full rounded-full border border-black/10 bg-white px-3 py-2 text-base font-semibold text-black transition hover:bg-black hover:text-white"
+                >
+                  {loggedOutPrompt.actionLabel}
+                </button>
+              </div>
             </div>
-          </div>
-        )
+          )}
+        </>
       )}
     </aside>
   );
