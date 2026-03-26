@@ -269,7 +269,7 @@ const AiSearchResults = () => {
       <main className="pb-8">
         <div className="mx-0 w-full max-w-[80rem] px-1 sm:px-6 lg:mx-auto lg:max-w-[80rem] lg:px-0 lg:min-w-[75%]">
           <div className="rounded-[10px] bg-white px-4 pb-6">
-            <div className="flex">
+            <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => navigate("/home")}
@@ -278,9 +278,12 @@ const AiSearchResults = () => {
               >
                 <HiOutlineArrowLeft size={18} />
               </button>
+              <span className="text-sm font-semibold text-primary-blue sm:hidden">
+                {selectedGoal}
+              </span>
             </div>
 
-            <div className="mt-4 flex max-w-4xl items-center rounded-[30px] border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] lg:ml-[6.25rem] lg:mr-36">
+            <div className="mt-4 hidden max-w-4xl items-center rounded-[30px] border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] sm:flex lg:ml-[6.25rem] lg:mr-36">
               <div className="flex flex-wrap items-center gap-2">
                 {searchBarBadges.map((badgeLabel, index) => (
                   <div
