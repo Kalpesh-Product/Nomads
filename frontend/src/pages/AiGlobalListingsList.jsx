@@ -24,6 +24,7 @@ import AiSelectedBadgesSearchBar from "../components/AiSelectedBadgesSearchBar.j
 import { AnimatePresence, motion } from "motion/react";
 import { Helmet } from "@dr.pogodin/react-helmet";
 import useAuth from "../hooks/useAuth.js";
+import { HiOutlineX } from "react-icons/hi";
 
 const HorizontalScrollWrapper = ({ children, title }) => {
   const scrollRef = React.useRef(null);
@@ -687,39 +688,50 @@ const AiGlobalListingsList = () => {
         <div className="flex flex-col gap-4 justify-center items-center w-full lg:mt-0">
           <div className="w-full lg:min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-4 sm:px-6 lg:px-0">
             <div className="lg:hidden w-full flex flex-col gap-4 mb-4">
-              <button
-                onClick={() => setShowMobileSearch((prev) => !prev)}
-                className="bg-white shadow-md flex items-center w-[92%] mx-auto text-center justify-center font-medium text-secondary-dark border-2 px-6 py-2 rounded-full flex-col gap-1"
-              >
-                <div className="flex items-center gap-2">
-                  <IoSearch className="text-primary-red" />
-                  <span className="text-[11px] font-bold text-gray-900 truncate w-full text-left">
-                    {`${(formData?.country || "Country").charAt(0).toUpperCase() + (formData?.country || "Country").slice(1)} . ${
-                      formData?.location
-                        ? formData.location
-                            .split(" ")
-                            .map(
-                              (word) =>
-                                word.charAt(0).toUpperCase() +
-                                word.slice(1).toLowerCase(),
-                            )
-                            .join(" ")
-                        : "Unknown"
-                    } . ${
-                      formData?.category
-                        ? categoryOptions.find(
-                            (c) => c.value === formData.category,
-                          )?.label ||
-                          formData.category.charAt(0).toUpperCase() +
-                            formData.category.slice(1)
-                        : "All"
-                    }`}
+              <div className="w-[92%] mx-auto bg-white shadow-md border-2 rounded-full pl-16 pr-4 py-2 flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowMobileSearch((prev) => !prev)}
+                  className="flex items-center flex-1 text-center justify-center font-medium text-secondary-dark flex-col gap-1 min-w-0"
+                >
+                  <div className="flex items-center gap-2 w-full">
+                    <IoSearch className="text-primary-red" />
+                    <span className="text-[11px] font-bold text-gray-900 truncate w-full text-left">
+                      {`${(formData?.country || "Country").charAt(0).toUpperCase() + (formData?.country || "Country").slice(1)} . ${
+                        formData?.location
+                          ? formData.location
+                              .split(" ")
+                              .map(
+                                (word) =>
+                                  word.charAt(0).toUpperCase() +
+                                  word.slice(1).toLowerCase(),
+                              )
+                              .join(" ")
+                          : "Unknown"
+                      } . ${
+                        formData?.category
+                          ? categoryOptions.find(
+                              (c) => c.value === formData.category,
+                            )?.label ||
+                            formData.category.charAt(0).toUpperCase() +
+                              formData.category.slice(1)
+                          : "All"
+                      }`}
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-gray-500">
+                    {formData?.count || "1-5"} Nomads
                   </span>
-                </div>
-                <span className="text-[10px] text-gray-500">
-                  {formData?.count || "1-5"} Nomads
-                </span>
-              </button>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate("/search/results")}
+                  aria-label="Close and go to search results"
+                  className="h-8 w-8 shrink-0 rounded-full bg-gray-200 text-black/60 flex items-center justify-center"
+                >
+                  <HiOutlineX size={18} />
+                </button>
+              </div>
             </div>
 
             <div className="lg:hidden flex overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 md:justify-center">
