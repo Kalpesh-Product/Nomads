@@ -4,6 +4,7 @@ import {
   clearStoredLoginState,
   readStoredLoginState,
 } from "../hooks/useNomadLoginState";
+import logo from "../assets/WONO_LOGO_Black_TP.png";
 import {
   HiChevronDown,
   HiChevronUp,
@@ -217,14 +218,23 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     >
       <div className="px-4 py-4">
         {isMobileOverlay ? (
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded p-1 text-black/80 hover:bg-black/5"
-            aria-label="Close sidebar"
-          >
-            <HiX size={24} />
-          </button>
+          <div className="flex items-center justify-between gap-3">
+            <div className="h-10 w-24 overflow-x-hidden rounded-lg">
+              <img
+                src={logo}
+                alt="WONO logo"
+                className="h-full w-fit object-contain"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded p-1 text-black/80 hover:bg-black/5"
+              aria-label="Close sidebar"
+            >
+              <HiX size={24} />
+            </button>
+          </div>
         ) : (
           <button
             type="button"
