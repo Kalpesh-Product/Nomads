@@ -89,12 +89,14 @@ const SidebarSection = ({
 
   return (
     <div className="px-4 pt-3">
-      <div className="border-t border-black/10 pt-2">
+      <div className="border-t border-black/10 pt-3">
         {collapsed ? null : isExpandable ? (
           <button
             type="button"
             onClick={onToggle}
-            className="flex w-full items-center justify-between text-left text-xs font-semibold uppercase tracking-wide text-black/80 transition hover:text-black"
+            className={`flex w-full items-center justify-between text-left text-xs font-semibold uppercase tracking-wide text-black/80 transition hover:text-black ${
+              isOpen ? "border-b border-black/10 pb-3" : ""
+            }`}
             aria-expanded={isOpen}
             aria-label={`${isOpen ? "Collapse" : "Expand"} ${title}`}
           >
