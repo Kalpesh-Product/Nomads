@@ -468,7 +468,7 @@ const AiGlobalListingsList = () => {
           stateLabel={selectedLocationLabel}
           onBack={() => navigate("/search/results")}
           onClear={() => navigate("/search/results")}
-          className="mb-8"
+          className="mb-2"
         />
         <div className="flex flex-col gap-4 justify-center items-center w-full">
           <div className="min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0">
