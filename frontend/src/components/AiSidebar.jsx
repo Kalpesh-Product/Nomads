@@ -210,7 +210,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
   return (
     <aside
-      className={`flex h-full flex-col border-r border-black/10 bg-[#efefef] transition-all duration-300 ${
+      className={`flex h-full max-h-screen flex-col overflow-y-auto overscroll-contain border-r border-black/10 bg-[#efefef] transition-all duration-300 custom-scrollbar-hide ${
         isMobileOverlay
           ? "w-[calc(100%-52px)] max-w-[320px]"
           : isCollapsed
