@@ -45,3 +45,8 @@
 .swal2-icon.swal2-success .swal2-success-ring {
   border-color: rgba(134, 239, 172, 0.35);
 }
+.swal2-button--pill {
+  border-radius: 9999px !important;
+  padding: 0.65rem 1.35rem !important;
+  font-weight: 600;
+}

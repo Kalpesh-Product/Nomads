@@ -63,11 +63,15 @@ const AiVisaSupport = () => {
       text: "Form submitted. Would you like us to get back to you or search yourself?",
       icon: "success",
       showCancelButton: true,
-      confirmButtonText: "Get Back to Me",
+      confirmButtonText: "Get Back To Me",
       cancelButtonText: "Self Serve",
       reverseButtons: true,
       cancelButtonColor: "#000000",
       confirmButtonColor: "#0BA9EF",
+      customClass: {
+        confirmButton: "swal2-button--pill",
+        cancelButton: "swal2-button--pill",
+      },
     });
 
     const choice = result.isConfirmed ? "get-back-to-me" : "help-needed";

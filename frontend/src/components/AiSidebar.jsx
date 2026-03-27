@@ -53,8 +53,12 @@ const valueAdditionItems = [
     path: "/help-you-get-activated",
   },
   { label: "Company Setup", icon: HiOutlineCog },
-  { label: "Apply for Job", icon: HiOutlineUserCircle },
   { label: "Consultation", icon: LuCircleDollarSign, path: "/consultation" },
+  {
+    label: "Apply for Job",
+    icon: HiOutlineUserCircle,
+    badge: "Coming Soon",
+  },
 ];
 
 const becomeHostItem = [{ label: "Become A Host", icon: HiOutlineViewGrid }];
@@ -126,7 +130,14 @@ const SidebarSection = ({
                 >
                   <Icon size={18} className="shrink-0" />
                   {!collapsed && (
-                    <span className="text-xs font-medium ">{item.label}</span>
+                    <>
+                      <span className="text-xs font-medium">{item.label}</span>
+                      {item.badge && (
+                        <span className="ml-0 rounded-full border border-gray-400 bg-gray-200 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-gray-400 shadow-sm">
+                          {item.badge}
+                        </span>
+                      )}
+                    </>
                   )}
                 </button>
               );
