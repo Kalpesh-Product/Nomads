@@ -257,6 +257,10 @@ const AiSearchResults = () => {
 
   const thinkingHeadingText = "Thinking...";
 
+  const isThinkingHeadingVisible =
+    typedTopHeading.length > 0 &&
+    thinkingHeadingText.startsWith(typedTopHeading);
+
   const clearTypingAnimations = useCallback(() => {
     if (topTypingIntervalRef.current) {
       clearInterval(topTypingIntervalRef.current);
@@ -400,7 +404,7 @@ const AiSearchResults = () => {
     <div className="min-h-full bg-white">
       <main className="pb-8">
         <div className="mx-0 w-full max-w-[80rem] px-1 sm:px-6 lg:mx-auto lg:max-w-[80rem] lg:px-0 lg:min-w-[75%]">
-          <div className="rounded-[10px] bg-white px-4 pb-6">
+          <div className="rounded-[10px] bg-white px-0 pb-6">
             <div className="flex items-center gap-2">
               <button
                 type="button"
@@ -416,7 +420,13 @@ const AiSearchResults = () => {
             </div>
 
             <div className="mt-6 lg:ml-[6.25rem] lg:mr-36">
-              <p className="text-sm font-medium leading-snug text-black/85 lg:text-lg font-play">
+              <p className="flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-lg font-play">
+                {isThinkingHeadingVisible && (
+                  <span
+                    className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-b-transparent"
+                    aria-hidden="true"
+                  />
+                )}
                 {typedTopHeading}
               </p>
             </div>
