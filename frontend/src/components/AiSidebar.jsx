@@ -16,6 +16,7 @@ import {
   HiOutlineUserCircle,
   HiOutlineKey,
   HiOutlineLogout,
+  HiOutlineSearch,
 } from "react-icons/hi";
 import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
 
@@ -44,7 +45,7 @@ const recommendationItems = [
     icon: HiOutlineUserCircle,
     path: "/search/results",
   },
-  { label: "Search Old School", icon: HiOutlineMenu, path: "/manual-search" },
+  { label: "Search Old School", icon: HiOutlineSearch, path: "/manual-search" },
 ];
 const valueAdditionItems = [
   { label: "VISA Support", icon: LuMapPinned, path: "/visa-support" },
