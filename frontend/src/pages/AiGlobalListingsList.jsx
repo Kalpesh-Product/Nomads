@@ -673,7 +673,7 @@ const AiGlobalListingsList = () => {
                                   className="text-primary-blue text-sm font-semibold hover:underline"
                                 >
                                   {expandedCategories.includes(type)
-                                    ? "View Less ←"
+                                    ? "View less ←"
                                     : "View more →"}
                                 </button>
                               </div>
