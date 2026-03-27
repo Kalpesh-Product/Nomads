@@ -667,7 +667,7 @@ const AiGlobalListingsList = () => {
                               ))}
                             </div>
                             {showViewMore && (
-                              <div className="mt-3 text-right">
+                              <div className="mt-0 text-right">
                                 <button
                                   onClick={() => handleShowMoreClick(type)}
                                   className="text-primary-blue text-sm font-semibold hover:underline"
