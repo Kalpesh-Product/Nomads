@@ -589,89 +589,99 @@ const AiGlobalListingsList = () => {
                   ))
                 ) : groupedListings &&
                   Object.keys(groupedListings).length > 0 ? (
-                  Object.entries(groupedListings)
-                    .sort(([typeA], [typeB]) => {
-                      const typeOrder = [
-                        "coworking",
-                        "coliving",
-                        "hostel",
-                        "workation",
-                        "privatestay",
-                        "meetingroom",
-                        "cafe",
-                      ];
-                      const indexA = typeOrder.indexOf(typeA);
-                      const indexB = typeOrder.indexOf(typeB);
-                      return (
-                        (indexA === -1 ? 999 : indexA) -
-                        (indexB === -1 ? 999 : indexB)
-                      );
-                    })
-                    .map(([type, items]) => {
-                      const prioritizedCompanies = ["BIZ Nest", "MeWo"];
-                      const sortedItems = [...items].sort((a, b) => {
-                        const aPriorityIndex = prioritizedCompanies.indexOf(
-                          a.companyName,
+                  <>
+                    <div className="border-t border-gray-300 mt-2 mb-6" />
+                    {Object.entries(groupedListings)
+                      .sort(([typeA], [typeB]) => {
+                        const typeOrder = [
+                          "coworking",
+                          "coliving",
+                          "hostel",
+                          "workation",
+                          "privatestay",
+                          "meetingroom",
+                          "cafe",
+                        ];
+                        const indexA = typeOrder.indexOf(typeA);
+                        const indexB = typeOrder.indexOf(typeB);
+                        return (
+                          (indexA === -1 ? 999 : indexA) -
+                          (indexB === -1 ? 999 : indexB)
                         );
-                        const bPriorityIndex = prioritizedCompanies.indexOf(
-                          b.companyName,
-                        );
-                        if (aPriorityIndex !== -1 && bPriorityIndex !== -1) {
-                          return aPriorityIndex - bPriorityIndex;
-                        }
-                        if (aPriorityIndex !== -1) return -1;
-                        if (bPriorityIndex !== -1) return 1;
-                        const aRating = Number(a.ratings || 0);
-                        const bRating = Number(b.ratings || 0);
-                        return bRating - aRating;
-                      });
+                      })
+                      .map(([type, items], index) => {
+                        const prioritizedCompanies = ["BIZ Nest", "MeWo"];
+                        const sortedItems = [...items].sort((a, b) => {
+                          const aPriorityIndex = prioritizedCompanies.indexOf(
+                            a.companyName,
+                          );
+                          const bPriorityIndex = prioritizedCompanies.indexOf(
+                            b.companyName,
+                          );
+                          if (aPriorityIndex !== -1 && bPriorityIndex !== -1) {
+                            return aPriorityIndex - bPriorityIndex;
+                          }
+                          if (aPriorityIndex !== -1) return -1;
+                          if (bPriorityIndex !== -1) return 1;
+                          const aRating = Number(a.ratings || 0);
+                          const bRating = Number(b.ratings || 0);
+                          return bRating - aRating;
+                        });
 
-                      const displayItems = expandedCategories.includes(type)
-                        ? sortedItems
-                        : sortedItems.slice(0, 5);
-                      const showViewMore = sortedItems.length > 5;
-                      const sectionTitle = `Popular ${typeLabels[type] || typeLabels.default(type)} in ${selectedLocationLabel}`;
+                        const displayItems = expandedCategories.includes(type)
+                          ? sortedItems
+                          : sortedItems.slice(0, 5);
+                        const showViewMore = sortedItems.length > 5;
+                        const sectionTitle = `Popular ${typeLabels[type] || typeLabels.default(type)} in ${selectedLocationLabel}`;
 
-                      return (
-                        <div key={type} className="col-span-full mb-6">
-                          <h2 className="text-subtitle font-semibold mb-5 text-secondary-dark">
-                            {sectionTitle}
-                          </h2>
-                          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-x-5 gap-y-0">
-                            {displayItems.map((item) => (
-                              <ListingCard
-                                key={item._id}
-                                item={item}
-                                showVertical={false}
-                                handleNavigation={() =>
-                                  navigate(
-                                    `/ai-listings/${encodeURIComponent(item.companyName)}`,
-                                    {
-                                      state: {
-                                        companyId: item.companyId,
-                                        type: item.companyType,
+                        return (
+                          <div
+                            key={type}
+                            className={`col-span-full ${
+                              index > 0
+                                ? "border-t border-gray-300 mt-6 pt-6"
+                                : ""
+                            } mb-6`}
+                          >
+                            <h2 className="text-subtitle font-semibold mb-5 text-secondary-dark">
+                              {sectionTitle}
+                            </h2>
+                            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-x-5 gap-y-0">
+                              {displayItems.map((item) => (
+                                <ListingCard
+                                  key={item._id}
+                                  item={item}
+                                  showVertical={false}
+                                  handleNavigation={() =>
+                                    navigate(
+                                      `/ai-listings/${encodeURIComponent(item.companyName)}`,
+                                      {
+                                        state: {
+                                          companyId: item.companyId,
+                                          type: item.companyType,
+                                        },
                                       },
-                                    },
-                                  )
-                                }
-                              />
-                            ))}
-                          </div>
-                          {showViewMore && (
-                            <div className="mt-3 text-right">
-                              <button
-                                onClick={() => handleShowMoreClick(type)}
-                                className="text-primary-blue text-sm font-semibold hover:underline"
-                              >
-                                {expandedCategories.includes(type)
-                                  ? "View Less ←"
-                                  : "View More →"}
-                              </button>
+                                    )
+                                  }
+                                />
+                              ))}
                             </div>
-                          )}
-                        </div>
-                      );
-                    })
+                            {showViewMore && (
+                              <div className="mt-3 text-right">
+                                <button
+                                  onClick={() => handleShowMoreClick(type)}
+                                  className="text-primary-blue text-sm font-semibold hover:underline"
+                                >
+                                  {expandedCategories.includes(type)
+                                    ? "View Less ←"
+                                    : "View More →"}
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                  </>
                 ) : (
                   <div className="col-span-full text-center text-sm text-gray-500 border border-dotted rounded-lg p-4">
                     No listings found.
