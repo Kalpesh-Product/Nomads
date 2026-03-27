@@ -5,6 +5,7 @@ import {
   HiOutlineSearch,
   HiOutlineX,
 } from "react-icons/hi";
+import { FaCheckCircle } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { aiDestinationCards } from "../constants/aiDestinationCards";
@@ -80,7 +81,7 @@ const DropdownBadge = ({
                   <button
                     type="button"
                     onClick={() => onSelect(option)}
-                    className={`flex w-full items-center rounded-xl px-3 py-2 text-left text-sm transition-colors ${
+                    className={`flex w-full items-center rounded-xl px-4 py-2 text-left text-sm transition-colors ${
                       isSelected
                         ? "bg-sky-50 font-medium text-sky-600"
                         : "text-black/80 hover:bg-slate-50"
@@ -88,7 +89,16 @@ const DropdownBadge = ({
                     role="option"
                     aria-selected={isSelected}
                   >
-                    {option}
+                    <span className="mr-2 inline-flex w-4 shrink-0 items-center justify-center">
+                      {isSelected && (
+                        <FaCheckCircle
+                          size={16}
+                          className="shrink-0 text-primary-blue"
+                          aria-hidden="true"
+                        />
+                      )}
+                    </span>
+                    <span className="pl-1">{option}</span>
                   </button>
                 </li>
               );
@@ -117,6 +127,7 @@ const AiSearchResults = () => {
   const [headingAnimationKey, setHeadingAnimationKey] = useState(0);
   const [showAllDestinations, setShowAllDestinations] = useState(false);
   const dropdownContainerRef = useRef(null);
+  const closeDropdownTimeoutRef = useRef(null);
 
   const hasSelectedContinent = Boolean(selectedContinent);
   const hasSelectedGoalOption = Boolean(selectedGoalOption);
@@ -206,13 +217,23 @@ const AiSearchResults = () => {
 
   const handleContinentSelect = (continent) => {
     setSelectedContinent(continent);
-    setOpenDropdown(null);
+    if (closeDropdownTimeoutRef.current) {
+      clearTimeout(closeDropdownTimeoutRef.current);
+    }
+    closeDropdownTimeoutRef.current = setTimeout(() => {
+      setOpenDropdown(null);
+    }, 120);
     setHeadingAnimationKey((currentKey) => currentKey + 1);
   };
 
   const handleGoalOptionSelect = (option) => {
     setSelectedGoalOption(option);
-    setOpenDropdown(null);
+    if (closeDropdownTimeoutRef.current) {
+      clearTimeout(closeDropdownTimeoutRef.current);
+    }
+    closeDropdownTimeoutRef.current = setTimeout(() => {
+      setOpenDropdown(null);
+    }, 120);
     setHeadingAnimationKey((currentKey) => currentKey + 1);
   };
 
@@ -255,6 +276,15 @@ const AiSearchResults = () => {
       document.removeEventListener("mousedown", handleOutsideClick);
     };
   }, []);
+
+  useEffect(
+    () => () => {
+      if (closeDropdownTimeoutRef.current) {
+        clearTimeout(closeDropdownTimeoutRef.current);
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
     setSelectedGoalOption(selectedFilter);
