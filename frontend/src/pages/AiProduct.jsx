@@ -1266,7 +1266,7 @@ const AiProduct = () => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                View More →
+                View more →
               </a>
             </div>
 
@@ -1323,7 +1323,7 @@ const AiProduct = () => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                View More →
+                View more →
               </a>
             </div> */}
 
@@ -2210,7 +2210,7 @@ const AiProduct = () => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                View More →
+                View more →
               </a>
             </div>
 

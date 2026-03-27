@@ -562,7 +562,7 @@ const AiSearchResults = () => {
                       onClick={() => setShowAllDestinations(true)}
                       className="mx-auto mt-8 block text-center text-base font-semibold text-sky-600 transition-colors hover:text-sky-700"
                     >
-                      View More
+                      View more
                     </button>
                   )}
 
