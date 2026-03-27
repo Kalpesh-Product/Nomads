@@ -181,9 +181,8 @@ const AiHome = () => {
               {recommendationCards.map((card) => {
                 const Icon = card.icon;
 
-                const loggedOutCardText = freeRecommendationTitles.has(
-                  card.title,
-                )
+                const isFreeCard = freeRecommendationTitles.has(card.title);
+                const loggedOutCardText = isFreeCard
                   ? "Available For Free"
                   : "Login Required";
 
@@ -207,7 +206,11 @@ const AiHome = () => {
                       </div>
                     </article>
                     {!isLoggedIn ? (
-                      <p className="mt-2 text-[10px] font-semibold tracking-wide text-black/70 md:text-xs">
+                      <p
+                        className={`mt-2 text-[10px] font-semibold tracking-wide md:text-xs ${
+                          isFreeCard ? "text-primary-blue" : "text-black/70"
+                        }`}
+                      >
                         {loggedOutCardText}
                       </p>
                     ) : null}

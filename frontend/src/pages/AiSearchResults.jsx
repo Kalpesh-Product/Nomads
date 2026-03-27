@@ -11,7 +11,7 @@ import {
   HiOutlineSearch,
   HiOutlineX,
 } from "react-icons/hi";
-import { FaCheckCircle } from "react-icons/fa";
+import { FaCheck } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { aiDestinationCards } from "../constants/aiDestinationCards";
@@ -87,7 +87,7 @@ const DropdownBadge = ({
                   <button
                     type="button"
                     onClick={() => onSelect(option)}
-                    className={`flex w-full items-center rounded-xl px-4 py-2 text-left text-sm transition-colors ${
+                    className={`group flex w-full items-center rounded-xl px-4 py-2 text-left text-sm transition-colors ${
                       isSelected
                         ? "bg-sky-50 font-medium text-sky-600"
                         : "text-black/80 hover:bg-slate-50"
@@ -96,13 +96,15 @@ const DropdownBadge = ({
                     aria-selected={isSelected}
                   >
                     <span className="mr-2 inline-flex w-4 shrink-0 items-center justify-center">
-                      {isSelected && (
-                        <FaCheckCircle
-                          size={16}
-                          className="shrink-0 text-primary-blue"
-                          aria-hidden="true"
-                        />
-                      )}
+                      <FaCheck
+                        size={13}
+                        className={`shrink-0 text-primary-blue transition-opacity ${
+                          isSelected
+                            ? "opacity-100"
+                            : "opacity-0 group-hover:opacity-100"
+                        }`}
+                        aria-hidden="true"
+                      />
                     </span>
                     <span className="pl-1">{option}</span>
                   </button>
