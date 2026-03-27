@@ -590,7 +590,7 @@ const AiGlobalListingsList = () => {
                 ) : groupedListings &&
                   Object.keys(groupedListings).length > 0 ? (
                   <>
-                    <div className="border-t border-gray-300 mt-2 mb-6" />
+                    <div className="border-t border-gray-300 mt-0 mb-6" />
                     {Object.entries(groupedListings)
                       .sort(([typeA], [typeB]) => {
                         const typeOrder = [
