@@ -303,7 +303,7 @@ const AiSearchResults = () => {
               <button
                 type="button"
                 onClick={() => navigate("/home")}
-                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
+                className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
                 aria-label="Go back"
               >
                 <HiOutlineArrowLeft size={18} />
