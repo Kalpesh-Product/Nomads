@@ -419,7 +419,7 @@ const AiSearchResults = () => {
               </span>
             </div>
 
-            <div className="mt-6 lg:ml-[6.25rem] lg:mr-36">
+            <div className="mt-6 mb-6 lg:ml-[6.25rem] lg:mr-36">
               <p className="flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-lg font-play">
                 {isThinkingHeadingVisible && (
                   <span
