@@ -1,16 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Container from "../components/Container";
 
 const AiVisaSupportThankYou = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [typedMessage, setTypedMessage] = useState("");
-  const [secondsRemaining, setSecondsRemaining] = useState(5);
-  const choice = searchParams.get("choice");
   const selectedState = searchParams.get("state");
   const selectedCountry = searchParams.get("country");
-  const selectedDestinationLabel = searchParams.get("destination");
 
   const destinationPath = useMemo(() => {
     if (!selectedState || !selectedCountry) {
@@ -20,10 +17,19 @@ const AiVisaSupportThankYou = () => {
     return `/ai-verticals?country=${encodeURIComponent(selectedCountry)}&state=${encodeURIComponent(selectedState)}`;
   }, [selectedCountry, selectedState]);
 
-  const message =
-    choice === "get-back-to-me"
-      ? "Thanks for submitting your request. Our team will get back to you shortly."
-      : "Thanks for submitting your request. Use the link below to continue your search confidently.";
+  const formattedState = useMemo(() => {
+    if (!selectedState) {
+      return "your selected state";
+    }
+
+    return selectedState
+      .split(/[-_\s]+/)
+      .filter(Boolean)
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+      .join(" ");
+  }, [selectedState]);
+
+  const message = `Thank you for the suggestion. Redirecting you to ${formattedState} for now`;
 
   useEffect(() => {
     setTypedMessage("");
@@ -42,32 +48,18 @@ const AiVisaSupportThankYou = () => {
   }, [message]);
 
   useEffect(() => {
-    if (!destinationPath || !selectedDestinationLabel) {
+    if (!destinationPath) {
       return undefined;
     }
-
-    setSecondsRemaining(5);
-
-    const countdownInterval = setInterval(() => {
-      setSecondsRemaining((currentSecond) => {
-        if (currentSecond <= 1) {
-          clearInterval(countdownInterval);
-          return 0;
-        }
-
-        return currentSecond - 1;
-      });
-    }, 1000);
 
     const redirectTimeout = setTimeout(() => {
       navigate(destinationPath);
     }, 7000);
 
     return () => {
-      clearInterval(countdownInterval);
       clearTimeout(redirectTimeout);
     };
-  }, [destinationPath, navigate, selectedDestinationLabel]);
+  }, [destinationPath, navigate]);
 
   return (
     <div className="bg-white text-black font-sans">
@@ -77,20 +69,6 @@ const AiVisaSupportThankYou = () => {
             <p className="text-xl leading-relaxed font-play min-h-[72px]">
               {typedMessage}
             </p>
-
-            {destinationPath && selectedDestinationLabel ? (
-              <p className="mt-6 text-lg font-play font-semibold text-black/85">
-                Redirecting You To{" "}
-                <Link
-                  to={destinationPath}
-                  className="text-primary-blue underline underline-offset-4 hover:text-[#084f95]"
-                >
-                  {selectedDestinationLabel}
-                </Link>
-                {/* {" "} */}
-                {/* in {secondsRemaining} seconds. */}
-              </p>
-            ) : null}
           </div>
         </section>
       </Container>

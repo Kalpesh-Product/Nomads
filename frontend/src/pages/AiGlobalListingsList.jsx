@@ -590,7 +590,7 @@ const AiGlobalListingsList = () => {
                 ) : groupedListings &&
                   Object.keys(groupedListings).length > 0 ? (
                   <>
-                    <div className="border-t border-gray-300 mt-2 mb-6" />
+                    <div className="border-t border-gray-300 mt-0 mb-6" />
                     {Object.entries(groupedListings)
                       .sort(([typeA], [typeB]) => {
                         const typeOrder = [
@@ -667,14 +667,14 @@ const AiGlobalListingsList = () => {
                               ))}
                             </div>
                             {showViewMore && (
-                              <div className="mt-3 text-right">
+                              <div className="mt-0 text-right">
                                 <button
                                   onClick={() => handleShowMoreClick(type)}
                                   className="text-primary-blue text-sm font-semibold hover:underline"
                                 >
                                   {expandedCategories.includes(type)
-                                    ? "View Less ←"
-                                    : "View More →"}
+                                    ? "View less ←"
+                                    : "View more →"}
                                 </button>
                               </div>
                             )}

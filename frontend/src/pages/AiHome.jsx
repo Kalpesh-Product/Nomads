@@ -176,16 +176,15 @@ const AiHome = () => {
             </p>
           ) : null} */}
 
-          <div className="mt-4 rounded-[40px] px-2 py-4 md:px-6 md:py-8">
+          <div className="mt-4 rounded-[40px] px-0 py-4 md:px-6 md:py-8">
             <div className="grid grid-cols-2 gap-4 md:grid-cols-2 md:gap-10 xl:grid-cols-3">
               {recommendationCards.map((card) => {
                 const Icon = card.icon;
 
-                const loggedOutCardText = freeRecommendationTitles.has(
-                  card.title,
-                )
-                  ? "Available For Free"
-                  : "Login Required";
+                const isFreeCard = freeRecommendationTitles.has(card.title);
+                const loggedOutCardText = isFreeCard
+                  ? "Available for free"
+                  : "Login required";
 
                 return (
                   <div key={card.title}>
@@ -197,7 +196,7 @@ const AiHome = () => {
                         size={24}
                         className="mx-auto text-black/80 transition-colors duration-200 group-hover:text-sky-500"
                       />
-                      <h3 className="mt-2 text-nano sm:text-nano md:text-md lg:text-md font-bold text-black/90 leading-tight transition-colors duration-200 group-hover:text-sky-500">
+                      <h3 className="mt-2 text-nano sm:text-nano md:text-md lg:text-md font-bold text-black/90 leading-tight transition-colors duration-200 group-hover:text-sky-500 uppercase">
                         {card.title}
                       </h3>
                       <div className="mt-2 hidden rounded-2xl bg-[#f1f1f3] p-5 text-left shadow-[0_1px_0_rgba(255,255,255,0.7)] transition-colors duration-200 group-hover:bg-sky-500 md:block">
@@ -207,7 +206,11 @@ const AiHome = () => {
                       </div>
                     </article>
                     {!isLoggedIn ? (
-                      <p className="mt-2 text-[10px] font-semibold uppercase tracking-wide text-black/70 md:text-xs">
+                      <p
+                        className={`mt-2 text-[10px] font-semibold tracking-wide md:text-xs ${
+                          isFreeCard ? "text-primary-blue" : "text-black/70"
+                        }`}
+                      >
                         {loggedOutCardText}
                       </p>
                     ) : null}

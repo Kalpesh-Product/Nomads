@@ -11,7 +11,7 @@ import {
   HiOutlineSearch,
   HiOutlineX,
 } from "react-icons/hi";
-import { FaCheckCircle } from "react-icons/fa";
+import { FaCheck } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { aiDestinationCards } from "../constants/aiDestinationCards";
@@ -87,7 +87,7 @@ const DropdownBadge = ({
                   <button
                     type="button"
                     onClick={() => onSelect(option)}
-                    className={`flex w-full items-center rounded-xl px-4 py-2 text-left text-sm transition-colors ${
+                    className={`group flex w-full items-center rounded-xl px-4 py-2 text-left text-sm transition-colors ${
                       isSelected
                         ? "bg-sky-50 font-medium text-sky-600"
                         : "text-black/80 hover:bg-slate-50"
@@ -96,13 +96,15 @@ const DropdownBadge = ({
                     aria-selected={isSelected}
                   >
                     <span className="mr-2 inline-flex w-4 shrink-0 items-center justify-center">
-                      {isSelected && (
-                        <FaCheckCircle
-                          size={16}
-                          className="shrink-0 text-primary-blue"
-                          aria-hidden="true"
-                        />
-                      )}
+                      <FaCheck
+                        size={13}
+                        className={`shrink-0 text-primary-blue transition-opacity ${
+                          isSelected
+                            ? "opacity-100"
+                            : "opacity-0 group-hover:opacity-100"
+                        }`}
+                        aria-hidden="true"
+                      />
                     </span>
                     <span className="pl-1">{option}</span>
                   </button>
@@ -132,6 +134,7 @@ const AiSearchResults = () => {
   const [selectedGoalOption, setSelectedGoalOption] = useState(selectedFilter);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [showAllDestinations, setShowAllDestinations] = useState(false);
+  const [isResultsReady, setIsResultsReady] = useState(false);
   const dropdownContainerRef = useRef(null);
   const closeDropdownTimeoutRef = useRef(null);
 
@@ -303,6 +306,7 @@ const AiSearchResults = () => {
 
   const playInitialHeadingAnimation = useCallback(() => {
     clearTypingAnimations();
+    setIsResultsReady(false);
     setTypedBottomHeading("");
 
     topTypingIntervalRef.current = animateTypedText(
@@ -313,6 +317,7 @@ const AiSearchResults = () => {
 
   const playSelectedHeadingAnimation = useCallback(() => {
     clearTypingAnimations();
+    setIsResultsReady(false);
     setTypedBottomHeading("");
 
     topTypingIntervalRef.current = animateTypedText(
@@ -324,6 +329,7 @@ const AiSearchResults = () => {
             selectedTopHeadingText,
             setTypedTopHeading,
             () => {
+              setIsResultsReady(true);
               bottomTypingIntervalRef.current = animateTypedText(
                 selectedBottomHeadingText,
                 setTypedBottomHeading,
@@ -380,6 +386,13 @@ const AiSearchResults = () => {
   }, [selectedFilter]);
 
   useEffect(() => {
+    if (!hasSelectedFilters) {
+      setIsResultsReady(false);
+      setTypedBottomHeading("");
+    }
+  }, [hasSelectedFilters]);
+
+  useEffect(() => {
     setShowAllDestinations(false);
   }, [selectedContinent, selectedGoalOption]);
 
@@ -400,10 +413,12 @@ const AiSearchResults = () => {
     selectedGoalOption,
   ]);
 
+  const shouldShowResultsContent = hasSelectedFilters && isResultsReady;
+
   return (
     <div className="min-h-full bg-white">
       <main className="pb-8">
-        <div className="mx-0 w-full max-w-[80rem] px-1 sm:px-6 lg:mx-auto lg:max-w-[80rem] lg:px-0 lg:min-w-[75%]">
+        <div className="mx-0 w-full max-w-[80rem] px-3 sm:px-6 lg:mx-auto lg:max-w-[80rem] lg:px-0 lg:min-w-[75%]">
           <div className="rounded-[10px] bg-white px-0 pb-6">
             <div className="flex items-center gap-2">
               <button
@@ -419,7 +434,7 @@ const AiSearchResults = () => {
               </span>
             </div>
 
-            <div className="mt-6 lg:ml-[6.25rem] lg:mr-36">
+            <div className="mt-6 mb-6 lg:ml-[6.25rem] lg:mr-36">
               <p className="flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-lg font-play">
                 {isThinkingHeadingVisible && (
                   <span
@@ -481,13 +496,13 @@ const AiSearchResults = () => {
 
               <div className="relative mt-8">
                 <div className="relative z-10">
-                  <p
-                    className={`text-sm font-medium leading-snug text-black/85 lg:text-lg font-play ${typedBottomHeading ? "visible" : "invisible"}`}
-                  >
-                    {typedBottomHeading || " "}
-                  </p>
+                  {shouldShowResultsContent && (
+                    <p className="text-sm font-medium leading-snug text-black/85 lg:text-lg font-play">
+                      {typedBottomHeading}
+                    </p>
+                  )}
 
-                  {hasSelectedFilters ? (
+                  {shouldShowResultsContent ? (
                     <div className="mt-8 grid grid-cols-2 gap-3 md:mt-10 md:gap-4 xl:grid-cols-3">
                       {visibleDestinations.map((destination) => (
                         <article
@@ -554,17 +569,17 @@ const AiSearchResults = () => {
                     </>
                   )}
 
-                  {shouldShowViewMore && (
+                  {shouldShowResultsContent && shouldShowViewMore && (
                     <button
                       type="button"
                       onClick={() => setShowAllDestinations(true)}
                       className="mx-auto mt-8 block text-center text-base font-semibold text-sky-600 transition-colors hover:text-sky-700"
                     >
-                      View More
+                      View more
                     </button>
                   )}
 
-                  {hasSelectedFilters && !rankedDestinations.length && (
+                  {shouldShowResultsContent && !rankedDestinations.length && (
                     <div className="mt-10 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-500">
                       No destinations are available for {selectedContinent}{" "}
                       right now.

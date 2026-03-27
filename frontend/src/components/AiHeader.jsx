@@ -21,6 +21,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
   const { auth } = useAuth();
   const hasNomadLoginState = useNomadLoginState();
   const isLoggedIn = Boolean(auth?.user) || hasNomadLoginState;
+  const userInitial = auth?.user?.firstName?.charAt(0)?.toUpperCase() || "A";
 
   const formData = useSelector((state) => state.location.formValues);
   const handleNavigation = (path) => {
@@ -223,6 +224,20 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                 </button>
               </div>
             </li>
+            {isLoggedIn && (
+              <Avatar
+                className="bg-primary-blue"
+                sx={{
+                  width: 32,
+                  height: 32,
+                  fontSize: "0.9rem",
+                  fontWeight: 600,
+                  backgroundColor: "#0ba9ef",
+                }}
+              >
+                {userInitial}
+              </Avatar>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -238,7 +253,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                   backgroundColor: "#0ba9ef",
                 }}
               >
-                A
+                {userInitial}
               </Avatar>
             )}
             <button
