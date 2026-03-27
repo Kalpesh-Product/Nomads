@@ -64,8 +64,9 @@ const AiVisaSupport = () => {
       icon: "success",
       showCancelButton: true,
       confirmButtonText: "Get Back to Me",
-      cancelButtonText: "Search Myself",
+      cancelButtonText: "Self Serve",
       reverseButtons: true,
+      cancelButtonColor: "#000000",
       confirmButtonColor: "#0BA9EF",
     });
 
