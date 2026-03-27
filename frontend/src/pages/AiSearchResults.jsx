@@ -137,6 +137,7 @@ const AiSearchResults = () => {
 
   const topTypingIntervalRef = useRef(null);
   const bottomTypingIntervalRef = useRef(null);
+  const selectedHeadingDelayTimeoutRef = useRef(null);
   const previousSelectedPairRef = useRef(null);
 
   const hasSelectedContinent = Boolean(selectedContinent);
@@ -254,6 +255,8 @@ const AiSearchResults = () => {
   const selectedBottomHeadingText =
     "Change any of the above options to view your preferred results.";
 
+  const thinkingHeadingText = "Thinking...";
+
   const clearTypingAnimations = useCallback(() => {
     if (topTypingIntervalRef.current) {
       clearInterval(topTypingIntervalRef.current);
@@ -263,6 +266,11 @@ const AiSearchResults = () => {
     if (bottomTypingIntervalRef.current) {
       clearInterval(bottomTypingIntervalRef.current);
       bottomTypingIntervalRef.current = null;
+    }
+
+    if (selectedHeadingDelayTimeoutRef.current) {
+      clearTimeout(selectedHeadingDelayTimeoutRef.current);
+      selectedHeadingDelayTimeoutRef.current = null;
     }
   }, []);
 
@@ -304,18 +312,27 @@ const AiSearchResults = () => {
     setTypedBottomHeading("");
 
     topTypingIntervalRef.current = animateTypedText(
-      selectedTopHeadingText,
+      thinkingHeadingText,
       setTypedTopHeading,
       () => {
-        bottomTypingIntervalRef.current = animateTypedText(
-          selectedBottomHeadingText,
-          setTypedBottomHeading,
-        );
+        selectedHeadingDelayTimeoutRef.current = setTimeout(() => {
+          topTypingIntervalRef.current = animateTypedText(
+            selectedTopHeadingText,
+            setTypedTopHeading,
+            () => {
+              bottomTypingIntervalRef.current = animateTypedText(
+                selectedBottomHeadingText,
+                setTypedBottomHeading,
+              );
+            },
+          );
+        }, 2000);
       },
     );
   }, [
     animateTypedText,
     clearTypingAnimations,
+    thinkingHeadingText,
     selectedBottomHeadingText,
     selectedTopHeadingText,
   ]);
