@@ -183,8 +183,8 @@ const AiHome = () => {
 
                 const isFreeCard = freeRecommendationTitles.has(card.title);
                 const loggedOutCardText = isFreeCard
-                  ? "Available For Free"
-                  : "Login Required";
+                  ? "Available for free"
+                  : "Login required";
 
                 return (
                   <div key={card.title}>
