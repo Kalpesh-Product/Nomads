@@ -96,7 +96,7 @@ export default function AiSignup() {
               <TextField
                 {...field}
                 select
-                label="Country"
+                label="Current Country Of Residence"
                 fullWidth
                 variant="standard"
                 onChange={(event) =>

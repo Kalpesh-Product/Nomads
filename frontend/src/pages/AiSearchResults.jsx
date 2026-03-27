@@ -376,13 +376,14 @@ const AiSearchResults = () => {
                               </span>
                             </div>
                           </div>
-                          <div className="mt-1.5 flex items-start justify-between gap-2 md:mt-2 md:gap-3">
+                          <div className="mt-1.5 flex items-start justify-start gap-1 md:mt-2 md:gap-1">
                             <div className="min-w-0">
-                              <h3 className="truncate text-[1.05rem] font-semibold leading-tight text-black/90 md:text-[1.2rem]">
-                                {destination.city}
+                              <h3 className="truncate text-[0.8rem] font-semibold leading-tight text-black/90 md:text-[1.2rem]">
+                                {`${destination.city} - `}
                               </h3>
                             </div>
-                            <p className="truncate text-[0.95rem] font-semibold leading-tight text-black/90 md:mt-1 md:text-[1rem]">
+
+                            <p className="truncate text-[0.8rem] font-semibold leading-tight text-black/90  md:text-[1.2rem]">
                               {destination.country}
                             </p>
                           </div>
