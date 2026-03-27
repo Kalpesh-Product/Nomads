@@ -316,13 +316,13 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                 <h3 className="text-[13px] font-semibold leading-tight text-black/90">
                   {loggedOutPrompt.title}
                 </h3>
-                <p className="mt-4 text-nano leading-7 text-black/55">
+                <p className="mt-2 text-nano leading-5 text-black/55">
                   {loggedOutPrompt.description}
                 </p>
                 <button
                   type="button"
                   onClick={handleLogInClick}
-                  className="mt-6 w-full rounded-full border border-black/10 bg-white px-3 py-2 text-base font-semibold text-black transition hover:bg-black hover:text-white"
+                  className="mt-6 w-full rounded-full border border-black/10 bg-primary-blue px-3 py-2 text-base font-semibold text-white transition hover:bg-primary-light hover:text-white"
                 >
                   {loggedOutPrompt.actionLabel}
                 </button>
