@@ -1,10 +1,17 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   HiOutlineArrowLeft,
   HiOutlineChevronDown,
   HiOutlineSearch,
   HiOutlineX,
 } from "react-icons/hi";
+import { FaCheckCircle } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { aiDestinationCards } from "../constants/aiDestinationCards";
@@ -80,7 +87,7 @@ const DropdownBadge = ({
                   <button
                     type="button"
                     onClick={() => onSelect(option)}
-                    className={`flex w-full items-center rounded-xl px-3 py-2 text-left text-sm transition-colors ${
+                    className={`flex w-full items-center rounded-xl px-4 py-2 text-left text-sm transition-colors ${
                       isSelected
                         ? "bg-sky-50 font-medium text-sky-600"
                         : "text-black/80 hover:bg-slate-50"
@@ -88,7 +95,16 @@ const DropdownBadge = ({
                     role="option"
                     aria-selected={isSelected}
                   >
-                    {option}
+                    <span className="mr-2 inline-flex w-4 shrink-0 items-center justify-center">
+                      {isSelected && (
+                        <FaCheckCircle
+                          size={16}
+                          className="shrink-0 text-primary-blue"
+                          aria-hidden="true"
+                        />
+                      )}
+                    </span>
+                    <span className="pl-1">{option}</span>
                   </button>
                 </li>
               );
@@ -110,13 +126,19 @@ const AiSearchResults = () => {
   const goalOptions = goalFilterMap[selectedGoal] || goalFilterMap[defaultGoal];
   const selectedFilter = null;
 
-  const [typedHeading, setTypedHeading] = useState("");
+  const [typedTopHeading, setTypedTopHeading] = useState("");
+  const [typedBottomHeading, setTypedBottomHeading] = useState("");
   const [selectedContinent, setSelectedContinent] = useState(null);
   const [selectedGoalOption, setSelectedGoalOption] = useState(selectedFilter);
   const [openDropdown, setOpenDropdown] = useState(null);
-  const [headingAnimationKey, setHeadingAnimationKey] = useState(0);
   const [showAllDestinations, setShowAllDestinations] = useState(false);
   const dropdownContainerRef = useRef(null);
+  const closeDropdownTimeoutRef = useRef(null);
+
+  const topTypingIntervalRef = useRef(null);
+  const bottomTypingIntervalRef = useRef(null);
+  const selectedHeadingDelayTimeoutRef = useRef(null);
+  const previousSelectedPairRef = useRef(null);
 
   const hasSelectedContinent = Boolean(selectedContinent);
   const hasSelectedGoalOption = Boolean(selectedGoalOption);
@@ -206,38 +228,126 @@ const AiSearchResults = () => {
 
   const handleContinentSelect = (continent) => {
     setSelectedContinent(continent);
-    setOpenDropdown(null);
-    setHeadingAnimationKey((currentKey) => currentKey + 1);
+    if (closeDropdownTimeoutRef.current) {
+      clearTimeout(closeDropdownTimeoutRef.current);
+    }
+    closeDropdownTimeoutRef.current = setTimeout(() => {
+      setOpenDropdown(null);
+    }, 120);
   };
 
   const handleGoalOptionSelect = (option) => {
     setSelectedGoalOption(option);
-    setOpenDropdown(null);
-    setHeadingAnimationKey((currentKey) => currentKey + 1);
+    if (closeDropdownTimeoutRef.current) {
+      clearTimeout(closeDropdownTimeoutRef.current);
+    }
+    closeDropdownTimeoutRef.current = setTimeout(() => {
+      setOpenDropdown(null);
+    }, 120);
   };
 
   const isPrimaryGoalOptionSelected =
     hasSelectedGoalOption && selectedGoalOption === goalOptions[0];
 
-  const headingText = hasSelectedFilters
-    ? "Showing results for the selected option. Select any option to view your preferred results."
-    : "Select one option from each badge above to view matching destinations.";
+  const initialTopHeadingText =
+    "Select one option from each badge below to view matching destinations.";
+  const selectedTopHeadingText = "Showing results for the selected options.";
+  const selectedBottomHeadingText =
+    "Change any of the above options to view your preferred results.";
 
-  useEffect(() => {
-    setTypedHeading("");
+  const thinkingHeadingText = "Thinking...";
+
+  const isThinkingHeadingVisible =
+    typedTopHeading.length > 0 &&
+    thinkingHeadingText.startsWith(typedTopHeading);
+
+  const clearTypingAnimations = useCallback(() => {
+    if (topTypingIntervalRef.current) {
+      clearInterval(topTypingIntervalRef.current);
+      topTypingIntervalRef.current = null;
+    }
+
+    if (bottomTypingIntervalRef.current) {
+      clearInterval(bottomTypingIntervalRef.current);
+      bottomTypingIntervalRef.current = null;
+    }
+
+    if (selectedHeadingDelayTimeoutRef.current) {
+      clearTimeout(selectedHeadingDelayTimeoutRef.current);
+      selectedHeadingDelayTimeoutRef.current = null;
+    }
+  }, []);
+
+  const animateTypedText = useCallback((text, setText, onComplete) => {
+    setText("");
+
+    if (!text) {
+      onComplete?.();
+      return null;
+    }
 
     let currentIndex = 0;
-    const typingInterval = setInterval(() => {
-      currentIndex += 1;
-      setTypedHeading(headingText.slice(0, currentIndex));
 
-      if (currentIndex >= headingText.length) {
-        clearInterval(typingInterval);
+    const intervalId = setInterval(() => {
+      currentIndex += 1;
+      setText(text.slice(0, currentIndex));
+
+      if (currentIndex >= text.length) {
+        clearInterval(intervalId);
+        onComplete?.();
       }
     }, 25);
 
-    return () => clearInterval(typingInterval);
-  }, [headingText, headingAnimationKey]);
+    return intervalId;
+  }, []);
+
+  const playInitialHeadingAnimation = useCallback(() => {
+    clearTypingAnimations();
+    setTypedBottomHeading("");
+
+    topTypingIntervalRef.current = animateTypedText(
+      initialTopHeadingText,
+      setTypedTopHeading,
+    );
+  }, [animateTypedText, clearTypingAnimations, initialTopHeadingText]);
+
+  const playSelectedHeadingAnimation = useCallback(() => {
+    clearTypingAnimations();
+    setTypedBottomHeading("");
+
+    topTypingIntervalRef.current = animateTypedText(
+      thinkingHeadingText,
+      setTypedTopHeading,
+      () => {
+        selectedHeadingDelayTimeoutRef.current = setTimeout(() => {
+          topTypingIntervalRef.current = animateTypedText(
+            selectedTopHeadingText,
+            setTypedTopHeading,
+            () => {
+              bottomTypingIntervalRef.current = animateTypedText(
+                selectedBottomHeadingText,
+                setTypedBottomHeading,
+              );
+            },
+          );
+        }, 2000);
+      },
+    );
+  }, [
+    animateTypedText,
+    clearTypingAnimations,
+    thinkingHeadingText,
+    selectedBottomHeadingText,
+    selectedTopHeadingText,
+  ]);
+
+  useEffect(() => {
+    playInitialHeadingAnimation();
+
+    return () => {
+      clearTypingAnimations();
+    };
+  }, [clearTypingAnimations, playInitialHeadingAnimation]);
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
@@ -256,6 +366,15 @@ const AiSearchResults = () => {
     };
   }, []);
 
+  useEffect(
+    () => () => {
+      if (closeDropdownTimeoutRef.current) {
+        clearTimeout(closeDropdownTimeoutRef.current);
+      }
+    },
+    [],
+  );
+
   useEffect(() => {
     setSelectedGoalOption(selectedFilter);
   }, [selectedFilter]);
@@ -264,23 +383,52 @@ const AiSearchResults = () => {
     setShowAllDestinations(false);
   }, [selectedContinent, selectedGoalOption]);
 
+  useEffect(() => {
+    const selectedPair = hasSelectedFilters
+      ? `${selectedContinent}|${selectedGoalOption}`
+      : null;
+
+    if (selectedPair && previousSelectedPairRef.current !== selectedPair) {
+      playSelectedHeadingAnimation();
+    }
+
+    previousSelectedPairRef.current = selectedPair;
+  }, [
+    hasSelectedFilters,
+    playSelectedHeadingAnimation,
+    selectedContinent,
+    selectedGoalOption,
+  ]);
+
   return (
     <div className="min-h-full bg-white">
       <main className="pb-8">
         <div className="mx-0 w-full max-w-[80rem] px-1 sm:px-6 lg:mx-auto lg:max-w-[80rem] lg:px-0 lg:min-w-[75%]">
-          <div className="rounded-[10px] bg-white px-4 pb-6">
+          <div className="rounded-[10px] bg-white px-0 pb-6">
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => navigate("/home")}
-                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
+                className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
                 aria-label="Go back"
               >
                 <HiOutlineArrowLeft size={18} />
               </button>
-              <span className="text-sm font-semibold text-primary-blue sm:hidden">
+              <span className="text-lg font-semibold text-primary-blue sm:hidden">
                 {selectedGoal}
               </span>
+            </div>
+
+            <div className="mt-6 lg:ml-[6.25rem] lg:mr-36">
+              <p className="flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-lg font-play">
+                {isThinkingHeadingVisible && (
+                  <span
+                    className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-b-transparent"
+                    aria-hidden="true"
+                  />
+                )}
+                {typedTopHeading}
+              </p>
             </div>
 
             <div className="mt-4 hidden max-w-4xl items-center rounded-[30px] border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] sm:flex lg:ml-[6.25rem] lg:mr-36">
@@ -333,8 +481,10 @@ const AiSearchResults = () => {
 
               <div className="relative mt-8">
                 <div className="relative z-10">
-                  <p className="text-sm font-medium leading-snug text-black/85 lg:text-lg font-play">
-                    {typedHeading}
+                  <p
+                    className={`text-sm font-medium leading-snug text-black/85 lg:text-lg font-play ${typedBottomHeading ? "visible" : "invisible"}`}
+                  >
+                    {typedBottomHeading || " "}
                   </p>
 
                   {hasSelectedFilters ? (
