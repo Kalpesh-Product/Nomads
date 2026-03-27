@@ -120,14 +120,14 @@ const AiSearchResults = () => {
   const goalOptions = goalFilterMap[selectedGoal] || goalFilterMap[defaultGoal];
   const selectedFilter = null;
 
-  const [typedHeading, setTypedHeading] = useState("");
+  const [typedTopHeading, setTypedTopHeading] = useState("");
+  const [typedBottomHeading, setTypedBottomHeading] = useState("");
   const [selectedContinent, setSelectedContinent] = useState(null);
   const [selectedGoalOption, setSelectedGoalOption] = useState(selectedFilter);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [showAllDestinations, setShowAllDestinations] = useState(false);
   const dropdownContainerRef = useRef(null);
   const closeDropdownTimeoutRef = useRef(null);
-  const hasAnimatedHeadingOnLoadRef = useRef(false);
 
   const hasSelectedContinent = Boolean(selectedContinent);
   const hasSelectedGoalOption = Boolean(selectedGoalOption);
@@ -238,34 +238,38 @@ const AiSearchResults = () => {
   const isPrimaryGoalOptionSelected =
     hasSelectedGoalOption && selectedGoalOption === goalOptions[0];
 
-  const headingText = hasSelectedFilters
-    ? "Showing results for the selected option. Select any option to view your preferred results."
-    : "Select one option from each badge above to view matching destinations.";
+  const topHeadingText =
+    "Select one option from each badge below to view matching destinations.";
+  const bottomHeadingText = "Select any option to view your preferred results.";
 
   useEffect(() => {
-    const shouldAnimateHeading =
-      !hasAnimatedHeadingOnLoadRef.current || hasSelectedFilters;
+    const animateTypedText = (text, setText) => {
+      setText("");
+      let currentIndex = 0;
 
-    if (!shouldAnimateHeading) {
-      setTypedHeading(headingText);
-      return;
-    }
+      const intervalId = setInterval(() => {
+        currentIndex += 1;
+        setText(text.slice(0, currentIndex));
 
-    hasAnimatedHeadingOnLoadRef.current = true;
-    setTypedHeading("");
+        if (currentIndex >= text.length) {
+          clearInterval(intervalId);
+        }
+      }, 25);
 
-    let currentIndex = 0;
-    const typingInterval = setInterval(() => {
-      currentIndex += 1;
-      setTypedHeading(headingText.slice(0, currentIndex));
+      return intervalId;
+    };
 
-      if (currentIndex >= headingText.length) {
-        clearInterval(typingInterval);
-      }
-    }, 25);
+    let typingInterval = animateTypedText(topHeadingText, setTypedTopHeading);
+    let secondaryTypingInterval = animateTypedText(
+      bottomHeadingText,
+      setTypedBottomHeading,
+    );
 
-    return () => clearInterval(typingInterval);
-  }, [hasSelectedFilters, headingText, selectedContinent, selectedGoalOption]);
+    return () => {
+      clearInterval(typingInterval);
+      clearInterval(secondaryTypingInterval);
+    };
+  }, []);
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
@@ -320,6 +324,12 @@ const AiSearchResults = () => {
               </span>
             </div>
 
+            <div className="mt-6 lg:ml-[6.25rem] lg:mr-36">
+              <p className="text-sm font-medium leading-snug text-black/85 lg:text-lg font-play">
+                {typedTopHeading}
+              </p>
+            </div>
+
             <div className="mt-4 hidden max-w-4xl items-center rounded-[30px] border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] sm:flex lg:ml-[6.25rem] lg:mr-36">
               <div className="flex flex-wrap items-center gap-2">
                 {searchBarBadges.map((badgeLabel, index) => (
@@ -371,7 +381,7 @@ const AiSearchResults = () => {
               <div className="relative mt-8">
                 <div className="relative z-10">
                   <p className="text-sm font-medium leading-snug text-black/85 lg:text-lg font-play">
-                    {typedHeading}
+                    {typedBottomHeading}
                   </p>
 
                   {hasSelectedFilters ? (
