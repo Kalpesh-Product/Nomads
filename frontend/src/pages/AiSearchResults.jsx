@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   HiOutlineArrowLeft,
   HiOutlineChevronDown,
@@ -129,6 +135,10 @@ const AiSearchResults = () => {
   const dropdownContainerRef = useRef(null);
   const closeDropdownTimeoutRef = useRef(null);
 
+  const topTypingIntervalRef = useRef(null);
+  const bottomTypingIntervalRef = useRef(null);
+  const previousSelectedPairRef = useRef(null);
+
   const hasSelectedContinent = Boolean(selectedContinent);
   const hasSelectedGoalOption = Boolean(selectedGoalOption);
   const hasSelectedFilters = hasSelectedContinent && hasSelectedGoalOption;
@@ -238,38 +248,85 @@ const AiSearchResults = () => {
   const isPrimaryGoalOptionSelected =
     hasSelectedGoalOption && selectedGoalOption === goalOptions[0];
 
-  const topHeadingText =
+  const initialTopHeadingText =
     "Select one option from each badge below to view matching destinations.";
-  const bottomHeadingText = "Select any option to view your preferred results.";
+  const selectedTopHeadingText = "Showing results for the selected options.";
+  const selectedBottomHeadingText =
+    "Change any of the above options to view your preferred results.";
+
+  const clearTypingAnimations = useCallback(() => {
+    if (topTypingIntervalRef.current) {
+      clearInterval(topTypingIntervalRef.current);
+      topTypingIntervalRef.current = null;
+    }
+
+    if (bottomTypingIntervalRef.current) {
+      clearInterval(bottomTypingIntervalRef.current);
+      bottomTypingIntervalRef.current = null;
+    }
+  }, []);
+
+  const animateTypedText = useCallback((text, setText, onComplete) => {
+    setText("");
+
+    if (!text) {
+      onComplete?.();
+      return null;
+    }
+
+    let currentIndex = 0;
+
+    const intervalId = setInterval(() => {
+      currentIndex += 1;
+      setText(text.slice(0, currentIndex));
+
+      if (currentIndex >= text.length) {
+        clearInterval(intervalId);
+        onComplete?.();
+      }
+    }, 25);
+
+    return intervalId;
+  }, []);
+
+  const playInitialHeadingAnimation = useCallback(() => {
+    clearTypingAnimations();
+    setTypedBottomHeading("");
+
+    topTypingIntervalRef.current = animateTypedText(
+      initialTopHeadingText,
+      setTypedTopHeading,
+    );
+  }, [animateTypedText, clearTypingAnimations, initialTopHeadingText]);
+
+  const playSelectedHeadingAnimation = useCallback(() => {
+    clearTypingAnimations();
+    setTypedBottomHeading("");
+
+    topTypingIntervalRef.current = animateTypedText(
+      selectedTopHeadingText,
+      setTypedTopHeading,
+      () => {
+        bottomTypingIntervalRef.current = animateTypedText(
+          selectedBottomHeadingText,
+          setTypedBottomHeading,
+        );
+      },
+    );
+  }, [
+    animateTypedText,
+    clearTypingAnimations,
+    selectedBottomHeadingText,
+    selectedTopHeadingText,
+  ]);
 
   useEffect(() => {
-    const animateTypedText = (text, setText) => {
-      setText("");
-      let currentIndex = 0;
-
-      const intervalId = setInterval(() => {
-        currentIndex += 1;
-        setText(text.slice(0, currentIndex));
-
-        if (currentIndex >= text.length) {
-          clearInterval(intervalId);
-        }
-      }, 25);
-
-      return intervalId;
-    };
-
-    let typingInterval = animateTypedText(topHeadingText, setTypedTopHeading);
-    let secondaryTypingInterval = animateTypedText(
-      bottomHeadingText,
-      setTypedBottomHeading,
-    );
+    playInitialHeadingAnimation();
 
     return () => {
-      clearInterval(typingInterval);
-      clearInterval(secondaryTypingInterval);
+      clearTypingAnimations();
     };
-  }, []);
+  }, [clearTypingAnimations, playInitialHeadingAnimation]);
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
@@ -304,6 +361,23 @@ const AiSearchResults = () => {
   useEffect(() => {
     setShowAllDestinations(false);
   }, [selectedContinent, selectedGoalOption]);
+
+  useEffect(() => {
+    const selectedPair = hasSelectedFilters
+      ? `${selectedContinent}|${selectedGoalOption}`
+      : null;
+
+    if (selectedPair && previousSelectedPairRef.current !== selectedPair) {
+      playSelectedHeadingAnimation();
+    }
+
+    previousSelectedPairRef.current = selectedPair;
+  }, [
+    hasSelectedFilters,
+    playSelectedHeadingAnimation,
+    selectedContinent,
+    selectedGoalOption,
+  ]);
 
   return (
     <div className="min-h-full bg-white">
@@ -380,8 +454,10 @@ const AiSearchResults = () => {
 
               <div className="relative mt-8">
                 <div className="relative z-10">
-                  <p className="text-sm font-medium leading-snug text-black/85 lg:text-lg font-play">
-                    {typedBottomHeading}
+                  <p
+                    className={`text-sm font-medium leading-snug text-black/85 lg:text-lg font-play ${typedBottomHeading ? "visible" : "invisible"}`}
+                  >
+                    {typedBottomHeading || " "}
                   </p>
 
                   {hasSelectedFilters ? (
