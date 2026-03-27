@@ -124,10 +124,10 @@ const AiSearchResults = () => {
   const [selectedContinent, setSelectedContinent] = useState(null);
   const [selectedGoalOption, setSelectedGoalOption] = useState(selectedFilter);
   const [openDropdown, setOpenDropdown] = useState(null);
-  const [headingAnimationKey, setHeadingAnimationKey] = useState(0);
   const [showAllDestinations, setShowAllDestinations] = useState(false);
   const dropdownContainerRef = useRef(null);
   const closeDropdownTimeoutRef = useRef(null);
+  const hasAnimatedHeadingOnLoadRef = useRef(false);
 
   const hasSelectedContinent = Boolean(selectedContinent);
   const hasSelectedGoalOption = Boolean(selectedGoalOption);
@@ -223,7 +223,6 @@ const AiSearchResults = () => {
     closeDropdownTimeoutRef.current = setTimeout(() => {
       setOpenDropdown(null);
     }, 120);
-    setHeadingAnimationKey((currentKey) => currentKey + 1);
   };
 
   const handleGoalOptionSelect = (option) => {
@@ -234,7 +233,6 @@ const AiSearchResults = () => {
     closeDropdownTimeoutRef.current = setTimeout(() => {
       setOpenDropdown(null);
     }, 120);
-    setHeadingAnimationKey((currentKey) => currentKey + 1);
   };
 
   const isPrimaryGoalOptionSelected =
@@ -245,6 +243,15 @@ const AiSearchResults = () => {
     : "Select one option from each badge above to view matching destinations.";
 
   useEffect(() => {
+    const shouldAnimateHeading =
+      !hasAnimatedHeadingOnLoadRef.current || hasSelectedFilters;
+
+    if (!shouldAnimateHeading) {
+      setTypedHeading(headingText);
+      return;
+    }
+
+    hasAnimatedHeadingOnLoadRef.current = true;
     setTypedHeading("");
 
     let currentIndex = 0;
@@ -258,7 +265,7 @@ const AiSearchResults = () => {
     }, 25);
 
     return () => clearInterval(typingInterval);
-  }, [headingText, headingAnimationKey]);
+  }, [hasSelectedFilters, headingText, selectedContinent, selectedGoalOption]);
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
