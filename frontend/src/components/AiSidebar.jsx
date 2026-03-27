@@ -135,7 +135,7 @@ const SidebarSection = ({
                     <>
                       <span className="text-xs font-medium">{item.label}</span>
                       {item.badge && (
-                        <span className="ml-0 rounded-full border border-gray-400 bg-gray-200 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-gray-400 shadow-sm">
+                        <span className="ml-0 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.45 text-[7px] font-semibold tracking-wide text-red-400 shadow-sm">
                           {item.badge}
                         </span>
                       )}
