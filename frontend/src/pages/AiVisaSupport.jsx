@@ -59,12 +59,12 @@ const AiVisaSupport = () => {
 
   const handleFormSubmit = async (formValues) => {
     const result = await Swal.fire({
-      title: "Form Submitted",
-      text: "Form submitted. Would you like us to get back to you or search yourself?",
+      title: "Request Submitted!",
+      text: "Please suggest and select below options.",
       icon: "success",
       showCancelButton: true,
-      confirmButtonText: "Get Back To Me",
-      cancelButtonText: "Self Serve",
+      confirmButtonText: "Need custom solution",
+      cancelButtonText: "Browse options yourself",
       reverseButtons: true,
       cancelButtonColor: "#000000",
       confirmButtonColor: "#0BA9EF",
