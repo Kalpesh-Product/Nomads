@@ -134,6 +134,7 @@ const AiSearchResults = () => {
   const [selectedGoalOption, setSelectedGoalOption] = useState(selectedFilter);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [showAllDestinations, setShowAllDestinations] = useState(false);
+  const [isResultsReady, setIsResultsReady] = useState(false);
   const dropdownContainerRef = useRef(null);
   const closeDropdownTimeoutRef = useRef(null);
 
@@ -305,6 +306,7 @@ const AiSearchResults = () => {
 
   const playInitialHeadingAnimation = useCallback(() => {
     clearTypingAnimations();
+    setIsResultsReady(false);
     setTypedBottomHeading("");
 
     topTypingIntervalRef.current = animateTypedText(
@@ -315,6 +317,7 @@ const AiSearchResults = () => {
 
   const playSelectedHeadingAnimation = useCallback(() => {
     clearTypingAnimations();
+    setIsResultsReady(false);
     setTypedBottomHeading("");
 
     topTypingIntervalRef.current = animateTypedText(
@@ -326,6 +329,7 @@ const AiSearchResults = () => {
             selectedTopHeadingText,
             setTypedTopHeading,
             () => {
+              setIsResultsReady(true);
               bottomTypingIntervalRef.current = animateTypedText(
                 selectedBottomHeadingText,
                 setTypedBottomHeading,
@@ -382,6 +386,13 @@ const AiSearchResults = () => {
   }, [selectedFilter]);
 
   useEffect(() => {
+    if (!hasSelectedFilters) {
+      setIsResultsReady(false);
+      setTypedBottomHeading("");
+    }
+  }, [hasSelectedFilters]);
+
+  useEffect(() => {
     setShowAllDestinations(false);
   }, [selectedContinent, selectedGoalOption]);
 
@@ -401,6 +412,8 @@ const AiSearchResults = () => {
     selectedContinent,
     selectedGoalOption,
   ]);
+
+  const shouldShowResultsContent = hasSelectedFilters && isResultsReady;
 
   return (
     <div className="min-h-full bg-white">
@@ -483,13 +496,13 @@ const AiSearchResults = () => {
 
               <div className="relative mt-8">
                 <div className="relative z-10">
-                  <p
-                    className={`text-sm font-medium leading-snug text-black/85 lg:text-lg font-play ${typedBottomHeading ? "visible" : "invisible"}`}
-                  >
-                    {typedBottomHeading || " "}
-                  </p>
+                  {shouldShowResultsContent && (
+                    <p className="text-sm font-medium leading-snug text-black/85 lg:text-lg font-play">
+                      {typedBottomHeading}
+                    </p>
+                  )}
 
-                  {hasSelectedFilters ? (
+                  {shouldShowResultsContent ? (
                     <div className="mt-8 grid grid-cols-2 gap-3 md:mt-10 md:gap-4 xl:grid-cols-3">
                       {visibleDestinations.map((destination) => (
                         <article
@@ -556,7 +569,7 @@ const AiSearchResults = () => {
                     </>
                   )}
 
-                  {shouldShowViewMore && (
+                  {shouldShowResultsContent && shouldShowViewMore && (
                     <button
                       type="button"
                       onClick={() => setShowAllDestinations(true)}
@@ -566,7 +579,7 @@ const AiSearchResults = () => {
                     </button>
                   )}
 
-                  {hasSelectedFilters && !rankedDestinations.length && (
+                  {shouldShowResultsContent && !rankedDestinations.length && (
                     <div className="mt-10 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-500">
                       No destinations are available for {selectedContinent}{" "}
                       right now.
