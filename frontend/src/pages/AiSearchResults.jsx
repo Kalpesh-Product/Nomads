@@ -308,7 +308,7 @@ const AiSearchResults = () => {
               >
                 <HiOutlineArrowLeft size={18} />
               </button>
-              <span className="text-sm font-semibold text-primary-blue sm:hidden">
+              <span className="text-lg font-semibold text-primary-blue sm:hidden">
                 {selectedGoal}
               </span>
             </div>
