@@ -598,7 +598,7 @@ const AiProduct = () => {
   };
 
   return (
-    <div className="p-4">
+    <div className="pb-4 pt-4 px-4 sm:px-0 sm:pt-0 ">
       {/* Share Modal - Shared between both views */}
       <TransparentModal
         open={shareMenuOpen}

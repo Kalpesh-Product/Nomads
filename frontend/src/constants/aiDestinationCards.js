@@ -85,9 +85,29 @@ const destinations = [
   ["Giza Governorate", "Egypt", "Africa"],
 ];
 
+const destinationCardShortNames = {
+  "Vietnam|Ho Chi Minh City": "Ho Chi Minh",
+  "Spain|Canary Islands": "Las Palmas",
+  "Brazil|Santa Catarina": "Florianopolis",
+  "Mexico|Quintana Roo": "Playa del Carmen",
+  "South Africa|Western Cape": "Cape Town",
+  "Australia|Gold Coast": "Queensland",
+  "Netherlands|North Holland": "Amsterdam",
+  "Costa Rica|San José Province": "San José",
+  "Spain|Santa Cruz de Tenerife": "Tenerife",
+  "Morocco|Casablanca-Settat": "Casablanca",
+  "Portugal|Lagos (Portugal)": "Lagos",
+  "Egypt|Cairo Governorate": "Cairo",
+  "Philippines|Surigao del Norte": "Surigao",
+  "New Zealand|Otago Region": "Queenstown",
+  "Egypt|Giza Governorate": "Giza",
+};
+
 export const aiDestinationCards = destinations.map(
   ([city, country, continent], index) => ({
     city,
+    displayCity: destinationCardShortNames[`${country}|${city}`] || city,
+    routeCity: destinationCardShortNames[`${country}|${city}`] || city,
     country,
     continent,
     suggestions: 102 - (index % 30),

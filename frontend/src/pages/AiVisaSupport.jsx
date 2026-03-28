@@ -1,5 +1,13 @@
 import React, { useMemo } from "react";
-import { Box, Button, ListSubheader, MenuItem, TextField } from "@mui/material";
+import {
+  Box,
+  Button,
+  InputBase,
+  ListSubheader,
+  MenuItem,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { Country } from "country-state-city";
 import Swal from "sweetalert2";
@@ -36,6 +44,7 @@ const defaultValues = {
   currentResidence: "",
   destination: "",
   email: "",
+  contactCode: "",
   contactNumber: "",
   serviceRequired: "",
   comments: "",
@@ -93,7 +102,11 @@ const AiVisaSupport = () => {
     const phonePrefix = country?.phonecode ? `+${country.phonecode}` : "";
 
     onChange(countryName);
-    setValue("contactNumber", phonePrefix, {
+    setValue("contactCode", phonePrefix, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+    setValue("contactNumber", "", {
       shouldDirty: true,
       shouldTouch: true,
     });
@@ -246,24 +259,72 @@ const AiVisaSupport = () => {
                   )}
                 />
 
-                <Controller
-                  name="contactNumber"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label="Contact Number"
-                      variant="standard"
-                      placeholder={
-                        selectedResidence
-                          ? "Country code is prefilled based on residence"
-                          : ""
-                      }
-                      InputLabelProps={{ sx: floatingLabelSx }}
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "flex-end",
+                    borderBottom: "1px solid rgba(0, 0, 0, 0.42)",
+                    transition: "border-bottom-color 0.2s ease",
+                    "&:focus-within": { borderBottomColor: "#1976d2" },
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: "32%",
+                      px: 0.5,
+                      pb: 0.5,
+                      borderRight: "1px solid rgba(0, 0, 0, 0.12)",
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: selectedResidence ? "#1976d2" : "#6b7280",
+                        fontWeight: 500,
+                        display: "block",
+                      }}
+                    >
+                      Code
+                    </Typography>
+                    <Controller
+                      name="contactCode"
+                      control={control}
+                      render={({ field }) => (
+                        <InputBase
+                          {...field}
+                          fullWidth
+                          readOnly
+                          placeholder="+___"
+                          sx={{ color: "rgba(0, 0, 0, 0.6)" }}
+                        />
+                      )}
                     />
-                  )}
-                />
+                  </Box>
+
+                  <Box sx={{ flex: 1, px: 1, pb: 0.5 }}>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: selectedResidence ? "#1976d2" : "#6b7280",
+                        fontWeight: 500,
+                        display: "block",
+                      }}
+                    >
+                      Contact
+                    </Typography>
+                    <Controller
+                      name="contactNumber"
+                      control={control}
+                      render={({ field }) => (
+                        <InputBase
+                          {...field}
+                          fullWidth
+                          inputProps={{ inputMode: "tel" }}
+                        />
+                      )}
+                    />
+                  </Box>
+                </Box>
 
                 <Controller
                   name="serviceRequired"
