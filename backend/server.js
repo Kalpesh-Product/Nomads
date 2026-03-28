@@ -16,6 +16,7 @@ import newsRoutes from "./routes/newsRoutes.js";
 import blogRoutes from "./routes/blogRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import nomadUserRoutes from "./routes/nomadUserRoutes.js";
+import worldRankingRoutes from "./routes/worldRankingRoutes.js";
 import cookieParser from "cookie-parser";
 import credentials from "./middlewares/credentials.js";
 import { verifyJwt } from "./middlewares/verifyJwt.js";
@@ -39,6 +40,7 @@ app.use("/api/poc", pocRoutes);
 app.use("/api/review", reviewRoutes);
 app.use("/api/forms", formRoutes);
 app.use("/api/job", jobRoutes);
+app.use("/api/world-ranking", worldRankingRoutes);
 
 app.use("/api/news", newsRoutes);
 app.use("/api/blogs", blogRoutes); // New Blog Route
