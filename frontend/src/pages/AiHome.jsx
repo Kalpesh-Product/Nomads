@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
-  HiOutlineViewGrid,
-  HiOutlineHeart,
-  HiOutlineUserCircle,
-} from "react-icons/hi";
-import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
+  PiBuildingOffice,
+  PiRanking,
+} from "react-icons/pi";
+import { TiGlobeOutline } from "react-icons/ti";
+import { BiDollar } from "react-icons/bi";
+import { RiUserCommunityLine } from "react-icons/ri";
+import { TbWorldWww } from "react-icons/tb";
 import useNomadLoginState from "../hooks/useNomadLoginState";
 
 const gatedRecommendationTitles = new Set([
@@ -25,42 +27,42 @@ const recommendationCards = [
     title: "World Ranking",
     description:
       "Global suggestions for the best nomad destinations based on the world index which includes 50+ global factors.",
-    icon: HiOutlineViewGrid,
+    icon: PiRanking,
     path: "/search/results",
   },
   {
     title: "Work From Anywhere",
     description:
       "Custom suggestions to help you discover and work from the best nomad destinations.",
-    icon: HiOutlineHeart,
+    icon: TiGlobeOutline,
     path: "/search/results",
   },
   {
     title: "Increase Your Savings",
     description:
       "Tailored nomad destination suggestions to help you increase your savings as a nomad.",
-    icon: LuCircleDollarSign,
+    icon: BiDollar,
     path: "/search/results",
   },
   {
     title: "Advance Your Career",
     description:
       "Intellegent suggestions to help you find the most sutaible nomad destinations to advance your acreer.",
-    icon: LuMapPinned,
+    icon: PiBuildingOffice,
     path: "/search/results",
   },
   {
     title: "Find Your Community",
     description:
       "Find like minded individuals & communities as per your preferances from nomad destinations.",
-    icon: HiOutlineUserCircle,
+    icon: RiUserCommunityLine,
     path: "/search/results",
   },
   {
     title: "Search Old School",
     description:
       "Self search and find your ideal nomad destination as per your preferance like old times.",
-    icon: HiOutlineViewGrid,
+    icon: TbWorldWww,
     path: "/manual-search",
   },
 ];

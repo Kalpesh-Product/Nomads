@@ -16,9 +16,13 @@ import {
   HiOutlineUserCircle,
   HiOutlineKey,
   HiOutlineLogout,
-  HiOutlineSearch,
 } from "react-icons/hi";
 import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
+import { PiBuildingOffice, PiRanking } from "react-icons/pi";
+import { TiGlobeOutline } from "react-icons/ti";
+import { BiDollar } from "react-icons/bi";
+import { RiUserCommunityLine } from "react-icons/ri";
+import { TbWorldWww } from "react-icons/tb";
 
 const gatedRecommendationLabels = new Set([
   "Work From Anywhere",
@@ -28,24 +32,28 @@ const gatedRecommendationLabels = new Set([
 ]);
 
 const recommendationItems = [
-  { label: "World Ranking", icon: HiOutlineViewGrid, path: "/search/results" },
+  { label: "World Ranking", icon: PiRanking, path: "/search/results" },
   {
     label: "Work From Anywhere",
-    icon: HiOutlineHeart,
+    icon: TiGlobeOutline,
     path: "/search/results",
   },
   {
     label: "Increase Your Savings",
-    icon: LuCircleDollarSign,
+    icon: BiDollar,
     path: "/search/results",
   },
-  { label: "Advance Your Career", icon: LuMapPinned, path: "/search/results" },
+  {
+    label: "Advance Your Career",
+    icon: PiBuildingOffice,
+    path: "/search/results",
+  },
   {
     label: "Find Your Community",
-    icon: HiOutlineUserCircle,
+    icon: RiUserCommunityLine,
     path: "/search/results",
   },
-  { label: "Search Old School", icon: HiOutlineSearch, path: "/manual-search" },
+  { label: "Search Old School", icon: TbWorldWww, path: "/manual-search" },
 ];
 const valueAdditionItems = [
   { label: "VISA Support", icon: LuMapPinned, path: "/visa-support" },
