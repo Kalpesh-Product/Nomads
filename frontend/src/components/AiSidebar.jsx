@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   clearStoredLoginState,
@@ -167,6 +167,14 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
   const location = useLocation();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const normalizedPath = location.pathname.replace(/\/$/, "") || "/";
+    const isAiHomePage = normalizedPath === "/home";
+
+    setIsRecommendationsOpen(!isAiHomePage);
+    setIsValueAdditionsOpen(isAiHomePage);
+  }, [location.pathname]);
 
   const searchParams = new URLSearchParams(location.search);
   const isLoggedIn =
