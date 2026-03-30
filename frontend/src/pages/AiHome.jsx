@@ -78,7 +78,7 @@ const AiHome = () => {
   const greetingText = isLoggedIn ? "hi Abrar" : "Meet Wono";
   const subheadingText = isLoggedIn
     ? "Please choose your goals from below so that we can help you design your accurate nomad lifestyle."
-    : "AI-Powered Living For The Modern Nomad";
+    : "An intellegent platform for moden nomads";
   const loggedOutNoteText = isLoggedIn
     ? ""
     : "World ranking and search old school are available without logging in. Log in to view the rest.";
@@ -183,7 +183,7 @@ const AiHome = () => {
 
                 const isFreeCard = freeRecommendationTitles.has(card.title);
                 const loggedOutCardText = isFreeCard
-                  ? "Available for free"
+                  ? "Login not required"
                   : "Login required";
 
                 return (
