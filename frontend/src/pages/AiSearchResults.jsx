@@ -130,6 +130,7 @@ const AiSearchResults = () => {
 
   const [typedTopHeading, setTypedTopHeading] = useState("");
   const [typedBottomHeading, setTypedBottomHeading] = useState("");
+  const [typedResultsHeading, setTypedResultsHeading] = useState("");
   const [selectedContinent, setSelectedContinent] = useState(null);
   const [selectedGoalOption, setSelectedGoalOption] = useState(selectedFilter);
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -257,7 +258,15 @@ const AiSearchResults = () => {
   const selectedTopHeadingText =
     "Please find below the best curated results from the options you suggested to me based on world ranking index.";
   const selectedBottomHeadingText =
-    "Feel free to edit your above selaction anytime and I will curate the new set of best results for you.";
+    "Feel free to edit your above selection anytime and I will curate the new set of best results for you.";
+
+  const selectedResultsHeadingText = useMemo(() => {
+    if (!selectedContinent || !selectedGoalOption) {
+      return "";
+    }
+
+    return `Curated below are the best cities in ${selectedContinent} as per the ${selectedGoalOption} for you. The results below are ranked using WoNo’s Intelligence Model, analyzing 50+ global factors — including safety, nomad population, healthcare, visa flexibility, cost of living, taxation, work infrastructure, lifestyle quality, and community — tailored to your personal profile.`;
+  }, [selectedContinent, selectedGoalOption]);
 
   const thinkingHeadingText = "Curating the best results for you";
 
@@ -310,6 +319,8 @@ const AiSearchResults = () => {
     setIsResultsReady(false);
     setTypedBottomHeading("");
 
+    setTypedResultsHeading("");
+
     topTypingIntervalRef.current = animateTypedText(
       initialTopHeadingText,
       setTypedTopHeading,
@@ -320,6 +331,7 @@ const AiSearchResults = () => {
     clearTypingAnimations();
     setIsResultsReady(false);
     setTypedBottomHeading("");
+    setTypedResultsHeading("");
 
     topTypingIntervalRef.current = animateTypedText(
       thinkingHeadingText,
@@ -330,10 +342,18 @@ const AiSearchResults = () => {
             selectedTopHeadingText,
             setTypedTopHeading,
             () => {
-              setIsResultsReady(true);
               bottomTypingIntervalRef.current = animateTypedText(
                 selectedBottomHeadingText,
                 setTypedBottomHeading,
+                () => {
+                  bottomTypingIntervalRef.current = animateTypedText(
+                    selectedResultsHeadingText,
+                    setTypedResultsHeading,
+                    () => {
+                      setIsResultsReady(true);
+                    },
+                  );
+                },
               );
             },
           );
@@ -345,6 +365,7 @@ const AiSearchResults = () => {
     clearTypingAnimations,
     thinkingHeadingText,
     selectedBottomHeadingText,
+    selectedResultsHeadingText,
     selectedTopHeadingText,
   ]);
 
@@ -390,6 +411,7 @@ const AiSearchResults = () => {
     if (!hasSelectedFilters) {
       setIsResultsReady(false);
       setTypedBottomHeading("");
+      setTypedResultsHeading("");
     }
   }, [hasSelectedFilters]);
 
@@ -415,6 +437,8 @@ const AiSearchResults = () => {
   ]);
 
   const shouldShowResultsContent = hasSelectedFilters && isResultsReady;
+  const shouldShowNarrative =
+    hasSelectedFilters && (typedBottomHeading || typedResultsHeading);
 
   return (
     <div className="min-h-full bg-white">
@@ -497,10 +521,15 @@ const AiSearchResults = () => {
 
               <div className="relative mt-8">
                 <div className="relative z-10">
-                  {shouldShowResultsContent && (
-                    <p className="text-sm font-medium leading-snug text-black/85 lg:text-lg font-play">
-                      {typedBottomHeading}
-                    </p>
+                  {shouldShowNarrative && (
+                    <>
+                      <p className="text-sm font-medium leading-snug text-black/85 lg:text-lg font-play">
+                        {typedBottomHeading}
+                      </p>
+                      <p className="mt-3 text-sm font-medium leading-snug text-black/85 lg:text-lg font-play">
+                        {typedResultsHeading}
+                      </p>
+                    </>
                   )}
 
                   {shouldShowResultsContent ? (
