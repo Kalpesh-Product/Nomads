@@ -253,12 +253,13 @@ const AiSearchResults = () => {
     hasSelectedGoalOption && selectedGoalOption === goalOptions[0];
 
   const initialTopHeadingText =
-    "Select one option from each badge below to view matching destinations.";
-  const selectedTopHeadingText = "Showing results for the selected options.";
+    "Please select one option from each below so that I can display the best curated results.";
+  const selectedTopHeadingText =
+    "Please find below the best curated results from the options you suggested to me based on world ranking index.";
   const selectedBottomHeadingText =
-    "Change any of the above options to view your preferred results.";
+    "Feel free to edit your above selaction anytime and I will curate the new set of best results for you.";
 
-  const thinkingHeadingText = "Thinking...";
+  const thinkingHeadingText = "Curating the best results for you";
 
   const isThinkingHeadingVisible =
     typedTopHeading.length > 0 &&
