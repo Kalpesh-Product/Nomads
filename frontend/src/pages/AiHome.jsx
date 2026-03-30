@@ -24,42 +24,42 @@ const recommendationCards = [
   {
     title: "World Ranking",
     description:
-      "WoNo analyzes global data to rank the best destinations worldwide based on livability, popularity, and remote-work potential.",
+      "Global suggestions for the best nomad destinations based on the world index which includes 50+ global factors.",
     icon: HiOutlineViewGrid,
     path: "/search/results",
   },
   {
     title: "Work From Anywhere",
     description:
-      "WoNo evaluates your preferences and recommends destinations that best match your lifestyle and work needs.",
+      "Custom suggestions to help you discover and work from the best nomad destinations.",
     icon: HiOutlineHeart,
     path: "/search/results",
   },
   {
     title: "Increase Your Savings",
     description:
-      "WoNo calculates where your income goes further and highlights destinations that help you save more while living well.",
+      "Tailored nomad destination suggestions to help you increase your savings as a nomad.",
     icon: LuCircleDollarSign,
     path: "/search/results",
   },
   {
     title: "Advance Your Career",
     description:
-      "WoNo identifies high-value, low-cost destinations that offer strong amenities without high expenses.",
+      "Intellegent suggestions to help you find the most sutaible nomad destinations to advance your acreer.",
     icon: LuMapPinned,
     path: "/search/results",
   },
   {
     title: "Find Your Community",
     description:
-      "WoNo matches destinations to your climate, culture, and community preferences for a better overall fit.",
+      "Find like minded individuals & communities as per your preferances from nomad destinations.",
     icon: HiOutlineUserCircle,
     path: "/search/results",
   },
   {
     title: "Search Old School",
     description:
-      "WoNo lets you manually filter and sort destinations if you prefer a traditional search approach.",
+      "Self search and find your ideal nomad destination as per your preferance like old times.",
     icon: HiOutlineViewGrid,
     path: "/manual-search",
   },
@@ -71,7 +71,8 @@ const AiHome = () => {
   const [typedGreeting, setTypedGreeting] = useState("");
   const [typedSubheading, setTypedSubheading] = useState("");
 
-  const [typedLoggedOutNote, setTypedLoggedOutNote] = useState("");
+  const [typedThirdLine, setTypedThirdLine] = useState("");
+  const [typedFourthLine, setTypedFourthLine] = useState("");
 
   const isLoggedIn = useNomadLoginState();
 
@@ -79,20 +80,26 @@ const AiHome = () => {
   const subheadingText = isLoggedIn
     ? "Please choose your goals from below so that we can help you design your accurate nomad lifestyle."
     : "An intellegent platform for moden nomads";
-  const loggedOutNoteText = isLoggedIn
+  const thirdLineText = isLoggedIn
     ? ""
-    : "World ranking and search old school are available without logging in. Log in to view the rest.";
+    : "Supporting the global community of remote workers, creators, entrepreneurs, hosts and investors who are redefining how the world lives and works.";
+  const fourthLineText = isLoggedIn
+    ? ""
+    : "Early adoption of our future lifestyle!";
 
   useEffect(() => {
     setTypedGreeting("");
     setTypedSubheading("");
-    setTypedLoggedOutNote("");
+    setTypedThirdLine("");
+    setTypedFourthLine("");
 
     let greetingIndex = 0;
     let subheadingIndex = 0;
-    let loggedOutNoteIndex = 0;
+    let thirdLineIndex = 0;
+    let fourthLineIndex = 0;
     let cleanupSubheading = () => {};
-    let cleanupLoggedOutNote = () => {};
+    let cleanupThirdLine = () => {};
+    let cleanupFourthLine = () => {};
 
     const greetingInterval = setInterval(() => {
       greetingIndex += 1;
@@ -108,22 +115,37 @@ const AiHome = () => {
           if (subheadingIndex >= subheadingText.length) {
             clearInterval(subheadingInterval);
 
-            if (!loggedOutNoteText) {
+            if (!thirdLineText) {
               return;
             }
 
-            const loggedOutNoteInterval = setInterval(() => {
-              loggedOutNoteIndex += 1;
-              setTypedLoggedOutNote(
-                loggedOutNoteText.slice(0, loggedOutNoteIndex),
-              );
+            const thirdLineInterval = setInterval(() => {
+              thirdLineIndex += 1;
+              setTypedThirdLine(thirdLineText.slice(0, thirdLineIndex));
 
-              if (loggedOutNoteIndex >= loggedOutNoteText.length) {
-                clearInterval(loggedOutNoteInterval);
+              if (thirdLineIndex >= thirdLineText.length) {
+                clearInterval(thirdLineInterval);
+
+                if (!fourthLineText) {
+                  return;
+                }
+
+                const fourthLineInterval = setInterval(() => {
+                  fourthLineIndex += 1;
+                  setTypedFourthLine(
+                    fourthLineText.slice(0, fourthLineIndex),
+                  );
+
+                  if (fourthLineIndex >= fourthLineText.length) {
+                    clearInterval(fourthLineInterval);
+                  }
+                }, 25);
+
+                cleanupFourthLine = () => clearInterval(fourthLineInterval);
               }
             }, 25);
 
-            cleanupLoggedOutNote = () => clearInterval(loggedOutNoteInterval);
+            cleanupThirdLine = () => clearInterval(thirdLineInterval);
           }
         }, 25);
 
@@ -134,9 +156,10 @@ const AiHome = () => {
     return () => {
       clearInterval(greetingInterval);
       cleanupSubheading();
-      cleanupLoggedOutNote();
+      cleanupThirdLine();
+      cleanupFourthLine();
     };
-  }, [greetingText, loggedOutNoteText, subheadingText]);
+  }, [fourthLineText, greetingText, subheadingText, thirdLineText]);
 
   const handleCardClick = (card) => {
     const params = new URLSearchParams(location.search);
@@ -170,11 +193,16 @@ const AiHome = () => {
           <h2 className="mt-10 text-sm font-semibold text-black/85 font-play sm:text-lg">
             {typedSubheading}
           </h2>
-          {/* {!isLoggedIn ? (
-            <p className="mt-3 text-sm sm:text-lg font-semibold text-black/85 font-play">
-              {typedLoggedOutNote}
-            </p>
-          ) : null} */}
+          {!isLoggedIn ? (
+            <>
+              <p className="mt-3 text-sm sm:text-lg font-semibold text-black/85 font-play">
+                {typedThirdLine}
+              </p>
+              <p className="mt-3 text-sm sm:text-lg font-semibold text-black/85 font-play">
+                {typedFourthLine}
+              </p>
+            </>
+          ) : null}
 
           <div className="mt-4 rounded-[40px] px-0 py-4 md:px-6 md:py-8">
             <div className="grid grid-cols-2 gap-4 md:grid-cols-2 md:gap-10 xl:grid-cols-3">
@@ -200,7 +228,7 @@ const AiHome = () => {
                         {card.title}
                       </h3>
                       <div className="mt-2 hidden rounded-2xl bg-[#f1f1f3] p-5 text-left shadow-[0_1px_0_rgba(255,255,255,0.7)] transition-colors duration-200 group-hover:bg-sky-500 md:block">
-                        <p className="text-nano leading-relaxed text-black/90 transition-colors duration-200 group-hover:text-white">
+                        <p className="text-micro leading-relaxed text-black/90 transition-colors duration-200 group-hover:text-white">
                           {card.description}
                         </p>
                       </div>
