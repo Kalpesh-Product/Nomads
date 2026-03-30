@@ -36,6 +36,21 @@ const destinationCards = aiDestinationCards;
 
 const INITIAL_VISIBLE_DESTINATIONS = 18;
 
+const goalNarrativeTopHeadingMap = {
+  "World Ranking":
+    "Please find below the best curated results from the options you suggested to me based on world ranking index.",
+  "Work From Anywhere":
+    "Please find below the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.",
+  "Increase Your Savings":
+    "Please find below the best curated results from the options you suggested to me to help you increase your savings.",
+  "Advance Your Career":
+    "Please find below the best curated results from the options you suggested to me to help you advance your career.",
+  "Find Your Community":
+    "Please find below the best curated results from the options you suggested to me to help you discover your preferred community in nomad destinations.",
+  "Search Old School":
+    "Please find below the best curated results from the options you suggested to me to help you discover your preferred nomad destinations.",
+};
+
 const searchBarBadgeClassName =
   "inline-flex min-h-[40px] min-w-[5rem] items-center rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85";
 
@@ -121,15 +136,15 @@ const DropdownBadge = ({
 const AiSearchResults = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
+  const requestedGoal = state?.selectedGoal;
   const selectedGoal =
-    state?.selectedGoal && goalFilterMap[state.selectedGoal]
-      ? state.selectedGoal
-      : defaultGoal;
+    requestedGoal && goalFilterMap[requestedGoal] ? requestedGoal : defaultGoal;
   const goalOptions = goalFilterMap[selectedGoal] || goalFilterMap[defaultGoal];
   const selectedFilter = null;
 
   const [typedTopHeading, setTypedTopHeading] = useState("");
   const [typedBottomHeading, setTypedBottomHeading] = useState("");
+  const [typedResultsHeading, setTypedResultsHeading] = useState("");
   const [selectedContinent, setSelectedContinent] = useState(null);
   const [selectedGoalOption, setSelectedGoalOption] = useState(selectedFilter);
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -253,12 +268,23 @@ const AiSearchResults = () => {
     hasSelectedGoalOption && selectedGoalOption === goalOptions[0];
 
   const initialTopHeadingText =
-    "Select one option from each badge below to view matching destinations.";
-  const selectedTopHeadingText = "Showing results for the selected options.";
+    "Please select one option from each below so that I can display the best curated results.";
+  const selectedTopHeadingText =
+    goalNarrativeTopHeadingMap[requestedGoal] ||
+    goalNarrativeTopHeadingMap[selectedGoal] ||
+    goalNarrativeTopHeadingMap["World Ranking"];
   const selectedBottomHeadingText =
-    "Change any of the above options to view your preferred results.";
+    "Feel free to edit your above selection anytime and I will curate the new set of best results for you.";
 
-  const thinkingHeadingText = "Thinking...";
+  const selectedResultsHeadingText = useMemo(() => {
+    if (!selectedContinent || !selectedGoalOption) {
+      return "";
+    }
+
+    return `Curated below are the best cities in ${selectedContinent} as per the ${selectedGoalOption} for you. The results below are ranked using WoNo’s Intelligence Model, analyzing 50+ global factors — including safety, nomad population, healthcare, visa flexibility, cost of living, taxation, work infrastructure, lifestyle quality, and community — tailored to your personal profile.`;
+  }, [selectedContinent, selectedGoalOption]);
+
+  const thinkingHeadingText = "Curating the best results for you";
 
   const isThinkingHeadingVisible =
     typedTopHeading.length > 0 &&
@@ -309,6 +335,8 @@ const AiSearchResults = () => {
     setIsResultsReady(false);
     setTypedBottomHeading("");
 
+    setTypedResultsHeading("");
+
     topTypingIntervalRef.current = animateTypedText(
       initialTopHeadingText,
       setTypedTopHeading,
@@ -319,6 +347,7 @@ const AiSearchResults = () => {
     clearTypingAnimations();
     setIsResultsReady(false);
     setTypedBottomHeading("");
+    setTypedResultsHeading("");
 
     topTypingIntervalRef.current = animateTypedText(
       thinkingHeadingText,
@@ -329,14 +358,22 @@ const AiSearchResults = () => {
             selectedTopHeadingText,
             setTypedTopHeading,
             () => {
-              setIsResultsReady(true);
               bottomTypingIntervalRef.current = animateTypedText(
                 selectedBottomHeadingText,
                 setTypedBottomHeading,
+                () => {
+                  bottomTypingIntervalRef.current = animateTypedText(
+                    selectedResultsHeadingText,
+                    setTypedResultsHeading,
+                    () => {
+                      setIsResultsReady(true);
+                    },
+                  );
+                },
               );
             },
           );
-        }, 2000);
+        }, 4000);
       },
     );
   }, [
@@ -344,6 +381,7 @@ const AiSearchResults = () => {
     clearTypingAnimations,
     thinkingHeadingText,
     selectedBottomHeadingText,
+    selectedResultsHeadingText,
     selectedTopHeadingText,
   ]);
 
@@ -389,6 +427,7 @@ const AiSearchResults = () => {
     if (!hasSelectedFilters) {
       setIsResultsReady(false);
       setTypedBottomHeading("");
+      setTypedResultsHeading("");
     }
   }, [hasSelectedFilters]);
 
@@ -414,6 +453,8 @@ const AiSearchResults = () => {
   ]);
 
   const shouldShowResultsContent = hasSelectedFilters && isResultsReady;
+  const shouldShowNarrative =
+    hasSelectedFilters && (typedBottomHeading || typedResultsHeading);
 
   return (
     <div className="min-h-full bg-white">
@@ -496,10 +537,15 @@ const AiSearchResults = () => {
 
               <div className="relative mt-8">
                 <div className="relative z-10">
-                  {shouldShowResultsContent && (
-                    <p className="text-sm font-medium leading-snug text-black/85 lg:text-lg font-play">
-                      {typedBottomHeading}
-                    </p>
+                  {shouldShowNarrative && (
+                    <>
+                      <p className="text-sm font-medium leading-snug text-black/85 lg:text-lg font-play">
+                        {typedBottomHeading}
+                      </p>
+                      <p className="mt-3 text-sm font-medium leading-snug text-black/85 lg:text-lg font-play">
+                        {typedResultsHeading}
+                      </p>
+                    </>
                   )}
 
                   {shouldShowResultsContent ? (

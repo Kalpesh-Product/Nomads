@@ -1,8 +1,8 @@
 import { TextField, IconButton, InputAdornment } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import AiPrimaryButton from "../components/AiPrimaryButton";
 
@@ -11,25 +11,98 @@ const LOGIN_PROMPT =
 
 export default function AiLogin() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
+  const [typedHeading, setTypedHeading] = useState("");
+  const [typedDescription, setTypedDescription] = useState("");
   const [typedMessage, setTypedMessage] = useState("");
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
+  const loginContext = useMemo(() => {
+    if (!location.state || typeof location.state !== "object") {
+      return null;
+    }
+
+    const context = location.state.loginContext;
+
+    if (
+      !context ||
+      typeof context.title !== "string" ||
+      typeof context.description !== "string"
+    ) {
+      return null;
+    }
+
+    return {
+      title: context.title,
+      description: context.description,
+    };
+  }, [location.state]);
+
   useEffect(() => {
+    setTypedHeading("");
+    setTypedDescription("");
     setTypedMessage("");
 
-    let currentIndex = 0;
-    const typingInterval = setInterval(() => {
-      currentIndex += 1;
-      setTypedMessage(LOGIN_PROMPT.slice(0, currentIndex));
+    let headingIndex = 0;
+    let descriptionIndex = 0;
+    let messageIndex = 0;
+    let cleanupHeading = () => {};
+    let cleanupDescription = () => {};
+    let cleanupMessage = () => {};
 
-      if (currentIndex >= LOGIN_PROMPT.length) {
-        clearInterval(typingInterval);
+    const typeLoginPrompt = () => {
+      const messageInterval = setInterval(() => {
+        messageIndex += 1;
+        setTypedMessage(LOGIN_PROMPT.slice(0, messageIndex));
+
+        if (messageIndex >= LOGIN_PROMPT.length) {
+          clearInterval(messageInterval);
+        }
+      }, 25);
+
+      cleanupMessage = () => clearInterval(messageInterval);
+    };
+
+    if (!loginContext) {
+      typeLoginPrompt();
+
+      return () => {
+        cleanupMessage();
+      };
+    }
+
+    const headingInterval = setInterval(() => {
+      headingIndex += 1;
+      setTypedHeading(loginContext.title.slice(0, headingIndex));
+
+      if (headingIndex >= loginContext.title.length) {
+        clearInterval(headingInterval);
+
+        const descriptionInterval = setInterval(() => {
+          descriptionIndex += 1;
+          setTypedDescription(
+            loginContext.description.slice(0, descriptionIndex),
+          );
+
+          if (descriptionIndex >= loginContext.description.length) {
+            clearInterval(descriptionInterval);
+            typeLoginPrompt();
+          }
+        }, 25);
+
+        cleanupDescription = () => clearInterval(descriptionInterval);
       }
     }, 25);
 
-    return () => clearInterval(typingInterval);
-  }, []);
+    cleanupHeading = () => clearInterval(headingInterval);
+
+    return () => {
+      cleanupHeading();
+      cleanupDescription();
+      cleanupMessage();
+    };
+  }, [loginContext]);
 
   const { control } = useForm({
     defaultValues: {
@@ -47,7 +120,17 @@ export default function AiLogin() {
     <>
       <div className="flex min-h-[55vh] flex-col items-center justify-center gap-10 rounded-lg border-gray-300 px-6 py-8 md:min-h-[60vh] lg:min-h-[75vh]">
         <div className="w-full max-w-4xl">
-          <p className="mx-auto min-h-[3rem] w-full text-center font-play text-[1rem] leading-relaxed text-gray-900 sm:min-h-[3.5rem] sm:text-[1.4rem]">
+          {loginContext ? (
+            <h2 className="mx-auto min-h-[2rem] w-full text-center font-play text-[1.1rem] font-semibold leading-relaxed text-gray-900 sm:min-h-[2.4rem] sm:text-[1.6rem]">
+              {typedHeading}
+            </h2>
+          ) : null}
+          {loginContext ? (
+            <p className="mx-auto mt-2 min-h-[3rem] w-full text-center font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1.2rem]">
+              {typedDescription}
+            </p>
+          ) : null}
+          <p className="mx-auto mt-2 min-h-[3rem] w-full text-center font-play text-[1rem] leading-relaxed text-gray-900 sm:min-h-[3.5rem] sm:text-[1.4rem]">
             {typedMessage}
           </p>
         </div>

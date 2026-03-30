@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   clearStoredLoginState,
@@ -16,9 +16,13 @@ import {
   HiOutlineUserCircle,
   HiOutlineKey,
   HiOutlineLogout,
-  HiOutlineSearch,
 } from "react-icons/hi";
 import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
+import { PiBuildingOffice, PiRanking } from "react-icons/pi";
+import { TiGlobeOutline } from "react-icons/ti";
+import { BiDollar } from "react-icons/bi";
+import { RiUserCommunityLine } from "react-icons/ri";
+import { TbWorldWww } from "react-icons/tb";
 
 const gatedRecommendationLabels = new Set([
   "Work From Anywhere",
@@ -28,24 +32,42 @@ const gatedRecommendationLabels = new Set([
 ]);
 
 const recommendationItems = [
-  { label: "World Ranking", icon: HiOutlineViewGrid, path: "/search/results" },
+  {
+    label: "World Ranking",
+    description:
+      "Global suggestions for the best nomad destinations based on the world index which includes 50+ global factors.",
+    icon: PiRanking,
+    path: "/search/results",
+  },
   {
     label: "Work From Anywhere",
-    icon: HiOutlineHeart,
+    description:
+      "Custom suggestions to help you discover and work from the best nomad destinations.",
+    icon: TiGlobeOutline,
     path: "/search/results",
   },
   {
     label: "Increase Your Savings",
-    icon: LuCircleDollarSign,
+    description:
+      "Tailored nomad destination suggestions to help you increase your savings as a nomad.",
+    icon: BiDollar,
     path: "/search/results",
   },
-  { label: "Advance Your Career", icon: LuMapPinned, path: "/search/results" },
+  {
+    label: "Advance Your Career",
+    description:
+      "Intellegent suggestions to help you find the most sutaible nomad destinations to advance your acreer.",
+    icon: PiBuildingOffice,
+    path: "/search/results",
+  },
   {
     label: "Find Your Community",
-    icon: HiOutlineUserCircle,
+    description:
+      "Find like minded individuals & communities as per your preferances from nomad destinations.",
+    icon: RiUserCommunityLine,
     path: "/search/results",
   },
-  { label: "Search Old School", icon: HiOutlineSearch, path: "/manual-search" },
+  { label: "Search Old School", icon: TbWorldWww, path: "/manual-search" },
 ];
 const valueAdditionItems = [
   { label: "VISA Support", icon: LuMapPinned, path: "/visa-support" },
@@ -160,6 +182,14 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const normalizedPath = location.pathname.replace(/\/$/, "") || "/";
+    const isAiHomePage = normalizedPath === "/home";
+
+    setIsRecommendationsOpen(!isAiHomePage);
+    setIsValueAdditionsOpen(isAiHomePage);
+  }, [location.pathname]);
+
   const searchParams = new URLSearchParams(location.search);
   const isLoggedIn =
     searchParams.get("login") === "true" || readStoredLoginState();
@@ -168,7 +198,14 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     const params = new URLSearchParams(location.search);
 
     if (!isLoggedIn && gatedRecommendationLabels.has(item.label)) {
-      navigate(`/ai-login${location.search}`);
+      navigate(`/ai-login${location.search}`, {
+        state: {
+          loginContext: {
+            title: item.label,
+            description: item.description || "",
+          },
+        },
+      });
       return;
     }
 
@@ -266,7 +303,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
       </div>
 
       <SidebarSection
-        title="Nomad Recommendations"
+        title="Our Intelligence"
         items={recommendationItems}
         collapsed={isCollapsed}
         isExpandable

@@ -36,6 +36,7 @@ module.exports = {
       },
       fontSize: {
         nano: ["0.65rem", { lineHeight: "0.75rem" }], // ~10px
+        micro: ["0.71rem", { lineHeight: "0.7rem" }], // ~10px
         tiny: ["0.75rem", { lineHeight: "1rem" }], // ~12px
         small: ["0.875rem", { lineHeight: "1.5rem" }], // 16px
         content: ["1rem", { lineHeight: "1.5rem" }], // 16px
