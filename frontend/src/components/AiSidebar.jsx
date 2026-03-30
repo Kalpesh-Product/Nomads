@@ -32,24 +32,38 @@ const gatedRecommendationLabels = new Set([
 ]);
 
 const recommendationItems = [
-  { label: "World Ranking", icon: PiRanking, path: "/search/results" },
+  {
+    label: "World Ranking",
+    description:
+      "Global suggestions for the best nomad destinations based on the world index which includes 50+ global factors.",
+    icon: PiRanking,
+    path: "/search/results",
+  },
   {
     label: "Work From Anywhere",
+    description:
+      "Custom suggestions to help you discover and work from the best nomad destinations.",
     icon: TiGlobeOutline,
     path: "/search/results",
   },
   {
     label: "Increase Your Savings",
+    description:
+      "Tailored nomad destination suggestions to help you increase your savings as a nomad.",
     icon: BiDollar,
     path: "/search/results",
   },
   {
     label: "Advance Your Career",
+    description:
+      "Intellegent suggestions to help you find the most sutaible nomad destinations to advance your acreer.",
     icon: PiBuildingOffice,
     path: "/search/results",
   },
   {
     label: "Find Your Community",
+    description:
+      "Find like minded individuals & communities as per your preferances from nomad destinations.",
     icon: RiUserCommunityLine,
     path: "/search/results",
   },
@@ -184,7 +198,14 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     const params = new URLSearchParams(location.search);
 
     if (!isLoggedIn && gatedRecommendationLabels.has(item.label)) {
-      navigate(`/ai-login${location.search}`);
+      navigate(`/ai-login${location.search}`, {
+        state: {
+          loginContext: {
+            title: item.label,
+            description: item.description || "",
+          },
+        },
+      });
       return;
     }
 

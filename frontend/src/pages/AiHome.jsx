@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  PiBuildingOffice,
-  PiRanking,
-} from "react-icons/pi";
+import { PiBuildingOffice, PiRanking } from "react-icons/pi";
 import { TiGlobeOutline } from "react-icons/ti";
 import { BiDollar } from "react-icons/bi";
 import { RiUserCommunityLine } from "react-icons/ri";
@@ -134,9 +131,7 @@ const AiHome = () => {
 
                 const fourthLineInterval = setInterval(() => {
                   fourthLineIndex += 1;
-                  setTypedFourthLine(
-                    fourthLineText.slice(0, fourthLineIndex),
-                  );
+                  setTypedFourthLine(fourthLineText.slice(0, fourthLineIndex));
 
                   if (fourthLineIndex >= fourthLineText.length) {
                     clearInterval(fourthLineInterval);
@@ -167,7 +162,14 @@ const AiHome = () => {
     const params = new URLSearchParams(location.search);
 
     if (!isLoggedIn && gatedRecommendationTitles.has(card.title)) {
-      navigate(`/ai-login${location.search}`);
+      navigate(`/ai-login${location.search}`, {
+        state: {
+          loginContext: {
+            title: card.title,
+            description: card.description,
+          },
+        },
+      });
       return;
     }
 
