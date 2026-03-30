@@ -36,6 +36,21 @@ const destinationCards = aiDestinationCards;
 
 const INITIAL_VISIBLE_DESTINATIONS = 18;
 
+const goalNarrativeTopHeadingMap = {
+  "World Ranking":
+    "Please find below the best curated results from the options you suggested to me based on world ranking index.",
+  "Work From Anywhere":
+    "Please find below the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.",
+  "Increase Your Savings":
+    "Please find below the best curated results from the options you suggested to me to help you increase your savings.",
+  "Advance Your Career":
+    "Please find below the best curated results from the options you suggested to me to help you advance your career.",
+  "Find Your Community":
+    "Please find below the best curated results from the options you suggested to me to help you discover your preferred community in nomad destinations.",
+  "Search Old School":
+    "Please find below the best curated results from the options you suggested to me to help you discover your preferred nomad destinations.",
+};
+
 const searchBarBadgeClassName =
   "inline-flex min-h-[40px] min-w-[5rem] items-center rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85";
 
@@ -121,10 +136,9 @@ const DropdownBadge = ({
 const AiSearchResults = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
+  const requestedGoal = state?.selectedGoal;
   const selectedGoal =
-    state?.selectedGoal && goalFilterMap[state.selectedGoal]
-      ? state.selectedGoal
-      : defaultGoal;
+    requestedGoal && goalFilterMap[requestedGoal] ? requestedGoal : defaultGoal;
   const goalOptions = goalFilterMap[selectedGoal] || goalFilterMap[defaultGoal];
   const selectedFilter = null;
 
@@ -256,7 +270,9 @@ const AiSearchResults = () => {
   const initialTopHeadingText =
     "Please select one option from each below so that I can display the best curated results.";
   const selectedTopHeadingText =
-    "Please find below the best curated results from the options you suggested to me based on world ranking index.";
+    goalNarrativeTopHeadingMap[requestedGoal] ||
+    goalNarrativeTopHeadingMap[selectedGoal] ||
+    goalNarrativeTopHeadingMap["World Ranking"];
   const selectedBottomHeadingText =
     "Feel free to edit your above selection anytime and I will curate the new set of best results for you.";
 
