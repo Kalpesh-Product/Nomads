@@ -28,6 +28,8 @@ import PaginatedGrid from "../components/PaginatedGrid.jsx";
 import { Helmet } from "@dr.pogodin/react-helmet";
 import useAuth from "../hooks/useAuth.js";
 
+const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
+
 const HorizontalScrollWrapper = ({ children, title }) => {
   const scrollRef = React.useRef(null);
   const [showLeft, setShowLeft] = useState(false);
@@ -271,10 +273,14 @@ const AiGlobalListingsMap = () => {
   }, [listingsData]);
 
   const categoryOptions = useMemo(() => {
-    if (!listingsData || listingsData.length === 0) return [];
-
-    // Add 'All' option specifically for the UI chips
-    const baseOptions = [];
+    if (!listingsData || listingsData.length === 0) {
+      return [
+        {
+          label: "Value Added Services",
+          value: VALUE_ADDED_SERVICES_CATEGORY,
+        },
+      ];
+    }
 
     const uniqueTypes = [
       ...new Set(
@@ -292,6 +298,7 @@ const AiGlobalListingsMap = () => {
       workation: "Workation",
       meetingroom: "Meetings",
       cafe: "Cafe's",
+      [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
     };
 
     const typeOrder = [
@@ -301,13 +308,26 @@ const AiGlobalListingsMap = () => {
       "workation",
       "meetingroom",
       "cafe",
+      VALUE_ADDED_SERVICES_CATEGORY,
     ];
 
     const result = uniqueTypes
       .map((type) => ({ label: labelMap[type] || type, value: type }))
       .sort((a, b) => typeOrder.indexOf(a.value) - typeOrder.indexOf(b.value));
 
-    return result;
+    if (
+      result.some((option) => option.value === VALUE_ADDED_SERVICES_CATEGORY)
+    ) {
+      return result;
+    }
+
+    return [
+      ...result,
+      {
+        label: "Value Added Services",
+        value: VALUE_ADDED_SERVICES_CATEGORY,
+      },
+    ];
   }, [listingsData]);
 
   const groupedListings = sortedListings?.reduce((acc, item) => {
@@ -414,7 +434,7 @@ const AiGlobalListingsMap = () => {
     }
     dispatch(setFormValues({ ...currentFormData, category: categoryValue }));
 
-    if (isMobileOrTablet) {
+    if (isMobileOrTablet && categoryValue !== VALUE_ADDED_SERVICES_CATEGORY) {
       setShowListings(true);
       // Optional: Clear mobile search if open
       setShowMobileSearch(false);

@@ -33,6 +33,8 @@ import {
   HiOutlineUserCircle,
 } from "react-icons/hi";
 
+const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
+
 const HorizontalScrollWrapper = ({ children, title }) => {
   const scrollRef = React.useRef(null);
   const [showLeft, setShowLeft] = useState(false);
@@ -270,7 +272,14 @@ const AiGlobalListingsList = () => {
   });
 
   const categoryOptions = useMemo(() => {
-    if (!listingsData || listingsData.length === 0) return [];
+    if (!listingsData || listingsData.length === 0) {
+      return [
+        {
+          label: "Value Added Services",
+          value: VALUE_ADDED_SERVICES_CATEGORY,
+        },
+      ];
+    }
 
     const uniqueTypes = [
       ...new Set(
@@ -288,6 +297,7 @@ const AiGlobalListingsList = () => {
       workation: "Workation",
       meetingroom: "Meetings",
       cafe: "Cafe's",
+      [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
     };
 
     const typeOrder = [
@@ -297,11 +307,26 @@ const AiGlobalListingsList = () => {
       "workation",
       "meetingroom",
       "cafe",
+      VALUE_ADDED_SERVICES_CATEGORY,
     ];
 
-    return uniqueTypes
+    const options = uniqueTypes
       .map((type) => ({ label: labelMap[type] || type, value: type }))
       .sort((a, b) => typeOrder.indexOf(a.value) - typeOrder.indexOf(b.value));
+
+    if (
+      options.some((option) => option.value === VALUE_ADDED_SERVICES_CATEGORY)
+    ) {
+      return options;
+    }
+
+    return [
+      ...options,
+      {
+        label: "Value Added Services",
+        value: VALUE_ADDED_SERVICES_CATEGORY,
+      },
+    ];
   }, [listingsData]);
 
   const groupedListings = listingsData?.reduce((acc, item) => {
