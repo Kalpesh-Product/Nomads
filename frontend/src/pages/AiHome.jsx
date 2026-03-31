@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { SlBadge } from "react-icons/sl";
 import { FaGlobeAmericas } from "react-icons/fa";
 import { MdOutlineWorkHistory } from "react-icons/md";
 import { HiOutlineCurrencyDollar } from "react-icons/hi";
 import { RiUserCommunityLine } from "react-icons/ri";
-import { TbWorldWww } from "react-icons/tb";
+import { TbAward, TbWorldWww } from "react-icons/tb";
 import useNomadLoginState from "../hooks/useNomadLoginState";
 
 const gatedRecommendationTitles = new Set([
@@ -25,7 +24,7 @@ const recommendationCards = [
     title: "World Ranking",
     description:
       "Best nomad destinations based on the world index which includes 50+ global factors.",
-    icon: SlBadge,
+    icon: TbAward,
     path: "/search/results",
   },
   {
