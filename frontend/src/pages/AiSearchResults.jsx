@@ -541,10 +541,10 @@ const AiSearchResults = () => {
                 <div className="relative z-10">
                   {shouldShowNarrative && (
                     <>
-                      <p className="text-sm font-medium leading-relaxed text-black/85 lg:text-[0.9rem] font-play">
+                      <p className="text-sm font-medium leading-relaxed text-primary-blue lg:text-[0.9rem] font-play">
                         {typedBottomHeading}
                       </p>
-                      <p className="mt-3 text-sm font-medium leading-relaxed text-black/85 lg:text-[0.9rem] font-play">
+                      <p className="mt-6 text-sm font-medium leading-relaxed text-black/85 lg:text-[0.9rem] font-play">
                         {typedResultsHeading}
                       </p>
                     </>
@@ -602,7 +602,7 @@ const AiSearchResults = () => {
                           </div>
                           <div>
                             <p className="text-[0.82rem] text-black/60 md:text-[0.9rem]">
-                              Find activation options
+                              Click to view options
                             </p>
                           </div>
                         </article>

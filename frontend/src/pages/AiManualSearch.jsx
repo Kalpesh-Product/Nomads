@@ -228,32 +228,50 @@ const AiManualSearch = () => {
     );
   };
 
-  const handleSearch = () => {
-    if (!hasAllSelections) return;
-
+  const navigateToSearchResults = ({ continent, country, location, count }) => {
     const formValues = {
-      continent: selectedContinent,
-      country: selectedCountry,
-      location: selectedLocation,
+      continent,
+      country,
+      location,
       category: "",
-      count: selectedCount,
+      count,
     };
 
     dispatch(setFormValues(formValues));
 
+    const badges = [
+      "Search Old School",
+      continentOptions.find((option) => option.value === continent)?.label,
+      countryOptions.find((option) => option.value === country)?.label,
+      locationOptions.find((option) => option.value === location)?.label,
+      countOptions.find((option) => option.value === count)?.label &&
+        `${countOptions.find((option) => option.value === count)?.label} Nomads`,
+    ].filter(Boolean);
+
     navigate(
-      `/ai-verticals?country=${encodeURIComponent(selectedCountry)}&location=${encodeURIComponent(selectedLocation)}`,
+      `/ai-verticals?country=${encodeURIComponent(country)}&location=${encodeURIComponent(location)}`,
       {
         state: {
           breadcrumbFilters: {
-            continent: selectedContinent,
-            country: selectedCountry,
-            location: selectedLocation,
+            continent,
+            country,
+            location,
           },
-          searchBarBadges,
+          searchBarBadges: badges,
         },
       },
     );
+  };
+
+  const handleSearch = () => {
+    if (!hasAllSelections) return;
+
+    navigateToSearchResults({
+      continent: selectedContinent,
+      country: selectedCountry,
+      location: selectedLocation,
+      count: selectedCount,
+    });
   };
 
   useEffect(() => {
@@ -456,6 +474,12 @@ const AiManualSearch = () => {
                   onSelect={(value) => {
                     setSelectedCount(value);
                     setOpenDropdown(null);
+                    navigateToSearchResults({
+                      continent: selectedContinent,
+                      country: selectedCountry,
+                      location: selectedLocation,
+                      count: value,
+                    });
                   }}
                   disabled={!selectedLocation}
                 />

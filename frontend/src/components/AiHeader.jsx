@@ -201,7 +201,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                   onClick={() => navigate(`/ai-login${location.search}`)}
                   className="rounded-full bg-black px-4 py-2 text-sm font-semibold text-white transition hover:bg-black/80 min-w-28"
                 >
-                  Log in
+                  Login
                 </button>
                 <button
                   type="button"

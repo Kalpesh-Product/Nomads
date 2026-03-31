@@ -18,12 +18,11 @@ import {
   HiOutlineLogout,
 } from "react-icons/hi";
 import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
-import { SlBadge } from "react-icons/sl";
 import { FaGlobeAmericas } from "react-icons/fa";
 import { MdOutlineWorkHistory } from "react-icons/md";
 import { HiOutlineCurrencyDollar } from "react-icons/hi";
 import { RiUserCommunityLine } from "react-icons/ri";
-import { TbWorldWww } from "react-icons/tb";
+import { TbAward, TbWorldWww } from "react-icons/tb";
 
 const gatedRecommendationLabels = new Set([
   "Work From Anywhere",
@@ -37,7 +36,7 @@ const recommendationItems = [
     label: "World Ranking",
     description:
       "Global suggestions for the best nomad destinations based on the world index which includes 50+ global factors.",
-    icon: SlBadge,
+    icon: TbAward,
     path: "/search/results",
   },
   {
@@ -86,17 +85,25 @@ const valueAdditionItems = [
   {
     label: "Apply for Job",
     icon: HiOutlineUserCircle,
-    badge: "Coming Soon",
+    badge: "Coming soon",
   },
 ];
 
 const becomeHostItem = [{ label: "Become A Host", icon: HiOutlineViewGrid }];
 
+const becomeContributorItem = [
+  {
+    label: "Become A Contributor",
+    icon: HiOutlineViewGrid,
+    path: "/become-a-contributor",
+  },
+];
+
 const loggedOutPrompt = {
   title: "Get responses tailored to you",
   description:
-    "Login to explore your nomad lifestyle and discover where you should live, work, and save more - powered by your preferences.",
-  actionLabel: "Log in",
+    "Login to explore your nomad lifestyle and discover where you should live, work, and save more.",
+  actionLabel: "Login",
 };
 
 const profileItems = [
@@ -250,6 +257,14 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     }
   };
 
+  const handleBecomeContributorClick = (item) => {
+    const params = new URLSearchParams(location.search);
+    navigate({
+      pathname: item.path,
+      search: params.toString() ? `?${params.toString()}` : "",
+    });
+  };
+
   const handleSignOutClick = () => {
     const nextSearchParams = new URLSearchParams(location.search);
     nextSearchParams.delete("login");
@@ -316,7 +331,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
       </div>
 
       <SidebarSection
-        title="Our Intelligence"
+        title="WoNo Intelligence"
         items={recommendationItems}
         collapsed={isCollapsed}
         isExpandable
@@ -349,6 +364,11 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
             onItemClick={handleBecomeHostClick}
           />
           <SidebarSection
+            items={becomeContributorItem}
+            collapsed={isCollapsed}
+            onItemClick={handleBecomeContributorClick}
+          />
+          <SidebarSection
             items={signOutItem}
             collapsed={isCollapsed}
             onItemClick={handleSignOutClick}
@@ -361,14 +381,22 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
             collapsed={isCollapsed}
             onItemClick={handleBecomeHostClick}
           />
+          <SidebarSection
+            items={becomeContributorItem}
+            collapsed={isCollapsed}
+            onItemClick={handleBecomeContributorClick}
+          />
           {!isCollapsed && (
             <div className="mt-auto px-4 pb-4 pt-10">
               <div className="rounded-[28px]   p-4 shadow-sm">
                 {/* <h3 className="text-[13px] font-semibold leading-tight text-black/90">
                   {loggedOutPrompt.title}
                 </h3> */}
-                <p className="mt-2 text-nano leading-5 text-black/55">
+                <p className="mt-2 text-nano leading-[0.9rem] text-black/55">
                   {loggedOutPrompt.description}
+                </p>
+                <p className=" text-nano leading-5 text-black/55">
+                  Powered by your preferences.
                 </p>
                 <button
                   type="button"

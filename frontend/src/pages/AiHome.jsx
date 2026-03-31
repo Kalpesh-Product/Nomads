@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { SlBadge } from "react-icons/sl";
 import { FaGlobeAmericas } from "react-icons/fa";
 import { MdOutlineWorkHistory } from "react-icons/md";
 import { HiOutlineCurrencyDollar } from "react-icons/hi";
 import { RiUserCommunityLine } from "react-icons/ri";
-import { TbWorldWww } from "react-icons/tb";
+import { TbAward, TbWorldWww } from "react-icons/tb";
 import useNomadLoginState from "../hooks/useNomadLoginState";
 
 const gatedRecommendationTitles = new Set([
@@ -25,7 +24,7 @@ const recommendationCards = [
     title: "World Ranking",
     description:
       "Best nomad destinations based on the world index which includes 50+ global factors.",
-    icon: SlBadge,
+    icon: TbAward,
     path: "/search/results",
   },
   {
@@ -74,12 +73,14 @@ const AiHome = () => {
   const [typedThirdLine, setTypedThirdLine] = useState("");
   const [typedFourthLine, setTypedFourthLine] = useState("");
 
+  const [areCardsVisible, setAreCardsVisible] = useState(false);
+
   const isLoggedIn = useNomadLoginState();
 
   const greetingText = isLoggedIn ? "hi Abrar" : "Meet Wono";
   const subheadingText = isLoggedIn
     ? "Please choose your goals from below so that we can help you design your accurate nomad lifestyle."
-    : "An intellegent platform for moden nomads";
+    : "An intellegent platform for moden nomads.";
   const thirdLineText = isLoggedIn
     ? ""
     : "Supporting the global community of remote workers, creators, entrepreneurs, hosts and investors who are redefining how the world lives and works.";
@@ -92,6 +93,7 @@ const AiHome = () => {
     setTypedSubheading("");
     setTypedThirdLine("");
     setTypedFourthLine("");
+    setAreCardsVisible(false);
 
     let greetingIndex = 0;
     let subheadingIndex = 0;
@@ -116,6 +118,7 @@ const AiHome = () => {
             clearInterval(subheadingInterval);
 
             if (!thirdLineText) {
+              setAreCardsVisible(true);
               return;
             }
 
@@ -127,6 +130,7 @@ const AiHome = () => {
                 clearInterval(thirdLineInterval);
 
                 if (!fourthLineText) {
+                  setAreCardsVisible(true);
                   return;
                 }
 
@@ -136,6 +140,7 @@ const AiHome = () => {
 
                   if (fourthLineIndex >= fourthLineText.length) {
                     clearInterval(fourthLineInterval);
+                    setAreCardsVisible(true);
                   }
                 }, 25);
 
@@ -146,6 +151,10 @@ const AiHome = () => {
             cleanupThirdLine = () => clearInterval(thirdLineInterval);
           }
         }, 25);
+
+        if (!subheadingText) {
+          setAreCardsVisible(true);
+        }
 
         cleanupSubheading = () => clearInterval(subheadingInterval);
       }
@@ -209,7 +218,11 @@ const AiHome = () => {
             </>
           ) : null}
 
-          <div className="mt-4 rounded-[40px] px-0 py-4 md:px-6 md:py-8">
+          <div
+            className={`mt-4 rounded-[40px] px-0 py-4 md:px-6 md:py-8 ${
+              areCardsVisible ? "visible" : "invisible"
+            }`}
+          >
             <div className="grid grid-cols-2 gap-4 md:grid-cols-2 md:gap-10 xl:grid-cols-3">
               {recommendationCards.map((card) => {
                 const Icon = card.icon;

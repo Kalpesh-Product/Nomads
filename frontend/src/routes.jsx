@@ -77,6 +77,7 @@ import AiOverallActivationSupport from "./pages/AiOverallActivationSupport";
 import AiNewCompanySetup from "./pages/AiNewCompanySetup";
 import AiConsultation from "./pages/AiConsultation";
 import AiManualSearch from "./pages/AiManualSearch";
+import AiBecomeContributor from "./pages/AiBecomeContributor";
 
 function getTenantFromHost() {
   const hostname = window.location.hostname; // e.g. "nomad.wono.co" or "nomad.localhost"
@@ -219,6 +220,10 @@ if (tenant === "main") {
               element: <AiNewCompanySetup />,
             },
             { path: "consultation", element: <AiConsultation /> },
+            {
+              path: "become-a-contributor",
+              element: <AiBecomeContributor />,
+            },
           ],
         },
       ],
