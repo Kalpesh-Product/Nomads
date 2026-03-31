@@ -195,15 +195,15 @@ const AiHome = () => {
           <h1 className="text-3xl font-medium text-black/90 font-play">
             {typedGreeting}
           </h1>
-          <h2 className="mt-10 text-sm font-semibold text-black/85 font-play sm:text-lg">
+          <h2 className="mt-4 text-sm font-semibold text-black/85 font-play sm:text-lg">
             {typedSubheading}
           </h2>
           {!isLoggedIn ? (
             <>
-              <p className="mt-3 text-sm sm:text-lg font-semibold text-black/85 font-play">
+              <p className="mt-4 text-sm sm:text-lg font-semibold text-black/85 font-play">
                 {typedThirdLine}
               </p>
-              <p className="mt-3 text-sm sm:text-lg font-semibold text-black/85 font-play">
+              <p className="mt-4 text-sm sm:text-lg font-semibold text-black/85 font-play">
                 {typedFourthLine}
               </p>
             </>
