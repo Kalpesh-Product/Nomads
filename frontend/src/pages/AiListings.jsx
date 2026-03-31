@@ -498,6 +498,9 @@ const AiListings = () => {
   const [mapOpen, setMapOpen] = useState(true);
   const isMobile = useMediaQuery("(max-width:767px)");
   const isTablet = useMediaQuery("(max-width:1023px)");
+  const isValueAddedServicesSelected =
+    formData?.category === VALUE_ADDED_SERVICES_CATEGORY;
+  const showDesktopMap = mapOpen && !isValueAddedServicesSelected;
   const selectedStateFromParams =
     searchParams.get("state") || searchParams.get("location") || "";
   const backLabel = selectedStateFromParams || formData?.location || "";
@@ -1023,7 +1026,7 @@ const AiListings = () => {
             exit={{ opacity: 0, x: -50 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className={`${
-              mapOpen ? "col-span-5" : "col-span-9"
+              showDesktopMap ? "col-span-5" : "col-span-9"
             } font-semibold text-lg`}
           >
             {formData?.category === VALUE_ADDED_SERVICES_CATEGORY ? (
@@ -1064,12 +1067,14 @@ const AiListings = () => {
                 // data={isLisitingLoading ? skeletonArray : sortedListings}
                 data={isLisitingLoading ? skeletonArray : filteredListings}
                 entriesPerPage={
-                  isMobile ? 10 : isTablet ? 9 : !mapOpen ? 10 : 9
+                  isMobile ? 10 : isTablet ? 9 : !showDesktopMap ? 10 : 9
                 }
                 persistPage={true}
                 resetPageKey={resetPageKey}
                 columns={`grid-cols-2 md:grid-cols-3 ${
-                  mapOpen ? "lg:grid-cols-3" : "lg:grid-cols-4 xl:grid-cols-5"
+                  showDesktopMap
+                    ? "lg:grid-cols-3"
+                    : "lg:grid-cols-4 xl:grid-cols-5"
                 } gap-4 md:gap-5`}
                 renderItem={(item, index) =>
                   isLisitingLoading ? (
@@ -1117,7 +1122,7 @@ const AiListings = () => {
 
           {/* MAP VIEW */}
           <AnimatePresence>
-            {mapOpen && (
+            {showDesktopMap && (
               <motion.div
                 key="map-view"
                 initial={{ opacity: 0, x: 50 }}
@@ -1141,36 +1146,40 @@ const AiListings = () => {
         </div>
       </Container>
 
-      <div className="lg:hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-[1000]">
-        <button
-          onClick={() =>
-            navigate(
-              `/verticals?country=${formData?.country}&location=${formData?.location}&view=map`,
-              {
-                state: { searchBarBadges },
-              },
-            )
-          }
-          className="bg-[#222222] text-white px-5 py-3 rounded-full flex items-center gap-2 shadow-xl hover:scale-105 transition-transform active:scale-95"
-        >
-          <span className="text-sm font-semibold tracking-wide">Show map</span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 32 32"
-            aria-hidden="true"
-            role="presentation"
-            focusable="false"
-            style={{
-              display: "block",
-              height: "16px",
-              width: "16px",
-              fill: "white",
-            }}
+      {!isValueAddedServicesSelected && (
+        <div className="lg:hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-[1000]">
+          <button
+            onClick={() =>
+              navigate(
+                `/verticals?country=${formData?.country}&location=${formData?.location}&view=map`,
+                {
+                  state: { searchBarBadges },
+                },
+              )
+            }
+            className="bg-[#222222] text-white px-5 py-3 rounded-full flex items-center gap-2 shadow-xl hover:scale-105 transition-transform active:scale-95"
           >
-            <path d="M31.25 3.75a2.29 2.29 0 0 0-1.01-1.44A2.29 2.29 0 0 0 28.5 2L21 3.67l-10-2L2.5 3.56A2.29 2.29 0 0 0 .7 5.8v21.95a2.28 2.28 0 0 0 1.06 1.94A2.29 2.29 0 0 0 3.5 30L11 28.33l10 2 8.49-1.89a2.29 2.29 0 0 0 1.8-2.24V4.25a2.3 2.3 0 0 0-.06-.5zM12.5 25.98l-1.51-.3L9.5 26H9.5V4.66l1.51-.33 1.49.3v21.34zm10 1.36-1.51.33-1.49-.3V6.02l1.51.3L22.5 6h.01v21.34z"></path>
-          </svg>
-        </button>
-      </div>
+            <span className="text-sm font-semibold tracking-wide">
+              Show map
+            </span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 32 32"
+              aria-hidden="true"
+              role="presentation"
+              focusable="false"
+              style={{
+                display: "block",
+                height: "16px",
+                width: "16px",
+                fill: "white",
+              }}
+            >
+              <path d="M31.25 3.75a2.29 2.29 0 0 0-1.01-1.44A2.29 2.29 0 0 0 28.5 2L21 3.67l-10-2L2.5 3.56A2.29 2.29 0 0 0 .7 5.8v21.95a2.28 2.28 0 0 0 1.06 1.94A2.29 2.29 0 0 0 3.5 30L11 28.33l10 2 8.49-1.89a2.29 2.29 0 0 0 1.8-2.24V4.25a2.3 2.3 0 0 0-.06-.5zM12.5 25.98l-1.51-.3L9.5 26H9.5V4.66l1.51-.33 1.49.3v21.34zm10 1.36-1.51.33-1.49-.3V6.02l1.51.3L22.5 6h.01v21.34z"></path>
+            </svg>
+          </button>
+        </div>
+      )}
     </div>
   );
 };
