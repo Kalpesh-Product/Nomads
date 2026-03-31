@@ -35,6 +35,8 @@ const continentOptions = [
 const destinationCards = aiDestinationCards;
 
 const INITIAL_VISIBLE_DESTINATIONS = 18;
+const TYPING_INTERVAL_MS = 8;
+const SELECTED_HEADING_TRANSITION_DELAY_MS = 1200;
 
 const goalNarrativeTopHeadingMap = {
   "World Ranking":
@@ -325,7 +327,7 @@ const AiSearchResults = () => {
         clearInterval(intervalId);
         onComplete?.();
       }
-    }, 25);
+    }, TYPING_INTERVAL_MS);
 
     return intervalId;
   }, []);
@@ -373,7 +375,7 @@ const AiSearchResults = () => {
               );
             },
           );
-        }, 4000);
+        }, SELECTED_HEADING_TRANSITION_DELAY_MS);
       },
     );
   }, [
