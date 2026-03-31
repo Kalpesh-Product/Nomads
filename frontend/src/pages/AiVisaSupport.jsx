@@ -3,12 +3,13 @@ import {
   Box,
   Button,
   InputBase,
-  ListSubheader,
   MenuItem,
   TextField,
   Typography,
 } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
+import { DatePicker } from "@mui/x-date-pickers";
+import dayjs from "dayjs";
 import { Country } from "country-state-city";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
@@ -21,21 +22,6 @@ const floatingLabelSx = {
   "&.MuiInputLabel-shrink": { color: "#1976d2" },
 };
 
-const visaSupportOptions = {
-  "Free Services": [
-    "Visa eligibility check",
-    "Required documents checklist",
-    "Processing timeline",
-    "Recommended visa type",
-    "Estimated approval chances",
-  ],
-  "Paid Services": [
-    "Visa Consultation (1-on-1 expert call / Personalized visa strategy / Country comparison)",
-    "Application Support (Form filling assistance / Document review / SOP / cover letter drafting)",
-    "End-to-End Visa Processing (Appointment booking / Submission tracking)",
-  ],
-};
-
 const defaultValues = {
   fullName: "",
   gender: "",
@@ -46,7 +32,7 @@ const defaultValues = {
   email: "",
   contactCode: "",
   contactNumber: "",
-  serviceRequired: "",
+  tentativeTravelDate: "",
   comments: "",
 };
 
@@ -179,13 +165,26 @@ const AiVisaSupport = () => {
                   name="dateOfBirth"
                   control={control}
                   render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
+                    <DatePicker
                       label="Date of Birth"
-                      variant="standard"
-                      type="date"
-                      InputLabelProps={{ shrink: true, sx: floatingLabelSx }}
+                      format="DD-MM-YYYY"
+                      value={field.value ? dayjs(field.value) : null}
+                      onChange={(value) =>
+                        field.onChange(
+                          value ? dayjs(value).format("YYYY-MM-DD") : "",
+                        )
+                      }
+                      slotProps={{
+                        textField: {
+                          fullWidth: true,
+                          variant: "standard",
+                          placeholder: "dd-mm-yyyy",
+                          InputLabelProps: {
+                            sx: floatingLabelSx,
+                            shrink: true,
+                          },
+                        },
+                      }}
                     />
                   )}
                 />
@@ -194,13 +193,26 @@ const AiVisaSupport = () => {
                   name="passportValidity"
                   control={control}
                   render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
+                    <DatePicker
                       label="Passport Validity (Expiry Date)"
-                      variant="standard"
-                      type="date"
-                      InputLabelProps={{ shrink: true, sx: floatingLabelSx }}
+                      format="DD-MM-YYYY"
+                      value={field.value ? dayjs(field.value) : null}
+                      onChange={(value) =>
+                        field.onChange(
+                          value ? dayjs(value).format("YYYY-MM-DD") : "",
+                        )
+                      }
+                      slotProps={{
+                        textField: {
+                          fullWidth: true,
+                          variant: "standard",
+                          placeholder: "dd-mm-yyyy",
+                          InputLabelProps: {
+                            sx: floatingLabelSx,
+                            shrink: true,
+                          },
+                        },
+                      }}
                     />
                   )}
                 />
@@ -327,38 +339,30 @@ const AiVisaSupport = () => {
                 </Box>
 
                 <Controller
-                  name="serviceRequired"
+                  name="tentativeTravelDate"
                   control={control}
                   render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label="Services Required"
-                      variant="standard"
-                      select
-                      InputLabelProps={{ sx: floatingLabelSx }}
-                    >
-                      <MenuItem value="">Select an option</MenuItem>
-                      {Object.entries(visaSupportOptions).map(
-                        ([category, options]) => [
-                          <ListSubheader
-                            key={`${category}-header`}
-                            disableSticky
-                            sx={{ color: "#111827", fontWeight: 600 }}
-                          >
-                            {category}
-                          </ListSubheader>,
-                          ...options.map((option) => (
-                            <MenuItem
-                              key={`${category}-${option}`}
-                              value={`${category} - ${option}`}
-                            >
-                              {option}
-                            </MenuItem>
-                          )),
-                        ],
-                      )}
-                    </TextField>
+                    <DatePicker
+                      label="Tentetive Travel Date"
+                      format="DD-MM-YYYY"
+                      value={field.value ? dayjs(field.value) : null}
+                      onChange={(value) =>
+                        field.onChange(
+                          value ? dayjs(value).format("YYYY-MM-DD") : "",
+                        )
+                      }
+                      slotProps={{
+                        textField: {
+                          fullWidth: true,
+                          variant: "standard",
+                          placeholder: "dd-mm-yyyy",
+                          InputLabelProps: {
+                            sx: floatingLabelSx,
+                            shrink: true,
+                          },
+                        },
+                      }}
+                    />
                   )}
                 />
 
@@ -372,7 +376,7 @@ const AiVisaSupport = () => {
                         fullWidth
                         multiline
                         minRows={4}
-                        label="Comments"
+                        label="Additional Comments"
                         variant="standard"
                         InputLabelProps={{ sx: floatingLabelSx }}
                       />
