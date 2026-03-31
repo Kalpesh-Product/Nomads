@@ -95,7 +95,7 @@ const becomeHostItem = [{ label: "Become A Host", icon: HiOutlineViewGrid }];
 const loggedOutPrompt = {
   title: "Get responses tailored to you",
   description:
-    "Log in to get answers based on saved chats, plus create images and upload files.",
+    "Login to explore your nomad lifestyle and discover where you should live, work, and save more - powered by your preferences.",
   actionLabel: "Log in",
 };
 
@@ -162,7 +162,7 @@ const SidebarSection = ({
                     <>
                       <span className="text-xs font-medium">{item.label}</span>
                       {item.badge && (
-                        <span className="ml-0 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.45 text-[7px] font-semibold tracking-wide text-red-400 shadow-sm">
+                        <span className="ml-0 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.45 text-[7px] font-semibold tracking-wide text-black shadow-sm">
                           {item.badge}
                         </span>
                       )}
@@ -364,9 +364,9 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
           {!isCollapsed && (
             <div className="mt-auto px-4 pb-4 pt-10">
               <div className="rounded-[28px]   p-4 shadow-sm">
-                <h3 className="text-[13px] font-semibold leading-tight text-black/90">
+                {/* <h3 className="text-[13px] font-semibold leading-tight text-black/90">
                   {loggedOutPrompt.title}
-                </h3>
+                </h3> */}
                 <p className="mt-2 text-nano leading-5 text-black/55">
                   {loggedOutPrompt.description}
                 </p>
