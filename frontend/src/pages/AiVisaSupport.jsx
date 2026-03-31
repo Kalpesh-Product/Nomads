@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
@@ -36,7 +36,14 @@ const defaultValues = {
   comments: "",
 };
 
+const VISA_SUPPORT_PROMPT =
+  "Tell us about your travel plans and we will help you navigate the visa process with confidence.";
+const VISA_SUPPORT_HEADING = "Visa Support";
+
 const AiVisaSupport = () => {
+  const [typedMessage, setTypedMessage] = useState("");
+  const [typedVisaHeading, setTypedVisaHeading] = useState("");
+  const [isFormVisible, setIsFormVisible] = useState(false);
   const navigate = useNavigate();
   const { control, handleSubmit, reset, setValue, watch } = useForm({
     defaultValues,
@@ -98,20 +105,65 @@ const AiVisaSupport = () => {
     });
   };
 
+  useEffect(() => {
+    setTypedMessage("");
+    setTypedVisaHeading("");
+    setIsFormVisible(false);
+
+    let messageIndex = 0;
+    let visaHeadingIndex = 0;
+    let cleanupHeading = () => {};
+
+    const typeVisaHeading = () => {
+      const headingInterval = setInterval(() => {
+        visaHeadingIndex += 1;
+        setTypedVisaHeading(VISA_SUPPORT_HEADING.slice(0, visaHeadingIndex));
+
+        if (visaHeadingIndex >= VISA_SUPPORT_HEADING.length) {
+          clearInterval(headingInterval);
+          setIsFormVisible(true);
+        }
+      }, 35);
+
+      cleanupHeading = () => clearInterval(headingInterval);
+    };
+
+    const messageInterval = setInterval(() => {
+      messageIndex += 1;
+      setTypedMessage(VISA_SUPPORT_PROMPT.slice(0, messageIndex));
+
+      if (messageIndex >= VISA_SUPPORT_PROMPT.length) {
+        clearInterval(messageInterval);
+        typeVisaHeading();
+      }
+    }, 25);
+
+    return () => {
+      clearInterval(messageInterval);
+      cleanupHeading();
+    };
+  }, []);
+
   return (
     <div className="bg-white text-black font-sans">
       <Container padding={false}>
         <section className="min-h-[85vh] flex items-center justify-center py-8">
-          <div className="w-full max-w-5xl md:px-20 lg:px-40">
+          <div className="w-full max-w-5xl md:px-20 lg:px-40 flex flex-col gap-6">
+            <p className="mx-auto min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1.2rem]">
+              {typedMessage}
+            </p>
+
+            <h1 className="text-hero min-h-[3rem] text-center font-play">
+              {typedVisaHeading}
+            </h1>
+
             <Box
               component="form"
               onSubmit={handleSubmit(handleFormSubmit)}
-              className="bg-white p-6 md:p-10 rounded-2xl "
+              className={`bg-white p-6 md:p-10 rounded-2xl ${
+                isFormVisible ? "visible" : "invisible"
+              }`}
             >
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold uppercase mb-8 text-center">
-                Visa Support
-              </h2>
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 <Controller
                   name="fullName"
