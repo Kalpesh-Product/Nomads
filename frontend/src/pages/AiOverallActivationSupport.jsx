@@ -23,13 +23,12 @@ const floatingLabelSx = {
   "&.MuiInputLabel-shrink": { color: "#1976d2" },
 };
 
-const supportOptions = [
-  "Visa Consultation",
-  "Immigration Consultation",
-  "Tax Consultation",
-  "Financial Consultation",
-  "Accommodation Consultation",
-  "Business Setup Consultation",
+const activationSupportOptions = [
+  "Visa & Immigration",
+  "Relocation Assistance",
+  "Accommodation Support",
+  "On-ground Activation",
+  "Compliance & Documentation",
   "Other",
 ];
 
@@ -39,7 +38,7 @@ const defaultValues = {
   dateOfBirth: "",
   passportValidity: "",
   nationalityOnPassport: "",
-  consultationCountry: "",
+  travelCountry: "",
   contactCode: "",
   contactNumber: "",
   supportRequired: "",
@@ -47,7 +46,7 @@ const defaultValues = {
   comments: "",
 };
 
-const AiConsultation = () => {
+const AiOverallActivationSupport = () => {
   const countries = useMemo(() => Country.getAllCountries(), []);
   const { control, handleSubmit, reset, setValue, watch } = useForm({
     defaultValues,
@@ -58,7 +57,7 @@ const AiConsultation = () => {
     mutationFn: async (data) => {
       const response = await axios.post("forms/add-new-b2c-form-submission", {
         ...data,
-        sheetName: "AI_Consultation",
+        sheetName: "AI_Overall_Activation_Support",
       });
       return response.data;
     },
@@ -97,7 +96,7 @@ const AiConsultation = () => {
               className="bg-gray-50/50 p-6 md:p-10 rounded-2xl border border-gray-100 shadow-sm"
             >
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold uppercase mb-8 text-center">
-                Consultation
+                Overall Activation Support
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
@@ -244,15 +243,15 @@ const AiConsultation = () => {
                 />
 
                 <Controller
-                  name="consultationCountry"
+                  name="travelCountry"
                   control={control}
-                  rules={{ required: "Consultation Country is required" }}
+                  rules={{ required: "Travel Country is required" }}
                   render={({ field, fieldState }) => (
                     <TextField
                       {...field}
                       fullWidth
                       select
-                      label="Consultation Country"
+                      label="Travel Country"
                       variant="standard"
                       required
                       error={!!fieldState.error}
@@ -358,7 +357,7 @@ const AiConsultation = () => {
                       <MenuItem value="" sx={{ fontWeight: 700 }}>
                         Select Support
                       </MenuItem>
-                      {supportOptions.map((option) => (
+                      {activationSupportOptions.map((option) => (
                         <MenuItem key={option} value={option}>
                           {option}
                         </MenuItem>
@@ -452,4 +451,4 @@ const AiConsultation = () => {
   );
 };
 
-export default AiConsultation;
+export default AiOverallActivationSupport;

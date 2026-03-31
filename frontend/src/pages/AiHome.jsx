@@ -24,7 +24,7 @@ const recommendationCards = [
   {
     title: "World Ranking",
     description:
-      "Global suggestions for the best nomad destinations based on the world index which includes 50+ global factors.",
+      "Best nomad destinations based on the world index which includes 50+ global factors.",
     icon: SlBadge,
     path: "/search/results",
   },
@@ -45,21 +45,21 @@ const recommendationCards = [
   {
     title: "Advance Your Career",
     description:
-      "Intellegent suggestions to help you find the most sutaible nomad destinations to advance your career.",
+      "Discover the most sutaible nomad destinations to advance your career.",
     icon: MdOutlineWorkHistory,
     path: "/search/results",
   },
   {
     title: "Find Your Community",
     description:
-      "Find like minded individuals & communities as per your preferances from nomad destinations.",
+      "Like minded individuals & communities as per your preferances in nomad destinations.",
     icon: RiUserCommunityLine,
     path: "/search/results",
   },
   {
     title: "Search Old School",
     description:
-      "Self search and find your ideal nomad destination as per your preferance like old times.",
+      "Self search & find ideal nomad destinations as per your preference like old times.",
     icon: TbWorldWww,
     path: "/manual-search",
   },
@@ -190,20 +190,20 @@ const AiHome = () => {
 
   return (
     <div className="flex min-h-[calc(100vh-100px)] flex-col bg-white">
-      <main className="flex-1 px-3 py-10 sm:px-6 lg:px-14">
+      <main className="flex-1 px-3 py-6 sm:px-6 lg:px-10">
         <div className="mx-auto max-w-5xl text-center">
           <h1 className="text-3xl font-medium text-black/90 font-play">
             {typedGreeting}
           </h1>
-          <h2 className="mt-4 text-sm font-semibold text-black/85 font-play sm:text-lg">
+          <h2 className="mt-5 text-sm font-medium text-black/85 font-play sm:text-lg">
             {typedSubheading}
           </h2>
           {!isLoggedIn ? (
             <>
-              <p className="mt-4 text-sm sm:text-lg font-semibold text-black/85 font-play">
+              <p className="mt-4 text-sm sm:text-lg font-medium text-black/85 font-play">
                 {typedThirdLine}
               </p>
-              <p className="mt-4 text-sm sm:text-lg font-semibold text-primary-blue font-play">
+              <p className="mt-4 text-sm sm:text-lg font-medium text-primary-blue font-play">
                 {typedFourthLine}
               </p>
             </>
