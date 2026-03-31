@@ -238,6 +238,14 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     navigate(`/ai-login${location.search}`);
   };
 
+  const handleBecomeHostClick = () => {
+    if (window.location.hostname.includes("localhost")) {
+      window.location.href = "http://hosts.localhost:5173";
+    } else {
+      window.location.href = "https://hosts.wono.co";
+    }
+  };
+
   const handleSignOutClick = () => {
     const nextSearchParams = new URLSearchParams(location.search);
     nextSearchParams.delete("login");
@@ -334,7 +342,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
           <SidebarSection
             items={becomeHostItem}
             collapsed={isCollapsed}
-            onItemClick={handleValueAdditionClick}
+            onItemClick={handleBecomeHostClick}
           />
           <SidebarSection
             items={signOutItem}
@@ -347,7 +355,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
           <SidebarSection
             items={becomeHostItem}
             collapsed={isCollapsed}
-            onItemClick={handleValueAdditionClick}
+            onItemClick={handleBecomeHostClick}
           />
           {!isCollapsed && (
             <div className="mt-auto px-4 pb-4 pt-10">
