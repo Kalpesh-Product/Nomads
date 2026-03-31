@@ -735,7 +735,7 @@ const AiGlobalListingsList = () => {
                                 handleValueAddedServiceClick(service)
                               }
                               disabled={isDisabled}
-                              className={`rounded-2xl bg-[#f1f1f3] px-4 py-6 min-h-[132px] flex flex-col items-center justify-center text-center transition-colors ${
+                              className={`rounded-3xl bg-[#f1f1f3] px-4 py-6 min-h-[132px] aspect-square flex flex-col items-center justify-center text-center transition-colors ${
                                 isDisabled
                                   ? "cursor-not-allowed opacity-80"
                                   : "hover:bg-[#e8e8ed]"
@@ -1068,7 +1068,7 @@ const AiGlobalListingsList = () => {
                                 handleValueAddedServiceClick(service)
                               }
                               disabled={isDisabled}
-                              className={`w-[calc(85%-0.5rem)] flex-shrink-0 snap-start rounded-2xl bg-[#f1f1f3] px-3 py-5 text-center min-h-[112px] transition-colors ${
+                              className={`w-[calc(85%-0.5rem)] flex-shrink-0 snap-start rounded-3xl bg-[#f1f1f3] px-3 py-5 text-center min-h-[112px] aspect-square flex flex-col items-center justify-center transition-colors ${
                                 isDisabled
                                   ? "cursor-not-allowed opacity-80"
                                   : "hover:bg-[#e8e8ed]"
@@ -1078,7 +1078,7 @@ const AiGlobalListingsList = () => {
                                 size={24}
                                 className="mx-auto text-black/80"
                               />
-                              <div className="mt-2 flex items-center justify-center gap-1.5">
+                              <div className="mt-2 flex flex-col items-center justify-center gap-1.5">
                                 <span className="text-nano font-bold uppercase text-black/90 leading-tight">
                                   {service.label}
                                 </span>
@@ -1105,7 +1105,7 @@ const AiGlobalListingsList = () => {
                                 handleValueAddedServiceClick(service)
                               }
                               disabled={isDisabled}
-                              className={`rounded-2xl bg-[#f1f1f3] px-3 py-5 text-center min-h-[112px] transition-colors ${
+                              className={`rounded-3xl bg-[#f1f1f3] px-3 py-5 text-center min-h-[112px] aspect-square flex flex-col items-center justify-center transition-colors ${
                                 isDisabled
                                   ? "cursor-not-allowed opacity-80"
                                   : "hover:bg-[#e8e8ed]"
@@ -1115,7 +1115,7 @@ const AiGlobalListingsList = () => {
                                 size={24}
                                 className="mx-auto text-black/80"
                               />
-                              <div className="mt-2 flex items-center justify-center gap-1.5">
+                              <div className="mt-2 flex flex-col items-center justify-center gap-1.5">
                                 <span className="text-nano font-bold uppercase text-black/90 leading-tight">
                                   {service.label}
                                 </span>
