@@ -430,6 +430,7 @@ const AiConsultation = () => {
                       py: 1.5,
                       fontSize: "1rem",
                       fontWeight: "600",
+                      textTransform: "none",
                       "&:hover": { bgcolor: "#333" },
                       width: { xs: "100%", md: "auto" },
                     }}
@@ -440,7 +441,7 @@ const AiConsultation = () => {
                         sx={{ color: "white", mr: 1 }}
                       />
                     )}
-                    {isPending ? "SUBMITTING..." : "SUBMIT"}
+                    {isPending ? "Submitting..." : "Submit"}
                   </Button>
                 </div>
               </div>
