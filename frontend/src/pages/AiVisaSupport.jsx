@@ -197,7 +197,7 @@ const AiVisaSupport = () => {
                     <TextField
                       {...field}
                       fullWidth
-                      label="Passport Validity"
+                      label="Passport Validity (Expiry Date)"
                       variant="standard"
                       type="date"
                       InputLabelProps={{ shrink: true, sx: floatingLabelSx }}
@@ -212,7 +212,7 @@ const AiVisaSupport = () => {
                     <TextField
                       {...field}
                       fullWidth
-                      label="Current City/Country of Residence"
+                      label="Nationality on Passport"
                       variant="standard"
                       select
                       InputLabelProps={{ sx: floatingLabelSx }}
@@ -240,7 +240,7 @@ const AiVisaSupport = () => {
                     <TextField
                       {...field}
                       fullWidth
-                      label="Destination"
+                      label="Travel Country"
                       variant="standard"
                       select
                       InputLabelProps={{ sx: floatingLabelSx }}
@@ -310,7 +310,7 @@ const AiVisaSupport = () => {
                         display: "block",
                       }}
                     >
-                      Contact
+                      Contact Number
                     </Typography>
                     <Controller
                       name="contactNumber"
