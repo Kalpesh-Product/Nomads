@@ -93,7 +93,7 @@ const AiNewCompanySetup = () => {
             <Box
               component="form"
               onSubmit={handleSubmit((data) => submitForm(data))}
-              className="bg-gray-50/50 p-6 md:p-10 rounded-2xl border border-gray-100 shadow-sm"
+              className="bg-white p-6 md:p-10 rounded-2xl "
             >
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold uppercase mb-8 text-center">
                 New Company Setup
@@ -366,7 +366,7 @@ const AiNewCompanySetup = () => {
                   )}
                 />
 
-                <Controller
+                {/* <Controller
                   name="tentativeTravelDate"
                   control={control}
                   render={({ field }) => (
@@ -397,7 +397,7 @@ const AiNewCompanySetup = () => {
                       }}
                     />
                   )}
-                />
+                /> */}
 
                 <div className="md:col-span-2">
                   <Controller
