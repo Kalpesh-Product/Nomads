@@ -24,7 +24,7 @@ const recommendationCards = [
   {
     title: "World Ranking",
     description:
-      "Global suggestions for the best nomad destinations based on the world index which includes 50+ global factors.",
+      "Best nomad destinations based on the world index which includes 50+ global factors.",
     icon: SlBadge,
     path: "/search/results",
   },
@@ -45,21 +45,21 @@ const recommendationCards = [
   {
     title: "Advance Your Career",
     description:
-      "Intellegent suggestions to help you find the most sutaible nomad destinations to advance your career.",
+      "Discover the most sutaible nomad destinations to advance your career.",
     icon: MdOutlineWorkHistory,
     path: "/search/results",
   },
   {
     title: "Find Your Community",
     description:
-      "Find like minded individuals & communities as per your preferances from nomad destinations.",
+      "Like minded individuals & communities as per your preferances in nomad destinations.",
     icon: RiUserCommunityLine,
     path: "/search/results",
   },
   {
     title: "Search Old School",
     description:
-      "Self search and find your ideal nomad destination as per your preferance like old times.",
+      "Self search & find ideal nomad destinations as per your preference like old times.",
     icon: TbWorldWww,
     path: "/manual-search",
   },
