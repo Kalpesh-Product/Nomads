@@ -256,7 +256,8 @@ const AiHome = () => {
       </main>
 
       <div className="sticky bottom-0 z-10  bg-white/95 py-6 text-center text-nano text-gray-600 backdrop-blur supports-[backdrop-filter]:bg-white/80">
-        WoNo AI can make mistakes. Check important info. See Cookie Preferences.
+        WoNo is in Beta and can make mistakes. Building the future of global
+        nomad living, one update at a time. See Cookie Preferences.
       </div>
     </div>
   );
