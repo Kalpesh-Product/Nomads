@@ -149,6 +149,7 @@ const AiOverallActivationSupport = () => {
                     <DatePicker
                       label="Date of Birth"
                       format="DD-MM-YYYY"
+                      enableAccessibleFieldDOMStructure={false}
                       value={field.value ? dayjs(field.value) : null}
                       onChange={(value) =>
                         field.onChange(
@@ -156,11 +157,14 @@ const AiOverallActivationSupport = () => {
                         )
                       }
                       slotProps={{
+                        field: {
+                          placeholder: "DD-MM-YYYY",
+                        },
                         textField: {
                           fullWidth: true,
                           variant: "standard",
-                          placeholder: "dd-mm-yyyy",
-                          inputProps: { placeholder: "dd-mm-yyyy" },
+                          placeholder: "DD-MM-YYYY",
+                          inputProps: { placeholder: "DD-MM-YYYY" },
                           InputLabelProps: {
                             sx: floatingLabelSx,
                             shrink: true,
@@ -178,6 +182,7 @@ const AiOverallActivationSupport = () => {
                     <DatePicker
                       label="Passport Validity (Expiry Date)"
                       format="DD-MM-YYYY"
+                      enableAccessibleFieldDOMStructure={false}
                       value={field.value ? dayjs(field.value) : null}
                       onChange={(value) =>
                         field.onChange(
@@ -185,11 +190,14 @@ const AiOverallActivationSupport = () => {
                         )
                       }
                       slotProps={{
+                        field: {
+                          placeholder: "DD-MM-YYYY",
+                        },
                         textField: {
                           fullWidth: true,
                           variant: "standard",
-                          placeholder: "dd-mm-yyyy",
-                          inputProps: { placeholder: "dd-mm-yyyy" },
+                          placeholder: "DD-MM-YYYY",
+                          inputProps: { placeholder: "DD-MM-YYYY" },
                           InputLabelProps: {
                             sx: floatingLabelSx,
                             shrink: true,
@@ -359,6 +367,7 @@ const AiOverallActivationSupport = () => {
                     <DatePicker
                       label="Tentative Travel Date"
                       format="DD-MM-YYYY"
+                      enableAccessibleFieldDOMStructure={false}
                       value={field.value ? dayjs(field.value) : null}
                       onChange={(value) =>
                         field.onChange(
@@ -366,11 +375,14 @@ const AiOverallActivationSupport = () => {
                         )
                       }
                       slotProps={{
+                        field: {
+                          placeholder: "DD-MM-YYYY",
+                        },
                         textField: {
                           fullWidth: true,
                           variant: "standard",
-                          placeholder: "dd-mm-yyyy",
-                          inputProps: { placeholder: "dd-mm-yyyy" },
+                          placeholder: "DD-MM-YYYY",
+                          inputProps: { placeholder: "DD-MM-YYYY" },
                           InputLabelProps: {
                             sx: floatingLabelSx,
                             shrink: true,
