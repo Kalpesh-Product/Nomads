@@ -26,6 +26,13 @@ import { Helmet } from "@dr.pogodin/react-helmet";
 import useAuth from "../hooks/useAuth.js";
 import { HiOutlineX } from "react-icons/hi";
 
+import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
+import {
+  HiOutlineCog,
+  HiOutlineKey,
+  HiOutlineUserCircle,
+} from "react-icons/hi";
+
 const HorizontalScrollWrapper = ({ children, title }) => {
   const scrollRef = React.useRef(null);
   const [showLeft, setShowLeft] = useState(false);
@@ -74,6 +81,26 @@ const HorizontalScrollWrapper = ({ children, title }) => {
     </div>
   );
 };
+
+const valueAddedServiceItems = [
+  { label: "VISA Support", icon: LuMapPinned, path: "/visa-support" },
+  {
+    label: "Overall Activation Support",
+    icon: HiOutlineKey,
+    path: "/overall-activation-support",
+  },
+  {
+    label: "New Company Setup",
+    icon: HiOutlineCog,
+    path: "/new-company-setup",
+  },
+  { label: "Consultation", icon: LuCircleDollarSign, path: "/consultation" },
+  {
+    label: "Apply for Job",
+    icon: HiOutlineUserCircle,
+    badge: "Coming soon",
+  },
+];
 
 const AiGlobalListingsList = () => {
   const [favorites, setFavorites] = useState([]);
@@ -408,6 +435,16 @@ const AiGlobalListingsList = () => {
     );
   };
 
+  const handleValueAddedServiceClick = (service) => {
+    if (!service.path) return;
+
+    const params = new URLSearchParams(location.search);
+    navigate({
+      pathname: service.path,
+      search: params.toString() ? `?${params.toString()}` : "",
+    });
+  };
+
   const prioritizedCompanies = ["BIZ Nest", "MeWo"];
   const sortedListings = [...(listingsData || [])].sort((a, b) => {
     const aIsPriority = prioritizedCompanies.includes(a.companyName);
@@ -681,6 +718,45 @@ const AiGlobalListingsList = () => {
                           </div>
                         );
                       })}
+                    <div className="col-span-full border-t border-gray-300 mt-6 pt-6 mb-6">
+                      <h2 className="text-subtitle font-semibold mb-5 text-secondary-dark">
+                        Value Added Services in {selectedLocationLabel}
+                      </h2>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                        {valueAddedServiceItems.map((service) => {
+                          const Icon = service.icon;
+                          const isDisabled = !service.path;
+
+                          return (
+                            <button
+                              key={service.label}
+                              type="button"
+                              onClick={() =>
+                                handleValueAddedServiceClick(service)
+                              }
+                              disabled={isDisabled}
+                              className={`rounded-2xl bg-[#f1f1f3] px-4 py-6 min-h-[132px] flex flex-col items-center justify-center text-center transition-colors ${
+                                isDisabled
+                                  ? "cursor-not-allowed opacity-80"
+                                  : "hover:bg-[#e8e8ed]"
+                              }`}
+                            >
+                              <Icon size={24} className="text-black/80" />
+                              <div className="mt-3 flex flex-col items-center gap-1.5 justify-center">
+                                <span className="text-xs font-bold uppercase text-black/90 leading-tight">
+                                  {service.label}
+                                </span>
+                                {service.badge && (
+                                  <span className="rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[9px] font-semibold normal-case text-black shadow-sm">
+                                    {service.badge}
+                                  </span>
+                                )}
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </>
                 ) : (
                   <div className="col-span-full text-center text-sm text-gray-500 border border-dotted rounded-lg p-4">
@@ -871,109 +947,153 @@ const AiGlobalListingsList = () => {
                   ))
                 ) : groupedListings &&
                   Object.keys(groupedListings).length > 0 ? (
-                  Object.entries(groupedListings)
-                    .sort(([typeA], [typeB]) => {
-                      const typeOrder = [
-                        "coworking",
-                        "hostel",
-                        "workation",
-                        "privatestay",
-                        "coliving",
-                        "meetingroom",
-                        "cafe",
-                      ];
-                      const indexA = typeOrder.indexOf(typeA);
-                      const indexB = typeOrder.indexOf(typeB);
-                      return (
-                        (indexA === -1 ? 999 : indexA) -
-                        (indexB === -1 ? 999 : indexB)
-                      );
-                    })
-                    .map(([type, items]) => {
-                      const prioritizedCompanies = ["BIZ Nest", "MeWo"];
-                      const sortedItems = [...items].sort((a, b) => {
-                        const aPriorityIndex = prioritizedCompanies.indexOf(
-                          a.companyName,
+                  <>
+                    {Object.entries(groupedListings)
+                      .sort(([typeA], [typeB]) => {
+                        const typeOrder = [
+                          "coworking",
+                          "hostel",
+                          "workation",
+                          "privatestay",
+                          "coliving",
+                          "meetingroom",
+                          "cafe",
+                        ];
+                        const indexA = typeOrder.indexOf(typeA);
+                        const indexB = typeOrder.indexOf(typeB);
+                        return (
+                          (indexA === -1 ? 999 : indexA) -
+                          (indexB === -1 ? 999 : indexB)
                         );
-                        const bPriorityIndex = prioritizedCompanies.indexOf(
-                          b.companyName,
-                        );
-                        if (aPriorityIndex !== -1 && bPriorityIndex !== -1) {
-                          return aPriorityIndex - bPriorityIndex;
-                        }
-                        if (aPriorityIndex !== -1) return -1;
-                        if (bPriorityIndex !== -1) return 1;
-                        const aRating = Number(a.ratings || 0);
-                        const bRating = Number(b.ratings || 0);
-                        return bRating - aRating;
-                      });
+                      })
+                      .map(([type, items]) => {
+                        const prioritizedCompanies = ["BIZ Nest", "MeWo"];
+                        const sortedItems = [...items].sort((a, b) => {
+                          const aPriorityIndex = prioritizedCompanies.indexOf(
+                            a.companyName,
+                          );
+                          const bPriorityIndex = prioritizedCompanies.indexOf(
+                            b.companyName,
+                          );
+                          if (aPriorityIndex !== -1 && bPriorityIndex !== -1) {
+                            return aPriorityIndex - bPriorityIndex;
+                          }
+                          if (aPriorityIndex !== -1) return -1;
+                          if (bPriorityIndex !== -1) return 1;
+                          const aRating = Number(a.ratings || 0);
+                          const bRating = Number(b.ratings || 0);
+                          return bRating - aRating;
+                        });
 
-                      const displayItems = sortedItems;
-                      const hasMore = displayItems.length > 5;
-                      const itemsToShow = hasMore
-                        ? displayItems.slice(0, 5)
-                        : displayItems;
+                        const displayItems = sortedItems;
+                        const hasMore = displayItems.length > 5;
+                        const itemsToShow = hasMore
+                          ? displayItems.slice(0, 5)
+                          : displayItems;
 
-                      const sectionTitle = `Popular ${typeLabels[type] || typeLabels.default(type)} in ${selectedLocationLabel}`;
+                        const sectionTitle = `Popular ${typeLabels[type] || typeLabels.default(type)} in ${selectedLocationLabel}`;
 
-                      return (
-                        <HorizontalScrollWrapper
-                          key={type}
-                          title={sectionTitle}
-                        >
-                          {itemsToShow.map((item) => (
-                            <div
-                              key={item._id}
-                              className="w-[calc(85%-0.5rem)] md:w-[calc(33.33%-1rem)] lg:w-[calc(20%-1.5rem)] flex-shrink-0 snap-start"
-                            >
-                              <ListingCard
-                                item={item}
-                                showVertical={false}
-                                handleNavigation={() =>
-                                  navigate(
-                                    `/ai-listings/${encodeURIComponent(item.companyName)}`,
-                                    {
-                                      state: {
-                                        companyId: item.companyId,
-                                        type: item.companyType,
-                                      },
-                                    },
-                                  )
-                                }
-                              />
-                            </div>
-                          ))}
-                          {hasMore && (
-                            <div className="w-[calc(85%-0.5rem)] md:w-[calc(33.33%-1rem)] lg:w-[calc(20%-1.5rem)] flex-shrink-0 snap-start">
-                              <button
-                                onClick={() => handleCategoryClick(type)}
-                                className="w-full aspect-square border-2 border-gray-100 rounded-3xl flex flex-col items-center justify-start pt-12 gap-3 hover:border-primary-blue hover:shadow-md transition-all bg-gray-50/30 group"
+                        return (
+                          <HorizontalScrollWrapper
+                            key={type}
+                            title={sectionTitle}
+                          >
+                            {itemsToShow.map((item) => (
+                              <div
+                                key={item._id}
+                                className="w-[calc(85%-0.5rem)] md:w-[calc(33.33%-1rem)] lg:w-[calc(20%-1.5rem)] flex-shrink-0 snap-start"
                               >
-                                <div className="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-gray-100 transition-colors">
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    strokeWidth={2}
-                                    stroke="currentColor"
-                                    className="w-8 h-8 text-gray-400 group-hover:text-gray-600"
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                                    />
-                                  </svg>
-                                </div>
-                                <span className="text-lg font-medium text-gray-600 group-hover:text-gray-900">
-                                  View All
+                                <ListingCard
+                                  item={item}
+                                  showVertical={false}
+                                  handleNavigation={() =>
+                                    navigate(
+                                      `/ai-listings/${encodeURIComponent(item.companyName)}`,
+                                      {
+                                        state: {
+                                          companyId: item.companyId,
+                                          type: item.companyType,
+                                        },
+                                      },
+                                    )
+                                  }
+                                />
+                              </div>
+                            ))}
+                            {hasMore && (
+                              <div className="w-[calc(85%-0.5rem)] md:w-[calc(33.33%-1rem)] lg:w-[calc(20%-1.5rem)] flex-shrink-0 snap-start">
+                                <button
+                                  onClick={() => handleCategoryClick(type)}
+                                  className="w-full aspect-square border-2 border-gray-100 rounded-3xl flex flex-col items-center justify-start pt-12 gap-3 hover:border-primary-blue hover:shadow-md transition-all bg-gray-50/30 group"
+                                >
+                                  <div className="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-gray-100 transition-colors">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      strokeWidth={2}
+                                      stroke="currentColor"
+                                      className="w-8 h-8 text-gray-400 group-hover:text-gray-600"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                                      />
+                                    </svg>
+                                  </div>
+                                  <span className="text-lg font-medium text-gray-600 group-hover:text-gray-900">
+                                    View All
+                                  </span>
+                                </button>
+                              </div>
+                            )}
+                          </HorizontalScrollWrapper>
+                        );
+                      })}
+                    <div className="mb-6">
+                      <h2 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold leading-tight mb-4">
+                        Value Added Services in {selectedLocationLabel}
+                      </h2>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {valueAddedServiceItems.map((service) => {
+                          const Icon = service.icon;
+                          const isDisabled = !service.path;
+
+                          return (
+                            <button
+                              key={service.label}
+                              type="button"
+                              onClick={() =>
+                                handleValueAddedServiceClick(service)
+                              }
+                              disabled={isDisabled}
+                              className={`rounded-2xl bg-[#f1f1f3] px-3 py-5 text-center min-h-[112px] transition-colors ${
+                                isDisabled
+                                  ? "cursor-not-allowed opacity-80"
+                                  : "hover:bg-[#e8e8ed]"
+                              }`}
+                            >
+                              <Icon
+                                size={24}
+                                className="mx-auto text-black/80"
+                              />
+                              <div className="mt-2 flex items-center justify-center gap-1.5">
+                                <span className="text-nano font-bold uppercase text-black/90 leading-tight">
+                                  {service.label}
                                 </span>
-                              </button>
-                            </div>
-                          )}
-                        </HorizontalScrollWrapper>
-                      );
-                    })
+                                {service.badge && (
+                                  <span className="rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[8px] font-semibold normal-case text-black shadow-sm">
+                                    {service.badge}
+                                  </span>
+                                )}
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </>
                 ) : (
                   <div className="col-span-full text-center text-sm text-gray-500 border border-dotted rounded-lg p-4">
                     No listings found.
