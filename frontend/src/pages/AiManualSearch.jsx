@@ -22,6 +22,8 @@ const countOptions = [
   { label: "25+", value: "25+" },
 ];
 
+const TYPING_INTERVAL_MS = 8;
+
 const DropdownBadge = ({
   label,
   options,
@@ -100,6 +102,8 @@ const AiManualSearch = () => {
   const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [selectedCount, setSelectedCount] = useState("");
+  const [typedTopHeading, setTypedTopHeading] = useState("");
+  const [typedBottomHeading, setTypedBottomHeading] = useState("");
 
   const user = auth?.user || {};
 
@@ -196,12 +200,22 @@ const AiManualSearch = () => {
     countOptions.find((option) => option.value === selectedCount)?.label ||
     "Count";
 
+  const topTypingIntervalRef = useRef(null);
+  const bottomTypingIntervalRef = useRef(null);
+
   const hasAllSelections = Boolean(
     selectedContinent && selectedCountry && selectedLocation && selectedCount,
   );
+  const initialTopHeadingText =
+    "Please select one option from each below so that I can display the best curated results.";
+  const selectedTopHeadingText =
+    "Curating the best results for you. Click on Search to continue.";
+  const selectedBottomHeadingText = hasAllSelections
+    ? `You are about to view ${countLabel} nomad destination options in ${locationLabel}, ${countryLabel}, ${continentLabel}. Click search to continue.`
+    : "";
 
   const searchBarBadges = [
-    "Manual Search",
+    "Search Old School",
     selectedContinent && continentLabel,
     selectedCountry && countryLabel,
     selectedLocation && locationLabel,
@@ -256,6 +270,73 @@ const AiManualSearch = () => {
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
 
+  useEffect(() => {
+    const clearTypingAnimations = () => {
+      if (topTypingIntervalRef.current) {
+        clearInterval(topTypingIntervalRef.current);
+        topTypingIntervalRef.current = null;
+      }
+
+      if (bottomTypingIntervalRef.current) {
+        clearInterval(bottomTypingIntervalRef.current);
+        bottomTypingIntervalRef.current = null;
+      }
+    };
+
+    const animateTypedText = (text, setText, onComplete) => {
+      setText("");
+
+      if (!text) {
+        onComplete?.();
+        return null;
+      }
+
+      let currentIndex = 0;
+
+      const intervalId = setInterval(() => {
+        currentIndex += 1;
+        setText(text.slice(0, currentIndex));
+
+        if (currentIndex >= text.length) {
+          clearInterval(intervalId);
+          onComplete?.();
+        }
+      }, TYPING_INTERVAL_MS);
+
+      return intervalId;
+    };
+
+    clearTypingAnimations();
+
+    if (hasAllSelections) {
+      topTypingIntervalRef.current = animateTypedText(
+        selectedTopHeadingText,
+        setTypedTopHeading,
+        () => {
+          bottomTypingIntervalRef.current = animateTypedText(
+            selectedBottomHeadingText,
+            setTypedBottomHeading,
+          );
+        },
+      );
+    } else {
+      setTypedBottomHeading("");
+      topTypingIntervalRef.current = animateTypedText(
+        initialTopHeadingText,
+        setTypedTopHeading,
+      );
+    }
+
+    return () => {
+      clearTypingAnimations();
+    };
+  }, [
+    hasAllSelections,
+    initialTopHeadingText,
+    selectedBottomHeadingText,
+    selectedTopHeadingText,
+  ]);
+
   return (
     <div className="min-h-full bg-white">
       <main className="pb-8">
@@ -270,6 +351,12 @@ const AiManualSearch = () => {
               >
                 <HiOutlineArrowLeft size={18} />
               </button>
+            </div>
+
+            <div className="mt-6 mb-6 lg:ml-[6.25rem] lg:mr-36">
+              <p className="text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
+                {typedTopHeading}
+              </p>
             </div>
 
             <div className="mt-4 flex max-w-4xl items-center rounded-[30px] border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] lg:ml-[6.25rem] lg:mr-36">
@@ -385,6 +472,13 @@ const AiManualSearch = () => {
                   filters and click search.
                 </div>
               </div> */}
+              {/* {typedBottomHeading && (
+                <div className="relative mt-8">
+                  <p className="text-sm font-medium leading-relaxed text-black/85 lg:text-[0.9rem] font-play">
+                    {typedBottomHeading}
+                  </p>
+                </div>
+              )} */}
             </div>
           </div>
         </div>
