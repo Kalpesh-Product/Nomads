@@ -203,7 +203,7 @@ const AiHome = () => {
               <p className="mt-4 text-sm sm:text-lg font-semibold text-black/85 font-play">
                 {typedThirdLine}
               </p>
-              <p className="mt-4 text-sm sm:text-lg font-semibold text-black/85 font-play">
+              <p className="mt-4 text-sm sm:text-lg font-semibold text-primary-blue font-play">
                 {typedFourthLine}
               </p>
             </>
