@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
@@ -13,9 +13,10 @@ import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import { useMutation } from "@tanstack/react-query";
 import { Country } from "country-state-city";
+import Swal from "sweetalert2";
 import Container from "../components/Container";
 import axios from "../utils/axios";
-import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
+import { showErrorAlert } from "../utils/alerts";
 
 const floatingLabelSx = {
   color: "black",
@@ -46,7 +47,14 @@ const defaultValues = {
   comments: "",
 };
 
+const OVERALL_ACTIVATION_PROMPT =
+  "Tell us what kind of on-ground activation help you need, and our team will guide you end-to-end.";
+const OVERALL_ACTIVATION_HEADING = "Overall Activation Support";
+
 const AiOverallActivationSupport = () => {
+  const [typedMessage, setTypedMessage] = useState("");
+  const [typedPageHeading, setTypedPageHeading] = useState("");
+  const [isFormVisible, setIsFormVisible] = useState(false);
   const countries = useMemo(() => Country.getAllCountries(), []);
   const { control, handleSubmit, reset, setValue, watch } = useForm({
     defaultValues,
@@ -61,8 +69,14 @@ const AiOverallActivationSupport = () => {
       });
       return response.data;
     },
-    onSuccess: () => {
-      showSuccessAlert("Form submitted successfully");
+    onSuccess: async () => {
+      await Swal.fire({
+        title: "Request Submitted!",
+        text: "Your form has been submitted. We will get back to you shortly.",
+        icon: "success",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#0BA9EF",
+      });
       reset(defaultValues);
     },
     onError: (error) => {
@@ -85,20 +99,65 @@ const AiOverallActivationSupport = () => {
     });
   };
 
+  useEffect(() => {
+    setTypedMessage("");
+    setTypedPageHeading("");
+    setIsFormVisible(false);
+
+    let messageIndex = 0;
+    let headingIndex = 0;
+    let cleanupHeading = () => {};
+
+    const typeHeading = () => {
+      const headingInterval = setInterval(() => {
+        headingIndex += 1;
+        setTypedPageHeading(OVERALL_ACTIVATION_HEADING.slice(0, headingIndex));
+
+        if (headingIndex >= OVERALL_ACTIVATION_HEADING.length) {
+          clearInterval(headingInterval);
+          setIsFormVisible(true);
+        }
+      }, 35);
+
+      cleanupHeading = () => clearInterval(headingInterval);
+    };
+
+    const messageInterval = setInterval(() => {
+      messageIndex += 1;
+      setTypedMessage(OVERALL_ACTIVATION_PROMPT.slice(0, messageIndex));
+
+      if (messageIndex >= OVERALL_ACTIVATION_PROMPT.length) {
+        clearInterval(messageInterval);
+        typeHeading();
+      }
+    }, 25);
+
+    return () => {
+      clearInterval(messageInterval);
+      cleanupHeading();
+    };
+  }, []);
+
   return (
     <div className="bg-white text-black font-sans">
       <Container padding={false}>
         <section className="min-h-[85vh] flex items-center justify-center py-8">
           <div className="w-full max-w-5xl md:px-20 lg:px-40">
+            <div className="mx-auto mb-8 flex w-full max-w-4xl flex-col items-center gap-4 px-6">
+              <p className="min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1.2rem]">
+                {typedMessage}
+              </p>
+              <h1 className="text-hero min-h-[3rem] text-center font-play">
+                {typedPageHeading}
+              </h1>
+            </div>
             <Box
               component="form"
               onSubmit={handleSubmit((data) => submitForm(data))}
-              className="bg-white p-6 md:p-10 rounded-2xl "
+              className={`bg-white p-6 md:p-10 rounded-2xl ${
+                isFormVisible ? "visible" : "invisible"
+              }`}
             >
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold uppercase mb-8 text-center">
-                Overall Activation Support
-              </h2>
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 <Controller
                   name="fullName"
