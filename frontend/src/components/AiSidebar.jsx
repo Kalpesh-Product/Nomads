@@ -91,6 +91,14 @@ const valueAdditionItems = [
 
 const becomeHostItem = [{ label: "Become A Host", icon: HiOutlineViewGrid }];
 
+const becomeContributorItem = [
+  {
+    label: "Become A Contributor",
+    icon: HiOutlineViewGrid,
+    path: "/become-a-contributor",
+  },
+];
+
 const loggedOutPrompt = {
   title: "Get responses tailored to you",
   description:
@@ -249,6 +257,14 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     }
   };
 
+  const handleBecomeContributorClick = (item) => {
+    const params = new URLSearchParams(location.search);
+    navigate({
+      pathname: item.path,
+      search: params.toString() ? `?${params.toString()}` : "",
+    });
+  };
+
   const handleSignOutClick = () => {
     const nextSearchParams = new URLSearchParams(location.search);
     nextSearchParams.delete("login");
@@ -348,6 +364,11 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
             onItemClick={handleBecomeHostClick}
           />
           <SidebarSection
+            items={becomeContributorItem}
+            collapsed={isCollapsed}
+            onItemClick={handleBecomeContributorClick}
+          />
+          <SidebarSection
             items={signOutItem}
             collapsed={isCollapsed}
             onItemClick={handleSignOutClick}
@@ -359,6 +380,11 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
             items={becomeHostItem}
             collapsed={isCollapsed}
             onItemClick={handleBecomeHostClick}
+          />
+          <SidebarSection
+            items={becomeContributorItem}
+            collapsed={isCollapsed}
+            onItemClick={handleBecomeContributorClick}
           />
           {!isCollapsed && (
             <div className="mt-auto px-4 pb-4 pt-10">
