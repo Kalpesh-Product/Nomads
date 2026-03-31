@@ -230,7 +230,9 @@ const AiOverallActivationSupport = () => {
                         )
                       }
                     >
-                      <MenuItem value="">Select Country</MenuItem>
+                      <MenuItem value="" sx={{ fontWeight: 700 }}>
+                        Select Country
+                      </MenuItem>
                       {countries.map((country) => (
                         <MenuItem key={country.isoCode} value={country.name}>
                           {country.name}
@@ -256,7 +258,9 @@ const AiOverallActivationSupport = () => {
                       helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
                     >
-                      <MenuItem value="">Select Country</MenuItem>
+                      <MenuItem value="" sx={{ fontWeight: 700 }}>
+                        Select Country
+                      </MenuItem>
                       {countries.map((country) => (
                         <MenuItem key={country.isoCode} value={country.name}>
                           {country.name}
@@ -350,7 +354,9 @@ const AiOverallActivationSupport = () => {
                       helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
                     >
-                      <MenuItem value="">Select Support</MenuItem>
+                      <MenuItem value="" sx={{ fontWeight: 700 }}>
+                        Select Support
+                      </MenuItem>
                       {activationSupportOptions.map((option) => (
                         <MenuItem key={option} value={option}>
                           {option}

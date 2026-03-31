@@ -245,7 +245,9 @@ const AiVisaSupport = () => {
                         )
                       }
                     >
-                      <MenuItem value="">Select Country</MenuItem>
+                      <MenuItem value="" sx={{ fontWeight: 700 }}>
+                        Select Country
+                      </MenuItem>
                       {countries.map((country) => (
                         <MenuItem key={country.isoCode} value={country.name}>
                           {country.name}
@@ -268,7 +270,9 @@ const AiVisaSupport = () => {
                       InputLabelProps={{ sx: floatingLabelSx }}
                       onChange={(event) => field.onChange(event.target.value)}
                     >
-                      <MenuItem value="">Select State</MenuItem>
+                      <MenuItem value="" sx={{ fontWeight: 700 }}>
+                        Select Location
+                      </MenuItem>
                       {destinationOptions.map((destinationOption) => (
                         <MenuItem
                           key={`${destinationOption.state}-${destinationOption.country}`}
