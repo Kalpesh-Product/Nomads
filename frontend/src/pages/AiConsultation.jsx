@@ -1,5 +1,5 @@
 import React from "react";
-import AiValueAdditionForm from "./AiValueAdditionForm";
+import AiServiceSupportForm from "./AiServiceSupportForm";
 
 const consultationOptions = [
   "Visa Consultation",
@@ -7,21 +7,17 @@ const consultationOptions = [
   "Tax Consultation",
   "Financial Consultation",
   "Accommodation Consultation",
-  "Lifestyle Consultation",
-  "Business registration Consultation",
-  "Compliance & regulatory",
-  "Terms & conditions Consultation",
-  "Privacy policies Consultation",
-  "Visa renewal & extension Consultation",
-  "Personalised",
+  "Business Setup Consultation",
+  "Other",
 ];
 
 const AiConsultation = () => (
-  <AiValueAdditionForm
+  <AiServiceSupportForm
     title="Consultation"
-    selectLabel="Consultation Required"
-    selectFieldName="consultationRequired"
-    options={consultationOptions}
+    countryLabel="Consultation Country"
+    countryFieldName="consultationCountry"
+    supportFieldName="supportRequired"
+    supportOptions={consultationOptions}
     sheetName="AI_Consultation"
   />
 );

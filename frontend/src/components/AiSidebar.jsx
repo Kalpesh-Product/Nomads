@@ -75,9 +75,13 @@ const valueAdditionItems = [
   {
     label: "Overall Activation Support",
     icon: HiOutlineKey,
-    path: "/help-you-get-activated",
+    path: "/overall-activation-support",
   },
-  { label: "New Company Setup", icon: HiOutlineCog },
+  {
+    label: "New Company Setup",
+    icon: HiOutlineCog,
+    path: "/new-company-setup",
+  },
   { label: "Consultation", icon: LuCircleDollarSign, path: "/consultation" },
   {
     label: "Apply for Job",

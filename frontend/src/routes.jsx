@@ -73,7 +73,8 @@ import AiLogin from "./pages/AiLogin";
 import AiSignup from "./pages/AiSignup";
 import AiVisaSupport from "./pages/AiVisaSupport";
 import AiVisaSupportThankYou from "./pages/AiVisaSupportThankYou";
-import AiHelpGetActivated from "./pages/AiHelpGetActivated";
+import AiOverallActivationSupport from "./pages/AiOverallActivationSupport";
+import AiNewCompanySetup from "./pages/AiNewCompanySetup";
 import AiConsultation from "./pages/AiConsultation";
 import AiManualSearch from "./pages/AiManualSearch";
 
@@ -210,8 +211,12 @@ if (tenant === "main") {
               element: <AiVisaSupportThankYou />,
             },
             {
-              path: "help-you-get-activated",
-              element: <AiHelpGetActivated />,
+              path: "overall-activation-support",
+              element: <AiOverallActivationSupport />,
+            },
+            {
+              path: "new-company-setup",
+              element: <AiNewCompanySetup />,
             },
             { path: "consultation", element: <AiConsultation /> },
           ],
