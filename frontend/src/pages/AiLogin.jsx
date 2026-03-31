@@ -9,6 +9,20 @@ import AiPrimaryButton from "../components/AiPrimaryButton";
 const LOGIN_PROMPT =
   "Log in to unlock all features and get the most out of your Nomad experience.";
 
+const LOGIN_HEADING = "Login";
+
+const toSentenceCase = (value = "") => {
+  const trimmedValue = value.trim();
+
+  if (!trimmedValue) {
+    return "";
+  }
+
+  return `${trimmedValue.charAt(0).toUpperCase()}${trimmedValue
+    .slice(1)
+    .toLowerCase()}`;
+};
+
 export default function AiLogin() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -16,6 +30,8 @@ export default function AiLogin() {
   const [typedHeading, setTypedHeading] = useState("");
   const [typedDescription, setTypedDescription] = useState("");
   const [typedMessage, setTypedMessage] = useState("");
+  const [typedLoginHeading, setTypedLoginHeading] = useState("");
+  const [isFormVisible, setIsFormVisible] = useState(false);
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
   const loginContext = useMemo(() => {
@@ -43,13 +59,29 @@ export default function AiLogin() {
     setTypedHeading("");
     setTypedDescription("");
     setTypedMessage("");
+    setTypedLoginHeading("");
+    setIsFormVisible(false);
 
-    let headingIndex = 0;
     let descriptionIndex = 0;
     let messageIndex = 0;
-    let cleanupHeading = () => {};
+    let loginHeadingIndex = 0;
     let cleanupDescription = () => {};
     let cleanupMessage = () => {};
+    let cleanupLoginHeading = () => {};
+
+    const typeLoginHeading = () => {
+      const loginHeadingInterval = setInterval(() => {
+        loginHeadingIndex += 1;
+        setTypedLoginHeading(LOGIN_HEADING.slice(0, loginHeadingIndex));
+
+        if (loginHeadingIndex >= LOGIN_HEADING.length) {
+          clearInterval(loginHeadingInterval);
+          setIsFormVisible(true);
+        }
+      }, 35);
+
+      cleanupLoginHeading = () => clearInterval(loginHeadingInterval);
+    };
 
     const typeLoginPrompt = () => {
       const messageInterval = setInterval(() => {
@@ -58,6 +90,7 @@ export default function AiLogin() {
 
         if (messageIndex >= LOGIN_PROMPT.length) {
           clearInterval(messageInterval);
+          typeLoginHeading();
         }
       }, 25);
 
@@ -69,38 +102,27 @@ export default function AiLogin() {
 
       return () => {
         cleanupMessage();
+        cleanupLoginHeading();
       };
     }
 
-    const headingInterval = setInterval(() => {
-      headingIndex += 1;
-      setTypedHeading(loginContext.title.slice(0, headingIndex));
+    setTypedHeading(toSentenceCase(loginContext.title));
+    const descriptionInterval = setInterval(() => {
+      descriptionIndex += 1;
+      setTypedDescription(loginContext.description.slice(0, descriptionIndex));
 
-      if (headingIndex >= loginContext.title.length) {
-        clearInterval(headingInterval);
-
-        const descriptionInterval = setInterval(() => {
-          descriptionIndex += 1;
-          setTypedDescription(
-            loginContext.description.slice(0, descriptionIndex),
-          );
-
-          if (descriptionIndex >= loginContext.description.length) {
-            clearInterval(descriptionInterval);
-            typeLoginPrompt();
-          }
-        }, 25);
-
-        cleanupDescription = () => clearInterval(descriptionInterval);
+      if (descriptionIndex >= loginContext.description.length) {
+        clearInterval(descriptionInterval);
+        typeLoginPrompt();
       }
     }, 25);
 
-    cleanupHeading = () => clearInterval(headingInterval);
+    cleanupDescription = () => clearInterval(descriptionInterval);
 
     return () => {
-      cleanupHeading();
       cleanupDescription();
       cleanupMessage();
+      cleanupLoginHeading();
     };
   }, [loginContext]);
 
@@ -126,20 +148,24 @@ export default function AiLogin() {
             </h2>
           ) : null}
           {loginContext ? (
-            <p className="mx-auto mt-2 min-h-[3rem] w-full text-center font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1.2rem]">
+            <p className="mx-auto mt-5 min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1.2rem]">
               {typedDescription}
             </p>
           ) : null}
-          <p className="mx-auto mt-2 min-h-[3rem] w-full text-center font-play text-[1rem] leading-relaxed text-gray-900 sm:min-h-[3.5rem] sm:text-[1.4rem]">
+          <p className="mx-auto min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1.2rem]">
             {typedMessage}
           </p>
         </div>
         <div className="flex w-full max-w-4xl flex-col items-center gap-6">
-          <h1 className="text-hero text-center">Login</h1>
+          <h1 className="text-hero min-h-[3rem] text-center font-play">
+            {typedLoginHeading}
+          </h1>
 
           <form
             onSubmit={handleLogin}
-            className="w-full grid grid-cols-1 md:grid-cols-2 gap-6"
+            className={`w-full grid grid-cols-1 gap-6 md:grid-cols-2 ${
+              isFormVisible ? "visible" : "invisible"
+            }`}
           >
             <Controller
               name="email"

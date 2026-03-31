@@ -45,7 +45,7 @@ const recommendationCards = [
   {
     title: "Advance Your Career",
     description:
-      "Intellegent suggestions to help you find the most sutaible nomad destinations to advance your acreer.",
+      "Intellegent suggestions to help you find the most sutaible nomad destinations to advance your career.",
     icon: MdOutlineWorkHistory,
     path: "/search/results",
   },
