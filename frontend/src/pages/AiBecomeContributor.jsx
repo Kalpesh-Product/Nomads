@@ -265,7 +265,7 @@ const AiBecomeContributor = () => {
                         sx={{ color: "white", mr: 1 }}
                       />
                     )}
-                    {isPending ? "SUBMITTING..." : "SUBMIT"}
+                    {isPending ? "Submitting..." : "Submit"}
                   </Button>
                 </div>
               </div>
