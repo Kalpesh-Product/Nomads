@@ -29,8 +29,36 @@ import SearchBarCombobox from "../components/SearchBarCombobox.jsx";
 import AiSelectedBadgesSearchBar from "../components/AiSelectedBadgesSearchBar.jsx";
 import { IoSearch } from "react-icons/io5";
 import { HiOutlineArrowLeft } from "react-icons/hi";
+import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
+import {
+  HiOutlineCog,
+  HiOutlineKey,
+  HiOutlineUserCircle,
+} from "react-icons/hi";
 import { AnimatePresence, motion } from "motion/react";
 import useAuth from "../hooks/useAuth.js";
+
+const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
+
+const valueAddedServiceItems = [
+  { label: "VISA Support", icon: LuMapPinned, path: "/visa-support" },
+  {
+    label: "Overall Activation Support",
+    icon: HiOutlineKey,
+    path: "/overall-activation-support",
+  },
+  {
+    label: "New Company Setup",
+    icon: HiOutlineCog,
+    path: "/new-company-setup",
+  },
+  { label: "Consultation", icon: LuCircleDollarSign, path: "/consultation" },
+  {
+    label: "Apply for Job",
+    icon: HiOutlineUserCircle,
+    badge: "Coming soon",
+  },
+];
 
 const AiListings = () => {
   const [resetPageKey, setResetPageKey] = useState(0);
@@ -230,7 +258,14 @@ const AiListings = () => {
   });
 
   const categoryOptions = React.useMemo(() => {
-    if (!listingsData || listingsData.length === 0) return [];
+    if (!listingsData || listingsData.length === 0) {
+      return [
+        {
+          label: "Value Added Services",
+          value: VALUE_ADDED_SERVICES_CATEGORY,
+        },
+      ];
+    }
 
     const uniqueTypes = [
       ...new Set(
@@ -259,11 +294,23 @@ const AiListings = () => {
       // "privatestay",
       "meetingroom",
       "cafe",
+      VALUE_ADDED_SERVICES_CATEGORY,
     ];
 
-    return uniqueTypes
+    const options = uniqueTypes
       .map((type) => ({ label: labelMap[type] || type, value: type }))
       .sort((a, b) => typeOrder.indexOf(a.value) - typeOrder.indexOf(b.value));
+
+    if (
+      options.some((option) => option.value === VALUE_ADDED_SERVICES_CATEGORY)
+    ) {
+      return options;
+    }
+
+    return [
+      ...options,
+      { label: "Value Added Services", value: VALUE_ADDED_SERVICES_CATEGORY },
+    ];
   }, [listingsData]);
 
   const categoryBadgeLabel = useMemo(() => {
@@ -282,6 +329,7 @@ const AiListings = () => {
       workation: "Workation",
       meetingroom: "Meetings",
       cafe: "Cafe’s",
+      [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
     };
 
     return (
@@ -299,6 +347,7 @@ const AiListings = () => {
 
   const filteredListings = React.useMemo(() => {
     if (!listingsData) return [];
+    if (formData?.category === VALUE_ADDED_SERVICES_CATEGORY) return [];
 
     if (!formData?.category) return listingsData;
 
@@ -359,6 +408,7 @@ const AiListings = () => {
   }, [formData]);
   useEffect(() => {
     if (formData?.category && listingsData?.length > 0) {
+      if (formData.category === VALUE_ADDED_SERVICES_CATEGORY) return;
       const hasCategory = listingsData.some(
         (item) => item.companyType === formData.category,
       );
@@ -438,6 +488,11 @@ const AiListings = () => {
   const onSubmit = (data) => {
     locationData(data);
     setResetPageKey((prev) => prev + 1); // ensures a new value every time
+  };
+
+  const handleValueAddedServiceClick = (service) => {
+    if (!service?.path) return;
+    navigate(service.path);
   };
 
   const [mapOpen, setMapOpen] = useState(true);
@@ -942,6 +997,7 @@ const AiListings = () => {
                 privatestay: "Private Stays",
                 meetingroom: "Meeting Rooms",
                 cafe: "Cafes",
+                [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
               }[formData.category] || `${formData.category} Spaces`}{" "}
               in{" "}
               {formData?.location
@@ -970,56 +1026,93 @@ const AiListings = () => {
               mapOpen ? "col-span-5" : "col-span-9"
             } font-semibold text-lg`}
           >
-            <PaginatedGrid
-              // data={isLisitingLoading ? skeletonArray : sortedListings}
-              data={isLisitingLoading ? skeletonArray : filteredListings}
-              entriesPerPage={isMobile ? 10 : isTablet ? 9 : !mapOpen ? 10 : 9}
-              persistPage={true}
-              resetPageKey={resetPageKey}
-              columns={`grid-cols-2 md:grid-cols-3 ${
-                mapOpen ? "lg:grid-cols-3" : "lg:grid-cols-4 xl:grid-cols-5"
-              } gap-4 md:gap-5`}
-              renderItem={(item, index) =>
-                isLisitingLoading ? (
-                  <Box key={index} className="w-full h-full">
-                    <Skeleton
-                      variant="rectangular"
-                      height={200}
-                      sx={{ borderRadius: 2 }}
-                    />
-                    <Skeleton variant="text" width="80%" sx={{ mt: 1 }} />
-                    <Skeleton variant="text" width="60%" />
-                  </Box>
-                ) : (
-                  <motion.div
-                    key={item._id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      duration: 0.4,
-                      delay: index * 0.1,
-                      ease: "easeOut",
-                    }}
-                  >
-                    <ListingCard
-                      item={item}
-                      showVertical={false}
-                      handleNavigation={() => {
-                        navigate(
-                          `/ai-listings/${encodeURIComponent(item.companyName)}`,
-                          {
-                            state: {
-                              companyId: item.companyId,
-                              type: item.companyType,
-                            },
-                          },
-                        );
+            {formData?.category === VALUE_ADDED_SERVICES_CATEGORY ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-5">
+                {valueAddedServiceItems.map((service) => {
+                  const Icon = service.icon;
+                  const isDisabled = !service.path;
+
+                  return (
+                    <button
+                      key={service.label}
+                      type="button"
+                      onClick={() => handleValueAddedServiceClick(service)}
+                      disabled={isDisabled}
+                      className={`rounded-3xl bg-[#f1f1f3] px-4 py-6 min-h-[132px] aspect-square flex flex-col items-center justify-center text-center transition-colors ${
+                        isDisabled
+                          ? "cursor-not-allowed opacity-80"
+                          : "hover:bg-[#e8e8ed]"
+                      }`}
+                    >
+                      <Icon size={24} className="text-black/80" />
+                      <div className="mt-3 flex flex-col items-center gap-1.5 justify-center">
+                        <span className="text-xs font-bold uppercase text-black/90 leading-tight">
+                          {service.label}
+                        </span>
+                        {service.badge && (
+                          <span className="rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[9px] font-semibold normal-case text-black shadow-sm">
+                            {service.badge}
+                          </span>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <PaginatedGrid
+                // data={isLisitingLoading ? skeletonArray : sortedListings}
+                data={isLisitingLoading ? skeletonArray : filteredListings}
+                entriesPerPage={
+                  isMobile ? 10 : isTablet ? 9 : !mapOpen ? 10 : 9
+                }
+                persistPage={true}
+                resetPageKey={resetPageKey}
+                columns={`grid-cols-2 md:grid-cols-3 ${
+                  mapOpen ? "lg:grid-cols-3" : "lg:grid-cols-4 xl:grid-cols-5"
+                } gap-4 md:gap-5`}
+                renderItem={(item, index) =>
+                  isLisitingLoading ? (
+                    <Box key={index} className="w-full h-full">
+                      <Skeleton
+                        variant="rectangular"
+                        height={200}
+                        sx={{ borderRadius: 2 }}
+                      />
+                      <Skeleton variant="text" width="80%" sx={{ mt: 1 }} />
+                      <Skeleton variant="text" width="60%" />
+                    </Box>
+                  ) : (
+                    <motion.div
+                      key={item._id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{
+                        duration: 0.4,
+                        delay: index * 0.1,
+                        ease: "easeOut",
                       }}
-                    />
-                  </motion.div>
-                )
-              }
-            />
+                    >
+                      <ListingCard
+                        item={item}
+                        showVertical={false}
+                        handleNavigation={() => {
+                          navigate(
+                            `/ai-listings/${encodeURIComponent(item.companyName)}`,
+                            {
+                              state: {
+                                companyId: item.companyId,
+                                type: item.companyType,
+                              },
+                            },
+                          );
+                        }}
+                      />
+                    </motion.div>
+                  )
+                }
+              />
+            )}
           </motion.div>
 
           {/* MAP VIEW */}
