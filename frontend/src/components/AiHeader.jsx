@@ -217,7 +217,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
               <div className="p-4 px-0 whitespace-nowrap">
                 <button
                   onClick={goToHosts}
-                  className="relative pb-1 transition-all cursor-pointer duration-300 group font-semibold bg-transparent border-none text-sm text-blue-500"
+                  className="relative pb-1 transition-all cursor-pointer duration-300 group font-semibold bg-transparent border-none text-sm text-primary-blue"
                 >
                   Become A Host
                   <span className="absolute left-0 w-0 bottom-0 block h-[2px] bg-black transition-all duration-300 group-hover:w-full"></span>

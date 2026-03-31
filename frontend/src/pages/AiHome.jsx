@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { PiBuildingOffice, PiRanking } from "react-icons/pi";
-import { TiGlobeOutline } from "react-icons/ti";
-import { BiDollar } from "react-icons/bi";
+import { SlBadge } from "react-icons/sl";
+import { FaGlobeAmericas } from "react-icons/fa";
+import { MdOutlineWorkHistory } from "react-icons/md";
+import { HiOutlineCurrencyDollar } from "react-icons/hi";
 import { RiUserCommunityLine } from "react-icons/ri";
 import { TbWorldWww } from "react-icons/tb";
 import useNomadLoginState from "../hooks/useNomadLoginState";
@@ -24,28 +25,28 @@ const recommendationCards = [
     title: "World Ranking",
     description:
       "Global suggestions for the best nomad destinations based on the world index which includes 50+ global factors.",
-    icon: PiRanking,
+    icon: SlBadge,
     path: "/search/results",
   },
   {
     title: "Work From Anywhere",
     description:
       "Custom suggestions to help you discover and work from the best nomad destinations.",
-    icon: TiGlobeOutline,
+    icon: FaGlobeAmericas,
     path: "/search/results",
   },
   {
     title: "Increase Your Savings",
     description:
       "Tailored nomad destination suggestions to help you increase your savings as a nomad.",
-    icon: BiDollar,
+    icon: HiOutlineCurrencyDollar,
     path: "/search/results",
   },
   {
     title: "Advance Your Career",
     description:
-      "Intellegent suggestions to help you find the most sutaible nomad destinations to advance your acreer.",
-    icon: PiBuildingOffice,
+      "Intellegent suggestions to help you find the most sutaible nomad destinations to advance your career.",
+    icon: MdOutlineWorkHistory,
     path: "/search/results",
   },
   {
@@ -194,15 +195,15 @@ const AiHome = () => {
           <h1 className="text-3xl font-medium text-black/90 font-play">
             {typedGreeting}
           </h1>
-          <h2 className="mt-10 text-sm font-semibold text-black/85 font-play sm:text-lg">
+          <h2 className="mt-4 text-sm font-semibold text-black/85 font-play sm:text-lg">
             {typedSubheading}
           </h2>
           {!isLoggedIn ? (
             <>
-              <p className="mt-3 text-sm sm:text-lg font-semibold text-black/85 font-play">
+              <p className="mt-4 text-sm sm:text-lg font-semibold text-black/85 font-play">
                 {typedThirdLine}
               </p>
-              <p className="mt-3 text-sm sm:text-lg font-semibold text-black/85 font-play">
+              <p className="mt-4 text-sm sm:text-lg font-semibold text-primary-blue font-play">
                 {typedFourthLine}
               </p>
             </>

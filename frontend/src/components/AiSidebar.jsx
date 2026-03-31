@@ -18,9 +18,10 @@ import {
   HiOutlineLogout,
 } from "react-icons/hi";
 import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
-import { PiBuildingOffice, PiRanking } from "react-icons/pi";
-import { TiGlobeOutline } from "react-icons/ti";
-import { BiDollar } from "react-icons/bi";
+import { SlBadge } from "react-icons/sl";
+import { FaGlobeAmericas } from "react-icons/fa";
+import { MdOutlineWorkHistory } from "react-icons/md";
+import { HiOutlineCurrencyDollar } from "react-icons/hi";
 import { RiUserCommunityLine } from "react-icons/ri";
 import { TbWorldWww } from "react-icons/tb";
 
@@ -36,28 +37,28 @@ const recommendationItems = [
     label: "World Ranking",
     description:
       "Global suggestions for the best nomad destinations based on the world index which includes 50+ global factors.",
-    icon: PiRanking,
+    icon: SlBadge,
     path: "/search/results",
   },
   {
     label: "Work From Anywhere",
     description:
       "Custom suggestions to help you discover and work from the best nomad destinations.",
-    icon: TiGlobeOutline,
+    icon: FaGlobeAmericas,
     path: "/search/results",
   },
   {
     label: "Increase Your Savings",
     description:
       "Tailored nomad destination suggestions to help you increase your savings as a nomad.",
-    icon: BiDollar,
+    icon: HiOutlineCurrencyDollar,
     path: "/search/results",
   },
   {
     label: "Advance Your Career",
     description:
-      "Intellegent suggestions to help you find the most sutaible nomad destinations to advance your acreer.",
-    icon: PiBuildingOffice,
+      "Intellegent suggestions to help you find the most sutaible nomad destinations to advance your career.",
+    icon: MdOutlineWorkHistory,
     path: "/search/results",
   },
   {
@@ -237,6 +238,14 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     navigate(`/ai-login${location.search}`);
   };
 
+  const handleBecomeHostClick = () => {
+    if (window.location.hostname.includes("localhost")) {
+      window.location.href = "http://hosts.localhost:5173";
+    } else {
+      window.location.href = "https://hosts.wono.co";
+    }
+  };
+
   const handleSignOutClick = () => {
     const nextSearchParams = new URLSearchParams(location.search);
     nextSearchParams.delete("login");
@@ -333,7 +342,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
           <SidebarSection
             items={becomeHostItem}
             collapsed={isCollapsed}
-            onItemClick={handleValueAdditionClick}
+            onItemClick={handleBecomeHostClick}
           />
           <SidebarSection
             items={signOutItem}
@@ -346,7 +355,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
           <SidebarSection
             items={becomeHostItem}
             collapsed={isCollapsed}
-            onItemClick={handleValueAdditionClick}
+            onItemClick={handleBecomeHostClick}
           />
           {!isCollapsed && (
             <div className="mt-auto px-4 pb-4 pt-10">

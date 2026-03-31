@@ -35,6 +35,8 @@ const continentOptions = [
 const destinationCards = aiDestinationCards;
 
 const INITIAL_VISIBLE_DESTINATIONS = 18;
+const TYPING_INTERVAL_MS = 8;
+const SELECTED_HEADING_TRANSITION_DELAY_MS = 1200;
 
 const goalNarrativeTopHeadingMap = {
   "World Ranking":
@@ -325,7 +327,7 @@ const AiSearchResults = () => {
         clearInterval(intervalId);
         onComplete?.();
       }
-    }, 25);
+    }, TYPING_INTERVAL_MS);
 
     return intervalId;
   }, []);
@@ -373,7 +375,7 @@ const AiSearchResults = () => {
               );
             },
           );
-        }, 4000);
+        }, SELECTED_HEADING_TRANSITION_DELAY_MS);
       },
     );
   }, [
@@ -476,7 +478,7 @@ const AiSearchResults = () => {
             </div>
 
             <div className="mt-6 mb-6 lg:ml-[6.25rem] lg:mr-36">
-              <p className="flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-lg font-play">
+              <p className="flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
                 {isThinkingHeadingVisible && (
                   <span
                     className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-b-transparent"
@@ -487,7 +489,7 @@ const AiSearchResults = () => {
               </p>
             </div>
 
-            <div className="mt-4 hidden max-w-4xl items-center rounded-[30px] border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] sm:flex lg:ml-[6.25rem] lg:mr-36">
+            <div className="mt-4 hidden max-w-full items-center rounded-[30px] border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] sm:flex lg:ml-[6.25rem] lg:mr-36">
               <div className="flex flex-wrap items-center gap-2">
                 {searchBarBadges.map((badgeLabel, index) => (
                   <div
@@ -539,10 +541,10 @@ const AiSearchResults = () => {
                 <div className="relative z-10">
                   {shouldShowNarrative && (
                     <>
-                      <p className="text-sm font-medium leading-snug text-black/85 lg:text-lg font-play">
+                      <p className="text-sm font-medium leading-relaxed text-black/85 lg:text-[0.9rem] font-play">
                         {typedBottomHeading}
                       </p>
-                      <p className="mt-3 text-sm font-medium leading-snug text-black/85 lg:text-lg font-play">
+                      <p className="mt-3 text-sm font-medium leading-relaxed text-black/85 lg:text-[0.9rem] font-play">
                         {typedResultsHeading}
                       </p>
                     </>
