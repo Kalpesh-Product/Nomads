@@ -1055,7 +1055,44 @@ const AiGlobalListingsList = () => {
                       <h2 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold leading-tight mb-4">
                         Value Added Services in {selectedLocationLabel}
                       </h2>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      <div className="flex md:hidden flex-nowrap overflow-x-auto snap-x snap-mandatory gap-4 pb-2 custom-scrollbar-hide">
+                        {valueAddedServiceItems.map((service) => {
+                          const Icon = service.icon;
+                          const isDisabled = !service.path;
+
+                          return (
+                            <button
+                              key={service.label}
+                              type="button"
+                              onClick={() =>
+                                handleValueAddedServiceClick(service)
+                              }
+                              disabled={isDisabled}
+                              className={`w-[calc(85%-0.5rem)] flex-shrink-0 snap-start rounded-2xl bg-[#f1f1f3] px-3 py-5 text-center min-h-[112px] transition-colors ${
+                                isDisabled
+                                  ? "cursor-not-allowed opacity-80"
+                                  : "hover:bg-[#e8e8ed]"
+                              }`}
+                            >
+                              <Icon
+                                size={24}
+                                className="mx-auto text-black/80"
+                              />
+                              <div className="mt-2 flex items-center justify-center gap-1.5">
+                                <span className="text-nano font-bold uppercase text-black/90 leading-tight">
+                                  {service.label}
+                                </span>
+                                {service.badge && (
+                                  <span className="rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[8px] font-semibold normal-case text-black shadow-sm">
+                                    {service.badge}
+                                  </span>
+                                )}
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <div className="hidden md:grid grid-cols-3 gap-4">
                         {valueAddedServiceItems.map((service) => {
                           const Icon = service.icon;
                           const isDisabled = !service.path;
