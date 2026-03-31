@@ -73,11 +73,11 @@ const recommendationItems = [
 const valueAdditionItems = [
   { label: "VISA Support", icon: LuMapPinned, path: "/visa-support" },
   {
-    label: "Help you get activated",
+    label: "Overall Activation Support",
     icon: HiOutlineKey,
     path: "/help-you-get-activated",
   },
-  { label: "Company Setup", icon: HiOutlineCog },
+  { label: "New Company Setup", icon: HiOutlineCog },
   { label: "Consultation", icon: LuCircleDollarSign, path: "/consultation" },
   {
     label: "Apply for Job",
