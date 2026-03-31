@@ -7,7 +7,7 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import AiPrimaryButton from "../components/AiPrimaryButton";
 
 const LOGIN_PROMPT =
-  "Log in to unlock all features and get the most out of your Nomad experience.";
+  "Login to unlock all features and get the most out of your Nomad experience.";
 
 const LOGIN_HEADING = "Login";
 

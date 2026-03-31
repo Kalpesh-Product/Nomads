@@ -31,13 +31,13 @@ export const login = async (req, res) => {
     const accessToken = jwt.sign(
       { userInfo: { ...user } },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "15m" }
+      { expiresIn: "15m" },
     );
 
     const refreshToken = jwt.sign(
       { userInfo: { ...user } },
       process.env.REFRESH_TOKEN_SECRET,
-      { expiresIn: "15d" }
+      { expiresIn: "15d" },
     );
 
     await NomadUser.findOneAndUpdate({ email }, { refreshToken }).lean().exec();
@@ -211,7 +211,7 @@ export const resetPassword = async (req, res) => {
       <p>Your password has been successfully reset.</p>
       <p>You can now <a href="${
         process.env.FRONTEND_DEV_LINK
-      }login" target="_blank">log in</a> with your new password.</p>
+      }login" target="_blank">Login</a> with your new password.</p>
       <p>If you did not perform this action, please contact us immediately.</p>
       <br/>
       <p>Best,<br/>The Wono Team</p>
@@ -226,7 +226,7 @@ export const resetPassword = async (req, res) => {
     } catch (error) {
       console.error(
         "⚠️ Password reset confirmation email failed:",
-        error.message
+        error.message,
       );
     }
 

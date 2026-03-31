@@ -86,7 +86,7 @@ const valueAdditionItems = [
   {
     label: "Apply for Job",
     icon: HiOutlineUserCircle,
-    badge: "Coming Soon",
+    badge: "Coming soon",
   },
 ];
 
@@ -95,8 +95,8 @@ const becomeHostItem = [{ label: "Become A Host", icon: HiOutlineViewGrid }];
 const loggedOutPrompt = {
   title: "Get responses tailored to you",
   description:
-    "Login to explore your nomad lifestyle and discover where you should live, work, and save more - powered by your preferences.",
-  actionLabel: "Log in",
+    "Login to explore your nomad lifestyle and discover where you should live, work, and save more.",
+  actionLabel: "Login",
 };
 
 const profileItems = [
@@ -367,8 +367,11 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                 {/* <h3 className="text-[13px] font-semibold leading-tight text-black/90">
                   {loggedOutPrompt.title}
                 </h3> */}
-                <p className="mt-2 text-nano leading-5 text-black/55">
+                <p className="mt-2 text-nano leading-[0.9rem] text-black/55">
                   {loggedOutPrompt.description}
+                </p>
+                <p className=" text-nano leading-5 text-black/55">
+                  Powered by your preferences.
                 </p>
                 <button
                   type="button"

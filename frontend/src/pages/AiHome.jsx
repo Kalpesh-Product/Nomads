@@ -79,7 +79,7 @@ const AiHome = () => {
   const greetingText = isLoggedIn ? "hi Abrar" : "Meet Wono";
   const subheadingText = isLoggedIn
     ? "Please choose your goals from below so that we can help you design your accurate nomad lifestyle."
-    : "An intellegent platform for moden nomads";
+    : "An intellegent platform for moden nomads.";
   const thirdLineText = isLoggedIn
     ? ""
     : "Supporting the global community of remote workers, creators, entrepreneurs, hosts and investors who are redefining how the world lives and works.";

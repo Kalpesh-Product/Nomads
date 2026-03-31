@@ -236,7 +236,7 @@ export default function Signup() {
             <p className="text-center">
               Already have an account?&nbsp;
               <span className="underline">
-                <Link to="/login">Log In</Link>
+                <Link to="/login">Login</Link>
               </span>
             </p>
           </div>

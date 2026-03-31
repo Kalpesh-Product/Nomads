@@ -248,7 +248,7 @@ export default function AiSignup() {
             <p className="text-center">
               Already have an account?&nbsp;
               <span className="underline">
-                <Link to="/ai-login">Log In</Link>
+                <Link to="/ai-login">Login</Link>
               </span>
             </p>
           </div>
