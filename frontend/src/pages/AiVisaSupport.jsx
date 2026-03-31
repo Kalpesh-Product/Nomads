@@ -179,6 +179,7 @@ const AiVisaSupport = () => {
                           fullWidth: true,
                           variant: "standard",
                           placeholder: "dd-mm-yyyy",
+                          inputProps: { placeholder: "dd-mm-yyyy" },
                           InputLabelProps: {
                             sx: floatingLabelSx,
                             shrink: true,
@@ -207,6 +208,7 @@ const AiVisaSupport = () => {
                           fullWidth: true,
                           variant: "standard",
                           placeholder: "dd-mm-yyyy",
+                          inputProps: { placeholder: "dd-mm-yyyy" },
                           InputLabelProps: {
                             sx: floatingLabelSx,
                             shrink: true,
@@ -343,7 +345,7 @@ const AiVisaSupport = () => {
                   control={control}
                   render={({ field }) => (
                     <DatePicker
-                      label="Tentetive Travel Date"
+                      label="Tentative Travel Date"
                       format="DD-MM-YYYY"
                       value={field.value ? dayjs(field.value) : null}
                       onChange={(value) =>
@@ -356,6 +358,7 @@ const AiVisaSupport = () => {
                           fullWidth: true,
                           variant: "standard",
                           placeholder: "dd-mm-yyyy",
+                          inputProps: { placeholder: "dd-mm-yyyy" },
                           InputLabelProps: {
                             sx: floatingLabelSx,
                             shrink: true,
