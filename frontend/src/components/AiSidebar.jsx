@@ -315,7 +315,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
       </div>
 
       <SidebarSection
-        title="Our Intelligence"
+        title="WoNo Intelligence"
         items={recommendationItems}
         collapsed={isCollapsed}
         isExpandable

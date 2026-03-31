@@ -73,6 +73,8 @@ const AiHome = () => {
   const [typedThirdLine, setTypedThirdLine] = useState("");
   const [typedFourthLine, setTypedFourthLine] = useState("");
 
+  const [areCardsVisible, setAreCardsVisible] = useState(false);
+
   const isLoggedIn = useNomadLoginState();
 
   const greetingText = isLoggedIn ? "hi Abrar" : "Meet Wono";
@@ -91,6 +93,7 @@ const AiHome = () => {
     setTypedSubheading("");
     setTypedThirdLine("");
     setTypedFourthLine("");
+    setAreCardsVisible(false);
 
     let greetingIndex = 0;
     let subheadingIndex = 0;
@@ -115,6 +118,7 @@ const AiHome = () => {
             clearInterval(subheadingInterval);
 
             if (!thirdLineText) {
+              setAreCardsVisible(true);
               return;
             }
 
@@ -126,6 +130,7 @@ const AiHome = () => {
                 clearInterval(thirdLineInterval);
 
                 if (!fourthLineText) {
+                  setAreCardsVisible(true);
                   return;
                 }
 
@@ -135,6 +140,7 @@ const AiHome = () => {
 
                   if (fourthLineIndex >= fourthLineText.length) {
                     clearInterval(fourthLineInterval);
+                    setAreCardsVisible(true);
                   }
                 }, 25);
 
@@ -145,6 +151,10 @@ const AiHome = () => {
             cleanupThirdLine = () => clearInterval(thirdLineInterval);
           }
         }, 25);
+
+        if (!subheadingText) {
+          setAreCardsVisible(true);
+        }
 
         cleanupSubheading = () => clearInterval(subheadingInterval);
       }
@@ -208,7 +218,11 @@ const AiHome = () => {
             </>
           ) : null}
 
-          <div className="mt-4 rounded-[40px] px-0 py-4 md:px-6 md:py-8">
+          <div
+            className={`mt-4 rounded-[40px] px-0 py-4 md:px-6 md:py-8 ${
+              areCardsVisible ? "visible" : "invisible"
+            }`}
+          >
             <div className="grid grid-cols-2 gap-4 md:grid-cols-2 md:gap-10 xl:grid-cols-3">
               {recommendationCards.map((card) => {
                 const Icon = card.icon;
