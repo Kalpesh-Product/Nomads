@@ -478,7 +478,7 @@ const AiSearchResults = () => {
             </div>
 
             <div className="mt-6 mb-6 lg:ml-[6.25rem] lg:mr-36">
-              <p className="flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-lg font-play">
+              <p className="flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
                 {isThinkingHeadingVisible && (
                   <span
                     className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-b-transparent"
@@ -541,10 +541,10 @@ const AiSearchResults = () => {
                 <div className="relative z-10">
                   {shouldShowNarrative && (
                     <>
-                      <p className="text-sm font-medium leading-snug text-black/85 lg:text-lg font-play">
+                      <p className="text-sm font-medium leading-relaxed text-black/85 lg:text-[0.9rem] font-play">
                         {typedBottomHeading}
                       </p>
-                      <p className="mt-3 text-sm font-medium leading-snug text-black/85 lg:text-lg font-play">
+                      <p className="mt-3 text-sm font-medium leading-relaxed text-black/85 lg:text-[0.9rem] font-play">
                         {typedResultsHeading}
                       </p>
                     </>
