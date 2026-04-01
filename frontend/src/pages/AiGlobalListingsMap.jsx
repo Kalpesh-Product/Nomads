@@ -555,7 +555,7 @@ const AiGlobalListingsMap = () => {
           onClear={() => navigate("/search/results")}
           className="mb-2"
         />
-        <p className="mb-2 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
+        <p className="mb-4 mt-2 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
           {!isSecondHeadingPhase && (
             <span
               className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-b-transparent"
@@ -569,7 +569,7 @@ const AiGlobalListingsMap = () => {
         >
           <div className="min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0">
             <div className="flex flex-col gap-4 justify-between items-center">
-              <div className="w-3/4 pb-4">
+              <div className="w-11/12 pb-4">
                 <div className="flex justify-between items-center">
                   {categoryOptions.map((cat) => {
                     const iconSrc = newIcons[cat.value];

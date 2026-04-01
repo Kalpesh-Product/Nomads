@@ -603,7 +603,7 @@ const AiListings = () => {
           className="mb-4"
         />
 
-        <p className="mb-2 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
+        <p className="mb-4 mt-6 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
           {!isSecondHeadingPhase && (
             <span
               className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-b-transparent"
@@ -773,7 +773,7 @@ const AiListings = () => {
               <div className="hidden lg:flex flex-col gap-4 justify-between items-center w-full h-full">
                 {/* the 5 icons */}
 
-                <div className=" w-3/4 pb-4">
+                <div className=" w-9/12 pb-4">
                   <div className="flex justify-between items-center">
                     {categoryOptions.map((cat) => {
                       const iconSrc = newIcons[cat.value];

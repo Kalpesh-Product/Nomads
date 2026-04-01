@@ -6,7 +6,7 @@ const newIcons = {
   coliving: "/icons-new/coliving.png",
   workation: "/icons-new/companyWorkation.png",
   meetingroom: "/icons-new/meeting-room.png",
-  valueaddedservices: "/oldIcons/icons8-customer-service-50.png",
+  valueaddedservices: "/icons-new/valueAddedServices.png",
 };
 
 export default newIcons;
