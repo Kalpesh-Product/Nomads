@@ -595,15 +595,7 @@ const AiListings = () => {
             </span>
           )}
         </div>
-        <AiSelectedBadgesSearchBar
-          badges={badgesWithCategory}
-          stateLabel={selectedStateLabel}
-          onBack={() => navigate("/search/results")}
-          onClear={() => navigate("/search/results")}
-          className="mb-4"
-        />
-
-        <p className="mb-4 mt-6 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
+        <p className="mb-4 mt-6 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:hidden font-play">
           {!isSecondHeadingPhase && (
             <span
               className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-b-transparent"
@@ -612,6 +604,24 @@ const AiListings = () => {
           )}
           {typedHeading}
         </p>
+        <AiSelectedBadgesSearchBar
+          badges={badgesWithCategory}
+          stateLabel={selectedStateLabel}
+          onBack={() => navigate("/search/results")}
+          onClear={() => navigate("/search/results")}
+          heading={
+            <p className="mb-2 hidden items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:flex lg:text-[0.9rem] font-play">
+              {!isSecondHeadingPhase && (
+                <span
+                  className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-b-transparent"
+                  aria-hidden="true"
+                />
+              )}
+              {typedHeading}
+            </p>
+          }
+          className="mb-4"
+        />
         <div className={isHeadingSequenceComplete ? "block" : "hidden"}>
           <div className="lg:hidden w-full flex flex-col gap-4 mb-4">
             <button

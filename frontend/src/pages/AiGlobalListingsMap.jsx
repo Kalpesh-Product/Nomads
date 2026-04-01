@@ -553,17 +553,19 @@ const AiGlobalListingsMap = () => {
           stateLabel={selectedLocationLabel}
           onBack={() => navigate("/search/results")}
           onClear={() => navigate("/search/results")}
+          heading={
+            <p className="mb-2 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
+              {!isSecondHeadingPhase && (
+                <span
+                  className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-b-transparent"
+                  aria-hidden="true"
+                />
+              )}
+              {typedHeading}
+            </p>
+          }
           className="mb-2"
         />
-        <p className="mb-4 mt-2 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
-          {!isSecondHeadingPhase && (
-            <span
-              className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-b-transparent"
-              aria-hidden="true"
-            />
-          )}
-          {typedHeading}
-        </p>
         <div
           className={`${isHeadingSequenceComplete ? "flex" : "hidden"} flex-col gap-4 justify-center items-center w-full`}
         >
