@@ -35,6 +35,12 @@ import {
 
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
 
+const TYPING_INTERVAL_MS = 24;
+const SECOND_HEADING_DELAY_MS = 250;
+const THINKING_HEADING_TEXT = "Curating the best results for you";
+const CURATED_RESULTS_HEADING_TEXT =
+  "Please find below the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
+
 const HorizontalScrollWrapper = ({ children, title }) => {
   const scrollRef = React.useRef(null);
   const [showLeft, setShowLeft] = useState(false);
@@ -129,6 +135,11 @@ const AiGlobalListingsList = () => {
 
   const [persistedSearchBarBadges, setPersistedSearchBarBadges] = useState([]);
 
+  const [typedHeading, setTypedHeading] = useState("");
+  const [isSecondHeadingPhase, setIsSecondHeadingPhase] = useState(false);
+  const [isHeadingSequenceComplete, setIsHeadingSequenceComplete] =
+    useState(false);
+
   const searchBarBadges = useMemo(() => {
     const locationStateBadges = location.state?.searchBarBadges;
 
@@ -138,6 +149,41 @@ const AiGlobalListingsList = () => {
 
     return persistedSearchBarBadges;
   }, [location.state, persistedSearchBarBadges]);
+
+  useEffect(() => {
+    let timeoutId;
+    let intervalId;
+
+    const typeText = (text, onComplete) => {
+      let index = 0;
+      setTypedHeading("");
+      intervalId = setInterval(() => {
+        index += 1;
+        setTypedHeading(text.slice(0, index));
+        if (index >= text.length) {
+          clearInterval(intervalId);
+          onComplete?.();
+        }
+      }, TYPING_INTERVAL_MS);
+    };
+
+    setIsSecondHeadingPhase(false);
+    setIsHeadingSequenceComplete(false);
+
+    typeText(THINKING_HEADING_TEXT, () => {
+      timeoutId = setTimeout(() => {
+        setIsSecondHeadingPhase(true);
+        typeText(CURATED_RESULTS_HEADING_TEXT, () => {
+          setIsHeadingSequenceComplete(true);
+        });
+      }, SECOND_HEADING_DELAY_MS);
+    });
+
+    return () => {
+      clearTimeout(timeoutId);
+      clearInterval(intervalId);
+    };
+  }, []);
 
   // Special users who can see all locations
   const specialUserEmails = [
@@ -532,7 +578,18 @@ const AiGlobalListingsList = () => {
           onClear={() => navigate("/search/results")}
           className="mb-2"
         />
-        <div className="flex flex-col gap-4 justify-center items-center w-full">
+        <p className="mb-2 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
+          {!isSecondHeadingPhase && (
+            <span
+              className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-b-transparent"
+              aria-hidden="true"
+            />
+          )}
+          {typedHeading}
+        </p>
+        <div
+          className={`${isHeadingSequenceComplete ? "flex" : "hidden"} flex-col gap-4 justify-center items-center w-full`}
+        >
           <div className="min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0">
             <div className="flex flex-col gap-4 justify-between items-center w-full h-full">
               <div className="w-3/4 pb-4">
@@ -641,157 +698,162 @@ const AiGlobalListingsList = () => {
           </div>
         </div>
 
-        <Container padding={false}>
-          <div className="">
-            <div className="font-semibold text-md">
-              <div className="custom-scrollbar-hide">
-                {isLisitingLoading ? (
-                  Array.from({ length: 4 }).map((_, i) => (
-                    <SkeletonCard key={i} />
-                  ))
-                ) : groupedListings &&
-                  Object.keys(groupedListings).length > 0 ? (
-                  <>
-                    <div className="border-t border-gray-300 mt-0 mb-6" />
-                    {Object.entries(groupedListings)
-                      .sort(([typeA], [typeB]) => {
-                        const typeOrder = [
-                          "coworking",
-                          "coliving",
-                          "hostel",
-                          "workation",
-                          "privatestay",
-                          "meetingroom",
-                          "cafe",
-                        ];
-                        const indexA = typeOrder.indexOf(typeA);
-                        const indexB = typeOrder.indexOf(typeB);
-                        return (
-                          (indexA === -1 ? 999 : indexA) -
-                          (indexB === -1 ? 999 : indexB)
-                        );
-                      })
-                      .map(([type, items], index) => {
-                        const prioritizedCompanies = ["BIZ Nest", "MeWo"];
-                        const sortedItems = [...items].sort((a, b) => {
-                          const aPriorityIndex = prioritizedCompanies.indexOf(
-                            a.companyName,
+        <div className={isHeadingSequenceComplete ? "block" : "hidden"}>
+          <Container padding={false}>
+            <div className="">
+              <div className="font-semibold text-md">
+                <div className="custom-scrollbar-hide">
+                  {isLisitingLoading ? (
+                    Array.from({ length: 4 }).map((_, i) => (
+                      <SkeletonCard key={i} />
+                    ))
+                  ) : groupedListings &&
+                    Object.keys(groupedListings).length > 0 ? (
+                    <>
+                      <div className="border-t border-gray-300 mt-0 mb-6" />
+                      {Object.entries(groupedListings)
+                        .sort(([typeA], [typeB]) => {
+                          const typeOrder = [
+                            "coworking",
+                            "coliving",
+                            "hostel",
+                            "workation",
+                            "privatestay",
+                            "meetingroom",
+                            "cafe",
+                          ];
+                          const indexA = typeOrder.indexOf(typeA);
+                          const indexB = typeOrder.indexOf(typeB);
+                          return (
+                            (indexA === -1 ? 999 : indexA) -
+                            (indexB === -1 ? 999 : indexB)
                           );
-                          const bPriorityIndex = prioritizedCompanies.indexOf(
-                            b.companyName,
-                          );
-                          if (aPriorityIndex !== -1 && bPriorityIndex !== -1) {
-                            return aPriorityIndex - bPriorityIndex;
-                          }
-                          if (aPriorityIndex !== -1) return -1;
-                          if (bPriorityIndex !== -1) return 1;
-                          const aRating = Number(a.ratings || 0);
-                          const bRating = Number(b.ratings || 0);
-                          return bRating - aRating;
-                        });
+                        })
+                        .map(([type, items], index) => {
+                          const prioritizedCompanies = ["BIZ Nest", "MeWo"];
+                          const sortedItems = [...items].sort((a, b) => {
+                            const aPriorityIndex = prioritizedCompanies.indexOf(
+                              a.companyName,
+                            );
+                            const bPriorityIndex = prioritizedCompanies.indexOf(
+                              b.companyName,
+                            );
+                            if (
+                              aPriorityIndex !== -1 &&
+                              bPriorityIndex !== -1
+                            ) {
+                              return aPriorityIndex - bPriorityIndex;
+                            }
+                            if (aPriorityIndex !== -1) return -1;
+                            if (bPriorityIndex !== -1) return 1;
+                            const aRating = Number(a.ratings || 0);
+                            const bRating = Number(b.ratings || 0);
+                            return bRating - aRating;
+                          });
 
-                        const displayItems = expandedCategories.includes(type)
-                          ? sortedItems
-                          : sortedItems.slice(0, 5);
-                        const showViewMore = sortedItems.length > 5;
-                        const sectionTitle = `Popular ${typeLabels[type] || typeLabels.default(type)} in ${selectedLocationLabel}`;
-
-                        return (
-                          <div
-                            key={type}
-                            className={`col-span-full ${
-                              index > 0
-                                ? "border-t border-gray-300 mt-6 pt-6"
-                                : ""
-                            } mb-6`}
-                          >
-                            <h2 className="text-subtitle font-semibold mb-5 text-secondary-dark">
-                              {sectionTitle}
-                            </h2>
-                            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-x-5 gap-y-0">
-                              {displayItems.map((item) => (
-                                <ListingCard
-                                  key={item._id}
-                                  item={item}
-                                  showVertical={false}
-                                  handleNavigation={() =>
-                                    navigate(
-                                      `/ai-listings/${encodeURIComponent(item.companyName)}`,
-                                      {
-                                        state: {
-                                          companyId: item.companyId,
-                                          type: item.companyType,
-                                        },
-                                      },
-                                    )
-                                  }
-                                />
-                              ))}
-                            </div>
-                            {showViewMore && (
-                              <div className="mt-0 text-right">
-                                <button
-                                  onClick={() => handleShowMoreClick(type)}
-                                  className="text-primary-blue text-sm font-semibold hover:underline"
-                                >
-                                  {expandedCategories.includes(type)
-                                    ? "View less ←"
-                                    : "View more →"}
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    <div className="col-span-full border-t border-gray-300 mt-6 pt-6 mb-6">
-                      <h2 className="text-subtitle font-semibold mb-5 text-secondary-dark">
-                        Value Added Services in {selectedLocationLabel}
-                      </h2>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                        {valueAddedServiceItems.map((service) => {
-                          const Icon = service.icon;
-                          const isDisabled = !service.path;
+                          const displayItems = expandedCategories.includes(type)
+                            ? sortedItems
+                            : sortedItems.slice(0, 5);
+                          const showViewMore = sortedItems.length > 5;
+                          const sectionTitle = `Popular ${typeLabels[type] || typeLabels.default(type)} in ${selectedLocationLabel}`;
 
                           return (
-                            <button
-                              key={service.label}
-                              type="button"
-                              onClick={() =>
-                                handleValueAddedServiceClick(service)
-                              }
-                              disabled={isDisabled}
-                              className={`rounded-3xl bg-[#f1f1f3] px-4 py-6 min-h-[132px] aspect-square flex flex-col items-center justify-center text-center transition-colors ${
-                                isDisabled
-                                  ? "cursor-not-allowed opacity-80"
-                                  : "hover:bg-[#e8e8ed]"
-                              }`}
+                            <div
+                              key={type}
+                              className={`col-span-full ${
+                                index > 0
+                                  ? "border-t border-gray-300 mt-6 pt-6"
+                                  : ""
+                              } mb-6`}
                             >
-                              <Icon size={24} className="text-black/80" />
-                              <div className="mt-3 flex flex-col items-center gap-1.5 justify-center">
-                                <span className="text-xs font-bold uppercase text-black/90 leading-tight">
-                                  {service.label}
-                                </span>
-                                {service.badge && (
-                                  <span className="rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[9px] font-semibold normal-case text-black shadow-sm">
-                                    {service.badge}
-                                  </span>
-                                )}
+                              <h2 className="text-subtitle font-semibold mb-5 text-secondary-dark">
+                                {sectionTitle}
+                              </h2>
+                              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-x-5 gap-y-0">
+                                {displayItems.map((item) => (
+                                  <ListingCard
+                                    key={item._id}
+                                    item={item}
+                                    showVertical={false}
+                                    handleNavigation={() =>
+                                      navigate(
+                                        `/ai-listings/${encodeURIComponent(item.companyName)}`,
+                                        {
+                                          state: {
+                                            companyId: item.companyId,
+                                            type: item.companyType,
+                                          },
+                                        },
+                                      )
+                                    }
+                                  />
+                                ))}
                               </div>
-                            </button>
+                              {showViewMore && (
+                                <div className="mt-0 text-right">
+                                  <button
+                                    onClick={() => handleShowMoreClick(type)}
+                                    className="text-primary-blue text-sm font-semibold hover:underline"
+                                  >
+                                    {expandedCategories.includes(type)
+                                      ? "View less ←"
+                                      : "View more →"}
+                                  </button>
+                                </div>
+                              )}
+                            </div>
                           );
                         })}
+                      <div className="col-span-full border-t border-gray-300 mt-6 pt-6 mb-6">
+                        <h2 className="text-subtitle font-semibold mb-5 text-secondary-dark">
+                          Value Added Services in {selectedLocationLabel}
+                        </h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                          {valueAddedServiceItems.map((service) => {
+                            const Icon = service.icon;
+                            const isDisabled = !service.path;
+
+                            return (
+                              <button
+                                key={service.label}
+                                type="button"
+                                onClick={() =>
+                                  handleValueAddedServiceClick(service)
+                                }
+                                disabled={isDisabled}
+                                className={`rounded-3xl bg-[#f1f1f3] px-4 py-6 min-h-[132px] aspect-square flex flex-col items-center justify-center text-center transition-colors ${
+                                  isDisabled
+                                    ? "cursor-not-allowed opacity-80"
+                                    : "hover:bg-[#e8e8ed]"
+                                }`}
+                              >
+                                <Icon size={24} className="text-black/80" />
+                                <div className="mt-3 flex flex-col items-center gap-1.5 justify-center">
+                                  <span className="text-xs font-bold uppercase text-black/90 leading-tight">
+                                    {service.label}
+                                  </span>
+                                  {service.badge && (
+                                    <span className="rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[9px] font-semibold normal-case text-black shadow-sm">
+                                      {service.badge}
+                                    </span>
+                                  )}
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
                       </div>
+                    </>
+                  ) : (
+                    <div className="col-span-full text-center text-sm text-gray-500 border border-dotted rounded-lg p-4">
+                      No listings found.
                     </div>
-                  </>
-                ) : (
-                  <div className="col-span-full text-center text-sm text-gray-500 border border-dotted rounded-lg p-4">
-                    No listings found.
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        </Container>
+          </Container>
+        </div>
       </div>
 
       {/* ==================== MOBILE/TABLET VIEW (below lg) ==================== */}

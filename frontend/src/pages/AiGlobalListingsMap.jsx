@@ -30,6 +30,12 @@ import useAuth from "../hooks/useAuth.js";
 
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
 
+const TYPING_INTERVAL_MS = 24;
+const SECOND_HEADING_DELAY_MS = 250;
+const THINKING_HEADING_TEXT = "Curating the best results for you";
+const CURATED_RESULTS_HEADING_TEXT =
+  "Please find below the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
+
 const HorizontalScrollWrapper = ({ children, title }) => {
   const scrollRef = React.useRef(null);
   const [showLeft, setShowLeft] = useState(false);
@@ -105,6 +111,11 @@ const AiGlobalListingsMap = () => {
 
   const [persistedSearchBarBadges, setPersistedSearchBarBadges] = useState([]);
 
+  const [typedHeading, setTypedHeading] = useState("");
+  const [isSecondHeadingPhase, setIsSecondHeadingPhase] = useState(false);
+  const [isHeadingSequenceComplete, setIsHeadingSequenceComplete] =
+    useState(false);
+
   const searchBarBadges = useMemo(() => {
     const locationStateBadges = location.state?.searchBarBadges;
 
@@ -114,6 +125,37 @@ const AiGlobalListingsMap = () => {
 
     return persistedSearchBarBadges;
   }, [location.state, persistedSearchBarBadges]);
+
+  useEffect(() => {
+    let timeoutId;
+    let intervalId;
+    const typeText = (text, onComplete) => {
+      let index = 0;
+      setTypedHeading("");
+      intervalId = setInterval(() => {
+        index += 1;
+        setTypedHeading(text.slice(0, index));
+        if (index >= text.length) {
+          clearInterval(intervalId);
+          onComplete?.();
+        }
+      }, TYPING_INTERVAL_MS);
+    };
+    setIsSecondHeadingPhase(false);
+    setIsHeadingSequenceComplete(false);
+    typeText(THINKING_HEADING_TEXT, () => {
+      timeoutId = setTimeout(() => {
+        setIsSecondHeadingPhase(true);
+        typeText(CURATED_RESULTS_HEADING_TEXT, () =>
+          setIsHeadingSequenceComplete(true),
+        );
+      }, SECOND_HEADING_DELAY_MS);
+    });
+    return () => {
+      clearTimeout(timeoutId);
+      clearInterval(intervalId);
+    };
+  }, []);
 
   const specialUserEmails = [
     "allan.wono@gmail.com",
@@ -513,7 +555,18 @@ const AiGlobalListingsMap = () => {
           onClear={() => navigate("/search/results")}
           className="mb-2"
         />
-        <div className="flex flex-col gap-4 justify-center items-center w-full">
+        <p className="mb-2 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
+          {!isSecondHeadingPhase && (
+            <span
+              className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-b-transparent"
+              aria-hidden="true"
+            />
+          )}
+          {typedHeading}
+        </p>
+        <div
+          className={`${isHeadingSequenceComplete ? "flex" : "hidden"} flex-col gap-4 justify-center items-center w-full`}
+        >
           <div className="min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0">
             <div className="flex flex-col gap-4 justify-between items-center">
               <div className="w-3/4 pb-4">
@@ -622,89 +675,93 @@ const AiGlobalListingsMap = () => {
           </div>
         </div>
 
-        <Container padding={false}>
-          <div className="">
-            <div className="font-semibold text-md grid grid-cols-9 gap-4 pt-3">
-              <div className="custom-scrollbar-hide col-span-5">
-                {isLisitingLoading ? (
-                  Array.from({ length: 4 }).map((_, i) => (
-                    <SkeletonCard key={i} />
-                  ))
-                ) : (
-                  <div className="col-span-full mb-6">
-                    <PaginatedGrid
-                      data={isLisitingLoading ? skeletonArray : sortedListings}
-                      allowScroll={false}
-                      entriesPerPage={9}
-                      persistPage={true}
-                      persistKey="verticalsListingsPage"
-                      columns={`grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-5`}
-                      renderItem={(item, index) =>
-                        isLisitingLoading ? (
-                          <Box key={index} className="w-full h-full">
-                            <Skeleton
-                              variant="rectangular"
-                              height={200}
-                              sx={{ borderRadius: 2 }}
-                            />
-                            <Skeleton
-                              variant="text"
-                              width="80%"
-                              sx={{ mt: 1 }}
-                            />
-                            <Skeleton variant="text" width="60%" />
-                          </Box>
-                        ) : (
-                          <motion.div
-                            key={item._id}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{
-                              duration: 0.4,
-                              delay: index * 0.1,
-                              ease: "easeOut",
-                            }}
-                          >
-                            <ListingCard
-                              item={item}
-                              showVertical={true}
-                              handleNavigation={() =>
-                                navigate(
-                                  `/ai-listings/${encodeURIComponent(
-                                    item.companyName,
-                                  )}`,
-                                  {
-                                    state: {
-                                      companyId: item.companyId,
-                                      type: item.companyType || "ss",
-                                    },
-                                  },
-                                )
-                              }
-                            />
-                          </motion.div>
-                        )
-                      }
-                    />
-                  </div>
-                )}
-              </div>
-              <div className="col-span-4 sticky top-24 h-screen lg:h-[68%] pb-10">
-                <div className="rounded-xl h-full overflow-hidden">
+        <div className={isHeadingSequenceComplete ? "block" : "hidden"}>
+          <Container padding={false}>
+            <div className="">
+              <div className="font-semibold text-md grid grid-cols-9 gap-4 pt-3">
+                <div className="custom-scrollbar-hide col-span-5">
                   {isLisitingLoading ? (
-                    <SkeletonMap />
-                  ) : forMapsData?.length ? (
-                    <Map locations={forMapsData} />
+                    Array.from({ length: 4 }).map((_, i) => (
+                      <SkeletonCard key={i} />
+                    ))
                   ) : (
-                    <div className="h-full flex items-center justify-center text-gray-500 text-sm border border-dotted rounded-lg">
-                      Map data not available.
+                    <div className="col-span-full mb-6">
+                      <PaginatedGrid
+                        data={
+                          isLisitingLoading ? skeletonArray : sortedListings
+                        }
+                        allowScroll={false}
+                        entriesPerPage={9}
+                        persistPage={true}
+                        persistKey="verticalsListingsPage"
+                        columns={`grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-5`}
+                        renderItem={(item, index) =>
+                          isLisitingLoading ? (
+                            <Box key={index} className="w-full h-full">
+                              <Skeleton
+                                variant="rectangular"
+                                height={200}
+                                sx={{ borderRadius: 2 }}
+                              />
+                              <Skeleton
+                                variant="text"
+                                width="80%"
+                                sx={{ mt: 1 }}
+                              />
+                              <Skeleton variant="text" width="60%" />
+                            </Box>
+                          ) : (
+                            <motion.div
+                              key={item._id}
+                              initial={{ opacity: 0, y: 20 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{
+                                duration: 0.4,
+                                delay: index * 0.1,
+                                ease: "easeOut",
+                              }}
+                            >
+                              <ListingCard
+                                item={item}
+                                showVertical={true}
+                                handleNavigation={() =>
+                                  navigate(
+                                    `/ai-listings/${encodeURIComponent(
+                                      item.companyName,
+                                    )}`,
+                                    {
+                                      state: {
+                                        companyId: item.companyId,
+                                        type: item.companyType || "ss",
+                                      },
+                                    },
+                                  )
+                                }
+                              />
+                            </motion.div>
+                          )
+                        }
+                      />
                     </div>
                   )}
                 </div>
+                <div className="col-span-4 sticky top-24 h-screen lg:h-[68%] pb-10">
+                  <div className="rounded-xl h-full overflow-hidden">
+                    {isLisitingLoading ? (
+                      <SkeletonMap />
+                    ) : forMapsData?.length ? (
+                      <Map locations={forMapsData} />
+                    ) : (
+                      <div className="h-full flex items-center justify-center text-gray-500 text-sm border border-dotted rounded-lg">
+                        Map data not available.
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </Container>
+          </Container>
+        </div>
       </div>
 
       {/* ==================== MOBILE/TABLET VIEW (below lg) ==================== */}

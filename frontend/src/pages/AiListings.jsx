@@ -40,6 +40,12 @@ import useAuth from "../hooks/useAuth.js";
 
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
 
+const TYPING_INTERVAL_MS = 24;
+const SECOND_HEADING_DELAY_MS = 250;
+const THINKING_HEADING_TEXT = "Curating the best results for you";
+const CURATED_RESULTS_HEADING_TEXT =
+  "Please find below the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
+
 const valueAddedServiceItems = [
   { label: "VISA Support", icon: LuMapPinned, path: "/visa-support" },
   {
@@ -97,6 +103,11 @@ const AiListings = () => {
 
   const [persistedSearchBarBadges, setPersistedSearchBarBadges] = useState([]);
 
+  const [typedHeading, setTypedHeading] = useState("");
+  const [isSecondHeadingPhase, setIsSecondHeadingPhase] = useState(false);
+  const [isHeadingSequenceComplete, setIsHeadingSequenceComplete] =
+    useState(false);
+
   const searchBarBadges = useMemo(() => {
     const locationStateBadges = location.state?.searchBarBadges;
 
@@ -106,6 +117,37 @@ const AiListings = () => {
 
     return persistedSearchBarBadges;
   }, [location.state, persistedSearchBarBadges]);
+
+  useEffect(() => {
+    let timeoutId;
+    let intervalId;
+    const typeText = (text, onComplete) => {
+      let index = 0;
+      setTypedHeading("");
+      intervalId = setInterval(() => {
+        index += 1;
+        setTypedHeading(text.slice(0, index));
+        if (index >= text.length) {
+          clearInterval(intervalId);
+          onComplete?.();
+        }
+      }, TYPING_INTERVAL_MS);
+    };
+    setIsSecondHeadingPhase(false);
+    setIsHeadingSequenceComplete(false);
+    typeText(THINKING_HEADING_TEXT, () => {
+      timeoutId = setTimeout(() => {
+        setIsSecondHeadingPhase(true);
+        typeText(CURATED_RESULTS_HEADING_TEXT, () =>
+          setIsHeadingSequenceComplete(true),
+        );
+      }, SECOND_HEADING_DELAY_MS);
+    });
+    return () => {
+      clearTimeout(timeoutId);
+      clearInterval(intervalId);
+    };
+  }, []);
   const { data: locations = [], isLoading: isLocations } = useQuery({
     queryKey: ["locations", user?.email],
     queryFn: async () => {
@@ -560,89 +602,101 @@ const AiListings = () => {
           onClear={() => navigate("/search/results")}
           className="mb-4"
         />
-        <div className="lg:hidden w-full flex flex-col gap-4 mb-4">
-          <button
-            onClick={() => setShowMobileSearch((prev) => !prev)}
-            className="bg-white shadow-md flex items-center w-[92%] mx-auto text-center justify-center font-medium text-secondary-dark border-2 px-6 py-2 rounded-full flex-col gap-1"
-          >
-            <div className="flex items-center gap-2">
-              <IoSearch className="text-primary-red" />
-              <span className="text-[11px] font-bold text-gray-900 truncate w-full text-left">
-                {`${(formData?.country || "Country").charAt(0).toUpperCase() + (formData?.country || "Country").slice(1)} . ${
-                  formData?.location
-                    ? formData.location
-                        .split(" ")
-                        .map(
-                          (word) =>
-                            word.charAt(0).toUpperCase() +
-                            word.slice(1).toLowerCase(),
-                        )
-                        .join(" ")
-                    : "Unknown"
-                } . ${
-                  formData?.category
-                    ? categoryOptions.find((c) => c.value === formData.category)
-                        ?.label ||
-                      formData.category.charAt(0).toUpperCase() +
-                        formData.category.slice(1)
-                    : "All"
-                }`}
+
+        <p className="mb-2 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
+          {!isSecondHeadingPhase && (
+            <span
+              className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-b-transparent"
+              aria-hidden="true"
+            />
+          )}
+          {typedHeading}
+        </p>
+        <div className={isHeadingSequenceComplete ? "block" : "hidden"}>
+          <div className="lg:hidden w-full flex flex-col gap-4 mb-4">
+            <button
+              onClick={() => setShowMobileSearch((prev) => !prev)}
+              className="bg-white shadow-md flex items-center w-[92%] mx-auto text-center justify-center font-medium text-secondary-dark border-2 px-6 py-2 rounded-full flex-col gap-1"
+            >
+              <div className="flex items-center gap-2">
+                <IoSearch className="text-primary-red" />
+                <span className="text-[11px] font-bold text-gray-900 truncate w-full text-left">
+                  {`${(formData?.country || "Country").charAt(0).toUpperCase() + (formData?.country || "Country").slice(1)} . ${
+                    formData?.location
+                      ? formData.location
+                          .split(" ")
+                          .map(
+                            (word) =>
+                              word.charAt(0).toUpperCase() +
+                              word.slice(1).toLowerCase(),
+                          )
+                          .join(" ")
+                      : "Unknown"
+                  } . ${
+                    formData?.category
+                      ? categoryOptions.find(
+                          (c) => c.value === formData.category,
+                        )?.label ||
+                        formData.category.charAt(0).toUpperCase() +
+                          formData.category.slice(1)
+                      : "All"
+                  }`}
+                </span>
+              </div>
+              <span className="text-[10px] text-gray-500">
+                {formData?.count || "1-5"} Nomads
               </span>
-            </div>
-            <span className="text-[10px] text-gray-500">
-              {formData?.count || "1-5"} Nomads
-            </span>
-          </button>
+            </button>
+          </div>
+
+          <div className="lg:hidden flex overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 md:justify-center">
+            {categoryOptions.map((cat) => {
+              const iconSrc = newIcons[cat.value];
+              const isActive = formData?.category === cat.value;
+              return (
+                <button
+                  key={cat.value}
+                  type="button"
+                  onClick={() => handleCategoryClick(cat.value)}
+                  className="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] lg:w-[10%]"
+                >
+                  <div className="h-10 w-full flex flex-col items-center gap-1">
+                    <img
+                      src={iconSrc}
+                      alt={cat.label}
+                      className="h-full w-[90%] object-contain"
+                    />
+                    <span
+                      className={`text-[10px] font-medium whitespace-nowrap border-b-2 ${isActive ? "border-primary-blue text-primary-blue" : "border-transparent text-black"}`}
+                    >
+                      {cat.label}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        <div className="lg:hidden flex overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 md:justify-center">
-          {categoryOptions.map((cat) => {
-            const iconSrc = newIcons[cat.value];
-            const isActive = formData?.category === cat.value;
-            return (
-              <button
-                key={cat.value}
-                type="button"
-                onClick={() => handleCategoryClick(cat.value)}
-                className="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] lg:w-[10%]"
-              >
-                <div className="h-10 w-full flex flex-col items-center gap-1">
-                  <img
-                    src={iconSrc}
-                    alt={cat.label}
-                    className="h-full w-[90%] object-contain"
-                  />
-                  <span
-                    className={`text-[10px] font-medium whitespace-nowrap border-b-2 ${isActive ? "border-primary-blue text-primary-blue" : "border-transparent text-black"}`}
-                  >
-                    {cat.label}
-                  </span>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+        <AnimatePresence>
+          {showMobileSearch && (
+            <motion.div
+              exit={{ y: "-100%" }}
+              transition={{ duration: 0.3 }}
+              className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 p-4 rounded-t-3xl lg:hidden h-[100dvh]"
+            >
+              <div className="flex justify-between items-center mb-10">
+                <div>&nbsp;</div>
+                <h3 className="text-xl font-semibold">Search</h3>
+                <button
+                  onClick={() => setShowMobileSearch(false)}
+                  className="text-gray-500 text-xl"
+                >
+                  &times;
+                </button>
+              </div>
 
-      <AnimatePresence>
-        {showMobileSearch && (
-          <motion.div
-            exit={{ y: "-100%" }}
-            transition={{ duration: 0.3 }}
-            className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 p-4 rounded-t-3xl lg:hidden h-[100dvh]"
-          >
-            <div className="flex justify-between items-center mb-10">
-              <div>&nbsp;</div>
-              <h3 className="text-xl font-semibold">Search</h3>
-              <button
-                onClick={() => setShowMobileSearch(false)}
-                className="text-gray-500 text-xl"
-              >
-                &times;
-              </button>
-            </div>
-
-            {/* <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              {/* <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <Controller
                 name="continent"
                 control={control}
@@ -710,55 +764,55 @@ const AiListings = () => {
                 Search
               </button>
             </form> */}
-          </motion.div>
-        )}
-      </AnimatePresence>
-      <div className="min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0 ">
-        <div className="lg:flex w-full items-center justify-between hidden">
-          <div className="flex flex-col gap-4 justify-center items-center  w-full mt-10 lg:mt-0">
-            <div className="hidden lg:flex flex-col gap-4 justify-between items-center w-full h-full">
-              {/* the 5 icons */}
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <div className="min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0 ">
+          <div className="lg:flex w-full items-center justify-between hidden">
+            <div className="flex flex-col gap-4 justify-center items-center  w-full mt-10 lg:mt-0">
+              <div className="hidden lg:flex flex-col gap-4 justify-between items-center w-full h-full">
+                {/* the 5 icons */}
 
-              <div className=" w-3/4 pb-4">
-                <div className="flex justify-between items-center">
-                  {categoryOptions.map((cat) => {
-                    const iconSrc = newIcons[cat.value];
-                    const isActive = activeCategory === cat.value;
+                <div className=" w-3/4 pb-4">
+                  <div className="flex justify-between items-center">
+                    {categoryOptions.map((cat) => {
+                      const iconSrc = newIcons[cat.value];
+                      const isActive = activeCategory === cat.value;
 
-                    return (
-                      <button
-                        key={cat.value}
-                        type="button"
-                        onClick={() => handleCategoryClick(cat.value)}
-                        className="text-black px-4 py-2 hover:text-black transition flex items-center justify-center w-full"
-                      >
-                        {iconSrc ? (
-                          <div className="h-10 w-full flex flex-col gap-0 items-center">
-                            <img
-                              src={iconSrc}
-                              alt={cat.label}
-                              className="h-full w-full object-contain"
-                            />
-                            <span
-                              className={`text-sm border-b-4 ${
-                                isActive
-                                  ? "border-primary-blue"
-                                  : "border-transparent"
-                              }`}
-                            >
-                              {cat.label}
-                            </span>
-                          </div>
-                        ) : (
-                          cat.label
-                        )}
-                      </button>
-                    );
-                  })}
+                      return (
+                        <button
+                          key={cat.value}
+                          type="button"
+                          onClick={() => handleCategoryClick(cat.value)}
+                          className="text-black px-4 py-2 hover:text-black transition flex items-center justify-center w-full"
+                        >
+                          {iconSrc ? (
+                            <div className="h-10 w-full flex flex-col gap-0 items-center">
+                              <img
+                                src={iconSrc}
+                                alt={cat.label}
+                                className="h-full w-full object-contain"
+                              />
+                              <span
+                                className={`text-sm border-b-4 ${
+                                  isActive
+                                    ? "border-primary-blue"
+                                    : "border-transparent"
+                                }`}
+                              >
+                                {cat.label}
+                              </span>
+                            </div>
+                          ) : (
+                            cat.label
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
 
-              {/* <form
+                {/* <form
                 onSubmit={handleSubmit(onSubmit)}
                 className=" flex justify-around md:w-full lg:w-full border-2 bg-gray-50 rounded-full p-0 items-center"
                 
@@ -832,10 +886,10 @@ const AiListings = () => {
                   <IoSearch />
                 </button>
               </form> */}
+              </div>
             </div>
           </div>
-        </div>
-        {/* <div className="lg:hidden w-full flex flex-col gap-4 my-0">
+          {/* <div className="lg:hidden w-full flex flex-col gap-4 my-0">
           
 
           <button
@@ -891,29 +945,29 @@ const AiListings = () => {
           </div>
 
         </div> */}
-      </div>
-      <AnimatePresence>
-        {showMobileSearch && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 p-0 rounded-t-3xl lg:hidden"
-          >
-            <motion.div className="bg-white shadow-2xl overflow-auto p-4 rounded-b-3xl  h-screen  w-full">
-              <div className="flex justify-between items-center mb-10">
-                <div>&nbsp;</div>
-                <h3 className="text-xl font-semibold">Search</h3>
-                <button
-                  onClick={() => setShowMobileSearch(false)}
-                  className="text-gray-500 text-xl"
-                >
-                  &times;
-                </button>
-              </div>
+        </div>
+        <AnimatePresence>
+          {showMobileSearch && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-auto z-50 p-0 rounded-t-3xl lg:hidden"
+            >
+              <motion.div className="bg-white shadow-2xl overflow-auto p-4 rounded-b-3xl  h-screen  w-full">
+                <div className="flex justify-between items-center mb-10">
+                  <div>&nbsp;</div>
+                  <h3 className="text-xl font-semibold">Search</h3>
+                  <button
+                    onClick={() => setShowMobileSearch(false)}
+                    className="text-gray-500 text-xl"
+                  >
+                    &times;
+                  </button>
+                </div>
 
-              {/* <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                {/* <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <Controller
                   name="continent"
                   control={control}
@@ -982,204 +1036,205 @@ const AiListings = () => {
                   Search
                 </button>
               </form> */}
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      <Container padding={false}>
-        {/* Dynamic Header */}
-        {formData?.category && formData?.location && (
-          <div className="mb-4 mt-2 px-1">
-            <h1 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight">
-              Popular{" "}
-              {{
-                coworking: "Co-Working Spaces",
-                coliving: "Co-Living Spaces",
-                hostel: "Hostels",
-                workation: "Workation",
-                privatestay: "Private Stays",
-                meetingroom: "Meeting Rooms",
-                cafe: "Cafes",
-                [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
-              }[formData.category] || `${formData.category} Spaces`}{" "}
-              in{" "}
-              {formData?.location
-                ? formData.location
-                    .split(" ")
-                    .map(
-                      (word) =>
-                        word.charAt(0).toUpperCase() +
-                        word.slice(1).toLowerCase(),
+          )}
+        </AnimatePresence>
+        <Container padding={false}>
+          {/* Dynamic Header */}
+          {formData?.category && formData?.location && (
+            <div className="mb-4 mt-2 px-1">
+              <h1 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight">
+                Popular{" "}
+                {{
+                  coworking: "Co-Working Spaces",
+                  coliving: "Co-Living Spaces",
+                  hostel: "Hostels",
+                  workation: "Workation",
+                  privatestay: "Private Stays",
+                  meetingroom: "Meeting Rooms",
+                  cafe: "Cafes",
+                  [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
+                }[formData.category] || `${formData.category} Spaces`}{" "}
+                in{" "}
+                {formData?.location
+                  ? formData.location
+                      .split(" ")
+                      .map(
+                        (word) =>
+                          word.charAt(0).toUpperCase() +
+                          word.slice(1).toLowerCase(),
+                      )
+                      .join(" ")
+                  : "Unknown"}
+              </h1>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 lg:grid-cols-9 gap-4">
+            {/* LIST VIEW */}
+            <motion.div
+              key="list-view"
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -50 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className={`${
+                showDesktopMap ? "col-span-5" : "col-span-9"
+              } font-semibold text-lg`}
+            >
+              {formData?.category === VALUE_ADDED_SERVICES_CATEGORY ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-5">
+                  {valueAddedServiceItems.map((service) => {
+                    const Icon = service.icon;
+                    const isDisabled = !service.path;
+
+                    return (
+                      <button
+                        key={service.label}
+                        type="button"
+                        onClick={() => handleValueAddedServiceClick(service)}
+                        disabled={isDisabled}
+                        className={`rounded-3xl bg-[#f1f1f3] px-4 py-6 min-h-[132px] aspect-square flex flex-col items-center justify-center text-center transition-colors ${
+                          isDisabled
+                            ? "cursor-not-allowed opacity-80"
+                            : "hover:bg-[#e8e8ed]"
+                        }`}
+                      >
+                        <Icon size={24} className="text-black/80" />
+                        <div className="mt-3 flex flex-col items-center gap-1.5 justify-center">
+                          <span className="text-xs font-bold uppercase text-black/90 leading-tight">
+                            {service.label}
+                          </span>
+                          {service.badge && (
+                            <span className="rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[9px] font-semibold normal-case text-black shadow-sm">
+                              {service.badge}
+                            </span>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <PaginatedGrid
+                  // data={isLisitingLoading ? skeletonArray : sortedListings}
+                  data={isLisitingLoading ? skeletonArray : filteredListings}
+                  entriesPerPage={
+                    isMobile ? 10 : isTablet ? 9 : !showDesktopMap ? 10 : 9
+                  }
+                  persistPage={true}
+                  resetPageKey={resetPageKey}
+                  columns={`grid-cols-2 md:grid-cols-3 ${
+                    showDesktopMap
+                      ? "lg:grid-cols-3"
+                      : "lg:grid-cols-4 xl:grid-cols-5"
+                  } gap-4 md:gap-5`}
+                  renderItem={(item, index) =>
+                    isLisitingLoading ? (
+                      <Box key={index} className="w-full h-full">
+                        <Skeleton
+                          variant="rectangular"
+                          height={200}
+                          sx={{ borderRadius: 2 }}
+                        />
+                        <Skeleton variant="text" width="80%" sx={{ mt: 1 }} />
+                        <Skeleton variant="text" width="60%" />
+                      </Box>
+                    ) : (
+                      <motion.div
+                        key={item._id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{
+                          duration: 0.4,
+                          delay: index * 0.1,
+                          ease: "easeOut",
+                        }}
+                      >
+                        <ListingCard
+                          item={item}
+                          showVertical={false}
+                          handleNavigation={() => {
+                            navigate(
+                              `/ai-listings/${encodeURIComponent(item.companyName)}`,
+                              {
+                                state: {
+                                  companyId: item.companyId,
+                                  type: item.companyType,
+                                },
+                              },
+                            );
+                          }}
+                        />
+                      </motion.div>
                     )
-                    .join(" ")
-                : "Unknown"}
-            </h1>
+                  }
+                />
+              )}
+            </motion.div>
+
+            {/* MAP VIEW */}
+            <AnimatePresence>
+              {showDesktopMap && (
+                <motion.div
+                  key="map-view"
+                  initial={{ opacity: 0, x: 50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 50 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  className="hidden lg:block col-span-4 w-full overflow-hidden rounded-xl lg:sticky lg:top-24 lg:self-start lg:h-[calc(100vh-120px)] min-h-[500px]"
+                >
+                  {isLisitingLoading ? (
+                    <SkeletonMap />
+                  ) : forMapsData?.length ? (
+                    <Map locations={forMapsData} />
+                  ) : (
+                    <div className="h-full flex items-center justify-center text-gray-500 text-sm border border-dotted rounded-lg">
+                      Map data not available.
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </Container>
+
+        {!isValueAddedServicesSelected && (
+          <div className="lg:hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-[1000]">
+            <button
+              onClick={() =>
+                navigate(
+                  `/verticals?country=${formData?.country}&location=${formData?.location}&view=map`,
+                  {
+                    state: { searchBarBadges },
+                  },
+                )
+              }
+              className="bg-[#222222] text-white px-5 py-3 rounded-full flex items-center gap-2 shadow-xl hover:scale-105 transition-transform active:scale-95"
+            >
+              <span className="text-sm font-semibold tracking-wide">
+                Show map
+              </span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 32 32"
+                aria-hidden="true"
+                role="presentation"
+                focusable="false"
+                style={{
+                  display: "block",
+                  height: "16px",
+                  width: "16px",
+                  fill: "white",
+                }}
+              >
+                <path d="M31.25 3.75a2.29 2.29 0 0 0-1.01-1.44A2.29 2.29 0 0 0 28.5 2L21 3.67l-10-2L2.5 3.56A2.29 2.29 0 0 0 .7 5.8v21.95a2.28 2.28 0 0 0 1.06 1.94A2.29 2.29 0 0 0 3.5 30L11 28.33l10 2 8.49-1.89a2.29 2.29 0 0 0 1.8-2.24V4.25a2.3 2.3 0 0 0-.06-.5zM12.5 25.98l-1.51-.3L9.5 26H9.5V4.66l1.51-.33 1.49.3v21.34zm10 1.36-1.51.33-1.49-.3V6.02l1.51.3L22.5 6h.01v21.34z"></path>
+              </svg>
+            </button>
           </div>
         )}
-
-        <div className="grid grid-cols-1 lg:grid-cols-9 gap-4">
-          {/* LIST VIEW */}
-          <motion.div
-            key="list-view"
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className={`${
-              showDesktopMap ? "col-span-5" : "col-span-9"
-            } font-semibold text-lg`}
-          >
-            {formData?.category === VALUE_ADDED_SERVICES_CATEGORY ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-5">
-                {valueAddedServiceItems.map((service) => {
-                  const Icon = service.icon;
-                  const isDisabled = !service.path;
-
-                  return (
-                    <button
-                      key={service.label}
-                      type="button"
-                      onClick={() => handleValueAddedServiceClick(service)}
-                      disabled={isDisabled}
-                      className={`rounded-3xl bg-[#f1f1f3] px-4 py-6 min-h-[132px] aspect-square flex flex-col items-center justify-center text-center transition-colors ${
-                        isDisabled
-                          ? "cursor-not-allowed opacity-80"
-                          : "hover:bg-[#e8e8ed]"
-                      }`}
-                    >
-                      <Icon size={24} className="text-black/80" />
-                      <div className="mt-3 flex flex-col items-center gap-1.5 justify-center">
-                        <span className="text-xs font-bold uppercase text-black/90 leading-tight">
-                          {service.label}
-                        </span>
-                        {service.badge && (
-                          <span className="rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[9px] font-semibold normal-case text-black shadow-sm">
-                            {service.badge}
-                          </span>
-                        )}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            ) : (
-              <PaginatedGrid
-                // data={isLisitingLoading ? skeletonArray : sortedListings}
-                data={isLisitingLoading ? skeletonArray : filteredListings}
-                entriesPerPage={
-                  isMobile ? 10 : isTablet ? 9 : !showDesktopMap ? 10 : 9
-                }
-                persistPage={true}
-                resetPageKey={resetPageKey}
-                columns={`grid-cols-2 md:grid-cols-3 ${
-                  showDesktopMap
-                    ? "lg:grid-cols-3"
-                    : "lg:grid-cols-4 xl:grid-cols-5"
-                } gap-4 md:gap-5`}
-                renderItem={(item, index) =>
-                  isLisitingLoading ? (
-                    <Box key={index} className="w-full h-full">
-                      <Skeleton
-                        variant="rectangular"
-                        height={200}
-                        sx={{ borderRadius: 2 }}
-                      />
-                      <Skeleton variant="text" width="80%" sx={{ mt: 1 }} />
-                      <Skeleton variant="text" width="60%" />
-                    </Box>
-                  ) : (
-                    <motion.div
-                      key={item._id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{
-                        duration: 0.4,
-                        delay: index * 0.1,
-                        ease: "easeOut",
-                      }}
-                    >
-                      <ListingCard
-                        item={item}
-                        showVertical={false}
-                        handleNavigation={() => {
-                          navigate(
-                            `/ai-listings/${encodeURIComponent(item.companyName)}`,
-                            {
-                              state: {
-                                companyId: item.companyId,
-                                type: item.companyType,
-                              },
-                            },
-                          );
-                        }}
-                      />
-                    </motion.div>
-                  )
-                }
-              />
-            )}
-          </motion.div>
-
-          {/* MAP VIEW */}
-          <AnimatePresence>
-            {showDesktopMap && (
-              <motion.div
-                key="map-view"
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 50 }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="hidden lg:block col-span-4 w-full overflow-hidden rounded-xl lg:sticky lg:top-24 lg:self-start lg:h-[calc(100vh-120px)] min-h-[500px]"
-              >
-                {isLisitingLoading ? (
-                  <SkeletonMap />
-                ) : forMapsData?.length ? (
-                  <Map locations={forMapsData} />
-                ) : (
-                  <div className="h-full flex items-center justify-center text-gray-500 text-sm border border-dotted rounded-lg">
-                    Map data not available.
-                  </div>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </Container>
-
-      {!isValueAddedServicesSelected && (
-        <div className="lg:hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-[1000]">
-          <button
-            onClick={() =>
-              navigate(
-                `/verticals?country=${formData?.country}&location=${formData?.location}&view=map`,
-                {
-                  state: { searchBarBadges },
-                },
-              )
-            }
-            className="bg-[#222222] text-white px-5 py-3 rounded-full flex items-center gap-2 shadow-xl hover:scale-105 transition-transform active:scale-95"
-          >
-            <span className="text-sm font-semibold tracking-wide">
-              Show map
-            </span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 32 32"
-              aria-hidden="true"
-              role="presentation"
-              focusable="false"
-              style={{
-                display: "block",
-                height: "16px",
-                width: "16px",
-                fill: "white",
-              }}
-            >
-              <path d="M31.25 3.75a2.29 2.29 0 0 0-1.01-1.44A2.29 2.29 0 0 0 28.5 2L21 3.67l-10-2L2.5 3.56A2.29 2.29 0 0 0 .7 5.8v21.95a2.28 2.28 0 0 0 1.06 1.94A2.29 2.29 0 0 0 3.5 30L11 28.33l10 2 8.49-1.89a2.29 2.29 0 0 0 1.8-2.24V4.25a2.3 2.3 0 0 0-.06-.5zM12.5 25.98l-1.51-.3L9.5 26H9.5V4.66l1.51-.33 1.49.3v21.34zm10 1.36-1.51.33-1.49-.3V6.02l1.51.3L22.5 6h.01v21.34z"></path>
-            </svg>
-          </button>
-        </div>
-      )}
+      </div>
     </div>
   );
 };
