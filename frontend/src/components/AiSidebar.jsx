@@ -130,7 +130,7 @@ const SidebarSection = ({
   return (
     <div className="px-4 pt-3">
       <div
-        className={`${showTopBorder ? "border-t border-black/10" : ""} pt-3`}
+        className={`${showTopBorder ? "border-t border-black/10" : ""} pt-2`}
       >
         {collapsed ? null : isExpandable ? (
           <button
@@ -292,20 +292,22 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     const Icon = becomeContributorLink.icon;
 
     return (
-      <div className="px-4">
-        <button
-          type="button"
-          onClick={() => handleBecomeContributorClick(becomeContributorLink)}
-          className="flex w-full items-center gap-2 rounded-md px-2 py-3 text-left text-[22px] text-black/80 transition hover:bg-white/70"
-          title={isCollapsed ? becomeContributorLink.label : ""}
-        >
-          <Icon size={18} className="shrink-0" />
-          {!isCollapsed && (
-            <span className="text-xs font-medium">
-              {becomeContributorLink.label}
-            </span>
-          )}
-        </button>
+      <div className="px-4 pt-3">
+        <div className="border-t border-black/10 pt-2">
+          <button
+            type="button"
+            onClick={() => handleBecomeContributorClick(becomeContributorLink)}
+            className="flex w-full items-center gap-2 rounded-md px-2 py-3 text-left text-[22px] text-black/80 transition hover:bg-white/70"
+            title={isCollapsed ? becomeContributorLink.label : ""}
+          >
+            <Icon size={18} className="shrink-0" />
+            {!isCollapsed && (
+              <span className="text-xs font-medium">
+                {becomeContributorLink.label}
+              </span>
+            )}
+          </button>
+        </div>
       </div>
     );
   };
