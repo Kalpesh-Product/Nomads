@@ -9,12 +9,9 @@ import {
   Typography,
 } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
 import { Country } from "country-state-city";
 import Swal from "sweetalert2";
 import Container from "../components/Container";
-import axios from "../utils/axios";
-import { showErrorAlert } from "../utils/alerts";
 
 const floatingLabelSx = {
   color: "black",
@@ -40,33 +37,27 @@ const AiBecomeContributor = () => {
   const [typedPageHeading, setTypedPageHeading] = useState("");
   const [isFormVisible, setIsFormVisible] = useState(false);
   const countries = useMemo(() => Country.getAllCountries(), []);
-  const { control, handleSubmit, reset, setValue, watch } = useForm({
+  const { control, reset, setValue, watch } = useForm({
     defaultValues,
   });
   const selectedCountry = watch("currentCountry");
 
-  const { mutate: submitForm, isPending } = useMutation({
-    mutationFn: async (data) => {
-      const response = await axios.post("forms/add-new-b2c-form-submission", {
-        ...data,
-        sheetName: "AI_Become_A_Contributor",
-      });
-      return response.data;
-    },
-    onSuccess: async () => {
-      await Swal.fire({
-        title: "Request Submitted!",
-        text: "Your form has been submitted. We will get back to you shortly.",
-        icon: "success",
-        confirmButtonText: "OK",
-        confirmButtonColor: "#0BA9EF",
-      });
-      reset(defaultValues);
-    },
-    onError: (error) => {
-      showErrorAlert(error?.response?.data?.message || "Failed to submit form");
-    },
-  });
+  const [isPending, setIsPending] = useState(false);
+
+  const handleFormSubmit = async () => {
+    setIsPending(true);
+
+    await Swal.fire({
+      title: "Request Submitted!",
+      text: "Your form has been submitted. We will get back to you shortly.",
+      icon: "success",
+      confirmButtonText: "OK",
+      confirmButtonColor: "#0BA9EF",
+    });
+
+    reset(defaultValues);
+    setIsPending(false);
+  };
 
   const handleCountryChange = (countryName, onChange) => {
     const country = countries.find((item) => item.name === countryName);
@@ -137,7 +128,10 @@ const AiBecomeContributor = () => {
             </div>
             <Box
               component="form"
-              onSubmit={handleSubmit((data) => submitForm(data))}
+              onSubmit={(event) => {
+                event.preventDefault();
+                handleFormSubmit();
+              }}
               className={`bg-white p-6 md:p-10 rounded-2xl ${
                 isFormVisible ? "visible" : "invisible"
               }`}
@@ -153,7 +147,6 @@ const AiBecomeContributor = () => {
                       fullWidth
                       label="Full Name"
                       variant="standard"
-                      required
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
@@ -177,7 +170,6 @@ const AiBecomeContributor = () => {
                       fullWidth
                       label="Email"
                       variant="standard"
-                      required
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
@@ -196,7 +188,6 @@ const AiBecomeContributor = () => {
                       select
                       label="Current Country"
                       variant="standard"
-                      required
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
