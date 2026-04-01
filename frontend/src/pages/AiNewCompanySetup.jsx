@@ -22,12 +22,17 @@ const floatingLabelSx = {
 };
 
 const supportOptions = [
-  "Company Registration",
-  "Tax Setup",
-  "Legal & Compliance",
-  "Banking Assistance",
-  "Office/Virtual Office Setup",
-  "Other",
+  "Private / Co-Working Setup for Registration",
+  "Virtual Office Setup for Registration",
+  "Fresh New Company Setup",
+  "Subsidiary / Foreign Company Setup",
+  "Branch / Liaison Office Setup",
+  "LLP / Partnership Firm Registration",
+  "Redomiciliation / Company Migration",
+  "Setting up Holding Company Structure",
+  "Sole Proprietorship Registration",
+  "Offshore Company Setup",
+  "Not Sure - Need Customised Support",
 ];
 
 const defaultValues = {

@@ -22,12 +22,12 @@ const floatingLabelSx = {
 };
 
 const activationSupportOptions = [
-  "Visa & Immigration",
-  "Relocation Assistance",
-  "Accommodation Support",
-  "On-ground Activation",
-  "Compliance & Documentation",
-  "Other",
+  "Private Family Stay Setup Assistance",
+  "Shared / Co-Living Setup Assistance",
+  "Private Office Setup Assistance",
+  "Co-Working Setup Assistance",
+  "Overall New Location Setup Assistance",
+  "Not Sure - Need Customised Support",
 ];
 
 const defaultValues = {
