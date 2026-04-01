@@ -23,6 +23,7 @@ import { MdOutlineWorkHistory } from "react-icons/md";
 import { HiOutlineCurrencyDollar } from "react-icons/hi";
 import { RiUserCommunityLine } from "react-icons/ri";
 import { TbAward, TbWorldWww } from "react-icons/tb";
+import { IoMdPersonAdd } from "react-icons/io";
 
 const gatedRecommendationLabels = new Set([
   "Work From Anywhere",
@@ -91,14 +92,6 @@ const valueAdditionItems = [
 
 const becomeHostItem = [{ label: "Become A Host", icon: HiOutlineViewGrid }];
 
-const becomeContributorItem = [
-  {
-    label: "Become A Contributor",
-    icon: HiOutlineViewGrid,
-    path: "/become-a-contributor",
-  },
-];
-
 const loggedOutPrompt = {
   title: "Get responses tailored to you",
   description:
@@ -116,12 +109,19 @@ const profileItems = [
 
 const signOutItem = [{ label: "Sign Out", icon: HiOutlineLogout }];
 
+const becomeContributorLink = {
+  label: "Become A Contributor",
+  icon: IoMdPersonAdd,
+  path: "/become-a-contributor",
+};
+
 const SidebarSection = ({
   title,
   items,
   collapsed,
   isExpandable = false,
   isOpen = true,
+  showTopBorder = true,
   onToggle,
   onItemClick,
 }) => {
@@ -129,7 +129,9 @@ const SidebarSection = ({
 
   return (
     <div className="px-4 pt-3">
-      <div className="border-t border-black/10 pt-3">
+      <div
+        className={`${showTopBorder ? "border-t border-black/10" : ""} pt-3`}
+      >
         {collapsed ? null : isExpandable ? (
           <button
             type="button"
@@ -286,6 +288,28 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
   const isCollapsed = isMobileOverlay ? false : collapsed;
 
+  const BecomeContributorButton = () => {
+    const Icon = becomeContributorLink.icon;
+
+    return (
+      <div className="px-4">
+        <button
+          type="button"
+          onClick={() => handleBecomeContributorClick(becomeContributorLink)}
+          className="flex w-full items-center gap-2 rounded-md px-2 py-3 text-left text-[22px] text-black/80 transition hover:bg-white/70"
+          title={isCollapsed ? becomeContributorLink.label : ""}
+        >
+          <Icon size={18} className="shrink-0" />
+          {!isCollapsed && (
+            <span className="text-xs font-medium">
+              {becomeContributorLink.label}
+            </span>
+          )}
+        </button>
+      </div>
+    );
+  };
+
   return (
     <aside
       className={`flex h-full max-h-screen flex-col overflow-y-auto overscroll-contain border-r border-black/10 bg-[#efefef] transition-all duration-300 custom-scrollbar-hide ${
@@ -363,11 +387,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
             collapsed={isCollapsed}
             onItemClick={handleBecomeHostClick}
           />
-          <SidebarSection
-            items={becomeContributorItem}
-            collapsed={isCollapsed}
-            onItemClick={handleBecomeContributorClick}
-          />
+          <BecomeContributorButton />
           <SidebarSection
             items={signOutItem}
             collapsed={isCollapsed}
@@ -381,11 +401,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
             collapsed={isCollapsed}
             onItemClick={handleBecomeHostClick}
           />
-          <SidebarSection
-            items={becomeContributorItem}
-            collapsed={isCollapsed}
-            onItemClick={handleBecomeContributorClick}
-          />
+          <BecomeContributorButton />
           {!isCollapsed && (
             <div className="mt-auto px-4 pb-4 pt-10">
               <div className="rounded-[28px]   p-4 shadow-sm">

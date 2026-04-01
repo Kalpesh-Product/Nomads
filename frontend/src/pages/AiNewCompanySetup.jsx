@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
@@ -11,11 +11,9 @@ import {
 import { Controller, useForm } from "react-hook-form";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
-import { useMutation } from "@tanstack/react-query";
 import { Country } from "country-state-city";
+import Swal from "sweetalert2";
 import Container from "../components/Container";
-import axios from "../utils/axios";
-import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 
 const floatingLabelSx = {
   color: "black",
@@ -46,29 +44,36 @@ const defaultValues = {
   comments: "",
 };
 
+const NEW_COMPANY_PROMPT =
+  "Planning to build your business abroad? Share your details and we will support your setup journey.";
+const NEW_COMPANY_HEADING = "New Company Setup";
+
 const AiNewCompanySetup = () => {
+  const [typedMessage, setTypedMessage] = useState("");
+  const [typedPageHeading, setTypedPageHeading] = useState("");
+  const [isFormVisible, setIsFormVisible] = useState(false);
   const countries = useMemo(() => Country.getAllCountries(), []);
-  const { control, handleSubmit, reset, setValue, watch } = useForm({
+  const { control, reset, setValue, watch } = useForm({
     defaultValues,
   });
   const selectedNationality = watch("nationalityOnPassport");
 
-  const { mutate: submitForm, isPending } = useMutation({
-    mutationFn: async (data) => {
-      const response = await axios.post("forms/add-new-b2c-form-submission", {
-        ...data,
-        sheetName: "AI_New_Company_Setup",
-      });
-      return response.data;
-    },
-    onSuccess: () => {
-      showSuccessAlert("Form submitted successfully");
-      reset(defaultValues);
-    },
-    onError: (error) => {
-      showErrorAlert(error?.response?.data?.message || "Failed to submit form");
-    },
-  });
+  const [isPending, setIsPending] = useState(false);
+
+  const handleFormSubmit = async () => {
+    setIsPending(true);
+
+    await Swal.fire({
+      title: "Request Submitted!",
+      text: "Your form has been submitted. We will get back to you shortly.",
+      icon: "success",
+      confirmButtonText: "OK",
+      confirmButtonColor: "#0BA9EF",
+    });
+
+    reset(defaultValues);
+    setIsPending(false);
+  };
 
   const handleNationalityChange = (countryName, onChange) => {
     const country = countries.find((item) => item.name === countryName);
@@ -85,20 +90,68 @@ const AiNewCompanySetup = () => {
     });
   };
 
+  useEffect(() => {
+    setTypedMessage("");
+    setTypedPageHeading("");
+    setIsFormVisible(false);
+
+    let messageIndex = 0;
+    let headingIndex = 0;
+    let cleanupHeading = () => {};
+
+    const typeHeading = () => {
+      const headingInterval = setInterval(() => {
+        headingIndex += 1;
+        setTypedPageHeading(NEW_COMPANY_HEADING.slice(0, headingIndex));
+
+        if (headingIndex >= NEW_COMPANY_HEADING.length) {
+          clearInterval(headingInterval);
+          setIsFormVisible(true);
+        }
+      }, 35);
+
+      cleanupHeading = () => clearInterval(headingInterval);
+    };
+
+    const messageInterval = setInterval(() => {
+      messageIndex += 1;
+      setTypedMessage(NEW_COMPANY_PROMPT.slice(0, messageIndex));
+
+      if (messageIndex >= NEW_COMPANY_PROMPT.length) {
+        clearInterval(messageInterval);
+        typeHeading();
+      }
+    }, 25);
+
+    return () => {
+      clearInterval(messageInterval);
+      cleanupHeading();
+    };
+  }, []);
+
   return (
     <div className="bg-white text-black font-sans">
       <Container padding={false}>
         <section className="min-h-[85vh] flex items-center justify-center py-8">
           <div className="w-full max-w-5xl md:px-20 lg:px-40">
+            <div className="mx-auto mb-8 flex w-full max-w-4xl flex-col items-center gap-4 px-6">
+              <p className="min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1.2rem]">
+                {typedMessage}
+              </p>
+              <h1 className="text-hero min-h-[3rem] text-center font-play">
+                {typedPageHeading}
+              </h1>
+            </div>
             <Box
               component="form"
-              onSubmit={handleSubmit((data) => submitForm(data))}
-              className="bg-white p-6 md:p-10 rounded-2xl "
+              onSubmit={(event) => {
+                event.preventDefault();
+                handleFormSubmit();
+              }}
+              className={`bg-white p-6 md:p-10 rounded-2xl ${
+                isFormVisible ? "visible" : "invisible"
+              }`}
             >
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold uppercase mb-8 text-center">
-                New Company Setup
-              </h2>
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 <Controller
                   name="fullName"
@@ -110,7 +163,6 @@ const AiNewCompanySetup = () => {
                       fullWidth
                       label="Full Name"
                       variant="standard"
-                      required
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
@@ -134,7 +186,6 @@ const AiNewCompanySetup = () => {
                       fullWidth
                       label="Email Address"
                       variant="standard"
-                      required
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
@@ -219,7 +270,6 @@ const AiNewCompanySetup = () => {
                       select
                       label="Nationality on Passport"
                       variant="standard"
-                      required
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
@@ -253,7 +303,6 @@ const AiNewCompanySetup = () => {
                       select
                       label="New Company Country"
                       variant="standard"
-                      required
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
@@ -349,7 +398,7 @@ const AiNewCompanySetup = () => {
                       select
                       label="Support Required"
                       variant="standard"
-                      required
+                      // required
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}

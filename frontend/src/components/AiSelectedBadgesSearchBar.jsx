@@ -13,6 +13,7 @@ const AiSelectedBadgesSearchBar = ({
   stateLabel = "",
   onBack,
   onClear,
+  heading = null,
   className = "",
 }) => {
   const visibleBadges = badges.filter(Boolean);
@@ -34,8 +35,15 @@ const AiSelectedBadgesSearchBar = ({
           </span>
         )}
       </div>
+      {heading && (
+        <div className="mx-auto mt-4 w-full max-w-[50rem] lg:max-w-[61rem] xl:max-w-[61rem]">
+          {heading}
+        </div>
+      )}
 
-      <div className="mx-auto mt-4 flex min-h-[58px] w-full max-w-[50rem] items-center rounded-full border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] xl:max-w-[52rem]">
+      <div
+        className={`mx-auto flex min-h-[58px] w-full max-w-[50rem] items-center rounded-full border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] lg:max-w-[61rem] xl:max-w-[61rem] ${heading ? "mt-2" : "mt-4"}`}
+      >
         <div className="flex flex-1 flex-wrap items-center gap-2 overflow-hidden">
           {visibleBadges.map((badgeLabel, index) => (
             <div key={`${badgeLabel}-${index}`} className={badgeClassName}>

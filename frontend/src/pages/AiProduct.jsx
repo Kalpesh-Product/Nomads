@@ -660,7 +660,7 @@ const AiProduct = () => {
       </TransparentModal>
 
       {/* ==================== DESKTOP VIEW (lg and above) ==================== */}
-      <div className="hidden lg:block min-w-[70%] max-w-[80rem] lg:max-w-[70rem] mx-0 md:mx-auto">
+      <div className="hidden lg:block min-w-[70%] max-w-[80rem] lg:max-w-full mx-0 md:mx-auto">
         <div className="pb-4">
           {/* Breadcrumb - Desktop Only */}
           <nav

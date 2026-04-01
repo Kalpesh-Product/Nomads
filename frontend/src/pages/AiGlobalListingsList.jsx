@@ -26,6 +26,21 @@ import { Helmet } from "@dr.pogodin/react-helmet";
 import useAuth from "../hooks/useAuth.js";
 import { HiOutlineX } from "react-icons/hi";
 
+import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
+import {
+  HiOutlineCog,
+  HiOutlineKey,
+  HiOutlineUserCircle,
+} from "react-icons/hi";
+
+const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
+
+const TYPING_INTERVAL_MS = 24;
+const SECOND_HEADING_DELAY_MS = 250;
+const THINKING_HEADING_TEXT = "Curating the best results for you";
+const CURATED_RESULTS_HEADING_TEXT =
+  "Please find below the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
+
 const HorizontalScrollWrapper = ({ children, title }) => {
   const scrollRef = React.useRef(null);
   const [showLeft, setShowLeft] = useState(false);
@@ -75,6 +90,26 @@ const HorizontalScrollWrapper = ({ children, title }) => {
   );
 };
 
+const valueAddedServiceItems = [
+  { label: "VISA Support", icon: LuMapPinned, path: "/visa-support" },
+  {
+    label: "Overall Activation Support",
+    icon: HiOutlineKey,
+    path: "/overall-activation-support",
+  },
+  {
+    label: "New Company Setup",
+    icon: HiOutlineCog,
+    path: "/new-company-setup",
+  },
+  { label: "Consultation", icon: LuCircleDollarSign, path: "/consultation" },
+  {
+    label: "Apply for Job",
+    icon: HiOutlineUserCircle,
+    badge: "Coming soon",
+  },
+];
+
 const AiGlobalListingsList = () => {
   const [favorites, setFavorites] = useState([]);
   const [expandedCategories, setExpandedCategories] = useState([]);
@@ -100,6 +135,11 @@ const AiGlobalListingsList = () => {
 
   const [persistedSearchBarBadges, setPersistedSearchBarBadges] = useState([]);
 
+  const [typedHeading, setTypedHeading] = useState("");
+  const [isSecondHeadingPhase, setIsSecondHeadingPhase] = useState(false);
+  const [isHeadingSequenceComplete, setIsHeadingSequenceComplete] =
+    useState(false);
+
   const searchBarBadges = useMemo(() => {
     const locationStateBadges = location.state?.searchBarBadges;
 
@@ -109,6 +149,41 @@ const AiGlobalListingsList = () => {
 
     return persistedSearchBarBadges;
   }, [location.state, persistedSearchBarBadges]);
+
+  useEffect(() => {
+    let timeoutId;
+    let intervalId;
+
+    const typeText = (text, onComplete) => {
+      let index = 0;
+      setTypedHeading("");
+      intervalId = setInterval(() => {
+        index += 1;
+        setTypedHeading(text.slice(0, index));
+        if (index >= text.length) {
+          clearInterval(intervalId);
+          onComplete?.();
+        }
+      }, TYPING_INTERVAL_MS);
+    };
+
+    setIsSecondHeadingPhase(false);
+    setIsHeadingSequenceComplete(false);
+
+    typeText(THINKING_HEADING_TEXT, () => {
+      timeoutId = setTimeout(() => {
+        setIsSecondHeadingPhase(true);
+        typeText(CURATED_RESULTS_HEADING_TEXT, () => {
+          setIsHeadingSequenceComplete(true);
+        });
+      }, SECOND_HEADING_DELAY_MS);
+    });
+
+    return () => {
+      clearTimeout(timeoutId);
+      clearInterval(intervalId);
+    };
+  }, []);
 
   // Special users who can see all locations
   const specialUserEmails = [
@@ -243,7 +318,14 @@ const AiGlobalListingsList = () => {
   });
 
   const categoryOptions = useMemo(() => {
-    if (!listingsData || listingsData.length === 0) return [];
+    if (!listingsData || listingsData.length === 0) {
+      return [
+        {
+          label: "Value Added Services",
+          value: VALUE_ADDED_SERVICES_CATEGORY,
+        },
+      ];
+    }
 
     const uniqueTypes = [
       ...new Set(
@@ -261,6 +343,7 @@ const AiGlobalListingsList = () => {
       workation: "Workation",
       meetingroom: "Meetings",
       cafe: "Cafe's",
+      [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
     };
 
     const typeOrder = [
@@ -270,11 +353,26 @@ const AiGlobalListingsList = () => {
       "workation",
       "meetingroom",
       "cafe",
+      VALUE_ADDED_SERVICES_CATEGORY,
     ];
 
-    return uniqueTypes
+    const options = uniqueTypes
       .map((type) => ({ label: labelMap[type] || type, value: type }))
       .sort((a, b) => typeOrder.indexOf(a.value) - typeOrder.indexOf(b.value));
+
+    if (
+      options.some((option) => option.value === VALUE_ADDED_SERVICES_CATEGORY)
+    ) {
+      return options;
+    }
+
+    return [
+      ...options,
+      {
+        label: "Value Added Services",
+        value: VALUE_ADDED_SERVICES_CATEGORY,
+      },
+    ];
   }, [listingsData]);
 
   const groupedListings = listingsData?.reduce((acc, item) => {
@@ -408,6 +506,16 @@ const AiGlobalListingsList = () => {
     );
   };
 
+  const handleValueAddedServiceClick = (service) => {
+    if (!service.path) return;
+
+    const params = new URLSearchParams(location.search);
+    navigate({
+      pathname: service.path,
+      search: params.toString() ? `?${params.toString()}` : "",
+    });
+  };
+
   const prioritizedCompanies = ["BIZ Nest", "MeWo"];
   const sortedListings = [...(listingsData || [])].sort((a, b) => {
     const aIsPriority = prioritizedCompanies.includes(a.companyName);
@@ -468,12 +576,25 @@ const AiGlobalListingsList = () => {
           stateLabel={selectedLocationLabel}
           onBack={() => navigate("/search/results")}
           onClear={() => navigate("/search/results")}
+          heading={
+            <p className=" mt-6 mb-6 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
+              {!isSecondHeadingPhase && (
+                <span
+                  className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-b-transparent"
+                  aria-hidden="true"
+                />
+              )}
+              {typedHeading}
+            </p>
+          }
           className="mb-2"
         />
-        <div className="flex flex-col gap-4 justify-center items-center w-full">
+        <div
+          className={`${isHeadingSequenceComplete ? "flex" : "hidden"} flex-col gap-4 justify-center items-center w-full`}
+        >
           <div className="min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0">
             <div className="flex flex-col gap-4 justify-between items-center w-full h-full">
-              <div className="w-3/4 pb-4">
+              <div className="w-11/12 pb-4">
                 <div className="flex justify-between items-center">
                   {categoryOptions.map((cat) => {
                     const iconSrc = newIcons[cat.value];
@@ -482,7 +603,7 @@ const AiGlobalListingsList = () => {
                         key={cat.value}
                         type="button"
                         onClick={() => handleCategoryClick(cat.value)}
-                        className="text-black px-4 py-2 hover:text-black transition flex items-center justify-center w-full"
+                        className="text-black px-1 py-2 hover:text-black transition flex items-center justify-center w-full"
                       >
                         {iconSrc ? (
                           <div className="h-10 w-full flex flex-col gap-0">
@@ -491,7 +612,7 @@ const AiGlobalListingsList = () => {
                               alt={cat.label}
                               className="h-full w-full object-contain"
                             />
-                            <span className="text-sm">{cat.label}</span>
+                            <span className="text-tiny">{cat.label}</span>
                           </div>
                         ) : (
                           cat.label
@@ -579,118 +700,162 @@ const AiGlobalListingsList = () => {
           </div>
         </div>
 
-        <Container padding={false}>
-          <div className="">
-            <div className="font-semibold text-md">
-              <div className="custom-scrollbar-hide">
-                {isLisitingLoading ? (
-                  Array.from({ length: 4 }).map((_, i) => (
-                    <SkeletonCard key={i} />
-                  ))
-                ) : groupedListings &&
-                  Object.keys(groupedListings).length > 0 ? (
-                  <>
-                    <div className="border-t border-gray-300 mt-0 mb-6" />
-                    {Object.entries(groupedListings)
-                      .sort(([typeA], [typeB]) => {
-                        const typeOrder = [
-                          "coworking",
-                          "coliving",
-                          "hostel",
-                          "workation",
-                          "privatestay",
-                          "meetingroom",
-                          "cafe",
-                        ];
-                        const indexA = typeOrder.indexOf(typeA);
-                        const indexB = typeOrder.indexOf(typeB);
-                        return (
-                          (indexA === -1 ? 999 : indexA) -
-                          (indexB === -1 ? 999 : indexB)
-                        );
-                      })
-                      .map(([type, items], index) => {
-                        const prioritizedCompanies = ["BIZ Nest", "MeWo"];
-                        const sortedItems = [...items].sort((a, b) => {
-                          const aPriorityIndex = prioritizedCompanies.indexOf(
-                            a.companyName,
+        <div className={isHeadingSequenceComplete ? "block" : "hidden"}>
+          <Container padding={false}>
+            <div className="">
+              <div className="font-semibold text-md">
+                <div className="custom-scrollbar-hide">
+                  {isLisitingLoading ? (
+                    Array.from({ length: 4 }).map((_, i) => (
+                      <SkeletonCard key={i} />
+                    ))
+                  ) : groupedListings &&
+                    Object.keys(groupedListings).length > 0 ? (
+                    <>
+                      <div className="border-t border-gray-300 mt-0 mb-6" />
+                      {Object.entries(groupedListings)
+                        .sort(([typeA], [typeB]) => {
+                          const typeOrder = [
+                            "coworking",
+                            "coliving",
+                            "hostel",
+                            "workation",
+                            "privatestay",
+                            "meetingroom",
+                            "cafe",
+                          ];
+                          const indexA = typeOrder.indexOf(typeA);
+                          const indexB = typeOrder.indexOf(typeB);
+                          return (
+                            (indexA === -1 ? 999 : indexA) -
+                            (indexB === -1 ? 999 : indexB)
                           );
-                          const bPriorityIndex = prioritizedCompanies.indexOf(
-                            b.companyName,
-                          );
-                          if (aPriorityIndex !== -1 && bPriorityIndex !== -1) {
-                            return aPriorityIndex - bPriorityIndex;
-                          }
-                          if (aPriorityIndex !== -1) return -1;
-                          if (bPriorityIndex !== -1) return 1;
-                          const aRating = Number(a.ratings || 0);
-                          const bRating = Number(b.ratings || 0);
-                          return bRating - aRating;
-                        });
+                        })
+                        .map(([type, items], index) => {
+                          const prioritizedCompanies = ["BIZ Nest", "MeWo"];
+                          const sortedItems = [...items].sort((a, b) => {
+                            const aPriorityIndex = prioritizedCompanies.indexOf(
+                              a.companyName,
+                            );
+                            const bPriorityIndex = prioritizedCompanies.indexOf(
+                              b.companyName,
+                            );
+                            if (
+                              aPriorityIndex !== -1 &&
+                              bPriorityIndex !== -1
+                            ) {
+                              return aPriorityIndex - bPriorityIndex;
+                            }
+                            if (aPriorityIndex !== -1) return -1;
+                            if (bPriorityIndex !== -1) return 1;
+                            const aRating = Number(a.ratings || 0);
+                            const bRating = Number(b.ratings || 0);
+                            return bRating - aRating;
+                          });
 
-                        const displayItems = expandedCategories.includes(type)
-                          ? sortedItems
-                          : sortedItems.slice(0, 5);
-                        const showViewMore = sortedItems.length > 5;
-                        const sectionTitle = `Popular ${typeLabels[type] || typeLabels.default(type)} in ${selectedLocationLabel}`;
+                          const displayItems = expandedCategories.includes(type)
+                            ? sortedItems
+                            : sortedItems.slice(0, 5);
+                          const showViewMore = sortedItems.length > 5;
+                          const sectionTitle = `Popular ${typeLabels[type] || typeLabels.default(type)} in ${selectedLocationLabel}`;
 
-                        return (
-                          <div
-                            key={type}
-                            className={`col-span-full ${
-                              index > 0
-                                ? "border-t border-gray-300 mt-6 pt-6"
-                                : ""
-                            } mb-6`}
-                          >
-                            <h2 className="text-subtitle font-semibold mb-5 text-secondary-dark">
-                              {sectionTitle}
-                            </h2>
-                            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-x-5 gap-y-0">
-                              {displayItems.map((item) => (
-                                <ListingCard
-                                  key={item._id}
-                                  item={item}
-                                  showVertical={false}
-                                  handleNavigation={() =>
-                                    navigate(
-                                      `/ai-listings/${encodeURIComponent(item.companyName)}`,
-                                      {
-                                        state: {
-                                          companyId: item.companyId,
-                                          type: item.companyType,
+                          return (
+                            <div
+                              key={type}
+                              className={`col-span-full ${
+                                index > 0
+                                  ? "border-t border-gray-300 mt-6 pt-6"
+                                  : ""
+                              } mb-6`}
+                            >
+                              <h2 className="text-subtitle font-semibold mb-5 text-secondary-dark">
+                                {sectionTitle}
+                              </h2>
+                              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-x-5 gap-y-0">
+                                {displayItems.map((item) => (
+                                  <ListingCard
+                                    key={item._id}
+                                    item={item}
+                                    showVertical={false}
+                                    handleNavigation={() =>
+                                      navigate(
+                                        `/ai-listings/${encodeURIComponent(item.companyName)}`,
+                                        {
+                                          state: {
+                                            companyId: item.companyId,
+                                            type: item.companyType,
+                                          },
                                         },
-                                      },
-                                    )
-                                  }
-                                />
-                              ))}
-                            </div>
-                            {showViewMore && (
-                              <div className="mt-0 text-right">
-                                <button
-                                  onClick={() => handleShowMoreClick(type)}
-                                  className="text-primary-blue text-sm font-semibold hover:underline"
-                                >
-                                  {expandedCategories.includes(type)
-                                    ? "View less ←"
-                                    : "View more →"}
-                                </button>
+                                      )
+                                    }
+                                  />
+                                ))}
                               </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                  </>
-                ) : (
-                  <div className="col-span-full text-center text-sm text-gray-500 border border-dotted rounded-lg p-4">
-                    No listings found.
-                  </div>
-                )}
+                              {showViewMore && (
+                                <div className="mt-0 text-right">
+                                  <button
+                                    onClick={() => handleShowMoreClick(type)}
+                                    className="text-primary-blue text-sm font-semibold hover:underline"
+                                  >
+                                    {expandedCategories.includes(type)
+                                      ? "View less ←"
+                                      : "View more →"}
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      <div className="col-span-full border-t border-gray-300 mt-6 pt-6 mb-6">
+                        <h2 className="text-subtitle font-semibold mb-5 text-secondary-dark">
+                          Value Added Services in {selectedLocationLabel}
+                        </h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                          {valueAddedServiceItems.map((service) => {
+                            const Icon = service.icon;
+                            const isDisabled = !service.path;
+
+                            return (
+                              <button
+                                key={service.label}
+                                type="button"
+                                onClick={() =>
+                                  handleValueAddedServiceClick(service)
+                                }
+                                disabled={isDisabled}
+                                className={`rounded-3xl bg-[#f1f1f3] px-4 py-6 min-h-[132px] aspect-square flex flex-col items-center justify-center text-center transition-colors ${
+                                  isDisabled
+                                    ? "cursor-not-allowed opacity-80"
+                                    : "hover:bg-[#e8e8ed]"
+                                }`}
+                              >
+                                <Icon size={24} className="text-black/80" />
+                                <div className="mt-3 flex flex-col items-center gap-1.5 justify-center">
+                                  <span className="text-xs font-bold uppercase text-black/90 leading-tight">
+                                    {service.label}
+                                  </span>
+                                  {service.badge && (
+                                    <span className="rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[9px] font-semibold normal-case text-black shadow-sm">
+                                      {service.badge}
+                                    </span>
+                                  )}
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="col-span-full text-center text-sm text-gray-500 border border-dotted rounded-lg p-4">
+                      No listings found.
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        </Container>
+          </Container>
+        </div>
       </div>
 
       {/* ==================== MOBILE/TABLET VIEW (below lg) ==================== */}
@@ -871,109 +1036,190 @@ const AiGlobalListingsList = () => {
                   ))
                 ) : groupedListings &&
                   Object.keys(groupedListings).length > 0 ? (
-                  Object.entries(groupedListings)
-                    .sort(([typeA], [typeB]) => {
-                      const typeOrder = [
-                        "coworking",
-                        "hostel",
-                        "workation",
-                        "privatestay",
-                        "coliving",
-                        "meetingroom",
-                        "cafe",
-                      ];
-                      const indexA = typeOrder.indexOf(typeA);
-                      const indexB = typeOrder.indexOf(typeB);
-                      return (
-                        (indexA === -1 ? 999 : indexA) -
-                        (indexB === -1 ? 999 : indexB)
-                      );
-                    })
-                    .map(([type, items]) => {
-                      const prioritizedCompanies = ["BIZ Nest", "MeWo"];
-                      const sortedItems = [...items].sort((a, b) => {
-                        const aPriorityIndex = prioritizedCompanies.indexOf(
-                          a.companyName,
+                  <>
+                    {Object.entries(groupedListings)
+                      .sort(([typeA], [typeB]) => {
+                        const typeOrder = [
+                          "coworking",
+                          "hostel",
+                          "workation",
+                          "privatestay",
+                          "coliving",
+                          "meetingroom",
+                          "cafe",
+                        ];
+                        const indexA = typeOrder.indexOf(typeA);
+                        const indexB = typeOrder.indexOf(typeB);
+                        return (
+                          (indexA === -1 ? 999 : indexA) -
+                          (indexB === -1 ? 999 : indexB)
                         );
-                        const bPriorityIndex = prioritizedCompanies.indexOf(
-                          b.companyName,
-                        );
-                        if (aPriorityIndex !== -1 && bPriorityIndex !== -1) {
-                          return aPriorityIndex - bPriorityIndex;
-                        }
-                        if (aPriorityIndex !== -1) return -1;
-                        if (bPriorityIndex !== -1) return 1;
-                        const aRating = Number(a.ratings || 0);
-                        const bRating = Number(b.ratings || 0);
-                        return bRating - aRating;
-                      });
+                      })
+                      .map(([type, items]) => {
+                        const prioritizedCompanies = ["BIZ Nest", "MeWo"];
+                        const sortedItems = [...items].sort((a, b) => {
+                          const aPriorityIndex = prioritizedCompanies.indexOf(
+                            a.companyName,
+                          );
+                          const bPriorityIndex = prioritizedCompanies.indexOf(
+                            b.companyName,
+                          );
+                          if (aPriorityIndex !== -1 && bPriorityIndex !== -1) {
+                            return aPriorityIndex - bPriorityIndex;
+                          }
+                          if (aPriorityIndex !== -1) return -1;
+                          if (bPriorityIndex !== -1) return 1;
+                          const aRating = Number(a.ratings || 0);
+                          const bRating = Number(b.ratings || 0);
+                          return bRating - aRating;
+                        });
 
-                      const displayItems = sortedItems;
-                      const hasMore = displayItems.length > 5;
-                      const itemsToShow = hasMore
-                        ? displayItems.slice(0, 5)
-                        : displayItems;
+                        const displayItems = sortedItems;
+                        const hasMore = displayItems.length > 5;
+                        const itemsToShow = hasMore
+                          ? displayItems.slice(0, 5)
+                          : displayItems;
 
-                      const sectionTitle = `Popular ${typeLabels[type] || typeLabels.default(type)} in ${selectedLocationLabel}`;
+                        const sectionTitle = `Popular ${typeLabels[type] || typeLabels.default(type)} in ${selectedLocationLabel}`;
 
-                      return (
-                        <HorizontalScrollWrapper
-                          key={type}
-                          title={sectionTitle}
-                        >
-                          {itemsToShow.map((item) => (
-                            <div
-                              key={item._id}
-                              className="w-[calc(85%-0.5rem)] md:w-[calc(33.33%-1rem)] lg:w-[calc(20%-1.5rem)] flex-shrink-0 snap-start"
-                            >
-                              <ListingCard
-                                item={item}
-                                showVertical={false}
-                                handleNavigation={() =>
-                                  navigate(
-                                    `/ai-listings/${encodeURIComponent(item.companyName)}`,
-                                    {
-                                      state: {
-                                        companyId: item.companyId,
-                                        type: item.companyType,
-                                      },
-                                    },
-                                  )
-                                }
-                              />
-                            </div>
-                          ))}
-                          {hasMore && (
-                            <div className="w-[calc(85%-0.5rem)] md:w-[calc(33.33%-1rem)] lg:w-[calc(20%-1.5rem)] flex-shrink-0 snap-start">
-                              <button
-                                onClick={() => handleCategoryClick(type)}
-                                className="w-full aspect-square border-2 border-gray-100 rounded-3xl flex flex-col items-center justify-start pt-12 gap-3 hover:border-primary-blue hover:shadow-md transition-all bg-gray-50/30 group"
+                        return (
+                          <HorizontalScrollWrapper
+                            key={type}
+                            title={sectionTitle}
+                          >
+                            {itemsToShow.map((item) => (
+                              <div
+                                key={item._id}
+                                className="w-[calc(85%-0.5rem)] md:w-[calc(33.33%-1rem)] lg:w-[calc(20%-1.5rem)] flex-shrink-0 snap-start"
                               >
-                                <div className="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-gray-100 transition-colors">
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    strokeWidth={2}
-                                    stroke="currentColor"
-                                    className="w-8 h-8 text-gray-400 group-hover:text-gray-600"
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                                    />
-                                  </svg>
-                                </div>
-                                <span className="text-lg font-medium text-gray-600 group-hover:text-gray-900">
-                                  View All
+                                <ListingCard
+                                  item={item}
+                                  showVertical={false}
+                                  handleNavigation={() =>
+                                    navigate(
+                                      `/ai-listings/${encodeURIComponent(item.companyName)}`,
+                                      {
+                                        state: {
+                                          companyId: item.companyId,
+                                          type: item.companyType,
+                                        },
+                                      },
+                                    )
+                                  }
+                                />
+                              </div>
+                            ))}
+                            {hasMore && (
+                              <div className="w-[calc(85%-0.5rem)] md:w-[calc(33.33%-1rem)] lg:w-[calc(20%-1.5rem)] flex-shrink-0 snap-start">
+                                <button
+                                  onClick={() => handleCategoryClick(type)}
+                                  className="w-full aspect-square border-2 border-gray-100 rounded-3xl flex flex-col items-center justify-start pt-12 gap-3 hover:border-primary-blue hover:shadow-md transition-all bg-gray-50/30 group"
+                                >
+                                  <div className="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-gray-100 transition-colors">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      strokeWidth={2}
+                                      stroke="currentColor"
+                                      className="w-8 h-8 text-gray-400 group-hover:text-gray-600"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                                      />
+                                    </svg>
+                                  </div>
+                                  <span className="text-lg font-medium text-gray-600 group-hover:text-gray-900">
+                                    View All
+                                  </span>
+                                </button>
+                              </div>
+                            )}
+                          </HorizontalScrollWrapper>
+                        );
+                      })}
+                    <div className="mb-6">
+                      <h2 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold leading-tight mb-4">
+                        Value Added Services in {selectedLocationLabel}
+                      </h2>
+                      <div className="flex md:hidden flex-nowrap overflow-x-auto snap-x snap-mandatory gap-4 pb-2 custom-scrollbar-hide">
+                        {valueAddedServiceItems.map((service) => {
+                          const Icon = service.icon;
+                          const isDisabled = !service.path;
+
+                          return (
+                            <button
+                              key={service.label}
+                              type="button"
+                              onClick={() =>
+                                handleValueAddedServiceClick(service)
+                              }
+                              disabled={isDisabled}
+                              className={`w-[calc(85%-0.5rem)] flex-shrink-0 snap-start rounded-3xl bg-[#f1f1f3] px-3 py-5 text-center min-h-[112px] aspect-square flex flex-col items-center justify-center transition-colors ${
+                                isDisabled
+                                  ? "cursor-not-allowed opacity-80"
+                                  : "hover:bg-[#e8e8ed]"
+                              }`}
+                            >
+                              <Icon
+                                size={24}
+                                className="mx-auto text-black/80"
+                              />
+                              <div className="mt-2 flex flex-col items-center justify-center gap-1.5">
+                                <span className="text-nano font-bold uppercase text-black/90 leading-tight">
+                                  {service.label}
                                 </span>
-                              </button>
-                            </div>
-                          )}
-                        </HorizontalScrollWrapper>
-                      );
-                    })
+                                {service.badge && (
+                                  <span className="rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[8px] font-semibold normal-case text-black shadow-sm">
+                                    {service.badge}
+                                  </span>
+                                )}
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <div className="hidden md:grid grid-cols-3 gap-4">
+                        {valueAddedServiceItems.map((service) => {
+                          const Icon = service.icon;
+                          const isDisabled = !service.path;
+
+                          return (
+                            <button
+                              key={service.label}
+                              type="button"
+                              onClick={() =>
+                                handleValueAddedServiceClick(service)
+                              }
+                              disabled={isDisabled}
+                              className={`rounded-3xl bg-[#f1f1f3] px-3 py-5 text-center min-h-[112px] aspect-square flex flex-col items-center justify-center transition-colors ${
+                                isDisabled
+                                  ? "cursor-not-allowed opacity-80"
+                                  : "hover:bg-[#e8e8ed]"
+                              }`}
+                            >
+                              <Icon
+                                size={24}
+                                className="mx-auto text-black/80"
+                              />
+                              <div className="mt-2 flex flex-col items-center justify-center gap-1.5">
+                                <span className="text-nano font-bold uppercase text-black/90 leading-tight">
+                                  {service.label}
+                                </span>
+                                {service.badge && (
+                                  <span className="rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[8px] font-semibold normal-case text-black shadow-sm">
+                                    {service.badge}
+                                  </span>
+                                )}
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </>
                 ) : (
                   <div className="col-span-full text-center text-sm text-gray-500 border border-dotted rounded-lg p-4">
                     No listings found.
