@@ -554,7 +554,7 @@ const AiGlobalListingsMap = () => {
           onBack={() => navigate("/search/results")}
           onClear={() => navigate("/search/results")}
           heading={
-            <p className="mb-2 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
+            <p className="mt-6 mb-6 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
               {!isSecondHeadingPhase && (
                 <span
                   className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-b-transparent"
