@@ -138,8 +138,8 @@ const AiConsultation = () => {
     <div className="bg-white text-black font-sans">
       <Container padding={false}>
         <section className="min-h-[85vh] flex items-center justify-center py-8">
-          <div className="w-full max-w-5xl md:px-20 lg:px-40">
-            <div className="mx-auto mb-0 flex w-full max-w-4xl flex-col items-center gap-8 px-6">
+          <div className="w-full max-w-5xl md:px-20 lg:px-20">
+            <div className="mx-auto mb-0 flex w-full max-w-4xl flex-col items-center gap-8 ">
               <p className="min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1.2rem]">
                 {typedMessage}
               </p>
@@ -153,7 +153,7 @@ const AiConsultation = () => {
                 event.preventDefault();
                 handleFormSubmit();
               }}
-              className={`bg-white p-6 md:p-6 rounded-2xl ${
+              className={`bg-white p-6 md:p-0 rounded-2xl ${
                 isFormVisible ? "visible" : "invisible"
               }`}
             >
@@ -360,7 +360,7 @@ const AiConsultation = () => {
                           fullWidth
                           readOnly
                           placeholder="+___"
-                          sx={{ color: "rgba(0, 0, 0, 0.6)" }}
+                          sx={{ color: "rgba(0, 0, 0, 0.6)", py: 0 }}
                         />
                       )}
                     />
