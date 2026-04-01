@@ -580,7 +580,7 @@ const AiGlobalListingsMap = () => {
                         key={cat.value}
                         type="button"
                         onClick={() => handleCategoryClick(cat.value)}
-                        className="text-black px-4 py-2 hover:text-black transition flex items-center justify-center w-full"
+                        className="text-black px-1 py-2 hover:text-black transition flex items-center justify-center w-full"
                       >
                         {iconSrc ? (
                           <div className="h-10 w-full flex flex-col gap-0">
@@ -589,7 +589,7 @@ const AiGlobalListingsMap = () => {
                               alt={cat.label}
                               className="h-full w-full object-contain"
                             />
-                            <span className="text-sm">{cat.label}</span>
+                            <span className="text-tiny">{cat.label}</span>
                           </div>
                         ) : (
                           cat.label

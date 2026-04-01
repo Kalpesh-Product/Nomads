@@ -794,7 +794,7 @@ const AiListings = () => {
                           key={cat.value}
                           type="button"
                           onClick={() => handleCategoryClick(cat.value)}
-                          className="text-black px-4 py-2 hover:text-black transition flex items-center justify-center w-full"
+                          className="text-black px-1 py-2 hover:text-black transition flex items-center justify-center w-full"
                         >
                           {iconSrc ? (
                             <div className="h-10 w-full flex flex-col gap-0 items-center">
@@ -804,7 +804,7 @@ const AiListings = () => {
                                 className="h-full w-full object-contain"
                               />
                               <span
-                                className={`text-sm border-b-4 ${
+                                className={`text-tiny border-b-4 ${
                                   isActive
                                     ? "border-primary-blue"
                                     : "border-transparent"
