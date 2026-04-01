@@ -23,6 +23,7 @@ import { MdOutlineWorkHistory } from "react-icons/md";
 import { HiOutlineCurrencyDollar } from "react-icons/hi";
 import { RiUserCommunityLine } from "react-icons/ri";
 import { TbAward, TbWorldWww } from "react-icons/tb";
+import { IoMdPersonAdd } from "react-icons/io";
 
 const gatedRecommendationLabels = new Set([
   "Work From Anywhere",
@@ -94,7 +95,7 @@ const becomeHostItem = [{ label: "Become A Host", icon: HiOutlineViewGrid }];
 const becomeContributorItem = [
   {
     label: "Become A Contributor",
-    icon: HiOutlineViewGrid,
+    icon: IoMdPersonAdd,
     path: "/become-a-contributor",
   },
 ];
@@ -122,6 +123,7 @@ const SidebarSection = ({
   collapsed,
   isExpandable = false,
   isOpen = true,
+  showTopBorder = true,
   onToggle,
   onItemClick,
 }) => {
@@ -129,7 +131,9 @@ const SidebarSection = ({
 
   return (
     <div className="px-4 pt-3">
-      <div className="border-t border-black/10 pt-3">
+      <div
+        className={`${showTopBorder ? "border-t border-black/10" : ""} pt-3`}
+      >
         {collapsed ? null : isExpandable ? (
           <button
             type="button"
@@ -366,6 +370,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
           <SidebarSection
             items={becomeContributorItem}
             collapsed={isCollapsed}
+            showTopBorder={false}
             onItemClick={handleBecomeContributorClick}
           />
           <SidebarSection
@@ -384,6 +389,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
           <SidebarSection
             items={becomeContributorItem}
             collapsed={isCollapsed}
+            showTopBorder={false}
             onItemClick={handleBecomeContributorClick}
           />
           {!isCollapsed && (
