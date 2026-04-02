@@ -84,10 +84,10 @@ const AiHome = () => {
     : "An intellegent platform for moden nomads.";
   const thirdLineText = isLoggedIn
     ? ""
-    : "Supporting the global community of remote workers, creators, entrepreneurs, hosts and investors who are redefining how the world lives and works.";
+    : "A global community of nomads & remote workers, who are redefining how the world lives and works. Early adoption of our future lifestyle!";
   const fourthLineText = isLoggedIn
     ? ""
-    : "Early adoption of our future lifestyle!";
+    : "Choose your goals from below so that we can help you design your nomad lifestyle.";
 
   useEffect(() => {
     setTypedGreeting("");
