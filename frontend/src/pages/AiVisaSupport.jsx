@@ -178,7 +178,7 @@ const AiVisaSupport = () => {
                 isFormVisible ? "visible" : "invisible"
               }`}
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
                 <Controller
                   name="fullName"
                   control={control}
