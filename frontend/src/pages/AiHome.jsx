@@ -74,6 +74,7 @@ const AiHome = () => {
   const [typedFourthLine, setTypedFourthLine] = useState("");
 
   const [areCardsVisible, setAreCardsVisible] = useState(false);
+  const [visibleCardCount, setVisibleCardCount] = useState(0);
 
   const isLoggedIn = useNomadLoginState();
 
@@ -168,6 +169,28 @@ const AiHome = () => {
     };
   }, [fourthLineText, greetingText, subheadingText, thirdLineText]);
 
+  useEffect(() => {
+    if (!areCardsVisible) {
+      setVisibleCardCount(0);
+      return;
+    }
+
+    let currentVisibleCount = 0;
+
+    const revealInterval = setInterval(() => {
+      currentVisibleCount += 1;
+      setVisibleCardCount(currentVisibleCount);
+
+      if (currentVisibleCount >= recommendationCards.length) {
+        clearInterval(revealInterval);
+      }
+    }, 120);
+
+    return () => {
+      clearInterval(revealInterval);
+    };
+  }, [areCardsVisible]);
+
   const handleCardClick = (card) => {
     const params = new URLSearchParams(location.search);
 
@@ -224,7 +247,7 @@ const AiHome = () => {
             }`}
           >
             <div className="grid grid-cols-2 gap-4 md:grid-cols-2 md:gap-10 xl:grid-cols-3">
-              {recommendationCards.map((card) => {
+              {recommendationCards.map((card, index) => {
                 const Icon = card.icon;
 
                 const isFreeCard = freeRecommendationTitles.has(card.title);
@@ -233,7 +256,14 @@ const AiHome = () => {
                   : "Login required";
 
                 return (
-                  <div key={card.title}>
+                  <div
+                    key={card.title}
+                    className={`transition-all duration-300 ${
+                      index < visibleCardCount
+                        ? "translate-y-0 opacity-100"
+                        : "pointer-events-none translate-y-2 opacity-0"
+                    }`}
+                  >
                     <article
                       onClick={() => handleCardClick(card)}
                       className="group cursor-pointer rounded-2xl bg-[#f1f1f3] px-3 py-5 text-center transition-colors duration-200 hover:bg-[#e8e8ed] md:rounded-none md:bg-transparent md:px-0 md:py-0 md:hover:bg-transparent"

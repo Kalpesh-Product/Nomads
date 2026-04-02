@@ -37,6 +37,7 @@ const destinationCards = aiDestinationCards;
 const INITIAL_VISIBLE_DESTINATIONS = 18;
 const TYPING_INTERVAL_MS = 8;
 const SELECTED_HEADING_TRANSITION_DELAY_MS = 1200;
+const DESTINATION_REVEAL_INTERVAL_MS = 70;
 
 const goalNarrativeTopHeadingMap = {
   "World Ranking":
@@ -152,6 +153,7 @@ const AiSearchResults = () => {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [showAllDestinations, setShowAllDestinations] = useState(false);
   const [isResultsReady, setIsResultsReady] = useState(false);
+  const [visibleDestinationCount, setVisibleDestinationCount] = useState(0);
   const dropdownContainerRef = useRef(null);
   const closeDropdownTimeoutRef = useRef(null);
 
@@ -438,6 +440,33 @@ const AiSearchResults = () => {
   }, [selectedContinent, selectedGoalOption]);
 
   useEffect(() => {
+    if (!hasSelectedFilters || !isResultsReady) {
+      setVisibleDestinationCount(0);
+      return;
+    }
+
+    if (!visibleDestinations.length) {
+      setVisibleDestinationCount(0);
+      return;
+    }
+
+    let currentVisibleCount = 0;
+
+    const revealInterval = setInterval(() => {
+      currentVisibleCount += 1;
+      setVisibleDestinationCount(currentVisibleCount);
+
+      if (currentVisibleCount >= visibleDestinations.length) {
+        clearInterval(revealInterval);
+      }
+    }, DESTINATION_REVEAL_INTERVAL_MS);
+
+    return () => {
+      clearInterval(revealInterval);
+    };
+  }, [hasSelectedFilters, isResultsReady, visibleDestinations]);
+
+  useEffect(() => {
     const selectedPair = hasSelectedFilters
       ? `${selectedContinent}|${selectedGoalOption}`
       : null;
@@ -552,10 +581,14 @@ const AiSearchResults = () => {
 
                   {shouldShowResultsContent ? (
                     <div className="mt-8 grid grid-cols-2 gap-3 md:mt-10 md:gap-4 xl:grid-cols-3">
-                      {visibleDestinations.map((destination) => (
+                      {visibleDestinations.map((destination, index) => (
                         <article
                           key={`${destination.city}-${destination.country}`}
-                          className="cursor-pointer"
+                          className={`cursor-pointer transition-all duration-300 ${
+                            index < visibleDestinationCount
+                              ? "translate-y-0 opacity-100"
+                              : "pointer-events-none translate-y-2 opacity-0"
+                          }`}
                           role="button"
                           tabIndex={0}
                           onClick={() => handleDestinationClick(destination)}
