@@ -97,21 +97,24 @@ const AiOverallActivationSupport = () => {
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => {};
+    let cleanupHeading = () => { };
 
-    const typeHeading = () => {
-      const headingInterval = setInterval(() => {
-        headingIndex += 1;
-        setTypedPageHeading(OVERALL_ACTIVATION_HEADING.slice(0, headingIndex));
+    // const typeHeading = () => {
+    //   const headingInterval = setInterval(() => {
+    //     headingIndex += 1;
+    //     setTypedPageHeading(OVERALL_ACTIVATION_HEADING.slice(0, headingIndex));
 
-        if (headingIndex >= OVERALL_ACTIVATION_HEADING.length) {
-          clearInterval(headingInterval);
-          setIsFormVisible(true);
-        }
-      }, 35);
+    //     if (headingIndex >= OVERALL_ACTIVATION_HEADING.length) {
+    //       clearInterval(headingInterval);
+    //       setIsFormVisible(true);
+    //     }
+    //   }, 35);
 
-      cleanupHeading = () => clearInterval(headingInterval);
-    };
+    //   cleanupHeading = () => clearInterval(headingInterval);
+    // };
+
+    setTypedPageHeading(OVERALL_ACTIVATION_HEADING);
+    setIsFormVisible(true);
 
     const messageInterval = setInterval(() => {
       messageIndex += 1;
@@ -148,9 +151,8 @@ const AiOverallActivationSupport = () => {
                 event.preventDefault();
                 handleFormSubmit();
               }}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${
-                isFormVisible ? "visible" : "invisible"
-              }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
+                }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 <Controller

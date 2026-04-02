@@ -29,8 +29,8 @@ const defaultValues = {
 };
 
 const CONTRIBUTOR_PROMPT =
-  "Want to contribute to the Nomads ecosystem? Share your profile and we will connect with you soon.";
-const CONTRIBUTOR_HEADING = "Become A Contributor";
+  "We are constantly looking out for individuals who can support our cause to make WoNo the largest Nomad Community & Platform in the world. We know we will not be able to do this alone.";
+const CONTRIBUTOR_HEADING = "Become a WoNo Contributor";
 
 const AiBecomeContributor = () => {
   const [typedMessage, setTypedMessage] = useState("");
@@ -81,21 +81,24 @@ const AiBecomeContributor = () => {
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => {};
+    let cleanupHeading = () => { };
 
-    const typeHeading = () => {
-      const headingInterval = setInterval(() => {
-        headingIndex += 1;
-        setTypedPageHeading(CONTRIBUTOR_HEADING.slice(0, headingIndex));
+    // const typeHeading = () => {
+    //   const headingInterval = setInterval(() => {
+    //     headingIndex += 1;
+    //     setTypedPageHeading(CONTRIBUTOR_HEADING.slice(0, headingIndex));
 
-        if (headingIndex >= CONTRIBUTOR_HEADING.length) {
-          clearInterval(headingInterval);
-          setIsFormVisible(true);
-        }
-      }, 35);
+    //     if (headingIndex >= CONTRIBUTOR_HEADING.length) {
+    //       clearInterval(headingInterval);
+    //       setIsFormVisible(true);
+    //     }
+    //   }, 35);
 
-      cleanupHeading = () => clearInterval(headingInterval);
-    };
+    //   cleanupHeading = () => clearInterval(headingInterval);
+    // };
+
+    setTypedPageHeading(CONTRIBUTOR_HEADING);
+    setIsFormVisible(true);
 
     const messageInterval = setInterval(() => {
       messageIndex += 1;
@@ -132,9 +135,8 @@ const AiBecomeContributor = () => {
                 event.preventDefault();
                 handleFormSubmit();
               }}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${
-                isFormVisible ? "visible" : "invisible"
-              }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
+                }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 <Controller
@@ -243,7 +245,7 @@ const AiBecomeContributor = () => {
                           fullWidth
                           readOnly
                           placeholder="+___"
-                          sx={{ color: "rgba(0, 0, 0, 0.6)" , py: 0 }}
+                          sx={{ color: "rgba(0, 0, 0, 0.6)", py: 0 }}
                         />
                       )}
                     />
@@ -275,6 +277,38 @@ const AiBecomeContributor = () => {
                     />
                   </Box>
                 </Box>
+                <Controller
+                  name="linkedinProfile"
+                  control={control}
+                  rules={{ required: "Linkedin profile is required" }}
+                  render={({ field, fieldState }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Linkedin Profile"
+                      variant="standard"
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                      InputLabelProps={{ sx: floatingLabelSx }}
+                    />
+                  )}
+                />
+                <Controller
+                  name="website"
+                  control={control}
+                  rules={{ required: "Website is required" }}
+                  render={({ field, fieldState }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Website/Insta/FB etc"
+                      variant="standard"
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                      InputLabelProps={{ sx: floatingLabelSx }}
+                    />
+                  )}
+                />
 
                 <div className="md:col-span-2">
                   <Controller

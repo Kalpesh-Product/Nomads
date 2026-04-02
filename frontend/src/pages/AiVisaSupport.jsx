@@ -112,21 +112,24 @@ const AiVisaSupport = () => {
 
     let messageIndex = 0;
     let visaHeadingIndex = 0;
-    let cleanupHeading = () => {};
+    let cleanupHeading = () => { };
 
-    const typeVisaHeading = () => {
-      const headingInterval = setInterval(() => {
-        visaHeadingIndex += 1;
-        setTypedVisaHeading(VISA_SUPPORT_HEADING.slice(0, visaHeadingIndex));
+    // const typeVisaHeading = () => {
+    //   const headingInterval = setInterval(() => {
+    //     visaHeadingIndex += 1;
+    //     setTypedVisaHeading(VISA_SUPPORT_HEADING.slice(0, visaHeadingIndex));
 
-        if (visaHeadingIndex >= VISA_SUPPORT_HEADING.length) {
-          clearInterval(headingInterval);
-          setIsFormVisible(true);
-        }
-      }, 35);
+    //     if (visaHeadingIndex >= VISA_SUPPORT_HEADING.length) {
+    //       clearInterval(headingInterval);
+    //       setIsFormVisible(true);
+    //     }
+    //   }, 35);
 
-      cleanupHeading = () => clearInterval(headingInterval);
-    };
+    //   cleanupHeading = () => clearInterval(headingInterval);
+    // };
+
+    setTypedVisaHeading(VISA_SUPPORT_HEADING);
+    setIsFormVisible(true);
 
     const messageInterval = setInterval(() => {
       messageIndex += 1;
@@ -160,9 +163,8 @@ const AiVisaSupport = () => {
             <Box
               component="form"
               onSubmit={handleSubmit(handleFormSubmit)}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${
-                isFormVisible ? "visible" : "invisible"
-              }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
+                }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 <Controller
