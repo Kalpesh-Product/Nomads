@@ -544,7 +544,10 @@ const AiListings = ({ forceListView = false }) => {
     formData?.category === VALUE_ADDED_SERVICES_CATEGORY;
   const showDesktopMap =
     !forceListView && mapOpen && !isValueAddedServicesSelected;
-  const listingsBasePath = "/ai-listings-list";
+  const listingsBasePath =
+    location.pathname === "/ai-listings-list"
+      ? "/ai-listings-list"
+      : "/ai-listings";
   const selectedStateFromParams =
     searchParams.get("state") || searchParams.get("location") || "";
   const backLabel = selectedStateFromParams || formData?.location || "";
