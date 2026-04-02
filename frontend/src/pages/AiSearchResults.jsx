@@ -42,6 +42,8 @@ const SEARCH_RESULTS_LOCATION_STORAGE_KEY = "aiSearchResults.selectedLocation";
 const SEARCH_RESULTS_ATTRIBUTE_STORAGE_KEY =
   "aiSearchResults.selectedAttribute";
 const SEARCH_RESULTS_GOAL_STORAGE_KEY = "aiSearchResults.selectedGoal";
+const SEARCH_RESULTS_SELECTION_SIGNATURE_STORAGE_KEY =
+  "aiSearchResults.selectionSignature";
 
 const goalNarrativeTopHeadingMap = {
   "World Ranking":
@@ -153,6 +155,14 @@ const AiSearchResults = () => {
     if (typeof window === "undefined") return null;
     return localStorage.getItem(SEARCH_RESULTS_ATTRIBUTE_STORAGE_KEY);
   };
+  const getPersistedGoal = () => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem(SEARCH_RESULTS_GOAL_STORAGE_KEY);
+  };
+  const getPersistedSelectionSignature = () => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem(SEARCH_RESULTS_SELECTION_SIGNATURE_STORAGE_KEY);
+  };
 
   const [typedTopHeading, setTypedTopHeading] = useState("");
   const [typedBottomHeading, setTypedBottomHeading] = useState("");
@@ -174,6 +184,7 @@ const AiSearchResults = () => {
   const bottomTypingIntervalRef = useRef(null);
   const selectedHeadingDelayTimeoutRef = useRef(null);
   const previousSelectedPairRef = useRef(null);
+  const previousGoalRef = useRef(getPersistedGoal() || selectedGoal);
 
   const hasSelectedContinent = Boolean(selectedContinent);
   const hasSelectedGoalOption = Boolean(selectedGoalOption);
@@ -482,6 +493,25 @@ const AiSearchResults = () => {
   }, [selectedGoalOption]);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    if (previousGoalRef.current !== selectedGoal) {
+      localStorage.removeItem(SEARCH_RESULTS_LOCATION_STORAGE_KEY);
+      localStorage.removeItem(SEARCH_RESULTS_ATTRIBUTE_STORAGE_KEY);
+      localStorage.removeItem(SEARCH_RESULTS_SELECTION_SIGNATURE_STORAGE_KEY);
+      setSelectedContinent(null);
+      setSelectedGoalOption(null);
+    }
+
+    if (selectedGoal) {
+      localStorage.setItem(SEARCH_RESULTS_GOAL_STORAGE_KEY, selectedGoal);
+    } else {
+      localStorage.removeItem(SEARCH_RESULTS_GOAL_STORAGE_KEY);
+    }
+    previousGoalRef.current = selectedGoal;
+  }, [selectedGoal]);
+
+  useEffect(() => {
     if (!hasSelectedFilters) {
       setIsResultsReady(false);
       setTypedBottomHeading("");
@@ -521,20 +551,52 @@ const AiSearchResults = () => {
   }, [hasSelectedFilters, isResultsReady, visibleDestinations]);
 
   useEffect(() => {
+    const persistedSignature = getPersistedSelectionSignature();
+    const persistedGoal = getPersistedGoal();
     const selectedPair = hasSelectedFilters
       ? `${selectedContinent}|${selectedGoalOption}`
       : null;
+    const selectedSignature = selectedPair
+      ? `${selectedGoal}|${selectedPair}`
+      : null;
 
-    if (selectedPair && previousSelectedPairRef.current !== selectedPair) {
+    if (!selectedSignature) {
+      previousSelectedPairRef.current = selectedPair;
+      return;
+    }
+
+    const isFirstRenderForSelection = previousSelectedPairRef.current === null;
+    const hasPersistedMatch =
+      persistedSignature === selectedSignature && persistedGoal === selectedGoal;
+
+    if (isFirstRenderForSelection && hasPersistedMatch) {
+      clearTypingAnimations();
+      setTypedTopHeading(selectedTopHeadingText);
+      setTypedBottomHeading(selectedBottomHeadingText);
+      setTypedResultsHeading(selectedResultsHeadingText);
+      setIsResultsReady(true);
+    } else if (previousSelectedPairRef.current !== selectedPair) {
       playSelectedHeadingAnimation();
+    }
+
+    if (typeof window !== "undefined") {
+      localStorage.setItem(
+        SEARCH_RESULTS_SELECTION_SIGNATURE_STORAGE_KEY,
+        selectedSignature,
+      );
     }
 
     previousSelectedPairRef.current = selectedPair;
   }, [
+    clearTypingAnimations,
     hasSelectedFilters,
     playSelectedHeadingAnimation,
+    selectedBottomHeadingText,
     selectedContinent,
+    selectedGoal,
     selectedGoalOption,
+    selectedResultsHeadingText,
+    selectedTopHeadingText,
   ]);
 
   const shouldShowResultsContent = hasSelectedFilters && isResultsReady;
