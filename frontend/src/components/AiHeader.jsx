@@ -17,13 +17,42 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const view = searchParams.get("view");
-  const showToggle = location.pathname.includes("verticals");
+  const formData = useSelector((state) => state.location.formValues);
+
+  const isAiListingsMapPage = location.pathname === "/ai-listings";
+  const isAiListingsListPage = location.pathname === "/ai-listings-list";
+  const showToggle =
+    location.pathname.includes("verticals") ||
+    isAiListingsMapPage ||
+    isAiListingsListPage;
+
+  const countryParam = searchParams.get("country") || formData?.country || "";
+  const locationParam =
+    searchParams.get("location") || formData?.location || "";
+  const categoryParam =
+    searchParams.get("category") || formData?.category || "";
+
+  const buildListingsQuery = () => {
+    const params = new URLSearchParams();
+
+    if (countryParam) params.set("country", countryParam);
+    if (locationParam) params.set("location", locationParam);
+    if (categoryParam) params.set("category", categoryParam);
+
+    return params.toString();
+  };
+
+  const listingsQuery = buildListingsQuery();
+  const mapViewLink = listingsQuery
+    ? `/ai-listings?${listingsQuery}`
+    : "/ai-listings";
+  const listViewLink = listingsQuery
+    ? `/ai-listings-list?${listingsQuery}`
+    : "/ai-listings-list";
   const { auth } = useAuth();
   const hasNomadLoginState = useNomadLoginState();
   const isLoggedIn = Boolean(auth?.user) || hasNomadLoginState;
   const userInitial = auth?.user?.firstName?.charAt(0)?.toUpperCase() || "A";
-
-  const formData = useSelector((state) => state.location.formValues);
   const handleNavigation = (path) => {
     navigate(path);
     setOpen(false);
@@ -160,11 +189,16 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
             <div className="min-w-[80px] hidden lg:block">
               {showToggle && (
                 <ul>
-                  {view !== "map" && (
+                  {(isAiListingsListPage ||
+                    (!isAiListingsMapPage && view !== "map")) && (
                     <li className="flex items-center">
                       <div className="p-4 px-0 whitespace-nowrap">
                         <Link
-                          to={`${location.pathname}?country=${formData?.country}&location=${formData?.location}&view=map`}
+                          to={
+                            isAiListingsListPage
+                              ? mapViewLink
+                              : `${location.pathname}?country=${formData?.country}&location=${formData?.location}&view=map`
+                          }
                           className="group relative text-md text-black"
                         >
                           <span className="relative z-10 group-hover:font-bold  mb-2 text-sm font-semibold">
@@ -176,11 +210,15 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                     </li>
                   )}
 
-                  {view === "map" && (
+                  {(isAiListingsMapPage || view === "map") && (
                     <li className="flex items-center">
                       <div className="p-4 px-0 whitespace-nowrap">
                         <Link
-                          to={`${location.pathname}?country=${formData?.country}&location=${formData?.location}`}
+                          to={
+                            isAiListingsMapPage
+                              ? listViewLink
+                              : `${location.pathname}?country=${formData?.country}&location=${formData?.location}`
+                          }
                           className="group relative text-md text-black"
                         >
                           <span className="relative z-10 group-hover:font-bold  mb-2 text-sm font-semibold">
