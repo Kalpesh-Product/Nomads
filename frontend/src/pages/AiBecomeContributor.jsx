@@ -29,8 +29,9 @@ const defaultValues = {
 };
 
 const CONTRIBUTOR_PROMPT =
-  "Want to contribute to the Nomads ecosystem? Share your profile and we will connect with you soon.";
-const CONTRIBUTOR_HEADING = "Become A Contributor";
+  "We are constantly looking out for individuals who can support our cause to make WoNo the largest Nomad Community & Platform in the world. We know we will not be able to do this alone.";
+const CONTRIBUTOR_HEADING = "Become a WoNo Contributor";
+const CONTRIBUTOR_TYPING_SEEN_KEY = "wono-contributor-typing-seen";
 
 const AiBecomeContributor = () => {
   const [typedMessage, setTypedMessage] = useState("");
@@ -75,13 +76,23 @@ const AiBecomeContributor = () => {
   };
 
   useEffect(() => {
+    const hasSeenTypingEffect =
+      typeof window !== "undefined" &&
+      window.localStorage.getItem(CONTRIBUTOR_TYPING_SEEN_KEY) === "true";
+
+    if (hasSeenTypingEffect) {
+      setTypedMessage(CONTRIBUTOR_PROMPT);
+      setTypedPageHeading(CONTRIBUTOR_HEADING);
+      setIsFormVisible(true);
+      return;
+    }
     setTypedMessage("");
     setTypedPageHeading("");
     setIsFormVisible(false);
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => {};
+    let cleanupHeading = () => { };
 
     const typeHeading = () => {
       const headingInterval = setInterval(() => {
@@ -91,11 +102,15 @@ const AiBecomeContributor = () => {
         if (headingIndex >= CONTRIBUTOR_HEADING.length) {
           clearInterval(headingInterval);
           setIsFormVisible(true);
+          if (typeof window !== "undefined") {
+            window.localStorage.setItem(CONTRIBUTOR_TYPING_SEEN_KEY, "true");
+          }
         }
       }, 35);
 
       cleanupHeading = () => clearInterval(headingInterval);
     };
+
 
     const messageInterval = setInterval(() => {
       messageIndex += 1;
@@ -105,7 +120,7 @@ const AiBecomeContributor = () => {
         clearInterval(messageInterval);
         typeHeading();
       }
-    }, 25);
+    }, 2);
 
     return () => {
       clearInterval(messageInterval);
@@ -132,9 +147,8 @@ const AiBecomeContributor = () => {
                 event.preventDefault();
                 handleFormSubmit();
               }}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${
-                isFormVisible ? "visible" : "invisible"
-              }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
+                }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 <Controller
@@ -243,7 +257,7 @@ const AiBecomeContributor = () => {
                           fullWidth
                           readOnly
                           placeholder="+___"
-                          sx={{ color: "rgba(0, 0, 0, 0.6)" , py: 0 }}
+                          sx={{ color: "rgba(0, 0, 0, 0.6)", py: 0 }}
                         />
                       )}
                     />
@@ -275,6 +289,38 @@ const AiBecomeContributor = () => {
                     />
                   </Box>
                 </Box>
+                <Controller
+                  name="linkedinProfile"
+                  control={control}
+                  rules={{ required: "Linkedin profile is required" }}
+                  render={({ field, fieldState }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Linkedin Profile"
+                      variant="standard"
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                      InputLabelProps={{ sx: floatingLabelSx }}
+                    />
+                  )}
+                />
+                <Controller
+                  name="website"
+                  control={control}
+                  rules={{ required: "Website is required" }}
+                  render={({ field, fieldState }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Website/Insta/FB etc"
+                      variant="standard"
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                      InputLabelProps={{ sx: floatingLabelSx }}
+                    />
+                  )}
+                />
 
                 <div className="md:col-span-2">
                   <Controller
@@ -285,7 +331,7 @@ const AiBecomeContributor = () => {
                         {...field}
                         fullWidth
                         multiline
-                        minRows={3}
+                        minRows={2}
                         label="Message"
                         variant="standard"
                         InputLabelProps={{ sx: floatingLabelSx }}
@@ -294,7 +340,7 @@ const AiBecomeContributor = () => {
                   />
                 </div>
 
-                <div className="pt-6 md:col-span-2 text-center">
+                <div className="pt-0 md:col-span-2 text-center">
                   <Button
                     type="submit"
                     variant="contained"

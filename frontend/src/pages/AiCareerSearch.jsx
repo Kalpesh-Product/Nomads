@@ -3,6 +3,8 @@ import { HiOutlineSearch } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 import { TextField } from "@mui/material";
 
+const AI_CAREER_TYPING_SEEN_KEY = "wono-ai-career-typing-seen";
+
 const filters = [
   // "Budget",
   "Enter Budget (USD)",
@@ -57,6 +59,14 @@ const AiBudgetSearch = () => {
   };
 
   useEffect(() => {
+    const hasSeenTypingEffect =
+      typeof window !== "undefined" &&
+      window.localStorage.getItem(AI_CAREER_TYPING_SEEN_KEY) === "true";
+
+    if (hasSeenTypingEffect) {
+      setTypedHeading(headingText);
+      return;
+    }
     setTypedHeading("");
 
     let currentIndex = 0;
@@ -66,6 +76,9 @@ const AiBudgetSearch = () => {
 
       if (currentIndex >= headingText.length) {
         clearInterval(typingInterval);
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem(AI_CAREER_TYPING_SEEN_KEY, "true");
+        }
       }
     }, 25);
 
@@ -173,11 +186,10 @@ const AiBudgetSearch = () => {
                   key={filter}
                   type="button"
                   onClick={() => handleFilterClick(filter)}
-                  className={`rounded-full border px-6 py-2 text-xs font-medium transition-colors ${
-                    isActive
-                      ? "border-sky-500 bg-sky-500 text-white"
-                      : "border-black text-black/90 hover:border-sky-500"
-                  }`}
+                  className={`rounded-full border px-6 py-2 text-xs font-medium transition-colors ${isActive
+                    ? "border-sky-500 bg-sky-500 text-white"
+                    : "border-black text-black/90 hover:border-sky-500"
+                    }`}
                 >
                   {filter}
                 </button>

@@ -6,6 +6,8 @@ import {
 } from "react-icons/hi";
 import { useLocation, useNavigate } from "react-router-dom";
 
+const AI_WORLD_RANKINGS_TYPING_SEEN_KEY = "wono-ai-world-rankings-typing-seen";
+
 const filters = [
   "Budget",
   "Internet",
@@ -163,6 +165,14 @@ const AiWorldRankings = () => {
     "Please find below the best destinations curated for you based on World Rankings";
 
   useEffect(() => {
+    const hasSeenTypingEffect =
+      typeof window !== "undefined" &&
+      window.localStorage.getItem(AI_WORLD_RANKINGS_TYPING_SEEN_KEY) === "true";
+
+    if (hasSeenTypingEffect) {
+      setTypedHeading(headingText);
+      return;
+    }
     setTypedHeading("");
 
     let currentIndex = 0;
@@ -172,6 +182,9 @@ const AiWorldRankings = () => {
 
       if (currentIndex >= headingText.length) {
         clearInterval(typingInterval);
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem(AI_WORLD_RANKINGS_TYPING_SEEN_KEY, "true");
+        }
       }
     }, 25);
 
