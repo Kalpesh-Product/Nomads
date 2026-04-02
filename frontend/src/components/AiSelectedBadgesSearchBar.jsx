@@ -29,11 +29,11 @@ const AiSelectedBadgesSearchBar = ({
         >
           <HiOutlineArrowLeft size={18} />
         </button>
-        {stateLabel && (
+        {/* {stateLabel && (
           <span className="text-lg font-medium text-primary-blue">
             {stateLabel}
           </span>
-        )}
+        )} */}
       </div>
       {heading && (
         <div className="mx-auto mt-4 w-full max-w-[50rem] lg:max-w-[61rem] xl:max-w-[61rem]">
@@ -50,7 +50,9 @@ const AiSelectedBadgesSearchBar = ({
               <span className="truncate">{badgeLabel}</span>
             </div>
           ))}
+          {stateLabel && <span className={badgeClassName}>{stateLabel}</span>}
         </div>
+
         <div className="ml-3 flex shrink-0 items-center gap-2">
           <button
             type="button"
