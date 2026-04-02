@@ -114,22 +114,20 @@ const AiVisaSupport = () => {
     let visaHeadingIndex = 0;
     let cleanupHeading = () => { };
 
-    // const typeVisaHeading = () => {
-    //   const headingInterval = setInterval(() => {
-    //     visaHeadingIndex += 1;
-    //     setTypedVisaHeading(VISA_SUPPORT_HEADING.slice(0, visaHeadingIndex));
+    const typeVisaHeading = () => {
+      const headingInterval = setInterval(() => {
+        visaHeadingIndex += 1;
+        setTypedVisaHeading(VISA_SUPPORT_HEADING.slice(0, visaHeadingIndex));
 
-    //     if (visaHeadingIndex >= VISA_SUPPORT_HEADING.length) {
-    //       clearInterval(headingInterval);
-    //       setIsFormVisible(true);
-    //     }
-    //   }, 35);
+        if (visaHeadingIndex >= VISA_SUPPORT_HEADING.length) {
+          clearInterval(headingInterval);
+          setIsFormVisible(true);
+        }
+      }, 35);
 
-    //   cleanupHeading = () => clearInterval(headingInterval);
-    // };
+      cleanupHeading = () => clearInterval(headingInterval);
+    };
 
-    setTypedVisaHeading(VISA_SUPPORT_HEADING);
-    setIsFormVisible(true);
 
     const messageInterval = setInterval(() => {
       messageIndex += 1;
@@ -139,7 +137,7 @@ const AiVisaSupport = () => {
         clearInterval(messageInterval);
         typeVisaHeading();
       }
-    }, 25);
+    }, 2);
 
     return () => {
       clearInterval(messageInterval);

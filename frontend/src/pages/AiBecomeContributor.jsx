@@ -83,22 +83,20 @@ const AiBecomeContributor = () => {
     let headingIndex = 0;
     let cleanupHeading = () => { };
 
-    // const typeHeading = () => {
-    //   const headingInterval = setInterval(() => {
-    //     headingIndex += 1;
-    //     setTypedPageHeading(CONTRIBUTOR_HEADING.slice(0, headingIndex));
+    const typeHeading = () => {
+      const headingInterval = setInterval(() => {
+        headingIndex += 1;
+        setTypedPageHeading(CONTRIBUTOR_HEADING.slice(0, headingIndex));
 
-    //     if (headingIndex >= CONTRIBUTOR_HEADING.length) {
-    //       clearInterval(headingInterval);
-    //       setIsFormVisible(true);
-    //     }
-    //   }, 35);
+        if (headingIndex >= CONTRIBUTOR_HEADING.length) {
+          clearInterval(headingInterval);
+          setIsFormVisible(true);
+        }
+      }, 35);
 
-    //   cleanupHeading = () => clearInterval(headingInterval);
-    // };
+      cleanupHeading = () => clearInterval(headingInterval);
+    };
 
-    setTypedPageHeading(CONTRIBUTOR_HEADING);
-    setIsFormVisible(true);
 
     const messageInterval = setInterval(() => {
       messageIndex += 1;
@@ -108,7 +106,7 @@ const AiBecomeContributor = () => {
         clearInterval(messageInterval);
         typeHeading();
       }
-    }, 25);
+    }, 2);
 
     return () => {
       clearInterval(messageInterval);
@@ -319,7 +317,7 @@ const AiBecomeContributor = () => {
                         {...field}
                         fullWidth
                         multiline
-                        minRows={3}
+                        minRows={2}
                         label="Message"
                         variant="standard"
                         InputLabelProps={{ sx: floatingLabelSx }}
@@ -328,7 +326,7 @@ const AiBecomeContributor = () => {
                   />
                 </div>
 
-                <div className="pt-6 md:col-span-2 text-center">
+                <div className="pt-0 md:col-span-2 text-center">
                   <Button
                     type="submit"
                     variant="contained"

@@ -104,22 +104,19 @@ const AiConsultation = () => {
     let headingIndex = 0;
     let cleanupHeading = () => { };
 
-    // const typeHeading = () => {
-    //   const headingInterval = setInterval(() => {
-    //     headingIndex += 1;
-    //     setTypedPageHeading(CONSULTATION_HEADING.slice(0, headingIndex));
+    const typeHeading = () => {
+      const headingInterval = setInterval(() => {
+        headingIndex += 1;
+        setTypedPageHeading(CONSULTATION_HEADING.slice(0, headingIndex));
 
-    //     if (headingIndex >= CONSULTATION_HEADING.length) {
-    //       clearInterval(headingInterval);
-    //       setIsFormVisible(true);
-    //     }
-    //   }, 35);
+        if (headingIndex >= CONSULTATION_HEADING.length) {
+          clearInterval(headingInterval);
+          setIsFormVisible(true);
+        }
+      }, 35);
 
-    //   cleanupHeading = () => clearInterval(headingInterval);
-    // };
-
-    setTypedPageHeading(CONSULTATION_HEADING);
-    setIsFormVisible(true);
+      cleanupHeading = () => clearInterval(headingInterval);
+    };
 
     const messageInterval = setInterval(() => {
       messageIndex += 1;
@@ -129,7 +126,7 @@ const AiConsultation = () => {
         clearInterval(messageInterval);
         typeHeading();
       }
-    }, 25);
+    }, 2);
 
     return () => {
       clearInterval(messageInterval);

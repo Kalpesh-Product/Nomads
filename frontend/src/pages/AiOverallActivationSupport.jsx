@@ -99,22 +99,20 @@ const AiOverallActivationSupport = () => {
     let headingIndex = 0;
     let cleanupHeading = () => { };
 
-    // const typeHeading = () => {
-    //   const headingInterval = setInterval(() => {
-    //     headingIndex += 1;
-    //     setTypedPageHeading(OVERALL_ACTIVATION_HEADING.slice(0, headingIndex));
+    const typeHeading = () => {
+      const headingInterval = setInterval(() => {
+        headingIndex += 1;
+        setTypedPageHeading(OVERALL_ACTIVATION_HEADING.slice(0, headingIndex));
 
-    //     if (headingIndex >= OVERALL_ACTIVATION_HEADING.length) {
-    //       clearInterval(headingInterval);
-    //       setIsFormVisible(true);
-    //     }
-    //   }, 35);
+        if (headingIndex >= OVERALL_ACTIVATION_HEADING.length) {
+          clearInterval(headingInterval);
+          setIsFormVisible(true);
+        }
+      }, 35);
 
-    //   cleanupHeading = () => clearInterval(headingInterval);
-    // };
+      cleanupHeading = () => clearInterval(headingInterval);
+    };
 
-    setTypedPageHeading(OVERALL_ACTIVATION_HEADING);
-    setIsFormVisible(true);
 
     const messageInterval = setInterval(() => {
       messageIndex += 1;
@@ -124,7 +122,7 @@ const AiOverallActivationSupport = () => {
         clearInterval(messageInterval);
         typeHeading();
       }
-    }, 25);
+    }, 2);
 
     return () => {
       clearInterval(messageInterval);
