@@ -331,7 +331,7 @@ const AiBecomeContributor = () => {
                         {...field}
                         fullWidth
                         multiline
-                        minRows={2}
+                        minRows={3}
                         label="Message"
                         variant="standard"
                         InputLabelProps={{ sx: floatingLabelSx }}
