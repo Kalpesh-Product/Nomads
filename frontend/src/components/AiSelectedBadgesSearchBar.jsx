@@ -50,7 +50,9 @@ const AiSelectedBadgesSearchBar = ({
               <span className="truncate">{badgeLabel}</span>
             </div>
           ))}
+          {/* {stateLabel && <span className={badgeClassName}>{stateLabel}</span>} */}
         </div>
+
         <div className="ml-3 flex shrink-0 items-center gap-2">
           <button
             type="button"
