@@ -38,6 +38,10 @@ const INITIAL_VISIBLE_DESTINATIONS = 18;
 const TYPING_INTERVAL_MS = 8;
 const SELECTED_HEADING_TRANSITION_DELAY_MS = 1200;
 const DESTINATION_REVEAL_INTERVAL_MS = 70;
+const SEARCH_RESULTS_LOCATION_STORAGE_KEY = "aiSearchResults.selectedLocation";
+const SEARCH_RESULTS_ATTRIBUTE_STORAGE_KEY =
+  "aiSearchResults.selectedAttribute";
+const SEARCH_RESULTS_GOAL_STORAGE_KEY = "aiSearchResults.selectedGoal";
 
 const goalNarrativeTopHeadingMap = {
   "World Ranking":
@@ -141,16 +145,23 @@ const AiSearchResults = () => {
   const selectedGoal =
     requestedGoal && goalFilterMap[requestedGoal] ? requestedGoal : defaultGoal;
   const goalOptions = goalFilterMap[selectedGoal] || goalFilterMap[defaultGoal];
-  const selectedFilter = null;
+  const getPersistedLocation = () => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem(SEARCH_RESULTS_LOCATION_STORAGE_KEY);
+  };
+  const getPersistedAttribute = () => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem(SEARCH_RESULTS_ATTRIBUTE_STORAGE_KEY);
+  };
 
   const [typedTopHeading, setTypedTopHeading] = useState("");
   const [typedBottomHeading, setTypedBottomHeading] = useState("");
   const [typedResultsHeading, setTypedResultsHeading] = useState("");
   const [selectedContinent, setSelectedContinent] = useState(
-    state?.selectedFilters?.continent || null,
+    state?.selectedFilters?.continent || getPersistedLocation(),
   );
   const [selectedGoalOption, setSelectedGoalOption] = useState(
-    state?.selectedFilters?.goalOption || null,
+    state?.selectedFilters?.goalOption || getPersistedAttribute(),
   );
   const [openDropdown, setOpenDropdown] = useState(null);
   const [showAllDestinations, setShowAllDestinations] = useState(false);
@@ -445,6 +456,32 @@ const AiSearchResults = () => {
   }, [location.state]);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    if (selectedContinent) {
+      localStorage.setItem(
+        SEARCH_RESULTS_LOCATION_STORAGE_KEY,
+        selectedContinent,
+      );
+    } else {
+      localStorage.removeItem(SEARCH_RESULTS_LOCATION_STORAGE_KEY);
+    }
+  }, [selectedContinent]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    if (selectedGoalOption) {
+      localStorage.setItem(
+        SEARCH_RESULTS_ATTRIBUTE_STORAGE_KEY,
+        selectedGoalOption,
+      );
+    } else {
+      localStorage.removeItem(SEARCH_RESULTS_ATTRIBUTE_STORAGE_KEY);
+    }
+  }, [selectedGoalOption]);
+
+  useEffect(() => {
     if (!hasSelectedFilters) {
       setIsResultsReady(false);
       setTypedBottomHeading("");
@@ -512,7 +549,7 @@ const AiSearchResults = () => {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={() => navigate("/home")}
+                onClick={() => navigate(-1)}
                 className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
                 aria-label="Go back"
               >

@@ -39,13 +39,12 @@ const DropdownBadge = ({
         type="button"
         onClick={onToggle}
         disabled={disabled}
-        className={`flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${
-          disabled
+        className={`flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${disabled
             ? "cursor-not-allowed border-black/10 bg-black/[0.03] text-black/35"
             : isOpen
               ? "border-sky-500 bg-sky-500 text-white"
               : "border-black/20 bg-white text-black/85 hover:border-sky-500"
-        }`}
+          }`}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
       >
@@ -71,11 +70,10 @@ const DropdownBadge = ({
                   <button
                     type="button"
                     onClick={() => onSelect(option.value)}
-                    className={`flex w-full items-center rounded-xl px-3 py-2 text-left text-sm transition-colors ${
-                      isSelected
+                    className={`flex w-full items-center rounded-xl px-3 py-2 text-left text-sm transition-colors ${isSelected
                         ? "bg-sky-50 font-medium text-sky-600"
                         : "text-black/80 hover:bg-slate-50"
-                    }`}
+                      }`}
                     role="option"
                     aria-selected={isSelected}
                   >
@@ -159,9 +157,9 @@ const AiManualSearch = () => {
   const countryOptions = useMemo(() => {
     const filtered = selectedContinent
       ? locations.filter(
-          (item) =>
-            item.continent?.toLowerCase() === selectedContinent?.toLowerCase(),
-        )
+        (item) =>
+          item.continent?.toLowerCase() === selectedContinent?.toLowerCase(),
+      )
       : locations;
 
     return filtered
@@ -245,7 +243,7 @@ const AiManualSearch = () => {
       countryOptions.find((option) => option.value === country)?.label,
       locationOptions.find((option) => option.value === location)?.label,
       countOptions.find((option) => option.value === count)?.label &&
-        `${countOptions.find((option) => option.value === count)?.label} Nomads`,
+      `${countOptions.find((option) => option.value === count)?.label} Nomads`,
     ].filter(Boolean);
 
     navigate(
@@ -363,7 +361,7 @@ const AiManualSearch = () => {
             <div className="flex">
               <button
                 type="button"
-                onClick={() => navigate("/home")}
+                onClick={() => navigate(-1)}
                 className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
                 aria-label="Go back"
               >
@@ -400,11 +398,10 @@ const AiManualSearch = () => {
                 <button
                   type="button"
                   onClick={handleSearch}
-                  className={`inline-flex items-center justify-center rounded-full p-1 transition-colors ${
-                    hasAllSelections
+                  className={`inline-flex items-center justify-center rounded-full p-1 transition-colors ${hasAllSelections
                       ? "text-black/90 hover:text-sky-600"
                       : "cursor-not-allowed text-black/35"
-                  }`}
+                    }`}
                   aria-label="Search listings"
                   disabled={!hasAllSelections}
                 >

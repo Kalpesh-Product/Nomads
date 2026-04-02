@@ -611,7 +611,7 @@ const AiListings = ({ forceListView = false }) => {
         <AiSelectedBadgesSearchBar
           badges={badgesWithCategory}
           stateLabel={selectedStateLabel}
-          onBack={() => navigate("/search/results")}
+          onBack={() => navigate(-1)}
           onClear={() => navigate("/search/results")}
           heading={
             <p className="mt-6 mb-6 hidden items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:flex lg:text-[0.9rem] font-play">

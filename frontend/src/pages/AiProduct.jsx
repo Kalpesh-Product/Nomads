@@ -65,9 +65,8 @@ const AiProduct = () => {
   const dispatch = useDispatch();
   const userId = auth?.user?._id || auth?.user?.id;
 
-  const reviewerName = `${auth?.user?.firstName || ""} ${
-    auth?.user?.lastName || ""
-  }`.trim();
+  const reviewerName = `${auth?.user?.firstName || ""} ${auth?.user?.lastName || ""
+    }`.trim();
 
   const [selectedReview, setSelectedReview] = useState([]);
   const [showAmenities, setShowAmenities] = useState(false);
@@ -254,22 +253,20 @@ const AiProduct = () => {
 
     if (isCompanyTypeClick) {
       navigate(
-        `/ai-listings?country=${normalizedCountry || ""}&location=${
-          normalizedLocation || ""
+        `/ai-listings?country=${normalizedCountry || ""}&location=${normalizedLocation || ""
         }&category=${normalizedCategory || ""}`,
       );
       return;
     }
 
     navigate(
-      `/ai-verticals?country=${normalizedCountry || ""}&state=${
-        normalizedLocation || ""
+      `/ai-verticals?country=${normalizedCountry || ""}&state=${normalizedLocation || ""
       }`,
     );
   };
 
   const handleBackButtonClick = () => {
-    navigate("/search/results");
+    navigate(-1);
   };
 
   const handleWriteReviewClick = () => {
@@ -307,9 +304,8 @@ const AiProduct = () => {
 
   useEffect(() => {
     if (auth?.user) {
-      const fullName = `${auth.user.firstName || ""} ${
-        auth.user.lastName || ""
-      }`.trim();
+      const fullName = `${auth.user.firstName || ""} ${auth.user.lastName || ""
+        }`.trim();
 
       reset({
         fullName,
@@ -464,11 +460,11 @@ const AiProduct = () => {
   const reviewData = isCompanyDetails
     ? []
     : companyDetails?.reviews?.map((item) => ({
-        ...item,
-        stars: item.starCount,
-        message: item.description,
-        date: dayjs(item.createdAt).fromNow(),
-      }));
+      ...item,
+      stars: item.starCount,
+      message: item.description,
+      date: dayjs(item.createdAt).fromNow(),
+    }));
 
   const forMapsData = {
     id: companyDetails?._id,
@@ -677,12 +673,12 @@ const AiProduct = () => {
             </button>
             <span className="mx-2">{">"}</span>
             {[
-              // {
-              //   key: "continent",
-              //   label: companyDetails?.continent,
-              //   isLink: true,
-              // },
-              // { key: "country", label: companyDetails?.country, isLink: true },
+              {
+                key: "continent",
+                label: companyDetails?.continent,
+                isLink: true,
+              },
+              { key: "country", label: companyDetails?.country, isLink: true },
               { key: "state", label: companyDetails?.state, isLink: true },
               {
                 key: "companyType",
@@ -774,11 +770,10 @@ const AiProduct = () => {
                 {companyDetails?.images?.slice(1, 5).map((item, index) => (
                   <div
                     key={item._id}
-                    className={`relative w-full h-56 overflow-hidden rounded-md cursor-pointer border-2 ${
-                      selectedImage?._id === item._id
-                        ? "border-primary-dark"
-                        : "border-transparent"
-                    }`}
+                    className={`relative w-full h-56 overflow-hidden rounded-md cursor-pointer border-2 ${selectedImage?._id === item._id
+                      ? "border-primary-dark"
+                      : "border-transparent"
+                      }`}
                     onClick={() =>
                       navigate("images", {
                         state: {
@@ -826,10 +821,10 @@ const AiProduct = () => {
               {isCompanyDetails ? (
                 <div className="w-full h-36 bg-gray-200 animate-pulse rounded-md" />
               ) : !(
-                  (typeof companyDetails?.logo === "string" &&
-                    companyDetails.logo) ||
-                  companyDetails?.logo?.url
-                ) ? (
+                (typeof companyDetails?.logo === "string" &&
+                  companyDetails.logo) ||
+                companyDetails?.logo?.url
+              ) ? (
                 <div className="w-full h-36 flex items-center justify-center bg-gray-100 border border-dashed border-gray-300 rounded-md">
                   <span className="text-gray-500 text-sm">
                     No company logo available
@@ -1656,11 +1651,10 @@ const AiProduct = () => {
                   {companyDetails?.images?.slice(1, 5).map((item, index) => (
                     <div
                       key={item._id}
-                      className={`relative w-full h-56 overflow-hidden rounded-md cursor-pointer border-2 ${
-                        selectedImage?._id === item._id
-                          ? "border-primary-dark"
-                          : "border-transparent"
-                      }`}
+                      className={`relative w-full h-56 overflow-hidden rounded-md cursor-pointer border-2 ${selectedImage?._id === item._id
+                        ? "border-primary-dark"
+                        : "border-transparent"
+                        }`}
                       onClick={() =>
                         navigate("images", {
                           state: {
@@ -1736,11 +1730,10 @@ const AiProduct = () => {
                   {companyDetails?.images?.slice(0, 8).map((_, idx) => (
                     <div
                       key={idx}
-                      className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                        currentImageIndex === idx
-                          ? "bg-white w-4"
-                          : "bg-white/50"
-                      }`}
+                      className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${currentImageIndex === idx
+                        ? "bg-white w-4"
+                        : "bg-white/50"
+                        }`}
                     />
                   ))}
                 </div>
@@ -1754,10 +1747,10 @@ const AiProduct = () => {
               {isCompanyDetails ? (
                 <div className="w-full h-36 bg-gray-200 animate-pulse rounded-md" />
               ) : !(
-                  (typeof companyDetails?.logo === "string" &&
-                    companyDetails.logo) ||
-                  companyDetails?.logo?.url
-                ) ? (
+                (typeof companyDetails?.logo === "string" &&
+                  companyDetails.logo) ||
+                companyDetails?.logo?.url
+              ) ? (
                 <div className="w-full h-36 flex items-center justify-center bg-gray-100 border border-dashed border-gray-300 rounded-md">
                   <span className="text-gray-500 text-sm">
                     No company logo available
@@ -1841,11 +1834,10 @@ const AiProduct = () => {
                 ) : (
                   <div>
                     <p
-                      className={`text-sm text-secondary-dark leading-relaxed ${
-                        !isAboutExpanded
-                          ? "line-clamp-4 md:line-clamp-none"
-                          : ""
-                      }`}
+                      className={`text-sm text-secondary-dark leading-relaxed ${!isAboutExpanded
+                        ? "line-clamp-4 md:line-clamp-none"
+                        : ""
+                        }`}
                     >
                       {companyDetails.about.replace(/\\n/g, " ")}
                     </p>
@@ -2400,11 +2392,10 @@ const AiProduct = () => {
               </p>
 
               <div
-                className={`${
-                  !isDisclaimerExpanded
-                    ? "line-clamp-[6] md:line-clamp-none overflow-hidden"
-                    : ""
-                }`}
+                className={`${!isDisclaimerExpanded
+                  ? "line-clamp-[6] md:line-clamp-none overflow-hidden"
+                  : ""
+                  }`}
               >
                 <p className="mb-2">
                   <b>Content and Copyright Disclaimer:</b> WoNo is a nomad
