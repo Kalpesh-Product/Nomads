@@ -66,7 +66,7 @@ const valueAddedServiceItems = [
   },
 ];
 
-const AiListings = () => {
+const AiListings = ({ forceListView = false }) => {
   const [resetPageKey, setResetPageKey] = useState(0);
   const [favorites, setFavorites] = useState([]);
   const dispatch = useDispatch();
@@ -515,7 +515,7 @@ const AiListings = () => {
     };
     setShowMobileSearch(false);
     navigate(
-      `/ai-listings?country=${formData.country}&location=${formData.location}&category=${state.category}`,
+      `${listingsBasePath}?country=${formData.country}&location=${formData.location}&category=${state.category}`,
       {
         state: {
           country: formData.country,
@@ -537,12 +537,14 @@ const AiListings = () => {
     navigate(service.path);
   };
 
-  const [mapOpen, setMapOpen] = useState(true);
+  const [mapOpen, setMapOpen] = useState(!forceListView);
   const isMobile = useMediaQuery("(max-width:767px)");
   const isTablet = useMediaQuery("(max-width:1023px)");
   const isValueAddedServicesSelected =
     formData?.category === VALUE_ADDED_SERVICES_CATEGORY;
-  const showDesktopMap = mapOpen && !isValueAddedServicesSelected;
+  const showDesktopMap =
+    !forceListView && mapOpen && !isValueAddedServicesSelected;
+  const listingsBasePath = "/ai-listings-list";
   const selectedStateFromParams =
     searchParams.get("state") || searchParams.get("location") || "";
   const backLabel = selectedStateFromParams || formData?.location || "";

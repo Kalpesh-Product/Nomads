@@ -494,7 +494,7 @@ const AiGlobalListingsList = () => {
     };
 
     navigate(
-      `/ai-listings?country=${formData.country}&location=${formData.location}&category=${state.category}`,
+      `/ai-listings-list?country=${formData.country}&location=${formData.location}&category=${state.category}`,
       {
         state: {
           country: formData.country,
