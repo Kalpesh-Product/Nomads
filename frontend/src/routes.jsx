@@ -59,6 +59,7 @@ import AiSearch from "./pages/AiSearch";
 import AiSearchResults from "./pages/AiSearchResults";
 import AiGlobalListings from "./pages/AiGlobalListings";
 import AiListings from "./pages/AiListings";
+import AiListingsListView from "./pages/AiListingsListView";
 import AiProduct from "./pages/AiProduct";
 import AiImageGallery from "./pages/AiImageGallery";
 import AiWorldRankings from "./pages/AiWorldRankingsSearchResults";
@@ -201,6 +202,7 @@ if (tenant === "main") {
             { path: "manual-search", element: <AiManualSearch /> },
             { path: "ai-verticals", element: <AiGlobalListings /> },
             { path: "ai-listings", element: <AiListings /> },
+            { path: "ai-listings-list", element: <AiListingsListView /> },
             { path: "ai-listings/:company", element: <AiProduct /> },
             {
               path: "ai-listings/:company/images",

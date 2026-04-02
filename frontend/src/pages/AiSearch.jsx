@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { HiOutlineSearch } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 
+const AI_SEARCH_TYPING_SEEN_KEY = "wono-ai-search-typing-seen";
+
 const filters = [
   "Overall Work from anywhere Index",
   "Digital nomad visas",
@@ -85,6 +87,14 @@ const AiSearch = () => {
     "Please share the below details to find the best destinations for you";
 
   useEffect(() => {
+    const hasSeenTypingEffect =
+      typeof window !== "undefined" &&
+      window.localStorage.getItem(AI_SEARCH_TYPING_SEEN_KEY) === "true";
+
+    if (hasSeenTypingEffect) {
+      setTypedHeading(headingText);
+      return;
+    }
     setTypedHeading("");
 
     let currentIndex = 0;
@@ -94,6 +104,9 @@ const AiSearch = () => {
 
       if (currentIndex >= headingText.length) {
         clearInterval(typingInterval);
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem(AI_SEARCH_TYPING_SEEN_KEY, "true");
+        }
       }
     }, 25);
 
@@ -166,11 +179,10 @@ const AiSearch = () => {
                   key={filter}
                   type="button"
                   onClick={() => handleFilterClick(filter)}
-                  className={`rounded-full border px-6 py-2 text-xs font-medium transition-colors ${
-                    isActive
-                      ? "border-sky-500 bg-sky-500 text-white"
-                      : "border-black text-black/90 hover:border-sky-500"
-                  }`}
+                  className={`rounded-full border px-6 py-2 text-xs font-medium transition-colors ${isActive
+                    ? "border-sky-500 bg-sky-500 text-white"
+                    : "border-black text-black/90 hover:border-sky-500"
+                    }`}
                 >
                   {filter}
                 </button>

@@ -9,7 +9,7 @@ const sharedImages = [
 
 const destinations = [
   ["Lisbon", "Portugal", "Europe"],
-  ["Dubai", "UAE", "Asia"],
+  ["Dubai", "United Arab Emirates", "Asia"],
   ["Barcelona", "Spain", "Europe"],
   ["Bali", "Indonesia", "Asia"],
   ["Bangkok", "Thailand", "Asia"],

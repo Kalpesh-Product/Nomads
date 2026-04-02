@@ -52,6 +52,7 @@ const defaultValues = {
 const CONSULTATION_PROMPT =
   "Share your consultation requirements and we will connect you with the right expert support.";
 const CONSULTATION_HEADING = "Consultation";
+const CONSULTATION_TYPING_SEEN_KEY = "wono-consultation-typing-seen";
 
 const AiConsultation = () => {
   const [typedMessage, setTypedMessage] = useState("");
@@ -96,13 +97,23 @@ const AiConsultation = () => {
   };
 
   useEffect(() => {
+    const hasSeenTypingEffect =
+      typeof window !== "undefined" &&
+      window.localStorage.getItem(CONSULTATION_TYPING_SEEN_KEY) === "true";
+
+    if (hasSeenTypingEffect) {
+      setTypedMessage(CONSULTATION_PROMPT);
+      setTypedPageHeading(CONSULTATION_HEADING);
+      setIsFormVisible(true);
+      return;
+    }
     setTypedMessage("");
     setTypedPageHeading("");
     setIsFormVisible(false);
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => {};
+    let cleanupHeading = () => { };
 
     const typeHeading = () => {
       const headingInterval = setInterval(() => {
@@ -112,6 +123,9 @@ const AiConsultation = () => {
         if (headingIndex >= CONSULTATION_HEADING.length) {
           clearInterval(headingInterval);
           setIsFormVisible(true);
+          if (typeof window !== "undefined") {
+            window.localStorage.setItem(CONSULTATION_TYPING_SEEN_KEY, "true");
+          }
         }
       }, 35);
 
@@ -126,7 +140,7 @@ const AiConsultation = () => {
         clearInterval(messageInterval);
         typeHeading();
       }
-    }, 25);
+    }, 2);
 
     return () => {
       clearInterval(messageInterval);
@@ -153,9 +167,8 @@ const AiConsultation = () => {
                 event.preventDefault();
                 handleFormSubmit();
               }}
-              className={`bg-white p-6 md:p-0 rounded-2xl ${
-                isFormVisible ? "visible" : "invisible"
-              }`}
+              className={`bg-white p-6 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
+                }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 <Controller

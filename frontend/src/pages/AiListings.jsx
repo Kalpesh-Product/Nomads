@@ -66,7 +66,7 @@ const valueAddedServiceItems = [
   },
 ];
 
-const AiListings = () => {
+const AiListings = ({ forceListView = false }) => {
   const [resetPageKey, setResetPageKey] = useState(0);
   const [favorites, setFavorites] = useState([]);
   const dispatch = useDispatch();
@@ -286,8 +286,7 @@ const AiListings = () => {
     queryFn: async () => {
       const { country, location } = formData || {};
       const response = await axios.get(
-        `company/companiesn?country=${country}&state=${location}&userId=${
-          userId || ""
+        `company/companiesn?country=${country}&state=${location}&userId=${userId || ""
         }`,
       );
 
@@ -481,23 +480,23 @@ const AiListings = () => {
   const forMapsData = isLisitingLoading
     ? []
     : listingsData.map((item) => ({
-        ...item,
-        id: item._id,
-        lat: item.latitude,
-        lng: item.longitude,
-        name: item.companyName,
-        location: item.city,
-        reviews: item.reviews?.length,
-        rating: item.reviews?.length
-          ? (() => {
-              const avg =
-                item.reviews.reduce((sum, r) => sum + r.starCount, 0) /
-                item.reviews.length;
-              return avg % 1 === 0 ? avg : avg.toFixed(1);
-            })()
-          : "0",
-        image: item.images?.[0]?.url,
-      }));
+      ...item,
+      id: item._id,
+      lat: item.latitude,
+      lng: item.longitude,
+      name: item.companyName,
+      location: item.city,
+      reviews: item.reviews?.length,
+      rating: item.reviews?.length
+        ? (() => {
+          const avg =
+            item.reviews.reduce((sum, r) => sum + r.starCount, 0) /
+            item.reviews.length;
+          return avg % 1 === 0 ? avg : avg.toFixed(1);
+        })()
+        : "0",
+      image: item.images?.[0]?.url,
+    }));
 
   const handleCategoryClick = (categoryValue) => {
     const formData = getValues(); // from react-hook-form
@@ -515,7 +514,7 @@ const AiListings = () => {
     };
     setShowMobileSearch(false);
     navigate(
-      `/ai-listings?country=${formData.country}&location=${formData.location}&category=${state.category}`,
+      `${listingsBasePath}?country=${formData.country}&location=${formData.location}&category=${state.category}`,
       {
         state: {
           country: formData.country,
@@ -537,22 +536,27 @@ const AiListings = () => {
     navigate(service.path);
   };
 
-  const [mapOpen, setMapOpen] = useState(true);
+  const [mapOpen, setMapOpen] = useState(!forceListView);
   const isMobile = useMediaQuery("(max-width:767px)");
   const isTablet = useMediaQuery("(max-width:1023px)");
   const isValueAddedServicesSelected =
     formData?.category === VALUE_ADDED_SERVICES_CATEGORY;
-  const showDesktopMap = mapOpen && !isValueAddedServicesSelected;
+  const showDesktopMap =
+    !forceListView && mapOpen && !isValueAddedServicesSelected;
+  const listingsBasePath =
+    location.pathname === "/ai-listings-list"
+      ? "/ai-listings-list"
+      : "/ai-listings";
   const selectedStateFromParams =
     searchParams.get("state") || searchParams.get("location") || "";
   const backLabel = selectedStateFromParams || formData?.location || "";
   const selectedStateLabel = backLabel
     ? backLabel
-        .split(" ")
-        .map(
-          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
-        )
-        .join(" ")
+      .split(" ")
+      .map(
+        (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
+      )
+      .join(" ")
     : "";
 
   // Prioritize BIZ Nest and MeWo first, then sort the rest by rating descending
@@ -589,11 +593,11 @@ const AiListings = () => {
           >
             <HiOutlineArrowLeft size={18} />
           </button>
-          {selectedStateLabel && (
+          {/* {selectedStateLabel && (
             <span className="text-lg font-medium text-primary-blue">
               {selectedStateLabel}
             </span>
-          )}
+          )} */}
         </div>
         <p className="mb-4 mt-6 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:hidden font-play">
           {!isSecondHeadingPhase && (
@@ -631,26 +635,24 @@ const AiListings = () => {
               <div className="flex items-center gap-2">
                 <IoSearch className="text-primary-red" />
                 <span className="text-[11px] font-bold text-gray-900 truncate w-full text-left">
-                  {`${(formData?.country || "Country").charAt(0).toUpperCase() + (formData?.country || "Country").slice(1)} . ${
-                    formData?.location
-                      ? formData.location
-                          .split(" ")
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() +
-                              word.slice(1).toLowerCase(),
-                          )
-                          .join(" ")
-                      : "Unknown"
-                  } . ${
-                    formData?.category
+                  {`${(formData?.country || "Country").charAt(0).toUpperCase() + (formData?.country || "Country").slice(1)} . ${formData?.location
+                    ? formData.location
+                      .split(" ")
+                      .map(
+                        (word) =>
+                          word.charAt(0).toUpperCase() +
+                          word.slice(1).toLowerCase(),
+                      )
+                      .join(" ")
+                    : "Unknown"
+                    } . ${formData?.category
                       ? categoryOptions.find(
-                          (c) => c.value === formData.category,
-                        )?.label ||
-                        formData.category.charAt(0).toUpperCase() +
-                          formData.category.slice(1)
+                        (c) => c.value === formData.category,
+                      )?.label ||
+                      formData.category.charAt(0).toUpperCase() +
+                      formData.category.slice(1)
                       : "All"
-                  }`}
+                    }`}
                 </span>
               </div>
               <span className="text-[10px] text-gray-500">
@@ -804,11 +806,10 @@ const AiListings = () => {
                                 className="h-full w-full object-contain"
                               />
                               <span
-                                className={`text-tiny border-b-4 ${
-                                  isActive
-                                    ? "border-primary-blue"
-                                    : "border-transparent"
-                                }`}
+                                className={`text-tiny border-b-4 ${isActive
+                                  ? "border-primary-blue"
+                                  : "border-transparent"
+                                  }`}
                               >
                                 {cat.label}
                               </span>
@@ -1069,13 +1070,13 @@ const AiListings = () => {
                 in{" "}
                 {formData?.location
                   ? formData.location
-                      .split(" ")
-                      .map(
-                        (word) =>
-                          word.charAt(0).toUpperCase() +
-                          word.slice(1).toLowerCase(),
-                      )
-                      .join(" ")
+                    .split(" ")
+                    .map(
+                      (word) =>
+                        word.charAt(0).toUpperCase() +
+                        word.slice(1).toLowerCase(),
+                    )
+                    .join(" ")
                   : "Unknown"}
               </h1>
             </div>
@@ -1089,9 +1090,8 @@ const AiListings = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -50 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              className={`${
-                showDesktopMap ? "col-span-5" : "col-span-9"
-              } font-semibold text-lg`}
+              className={`${showDesktopMap ? "col-span-5" : "col-span-9"
+                } font-semibold text-lg`}
             >
               {formData?.category === VALUE_ADDED_SERVICES_CATEGORY ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-5">
@@ -1105,11 +1105,10 @@ const AiListings = () => {
                         type="button"
                         onClick={() => handleValueAddedServiceClick(service)}
                         disabled={isDisabled}
-                        className={`rounded-3xl bg-[#f1f1f3] px-4 py-6 min-h-[132px] aspect-square flex flex-col items-center justify-center text-center transition-colors ${
-                          isDisabled
-                            ? "cursor-not-allowed opacity-80"
-                            : "hover:bg-[#e8e8ed]"
-                        }`}
+                        className={`rounded-3xl bg-[#f1f1f3] px-4 py-6 min-h-[132px] aspect-square flex flex-col items-center justify-center text-center transition-colors ${isDisabled
+                          ? "cursor-not-allowed opacity-80"
+                          : "hover:bg-[#e8e8ed]"
+                          }`}
                       >
                         <Icon size={24} className="text-black/80" />
                         <div className="mt-3 flex flex-col items-center gap-1.5 justify-center">
@@ -1135,11 +1134,10 @@ const AiListings = () => {
                   }
                   persistPage={true}
                   resetPageKey={resetPageKey}
-                  columns={`grid-cols-2 md:grid-cols-3 ${
-                    showDesktopMap
-                      ? "lg:grid-cols-3"
-                      : "lg:grid-cols-4 xl:grid-cols-5"
-                  } gap-4 md:gap-5`}
+                  columns={`grid-cols-2 md:grid-cols-3 ${showDesktopMap
+                    ? "lg:grid-cols-3"
+                    : "lg:grid-cols-4 xl:grid-cols-5"
+                    } gap-4 md:gap-5`}
                   renderItem={(item, index) =>
                     isLisitingLoading ? (
                       <Box key={index} className="w-full h-full">

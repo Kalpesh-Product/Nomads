@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import AiHeader from "../components/AiHeader";
 import AiSidebar from "../components/AiSidebar";
+import AiFooter from "../components/AiFooter";
 
 const NomadAiLayout = () => {
   const location = useLocation();
@@ -59,7 +60,7 @@ const NomadAiLayout = () => {
           </div>
           {/* <Toaster /> */}
           {(location.pathname !== "/verticals" ||
-            window.innerWidth >= 1024) && <Footer />}
+            window.innerWidth >= 1024) && <AiFooter />}
         </div>
       </div>
     </div>

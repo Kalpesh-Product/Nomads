@@ -57,14 +57,14 @@ const recommendationItems = [
   {
     label: "Advance Your Career",
     description:
-      "Intellegent suggestions to help you find the most sutaible nomad destinations to advance your career.",
+      "Intelligent suggestions to help you find the most suitable nomad destinations to advance your career.",
     icon: MdOutlineWorkHistory,
     path: "/search/results",
   },
   {
     label: "Find Your Community",
     description:
-      "Find like minded individuals & communities as per your preferances from nomad destinations.",
+      "Find like minded individuals & communities as per your preferences from nomad destinations.",
     icon: RiUserCommunityLine,
     path: "/search/results",
   },
@@ -110,7 +110,7 @@ const profileItems = [
 const signOutItem = [{ label: "Sign Out", icon: HiOutlineLogout }];
 
 const becomeContributorLink = {
-  label: "Become A Contributor",
+  label: "Become a WoNo Contributor",
   icon: IoMdPersonAdd,
   path: "/become-a-contributor",
 };
@@ -136,9 +136,8 @@ const SidebarSection = ({
           <button
             type="button"
             onClick={onToggle}
-            className={`flex w-full items-center justify-between text-left text-xs font-semibold uppercase tracking-wide text-black/80 transition hover:text-black ${
-              isOpen ? "border-b border-black/10 pb-3" : ""
-            }`}
+            className={`flex w-full items-center justify-between text-left text-xs font-semibold uppercase tracking-wide text-black/80 transition hover:text-black ${isOpen ? "border-b border-black/10 pb-3" : ""
+              }`}
             aria-expanded={isOpen}
             aria-label={`${isOpen ? "Collapse" : "Expand"} ${title}`}
           >
@@ -159,11 +158,10 @@ const SidebarSection = ({
                   key={item.label}
                   type="button"
                   onClick={() => onItemClick?.(item)}
-                  className={`flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-[22px] transition  ${
-                    item.active
-                      ? "bg-white text-black shadow-sm"
-                      : "text-black/80 hover:bg-white/70"
-                  }`}
+                  className={`flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-[22px] transition  ${item.active
+                    ? "bg-white text-black shadow-sm"
+                    : "text-black/80 hover:bg-white/70"
+                    }`}
                   title={collapsed ? item.label : ""}
                 >
                   <Icon size={18} className="shrink-0" />
@@ -314,13 +312,12 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
   return (
     <aside
-      className={`flex h-full max-h-screen flex-col overflow-y-auto overscroll-contain border-r border-black/10 bg-[#efefef] transition-all duration-300 custom-scrollbar-hide ${
-        isMobileOverlay
-          ? "w-[calc(100%-52px)] max-w-[320px]"
-          : isCollapsed
-            ? "w-[70px]"
-            : "w-[260px]"
-      }`}
+      className={`flex h-full max-h-screen flex-col overflow-y-auto overscroll-contain border-r border-black/10 bg-[#efefef] transition-all duration-300 custom-scrollbar-hide ${isMobileOverlay
+        ? "w-[calc(100%-52px)] max-w-[320px]"
+        : isCollapsed
+          ? "w-[70px]"
+          : "w-[260px]"
+        }`}
       onClick={(event) => {
         if (isMobileOverlay) event.stopPropagation();
       }}
@@ -384,12 +381,12 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
             isOpen={isProfileOpen}
             onToggle={() => setIsProfileOpen((prev) => !prev)}
           />
+          <BecomeContributorButton />
           <SidebarSection
             items={becomeHostItem}
             collapsed={isCollapsed}
             onItemClick={handleBecomeHostClick}
           />
-          <BecomeContributorButton />
           <SidebarSection
             items={signOutItem}
             collapsed={isCollapsed}
@@ -398,12 +395,12 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         </>
       ) : (
         <>
+          <BecomeContributorButton />
           <SidebarSection
             items={becomeHostItem}
             collapsed={isCollapsed}
             onItemClick={handleBecomeHostClick}
           />
-          <BecomeContributorButton />
           {!isCollapsed && (
             <div className="mt-auto px-4 pb-4 pt-10">
               <div className="rounded-[28px]   p-4 shadow-sm">
@@ -419,7 +416,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                 <button
                   type="button"
                   onClick={handleLogInClick}
-                  className="mt-6 w-full rounded-full border border-black/10 bg-primary-blue px-3 py-2 text-base font-semibold text-white transition hover:bg-primary-light hover:text-white"
+                  className="mt-6 w-full rounded-full border border-black/10 bg-primary-blue px-3 py-2 text-base font-semibold text-white transition hover:bg-black hover:text-white"
                 >
                   {loggedOutPrompt.actionLabel}
                 </button>

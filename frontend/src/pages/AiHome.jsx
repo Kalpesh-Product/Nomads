@@ -44,14 +44,14 @@ const recommendationCards = [
   {
     title: "Advance Your Career",
     description:
-      "Discover the most sutaible nomad destinations to advance your career.",
+      "Discover the most suitable nomad destinations to advance your career.",
     icon: MdOutlineWorkHistory,
     path: "/search/results",
   },
   {
     title: "Find Your Community",
     description:
-      "Like minded individuals & communities as per your preferances in nomad destinations.",
+      "Like minded individuals & communities as per your preferences in nomad destinations.",
     icon: RiUserCommunityLine,
     path: "/search/results",
   },
@@ -74,19 +74,20 @@ const AiHome = () => {
   const [typedFourthLine, setTypedFourthLine] = useState("");
 
   const [areCardsVisible, setAreCardsVisible] = useState(false);
+  const [visibleCardCount, setVisibleCardCount] = useState(0);
 
   const isLoggedIn = useNomadLoginState();
 
   const greetingText = isLoggedIn ? "hi Abrar" : "Meet Wono";
   const subheadingText = isLoggedIn
-    ? "Please choose your goals from below so that we can help you design your accurate nomad lifestyle."
+    ? "Welcome back to wono, an intelligent platform for modern nomads."
     : "An intellegent platform for moden nomads.";
   const thirdLineText = isLoggedIn
-    ? ""
-    : "Supporting the global community of remote workers, creators, entrepreneurs, hosts and investors who are redefining how the world lives and works.";
+    ? "A global community of nomads & remote workers, who are redefining how the world lives and works. Early adoption of our future lifestyle!"
+    : "A global community of nomads & remote workers, who are redefining how the world lives and works. Early adoption of our future lifestyle!";
   const fourthLineText = isLoggedIn
-    ? ""
-    : "Early adoption of our future lifestyle!";
+    ? "Choose your goals from below so that we can help you design your nomad lifestyle."
+    : "Choose your goals from below so that we can help you design your nomad lifestyle.";
 
   useEffect(() => {
     setTypedGreeting("");
@@ -168,6 +169,28 @@ const AiHome = () => {
     };
   }, [fourthLineText, greetingText, subheadingText, thirdLineText]);
 
+  useEffect(() => {
+    if (!areCardsVisible) {
+      setVisibleCardCount(0);
+      return;
+    }
+
+    let currentVisibleCount = 0;
+
+    const revealInterval = setInterval(() => {
+      currentVisibleCount += 1;
+      setVisibleCardCount(currentVisibleCount);
+
+      if (currentVisibleCount >= recommendationCards.length) {
+        clearInterval(revealInterval);
+      }
+    }, 120);
+
+    return () => {
+      clearInterval(revealInterval);
+    };
+  }, [areCardsVisible]);
+
   const handleCardClick = (card) => {
     const params = new URLSearchParams(location.search);
 
@@ -207,16 +230,12 @@ const AiHome = () => {
           <h2 className="mt-5 text-sm font-semibold text-black/85 font-play sm:text-lg">
             {typedSubheading}
           </h2>
-          {!isLoggedIn ? (
-            <>
-              <p className="mt-4 text-sm sm:text-lg font-medium text-black/85 font-play">
-                {typedThirdLine}
-              </p>
-              <p className="mt-4 text-sm sm:text-lg font-medium text-primary-blue font-play">
-                {typedFourthLine}
-              </p>
-            </>
-          ) : null}
+          <p className="mt-4 text-sm sm:text-lg font-medium text-black/85 font-play">
+            {typedThirdLine}
+          </p>
+          <p className="mt-4 text-sm sm:text-lg font-medium text-primary-blue font-play">
+            {typedFourthLine}
+          </p>
 
           <div
             className={`mt-4 rounded-[40px] px-0 py-4 md:px-6 md:py-8 ${
@@ -224,7 +243,7 @@ const AiHome = () => {
             }`}
           >
             <div className="grid grid-cols-2 gap-4 md:grid-cols-2 md:gap-10 xl:grid-cols-3">
-              {recommendationCards.map((card) => {
+              {recommendationCards.map((card, index) => {
                 const Icon = card.icon;
 
                 const isFreeCard = freeRecommendationTitles.has(card.title);
@@ -233,7 +252,14 @@ const AiHome = () => {
                   : "Login required";
 
                 return (
-                  <div key={card.title}>
+                  <div
+                    key={card.title}
+                    className={`transition-all duration-300 ${
+                      index < visibleCardCount
+                        ? "translate-y-0 opacity-100"
+                        : "pointer-events-none translate-y-2 opacity-0"
+                    }`}
+                  >
                     <article
                       onClick={() => handleCardClick(card)}
                       className="group cursor-pointer rounded-2xl bg-[#f1f1f3] px-3 py-5 text-center transition-colors duration-200 hover:bg-[#e8e8ed] md:rounded-none md:bg-transparent md:px-0 md:py-0 md:hover:bg-transparent"
@@ -242,7 +268,7 @@ const AiHome = () => {
                         size={24}
                         className="mx-auto text-black/80 transition-colors duration-200 group-hover:text-sky-500"
                       />
-                      <h3 className="mt-2 text-nano sm:text-nano md:text-md lg:text-md font-bold text-black/90 leading-tight transition-colors duration-200 group-hover:text-sky-500 uppercase">
+                      <h3 className="mt-2 text-nano sm:text-[0.8rem]  font-bold text-black/90 leading-tight transition-colors duration-200 group-hover:text-sky-500 uppercase">
                         {card.title}
                       </h3>
                       <div className="mt-2 hidden rounded-2xl bg-[#f1f1f3] p-5 text-left shadow-[0_1px_0_rgba(255,255,255,0.7)] transition-colors duration-200 group-hover:bg-sky-500 md:block">
@@ -268,10 +294,10 @@ const AiHome = () => {
         </div>
       </main>
 
-      <div className="sticky bottom-0 z-10  bg-white/95 py-6 text-center text-nano text-gray-600 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+      {/* <div className="sticky bottom-0 z-10  bg-white/95 py-6 text-center text-nano text-gray-600 backdrop-blur supports-[backdrop-filter]:bg-white/80">
         WoNo is in Beta and can make mistakes. Building the future of global
         nomad living, one update at a time. See Cookie Preferences.
-      </div>
+      </div> */}
     </div>
   );
 };

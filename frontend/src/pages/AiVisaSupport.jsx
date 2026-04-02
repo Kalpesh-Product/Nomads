@@ -39,6 +39,7 @@ const defaultValues = {
 const VISA_SUPPORT_PROMPT =
   "Tell us about your travel plans and we will help you navigate the visa process with confidence.";
 const VISA_SUPPORT_HEADING = "Visa Support";
+const VISA_SUPPORT_TYPING_SEEN_KEY = "wono-visa-support-typing-seen";
 
 const AiVisaSupport = () => {
   const [typedMessage, setTypedMessage] = useState("");
@@ -106,13 +107,23 @@ const AiVisaSupport = () => {
   };
 
   useEffect(() => {
+    const hasSeenTypingEffect =
+      typeof window !== "undefined" &&
+      window.localStorage.getItem(VISA_SUPPORT_TYPING_SEEN_KEY) === "true";
+
+    if (hasSeenTypingEffect) {
+      setTypedMessage(VISA_SUPPORT_PROMPT);
+      setTypedVisaHeading(VISA_SUPPORT_HEADING);
+      setIsFormVisible(true);
+      return;
+    }
     setTypedMessage("");
     setTypedVisaHeading("");
     setIsFormVisible(false);
 
     let messageIndex = 0;
     let visaHeadingIndex = 0;
-    let cleanupHeading = () => {};
+    let cleanupHeading = () => { };
 
     const typeVisaHeading = () => {
       const headingInterval = setInterval(() => {
@@ -122,11 +133,15 @@ const AiVisaSupport = () => {
         if (visaHeadingIndex >= VISA_SUPPORT_HEADING.length) {
           clearInterval(headingInterval);
           setIsFormVisible(true);
+          if (typeof window !== "undefined") {
+            window.localStorage.setItem(VISA_SUPPORT_TYPING_SEEN_KEY, "true");
+          }
         }
       }, 35);
 
       cleanupHeading = () => clearInterval(headingInterval);
     };
+
 
     const messageInterval = setInterval(() => {
       messageIndex += 1;
@@ -136,7 +151,7 @@ const AiVisaSupport = () => {
         clearInterval(messageInterval);
         typeVisaHeading();
       }
-    }, 25);
+    }, 2);
 
     return () => {
       clearInterval(messageInterval);
@@ -160,9 +175,8 @@ const AiVisaSupport = () => {
             <Box
               component="form"
               onSubmit={handleSubmit(handleFormSubmit)}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${
-                isFormVisible ? "visible" : "invisible"
-              }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
+                }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 <Controller

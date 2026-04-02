@@ -37,6 +37,7 @@ const destinationCards = aiDestinationCards;
 const INITIAL_VISIBLE_DESTINATIONS = 18;
 const TYPING_INTERVAL_MS = 8;
 const SELECTED_HEADING_TRANSITION_DELAY_MS = 1200;
+const DESTINATION_REVEAL_INTERVAL_MS = 70;
 
 const goalNarrativeTopHeadingMap = {
   "World Ranking":
@@ -72,11 +73,10 @@ const DropdownBadge = ({
       <button
         type="button"
         onClick={onToggle}
-        className={`flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${
-          isOpen
-            ? "border-sky-500 bg-sky-500 text-white"
-            : "border-black/20 bg-white text-black/85 hover:border-sky-500"
-        }`}
+        className={`flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${isOpen
+          ? "border-sky-500 bg-sky-500 text-white"
+          : "border-black/20 bg-white text-black/85 hover:border-sky-500"
+          }`}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
       >
@@ -104,22 +104,20 @@ const DropdownBadge = ({
                   <button
                     type="button"
                     onClick={() => onSelect(option)}
-                    className={`group flex w-full items-center rounded-xl px-4 py-2 text-left text-sm transition-colors ${
-                      isSelected
-                        ? "bg-sky-50 font-medium text-sky-600"
-                        : "text-black/80 hover:bg-slate-50"
-                    }`}
+                    className={`group flex w-full items-center rounded-xl px-4 py-2 text-left text-sm transition-colors ${isSelected
+                      ? "bg-sky-50 font-medium text-sky-600"
+                      : "text-black/80 hover:bg-slate-50"
+                      }`}
                     role="option"
                     aria-selected={isSelected}
                   >
                     <span className="mr-2 inline-flex w-4 shrink-0 items-center justify-center">
                       <FaCheck
                         size={13}
-                        className={`shrink-0 text-primary-blue transition-opacity ${
-                          isSelected
-                            ? "opacity-100"
-                            : "opacity-0 group-hover:opacity-100"
-                        }`}
+                        className={`shrink-0 text-primary-blue transition-opacity ${isSelected
+                          ? "opacity-100"
+                          : "opacity-0 group-hover:opacity-100"
+                          }`}
                         aria-hidden="true"
                       />
                     </span>
@@ -137,7 +135,8 @@ const DropdownBadge = ({
 
 const AiSearchResults = () => {
   const navigate = useNavigate();
-  const { state } = useLocation();
+  const location = useLocation();
+  const { state } = location;
   const requestedGoal = state?.selectedGoal;
   const selectedGoal =
     requestedGoal && goalFilterMap[requestedGoal] ? requestedGoal : defaultGoal;
@@ -147,11 +146,16 @@ const AiSearchResults = () => {
   const [typedTopHeading, setTypedTopHeading] = useState("");
   const [typedBottomHeading, setTypedBottomHeading] = useState("");
   const [typedResultsHeading, setTypedResultsHeading] = useState("");
-  const [selectedContinent, setSelectedContinent] = useState(null);
-  const [selectedGoalOption, setSelectedGoalOption] = useState(selectedFilter);
+  const [selectedContinent, setSelectedContinent] = useState(
+    state?.selectedFilters?.continent || null,
+  );
+  const [selectedGoalOption, setSelectedGoalOption] = useState(
+    state?.selectedFilters?.goalOption || null,
+  );
   const [openDropdown, setOpenDropdown] = useState(null);
   const [showAllDestinations, setShowAllDestinations] = useState(false);
   const [isResultsReady, setIsResultsReady] = useState(false);
+  const [visibleDestinationCount, setVisibleDestinationCount] = useState(0);
   const dropdownContainerRef = useRef(null);
   const closeDropdownTimeoutRef = useRef(null);
 
@@ -194,9 +198,12 @@ const AiSearchResults = () => {
   const searchBarBadges = useMemo(() => {
     const badges = [selectedGoal];
 
-    if (hasSelectedContinent || hasSelectedGoalOption) {
-      badges.push(selectedContinent || "Select Location");
-      badges.push(selectedGoalOption || "Select Attribute");
+    if (hasSelectedContinent) {
+      badges.push(selectedContinent);
+    }
+
+    if (hasSelectedGoalOption) {
+      badges.push(selectedGoalOption);
     }
 
     return badges;
@@ -222,19 +229,27 @@ const AiSearchResults = () => {
 
   const handleDestinationClick = (destination) => {
     const country = destination.country.toLowerCase();
-    const location = (destination.routeCity || destination.city).toLowerCase();
+    const selectedLocationLabel = destination.displayCity || destination.city;
+    const selectedLocationParam = (
+      destination.routeCity || destination.city
+    ).toLowerCase();
     const continent = destination.continent.toLowerCase();
+    const nextSearchBarBadges = [...searchBarBadges, selectedLocationLabel];
 
     navigate(
-      `/ai-verticals?country=${encodeURIComponent(country)}&state=${encodeURIComponent(location)}`,
+      `/ai-verticals?country=${encodeURIComponent(country)}&state=${encodeURIComponent(selectedLocationParam)}`,
       {
         state: {
           breadcrumbFilters: {
             continent,
             country,
-            location,
+            location: selectedLocationParam,
           },
-          searchBarBadges,
+          selectedFilters: {
+            continent: selectedContinent,
+            goalOption: selectedGoalOption,
+          },
+          searchBarBadges: nextSearchBarBadges,
         },
       },
     );
@@ -422,8 +437,12 @@ const AiSearchResults = () => {
   );
 
   useEffect(() => {
-    setSelectedGoalOption(selectedFilter);
-  }, [selectedFilter]);
+    const incomingFilters = location.state?.selectedFilters;
+    if (!incomingFilters) return;
+
+    setSelectedContinent(incomingFilters.continent || null);
+    setSelectedGoalOption(incomingFilters.goalOption || null);
+  }, [location.state]);
 
   useEffect(() => {
     if (!hasSelectedFilters) {
@@ -436,6 +455,33 @@ const AiSearchResults = () => {
   useEffect(() => {
     setShowAllDestinations(false);
   }, [selectedContinent, selectedGoalOption]);
+
+  useEffect(() => {
+    if (!hasSelectedFilters || !isResultsReady) {
+      setVisibleDestinationCount(0);
+      return;
+    }
+
+    if (!visibleDestinations.length) {
+      setVisibleDestinationCount(0);
+      return;
+    }
+
+    let currentVisibleCount = 0;
+
+    const revealInterval = setInterval(() => {
+      currentVisibleCount += 1;
+      setVisibleDestinationCount(currentVisibleCount);
+
+      if (currentVisibleCount >= visibleDestinations.length) {
+        clearInterval(revealInterval);
+      }
+    }, DESTINATION_REVEAL_INTERVAL_MS);
+
+    return () => {
+      clearInterval(revealInterval);
+    };
+  }, [hasSelectedFilters, isResultsReady, visibleDestinations]);
 
   useEffect(() => {
     const selectedPair = hasSelectedFilters
@@ -552,10 +598,13 @@ const AiSearchResults = () => {
 
                   {shouldShowResultsContent ? (
                     <div className="mt-8 grid grid-cols-2 gap-3 md:mt-10 md:gap-4 xl:grid-cols-3">
-                      {visibleDestinations.map((destination) => (
+                      {visibleDestinations.map((destination, index) => (
                         <article
                           key={`${destination.city}-${destination.country}`}
-                          className="cursor-pointer"
+                          className={`cursor-pointer transition-all duration-300 ${index < visibleDestinationCount
+                            ? "translate-y-0 opacity-100"
+                            : "pointer-events-none translate-y-2 opacity-0"
+                            }`}
                           role="button"
                           tabIndex={0}
                           onClick={() => handleDestinationClick(destination)}
@@ -573,11 +622,10 @@ const AiSearchResults = () => {
                               className="aspect-square w-full rounded-xl object-cover md:rounded-2xl"
                             />
                             <div
-                              className={`pointer-events-none absolute inset-x-0 bottom-0 flex items-end gap-1.5 bg-gradient-to-t from-black/75 via-black/25 to-transparent px-2 py-2 text-white md:gap-3 md:px-4 md:py-3 ${
-                                isPrimaryGoalOptionSelected
-                                  ? "justify-end"
-                                  : "justify-between"
-                              }`}
+                              className={`pointer-events-none absolute inset-x-0 bottom-0 flex items-end gap-1.5 bg-gradient-to-t from-black/75 via-black/25 to-transparent px-2 py-2 text-white md:gap-3 md:px-4 md:py-3 ${isPrimaryGoalOptionSelected
+                                ? "justify-end"
+                                : "justify-between"
+                                }`}
                             >
                               {!isPrimaryGoalOptionSelected && (
                                 <span className="rounded-full bg-black/45 px-2 py-0.5 text-[0.7rem] font-semibold tracking-wide backdrop-blur-sm md:px-3 md:py-1 md:text-xs">
