@@ -52,6 +52,7 @@ const defaultValues = {
 const NEW_COMPANY_PROMPT =
   "Planning to build your business abroad? Share your details and we will support your setup journey.";
 const NEW_COMPANY_HEADING = "New Company Setup";
+const NEW_COMPANY_TYPING_SEEN_KEY = "wono-new-company-typing-seen";
 
 const AiNewCompanySetup = () => {
   const [typedMessage, setTypedMessage] = useState("");
@@ -96,6 +97,16 @@ const AiNewCompanySetup = () => {
   };
 
   useEffect(() => {
+    const hasSeenTypingEffect =
+      typeof window !== "undefined" &&
+      window.localStorage.getItem(NEW_COMPANY_TYPING_SEEN_KEY) === "true";
+
+    if (hasSeenTypingEffect) {
+      setTypedMessage(NEW_COMPANY_PROMPT);
+      setTypedPageHeading(NEW_COMPANY_HEADING);
+      setIsFormVisible(true);
+      return;
+    }
     setTypedMessage("");
     setTypedPageHeading("");
     setIsFormVisible(false);
@@ -112,6 +123,9 @@ const AiNewCompanySetup = () => {
         if (headingIndex >= NEW_COMPANY_HEADING.length) {
           clearInterval(headingInterval);
           setIsFormVisible(true);
+          if (typeof window !== "undefined") {
+            window.localStorage.setItem(NEW_COMPANY_TYPING_SEEN_KEY, "true");
+          }
         }
       }, 35);
 

@@ -47,6 +47,7 @@ const defaultValues = {
 const OVERALL_ACTIVATION_PROMPT =
   "Tell us what kind of on-ground activation help you need, and our team will guide you end-to-end.";
 const OVERALL_ACTIVATION_HEADING = "Overall Activation Support";
+const OVERALL_ACTIVATION_TYPING_SEEN_KEY = "wono-overall-activation-typing-seen";
 
 const AiOverallActivationSupport = () => {
   const [typedMessage, setTypedMessage] = useState("");
@@ -91,6 +92,16 @@ const AiOverallActivationSupport = () => {
   };
 
   useEffect(() => {
+    const hasSeenTypingEffect =
+      typeof window !== "undefined" &&
+      window.localStorage.getItem(OVERALL_ACTIVATION_TYPING_SEEN_KEY) === "true";
+
+    if (hasSeenTypingEffect) {
+      setTypedMessage(OVERALL_ACTIVATION_PROMPT);
+      setTypedPageHeading(OVERALL_ACTIVATION_HEADING);
+      setIsFormVisible(true);
+      return;
+    }
     setTypedMessage("");
     setTypedPageHeading("");
     setIsFormVisible(false);
@@ -107,6 +118,9 @@ const AiOverallActivationSupport = () => {
         if (headingIndex >= OVERALL_ACTIVATION_HEADING.length) {
           clearInterval(headingInterval);
           setIsFormVisible(true);
+          if (typeof window !== "undefined") {
+            window.localStorage.setItem(OVERALL_ACTIVATION_TYPING_SEEN_KEY, "true");
+          }
         }
       }, 35);
 

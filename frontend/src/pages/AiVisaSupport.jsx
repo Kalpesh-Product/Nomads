@@ -39,6 +39,7 @@ const defaultValues = {
 const VISA_SUPPORT_PROMPT =
   "Tell us about your travel plans and we will help you navigate the visa process with confidence.";
 const VISA_SUPPORT_HEADING = "Visa Support";
+const VISA_SUPPORT_TYPING_SEEN_KEY = "wono-visa-support-typing-seen";
 
 const AiVisaSupport = () => {
   const [typedMessage, setTypedMessage] = useState("");
@@ -106,6 +107,16 @@ const AiVisaSupport = () => {
   };
 
   useEffect(() => {
+    const hasSeenTypingEffect =
+      typeof window !== "undefined" &&
+      window.localStorage.getItem(VISA_SUPPORT_TYPING_SEEN_KEY) === "true";
+
+    if (hasSeenTypingEffect) {
+      setTypedMessage(VISA_SUPPORT_PROMPT);
+      setTypedVisaHeading(VISA_SUPPORT_HEADING);
+      setIsFormVisible(true);
+      return;
+    }
     setTypedMessage("");
     setTypedVisaHeading("");
     setIsFormVisible(false);
@@ -122,6 +133,9 @@ const AiVisaSupport = () => {
         if (visaHeadingIndex >= VISA_SUPPORT_HEADING.length) {
           clearInterval(headingInterval);
           setIsFormVisible(true);
+          if (typeof window !== "undefined") {
+            window.localStorage.setItem(VISA_SUPPORT_TYPING_SEEN_KEY, "true");
+          }
         }
       }, 35);
 

@@ -31,6 +31,7 @@ const defaultValues = {
 const CONTRIBUTOR_PROMPT =
   "We are constantly looking out for individuals who can support our cause to make WoNo the largest Nomad Community & Platform in the world. We know we will not be able to do this alone.";
 const CONTRIBUTOR_HEADING = "Become a WoNo Contributor";
+const CONTRIBUTOR_TYPING_SEEN_KEY = "wono-contributor-typing-seen";
 
 const AiBecomeContributor = () => {
   const [typedMessage, setTypedMessage] = useState("");
@@ -75,6 +76,16 @@ const AiBecomeContributor = () => {
   };
 
   useEffect(() => {
+    const hasSeenTypingEffect =
+      typeof window !== "undefined" &&
+      window.localStorage.getItem(CONTRIBUTOR_TYPING_SEEN_KEY) === "true";
+
+    if (hasSeenTypingEffect) {
+      setTypedMessage(CONTRIBUTOR_PROMPT);
+      setTypedPageHeading(CONTRIBUTOR_HEADING);
+      setIsFormVisible(true);
+      return;
+    }
     setTypedMessage("");
     setTypedPageHeading("");
     setIsFormVisible(false);
@@ -91,6 +102,9 @@ const AiBecomeContributor = () => {
         if (headingIndex >= CONTRIBUTOR_HEADING.length) {
           clearInterval(headingInterval);
           setIsFormVisible(true);
+          if (typeof window !== "undefined") {
+            window.localStorage.setItem(CONTRIBUTOR_TYPING_SEEN_KEY, "true");
+          }
         }
       }, 35);
 

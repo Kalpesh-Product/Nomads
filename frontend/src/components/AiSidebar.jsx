@@ -159,8 +159,8 @@ const SidebarSection = ({
                   type="button"
                   onClick={() => onItemClick?.(item)}
                   className={`flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-[22px] transition  ${item.active
-                      ? "bg-white text-black shadow-sm"
-                      : "text-black/80 hover:bg-white/70"
+                    ? "bg-white text-black shadow-sm"
+                    : "text-black/80 hover:bg-white/70"
                     }`}
                   title={collapsed ? item.label : ""}
                 >
@@ -313,10 +313,10 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   return (
     <aside
       className={`flex h-full max-h-screen flex-col overflow-y-auto overscroll-contain border-r border-black/10 bg-[#efefef] transition-all duration-300 custom-scrollbar-hide ${isMobileOverlay
-          ? "w-[calc(100%-52px)] max-w-[320px]"
-          : isCollapsed
-            ? "w-[70px]"
-            : "w-[260px]"
+        ? "w-[calc(100%-52px)] max-w-[320px]"
+        : isCollapsed
+          ? "w-[70px]"
+          : "w-[260px]"
         }`}
       onClick={(event) => {
         if (isMobileOverlay) event.stopPropagation();
@@ -381,12 +381,12 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
             isOpen={isProfileOpen}
             onToggle={() => setIsProfileOpen((prev) => !prev)}
           />
+          <BecomeContributorButton />
           <SidebarSection
             items={becomeHostItem}
             collapsed={isCollapsed}
             onItemClick={handleBecomeHostClick}
           />
-          <BecomeContributorButton />
           <SidebarSection
             items={signOutItem}
             collapsed={isCollapsed}
@@ -395,12 +395,12 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         </>
       ) : (
         <>
+          <BecomeContributorButton />
           <SidebarSection
             items={becomeHostItem}
             collapsed={isCollapsed}
             onItemClick={handleBecomeHostClick}
           />
-          <BecomeContributorButton />
           {!isCollapsed && (
             <div className="mt-auto px-4 pb-4 pt-10">
               <div className="rounded-[28px]   p-4 shadow-sm">
