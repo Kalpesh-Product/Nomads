@@ -184,6 +184,7 @@ const AiSearchResults = () => {
   const bottomTypingIntervalRef = useRef(null);
   const selectedHeadingDelayTimeoutRef = useRef(null);
   const previousSelectedPairRef = useRef(null);
+  const previousGoalRef = useRef(getPersistedGoal() || selectedGoal);
 
   const hasSelectedContinent = Boolean(selectedContinent);
   const hasSelectedGoalOption = Boolean(selectedGoalOption);
@@ -494,11 +495,20 @@ const AiSearchResults = () => {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
+    if (previousGoalRef.current !== selectedGoal) {
+      localStorage.removeItem(SEARCH_RESULTS_LOCATION_STORAGE_KEY);
+      localStorage.removeItem(SEARCH_RESULTS_ATTRIBUTE_STORAGE_KEY);
+      localStorage.removeItem(SEARCH_RESULTS_SELECTION_SIGNATURE_STORAGE_KEY);
+      setSelectedContinent(null);
+      setSelectedGoalOption(null);
+    }
+
     if (selectedGoal) {
       localStorage.setItem(SEARCH_RESULTS_GOAL_STORAGE_KEY, selectedGoal);
     } else {
       localStorage.removeItem(SEARCH_RESULTS_GOAL_STORAGE_KEY);
     }
+    previousGoalRef.current = selectedGoal;
   }, [selectedGoal]);
 
   useEffect(() => {
