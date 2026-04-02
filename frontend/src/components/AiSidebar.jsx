@@ -162,7 +162,7 @@ const SidebarSection = ({
                   className={`group relative flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-[22px] transition ${
                     item.active && !item.disableActiveBackground
                       ? "bg-white text-black shadow-sm"
-                      : "text-black/80 hover:bg-white/70"
+                      : "text-black/80 "
                   }`}
                   title={collapsed ? item.label : ""}
                 >
