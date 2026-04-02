@@ -413,7 +413,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                 <p className="mt-2 text-nano leading-[0.9rem] text-black/55">
                   {loggedOutPrompt.description}
                 </p>
-                <p className=" text-nano leading-5 text-black/55">
+                <p className=" text-nano font-semibold leading-5 text-black/55">
                   Powered by your preferences.
                 </p>
                 <button

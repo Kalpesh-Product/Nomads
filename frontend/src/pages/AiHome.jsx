@@ -204,7 +204,7 @@ const AiHome = () => {
           <h1 className="text-3xl font-medium text-black/90 font-play">
             {typedGreeting}
           </h1>
-          <h2 className="mt-5 text-sm font-medium text-black/85 font-play sm:text-lg">
+          <h2 className="mt-5 text-sm font-semibold text-black/85 font-play sm:text-lg">
             {typedSubheading}
           </h2>
           {!isLoggedIn ? (
