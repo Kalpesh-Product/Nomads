@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { HiOutlineSearch, HiOutlineX } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 
+const AI_COMPATIBLE_TYPING_SEEN_KEY = "wono-ai-compatible-typing-seen";
+
 const compatibleBadges = [
   "Adventure",
   "Gyming",
@@ -37,6 +39,14 @@ const AiCompatibleSearch = () => {
     "Please share the below details to find the best destinations for you";
 
   useEffect(() => {
+    const hasSeenTypingEffect =
+      typeof window !== "undefined" &&
+      window.localStorage.getItem(AI_COMPATIBLE_TYPING_SEEN_KEY) === "true";
+
+    if (hasSeenTypingEffect) {
+      setTypedHeading(headingText);
+      return;
+    }
     setTypedHeading("");
 
     let currentIndex = 0;
@@ -46,6 +56,9 @@ const AiCompatibleSearch = () => {
 
       if (currentIndex >= headingText.length) {
         clearInterval(typingInterval);
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem(AI_COMPATIBLE_TYPING_SEEN_KEY, "true");
+        }
       }
     }, 25);
 
@@ -166,11 +179,10 @@ const AiCompatibleSearch = () => {
                       key={`${badge}-${index}`}
                       type="button"
                       onClick={() => handleBadgeClick(badge)}
-                      className={`shrink-0 rounded-full border px-6 py-2 text-xs font-medium transition-colors ${
-                        isActive
+                      className={`shrink-0 rounded-full border px-6 py-2 text-xs font-medium transition-colors ${isActive
                           ? "border-sky-500 bg-sky-500 text-white"
                           : "border-black text-black/90 hover:border-sky-500"
-                      }`}
+                        }`}
                     >
                       {badge}
                     </button>

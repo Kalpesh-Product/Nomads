@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { HiOutlineSearch } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 
+const AI_SAVINGS_TYPING_SEEN_KEY = "wono-ai-savings-typing-seen";
+
 const filters = [
   // "Budget",
   "Monthly Income (USD)",
@@ -67,6 +69,14 @@ const AiSavingsSearch = () => {
   );
 
   useEffect(() => {
+    const hasSeenTypingEffect =
+      typeof window !== "undefined" &&
+      window.localStorage.getItem(AI_SAVINGS_TYPING_SEEN_KEY) === "true";
+
+    if (hasSeenTypingEffect) {
+      setTypedHeading(headingText);
+      return;
+    }
     setTypedHeading("");
 
     let currentIndex = 0;
@@ -76,6 +86,9 @@ const AiSavingsSearch = () => {
 
       if (currentIndex >= headingText.length) {
         clearInterval(typingInterval);
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem(AI_SAVINGS_TYPING_SEEN_KEY, "true");
+        }
       }
     }, 25);
 
@@ -194,11 +207,10 @@ const AiSavingsSearch = () => {
                   key={filter}
                   type="button"
                   onClick={() => handleFilterClick(filter)}
-                  className={`rounded-full border px-6 py-2 text-xs font-medium transition-colors ${
-                    isActive
-                      ? "border-sky-500 bg-sky-500 text-white"
-                      : "border-black text-black/90 hover:border-sky-500"
-                  }`}
+                  className={`rounded-full border px-6 py-2 text-xs font-medium transition-colors ${isActive
+                    ? "border-sky-500 bg-sky-500 text-white"
+                    : "border-black text-black/90 hover:border-sky-500"
+                    }`}
                 >
                   {filter}
                 </button>
