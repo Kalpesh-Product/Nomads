@@ -476,7 +476,7 @@ const AiNewCompanySetup = () => {
                         {...field}
                         fullWidth
                         multiline
-                        minRows={4}
+                        minRows={3}
                         label="Additional Comments"
                         variant="standard"
                         InputLabelProps={{ sx: floatingLabelSx }}
