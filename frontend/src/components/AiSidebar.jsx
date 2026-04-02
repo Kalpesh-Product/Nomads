@@ -414,6 +414,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
             collapsed={isCollapsed}
             onItemClick={handleBecomeHostClick}
           />
+          <div className="border-t border-black/10 mt-4"></div>
           {!isCollapsed && (
             <div className="mt-auto px-4 pb-4 pt-10">
               <div className="rounded-[28px]   p-4 shadow-sm">
