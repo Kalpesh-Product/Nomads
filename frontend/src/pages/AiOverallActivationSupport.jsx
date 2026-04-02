@@ -22,12 +22,12 @@ const floatingLabelSx = {
 };
 
 const activationSupportOptions = [
-  "Visa & Immigration",
-  "Relocation Assistance",
-  "Accommodation Support",
-  "On-ground Activation",
-  "Compliance & Documentation",
-  "Other",
+  "Private Family Stay Setup Assistance",
+  "Shared / Co-Living Setup Assistance",
+  "Private Office Setup Assistance",
+  "Co-Working Setup Assistance",
+  "Overall New Location Setup Assistance",
+  "Not Sure - Need Customised Support",
 ];
 
 const defaultValues = {
@@ -133,8 +133,8 @@ const AiOverallActivationSupport = () => {
     <div className="bg-white text-black font-sans">
       <Container padding={false}>
         <section className="min-h-[85vh] flex items-center justify-center py-8">
-          <div className="w-full max-w-5xl md:px-20 lg:px-40">
-            <div className="mx-auto mb-8 flex w-full max-w-4xl flex-col items-center gap-4 px-6">
+          <div className="w-full max-w-5xl md:px-20 lg:px-20">
+            <div className="mx-auto mb-0 flex w-full max-w-4xl flex-col items-center gap-8 px-0">
               <p className="min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1.2rem]">
                 {typedMessage}
               </p>
@@ -148,7 +148,7 @@ const AiOverallActivationSupport = () => {
                 event.preventDefault();
                 handleFormSubmit();
               }}
-              className={`bg-white p-6 md:p-10 rounded-2xl ${
+              className={`bg-white p-0 md:p-0 rounded-2xl ${
                 isFormVisible ? "visible" : "invisible"
               }`}
             >
@@ -361,7 +361,7 @@ const AiOverallActivationSupport = () => {
                     />
                   </Box>
 
-                  <Box sx={{ flex: 1, px: 1, pb: 0.5 }}>
+                  <Box sx={{ flex: 1, px: 1, pb: 0 }}>
                     <Typography
                       variant="caption"
                       sx={{
@@ -381,6 +381,7 @@ const AiOverallActivationSupport = () => {
                           {...field}
                           fullWidth
                           inputProps={{ inputMode: "tel" }}
+                          sx={{ py: 0 }}
                         />
                       )}
                     />
@@ -457,7 +458,7 @@ const AiOverallActivationSupport = () => {
                         {...field}
                         fullWidth
                         multiline
-                        minRows={4}
+                        minRows={3}
                         label="Additional Comments"
                         variant="standard"
                         InputLabelProps={{ sx: floatingLabelSx }}

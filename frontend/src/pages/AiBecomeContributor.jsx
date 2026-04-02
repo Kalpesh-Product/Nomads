@@ -116,9 +116,9 @@ const AiBecomeContributor = () => {
   return (
     <div className="bg-white text-black font-sans">
       <Container padding={false}>
-        <section className="min-h-[85vh] flex items-center justify-center py-8">
-          <div className="w-full max-w-5xl md:px-20 lg:px-40">
-            <div className="mx-auto mb-8 flex w-full max-w-4xl flex-col items-center gap-4 px-6">
+        <section className="min-h-[85vh] flex items-center justify-center py-0">
+          <div className="w-full max-w-5xl md:px-20 lg:px-20">
+            <div className="mx-auto mb-0 flex w-full max-w-4xl flex-col items-center gap-8 px-0">
               <p className="min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1.2rem]">
                 {typedMessage}
               </p>
@@ -132,7 +132,7 @@ const AiBecomeContributor = () => {
                 event.preventDefault();
                 handleFormSubmit();
               }}
-              className={`bg-white p-6 md:p-10 rounded-2xl ${
+              className={`bg-white p-0 md:p-0 rounded-2xl ${
                 isFormVisible ? "visible" : "invisible"
               }`}
             >
@@ -220,7 +220,7 @@ const AiBecomeContributor = () => {
                     sx={{
                       width: "32%",
                       px: 0.5,
-                      pb: 0.5,
+                      pb: 0,
                       borderRight: "1px solid rgba(0, 0, 0, 0.12)",
                     }}
                   >
@@ -243,13 +243,13 @@ const AiBecomeContributor = () => {
                           fullWidth
                           readOnly
                           placeholder="+___"
-                          sx={{ color: "rgba(0, 0, 0, 0.6)" }}
+                          sx={{ color: "rgba(0, 0, 0, 0.6)" , py: 0 }}
                         />
                       )}
                     />
                   </Box>
 
-                  <Box sx={{ flex: 1, px: 1, pb: 0.5 }}>
+                  <Box sx={{ flex: 1, px: 1, pb: 0 }}>
                     <Typography
                       variant="caption"
                       sx={{
@@ -269,6 +269,7 @@ const AiBecomeContributor = () => {
                           {...field}
                           fullWidth
                           inputProps={{ inputMode: "tel" }}
+                          sx={{ py: 0 }}
                         />
                       )}
                     />
@@ -284,7 +285,7 @@ const AiBecomeContributor = () => {
                         {...field}
                         fullWidth
                         multiline
-                        minRows={4}
+                        minRows={3}
                         label="Message"
                         variant="standard"
                         InputLabelProps={{ sx: floatingLabelSx }}

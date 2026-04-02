@@ -22,13 +22,17 @@ const floatingLabelSx = {
 };
 
 const supportOptions = [
-  "Visa Consultation",
-  "Immigration Consultation",
-  "Tax Consultation",
-  "Financial Consultation",
-  "Accommodation Consultation",
-  "Business Setup Consultation",
-  "Other",
+  "Private Office / Co-Working Setup",
+  "Private Home / Shared Stay Setup",
+  "Business Expansion to New Country",
+  "Company Compliance & Filings",
+  "Accounting & Bookkeeping Services",
+  "Tax Advisory & Structuring",
+  "GST / VAT Registration & Filing",
+  "Legal Documentation / Agreements",
+  "Corporate Bank Account Opening",
+  "Business Structuring Consultation",
+  "Not Sure - Need Customised Support",
 ];
 
 const defaultValues = {
@@ -134,8 +138,8 @@ const AiConsultation = () => {
     <div className="bg-white text-black font-sans">
       <Container padding={false}>
         <section className="min-h-[85vh] flex items-center justify-center py-8">
-          <div className="w-full max-w-5xl md:px-20 lg:px-40">
-            <div className="mx-auto mb-8 flex w-full max-w-4xl flex-col items-center gap-4 px-6">
+          <div className="w-full max-w-5xl md:px-20 lg:px-20">
+            <div className="mx-auto mb-0 flex w-full max-w-4xl flex-col items-center gap-8 ">
               <p className="min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1.2rem]">
                 {typedMessage}
               </p>
@@ -149,7 +153,7 @@ const AiConsultation = () => {
                 event.preventDefault();
                 handleFormSubmit();
               }}
-              className={`bg-white p-6 md:p-10 rounded-2xl ${
+              className={`bg-white p-6 md:p-0 rounded-2xl ${
                 isFormVisible ? "visible" : "invisible"
               }`}
             >
@@ -332,8 +336,8 @@ const AiConsultation = () => {
                   <Box
                     sx={{
                       width: "32%",
-                      px: 0.5,
-                      pb: 0.5,
+                      px: 0,
+                      pb: 0,
                       borderRight: "1px solid rgba(0, 0, 0, 0.12)",
                     }}
                   >
@@ -356,13 +360,13 @@ const AiConsultation = () => {
                           fullWidth
                           readOnly
                           placeholder="+___"
-                          sx={{ color: "rgba(0, 0, 0, 0.6)" }}
+                          sx={{ color: "rgba(0, 0, 0, 0.6)", py: 0 }}
                         />
                       )}
                     />
                   </Box>
 
-                  <Box sx={{ flex: 1, px: 1, pb: 0.5 }}>
+                  <Box sx={{ flex: 1, px: 1, pb: 0 }}>
                     <Typography
                       variant="caption"
                       sx={{
@@ -377,11 +381,13 @@ const AiConsultation = () => {
                       name="contactNumber"
                       control={control}
                       rules={{ required: "Contact number is required" }}
+                      sx={{ px: 0, py: 0 }}
                       render={({ field }) => (
                         <InputBase
                           {...field}
                           fullWidth
                           inputProps={{ inputMode: "tel" }}
+                          sx={{ px: 0, py: 0 }}
                         />
                       )}
                     />
@@ -458,7 +464,7 @@ const AiConsultation = () => {
                         {...field}
                         fullWidth
                         multiline
-                        minRows={4}
+                        minRows={3}
                         label="Additional Comments"
                         variant="standard"
                         InputLabelProps={{ sx: floatingLabelSx }}

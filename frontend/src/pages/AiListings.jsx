@@ -303,7 +303,7 @@ const AiListings = () => {
     if (!listingsData || listingsData.length === 0) {
       return [
         {
-          label: "Value Added Services",
+          label: "Value Adds",
           value: VALUE_ADDED_SERVICES_CATEGORY,
         },
       ];
@@ -351,7 +351,7 @@ const AiListings = () => {
 
     return [
       ...options,
-      { label: "Value Added Services", value: VALUE_ADDED_SERVICES_CATEGORY },
+      { label: "Value Adds", value: VALUE_ADDED_SERVICES_CATEGORY },
     ];
   }, [listingsData]);
 

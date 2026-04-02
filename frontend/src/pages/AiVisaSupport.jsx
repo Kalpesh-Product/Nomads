@@ -148,7 +148,7 @@ const AiVisaSupport = () => {
     <div className="bg-white text-black font-sans">
       <Container padding={false}>
         <section className="min-h-[85vh] flex items-center justify-center py-8">
-          <div className="w-full max-w-5xl md:px-20 lg:px-40 flex flex-col gap-6">
+          <div className="w-full max-w-5xl md:px-20 lg:px-20 flex flex-col gap-6">
             <p className="mx-auto min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1.2rem]">
               {typedMessage}
             </p>
@@ -160,7 +160,7 @@ const AiVisaSupport = () => {
             <Box
               component="form"
               onSubmit={handleSubmit(handleFormSubmit)}
-              className={`bg-white p-6 md:p-10 rounded-2xl ${
+              className={`bg-white p-0 md:p-0 rounded-2xl ${
                 isFormVisible ? "visible" : "invisible"
               }`}
             >
@@ -373,13 +373,13 @@ const AiVisaSupport = () => {
                           fullWidth
                           readOnly
                           placeholder="+___"
-                          sx={{ color: "rgba(0, 0, 0, 0.6)" }}
+                          sx={{ color: "rgba(0, 0, 0, 0.6)", py: 0 }}
                         />
                       )}
                     />
                   </Box>
 
-                  <Box sx={{ flex: 1, px: 1, pb: 0.5 }}>
+                  <Box sx={{ flex: 1, px: 1, pb: 0 }}>
                     <Typography
                       variant="caption"
                       sx={{
@@ -398,6 +398,7 @@ const AiVisaSupport = () => {
                           {...field}
                           fullWidth
                           inputProps={{ inputMode: "tel" }}
+                          sx={{ py: 0 }}
                         />
                       )}
                     />
@@ -446,7 +447,7 @@ const AiVisaSupport = () => {
                         {...field}
                         fullWidth
                         multiline
-                        minRows={4}
+                        minRows={3}
                         label="Additional Comments"
                         variant="standard"
                         InputLabelProps={{ sx: floatingLabelSx }}
