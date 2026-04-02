@@ -44,14 +44,14 @@ const recommendationCards = [
   {
     title: "Advance Your Career",
     description:
-      "Discover the most sutaible nomad destinations to advance your career.",
+      "Discover the most suitable nomad destinations to advance your career.",
     icon: MdOutlineWorkHistory,
     path: "/search/results",
   },
   {
     title: "Find Your Community",
     description:
-      "Like minded individuals & communities as per your preferances in nomad destinations.",
+      "Like minded individuals & communities as per your preferences in nomad destinations.",
     icon: RiUserCommunityLine,
     path: "/search/results",
   },
@@ -80,13 +80,13 @@ const AiHome = () => {
 
   const greetingText = isLoggedIn ? "hi Abrar" : "Meet Wono";
   const subheadingText = isLoggedIn
-    ? "Please choose your goals from below so that we can help you design your accurate nomad lifestyle."
+    ? "Welcome back to wono, an intelligent platform for modern nomads."
     : "An intellegent platform for moden nomads.";
   const thirdLineText = isLoggedIn
-    ? ""
+    ? "A global community of nomads & remote workers, who are redefining how the world lives and works. Early adoption of our future lifestyle!"
     : "A global community of nomads & remote workers, who are redefining how the world lives and works. Early adoption of our future lifestyle!";
   const fourthLineText = isLoggedIn
-    ? ""
+    ? "Choose your goals from below so that we can help you design your nomad lifestyle."
     : "Choose your goals from below so that we can help you design your nomad lifestyle.";
 
   useEffect(() => {
@@ -230,16 +230,12 @@ const AiHome = () => {
           <h2 className="mt-5 text-sm font-semibold text-black/85 font-play sm:text-lg">
             {typedSubheading}
           </h2>
-          {!isLoggedIn ? (
-            <>
-              <p className="mt-4 text-sm sm:text-lg font-medium text-black/85 font-play">
-                {typedThirdLine}
-              </p>
-              <p className="mt-4 text-sm sm:text-lg font-medium text-primary-blue font-play">
-                {typedFourthLine}
-              </p>
-            </>
-          ) : null}
+          <p className="mt-4 text-sm sm:text-lg font-medium text-black/85 font-play">
+            {typedThirdLine}
+          </p>
+          <p className="mt-4 text-sm sm:text-lg font-medium text-primary-blue font-play">
+            {typedFourthLine}
+          </p>
 
           <div
             className={`mt-4 rounded-[40px] px-0 py-4 md:px-6 md:py-8 ${

@@ -57,14 +57,14 @@ const recommendationItems = [
   {
     label: "Advance Your Career",
     description:
-      "Intellegent suggestions to help you find the most sutaible nomad destinations to advance your career.",
+      "Intelligent suggestions to help you find the most suitable nomad destinations to advance your career.",
     icon: MdOutlineWorkHistory,
     path: "/search/results",
   },
   {
     label: "Find Your Community",
     description:
-      "Find like minded individuals & communities as per your preferances from nomad destinations.",
+      "Find like minded individuals & communities as per your preferences from nomad destinations.",
     icon: RiUserCommunityLine,
     path: "/search/results",
   },
