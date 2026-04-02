@@ -495,7 +495,10 @@ const AiSearchResults = () => {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    if (previousGoalRef.current !== selectedGoal) {
+    const isGoalSelectedFromNavigation = Boolean(requestedGoal);
+    const hasGoalChanged = previousGoalRef.current !== selectedGoal;
+
+    if (isGoalSelectedFromNavigation || hasGoalChanged) {
       localStorage.removeItem(SEARCH_RESULTS_LOCATION_STORAGE_KEY);
       localStorage.removeItem(SEARCH_RESULTS_ATTRIBUTE_STORAGE_KEY);
       localStorage.removeItem(SEARCH_RESULTS_SELECTION_SIGNATURE_STORAGE_KEY);
@@ -508,8 +511,9 @@ const AiSearchResults = () => {
     } else {
       localStorage.removeItem(SEARCH_RESULTS_GOAL_STORAGE_KEY);
     }
+
     previousGoalRef.current = selectedGoal;
-  }, [selectedGoal]);
+  }, [location.key, requestedGoal, selectedGoal]);
 
   useEffect(() => {
     if (!hasSelectedFilters) {
