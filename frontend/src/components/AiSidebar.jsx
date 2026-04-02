@@ -159,8 +159,8 @@ const SidebarSection = ({
                   key={item.label}
                   type="button"
                   onClick={() => onItemClick?.(item)}
-                  className={`flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-[22px] transition  ${
-                    item.active
+                  className={`group relative flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-[22px] transition ${
+                    item.active && !item.disableActiveBackground
                       ? "bg-white text-black shadow-sm"
                       : "text-black/80 hover:bg-white/70"
                   }`}
@@ -176,6 +176,13 @@ const SidebarSection = ({
                         </span>
                       )}
                     </>
+                  )}
+                  {item.showActiveUnderline && (
+                    <span
+                      className={`absolute bottom-0 left-0 block h-[1px] bg-black transition-all duration-300 ${
+                        item.active ? "w-full" : "w-0 group-hover:w-full"
+                      }`}
+                    />
                   )}
                 </button>
               );
@@ -298,6 +305,24 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
   const isCollapsed = isMobileOverlay ? false : collapsed;
 
+  const normalizedPath = location.pathname.replace(/\/$/, "") || "/";
+
+  const valueAdditionItemsWithActivePath = valueAdditionItems.map((item) => {
+    if (!item.path) return item;
+
+    const normalizedItemPath = item.path.replace(/\/$/, "");
+    const isActivePath =
+      normalizedPath === normalizedItemPath ||
+      normalizedPath.startsWith(`${normalizedItemPath}/`);
+
+    return {
+      ...item,
+      active: isActivePath,
+      showActiveUnderline: true,
+      disableActiveBackground: true,
+    };
+  });
+
   const BecomeContributorButton = () => {
     const Icon = becomeContributorLink.icon;
 
@@ -377,7 +402,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
       />
       <SidebarSection
         title="Value Added Services"
-        items={valueAdditionItems}
+        items={valueAdditionItemsWithActivePath}
         collapsed={isCollapsed}
         isExpandable
         isOpen={isValueAdditionsOpen}

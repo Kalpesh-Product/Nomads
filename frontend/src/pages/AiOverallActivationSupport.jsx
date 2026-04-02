@@ -314,13 +314,13 @@ const AiOverallActivationSupport = () => {
                 <Controller
                   name="travelCountry"
                   control={control}
-                  rules={{ required: "Travel Country is required" }}
+                  rules={{ required: "Travelling Country is required" }}
                   render={({ field, fieldState }) => (
                     <TextField
                       {...field}
                       fullWidth
                       select
-                      label="Travel Country"
+                      label="Travelling Country"
                       variant="standard"
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
