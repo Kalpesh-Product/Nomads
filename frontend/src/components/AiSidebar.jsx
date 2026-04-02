@@ -200,8 +200,18 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     const normalizedPath = location.pathname.replace(/\/$/, "") || "/";
     const isAiHomePage = normalizedPath === "/home";
 
+    const isValueAddedPage = valueAdditionItems.some((item) => {
+      if (!item.path) return false;
+
+      const normalizedItemPath = item.path.replace(/\/$/, "");
+      return (
+        normalizedPath === normalizedItemPath ||
+        normalizedPath.startsWith(`${normalizedItemPath}/`)
+      );
+    });
+
     setIsRecommendationsOpen(!isAiHomePage);
-    setIsValueAdditionsOpen(isAiHomePage);
+    setIsValueAdditionsOpen(isAiHomePage || isValueAddedPage);
   }, [location.pathname]);
 
   const searchParams = new URLSearchParams(location.search);
