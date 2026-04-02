@@ -180,7 +180,7 @@ const SidebarSection = ({
                   {item.showActiveUnderline && (
                     <span
                       className={`absolute bottom-0 left-0 block h-[1px] bg-black transition-all duration-300 ${
-                        item.active ? "w-full" : "w-0 group-hover:w-full"
+                        item.active ? "w-[90%]" : "w-0 group-hover:w-[90%]"
                       }`}
                     />
                   )}
