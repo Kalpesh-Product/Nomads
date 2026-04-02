@@ -44,14 +44,14 @@ const recommendationCards = [
   {
     title: "Advance Your Career",
     description:
-      "Discover the most sutaible nomad destinations to advance your career.",
+      "Discover the most suitable nomad destinations to advance your career.",
     icon: MdOutlineWorkHistory,
     path: "/search/results",
   },
   {
     title: "Find Your Community",
     description:
-      "Like minded individuals & communities as per your preferances in nomad destinations.",
+      "Like minded individuals & communities as per your preferences in nomad destinations.",
     icon: RiUserCommunityLine,
     path: "/search/results",
   },
@@ -80,14 +80,14 @@ const AiHome = () => {
 
   const greetingText = isLoggedIn ? "hi Abrar" : "Meet Wono";
   const subheadingText = isLoggedIn
-    ? "Please choose your goals from below so that we can help you design your accurate nomad lifestyle."
+    ? "Welcome back to wono, an intelligent platform for modern nomads."
     : "An intellegent platform for moden nomads.";
   const thirdLineText = isLoggedIn
-    ? ""
-    : "Supporting the global community of remote workers, creators, entrepreneurs, hosts and investors who are redefining how the world lives and works.";
+    ? "A global community of nomads & remote workers, who are redefining how the world lives and works. Early adoption of our future lifestyle!"
+    : "A global community of nomads & remote workers, who are redefining how the world lives and works. Early adoption of our future lifestyle!";
   const fourthLineText = isLoggedIn
-    ? ""
-    : "Early adoption of our future lifestyle!";
+    ? "Choose your goals from below so that we can help you design your nomad lifestyle."
+    : "Choose your goals from below so that we can help you design your nomad lifestyle.";
 
   useEffect(() => {
     setTypedGreeting("");
@@ -230,16 +230,12 @@ const AiHome = () => {
           <h2 className="mt-5 text-sm font-semibold text-black/85 font-play sm:text-lg">
             {typedSubheading}
           </h2>
-          {!isLoggedIn ? (
-            <>
-              <p className="mt-4 text-sm sm:text-lg font-medium text-black/85 font-play">
-                {typedThirdLine}
-              </p>
-              <p className="mt-4 text-sm sm:text-lg font-medium text-primary-blue font-play">
-                {typedFourthLine}
-              </p>
-            </>
-          ) : null}
+          <p className="mt-4 text-sm sm:text-lg font-medium text-black/85 font-play">
+            {typedThirdLine}
+          </p>
+          <p className="mt-4 text-sm sm:text-lg font-medium text-primary-blue font-play">
+            {typedFourthLine}
+          </p>
 
           <div
             className={`mt-4 rounded-[40px] px-0 py-4 md:px-6 md:py-8 ${
@@ -272,7 +268,7 @@ const AiHome = () => {
                         size={24}
                         className="mx-auto text-black/80 transition-colors duration-200 group-hover:text-sky-500"
                       />
-                      <h3 className="mt-2 text-nano sm:text-nano md:text-md lg:text-md font-bold text-black/90 leading-tight transition-colors duration-200 group-hover:text-sky-500 uppercase">
+                      <h3 className="mt-2 text-nano sm:text-[0.8rem]  font-bold text-black/90 leading-tight transition-colors duration-200 group-hover:text-sky-500 uppercase">
                         {card.title}
                       </h3>
                       <div className="mt-2 hidden rounded-2xl bg-[#f1f1f3] p-5 text-left shadow-[0_1px_0_rgba(255,255,255,0.7)] transition-colors duration-200 group-hover:bg-sky-500 md:block">

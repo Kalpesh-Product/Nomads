@@ -13,7 +13,7 @@ const AiPrimaryButton = ({
   isLoading, // New prop for showing the spinner
 }) => {
   const baseBgColor = disabled || isLoading ? "bg-gray-400" : "bg-primary-blue";
-  const hoverBgColor = disabled || isLoading ? "" : "hover:bg-primary-light"; // Add hover color here
+  const hoverBgColor = disabled || isLoading ? "" : "hover:bg-black"; // Add hover color here
 
   return (
     <button
