@@ -419,7 +419,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                 <button
                   type="button"
                   onClick={handleLogInClick}
-                  className="mt-6 w-full rounded-full border border-black/10 bg-primary-blue px-3 py-2 text-base font-semibold text-white transition hover:bg-primary-light hover:text-white"
+                  className="mt-6 w-full rounded-full border border-black/10 bg-primary-blue px-3 py-2 text-base font-semibold text-white transition hover:bg-black hover:text-white"
                 >
                   {loggedOutPrompt.actionLabel}
                 </button>
