@@ -224,7 +224,7 @@ const AiValueAdditionForm = ({
                           {type === "country" && (
                             <>
                               <MenuItem value="" disabled>
-                                Select Country
+                                SELECT COUNTRY
                               </MenuItem>
                               {countries.map((country) => (
                                 <MenuItem

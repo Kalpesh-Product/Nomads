@@ -301,7 +301,7 @@ const AiNewCompanySetup = () => {
                       }
                     >
                       <MenuItem value="" sx={{ fontWeight: 700 }}>
-                        Select Country
+                        SELECT COUNTRY
                       </MenuItem>
                       {countries.map((country) => (
                         <MenuItem key={country.isoCode} value={country.name}>
