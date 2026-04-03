@@ -335,14 +335,21 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   const isCollapsed = isMobileOverlay ? false : collapsed;
 
   const normalizedPath = location.pathname.replace(/\/$/, "") || "/";
+  const redirectGoal = location.pathname
+    .replace(/\/$/, "")
+    .match(/^\/ai-login\/([^/]+)$/)?.[1];
 
   const recommendationItemsWithActivePath = recommendationItems.map((item) => {
     if (!item.path) return item;
 
     const normalizedItemPath = item.path.replace(/\/$/, "");
+    const goalSlug = goalSlugByLabel[item.label];
     const isActivePath =
       normalizedPath === normalizedItemPath ||
-      normalizedPath.startsWith(`${normalizedItemPath}/`);
+      normalizedPath.startsWith(`${normalizedItemPath}/`) ||
+      (normalizedPath.startsWith("/ai-login/") &&
+        Boolean(goalSlug) &&
+        goalSlug === redirectGoal);
 
     return {
       ...item,
@@ -368,29 +375,15 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     };
   });
 
-  const BecomeContributorButton = () => {
-    const Icon = becomeContributorLink.icon;
-
-    return (
-      <div className="px-4 pt-3">
-        <div className="border-t border-black/10 pt-2">
-          <button
-            type="button"
-            onClick={() => handleBecomeContributorClick(becomeContributorLink)}
-            className="flex w-full items-center gap-2 rounded-md px-2 py-3 text-left text-[22px] text-black/80 transition hover:bg-white/70"
-            title={isCollapsed ? becomeContributorLink.label : ""}
-          >
-            <Icon size={18} className="shrink-0" />
-            {!isCollapsed && (
-              <span className="text-xs font-medium">
-                {becomeContributorLink.label}
-              </span>
-            )}
-          </button>
-        </div>
-      </div>
-    );
+  const becomeContributorItemWithActivePath = {
+    ...becomeContributorLink,
+    active:
+      normalizedPath === becomeContributorLink.path ||
+      normalizedPath.startsWith(`${becomeContributorLink.path}/`),
+    showActiveUnderline: true,
+    disableActiveBackground: true,
   };
+
 
   return (
     <aside
@@ -463,7 +456,11 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
             isOpen={isProfileOpen}
             onToggle={() => setIsProfileOpen((prev) => !prev)}
           />
-          <BecomeContributorButton />
+          <SidebarSection
+            items={[becomeContributorItemWithActivePath]}
+            collapsed={isCollapsed}
+            onItemClick={handleBecomeContributorClick}
+          />
           <SidebarSection
             items={becomeHostItem}
             collapsed={isCollapsed}
@@ -477,7 +474,11 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         </>
       ) : (
         <>
-          <BecomeContributorButton />
+          <SidebarSection
+            items={[becomeContributorItemWithActivePath]}
+            collapsed={isCollapsed}
+            onItemClick={handleBecomeContributorClick}
+          />
           <SidebarSection
             items={becomeHostItem}
             collapsed={isCollapsed}
