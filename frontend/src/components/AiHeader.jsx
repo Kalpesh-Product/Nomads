@@ -387,7 +387,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                       <FiLogOut />
                     )}
                   </span>
-                  <span>Log Out</span>
+                  <span>Sign Out</span>
                 </button>
               </div>
             </Popover>

@@ -151,9 +151,9 @@ const AiConsultation = () => {
   return (
     <div className="bg-white text-black font-sans">
       <Container padding={false}>
-        <section className="min-h-[85vh] flex items-center justify-center py-8">
+        <section className="min-h-[85vh] flex items-center justify-center py-2">
           <div className="w-full max-w-5xl md:px-20 lg:px-20">
-            <div className="mx-auto mb-0 flex w-full max-w-4xl flex-col items-center gap-8 ">
+            <div className="mx-auto mb-0 flex w-full max-w-4xl flex-col items-center gap-2 ">
               <p className="min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1rem]">
                 {typedMessage}
               </p>
@@ -170,7 +170,7 @@ const AiConsultation = () => {
               className={`bg-white p-6 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
                 }`}
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-4">
                 <Controller
                   name="fullName"
                   control={control}
@@ -486,7 +486,7 @@ const AiConsultation = () => {
                   />
                 </div>
 
-                <div className="pt-6 md:col-span-2 text-center">
+                <div className="pt-2 md:col-span-2 text-center">
                   <Button
                     type="submit"
                     variant="contained"
