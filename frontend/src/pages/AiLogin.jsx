@@ -2,7 +2,7 @@ import { TextField, IconButton, InputAdornment } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { useEffect, useMemo, useState } from "react";
 
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import AiPrimaryButton from "../components/AiPrimaryButton";
 
@@ -26,6 +26,7 @@ const toSentenceCase = (value = "") => {
 export default function AiLogin() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { redirectGoal } = useParams();
   const [showPassword, setShowPassword] = useState(false);
   const [typedHeading, setTypedHeading] = useState("");
   const [typedDescription, setTypedDescription] = useState("");
@@ -65,9 +66,9 @@ export default function AiLogin() {
     let descriptionIndex = 0;
     let messageIndex = 0;
     let loginHeadingIndex = 0;
-    let cleanupDescription = () => {};
-    let cleanupMessage = () => {};
-    let cleanupLoginHeading = () => {};
+    let cleanupDescription = () => { };
+    let cleanupMessage = () => { };
+    let cleanupLoginHeading = () => { };
 
     const typeLoginHeading = () => {
       const loginHeadingInterval = setInterval(() => {
@@ -133,9 +134,34 @@ export default function AiLogin() {
     },
   });
 
+  const resolveRedirectPath = () => {
+    if (
+      location.state &&
+      typeof location.state === "object" &&
+      typeof location.state.redirectTo === "string" &&
+      location.state.redirectTo.startsWith("/")
+    ) {
+      return location.state.redirectTo;
+    }
+
+    if (redirectGoal) {
+      return `/search/${redirectGoal}/results`;
+    }
+
+    return "/home";
+  };
+
   const handleLogin = (event) => {
     event.preventDefault();
-    navigate("/home?login=true");
+    const redirectPath = resolveRedirectPath();
+    const [pathname, search = ""] = redirectPath.split("?");
+    const nextParams = new URLSearchParams(search);
+    nextParams.set("login", "true");
+
+    navigate({
+      pathname,
+      search: `?${nextParams.toString()}`,
+    });
   };
 
   return (
@@ -163,9 +189,8 @@ export default function AiLogin() {
 
           <form
             onSubmit={handleLogin}
-            className={`w-full grid grid-cols-1 gap-6 md:grid-cols-2 ${
-              isFormVisible ? "visible" : "invisible"
-            }`}
+            className={`w-full grid grid-cols-1 gap-6 md:grid-cols-2 ${isFormVisible ? "visible" : "invisible"
+              }`}
           >
             <Controller
               name="email"

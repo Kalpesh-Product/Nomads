@@ -181,7 +181,7 @@ if (tenant === "main") {
           path: "/",
           children: [
             { path: "home", element: <AiHome /> },
-            { path: "ai-login", element: <AiLogin /> },
+            { path: "ai-login/:redirectGoal?", element: <AiLogin /> },
             { path: "ai-signup", element: <AiSignup /> },
             { path: "home-logged-in", element: <AiHomeLoggedIn /> },
             { path: "search", element: <AiSearch /> },

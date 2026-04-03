@@ -238,14 +238,20 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
   const handleRecommendationClick = (item) => {
     const params = new URLSearchParams(location.search);
+    const targetSearch = params.toString() ? `?${params.toString()}` : "";
+    const targetRoute = `${item.path || "/search/results"}${targetSearch}`;
 
     if (!isLoggedIn && gatedRecommendationLabels.has(item.label)) {
-      navigate(`/ai-login${location.search}`, {
+      const goalSlug = goalSlugByLabel[item.label];
+      const loginPath = goalSlug ? `/ai-login/${goalSlug}` : "/ai-login";
+
+      navigate(`${loginPath}${location.search}`, {
         state: {
           loginContext: {
             title: item.label,
             description: item.description || "",
           },
+          redirectTo: targetRoute,
         },
       });
       return;
@@ -254,7 +260,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     navigate(
       {
         pathname: item.path || "/search/results",
-        search: params.toString() ? `?${params.toString()}` : "",
+        search: targetSearch,
       },
       {
         state:
@@ -276,7 +282,11 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   };
 
   const handleLogInClick = () => {
-    navigate(`/ai-login${location.search}`);
+    navigate(`/ai-login${location.search}`, {
+      state: {
+        redirectTo: `${location.pathname}${location.search}`,
+      },
+    });
   };
 
   const handleBecomeHostClick = () => {

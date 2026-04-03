@@ -281,7 +281,13 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
               <div className="flex items-center gap-3">
                 <button
                   type="button"
-                  onClick={() => navigate(`/ai-login${location.search}`)}
+                  onClick={() =>
+                    navigate(`/ai-login${location.search}`, {
+                      state: {
+                        redirectTo: `${location.pathname}${location.search}`,
+                      },
+                    })
+                  }
                   className="rounded-full bg-primary-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-black min-w-28"
                 >
                   Login
@@ -343,35 +349,46 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                 {userInitial}
               </Avatar>
             )}
+            {/* Inside the Popover */}
             <Popover
               open={openPopover}
               anchorEl={anchorEl}
               onClose={handlePopoverClose}
               anchorOrigin={{
                 vertical: "bottom",
-                horizontal: "center",
+                horizontal: "right",
               }}
               transformOrigin={{
                 vertical: "top",
-                horizontal: "center",
+                horizontal: "right",
+              }}
+              // Add this slotProps section:
+              slotProps={{
+                paper: {
+                  style: {
+                    marginTop: "5px", // Adjust this value to increase/decrease the gap
+                    borderRadius: "20px", // Optional: keeps it looking clean with your rounded button
+                    overflow: "visible",  // Ensures shadows aren't clipped
+                  },
+                },
               }}
             >
-              <div className="w-44 p-2">
-                <List>
-                  <ListItemButton
-                    onClick={handleSignOut}
-                    disabled={isLogoutLoading}
-                  >
-                    <ListItemIcon>
-                      {isLogoutLoading ? (
-                        <CircularProgress size={18} sx={{ color: "gray" }} />
-                      ) : (
-                        <FiLogOut className="text-gray-500" />
-                      )}
-                    </ListItemIcon>
-                    <ListItemText primary="Log Out" />
-                  </ListItemButton>
-                </List>
+              <div className="p-[0.3rem]">
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  disabled={isLogoutLoading}
+                  className="w-full min-w-[140px] h-10 px-5 rounded-2xl bg-white shadow-sm border border-gray-200 flex items-center gap-3 text-[#2f2f2f] text-[15px] font-medium hover:shadow-md active:bg-gray-50 transition-all disabled:opacity-70"
+                >
+                  <span className="w-5 h-5 flex items-center justify-center text-gray-500">
+                    {isLogoutLoading ? (
+                      <CircularProgress size={18} sx={{ color: "gray" }} />
+                    ) : (
+                      <FiLogOut />
+                    )}
+                  </span>
+                  <span>Log Out</span>
+                </button>
               </div>
             </Popover>
             <button

@@ -207,14 +207,20 @@ const AiHome = () => {
 
   const handleCardClick = (card) => {
     const params = new URLSearchParams(location.search);
+    const targetSearch = params.toString() ? `?${params.toString()}` : "";
+    const targetRoute = `${card.path}${targetSearch}`;
 
     if (!isLoggedIn && gatedRecommendationTitles.has(card.title)) {
-      navigate(`/ai-login${location.search}`, {
+      const goalSlug = goalSlugByTitle[card.title];
+      const loginPath = goalSlug ? `/ai-login/${goalSlug}` : "/ai-login";
+
+      navigate(`${loginPath}${location.search}`, {
         state: {
           loginContext: {
             title: card.title,
             description: card.description,
           },
+          redirectTo: targetRoute,
         },
       });
       return;
@@ -223,7 +229,7 @@ const AiHome = () => {
     navigate(
       {
         pathname: card.path,
-        search: params.toString() ? `?${params.toString()}` : "",
+        search: targetSearch,
       },
       {
         state:
