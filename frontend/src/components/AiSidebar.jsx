@@ -83,6 +83,7 @@ const recommendationItems = [
   },
   { label: "Search Old School", icon: TbWorldWww, path: "/manual-search" },
 ];
+
 const valueAdditionItems = [
   { label: "VISA Support", icon: LuMapPinned, path: "/visa-support" },
   {
@@ -150,9 +151,7 @@ const SidebarSection = ({
           <button
             type="button"
             onClick={onToggle}
-            className={`flex w-full items-center justify-between text-left text-xs font-semibold uppercase tracking-wide text-black/80 transition hover:text-black ${
-              isOpen ? "border-b border-black/10 pb-3" : ""
-            }`}
+            className="flex w-full items-center justify-between text-left text-xs font-semibold uppercase tracking-wide text-black/80"
             aria-expanded={isOpen}
             aria-label={`${isOpen ? "Collapse" : "Expand"} ${title}`}
           >
@@ -164,38 +163,49 @@ const SidebarSection = ({
             {title}
           </h3>
         )}
+
         {shouldShowItems && (
           <div className="mt-2 space-y-1">
             {items.map((item) => {
               const Icon = item.icon;
+              const isActive = !!item.active;
+
               return (
                 <button
                   key={item.label}
                   type="button"
                   onClick={() => onItemClick?.(item)}
-                  className={`group relative flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-[22px] transition ${
-                    item.active && !item.disableActiveBackground
-                      ? "bg-white text-black shadow-sm"
-                      : "text-black/80 "
+                  className={`group relative flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-left transition-all ${
+                    isActive
+                      ? "bg-white text-black shadow-sm" // Abrar Shaikh style
+                      : "text-black/80"
                   }`}
                   title={collapsed ? item.label : ""}
                 >
-                  <Icon size={18} className="shrink-0" />
+                  <Icon
+                    size={18}
+                    className={`shrink-0 ${isActive ? "text-black" : "text-black/80"}`}
+                  />
+
                   {!collapsed && (
                     <>
-                      <span className="text-xs font-medium">{item.label}</span>
+                      <span
+                        className={`text-xs font-medium ${isActive ? "font-semibold" : ""}`}
+                      >
+                        {item.label}
+                      </span>
                       {item.badge && (
-                        <span className="ml-0 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.45 text-[7px] font-semibold tracking-wide text-black shadow-sm">
+                        <span className="ml-auto rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[7px] font-semibold tracking-wide text-black shadow-sm">
                           {item.badge}
                         </span>
                       )}
                     </>
                   )}
-                  <span
-                    className={`absolute bottom-0 left-0 block h-[3px] bg-black transition-all duration-300 ${
-                      item.active ? "w-full" : "w-0 group-hover:w-full"
-                    }`}
-                  />
+
+                  {/* Black bottom line - only for active item */}
+                  {isActive && (
+                    <span className="absolute bottom-0 left-0 right-0 h-[3px] bg-black rounded-t" />
+                  )}
                 </button>
               );
             })}
@@ -221,7 +231,6 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
     const isValueAddedPage = valueAdditionItems.some((item) => {
       if (!item.path) return false;
-
       const normalizedItemPath = item.path.replace(/\/$/, "");
       return (
         normalizedPath === normalizedItemPath ||
@@ -236,7 +245,6 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     }
 
     setIsRecommendationsOpen(true);
-
     if (isValueAddedPage) {
       setIsValueAdditionsOpen(true);
     }
@@ -341,6 +349,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     .replace(/\/$/, "")
     .match(/^\/ai-login\/([^/]+)$/)?.[1];
 
+  // Active state logic for recommendations
   const recommendationItemsWithActivePath = recommendationItems.map((item) => {
     if (!item.path) return item;
 
@@ -356,11 +365,10 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     return {
       ...item,
       active: isActivePath,
-      showActiveUnderline: true,
-      disableActiveBackground: true,
     };
   });
 
+  // Active state logic for value additions
   const valueAdditionItemsWithActivePath = valueAdditionItems.map((item) => {
     if (!item.path) return item;
 
@@ -372,8 +380,6 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     return {
       ...item,
       active: isActivePath,
-      showActiveUnderline: true,
-      disableActiveBackground: true,
     };
   });
 
@@ -382,10 +388,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     active:
       normalizedPath === becomeContributorLink.path ||
       normalizedPath.startsWith(`${becomeContributorLink.path}/`),
-    showActiveUnderline: true,
-    disableActiveBackground: true,
   };
-
 
   return (
     <aside
@@ -400,6 +403,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         if (isMobileOverlay) event.stopPropagation();
       }}
     >
+      {/* Logo / Collapse Button */}
       <div className="px-4 py-4">
         {isMobileOverlay ? (
           <div className="flex items-center justify-between gap-3">
@@ -413,7 +417,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
             <button
               type="button"
               onClick={onClose}
-              className="rounded p-1 text-black/80 hover:bg-black/5"
+              className="rounded p-1 text-black/80"
               aria-label="Close sidebar"
             >
               <HiX size={24} />
@@ -423,7 +427,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
           <button
             type="button"
             onClick={() => setCollapsed((prev) => !prev)}
-            className="rounded p-1 text-black/80 hover:bg-black/5"
+            className="rounded p-1 text-black/80"
             aria-label="Toggle sidebar"
           >
             <HiOutlineMenu size={24} />
@@ -431,6 +435,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         )}
       </div>
 
+      {/* Sections */}
       <SidebarSection
         title="WoNo Intelligence"
         items={recommendationItemsWithActivePath}
@@ -440,6 +445,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         onToggle={() => setIsRecommendationsOpen((prev) => !prev)}
         onItemClick={handleRecommendationClick}
       />
+
       <SidebarSection
         title="Value Added Services"
         items={valueAdditionItemsWithActivePath}
@@ -449,6 +455,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         onToggle={() => setIsValueAdditionsOpen((prev) => !prev)}
         onItemClick={handleValueAdditionClick}
       />
+
       {isLoggedIn ? (
         <>
           <SidebarSection
@@ -490,20 +497,17 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
           <div className="border-t border-black/10 mt-4"></div>
           {!isCollapsed && (
             <div className="mt-auto px-4 pb-4 pt-10">
-              <div className="rounded-[28px]   p-4 shadow-sm">
-                {/* <h3 className="text-[13px] font-semibold leading-tight text-black/90">
-                  {loggedOutPrompt.title}
-                </h3> */}
+              <div className="rounded-[28px] p-4 shadow-sm">
                 <p className="mt-2 text-nano leading-[0.9rem] text-black/55">
                   {loggedOutPrompt.description}
                 </p>
-                <p className=" text-nano font-semibold leading-5 text-black/55">
+                <p className="text-nano font-semibold leading-5 text-black/55">
                   Powered by your preferences.
                 </p>
                 <button
                   type="button"
                   onClick={handleLogInClick}
-                  className="mt-6 w-full rounded-full border border-black/10 bg-primary-blue px-3 py-2 text-base font-semibold text-white transition hover:bg-black hover:text-white"
+                  className="mt-6 w-full rounded-full border border-black/10 bg-primary-blue px-3 py-2 text-base font-semibold text-white"
                 >
                   {loggedOutPrompt.actionLabel}
                 </button>
