@@ -110,7 +110,7 @@ const profileItems = [
 const signOutItem = [{ label: "Sign Out", icon: HiOutlineLogout }];
 
 const becomeContributorLink = {
-  label: "Become a WoNo Contributor",
+  label: "Become a Contributor",
   icon: IoMdPersonAdd,
   path: "/become-a-contributor",
 };
@@ -136,8 +136,9 @@ const SidebarSection = ({
           <button
             type="button"
             onClick={onToggle}
-            className={`flex w-full items-center justify-between text-left text-xs font-semibold uppercase tracking-wide text-black/80 transition hover:text-black ${isOpen ? "border-b border-black/10 pb-3" : ""
-              }`}
+            className={`flex w-full items-center justify-between text-left text-xs font-semibold uppercase tracking-wide text-black/80 transition hover:text-black ${
+              isOpen ? "border-b border-black/10 pb-3" : ""
+            }`}
             aria-expanded={isOpen}
             aria-label={`${isOpen ? "Collapse" : "Expand"} ${title}`}
           >
@@ -158,10 +159,11 @@ const SidebarSection = ({
                   key={item.label}
                   type="button"
                   onClick={() => onItemClick?.(item)}
-                  className={`flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-[22px] transition  ${item.active
-                    ? "bg-white text-black shadow-sm"
-                    : "text-black/80 hover:bg-white/70"
-                    }`}
+                  className={`group relative flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-[22px] transition ${
+                    item.active && !item.disableActiveBackground
+                      ? "bg-white text-black shadow-sm"
+                      : "text-black/80 "
+                  }`}
                   title={collapsed ? item.label : ""}
                 >
                   <Icon size={18} className="shrink-0" />
@@ -174,6 +176,13 @@ const SidebarSection = ({
                         </span>
                       )}
                     </>
+                  )}
+                  {item.showActiveUnderline && (
+                    <span
+                      className={`absolute bottom-0 left-0 block h-[1px] bg-black transition-all duration-300 ${
+                        item.active ? "w-full" : "w-0 group-hover:w-full"
+                      }`}
+                    />
                   )}
                 </button>
               );
@@ -198,8 +207,18 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     const normalizedPath = location.pathname.replace(/\/$/, "") || "/";
     const isAiHomePage = normalizedPath === "/home";
 
+    const isValueAddedPage = valueAdditionItems.some((item) => {
+      if (!item.path) return false;
+
+      const normalizedItemPath = item.path.replace(/\/$/, "");
+      return (
+        normalizedPath === normalizedItemPath ||
+        normalizedPath.startsWith(`${normalizedItemPath}/`)
+      );
+    });
+
     setIsRecommendationsOpen(!isAiHomePage);
-    setIsValueAdditionsOpen(isAiHomePage);
+    setIsValueAdditionsOpen(isAiHomePage || isValueAddedPage);
   }, [location.pathname]);
 
   const searchParams = new URLSearchParams(location.search);
@@ -286,6 +305,24 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
   const isCollapsed = isMobileOverlay ? false : collapsed;
 
+  const normalizedPath = location.pathname.replace(/\/$/, "") || "/";
+
+  const valueAdditionItemsWithActivePath = valueAdditionItems.map((item) => {
+    if (!item.path) return item;
+
+    const normalizedItemPath = item.path.replace(/\/$/, "");
+    const isActivePath =
+      normalizedPath === normalizedItemPath ||
+      normalizedPath.startsWith(`${normalizedItemPath}/`);
+
+    return {
+      ...item,
+      active: isActivePath,
+      showActiveUnderline: true,
+      disableActiveBackground: true,
+    };
+  });
+
   const BecomeContributorButton = () => {
     const Icon = becomeContributorLink.icon;
 
@@ -312,12 +349,13 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
   return (
     <aside
-      className={`flex h-full max-h-screen flex-col overflow-y-auto overscroll-contain border-r border-black/10 bg-[#efefef] transition-all duration-300 custom-scrollbar-hide ${isMobileOverlay
-        ? "w-[calc(100%-52px)] max-w-[320px]"
-        : isCollapsed
-          ? "w-[70px]"
-          : "w-[260px]"
-        }`}
+      className={`flex h-full max-h-screen flex-col overflow-y-auto overscroll-contain border-r border-black/10 bg-[#efefef] transition-all duration-300 custom-scrollbar-hide ${
+        isMobileOverlay
+          ? "w-[calc(100%-52px)] max-w-[320px]"
+          : isCollapsed
+            ? "w-[70px]"
+            : "w-[260px]"
+      }`}
       onClick={(event) => {
         if (isMobileOverlay) event.stopPropagation();
       }}
@@ -364,7 +402,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
       />
       <SidebarSection
         title="Value Added Services"
-        items={valueAdditionItems}
+        items={valueAdditionItemsWithActivePath}
         collapsed={isCollapsed}
         isExpandable
         isOpen={isValueAdditionsOpen}
@@ -401,6 +439,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
             collapsed={isCollapsed}
             onItemClick={handleBecomeHostClick}
           />
+          <div className="border-t border-black/10 mt-4"></div>
           {!isCollapsed && (
             <div className="mt-auto px-4 pb-4 pt-10">
               <div className="rounded-[28px]   p-4 shadow-sm">

@@ -1054,8 +1054,8 @@ const AiListings = ({ forceListView = false }) => {
         <Container padding={false}>
           {/* Dynamic Header */}
           {formData?.category && formData?.location && (
-            <div className="mb-4 mt-2 px-1">
-              <h1 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight">
+            <div className="mt-6 mb-2 px-1 border-t border-gray-300">
+              <h1 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight mt-6">
                 Popular{" "}
                 {{
                   coworking: "Co-Working Spaces",
@@ -1130,7 +1130,7 @@ const AiListings = ({ forceListView = false }) => {
                   // data={isLisitingLoading ? skeletonArray : sortedListings}
                   data={isLisitingLoading ? skeletonArray : filteredListings}
                   entriesPerPage={
-                    isMobile ? 10 : isTablet ? 9 : !showDesktopMap ? 10 : 9
+                    isMobile ? 10 : isTablet ? 9 : !showDesktopMap ? 100 : 9
                   }
                   persistPage={true}
                   resetPageKey={resetPageKey}

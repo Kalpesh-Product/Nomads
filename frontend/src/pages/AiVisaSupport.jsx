@@ -123,7 +123,7 @@ const AiVisaSupport = () => {
 
     let messageIndex = 0;
     let visaHeadingIndex = 0;
-    let cleanupHeading = () => { };
+    let cleanupHeading = () => {};
 
     const typeVisaHeading = () => {
       const headingInterval = setInterval(() => {
@@ -141,7 +141,6 @@ const AiVisaSupport = () => {
 
       cleanupHeading = () => clearInterval(headingInterval);
     };
-
 
     const messageInterval = setInterval(() => {
       messageIndex += 1;
@@ -164,7 +163,7 @@ const AiVisaSupport = () => {
       <Container padding={false}>
         <section className="min-h-[85vh] flex items-center justify-center py-8">
           <div className="w-full max-w-5xl md:px-20 lg:px-20 flex flex-col gap-6">
-            <p className="mx-auto min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1.2rem]">
+            <p className="mx-auto min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1rem]">
               {typedMessage}
             </p>
 
@@ -175,10 +174,11 @@ const AiVisaSupport = () => {
             <Box
               component="form"
               onSubmit={handleSubmit(handleFormSubmit)}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
-                }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${
+                isFormVisible ? "visible" : "invisible"
+              }`}
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
                 <Controller
                   name="fullName"
                   control={control}
@@ -330,7 +330,7 @@ const AiVisaSupport = () => {
                     <TextField
                       {...field}
                       fullWidth
-                      label="Travel Country"
+                      label="Travelling Country"
                       variant="standard"
                       select
                       InputLabelProps={{ sx: floatingLabelSx }}

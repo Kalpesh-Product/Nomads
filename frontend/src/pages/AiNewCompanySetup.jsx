@@ -155,7 +155,7 @@ const AiNewCompanySetup = () => {
         <section className="min-h-[85vh] flex items-center justify-center py-8">
           <div className="w-full max-w-5xl md:px-20 lg:px-20">
             <div className="mx-auto mb-0 flex w-full max-w-4xl flex-col items-center gap-8 px-0">
-              <p className="min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1.2rem]">
+              <p className="min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1rem]">
                 {typedMessage}
               </p>
               <h1 className="text-hero min-h-[3rem] text-center font-play">
