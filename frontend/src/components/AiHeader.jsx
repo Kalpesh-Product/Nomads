@@ -2,17 +2,30 @@ import React, { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import logo from "../assets/WONO_LOGO_Black_TP.png";
 import { useSelector } from "react-redux";
-import { Drawer, Avatar } from "@mui/material";
+import {
+  Drawer,
+  Avatar,
+  Popover,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  CircularProgress,
+} from "@mui/material";
 import { IoCloseSharp } from "react-icons/io5";
 import { HiOutlineMenu } from "react-icons/hi";
-import Container from "./Container";
+import { FiLogOut } from "react-icons/fi";
 import useAuth from "../hooks/useAuth";
 
 import useNomadLoginState from "../hooks/useNomadLoginState";
 import AiContainer from "./AiContainer";
+import useLogout from "../hooks/useLogout";
+import { clearStoredLoginState } from "../hooks/useNomadLoginState";
 
 const AiHeader = ({ onMobileSidebarToggle }) => {
   const [open, setOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [isLogoutLoading, setIsLogoutLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -50,9 +63,42 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
     ? `/ai-listings-list?${listingsQuery}`
     : "/ai-listings-list";
   const { auth } = useAuth();
+  const logout = useLogout();
   const hasNomadLoginState = useNomadLoginState();
   const isLoggedIn = Boolean(auth?.user) || hasNomadLoginState;
   const userInitial = auth?.user?.firstName?.charAt(0)?.toUpperCase() || "A";
+  const openPopover = Boolean(anchorEl);
+
+  const handleAvatarClick = (event) => setAnchorEl(event.currentTarget);
+  const handlePopoverClose = () => setAnchorEl(null);
+
+  const handleSignOut = async () => {
+    if (isLogoutLoading) return;
+
+    setIsLogoutLoading(true);
+    handlePopoverClose();
+
+    try {
+      if (auth?.user) {
+        await logout();
+      }
+
+      const nextSearchParams = new URLSearchParams(location.search);
+      nextSearchParams.delete("login");
+      clearStoredLoginState();
+
+      navigate({
+        pathname: "/home",
+        search: nextSearchParams.toString()
+          ? `?${nextSearchParams.toString()}`
+          : "",
+      });
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      setIsLogoutLoading(false);
+    }
+  };
   const handleNavigation = (path) => {
     navigate(path);
     setOpen(false);
@@ -165,9 +211,8 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                           className="group relative text-md text-black"
                         >
                           <span
-                            className={`relative z-10 mb-8 uppercase ${
-                              isActive ? "text-black" : "group-hover:font-bold"
-                            }`}
+                            className={`relative z-10 mb-8 uppercase ${isActive ? "text-black" : "group-hover:font-bold"
+                              }`}
                           >
                             {item.text}
                           </span>
@@ -191,24 +236,24 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                 <ul>
                   {(isAiListingsListPage ||
                     (!isAiListingsMapPage && view !== "map")) && (
-                    <li className="flex items-center">
-                      <div className="p-4 px-0 whitespace-nowrap">
-                        <Link
-                          to={
-                            isAiListingsListPage
-                              ? mapViewLink
-                              : `${location.pathname}?country=${formData?.country}&location=${formData?.location}&view=map`
-                          }
-                          className="group relative text-md text-black"
-                        >
-                          <span className="relative z-10 group-hover:font-bold  mb-2 text-sm font-semibold">
-                            Map View
-                          </span>
-                          <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
-                        </Link>
-                      </div>
-                    </li>
-                  )}
+                      <li className="flex items-center">
+                        <div className="p-4 px-0 whitespace-nowrap">
+                          <Link
+                            to={
+                              isAiListingsListPage
+                                ? mapViewLink
+                                : `${location.pathname}?country=${formData?.country}&location=${formData?.location}&view=map`
+                            }
+                            className="group relative text-md text-black"
+                          >
+                            <span className="relative z-10 group-hover:font-bold  mb-2 text-sm font-semibold">
+                              Map View
+                            </span>
+                            <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                          </Link>
+                        </div>
+                      </li>
+                    )}
 
                   {(isAiListingsMapPage || view === "map") && (
                     <li className="flex items-center">
@@ -264,8 +309,10 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
             </li>
             {isLoggedIn && (
               <Avatar
+                onClick={handleAvatarClick}
                 className="bg-primary-blue"
                 sx={{
+                  cursor: "pointer",
                   width: 32,
                   height: 32,
                   fontSize: "0.9rem",
@@ -282,8 +329,10 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
           <div className="h-full px-2 lg:hidden sm:hidden flex items-center gap-2">
             {isLoggedIn && (
               <Avatar
+                onClick={handleAvatarClick}
                 className="bg-primary-blue"
                 sx={{
+                  cursor: "pointer",
                   width: 32,
                   height: 32,
                   fontSize: "0.9rem",
@@ -294,11 +343,41 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                 {userInitial}
               </Avatar>
             )}
+            <Popover
+              open={openPopover}
+              anchorEl={anchorEl}
+              onClose={handlePopoverClose}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "center",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "center",
+              }}
+            >
+              <div className="w-44 p-2">
+                <List>
+                  <ListItemButton
+                    onClick={handleSignOut}
+                    disabled={isLogoutLoading}
+                  >
+                    <ListItemIcon>
+                      {isLogoutLoading ? (
+                        <CircularProgress size={18} sx={{ color: "gray" }} />
+                      ) : (
+                        <FiLogOut className="text-gray-500" />
+                      )}
+                    </ListItemIcon>
+                    <ListItemText primary="Log Out" />
+                  </ListItemButton>
+                </List>
+              </div>
+            </Popover>
             <button
               onClick={() => setOpen(true)}
-              className={`rounded-lg text-subtitle text-black ${
-                onMobileSidebarToggle ? "hidden" : ""
-              }`}
+              className={`rounded-lg text-subtitle text-black ${onMobileSidebarToggle ? "hidden" : ""
+                }`}
             >
               ☰
             </button>
