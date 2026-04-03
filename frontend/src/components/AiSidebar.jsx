@@ -140,6 +140,7 @@ const SidebarSection = ({
   onItemClick,
 }) => {
   const ChevronIcon = isOpen ? HiChevronUp : HiChevronDown;
+  const shouldShowItems = collapsed ? true : !isExpandable || isOpen;
 
   return (
     <div className="px-4 pt-3">
@@ -163,7 +164,7 @@ const SidebarSection = ({
             {title}
           </h3>
         )}
-        {(!isExpandable || isOpen) && (
+        {shouldShowItems && (
           <div className="mt-2 space-y-1">
             {items.map((item) => {
               const Icon = item.icon;
@@ -189,12 +190,10 @@ const SidebarSection = ({
                       )}
                     </>
                   )}
-                  {item.showActiveUnderline && (
-                    <span
-                      className={`absolute bottom-0 left-0 block h-[1px] bg-black transition-all duration-300 ${item.active ? "w-full" : "w-0 group-hover:w-full"
-                        }`}
-                    />
-                  )}
+                  <span
+                    className={`absolute bottom-0 left-0 block h-[3px] bg-black transition-all duration-300 ${item.active ? "w-full" : "w-0 group-hover:w-full"
+                      }`}
+                  />
                 </button>
               );
             })}
@@ -228,8 +227,17 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
       );
     });
 
-    setIsRecommendationsOpen(!isAiHomePage);
-    setIsValueAdditionsOpen(isAiHomePage || isValueAddedPage);
+    if (isAiHomePage) {
+      setIsRecommendationsOpen(false);
+      setIsValueAdditionsOpen(true);
+      return;
+    }
+
+    setIsRecommendationsOpen(true);
+
+    if (isValueAddedPage) {
+      setIsValueAdditionsOpen(true);
+    }
   }, [location.pathname]);
 
   const searchParams = new URLSearchParams(location.search);
@@ -328,6 +336,22 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
   const normalizedPath = location.pathname.replace(/\/$/, "") || "/";
 
+  const recommendationItemsWithActivePath = recommendationItems.map((item) => {
+    if (!item.path) return item;
+
+    const normalizedItemPath = item.path.replace(/\/$/, "");
+    const isActivePath =
+      normalizedPath === normalizedItemPath ||
+      normalizedPath.startsWith(`${normalizedItemPath}/`);
+
+    return {
+      ...item,
+      active: isActivePath,
+      showActiveUnderline: true,
+      disableActiveBackground: true,
+    };
+  });
+
   const valueAdditionItemsWithActivePath = valueAdditionItems.map((item) => {
     if (!item.path) return item;
 
@@ -413,7 +437,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
       <SidebarSection
         title="WoNo Intelligence"
-        items={recommendationItems}
+        items={recommendationItemsWithActivePath}
         collapsed={isCollapsed}
         isExpandable
         isOpen={isRecommendationsOpen}

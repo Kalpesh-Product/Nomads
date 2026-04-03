@@ -13,6 +13,7 @@ import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import { Country } from "country-state-city";
 import Swal from "sweetalert2";
+import { FaCheck } from "react-icons/fa";
 import Container from "../components/Container";
 
 const floatingLabelSx = {
@@ -327,7 +328,7 @@ const AiNewCompanySetup = () => {
                       InputLabelProps={{ sx: floatingLabelSx }}
                     >
                       <MenuItem value="" sx={{ fontWeight: 700 }}>
-                        Select Country
+                        SELECT COUNTRY
                       </MenuItem>
                       {countries.map((country) => (
                         <MenuItem key={country.isoCode} value={country.name}>
