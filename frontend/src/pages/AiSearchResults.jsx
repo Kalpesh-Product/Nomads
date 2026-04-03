@@ -12,7 +12,7 @@ import {
   HiOutlineX,
 } from "react-icons/hi";
 import { FaCheck } from "react-icons/fa";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { aiDestinationCards } from "../constants/aiDestinationCards";
 
@@ -38,9 +38,6 @@ const INITIAL_VISIBLE_DESTINATIONS = 18;
 const TYPING_INTERVAL_MS = 8;
 const SELECTED_HEADING_TRANSITION_DELAY_MS = 1200;
 const DESTINATION_REVEAL_INTERVAL_MS = 70;
-const SEARCH_RESULTS_LOCATION_STORAGE_KEY = "aiSearchResults.selectedLocation";
-const SEARCH_RESULTS_ATTRIBUTE_STORAGE_KEY =
-  "aiSearchResults.selectedAttribute";
 const SEARCH_RESULTS_GOAL_STORAGE_KEY = "aiSearchResults.selectedGoal";
 const SEARCH_RESULTS_SELECTION_SIGNATURE_STORAGE_KEY =
   "aiSearchResults.selectionSignature";
@@ -142,37 +139,36 @@ const DropdownBadge = ({
 const AiSearchResults = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { loc, attr } = useParams();
   const { state } = location;
   const requestedGoal = state?.selectedGoal;
   const selectedGoal =
     requestedGoal && goalFilterMap[requestedGoal] ? requestedGoal : defaultGoal;
   const goalOptions = goalFilterMap[selectedGoal] || goalFilterMap[defaultGoal];
-  const getPersistedLocation = () => {
-    if (typeof window === "undefined") return null;
-    return localStorage.getItem(SEARCH_RESULTS_LOCATION_STORAGE_KEY);
-  };
-  const getPersistedAttribute = () => {
-    if (typeof window === "undefined") return null;
-    return localStorage.getItem(SEARCH_RESULTS_ATTRIBUTE_STORAGE_KEY);
-  };
   const getPersistedGoal = () => {
     if (typeof window === "undefined") return null;
     return localStorage.getItem(SEARCH_RESULTS_GOAL_STORAGE_KEY);
-  };
-  const getPersistedSelectionSignature = () => {
+  },
+  getPersistedSelectionSignature = () => {
     if (typeof window === "undefined") return null;
     return localStorage.getItem(SEARCH_RESULTS_SELECTION_SIGNATURE_STORAGE_KEY);
   };
 
+  const initialContinent = useMemo(() => {
+    if (loc) return decodeURIComponent(loc);
+    return state?.selectedFilters?.continent || null;
+  }, [loc, state?.selectedFilters?.continent]);
+
+  const initialGoalOption = useMemo(() => {
+    if (attr) return decodeURIComponent(attr);
+    return state?.selectedFilters?.goalOption || null;
+  }, [attr, state?.selectedFilters?.goalOption]);
+
   const [typedTopHeading, setTypedTopHeading] = useState("");
   const [typedBottomHeading, setTypedBottomHeading] = useState("");
   const [typedResultsHeading, setTypedResultsHeading] = useState("");
-  const [selectedContinent, setSelectedContinent] = useState(
-    state?.selectedFilters?.continent || getPersistedLocation(),
-  );
-  const [selectedGoalOption, setSelectedGoalOption] = useState(
-    state?.selectedFilters?.goalOption || getPersistedAttribute(),
-  );
+  const [selectedContinent, setSelectedContinent] = useState(initialContinent);
+  const [selectedGoalOption, setSelectedGoalOption] = useState(initialGoalOption);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [showAllDestinations, setShowAllDestinations] = useState(false);
   const [isResultsReady, setIsResultsReady] = useState(false);
@@ -220,21 +216,24 @@ const AiSearchResults = () => {
   const searchBarBadges = useMemo(() => {
     const badges = [selectedGoal];
 
-    if (hasSelectedContinent) {
-      badges.push(selectedContinent);
+    const displayLoc = loc ? decodeURIComponent(loc) : selectedContinent;
+    const displayAttr = attr ? decodeURIComponent(attr) : selectedGoalOption;
+
+    if (displayLoc) {
+      badges.push(displayLoc);
     }
 
-    if (hasSelectedGoalOption) {
-      badges.push(selectedGoalOption);
+    if (displayAttr) {
+      badges.push(displayAttr);
     }
 
     return badges;
   }, [
-    hasSelectedContinent,
-    hasSelectedGoalOption,
+    loc,
+    attr,
     selectedContinent,
-    selectedGoal,
     selectedGoalOption,
+    selectedGoal,
   ]);
 
   const visibleDestinations = useMemo(() => {
@@ -285,6 +284,13 @@ const AiSearchResults = () => {
 
   const handleContinentSelect = (continent) => {
     setSelectedContinent(continent);
+    const encodedLoc = encodeURIComponent(continent);
+    if (selectedGoalOption) {
+      navigate(`/search/results/${encodedLoc}/${encodeURIComponent(selectedGoalOption)}`, { state });
+    } else {
+      navigate(`/search/results/${encodedLoc}`, { state });
+    }
+
     if (closeDropdownTimeoutRef.current) {
       clearTimeout(closeDropdownTimeoutRef.current);
     }
@@ -295,6 +301,10 @@ const AiSearchResults = () => {
 
   const handleGoalOptionSelect = (option) => {
     setSelectedGoalOption(option);
+    const encodedLoc = selectedContinent ? encodeURIComponent(selectedContinent) : "World";
+    const encodedAttr = encodeURIComponent(option);
+    navigate(`/search/results/${encodedLoc}/${encodedAttr}`, { state });
+
     if (closeDropdownTimeoutRef.current) {
       clearTimeout(closeDropdownTimeoutRef.current);
     }
@@ -459,13 +469,31 @@ const AiSearchResults = () => {
   );
 
   useEffect(() => {
+    if (loc) {
+      setSelectedContinent(decodeURIComponent(loc));
+    } else if (loc === undefined) {
+      setSelectedContinent(null);
+    }
+  }, [loc]);
+
+  useEffect(() => {
+    if (attr) {
+      setSelectedGoalOption(decodeURIComponent(attr));
+    } else if (attr === undefined) {
+      setSelectedGoalOption(null);
+    }
+  }, [attr]);
+
+  useEffect(() => {
     const incomingFilters = location.state?.selectedFilters;
-    if (!incomingFilters) return;
+    if (!incomingFilters || loc || attr) return; // If URL params exist, they take priority
 
     setSelectedContinent(incomingFilters.continent || null);
     setSelectedGoalOption(incomingFilters.goalOption || null);
-  }, [location.state]);
+  }, [location.state, loc, attr]);
 
+  // Redundant localStorage sync removed as per user request to use URLs instead
+  /*
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -491,29 +519,27 @@ const AiSearchResults = () => {
       localStorage.removeItem(SEARCH_RESULTS_ATTRIBUTE_STORAGE_KEY);
     }
   }, [selectedGoalOption]);
+  */
 
+  // Goal-change effect
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const isGoalSelectedFromNavigation = Boolean(requestedGoal);
-    const hasGoalChanged = previousGoalRef.current !== selectedGoal;
-
-    if (isGoalSelectedFromNavigation || hasGoalChanged) {
-      localStorage.removeItem(SEARCH_RESULTS_LOCATION_STORAGE_KEY);
-      localStorage.removeItem(SEARCH_RESULTS_ATTRIBUTE_STORAGE_KEY);
-      localStorage.removeItem(SEARCH_RESULTS_SELECTION_SIGNATURE_STORAGE_KEY);
+    if (previousGoalRef.current !== selectedGoal) {
       setSelectedContinent(null);
       setSelectedGoalOption(null);
+      // If we are at a deep results URL, go back to root results on goal change
+      if (loc || attr) {
+        navigate("/search/results", { state: location.state });
+      }
     }
 
     if (selectedGoal) {
       localStorage.setItem(SEARCH_RESULTS_GOAL_STORAGE_KEY, selectedGoal);
-    } else {
-      localStorage.removeItem(SEARCH_RESULTS_GOAL_STORAGE_KEY);
     }
 
     previousGoalRef.current = selectedGoal;
-  }, [location.key, requestedGoal, selectedGoal]);
+  }, [selectedGoal, navigate, loc, attr, location.state]);
 
   useEffect(() => {
     if (!hasSelectedFilters) {
