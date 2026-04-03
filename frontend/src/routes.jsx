@@ -199,6 +199,10 @@ if (tenant === "main") {
               element: <AiCareerSearchResults />,
             },
             { path: "search/results/:loc?/:attr?", element: <AiSearchResults /> },
+            {
+              path: "search/:goal/results/:loc?/:attr?",
+              element: <AiSearchResults />,
+            },
             { path: "manual-search", element: <AiManualSearch /> },
             { path: "ai-verticals", element: <AiGlobalListings /> },
             { path: "ai-listings", element: <AiListings /> },

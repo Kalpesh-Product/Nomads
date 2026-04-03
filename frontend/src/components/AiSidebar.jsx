@@ -32,41 +32,55 @@ const gatedRecommendationLabels = new Set([
   "Find Your Community",
 ]);
 
+const goalSlugByLabel = {
+  "World Ranking": "worldranking",
+  "Work From Anywhere": "workfromanywhere",
+  "Increase Your Savings": "increaseyoursavings",
+  "Advance Your Career": "advanceyourcareer",
+  "Find Your Community": "findyourcommunity",
+};
+
+const getSearchPathForGoal = (goalLabel) => {
+  const goalSlug = goalSlugByLabel[goalLabel];
+  return goalSlug ? `/search/${goalSlug}/results` : "/search/results";
+};
+
+
 const recommendationItems = [
   {
     label: "World Ranking",
     description:
       "Global suggestions for the best nomad destinations based on the world index which includes 50+ global factors.",
     icon: TbAward,
-    path: "/search/results",
+    path: getSearchPathForGoal("World Ranking"),
   },
   {
     label: "Work From Anywhere",
     description:
       "Custom suggestions to help you discover and work from the best nomad destinations.",
     icon: FaGlobeAmericas,
-    path: "/search/results",
+    path: getSearchPathForGoal("Work From Anywhere"),
   },
   {
     label: "Increase Your Savings",
     description:
       "Tailored nomad destination suggestions to help you increase your savings as a nomad.",
     icon: HiOutlineCurrencyDollar,
-    path: "/search/results",
+    path: getSearchPathForGoal("Increase Your Savings"),
   },
   {
     label: "Advance Your Career",
     description:
       "Intelligent suggestions to help you find the most suitable nomad destinations to advance your career.",
     icon: MdOutlineWorkHistory,
-    path: "/search/results",
+    path: getSearchPathForGoal("Advance Your Career"),
   },
   {
     label: "Find Your Community",
     description:
       "Find like minded individuals & communities as per your preferences from nomad destinations.",
     icon: RiUserCommunityLine,
-    path: "/search/results",
+    path: getSearchPathForGoal("Find Your Community"),
   },
   { label: "Search Old School", icon: TbWorldWww, path: "/manual-search" },
 ];
@@ -136,9 +150,8 @@ const SidebarSection = ({
           <button
             type="button"
             onClick={onToggle}
-            className={`flex w-full items-center justify-between text-left text-xs font-semibold uppercase tracking-wide text-black/80 transition hover:text-black ${
-              isOpen ? "border-b border-black/10 pb-3" : ""
-            }`}
+            className={`flex w-full items-center justify-between text-left text-xs font-semibold uppercase tracking-wide text-black/80 transition hover:text-black ${isOpen ? "border-b border-black/10 pb-3" : ""
+              }`}
             aria-expanded={isOpen}
             aria-label={`${isOpen ? "Collapse" : "Expand"} ${title}`}
           >
@@ -159,11 +172,10 @@ const SidebarSection = ({
                   key={item.label}
                   type="button"
                   onClick={() => onItemClick?.(item)}
-                  className={`group relative flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-[22px] transition ${
-                    item.active && !item.disableActiveBackground
-                      ? "bg-white text-black shadow-sm"
-                      : "text-black/80 "
-                  }`}
+                  className={`group relative flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-[22px] transition ${item.active && !item.disableActiveBackground
+                    ? "bg-white text-black shadow-sm"
+                    : "text-black/80 "
+                    }`}
                   title={collapsed ? item.label : ""}
                 >
                   <Icon size={18} className="shrink-0" />
@@ -179,9 +191,8 @@ const SidebarSection = ({
                   )}
                   {item.showActiveUnderline && (
                     <span
-                      className={`absolute bottom-0 left-0 block h-[1px] bg-black transition-all duration-300 ${
-                        item.active ? "w-full" : "w-0 group-hover:w-full"
-                      }`}
+                      className={`absolute bottom-0 left-0 block h-[1px] bg-black transition-all duration-300 ${item.active ? "w-full" : "w-0 group-hover:w-full"
+                        }`}
                     />
                   )}
                 </button>
@@ -247,7 +258,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
       },
       {
         state:
-          item.path === "/search/results"
+          item.path?.includes("/search") && item.path?.includes("/results")
             ? { selectedGoal: item.label }
             : undefined,
       },
@@ -349,13 +360,12 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
   return (
     <aside
-      className={`flex h-full max-h-screen flex-col overflow-y-auto overscroll-contain border-r border-black/10 bg-[#efefef] transition-all duration-300 custom-scrollbar-hide ${
-        isMobileOverlay
-          ? "w-[calc(100%-52px)] max-w-[320px]"
-          : isCollapsed
-            ? "w-[70px]"
-            : "w-[260px]"
-      }`}
+      className={`flex h-full max-h-screen flex-col overflow-y-auto overscroll-contain border-r border-black/10 bg-[#efefef] transition-all duration-300 custom-scrollbar-hide ${isMobileOverlay
+        ? "w-[calc(100%-52px)] max-w-[320px]"
+        : isCollapsed
+          ? "w-[70px]"
+          : "w-[260px]"
+        }`}
       onClick={(event) => {
         if (isMobileOverlay) event.stopPropagation();
       }}

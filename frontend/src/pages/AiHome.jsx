@@ -19,41 +19,55 @@ const freeRecommendationTitles = new Set([
   "Search Old School",
 ]);
 
+const goalSlugByTitle = {
+  "World Ranking": "worldranking",
+  "Work From Anywhere": "workfromanywhere",
+  "Increase Your Savings": "increaseyoursavings",
+  "Advance Your Career": "advanceyourcareer",
+  "Find Your Community": "findyourcommunity",
+};
+
+const getSearchPathForGoal = (goalTitle) => {
+  const goalSlug = goalSlugByTitle[goalTitle];
+  return goalSlug ? `/search/${goalSlug}/results` : "/search/results";
+};
+
+
 const recommendationCards = [
   {
     title: "World Ranking",
     description:
       "Best nomad destinations based on the world index which includes 50+ global factors.",
     icon: TbAward,
-    path: "/search/results",
+    path: getSearchPathForGoal("World Ranking"),
   },
   {
     title: "Work From Anywhere",
     description:
       "Custom suggestions to help you discover and work from the best nomad destinations.",
     icon: FaGlobeAmericas,
-    path: "/search/results",
+    path: getSearchPathForGoal("Work From Anywhere"),
   },
   {
     title: "Increase Your Savings",
     description:
       "Tailored nomad destination suggestions to help you increase your savings as a nomad.",
     icon: HiOutlineCurrencyDollar,
-    path: "/search/results",
+    path: getSearchPathForGoal("Increase Your Savings"),
   },
   {
     title: "Advance Your Career",
     description:
       "Discover the most suitable nomad destinations to advance your career.",
     icon: MdOutlineWorkHistory,
-    path: "/search/results",
+    path: getSearchPathForGoal("Advance Your Career"),
   },
   {
     title: "Find Your Community",
     description:
       "Like minded individuals & communities as per your preferences in nomad destinations.",
     icon: RiUserCommunityLine,
-    path: "/search/results",
+    path: getSearchPathForGoal("Find Your Community"),
   },
   {
     title: "Search Old School",
@@ -100,9 +114,9 @@ const AiHome = () => {
     let subheadingIndex = 0;
     let thirdLineIndex = 0;
     let fourthLineIndex = 0;
-    let cleanupSubheading = () => {};
-    let cleanupThirdLine = () => {};
-    let cleanupFourthLine = () => {};
+    let cleanupSubheading = () => { };
+    let cleanupThirdLine = () => { };
+    let cleanupFourthLine = () => { };
 
     const greetingInterval = setInterval(() => {
       greetingIndex += 1;
@@ -213,7 +227,7 @@ const AiHome = () => {
       },
       {
         state:
-          card.path === "/search/results"
+          card.path.includes("/search") && card.path.includes("/results")
             ? { selectedGoal: card.title }
             : undefined,
       },
@@ -238,9 +252,8 @@ const AiHome = () => {
           </p>
 
           <div
-            className={`mt-4 rounded-[40px] px-0 py-4 md:px-6 md:py-8 ${
-              areCardsVisible ? "visible" : "invisible"
-            }`}
+            className={`mt-4 rounded-[40px] px-0 py-4 md:px-6 md:py-8 ${areCardsVisible ? "visible" : "invisible"
+              }`}
           >
             <div className="grid grid-cols-2 gap-4 md:grid-cols-2 md:gap-10 xl:grid-cols-3">
               {recommendationCards.map((card, index) => {
@@ -254,11 +267,10 @@ const AiHome = () => {
                 return (
                   <div
                     key={card.title}
-                    className={`transition-all duration-300 ${
-                      index < visibleCardCount
-                        ? "translate-y-0 opacity-100"
-                        : "pointer-events-none translate-y-2 opacity-0"
-                    }`}
+                    className={`transition-all duration-300 ${index < visibleCardCount
+                      ? "translate-y-0 opacity-100"
+                      : "pointer-events-none translate-y-2 opacity-0"
+                      }`}
                   >
                     <article
                       onClick={() => handleCardClick(card)}
@@ -279,9 +291,8 @@ const AiHome = () => {
                     </article>
                     {!isLoggedIn ? (
                       <p
-                        className={`mt-2 text-[10px] font-semibold tracking-wide md:text-xs ${
-                          isFreeCard ? "text-primary-blue" : "text-black/70"
-                        }`}
+                        className={`mt-2 text-[10px] font-semibold tracking-wide md:text-xs ${isFreeCard ? "text-primary-blue" : "text-black/70"
+                          }`}
                       >
                         {loggedOutCardText}
                       </p>

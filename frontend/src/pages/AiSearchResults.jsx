@@ -42,6 +42,15 @@ const SEARCH_RESULTS_GOAL_STORAGE_KEY = "aiSearchResults.selectedGoal";
 const SEARCH_RESULTS_SELECTION_SIGNATURE_STORAGE_KEY =
   "aiSearchResults.selectionSignature";
 
+const goalNameBySlug = {
+  worldranking: "World Ranking",
+  workfromanywhere: "Work From Anywhere",
+  increaseyoursavings: "Increase Your Savings",
+  advanceyourcareer: "Advance Your Career",
+  findyourcommunity: "Find Your Community",
+};
+
+
 const goalNarrativeTopHeadingMap = {
   "World Ranking":
     "Please find below the best curated results from the options you suggested to me based on world ranking index.",
@@ -139,20 +148,24 @@ const DropdownBadge = ({
 const AiSearchResults = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { loc, attr } = useParams();
+  const { goal, loc, attr } = useParams();
   const { state } = location;
-  const requestedGoal = state?.selectedGoal;
+  const requestedGoalFromUrl = goal ? goalNameBySlug[goal.toLowerCase()] : null;
+  const requestedGoal = state?.selectedGoal || requestedGoalFromUrl;
   const selectedGoal =
     requestedGoal && goalFilterMap[requestedGoal] ? requestedGoal : defaultGoal;
+  const searchResultsBasePath = goal
+    ? `/search/${encodeURIComponent(goal)}/results`
+    : "/search/results";
   const goalOptions = goalFilterMap[selectedGoal] || goalFilterMap[defaultGoal];
   const getPersistedGoal = () => {
     if (typeof window === "undefined") return null;
     return localStorage.getItem(SEARCH_RESULTS_GOAL_STORAGE_KEY);
   },
-  getPersistedSelectionSignature = () => {
-    if (typeof window === "undefined") return null;
-    return localStorage.getItem(SEARCH_RESULTS_SELECTION_SIGNATURE_STORAGE_KEY);
-  };
+    getPersistedSelectionSignature = () => {
+      if (typeof window === "undefined") return null;
+      return localStorage.getItem(SEARCH_RESULTS_SELECTION_SIGNATURE_STORAGE_KEY);
+    };
 
   const initialContinent = useMemo(() => {
     if (loc) return decodeURIComponent(loc);
@@ -286,9 +299,12 @@ const AiSearchResults = () => {
     setSelectedContinent(continent);
     const encodedLoc = encodeURIComponent(continent);
     if (selectedGoalOption) {
-      navigate(`/search/results/${encodedLoc}/${encodeURIComponent(selectedGoalOption)}`, { state });
+      navigate(
+        `${searchResultsBasePath}/${encodedLoc}/${encodeURIComponent(selectedGoalOption)}`,
+        { state },
+      );
     } else {
-      navigate(`/search/results/${encodedLoc}`, { state });
+      navigate(`${searchResultsBasePath}/${encodedLoc}`, { state });
     }
 
     if (closeDropdownTimeoutRef.current) {
@@ -303,7 +319,7 @@ const AiSearchResults = () => {
     setSelectedGoalOption(option);
     const encodedLoc = selectedContinent ? encodeURIComponent(selectedContinent) : "World";
     const encodedAttr = encodeURIComponent(option);
-    navigate(`/search/results/${encodedLoc}/${encodedAttr}`, { state });
+    navigate(`${searchResultsBasePath}/${encodedLoc}/${encodedAttr}`, { state });
 
     if (closeDropdownTimeoutRef.current) {
       clearTimeout(closeDropdownTimeoutRef.current);
@@ -530,7 +546,7 @@ const AiSearchResults = () => {
       setSelectedGoalOption(null);
       // If we are at a deep results URL, go back to root results on goal change
       if (loc || attr) {
-        navigate("/search/results", { state: location.state });
+        navigate(searchResultsBasePath, { state: location.state });
       }
     }
 
@@ -539,7 +555,7 @@ const AiSearchResults = () => {
     }
 
     previousGoalRef.current = selectedGoal;
-  }, [selectedGoal, navigate, loc, attr, location.state]);
+  }, [selectedGoal, navigate, loc, attr, location.state, searchResultsBasePath]);
 
   useEffect(() => {
     if (!hasSelectedFilters) {
