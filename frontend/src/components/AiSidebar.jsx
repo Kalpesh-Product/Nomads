@@ -45,7 +45,6 @@ const getSearchPathForGoal = (goalLabel) => {
   return goalSlug ? `/search/${goalSlug}/results` : "/search/results";
 };
 
-
 const recommendationItems = [
   {
     label: "World Ranking",
@@ -151,8 +150,9 @@ const SidebarSection = ({
           <button
             type="button"
             onClick={onToggle}
-            className={`flex w-full items-center justify-between text-left text-xs font-semibold uppercase tracking-wide text-black/80 transition hover:text-black ${isOpen ? "border-b border-black/10 pb-3" : ""
-              }`}
+            className={`flex w-full items-center justify-between text-left text-xs font-semibold uppercase tracking-wide text-black/80 transition hover:text-black ${
+              isOpen ? "border-b border-black/10 pb-3" : ""
+            }`}
             aria-expanded={isOpen}
             aria-label={`${isOpen ? "Collapse" : "Expand"} ${title}`}
           >
@@ -173,10 +173,11 @@ const SidebarSection = ({
                   key={item.label}
                   type="button"
                   onClick={() => onItemClick?.(item)}
-                  className={`group relative flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-[22px] transition ${item.active && !item.disableActiveBackground
-                    ? "bg-white text-black shadow-sm"
-                    : "text-black/80 "
-                    }`}
+                  className={`group relative flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-[22px] transition ${
+                    item.active && !item.disableActiveBackground
+                      ? "bg-white text-black shadow-sm"
+                      : "text-black/80 "
+                  }`}
                   title={collapsed ? item.label : ""}
                 >
                   <Icon size={18} className="shrink-0" />
@@ -191,8 +192,9 @@ const SidebarSection = ({
                     </>
                   )}
                   <span
-                    className={`absolute bottom-0 left-0 block h-[3px] bg-black transition-all duration-300 ${item.active ? "w-full" : "w-0 group-hover:w-full"
-                      }`}
+                    className={`absolute bottom-0 left-0 block h-[3px] bg-black transition-all duration-300 ${
+                      item.active ? "w-full" : "w-0 group-hover:w-full"
+                    }`}
                   />
                 </button>
               );
@@ -394,12 +396,13 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
   return (
     <aside
-      className={`flex h-full max-h-screen flex-col overflow-y-auto overscroll-contain border-r border-black/10 bg-[#efefef] transition-all duration-300 custom-scrollbar-hide ${isMobileOverlay
-        ? "w-[calc(100%-52px)] max-w-[320px]"
-        : isCollapsed
-          ? "w-[70px]"
-          : "w-[260px]"
-        }`}
+      className={`flex h-full max-h-screen flex-col overflow-y-auto overscroll-contain border-r border-black/10 bg-[#efefef] transition-all duration-300 custom-scrollbar-hide ${
+        isMobileOverlay
+          ? "w-[calc(100%-52px)] max-w-[320px]"
+          : isCollapsed
+            ? "w-[70px]"
+            : "w-[260px]"
+      }`}
       onClick={(event) => {
         if (isMobileOverlay) event.stopPropagation();
       }}
