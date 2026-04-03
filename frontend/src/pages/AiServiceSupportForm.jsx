@@ -144,7 +144,7 @@ const AiServiceSupportForm = ({
                       InputLabelProps={{ sx: floatingLabelSx }}
                     >
                       <MenuItem value="" disabled>
-                        Select Country
+                        SELECT COUNTRY
                       </MenuItem>
                       {countries.map((country) => (
                         <MenuItem key={country.isoCode} value={country.name}>
@@ -172,7 +172,7 @@ const AiServiceSupportForm = ({
                       InputLabelProps={{ sx: floatingLabelSx }}
                     >
                       <MenuItem value="" disabled>
-                        Select Country
+                        SELECT COUNTRY
                       </MenuItem>
                       {countries.map((country) => (
                         <MenuItem key={country.isoCode} value={country.name}>

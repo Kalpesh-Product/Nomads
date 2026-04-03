@@ -113,7 +113,7 @@ const AiConsultation = () => {
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => {};
+    let cleanupHeading = () => { };
 
     const typeHeading = () => {
       const headingInterval = setInterval(() => {
@@ -167,9 +167,8 @@ const AiConsultation = () => {
                 event.preventDefault();
                 handleFormSubmit();
               }}
-              className={`bg-white p-6 md:p-0 rounded-2xl ${
-                isFormVisible ? "visible" : "invisible"
-              }`}
+              className={`bg-white p-6 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
+                }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 <Controller
@@ -300,7 +299,7 @@ const AiConsultation = () => {
                       }
                     >
                       <MenuItem value="" sx={{ fontWeight: 700 }}>
-                        Select Country
+                        SELECT COUNTRY
                       </MenuItem>
                       {countries.map((country) => (
                         <MenuItem key={country.isoCode} value={country.name}>
@@ -327,7 +326,7 @@ const AiConsultation = () => {
                       InputLabelProps={{ sx: floatingLabelSx }}
                     >
                       <MenuItem value="" sx={{ fontWeight: 700 }}>
-                        Select Country
+                        SELECT COUNTRY
                       </MenuItem>
                       {countries.map((country) => (
                         <MenuItem key={country.isoCode} value={country.name}>

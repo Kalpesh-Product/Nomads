@@ -96,7 +96,7 @@ const AiOverallActivationSupport = () => {
     const hasSeenTypingEffect =
       typeof window !== "undefined" &&
       window.localStorage.getItem(OVERALL_ACTIVATION_TYPING_SEEN_KEY) ===
-        "true";
+      "true";
 
     if (hasSeenTypingEffect) {
       setTypedMessage(OVERALL_ACTIVATION_PROMPT);
@@ -110,7 +110,7 @@ const AiOverallActivationSupport = () => {
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => {};
+    let cleanupHeading = () => { };
 
     const typeHeading = () => {
       const headingInterval = setInterval(() => {
@@ -167,9 +167,8 @@ const AiOverallActivationSupport = () => {
                 event.preventDefault();
                 handleFormSubmit();
               }}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${
-                isFormVisible ? "visible" : "invisible"
-              }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
+                }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 <Controller
@@ -300,7 +299,7 @@ const AiOverallActivationSupport = () => {
                       }
                     >
                       <MenuItem value="" sx={{ fontWeight: 700 }}>
-                        Select Country
+                        SELECT COUNTRY
                       </MenuItem>
                       {countries.map((country) => (
                         <MenuItem key={country.isoCode} value={country.name}>
@@ -327,7 +326,7 @@ const AiOverallActivationSupport = () => {
                       InputLabelProps={{ sx: floatingLabelSx }}
                     >
                       <MenuItem value="" sx={{ fontWeight: 700 }}>
-                        Select Country
+                        SELECT COUNTRY
                       </MenuItem>
                       {countries.map((country) => (
                         <MenuItem key={country.isoCode} value={country.name}>

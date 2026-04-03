@@ -123,7 +123,7 @@ const AiVisaSupport = () => {
 
     let messageIndex = 0;
     let visaHeadingIndex = 0;
-    let cleanupHeading = () => {};
+    let cleanupHeading = () => { };
 
     const typeVisaHeading = () => {
       const headingInterval = setInterval(() => {
@@ -174,9 +174,8 @@ const AiVisaSupport = () => {
             <Box
               component="form"
               onSubmit={handleSubmit(handleFormSubmit)}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${
-                isFormVisible ? "visible" : "invisible"
-              }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
+                }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
                 <Controller
@@ -312,7 +311,7 @@ const AiVisaSupport = () => {
                       }
                     >
                       <MenuItem value="" sx={{ fontWeight: 700 }}>
-                        Select Country
+                        SELECT COUNTRY
                       </MenuItem>
                       {countries.map((country) => (
                         <MenuItem key={country.isoCode} value={country.name}>
@@ -337,7 +336,7 @@ const AiVisaSupport = () => {
                       onChange={(event) => field.onChange(event.target.value)}
                     >
                       <MenuItem value="" sx={{ fontWeight: 700 }}>
-                        Select Location
+                        SELECT COUNTRY
                       </MenuItem>
                       {destinationOptions.map((destinationOption) => (
                         <MenuItem
