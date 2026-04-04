@@ -154,7 +154,7 @@ const Footer = () => {
         {/* Left side — Copyright */}
         <div className="flex flex-col md:flex-row justify-center md:justify-start items-center gap-1 text-[10px] md:text-xs font-semibold text-gray-800 mb-3 lg:mb-0">
           <span>
-            &copy; Copyright {new Date().getFullYear()} -{" "}
+            &copy; Copyright {new Date().getFullYear()}-
             {(new Date().getFullYear() + 1).toString().slice(-2)}
           </span>
           <span className="text-[10px] md:text-xs font-semibold md:ml-2">

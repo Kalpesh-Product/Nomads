@@ -31,16 +31,13 @@ const activationSupportOptions = [
 ];
 
 const defaultValues = {
+  supportRequired: "",
   fullName: "",
-  email: "",
-  dateOfBirth: "",
-  passportValidity: "",
   nationalityOnPassport: "",
   travelCountry: "",
   contactCode: "",
   contactNumber: "",
-  supportRequired: "",
-  tentativeTravelDate: "",
+  email: "",
   comments: "",
 };
 
@@ -172,6 +169,33 @@ const AiOverallActivationSupport = () => {
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-4">
                 <Controller
+                  name="supportRequired"
+                  control={control}
+                  rules={{ required: "Support required is required" }}
+                  render={({ field, fieldState }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      select
+                      label="Support Required"
+                      variant="standard"
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                      InputLabelProps={{ sx: floatingLabelSx }}
+                    >
+                      <MenuItem value="" sx={{ fontWeight: 700 }}>
+                        Select Support
+                      </MenuItem>
+                      {activationSupportOptions.map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  )}
+                />
+
+                <Controller
                   name="fullName"
                   control={control}
                   rules={{ required: "Full name is required" }}
@@ -184,95 +208,6 @@ const AiOverallActivationSupport = () => {
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
-                    />
-                  )}
-                />
-
-                <Controller
-                  name="email"
-                  control={control}
-                  rules={{
-                    required: "Email is required",
-                    pattern: {
-                      value: /^\S+@\S+$/i,
-                      message: "Invalid email address",
-                    },
-                  }}
-                  render={({ field, fieldState }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label="Email Address"
-                      variant="standard"
-                      error={!!fieldState.error}
-                      helperText={fieldState.error?.message}
-                      InputLabelProps={{ sx: floatingLabelSx }}
-                    />
-                  )}
-                />
-
-                <Controller
-                  name="dateOfBirth"
-                  control={control}
-                  render={({ field }) => (
-                    <DatePicker
-                      label="Date of Birth"
-                      format="DD-MM-YYYY"
-                      enableAccessibleFieldDOMStructure={false}
-                      value={field.value ? dayjs(field.value) : null}
-                      onChange={(value) =>
-                        field.onChange(
-                          value ? dayjs(value).format("YYYY-MM-DD") : "",
-                        )
-                      }
-                      slotProps={{
-                        field: {
-                          placeholder: "DD-MM-YYYY",
-                        },
-                        textField: {
-                          fullWidth: true,
-                          variant: "standard",
-                          placeholder: "DD-MM-YYYY",
-                          inputProps: { placeholder: "DD-MM-YYYY" },
-                          InputLabelProps: {
-                            sx: floatingLabelSx,
-                            shrink: true,
-                          },
-                        },
-                      }}
-                    />
-                  )}
-                />
-
-                <Controller
-                  name="passportValidity"
-                  control={control}
-                  render={({ field }) => (
-                    <DatePicker
-                      label="Passport Validity (Expiry Date)"
-                      format="DD-MM-YYYY"
-                      enableAccessibleFieldDOMStructure={false}
-                      value={field.value ? dayjs(field.value) : null}
-                      onChange={(value) =>
-                        field.onChange(
-                          value ? dayjs(value).format("YYYY-MM-DD") : "",
-                        )
-                      }
-                      slotProps={{
-                        field: {
-                          placeholder: "DD-MM-YYYY",
-                        },
-                        textField: {
-                          fullWidth: true,
-                          variant: "standard",
-                          placeholder: "DD-MM-YYYY",
-                          inputProps: { placeholder: "DD-MM-YYYY" },
-                          InputLabelProps: {
-                            sx: floatingLabelSx,
-                            shrink: true,
-                          },
-                        },
-                      }}
                     />
                   )}
                 />
@@ -337,135 +272,65 @@ const AiOverallActivationSupport = () => {
                   )}
                 />
 
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "flex-end",
-                    borderBottom: "1px solid rgba(0, 0, 0, 0.42)",
-                    transition: "border-bottom-color 0.2s ease",
-                    "&:focus-within": { borderBottomColor: "#1976d2" },
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: "32%",
-                      px: 0.5,
-                      pb: 0.5,
-                      borderRight: "1px solid rgba(0, 0, 0, 0.12)",
-                    }}
-                  >
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        color: selectedNationality ? "#1976d2" : "#6b7280",
-                        fontWeight: 500,
-                        display: "block",
-                      }}
-                    >
-                      Code
-                    </Typography>
-                    <Controller
-                      name="contactCode"
-                      control={control}
-                      render={({ field }) => (
-                        <InputBase
-                          {...field}
-                          fullWidth
-                          readOnly
-                          placeholder="+___"
-                          sx={{ color: "rgba(0, 0, 0, 0.6)" }}
-                        />
-                      )}
-                    />
-                  </Box>
-
-                  <Box sx={{ flex: 1, px: 1, pb: 0 }}>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        color: selectedNationality ? "#1976d2" : "#6b7280",
-                        fontWeight: 500,
-                        display: "block",
-                      }}
-                    >
-                      Contact Number
-                    </Typography>
-                    <Controller
-                      name="contactNumber"
-                      control={control}
-                      rules={{ required: "Contact number is required" }}
-                      render={({ field }) => (
-                        <InputBase
-                          {...field}
-                          fullWidth
-                          inputProps={{ inputMode: "tel" }}
-                          sx={{ py: 0 }}
-                        />
-                      )}
-                    />
-                  </Box>
+                <Box sx={{ display: "flex", gap: 2, width: "100%" }}>
+                  <Controller
+                    name="contactCode"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label="Code"
+                        variant="standard"
+                        InputLabelProps={{ sx: floatingLabelSx }}
+                        inputProps={{ readOnly: true }}
+                        sx={{ width: "20%" }}
+                      />
+                    )}
+                  />
+                  <Box sx={{ width: "1px", height: "100%", backgroundColor: "#ccc" }} />
+                  <Controller
+                    name="contactNumber"
+                    control={control}
+                    rules={{ required: "Contact number is required" }}
+                    render={({ field, fieldState }) => (
+                      <TextField
+                        {...field}
+                        fullWidth
+                        label="Contact Number"
+                        variant="standard"
+                        type="tel"
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message}
+                        InputLabelProps={{ sx: floatingLabelSx }}
+                        sx={{ flex: 1 }}
+                      />
+                    )}
+                  />
                 </Box>
 
+
                 <Controller
-                  name="supportRequired"
+                  name="email"
                   control={control}
-                  rules={{ required: "Support required is required" }}
+                  rules={{
+                    required: "Email is required",
+                    pattern: {
+                      value: /^\S+@\S+$/i,
+                      message: "Invalid email address",
+                    },
+                  }}
                   render={({ field, fieldState }) => (
                     <TextField
                       {...field}
                       fullWidth
-                      select
-                      label="Support Required"
+                      label="Email Address"
                       variant="standard"
-                      // required
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
-                    >
-                      <MenuItem value="" sx={{ fontWeight: 700 }}>
-                        Select Support
-                      </MenuItem>
-                      {activationSupportOptions.map((option) => (
-                        <MenuItem key={option} value={option}>
-                          {option}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  )}
-                />
-
-                {/* <Controller
-                  name="tentativeTravelDate"
-                  control={control}
-                  render={({ field }) => (
-                    <DatePicker
-                      label="Tentative Travel Date"
-                      format="DD-MM-YYYY"
-                      enableAccessibleFieldDOMStructure={false}
-                      value={field.value ? dayjs(field.value) : null}
-                      onChange={(value) =>
-                        field.onChange(
-                          value ? dayjs(value).format("YYYY-MM-DD") : "",
-                        )
-                      }
-                      slotProps={{
-                        field: {
-                          placeholder: "DD-MM-YYYY",
-                        },
-                        textField: {
-                          fullWidth: true,
-                          variant: "standard",
-                          placeholder: "DD-MM-YYYY",
-                          inputProps: { placeholder: "DD-MM-YYYY" },
-                          InputLabelProps: {
-                            sx: floatingLabelSx,
-                            shrink: true,
-                          },
-                        },
-                      }}
                     />
                   )}
-                /> */}
+                />
 
                 <div className="md:col-span-2">
                   <Controller

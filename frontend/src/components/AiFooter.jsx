@@ -159,7 +159,7 @@ const AiFooter = () => {
           {/* Left side — Copyright */}
           <div className="flex flex-col md:flex-row justify-center md:justify-start items-center gap-1 text-[10px] md:text-xs font-semibold text-gray-800 mb-3 lg:mb-0">
             <span>
-              &copy; Copyright {new Date().getFullYear()} -{" "}
+              &copy; Copyright {new Date().getFullYear()}-
               {(new Date().getFullYear() + 1).toString().slice(-2)}
             </span>
             <span className="text-[10px] md:text-xs font-semibold md:ml-2">
@@ -236,11 +236,10 @@ const AiFooter = () => {
                         setShowLangModal(false);
                       }}
                       className={`border rounded-md px-3 py-2 
-        ${
-          isDisabled
-            ? "opacity-40 cursor-not-allowed"
-            : "cursor-pointer hover:border-black"
-        } 
+        ${isDisabled
+                          ? "opacity-40 cursor-not-allowed"
+                          : "cursor-pointer hover:border-black"
+                        } 
         ${selectedLang.code === lang.code ? "border-black" : "border-gray-300"}
       `}
                     >
@@ -277,16 +276,14 @@ const AiFooter = () => {
                         setShowCurrencyModal(false);
                       }}
                       className={`border rounded-md px-3 py-2 
-        ${
-          isDisabled
-            ? "opacity-40 cursor-not-allowed"
-            : "cursor-pointer hover:border-black"
-        } 
-        ${
-          selectedCurrency.code === cur.code
-            ? "border-black"
-            : "border-gray-300"
-        }
+        ${isDisabled
+                          ? "opacity-40 cursor-not-allowed"
+                          : "cursor-pointer hover:border-black"
+                        } 
+        ${selectedCurrency.code === cur.code
+                          ? "border-black"
+                          : "border-gray-300"
+                        }
       `}
                     >
                       <div className="font-medium">{cur.name}</div>
