@@ -37,16 +37,13 @@ const supportOptions = [
 ];
 
 const defaultValues = {
+  supportRequired: "",
   fullName: "",
-  email: "",
-  dateOfBirth: "",
-  passportValidity: "",
-  nationalityOnPassport: "",
+  currentCompanyCountry: "",
   newCompanyCountry: "",
   contactCode: "",
   contactNumber: "",
-  supportRequired: "",
-  tentativeTravelDate: "",
+  email: "",
   comments: "",
 };
 
@@ -63,7 +60,7 @@ const AiNewCompanySetup = () => {
   const { control, reset, setValue, watch } = useForm({
     defaultValues,
   });
-  const selectedNationality = watch("nationalityOnPassport");
+  const selectedCountry = watch("currentCompanyCountry");
 
   const [isPending, setIsPending] = useState(false);
 
@@ -82,7 +79,7 @@ const AiNewCompanySetup = () => {
     setIsPending(false);
   };
 
-  const handleNationalityChange = (countryName, onChange) => {
+  const handleCountryChange = (countryName, onChange) => {
     const country = countries.find((item) => item.name === countryName);
     const phonePrefix = country?.phonecode ? `+${country.phonecode}` : "";
 
@@ -174,6 +171,33 @@ const AiNewCompanySetup = () => {
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-4">
                 <Controller
+                  name="supportRequired"
+                  control={control}
+                  rules={{ required: "Support required is required" }}
+                  render={({ field, fieldState }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      select
+                      label="Support Required"
+                      variant="standard"
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                      InputLabelProps={{ sx: floatingLabelSx }}
+                    >
+                      <MenuItem value="" sx={{ fontWeight: 700 }}>
+                        Select Support
+                      </MenuItem>
+                      {supportOptions.map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  )}
+                />
+
+                <Controller
                   name="fullName"
                   control={control}
                   rules={{ required: "Full name is required" }}
@@ -191,110 +215,21 @@ const AiNewCompanySetup = () => {
                 />
 
                 <Controller
-                  name="email"
+                  name="currentCompanyCountry"
                   control={control}
-                  rules={{
-                    required: "Email is required",
-                    pattern: {
-                      value: /^\S+@\S+$/i,
-                      message: "Invalid email address",
-                    },
-                  }}
-                  render={({ field, fieldState }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label="Email Address"
-                      variant="standard"
-                      error={!!fieldState.error}
-                      helperText={fieldState.error?.message}
-                      InputLabelProps={{ sx: floatingLabelSx }}
-                    />
-                  )}
-                />
-
-                <Controller
-                  name="dateOfBirth"
-                  control={control}
-                  render={({ field }) => (
-                    <DatePicker
-                      label="Date of Birth"
-                      format="DD-MM-YYYY"
-                      enableAccessibleFieldDOMStructure={false}
-                      value={field.value ? dayjs(field.value) : null}
-                      onChange={(value) =>
-                        field.onChange(
-                          value ? dayjs(value).format("YYYY-MM-DD") : "",
-                        )
-                      }
-                      slotProps={{
-                        field: {
-                          placeholder: "DD-MM-YYYY",
-                        },
-                        textField: {
-                          fullWidth: true,
-                          variant: "standard",
-                          placeholder: "DD-MM-YYYY",
-                          inputProps: { placeholder: "DD-MM-YYYY" },
-                          InputLabelProps: {
-                            sx: floatingLabelSx,
-                            shrink: true,
-                          },
-                        },
-                      }}
-                    />
-                  )}
-                />
-
-                <Controller
-                  name="passportValidity"
-                  control={control}
-                  render={({ field }) => (
-                    <DatePicker
-                      label="Passport Validity (Expiry Date)"
-                      format="DD-MM-YYYY"
-                      enableAccessibleFieldDOMStructure={false}
-                      value={field.value ? dayjs(field.value) : null}
-                      onChange={(value) =>
-                        field.onChange(
-                          value ? dayjs(value).format("YYYY-MM-DD") : "",
-                        )
-                      }
-                      slotProps={{
-                        field: {
-                          placeholder: "DD-MM-YYYY",
-                        },
-                        textField: {
-                          fullWidth: true,
-                          variant: "standard",
-                          placeholder: "DD-MM-YYYY",
-                          inputProps: { placeholder: "DD-MM-YYYY" },
-                          InputLabelProps: {
-                            sx: floatingLabelSx,
-                            shrink: true,
-                          },
-                        },
-                      }}
-                    />
-                  )}
-                />
-
-                <Controller
-                  name="nationalityOnPassport"
-                  control={control}
-                  rules={{ required: "Nationality on passport is required" }}
+                  rules={{ required: "Current Company Country is required" }}
                   render={({ field, fieldState }) => (
                     <TextField
                       {...field}
                       fullWidth
                       select
-                      label="Nationality on Passport"
+                      label="Current Company Country"
                       variant="standard"
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
                       onChange={(event) =>
-                        handleNationalityChange(
+                        handleCountryChange(
                           event.target.value,
                           field.onChange,
                         )
@@ -359,7 +294,7 @@ const AiNewCompanySetup = () => {
                     <Typography
                       variant="caption"
                       sx={{
-                        color: selectedNationality ? "#1976d2" : "#6b7280",
+                        color: selectedCountry ? "#1976d2" : "#6b7280",
                         fontWeight: 500,
                         display: "block",
                       }}
@@ -385,7 +320,7 @@ const AiNewCompanySetup = () => {
                     <Typography
                       variant="caption"
                       sx={{
-                        color: selectedNationality ? "#1976d2" : "#6b7280",
+                        color: selectedCountry ? "#1976d2" : "#6b7280",
                         fontWeight: 500,
                         display: "block",
                       }}
@@ -401,6 +336,7 @@ const AiNewCompanySetup = () => {
                           {...field}
                           fullWidth
                           inputProps={{ inputMode: "tel" }}
+                          sx={{ py: 0 }}
                         />
                       )}
                     />
@@ -408,65 +344,27 @@ const AiNewCompanySetup = () => {
                 </Box>
 
                 <Controller
-                  name="supportRequired"
+                  name="email"
                   control={control}
-                  rules={{ required: "Support required is required" }}
+                  rules={{
+                    required: "Email is required",
+                    pattern: {
+                      value: /^\S+@\S+$/i,
+                      message: "Invalid email address",
+                    },
+                  }}
                   render={({ field, fieldState }) => (
                     <TextField
                       {...field}
                       fullWidth
-                      select
-                      label="Support Required"
+                      label="Email Address"
                       variant="standard"
-                      // required
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
-                    >
-                      <MenuItem value="" sx={{ fontWeight: 700 }}>
-                        Select Support
-                      </MenuItem>
-                      {supportOptions.map((option) => (
-                        <MenuItem key={option} value={option}>
-                          {option}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  )}
-                />
-
-                {/* <Controller
-                  name="tentativeTravelDate"
-                  control={control}
-                  render={({ field }) => (
-                    <DatePicker
-                      label="Tentative Travel Date"
-                      format="DD-MM-YYYY"
-                      enableAccessibleFieldDOMStructure={false}
-                      value={field.value ? dayjs(field.value) : null}
-                      onChange={(value) =>
-                        field.onChange(
-                          value ? dayjs(value).format("YYYY-MM-DD") : "",
-                        )
-                      }
-                      slotProps={{
-                        field: {
-                          placeholder: "DD-MM-YYYY",
-                        },
-                        textField: {
-                          fullWidth: true,
-                          variant: "standard",
-                          placeholder: "DD-MM-YYYY",
-                          inputProps: { placeholder: "DD-MM-YYYY" },
-                          InputLabelProps: {
-                            sx: floatingLabelSx,
-                            shrink: true,
-                          },
-                        },
-                      }}
                     />
                   )}
-                /> */}
+                />
 
                 <div className="md:col-span-2">
                   <Controller

@@ -23,18 +23,26 @@ const floatingLabelSx = {
 };
 
 const defaultValues = {
+  visaType: "",
   fullName: "",
-  gender: "",
-  dateOfBirth: "",
-  passportValidity: "",
-  currentResidence: "",
-  destination: "",
+  nationality: "",
+  travellingCountry: "",
   email: "",
   contactCode: "",
   contactNumber: "",
-  tentativeTravelDate: "",
   comments: "",
 };
+
+const VISA_TYPE_OPTIONS = [
+  "Explore / Travel",
+  "Work Remotely",
+  "Get a Job Abroad",
+  "Study Abroad",
+  "Start or Expand a Business",
+  "Relocate / Settle Long-Term",
+  "Move with Family",
+  "Not Sure - Need Recommendation",
+];
 
 const VISA_SUPPORT_PROMPT =
   "Tell us about your travel plans and we will help you navigate the visa process with confidence.";
@@ -58,7 +66,7 @@ const AiVisaSupport = () => {
       })),
     [],
   );
-  const selectedResidence = watch("currentResidence");
+  const selectedNationality = watch("nationality");
 
   const handleFormSubmit = async (formValues) => {
     const result = await Swal.fire({
@@ -79,19 +87,19 @@ const AiVisaSupport = () => {
 
     const choice = result.isConfirmed ? "get-back-to-me" : "help-needed";
     const selectedDestination = destinationOptions.find(
-      (option) => option.state === formValues.destination,
+      (option) => option.state === formValues.travellingCountry,
     );
     const destinationState = selectedDestination?.state?.toLowerCase() || "";
     const destinationCountry =
       selectedDestination?.country?.toLowerCase() || "";
 
     navigate(
-      `/visa-support/thank-you?choice=${choice}&state=${encodeURIComponent(destinationState)}&country=${encodeURIComponent(destinationCountry)}&destination=${encodeURIComponent(formValues.destination || "")}`,
+      `/visa-support/thank-you?choice=${choice}&state=${encodeURIComponent(destinationState)}&country=${encodeURIComponent(destinationCountry)}&destination=${encodeURIComponent(formValues.travellingCountry || "")}`,
     );
     reset(defaultValues);
   };
 
-  const handleResidenceChange = (countryName, onChange) => {
+  const handleNationalityChange = (countryName, onChange) => {
     const country = countries.find((item) => item.name === countryName);
     const phonePrefix = country?.phonecode ? `+${country.phonecode}` : "";
 
@@ -179,6 +187,30 @@ const AiVisaSupport = () => {
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
                 <Controller
+                  name="visaType"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="VISA Type"
+                      variant="standard"
+                      select
+                      InputLabelProps={{ sx: floatingLabelSx }}
+                    >
+                      <MenuItem value="" sx={{ fontWeight: 700 }}>
+                        SELECT VISA TYPE
+                      </MenuItem>
+                      {VISA_TYPE_OPTIONS.map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  )}
+                />
+
+                <Controller
                   name="fullName"
                   control={control}
                   render={({ field }) => (
@@ -193,107 +225,7 @@ const AiVisaSupport = () => {
                 />
 
                 <Controller
-                  name="email"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label="Email Address"
-                      variant="standard"
-                      InputLabelProps={{ sx: floatingLabelSx }}
-                    />
-                  )}
-                />
-
-                {/* <Controller
-                  name="gender"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label="Gender"
-                      variant="standard"
-                      select
-                      InputLabelProps={{ sx: floatingLabelSx }}
-                    >
-                      <MenuItem value="">Select Gender</MenuItem>
-                      <MenuItem value="Male">Male</MenuItem>
-                      <MenuItem value="Female">Female</MenuItem>
-                      <MenuItem value="Other">Other</MenuItem>
-                    </TextField>
-                  )}
-                /> */}
-
-                <Controller
-                  name="dateOfBirth"
-                  control={control}
-                  render={({ field }) => (
-                    <DatePicker
-                      label="Date of Birth"
-                      format="DD-MM-YYYY"
-                      enableAccessibleFieldDOMStructure={false}
-                      value={field.value ? dayjs(field.value) : null}
-                      onChange={(value) =>
-                        field.onChange(
-                          value ? dayjs(value).format("YYYY-MM-DD") : "",
-                        )
-                      }
-                      slotProps={{
-                        field: {
-                          placeholder: "DD-MM-YYYY",
-                        },
-                        textField: {
-                          fullWidth: true,
-                          variant: "standard",
-                          placeholder: "DD-MM-YYYY",
-                          inputProps: { placeholder: "DD-MM-YYYY" },
-                          InputLabelProps: {
-                            sx: floatingLabelSx,
-                            shrink: true,
-                          },
-                        },
-                      }}
-                    />
-                  )}
-                />
-
-                <Controller
-                  name="passportValidity"
-                  control={control}
-                  render={({ field }) => (
-                    <DatePicker
-                      label="Passport Validity (Expiry Date)"
-                      format="DD-MM-YYYY"
-                      enableAccessibleFieldDOMStructure={false}
-                      value={field.value ? dayjs(field.value) : null}
-                      onChange={(value) =>
-                        field.onChange(
-                          value ? dayjs(value).format("YYYY-MM-DD") : "",
-                        )
-                      }
-                      slotProps={{
-                        field: {
-                          placeholder: "DD-MM-YYYY",
-                        },
-                        textField: {
-                          fullWidth: true,
-                          variant: "standard",
-                          placeholder: "DD-MM-YYYY",
-                          inputProps: { placeholder: "DD-MM-YYYY" },
-                          InputLabelProps: {
-                            sx: floatingLabelSx,
-                            shrink: true,
-                          },
-                        },
-                      }}
-                    />
-                  )}
-                />
-
-                <Controller
-                  name="currentResidence"
+                  name="nationality"
                   control={control}
                   render={({ field }) => (
                     <TextField
@@ -304,7 +236,7 @@ const AiVisaSupport = () => {
                       select
                       InputLabelProps={{ sx: floatingLabelSx }}
                       onChange={(event) =>
-                        handleResidenceChange(
+                        handleNationalityChange(
                           event.target.value,
                           field.onChange,
                         )
@@ -323,7 +255,7 @@ const AiVisaSupport = () => {
                 />
 
                 <Controller
-                  name="destination"
+                  name="travellingCountry"
                   control={control}
                   render={({ field }) => (
                     <TextField
@@ -370,7 +302,7 @@ const AiVisaSupport = () => {
                     <Typography
                       variant="caption"
                       sx={{
-                        color: selectedResidence ? "#1976d2" : "#6b7280",
+                        color: selectedNationality ? "#1976d2" : "#6b7280",
                         fontWeight: 500,
                         display: "block",
                       }}
@@ -396,7 +328,7 @@ const AiVisaSupport = () => {
                     <Typography
                       variant="caption"
                       sx={{
-                        color: selectedResidence ? "#1976d2" : "#6b7280",
+                        color: selectedNationality ? "#1976d2" : "#6b7280",
                         fontWeight: 500,
                         display: "block",
                       }}
@@ -419,34 +351,15 @@ const AiVisaSupport = () => {
                 </Box>
 
                 <Controller
-                  name="tentativeTravelDate"
+                  name="email"
                   control={control}
                   render={({ field }) => (
-                    <DatePicker
-                      label="Tentative Travel Date"
-                      format="DD-MM-YYYY"
-                      enableAccessibleFieldDOMStructure={false}
-                      value={field.value ? dayjs(field.value) : null}
-                      onChange={(value) =>
-                        field.onChange(
-                          value ? dayjs(value).format("YYYY-MM-DD") : "",
-                        )
-                      }
-                      slotProps={{
-                        field: {
-                          placeholder: "DD-MM-YYYY",
-                        },
-                        textField: {
-                          fullWidth: true,
-                          variant: "standard",
-                          placeholder: "DD-MM-YYYY",
-                          inputProps: { placeholder: "DD-MM-YYYY" },
-                          InputLabelProps: {
-                            sx: floatingLabelSx,
-                            shrink: true,
-                          },
-                        },
-                      }}
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Email Address"
+                      variant="standard"
+                      InputLabelProps={{ sx: floatingLabelSx }}
                     />
                   )}
                 />
