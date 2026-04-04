@@ -282,72 +282,37 @@ const AiVisaSupport = () => {
                   )}
                 />
 
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "flex-end",
-                    borderBottom: "1px solid rgba(0, 0, 0, 0.42)",
-                    transition: "border-bottom-color 0.2s ease",
-                    "&:focus-within": { borderBottomColor: "#1976d2" },
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: "32%",
-                      px: 0.5,
-                      pb: 0.5,
-                      borderRight: "1px solid rgba(0, 0, 0, 0.12)",
-                    }}
-                  >
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        color: selectedNationality ? "#1976d2" : "#6b7280",
-                        fontWeight: 500,
-                        display: "block",
-                      }}
-                    >
-                      Code
-                    </Typography>
-                    <Controller
-                      name="contactCode"
-                      control={control}
-                      render={({ field }) => (
-                        <InputBase
-                          {...field}
-                          fullWidth
-                          readOnly
-                          placeholder="+___"
-                          sx={{ color: "rgba(0, 0, 0, 0.6)", py: 0 }}
-                        />
-                      )}
-                    />
-                  </Box>
-
-                  <Box sx={{ flex: 1, px: 1, pb: 0 }}>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        color: selectedNationality ? "#1976d2" : "#6b7280",
-                        fontWeight: 500,
-                        display: "block",
-                      }}
-                    >
-                      Contact Number
-                    </Typography>
-                    <Controller
-                      name="contactNumber"
-                      control={control}
-                      render={({ field }) => (
-                        <InputBase
-                          {...field}
-                          fullWidth
-                          inputProps={{ inputMode: "tel" }}
-                          sx={{ py: 0 }}
-                        />
-                      )}
-                    />
-                  </Box>
+                <Box sx={{ display: "flex", gap: 2, width: "100%" }}>
+                  <Controller
+                    name="contactCode"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label="Code"
+                        variant="standard"
+                        InputLabelProps={{ sx: floatingLabelSx }}
+                        inputProps={{ readOnly: true }}
+                        sx={{ width: "20%" }}
+                      />
+                    )}
+                  />
+                  <Box sx={{ width: "1px", height: "100%", backgroundColor: "#ccc" }} />
+                  <Controller
+                    name="contactNumber"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        fullWidth
+                        label="Contact Number"
+                        variant="standard"
+                        type="tel"
+                        InputLabelProps={{ sx: floatingLabelSx }}
+                        sx={{ flex: 1 }}
+                      />
+                    )}
+                  />
                 </Box>
 
                 <Controller
