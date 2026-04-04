@@ -2,6 +2,7 @@ import express, { Router } from "express";
 import upload from "../config/multerConfig.js";
 import {
   bulkInsertWorldRankingCsv,
+  getAllWorldRankingStates,
   getDropdownBadges,
   getWorldRankingStates,
   getWorldRankingWeights,
@@ -14,6 +15,7 @@ const router = Router();
 
 router.get("/weights", getWorldRankingWeights);
 router.get("/dropdown-badges", getDropdownBadges);
+router.get("/all", getAllWorldRankingStates);
 router.get("/states", getWorldRankingStates);
 router.post("/search", searchWorldRankingByBadges);
 router.post("/states/upsert", upsertWorldRankingStates);
