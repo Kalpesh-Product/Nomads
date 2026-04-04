@@ -184,9 +184,8 @@ const Header = () => {
                           className="group relative text-md text-black"
                         >
                           <span
-                            className={`relative z-10 mb-8 uppercase ${
-                              isActive ? "text-black" : "group-hover:font-bold"
-                            }`}
+                            className={`relative z-10 mb-8 uppercase ${isActive ? "text-black" : "group-hover:font-bold"
+                              }`}
                           >
                             {item.text}
                           </span>

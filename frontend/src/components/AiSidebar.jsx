@@ -136,6 +136,7 @@ const SidebarSection = ({
   isExpandable = false,
   isOpen = true,
   showTopBorder = true,
+  compact = false,
   onToggle,
   onItemClick,
 }) => {
@@ -143,9 +144,9 @@ const SidebarSection = ({
   const shouldShowItems = collapsed ? true : !isExpandable || isOpen;
 
   return (
-    <div className="px-4 pt-3">
+    <div className={`px-4 ${compact ? "pt-0" : "pt-3"}`}>
       <div
-        className={`${showTopBorder ? "border-t border-black/10" : ""} pt-2`}
+        className={`${showTopBorder && !compact ? "border-t border-black/10" : ""} ${compact ? "pt-0" : "pt-2"}`}
       >
         {collapsed ? null : isExpandable ? (
           <button
@@ -176,9 +177,7 @@ const SidebarSection = ({
                   type="button"
                   onClick={() => onItemClick?.(item)}
                   className={`group relative flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-left transition-all ${
-                    isActive
-                      ? "bg-white text-black shadow-sm" // Abrar Shaikh style
-                      : "text-black/80"
+                    isActive ? "bg-white text-black shadow-sm" : "text-black/80"
                   }`}
                   title={collapsed ? item.label : ""}
                 >
@@ -200,11 +199,6 @@ const SidebarSection = ({
                         </span>
                       )}
                     </>
-                  )}
-
-                  {/* Black bottom line - only for active item */}
-                  {isActive && (
-                    <span className="absolute bottom-0 left-0 right-0 h-[3px] bg-black rounded-t" />
                   )}
                 </button>
               );
@@ -466,21 +460,29 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
             isOpen={isProfileOpen}
             onToggle={() => setIsProfileOpen((prev) => !prev)}
           />
+          <div className="mx-4 border-t border-black/10"></div>
+          {/* Compact sections - minimal spacing */}
           <SidebarSection
             items={[becomeContributorItemWithActivePath]}
             collapsed={isCollapsed}
             onItemClick={handleBecomeContributorClick}
+            compact={true}
           />
+          <div className="mx-4 border-t border-black/10"></div>
           <SidebarSection
             items={becomeHostItem}
             collapsed={isCollapsed}
             onItemClick={handleBecomeHostClick}
+            compact={true}
           />
+          <div className="mx-4 border-t border-black/10"></div>
           <SidebarSection
             items={signOutItem}
             collapsed={isCollapsed}
             onItemClick={handleSignOutClick}
+            compact={true}
           />
+          <div className="mx-4 border-t border-black/10"></div>
         </>
       ) : (
         <>
@@ -488,11 +490,13 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
             items={[becomeContributorItemWithActivePath]}
             collapsed={isCollapsed}
             onItemClick={handleBecomeContributorClick}
+            compact={true}
           />
           <SidebarSection
             items={becomeHostItem}
             collapsed={isCollapsed}
             onItemClick={handleBecomeHostClick}
+            compact={true}
           />
           <div className="border-t border-black/10 mt-4"></div>
           {!isCollapsed && (

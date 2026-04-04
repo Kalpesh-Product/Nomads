@@ -237,6 +237,21 @@ export const getWorldRankingStates = async (req, res, next) => {
   }
 };
 
+export const getAllWorldRankingStates = async (_req, res, next) => {
+  try {
+    const data = await WorldRankingState.find({})
+      .sort({ rank: 1, country: 1, destination: 1 })
+      .lean();
+
+    return res.status(200).json({
+      total: data.length,
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const searchWorldRankingByBadges = async (req, res, next) => {
   try {
     const {
@@ -383,11 +398,9 @@ export const upsertWorldRankingStates = async (req, res, next) => {
 export const bulkInsertWorldRankingCsv = async (req, res, next) => {
   try {
     if (!req.file) {
-      return res
-        .status(400)
-        .json({
-          message: "Please upload a CSV file using field world-ranking-file.",
-        });
+      return res.status(400).json({
+        message: "Please upload a CSV file using field world-ranking-file.",
+      });
     }
 
     const rows = [];

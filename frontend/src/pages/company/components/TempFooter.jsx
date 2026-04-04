@@ -27,9 +27,9 @@ const TempFooter = ({
 
   const contactLinks = !isPending
     ? [
-        { label: phone, href: `tel:${phone}` },
-        { label: email, href: `mailto:${email}` },
-      ]
+      { label: phone, href: `tel:${phone}` },
+      { label: email, href: `mailto:${email}` },
+    ]
     : [];
 
   return (

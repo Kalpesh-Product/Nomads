@@ -102,7 +102,7 @@ const WebsiteUnderMaintenance = () => {
         <div className="w-full  ">
           <p className="text-center pb-2 text-tiny sm:text-tiny xs:text-tiny md:text-content lg:text-content">
             <span className="whitespace-nowrap">
-              &copy; Copyright {new Date().getFullYear()} -{" "}
+              &copy; Copyright {new Date().getFullYear()}-
               {(new Date().getFullYear() + 1).toString().slice(-2)}
             </span>
             <span className="block sm:inline">
