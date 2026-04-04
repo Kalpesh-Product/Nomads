@@ -199,6 +199,13 @@ const SidebarSection = ({
                       )}
                     </>
                   )}
+                  <span
+                    className={`absolute bottom-0 left-0 h-[2px] bg-black rounded-t transition-all duration-300 ease-out
+      ${isActive
+                        ? "w-full"
+                        : "w-0 group-hover:w-full"
+                      }`}
+                  />
                 </button>
               );
             })}
@@ -458,7 +465,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
             isOpen={isProfileOpen}
             onToggle={() => setIsProfileOpen((prev) => !prev)}
           />
-          <div className="mx-4 border-t border-black/10"></div>
+          {/* <div className="mx-4 border-t border-black/10"></div> */}
           {/* Compact sections - minimal spacing */}
           <SidebarSection
             items={[becomeContributorItemWithActivePath]}
