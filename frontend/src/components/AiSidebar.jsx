@@ -176,8 +176,8 @@ const SidebarSection = ({
                   type="button"
                   onClick={() => onItemClick?.(item)}
                   className={`group relative flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-left transition-all ${isActive
-                      ? "bg-white text-black shadow-sm"   // Abrar Shaikh style
-                      : "text-black/80"
+                    ? "bg-white text-black shadow-sm"
+                    : "text-black/80"
                     }`}
                   title={collapsed ? item.label : ""}
                 >

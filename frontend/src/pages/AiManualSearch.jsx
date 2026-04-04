@@ -451,7 +451,7 @@ const AiManualSearch = () => {
                   label="Location"
                   options={locationOptions}
                   selectedValue={
-                    selectedLocation ? locationLabel : "Select Location"
+                    selectedLocation ? locationLabel : "SELECT LOCATION"
                   }
                   isOpen={openDropdown === "location"}
                   onToggle={() => handleDropdownToggle("location")}
