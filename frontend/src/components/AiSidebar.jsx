@@ -166,7 +166,8 @@ const SidebarSection = ({
         )}
 
         {shouldShowItems && (
-          <div className="mt-2 space-y-1">
+          // <div className="mt-2 space-y-1">
+          <div className=" space-y-1">
             {items.map((item) => {
               const Icon = item.icon;
               const isActive = !!item.active;
@@ -507,7 +508,8 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
             onItemClick={handleBecomeHostClick}
             compact={true}
           />
-          <div className="border-t border-black/10 mt-4 mx-4"></div>
+          {/* <div className="border-t border-black/10 mt-4 mx-4"></div> */}
+          <div className="border-t border-black/10 mx-4"></div>
           {!isCollapsed && (
             <div className="mt-auto px-4 pb-4 pt-10">
               <div className="rounded-[28px] p-4 shadow-sm">
