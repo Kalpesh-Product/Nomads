@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   CircularProgress,
+  InputAdornment,
   InputBase,
   MenuItem,
   TextField,
@@ -47,6 +48,8 @@ const OVERALL_ACTIVATION_PROMPT =
 const OVERALL_ACTIVATION_HEADING = "Overall Activation Support";
 const OVERALL_ACTIVATION_TYPING_SEEN_KEY =
   "wono-overall-activation-typing-seen";
+const getFlagIconUrl = (isoCode) =>
+  `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
 
 const AiOverallActivationSupport = () => {
   const [typedMessage, setTypedMessage] = useState("");
@@ -60,6 +63,11 @@ const AiOverallActivationSupport = () => {
   const messagePrefix = isLoggedIn ? "Abrar, " : "";
   const overallActivationPrompt = `${messagePrefix}${OVERALL_ACTIVATION_PROMPT}`;
   const selectedNationality = watch("nationalityOnPassport");
+  const selectedNationalityCountry = useMemo(
+    () =>
+      countries.find((country) => country.name === selectedNationality) || null,
+    [countries, selectedNationality],
+  );
 
   const [isPending, setIsPending] = useState(false);
 
@@ -97,7 +105,7 @@ const AiOverallActivationSupport = () => {
     const hasSeenTypingEffect =
       typeof window !== "undefined" &&
       window.localStorage.getItem(OVERALL_ACTIVATION_TYPING_SEEN_KEY) ===
-      "true";
+        "true";
 
     if (hasSeenTypingEffect) {
       setTypedMessage(overallActivationPrompt);
@@ -111,7 +119,7 @@ const AiOverallActivationSupport = () => {
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => { };
+    let cleanupHeading = () => {};
 
     const typeHeading = () => {
       const headingInterval = setInterval(() => {
@@ -158,7 +166,6 @@ const AiOverallActivationSupport = () => {
         <section className="min-h-[85vh] flex items-center justify-center py-2">
           <div className="w-full max-w-5xl md:px-20 lg:px-20">
             <div className="mx-auto mb-0 flex w-full max-w-4xl flex-col items-center gap-2 px-0">
-
               <p className="min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1rem]">
                 {messagePrefix ? (
                   <>
@@ -179,8 +186,9 @@ const AiOverallActivationSupport = () => {
                 event.preventDefault();
                 handleFormSubmit();
               }}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
-                }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${
+                isFormVisible ? "visible" : "invisible"
+              }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-4">
                 <Controller
@@ -241,6 +249,36 @@ const AiOverallActivationSupport = () => {
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
+                      SelectProps={{
+                        renderValue: (value) => {
+                          const selectedCountry = countries.find(
+                            (country) => country.name === value,
+                          );
+
+                          if (!selectedCountry) {
+                            return value;
+                          }
+
+                          return (
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
+                              }}
+                            >
+                              <img
+                                src={getFlagIconUrl(selectedCountry.isoCode)}
+                                alt={`${selectedCountry.name} flag`}
+                                width={20}
+                                height={15}
+                                loading="lazy"
+                              />
+                              <span>{selectedCountry.name}</span>
+                            </Box>
+                          );
+                        },
+                      }}
                       onChange={(event) =>
                         handleNationalityChange(
                           event.target.value,
@@ -253,7 +291,14 @@ const AiOverallActivationSupport = () => {
                       </MenuItem>
                       {countries.map((country) => (
                         <MenuItem key={country.isoCode} value={country.name}>
-                          {country.name}
+                          <Box
+                            component="img"
+                            src={getFlagIconUrl(country.isoCode)}
+                            alt={`${country.name} flag`}
+                            sx={{ width: 20, height: 15, mr: 1, flexShrink: 0 }}
+                            loading="lazy"
+                          />
+                          <span>{country.name}</span>
                         </MenuItem>
                       ))}
                     </TextField>
@@ -297,6 +342,22 @@ const AiOverallActivationSupport = () => {
                         label="Code"
                         variant="standard"
                         InputLabelProps={{ sx: floatingLabelSx }}
+                        InputProps={{
+                          startAdornment:
+                            selectedNationalityCountry?.isoCode ? (
+                              <InputAdornment position="start">
+                                <Box
+                                  component="img"
+                                  src={getFlagIconUrl(
+                                    selectedNationalityCountry.isoCode,
+                                  )}
+                                  alt={`${selectedNationalityCountry.name} flag`}
+                                  sx={{ width: 20, height: 15, flexShrink: 0 }}
+                                  loading="lazy"
+                                />
+                              </InputAdornment>
+                            ) : null,
+                        }}
                         inputProps={{ readOnly: true }}
                         sx={{ width: "20%" }}
                       />
