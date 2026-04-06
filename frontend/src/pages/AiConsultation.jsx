@@ -62,7 +62,7 @@ const AiConsultation = () => {
     defaultValues,
   });
   const selectedCountry = watch("currentCountry");
-  const messagePrefix = isLoggedIn ? "Abrar " : "";
+  const messagePrefix = isLoggedIn ? "Abrar, " : "";
   const consultationPrompt = `${messagePrefix}${CONSULTATION_PROMPT}`;
 
   const [isPending, setIsPending] = useState(false);

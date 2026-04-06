@@ -57,7 +57,7 @@ const AiOverallActivationSupport = () => {
   const { control, reset, setValue, watch } = useForm({
     defaultValues,
   });
-  const messagePrefix = isLoggedIn ? "Abrar " : "";
+  const messagePrefix = isLoggedIn ? "Abrar, " : "";
   const overallActivationPrompt = `${messagePrefix}${OVERALL_ACTIVATION_PROMPT}`;
   const selectedNationality = watch("nationalityOnPassport");
 

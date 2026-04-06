@@ -63,7 +63,7 @@ const AiNewCompanySetup = () => {
     defaultValues,
   });
   const selectedCountry = watch("currentCompanyCountry");
-  const messagePrefix = isLoggedIn ? "Abrar " : "";
+  const messagePrefix = isLoggedIn ? "Abrar, " : "";
   const newCompanyPrompt = `${messagePrefix}${NEW_COMPANY_PROMPT}`;
 
   const [isPending, setIsPending] = useState(false);

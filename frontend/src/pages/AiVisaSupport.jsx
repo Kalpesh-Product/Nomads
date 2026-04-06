@@ -59,7 +59,7 @@ const AiVisaSupport = () => {
   const { control, handleSubmit, reset, setValue, watch } = useForm({
     defaultValues,
   });
-  const messagePrefix = isLoggedIn ? "Abrar " : "";
+  const messagePrefix = isLoggedIn ? "Abrar, " : "";
   const visaSupportPrompt = `${messagePrefix}${VISA_SUPPORT_PROMPT}`;
   const countries = useMemo(() => Country.getAllCountries(), []);
   const destinationOptions = useMemo(
