@@ -14,6 +14,7 @@ import dayjs from "dayjs";
 import { Country } from "country-state-city";
 import Swal from "sweetalert2";
 import Container from "../components/Container";
+import useNomadLoginState from "../hooks/useNomadLoginState";
 
 const floatingLabelSx = {
   color: "black",
@@ -54,12 +55,15 @@ const CONSULTATION_TYPING_SEEN_KEY = "wono-consultation-typing-seen";
 const AiConsultation = () => {
   const [typedMessage, setTypedMessage] = useState("");
   const [typedPageHeading, setTypedPageHeading] = useState("");
+  const isLoggedIn = useNomadLoginState();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const countries = useMemo(() => Country.getAllCountries(), []);
   const { control, reset, setValue, watch } = useForm({
     defaultValues,
   });
   const selectedCountry = watch("currentCountry");
+  const messagePrefix = isLoggedIn ? "Abrar " : "";
+  const consultationPrompt = `${messagePrefix}${CONSULTATION_PROMPT}`;
 
   const [isPending, setIsPending] = useState(false);
 
@@ -99,7 +103,7 @@ const AiConsultation = () => {
       window.localStorage.getItem(CONSULTATION_TYPING_SEEN_KEY) === "true";
 
     if (hasSeenTypingEffect) {
-      setTypedMessage(CONSULTATION_PROMPT);
+      setTypedMessage(consultationPrompt);
       setTypedPageHeading(CONSULTATION_HEADING);
       setIsFormVisible(true);
       return;
@@ -110,7 +114,7 @@ const AiConsultation = () => {
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => {};
+    let cleanupHeading = () => { };
 
     const typeHeading = () => {
       const headingInterval = setInterval(() => {
@@ -131,9 +135,9 @@ const AiConsultation = () => {
 
     const messageInterval = setInterval(() => {
       messageIndex += 1;
-      setTypedMessage(CONSULTATION_PROMPT.slice(0, messageIndex));
+      setTypedMessage(consultationPrompt.slice(0, messageIndex));
 
-      if (messageIndex >= CONSULTATION_PROMPT.length) {
+      if (messageIndex >= consultationPrompt.length) {
         clearInterval(messageInterval);
         typeHeading();
       }
@@ -143,7 +147,10 @@ const AiConsultation = () => {
       clearInterval(messageInterval);
       cleanupHeading();
     };
-  }, []);
+  }, [consultationPrompt]);
+
+  const namePortion = typedMessage.slice(0, messagePrefix.length);
+  const messagePortion = typedMessage.slice(messagePrefix.length);
 
   return (
     <div className="bg-white text-black font-sans">
@@ -152,7 +159,14 @@ const AiConsultation = () => {
           <div className="w-full max-w-5xl md:px-20 lg:px-20">
             <div className="mx-auto mb-0 flex w-full max-w-4xl flex-col items-center gap-2 ">
               <p className="min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1rem]">
-                {typedMessage}
+                {messagePrefix ? (
+                  <>
+                    <span className="text-blue-600">{namePortion}</span>
+                    {messagePortion}
+                  </>
+                ) : (
+                  typedMessage
+                )}
               </p>
               <h1 className="text-hero min-h-[3rem] text-center font-play">
                 {typedPageHeading}

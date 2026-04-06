@@ -14,6 +14,7 @@ import dayjs from "dayjs";
 import { Country } from "country-state-city";
 import Swal from "sweetalert2";
 import Container from "../components/Container";
+import useNomadLoginState from "../hooks/useNomadLoginState";
 
 const floatingLabelSx = {
   color: "black",
@@ -50,11 +51,14 @@ const OVERALL_ACTIVATION_TYPING_SEEN_KEY =
 const AiOverallActivationSupport = () => {
   const [typedMessage, setTypedMessage] = useState("");
   const [typedPageHeading, setTypedPageHeading] = useState("");
+  const isLoggedIn = useNomadLoginState();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const countries = useMemo(() => Country.getAllCountries(), []);
   const { control, reset, setValue, watch } = useForm({
     defaultValues,
   });
+  const messagePrefix = isLoggedIn ? "Abrar " : "";
+  const overallActivationPrompt = `${messagePrefix}${OVERALL_ACTIVATION_PROMPT}`;
   const selectedNationality = watch("nationalityOnPassport");
 
   const [isPending, setIsPending] = useState(false);
@@ -93,10 +97,10 @@ const AiOverallActivationSupport = () => {
     const hasSeenTypingEffect =
       typeof window !== "undefined" &&
       window.localStorage.getItem(OVERALL_ACTIVATION_TYPING_SEEN_KEY) ===
-        "true";
+      "true";
 
     if (hasSeenTypingEffect) {
-      setTypedMessage(OVERALL_ACTIVATION_PROMPT);
+      setTypedMessage(overallActivationPrompt);
       setTypedPageHeading(OVERALL_ACTIVATION_HEADING);
       setIsFormVisible(true);
       return;
@@ -107,12 +111,12 @@ const AiOverallActivationSupport = () => {
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => {};
+    let cleanupHeading = () => { };
 
     const typeHeading = () => {
       const headingInterval = setInterval(() => {
         headingIndex += 1;
-        setTypedPageHeading(OVERALL_ACTIVATION_HEADING.slice(0, headingIndex));
+        setTypedPageHeading(overallActivationPrompt.slice(0, headingIndex));
 
         if (headingIndex >= OVERALL_ACTIVATION_HEADING.length) {
           clearInterval(headingInterval);
@@ -131,9 +135,9 @@ const AiOverallActivationSupport = () => {
 
     const messageInterval = setInterval(() => {
       messageIndex += 1;
-      setTypedMessage(OVERALL_ACTIVATION_PROMPT.slice(0, messageIndex));
+      setTypedMessage(overallActivationPrompt.slice(0, messageIndex));
 
-      if (messageIndex >= OVERALL_ACTIVATION_PROMPT.length) {
+      if (messageIndex >= overallActivationPrompt.length) {
         clearInterval(messageInterval);
         typeHeading();
       }
@@ -143,7 +147,10 @@ const AiOverallActivationSupport = () => {
       clearInterval(messageInterval);
       cleanupHeading();
     };
-  }, []);
+  }, [overallActivationPrompt]);
+
+  const namePortion = typedMessage.slice(0, messagePrefix.length);
+  const messagePortion = typedMessage.slice(messagePrefix.length);
 
   return (
     <div className="bg-white text-black font-sans">
@@ -151,8 +158,16 @@ const AiOverallActivationSupport = () => {
         <section className="min-h-[85vh] flex items-center justify-center py-2">
           <div className="w-full max-w-5xl md:px-20 lg:px-20">
             <div className="mx-auto mb-0 flex w-full max-w-4xl flex-col items-center gap-2 px-0">
+
               <p className="min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1rem]">
-                {typedMessage}
+                {messagePrefix ? (
+                  <>
+                    <span className="text-blue-600">{namePortion}</span>
+                    {messagePortion}
+                  </>
+                ) : (
+                  typedMessage
+                )}
               </p>
               <h1 className="text-hero min-h-[3rem] text-center font-play">
                 {typedPageHeading}
@@ -164,9 +179,8 @@ const AiOverallActivationSupport = () => {
                 event.preventDefault();
                 handleFormSubmit();
               }}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${
-                isFormVisible ? "visible" : "invisible"
-              }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
+                }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-4">
                 <Controller
