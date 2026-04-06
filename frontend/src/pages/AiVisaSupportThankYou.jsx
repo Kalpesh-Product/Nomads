@@ -42,7 +42,7 @@ const AiVisaSupportThankYou = () => {
       if (index >= message.length) {
         clearInterval(typeInterval);
       }
-    }, 25);
+    }, 7);
 
     return () => clearInterval(typeInterval);
   }, [message]);
