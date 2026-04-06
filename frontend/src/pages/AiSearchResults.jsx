@@ -69,6 +69,44 @@ const goalNarrativeTopHeadingMap = {
 const searchBarBadgeClassName =
   "inline-flex min-h-[40px] min-w-[5rem] items-center rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85";
 
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const highlightSelectedTokens = (text, tokens) => {
+  if (!text) {
+    return "";
+  }
+
+  const validTokens = tokens.filter(Boolean);
+  if (!validTokens.length) {
+    return text;
+  }
+
+  const tokenPattern = validTokens
+    .sort((left, right) => right.length - left.length)
+    .map((token) => escapeRegExp(token))
+    .join("|");
+
+  if (!tokenPattern) {
+    return text;
+  }
+
+  const parts = text.split(new RegExp(`(${tokenPattern})`, "g"));
+
+  return parts.map((part, index) => {
+    const isSelectedToken = validTokens.some((token) => token === part);
+
+    if (!isSelectedToken) {
+      return <React.Fragment key={`${part}-${index}`}>{part}</React.Fragment>;
+    }
+
+    return (
+      <span key={`${part}-${index}`} className="text-primary-blue">
+        {part}
+      </span>
+    );
+  });
+};
+
 const DropdownBadge = ({
   label,
   options,
@@ -649,6 +687,15 @@ const AiSearchResults = () => {
   const shouldShowNarrative =
     hasSelectedFilters && (typedBottomHeading || typedResultsHeading);
 
+  const highlightedResultsHeading = useMemo(
+    () =>
+      highlightSelectedTokens(typedResultsHeading, [
+        selectedContinent,
+        selectedGoalOption,
+      ]),
+    [typedResultsHeading, selectedContinent, selectedGoalOption],
+  );
+
   return (
     <div className="min-h-full bg-white">
       <main className="pb-8">
@@ -736,7 +783,7 @@ const AiSearchResults = () => {
                         {typedBottomHeading}
                       </p>
                       <p className="mt-6 text-sm font-medium leading-relaxed text-black/85 lg:text-[0.9rem] font-play">
-                        {typedResultsHeading}
+                        {highlightedResultsHeading}
                       </p>
                     </>
                   )}
