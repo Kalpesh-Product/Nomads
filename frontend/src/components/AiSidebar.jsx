@@ -144,9 +144,9 @@ const SidebarSection = ({
   const shouldShowItems = collapsed ? true : !isExpandable || isOpen;
 
   return (
-    <div className={`px-4 ${compact ? 'pt-0' : 'pt-3'}`}>
+    <div className={`px-4 ${compact ? "pt-0" : "pt-3"}`}>
       <div
-        className={`${showTopBorder && !compact ? "border-t border-black/10" : ""} ${compact ? 'pt-0' : 'pt-2'}`}
+        className={`${showTopBorder && !compact ? "border-t border-black/10" : ""} ${compact ? "pt-0" : "pt-2"}`}
       >
         {collapsed ? null : isExpandable ? (
           <button
@@ -176,10 +176,9 @@ const SidebarSection = ({
                   key={item.label}
                   type="button"
                   onClick={() => onItemClick?.(item)}
-                  className={`group relative flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-left transition-all ${isActive
-                    ? "bg-white text-black shadow-sm"
-                    : "text-black/80"
-                    }`}
+                  className={`group relative flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-left transition-all hover:bg-white ${
+                    isActive ? "bg-white text-black shadow-sm" : "text-black/80"
+                  }`}
                   title={collapsed ? item.label : ""}
                 >
                   <Icon
@@ -189,7 +188,9 @@ const SidebarSection = ({
 
                   {!collapsed && (
                     <>
-                      <span className={`text-xs font-medium ${isActive ? "font-semibold" : ""}`}>
+                      <span
+                        className={`text-xs font-medium ${isActive ? "font-semibold" : ""}`}
+                      >
                         {item.label}
                       </span>
                       {item.badge && (
@@ -392,12 +393,13 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
   return (
     <aside
-      className={`flex h-full max-h-screen flex-col overflow-y-auto overscroll-contain border-r border-black/10 bg-[#efefef] transition-all duration-300 custom-scrollbar-hide ${isMobileOverlay
-        ? "w-[calc(100%-52px)] max-w-[320px]"
-        : isCollapsed
-          ? "w-[70px]"
-          : "w-[260px]"
-        }`}
+      className={`flex h-full max-h-screen flex-col overflow-y-auto overscroll-contain border-r border-black/10 bg-[#efefef] transition-all duration-300 custom-scrollbar-hide ${
+        isMobileOverlay
+          ? "w-[calc(100%-52px)] max-w-[320px]"
+          : isCollapsed
+            ? "w-[70px]"
+            : "w-[260px]"
+      }`}
       onClick={(event) => {
         if (isMobileOverlay) event.stopPropagation();
       }}
