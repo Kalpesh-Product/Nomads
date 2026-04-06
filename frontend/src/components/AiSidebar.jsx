@@ -191,9 +191,6 @@ const SidebarSection = ({
                       <span
                         className={`text-xs font-medium ${isActive ? "font-semibold" : ""}`}
                       >
-                      <span
-                        className={`text-xs font-medium ${isActive ? "font-semibold" : ""}`}
-                      >
                         {item.label}
                       </span>
                       {item.badge && (
