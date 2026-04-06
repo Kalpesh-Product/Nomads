@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
+  InputAdornment,
   InputBase,
   MenuItem,
   TextField,
@@ -49,6 +50,8 @@ const VISA_SUPPORT_PROMPT =
   "Tell us about your travel plans and we will help you navigate the visa process with confidence.";
 const VISA_SUPPORT_HEADING = "Visa Support";
 const VISA_SUPPORT_TYPING_SEEN_KEY = "wono-visa-support-typing-seen";
+const getFlagIconUrl = (isoCode) =>
+  `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
 
 const AiVisaSupport = () => {
   const [typedMessage, setTypedMessage] = useState("");
@@ -71,6 +74,11 @@ const AiVisaSupport = () => {
     [],
   );
   const selectedNationality = watch("nationality");
+  const selectedNationalityCountry = useMemo(
+    () =>
+      countries.find((country) => country.name === selectedNationality) || null,
+    [countries, selectedNationality],
+  );
 
   const handleFormSubmit = async (formValues) => {
     const result = await Swal.fire({
@@ -135,7 +143,7 @@ const AiVisaSupport = () => {
 
     let messageIndex = 0;
     let visaHeadingIndex = 0;
-    let cleanupHeading = () => { };
+    let cleanupHeading = () => {};
 
     const typeVisaHeading = () => {
       const headingInterval = setInterval(() => {
@@ -196,8 +204,9 @@ const AiVisaSupport = () => {
             <Box
               component="form"
               onSubmit={handleSubmit(handleFormSubmit)}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
-                }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${
+                isFormVisible ? "visible" : "invisible"
+              }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
                 <Controller
@@ -249,6 +258,36 @@ const AiVisaSupport = () => {
                       variant="standard"
                       select
                       InputLabelProps={{ sx: floatingLabelSx }}
+                      SelectProps={{
+                        renderValue: (value) => {
+                          const selectedCountry = countries.find(
+                            (country) => country.name === value,
+                          );
+
+                          if (!selectedCountry) {
+                            return value;
+                          }
+
+                          return (
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
+                              }}
+                            >
+                              <img
+                                src={getFlagIconUrl(selectedCountry.isoCode)}
+                                alt={`${selectedCountry.name} flag`}
+                                width={20}
+                                height={15}
+                                loading="lazy"
+                              />
+                              <span>{selectedCountry.name}</span>
+                            </Box>
+                          );
+                        },
+                      }}
                       onChange={(event) =>
                         handleNationalityChange(
                           event.target.value,
@@ -261,7 +300,14 @@ const AiVisaSupport = () => {
                       </MenuItem>
                       {countries.map((country) => (
                         <MenuItem key={country.isoCode} value={country.name}>
-                          {country.name}
+                          <Box
+                            component="img"
+                            src={getFlagIconUrl(country.isoCode)}
+                            alt={`${country.name} flag`}
+                            sx={{ width: 20, height: 15, mr: 1, flexShrink: 0 }}
+                            loading="lazy"
+                          />
+                          <span>{country.name}</span>
                         </MenuItem>
                       ))}
                     </TextField>
@@ -306,6 +352,22 @@ const AiVisaSupport = () => {
                         label="Code"
                         variant="standard"
                         InputLabelProps={{ sx: floatingLabelSx }}
+                        InputProps={{
+                          startAdornment:
+                            selectedNationalityCountry?.isoCode ? (
+                              <InputAdornment position="start">
+                                <Box
+                                  component="img"
+                                  src={getFlagIconUrl(
+                                    selectedNationalityCountry.isoCode,
+                                  )}
+                                  alt={`${selectedNationalityCountry.name} flag`}
+                                  sx={{ width: 20, height: 15, flexShrink: 0 }}
+                                  loading="lazy"
+                                />
+                              </InputAdornment>
+                            ) : null,
+                        }}
                         inputProps={{ readOnly: true }}
                         sx={{ width: "20%" }}
                       />
