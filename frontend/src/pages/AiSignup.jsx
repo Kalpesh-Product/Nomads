@@ -1,4 +1,10 @@
-import { TextField, IconButton, InputAdornment, MenuItem } from "@mui/material";
+import {
+  Box,
+  TextField,
+  IconButton,
+  InputAdornment,
+  MenuItem,
+} from "@mui/material";
 import { MuiTelInput } from "mui-tel-input";
 import { Controller, useForm } from "react-hook-form";
 import { useEffect, useMemo, useState } from "react";
@@ -11,6 +17,8 @@ const SIGNUP_PROMPT =
   "Create your account to personalize your journey and unlock the full Nomad experience.";
 
 const SIGNUP_HEADING = "Signup";
+const getFlagIconUrl = (isoCode) =>
+  `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
 
 export default function AiSignup() {
   const [showPassword, setShowPassword] = useState(false);
@@ -153,13 +161,46 @@ export default function AiSignup() {
                 label="Current Country Of Residence"
                 fullWidth
                 variant="standard"
+                SelectProps={{
+                  renderValue: (value) => {
+                    const selectedCountry = countries.find(
+                      (country) => country.name === value,
+                    );
+
+                    if (!selectedCountry) {
+                      return value;
+                    }
+
+                    return (
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                      >
+                        <img
+                          src={getFlagIconUrl(selectedCountry.isoCode)}
+                          alt={`${selectedCountry.name} flag`}
+                          width={20}
+                          height={15}
+                          loading="lazy"
+                        />
+                        <span>{selectedCountry.name}</span>
+                      </Box>
+                    );
+                  },
+                }}
                 onChange={(event) =>
                   handleCountryChange(event.target.value, field.onChange)
                 }
               >
                 {countries.map((country) => (
                   <MenuItem key={country.isoCode} value={country.name}>
-                    {country.name}
+                    <Box
+                      component="img"
+                      src={getFlagIconUrl(country.isoCode)}
+                      alt={`${country.name} flag`}
+                      sx={{ width: 20, height: 15, mr: 1, flexShrink: 0 }}
+                      loading="lazy"
+                    />
+                    <span>{country.name}</span>
                   </MenuItem>
                 ))}
               </TextField>
