@@ -32,6 +32,8 @@ const CONTRIBUTOR_PROMPT =
   "We are constantly looking out for individuals who can support our cause to make WoNo the largest Nomad Community & Platform in the world. We know we will not be able to do this alone.";
 const CONTRIBUTOR_HEADING = "Become a Wono Contributor";
 const CONTRIBUTOR_TYPING_SEEN_KEY = "wono-contributor-typing-seen";
+const getFlagIconUrl = (isoCode) =>
+  `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
 const CONTRIBUTION_TYPE_OPTIONS = [
   "Add your Business Listing & Services",
   "Become a Overall Destination Partner",
@@ -54,6 +56,10 @@ const AiBecomeContributor = () => {
     defaultValues,
   });
   const selectedCountry = watch("currentCountry");
+  const selectedCountryData = useMemo(
+    () => countries.find((country) => country.name === selectedCountry) || null,
+    [countries, selectedCountry],
+  );
 
   const [isPending, setIsPending] = useState(false);
 
@@ -104,7 +110,7 @@ const AiBecomeContributor = () => {
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => { };
+    let cleanupHeading = () => {};
 
     const typeHeading = () => {
       const headingInterval = setInterval(() => {
@@ -158,8 +164,9 @@ const AiBecomeContributor = () => {
                 event.preventDefault();
                 handleFormSubmit();
               }}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
-                }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${
+                isFormVisible ? "visible" : "invisible"
+              }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 <Controller
@@ -183,7 +190,6 @@ const AiBecomeContributor = () => {
                           {option}
                         </MenuItem>
                       ))}
-
                     </TextField>
                   )}
                 />
@@ -204,8 +210,6 @@ const AiBecomeContributor = () => {
                   )}
                 />
 
-
-
                 <Controller
                   name="currentCountry"
                   control={control}
@@ -220,6 +224,36 @@ const AiBecomeContributor = () => {
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
+                      SelectProps={{
+                        renderValue: (value) => {
+                          const selectedOption = countries.find(
+                            (country) => country.name === value,
+                          );
+
+                          if (!selectedOption) {
+                            return value;
+                          }
+
+                          return (
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
+                              }}
+                            >
+                              <img
+                                src={getFlagIconUrl(selectedOption.isoCode)}
+                                alt={`${selectedOption.name} flag`}
+                                width={20}
+                                height={15}
+                                loading="lazy"
+                              />
+                              <span>{selectedOption.name}</span>
+                            </Box>
+                          );
+                        },
+                      }}
                       onChange={(event) =>
                         handleCountryChange(event.target.value, field.onChange)
                       }
@@ -229,7 +263,14 @@ const AiBecomeContributor = () => {
                       </MenuItem>
                       {countries.map((country) => (
                         <MenuItem key={country.isoCode} value={country.name}>
-                          {country.name}
+                          <Box
+                            component="img"
+                            src={getFlagIconUrl(country.isoCode)}
+                            alt={`${country.name} flag`}
+                            sx={{ width: 20, height: 15, mr: 1, flexShrink: 0 }}
+                            loading="lazy"
+                          />
+                          <span>{country.name}</span>
                         </MenuItem>
                       ))}
                     </TextField>
@@ -284,13 +325,30 @@ const AiBecomeContributor = () => {
                       name="contactCode"
                       control={control}
                       render={({ field }) => (
-                        <InputBase
-                          {...field}
-                          fullWidth
-                          readOnly
-                          placeholder="+___"
-                          sx={{ color: "rgba(0, 0, 0, 0.6)", py: 0 }}
-                        />
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 0.75,
+                          }}
+                        >
+                          {selectedCountryData?.isoCode && (
+                            <Box
+                              component="img"
+                              src={getFlagIconUrl(selectedCountryData.isoCode)}
+                              alt={`${selectedCountryData.name} flag`}
+                              sx={{ width: 20, height: 15, flexShrink: 0 }}
+                              loading="lazy"
+                            />
+                          )}
+                          <InputBase
+                            {...field}
+                            fullWidth
+                            readOnly
+                            placeholder="+___"
+                            sx={{ color: "rgba(0, 0, 0, 0.6)", py: 0 }}
+                          />
+                        </Box>
                       )}
                     />
                   </Box>

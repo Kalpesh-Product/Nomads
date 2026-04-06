@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   CircularProgress,
+  InputAdornment,
   InputBase,
   MenuItem,
   TextField,
@@ -52,6 +53,8 @@ const NEW_COMPANY_PROMPT =
   "Planning to build your business abroad? Share your details and we will support your setup journey.";
 const NEW_COMPANY_HEADING = "New Company Setup";
 const NEW_COMPANY_TYPING_SEEN_KEY = "wono-new-company-typing-seen";
+const getFlagIconUrl = (isoCode) =>
+  `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
 
 const AiNewCompanySetup = () => {
   const [typedMessage, setTypedMessage] = useState("");
@@ -63,6 +66,10 @@ const AiNewCompanySetup = () => {
     defaultValues,
   });
   const selectedCountry = watch("currentCompanyCountry");
+  const selectedCountryData = useMemo(
+    () => countries.find((country) => country.name === selectedCountry) || null,
+    [countries, selectedCountry],
+  );
   const messagePrefix = isLoggedIn ? "Abrar, " : "";
   const newCompanyPrompt = `${messagePrefix}${NEW_COMPANY_PROMPT}`;
 
@@ -115,7 +122,7 @@ const AiNewCompanySetup = () => {
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => { };
+    let cleanupHeading = () => {};
 
     const typeHeading = () => {
       const headingInterval = setInterval(() => {
@@ -179,8 +186,9 @@ const AiNewCompanySetup = () => {
                 event.preventDefault();
                 handleFormSubmit();
               }}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
-                }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${
+                isFormVisible ? "visible" : "invisible"
+              }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-4">
                 <Controller
@@ -241,6 +249,36 @@ const AiNewCompanySetup = () => {
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
+                      SelectProps={{
+                        renderValue: (value) => {
+                          const selectedOption = countries.find(
+                            (country) => country.name === value,
+                          );
+
+                          if (!selectedOption) {
+                            return value;
+                          }
+
+                          return (
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
+                              }}
+                            >
+                              <img
+                                src={getFlagIconUrl(selectedOption.isoCode)}
+                                alt={`${selectedOption.name} flag`}
+                                width={20}
+                                height={15}
+                                loading="lazy"
+                              />
+                              <span>{selectedOption.name}</span>
+                            </Box>
+                          );
+                        },
+                      }}
                       onChange={(event) =>
                         handleCountryChange(event.target.value, field.onChange)
                       }
@@ -250,7 +288,14 @@ const AiNewCompanySetup = () => {
                       </MenuItem>
                       {countries.map((country) => (
                         <MenuItem key={country.isoCode} value={country.name}>
-                          {country.name}
+                          <Box
+                            component="img"
+                            src={getFlagIconUrl(country.isoCode)}
+                            alt={`${country.name} flag`}
+                            sx={{ width: 20, height: 15, mr: 1, flexShrink: 0 }}
+                            loading="lazy"
+                          />
+                          <span>{country.name}</span>
                         </MenuItem>
                       ))}
                     </TextField>
@@ -294,6 +339,21 @@ const AiNewCompanySetup = () => {
                         label="Code"
                         variant="standard"
                         InputLabelProps={{ sx: floatingLabelSx }}
+                        InputProps={{
+                          startAdornment: selectedCountryData?.isoCode ? (
+                            <InputAdornment position="start">
+                              <Box
+                                component="img"
+                                src={getFlagIconUrl(
+                                  selectedCountryData.isoCode,
+                                )}
+                                alt={`${selectedCountryData.name} flag`}
+                                sx={{ width: 20, height: 15, flexShrink: 0 }}
+                                loading="lazy"
+                              />
+                            </InputAdornment>
+                          ) : null,
+                        }}
                         inputProps={{ readOnly: true }}
                         sx={{ width: "20%" }}
                       />

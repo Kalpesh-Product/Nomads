@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   CircularProgress,
+  InputAdornment,
   InputBase,
   MenuItem,
   TextField,
@@ -51,6 +52,8 @@ const CONSULTATION_PROMPT =
   "Share your consultation requirements and we will connect you with the right expert support.";
 const CONSULTATION_HEADING = "Consultation";
 const CONSULTATION_TYPING_SEEN_KEY = "wono-consultation-typing-seen";
+const getFlagIconUrl = (isoCode) =>
+  `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
 
 const AiConsultation = () => {
   const [typedMessage, setTypedMessage] = useState("");
@@ -62,6 +65,10 @@ const AiConsultation = () => {
     defaultValues,
   });
   const selectedCountry = watch("currentCountry");
+  const selectedCountryData = useMemo(
+    () => countries.find((country) => country.name === selectedCountry) || null,
+    [countries, selectedCountry],
+  );
   const messagePrefix = isLoggedIn ? "Abrar, " : "";
   const consultationPrompt = `${messagePrefix}${CONSULTATION_PROMPT}`;
 
@@ -114,7 +121,7 @@ const AiConsultation = () => {
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => { };
+    let cleanupHeading = () => {};
 
     const typeHeading = () => {
       const headingInterval = setInterval(() => {
@@ -239,6 +246,36 @@ const AiConsultation = () => {
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
+                      SelectProps={{
+                        renderValue: (value) => {
+                          const selectedOption = countries.find(
+                            (country) => country.name === value,
+                          );
+
+                          if (!selectedOption) {
+                            return value;
+                          }
+
+                          return (
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
+                              }}
+                            >
+                              <img
+                                src={getFlagIconUrl(selectedOption.isoCode)}
+                                alt={`${selectedOption.name} flag`}
+                                width={20}
+                                height={15}
+                                loading="lazy"
+                              />
+                              <span>{selectedOption.name}</span>
+                            </Box>
+                          );
+                        },
+                      }}
                       onChange={(event) =>
                         handleCountryChange(event.target.value, field.onChange)
                       }
@@ -248,7 +285,14 @@ const AiConsultation = () => {
                       </MenuItem>
                       {countries.map((country) => (
                         <MenuItem key={country.isoCode} value={country.name}>
-                          {country.name}
+                          <Box
+                            component="img"
+                            src={getFlagIconUrl(country.isoCode)}
+                            alt={`${country.name} flag`}
+                            sx={{ width: 20, height: 15, mr: 1, flexShrink: 0 }}
+                            loading="lazy"
+                          />
+                          <span>{country.name}</span>
                         </MenuItem>
                       ))}
                     </TextField>
@@ -292,6 +336,21 @@ const AiConsultation = () => {
                         label="Code"
                         variant="standard"
                         InputLabelProps={{ sx: floatingLabelSx }}
+                        InputProps={{
+                          startAdornment: selectedCountryData?.isoCode ? (
+                            <InputAdornment position="start">
+                              <Box
+                                component="img"
+                                src={getFlagIconUrl(
+                                  selectedCountryData.isoCode,
+                                )}
+                                alt={`${selectedCountryData.name} flag`}
+                                sx={{ width: 20, height: 15, flexShrink: 0 }}
+                                loading="lazy"
+                              />
+                            </InputAdornment>
+                          ) : null,
+                        }}
                         inputProps={{ readOnly: true }}
                         sx={{ width: "20%" }}
                       />
