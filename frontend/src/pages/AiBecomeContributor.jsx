@@ -32,6 +32,20 @@ const CONTRIBUTOR_PROMPT =
   "We are constantly looking out for individuals who can support our cause to make WoNo the largest Nomad Community & Platform in the world. We know we will not be able to do this alone.";
 const CONTRIBUTOR_HEADING = "Become a Wono Contributor";
 const CONTRIBUTOR_TYPING_SEEN_KEY = "wono-contributor-typing-seen";
+const getFlagIconUrl = (isoCode) =>
+  `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
+const CONTRIBUTION_TYPE_OPTIONS = [
+  "Add your Business Listing & Services",
+  "Become a Overall Destination Partner",
+  "Become a Local Experience Partner",
+  "Become a Visa & Immigration Partner",
+  "Become a Tax & Financial Advisory Partner",
+  "Become a Company Setup Services Partner",
+  "Become a Nomad Blog & News Writer",
+  "Become a Content Contributor",
+  "Become a Remote Jobs Posting Partner",
+  "Not Sure - Lets Connect & Explore",
+];
 
 const AiBecomeContributor = () => {
   const [typedMessage, setTypedMessage] = useState("");
@@ -42,6 +56,10 @@ const AiBecomeContributor = () => {
     defaultValues,
   });
   const selectedCountry = watch("currentCountry");
+  const selectedCountryData = useMemo(
+    () => countries.find((country) => country.name === selectedCountry) || null,
+    [countries, selectedCountry],
+  );
 
   const [isPending, setIsPending] = useState(false);
 
@@ -92,7 +110,7 @@ const AiBecomeContributor = () => {
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => { };
+    let cleanupHeading = () => {};
 
     const typeHeading = () => {
       const headingInterval = setInterval(() => {
@@ -106,7 +124,7 @@ const AiBecomeContributor = () => {
             window.localStorage.setItem(CONTRIBUTOR_TYPING_SEEN_KEY, "true");
           }
         }
-      }, 35);
+      }, 7);
 
       cleanupHeading = () => clearInterval(headingInterval);
     };
@@ -119,7 +137,7 @@ const AiBecomeContributor = () => {
         clearInterval(messageInterval);
         typeHeading();
       }
-    }, 2);
+    }, 1);
 
     return () => {
       clearInterval(messageInterval);
@@ -146,10 +164,35 @@ const AiBecomeContributor = () => {
                 event.preventDefault();
                 handleFormSubmit();
               }}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
-                }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${
+                isFormVisible ? "visible" : "invisible"
+              }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                <Controller
+                  name="selectcontribution"
+                  control={control}
+                  rules={{ required: "Contribution Type is required" }}
+                  render={({ field, fieldState }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      select
+                      label="Support Required"
+                      variant="standard"
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                      InputLabelProps={{ sx: floatingLabelSx }}
+                      onChange={(event) => field.onChange(event.target.value)}
+                    >
+                      {CONTRIBUTION_TYPE_OPTIONS.map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  )}
+                />
                 <Controller
                   name="fullName"
                   control={control}
@@ -159,29 +202,6 @@ const AiBecomeContributor = () => {
                       {...field}
                       fullWidth
                       label="Full Name"
-                      variant="standard"
-                      error={!!fieldState.error}
-                      helperText={fieldState.error?.message}
-                      InputLabelProps={{ sx: floatingLabelSx }}
-                    />
-                  )}
-                />
-
-                <Controller
-                  name="email"
-                  control={control}
-                  rules={{
-                    required: "Email is required",
-                    pattern: {
-                      value: /^\S+@\S+$/i,
-                      message: "Invalid email address",
-                    },
-                  }}
-                  render={({ field, fieldState }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label="Email"
                       variant="standard"
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
@@ -204,6 +224,36 @@ const AiBecomeContributor = () => {
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
+                      SelectProps={{
+                        renderValue: (value) => {
+                          const selectedOption = countries.find(
+                            (country) => country.name === value,
+                          );
+
+                          if (!selectedOption) {
+                            return value;
+                          }
+
+                          return (
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
+                              }}
+                            >
+                              <img
+                                src={getFlagIconUrl(selectedOption.isoCode)}
+                                alt={`${selectedOption.name} flag`}
+                                width={20}
+                                height={15}
+                                loading="lazy"
+                              />
+                              <span>{selectedOption.name}</span>
+                            </Box>
+                          );
+                        },
+                      }}
                       onChange={(event) =>
                         handleCountryChange(event.target.value, field.onChange)
                       }
@@ -213,10 +263,34 @@ const AiBecomeContributor = () => {
                       </MenuItem>
                       {countries.map((country) => (
                         <MenuItem key={country.isoCode} value={country.name}>
-                          {country.name}
+                          <Box
+                            component="img"
+                            src={getFlagIconUrl(country.isoCode)}
+                            alt={`${country.name} flag`}
+                            sx={{ width: 20, height: 15, mr: 1, flexShrink: 0 }}
+                            loading="lazy"
+                          />
+                          <span>{country.name}</span>
                         </MenuItem>
                       ))}
                     </TextField>
+                  )}
+                />
+
+                <Controller
+                  name="linkedinProfile"
+                  control={control}
+                  rules={{ required: "Linkedin profile is required" }}
+                  render={({ field, fieldState }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Linkedin Profile"
+                      variant="standard"
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                      InputLabelProps={{ sx: floatingLabelSx }}
+                    />
                   )}
                 />
 
@@ -251,13 +325,30 @@ const AiBecomeContributor = () => {
                       name="contactCode"
                       control={control}
                       render={({ field }) => (
-                        <InputBase
-                          {...field}
-                          fullWidth
-                          readOnly
-                          placeholder="+___"
-                          sx={{ color: "rgba(0, 0, 0, 0.6)", py: 0 }}
-                        />
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 0.75,
+                          }}
+                        >
+                          {selectedCountryData?.isoCode && (
+                            <Box
+                              component="img"
+                              src={getFlagIconUrl(selectedCountryData.isoCode)}
+                              alt={`${selectedCountryData.name} flag`}
+                              sx={{ width: 20, height: 15, flexShrink: 0 }}
+                              loading="lazy"
+                            />
+                          )}
+                          <InputBase
+                            {...field}
+                            fullWidth
+                            readOnly
+                            placeholder="+___"
+                            sx={{ color: "rgba(0, 0, 0, 0.6)", py: 0 }}
+                          />
+                        </Box>
                       )}
                     />
                   </Box>
@@ -288,31 +379,22 @@ const AiBecomeContributor = () => {
                     />
                   </Box>
                 </Box>
+
                 <Controller
-                  name="linkedinProfile"
+                  name="email"
                   control={control}
-                  rules={{ required: "Linkedin profile is required" }}
+                  rules={{
+                    required: "Email is required",
+                    pattern: {
+                      value: /^\S+@\S+$/i,
+                      message: "Invalid email address",
+                    },
+                  }}
                   render={({ field, fieldState }) => (
                     <TextField
                       {...field}
                       fullWidth
-                      label="Linkedin Profile"
-                      variant="standard"
-                      error={!!fieldState.error}
-                      helperText={fieldState.error?.message}
-                      InputLabelProps={{ sx: floatingLabelSx }}
-                    />
-                  )}
-                />
-                <Controller
-                  name="website"
-                  control={control}
-                  rules={{ required: "Website is required" }}
-                  render={({ field, fieldState }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label="Website/Insta/FB etc"
+                      label="Email"
                       variant="standard"
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}

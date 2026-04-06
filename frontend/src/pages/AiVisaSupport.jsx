@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
+  InputAdornment,
   InputBase,
   MenuItem,
   TextField,
@@ -15,6 +16,7 @@ import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import Container from "../components/Container";
 import { aiDestinationCards } from "../constants/aiDestinationCards";
+import useNomadLoginState from "../hooks/useNomadLoginState";
 
 const floatingLabelSx = {
   color: "black",
@@ -48,15 +50,20 @@ const VISA_SUPPORT_PROMPT =
   "Tell us about your travel plans and we will help you navigate the visa process with confidence.";
 const VISA_SUPPORT_HEADING = "Visa Support";
 const VISA_SUPPORT_TYPING_SEEN_KEY = "wono-visa-support-typing-seen";
+const getFlagIconUrl = (isoCode) =>
+  `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
 
 const AiVisaSupport = () => {
   const [typedMessage, setTypedMessage] = useState("");
   const [typedVisaHeading, setTypedVisaHeading] = useState("");
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const isLoggedIn = useNomadLoginState();
   const navigate = useNavigate();
   const { control, handleSubmit, reset, setValue, watch } = useForm({
     defaultValues,
   });
+  const messagePrefix = isLoggedIn ? "Abrar, " : "";
+  const visaSupportPrompt = `${messagePrefix}${VISA_SUPPORT_PROMPT}`;
   const countries = useMemo(() => Country.getAllCountries(), []);
   const destinationOptions = useMemo(
     () =>
@@ -67,6 +74,11 @@ const AiVisaSupport = () => {
     [],
   );
   const selectedNationality = watch("nationality");
+  const selectedNationalityCountry = useMemo(
+    () =>
+      countries.find((country) => country.name === selectedNationality) || null,
+    [countries, selectedNationality],
+  );
 
   const handleFormSubmit = async (formValues) => {
     const result = await Swal.fire({
@@ -120,7 +132,7 @@ const AiVisaSupport = () => {
       window.localStorage.getItem(VISA_SUPPORT_TYPING_SEEN_KEY) === "true";
 
     if (hasSeenTypingEffect) {
-      setTypedMessage(VISA_SUPPORT_PROMPT);
+      setTypedMessage(visaSupportPrompt);
       setTypedVisaHeading(VISA_SUPPORT_HEADING);
       setIsFormVisible(true);
       return;
@@ -131,7 +143,7 @@ const AiVisaSupport = () => {
 
     let messageIndex = 0;
     let visaHeadingIndex = 0;
-    let cleanupHeading = () => { };
+    let cleanupHeading = () => {};
 
     const typeVisaHeading = () => {
       const headingInterval = setInterval(() => {
@@ -145,34 +157,44 @@ const AiVisaSupport = () => {
             window.localStorage.setItem(VISA_SUPPORT_TYPING_SEEN_KEY, "true");
           }
         }
-      }, 35);
+      }, 1);
 
       cleanupHeading = () => clearInterval(headingInterval);
     };
 
     const messageInterval = setInterval(() => {
       messageIndex += 1;
-      setTypedMessage(VISA_SUPPORT_PROMPT.slice(0, messageIndex));
+      setTypedMessage(visaSupportPrompt.slice(0, messageIndex));
 
-      if (messageIndex >= VISA_SUPPORT_PROMPT.length) {
+      if (messageIndex >= visaSupportPrompt.length) {
         clearInterval(messageInterval);
         typeVisaHeading();
       }
-    }, 2);
+    }, 1);
 
     return () => {
       clearInterval(messageInterval);
       cleanupHeading();
     };
-  }, []);
+  }, [visaSupportPrompt]);
+
+  const namePortion = typedMessage.slice(0, messagePrefix.length);
+  const messagePortion = typedMessage.slice(messagePrefix.length);
 
   return (
     <div className="bg-white text-black font-sans">
       <Container padding={false}>
         <section className="min-h-[85vh] flex items-center justify-center py-2">
-          <div className="w-full max-w-5xl md:px-20 lg:px-20 flex flex-col gap-2">
+          <div className="w-full max-w-5xl md:px-20 lg:px-20 flex flex-col gap-1">
             <p className="mx-auto min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1rem]">
-              {typedMessage}
+              {messagePrefix ? (
+                <>
+                  <span className="text-blue-600">{namePortion}</span>
+                  {messagePortion}
+                </>
+              ) : (
+                typedMessage
+              )}
             </p>
 
             <h1 className="text-hero min-h-[3rem] text-center font-play">
@@ -182,8 +204,9 @@ const AiVisaSupport = () => {
             <Box
               component="form"
               onSubmit={handleSubmit(handleFormSubmit)}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
-                }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${
+                isFormVisible ? "visible" : "invisible"
+              }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
                 <Controller
@@ -235,6 +258,36 @@ const AiVisaSupport = () => {
                       variant="standard"
                       select
                       InputLabelProps={{ sx: floatingLabelSx }}
+                      SelectProps={{
+                        renderValue: (value) => {
+                          const selectedCountry = countries.find(
+                            (country) => country.name === value,
+                          );
+
+                          if (!selectedCountry) {
+                            return value;
+                          }
+
+                          return (
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
+                              }}
+                            >
+                              <img
+                                src={getFlagIconUrl(selectedCountry.isoCode)}
+                                alt={`${selectedCountry.name} flag`}
+                                width={20}
+                                height={15}
+                                loading="lazy"
+                              />
+                              <span>{selectedCountry.name}</span>
+                            </Box>
+                          );
+                        },
+                      }}
                       onChange={(event) =>
                         handleNationalityChange(
                           event.target.value,
@@ -247,7 +300,14 @@ const AiVisaSupport = () => {
                       </MenuItem>
                       {countries.map((country) => (
                         <MenuItem key={country.isoCode} value={country.name}>
-                          {country.name}
+                          <Box
+                            component="img"
+                            src={getFlagIconUrl(country.isoCode)}
+                            alt={`${country.name} flag`}
+                            sx={{ width: 20, height: 15, mr: 1, flexShrink: 0 }}
+                            loading="lazy"
+                          />
+                          <span>{country.name}</span>
                         </MenuItem>
                       ))}
                     </TextField>
@@ -292,12 +352,34 @@ const AiVisaSupport = () => {
                         label="Code"
                         variant="standard"
                         InputLabelProps={{ sx: floatingLabelSx }}
+                        InputProps={{
+                          startAdornment:
+                            selectedNationalityCountry?.isoCode ? (
+                              <InputAdornment position="start">
+                                <Box
+                                  component="img"
+                                  src={getFlagIconUrl(
+                                    selectedNationalityCountry.isoCode,
+                                  )}
+                                  alt={`${selectedNationalityCountry.name} flag`}
+                                  sx={{ width: 20, height: 15, flexShrink: 0 }}
+                                  loading="lazy"
+                                />
+                              </InputAdornment>
+                            ) : null,
+                        }}
                         inputProps={{ readOnly: true }}
                         sx={{ width: "20%" }}
                       />
                     )}
                   />
-                  <Box sx={{ width: "1px", height: "100%", backgroundColor: "#ccc" }} />
+                  <Box
+                    sx={{
+                      width: "1px",
+                      height: "100%",
+                      backgroundColor: "#ccc",
+                    }}
+                  />
                   <Controller
                     name="contactNumber"
                     control={control}

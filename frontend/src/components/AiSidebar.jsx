@@ -176,7 +176,7 @@ const SidebarSection = ({
                   key={item.label}
                   type="button"
                   onClick={() => onItemClick?.(item)}
-                  className={`group relative flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-left transition-all ${
+                  className={`group relative flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-left transition-all hover:bg-white ${
                     isActive ? "bg-white text-black shadow-sm" : "text-black/80"
                   }`}
                   title={collapsed ? item.label : ""}
@@ -191,6 +191,9 @@ const SidebarSection = ({
                       <span
                         className={`text-xs font-medium ${isActive ? "font-semibold" : ""}`}
                       >
+                      <span
+                        className={`text-xs font-medium ${isActive ? "font-semibold" : ""}`}
+                      >
                         {item.label}
                       </span>
                       {item.badge && (
@@ -200,13 +203,13 @@ const SidebarSection = ({
                       )}
                     </>
                   )}
-                  <span
-                    className={`absolute bottom-0 left-0 h-[2px] bg-black rounded-t transition-all duration-300 ease-out
+                  {/* <span
+                    className={`absolute bottom-0 left-0 h-[0.5px] bg-black rounded-t transition-all duration-300 ease-out
       ${isActive
                         ? "w-full"
                         : "w-0 group-hover:w-full"
                       }`}
-                  />
+                  /> */}
                 </button>
               );
             })}
@@ -467,7 +470,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
             isOpen={isProfileOpen}
             onToggle={() => setIsProfileOpen((prev) => !prev)}
           />
-          {/* <div className="mx-4 border-t border-black/10"></div> */}
+          <div className="mx-4 mt-3 border-t border-black/10"></div>
           {/* Compact sections - minimal spacing */}
           <SidebarSection
             items={[becomeContributorItemWithActivePath]}
@@ -493,19 +496,21 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         </>
       ) : (
         <>
+          <div className="mx-4 mt-3 border-t border-black/10"></div>
           <SidebarSection
             items={[becomeContributorItemWithActivePath]}
             collapsed={isCollapsed}
             onItemClick={handleBecomeContributorClick}
             compact={true}
           />
+          <div className="mx-4 border-t border-black/10"></div>
           <SidebarSection
             items={becomeHostItem}
             collapsed={isCollapsed}
             onItemClick={handleBecomeHostClick}
             compact={true}
           />
-          <div className="border-t border-black/10 mt-4"></div>
+          <div className="border-t border-black/10 mt-4 mx-4"></div>
           {!isCollapsed && (
             <div className="mt-auto px-4 pb-4 pt-10">
               <div className="rounded-[28px] p-4 shadow-sm">

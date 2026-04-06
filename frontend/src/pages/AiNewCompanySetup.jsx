@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   CircularProgress,
+  InputAdornment,
   InputBase,
   MenuItem,
   TextField,
@@ -15,6 +16,7 @@ import { Country } from "country-state-city";
 import Swal from "sweetalert2";
 import { FaCheck } from "react-icons/fa";
 import Container from "../components/Container";
+import useNomadLoginState from "../hooks/useNomadLoginState";
 
 const floatingLabelSx = {
   color: "black",
@@ -51,16 +53,25 @@ const NEW_COMPANY_PROMPT =
   "Planning to build your business abroad? Share your details and we will support your setup journey.";
 const NEW_COMPANY_HEADING = "New Company Setup";
 const NEW_COMPANY_TYPING_SEEN_KEY = "wono-new-company-typing-seen";
+const getFlagIconUrl = (isoCode) =>
+  `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
 
 const AiNewCompanySetup = () => {
   const [typedMessage, setTypedMessage] = useState("");
   const [typedPageHeading, setTypedPageHeading] = useState("");
+  const isLoggedIn = useNomadLoginState();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const countries = useMemo(() => Country.getAllCountries(), []);
   const { control, reset, setValue, watch } = useForm({
     defaultValues,
   });
   const selectedCountry = watch("currentCompanyCountry");
+  const selectedCountryData = useMemo(
+    () => countries.find((country) => country.name === selectedCountry) || null,
+    [countries, selectedCountry],
+  );
+  const messagePrefix = isLoggedIn ? "Abrar, " : "";
+  const newCompanyPrompt = `${messagePrefix}${NEW_COMPANY_PROMPT}`;
 
   const [isPending, setIsPending] = useState(false);
 
@@ -100,7 +111,7 @@ const AiNewCompanySetup = () => {
       window.localStorage.getItem(NEW_COMPANY_TYPING_SEEN_KEY) === "true";
 
     if (hasSeenTypingEffect) {
-      setTypedMessage(NEW_COMPANY_PROMPT);
+      setTypedMessage(newCompanyPrompt);
       setTypedPageHeading(NEW_COMPANY_HEADING);
       setIsFormVisible(true);
       return;
@@ -111,41 +122,43 @@ const AiNewCompanySetup = () => {
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => { };
+    let cleanupHeading = () => {};
 
     const typeHeading = () => {
       const headingInterval = setInterval(() => {
         headingIndex += 1;
-        setTypedPageHeading(NEW_COMPANY_HEADING.slice(0, headingIndex));
+        setTypedPageHeading(newCompanyPrompt.slice(0, headingIndex));
 
-        if (headingIndex >= NEW_COMPANY_HEADING.length) {
+        if (headingIndex >= newCompanyPrompt.length) {
           clearInterval(headingInterval);
           setIsFormVisible(true);
           if (typeof window !== "undefined") {
             window.localStorage.setItem(NEW_COMPANY_TYPING_SEEN_KEY, "true");
           }
         }
-      }, 35);
+      }, 1);
 
       cleanupHeading = () => clearInterval(headingInterval);
     };
 
-
     const messageInterval = setInterval(() => {
       messageIndex += 1;
-      setTypedMessage(NEW_COMPANY_PROMPT.slice(0, messageIndex));
+      setTypedMessage(newCompanyPrompt.slice(0, messageIndex));
 
-      if (messageIndex >= NEW_COMPANY_PROMPT.length) {
+      if (messageIndex >= newCompanyPrompt.length) {
         clearInterval(messageInterval);
         typeHeading();
       }
-    }, 2);
+    }, 1);
 
     return () => {
       clearInterval(messageInterval);
       cleanupHeading();
     };
-  }, []);
+  }, [newCompanyPrompt]);
+
+  const namePortion = typedMessage.slice(0, messagePrefix.length);
+  const messagePortion = typedMessage.slice(messagePrefix.length);
 
   return (
     <div className="bg-white text-black font-sans">
@@ -154,7 +167,14 @@ const AiNewCompanySetup = () => {
           <div className="w-full max-w-5xl md:px-20 lg:px-20">
             <div className="mx-auto mb-0 flex w-full max-w-4xl flex-col items-center gap-2 px-0">
               <p className="min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1rem]">
-                {typedMessage}
+                {messagePrefix ? (
+                  <>
+                    <span className="text-blue-600">{namePortion}</span>
+                    {messagePortion}
+                  </>
+                ) : (
+                  typedMessage
+                )}
               </p>
               <h1 className="text-hero min-h-[3rem] text-center font-play">
                 {typedPageHeading}
@@ -166,8 +186,9 @@ const AiNewCompanySetup = () => {
                 event.preventDefault();
                 handleFormSubmit();
               }}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
-                }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${
+                isFormVisible ? "visible" : "invisible"
+              }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-4">
                 <Controller
@@ -228,11 +249,38 @@ const AiNewCompanySetup = () => {
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
+                      SelectProps={{
+                        renderValue: (value) => {
+                          const selectedOption = countries.find(
+                            (country) => country.name === value,
+                          );
+
+                          if (!selectedOption) {
+                            return value;
+                          }
+
+                          return (
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
+                              }}
+                            >
+                              <img
+                                src={getFlagIconUrl(selectedOption.isoCode)}
+                                alt={`${selectedOption.name} flag`}
+                                width={20}
+                                height={15}
+                                loading="lazy"
+                              />
+                              <span>{selectedOption.name}</span>
+                            </Box>
+                          );
+                        },
+                      }}
                       onChange={(event) =>
-                        handleCountryChange(
-                          event.target.value,
-                          field.onChange,
-                        )
+                        handleCountryChange(event.target.value, field.onChange)
                       }
                     >
                       <MenuItem value="" sx={{ fontWeight: 700 }}>
@@ -240,7 +288,14 @@ const AiNewCompanySetup = () => {
                       </MenuItem>
                       {countries.map((country) => (
                         <MenuItem key={country.isoCode} value={country.name}>
-                          {country.name}
+                          <Box
+                            component="img"
+                            src={getFlagIconUrl(country.isoCode)}
+                            alt={`${country.name} flag`}
+                            sx={{ width: 20, height: 15, mr: 1, flexShrink: 0 }}
+                            loading="lazy"
+                          />
+                          <span>{country.name}</span>
                         </MenuItem>
                       ))}
                     </TextField>
@@ -284,12 +339,33 @@ const AiNewCompanySetup = () => {
                         label="Code"
                         variant="standard"
                         InputLabelProps={{ sx: floatingLabelSx }}
+                        InputProps={{
+                          startAdornment: selectedCountryData?.isoCode ? (
+                            <InputAdornment position="start">
+                              <Box
+                                component="img"
+                                src={getFlagIconUrl(
+                                  selectedCountryData.isoCode,
+                                )}
+                                alt={`${selectedCountryData.name} flag`}
+                                sx={{ width: 20, height: 15, flexShrink: 0 }}
+                                loading="lazy"
+                              />
+                            </InputAdornment>
+                          ) : null,
+                        }}
                         inputProps={{ readOnly: true }}
                         sx={{ width: "20%" }}
                       />
                     )}
                   />
-                  <Box sx={{ width: "1px", height: "100%", backgroundColor: "#ccc" }} />
+                  <Box
+                    sx={{
+                      width: "1px",
+                      height: "100%",
+                      backgroundColor: "#ccc",
+                    }}
+                  />
                   <Controller
                     name="contactNumber"
                     control={control}

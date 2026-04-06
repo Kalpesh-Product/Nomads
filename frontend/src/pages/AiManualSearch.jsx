@@ -22,7 +22,7 @@ const countOptions = [
   { label: "25+", value: "25+" },
 ];
 
-const TYPING_INTERVAL_MS = 8;
+const TYPING_INTERVAL_MS = 7;
 
 const DropdownBadge = ({
   label,
@@ -40,10 +40,10 @@ const DropdownBadge = ({
         onClick={onToggle}
         disabled={disabled}
         className={`flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${disabled
-            ? "cursor-not-allowed border-black/10 bg-black/[0.03] text-black/35"
-            : isOpen
-              ? "border-sky-500 bg-sky-500 text-white"
-              : "border-black/20 bg-white text-black/85 hover:border-sky-500"
+          ? "cursor-not-allowed border-black/10 bg-black/[0.03] text-black/35"
+          : isOpen
+            ? "border-sky-500 bg-sky-500 text-white"
+            : "border-black/20 bg-white text-black/85 hover:border-sky-500"
           }`}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
@@ -71,8 +71,8 @@ const DropdownBadge = ({
                     type="button"
                     onClick={() => onSelect(option.value)}
                     className={`flex w-full items-center rounded-xl px-3 py-2 text-left text-sm transition-colors ${isSelected
-                        ? "bg-sky-50 font-medium text-sky-600"
-                        : "text-black/80 hover:bg-slate-50"
+                      ? "bg-sky-50 font-medium text-sky-600"
+                      : "text-black/80 hover:bg-slate-50"
                       }`}
                     role="option"
                     aria-selected={isSelected}
@@ -375,7 +375,7 @@ const AiManualSearch = () => {
               </p>
             </div>
 
-            <div className="mt-4 flex max-w-4xl items-center rounded-[30px] border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] lg:ml-[6.25rem] lg:mr-36">
+            <div className="mt-4 hidden max-w-full items-center rounded-[30px] border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] sm:flex lg:ml-[6.25rem] lg:mr-36">
               <div className="flex flex-wrap items-center gap-2">
                 {searchBarBadges.map((badgeLabel, index) => (
                   <div
@@ -399,8 +399,8 @@ const AiManualSearch = () => {
                   type="button"
                   onClick={handleSearch}
                   className={`inline-flex items-center justify-center rounded-full p-1 transition-colors ${hasAllSelections
-                      ? "text-black/90 hover:text-sky-600"
-                      : "cursor-not-allowed text-black/35"
+                    ? "text-black/90 hover:text-sky-600"
+                    : "cursor-not-allowed text-black/35"
                     }`}
                   aria-label="Search listings"
                   disabled={!hasAllSelections}
@@ -451,7 +451,7 @@ const AiManualSearch = () => {
                   label="Location"
                   options={locationOptions}
                   selectedValue={
-                    selectedLocation ? locationLabel : "SELECT LOCATION"
+                    selectedLocation ? locationLabel : "Select Location"
                   }
                   isOpen={openDropdown === "location"}
                   onToggle={() => handleDropdownToggle("location")}

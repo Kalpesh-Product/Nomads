@@ -66,9 +66,9 @@ export default function AiLogin() {
     let descriptionIndex = 0;
     let messageIndex = 0;
     let loginHeadingIndex = 0;
-    let cleanupDescription = () => { };
-    let cleanupMessage = () => { };
-    let cleanupLoginHeading = () => { };
+    let cleanupDescription = () => {};
+    let cleanupMessage = () => {};
+    let cleanupLoginHeading = () => {};
 
     const typeLoginHeading = () => {
       const loginHeadingInterval = setInterval(() => {
@@ -79,7 +79,7 @@ export default function AiLogin() {
           clearInterval(loginHeadingInterval);
           setIsFormVisible(true);
         }
-      }, 35);
+      }, 7);
 
       cleanupLoginHeading = () => clearInterval(loginHeadingInterval);
     };
@@ -93,7 +93,7 @@ export default function AiLogin() {
           clearInterval(messageInterval);
           typeLoginHeading();
         }
-      }, 25);
+      }, 7);
 
       cleanupMessage = () => clearInterval(messageInterval);
     };
@@ -116,7 +116,7 @@ export default function AiLogin() {
         clearInterval(descriptionInterval);
         typeLoginPrompt();
       }
-    }, 25);
+    }, 7);
 
     cleanupDescription = () => clearInterval(descriptionInterval);
 
@@ -169,16 +169,16 @@ export default function AiLogin() {
       <div className="flex min-h-[55vh] flex-col items-center justify-center gap-10 rounded-lg border-gray-300 px-6 py-8 md:min-h-[60vh] lg:min-h-[75vh]">
         <div className="w-full max-w-4xl">
           {loginContext ? (
-            <h2 className="mx-auto min-h-[2rem] w-full text-center font-play text-[1.1rem] font-medium leading-relaxed text-gray-900 sm:min-h-[2.4rem] sm:text-[1.6rem]">
+            <h2 className="mx-auto min-h-[2rem] w-full text-center font-play text-[1.1rem] font-medium leading-relaxed text-gray-900 sm:min-h-[3rem] sm:text-[1.6rem]">
               {typedHeading}
             </h2>
           ) : null}
           {loginContext ? (
-            <p className="mx-auto mt-5 min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1.2rem]">
+            <p className="min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[2.5rem] sm:text-[1rem]">
               {typedDescription}
             </p>
           ) : null}
-          <p className="mx-auto min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1.2rem]">
+          <p className="min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[2.5rem] sm:text-[1rem]">
             {typedMessage}
           </p>
         </div>
@@ -189,8 +189,9 @@ export default function AiLogin() {
 
           <form
             onSubmit={handleLogin}
-            className={`w-full grid grid-cols-1 gap-6 md:grid-cols-2 ${isFormVisible ? "visible" : "invisible"
-              }`}
+            className={`w-full grid grid-cols-1 gap-6 md:grid-cols-2 ${
+              isFormVisible ? "visible" : "invisible"
+            }`}
           >
             <Controller
               name="email"

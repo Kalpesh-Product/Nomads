@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   CircularProgress,
+  InputAdornment,
   InputBase,
   MenuItem,
   TextField,
@@ -14,6 +15,7 @@ import dayjs from "dayjs";
 import { Country } from "country-state-city";
 import Swal from "sweetalert2";
 import Container from "../components/Container";
+import useNomadLoginState from "../hooks/useNomadLoginState";
 
 const floatingLabelSx = {
   color: "black",
@@ -50,16 +52,25 @@ const CONSULTATION_PROMPT =
   "Share your consultation requirements and we will connect you with the right expert support.";
 const CONSULTATION_HEADING = "Consultation";
 const CONSULTATION_TYPING_SEEN_KEY = "wono-consultation-typing-seen";
+const getFlagIconUrl = (isoCode) =>
+  `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
 
 const AiConsultation = () => {
   const [typedMessage, setTypedMessage] = useState("");
   const [typedPageHeading, setTypedPageHeading] = useState("");
+  const isLoggedIn = useNomadLoginState();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const countries = useMemo(() => Country.getAllCountries(), []);
   const { control, reset, setValue, watch } = useForm({
     defaultValues,
   });
   const selectedCountry = watch("currentCountry");
+  const selectedCountryData = useMemo(
+    () => countries.find((country) => country.name === selectedCountry) || null,
+    [countries, selectedCountry],
+  );
+  const messagePrefix = isLoggedIn ? "Abrar, " : "";
+  const consultationPrompt = `${messagePrefix}${CONSULTATION_PROMPT}`;
 
   const [isPending, setIsPending] = useState(false);
 
@@ -99,7 +110,7 @@ const AiConsultation = () => {
       window.localStorage.getItem(CONSULTATION_TYPING_SEEN_KEY) === "true";
 
     if (hasSeenTypingEffect) {
-      setTypedMessage(CONSULTATION_PROMPT);
+      setTypedMessage(consultationPrompt);
       setTypedPageHeading(CONSULTATION_HEADING);
       setIsFormVisible(true);
       return;
@@ -110,7 +121,7 @@ const AiConsultation = () => {
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => { };
+    let cleanupHeading = () => {};
 
     const typeHeading = () => {
       const headingInterval = setInterval(() => {
@@ -124,26 +135,29 @@ const AiConsultation = () => {
             window.localStorage.setItem(CONSULTATION_TYPING_SEEN_KEY, "true");
           }
         }
-      }, 35);
+      }, 1);
 
       cleanupHeading = () => clearInterval(headingInterval);
     };
 
     const messageInterval = setInterval(() => {
       messageIndex += 1;
-      setTypedMessage(CONSULTATION_PROMPT.slice(0, messageIndex));
+      setTypedMessage(consultationPrompt.slice(0, messageIndex));
 
-      if (messageIndex >= CONSULTATION_PROMPT.length) {
+      if (messageIndex >= consultationPrompt.length) {
         clearInterval(messageInterval);
         typeHeading();
       }
-    }, 2);
+    }, 1);
 
     return () => {
       clearInterval(messageInterval);
       cleanupHeading();
     };
-  }, []);
+  }, [consultationPrompt]);
+
+  const namePortion = typedMessage.slice(0, messagePrefix.length);
+  const messagePortion = typedMessage.slice(messagePrefix.length);
 
   return (
     <div className="bg-white text-black font-sans">
@@ -152,7 +166,14 @@ const AiConsultation = () => {
           <div className="w-full max-w-5xl md:px-20 lg:px-20">
             <div className="mx-auto mb-0 flex w-full max-w-4xl flex-col items-center gap-2 ">
               <p className="min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1rem]">
-                {typedMessage}
+                {messagePrefix ? (
+                  <>
+                    <span className="text-blue-600">{namePortion}</span>
+                    {messagePortion}
+                  </>
+                ) : (
+                  typedMessage
+                )}
               </p>
               <h1 className="text-hero min-h-[3rem] text-center font-play">
                 {typedPageHeading}
@@ -225,6 +246,36 @@ const AiConsultation = () => {
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
+                      SelectProps={{
+                        renderValue: (value) => {
+                          const selectedOption = countries.find(
+                            (country) => country.name === value,
+                          );
+
+                          if (!selectedOption) {
+                            return value;
+                          }
+
+                          return (
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
+                              }}
+                            >
+                              <img
+                                src={getFlagIconUrl(selectedOption.isoCode)}
+                                alt={`${selectedOption.name} flag`}
+                                width={20}
+                                height={15}
+                                loading="lazy"
+                              />
+                              <span>{selectedOption.name}</span>
+                            </Box>
+                          );
+                        },
+                      }}
                       onChange={(event) =>
                         handleCountryChange(event.target.value, field.onChange)
                       }
@@ -234,7 +285,14 @@ const AiConsultation = () => {
                       </MenuItem>
                       {countries.map((country) => (
                         <MenuItem key={country.isoCode} value={country.name}>
-                          {country.name}
+                          <Box
+                            component="img"
+                            src={getFlagIconUrl(country.isoCode)}
+                            alt={`${country.name} flag`}
+                            sx={{ width: 20, height: 15, mr: 1, flexShrink: 0 }}
+                            loading="lazy"
+                          />
+                          <span>{country.name}</span>
                         </MenuItem>
                       ))}
                     </TextField>
@@ -278,12 +336,33 @@ const AiConsultation = () => {
                         label="Code"
                         variant="standard"
                         InputLabelProps={{ sx: floatingLabelSx }}
+                        InputProps={{
+                          startAdornment: selectedCountryData?.isoCode ? (
+                            <InputAdornment position="start">
+                              <Box
+                                component="img"
+                                src={getFlagIconUrl(
+                                  selectedCountryData.isoCode,
+                                )}
+                                alt={`${selectedCountryData.name} flag`}
+                                sx={{ width: 20, height: 15, flexShrink: 0 }}
+                                loading="lazy"
+                              />
+                            </InputAdornment>
+                          ) : null,
+                        }}
                         inputProps={{ readOnly: true }}
                         sx={{ width: "20%" }}
                       />
                     )}
                   />
-                  <Box sx={{ width: "1px", height: "100%", backgroundColor: "#ccc" }} />
+                  <Box
+                    sx={{
+                      width: "1px",
+                      height: "100%",
+                      backgroundColor: "#ccc",
+                    }}
+                  />
                   <Controller
                     name="contactNumber"
                     control={control}
@@ -303,7 +382,6 @@ const AiConsultation = () => {
                     )}
                   />
                 </Box>
-
 
                 {/* Email - Wrapped to ensure it starts on a fresh row below contact number */}
                 <div>
