@@ -15,6 +15,7 @@ import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import Container from "../components/Container";
 import { aiDestinationCards } from "../constants/aiDestinationCards";
+import useNomadLoginState from "../hooks/useNomadLoginState";
 
 const floatingLabelSx = {
   color: "black",
@@ -53,11 +54,12 @@ const AiVisaSupport = () => {
   const [typedMessage, setTypedMessage] = useState("");
   const [typedVisaHeading, setTypedVisaHeading] = useState("");
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const isLoggedIn = useNomadLoginState();
   const navigate = useNavigate();
   const { control, handleSubmit, reset, setValue, watch } = useForm({
     defaultValues,
   });
-  const messagePrefix = "Abrar ";
+  const messagePrefix = isLoggedIn ? "Abrar " : "";
   const visaSupportPrompt = `${messagePrefix}${VISA_SUPPORT_PROMPT}`;
   const countries = useMemo(() => Country.getAllCountries(), []);
   const destinationOptions = useMemo(
@@ -154,11 +156,7 @@ const AiVisaSupport = () => {
 
     const messageInterval = setInterval(() => {
       messageIndex += 1;
-      if (login === true) {
-        setTypedMessage(visaSupportPrompt.slice(0, messageIndex));
-      } else {
-        setTypedMessage(VISA_SUPPORT_PROMPT.slice(0, messageIndex));
-      }
+      setTypedMessage(visaSupportPrompt.slice(0, messageIndex));
 
       if (messageIndex >= visaSupportPrompt.length) {
         clearInterval(messageInterval);

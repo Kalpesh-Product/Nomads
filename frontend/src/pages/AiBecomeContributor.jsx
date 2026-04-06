@@ -33,6 +33,7 @@ const CONTRIBUTOR_PROMPT =
 const CONTRIBUTOR_HEADING = "Become a Wono Contributor";
 const CONTRIBUTOR_TYPING_SEEN_KEY = "wono-contributor-typing-seen";
 const CONTRIBUTION_TYPE_OPTIONS = [
+  "Add your Business Listing & Services",
   "Become a Overall Destination Partner",
   "Become a Local Experience Partner",
   "Become a Visa & Immigration Partner",
@@ -170,7 +171,7 @@ const AiBecomeContributor = () => {
                       {...field}
                       fullWidth
                       select
-                      label="Add your Business Listing & Services"
+                      label="Support Required"
                       variant="standard"
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
@@ -203,28 +204,7 @@ const AiBecomeContributor = () => {
                   )}
                 />
 
-                <Controller
-                  name="email"
-                  control={control}
-                  rules={{
-                    required: "Email is required",
-                    pattern: {
-                      value: /^\S+@\S+$/i,
-                      message: "Invalid email address",
-                    },
-                  }}
-                  render={({ field, fieldState }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label="Email"
-                      variant="standard"
-                      error={!!fieldState.error}
-                      helperText={fieldState.error?.message}
-                      InputLabelProps={{ sx: floatingLabelSx }}
-                    />
-                  )}
-                />
+
 
                 <Controller
                   name="currentCountry"
@@ -253,6 +233,23 @@ const AiBecomeContributor = () => {
                         </MenuItem>
                       ))}
                     </TextField>
+                  )}
+                />
+
+                <Controller
+                  name="linkedinProfile"
+                  control={control}
+                  rules={{ required: "Linkedin profile is required" }}
+                  render={({ field, fieldState }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Linkedin Profile"
+                      variant="standard"
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                      InputLabelProps={{ sx: floatingLabelSx }}
+                    />
                   )}
                 />
 
@@ -324,15 +321,22 @@ const AiBecomeContributor = () => {
                     />
                   </Box>
                 </Box>
+
                 <Controller
-                  name="linkedinProfile"
+                  name="email"
                   control={control}
-                  rules={{ required: "Linkedin profile is required" }}
+                  rules={{
+                    required: "Email is required",
+                    pattern: {
+                      value: /^\S+@\S+$/i,
+                      message: "Invalid email address",
+                    },
+                  }}
                   render={({ field, fieldState }) => (
                     <TextField
                       {...field}
                       fullWidth
-                      label="Linkedin Profile"
+                      label="Email"
                       variant="standard"
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
