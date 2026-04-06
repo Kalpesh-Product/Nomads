@@ -169,16 +169,16 @@ export default function AiLogin() {
       <div className="flex min-h-[55vh] flex-col items-center justify-center gap-10 rounded-lg border-gray-300 px-6 py-8 md:min-h-[60vh] lg:min-h-[75vh]">
         <div className="w-full max-w-4xl">
           {loginContext ? (
-            <h2 className="mx-auto min-h-[2rem] w-full text-center font-play text-[1.1rem] font-medium leading-relaxed text-gray-900 sm:min-h-[2.4rem] sm:text-[1.6rem]">
+            <h2 className="mx-auto min-h-[2rem] w-full text-center font-play text-[1.1rem] font-medium leading-relaxed text-gray-900 sm:min-h-[3rem] sm:text-[1.6rem]">
               {typedHeading}
             </h2>
           ) : null}
           {loginContext ? (
-            <p className="mx-auto mt-5 min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1.2rem]">
+            <p className="min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[2.5rem] sm:text-[1rem]">
               {typedDescription}
             </p>
           ) : null}
-          <p className="mx-auto min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1.2rem]">
+          <p className="min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[2.5rem] sm:text-[1rem]">
             {typedMessage}
           </p>
         </div>
