@@ -177,7 +177,7 @@ const AiVisaSupport = () => {
     <div className="bg-white text-black font-sans">
       <Container padding={false}>
         <section className="min-h-[85vh] flex items-center justify-center py-2">
-          <div className="w-full max-w-5xl md:px-20 lg:px-20 flex flex-col gap-2">
+          <div className="w-full max-w-5xl md:px-20 lg:px-20 flex flex-col gap-1">
             <p className="mx-auto min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1rem]">
               {messagePrefix ? (
                 <>
