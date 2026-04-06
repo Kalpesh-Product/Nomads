@@ -66,9 +66,9 @@ export default function AiLogin() {
     let descriptionIndex = 0;
     let messageIndex = 0;
     let loginHeadingIndex = 0;
-    let cleanupDescription = () => { };
-    let cleanupMessage = () => { };
-    let cleanupLoginHeading = () => { };
+    let cleanupDescription = () => {};
+    let cleanupMessage = () => {};
+    let cleanupLoginHeading = () => {};
 
     const typeLoginHeading = () => {
       const loginHeadingInterval = setInterval(() => {
@@ -79,7 +79,7 @@ export default function AiLogin() {
           clearInterval(loginHeadingInterval);
           setIsFormVisible(true);
         }
-      }, 8);
+      }, 7);
 
       cleanupLoginHeading = () => clearInterval(loginHeadingInterval);
     };
@@ -93,7 +93,7 @@ export default function AiLogin() {
           clearInterval(messageInterval);
           typeLoginHeading();
         }
-      }, 8);
+      }, 7);
 
       cleanupMessage = () => clearInterval(messageInterval);
     };
@@ -116,7 +116,7 @@ export default function AiLogin() {
         clearInterval(descriptionInterval);
         typeLoginPrompt();
       }
-    }, 8);
+    }, 7);
 
     cleanupDescription = () => clearInterval(descriptionInterval);
 
@@ -189,8 +189,9 @@ export default function AiLogin() {
 
           <form
             onSubmit={handleLogin}
-            className={`w-full grid grid-cols-1 gap-6 md:grid-cols-2 ${isFormVisible ? "visible" : "invisible"
-              }`}
+            className={`w-full grid grid-cols-1 gap-6 md:grid-cols-2 ${
+              isFormVisible ? "visible" : "invisible"
+            }`}
           >
             <Controller
               name="email"

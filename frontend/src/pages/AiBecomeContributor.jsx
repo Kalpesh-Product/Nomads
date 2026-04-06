@@ -118,7 +118,7 @@ const AiBecomeContributor = () => {
             window.localStorage.setItem(CONTRIBUTOR_TYPING_SEEN_KEY, "true");
           }
         }
-      }, 8);
+      }, 7);
 
       cleanupHeading = () => clearInterval(headingInterval);
     };
