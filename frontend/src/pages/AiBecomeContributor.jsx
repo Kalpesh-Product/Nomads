@@ -119,7 +119,7 @@ const AiBecomeContributor = () => {
         clearInterval(messageInterval);
         typeHeading();
       }
-    }, 8);
+    }, 1);
 
     return () => {
       clearInterval(messageInterval);

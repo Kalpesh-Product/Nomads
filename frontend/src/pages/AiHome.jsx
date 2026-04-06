@@ -157,15 +157,15 @@ const AiHome = () => {
                     clearInterval(fourthLineInterval);
                     setAreCardsVisible(true);
                   }
-                }, 25);
+                }, 8);
 
                 cleanupFourthLine = () => clearInterval(fourthLineInterval);
               }
-            }, 25);
+            }, 8);
 
             cleanupThirdLine = () => clearInterval(thirdLineInterval);
           }
-        }, 25);
+        }, 8);
 
         if (!subheadingText) {
           setAreCardsVisible(true);
@@ -173,7 +173,7 @@ const AiHome = () => {
 
         cleanupSubheading = () => clearInterval(subheadingInterval);
       }
-    }, 25);
+    }, 8);
 
     return () => {
       clearInterval(greetingInterval);
