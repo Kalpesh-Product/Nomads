@@ -124,7 +124,7 @@ const AiOverallActivationSupport = () => {
             );
           }
         }
-      }, 35);
+      }, 8);
 
       cleanupHeading = () => clearInterval(headingInterval);
     };
@@ -137,7 +137,7 @@ const AiOverallActivationSupport = () => {
         clearInterval(messageInterval);
         typeHeading();
       }
-    }, 2);
+    }, 1);
 
     return () => {
       clearInterval(messageInterval);

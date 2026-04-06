@@ -145,7 +145,7 @@ const AiVisaSupport = () => {
             window.localStorage.setItem(VISA_SUPPORT_TYPING_SEEN_KEY, "true");
           }
         }
-      }, 35);
+      }, 8);
 
       cleanupHeading = () => clearInterval(headingInterval);
     };
@@ -158,7 +158,7 @@ const AiVisaSupport = () => {
         clearInterval(messageInterval);
         typeVisaHeading();
       }
-    }, 2);
+    }, 1);
 
     return () => {
       clearInterval(messageInterval);

@@ -79,7 +79,7 @@ export default function AiLogin() {
           clearInterval(loginHeadingInterval);
           setIsFormVisible(true);
         }
-      }, 35);
+      }, 8);
 
       cleanupLoginHeading = () => clearInterval(loginHeadingInterval);
     };
@@ -93,7 +93,7 @@ export default function AiLogin() {
           clearInterval(messageInterval);
           typeLoginHeading();
         }
-      }, 25);
+      }, 8);
 
       cleanupMessage = () => clearInterval(messageInterval);
     };
@@ -116,7 +116,7 @@ export default function AiLogin() {
         clearInterval(descriptionInterval);
         typeLoginPrompt();
       }
-    }, 25);
+    }, 8);
 
     cleanupDescription = () => clearInterval(descriptionInterval);
 

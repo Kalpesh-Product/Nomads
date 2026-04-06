@@ -40,7 +40,7 @@ import useAuth from "../hooks/useAuth.js";
 
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
 
-const TYPING_INTERVAL_MS = 24;
+const TYPING_INTERVAL_MS = 8;
 const SECOND_HEADING_DELAY_MS = 250;
 const THINKING_HEADING_TEXT = "Curating the best results for you";
 const CURATED_RESULTS_HEADING_TEXT =

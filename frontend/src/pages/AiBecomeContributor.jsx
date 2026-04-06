@@ -106,7 +106,7 @@ const AiBecomeContributor = () => {
             window.localStorage.setItem(CONTRIBUTOR_TYPING_SEEN_KEY, "true");
           }
         }
-      }, 35);
+      }, 8);
 
       cleanupHeading = () => clearInterval(headingInterval);
     };
@@ -119,7 +119,7 @@ const AiBecomeContributor = () => {
         clearInterval(messageInterval);
         typeHeading();
       }
-    }, 2);
+    }, 8);
 
     return () => {
       clearInterval(messageInterval);
