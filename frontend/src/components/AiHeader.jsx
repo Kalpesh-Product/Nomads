@@ -29,6 +29,10 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
     location.pathname.includes("verticals") ||
     isAiListingsMapPage ||
     isAiListingsListPage;
+  const showNewsBlogLinks =
+    showToggle ||
+    location.pathname.startsWith("/ai-listings") ||
+    location.pathname.startsWith("/listings");
 
   const countryParam = searchParams.get("country") || formData?.country || "";
   const locationParam =
@@ -110,14 +114,13 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
   };
 
   const headerLinks = [
-    { id: 1, text: "Home", to: "/" },
+    // { id: 1, text: "Home", to: "/" },
     { id: 2, text: "News", to: "/news" },
     { id: 3, text: "Blog", to: "/blog" },
   ];
 
   const shouldShowHeaderLinks =
-    location.pathname === "/verticals" ||
-    location.pathname.startsWith("/listings");
+    location.pathname.startsWith("/listings") && !location.pathname.startsWith("/ai-listings");
 
   return (
     <div className="bg-white/80 backdrop-blur-md px-1 md:px-10">
@@ -255,8 +258,8 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
             )}
 
             <li className="flex items-center gap-6">
-              {showToggle && (
-                <ul className="flex items-center gap-8">
+              {showNewsBlogLinks && (
+                <ul >
                   {/* Blogs and News - Added on the LEFT side of Map/List View */}
                   <li className="flex items-center gap-6">
                     <Link
@@ -405,20 +408,26 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                   </span>
                 </div>
 
-                {shouldShowHeaderLinks &&
-                  headerLinks.map((item) => (
-                    <li key={item.id} className="items-center text-center">
-                      <div
-                        onClick={() => handleNavigation(item.to)}
-                        className="py-4 cursor-pointer"
-                      >
-                        <p className="text-secondary-dark text-lg">
-                          {item.text}
-                        </p>
-                      </div>
-                      <div className="h-[0.2px] bg-gray-300"></div>
-                    </li>
-                  ))}
+                {(shouldShowHeaderLinks || showNewsBlogLinks) &&
+                  headerLinks
+                    .filter((item) =>
+                      showNewsBlogLinks
+                        ? item.text === "News" || item.text === "Blog"
+                        : true,
+                    )
+                    .map((item) => (
+                      <li key={item.id} className="items-center text-center">
+                        <div
+                          onClick={() => handleNavigation(item.to)}
+                          className="py-4 cursor-pointer"
+                        >
+                          <p className="text-secondary-dark text-lg">
+                            {item.text}
+                          </p>
+                        </div>
+                        <div className="h-[0.2px] bg-gray-300"></div>
+                      </li>
+                    ))}
 
                 <li className="items-center text-center">
                   <div

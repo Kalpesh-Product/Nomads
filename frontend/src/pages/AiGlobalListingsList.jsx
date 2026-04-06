@@ -36,7 +36,7 @@ import {
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
 const VALUE_ADDED_SERVICES_DEFAULT_VISIBLE_COUNT = 5;
 
-const TYPING_INTERVAL_MS = 24;
+const TYPING_INTERVAL_MS = 7;
 const SECOND_HEADING_DELAY_MS = 250;
 const THINKING_HEADING_TEXT = "Curating the best results for you";
 const CURATED_RESULTS_HEADING_TEXT =
@@ -149,7 +149,10 @@ const AiGlobalListingsList = () => {
   const [persistedSearchBarBadges, setPersistedSearchBarBadges] = useState([]);
   const visibleValueAddedServiceItems = isValueAddedServicesExpanded
     ? valueAddedServiceItems
-    : valueAddedServiceItems.slice(0, VALUE_ADDED_SERVICES_DEFAULT_VISIBLE_COUNT);
+    : valueAddedServiceItems.slice(
+        0,
+        VALUE_ADDED_SERVICES_DEFAULT_VISIBLE_COUNT,
+      );
   const showValueAddedServicesToggle =
     valueAddedServiceItems.length > VALUE_ADDED_SERVICES_DEFAULT_VISIBLE_COUNT;
 
@@ -816,10 +819,11 @@ const AiGlobalListingsList = () => {
                           return (
                             <div
                               key={type}
-                              className={`col-span-full ${index > 0
-                                ? "border-t border-gray-300 mt-6 pt-6"
-                                : ""
-                                } mb-6`}
+                              className={`col-span-full ${
+                                index > 0
+                                  ? "border-t border-gray-300 mt-6 pt-6"
+                                  : ""
+                              } mb-6`}
                             >
                               <h2 className="text-subtitle font-semibold mb-5 text-secondary-dark">
                                 {sectionTitle}
@@ -876,10 +880,11 @@ const AiGlobalListingsList = () => {
                                   handleValueAddedServiceClick(service)
                                 }
                                 disabled={isDisabled}
-                                className={`rounded-3xl bg-[#f1f1f3] px-4 py-6 min-h-[132px] aspect-square flex flex-col items-center justify-center text-center transition-colors ${isDisabled
-                                  ? "cursor-not-allowed opacity-80"
-                                  : "hover:bg-[#e8e8ed]"
-                                  }`}
+                                className={`rounded-3xl bg-[#f1f1f3] px-4 py-6 min-h-[132px] aspect-square flex flex-col items-center justify-center text-center transition-colors ${
+                                  isDisabled
+                                    ? "cursor-not-allowed opacity-80"
+                                    : "hover:bg-[#e8e8ed]"
+                                }`}
                               >
                                 <Icon size={24} className="text-black/80" />
                                 <div className="mt-3 flex flex-col items-center gap-1.5 justify-center">
@@ -940,24 +945,26 @@ const AiGlobalListingsList = () => {
                   <div className="flex items-center gap-2 w-full">
                     <IoSearch className="text-primary-red" />
                     <span className="text-[11px] font-bold text-gray-900 truncate w-full text-left">
-                      {`${(formData?.country || "Country").charAt(0).toUpperCase() + (formData?.country || "Country").slice(1)} . ${formData?.location
-                        ? formData.location
-                          .split(" ")
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() +
-                              word.slice(1).toLowerCase(),
-                          )
-                          .join(" ")
-                        : "Unknown"
-                        } . ${formData?.category
+                      {`${(formData?.country || "Country").charAt(0).toUpperCase() + (formData?.country || "Country").slice(1)} . ${
+                        formData?.location
+                          ? formData.location
+                              .split(" ")
+                              .map(
+                                (word) =>
+                                  word.charAt(0).toUpperCase() +
+                                  word.slice(1).toLowerCase(),
+                              )
+                              .join(" ")
+                          : "Unknown"
+                      } . ${
+                        formData?.category
                           ? categoryOptions.find(
-                            (c) => c.value === formData.category,
-                          )?.label ||
-                          formData.category.charAt(0).toUpperCase() +
-                          formData.category.slice(1)
+                              (c) => c.value === formData.category,
+                            )?.label ||
+                            formData.category.charAt(0).toUpperCase() +
+                              formData.category.slice(1)
                           : "All"
-                        }`}
+                      }`}
                     </span>
                   </div>
                   <span className="text-[10px] text-gray-500">
@@ -1223,10 +1230,11 @@ const AiGlobalListingsList = () => {
                                 handleValueAddedServiceClick(service)
                               }
                               disabled={isDisabled}
-                              className={`w-[calc(85%-0.5rem)] flex-shrink-0 snap-start rounded-3xl bg-[#f1f1f3] px-3 py-5 text-center min-h-[112px] aspect-square flex flex-col items-center justify-center transition-colors ${isDisabled
-                                ? "cursor-not-allowed opacity-80"
-                                : "hover:bg-[#e8e8ed]"
-                                }`}
+                              className={`w-[calc(85%-0.5rem)] flex-shrink-0 snap-start rounded-3xl bg-[#f1f1f3] px-3 py-5 text-center min-h-[112px] aspect-square flex flex-col items-center justify-center transition-colors ${
+                                isDisabled
+                                  ? "cursor-not-allowed opacity-80"
+                                  : "hover:bg-[#e8e8ed]"
+                              }`}
                             >
                               <Icon
                                 size={24}
@@ -1259,10 +1267,11 @@ const AiGlobalListingsList = () => {
                                 handleValueAddedServiceClick(service)
                               }
                               disabled={isDisabled}
-                              className={`rounded-3xl bg-[#f1f1f3] px-3 py-5 text-center min-h-[112px] aspect-square flex flex-col items-center justify-center transition-colors ${isDisabled
-                                ? "cursor-not-allowed opacity-80"
-                                : "hover:bg-[#e8e8ed]"
-                                }`}
+                              className={`rounded-3xl bg-[#f1f1f3] px-3 py-5 text-center min-h-[112px] aspect-square flex flex-col items-center justify-center transition-colors ${
+                                isDisabled
+                                  ? "cursor-not-allowed opacity-80"
+                                  : "hover:bg-[#e8e8ed]"
+                              }`}
                             >
                               <Icon
                                 size={24}
