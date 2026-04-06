@@ -148,24 +148,24 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                 <ul>
                   {(isAiListingsListPage ||
                     (!isAiListingsMapPage && view !== "map")) && (
-                    <li className="flex items-center">
-                      <div className="p-4 px-0 whitespace-nowrap">
-                        <Link
-                          to={
-                            isAiListingsListPage
-                              ? mapViewLink
-                              : `${location.pathname}?country=${formData?.country}&location=${formData?.location}&view=map`
-                          }
-                          className="group relative text-md text-black"
-                        >
-                          <span className="relative z-10 group-hover:font-bold mb-2 text-sm font-semibold">
-                            Map View
-                          </span>
-                          <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
-                        </Link>
-                      </div>
-                    </li>
-                  )}
+                      <li className="flex items-center">
+                        <div className="p-4 px-0 whitespace-nowrap">
+                          <Link
+                            to={
+                              isAiListingsListPage
+                                ? mapViewLink
+                                : `${location.pathname}?country=${formData?.country}&location=${formData?.location}&view=map`
+                            }
+                            className="group relative text-md text-black"
+                          >
+                            <span className="relative z-10 group-hover:font-bold mb-2 text-sm font-semibold">
+                              Map View
+                            </span>
+                            <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                          </Link>
+                        </div>
+                      </li>
+                    )}
 
                   {(isAiListingsMapPage || view === "map") && (
                     <li className="flex items-center">
@@ -209,9 +209,8 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                           className="group relative text-md text-black"
                         >
                           <span
-                            className={`relative z-10 mb-8 uppercase ${
-                              isActive ? "text-black" : "group-hover:font-bold"
-                            }`}
+                            className={`relative z-10 mb-8 uppercase ${isActive ? "text-black" : "group-hover:font-bold"
+                              }`}
                           >
                             {item.text}
                           </span>
@@ -255,7 +254,35 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
               </div>
             )}
 
-            <li className="flex items-center">
+            <li className="flex items-center gap-6">
+              {showToggle && (
+                <ul className="flex items-center gap-8">
+                  {/* Blogs and News - Added on the LEFT side of Map/List View */}
+                  <li className="flex items-center gap-6">
+                    <Link
+                      to="/news"
+                      className="group relative text-md text-black font-semibold"
+                    >
+                      <span className="relative z-10 group-hover:font-bold mb-2 text-sm">
+                        News
+                      </span>
+                      <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                    </Link>
+
+                    <Link
+                      to="/blog"
+                      className="group relative text-md text-black font-semibold"
+                    >
+                      <span className="relative z-10 group-hover:font-bold mb-2 text-sm">
+                        Blog
+                      </span>
+                      <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                    </Link>
+                  </li>
+
+                  {/* Original Map View / List View - UNCHANGED */}
+                </ul>
+              )}
               <div className="p-4 px-0 whitespace-nowrap">
                 <button
                   onClick={goToHosts}
