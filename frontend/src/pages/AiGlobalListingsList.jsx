@@ -108,6 +108,16 @@ const valueAddedServiceItems = [
     icon: HiOutlineUserCircle,
     badge: "Coming soon",
   },
+  {
+    label: "Blogs",
+    icon: HiOutlineUserCircle,
+    path: "/blogs",
+  },
+  {
+    label: "News",
+    icon: HiOutlineUserCircle,
+    path: "/news",
+  },
 ];
 
 const AiGlobalListingsList = () => {

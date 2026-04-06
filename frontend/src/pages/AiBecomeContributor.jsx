@@ -151,6 +151,57 @@ const AiBecomeContributor = () => {
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 <Controller
+                  name="selectcontribution"
+                  control={control}
+                  rules={{ required: "Contribution Type is required" }}
+                  render={({ field, fieldState }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      select
+                      label="Select Contribution Type"
+                      variant="standard"
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                      InputLabelProps={{ sx: floatingLabelSx }}
+                      onChange={(event) =>
+                        handleCountryChange(event.target.value, field.onChange)
+                      }
+                    >
+                      <MenuItem value="">
+                        Add your Business Listing & Services
+                      </MenuItem>
+                      <MenuItem  >
+                        Become a Overall Destination Partner
+                      </MenuItem>
+                      <MenuItem  >
+                        Become a Local Experience Partner
+                      </MenuItem>
+                      <MenuItem  >
+                        Become a Visa & Immigration Partner
+                      </MenuItem>
+                      <MenuItem  >
+                        Become a Tax & Financial Advisory Partner
+                      </MenuItem>
+                      <MenuItem  >
+                        Become a Company Setup Services Partner
+                      </MenuItem>
+                      <MenuItem  >
+                        Become a Nomad Blog & News Writer
+                      </MenuItem>
+                      <MenuItem  >
+                        Become a Content Contributor
+                      </MenuItem>
+                      <MenuItem  >
+                        Become a Remote Jobs Posting Partner
+                      </MenuItem>
+                      <MenuItem  >
+                        Not Sure - Lets Connect & Explore
+                      </MenuItem>
+                    </TextField>
+                  )}
+                />
+                <Controller
                   name="fullName"
                   control={control}
                   rules={{ required: "Full name is required" }}
@@ -297,22 +348,6 @@ const AiBecomeContributor = () => {
                       {...field}
                       fullWidth
                       label="Linkedin Profile"
-                      variant="standard"
-                      error={!!fieldState.error}
-                      helperText={fieldState.error?.message}
-                      InputLabelProps={{ sx: floatingLabelSx }}
-                    />
-                  )}
-                />
-                <Controller
-                  name="website"
-                  control={control}
-                  rules={{ required: "Website is required" }}
-                  render={({ field, fieldState }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label="Website/Insta/FB etc"
                       variant="standard"
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
