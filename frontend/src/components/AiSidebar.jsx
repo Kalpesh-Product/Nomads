@@ -467,7 +467,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
             isOpen={isProfileOpen}
             onToggle={() => setIsProfileOpen((prev) => !prev)}
           />
-          <div className="mx-4 border-t border-black/10"></div>
+          <div className="mx-4 mt-3 border-t border-black/10"></div>
           {/* Compact sections - minimal spacing */}
           <SidebarSection
             items={[becomeContributorItemWithActivePath]}
