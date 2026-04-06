@@ -76,7 +76,7 @@ export default function AiSignup() {
           clearInterval(headingInterval);
           setIsFormVisible(true);
         }
-      }, 35);
+      }, 7);
 
       cleanupHeading = () => clearInterval(headingInterval);
     };
