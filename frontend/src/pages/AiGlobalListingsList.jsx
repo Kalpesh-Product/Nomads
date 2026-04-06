@@ -34,6 +34,7 @@ import {
 } from "react-icons/hi";
 
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
+const VALUE_ADDED_SERVICES_DEFAULT_VISIBLE_COUNT = 5;
 
 const TYPING_INTERVAL_MS = 24;
 const SECOND_HEADING_DELAY_MS = 250;
@@ -123,6 +124,8 @@ const valueAddedServiceItems = [
 const AiGlobalListingsList = () => {
   const [favorites, setFavorites] = useState([]);
   const [expandedCategories, setExpandedCategories] = useState([]);
+  const [isValueAddedServicesExpanded, setIsValueAddedServicesExpanded] =
+    useState(false);
   const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -144,6 +147,11 @@ const AiGlobalListingsList = () => {
   const selectedState = watch("location");
 
   const [persistedSearchBarBadges, setPersistedSearchBarBadges] = useState([]);
+  const visibleValueAddedServiceItems = isValueAddedServicesExpanded
+    ? valueAddedServiceItems
+    : valueAddedServiceItems.slice(0, VALUE_ADDED_SERVICES_DEFAULT_VISIBLE_COUNT);
+  const showValueAddedServicesToggle =
+    valueAddedServiceItems.length > VALUE_ADDED_SERVICES_DEFAULT_VISIBLE_COUNT;
 
   const [typedHeading, setTypedHeading] = useState("");
   const [isSecondHeadingPhase, setIsSecondHeadingPhase] = useState(false);
@@ -856,7 +864,7 @@ const AiGlobalListingsList = () => {
                           Value Added Services in {selectedLocationLabel}
                         </h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                          {valueAddedServiceItems.map((service) => {
+                          {visibleValueAddedServiceItems.map((service) => {
                             const Icon = service.icon;
                             const isDisabled = !service.path;
 
@@ -888,6 +896,22 @@ const AiGlobalListingsList = () => {
                             );
                           })}
                         </div>
+                        {showValueAddedServicesToggle && (
+                          <div className="mt-0 text-right">
+                            <button
+                              onClick={() =>
+                                setIsValueAddedServicesExpanded(
+                                  (prevState) => !prevState,
+                                )
+                              }
+                              className="text-primary-blue text-sm font-semibold hover:underline"
+                            >
+                              {isValueAddedServicesExpanded
+                                ? "View less ←"
+                                : "View more →"}
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </>
                   ) : (
@@ -1187,7 +1211,7 @@ const AiGlobalListingsList = () => {
                         Value Added Services in {selectedLocationLabel}
                       </h2>
                       <div className="flex md:hidden flex-nowrap overflow-x-auto snap-x snap-mandatory gap-4 pb-2 custom-scrollbar-hide">
-                        {valueAddedServiceItems.map((service) => {
+                        {visibleValueAddedServiceItems.map((service) => {
                           const Icon = service.icon;
                           const isDisabled = !service.path;
 
@@ -1258,6 +1282,22 @@ const AiGlobalListingsList = () => {
                           );
                         })}
                       </div>
+                      {showValueAddedServicesToggle && (
+                        <div className="hidden md:block mt-0 text-right">
+                          <button
+                            onClick={() =>
+                              setIsValueAddedServicesExpanded(
+                                (prevState) => !prevState,
+                              )
+                            }
+                            className="text-primary-blue text-sm font-semibold hover:underline"
+                          >
+                            {isValueAddedServicesExpanded
+                              ? "View less ←"
+                              : "View more →"}
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </>
                 ) : (

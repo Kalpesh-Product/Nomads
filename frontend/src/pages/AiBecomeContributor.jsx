@@ -32,6 +32,17 @@ const CONTRIBUTOR_PROMPT =
   "We are constantly looking out for individuals who can support our cause to make WoNo the largest Nomad Community & Platform in the world. We know we will not be able to do this alone.";
 const CONTRIBUTOR_HEADING = "Become a Wono Contributor";
 const CONTRIBUTOR_TYPING_SEEN_KEY = "wono-contributor-typing-seen";
+const CONTRIBUTION_TYPE_OPTIONS = [
+  "Become a Overall Destination Partner",
+  "Become a Local Experience Partner",
+  "Become a Visa & Immigration Partner",
+  "Become a Tax & Financial Advisory Partner",
+  "Become a Company Setup Services Partner",
+  "Become a Nomad Blog & News Writer",
+  "Become a Content Contributor",
+  "Become a Remote Jobs Posting Partner",
+  "Not Sure - Lets Connect & Explore",
+];
 
 const AiBecomeContributor = () => {
   const [typedMessage, setTypedMessage] = useState("");
@@ -159,45 +170,19 @@ const AiBecomeContributor = () => {
                       {...field}
                       fullWidth
                       select
-                      label="Select Contribution Type"
+                      label="Add your Business Listing & Services"
                       variant="standard"
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
-                      onChange={(event) =>
-                        handleCountryChange(event.target.value, field.onChange)
-                      }
+                      onChange={(event) => field.onChange(event.target.value)}
                     >
-                      <MenuItem value="">
-                        Add your Business Listing & Services
-                      </MenuItem>
-                      <MenuItem  >
-                        Become a Overall Destination Partner
-                      </MenuItem>
-                      <MenuItem  >
-                        Become a Local Experience Partner
-                      </MenuItem>
-                      <MenuItem  >
-                        Become a Visa & Immigration Partner
-                      </MenuItem>
-                      <MenuItem  >
-                        Become a Tax & Financial Advisory Partner
-                      </MenuItem>
-                      <MenuItem  >
-                        Become a Company Setup Services Partner
-                      </MenuItem>
-                      <MenuItem  >
-                        Become a Nomad Blog & News Writer
-                      </MenuItem>
-                      <MenuItem  >
-                        Become a Content Contributor
-                      </MenuItem>
-                      <MenuItem  >
-                        Become a Remote Jobs Posting Partner
-                      </MenuItem>
-                      <MenuItem  >
-                        Not Sure - Lets Connect & Explore
-                      </MenuItem>
+                      {CONTRIBUTION_TYPE_OPTIONS.map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+
                     </TextField>
                   )}
                 />
