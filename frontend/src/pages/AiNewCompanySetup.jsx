@@ -111,7 +111,7 @@ const AiNewCompanySetup = () => {
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => { };
+    let cleanupHeading = () => {};
 
     const typeHeading = () => {
       const headingInterval = setInterval(() => {
@@ -125,11 +125,10 @@ const AiNewCompanySetup = () => {
             window.localStorage.setItem(NEW_COMPANY_TYPING_SEEN_KEY, "true");
           }
         }
-      }, 8);
+      }, 1);
 
       cleanupHeading = () => clearInterval(headingInterval);
     };
-
 
     const messageInterval = setInterval(() => {
       messageIndex += 1;
@@ -166,8 +165,9 @@ const AiNewCompanySetup = () => {
                 event.preventDefault();
                 handleFormSubmit();
               }}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
-                }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${
+                isFormVisible ? "visible" : "invisible"
+              }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-4">
                 <Controller
@@ -229,10 +229,7 @@ const AiNewCompanySetup = () => {
                       helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
                       onChange={(event) =>
-                        handleCountryChange(
-                          event.target.value,
-                          field.onChange,
-                        )
+                        handleCountryChange(event.target.value, field.onChange)
                       }
                     >
                       <MenuItem value="" sx={{ fontWeight: 700 }}>
@@ -289,7 +286,13 @@ const AiNewCompanySetup = () => {
                       />
                     )}
                   />
-                  <Box sx={{ width: "1px", height: "100%", backgroundColor: "#ccc" }} />
+                  <Box
+                    sx={{
+                      width: "1px",
+                      height: "100%",
+                      backgroundColor: "#ccc",
+                    }}
+                  />
                   <Controller
                     name="contactNumber"
                     control={control}

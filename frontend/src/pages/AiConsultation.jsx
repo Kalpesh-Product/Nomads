@@ -110,7 +110,7 @@ const AiConsultation = () => {
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => { };
+    let cleanupHeading = () => {};
 
     const typeHeading = () => {
       const headingInterval = setInterval(() => {
@@ -124,7 +124,7 @@ const AiConsultation = () => {
             window.localStorage.setItem(CONSULTATION_TYPING_SEEN_KEY, "true");
           }
         }
-      }, 8);
+      }, 1);
 
       cleanupHeading = () => clearInterval(headingInterval);
     };
@@ -283,7 +283,13 @@ const AiConsultation = () => {
                       />
                     )}
                   />
-                  <Box sx={{ width: "1px", height: "100%", backgroundColor: "#ccc" }} />
+                  <Box
+                    sx={{
+                      width: "1px",
+                      height: "100%",
+                      backgroundColor: "#ccc",
+                    }}
+                  />
                   <Controller
                     name="contactNumber"
                     control={control}
@@ -303,7 +309,6 @@ const AiConsultation = () => {
                     )}
                   />
                 </Box>
-
 
                 {/* Email - Wrapped to ensure it starts on a fresh row below contact number */}
                 <div>
