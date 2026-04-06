@@ -57,6 +57,8 @@ const AiVisaSupport = () => {
   const { control, handleSubmit, reset, setValue, watch } = useForm({
     defaultValues,
   });
+  const messagePrefix = "Abrar ";
+  const visaSupportPrompt = `${messagePrefix}${VISA_SUPPORT_PROMPT}`;
   const countries = useMemo(() => Country.getAllCountries(), []);
   const destinationOptions = useMemo(
     () =>
@@ -120,7 +122,7 @@ const AiVisaSupport = () => {
       window.localStorage.getItem(VISA_SUPPORT_TYPING_SEEN_KEY) === "true";
 
     if (hasSeenTypingEffect) {
-      setTypedMessage(VISA_SUPPORT_PROMPT);
+      setTypedMessage(visaSupportPrompt);
       setTypedVisaHeading(VISA_SUPPORT_HEADING);
       setIsFormVisible(true);
       return;
@@ -152,9 +154,13 @@ const AiVisaSupport = () => {
 
     const messageInterval = setInterval(() => {
       messageIndex += 1;
-      setTypedMessage(VISA_SUPPORT_PROMPT.slice(0, messageIndex));
+      if (login === true) {
+        setTypedMessage(visaSupportPrompt.slice(0, messageIndex));
+      } else {
+        setTypedMessage(VISA_SUPPORT_PROMPT.slice(0, messageIndex));
+      }
 
-      if (messageIndex >= VISA_SUPPORT_PROMPT.length) {
+      if (messageIndex >= visaSupportPrompt.length) {
         clearInterval(messageInterval);
         typeVisaHeading();
       }
@@ -164,7 +170,10 @@ const AiVisaSupport = () => {
       clearInterval(messageInterval);
       cleanupHeading();
     };
-  }, []);
+  }, [visaSupportPrompt]);
+
+  const namePortion = typedMessage.slice(0, messagePrefix.length);
+  const messagePortion = typedMessage.slice(messagePrefix.length);
 
   return (
     <div className="bg-white text-black font-sans">
@@ -172,7 +181,14 @@ const AiVisaSupport = () => {
         <section className="min-h-[85vh] flex items-center justify-center py-2">
           <div className="w-full max-w-5xl md:px-20 lg:px-20 flex flex-col gap-2">
             <p className="mx-auto min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1rem]">
-              {typedMessage}
+              {messagePrefix ? (
+                <>
+                  <span className="text-blue-600">{namePortion}</span>
+                  {messagePortion}
+                </>
+              ) : (
+                typedMessage
+              )}
             </p>
 
             <h1 className="text-hero min-h-[3rem] text-center font-play">
