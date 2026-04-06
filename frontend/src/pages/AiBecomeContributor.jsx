@@ -110,7 +110,7 @@ const AiBecomeContributor = () => {
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => {};
+    let cleanupHeading = () => { };
 
     const typeHeading = () => {
       const headingInterval = setInterval(() => {
@@ -164,9 +164,8 @@ const AiBecomeContributor = () => {
                 event.preventDefault();
                 handleFormSubmit();
               }}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${
-                isFormVisible ? "visible" : "invisible"
-              }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
+                }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 <Controller
@@ -178,7 +177,7 @@ const AiBecomeContributor = () => {
                       {...field}
                       fullWidth
                       select
-                      label="Support Required"
+                      label="Contribution Towards WoNo"
                       variant="standard"
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
