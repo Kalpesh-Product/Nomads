@@ -2,12 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import logo from "../assets/WONO_LOGO_Black_TP.png";
 import { useSelector } from "react-redux";
-import {
-  Drawer,
-  Avatar,
-  Popover,
-  CircularProgress,
-} from "@mui/material";
+import { Drawer, Avatar, Popover, CircularProgress } from "@mui/material";
 import { IoCloseSharp } from "react-icons/io5";
 import { HiOutlineMenu } from "react-icons/hi";
 import { FiLogOut } from "react-icons/fi";
@@ -82,7 +77,9 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
 
       navigate({
         pathname: "/home",
-        search: nextSearchParams.toString() ? `?${nextSearchParams.toString()}` : "",
+        search: nextSearchParams.toString()
+          ? `?${nextSearchParams.toString()}`
+          : "",
       });
     } catch (error) {
       console.error("Logout failed:", error);
@@ -146,93 +143,29 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                 className="w-fit h-full object-contain"
               />
             </div>
-          </div>
-
-          {/* Main Nav */}
-          <div className="w-full">
-            {shouldShowHeaderLinks && (
-              <ul className="hidden xl:flex sm:hidden gap-8 justify-end flex-1">
-                {headerLinks.map((item) => {
-                  const isActive =
-                    item.to === "/"
-                      ? location.pathname === "/"
-                      : location.pathname.startsWith(item.to);
-
-                  return (
-                    <li key={item.id} className="flex items-center">
+            <div className="min-w-[80px] hidden lg:block">
+              {showToggle && (
+                <ul>
+                  {(isAiListingsListPage ||
+                    (!isAiListingsMapPage && view !== "map")) && (
+                    <li className="flex items-center">
                       <div className="p-4 px-0 whitespace-nowrap">
                         <Link
-                          to={item.to}
+                          to={
+                            isAiListingsListPage
+                              ? mapViewLink
+                              : `${location.pathname}?country=${formData?.country}&location=${formData?.location}&view=map`
+                          }
                           className="group relative text-md text-black"
                         >
-                          <span
-                            className={`relative z-10 mb-8 uppercase ${isActive ? "text-black" : "group-hover:font-bold"
-                              }`}
-                          >
-                            {item.text}
+                          <span className="relative z-10 group-hover:font-bold mb-2 text-sm font-semibold">
+                            Map View
                           </span>
-                          <span
-                            className={`absolute left-0 bottom-0 top-6 block h-[2px] bg-blue-500 transition-all duration-300 
-                              ${isActive ? "w-full" : "w-0 group-hover:w-full"}`}
-                          ></span>
+                          <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
                         </Link>
                       </div>
                     </li>
-                  );
-                })}
-              </ul>
-            )}
-          </div>
-
-          {/* Right Section - Desktop */}
-          <div className="hidden lg:flex items-center pl-10 gap-6">
-            <div className="min-w-[80px] hidden lg:block">
-              {showToggle && (
-                <ul className="flex items-center gap-8">
-                  {/* Blogs and News - Added on the LEFT side of Map/List View */}
-                  <li className="flex items-center gap-6">
-                    <Link
-                      to="/news"
-                      className="group relative text-md text-black font-semibold"
-                    >
-                      <span className="relative z-10 group-hover:font-bold mb-2 text-sm">
-                        News
-                      </span>
-                      <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
-                    </Link>
-
-                    <Link
-                      to="/blog"
-                      className="group relative text-md text-black font-semibold"
-                    >
-                      <span className="relative z-10 group-hover:font-bold mb-2 text-sm">
-                        Blog
-                      </span>
-                      <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
-                    </Link>
-                  </li>
-
-                  {/* Original Map View / List View - UNCHANGED */}
-                  {(isAiListingsListPage ||
-                    (!isAiListingsMapPage && view !== "map")) && (
-                      <li className="flex items-center">
-                        <div className="p-4 px-0 whitespace-nowrap">
-                          <Link
-                            to={
-                              isAiListingsListPage
-                                ? mapViewLink
-                                : `${location.pathname}?country=${formData?.country}&location=${formData?.location}&view=map`
-                            }
-                            className="group relative text-md text-black"
-                          >
-                            <span className="relative z-10 group-hover:font-bold mb-2 text-sm font-semibold">
-                              Map View
-                            </span>
-                            <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
-                          </Link>
-                        </div>
-                      </li>
-                    )}
+                  )}
 
                   {(isAiListingsMapPage || view === "map") && (
                     <li className="flex items-center">
@@ -256,7 +189,47 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                 </ul>
               )}
             </div>
+          </div>
 
+          {/* Main Nav */}
+          <div className="w-full">
+            {shouldShowHeaderLinks && (
+              <ul className="hidden xl:flex sm:hidden gap-8 justify-end flex-1">
+                {headerLinks.map((item) => {
+                  const isActive =
+                    item.to === "/"
+                      ? location.pathname === "/"
+                      : location.pathname.startsWith(item.to);
+
+                  return (
+                    <li key={item.id} className="flex items-center">
+                      <div className="p-4 px-0 whitespace-nowrap">
+                        <Link
+                          to={item.to}
+                          className="group relative text-md text-black"
+                        >
+                          <span
+                            className={`relative z-10 mb-8 uppercase ${
+                              isActive ? "text-black" : "group-hover:font-bold"
+                            }`}
+                          >
+                            {item.text}
+                          </span>
+                          <span
+                            className={`absolute left-0 bottom-0 top-6 block h-[2px] bg-blue-500 transition-all duration-300 
+                              ${isActive ? "w-full" : "w-0 group-hover:w-full"}`}
+                          ></span>
+                        </Link>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+
+          {/* Right Section - Desktop */}
+          <div className="hidden lg:flex items-center pl-10 gap-6">
             {!isLoggedIn && (
               <div className="flex items-center gap-3">
                 <button
