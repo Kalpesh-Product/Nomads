@@ -7,6 +7,8 @@ import { RiUserCommunityLine } from "react-icons/ri";
 import { TbAward, TbWorldWww } from "react-icons/tb";
 import useNomadLoginState from "../hooks/useNomadLoginState";
 
+const AI_HOME_TYPING_SEEN_KEY = "wono-ai-home-typing-seen";
+
 const gatedRecommendationTitles = new Set([
   "Work From Anywhere",
   "Increase Your Savings",
@@ -103,6 +105,18 @@ const AiHome = () => {
     : "Choose your goals from below so that we can help you design your nomad lifestyle.";
 
   useEffect(() => {
+    const hasSeenTypingEffect =
+      typeof window !== "undefined" &&
+      window.localStorage.getItem(AI_HOME_TYPING_SEEN_KEY) === "true";
+
+    if (hasSeenTypingEffect) {
+      setTypedGreeting(greetingText);
+      setTypedSubheading(subheadingText);
+      setTypedThirdLine(thirdLineText);
+      setTypedFourthLine(fourthLineText);
+      setAreCardsVisible(true);
+      return;
+    }
     setTypedGreeting("");
     setTypedSubheading("");
     setTypedThirdLine("");
@@ -113,9 +127,9 @@ const AiHome = () => {
     let subheadingIndex = 0;
     let thirdLineIndex = 0;
     let fourthLineIndex = 0;
-    let cleanupSubheading = () => {};
-    let cleanupThirdLine = () => {};
-    let cleanupFourthLine = () => {};
+    let cleanupSubheading = () => { };
+    let cleanupThirdLine = () => { };
+    let cleanupFourthLine = () => { };
 
     const greetingInterval = setInterval(() => {
       greetingIndex += 1;
@@ -154,6 +168,9 @@ const AiHome = () => {
 
                   if (fourthLineIndex >= fourthLineText.length) {
                     clearInterval(fourthLineInterval);
+                    if (typeof window !== "undefined") {
+                      window.localStorage.setItem(AI_HOME_TYPING_SEEN_KEY, "true");
+                    }
                     setAreCardsVisible(true);
                   }
                 }, 7);
@@ -257,9 +274,8 @@ const AiHome = () => {
           </p>
 
           <div
-            className={`mt-4 rounded-[40px] px-0 py-4 md:px-6 md:py-8 ${
-              areCardsVisible ? "visible" : "invisible"
-            }`}
+            className={`mt-4 rounded-[40px] px-0 py-4 md:px-6 md:py-8 ${areCardsVisible ? "visible" : "invisible"
+              }`}
           >
             <div className="grid grid-cols-2 gap-4 md:grid-cols-2 md:gap-10 xl:grid-cols-3">
               {recommendationCards.map((card, index) => {
@@ -273,11 +289,10 @@ const AiHome = () => {
                 return (
                   <div
                     key={card.title}
-                    className={`transition-all duration-300 ${
-                      index < visibleCardCount
-                        ? "translate-y-0 opacity-100"
-                        : "pointer-events-none translate-y-2 opacity-0"
-                    }`}
+                    className={`transition-all duration-300 ${index < visibleCardCount
+                      ? "translate-y-0 opacity-100"
+                      : "pointer-events-none translate-y-2 opacity-0"
+                      }`}
                   >
                     <article
                       onClick={() => handleCardClick(card)}
@@ -298,9 +313,8 @@ const AiHome = () => {
                     </article>
                     {!isLoggedIn ? (
                       <p
-                        className={`mt-2 text-[10px] font-semibold tracking-wide md:text-xs ${
-                          isFreeCard ? "text-primary-blue" : "text-black/70"
-                        }`}
+                        className={`mt-2 text-[10px] font-semibold tracking-wide md:text-xs ${isFreeCard ? "text-primary-blue" : "text-black/70"
+                          }`}
                       >
                         {loggedOutCardText}
                       </p>
