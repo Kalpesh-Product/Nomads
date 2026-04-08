@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import humanDate from "../utils/humanDate";
 import { ArrowLeft } from "lucide-react";
 
 const AiBlogDetails = () => {
+    const navigate = useNavigate();
     const handleBackButtonClick = () => {
         navigate(-1);
     };

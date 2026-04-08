@@ -265,6 +265,7 @@ const AiBlogsFetch = () => {
     const [dest, setDest] = useState(DESTS[0]);
     const formData = useSelector((state) => state.location.formValues);
     const initialized = useRef(false);
+    const navigate = useNavigate();
 
     const handleBackButtonClick = () => {
         navigate(-1);
