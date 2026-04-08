@@ -1118,7 +1118,7 @@ const AiListings = ({ forceListView = false }) => {
                           {service.label.split(" ").map((word) => (
                             <span
                               key={`${service.label}-${word}`}
-                              className="text-xs font-bold uppercase text-black/90 leading-tight"
+                              className="text-sm md:text-base font-bold uppercase text-black/90 leading-tight"
                             >
                               {word}
                             </span>
