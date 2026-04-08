@@ -4,10 +4,14 @@ import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema(
   {
+    fullName: {
+      type: String,
+      trim: true,
+    },
     firstName: {
       type: String,
       trim: true,
-      required: [true, "First name is required"],
+      // required: [true, "First name is required"],
     },
     lastName: {
       type: String,
@@ -30,6 +34,10 @@ const userSchema = new mongoose.Schema(
     resetPasswordToken: String,
     resetPasswordExpire: Date,
     country: {
+      type: String,
+      trim: true,
+    },
+    countryOfResidence: {
       type: String,
       trim: true,
     },
