@@ -236,9 +236,9 @@ const NewsCard = ({ a }) => {
 const normalizeLabel = (label) =>
   label
     ? label
-      .replace(/\+/g, " ")
-      .replace(/[\u2010-\u2015\u2212\u{FE63}\u{FF0D}]/gu, "-")
-      .trim()
+        .replace(/\+/g, " ")
+        .replace(/[\u2010-\u2015\u2212\u{FE63}\u{FF0D}]/gu, "-")
+        .trim()
     : label;
 
 const buildExactKeyword = (label) => {
@@ -405,7 +405,6 @@ const NewsFetch = () => {
             </Select>
           </FormControl>
         </div> */}
-        a{" "}
       </div>
 
       {/* Results */}

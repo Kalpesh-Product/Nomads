@@ -29,12 +29,6 @@ import SearchBarCombobox from "../components/SearchBarCombobox.jsx";
 import AiSelectedBadgesSearchBar from "../components/AiSelectedBadgesSearchBar.jsx";
 import { IoSearch } from "react-icons/io5";
 import { HiOutlineArrowLeft } from "react-icons/hi";
-import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
-import {
-  HiOutlineCog,
-  HiOutlineKey,
-  HiOutlineUserCircle,
-} from "react-icons/hi";
 import { AnimatePresence, motion } from "motion/react";
 import useAuth from "../hooks/useAuth.js";
 
@@ -47,22 +41,27 @@ const CURATED_RESULTS_HEADING_TEXT =
   "Please find below the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
 
 const valueAddedServiceItems = [
-  { label: "VISA Support", icon: LuMapPinned, path: "/visa-support" },
+  { label: "ANY VISA SUPPORT", path: "/visa-support" },
   {
-    label: "Overall Activation Support",
-    icon: HiOutlineKey,
+    label: "OVERALL ACTIVATION SUPPORT",
     path: "/overall-activation-support",
   },
   {
-    label: "New Company Setup",
-    icon: HiOutlineCog,
+    label: "NEW COMPANY SUPPORT",
     path: "/new-company-setup",
   },
-  { label: "Consultation", icon: LuCircleDollarSign, path: "/consultation" },
+  { label: "ANY CONSULTATION SUPPORT", path: "/consultation" },
   {
-    label: "Apply for Job",
-    icon: HiOutlineUserCircle,
+    label: "APPLY FOR JOB",
     badge: "Coming soon",
+  },
+  {
+    label: "VIEW BALI BLOGS",
+    path: "/blogs",
+  },
+  {
+    label: "VIEW BALI NEWS",
+    path: "/news",
   },
 ];
 
@@ -1101,7 +1100,6 @@ const AiListings = ({ forceListView = false }) => {
               {formData?.category === VALUE_ADDED_SERVICES_CATEGORY ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-5">
                   {valueAddedServiceItems.map((service) => {
-                    const Icon = service.icon;
                     const isDisabled = !service.path;
 
                     return (
@@ -1116,13 +1114,17 @@ const AiListings = ({ forceListView = false }) => {
                             : "hover:bg-[#e8e8ed]"
                         }`}
                       >
-                        <Icon size={24} className="text-black/80" />
-                        <div className="mt-3 flex flex-col items-center gap-1.5 justify-center">
-                          <span className="text-xs font-bold uppercase text-black/90 leading-tight">
-                            {service.label}
-                          </span>
+                        <div className="flex flex-col items-center justify-center">
+                          {service.label.split(" ").map((word) => (
+                            <span
+                              key={`${service.label}-${word}`}
+                              className="text-sm md:text-base font-bold uppercase text-black/90 leading-tight"
+                            >
+                              {word}
+                            </span>
+                          ))}
                           {service.badge && (
-                            <span className="rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[9px] font-semibold normal-case text-black shadow-sm">
+                            <span className="mt-2 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[9px] font-semibold leading-none normal-case text-black shadow-sm">
                               {service.badge}
                             </span>
                           )}
