@@ -2,9 +2,14 @@ import { TextField, IconButton, InputAdornment } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { useEffect, useMemo, useState } from "react";
 
+import { useMutation } from "@tanstack/react-query";
+
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import AiPrimaryButton from "../components/AiPrimaryButton";
+import useAuth from "../hooks/useAuth";
+import axios from "../utils/axios";
+import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 
 const LOGIN_PROMPT =
   "Login to unlock all features and get the most out of your Nomad experience.";
@@ -24,6 +29,7 @@ const toSentenceCase = (value = "") => {
 };
 
 export default function AiLogin() {
+  const { auth, setAuth } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { redirectGoal } = useParams();
@@ -66,9 +72,9 @@ export default function AiLogin() {
     let descriptionIndex = 0;
     let messageIndex = 0;
     let loginHeadingIndex = 0;
-    let cleanupDescription = () => { };
-    let cleanupMessage = () => { };
-    let cleanupLoginHeading = () => { };
+    let cleanupDescription = () => {};
+    let cleanupMessage = () => {};
+    let cleanupLoginHeading = () => {};
 
     const typeLoginHeading = () => {
       const loginHeadingInterval = setInterval(() => {
@@ -127,7 +133,23 @@ export default function AiLogin() {
     };
   }, [loginContext]);
 
-  const { control } = useForm({
+  useEffect(() => {
+    if (auth?.user) {
+      const redirectPath =
+        location.state &&
+        typeof location.state === "object" &&
+        typeof location.state.redirectTo === "string" &&
+        location.state.redirectTo.startsWith("/")
+          ? location.state.redirectTo
+          : redirectGoal
+            ? `/search/${redirectGoal}/results`
+            : "/home";
+
+      navigate(redirectPath, { replace: true });
+    }
+  }, [auth, location.state, navigate, redirectGoal]);
+
+  const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       email: "",
       password: "",
@@ -151,17 +173,59 @@ export default function AiLogin() {
     return "/home";
   };
 
-  const handleLogin = (event) => {
-    event.preventDefault();
-    const redirectPath = resolveRedirectPath();
-    const [pathname, search = ""] = redirectPath.split("?");
-    const nextParams = new URLSearchParams(search);
-    nextParams.set("login", "true");
+  const { mutate: submitLogin, isPending: isLoginPending } = useMutation({
+    mutationFn: async (data) => {
+      const payload = {
+        email: data.email,
+        password: data.password,
+      };
 
-    navigate({
-      pathname,
-      search: `?${nextParams.toString()}`,
-    });
+      const response = await axios.post("auth/login", payload);
+
+      setAuth((prevState) => ({
+        ...prevState,
+        accessToken: response?.data?.accessToken,
+        user: response?.data?.user,
+      }));
+
+      return response.data;
+    },
+    onSuccess: (data) => {
+      showSuccessAlert(data?.message || "Login successful");
+      reset();
+
+      const redirectPath = resolveRedirectPath();
+      const [pathname, search = ""] = redirectPath.split("?");
+      const nextParams = new URLSearchParams(search);
+      nextParams.set("login", "true");
+
+      navigate(
+        {
+          pathname,
+          search: `?${nextParams.toString()}`,
+        },
+        { replace: true },
+      );
+    },
+    onError: (error) => {
+      if (error.response) {
+        const { status, data } = error.response;
+        let message = "Something went wrong";
+
+        if (status === 400) message = "Email and password are required";
+        else if (status === 401 && data?.message) message = data.message;
+        else if (status === 500)
+          message = "Internal server error. Please try again.";
+
+        showErrorAlert(message);
+      } else {
+        showErrorAlert("Network error. Please check your connection.");
+      }
+    },
+  });
+
+  const onSubmit = (formData) => {
+    submitLogin(formData);
   };
 
   return (
@@ -188,20 +252,25 @@ export default function AiLogin() {
           </h1>
 
           <form
-            onSubmit={handleLogin}
-            className={`w-full grid grid-cols-1 gap-6 md:grid-cols-2 ${isFormVisible ? "visible" : "invisible"
-              }`}
+            onSubmit={handleSubmit(onSubmit)}
+            className={`w-full grid grid-cols-1 gap-6 md:grid-cols-2 ${
+              isFormVisible ? "visible" : "invisible"
+            }`}
           >
             <Controller
               name="email"
               control={control}
-              render={({ field }) => (
+              rules={{ required: "Email is required" }}
+              render={({ field, fieldState }) => (
                 <TextField
                   {...field}
                   label="Email"
                   type="email"
                   fullWidth
+                  required
                   variant="standard"
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
                 />
               )}
             />
@@ -209,13 +278,17 @@ export default function AiLogin() {
             <Controller
               name="password"
               control={control}
-              render={({ field }) => (
+              rules={{ required: "Password is required" }}
+              render={({ field, fieldState }) => (
                 <TextField
                   {...field}
                   label="Password"
                   type={showPassword ? "text" : "password"}
                   fullWidth
+                  required
                   variant="standard"
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
@@ -237,6 +310,8 @@ export default function AiLogin() {
               <AiPrimaryButton
                 title="Login"
                 type="submit"
+                isLoading={isLoginPending}
+                disabled={isLoginPending}
                 className="bg-primary-blue flex text-white font-[500] capitalize hover:bg-black w-full sm:w-[7rem] px-6"
               />
             </div>

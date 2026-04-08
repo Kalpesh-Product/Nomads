@@ -22,7 +22,7 @@ export default function useLogout() {
         };
       });
 
-      navigate("/login");
+      // navigate("/login");
     } catch (error) {
       showErrorAlert(error.message);
     }
