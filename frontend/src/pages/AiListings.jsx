@@ -1124,7 +1124,7 @@ const AiListings = ({ forceListView = false }) => {
                             </span>
                           ))}
                           {service.badge && (
-                            <span className="mt-2 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[9px] font-semibold normal-case text-black shadow-sm">
+                            <span className="mt-2 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[9px] font-semibold leading-none normal-case text-black shadow-sm">
                               {service.badge}
                             </span>
                           )}
