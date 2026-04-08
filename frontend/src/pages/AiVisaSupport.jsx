@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import Container from "../components/Container";
 import { aiDestinationCards } from "../constants/aiDestinationCards";
 import useNomadLoginState from "../hooks/useNomadLoginState";
+import useAuth from "../hooks/useAuth";
 
 const floatingLabelSx = {
   color: "black",
@@ -57,12 +58,13 @@ const AiVisaSupport = () => {
   const [typedMessage, setTypedMessage] = useState("");
   const [typedVisaHeading, setTypedVisaHeading] = useState("");
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const { auth } = useAuth();
   const isLoggedIn = useNomadLoginState();
   const navigate = useNavigate();
   const { control, handleSubmit, reset, setValue, watch } = useForm({
     defaultValues,
   });
-  const messagePrefix = isLoggedIn ? "Abrar, " : "";
+  const messagePrefix = isLoggedIn ? auth?.user?.fullName + ", " : "User, ";
   const visaSupportPrompt = `${messagePrefix}${VISA_SUPPORT_PROMPT}`;
   const countries = useMemo(() => Country.getAllCountries(), []);
   const destinationOptions = useMemo(
@@ -143,7 +145,7 @@ const AiVisaSupport = () => {
 
     let messageIndex = 0;
     let visaHeadingIndex = 0;
-    let cleanupHeading = () => {};
+    let cleanupHeading = () => { };
 
     const typeVisaHeading = () => {
       const headingInterval = setInterval(() => {
@@ -204,9 +206,8 @@ const AiVisaSupport = () => {
             <Box
               component="form"
               onSubmit={handleSubmit(handleFormSubmit)}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${
-                isFormVisible ? "visible" : "invisible"
-              }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
+                }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
                 <Controller

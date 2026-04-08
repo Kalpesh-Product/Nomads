@@ -17,6 +17,7 @@ import Swal from "sweetalert2";
 import { FaCheck } from "react-icons/fa";
 import Container from "../components/Container";
 import useNomadLoginState from "../hooks/useNomadLoginState";
+import useAuth from "../hooks/useAuth";
 
 const floatingLabelSx = {
   color: "black",
@@ -59,6 +60,7 @@ const getFlagIconUrl = (isoCode) =>
 const AiNewCompanySetup = () => {
   const [typedMessage, setTypedMessage] = useState("");
   const [typedPageHeading, setTypedPageHeading] = useState("");
+  const { auth } = useAuth();
   const isLoggedIn = useNomadLoginState();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const countries = useMemo(() => Country.getAllCountries(), []);
@@ -70,7 +72,7 @@ const AiNewCompanySetup = () => {
     () => countries.find((country) => country.name === selectedCountry) || null,
     [countries, selectedCountry],
   );
-  const messagePrefix = isLoggedIn ? "Abrar, " : "";
+  const messagePrefix = isLoggedIn ? auth?.user?.fullName + ", " : "User, ";
   const newCompanyPrompt = `${messagePrefix}${NEW_COMPANY_PROMPT}`;
 
   const [isPending, setIsPending] = useState(false);
@@ -122,7 +124,7 @@ const AiNewCompanySetup = () => {
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => {};
+    let cleanupHeading = () => { };
 
     const typeHeading = () => {
       const headingInterval = setInterval(() => {
@@ -186,9 +188,8 @@ const AiNewCompanySetup = () => {
                 event.preventDefault();
                 handleFormSubmit();
               }}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${
-                isFormVisible ? "visible" : "invisible"
-              }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
+                }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-4">
                 <Controller

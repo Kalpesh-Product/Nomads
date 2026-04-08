@@ -16,6 +16,7 @@ import { Country } from "country-state-city";
 import Swal from "sweetalert2";
 import Container from "../components/Container";
 import useNomadLoginState from "../hooks/useNomadLoginState";
+import useAuth from "../hooks/useAuth";
 
 const floatingLabelSx = {
   color: "black",
@@ -54,13 +55,14 @@ const getFlagIconUrl = (isoCode) =>
 const AiOverallActivationSupport = () => {
   const [typedMessage, setTypedMessage] = useState("");
   const [typedPageHeading, setTypedPageHeading] = useState("");
+  const { auth } = useAuth();
   const isLoggedIn = useNomadLoginState();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const countries = useMemo(() => Country.getAllCountries(), []);
   const { control, reset, setValue, watch } = useForm({
     defaultValues,
   });
-  const messagePrefix = isLoggedIn ? "Abrar, " : "";
+  const messagePrefix = isLoggedIn ? auth?.user?.fullName + ", " : "User, ";
   const overallActivationPrompt = `${messagePrefix}${OVERALL_ACTIVATION_PROMPT}`;
   const selectedNationality = watch("nationalityOnPassport");
   const selectedNationalityCountry = useMemo(

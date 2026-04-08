@@ -16,6 +16,7 @@ import { Country } from "country-state-city";
 import Swal from "sweetalert2";
 import Container from "../components/Container";
 import useNomadLoginState from "../hooks/useNomadLoginState";
+import useAuth from "../hooks/useAuth";
 
 const floatingLabelSx = {
   color: "black",
@@ -58,6 +59,7 @@ const getFlagIconUrl = (isoCode) =>
 const AiConsultation = () => {
   const [typedMessage, setTypedMessage] = useState("");
   const [typedPageHeading, setTypedPageHeading] = useState("");
+  const { auth } = useAuth();
   const isLoggedIn = useNomadLoginState();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const countries = useMemo(() => Country.getAllCountries(), []);
@@ -69,7 +71,7 @@ const AiConsultation = () => {
     () => countries.find((country) => country.name === selectedCountry) || null,
     [countries, selectedCountry],
   );
-  const messagePrefix = isLoggedIn ? "Abrar, " : "";
+  const messagePrefix = isLoggedIn ? auth?.user?.fullName + ", " : "User, ";
   const consultationPrompt = `${messagePrefix}${CONSULTATION_PROMPT}`;
 
   const [isPending, setIsPending] = useState(false);
@@ -121,7 +123,7 @@ const AiConsultation = () => {
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => {};
+    let cleanupHeading = () => { };
 
     const typeHeading = () => {
       const headingInterval = setInterval(() => {
