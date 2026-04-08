@@ -72,6 +72,7 @@ import AiCompatibleSearchResults from "./pages/AiCompatibleSearchResults";
 import AiHomeLoggedIn from "./pages/AiHomeLoggedIn";
 import AiLogin from "./pages/AiLogin";
 import AiSignup from "./pages/AiSignup";
+import AiProfile from "./pages/AiProfile";
 import AiVisaSupport from "./pages/AiVisaSupport";
 import AiVisaSupportThankYou from "./pages/AiVisaSupportThankYou";
 import AiOverallActivationSupport from "./pages/AiOverallActivationSupport";
@@ -233,6 +234,7 @@ if (tenant === "main") {
               element: <AiNewCompanySetup />,
             },
             { path: "consultation", element: <AiConsultation /> },
+            { path: "ai-profile", element: <AiProfile /> },
             {
               path: "become-a-contributor",
               element: <AiBecomeContributor />,
