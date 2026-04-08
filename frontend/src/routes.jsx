@@ -79,6 +79,9 @@ import AiNewCompanySetup from "./pages/AiNewCompanySetup";
 import AiConsultation from "./pages/AiConsultation";
 import AiManualSearch from "./pages/AiManualSearch";
 import AiBecomeContributor from "./pages/AiBecomeContributor";
+import AiBlogsFetch from "./components/AiBlogsFetch";
+import AiNewsFetch from "./components/AiNewsFetch";
+import AiBlogDetails from "./pages/AiBlogDetails";
 
 function getTenantFromHost() {
   const hostname = window.location.hostname; // e.g. "nomad.wono.co" or "nomad.localhost"
@@ -205,6 +208,10 @@ if (tenant === "main") {
             },
             { path: "manual-search", element: <AiManualSearch /> },
             { path: "ai-verticals", element: <AiGlobalListings /> },
+            { path: "ai-blogs", element: <AiBlogsFetch /> },
+            { path: "ai-blogs/ai-blog-details", element: <AiBlogDetails /> },
+            { path: "ai-news", element: <AiNewsFetch /> },
+            { path: "ai-news/ai-news-details", element: <AiBlogDetails /> },
             { path: "ai-listings", element: <AiListings /> },
             { path: "ai-listings-list", element: <AiListingsListView /> },
             { path: "ai-listings/:company", element: <AiProduct /> },

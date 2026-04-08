@@ -113,10 +113,11 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
     }
   };
 
+  const currentSearch = location.search || "";
   const headerLinks = [
     // { id: 1, text: "Home", to: "/" },
-    { id: 2, text: "News", to: "/news" },
-    { id: 3, text: "Blog", to: "/blog" },
+    { id: 2, text: "News", to: `/ai-news${currentSearch}` },
+    { id: 3, text: "Blog", to: `/ai-blogs${currentSearch}` },
   ];
 
   const shouldShowHeaderLinks =
@@ -263,7 +264,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                   {/* Blogs and News - Added on the LEFT side of Map/List View */}
                   <li className="flex items-center gap-6">
                     <Link
-                      to="/news"
+                      to={`/ai-news${currentSearch}`}
                       className="group relative text-md text-black font-semibold"
                     >
                       <span className="relative z-10 group-hover:font-bold mb-2 text-sm">
@@ -273,7 +274,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                     </Link>
 
                     <Link
-                      to="/blog"
+                      to={`/ai-blogs${currentSearch}`}
                       className="group relative text-md text-black font-semibold"
                     >
                       <span className="relative z-10 group-hover:font-bold mb-2 text-sm">
