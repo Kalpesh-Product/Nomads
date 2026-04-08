@@ -26,12 +26,12 @@ import { Helmet } from "@dr.pogodin/react-helmet";
 import useAuth from "../hooks/useAuth.js";
 import { HiOutlineX } from "react-icons/hi";
 
-import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
-import {
-  HiOutlineCog,
-  HiOutlineKey,
-  HiOutlineUserCircle,
-} from "react-icons/hi";
+// import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
+// import {
+//   HiOutlineCog,
+//   HiOutlineKey,
+//   HiOutlineUserCircle,
+// } from "react-icons/hi";
 
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
 const VALUE_ADDED_SERVICES_DEFAULT_VISIBLE_COUNT = 5;
@@ -92,32 +92,29 @@ const HorizontalScrollWrapper = ({ children, title }) => {
 };
 
 const valueAddedServiceItems = [
-  { label: "VISA Support", icon: LuMapPinned, path: "/visa-support" },
+  { label: "ANY VISA SUPPORT", path: "/visa-support" },
   {
-    label: "Overall Activation Support",
-    icon: HiOutlineKey,
+    label: "OVERALL ACTIVATION SUPPORT",
     path: "/overall-activation-support",
   },
   {
-    label: "New Company Setup",
-    icon: HiOutlineCog,
+    label: "NEW COMPANY SUPPORT",
     path: "/new-company-setup",
   },
-  { label: "Consultation", icon: LuCircleDollarSign, path: "/consultation" },
+  { label: "ANY CONSULTATION SUPPORT", path: "/consultation" },
   {
-    label: "Apply for Job",
-    icon: HiOutlineUserCircle,
+    label: "APPLY FOR JOB",
     badge: "Coming soon",
   },
   {
-    label: "Blogs",
-    icon: HiOutlineUserCircle,
-    path: "/blogs",
+    label: "VIEW LOCATION BLOGS",
+    path: "/ai-blogs",
+    usesSelectedLocation: true,
   },
   {
-    label: "News",
-    icon: HiOutlineUserCircle,
-    path: "/news",
+    label: "VIEW LOCATION NEWS",
+    path: "/ai-news",
+    usesSelectedLocation: true,
   },
 ];
 
@@ -573,6 +570,12 @@ const AiGlobalListingsList = () => {
     });
   };
 
+  const getValueAddedServiceLabel = (service) => {
+    if (!service.usesSelectedLocation) return service.label;
+    const locationLabel = selectedLocationLabel || "LOCATION";
+    return service.label.replace("LOCATION", locationLabel.toUpperCase());
+  };
+
   const prioritizedCompanies = ["BIZ Nest", "MeWo"];
   const sortedListings = [...(listingsData || [])].sort((a, b) => {
     const aIsPriority = prioritizedCompanies.includes(a.companyName);
@@ -869,12 +872,14 @@ const AiGlobalListingsList = () => {
                         </h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                           {visibleValueAddedServiceItems.map((service) => {
-                            const Icon = service.icon;
                             const isDisabled = !service.path;
+
+                            const serviceLabel =
+                              getValueAddedServiceLabel(service);
 
                             return (
                               <button
-                                key={service.label}
+                                key={serviceLabel}
                                 type="button"
                                 onClick={() =>
                                   handleValueAddedServiceClick(service)
@@ -886,13 +891,17 @@ const AiGlobalListingsList = () => {
                                     : "hover:bg-[#e8e8ed]"
                                 }`}
                               >
-                                <Icon size={24} className="text-black/80" />
-                                <div className="mt-3 flex flex-col items-center gap-1.5 justify-center">
-                                  <span className="text-xs font-bold uppercase text-black/90 leading-tight">
-                                    {service.label}
-                                  </span>
+                                <div className="flex flex-col items-center justify-center">
+                                  {serviceLabel.split(" ").map((word) => (
+                                    <span
+                                      key={`${serviceLabel}-${word}`}
+                                      className="text-sm md:text-base font-bold uppercase text-black/90 leading-tight"
+                                    >
+                                      {word}
+                                    </span>
+                                  ))}
                                   {service.badge && (
-                                    <span className="rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[9px] font-semibold normal-case text-black shadow-sm">
+                                    <span className="mt-2 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[9px] font-semibold normal-case text-black shadow-sm">
                                       {service.badge}
                                     </span>
                                   )}
@@ -1219,12 +1228,14 @@ const AiGlobalListingsList = () => {
                       </h2>
                       <div className="flex md:hidden flex-nowrap overflow-x-auto snap-x snap-mandatory gap-4 pb-2 custom-scrollbar-hide">
                         {visibleValueAddedServiceItems.map((service) => {
-                          const Icon = service.icon;
                           const isDisabled = !service.path;
+
+                          const serviceLabel =
+                            getValueAddedServiceLabel(service);
 
                           return (
                             <button
-                              key={service.label}
+                              key={serviceLabel}
                               type="button"
                               onClick={() =>
                                 handleValueAddedServiceClick(service)
@@ -1236,16 +1247,17 @@ const AiGlobalListingsList = () => {
                                   : "hover:bg-[#e8e8ed]"
                               }`}
                             >
-                              <Icon
-                                size={24}
-                                className="mx-auto text-black/80"
-                              />
-                              <div className="mt-2 flex flex-col items-center justify-center gap-1.5">
-                                <span className="text-nano font-bold uppercase text-black/90 leading-tight">
-                                  {service.label}
-                                </span>
+                              <div className="flex flex-col items-center justify-center">
+                                {serviceLabel.split(" ").map((word) => (
+                                  <span
+                                    key={`${serviceLabel}-${word}`}
+                                    className="text-sm md:text-base font-bold uppercase text-black/90 leading-tight"
+                                  >
+                                    {word}
+                                  </span>
+                                ))}
                                 {service.badge && (
-                                  <span className="rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[8px] font-semibold normal-case text-black shadow-sm">
+                                  <span className="mt-1.5 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[8px] font-semibold normal-case text-black shadow-sm">
                                     {service.badge}
                                   </span>
                                 )}
@@ -1256,12 +1268,13 @@ const AiGlobalListingsList = () => {
                       </div>
                       <div className="hidden md:grid grid-cols-3 gap-4">
                         {valueAddedServiceItems.map((service) => {
-                          const Icon = service.icon;
                           const isDisabled = !service.path;
+                          const serviceLabel =
+                            getValueAddedServiceLabel(service);
 
                           return (
                             <button
-                              key={service.label}
+                              key={serviceLabel}
                               type="button"
                               onClick={() =>
                                 handleValueAddedServiceClick(service)
@@ -1273,16 +1286,17 @@ const AiGlobalListingsList = () => {
                                   : "hover:bg-[#e8e8ed]"
                               }`}
                             >
-                              <Icon
-                                size={24}
-                                className="mx-auto text-black/80"
-                              />
-                              <div className="mt-2 flex flex-col items-center justify-center gap-1.5">
-                                <span className="text-nano font-bold uppercase text-black/90 leading-tight">
-                                  {service.label}
-                                </span>
+                              <div className="flex flex-col items-center justify-center">
+                                {serviceLabel.split(" ").map((word) => (
+                                  <span
+                                    key={`${serviceLabel}-${word}`}
+                                    className="text-sm md:text-base font-bold uppercase text-black/90 leading-tight"
+                                  >
+                                    {word}
+                                  </span>
+                                ))}
                                 {service.badge && (
-                                  <span className="rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[8px] font-semibold normal-case text-black shadow-sm">
+                                  <span className="mt-1.5 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[8px] font-semibold normal-case text-black shadow-sm">
                                     {service.badge}
                                   </span>
                                 )}
