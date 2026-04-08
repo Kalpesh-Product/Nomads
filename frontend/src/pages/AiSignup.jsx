@@ -11,7 +11,11 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { Country } from "country-state-city";
+import { useMutation } from "@tanstack/react-query";
+import axios from "../utils/axios";
 import AiPrimaryButton from "../components/AiPrimaryButton";
+import { isValidInternationalPhone } from "../utils/validators";
+import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 
 const SIGNUP_PROMPT =
   "Create your account to personalize your journey and unlock the full Nomad experience.";
@@ -32,10 +36,9 @@ export default function AiSignup() {
   const toggleConfirmPasswordVisibility = () =>
     setShowConfirmPassword((prev) => !prev);
 
-  const { control, handleSubmit, setValue, watch } = useForm({
+  const { control, handleSubmit, setValue, watch, reset } = useForm({
     defaultValues: {
-      firstName: "",
-      lastName: "",
+      fullName: "",
       email: "",
       country: "India",
       password: "",
@@ -54,9 +57,33 @@ export default function AiSignup() {
     [countries, selectedCountryName],
   );
 
-  const handleSignup = () => {
-    navigate("/ai-login");
-  };
+  const { mutate: submitRegistration, isPending } = useMutation({
+    mutationFn: async (data) => {
+      const payload = {
+        ...data,
+        sheetName: "Sign_up",
+      };
+
+      const response = await axios.post(
+        "/forms/add-new-b2c-form-submission",
+        payload,
+      );
+
+      return response.data;
+    },
+    onSuccess: () => {
+      showSuccessAlert(
+        "Signup successful! Please check your email for confirmation.",
+      );
+      reset();
+      navigate("/ai-login");
+    },
+    onError: (error) => {
+      showErrorAlert(error.response?.data?.message || "Something went wrong");
+    },
+  });
+
+  const handleSignup = (data) => submitRegistration(data);
 
   useEffect(() => {
     setTypedMessage("");
@@ -65,7 +92,7 @@ export default function AiSignup() {
 
     let messageIndex = 0;
     let signupHeadingIndex = 0;
-    let cleanupHeading = () => {};
+    let cleanupHeading = () => { };
 
     const typeSignupHeading = () => {
       const headingInterval = setInterval(() => {
@@ -121,35 +148,44 @@ export default function AiSignup() {
 
         <form
           onSubmit={handleSubmit(handleSignup)}
-          className={`w-full grid grid-cols-1 md:grid-cols-2 gap-6 ${
-            isFormVisible ? "visible" : "invisible"
-          }`}
+          className={`w-full grid grid-cols-1 md:grid-cols-2 gap-6 ${isFormVisible ? "visible" : "invisible"
+            }`}
         >
           <Controller
-            name="firstName"
+            name="fullName"
             control={control}
-            render={({ field }) => (
+            rules={{ required: "Full name is required" }}
+            render={({ field, fieldState }) => (
               <TextField
                 {...field}
                 label="Full Name"
                 fullWidth
+                required
                 variant="standard"
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
               />
             )}
           />
 
           <Controller
-            name="lastName"
+            name="email"
             control={control}
-            render={({ field }) => (
+            rules={{ required: "Email is required" }}
+            render={({ field, fieldState }) => (
               <TextField
                 {...field}
                 label="Email"
+                type="email"
                 fullWidth
+                required
                 variant="standard"
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
               />
             )}
           />
+
 
           <Controller
             name="country"
@@ -210,14 +246,21 @@ export default function AiSignup() {
           <Controller
             name="mobile"
             control={control}
-            render={({ field }) => (
+            rules={{
+              required: "Mobile number is required",
+              validate: isValidInternationalPhone,
+            }}
+            render={({ field, fieldState }) => (
               <MuiTelInput
                 {...field}
                 label="Mobile"
                 fullWidth
                 defaultCountry={selectedCountry?.isoCode || "IN"}
                 forceCallingCode
+                required
                 variant="standard"
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
                 onChange={(value) => field.onChange(value)}
               />
             )}
@@ -226,13 +269,17 @@ export default function AiSignup() {
           <Controller
             name="password"
             control={control}
-            render={({ field }) => (
+            rules={{ required: "Password is required" }}
+            render={({ field, fieldState }) => (
               <TextField
                 {...field}
                 label="Password"
                 type={showPassword ? "text" : "password"}
                 fullWidth
+                required
                 variant="standard"
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
@@ -253,13 +300,17 @@ export default function AiSignup() {
           <Controller
             name="confirmPassword"
             control={control}
-            render={({ field }) => (
+            rules={{ required: "Confirm password is required" }}
+            render={({ field, fieldState }) => (
               <TextField
                 {...field}
                 label="Confirm Password"
                 type={showConfirmPassword ? "text" : "password"}
                 fullWidth
+                required
                 variant="standard"
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
@@ -280,7 +331,9 @@ export default function AiSignup() {
           <div className="col-span-1 md:col-span-2 flex justify-center items-center mt-2 py-2 w-full">
             <AiPrimaryButton
               type="submit"
+              isLoading={isPending}
               title="Signup"
+              disabled={isPending}
               className="bg-primary-blue flex text-white font-[500] capitalize hover:bg-primary-light w-full sm:w-[7rem] px-6"
             />
           </div>
