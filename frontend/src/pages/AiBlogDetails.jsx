@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import humanDate from "../utils/humanDate";
+import { ArrowLeft } from "lucide-react";
 
 const AiBlogDetails = () => {
+    const handleBackButtonClick = () => {
+        navigate(-1);
+    };
     // const newsContent = [
     //   {
     //     id: 1,
@@ -63,6 +67,14 @@ const AiBlogDetails = () => {
 
     return (
         <div className="min-w-[70%] max-w-[80rem] lg:max-w-[70rem] mx-0 md:mx-auto p-4 lg:p-0">
+            <button
+                type="button"
+                onClick={handleBackButtonClick}
+                aria-label="Go back"
+                className="inline-flex items-center justify-center rounded-full border border-primary-blue p-1 text-primary-blue"
+            >
+                <ArrowLeft size={16} />
+            </button>
             <div className="flex flex-col gap-8">
                 <section className="space-y-8">
                     <h1 className="text-title leading-normal font-bold">
