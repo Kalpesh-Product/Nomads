@@ -48,7 +48,7 @@ const AiProfile = () => {
     });
 
     useEffect(() => {
-        if (!auth?.user) navigate("/login", { replace: true });
+        if (!auth?.user) navigate("/ai-login", { replace: true });
     }, [auth, navigate]);
 
     useEffect(() => {
@@ -61,7 +61,7 @@ const AiProfile = () => {
         setIsLogoutLoading(true);
         try {
             await logout();
-            navigate("/login");
+            navigate("/ai-login");
         } catch (error) {
             console.error("Logout failed:", error);
             showErrorAlert("Logout failed");
@@ -126,7 +126,7 @@ const AiProfile = () => {
                 confirmPassword: "",
             });
             await logout();
-            navigate("/login", { replace: true });
+            navigate("/ai-login", { replace: true });
         },
         onError: (error) => {
             showErrorAlert(
