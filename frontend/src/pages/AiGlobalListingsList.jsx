@@ -107,12 +107,14 @@ const valueAddedServiceItems = [
     badge: "Coming soon",
   },
   {
-    label: "VIEW BALI BLOGS",
-    path: "/blogs",
+    label: "VIEW LOCATION BLOGS",
+    path: "/ai-blogs",
+    usesSelectedLocation: true,
   },
   {
-    label: "VIEW BALI NEWS",
-    path: "/news",
+    label: "VIEW LOCATION NEWS",
+    path: "/ai-news",
+    usesSelectedLocation: true,
   },
 ];
 
@@ -568,6 +570,12 @@ const AiGlobalListingsList = () => {
     });
   };
 
+  const getValueAddedServiceLabel = (service) => {
+    if (!service.usesSelectedLocation) return service.label;
+    const locationLabel = selectedLocationLabel || "LOCATION";
+    return service.label.replace("LOCATION", locationLabel.toUpperCase());
+  };
+
   const prioritizedCompanies = ["BIZ Nest", "MeWo"];
   const sortedListings = [...(listingsData || [])].sort((a, b) => {
     const aIsPriority = prioritizedCompanies.includes(a.companyName);
@@ -866,9 +874,12 @@ const AiGlobalListingsList = () => {
                           {visibleValueAddedServiceItems.map((service) => {
                             const isDisabled = !service.path;
 
+                            const serviceLabel =
+                              getValueAddedServiceLabel(service);
+
                             return (
                               <button
-                                key={service.label}
+                                key={serviceLabel}
                                 type="button"
                                 onClick={() =>
                                   handleValueAddedServiceClick(service)
@@ -881,9 +892,9 @@ const AiGlobalListingsList = () => {
                                 }`}
                               >
                                 <div className="flex flex-col items-center justify-center">
-                                  {service.label.split(" ").map((word) => (
+                                  {serviceLabel.split(" ").map((word) => (
                                     <span
-                                      key={`${service.label}-${word}`}
+                                      key={`${serviceLabel}-${word}`}
                                       className="text-sm md:text-base font-bold uppercase text-black/90 leading-tight"
                                     >
                                       {word}
@@ -1219,9 +1230,12 @@ const AiGlobalListingsList = () => {
                         {visibleValueAddedServiceItems.map((service) => {
                           const isDisabled = !service.path;
 
+                          const serviceLabel =
+                            getValueAddedServiceLabel(service);
+
                           return (
                             <button
-                              key={service.label}
+                              key={serviceLabel}
                               type="button"
                               onClick={() =>
                                 handleValueAddedServiceClick(service)
@@ -1234,9 +1248,9 @@ const AiGlobalListingsList = () => {
                               }`}
                             >
                               <div className="flex flex-col items-center justify-center">
-                                {service.label.split(" ").map((word) => (
+                                {serviceLabel.split(" ").map((word) => (
                                   <span
-                                    key={`${service.label}-${word}`}
+                                    key={`${serviceLabel}-${word}`}
                                     className="text-sm md:text-base font-bold uppercase text-black/90 leading-tight"
                                   >
                                     {word}
@@ -1255,10 +1269,12 @@ const AiGlobalListingsList = () => {
                       <div className="hidden md:grid grid-cols-3 gap-4">
                         {valueAddedServiceItems.map((service) => {
                           const isDisabled = !service.path;
+                          const serviceLabel =
+                            getValueAddedServiceLabel(service);
 
                           return (
                             <button
-                              key={service.label}
+                              key={serviceLabel}
                               type="button"
                               onClick={() =>
                                 handleValueAddedServiceClick(service)
@@ -1271,9 +1287,9 @@ const AiGlobalListingsList = () => {
                               }`}
                             >
                               <div className="flex flex-col items-center justify-center">
-                                {service.label.split(" ").map((word) => (
+                                {serviceLabel.split(" ").map((word) => (
                                   <span
-                                    key={`${service.label}-${word}`}
+                                    key={`${serviceLabel}-${word}`}
                                     className="text-sm md:text-base font-bold uppercase text-black/90 leading-tight"
                                   >
                                     {word}

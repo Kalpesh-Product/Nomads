@@ -56,12 +56,14 @@ const valueAddedServiceItems = [
     badge: "Coming soon",
   },
   {
-    label: "VIEW BALI BLOGS",
-    path: "/blogs",
+    label: "VIEW LOCATION BLOGS",
+    path: "/ai-blogs",
+    usesSelectedLocation: true,
   },
   {
-    label: "VIEW BALI NEWS",
-    path: "/news",
+    label: "VIEW LOCATION NEWS",
+    path: "/ai-news",
+    usesSelectedLocation: true,
   },
 ];
 
@@ -534,6 +536,12 @@ const AiListings = ({ forceListView = false }) => {
   const handleValueAddedServiceClick = (service) => {
     if (!service?.path) return;
     navigate(service.path);
+  };
+
+  const getValueAddedServiceLabel = (service) => {
+    if (!service?.usesSelectedLocation) return service.label;
+    const locationLabel = selectedStateLabel || "LOCATION";
+    return service.label.replace("LOCATION", locationLabel.toUpperCase());
   };
 
   const [mapOpen, setMapOpen] = useState(!forceListView);
@@ -1102,9 +1110,11 @@ const AiListings = ({ forceListView = false }) => {
                   {valueAddedServiceItems.map((service) => {
                     const isDisabled = !service.path;
 
+                    const serviceLabel = getValueAddedServiceLabel(service);
+
                     return (
                       <button
-                        key={service.label}
+                        key={serviceLabel}
                         type="button"
                         onClick={() => handleValueAddedServiceClick(service)}
                         disabled={isDisabled}
@@ -1115,9 +1125,9 @@ const AiListings = ({ forceListView = false }) => {
                         }`}
                       >
                         <div className="flex flex-col items-center justify-center">
-                          {service.label.split(" ").map((word) => (
+                          {serviceLabel.split(" ").map((word) => (
                             <span
-                              key={`${service.label}-${word}`}
+                              key={`${serviceLabel}-${word}`}
                               className="text-sm md:text-base font-bold uppercase text-black/90 leading-tight"
                             >
                               {word}
