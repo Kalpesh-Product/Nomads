@@ -40,14 +40,14 @@ export default function AiSignup() {
     defaultValues: {
       fullName: "",
       email: "",
-      country: "India",
+      countryOfResidence: "India",
       password: "",
       confirmPassword: "",
       mobile: "+91",
     },
   });
 
-  const selectedCountryName = watch("country");
+  const selectedCountryName = watch("countryOfResidence");
 
   const countries = useMemo(() => Country.getAllCountries(), []);
   const selectedCountry = useMemo(
@@ -188,7 +188,7 @@ export default function AiSignup() {
 
 
           <Controller
-            name="country"
+            name="countryOfResidence"
             control={control}
             render={({ field }) => (
               <TextField

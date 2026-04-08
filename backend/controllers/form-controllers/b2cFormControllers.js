@@ -239,37 +239,54 @@ const connectWithUsSchema = yup.object().shape({
   sheetName: yup.string().required("Please provide a sheet name"),
 });
 
-const nomadsSignupSchema = yup.object().shape({
-  firstName: yup.string().required("Please provide your first name"),
-  lastName: yup.string().required("Please provide your last name"),
-  email: yup
-    .string()
-    .email("Please provide a valid email")
-    .required("Please provide your email"),
-  password: yup.string().optional(),
-  mobile: yup
-    .string()
-    .trim()
-    .required("Please provide the mobile")
-    .test(
-      "is-valid-phone",
-      "Please provide a valid phone number",
-      function (value) {
-        if (!value) return false;
-        try {
-          const number = parsePhoneNumberFromString(value);
-          if (!number?.isValid()) return false;
+const nomadsSignupSchema = yup
+  .object()
+  .shape({
+    fullName: yup.string().trim().optional(),
+    firstName: yup.string().trim().optional(),
+    lastName: yup.string().trim().optional(),
+    countryOfResidence: yup.string().trim().optional(),
+    country: yup.string().trim().optional(),
+    email: yup
+      .string()
+      .email("Please provide a valid email")
+      .required("Please provide your email"),
+    password: yup.string().optional(),
+    mobile: yup
+      .string()
+      .trim()
+      .required("Please provide the mobile")
+      .test(
+        "is-valid-phone",
+        "Please provide a valid phone number",
+        function (value) {
+          if (!value) return false;
+          try {
+            const number = parsePhoneNumberFromString(value);
+            if (!number?.isValid()) return false;
 
-          // store the normalized version on the validated data
-          this.parent.mobile = number.number;
-          return true;
-        } catch {
-          return false;
-        }
-      },
-    ),
-  sheetName: yup.string().required("Please provide a sheet name"),
-});
+            // store the normalized version on the validated data
+            this.parent.mobile = number.number;
+            return true;
+          } catch {
+            return false;
+          }
+        },
+      ),
+    sheetName: yup.string().required("Please provide a sheet name"),
+  })
+  .test(
+    "name-present",
+    "Please provide your full name or first and last name",
+    (value) => {
+      const hasFullName = Boolean(value?.fullName?.trim());
+      const hasFirstAndLast = Boolean(
+        value?.firstName?.trim() && value?.lastName?.trim(),
+      );
+
+      return hasFullName || hasFirstAndLast;
+    },
+  );
 
 const contentRemovalRequestsSchema = yup.object().shape({
   fullName: yup
@@ -349,8 +366,7 @@ export const addB2CformSubmission = async (req, res, next) => {
       let resumeLink = "";
       if (req.file) {
         const data = await uploadFileToS3(
-          `job-applications/${payload.jobPosition}/${
-            payload.name
+          `job-applications/${payload.jobPosition}/${payload.name
           }_${randomUUID()}/${req.file.originalname}`,
           req.file,
         );
@@ -507,23 +523,33 @@ export const addB2CformSubmission = async (req, res, next) => {
       },
       Sign_up: {
         schema: nomadsSignupSchema,
-        map: (d) => ({
-          firstName: d.firstName?.trim(),
-          lastName: d.lastName?.trim(),
-          email: d.email?.trim(),
-          password: d.password,
-          mobile: d.mobile?.trim(),
-          sheetName: d.sheetName,
-          submittedAt: new Date(),
-        }),
+        map: (d) => {
+          const normalizedFullName =
+            d.fullName?.trim() || `${d.firstName || ""} ${d.lastName || ""}`.trim();
+          const [derivedFirstName = "", ...restName] = normalizedFullName.split(/\s+/);
+          const derivedLastName = d.lastName?.trim() || restName.join(" ");
+
+          return {
+            fullName: normalizedFullName,
+            firstName: d.firstName?.trim() || derivedFirstName,
+            lastName: derivedLastName,
+            countryOfResidence:
+              d.countryOfResidence?.trim() || d.country?.trim() || "",
+            email: d.email?.trim(),
+            password: d.password,
+            mobile: d.mobile?.trim(),
+            sheetName: d.sheetName,
+            submittedAt: new Date(),
+          };
+        },
         successMsg: "Sign-up saved successfully.",
         emailTemplate: (data) => ({
           to: data.email,
           subject: "Welcome to WoNo",
-          text: `Hi ${data.firstName}, welcome to WoNo! Your signup was successful.`,
+          text: `Hi ${data.fullName}, welcome to WoNo! Your signup was successful.`,
           html: `
       <h2>Welcome to WoNo!</h2>
-      <p>Hi ${data.firstName},</p>
+      <p>Hi ${data.fullName},</p>
       <p>Thank you for signing up with <b>WoNo</b>.</p>
       <p>We’re excited to have you onboard! Our team will review your profile and connect with you shortly to complete the onboarding process.</p>
       <p>Cheers,<br/>The WoNo Team</p>
