@@ -8,6 +8,10 @@ import {
   MenuItem,
   TextField,
   Typography,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
 } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { DatePicker } from "@mui/x-date-pickers";
@@ -17,6 +21,7 @@ import Swal from "sweetalert2";
 import Container from "../components/Container";
 import useNomadLoginState from "../hooks/useNomadLoginState";
 import useAuth from "../hooks/useAuth";
+import axios from "../utils/axios";
 
 const floatingLabelSx = {
   color: "black",
@@ -59,11 +64,14 @@ const getFlagIconUrl = (isoCode) =>
 const AiConsultation = () => {
   const [typedMessage, setTypedMessage] = useState("");
   const [typedPageHeading, setTypedPageHeading] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showChoiceModal, setShowChoiceModal] = useState(false);
+  const [submittedDestination, setSubmittedDestination] = useState("");
   const { auth } = useAuth();
   const isLoggedIn = useNomadLoginState();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const countries = useMemo(() => Country.getAllCountries(), []);
-  const { control, reset, setValue, watch } = useForm({
+  const { handleSubmit, control, reset, setValue, watch } = useForm({
     defaultValues,
   });
   const selectedCountry = watch("currentCountry");
@@ -76,19 +84,36 @@ const AiConsultation = () => {
 
   const [isPending, setIsPending] = useState(false);
 
-  const handleFormSubmit = async () => {
-    setIsPending(true);
+  // const handleFormSubmit = async () => {
+  //   setIsPending(true);
 
-    await Swal.fire({
-      title: "Request Submitted!",
-      text: "Your form has been submitted. We will get back to you shortly.",
-      icon: "success",
-      confirmButtonText: "OK",
-      confirmButtonColor: "#0BA9EF",
-    });
+  //   await Swal.fire({
+  //     title: "Request Submitted!",
+  //     text: "Your form has been submitted. We will get back to you shortly.",
+  //     icon: "success",
+  //     confirmButtonText: "OK",
+  //     confirmButtonColor: "#0BA9EF",
+  //   });
 
-    reset(defaultValues);
-    setIsPending(false);
+  //   reset(defaultValues);
+  //   setIsPending(false);
+  // };
+
+  const handleFormSubmit = async (formValues) => {
+    try {
+      setIsSubmitting(true);
+      await axios.post("consultation", formValues);
+      setSubmittedDestination(formValues.travellingCountry || "");
+      setShowChoiceModal(true);
+      reset(defaultValues);
+    } catch (error) {
+      const errorMessage =
+        error?.response?.data?.message ||
+        "Something went wrong while submitting your request.";
+      window.alert(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCountryChange = (countryName, onChange) => {
@@ -183,10 +208,7 @@ const AiConsultation = () => {
             </div>
             <Box
               component="form"
-              onSubmit={(event) => {
-                event.preventDefault();
-                handleFormSubmit();
-              }}
+              onSubmit={handleSubmit(handleFormSubmit)}
               className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"}`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-4">
