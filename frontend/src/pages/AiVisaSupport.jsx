@@ -2,6 +2,10 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   InputAdornment,
   InputBase,
   MenuItem,
@@ -14,6 +18,7 @@ import dayjs from "dayjs";
 import { Country } from "country-state-city";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import axios from "../utils/axios";
 import Container from "../components/Container";
 import { aiDestinationCards } from "../constants/aiDestinationCards";
 import useNomadLoginState from "../hooks/useNomadLoginState";
@@ -58,6 +63,9 @@ const AiVisaSupport = () => {
   const [typedMessage, setTypedMessage] = useState("");
   const [typedVisaHeading, setTypedVisaHeading] = useState("");
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showChoiceModal, setShowChoiceModal] = useState(false);
+  const [submittedDestination, setSubmittedDestination] = useState("");
   const { auth } = useAuth();
   const isLoggedIn = useNomadLoginState();
   const navigate = useNavigate();
@@ -82,35 +90,35 @@ const AiVisaSupport = () => {
     [countries, selectedNationality],
   );
 
-  const handleFormSubmit = async (formValues) => {
-    const result = await Swal.fire({
-      title: "Request Submitted!",
-      text: "Please suggest and select below options.",
-      icon: "success",
-      showCancelButton: true,
-      confirmButtonText: "Need Custom Solution",
-      cancelButtonText: "Browse Options Yourself",
-      reverseButtons: true,
-      cancelButtonColor: "#000000",
-      confirmButtonColor: "#0BA9EF",
-      customClass: {
-        confirmButton: "swal2-button--pill",
-        cancelButton: "swal2-button--pill",
-      },
-    });
+  const navigateToThankYou = (choice, travellingCountry) => {
 
-    const choice = result.isConfirmed ? "get-back-to-me" : "help-needed";
     const selectedDestination = destinationOptions.find(
-      (option) => option.state === formValues.travellingCountry,
+      (option) => option.state === travellingCountry,
     );
     const destinationState = selectedDestination?.state?.toLowerCase() || "";
     const destinationCountry =
       selectedDestination?.country?.toLowerCase() || "";
 
     navigate(
-      `/visa-support/thank-you?choice=${choice}&state=${encodeURIComponent(destinationState)}&country=${encodeURIComponent(destinationCountry)}&destination=${encodeURIComponent(formValues.travellingCountry || "")}`,
+      `/visa-support/thank-you?choice=${choice}&state=${encodeURIComponent(destinationState)}&country=${encodeURIComponent(destinationCountry)}&destination=${encodeURIComponent(travellingCountry || "")}`,
     );
-    reset(defaultValues);
+  };
+
+  const handleFormSubmit = async (formValues) => {
+    try {
+      setIsSubmitting(true);
+      await axios.post("visa-support", formValues);
+      setSubmittedDestination(formValues.travellingCountry || "");
+      setShowChoiceModal(true);
+      reset(defaultValues);
+    } catch (error) {
+      const errorMessage =
+        error?.response?.data?.message ||
+        "Something went wrong while submitting your request.";
+      window.alert(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleNationalityChange = (countryName, onChange) => {
@@ -434,6 +442,7 @@ const AiVisaSupport = () => {
                   <Button
                     type="submit"
                     variant="contained"
+                    disabled={isSubmitting}
                     sx={{
                       bgcolor: "black",
                       borderRadius: 20,
@@ -446,11 +455,45 @@ const AiVisaSupport = () => {
                       width: { xs: "100%", md: "auto" },
                     }}
                   >
-                    Submit
+                    {isSubmitting ? "Submitting..." : "Submit"}
                   </Button>
                 </div>
               </div>
             </Box>
+
+            <Dialog
+              open={showChoiceModal}
+              onClose={() => setShowChoiceModal(false)}
+              fullWidth
+              maxWidth="xs"
+            >
+              <DialogTitle>Request Submitted!</DialogTitle>
+              <DialogContent>
+                Please suggest and select below options.
+              </DialogContent>
+              <DialogActions sx={{ px: 3, pb: 2 }}>
+                <Button
+                  variant="outlined"
+                  color="inherit"
+                  onClick={() => {
+                    setShowChoiceModal(false);
+                    navigateToThankYou("help-needed", submittedDestination);
+                  }}
+                >
+                  Browse Options Yourself
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={() => {
+                    setShowChoiceModal(false);
+                    navigateToThankYou("get-back-to-me", submittedDestination);
+                  }}
+                  sx={{ bgcolor: "#0BA9EF" }}
+                >
+                  Need Custom Solution
+                </Button>
+              </DialogActions>
+            </Dialog>
           </div>
         </section>
       </Container>
@@ -459,3 +502,4 @@ const AiVisaSupport = () => {
 };
 
 export default AiVisaSupport;
+
