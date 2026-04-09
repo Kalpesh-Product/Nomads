@@ -22,6 +22,7 @@ import credentials from "./middlewares/credentials.js";
 import { verifyJwt } from "./middlewares/verifyJwt.js";
 import { updateReviewStatus } from "./controllers/reviewControllers.js";
 import visaSupportRoutes from "./routes/visaSupportRoutes.js";
+import overallActivationSupportRoutes from "./routes/overallActivationSupportRoutes.js";
 
 const app = express();
 config({ override: true });
@@ -43,6 +44,7 @@ app.use("/api/forms", formRoutes);
 app.use("/api/job", jobRoutes);
 app.use("/api/world-ranking", worldRankingRoutes);
 app.use("/api/visa-support", visaSupportRoutes);
+app.use("/api/overall-activation-support", overallActivationSupportRoutes);
 
 app.use("/api/news", newsRoutes);
 app.use("/api/blogs", blogRoutes); // New Blog Route

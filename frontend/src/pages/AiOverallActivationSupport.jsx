@@ -8,6 +8,11 @@ import {
   MenuItem,
   TextField,
   Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { DatePicker } from "@mui/x-date-pickers";
@@ -17,6 +22,7 @@ import Swal from "sweetalert2";
 import Container from "../components/Container";
 import useNomadLoginState from "../hooks/useNomadLoginState";
 import useAuth from "../hooks/useAuth";
+import axios from "../utils/axios";
 
 const floatingLabelSx = {
   color: "black",
@@ -55,11 +61,14 @@ const getFlagIconUrl = (isoCode) =>
 const AiOverallActivationSupport = () => {
   const [typedMessage, setTypedMessage] = useState("");
   const [typedPageHeading, setTypedPageHeading] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submittedDestination, setSubmittedDestination] = useState("");
+  const [showChoiceModal, setShowChoiceModal] = useState(false);
   const { auth } = useAuth();
   const isLoggedIn = useNomadLoginState();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const countries = useMemo(() => Country.getAllCountries(), []);
-  const { control, reset, setValue, watch } = useForm({
+  const { control, handleSubmit, reset, setValue, watch } = useForm({
     defaultValues,
   });
   const messagePrefix = isLoggedIn ? auth?.user?.fullName + ", " : "User, ";
@@ -73,19 +82,36 @@ const AiOverallActivationSupport = () => {
 
   const [isPending, setIsPending] = useState(false);
 
-  const handleFormSubmit = async () => {
-    setIsPending(true);
+  // const handleFormSubmit = async () => {
+  //   setIsPending(true);
 
-    await Swal.fire({
-      title: "Request Submitted!",
-      text: "Your form has been submitted. We will get back to you shortly.",
-      icon: "success",
-      confirmButtonText: "OK",
-      confirmButtonColor: "#0BA9EF",
-    });
+  //   await Swal.fire({
+  //     title: "Request Submitted!",
+  //     text: "Your form has been submitted. We will get back to you shortly.",
+  //     icon: "success",
+  //     confirmButtonText: "OK",
+  //     confirmButtonColor: "#0BA9EF",
+  //   });
 
-    reset(defaultValues);
-    setIsPending(false);
+  //   reset(defaultValues);
+  //   setIsPending(false);
+  // };
+
+  const handleFormSubmit = async (formValues) => {
+    try {
+      setIsSubmitting(true);
+      await axios.post("overall-activation-support", formValues);
+      setSubmittedDestination(formValues.travelCountry || "");
+      setShowChoiceModal(true);
+      reset(defaultValues);
+    } catch (error) {
+      const errorMessage =
+        error?.response?.data?.message ||
+        "Something went wrong while submitting your request.";
+      window.alert(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleNationalityChange = (countryName, onChange) => {
@@ -184,10 +210,7 @@ const AiOverallActivationSupport = () => {
             </div>
             <Box
               component="form"
-              onSubmit={(event) => {
-                event.preventDefault();
-                handleFormSubmit();
-              }}
+              onSubmit={handleSubmit(handleFormSubmit)}
               className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
                 }`}
             >
@@ -436,7 +459,7 @@ const AiOverallActivationSupport = () => {
                   <Button
                     type="submit"
                     variant="contained"
-                    disabled={isPending}
+                    disabled={isSubmitting}
                     sx={{
                       bgcolor: "black",
                       borderRadius: 20,
@@ -449,13 +472,13 @@ const AiOverallActivationSupport = () => {
                       width: { xs: "100%", md: "auto" },
                     }}
                   >
-                    {isPending && (
+                    {isSubmitting && (
                       <CircularProgress
                         size={16}
                         sx={{ color: "white", mr: 1 }}
                       />
                     )}
-                    {isPending ? "Submitting..." : "Submit"}
+                    {isSubmitting ? "Submitting..." : "Submit"}
                   </Button>
                 </div>
               </div>
