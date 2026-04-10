@@ -97,6 +97,7 @@ const valueAdditionItems = [
     path: "/new-company-setup",
   },
   { label: "Consultation", icon: LuCircleDollarSign, path: "/consultation" },
+  { label: "Workation", icon: LuCircleDollarSign, path: "/workation" },
   {
     label: "Apply for Job",
     icon: HiOutlineUserCircle,
