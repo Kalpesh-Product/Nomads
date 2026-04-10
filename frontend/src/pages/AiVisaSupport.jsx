@@ -109,7 +109,22 @@ const AiVisaSupport = () => {
       setIsSubmitting(true);
       await axios.post("visa-support", formValues);
       setSubmittedDestination(formValues.travellingCountry || "");
-      setShowChoiceModal(true);
+      Swal.fire({
+        title: "Request Submitted!",
+        text: "Please suggest and select below options.",
+        icon: "success",
+        showCancelButton: true,
+        confirmButtonText: "Need Custom Solution",
+        cancelButtonText: "Browse Options Yourself",
+        reverseButtons: true,
+        cancelButtonColor: "#000000",
+        confirmButtonColor: "#0BA9EF",
+        customClass: {
+          confirmButton: "swal2-button--pill",
+          cancelButton: "swal2-button--pill",
+        },
+      });
+      navigateToThankYou("get-back-to-me", submittedDestination);
       reset(defaultValues);
     } catch (error) {
       const errorMessage =
@@ -460,40 +475,6 @@ const AiVisaSupport = () => {
                 </div>
               </div>
             </Box>
-
-            <Dialog
-              open={showChoiceModal}
-              onClose={() => setShowChoiceModal(false)}
-              fullWidth
-              maxWidth="xs"
-            >
-              <DialogTitle>Request Submitted!</DialogTitle>
-              <DialogContent>
-                Please suggest and select below options.
-              </DialogContent>
-              <DialogActions sx={{ px: 3, pb: 2 }}>
-                <Button
-                  variant="outlined"
-                  color="inherit"
-                  onClick={() => {
-                    setShowChoiceModal(false);
-                    navigateToThankYou("help-needed", submittedDestination);
-                  }}
-                >
-                  Browse Options Yourself
-                </Button>
-                <Button
-                  variant="contained"
-                  onClick={() => {
-                    setShowChoiceModal(false);
-                    navigateToThankYou("get-back-to-me", submittedDestination);
-                  }}
-                  sx={{ bgcolor: "#0BA9EF" }}
-                >
-                  Need Custom Solution
-                </Button>
-              </DialogActions>
-            </Dialog>
           </div>
         </section>
       </Container>
