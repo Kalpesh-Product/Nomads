@@ -230,6 +230,14 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
   const { auth } = useAuth();
   const logout = useLogout();
+  const userFullName =
+    auth?.user?.fullName?.trim() ||
+    `${auth?.user?.firstName || ""} ${auth?.user?.lastName || ""}`.trim() ||
+    "Profile";
+
+  const profileItemsWithUserName = profileItems.map((item) =>
+    item.label === "userFullName" ? { ...item, label: userFullName } : item,
+  );
 
   useEffect(() => {
     const normalizedPath = location.pathname.replace(/\/$/, "") || "/";
@@ -486,7 +494,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         <>
           <SidebarSection
             title="Profile"
-            items={profileItems}
+            items={profileItemsWithUserName}
             collapsed={isCollapsed}
             isExpandable
             isOpen={isProfileOpen}
