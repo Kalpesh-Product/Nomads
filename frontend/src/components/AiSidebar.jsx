@@ -99,6 +99,7 @@ const valueAdditionItems = [
     path: "/new-company-setup",
   },
   { label: "Consultation", icon: LuCircleDollarSign, path: "/consultation" },
+  { label: "Workation", icon: LuCircleDollarSign, path: "/workation" },
   {
     label: "Apply for Job",
     icon: HiOutlineUserCircle,
@@ -116,11 +117,10 @@ const loggedOutPrompt = {
 };
 
 const profileItems = [
-  { label: "Abrar Shaikh", icon: HiOutlineUserCircle, active: true },
-  { label: "Settings", icon: HiOutlineCog },
-  { label: "Favorites", icon: HiOutlineHeart },
-  { label: "Reviews", icon: LuCircleDollarSign },
-  { label: "Change Password", icon: HiOutlineKey },
+  { label: "Abrar Shaikh", icon: HiOutlineUserCircle, tab: "profile" },
+  { label: "Favorites", icon: HiOutlineHeart, tab: "favorites" },
+  { label: "Reviews", icon: LuCircleDollarSign, tab: "reviews" },
+  { label: "Change Password", icon: HiOutlineKey, tab: "password" },
 ];
 
 const signOutItem = [{ label: "Sign Out", icon: HiOutlineLogout }];
@@ -179,9 +179,8 @@ const SidebarSection = ({
                   key={item.label}
                   type="button"
                   onClick={() => onItemClick?.(item)}
-                  className={`group relative flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-left transition-all hover:bg-white ${
-                    isActive ? "bg-white text-black shadow-sm" : "text-black/80"
-                  }`}
+                  className={`group relative flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-left transition-all hover:bg-white ${isActive ? "bg-white text-black shadow-sm" : "text-black/80"
+                    }`}
                   title={collapsed ? item.label : ""}
                 >
                   <Icon
@@ -304,6 +303,18 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     });
   };
 
+  const handleProfileClick = (item) => {
+    if (!item.tab) return;
+
+    const params = new URLSearchParams(location.search);
+    params.set("tab", item.tab);
+
+    navigate({
+      pathname: "/ai-profile",
+      search: params.toString() ? `?${params.toString()}` : "",
+    });
+  };
+
   const handleLogInClick = () => {
     navigate(`/ai-login${location.search}`, {
       state: {
@@ -408,13 +419,12 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
   return (
     <aside
-      className={`flex h-full max-h-screen flex-col overflow-y-auto overscroll-contain border-r border-black/10 bg-[#efefef] transition-all duration-300 custom-scrollbar-hide ${
-        isMobileOverlay
-          ? "w-[calc(100%-52px)] max-w-[320px]"
-          : isCollapsed
-            ? "w-[70px]"
-            : "w-[260px]"
-      }`}
+      className={`flex h-full max-h-screen flex-col overflow-y-auto overscroll-contain border-r border-black/10 bg-[#efefef] transition-all duration-300 custom-scrollbar-hide ${isMobileOverlay
+        ? "w-[calc(100%-52px)] max-w-[320px]"
+        : isCollapsed
+          ? "w-[70px]"
+          : "w-[260px]"
+        }`}
       onClick={(event) => {
         if (isMobileOverlay) event.stopPropagation();
       }}
@@ -481,6 +491,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
             isExpandable
             isOpen={isProfileOpen}
             onToggle={() => setIsProfileOpen((prev) => !prev)}
+            onItemClick={handleProfileClick}
           />
           <div className="mx-4 mt-3 border-t border-black/10"></div>
           {/* Compact sections - minimal spacing */}

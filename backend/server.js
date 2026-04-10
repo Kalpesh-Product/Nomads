@@ -21,6 +21,12 @@ import cookieParser from "cookie-parser";
 import credentials from "./middlewares/credentials.js";
 import { verifyJwt } from "./middlewares/verifyJwt.js";
 import { updateReviewStatus } from "./controllers/reviewControllers.js";
+import visaSupportRoutes from "./routes/visaSupportRoutes.js";
+import overallActivationSupportRoutes from "./routes/overallActivationSupportRoutes.js";
+import newCompanySetupRoutes from "./routes/newCompanySetupRoutes.js";
+import consultationRoutes from "./routes/consultationRoutes.js";
+import workationRoutes from "./routes/workationRoutes.js";
+import becomeContributorRoutes from "./routes/becomeContributorRoutes.js";
 
 const app = express();
 config({ override: true });
@@ -41,6 +47,12 @@ app.use("/api/review", reviewRoutes);
 app.use("/api/forms", formRoutes);
 app.use("/api/job", jobRoutes);
 app.use("/api/world-ranking", worldRankingRoutes);
+app.use("/api/visa-support", visaSupportRoutes);
+app.use("/api/overall-activation-support", overallActivationSupportRoutes);
+app.use("/api/new-company-setup", newCompanySetupRoutes);
+app.use("/api/consultation", consultationRoutes);
+app.use("/api/workation", workationRoutes);
+app.use("/api/become-contributor", becomeContributorRoutes);
 
 app.use("/api/news", newsRoutes);
 app.use("/api/blogs", blogRoutes); // New Blog Route

@@ -7,11 +7,17 @@ import {
   MenuItem,
   TextField,
   Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { Country } from "country-state-city";
 import Swal from "sweetalert2";
 import Container from "../components/Container";
+import axios from "../utils/axios";
 
 const floatingLabelSx = {
   color: "black",
@@ -20,6 +26,7 @@ const floatingLabelSx = {
 };
 
 const defaultValues = {
+  contributionType: "",
   fullName: "",
   email: "",
   currentCountry: "",
@@ -51,8 +58,11 @@ const AiBecomeContributor = () => {
   const [typedMessage, setTypedMessage] = useState("");
   const [typedPageHeading, setTypedPageHeading] = useState("");
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showChoiceModal, setShowChoiceModal] = useState(false);
+  const [submittedDestination, setSubmittedDestination] = useState("");
   const countries = useMemo(() => Country.getAllCountries(), []);
-  const { control, reset, setValue, watch } = useForm({
+  const { handleSubmit, control, reset, setValue, watch } = useForm({
     defaultValues,
   });
   const selectedCountry = watch("currentCountry");
@@ -63,19 +73,36 @@ const AiBecomeContributor = () => {
 
   const [isPending, setIsPending] = useState(false);
 
-  const handleFormSubmit = async () => {
-    setIsPending(true);
+  // const handleFormSubmit = async () => {
+  //   setIsPending(true);
 
-    await Swal.fire({
-      title: "Request Submitted!",
-      text: "Your form has been submitted. We will get back to you shortly.",
-      icon: "success",
-      confirmButtonText: "OK",
-      confirmButtonColor: "#0BA9EF",
-    });
+  //   await Swal.fire({
+  //     title: "Request Submitted!",
+  //     text: "Your form has been submitted. We will get back to you shortly.",
+  //     icon: "success",
+  //     confirmButtonText: "OK",
+  //     confirmButtonColor: "#0BA9EF",
+  //   });
 
-    reset(defaultValues);
-    setIsPending(false);
+  //   reset(defaultValues);
+  //   setIsPending(false);
+  // };
+
+  const handleFormSubmit = async (formValues) => {
+    try {
+      setIsSubmitting(true);
+      await axios.post("become-contributor", formValues);
+      // setSubmittedDestination(formValues.travellingCountry || "");
+      setShowChoiceModal(true);
+      reset(defaultValues);
+    } catch (error) {
+      const errorMessage =
+        error?.response?.data?.message ||
+        "Something went wrong while submitting your request.";
+      window.alert(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCountryChange = (countryName, onChange) => {
@@ -160,16 +187,13 @@ const AiBecomeContributor = () => {
             </div>
             <Box
               component="form"
-              onSubmit={(event) => {
-                event.preventDefault();
-                handleFormSubmit();
-              }}
+              onSubmit={handleSubmit(handleFormSubmit)}
               className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
                 }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 <Controller
-                  name="selectcontribution"
+                  name="contributionType"
                   control={control}
                   rules={{ required: "Contribution Type is required" }}
                   render={({ field, fieldState }) => (
