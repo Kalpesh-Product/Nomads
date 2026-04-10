@@ -407,7 +407,13 @@ const AiOverallActivationSupport = () => {
                   <Controller
                     name="contactNumber"
                     control={control}
-                    rules={{ required: "Contact number is required" }}
+                    rules={{
+                      required: "Contact number is required",
+                      pattern: {
+                        value: /^[0-9]{7,15}$/,
+                        message: "Please enter a valid phone number",
+                      },
+                    }}
                     render={({ field, fieldState }) => (
                       <TextField
                         {...field}
