@@ -8,7 +8,7 @@ const visaSupportSchema = new mongoose.Schema(
         travellingCountry: { type: String, trim: true, default: "" },
         email: { type: String, trim: true, lowercase: true, required: true },
         contactCode: { type: String, trim: true, default: "" },
-        contactNumber: { type: Number, trim: true, required: true },
+        contactNumber: { type: String, trim: true, required: true },
         comments: { type: String, trim: true, default: "" },
     },
     { timestamps: true },
