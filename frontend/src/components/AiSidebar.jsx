@@ -117,7 +117,7 @@ const loggedOutPrompt = {
 };
 
 const profileItems = [
-  { label: "Abrar Shaikh", icon: HiOutlineUserCircle, tab: "profile" },
+  { label: "userFullName", icon: HiOutlineUserCircle, tab: "profile" },
   { label: "Favorites", icon: HiOutlineHeart, tab: "favorites" },
   { label: "Reviews", icon: LuCircleDollarSign, tab: "reviews" },
   { label: "Change Password", icon: HiOutlineKey, tab: "password" },
