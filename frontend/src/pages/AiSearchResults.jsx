@@ -68,6 +68,9 @@ const goalNarrativeTopHeadingMap = {
 const normalizeNarrativeKey = (value = "") =>
   value.toLowerCase().replace(/[^a-z0-9]/g, "");
 
+const getNarrativeContinentLabel = (continent) =>
+  continent === "World" ? "the World" : continent;
+
 const goalNarrativeByGoalAndAttribute = {
   [normalizeNarrativeKey("World Ranking")]: {
     [normalizeNarrativeKey("Best for Nomads")]:
@@ -477,6 +480,9 @@ const AiSearchResults = () => {
       return "";
     }
 
+    const narrativeContinentLabel =
+      getNarrativeContinentLabel(selectedContinent);
+
     const goalNarratives =
       goalNarrativeByGoalAndAttribute[normalizeNarrativeKey(selectedGoal)] ||
       {};
@@ -484,10 +490,10 @@ const AiSearchResults = () => {
       goalNarratives[normalizeNarrativeKey(selectedGoalOption)];
 
     if (narrativeTemplate) {
-      return narrativeTemplate.replaceAll("X", selectedContinent);
+      return narrativeTemplate.replaceAll("X", narrativeContinentLabel);
     }
 
-    return `Curated below are the best cities in ${selectedContinent} as per the ${selectedGoalOption} for you. The results below are ranked using WoNo’s Intelligence Model, analyzing 50+ global factors — including safety, nomad population, healthcare, visa flexibility, cost of living, taxation, work infrastructure, lifestyle quality, and community — tailored to your personal profile.`;
+    return `Curated below are the best cities in ${narrativeContinentLabel} as per the ${selectedGoalOption} for you. The results below are ranked using WoNo’s Intelligence Model, analyzing 50+ global factors — including safety, nomad population, healthcare, visa flexibility, cost of living, taxation, work infrastructure, lifestyle quality, and community — tailored to your personal profile.`;
   }, [selectedContinent, selectedGoal, selectedGoalOption]);
 
   const thinkingHeadingText = "Curating the best results for you";
