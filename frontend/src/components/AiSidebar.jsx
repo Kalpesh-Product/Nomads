@@ -4,6 +4,8 @@ import {
   clearStoredLoginState,
   readStoredLoginState,
 } from "../hooks/useNomadLoginState";
+import useAuth from "../hooks/useAuth";
+import useLogout from "../hooks/useLogout";
 import logo from "../assets/WONO_LOGO_Black_TP.png";
 import {
   HiChevronDown,
@@ -227,6 +229,9 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const { auth } = useAuth();
+  const logout = useLogout();
+
   useEffect(() => {
     const normalizedPath = location.pathname.replace(/\/$/, "") || "/";
     const isAiHomePage = normalizedPath === "/home";
@@ -252,9 +257,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     }
   }, [location.pathname]);
 
-  const searchParams = new URLSearchParams(location.search);
-  const isLoggedIn =
-    searchParams.get("login") === "true" || readStoredLoginState();
+  const isLoggedIn = Boolean(auth?.user) || readStoredLoginState();
 
   const handleRecommendationClick = (item) => {
     const params = new URLSearchParams(location.search);
@@ -325,23 +328,34 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     });
   };
 
-  const handleSignOutClick = () => {
+  const handleSignOutClick = async () => {
+    if (auth?.user) {
+      await logout();
+    }
+
     const nextSearchParams = new URLSearchParams(location.search);
     nextSearchParams.delete("login");
     clearStoredLoginState();
 
     if (isMobileOverlay) {
       onClose?.();
-      navigate("/home");
+      navigate("/ai-login");
       return;
     }
 
-    navigate({
-      pathname: location.pathname,
-      search: nextSearchParams.toString()
-        ? `?${nextSearchParams.toString()}`
-        : "",
-    });
+    navigate(
+      {
+        pathname: "/ai-login",
+        search: nextSearchParams.toString()
+          ? `?${nextSearchParams.toString()}`
+          : "",
+      },
+      {
+        state: {
+          redirectTo: `${location.pathname}${location.search}`,
+        },
+      },
+    );
   };
 
   const isCollapsed = isMobileOverlay ? false : collapsed;
