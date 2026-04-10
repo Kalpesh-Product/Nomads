@@ -72,11 +72,13 @@ import AiCompatibleSearchResults from "./pages/AiCompatibleSearchResults";
 import AiHomeLoggedIn from "./pages/AiHomeLoggedIn";
 import AiLogin from "./pages/AiLogin";
 import AiSignup from "./pages/AiSignup";
+import AiProfile from "./pages/AiProfile";
 import AiVisaSupport from "./pages/AiVisaSupport";
 import AiVisaSupportThankYou from "./pages/AiVisaSupportThankYou";
 import AiOverallActivationSupport from "./pages/AiOverallActivationSupport";
 import AiNewCompanySetup from "./pages/AiNewCompanySetup";
 import AiConsultation from "./pages/AiConsultation";
+import AiWorkation from "./pages/AiWorkation";
 import AiManualSearch from "./pages/AiManualSearch";
 import AiBecomeContributor from "./pages/AiBecomeContributor";
 import AiBlogsFetch from "./components/AiBlogsFetch";
@@ -233,6 +235,8 @@ if (tenant === "main") {
               element: <AiNewCompanySetup />,
             },
             { path: "consultation", element: <AiConsultation /> },
+            { path: "workation", element: <AiWorkation /> },
+            { path: "ai-profile", element: <AiProfile /> },
             {
               path: "become-a-contributor",
               element: <AiBecomeContributor />,
