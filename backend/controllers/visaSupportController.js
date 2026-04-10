@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import VisaSupportRequest from "../models/VisaSupportRequest.js";
+import VisaSupport from "../models/VisaSupport.js";
 
 const visaSupportSchema = yup.object({
     visaType: yup.string().trim().required("Visa type is required"),
@@ -12,22 +12,22 @@ const visaSupportSchema = yup.object({
         .email("Please provide a valid email")
         .required("Email is required"),
     contactCode: yup.string().trim().required("Contact code is required"),
-    contactNumber: yup.string().trim().required("Contact number is required"),
+    contactNumber: yup.number().required("Contact number is required"),
     comments: yup.string().trim().default(""),
 });
 
-export const createVisaSupportRequest = async (req, res, next) => {
+export const createVisaSupport = async (req, res, next) => {
     try {
         const payload = await visaSupportSchema.validate(req.body, {
             abortEarly: false,
             stripUnknown: true,
         });
 
-        const visaSupportRequest = await VisaSupportRequest.create(payload);
+        const visaSupport = await VisaSupport.create(payload);
 
         return res.status(201).json({
             message: "Visa support request submitted successfully",
-            data: visaSupportRequest,
+            data: visaSupport,
         });
     } catch (error) {
         if (error.name === "ValidationError") {
