@@ -236,7 +236,8 @@ const AiVisaSupport = () => {
                 <Controller
                   name="visaType"
                   control={control}
-                  render={({ field }) => (
+                  rules={{ required: "Visa type is required" }}
+                  render={({ field, fieldState }) => (
                     <TextField
                       {...field}
                       fullWidth
@@ -244,6 +245,8 @@ const AiVisaSupport = () => {
                       variant="standard"
                       select
                       InputLabelProps={{ sx: floatingLabelSx }}
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
                     >
                       <MenuItem value="" sx={{ fontWeight: 700 }}>
                         SELECT VISA TYPE
@@ -260,12 +263,15 @@ const AiVisaSupport = () => {
                 <Controller
                   name="fullName"
                   control={control}
-                  render={({ field }) => (
+                  rules={{ required: "Full name is required" }}
+                  render={({ field, fieldState }) => (
                     <TextField
                       {...field}
                       fullWidth
                       label="Full Name"
                       variant="standard"
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
                     />
                   )}
@@ -274,12 +280,15 @@ const AiVisaSupport = () => {
                 <Controller
                   name="nationality"
                   control={control}
-                  render={({ field }) => (
+                  rules={{ required: "Nationality is required" }}
+                  render={({ field, fieldState }) => (
                     <TextField
                       {...field}
                       fullWidth
                       label="Nationality on Passport"
                       variant="standard"
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
                       select
                       InputLabelProps={{ sx: floatingLabelSx }}
                       SelectProps={{
@@ -341,12 +350,15 @@ const AiVisaSupport = () => {
                 <Controller
                   name="travellingCountry"
                   control={control}
-                  render={({ field }) => (
+                  rules={{ required: "Travelling country is required" }}
+                  render={({ field, fieldState }) => (
                     <TextField
                       {...field}
                       fullWidth
                       label="Travelling Country"
                       variant="standard"
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
                       select
                       InputLabelProps={{ sx: floatingLabelSx }}
                       onChange={(event) => field.onChange(event.target.value)}
@@ -407,7 +419,8 @@ const AiVisaSupport = () => {
                   <Controller
                     name="contactNumber"
                     control={control}
-                    render={({ field }) => (
+                    rules={{ required: "Contact number is required" }}
+                    render={({ field, fieldState }) => (
                       <TextField
                         {...field}
                         fullWidth
@@ -416,6 +429,8 @@ const AiVisaSupport = () => {
                         type="tel"
                         InputLabelProps={{ sx: floatingLabelSx }}
                         sx={{ flex: 1 }}
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message}
                       />
                     )}
                   />
@@ -424,12 +439,15 @@ const AiVisaSupport = () => {
                 <Controller
                   name="email"
                   control={control}
-                  render={({ field }) => (
+                  rules={{ required: "Email is required" }}
+                  render={({ field, fieldState }) => (
                     <TextField
                       {...field}
                       fullWidth
                       label="Email Address"
                       variant="standard"
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
                     />
                   )}
