@@ -13,7 +13,7 @@ const becomeContributorSchema = yup.object({
         .required("Email is required"),
     contactCode: yup.string().required("Contact code is required"),
     contactNumber: yup.string().required("Contact number is required"),
-    comments: yup.string().trim().default(""),
+    message: yup.string().trim().default(""),
 });
 
 export const createBecomeContributor = async (req, res, next) => {
