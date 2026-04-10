@@ -109,7 +109,22 @@ const AiVisaSupport = () => {
       setIsSubmitting(true);
       await axios.post("visa-support", formValues);
       setSubmittedDestination(formValues.travellingCountry || "");
-      setShowChoiceModal(true);
+      Swal.fire({
+        title: "Request Submitted!",
+        text: "Please suggest and select below options.",
+        icon: "success",
+        showCancelButton: true,
+        confirmButtonText: "Need Custom Solution",
+        cancelButtonText: "Browse Options Yourself",
+        reverseButtons: true,
+        cancelButtonColor: "#000000",
+        confirmButtonColor: "#0BA9EF",
+        customClass: {
+          confirmButton: "swal2-button--pill",
+          cancelButton: "swal2-button--pill",
+        },
+      });
+      navigateToThankYou("get-back-to-me", submittedDestination);
       reset(defaultValues);
     } catch (error) {
       const errorMessage =
@@ -221,7 +236,8 @@ const AiVisaSupport = () => {
                 <Controller
                   name="visaType"
                   control={control}
-                  render={({ field }) => (
+                  rules={{ required: "Visa type is required" }}
+                  render={({ field, fieldState }) => (
                     <TextField
                       {...field}
                       fullWidth
@@ -229,6 +245,8 @@ const AiVisaSupport = () => {
                       variant="standard"
                       select
                       InputLabelProps={{ sx: floatingLabelSx }}
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
                     >
                       <MenuItem value="" sx={{ fontWeight: 700 }}>
                         SELECT VISA TYPE
@@ -245,12 +263,15 @@ const AiVisaSupport = () => {
                 <Controller
                   name="fullName"
                   control={control}
-                  render={({ field }) => (
+                  rules={{ required: "Full name is required" }}
+                  render={({ field, fieldState }) => (
                     <TextField
                       {...field}
                       fullWidth
                       label="Full Name"
                       variant="standard"
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
                     />
                   )}
@@ -259,12 +280,15 @@ const AiVisaSupport = () => {
                 <Controller
                   name="nationality"
                   control={control}
-                  render={({ field }) => (
+                  rules={{ required: "Nationality is required" }}
+                  render={({ field, fieldState }) => (
                     <TextField
                       {...field}
                       fullWidth
                       label="Nationality on Passport"
                       variant="standard"
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
                       select
                       InputLabelProps={{ sx: floatingLabelSx }}
                       SelectProps={{
@@ -326,12 +350,15 @@ const AiVisaSupport = () => {
                 <Controller
                   name="travellingCountry"
                   control={control}
-                  render={({ field }) => (
+                  rules={{ required: "Travelling country is required" }}
+                  render={({ field, fieldState }) => (
                     <TextField
                       {...field}
                       fullWidth
                       label="Travelling Country"
                       variant="standard"
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
                       select
                       InputLabelProps={{ sx: floatingLabelSx }}
                       onChange={(event) => field.onChange(event.target.value)}
@@ -392,7 +419,14 @@ const AiVisaSupport = () => {
                   <Controller
                     name="contactNumber"
                     control={control}
-                    render={({ field }) => (
+                    rules={{
+                      required: "Contact number is required",
+                      pattern: {
+                        value: /^[0-9]{7,15}$/,
+                        message: "Please enter a valid phone number",
+                      },
+                    }}
+                    render={({ field, fieldState }) => (
                       <TextField
                         {...field}
                         fullWidth
@@ -401,6 +435,8 @@ const AiVisaSupport = () => {
                         type="tel"
                         InputLabelProps={{ sx: floatingLabelSx }}
                         sx={{ flex: 1 }}
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message}
                       />
                     )}
                   />
@@ -409,12 +445,15 @@ const AiVisaSupport = () => {
                 <Controller
                   name="email"
                   control={control}
-                  render={({ field }) => (
+                  rules={{ required: "Email is required" }}
+                  render={({ field, fieldState }) => (
                     <TextField
                       {...field}
                       fullWidth
                       label="Email Address"
                       variant="standard"
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
                     />
                   )}
@@ -460,40 +499,6 @@ const AiVisaSupport = () => {
                 </div>
               </div>
             </Box>
-
-            <Dialog
-              open={showChoiceModal}
-              onClose={() => setShowChoiceModal(false)}
-              fullWidth
-              maxWidth="xs"
-            >
-              <DialogTitle>Request Submitted!</DialogTitle>
-              <DialogContent>
-                Please suggest and select below options.
-              </DialogContent>
-              <DialogActions sx={{ px: 3, pb: 2 }}>
-                <Button
-                  variant="outlined"
-                  color="inherit"
-                  onClick={() => {
-                    setShowChoiceModal(false);
-                    navigateToThankYou("help-needed", submittedDestination);
-                  }}
-                >
-                  Browse Options Yourself
-                </Button>
-                <Button
-                  variant="contained"
-                  onClick={() => {
-                    setShowChoiceModal(false);
-                    navigateToThankYou("get-back-to-me", submittedDestination);
-                  }}
-                  sx={{ bgcolor: "#0BA9EF" }}
-                >
-                  Need Custom Solution
-                </Button>
-              </DialogActions>
-            </Dialog>
           </div>
         </section>
       </Container>

@@ -107,6 +107,16 @@ const AiNewCompanySetup = () => {
       await axios.post("new-company-setup", formValues);
       setSubmittedDestination(formValues.travelCountry || "");
       setShowChoiceModal(true);
+      Swal.fire({
+        title: "Request Submitted!",
+        text: "Your form has been submitted. We will get back to you shortly.",
+        icon: "success",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#0BA9EF",
+        customClass: {
+          confirmButton: "swal2-button--pill",
+        },
+      });
       reset(defaultValues);
     } catch (error) {
       const errorMessage =
@@ -393,7 +403,13 @@ const AiNewCompanySetup = () => {
                   <Controller
                     name="contactNumber"
                     control={control}
-                    rules={{ required: "Contact number is required" }}
+                    rules={{
+                      required: "Contact number is required",
+                      pattern: {
+                        value: /^[0-9]{7,15}$/,
+                        message: "Please enter a valid phone number",
+                      },
+                    }}
                     render={({ field, fieldState }) => (
                       <TextField
                         {...field}

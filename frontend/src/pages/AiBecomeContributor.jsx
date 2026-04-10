@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   CircularProgress,
+  InputAdornment,
   InputBase,
   MenuItem,
   TextField,
@@ -94,6 +95,16 @@ const AiBecomeContributor = () => {
       await axios.post("become-contributor", formValues);
       // setSubmittedDestination(formValues.travellingCountry || "");
       setShowChoiceModal(true);
+      Swal.fire({
+        title: "Request Submitted!",
+        text: "Your form has been submitted. We will get back to you shortly.",
+        icon: "success",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#0BA9EF",
+        customClass: {
+          confirmButton: "swal2-button--pill",
+        },
+      });
       reset(defaultValues);
     } catch (error) {
       const errorMessage =
@@ -317,90 +328,68 @@ const AiBecomeContributor = () => {
                   )}
                 />
 
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "flex-end",
-                    borderBottom: "1px solid rgba(0, 0, 0, 0.42)",
-                    transition: "border-bottom-color 0.2s ease",
-                    "&:focus-within": { borderBottomColor: "#1976d2" },
-                  }}
-                >
+                <Box sx={{ display: "flex", gap: 2, width: "100%" }}>
+                  <Controller
+                    name="contactCode"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label="Code"
+                        variant="standard"
+                        InputLabelProps={{ sx: floatingLabelSx }}
+                        InputProps={{
+                          startAdornment:
+                            selectedCountryData?.isoCode ? (
+                              <InputAdornment position="start">
+                                <Box
+                                  component="img"
+                                  src={getFlagIconUrl(
+                                    selectedCountryData.isoCode,
+                                  )}
+                                  alt={`${selectedCountryData.name} flag`}
+                                  sx={{ width: 20, height: 15, flexShrink: 0 }}
+                                  loading="lazy"
+                                />
+                              </InputAdornment>
+                            ) : null,
+                        }}
+                        inputProps={{ readOnly: true }}
+                        sx={{ width: "20%" }}
+                      />
+                    )}
+                  />
                   <Box
                     sx={{
-                      width: "32%",
-                      px: 0.5,
-                      pb: 0,
-                      borderRight: "1px solid rgba(0, 0, 0, 0.12)",
+                      width: "1px",
+                      height: "100%",
+                      backgroundColor: "#ccc",
                     }}
-                  >
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        color: selectedCountry ? "#1976d2" : "#6b7280",
-                        fontWeight: 500,
-                        display: "block",
-                      }}
-                    >
-                      Code
-                    </Typography>
-                    <Controller
-                      name="contactCode"
-                      control={control}
-                      render={({ field }) => (
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 0.75,
-                          }}
-                        >
-                          {selectedCountryData?.isoCode && (
-                            <Box
-                              component="img"
-                              src={getFlagIconUrl(selectedCountryData.isoCode)}
-                              alt={`${selectedCountryData.name} flag`}
-                              sx={{ width: 20, height: 15, flexShrink: 0 }}
-                              loading="lazy"
-                            />
-                          )}
-                          <InputBase
-                            {...field}
-                            fullWidth
-                            readOnly
-                            placeholder="+___"
-                            sx={{ color: "rgba(0, 0, 0, 0.6)", py: 0 }}
-                          />
-                        </Box>
-                      )}
-                    />
-                  </Box>
-
-                  <Box sx={{ flex: 1, px: 1, pb: 0 }}>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        color: selectedCountry ? "#1976d2" : "#6b7280",
-                        fontWeight: 500,
-                        display: "block",
-                      }}
-                    >
-                      Contact Number
-                    </Typography>
-                    <Controller
-                      name="contactNumber"
-                      control={control}
-                      rules={{ required: "Contact number is required" }}
-                      render={({ field }) => (
-                        <InputBase
-                          {...field}
-                          fullWidth
-                          inputProps={{ inputMode: "tel" }}
-                          sx={{ py: 0 }}
-                        />
-                      )}
-                    />
-                  </Box>
+                  />
+                  <Controller
+                    name="contactNumber"
+                    control={control}
+                    rules={{
+                      required: "Contact number is required",
+                      pattern: {
+                        value: /^[0-9]{7,15}$/,
+                        message: "Please enter a valid phone number",
+                      },
+                    }}
+                    render={({ field, fieldState }) => (
+                      <TextField
+                        {...field}
+                        fullWidth
+                        label="Contact Number"
+                        variant="standard"
+                        type="tel"
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message}
+                        InputLabelProps={{ sx: floatingLabelSx }}
+                        sx={{ flex: 1 }}
+                      />
+                    )}
+                  />
                 </Box>
 
                 <Controller
