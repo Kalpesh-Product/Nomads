@@ -25,7 +25,19 @@ const Reviews = () => {
     queryFn: async () => {
       if (!userId) return [];
       const res = await axiosPrivate.get("/review/reviews");
-      return Array.isArray(res.data?.data) ? res.data.data : [];
+      if (!Array.isArray(res.data?.data)) return [];
+
+      return res.data.data.map((review) => {
+        const company = review?.company || {};
+        return {
+          ...review,
+          company: {
+            ...company,
+            companyTitle:
+              company.companyTitle || company.companyName || "Title",
+          },
+        };
+      });
     },
     enabled: !!userId,
     staleTime: 1000 * 60,
