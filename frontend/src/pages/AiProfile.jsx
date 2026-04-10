@@ -246,13 +246,22 @@ const AiProfile = () => {
           {/* Personal Info - Desktop: 3 columns, Tablet: 2 columns, Mobile: 1 column */}
           <div className="mt-6 border rounded-lg p-4">
             <h3 className="font-semibold mb-4">Personal Information</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <TextField
-                label="Full Name"
+                label="First Name"
                 size="small"
                 fullWidth
-                name="fullName"
-                value={profileForm.firstName + " " + profileForm.lastName}
+                name="firstName"
+                value={profileForm.firstName}
+                onChange={handleProfileChange}
+                InputProps={{ readOnly: !editMode }}
+              />
+              <TextField
+                label="Last Name"
+                size="small"
+                fullWidth
+                name="lastName"
+                value={profileForm.lastName}
                 onChange={handleProfileChange}
                 InputProps={{ readOnly: !editMode }}
               />
@@ -261,6 +270,7 @@ const AiProfile = () => {
                 size="small"
                 fullWidth
                 name="mobile"
+                type="number"
                 value={profileForm.mobile}
                 onChange={handleProfileChange}
                 InputProps={{ readOnly: !editMode }}
