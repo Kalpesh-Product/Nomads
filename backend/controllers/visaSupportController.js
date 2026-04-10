@@ -12,7 +12,7 @@ const visaSupportSchema = yup.object({
         .email("Please provide a valid email")
         .required("Email is required"),
     contactCode: yup.string().trim().required("Contact code is required"),
-    contactNumber: yup.number().required("Contact number is required"),
+    contactNumber: yup.string().trim().required("Contact number is required"),
     comments: yup.string().trim().default(""),
 });
 
