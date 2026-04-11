@@ -80,6 +80,7 @@ const AiVisaSupport = () => {
       aiDestinationCards.map((destination) => ({
         state: destination.city,
         country: destination.country,
+        continent: destination.continent,
       })),
     [],
   );
@@ -98,9 +99,11 @@ const AiVisaSupport = () => {
     const destinationState = selectedDestination?.state?.toLowerCase() || "";
     const destinationCountry =
       selectedDestination?.country?.toLowerCase() || "";
+    const destinationContinent =
+      selectedDestination?.continent?.toLowerCase() || "";
 
     navigate(
-      `/visa-support/thank-you?choice=${choice}&state=${encodeURIComponent(destinationState)}&country=${encodeURIComponent(destinationCountry)}&destination=${encodeURIComponent(travellingCountry || "")}`,
+      `/visa-support/thank-you?choice=${choice}&state=${encodeURIComponent(destinationState)}&country=${encodeURIComponent(destinationCountry)}&continent=${encodeURIComponent(destinationContinent)}&destination=${encodeURIComponent(travellingCountry || "")}`,
     );
   };
 
@@ -124,7 +127,10 @@ const AiVisaSupport = () => {
           cancelButton: "swal2-button--pill",
         },
       });
-      navigateToThankYou("get-back-to-me", submittedDestination);
+      navigateToThankYou(
+        "get-back-to-me",
+        formValues.travellingCountry || "",
+      );
       reset(defaultValues);
     } catch (error) {
       const errorMessage =

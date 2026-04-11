@@ -110,14 +110,50 @@ const AiListings = ({ forceListView = false }) => {
     useState(false);
 
   const searchBarBadges = useMemo(() => {
+    const formatBadgeValue = (value) =>
+      value
+        ?.split(/[-_\s]+/)
+        .filter(Boolean)
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+        .join(" ");
+
+    const params = new URLSearchParams(location.search);
+    const selectedStateFromQuery =
+      params.get("state") || params.get("location") || "";
+    const selectedStateBadge = formatBadgeValue(selectedStateFromQuery);
     const locationStateBadges = location.state?.searchBarBadges;
 
+    const replaceTrailingLocationBadge = (badges) => {
+      const cleanedBadges = badges.filter(Boolean);
+      if (!selectedStateBadge) return cleanedBadges;
+
+      if (cleanedBadges.length === 0) return [selectedStateBadge];
+
+      // If the last badge is already the selected state, just return
+      const lastBadge = cleanedBadges[cleanedBadges.length - 1];
+      if (lastBadge?.toLowerCase() === selectedStateBadge.toLowerCase()) {
+        return cleanedBadges;
+      }
+
+      // Check if the selected state is already in the badges but not at the end
+      const badgesWithoutSelected = cleanedBadges.filter(
+        (b) => b.toLowerCase() !== selectedStateBadge.toLowerCase()
+      );
+
+      // Re-add it to the end
+      return [...badgesWithoutSelected, selectedStateBadge];
+    };
+
     if (Array.isArray(locationStateBadges) && locationStateBadges.length > 0) {
-      return locationStateBadges.filter(Boolean);
+      return replaceTrailingLocationBadge(locationStateBadges);
     }
 
-    return persistedSearchBarBadges;
-  }, [location.state, persistedSearchBarBadges]);
+    if (persistedSearchBarBadges.length > 0) {
+      return replaceTrailingLocationBadge(persistedSearchBarBadges);
+    }
+
+    return selectedStateBadge ? [selectedStateBadge] : [];
+  }, [location.search, location.state, persistedSearchBarBadges]);
 
   useEffect(() => {
     let timeoutId;
@@ -448,7 +484,44 @@ const AiListings = ({ forceListView = false }) => {
     setValue("country", formData.country);
     setValue("location", formData.location);
     setValue("category", formData.category);
-  }, [formData]);
+  }, [formData, setValue]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const queryCountry = params.get("country");
+    const queryLocation = params.get("state") || params.get("location");
+    const queryContinent = params.get("continent");
+
+    const breadcrumbFilters = location.state?.breadcrumbFilters;
+
+    const normalizeValue = (value) =>
+      typeof value === "string" ? value.trim().toLowerCase() : value;
+
+    const country = normalizeValue(breadcrumbFilters?.country || queryCountry);
+    const loc = normalizeValue(breadcrumbFilters?.location || queryLocation);
+    const continent = normalizeValue(
+      breadcrumbFilters?.continent || queryContinent,
+    );
+
+    if (!country || !loc) return;
+
+    if (
+      country === normalizeValue(formData.country) &&
+      loc === normalizeValue(formData.location) &&
+      (!continent || continent === normalizeValue(formData.continent))
+    ) {
+      return;
+    }
+
+    const nextFormValues = {
+      ...formData,
+      country: country || "",
+      location: loc || "",
+      continent: continent || formData.continent || "",
+    };
+
+    dispatch(setFormValues(nextFormValues));
+  }, [dispatch, formData, location.state, location.search]);
   useEffect(() => {
     if (formData?.category && listingsData?.length > 0) {
       if (formData.category === VALUE_ADDED_SERVICES_CATEGORY) return;
