@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import { sendMail, sendAdminFormNotification } from "../../config/mailer.js"; // adjust path if different
 import User from "../../models/NomadUser.js";
 import NomadUser from "../../models/NomadUser.js";
+import VisaSupport from "../../models/VisaSupport.js";
 import { randomUUID } from "crypto";
 import bcrypt from "bcrypt";
 import { uploadFileToS3 } from "../../config/s3Config.js";
@@ -335,6 +336,25 @@ const contentRemovalRequestsSchema = yup.object().shape({
   sheetName: yup.string().required("Please provide a sheet name"),
 });
 
+const aiVisaSupportSchema = yup.object({
+  visaType: yup.string().trim().required("Visa type is required"),
+  fullName: yup.string().trim().required("Full name is required"),
+  nationality: yup.string().trim().required("Nationality is required"),
+  travellingCountry: yup
+    .string()
+    .trim()
+    .required("Travelling country is required"),
+  email: yup
+    .string()
+    .trim()
+    .email("Please provide a valid email address")
+    .required("Please provide your email address"),
+  contactCode: yup.string().trim().required("Contact code is required"),
+  contactNumber: yup.string().trim().required("Contact number is required"),
+  comments: yup.string().trim().nullable(),
+  sheetName: yup.string().required("Please provide a sheet name"),
+});
+
 function toISODateOnly(v) {
   if (!v) return "";
   const d = new Date(v);
@@ -366,7 +386,8 @@ export const addB2CformSubmission = async (req, res, next) => {
       let resumeLink = "";
       if (req.file) {
         const data = await uploadFileToS3(
-          `job-applications/${payload.jobPosition}/${payload.name
+          `job-applications/${payload.jobPosition}/${
+            payload.name
           }_${randomUUID()}/${req.file.originalname}`,
           req.file,
         );
@@ -525,8 +546,10 @@ export const addB2CformSubmission = async (req, res, next) => {
         schema: nomadsSignupSchema,
         map: (d) => {
           const normalizedFullName =
-            d.fullName?.trim() || `${d.firstName || ""} ${d.lastName || ""}`.trim();
-          const [derivedFirstName = "", ...restName] = normalizedFullName.split(/\s+/);
+            d.fullName?.trim() ||
+            `${d.firstName || ""} ${d.lastName || ""}`.trim();
+          const [derivedFirstName = "", ...restName] =
+            normalizedFullName.split(/\s+/);
           const derivedLastName = d.lastName?.trim() || restName.join(" ");
 
           return {
@@ -581,6 +604,35 @@ export const addB2CformSubmission = async (req, res, next) => {
       <p>We’ve received your content removal request for <b>${data.companyName}</b>.</p>
       <p>Our team will review the provided URLs and take the necessary action.</p>
       <p>We’ll get back to you via email if we need additional details.</p>
+      <p>Cheers,<br/>The WONO Team</p>
+   `,
+        }),
+      },
+      AI_Visa_Support: {
+        schema: aiVisaSupportSchema,
+        map: (d) => ({
+          visaType: d.visaType,
+          fullName: d.fullName,
+          nationality: d.nationality,
+          travellingCountry: d.travellingCountry,
+          email: d.email,
+          contactCode: d.contactCode,
+          contactNumber: d.contactNumber,
+          comments: d.comments || "",
+          sheetName: d.sheetName,
+          submittedAt: new Date(),
+        }),
+        successMsg:
+          "Your visa support request has been submitted successfully.",
+        emailTemplate: (data) => ({
+          to: data.email,
+          subject: "Visa Support Request Received",
+          text: `Hi ${data.fullName}, we have received your visa support request for ${data.travellingCountry}.`,
+          html: `
+      <h2>Visa Support Request Received</h2>
+      <p>Hi ${data.fullName},</p>
+      <p>Thank you for your request for <b>${data.travellingCountry}</b>.</p>
+      <p>Our team has received your details and will get back to you shortly with the next steps.</p>
       <p>Cheers,<br/>The WONO Team</p>
     `,
         }),
@@ -641,6 +693,21 @@ export const addB2CformSubmission = async (req, res, next) => {
       await signupEntry.save();
     }
 
+    if (sheetName === "AI_Visa_Support") {
+      await VisaSupport.create({
+        visaType: payload.visaType,
+        fullName: payload.fullName,
+        nationality: payload.nationality,
+        travellingCountry: payload.travellingCountry,
+        email: payload.email,
+        contactCode: payload.contactCode,
+        contactNumber: payload.contactNumber,
+        comments: payload.comments,
+      });
+    }
+
+    let sheetsWarning = null;
+
     // Send to Google Apps Script
     const response = await fetch(B2C_APPS_SCRIPT_URL, {
       method: "POST",
@@ -651,7 +718,25 @@ export const addB2CformSubmission = async (req, res, next) => {
     const result = await response.json();
 
     if (result.status !== "success") {
-      throw new Error(result.message || "Failed to save data to Google Sheets");
+      const upstreamMessage =
+        result.message || "Failed to save data to Google Sheets";
+      const normalizedMessage =
+        typeof upstreamMessage === "string"
+          ? upstreamMessage.toLowerCase()
+          : "";
+      const isSheetConfigIssue =
+        normalizedMessage === "invalid sheetname" ||
+        normalizedMessage === "sheet not found";
+
+      if (sheetName === "AI_Visa_Support" && isSheetConfigIssue) {
+        sheetsWarning = `Google Sheets sync skipped for "${payload.sheetName}". Please add this sheetName in Apps Script sheetConfigs and create the sheet tab.`;
+      } else if (normalizedMessage === "invalid sheetname") {
+        throw new Error(
+          `Google Sheets sync failed: sheetName "${payload.sheetName}" is not configured in Apps Script sheetConfigs.`,
+        );
+      } else {
+        throw new Error(upstreamMessage);
+      }
     }
 
     // send email if template exists
@@ -675,6 +760,7 @@ export const addB2CformSubmission = async (req, res, next) => {
       status: "success",
       message: config.successMsg,
       data: payload,
+      ...(sheetsWarning ? { warning: sheetsWarning } : {}),
     });
   } catch (err) {
     console.error("❌ Error in addB2CformSubmission:", err.message);

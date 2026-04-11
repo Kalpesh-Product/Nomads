@@ -2,27 +2,21 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   InputAdornment,
-  InputBase,
   MenuItem,
   TextField,
-  Typography,
 } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
-import { DatePicker } from "@mui/x-date-pickers";
-import dayjs from "dayjs";
 import { Country } from "country-state-city";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
 import axios from "../utils/axios";
 import Container from "../components/Container";
 import { aiDestinationCards } from "../constants/aiDestinationCards";
 import useNomadLoginState from "../hooks/useNomadLoginState";
 import useAuth from "../hooks/useAuth";
+import { showErrorAlert } from "../utils/alerts";
 
 const floatingLabelSx = {
   color: "black",
@@ -64,8 +58,6 @@ const AiVisaSupport = () => {
   const [typedVisaHeading, setTypedVisaHeading] = useState("");
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showChoiceModal, setShowChoiceModal] = useState(false);
-  const [submittedDestination, setSubmittedDestination] = useState("");
   const { auth } = useAuth();
   const isLoggedIn = useNomadLoginState();
   const navigate = useNavigate();
@@ -91,7 +83,6 @@ const AiVisaSupport = () => {
   );
 
   const navigateToThankYou = (choice, travellingCountry) => {
-
     const selectedDestination = destinationOptions.find(
       (option) => option.state === travellingCountry,
     );
@@ -104,12 +95,16 @@ const AiVisaSupport = () => {
     );
   };
 
-  const handleFormSubmit = async (formValues) => {
-    try {
-      setIsSubmitting(true);
-      await axios.post("visa-support", formValues);
-      setSubmittedDestination(formValues.travellingCountry || "");
-      Swal.fire({
+  const { mutate: submitVisaSupport } = useMutation({
+    mutationFn: async (formValues) => {
+      const response = await axios.post("forms/add-new-b2c-form-submission", {
+        ...formValues,
+        sheetName: "AI_Visa_Support",
+      });
+      return response.data;
+    },
+    onSuccess: async (_, formValues) => {
+      await Swal.fire({
         title: "Request Submitted!",
         text: "Please suggest and select below options.",
         icon: "success",
@@ -124,16 +119,23 @@ const AiVisaSupport = () => {
           cancelButton: "swal2-button--pill",
         },
       });
-      navigateToThankYou("get-back-to-me", submittedDestination);
+      navigateToThankYou("get-back-to-me", formValues.travellingCountry || "");
       reset(defaultValues);
-    } catch (error) {
-      const errorMessage =
+    },
+    onError: (error) => {
+      showErrorAlert(
         error?.response?.data?.message ||
-        "Something went wrong while submitting your request.";
-      window.alert(errorMessage);
-    } finally {
+          "Something went wrong while submitting your request.",
+      );
+    },
+    onSettled: () => {
       setIsSubmitting(false);
-    }
+    },
+  });
+
+  const handleFormSubmit = (formValues) => {
+    setIsSubmitting(true);
+    submitVisaSupport(formValues);
   };
 
   const handleNationalityChange = (countryName, onChange) => {
@@ -168,7 +170,7 @@ const AiVisaSupport = () => {
 
     let messageIndex = 0;
     let visaHeadingIndex = 0;
-    let cleanupHeading = () => { };
+    let cleanupHeading = () => {};
 
     const typeVisaHeading = () => {
       const headingInterval = setInterval(() => {
@@ -229,8 +231,9 @@ const AiVisaSupport = () => {
             <Box
               component="form"
               onSubmit={handleSubmit(handleFormSubmit)}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
-                }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${
+                isFormVisible ? "visible" : "invisible"
+              }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
                 <Controller
@@ -507,4 +510,3 @@ const AiVisaSupport = () => {
 };
 
 export default AiVisaSupport;
-
