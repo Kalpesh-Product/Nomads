@@ -22,6 +22,7 @@ import Container from "../components/Container";
 import useNomadLoginState from "../hooks/useNomadLoginState";
 import useAuth from "../hooks/useAuth";
 import axios from "../utils/axios";
+import { getCountryNameFromSelectedDestination } from "../utils/selectedDestinationSession";
 
 const floatingLabelSx = {
   color: "black",
@@ -66,18 +67,21 @@ const AiWorkation = () => {
   const [showChoiceModal, setShowChoiceModal] = useState(false);
   const [submittedDestination, setSubmittedDestination] = useState("");
   const { auth } = useAuth();
-  const isLoggedIn = useNomadLoginState();
+  const isLoggedIn = Boolean(auth?.user);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const countries = useMemo(() => Country.getAllCountries(), []);
   const { handleSubmit, control, reset, setValue, watch } = useForm({
     defaultValues,
   });
   const selectedCountry = watch("currentCountry");
+  const workationCountry = watch("workationCountry");
   const selectedCountryData = useMemo(
     () => countries.find((country) => country.name === selectedCountry) || null,
     [countries, selectedCountry],
   );
-  const messagePrefix = isLoggedIn ? auth?.user?.fullName + ", " : "User, ";
+  const messagePrefix = isLoggedIn
+    ? (auth?.user?.fullName?.split(" ")[0] || "User") + ", "
+    : "User, ";
   const workationPrompt = `${messagePrefix}${WORKATION_PROMPT}`;
 
   const [isPending, setIsPending] = useState(false);
@@ -85,10 +89,7 @@ const AiWorkation = () => {
   const handleFormSubmit = async (formValues) => {
     try {
       setIsSubmitting(true);
-      await axios.post("forms/add-new-b2c-form-submission", {
-        ...formValues,
-        sheetName: "AI_Workation",
-      });
+      await axios.post("workation", formValues);
       setSubmittedDestination(formValues.workationCountry || "");
       setShowChoiceModal(true);
       Swal.fire({

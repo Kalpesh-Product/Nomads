@@ -24,6 +24,7 @@ import Container from "../components/Container";
 import useNomadLoginState from "../hooks/useNomadLoginState";
 import useAuth from "../hooks/useAuth";
 import axios from "../utils/axios";
+import { getCountryNameFromSelectedDestination } from "../utils/selectedDestinationSession";
 
 const floatingLabelSx = {
   color: "black",
@@ -70,18 +71,19 @@ const AiNewCompanySetup = () => {
   const [submittedDestination, setSubmittedDestination] = useState("");
   const [showChoiceModal, setShowChoiceModal] = useState(false);
   const { auth } = useAuth();
-  const isLoggedIn = useNomadLoginState();
+  const isLoggedIn = Boolean(auth?.user);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const countries = useMemo(() => Country.getAllCountries(), []);
   const { handleSubmit, control, reset, setValue, watch } = useForm({
     defaultValues,
   });
   const selectedCountry = watch("currentCompanyCountry");
+  const newCompanyCountry = watch("newCompanyCountry");
   const selectedCountryData = useMemo(
     () => countries.find((country) => country.name === selectedCountry) || null,
     [countries, selectedCountry],
   );
-  const messagePrefix = isLoggedIn ? auth?.user?.fullName + ", " : "User, ";
+  const messagePrefix = isLoggedIn ? (auth?.user?.fullName?.split(" ")[0] || "User") + ", " : "User, ";
   const newCompanyPrompt = `${messagePrefix}${NEW_COMPANY_PROMPT}`;
 
   const [isPending, setIsPending] = useState(false);
@@ -131,6 +133,20 @@ const AiNewCompanySetup = () => {
     }
   };
 
+  useEffect(() => {
+    if (isLoggedIn && auth?.user) {
+      const { fullName, email, contactCode, contactNumber, country, countryOfResidence } = auth.user;
+      setValue("fullName", fullName || "");
+      setValue("email", email || "");
+      setValue("contactCode", contactCode || "");
+      setValue("contactNumber", contactNumber || "");
+      const userCountry = country || countryOfResidence;
+      if (userCountry) {
+        setValue("currentCompanyCountry", userCountry);
+      }
+    }
+  }, [isLoggedIn, auth, setValue]);
+
   const handleCountryChange = (countryName, onChange) => {
     const country = countries.find((item) => item.name === countryName);
     const phonePrefix = country?.phonecode ? `+${country.phonecode}` : "";
@@ -145,6 +161,16 @@ const AiNewCompanySetup = () => {
       shouldTouch: true,
     });
   };
+
+  useEffect(() => {
+    const destinationCountry = getCountryNameFromSelectedDestination(countries);
+    if (!destinationCountry || newCompanyCountry) return;
+
+    setValue("newCompanyCountry", destinationCountry, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+  }, [countries, newCompanyCountry, setValue]);
 
   useEffect(() => {
     const hasSeenTypingEffect =

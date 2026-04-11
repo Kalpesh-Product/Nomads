@@ -26,8 +26,7 @@ export default function Signup() {
 
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
-      firstName: "",
-      lastName: "",
+      fullName: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -78,33 +77,15 @@ export default function Signup() {
           onSubmit={handleSubmit(onSubmit)}
           className="w-full grid grid-cols-1 md:grid-cols-2 gap-6"
         >
-          {/* First Name */}
+          {/* Full Name */}
           <Controller
-            name="firstName"
+            name="fullName"
             control={control}
-            rules={{ required: "First name is required" }}
+            rules={{ required: "Full name is required" }}
             render={({ field, fieldState }) => (
               <TextField
                 {...field}
-                label="First Name"
-                fullWidth
-                required
-                variant="standard"
-                error={!!fieldState.error}
-                helperText={fieldState.error?.message}
-              />
-            )}
-          />
-
-          {/* Last Name */}
-          <Controller
-            name="lastName"
-            control={control}
-            rules={{ required: "Last name is required" }}
-            render={({ field, fieldState }) => (
-              <TextField
-                {...field}
-                label="Last Name"
+                label="Full Name"
                 fullWidth
                 required
                 variant="standard"

@@ -12,6 +12,7 @@ const PaginatedGrid = ({
   persistPage = false, // NEW PROP
   persistKey = "paginatedGridPage", // optional custom key
   resetPageKey, // number that increments on reset
+  emptyMessage, // NEW PROP
 }) => {
   const formData = useSelector((state) => state.location.formValues);
   const location = useLocation();
@@ -68,7 +69,7 @@ const PaginatedGrid = ({
             currentData.map((item, i) => renderItem(item, i))
           ) : (
             <div className="col-span-full text-center text-sm text-gray-500 border border-dotted rounded-lg p-4">
-              No items found.
+              {emptyMessage || "No items found."}
             </div>
           )}
         </div>

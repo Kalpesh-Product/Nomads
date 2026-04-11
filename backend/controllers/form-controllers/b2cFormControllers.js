@@ -249,8 +249,7 @@ const nomadsSignupSchema = yup
   .object()
   .shape({
     fullName: yup.string().trim().optional(),
-    firstName: yup.string().trim().optional(),
-    lastName: yup.string().trim().optional(),
+    fullName: yup.string().trim().required("Full name is required"),
     countryOfResidence: yup.string().trim().optional(),
     country: yup.string().trim().optional(),
     email: yup
@@ -286,9 +285,7 @@ const nomadsSignupSchema = yup
     "Please provide your full name or first and last name",
     (value) => {
       const hasFullName = Boolean(value?.fullName?.trim());
-      const hasFirstAndLast = Boolean(
-        value?.firstName?.trim() && value?.lastName?.trim(),
-      );
+      const hasFirstAndLast = Boolean(value?.fullName?.trim());
 
       return hasFullName || hasFirstAndLast;
     },
@@ -652,22 +649,23 @@ export const addB2CformSubmission = async (req, res, next) => {
       Sign_up: {
         schema: nomadsSignupSchema,
         map: (d) => {
+          const parsedMobile = parsePhoneNumberFromString(d.mobile || "");
+          const contactCode = parsedMobile?.countryCallingCode
+            ? `+${parsedMobile.countryCallingCode}`
+            : "";
+          const contactNumber = parsedMobile?.nationalNumber || "";
           const normalizedFullName =
             d.fullName?.trim() ||
             `${d.firstName || ""} ${d.lastName || ""}`.trim();
-          const [derivedFirstName = "", ...restName] =
-            normalizedFullName.split(/\s+/);
-          const derivedLastName = d.lastName?.trim() || restName.join(" ");
-
           return {
             fullName: normalizedFullName,
-            firstName: d.firstName?.trim() || derivedFirstName,
-            lastName: derivedLastName,
             countryOfResidence:
               d.countryOfResidence?.trim() || d.country?.trim() || "",
+            country: d.countryOfResidence?.trim() || d.country?.trim() || "",
             email: d.email?.trim(),
             password: d.password,
-            mobile: d.mobile?.trim(),
+            contactCode: contactCode,
+            contactNumber: contactNumber,
             sheetName: d.sheetName,
             submittedAt: new Date(),
           };

@@ -117,7 +117,7 @@ const loggedOutPrompt = {
 };
 
 const profileItems = [
-  { label: "Abrar Shaikh", icon: HiOutlineUserCircle, tab: "profile" },
+  { label: "userFullName", icon: HiOutlineUserCircle, tab: "profile" },
   { label: "Favorites", icon: HiOutlineHeart, tab: "favorites" },
   { label: "Reviews", icon: LuCircleDollarSign, tab: "reviews" },
   { label: "Change Password", icon: HiOutlineKey, tab: "password" },
@@ -230,6 +230,12 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
   const { auth } = useAuth();
   const logout = useLogout();
+  const userFullName =
+    auth?.user?.fullName?.trim() || "Profile";
+
+  const profileItemsWithUserName = profileItems.map((item) =>
+    item.label === "userFullName" ? { ...item, label: userFullName } : item,
+  );
 
   useEffect(() => {
     const normalizedPath = location.pathname.replace(/\/$/, "") || "/";
@@ -257,6 +263,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   }, [location.pathname]);
 
   const isLoggedIn = Boolean(auth?.user) || readStoredLoginState();
+  console.log(isLoggedIn);
 
   const handleRecommendationClick = (item) => {
     const params = new URLSearchParams(location.search);
@@ -486,7 +493,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         <>
           <SidebarSection
             title="Profile"
-            items={profileItems}
+            items={profileItemsWithUserName}
             collapsed={isCollapsed}
             isExpandable
             isOpen={isProfileOpen}

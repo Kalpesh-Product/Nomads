@@ -7,11 +7,12 @@ const userSchema = new mongoose.Schema(
     fullName: {
       type: String,
       trim: true,
+      required: [true, "Full name is required"],
     },
+    // Deprecated: firstName and lastName. Use fullName instead.
     firstName: {
       type: String,
       trim: true,
-      // required: [true, "First name is required"],
     },
     lastName: {
       type: String,
@@ -45,11 +46,8 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    mobile: {
-      type: String,
-      trim: true,
-      required: true,
-    },
+    contactCode: { type: String, trim: true, default: "" },
+    contactNumber: { type: String, trim: true, required: true },
     saves: [
       {
         type: mongoose.Schema.Types.ObjectId,

@@ -16,6 +16,7 @@ import Container from "../components/Container";
 import { aiDestinationCards } from "../constants/aiDestinationCards";
 import useNomadLoginState from "../hooks/useNomadLoginState";
 import useAuth from "../hooks/useAuth";
+import { getCountryNameFromSelectedDestination } from "../utils/selectedDestinationSession";
 import { showErrorAlert } from "../utils/alerts";
 
 const floatingLabelSx = {
@@ -59,12 +60,14 @@ const AiVisaSupport = () => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { auth } = useAuth();
-  const isLoggedIn = useNomadLoginState();
+  const isLoggedIn = Boolean(auth?.user);
   const navigate = useNavigate();
   const { control, handleSubmit, reset, setValue, watch } = useForm({
     defaultValues,
   });
-  const messagePrefix = isLoggedIn ? auth?.user?.fullName + ", " : "User, ";
+  const messagePrefix = isLoggedIn
+    ? (auth?.user?.fullName?.split(" ")[0] || "User") + ", "
+    : "User, ";
   const visaSupportPrompt = `${messagePrefix}${VISA_SUPPORT_PROMPT}`;
   const countries = useMemo(() => Country.getAllCountries(), []);
   const destinationOptions = useMemo(
@@ -72,10 +75,12 @@ const AiVisaSupport = () => {
       aiDestinationCards.map((destination) => ({
         state: destination.city,
         country: destination.country,
+        continent: destination.continent,
       })),
     [],
   );
   const selectedNationality = watch("nationality");
+  const selectedTravellingCountry = watch("travellingCountry");
   const selectedNationalityCountry = useMemo(
     () =>
       countries.find((country) => country.name === selectedNationality) || null,
@@ -89,9 +94,11 @@ const AiVisaSupport = () => {
     const destinationState = selectedDestination?.state?.toLowerCase() || "";
     const destinationCountry =
       selectedDestination?.country?.toLowerCase() || "";
+    const destinationContinent =
+      selectedDestination?.continent?.toLowerCase() || "";
 
     navigate(
-      `/visa-support/thank-you?choice=${choice}&state=${encodeURIComponent(destinationState)}&country=${encodeURIComponent(destinationCountry)}&destination=${encodeURIComponent(travellingCountry || "")}`,
+      `/visa-support/thank-you?choice=${choice}&state=${encodeURIComponent(destinationState)}&country=${encodeURIComponent(destinationCountry)}&continent=${encodeURIComponent(destinationContinent)}&destination=${encodeURIComponent(travellingCountry || "")}`,
     );
   };
 
@@ -119,7 +126,10 @@ const AiVisaSupport = () => {
           cancelButton: "swal2-button--pill",
         },
       });
-      navigateToThankYou("get-back-to-me", formValues.travellingCountry || "");
+      navigateToThankYou(
+        "get-back-to-me",
+        formValues.travellingCountry || "",
+      );
       reset(defaultValues);
     },
     onError: (error) => {
@@ -152,6 +162,37 @@ const AiVisaSupport = () => {
       shouldTouch: true,
     });
   };
+
+  useEffect(() => {
+    if (isLoggedIn && auth?.user) {
+      const {
+        fullName,
+        email,
+        contactCode,
+        contactNumber,
+        country,
+        countryOfResidence,
+      } = auth.user;
+      setValue("fullName", fullName || "");
+      setValue("email", email || "");
+      setValue("contactCode", contactCode || "");
+      setValue("contactNumber", contactNumber || "");
+      const userCountry = country || countryOfResidence;
+      if (userCountry) {
+        setValue("nationality", userCountry);
+      }
+    }
+  }, [isLoggedIn, auth, setValue]);
+
+  useEffect(() => {
+    const destinationCountry = getCountryNameFromSelectedDestination(countries);
+    if (!destinationCountry || selectedTravellingCountry) return;
+
+    setValue("travellingCountry", destinationCountry, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+  }, [countries, selectedTravellingCountry, setValue]);
 
   useEffect(() => {
     const hasSeenTypingEffect =
@@ -369,12 +410,12 @@ const AiVisaSupport = () => {
                       <MenuItem value="" sx={{ fontWeight: 700 }}>
                         SELECT COUNTRY
                       </MenuItem>
-                      {destinationOptions.map((destinationOption) => (
-                        <MenuItem
-                          key={`${destinationOption.state}-${destinationOption.country}`}
-                          value={destinationOption.state}
-                        >
-                          {destinationOption.state}
+                      <MenuItem value="" sx={{ fontWeight: 700 }}>
+                        SELECT COUNTRY
+                      </MenuItem>
+                      {countries.map((country) => (
+                        <MenuItem key={country.isoCode} value={country.name}>
+                          {country.name}
                         </MenuItem>
                       ))}
                     </TextField>

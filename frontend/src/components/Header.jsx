@@ -236,8 +236,8 @@ const Header = () => {
                       fontSize: "1rem",
                     }}
                   >
-                    {auth.user.firstName
-                      ? auth.user.firstName.charAt(0).toUpperCase()
+                    {auth.user.fullName
+                      ? auth.user.fullName.charAt(0).toUpperCase()
                       : "U"}
                   </Avatar>
 
