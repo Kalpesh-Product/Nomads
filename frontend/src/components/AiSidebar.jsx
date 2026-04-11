@@ -265,6 +265,8 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   }, [location.pathname]);
 
   const isLoggedIn = Boolean(auth?.user) || readStoredLoginState();
+  console.log(isLoggedIn);
+  console.log(auth?.user?.firstName);
 
   const handleRecommendationClick = (item) => {
     const params = new URLSearchParams(location.search);

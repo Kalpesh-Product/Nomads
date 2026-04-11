@@ -270,7 +270,6 @@ const AiProfile = () => {
                 size="small"
                 fullWidth
                 name="mobile"
-                type="number"
                 value={profileForm.mobile}
                 onChange={handleProfileChange}
                 InputProps={{ readOnly: !editMode }}

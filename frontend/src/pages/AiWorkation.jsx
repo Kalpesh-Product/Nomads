@@ -66,7 +66,7 @@ const AiWorkation = () => {
     const [showChoiceModal, setShowChoiceModal] = useState(false);
     const [submittedDestination, setSubmittedDestination] = useState("");
     const { auth } = useAuth();
-    const isLoggedIn = useNomadLoginState();
+    const isLoggedIn = Boolean(auth?.user);
     const [isFormVisible, setIsFormVisible] = useState(false);
     const countries = useMemo(() => Country.getAllCountries(), []);
     const { handleSubmit, control, reset, setValue, watch } = useForm({
@@ -77,7 +77,7 @@ const AiWorkation = () => {
         () => countries.find((country) => country.name === selectedCountry) || null,
         [countries, selectedCountry],
     );
-    const messagePrefix = isLoggedIn ? auth?.user?.fullName + ", " : "User, ";
+    const messagePrefix = isLoggedIn ? auth?.user?.firstName + ", " : "User, ";
     const workationPrompt = `${messagePrefix}${WORKATION_PROMPT}`;
 
     const [isPending, setIsPending] = useState(false);

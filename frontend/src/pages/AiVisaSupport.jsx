@@ -67,12 +67,12 @@ const AiVisaSupport = () => {
   const [showChoiceModal, setShowChoiceModal] = useState(false);
   const [submittedDestination, setSubmittedDestination] = useState("");
   const { auth } = useAuth();
-  const isLoggedIn = useNomadLoginState();
+  const isLoggedIn = Boolean(auth?.user);
   const navigate = useNavigate();
   const { control, handleSubmit, reset, setValue, watch } = useForm({
     defaultValues,
   });
-  const messagePrefix = isLoggedIn ? auth?.user?.fullName + ", " : "User, ";
+  const messagePrefix = isLoggedIn ? auth?.user?.firstName + ", " : "User, ";
   const visaSupportPrompt = `${messagePrefix}${VISA_SUPPORT_PROMPT}`;
   const countries = useMemo(() => Country.getAllCountries(), []);
   const destinationOptions = useMemo(

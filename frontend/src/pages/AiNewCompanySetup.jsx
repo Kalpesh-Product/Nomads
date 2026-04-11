@@ -70,7 +70,7 @@ const AiNewCompanySetup = () => {
   const [submittedDestination, setSubmittedDestination] = useState("");
   const [showChoiceModal, setShowChoiceModal] = useState(false);
   const { auth } = useAuth();
-  const isLoggedIn = useNomadLoginState();
+  const isLoggedIn = Boolean(auth?.user);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const countries = useMemo(() => Country.getAllCountries(), []);
   const { handleSubmit, control, reset, setValue, watch } = useForm({
@@ -81,7 +81,7 @@ const AiNewCompanySetup = () => {
     () => countries.find((country) => country.name === selectedCountry) || null,
     [countries, selectedCountry],
   );
-  const messagePrefix = isLoggedIn ? auth?.user?.fullName + ", " : "User, ";
+  const messagePrefix = isLoggedIn ? auth?.user?.firstName + ", " : "User, ";
   const newCompanyPrompt = `${messagePrefix}${NEW_COMPANY_PROMPT}`;
 
   const [isPending, setIsPending] = useState(false);

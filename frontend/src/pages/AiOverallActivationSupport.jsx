@@ -65,13 +65,13 @@ const AiOverallActivationSupport = () => {
   const [submittedDestination, setSubmittedDestination] = useState("");
   const [showChoiceModal, setShowChoiceModal] = useState(false);
   const { auth } = useAuth();
-  const isLoggedIn = useNomadLoginState();
+  const isLoggedIn = Boolean(auth?.user);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const countries = useMemo(() => Country.getAllCountries(), []);
   const { control, handleSubmit, reset, setValue, watch } = useForm({
     defaultValues,
   });
-  const messagePrefix = isLoggedIn ? auth?.user?.fullName + ", " : "User, ";
+  const messagePrefix = isLoggedIn ? auth?.user?.firstName + ", " : "User, ";
   const overallActivationPrompt = `${messagePrefix}${OVERALL_ACTIVATION_PROMPT}`;
   const selectedNationality = watch("nationalityOnPassport");
   const selectedNationalityCountry = useMemo(
