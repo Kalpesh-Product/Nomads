@@ -24,6 +24,7 @@ import Container from "../components/Container";
 import useNomadLoginState from "../hooks/useNomadLoginState";
 import useAuth from "../hooks/useAuth";
 import axios from "../utils/axios";
+import { getCountryNameFromSelectedDestination } from "../utils/selectedDestinationSession";
 
 const floatingLabelSx = {
   color: "black",
@@ -77,6 +78,7 @@ const AiNewCompanySetup = () => {
     defaultValues,
   });
   const selectedCountry = watch("currentCompanyCountry");
+  const newCompanyCountry = watch("newCompanyCountry");
   const selectedCountryData = useMemo(
     () => countries.find((country) => country.name === selectedCountry) || null,
     [countries, selectedCountry],
@@ -156,6 +158,16 @@ const AiNewCompanySetup = () => {
       shouldTouch: true,
     });
   };
+
+  useEffect(() => {
+    const destinationCountry = getCountryNameFromSelectedDestination(countries);
+    if (!destinationCountry || newCompanyCountry) return;
+
+    setValue("newCompanyCountry", destinationCountry, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+  }, [countries, newCompanyCountry, setValue]);
 
   useEffect(() => {
     const hasSeenTypingEffect =

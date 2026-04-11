@@ -23,6 +23,7 @@ import Container from "../components/Container";
 import useNomadLoginState from "../hooks/useNomadLoginState";
 import useAuth from "../hooks/useAuth";
 import axios from "../utils/axios";
+import { getCountryNameFromSelectedDestination } from "../utils/selectedDestinationSession";
 
 const floatingLabelSx = {
   color: "black",
@@ -74,6 +75,7 @@ const AiOverallActivationSupport = () => {
   const messagePrefix = isLoggedIn ? (auth?.user?.fullName?.split(" ")[0] || "User") + ", " : "User, ";
   const overallActivationPrompt = `${messagePrefix}${OVERALL_ACTIVATION_PROMPT}`;
   const selectedNationality = watch("nationalityOnPassport");
+  const selectedTravelCountry = watch("travelCountry");
   const selectedNationalityCountry = useMemo(
     () =>
       countries.find((country) => country.name === selectedNationality) || null,
@@ -137,6 +139,16 @@ const AiOverallActivationSupport = () => {
       }
     }
   }, [isLoggedIn, auth, setValue]);
+
+  useEffect(() => {
+    const destinationCountry = getCountryNameFromSelectedDestination(countries);
+    if (!destinationCountry || selectedTravelCountry) return;
+
+    setValue("travelCountry", destinationCountry, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+  }, [countries, selectedTravelCountry, setValue]);
 
   const handleNationalityChange = (countryName, onChange) => {
     const country = countries.find((item) => item.name === countryName);

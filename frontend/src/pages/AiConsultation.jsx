@@ -22,6 +22,7 @@ import Container from "../components/Container";
 import useNomadLoginState from "../hooks/useNomadLoginState";
 import useAuth from "../hooks/useAuth";
 import axios from "../utils/axios";
+import { getCountryNameFromSelectedDestination } from "../utils/selectedDestinationSession";
 
 const floatingLabelSx = {
   color: "black",
@@ -75,6 +76,7 @@ const AiConsultation = () => {
     defaultValues,
   });
   const selectedCountry = watch("currentCountry");
+  const consultationCountry = watch("consultationCountry");
   const selectedCountryData = useMemo(
     () => countries.find((country) => country.name === selectedCountry) || null,
     [countries, selectedCountry],
@@ -139,6 +141,16 @@ const AiConsultation = () => {
       }
     }
   }, [isLoggedIn, auth, setValue]);
+
+  useEffect(() => {
+    const destinationCountry = getCountryNameFromSelectedDestination(countries);
+    if (!destinationCountry || consultationCountry) return;
+
+    setValue("consultationCountry", destinationCountry, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+  }, [countries, consultationCountry, setValue]);
 
   const handleCountryChange = (countryName, onChange) => {
     const country = countries.find((item) => item.name === countryName);

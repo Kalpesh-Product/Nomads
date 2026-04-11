@@ -23,6 +23,7 @@ import Container from "../components/Container";
 import { aiDestinationCards } from "../constants/aiDestinationCards";
 import useNomadLoginState from "../hooks/useNomadLoginState";
 import useAuth from "../hooks/useAuth";
+import { getCountryNameFromSelectedDestination } from "../utils/selectedDestinationSession";
 
 const floatingLabelSx = {
   color: "black",
@@ -85,6 +86,7 @@ const AiVisaSupport = () => {
     [],
   );
   const selectedNationality = watch("nationality");
+  const selectedTravellingCountry = watch("travellingCountry");
   const selectedNationalityCountry = useMemo(
     () =>
       countries.find((country) => country.name === selectedNationality) || null,
@@ -170,6 +172,16 @@ const AiVisaSupport = () => {
       }
     }
   }, [isLoggedIn, auth, setValue]);
+
+  useEffect(() => {
+    const destinationCountry = getCountryNameFromSelectedDestination(countries);
+    if (!destinationCountry || selectedTravellingCountry) return;
+
+    setValue("travellingCountry", destinationCountry, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+  }, [countries, selectedTravellingCountry, setValue]);
 
   useEffect(() => {
     const hasSeenTypingEffect =
@@ -386,12 +398,12 @@ const AiVisaSupport = () => {
                       <MenuItem value="" sx={{ fontWeight: 700 }}>
                         SELECT COUNTRY
                       </MenuItem>
-                      {destinationOptions.map((destinationOption) => (
-                        <MenuItem
-                          key={`${destinationOption.state}-${destinationOption.country}`}
-                          value={destinationOption.state}
-                        >
-                          {destinationOption.state}
+                      <MenuItem value="" sx={{ fontWeight: 700 }}>
+                        SELECT COUNTRY
+                      </MenuItem>
+                      {countries.map((country) => (
+                        <MenuItem key={country.isoCode} value={country.name}>
+                          {country.name}
                         </MenuItem>
                       ))}
                     </TextField>
@@ -527,4 +539,3 @@ const AiVisaSupport = () => {
 };
 
 export default AiVisaSupport;
-

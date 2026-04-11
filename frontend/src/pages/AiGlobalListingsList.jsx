@@ -25,6 +25,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { Helmet } from "@dr.pogodin/react-helmet";
 import useAuth from "../hooks/useAuth.js";
 import { HiOutlineX } from "react-icons/hi";
+import { persistSelectedDestination } from "../utils/selectedDestinationSession.js";
 
 // import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
 // import {
@@ -491,6 +492,14 @@ const AiGlobalListingsList = () => {
   }, [formData, setValue]);
 
   useEffect(() => {
+    persistSelectedDestination({
+      continent: formData.continent,
+      country: formData.country,
+      city: formData.location,
+    });
+  }, [formData.continent, formData.country, formData.location]);
+
+  useEffect(() => {
     const params = new URLSearchParams(location.search);
     const queryCountry = params.get("country");
     const queryLocation = params.get("state") || params.get("location");
@@ -831,8 +840,8 @@ const AiGlobalListingsList = () => {
                             <div
                               key={type}
                               className={`col-span-full ${index > 0
-                                  ? "border-t border-gray-300 mt-6 pt-6"
-                                  : ""
+                                ? "border-t border-gray-300 mt-6 pt-6"
+                                : ""
                                 } mb-6`}
                             >
                               <h2 className="text-subtitle font-semibold mb-5 text-secondary-dark">
@@ -893,8 +902,8 @@ const AiGlobalListingsList = () => {
                                 }
                                 disabled={isDisabled}
                                 className={`rounded-3xl bg-[#f1f1f3] px-4 py-6 min-h-[132px] aspect-square flex flex-col items-center justify-center text-center transition-colors ${isDisabled
-                                    ? "cursor-not-allowed opacity-80"
-                                    : "hover:bg-[#e8e8ed]"
+                                  ? "cursor-not-allowed opacity-80"
+                                  : "hover:bg-[#e8e8ed]"
                                   }`}
                               >
                                 <div className="flex flex-col items-center justify-center">
@@ -961,15 +970,15 @@ const AiGlobalListingsList = () => {
                     <IoSearch className="text-primary-red" />
                     <span className="text-[11px] font-bold text-gray-900 truncate w-full text-left">
                       {`${(formData?.country || "Country").charAt(0).toUpperCase() + (formData?.country || "Country").slice(1)} . ${formData?.location
-                          ? formData.location
-                            .split(" ")
-                            .map(
-                              (word) =>
-                                word.charAt(0).toUpperCase() +
-                                word.slice(1).toLowerCase(),
-                            )
-                            .join(" ")
-                          : "Unknown"
+                        ? formData.location
+                          .split(" ")
+                          .map(
+                            (word) =>
+                              word.charAt(0).toUpperCase() +
+                              word.slice(1).toLowerCase(),
+                          )
+                          .join(" ")
+                        : "Unknown"
                         } . ${formData?.category
                           ? categoryOptions.find(
                             (c) => c.value === formData.category,
@@ -1246,8 +1255,8 @@ const AiGlobalListingsList = () => {
                               }
                               disabled={isDisabled}
                               className={`w-[calc(85%-0.5rem)] flex-shrink-0 snap-start rounded-3xl bg-[#f1f1f3] px-3 py-5 text-center min-h-[112px] aspect-square flex flex-col items-center justify-center transition-colors ${isDisabled
-                                  ? "cursor-not-allowed opacity-80"
-                                  : "hover:bg-[#e8e8ed]"
+                                ? "cursor-not-allowed opacity-80"
+                                : "hover:bg-[#e8e8ed]"
                                 }`}
                             >
                               <div className="flex flex-col items-center justify-center">
@@ -1284,8 +1293,8 @@ const AiGlobalListingsList = () => {
                               }
                               disabled={isDisabled}
                               className={`rounded-3xl bg-[#f1f1f3] px-3 py-5 text-center min-h-[112px] aspect-square flex flex-col items-center justify-center transition-colors ${isDisabled
-                                  ? "cursor-not-allowed opacity-80"
-                                  : "hover:bg-[#e8e8ed]"
+                                ? "cursor-not-allowed opacity-80"
+                                : "hover:bg-[#e8e8ed]"
                                 }`}
                             >
                               <div className="flex flex-col items-center justify-center">
