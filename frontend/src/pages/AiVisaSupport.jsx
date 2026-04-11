@@ -91,11 +91,17 @@ const AiVisaSupport = () => {
     const selectedDestination = destinationOptions.find(
       (option) => option.state === travellingCountry,
     );
+
+    // Fallback search: if no direct state match, check if any destination has this as its country to get continent
+    const countryFallback = !selectedDestination ? aiDestinationCards.find(
+      (dest) => dest.country.toLowerCase() === travellingCountry?.toLowerCase()
+    ) : null;
+
     const destinationState = selectedDestination?.state?.toLowerCase() || "";
     const destinationCountry =
-      selectedDestination?.country?.toLowerCase() || "";
+      selectedDestination?.country?.toLowerCase() || travellingCountry?.toLowerCase() || "";
     const destinationContinent =
-      selectedDestination?.continent?.toLowerCase() || "";
+      selectedDestination?.continent?.toLowerCase() || countryFallback?.continent?.toLowerCase() || "";
 
     navigate(
       `/visa-support/thank-you?choice=${choice}&state=${encodeURIComponent(destinationState)}&country=${encodeURIComponent(destinationCountry)}&continent=${encodeURIComponent(destinationContinent)}&destination=${encodeURIComponent(travellingCountry || "")}`,
@@ -135,7 +141,7 @@ const AiVisaSupport = () => {
     onError: (error) => {
       showErrorAlert(
         error?.response?.data?.message ||
-          "Something went wrong while submitting your request.",
+        "Something went wrong while submitting your request.",
       );
     },
     onSettled: () => {
@@ -211,7 +217,7 @@ const AiVisaSupport = () => {
 
     let messageIndex = 0;
     let visaHeadingIndex = 0;
-    let cleanupHeading = () => {};
+    let cleanupHeading = () => { };
 
     const typeVisaHeading = () => {
       const headingInterval = setInterval(() => {
@@ -272,9 +278,8 @@ const AiVisaSupport = () => {
             <Box
               component="form"
               onSubmit={handleSubmit(handleFormSubmit)}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${
-                isFormVisible ? "visible" : "invisible"
-              }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
+                }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
                 <Controller
