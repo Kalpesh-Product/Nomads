@@ -92,7 +92,10 @@ const AiBecomeContributor = () => {
   const handleFormSubmit = async (formValues) => {
     try {
       setIsSubmitting(true);
-      await axios.post("become-contributor", formValues);
+      await axios.post("forms/add-new-b2c-form-submission", {
+        ...formValues,
+        sheetName: "AI_Become_Contributor",
+      });
       // setSubmittedDestination(formValues.travellingCountry || "");
       setShowChoiceModal(true);
       Swal.fire({
@@ -148,7 +151,7 @@ const AiBecomeContributor = () => {
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => { };
+    let cleanupHeading = () => {};
 
     const typeHeading = () => {
       const headingInterval = setInterval(() => {
@@ -199,8 +202,9 @@ const AiBecomeContributor = () => {
             <Box
               component="form"
               onSubmit={handleSubmit(handleFormSubmit)}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
-                }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${
+                isFormVisible ? "visible" : "invisible"
+              }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 <Controller
@@ -339,20 +343,19 @@ const AiBecomeContributor = () => {
                         variant="standard"
                         InputLabelProps={{ sx: floatingLabelSx }}
                         InputProps={{
-                          startAdornment:
-                            selectedCountryData?.isoCode ? (
-                              <InputAdornment position="start">
-                                <Box
-                                  component="img"
-                                  src={getFlagIconUrl(
-                                    selectedCountryData.isoCode,
-                                  )}
-                                  alt={`${selectedCountryData.name} flag`}
-                                  sx={{ width: 20, height: 15, flexShrink: 0 }}
-                                  loading="lazy"
-                                />
-                              </InputAdornment>
-                            ) : null,
+                          startAdornment: selectedCountryData?.isoCode ? (
+                            <InputAdornment position="start">
+                              <Box
+                                component="img"
+                                src={getFlagIconUrl(
+                                  selectedCountryData.isoCode,
+                                )}
+                                alt={`${selectedCountryData.name} flag`}
+                                sx={{ width: 20, height: 15, flexShrink: 0 }}
+                                loading="lazy"
+                              />
+                            </InputAdornment>
+                          ) : null,
                         }}
                         inputProps={{ readOnly: true }}
                         sx={{ width: "20%" }}

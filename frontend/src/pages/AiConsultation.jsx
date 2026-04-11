@@ -102,7 +102,10 @@ const AiConsultation = () => {
   const handleFormSubmit = async (formValues) => {
     try {
       setIsSubmitting(true);
-      await axios.post("consultation", formValues);
+      await axios.post("forms/add-new-b2c-form-submission", {
+        ...formValues,
+        sheetName: "AI_Consultation",
+      });
       setSubmittedDestination(formValues.travellingCountry || "");
       setShowChoiceModal(true);
       Swal.fire({
@@ -158,7 +161,7 @@ const AiConsultation = () => {
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => { };
+    let cleanupHeading = () => {};
 
     const typeHeading = () => {
       const headingInterval = setInterval(() => {

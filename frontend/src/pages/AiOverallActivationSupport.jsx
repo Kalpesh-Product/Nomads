@@ -100,7 +100,10 @@ const AiOverallActivationSupport = () => {
   const handleFormSubmit = async (formValues) => {
     try {
       setIsSubmitting(true);
-      await axios.post("overall-activation-support", formValues);
+      await axios.post("forms/add-new-b2c-form-submission", {
+        ...formValues,
+        sheetName: "AI_Overall_Activation_Support",
+      });
       setSubmittedDestination(formValues.travelCountry || "");
       setShowChoiceModal(true);
       Swal.fire({
@@ -143,7 +146,7 @@ const AiOverallActivationSupport = () => {
     const hasSeenTypingEffect =
       typeof window !== "undefined" &&
       window.localStorage.getItem(OVERALL_ACTIVATION_TYPING_SEEN_KEY) ===
-      "true";
+        "true";
 
     if (hasSeenTypingEffect) {
       setTypedMessage(overallActivationPrompt);
@@ -157,7 +160,7 @@ const AiOverallActivationSupport = () => {
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => { };
+    let cleanupHeading = () => {};
 
     const typeHeading = () => {
       const headingInterval = setInterval(() => {
@@ -221,8 +224,9 @@ const AiOverallActivationSupport = () => {
             <Box
               component="form"
               onSubmit={handleSubmit(handleFormSubmit)}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
-                }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${
+                isFormVisible ? "visible" : "invisible"
+              }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-4">
                 <Controller
