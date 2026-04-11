@@ -54,8 +54,7 @@ export const login = async (req, res) => {
       message: "Login successful",
       user: {
         id: user._id,
-        firstName: user.firstName,
-        lastName: user.lastName,
+        fullName: user.fullName,
         email: user.email,
         country: user.country,
         countryOfResidence: user.countryOfResidence,
@@ -209,7 +208,7 @@ export const resetPassword = async (req, res) => {
 
     // ✅ Send confirmation email
     const successMessage = `
-      <p>Hi ${user.firstName || user.name || ""},</p>
+      <p>Hi ${(user.fullName || user.name || "").split(" ")[0] || ""},</p>
       <p>Your password has been successfully reset.</p>
       <p>You can now <a href="${process.env.FRONTEND_DEV_LINK
       }login" target="_blank">Login</a> with your new password.</p>
