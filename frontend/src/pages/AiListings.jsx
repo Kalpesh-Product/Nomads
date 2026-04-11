@@ -31,6 +31,7 @@ import { IoSearch } from "react-icons/io5";
 import { HiOutlineArrowLeft } from "react-icons/hi";
 import { AnimatePresence, motion } from "motion/react";
 import useAuth from "../hooks/useAuth.js";
+import { persistSelectedDestination } from "../utils/selectedDestinationSession.js";
 
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
 
@@ -110,14 +111,50 @@ const AiListings = ({ forceListView = false }) => {
     useState(false);
 
   const searchBarBadges = useMemo(() => {
+    const formatBadgeValue = (value) =>
+      value
+        ?.split(/[-_\s]+/)
+        .filter(Boolean)
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+        .join(" ");
+
+    const params = new URLSearchParams(location.search);
+    const selectedStateFromQuery =
+      params.get("state") || params.get("location") || "";
+    const selectedStateBadge = formatBadgeValue(selectedStateFromQuery);
     const locationStateBadges = location.state?.searchBarBadges;
 
+    const replaceTrailingLocationBadge = (badges) => {
+      const cleanedBadges = badges.filter(Boolean);
+      if (!selectedStateBadge) return cleanedBadges;
+
+      if (cleanedBadges.length === 0) return [selectedStateBadge];
+
+      // If the last badge is already the selected state, just return
+      const lastBadge = cleanedBadges[cleanedBadges.length - 1];
+      if (lastBadge?.toLowerCase() === selectedStateBadge.toLowerCase()) {
+        return cleanedBadges;
+      }
+
+      // Check if the selected state is already in the badges but not at the end
+      const badgesWithoutSelected = cleanedBadges.filter(
+        (b) => b.toLowerCase() !== selectedStateBadge.toLowerCase()
+      );
+
+      // Re-add it to the end
+      return [...badgesWithoutSelected, selectedStateBadge];
+    };
+
     if (Array.isArray(locationStateBadges) && locationStateBadges.length > 0) {
-      return locationStateBadges.filter(Boolean);
+      return replaceTrailingLocationBadge(locationStateBadges);
     }
 
-    return persistedSearchBarBadges;
-  }, [location.state, persistedSearchBarBadges]);
+    if (persistedSearchBarBadges.length > 0) {
+      return replaceTrailingLocationBadge(persistedSearchBarBadges);
+    }
+
+    return selectedStateBadge ? [selectedStateBadge] : [];
+  }, [location.search, location.state, persistedSearchBarBadges]);
 
   useEffect(() => {
     let timeoutId;
@@ -287,8 +324,7 @@ const AiListings = ({ forceListView = false }) => {
     queryFn: async () => {
       const { country, location } = formData || {};
       const response = await axios.get(
-        `company/companiesn?country=${country}&state=${location}&userId=${
-          userId || ""
+        `company/companiesn?country=${country}&state=${location}&userId=${userId || ""
         }`,
       );
 
@@ -448,7 +484,52 @@ const AiListings = ({ forceListView = false }) => {
     setValue("country", formData.country);
     setValue("location", formData.location);
     setValue("category", formData.category);
-  }, [formData]);
+  }, [formData, setValue]);
+
+  useEffect(() => {
+    persistSelectedDestination({
+      continent: formData.continent,
+      country: formData.country,
+      city: formData.location,
+    });
+  }, [formData.continent, formData.country, formData.location]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const queryCountry = params.get("country");
+    const queryLocation = params.get("state") || params.get("location");
+    const queryContinent = params.get("continent");
+
+    const breadcrumbFilters = location.state?.breadcrumbFilters;
+
+    const normalizeValue = (value) =>
+      typeof value === "string" ? value.trim().toLowerCase() : value;
+
+    const country = normalizeValue(breadcrumbFilters?.country || queryCountry);
+    const loc = normalizeValue(breadcrumbFilters?.location || queryLocation);
+    const continent = normalizeValue(
+      breadcrumbFilters?.continent || queryContinent,
+    );
+
+    if (!country || !loc) return;
+
+    if (
+      country === normalizeValue(formData.country) &&
+      loc === normalizeValue(formData.location) &&
+      (!continent || continent === normalizeValue(formData.continent))
+    ) {
+      return;
+    }
+
+    const nextFormValues = {
+      ...formData,
+      country: country || "",
+      location: loc || "",
+      continent: continent || formData.continent || "",
+    };
+
+    dispatch(setFormValues(nextFormValues));
+  }, [dispatch, formData, location.state, location.search]);
   useEffect(() => {
     if (formData?.category && listingsData?.length > 0) {
       if (formData.category === VALUE_ADDED_SERVICES_CATEGORY) return;
@@ -482,23 +563,23 @@ const AiListings = ({ forceListView = false }) => {
   const forMapsData = isLisitingLoading
     ? []
     : listingsData.map((item) => ({
-        ...item,
-        id: item._id,
-        lat: item.latitude,
-        lng: item.longitude,
-        name: item.companyName,
-        location: item.city,
-        reviews: item.reviews?.length,
-        rating: item.reviews?.length
-          ? (() => {
-              const avg =
-                item.reviews.reduce((sum, r) => sum + r.starCount, 0) /
-                item.reviews.length;
-              return avg % 1 === 0 ? avg : avg.toFixed(1);
-            })()
-          : "0",
-        image: item.images?.[0]?.url,
-      }));
+      ...item,
+      id: item._id,
+      lat: item.latitude,
+      lng: item.longitude,
+      name: item.companyName,
+      location: item.city,
+      reviews: item.reviews?.length,
+      rating: item.reviews?.length
+        ? (() => {
+          const avg =
+            item.reviews.reduce((sum, r) => sum + r.starCount, 0) /
+            item.reviews.length;
+          return avg % 1 === 0 ? avg : avg.toFixed(1);
+        })()
+        : "0",
+      image: item.images?.[0]?.url,
+    }));
 
   const handleCategoryClick = (categoryValue) => {
     const formData = getValues(); // from react-hook-form
@@ -560,11 +641,11 @@ const AiListings = ({ forceListView = false }) => {
   const backLabel = selectedStateFromParams || formData?.location || "";
   const selectedStateLabel = backLabel
     ? backLabel
-        .split(" ")
-        .map(
-          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
-        )
-        .join(" ")
+      .split(" ")
+      .map(
+        (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
+      )
+      .join(" ")
     : "";
 
   // Prioritize BIZ Nest and MeWo first, then sort the rest by rating descending
@@ -643,26 +724,24 @@ const AiListings = ({ forceListView = false }) => {
               <div className="flex items-center gap-2">
                 <IoSearch className="text-primary-red" />
                 <span className="text-[11px] font-bold text-gray-900 truncate w-full text-left">
-                  {`${(formData?.country || "Country").charAt(0).toUpperCase() + (formData?.country || "Country").slice(1)} . ${
-                    formData?.location
-                      ? formData.location
-                          .split(" ")
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() +
-                              word.slice(1).toLowerCase(),
-                          )
-                          .join(" ")
-                      : "Unknown"
-                  } . ${
-                    formData?.category
+                  {`${(formData?.country || "Country").charAt(0).toUpperCase() + (formData?.country || "Country").slice(1)} . ${formData?.location
+                    ? formData.location
+                      .split(" ")
+                      .map(
+                        (word) =>
+                          word.charAt(0).toUpperCase() +
+                          word.slice(1).toLowerCase(),
+                      )
+                      .join(" ")
+                    : "Unknown"
+                    } . ${formData?.category
                       ? categoryOptions.find(
-                          (c) => c.value === formData.category,
-                        )?.label ||
-                        formData.category.charAt(0).toUpperCase() +
-                          formData.category.slice(1)
+                        (c) => c.value === formData.category,
+                      )?.label ||
+                      formData.category.charAt(0).toUpperCase() +
+                      formData.category.slice(1)
                       : "All"
-                  }`}
+                    }`}
                 </span>
               </div>
               <span className="text-[10px] text-gray-500">
@@ -816,11 +895,10 @@ const AiListings = ({ forceListView = false }) => {
                                 className="h-full w-full object-contain"
                               />
                               <span
-                                className={`text-tiny border-b-4 ${
-                                  isActive
-                                    ? "border-primary-blue"
-                                    : "border-transparent"
-                                }`}
+                                className={`text-tiny border-b-4 ${isActive
+                                  ? "border-primary-blue"
+                                  : "border-transparent"
+                                  }`}
                               >
                                 {cat.label}
                               </span>
@@ -1081,13 +1159,13 @@ const AiListings = ({ forceListView = false }) => {
                 in{" "}
                 {formData?.location
                   ? formData.location
-                      .split(" ")
-                      .map(
-                        (word) =>
-                          word.charAt(0).toUpperCase() +
-                          word.slice(1).toLowerCase(),
-                      )
-                      .join(" ")
+                    .split(" ")
+                    .map(
+                      (word) =>
+                        word.charAt(0).toUpperCase() +
+                        word.slice(1).toLowerCase(),
+                    )
+                    .join(" ")
                   : "Unknown"}
               </h1>
             </div>
@@ -1101,9 +1179,8 @@ const AiListings = ({ forceListView = false }) => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -50 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              className={`${
-                showDesktopMap ? "col-span-5" : "col-span-9"
-              } font-semibold text-lg`}
+              className={`${showDesktopMap ? "col-span-5" : "col-span-9"
+                } font-semibold text-lg`}
             >
               {formData?.category === VALUE_ADDED_SERVICES_CATEGORY ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-5">
@@ -1118,11 +1195,10 @@ const AiListings = ({ forceListView = false }) => {
                         type="button"
                         onClick={() => handleValueAddedServiceClick(service)}
                         disabled={isDisabled}
-                        className={`rounded-3xl bg-[#f1f1f3] px-4 py-6 min-h-[132px] aspect-square flex flex-col items-center justify-center text-center transition-colors ${
-                          isDisabled
-                            ? "cursor-not-allowed opacity-80"
-                            : "hover:bg-[#e8e8ed]"
-                        }`}
+                        className={`rounded-3xl bg-[#f1f1f3] px-4 py-6 min-h-[132px] aspect-square flex flex-col items-center justify-center text-center transition-colors ${isDisabled
+                          ? "cursor-not-allowed opacity-80"
+                          : "hover:bg-[#e8e8ed]"
+                          }`}
                       >
                         <div className="flex flex-col items-center justify-center">
                           {serviceLabel.split(" ").map((word) => (
@@ -1152,11 +1228,10 @@ const AiListings = ({ forceListView = false }) => {
                   }
                   persistPage={true}
                   resetPageKey={resetPageKey}
-                  columns={`grid-cols-2 md:grid-cols-3 ${
-                    showDesktopMap
-                      ? "lg:grid-cols-3"
-                      : "lg:grid-cols-4 xl:grid-cols-5"
-                  } gap-4 md:gap-5`}
+                  columns={`grid-cols-2 md:grid-cols-3 ${showDesktopMap
+                    ? "lg:grid-cols-3"
+                    : "lg:grid-cols-4 xl:grid-cols-5"
+                    } gap-4 md:gap-5`}
                   renderItem={(item, index) =>
                     isLisitingLoading ? (
                       <Box key={index} className="w-full h-full">

@@ -24,6 +24,7 @@ import Container from "../components/Container";
 import useNomadLoginState from "../hooks/useNomadLoginState";
 import useAuth from "../hooks/useAuth";
 import axios from "../utils/axios";
+import { getCountryNameFromSelectedDestination } from "../utils/selectedDestinationSession";
 
 const floatingLabelSx = {
   color: "black",
@@ -70,18 +71,19 @@ const AiNewCompanySetup = () => {
   const [submittedDestination, setSubmittedDestination] = useState("");
   const [showChoiceModal, setShowChoiceModal] = useState(false);
   const { auth } = useAuth();
-  const isLoggedIn = useNomadLoginState();
+  const isLoggedIn = Boolean(auth?.user);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const countries = useMemo(() => Country.getAllCountries(), []);
   const { handleSubmit, control, reset, setValue, watch } = useForm({
     defaultValues,
   });
   const selectedCountry = watch("currentCompanyCountry");
+  const newCompanyCountry = watch("newCompanyCountry");
   const selectedCountryData = useMemo(
     () => countries.find((country) => country.name === selectedCountry) || null,
     [countries, selectedCountry],
   );
-  const messagePrefix = isLoggedIn ? auth?.user?.fullName + ", " : "User, ";
+  const messagePrefix = isLoggedIn ? (auth?.user?.fullName?.split(" ")[0] || "User") + ", " : "User, ";
   const newCompanyPrompt = `${messagePrefix}${NEW_COMPANY_PROMPT}`;
 
   const [isPending, setIsPending] = useState(false);
@@ -104,9 +106,22 @@ const AiNewCompanySetup = () => {
   const handleFormSubmit = async (formValues) => {
     try {
       setIsSubmitting(true);
-      await axios.post("new-company-setup", formValues);
+      await axios.post("forms/add-new-b2c-form-submission", {
+        ...formValues,
+        sheetName: "AI_New_Company_Setup",
+      });
       setSubmittedDestination(formValues.travelCountry || "");
       setShowChoiceModal(true);
+      Swal.fire({
+        title: "Request Submitted!",
+        text: "Your form has been submitted. We will get back to you shortly.",
+        icon: "success",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#0BA9EF",
+        customClass: {
+          confirmButton: "swal2-button--pill",
+        },
+      });
       reset(defaultValues);
     } catch (error) {
       const errorMessage =
@@ -117,6 +132,20 @@ const AiNewCompanySetup = () => {
       setIsSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    if (isLoggedIn && auth?.user) {
+      const { fullName, email, contactCode, contactNumber, country, countryOfResidence } = auth.user;
+      setValue("fullName", fullName || "");
+      setValue("email", email || "");
+      setValue("contactCode", contactCode || "");
+      setValue("contactNumber", contactNumber || "");
+      const userCountry = country || countryOfResidence;
+      if (userCountry) {
+        setValue("currentCompanyCountry", userCountry);
+      }
+    }
+  }, [isLoggedIn, auth, setValue]);
 
   const handleCountryChange = (countryName, onChange) => {
     const country = countries.find((item) => item.name === countryName);
@@ -132,6 +161,16 @@ const AiNewCompanySetup = () => {
       shouldTouch: true,
     });
   };
+
+  useEffect(() => {
+    const destinationCountry = getCountryNameFromSelectedDestination(countries);
+    if (!destinationCountry || newCompanyCountry) return;
+
+    setValue("newCompanyCountry", destinationCountry, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+  }, [countries, newCompanyCountry, setValue]);
 
   useEffect(() => {
     const hasSeenTypingEffect =
@@ -150,7 +189,7 @@ const AiNewCompanySetup = () => {
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => { };
+    let cleanupHeading = () => {};
 
     const typeHeading = () => {
       const headingInterval = setInterval(() => {
@@ -211,8 +250,9 @@ const AiNewCompanySetup = () => {
             <Box
               component="form"
               onSubmit={handleSubmit(handleFormSubmit)}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
-                }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${
+                isFormVisible ? "visible" : "invisible"
+              }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-4">
                 <Controller
@@ -393,7 +433,13 @@ const AiNewCompanySetup = () => {
                   <Controller
                     name="contactNumber"
                     control={control}
-                    rules={{ required: "Contact number is required" }}
+                    rules={{
+                      required: "Contact number is required",
+                      pattern: {
+                        value: /^[0-9]{7,15}$/,
+                        message: "Please enter a valid phone number",
+                      },
+                    }}
                     render={({ field, fieldState }) => (
                       <TextField
                         {...field}

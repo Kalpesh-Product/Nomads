@@ -8,14 +8,24 @@ const AiVisaSupportThankYou = () => {
   const [typedMessage, setTypedMessage] = useState("");
   const selectedState = searchParams.get("state");
   const selectedCountry = searchParams.get("country");
+  const selectedContinent = searchParams.get("continent");
 
   const destinationPath = useMemo(() => {
     if (!selectedState || !selectedCountry) {
       return "";
     }
 
-    return `/ai-verticals?country=${encodeURIComponent(selectedCountry)}&state=${encodeURIComponent(selectedState)}`;
-  }, [selectedCountry, selectedState]);
+    const params = new URLSearchParams({
+      country: selectedCountry,
+      state: selectedState,
+    });
+
+    if (selectedContinent) {
+      params.set("continent", selectedContinent);
+    }
+
+    return `/ai-verticals?${params.toString()}`;
+  }, [selectedContinent, selectedCountry, selectedState]);
 
   const formattedState = useMemo(() => {
     if (!selectedState) {
@@ -53,6 +63,9 @@ const AiVisaSupportThankYou = () => {
     }
 
     const redirectTimeout = setTimeout(() => {
+      if (typeof window !== "undefined") {
+        window.sessionStorage.removeItem("aiSearchBarBadges");
+      }
       navigate(destinationPath);
     }, 7000);
 

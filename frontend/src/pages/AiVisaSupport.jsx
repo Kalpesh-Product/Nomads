@@ -2,27 +2,22 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   InputAdornment,
-  InputBase,
   MenuItem,
   TextField,
-  Typography,
 } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
-import { DatePicker } from "@mui/x-date-pickers";
-import dayjs from "dayjs";
 import { Country } from "country-state-city";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
 import axios from "../utils/axios";
 import Container from "../components/Container";
 import { aiDestinationCards } from "../constants/aiDestinationCards";
 import useNomadLoginState from "../hooks/useNomadLoginState";
 import useAuth from "../hooks/useAuth";
+import { getCountryNameFromSelectedDestination } from "../utils/selectedDestinationSession";
+import { showErrorAlert } from "../utils/alerts";
 
 const floatingLabelSx = {
   color: "black",
@@ -64,15 +59,15 @@ const AiVisaSupport = () => {
   const [typedVisaHeading, setTypedVisaHeading] = useState("");
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showChoiceModal, setShowChoiceModal] = useState(false);
-  const [submittedDestination, setSubmittedDestination] = useState("");
   const { auth } = useAuth();
-  const isLoggedIn = useNomadLoginState();
+  const isLoggedIn = Boolean(auth?.user);
   const navigate = useNavigate();
   const { control, handleSubmit, reset, setValue, watch } = useForm({
     defaultValues,
   });
-  const messagePrefix = isLoggedIn ? auth?.user?.fullName + ", " : "User, ";
+  const messagePrefix = isLoggedIn
+    ? (auth?.user?.fullName?.split(" ")[0] || "User") + ", "
+    : "User, ";
   const visaSupportPrompt = `${messagePrefix}${VISA_SUPPORT_PROMPT}`;
   const countries = useMemo(() => Country.getAllCountries(), []);
   const destinationOptions = useMemo(
@@ -80,10 +75,12 @@ const AiVisaSupport = () => {
       aiDestinationCards.map((destination) => ({
         state: destination.city,
         country: destination.country,
+        continent: destination.continent,
       })),
     [],
   );
   const selectedNationality = watch("nationality");
+  const selectedTravellingCountry = watch("travellingCountry");
   const selectedNationalityCountry = useMemo(
     () =>
       countries.find((country) => country.name === selectedNationality) || null,
@@ -91,34 +88,64 @@ const AiVisaSupport = () => {
   );
 
   const navigateToThankYou = (choice, travellingCountry) => {
-
     const selectedDestination = destinationOptions.find(
       (option) => option.state === travellingCountry,
     );
     const destinationState = selectedDestination?.state?.toLowerCase() || "";
     const destinationCountry =
       selectedDestination?.country?.toLowerCase() || "";
+    const destinationContinent =
+      selectedDestination?.continent?.toLowerCase() || "";
 
     navigate(
-      `/visa-support/thank-you?choice=${choice}&state=${encodeURIComponent(destinationState)}&country=${encodeURIComponent(destinationCountry)}&destination=${encodeURIComponent(travellingCountry || "")}`,
+      `/visa-support/thank-you?choice=${choice}&state=${encodeURIComponent(destinationState)}&country=${encodeURIComponent(destinationCountry)}&continent=${encodeURIComponent(destinationContinent)}&destination=${encodeURIComponent(travellingCountry || "")}`,
     );
   };
 
-  const handleFormSubmit = async (formValues) => {
-    try {
-      setIsSubmitting(true);
-      await axios.post("visa-support", formValues);
-      setSubmittedDestination(formValues.travellingCountry || "");
-      setShowChoiceModal(true);
+  const { mutate: submitVisaSupport } = useMutation({
+    mutationFn: async (formValues) => {
+      const response = await axios.post("forms/add-new-b2c-form-submission", {
+        ...formValues,
+        sheetName: "AI_Visa_Support",
+      });
+      return response.data;
+    },
+    onSuccess: async (_, formValues) => {
+      await Swal.fire({
+        title: "Request Submitted!",
+        text: "Please suggest and select below options.",
+        icon: "success",
+        showCancelButton: true,
+        confirmButtonText: "Need Custom Solution",
+        cancelButtonText: "Browse Options Yourself",
+        reverseButtons: true,
+        cancelButtonColor: "#000000",
+        confirmButtonColor: "#0BA9EF",
+        customClass: {
+          confirmButton: "swal2-button--pill",
+          cancelButton: "swal2-button--pill",
+        },
+      });
+      navigateToThankYou(
+        "get-back-to-me",
+        formValues.travellingCountry || "",
+      );
       reset(defaultValues);
-    } catch (error) {
-      const errorMessage =
+    },
+    onError: (error) => {
+      showErrorAlert(
         error?.response?.data?.message ||
-        "Something went wrong while submitting your request.";
-      window.alert(errorMessage);
-    } finally {
+          "Something went wrong while submitting your request.",
+      );
+    },
+    onSettled: () => {
       setIsSubmitting(false);
-    }
+    },
+  });
+
+  const handleFormSubmit = (formValues) => {
+    setIsSubmitting(true);
+    submitVisaSupport(formValues);
   };
 
   const handleNationalityChange = (countryName, onChange) => {
@@ -137,6 +164,37 @@ const AiVisaSupport = () => {
   };
 
   useEffect(() => {
+    if (isLoggedIn && auth?.user) {
+      const {
+        fullName,
+        email,
+        contactCode,
+        contactNumber,
+        country,
+        countryOfResidence,
+      } = auth.user;
+      setValue("fullName", fullName || "");
+      setValue("email", email || "");
+      setValue("contactCode", contactCode || "");
+      setValue("contactNumber", contactNumber || "");
+      const userCountry = country || countryOfResidence;
+      if (userCountry) {
+        setValue("nationality", userCountry);
+      }
+    }
+  }, [isLoggedIn, auth, setValue]);
+
+  useEffect(() => {
+    const destinationCountry = getCountryNameFromSelectedDestination(countries);
+    if (!destinationCountry || selectedTravellingCountry) return;
+
+    setValue("travellingCountry", destinationCountry, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+  }, [countries, selectedTravellingCountry, setValue]);
+
+  useEffect(() => {
     const hasSeenTypingEffect =
       typeof window !== "undefined" &&
       window.localStorage.getItem(VISA_SUPPORT_TYPING_SEEN_KEY) === "true";
@@ -153,7 +211,7 @@ const AiVisaSupport = () => {
 
     let messageIndex = 0;
     let visaHeadingIndex = 0;
-    let cleanupHeading = () => { };
+    let cleanupHeading = () => {};
 
     const typeVisaHeading = () => {
       const headingInterval = setInterval(() => {
@@ -214,14 +272,16 @@ const AiVisaSupport = () => {
             <Box
               component="form"
               onSubmit={handleSubmit(handleFormSubmit)}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
-                }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${
+                isFormVisible ? "visible" : "invisible"
+              }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
                 <Controller
                   name="visaType"
                   control={control}
-                  render={({ field }) => (
+                  rules={{ required: "Visa type is required" }}
+                  render={({ field, fieldState }) => (
                     <TextField
                       {...field}
                       fullWidth
@@ -229,6 +289,8 @@ const AiVisaSupport = () => {
                       variant="standard"
                       select
                       InputLabelProps={{ sx: floatingLabelSx }}
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
                     >
                       <MenuItem value="" sx={{ fontWeight: 700 }}>
                         SELECT VISA TYPE
@@ -245,12 +307,15 @@ const AiVisaSupport = () => {
                 <Controller
                   name="fullName"
                   control={control}
-                  render={({ field }) => (
+                  rules={{ required: "Full name is required" }}
+                  render={({ field, fieldState }) => (
                     <TextField
                       {...field}
                       fullWidth
                       label="Full Name"
                       variant="standard"
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
                     />
                   )}
@@ -259,12 +324,15 @@ const AiVisaSupport = () => {
                 <Controller
                   name="nationality"
                   control={control}
-                  render={({ field }) => (
+                  rules={{ required: "Nationality is required" }}
+                  render={({ field, fieldState }) => (
                     <TextField
                       {...field}
                       fullWidth
                       label="Nationality on Passport"
                       variant="standard"
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
                       select
                       InputLabelProps={{ sx: floatingLabelSx }}
                       SelectProps={{
@@ -326,12 +394,15 @@ const AiVisaSupport = () => {
                 <Controller
                   name="travellingCountry"
                   control={control}
-                  render={({ field }) => (
+                  rules={{ required: "Travelling country is required" }}
+                  render={({ field, fieldState }) => (
                     <TextField
                       {...field}
                       fullWidth
                       label="Travelling Country"
                       variant="standard"
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
                       select
                       InputLabelProps={{ sx: floatingLabelSx }}
                       onChange={(event) => field.onChange(event.target.value)}
@@ -339,12 +410,12 @@ const AiVisaSupport = () => {
                       <MenuItem value="" sx={{ fontWeight: 700 }}>
                         SELECT COUNTRY
                       </MenuItem>
-                      {destinationOptions.map((destinationOption) => (
-                        <MenuItem
-                          key={`${destinationOption.state}-${destinationOption.country}`}
-                          value={destinationOption.state}
-                        >
-                          {destinationOption.state}
+                      <MenuItem value="" sx={{ fontWeight: 700 }}>
+                        SELECT COUNTRY
+                      </MenuItem>
+                      {countries.map((country) => (
+                        <MenuItem key={country.isoCode} value={country.name}>
+                          {country.name}
                         </MenuItem>
                       ))}
                     </TextField>
@@ -392,7 +463,14 @@ const AiVisaSupport = () => {
                   <Controller
                     name="contactNumber"
                     control={control}
-                    render={({ field }) => (
+                    rules={{
+                      required: "Contact number is required",
+                      pattern: {
+                        value: /^[0-9]{7,15}$/,
+                        message: "Please enter a valid phone number",
+                      },
+                    }}
+                    render={({ field, fieldState }) => (
                       <TextField
                         {...field}
                         fullWidth
@@ -401,6 +479,8 @@ const AiVisaSupport = () => {
                         type="tel"
                         InputLabelProps={{ sx: floatingLabelSx }}
                         sx={{ flex: 1 }}
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message}
                       />
                     )}
                   />
@@ -409,12 +489,15 @@ const AiVisaSupport = () => {
                 <Controller
                   name="email"
                   control={control}
-                  render={({ field }) => (
+                  rules={{ required: "Email is required" }}
+                  render={({ field, fieldState }) => (
                     <TextField
                       {...field}
                       fullWidth
                       label="Email Address"
                       variant="standard"
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
                     />
                   )}
@@ -460,40 +543,6 @@ const AiVisaSupport = () => {
                 </div>
               </div>
             </Box>
-
-            <Dialog
-              open={showChoiceModal}
-              onClose={() => setShowChoiceModal(false)}
-              fullWidth
-              maxWidth="xs"
-            >
-              <DialogTitle>Request Submitted!</DialogTitle>
-              <DialogContent>
-                Please suggest and select below options.
-              </DialogContent>
-              <DialogActions sx={{ px: 3, pb: 2 }}>
-                <Button
-                  variant="outlined"
-                  color="inherit"
-                  onClick={() => {
-                    setShowChoiceModal(false);
-                    navigateToThankYou("help-needed", submittedDestination);
-                  }}
-                >
-                  Browse Options Yourself
-                </Button>
-                <Button
-                  variant="contained"
-                  onClick={() => {
-                    setShowChoiceModal(false);
-                    navigateToThankYou("get-back-to-me", submittedDestination);
-                  }}
-                  sx={{ bgcolor: "#0BA9EF" }}
-                >
-                  Need Custom Solution
-                </Button>
-              </DialogActions>
-            </Dialog>
           </div>
         </section>
       </Container>
@@ -502,4 +551,3 @@ const AiVisaSupport = () => {
 };
 
 export default AiVisaSupport;
-

@@ -384,7 +384,7 @@ export const getReviewsByCompany = async (req, res, next) => {
 
     // 2️⃣ Fetch reviews using ObjectId (fast)
     const reviews = await Review.find(query)
-      .populate("reviewer", "firstName lastName email mobile")
+      .populate("reviewer", "fullName email mobile")
       .lean()
       .exec();
 
@@ -404,7 +404,7 @@ export const getReviewsByUser = async (req, res, next) => {
     // 1️⃣ Resolve company once (cheap, indexed)
 
     const userExists = await NomadUser.findOne({ _id: user })
-      .select("_id firstName lastName")
+      .select("_id fullName")
       .lean();
 
     if (!userExists) {
@@ -414,7 +414,7 @@ export const getReviewsByUser = async (req, res, next) => {
     // 2️⃣ Fetch reviews using ObjectId (fast)
     const reviews = await Review.find({ reviewer: user })
       .populate([
-        { path: "reviewer", select: "firstName lastName email mobile" },
+        { path: "reviewer", select: "fullName email mobile" },
         {
           path: "company",
           select:

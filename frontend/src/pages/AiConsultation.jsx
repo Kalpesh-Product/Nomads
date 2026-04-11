@@ -22,6 +22,7 @@ import Container from "../components/Container";
 import useNomadLoginState from "../hooks/useNomadLoginState";
 import useAuth from "../hooks/useAuth";
 import axios from "../utils/axios";
+import { getCountryNameFromSelectedDestination } from "../utils/selectedDestinationSession";
 
 const floatingLabelSx = {
   color: "black",
@@ -68,18 +69,19 @@ const AiConsultation = () => {
   const [showChoiceModal, setShowChoiceModal] = useState(false);
   const [submittedDestination, setSubmittedDestination] = useState("");
   const { auth } = useAuth();
-  const isLoggedIn = useNomadLoginState();
+  const isLoggedIn = Boolean(auth?.user);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const countries = useMemo(() => Country.getAllCountries(), []);
   const { handleSubmit, control, reset, setValue, watch } = useForm({
     defaultValues,
   });
   const selectedCountry = watch("currentCountry");
+  const consultationCountry = watch("consultationCountry");
   const selectedCountryData = useMemo(
     () => countries.find((country) => country.name === selectedCountry) || null,
     [countries, selectedCountry],
   );
-  const messagePrefix = isLoggedIn ? auth?.user?.fullName + ", " : "User, ";
+  const messagePrefix = isLoggedIn ? (auth?.user?.fullName?.split(" ")[0] || "User") + ", " : "User, ";
   const consultationPrompt = `${messagePrefix}${CONSULTATION_PROMPT}`;
 
   const [isPending, setIsPending] = useState(false);
@@ -102,9 +104,22 @@ const AiConsultation = () => {
   const handleFormSubmit = async (formValues) => {
     try {
       setIsSubmitting(true);
-      await axios.post("consultation", formValues);
+      await axios.post("forms/add-new-b2c-form-submission", {
+        ...formValues,
+        sheetName: "AI_Consultation",
+      });
       setSubmittedDestination(formValues.travellingCountry || "");
       setShowChoiceModal(true);
+      Swal.fire({
+        title: "Request Submitted!",
+        text: "Your form has been submitted. We will get back to you shortly.",
+        icon: "success",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#0BA9EF",
+        customClass: {
+          confirmButton: "swal2-button--pill",
+        },
+      });
       reset(defaultValues);
     } catch (error) {
       const errorMessage =
@@ -115,6 +130,30 @@ const AiConsultation = () => {
       setIsSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    if (isLoggedIn && auth?.user) {
+      const { fullName, email, contactCode, contactNumber, country, countryOfResidence } = auth.user;
+      setValue("fullName", fullName || "");
+      setValue("email", email || "");
+      setValue("contactCode", contactCode || "");
+      setValue("contactNumber", contactNumber || "");
+      const userCountry = country || countryOfResidence;
+      if (userCountry) {
+        setValue("currentCountry", userCountry);
+      }
+    }
+  }, [isLoggedIn, auth, setValue]);
+
+  useEffect(() => {
+    const destinationCountry = getCountryNameFromSelectedDestination(countries);
+    if (!destinationCountry || consultationCountry) return;
+
+    setValue("consultationCountry", destinationCountry, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+  }, [countries, consultationCountry, setValue]);
 
   const handleCountryChange = (countryName, onChange) => {
     const country = countries.find((item) => item.name === countryName);
@@ -148,7 +187,7 @@ const AiConsultation = () => {
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => { };
+    let cleanupHeading = () => {};
 
     const typeHeading = () => {
       const headingInterval = setInterval(() => {
@@ -390,7 +429,13 @@ const AiConsultation = () => {
                   <Controller
                     name="contactNumber"
                     control={control}
-                    rules={{ required: "Contact number is required" }}
+                    rules={{
+                      required: "Contact number is required",
+                      pattern: {
+                        value: /^[0-9]{7,15}$/,
+                        message: "Please enter a valid phone number",
+                      },
+                    }}
                     render={({ field, fieldState }) => (
                       <TextField
                         {...field}

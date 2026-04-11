@@ -4,6 +4,12 @@ import mongoose from "mongoose";
 import { sendMail, sendAdminFormNotification } from "../../config/mailer.js"; // adjust path if different
 import User from "../../models/NomadUser.js";
 import NomadUser from "../../models/NomadUser.js";
+import VisaSupport from "../../models/VisaSupport.js";
+import OverallActivationSupport from "../../models/OverallActivationSupport.js";
+import NewCompanySetup from "../../models/NewCompanySetup.js";
+import Consultation from "../../models/Consultation.js";
+import Workation from "../../models/Workation.js";
+import BecomeContributor from "../../models/BecomeContributor.js";
 import { randomUUID } from "crypto";
 import bcrypt from "bcrypt";
 import { uploadFileToS3 } from "../../config/s3Config.js";
@@ -243,8 +249,7 @@ const nomadsSignupSchema = yup
   .object()
   .shape({
     fullName: yup.string().trim().optional(),
-    firstName: yup.string().trim().optional(),
-    lastName: yup.string().trim().optional(),
+    fullName: yup.string().trim().required("Full name is required"),
     countryOfResidence: yup.string().trim().optional(),
     country: yup.string().trim().optional(),
     email: yup
@@ -280,9 +285,7 @@ const nomadsSignupSchema = yup
     "Please provide your full name or first and last name",
     (value) => {
       const hasFullName = Boolean(value?.fullName?.trim());
-      const hasFirstAndLast = Boolean(
-        value?.firstName?.trim() && value?.lastName?.trim(),
-      );
+      const hasFirstAndLast = Boolean(value?.fullName?.trim());
 
       return hasFullName || hasFirstAndLast;
     },
@@ -335,6 +338,127 @@ const contentRemovalRequestsSchema = yup.object().shape({
   sheetName: yup.string().required("Please provide a sheet name"),
 });
 
+const aiVisaSupportSchema = yup.object({
+  visaType: yup.string().trim().required("Visa type is required"),
+  fullName: yup.string().trim().required("Full name is required"),
+  nationality: yup.string().trim().required("Nationality is required"),
+  travellingCountry: yup
+    .string()
+    .trim()
+    .required("Travelling country is required"),
+  email: yup
+    .string()
+    .trim()
+    .email("Please provide a valid email address")
+    .required("Please provide your email address"),
+  contactCode: yup.string().trim().required("Contact code is required"),
+  contactNumber: yup.string().trim().required("Contact number is required"),
+  comments: yup.string().trim().nullable(),
+  sheetName: yup.string().required("Please provide a sheet name"),
+});
+
+const aiOverallActivationSupportSchema = yup.object({
+  supportRequired: yup.string().trim().required("Support required is required"),
+  fullName: yup.string().trim().required("Full name is required"),
+  nationalityOnPassport: yup
+    .string()
+    .trim()
+    .required("Nationality on passport is required"),
+  travelCountry: yup.string().trim().required("Travel country is required"),
+  email: yup
+    .string()
+    .trim()
+    .email("Please provide a valid email address")
+    .required("Please provide your email address"),
+  contactCode: yup.string().trim().required("Contact code is required"),
+  contactNumber: yup.string().trim().required("Contact number is required"),
+  comments: yup.string().trim().nullable(),
+  sheetName: yup.string().required("Please provide a sheet name"),
+});
+
+const aiNewCompanySetupSchema = yup.object({
+  supportRequired: yup.string().trim().required("Support required is required"),
+  fullName: yup.string().trim().required("Full name is required"),
+  currentCompanyCountry: yup
+    .string()
+    .trim()
+    .required("Current company country is required"),
+  newCompanyCountry: yup
+    .string()
+    .trim()
+    .required("New company country is required"),
+  email: yup
+    .string()
+    .trim()
+    .email("Please provide a valid email address")
+    .required("Please provide your email address"),
+  contactCode: yup.string().trim().required("Contact code is required"),
+  contactNumber: yup.string().trim().required("Contact number is required"),
+  comments: yup.string().trim().nullable(),
+  sheetName: yup.string().required("Please provide a sheet name"),
+});
+
+const aiConsultationSchema = yup.object({
+  supportRequired: yup.string().trim().required("Support required is required"),
+  fullName: yup.string().trim().required("Full name is required"),
+  currentCountry: yup.string().trim().required("Current country is required"),
+  consultationCountry: yup
+    .string()
+    .trim()
+    .required("Consultation country is required"),
+  email: yup
+    .string()
+    .trim()
+    .email("Please provide a valid email address")
+    .required("Please provide your email address"),
+  contactCode: yup.string().trim().required("Contact code is required"),
+  contactNumber: yup.string().trim().required("Contact number is required"),
+  comments: yup.string().trim().nullable(),
+  sheetName: yup.string().required("Please provide a sheet name"),
+});
+
+const aiWorkationSchema = yup.object({
+  noOfPeople: yup.string().trim().required("Number of people is required"),
+  fullName: yup.string().trim().required("Full name is required"),
+  companyName: yup.string().trim().required("Company name is required"),
+  companyWebsite: yup.string().trim().required("Company website is required"),
+  currentCountry: yup.string().trim().required("Current country is required"),
+  workationCountry: yup
+    .string()
+    .trim()
+    .required("Workation country is required"),
+  startDate: yup.string().trim().required("Start date is required"),
+  endDate: yup.string().trim().required("End date is required"),
+  email: yup
+    .string()
+    .trim()
+    .email("Please provide a valid email address")
+    .required("Please provide your email address"),
+  contactCode: yup.string().trim().required("Contact code is required"),
+  contactNumber: yup.string().trim().required("Contact number is required"),
+  comments: yup.string().trim().nullable(),
+  sheetName: yup.string().required("Please provide a sheet name"),
+});
+
+const aiBecomeContributorSchema = yup.object({
+  contributionType: yup
+    .string()
+    .trim()
+    .required("Contribution type is required"),
+  fullName: yup.string().trim().required("Full name is required"),
+  currentCountry: yup.string().trim().required("Current country is required"),
+  linkedinProfile: yup.string().trim().required("Linkedin profile is required"),
+  email: yup
+    .string()
+    .trim()
+    .email("Please provide a valid email address")
+    .required("Please provide your email address"),
+  contactCode: yup.string().trim().required("Contact code is required"),
+  contactNumber: yup.string().trim().required("Contact number is required"),
+  message: yup.string().trim().nullable(),
+  sheetName: yup.string().required("Please provide a sheet name"),
+});
+
 function toISODateOnly(v) {
   if (!v) return "";
   const d = new Date(v);
@@ -366,7 +490,8 @@ export const addB2CformSubmission = async (req, res, next) => {
       let resumeLink = "";
       if (req.file) {
         const data = await uploadFileToS3(
-          `job-applications/${payload.jobPosition}/${payload.name
+          `job-applications/${payload.jobPosition}/${
+            payload.name
           }_${randomUUID()}/${req.file.originalname}`,
           req.file,
         );
@@ -524,20 +649,23 @@ export const addB2CformSubmission = async (req, res, next) => {
       Sign_up: {
         schema: nomadsSignupSchema,
         map: (d) => {
+          const parsedMobile = parsePhoneNumberFromString(d.mobile || "");
+          const contactCode = parsedMobile?.countryCallingCode
+            ? `+${parsedMobile.countryCallingCode}`
+            : "";
+          const contactNumber = parsedMobile?.nationalNumber || "";
           const normalizedFullName =
-            d.fullName?.trim() || `${d.firstName || ""} ${d.lastName || ""}`.trim();
-          const [derivedFirstName = "", ...restName] = normalizedFullName.split(/\s+/);
-          const derivedLastName = d.lastName?.trim() || restName.join(" ");
-
+            d.fullName?.trim() ||
+            `${d.firstName || ""} ${d.lastName || ""}`.trim();
           return {
             fullName: normalizedFullName,
-            firstName: d.firstName?.trim() || derivedFirstName,
-            lastName: derivedLastName,
             countryOfResidence:
               d.countryOfResidence?.trim() || d.country?.trim() || "",
+            country: d.countryOfResidence?.trim() || d.country?.trim() || "",
             email: d.email?.trim(),
             password: d.password,
-            mobile: d.mobile?.trim(),
+            contactCode: contactCode,
+            contactNumber: contactNumber,
             sheetName: d.sheetName,
             submittedAt: new Date(),
           };
@@ -581,6 +709,182 @@ export const addB2CformSubmission = async (req, res, next) => {
       <p>We’ve received your content removal request for <b>${data.companyName}</b>.</p>
       <p>Our team will review the provided URLs and take the necessary action.</p>
       <p>We’ll get back to you via email if we need additional details.</p>
+      <p>Cheers,<br/>The WONO Team</p>
+   `,
+        }),
+      },
+      AI_Visa_Support: {
+        schema: aiVisaSupportSchema,
+        map: (d) => ({
+          visaType: d.visaType,
+          fullName: d.fullName,
+          nationality: d.nationality,
+          travellingCountry: d.travellingCountry,
+          email: d.email,
+          contactCode: d.contactCode,
+          contactNumber: d.contactNumber,
+          comments: d.comments || "",
+          sheetName: d.sheetName,
+          submittedAt: new Date(),
+        }),
+        successMsg:
+          "Your visa support request has been submitted successfully.",
+        emailTemplate: (data) => ({
+          to: data.email,
+          subject: "Visa Support Request Received",
+          text: `Hi ${data.fullName}, we have received your visa support request for ${data.travellingCountry}.`,
+          html: `
+      <h2>Visa Support Request Received</h2>
+      <p>Hi ${data.fullName},</p>
+      <p>Thank you for your request for <b>${data.travellingCountry}</b>.</p>
+      <p>Our team has received your details and will get back to you shortly with the next steps.</p>
+      <p>Cheers,<br/>The WONO Team</p>
+          `,
+        }),
+      },
+      AI_Overall_Activation_Support: {
+        schema: aiOverallActivationSupportSchema,
+        map: (d) => ({
+          supportRequired: d.supportRequired,
+          fullName: d.fullName,
+          nationalityOnPassport: d.nationalityOnPassport,
+          travelCountry: d.travelCountry,
+          email: d.email,
+          contactCode: d.contactCode,
+          contactNumber: d.contactNumber,
+          comments: d.comments || "",
+          sheetName: d.sheetName,
+          submittedAt: new Date(),
+        }),
+        successMsg:
+          "Your overall activation support request has been submitted successfully.",
+        emailTemplate: (data) => ({
+          to: data.email,
+          subject: "Overall Activation Support Request Received",
+          text: `Hi ${data.fullName}, we have received your activation support request for ${data.travelCountry}.`,
+          html: `
+      <h2>Overall Activation Support Request Received</h2>
+      <p>Hi ${data.fullName},</p>
+      <p>Thank you for your request for <b>${data.travelCountry}</b>.</p>
+      <p>Our team has received your details and will get back to you shortly.</p>
+      <p>Cheers,<br/>The WONO Team</p>
+    `,
+        }),
+      },
+      AI_New_Company_Setup: {
+        schema: aiNewCompanySetupSchema,
+        map: (d) => ({
+          supportRequired: d.supportRequired,
+          fullName: d.fullName,
+          currentCompanyCountry: d.currentCompanyCountry,
+          newCompanyCountry: d.newCompanyCountry,
+          email: d.email,
+          contactCode: d.contactCode,
+          contactNumber: d.contactNumber,
+          comments: d.comments || "",
+          sheetName: d.sheetName,
+          submittedAt: new Date(),
+        }),
+        successMsg:
+          "Your new company setup request has been submitted successfully.",
+        emailTemplate: (data) => ({
+          to: data.email,
+          subject: "New Company Setup Request Received",
+          text: `Hi ${data.fullName}, we have received your new company setup request for ${data.newCompanyCountry}.`,
+          html: `
+      <h2>New Company Setup Request Received</h2>
+      <p>Hi ${data.fullName},</p>
+      <p>Thank you for your request to setup in <b>${data.newCompanyCountry}</b>.</p>
+      <p>Our team has received your details and will get back to you shortly.</p>
+      <p>Cheers,<br/>The WONO Team</p>
+    `,
+        }),
+      },
+      AI_Consultation: {
+        schema: aiConsultationSchema,
+        map: (d) => ({
+          supportRequired: d.supportRequired,
+          fullName: d.fullName,
+          currentCountry: d.currentCountry,
+          consultationCountry: d.consultationCountry,
+          email: d.email,
+          contactCode: d.contactCode,
+          contactNumber: d.contactNumber,
+          comments: d.comments || "",
+          sheetName: d.sheetName,
+          submittedAt: new Date(),
+        }),
+        successMsg:
+          "Your consultation request has been submitted successfully.",
+        emailTemplate: (data) => ({
+          to: data.email,
+          subject: "Consultation Request Received",
+          text: `Hi ${data.fullName}, we have received your consultation request for ${data.consultationCountry}.`,
+          html: `
+      <h2>Consultation Request Received</h2>
+      <p>Hi ${data.fullName},</p>
+      <p>Thank you for your consultation request for <b>${data.consultationCountry}</b>.</p>
+      <p>Our team has received your details and will get back to you shortly.</p>
+      <p>Cheers,<br/>The WONO Team</p>
+    `,
+        }),
+      },
+      AI_Workation: {
+        schema: aiWorkationSchema,
+        map: (d) => ({
+          noOfPeople: d.noOfPeople,
+          fullName: d.fullName,
+          companyName: d.companyName,
+          companyWebsite: d.companyWebsite,
+          currentCountry: d.currentCountry,
+          workationCountry: d.workationCountry,
+          startDate: d.startDate,
+          endDate: d.endDate,
+          email: d.email,
+          contactCode: d.contactCode,
+          contactNumber: d.contactNumber,
+          comments: d.comments || "",
+          sheetName: d.sheetName,
+          submittedAt: new Date(),
+        }),
+        successMsg: "Your workation request has been submitted successfully.",
+        emailTemplate: (data) => ({
+          to: data.email,
+          subject: "Workation Request Received",
+          text: `Hi ${data.fullName}, we have received your workation request for ${data.workationCountry}.`,
+          html: `
+      <h2>Workation Request Received</h2>
+      <p>Hi ${data.fullName},</p>
+      <p>Thank you for your workation request for <b>${data.workationCountry}</b>.</p>
+      <p>Our team has received your details and will get back to you shortly.</p>
+      <p>Cheers,<br/>The WONO Team</p>
+    `,
+        }),
+      },
+      AI_Become_Contributor: {
+        schema: aiBecomeContributorSchema,
+        map: (d) => ({
+          contributionType: d.contributionType,
+          fullName: d.fullName,
+          currentCountry: d.currentCountry,
+          linkedinProfile: d.linkedinProfile,
+          email: d.email,
+          contactCode: d.contactCode,
+          contactNumber: d.contactNumber,
+          message: d.message || "",
+          sheetName: d.sheetName,
+          submittedAt: new Date(),
+        }),
+        successMsg: "Your contributor request has been submitted successfully.",
+        emailTemplate: (data) => ({
+          to: data.email,
+          subject: "Contributor Request Received",
+          text: `Hi ${data.fullName}, we have received your contributor request.`,
+          html: `
+      <h2>Contributor Request Received</h2>
+      <p>Hi ${data.fullName},</p>
+      <p>Thank you for your interest in contributing to WoNo.</p>
+      <p>Our team has received your details and will get back to you shortly.</p>
       <p>Cheers,<br/>The WONO Team</p>
     `,
         }),
@@ -641,6 +945,41 @@ export const addB2CformSubmission = async (req, res, next) => {
       await signupEntry.save();
     }
 
+    if (sheetName === "AI_Visa_Support") {
+      await VisaSupport.create({
+        visaType: payload.visaType,
+        fullName: payload.fullName,
+        nationality: payload.nationality,
+        travellingCountry: payload.travellingCountry,
+        email: payload.email,
+        contactCode: payload.contactCode,
+        contactNumber: payload.contactNumber,
+        comments: payload.comments,
+      });
+    }
+
+    if (sheetName === "AI_Overall_Activation_Support") {
+      await OverallActivationSupport.create(payload);
+    }
+
+    if (sheetName === "AI_New_Company_Setup") {
+      await NewCompanySetup.create(payload);
+    }
+
+    if (sheetName === "AI_Consultation") {
+      await Consultation.create(payload);
+    }
+
+    if (sheetName === "AI_Workation") {
+      await Workation.create(payload);
+    }
+
+    if (sheetName === "AI_Become_Contributor") {
+      await BecomeContributor.create(payload);
+    }
+
+    let sheetsWarning = null;
+
     // Send to Google Apps Script
     const response = await fetch(B2C_APPS_SCRIPT_URL, {
       method: "POST",
@@ -651,7 +990,37 @@ export const addB2CformSubmission = async (req, res, next) => {
     const result = await response.json();
 
     if (result.status !== "success") {
-      throw new Error(result.message || "Failed to save data to Google Sheets");
+      const upstreamMessage =
+        result.message || "Failed to save data to Google Sheets";
+      const normalizedMessage =
+        typeof upstreamMessage === "string"
+          ? upstreamMessage.toLowerCase()
+          : "";
+      const isSheetConfigIssue =
+        normalizedMessage === "invalid sheetname" ||
+        normalizedMessage === "sheet not found";
+
+      const ALLOWED_AI_SHEETS_WITH_OPTIONAL_APPS_SCRIPT_CONFIG = new Set([
+        "AI_Visa_Support",
+        "AI_Overall_Activation_Support",
+        "AI_New_Company_Setup",
+        "AI_Consultation",
+        "AI_Workation",
+        "AI_Become_Contributor",
+      ]);
+
+      if (
+        ALLOWED_AI_SHEETS_WITH_OPTIONAL_APPS_SCRIPT_CONFIG.has(sheetName) &&
+        isSheetConfigIssue
+      ) {
+        sheetsWarning = `Google Sheets sync skipped for "${payload.sheetName}". Please add this sheetName in Apps Script sheetConfigs and create the sheet tab.`;
+      } else if (normalizedMessage === "invalid sheetname") {
+        throw new Error(
+          `Google Sheets sync failed: sheetName "${payload.sheetName}" is not configured in Apps Script sheetConfigs.`,
+        );
+      } else {
+        throw new Error(upstreamMessage);
+      }
     }
 
     // send email if template exists
@@ -675,6 +1044,7 @@ export const addB2CformSubmission = async (req, res, next) => {
       status: "success",
       message: config.successMsg,
       data: payload,
+      ...(sheetsWarning ? { warning: sheetsWarning } : {}),
     });
   } catch (err) {
     console.error("❌ Error in addB2CformSubmission:", err.message);

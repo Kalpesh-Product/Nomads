@@ -23,6 +23,7 @@ import Container from "../components/Container";
 import useNomadLoginState from "../hooks/useNomadLoginState";
 import useAuth from "../hooks/useAuth";
 import axios from "../utils/axios";
+import { getCountryNameFromSelectedDestination } from "../utils/selectedDestinationSession";
 
 const floatingLabelSx = {
   color: "black",
@@ -65,15 +66,16 @@ const AiOverallActivationSupport = () => {
   const [submittedDestination, setSubmittedDestination] = useState("");
   const [showChoiceModal, setShowChoiceModal] = useState(false);
   const { auth } = useAuth();
-  const isLoggedIn = useNomadLoginState();
+  const isLoggedIn = Boolean(auth?.user);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const countries = useMemo(() => Country.getAllCountries(), []);
   const { control, handleSubmit, reset, setValue, watch } = useForm({
     defaultValues,
   });
-  const messagePrefix = isLoggedIn ? auth?.user?.fullName + ", " : "User, ";
+  const messagePrefix = isLoggedIn ? (auth?.user?.fullName?.split(" ")[0] || "User") + ", " : "User, ";
   const overallActivationPrompt = `${messagePrefix}${OVERALL_ACTIVATION_PROMPT}`;
   const selectedNationality = watch("nationalityOnPassport");
+  const selectedTravelCountry = watch("travelCountry");
   const selectedNationalityCountry = useMemo(
     () =>
       countries.find((country) => country.name === selectedNationality) || null,
@@ -100,9 +102,22 @@ const AiOverallActivationSupport = () => {
   const handleFormSubmit = async (formValues) => {
     try {
       setIsSubmitting(true);
-      await axios.post("overall-activation-support", formValues);
+      await axios.post("forms/add-new-b2c-form-submission", {
+        ...formValues,
+        sheetName: "AI_Overall_Activation_Support",
+      });
       setSubmittedDestination(formValues.travelCountry || "");
       setShowChoiceModal(true);
+      Swal.fire({
+        title: "Request Submitted!",
+        text: "Your form has been submitted. We will get back to you shortly.",
+        icon: "success",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#0BA9EF",
+        customClass: {
+          confirmButton: "swal2-button--pill",
+        },
+      });
       reset(defaultValues);
     } catch (error) {
       const errorMessage =
@@ -113,6 +128,30 @@ const AiOverallActivationSupport = () => {
       setIsSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    if (isLoggedIn && auth?.user) {
+      const { fullName, email, contactCode, contactNumber, country, countryOfResidence } = auth.user;
+      setValue("fullName", fullName || "");
+      setValue("email", email || "");
+      setValue("contactCode", contactCode || "");
+      setValue("contactNumber", contactNumber || "");
+      const userCountry = country || countryOfResidence;
+      if (userCountry) {
+        setValue("nationalityOnPassport", userCountry);
+      }
+    }
+  }, [isLoggedIn, auth, setValue]);
+
+  useEffect(() => {
+    const destinationCountry = getCountryNameFromSelectedDestination(countries);
+    if (!destinationCountry || selectedTravelCountry) return;
+
+    setValue("travelCountry", destinationCountry, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+  }, [countries, selectedTravelCountry, setValue]);
 
   const handleNationalityChange = (countryName, onChange) => {
     const country = countries.find((item) => item.name === countryName);
@@ -133,7 +172,7 @@ const AiOverallActivationSupport = () => {
     const hasSeenTypingEffect =
       typeof window !== "undefined" &&
       window.localStorage.getItem(OVERALL_ACTIVATION_TYPING_SEEN_KEY) ===
-      "true";
+        "true";
 
     if (hasSeenTypingEffect) {
       setTypedMessage(overallActivationPrompt);
@@ -147,7 +186,7 @@ const AiOverallActivationSupport = () => {
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => { };
+    let cleanupHeading = () => {};
 
     const typeHeading = () => {
       const headingInterval = setInterval(() => {
@@ -211,8 +250,9 @@ const AiOverallActivationSupport = () => {
             <Box
               component="form"
               onSubmit={handleSubmit(handleFormSubmit)}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
-                }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${
+                isFormVisible ? "visible" : "invisible"
+              }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-4">
                 <Controller
@@ -397,7 +437,13 @@ const AiOverallActivationSupport = () => {
                   <Controller
                     name="contactNumber"
                     control={control}
-                    rules={{ required: "Contact number is required" }}
+                    rules={{
+                      required: "Contact number is required",
+                      pattern: {
+                        value: /^[0-9]{7,15}$/,
+                        message: "Please enter a valid phone number",
+                      },
+                    }}
                     render={({ field, fieldState }) => (
                       <TextField
                         {...field}

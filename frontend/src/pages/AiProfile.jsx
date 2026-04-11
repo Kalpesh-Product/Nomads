@@ -14,7 +14,7 @@ const AiProfile = () => {
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
   const queryClient = useQueryClient();
-  const { auth } = useAuth();
+  const { auth, setAuth } = useAuth();
   const logout = useLogout();
 
   const [isLogoutLoading, setIsLogoutLoading] = useState(false);
@@ -34,11 +34,11 @@ const AiProfile = () => {
 
   const [editMode, setEditMode] = useState(false);
   const [profileForm, setProfileForm] = useState({
-    firstName: user?.firstName || "",
-    lastName: user?.lastName || "",
-    country: user?.country || "",
+    fullName: user?.fullName || "",
+    country: user?.country || user?.countryOfResidence || "",
     state: user?.state || "",
-    mobile: user?.mobile || "",
+    contactCode: user?.contactCode || "",
+    contactNumber: user?.contactNumber || "",
   });
 
   const [passwordForm, setPasswordForm] = useState({
@@ -86,8 +86,9 @@ const AiProfile = () => {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({
-        queryKey: ["userProfile", data.user._id],
+        queryKey: ["userProfile", data.user.id || data.user._id],
       });
+      setAuth((prev) => ({ ...prev, user: data.user }));
       showSuccessAlert(data.message || "Profile updated successfully");
       setEditMode(false);
     },
@@ -204,12 +205,11 @@ const AiProfile = () => {
                   fontSize: "2rem",
                 }}
               >
-                {user?.firstName ? user.firstName.charAt(0).toUpperCase() : "U"}
+                {user?.fullName ? user.fullName.charAt(0).toUpperCase() : "U"}
               </Avatar>
               <div>
                 <h3 className="text-base sm:text-lg font-semibold">
-                  {`${user?.firstName || ""} ${user?.lastName || ""}`.trim() ||
-                    "User Name"}
+                  {user?.fullName || "User Name"}
                 </h3>
               </div>
             </div>
@@ -219,7 +219,7 @@ const AiProfile = () => {
                 <b>Email:</b> {user?.email || "N/A"}
               </p>
               <p>
-                <b>Mobile:</b> {user?.mobile || "N/A"}
+                <b>Mobile:</b> {user?.contactNumber || "N/A"}
               </p>
               <div className="mt-3">
                 <Button
@@ -252,7 +252,7 @@ const AiProfile = () => {
                 size="small"
                 fullWidth
                 name="fullName"
-                value={profileForm.firstName + " " + profileForm.lastName}
+                value={profileForm.fullName}
                 onChange={handleProfileChange}
                 InputProps={{ readOnly: !editMode }}
               />
@@ -260,8 +260,8 @@ const AiProfile = () => {
                 label="Mobile"
                 size="small"
                 fullWidth
-                name="mobile"
-                value={profileForm.mobile}
+                name="contactNumber"
+                value={profileForm.contactNumber}
                 onChange={handleProfileChange}
                 InputProps={{ readOnly: !editMode }}
               />
