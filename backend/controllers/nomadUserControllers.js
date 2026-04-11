@@ -38,7 +38,7 @@ export const updateProfile = async (req, res) => {
   try {
     console.log("profile");
     const { userId } = req.params;
-    const { firstName, lastName, country, state, contactCode, contactNumber } =
+    const { fullName, country, state, contactCode, contactNumber } =
       req.body;
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
@@ -50,8 +50,7 @@ export const updateProfile = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if (firstName) user.firstName = firstName.trim();
-    if (lastName) user.lastName = lastName.trim();
+    if (fullName) user.fullName = fullName.trim();
     if (country) user.country = country.trim();
     if (state) user.state = state.trim();
     if (contactCode) user.contactCode = contactCode.trim();
@@ -63,8 +62,7 @@ export const updateProfile = async (req, res) => {
       message: "Profile updated successfully",
       user: {
         id: updatedUser._id,
-        firstName: updatedUser.firstName,
-        lastName: updatedUser.lastName,
+        fullName: updatedUser.fullName,
         email: updatedUser.email,
         country: updatedUser.country,
         state: updatedUser.state,

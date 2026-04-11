@@ -243,8 +243,7 @@ const nomadsSignupSchema = yup
   .object()
   .shape({
     fullName: yup.string().trim().optional(),
-    firstName: yup.string().trim().optional(),
-    lastName: yup.string().trim().optional(),
+    fullName: yup.string().trim().required("Full name is required"),
     countryOfResidence: yup.string().trim().optional(),
     country: yup.string().trim().optional(),
     email: yup
@@ -281,7 +280,7 @@ const nomadsSignupSchema = yup
     (value) => {
       const hasFullName = Boolean(value?.fullName?.trim());
       const hasFirstAndLast = Boolean(
-        value?.firstName?.trim() && value?.lastName?.trim(),
+        value?.fullName?.trim(),
       );
 
       return hasFullName || hasFirstAndLast;
@@ -531,13 +530,8 @@ export const addB2CformSubmission = async (req, res, next) => {
           const contactNumber = parsedMobile?.nationalNumber || "";
           const normalizedFullName =
             d.fullName?.trim() || `${d.firstName || ""} ${d.lastName || ""}`.trim();
-          const [derivedFirstName = "", ...restName] = normalizedFullName.split(/\s+/);
-          const derivedLastName = d.lastName?.trim() || restName.join(" ");
-
           return {
             fullName: normalizedFullName,
-            firstName: d.firstName?.trim() || derivedFirstName,
-            lastName: derivedLastName,
             countryOfResidence:
               d.countryOfResidence?.trim() || d.country?.trim() || "",
             country: d.countryOfResidence?.trim() || d.country?.trim() || "",
