@@ -524,6 +524,11 @@ export const addB2CformSubmission = async (req, res, next) => {
       Sign_up: {
         schema: nomadsSignupSchema,
         map: (d) => {
+          const parsedMobile = parsePhoneNumberFromString(d.mobile || "");
+          const contactCode = parsedMobile?.countryCallingCode
+            ? `+${parsedMobile.countryCallingCode}`
+            : "";
+          const contactNumber = parsedMobile?.nationalNumber || "";
           const normalizedFullName =
             d.fullName?.trim() || `${d.firstName || ""} ${d.lastName || ""}`.trim();
           const [derivedFirstName = "", ...restName] = normalizedFullName.split(/\s+/);
@@ -535,9 +540,11 @@ export const addB2CformSubmission = async (req, res, next) => {
             lastName: derivedLastName,
             countryOfResidence:
               d.countryOfResidence?.trim() || d.country?.trim() || "",
+            country: d.countryOfResidence?.trim() || d.country?.trim() || "",
             email: d.email?.trim(),
             password: d.password,
-            mobile: d.mobile?.trim(),
+            contactCode: contactCode,
+            contactNumber: contactNumber,
             sheetName: d.sheetName,
             submittedAt: new Date(),
           };

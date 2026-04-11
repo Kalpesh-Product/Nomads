@@ -45,11 +45,8 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    mobile: {
-      type: String,
-      trim: true,
-      required: true,
-    },
+    contactCode: { type: String, trim: true, default: "" },
+    contactNumber: { type: String, trim: true, required: true },
     saves: [
       {
         type: mongoose.Schema.Types.ObjectId,

@@ -38,7 +38,8 @@ export const updateProfile = async (req, res) => {
   try {
     console.log("profile");
     const { userId } = req.params;
-    const { firstName, lastName, country, state, mobile } = req.body;
+    const { firstName, lastName, country, state, contactCode, contactNumber } =
+      req.body;
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ message: "Invalid user ID" });
@@ -53,7 +54,8 @@ export const updateProfile = async (req, res) => {
     if (lastName) user.lastName = lastName.trim();
     if (country) user.country = country.trim();
     if (state) user.state = state.trim();
-    if (mobile) user.mobile = mobile.trim();
+    if (contactCode) user.contactCode = contactCode.trim();
+    if (contactNumber) user.contactNumber = contactNumber.trim();
 
     const updatedUser = await user.save();
 
@@ -66,7 +68,8 @@ export const updateProfile = async (req, res) => {
         email: updatedUser.email,
         country: updatedUser.country,
         state: updatedUser.state,
-        mobile: updatedUser.mobile,
+        contactCode: updatedUser.contactCode,
+        contactNumber: updatedUser.contactNumber,
       },
     });
   } catch (error) {
