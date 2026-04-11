@@ -72,7 +72,7 @@ const AiVisaSupport = () => {
   const { control, handleSubmit, reset, setValue, watch } = useForm({
     defaultValues,
   });
-  const messagePrefix = isLoggedIn ? auth?.user?.firstName + ", " : "User, ";
+  const messagePrefix = isLoggedIn ? (auth?.user?.fullName?.split(" ")[0] || "User") + ", " : "User, ";
   const visaSupportPrompt = `${messagePrefix}${VISA_SUPPORT_PROMPT}`;
   const countries = useMemo(() => Country.getAllCountries(), []);
   const destinationOptions = useMemo(
@@ -150,6 +150,20 @@ const AiVisaSupport = () => {
       shouldTouch: true,
     });
   };
+
+  useEffect(() => {
+    if (isLoggedIn && auth?.user) {
+      const { fullName, email, contactCode, contactNumber, country, countryOfResidence } = auth.user;
+      setValue("fullName", fullName || "");
+      setValue("email", email || "");
+      setValue("contactCode", contactCode || "");
+      setValue("contactNumber", contactNumber || "");
+      const userCountry = country || countryOfResidence;
+      if (userCountry) {
+        setValue("nationality", userCountry);
+      }
+    }
+  }, [isLoggedIn, auth, setValue]);
 
   useEffect(() => {
     const hasSeenTypingEffect =

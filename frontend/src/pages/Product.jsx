@@ -65,9 +65,7 @@ const Product = () => {
   const dispatch = useDispatch();
   const userId = auth?.user?._id || auth?.user?.id;
 
-  const reviewerName = `${auth?.user?.firstName || ""} ${
-    auth?.user?.lastName || ""
-  }`.trim();
+  const reviewerName = auth?.user?.fullName?.trim() || "";
 
   const [selectedReview, setSelectedReview] = useState([]);
   const [showAmenities, setShowAmenities] = useState(false);
@@ -304,9 +302,7 @@ const Product = () => {
 
   useEffect(() => {
     if (auth?.user) {
-      const fullName = `${auth.user.firstName || ""} ${
-        auth.user.lastName || ""
-      }`.trim();
+      const fullName = auth.user.fullName || "";
 
       reset({
         fullName,

@@ -60,7 +60,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
   const logout = useLogout();
   const hasNomadLoginState = useNomadLoginState();
   const isLoggedIn = Boolean(auth?.user) || hasNomadLoginState;
-  const userInitial = auth?.user?.firstName?.charAt(0)?.toUpperCase() || "A";
+  const userInitial = auth?.user?.fullName?.charAt(0)?.toUpperCase() || "A";
   const openPopover = Boolean(anchorEl);
 
   const handleAvatarClick = (event) => setAnchorEl(event.currentTarget);

@@ -19,6 +19,7 @@ import { Country } from "country-state-city";
 import Swal from "sweetalert2";
 import Container from "../components/Container";
 import axios from "../utils/axios";
+import useAuth from "../hooks/useAuth";
 
 const floatingLabelSx = {
   color: "black",
@@ -61,7 +62,8 @@ const AiBecomeContributor = () => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showChoiceModal, setShowChoiceModal] = useState(false);
-  const [submittedDestination, setSubmittedDestination] = useState("");
+  const { auth } = useAuth();
+  const isLoggedIn = Boolean(auth?.user);
   const countries = useMemo(() => Country.getAllCountries(), []);
   const { handleSubmit, control, reset, setValue, watch } = useForm({
     defaultValues,
@@ -71,6 +73,8 @@ const AiBecomeContributor = () => {
     () => countries.find((country) => country.name === selectedCountry) || null,
     [countries, selectedCountry],
   );
+  const messagePrefix = isLoggedIn ? (auth?.user?.fullName?.split(" ")[0] || "User") + ", " : "User, ";
+  const contributorPrompt = `${messagePrefix}${CONTRIBUTOR_PROMPT}`;
 
   const [isPending, setIsPending] = useState(false);
 
@@ -132,12 +136,26 @@ const AiBecomeContributor = () => {
   };
 
   useEffect(() => {
+    if (isLoggedIn && auth?.user) {
+      const { fullName, email, contactCode, contactNumber, country, countryOfResidence } = auth.user;
+      setValue("fullName", fullName || "");
+      setValue("email", email || "");
+      setValue("contactCode", contactCode || "");
+      setValue("contactNumber", contactNumber || "");
+      const userCountry = country || countryOfResidence;
+      if (userCountry) {
+        setValue("currentCountry", userCountry);
+      }
+    }
+  }, [isLoggedIn, auth, setValue]);
+
+  useEffect(() => {
     const hasSeenTypingEffect =
       typeof window !== "undefined" &&
       window.localStorage.getItem(CONTRIBUTOR_TYPING_SEEN_KEY) === "true";
 
     if (hasSeenTypingEffect) {
-      setTypedMessage(CONTRIBUTOR_PROMPT);
+      setTypedMessage(contributorPrompt);
       setTypedPageHeading(CONTRIBUTOR_HEADING);
       setIsFormVisible(true);
       return;
@@ -162,16 +180,16 @@ const AiBecomeContributor = () => {
             window.localStorage.setItem(CONTRIBUTOR_TYPING_SEEN_KEY, "true");
           }
         }
-      }, 7);
+      }, 1);
 
       cleanupHeading = () => clearInterval(headingInterval);
     };
 
     const messageInterval = setInterval(() => {
       messageIndex += 1;
-      setTypedMessage(CONTRIBUTOR_PROMPT.slice(0, messageIndex));
+      setTypedMessage(contributorPrompt.slice(0, messageIndex));
 
-      if (messageIndex >= CONTRIBUTOR_PROMPT.length) {
+      if (messageIndex >= contributorPrompt.length) {
         clearInterval(messageInterval);
         typeHeading();
       }

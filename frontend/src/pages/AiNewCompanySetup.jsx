@@ -81,7 +81,7 @@ const AiNewCompanySetup = () => {
     () => countries.find((country) => country.name === selectedCountry) || null,
     [countries, selectedCountry],
   );
-  const messagePrefix = isLoggedIn ? auth?.user?.firstName + ", " : "User, ";
+  const messagePrefix = isLoggedIn ? (auth?.user?.fullName?.split(" ")[0] || "User") + ", " : "User, ";
   const newCompanyPrompt = `${messagePrefix}${NEW_COMPANY_PROMPT}`;
 
   const [isPending, setIsPending] = useState(false);
@@ -127,6 +127,20 @@ const AiNewCompanySetup = () => {
       setIsSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    if (isLoggedIn && auth?.user) {
+      const { fullName, email, contactCode, contactNumber, country, countryOfResidence } = auth.user;
+      setValue("fullName", fullName || "");
+      setValue("email", email || "");
+      setValue("contactCode", contactCode || "");
+      setValue("contactNumber", contactNumber || "");
+      const userCountry = country || countryOfResidence;
+      if (userCountry) {
+        setValue("currentCompanyCountry", userCountry);
+      }
+    }
+  }, [isLoggedIn, auth, setValue]);
 
   const handleCountryChange = (countryName, onChange) => {
     const country = countries.find((item) => item.name === countryName);

@@ -34,11 +34,10 @@ const Profile = () => {
 
   const [editMode, setEditMode] = useState(false);
   const [profileForm, setProfileForm] = useState({
-    firstName: user?.firstName || "",
-    lastName: user?.lastName || "",
+    fullName: user?.fullName || "",
     country: user?.country || "",
     state: user?.state || "",
-    mobile: user?.mobile || "",
+    mobile: user?.contactNumber || "",
   });
 
   const [passwordForm, setPasswordForm] = useState({
@@ -203,12 +202,11 @@ const Profile = () => {
                   fontSize: "2rem",
                 }}
               >
-                {user?.firstName ? user.firstName.charAt(0).toUpperCase() : "U"}
+                {user?.fullName ? user.fullName.charAt(0).toUpperCase() : "U"}
               </Avatar>
               <div>
                 <h3 className="text-base sm:text-lg font-semibold">
-                  {`${user?.firstName || ""} ${user?.lastName || ""}`.trim() ||
-                    "User Name"}
+                  {user?.fullName || "User Name"}
                 </h3>
               </div>
             </div>
@@ -247,20 +245,11 @@ const Profile = () => {
             <h3 className="font-semibold mb-4">Personal Information</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <TextField
-                label="First Name"
+                label="Full Name"
                 size="small"
                 fullWidth
-                name="firstName"
-                value={profileForm.firstName}
-                onChange={handleProfileChange}
-                InputProps={{ readOnly: !editMode }}
-              />
-              <TextField
-                label="Last Name"
-                size="small"
-                fullWidth
-                name="lastName"
-                value={profileForm.lastName}
+                name="fullName"
+                value={profileForm.fullName}
                 onChange={handleProfileChange}
                 InputProps={{ readOnly: !editMode }}
               />

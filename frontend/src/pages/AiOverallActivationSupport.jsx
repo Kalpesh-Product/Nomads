@@ -71,7 +71,7 @@ const AiOverallActivationSupport = () => {
   const { control, handleSubmit, reset, setValue, watch } = useForm({
     defaultValues,
   });
-  const messagePrefix = isLoggedIn ? auth?.user?.firstName + ", " : "User, ";
+  const messagePrefix = isLoggedIn ? (auth?.user?.fullName?.split(" ")[0] || "User") + ", " : "User, ";
   const overallActivationPrompt = `${messagePrefix}${OVERALL_ACTIVATION_PROMPT}`;
   const selectedNationality = watch("nationalityOnPassport");
   const selectedNationalityCountry = useMemo(
@@ -123,6 +123,20 @@ const AiOverallActivationSupport = () => {
       setIsSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    if (isLoggedIn && auth?.user) {
+      const { fullName, email, contactCode, contactNumber, country, countryOfResidence } = auth.user;
+      setValue("fullName", fullName || "");
+      setValue("email", email || "");
+      setValue("contactCode", contactCode || "");
+      setValue("contactNumber", contactNumber || "");
+      const userCountry = country || countryOfResidence;
+      if (userCountry) {
+        setValue("nationalityOnPassport", userCountry);
+      }
+    }
+  }, [isLoggedIn, auth, setValue]);
 
   const handleNationalityChange = (countryName, onChange) => {
     const country = countries.find((item) => item.name === countryName);

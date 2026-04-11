@@ -231,9 +231,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   const { auth } = useAuth();
   const logout = useLogout();
   const userFullName =
-    auth?.user?.fullName?.trim() ||
-    `${auth?.user?.firstName || ""} ${auth?.user?.lastName || ""}`.trim() ||
-    "Profile";
+    auth?.user?.fullName?.trim() || "Profile";
 
   const profileItemsWithUserName = profileItems.map((item) =>
     item.label === "userFullName" ? { ...item, label: userFullName } : item,
@@ -266,7 +264,6 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
   const isLoggedIn = Boolean(auth?.user) || readStoredLoginState();
   console.log(isLoggedIn);
-  console.log(auth?.user?.firstName);
 
   const handleRecommendationClick = (item) => {
     const params = new URLSearchParams(location.search);
