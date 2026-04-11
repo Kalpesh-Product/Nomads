@@ -113,6 +113,31 @@ const AiWorkation = () => {
     }
   };
 
+  useEffect(() => {
+    if (isLoggedIn && auth?.user) {
+      const { fullName, email, contactCode, contactNumber, country, countryOfResidence } = auth.user;
+      setValue("fullName", fullName || "");
+      setValue("email", email || "");
+      setValue("contactCode", contactCode || "");
+      setValue("contactNumber", contactNumber || "");
+      const userCountry = country || countryOfResidence;
+      if (userCountry) {
+        setValue("currentCountry", userCountry);
+      }
+    }
+  }, [isLoggedIn, auth, setValue]);
+
+  useEffect(() => {
+    const destinationCountry = getCountryNameFromSelectedDestination(countries);
+    if (!destinationCountry || workationCountry) return;
+
+    setValue("workationCountry", destinationCountry, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+  }, [countries, workationCountry, setValue]);
+
+
   const handleCountryChange = (countryName, onChange) => {
     const country = countries.find((item) => item.name === countryName);
     const phonePrefix = country?.phonecode ? `+${country.phonecode}` : "";
@@ -145,7 +170,7 @@ const AiWorkation = () => {
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => {};
+    let cleanupHeading = () => { };
 
     const typeHeading = () => {
       const headingInterval = setInterval(() => {
