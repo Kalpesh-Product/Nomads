@@ -88,13 +88,6 @@ const AiVisaSupport = () => {
       })),
     [],
   );
-  const destinationCountries = useMemo(
-    () =>
-      Array.from(
-        new Set(destinationOptions.map((option) => option.country)),
-      ).sort(),
-    [destinationOptions],
-  );
   const selectedNationality = watch("nationality");
   const selectedTravellingCountry = watch("travellingCountry");
   const selectedNationalityCountry = useMemo(
@@ -444,34 +437,27 @@ const AiVisaSupport = () => {
                       InputLabelProps={{ sx: floatingLabelSx }}
                       onChange={(event) => field.onChange(event.target.value)}
                     >
-                      <MenuItem value="" sx={{ fontWeight: 700 }}>
-                        SELECT COUNTRY
-                      </MenuItem>
-                      {destinationCountries.map((countryName) => {
-                        const country = countries.find((c) => c.name === countryName);
-                        if (!country) return null;
-                        return (
-                          <MenuItem
-                            key={country.isoCode}
-                            value={country.name}
-                            sx={tickMenuItemSx}
-                          >
-                            <Box className="flex w-full items-center gap-2">
-                              <HiCheck className="tick-icon" size={16} />
-                              <Box className="flex items-center gap-1">
-                                <Box
-                                  component="img"
-                                  src={getFlagIconUrl(country.isoCode)}
-                                  alt={`${country.name} flag`}
-                                  sx={{ width: 20, height: 15, flexShrink: 0 }}
-                                  loading="lazy"
-                                />
-                                <span>{country.name}</span>
-                              </Box>
+                      {countries.map((country) => (
+                        <MenuItem
+                          key={country.isoCode}
+                          value={country.name}
+                          sx={tickMenuItemSx}
+                        >
+                          <Box className="flex w-full items-center gap-2">
+                            <HiCheck className="tick-icon" size={16} />
+                            <Box className="flex items-center gap-1">
+                              <Box
+                                component="img"
+                                src={getFlagIconUrl(country.isoCode)}
+                                alt={`${country.name} flag`}
+                                sx={{ width: 20, height: 15, flexShrink: 0 }}
+                                loading="lazy"
+                              />
+                              <span>{country.name}</span>
                             </Box>
-                          </MenuItem>
-                        );
-                      })}
+                          </Box>
+                        </MenuItem>
+                      ))}
                     </TextField>
                   )}
                 />
