@@ -435,9 +435,6 @@ const AiVisaSupport = () => {
                       <MenuItem value="" sx={{ fontWeight: 700 }}>
                         SELECT COUNTRY
                       </MenuItem>
-                      <MenuItem value="" sx={{ fontWeight: 700 }}>
-                        SELECT COUNTRY
-                      </MenuItem>
                       {countries.map((country) => (
                         <MenuItem
                           key={country.isoCode}
