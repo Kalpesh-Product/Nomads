@@ -35,6 +35,7 @@ const AiProfile = () => {
   const [editMode, setEditMode] = useState(false);
   const [profileForm, setProfileForm] = useState({
     fullName: user?.fullName || "",
+    email: user?.email || "",
     country: user?.country || user?.countryOfResidence || "",
     state: user?.state || "",
     contactCode: user?.contactCode || "",
@@ -254,6 +255,24 @@ const AiProfile = () => {
                 fullWidth
                 name="fullName"
                 value={profileForm.fullName}
+                onChange={handleProfileChange}
+                InputProps={{ readOnly: !editMode }}
+              />
+              <TextField
+                label="Email"
+                size="small"
+                fullWidth
+                name="email"
+                value={profileForm.email}
+                onChange={handleProfileChange}
+                InputProps={{ readOnly: true }}
+              />
+              <TextField
+                label="Current Country Of Residence"
+                size="small"
+                fullWidth
+                name="country"
+                value={profileForm.country}
                 onChange={handleProfileChange}
                 InputProps={{ readOnly: !editMode }}
               />
