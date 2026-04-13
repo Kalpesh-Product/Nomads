@@ -4,26 +4,20 @@ import {
   Button,
   CircularProgress,
   InputAdornment,
-  InputBase,
   MenuItem,
   TextField,
   Typography,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
 } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
-import { DatePicker } from "@mui/x-date-pickers";
-import dayjs from "dayjs";
 import { Country } from "country-state-city";
 import Swal from "sweetalert2";
+import { useMutation } from "@tanstack/react-query";
 import Container from "../components/Container";
-import useNomadLoginState from "../hooks/useNomadLoginState";
 import useAuth from "../hooks/useAuth";
 import axios from "../utils/axios";
 import { getCountryNameFromSelectedDestination } from "../utils/selectedDestinationSession";
+import { showErrorAlert } from "../utils/alerts";
+import { HiCheck } from "react-icons/hi";
 
 const floatingLabelSx = {
   color: "black",
@@ -59,12 +53,17 @@ const OVERALL_ACTIVATION_TYPING_SEEN_KEY =
 const getFlagIconUrl = (isoCode) =>
   `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
 
+const tickMenuItemSx = {
+  "& .tick-icon": { opacity: 0, color: "#1976d2" },
+  "&:hover .tick-icon": { opacity: 1 },
+  "&.Mui-selected .tick-icon": { opacity: 1 },
+  "&.Mui-selected:hover .tick-icon": { opacity: 1 },
+};
+
 const AiOverallActivationSupport = () => {
   const [typedMessage, setTypedMessage] = useState("");
   const [typedPageHeading, setTypedPageHeading] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submittedDestination, setSubmittedDestination] = useState("");
-  const [showChoiceModal, setShowChoiceModal] = useState(false);
   const { auth } = useAuth();
   const isLoggedIn = Boolean(auth?.user);
   const [isFormVisible, setIsFormVisible] = useState(false);
@@ -72,7 +71,9 @@ const AiOverallActivationSupport = () => {
   const { control, handleSubmit, reset, setValue, watch } = useForm({
     defaultValues,
   });
-  const messagePrefix = isLoggedIn ? (auth?.user?.fullName?.split(" ")[0] || "User") + ", " : "User, ";
+  const messagePrefix = isLoggedIn
+    ? (auth?.user?.fullName?.split(" ")[0] || "User") + ", "
+    : "User, ";
   const overallActivationPrompt = `${messagePrefix}${OVERALL_ACTIVATION_PROMPT}`;
   const selectedNationality = watch("nationalityOnPassport");
   const selectedTravelCountry = watch("travelCountry");
@@ -82,33 +83,21 @@ const AiOverallActivationSupport = () => {
     [countries, selectedNationality],
   );
 
-  const [isPending, setIsPending] = useState(false);
-
-  // const handleFormSubmit = async () => {
-  //   setIsPending(true);
-
-  //   await Swal.fire({
-  //     title: "Request Submitted!",
-  //     text: "Your form has been submitted. We will get back to you shortly.",
-  //     icon: "success",
-  //     confirmButtonText: "OK",
-  //     confirmButtonColor: "#0BA9EF",
-  //   });
-
-  //   reset(defaultValues);
-  //   setIsPending(false);
-  // };
-
-  const handleFormSubmit = async (formValues) => {
-    try {
-      setIsSubmitting(true);
-      await axios.post("forms/add-new-b2c-form-submission", {
+  const { mutate: submitOverallActivationSupport } = useMutation({
+    mutationFn: async (formValues) => {
+      const response = await axios.post("forms/add-new-b2c-form-submission", {
         ...formValues,
         sheetName: "AI_Overall_Activation_Support",
       });
-      setSubmittedDestination(formValues.travelCountry || "");
-      setShowChoiceModal(true);
-      Swal.fire({
+      return response.data;
+    },
+    onSuccess: async (data) => {
+      if (data?.warning) {
+        showErrorAlert(data.warning);
+        return;
+      }
+
+      await Swal.fire({
         title: "Request Submitted!",
         text: "Your form has been submitted. We will get back to you shortly.",
         icon: "success",
@@ -119,19 +108,33 @@ const AiOverallActivationSupport = () => {
         },
       });
       reset(defaultValues);
-    } catch (error) {
-      const errorMessage =
+    },
+    onError: (error) => {
+      showErrorAlert(
         error?.response?.data?.message ||
-        "Something went wrong while submitting your request.";
-      window.alert(errorMessage);
-    } finally {
+          "Something went wrong while submitting your request.",
+      );
+    },
+    onSettled: () => {
       setIsSubmitting(false);
-    }
+    },
+  });
+
+  const handleFormSubmit = (formValues) => {
+    setIsSubmitting(true);
+    submitOverallActivationSupport(formValues);
   };
 
   useEffect(() => {
     if (isLoggedIn && auth?.user) {
-      const { fullName, email, contactCode, contactNumber, country, countryOfResidence } = auth.user;
+      const {
+        fullName,
+        email,
+        contactCode,
+        contactNumber,
+        country,
+        countryOfResidence,
+      } = auth.user;
       setValue("fullName", fullName || "");
       setValue("email", email || "");
       setValue("contactCode", contactCode || "");
@@ -274,8 +277,15 @@ const AiOverallActivationSupport = () => {
                         Select Support
                       </MenuItem>
                       {activationSupportOptions.map((option) => (
-                        <MenuItem key={option} value={option}>
-                          {option}
+                        <MenuItem
+                          key={option}
+                          value={option}
+                          sx={tickMenuItemSx}
+                        >
+                          <Box className="flex w-full items-center gap-2">
+                            <HiCheck className="tick-icon" size={16} />
+                            <span>{option}</span>
+                          </Box>
                         </MenuItem>
                       ))}
                     </TextField>
@@ -354,15 +364,24 @@ const AiOverallActivationSupport = () => {
                         SELECT COUNTRY
                       </MenuItem>
                       {countries.map((country) => (
-                        <MenuItem key={country.isoCode} value={country.name}>
-                          <Box
-                            component="img"
-                            src={getFlagIconUrl(country.isoCode)}
-                            alt={`${country.name} flag`}
-                            sx={{ width: 20, height: 15, mr: 1, flexShrink: 0 }}
-                            loading="lazy"
-                          />
-                          <span>{country.name}</span>
+                        <MenuItem
+                          key={country.isoCode}
+                          value={country.name}
+                          sx={tickMenuItemSx}
+                        >
+                          <Box className="flex w-full items-center gap-2">
+                            <HiCheck className="tick-icon" size={16} />
+                            <Box className="flex items-center gap-1">
+                              <Box
+                                component="img"
+                                src={getFlagIconUrl(country.isoCode)}
+                                alt={`${country.name} flag`}
+                                sx={{ width: 20, height: 15, flexShrink: 0 }}
+                                loading="lazy"
+                              />
+                              <span>{country.name}</span>
+                            </Box>
+                          </Box>
                         </MenuItem>
                       ))}
                     </TextField>
@@ -388,8 +407,24 @@ const AiOverallActivationSupport = () => {
                         SELECT COUNTRY
                       </MenuItem>
                       {countries.map((country) => (
-                        <MenuItem key={country.isoCode} value={country.name}>
-                          {country.name}
+                        <MenuItem
+                          key={country.isoCode}
+                          value={country.name}
+                          sx={tickMenuItemSx}
+                        >
+                          <Box className="flex w-full items-center gap-2">
+                            <HiCheck className="tick-icon" size={16} />
+                            <Box className="flex items-center gap-1">
+                              <Box
+                                component="img"
+                                src={getFlagIconUrl(country.isoCode)}
+                                alt={`${country.name} flag`}
+                                sx={{ width: 20, height: 15, flexShrink: 0 }}
+                                loading="lazy"
+                              />
+                              <span>{country.name}</span>
+                            </Box>
+                          </Box>
                         </MenuItem>
                       ))}
                     </TextField>

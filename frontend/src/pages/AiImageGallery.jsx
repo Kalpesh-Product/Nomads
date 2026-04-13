@@ -168,7 +168,7 @@ const AiImageGallery = () => {
     }
 
     navigate(
-      `/verticals?country=${normalizedCountry || ""}&state=${
+      `/ai-verticals?country=${normalizedCountry || ""}&state=${
         normalizedLocation || ""
       }`,
     );

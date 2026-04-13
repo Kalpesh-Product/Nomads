@@ -11,14 +11,17 @@ const AiVisaSupportThankYou = () => {
   const selectedContinent = searchParams.get("continent");
 
   const destinationPath = useMemo(() => {
-    if (!selectedState || !selectedCountry) {
+    if (!selectedCountry) {
       return "";
     }
 
     const params = new URLSearchParams({
       country: selectedCountry,
-      state: selectedState,
     });
+
+    if (selectedState) {
+      params.set("state", selectedState);
+    }
 
     if (selectedContinent) {
       params.set("continent", selectedContinent);
@@ -27,19 +30,19 @@ const AiVisaSupportThankYou = () => {
     return `/ai-verticals?${params.toString()}`;
   }, [selectedContinent, selectedCountry, selectedState]);
 
-  const formattedState = useMemo(() => {
-    if (!selectedState) {
-      return "your selected state";
+  const formattedCountry = useMemo(() => {
+    if (!selectedCountry) {
+      return "your selected country";
     }
 
-    return selectedState
+    return selectedCountry
       .split(/[-_\s]+/)
       .filter(Boolean)
       .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
       .join(" ");
-  }, [selectedState]);
+  }, [selectedCountry]);
 
-  const message = `Thank you for the suggestion. Redirecting you to ${formattedState} for now`;
+  const message = `Thank you for the suggestion. Redirecting you to ${formattedCountry} for now`;
 
   useEffect(() => {
     setTypedMessage("");
