@@ -88,15 +88,21 @@ const AiVisaSupport = () => {
       })),
     [],
   );
-  const destinationCountries = useMemo(
+  const travellingDestinationOptions = useMemo(
     () =>
-      Array.from(
-        new Set(destinationOptions.map((option) => option.country)),
-      ).sort(),
+      destinationOptions
+        .map((option) => ({
+          label: `${option.country} - ${option.state}`,
+          country: option.country,
+          state: option.state,
+          value: `${option.country}|||${option.state}`,
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
     [destinationOptions],
   );
   const selectedNationality = watch("nationality");
   const selectedTravellingCountry = watch("travellingCountry");
+  const selectedTravellingState = watch("travellingState");
   const selectedNationalityCountry = useMemo(
     () =>
       countries.find((country) => country.name === selectedNationality) || null,
@@ -428,38 +434,65 @@ const AiVisaSupport = () => {
                   )}
                 />
 
-                <Box sx={{ display: "flex", gap: 2, width: "100%" }}>
-                  <Controller
-                    name="travellingCountry"
-                    control={control}
-                    rules={{ required: "Travelling country is required" }}
-                    render={({ field, fieldState }) => (
+                <Controller
+                  name="travellingCountry"
+                  control={control}
+                  rules={{ required: "Travelling destination is required" }}
+                  render={({ field, fieldState }) => {
+                    const selectedValue =
+                      travellingDestinationOptions.find(
+                        (option) =>
+                          option.country === selectedTravellingCountry &&
+                          option.state === selectedTravellingState,
+                      )?.value || "";
+
+                    return (
                       <TextField
                         {...field}
                         fullWidth
-                        label="Travelling Country"
+                        label="Travelling Destination"
                         variant="standard"
                         error={!!fieldState.error}
                         helperText={fieldState.error?.message}
                         select
+                        value={selectedValue}
                         InputLabelProps={{ sx: floatingLabelSx }}
-                        onChange={(event) => field.onChange(event.target.value)}
+                        onChange={(event) => {
+                          const nextValue = event.target.value;
+                          if (!nextValue) {
+                            field.onChange("");
+                            setValue("travellingState", "", {
+                              shouldDirty: true,
+                              shouldTouch: true,
+                            });
+                            return;
+                          }
+
+                          const [country, state] = nextValue.split("|||");
+                          field.onChange(country || "");
+                          setValue("travellingState", state || "", {
+                            shouldDirty: true,
+                            shouldTouch: true,
+                          });
+                        }}
                       >
                         <MenuItem value="" sx={{ fontWeight: 700 }}>
-                          SELECT COUNTRY
+                          SELECT COUNTRY - STATE
                         </MenuItem>
-                        {destinationCountries.map((countryName) => {
-                          const country = countries.find((c) => c.name === countryName);
-                          if (!country) return null;
+                        {travellingDestinationOptions.map((destinationOption) => {
+                          const country = countries.find(
+                            (item) => item.name === destinationOption.country,
+                          );
+
                           return (
                             <MenuItem
-                              key={country.isoCode}
-                              value={country.name}
+                              key={destinationOption.value}
+                              value={destinationOption.value}
                               sx={tickMenuItemSx}
                             >
                               <Box className="flex w-full items-center gap-2">
                                 <HiCheck className="tick-icon" size={16} />
-                                <Box className="flex items-center gap-1">
+                                {/* {country?.isoCode ? (
                                   <Box
                                     component="img"
                                     src={getFlagIconUrl(country.isoCode)}
@@ -467,57 +500,16 @@ const AiVisaSupport = () => {
                                     sx={{ width: 20, height: 15, flexShrink: 0 }}
                                     loading="lazy"
                                   />
-                                  <span>{country.name}</span>
-
-                                </Box>
+                                ): null} */}
+                                <span>{destinationOption.label}</span>
                               </Box>
                             </MenuItem>
                           );
                         })}
                       </TextField>
-                    )}
-                  />
-
-                  <Controller
-                    name="travellingState"
-                    control={control}
-                    render={({ field, fieldState }) => (
-                      <TextField
-                        {...field}
-                        fullWidth
-                        label="Travelling City / State"
-                        variant="standard"
-                        error={!!fieldState.error}
-                        helperText={fieldState.error?.message}
-                        select
-                        disabled={!selectedTravellingCountry}
-                        InputLabelProps={{ sx: floatingLabelSx }}
-                      >
-                        <MenuItem value="" sx={{ fontWeight: 700 }}>
-                          {selectedTravellingCountry
-                            ? "SELECT CITY / STATE"
-                            : "SELECT COUNTRY FIRST"}
-                        </MenuItem>
-                        {destinationOptions
-                          .filter(
-                            (option) => option.country === selectedTravellingCountry,
-                          )
-                          .map((destinationOption) => (
-                            <MenuItem
-                              key={`${destinationOption.state}-${destinationOption.country}`}
-                              value={destinationOption.state}
-                              sx={tickMenuItemSx}
-                            >
-                              <Box className="flex w-full items-center gap-2">
-                                <HiCheck className="tick-icon" size={16} />
-                                <span>{destinationOption.state}</span>
-                              </Box>
-                            </MenuItem>
-                          ))}
-                      </TextField>
-                    )}
-                  />
-                </Box>
+                    );
+                  }}
+                />
 
                 <Box sx={{ display: "flex", gap: 2, width: "100%" }}>
                   <Controller
