@@ -18,6 +18,7 @@ import useNomadLoginState from "../hooks/useNomadLoginState";
 import useAuth from "../hooks/useAuth";
 import { getCountryNameFromSelectedDestination } from "../utils/selectedDestinationSession";
 import { showErrorAlert } from "../utils/alerts";
+import { HiCheck } from "react-icons/hi";
 
 const floatingLabelSx = {
   color: "black",
@@ -53,6 +54,13 @@ const VISA_SUPPORT_HEADING = "Visa Support";
 const VISA_SUPPORT_TYPING_SEEN_KEY = "wono-visa-support-typing-seen";
 const getFlagIconUrl = (isoCode) =>
   `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
+
+const tickMenuItemSx = {
+  "& .tick-icon": { opacity: 0, color: "#1976d2" },
+  "&:hover .tick-icon": { opacity: 1 },
+  "&.Mui-selected .tick-icon": { opacity: 1 },
+  "&.Mui-selected:hover .tick-icon": { opacity: 1 },
+};
 
 const AiVisaSupport = () => {
   const [typedMessage, setTypedMessage] = useState("");
@@ -301,8 +309,11 @@ const AiVisaSupport = () => {
                         SELECT VISA TYPE
                       </MenuItem>
                       {VISA_TYPE_OPTIONS.map((option) => (
-                        <MenuItem key={option} value={option}>
-                          {option}
+                        <MenuItem key={option} value={option} sx={tickMenuItemSx}>
+                          <Box className="flex w-full items-center gap-2">
+                            <HiCheck className="tick-icon" size={16} />
+                            <span>{option}</span>
+                          </Box>
                         </MenuItem>
                       ))}
                     </TextField>
@@ -381,15 +392,24 @@ const AiVisaSupport = () => {
                         SELECT COUNTRY
                       </MenuItem>
                       {countries.map((country) => (
-                        <MenuItem key={country.isoCode} value={country.name}>
-                          <Box
-                            component="img"
-                            src={getFlagIconUrl(country.isoCode)}
-                            alt={`${country.name} flag`}
-                            sx={{ width: 20, height: 15, mr: 1, flexShrink: 0 }}
-                            loading="lazy"
-                          />
-                          <span>{country.name}</span>
+                        <MenuItem
+                          key={country.isoCode}
+                          value={country.name}
+                          sx={tickMenuItemSx}
+                        >
+                          <Box className="flex w-full items-center gap-2">
+                            <HiCheck className="tick-icon" size={16} />
+                            <Box className="flex items-center gap-1">
+                              <Box
+                                component="img"
+                                src={getFlagIconUrl(country.isoCode)}
+                                alt={`${country.name} flag`}
+                                sx={{ width: 20, height: 15, flexShrink: 0 }}
+                                loading="lazy"
+                              />
+                              <span>{country.name}</span>
+                            </Box>
+                          </Box>
                         </MenuItem>
                       ))}
                     </TextField>
@@ -419,8 +439,24 @@ const AiVisaSupport = () => {
                         SELECT COUNTRY
                       </MenuItem>
                       {countries.map((country) => (
-                        <MenuItem key={country.isoCode} value={country.name}>
-                          {country.name}
+                        <MenuItem
+                          key={country.isoCode}
+                          value={country.name}
+                          sx={tickMenuItemSx}
+                        >
+                          <Box className="flex w-full items-center gap-2">
+                            <HiCheck className="tick-icon" size={16} />
+                            <Box className="flex items-center gap-1">
+                              <Box
+                                component="img"
+                                src={getFlagIconUrl(country.isoCode)}
+                                alt={`${country.name} flag`}
+                                sx={{ width: 20, height: 15, flexShrink: 0 }}
+                                loading="lazy"
+                              />
+                              <span>{country.name}</span>
+                            </Box>
+                          </Box>
                         </MenuItem>
                       ))}
                     </TextField>

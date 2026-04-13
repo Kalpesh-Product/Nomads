@@ -24,6 +24,7 @@ import useNomadLoginState from "../hooks/useNomadLoginState";
 import useAuth from "../hooks/useAuth";
 import axios from "../utils/axios";
 import { getCountryNameFromSelectedDestination } from "../utils/selectedDestinationSession";
+import { HiCheck } from "react-icons/hi";
 
 const floatingLabelSx = {
   color: "black",
@@ -58,6 +59,13 @@ const OVERALL_ACTIVATION_TYPING_SEEN_KEY =
   "wono-overall-activation-typing-seen";
 const getFlagIconUrl = (isoCode) =>
   `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
+
+const tickMenuItemSx = {
+  "& .tick-icon": { opacity: 0, color: "#1976d2" },
+  "&:hover .tick-icon": { opacity: 1 },
+  "&.Mui-selected .tick-icon": { opacity: 1 },
+  "&.Mui-selected:hover .tick-icon": { opacity: 1 },
+};
 
 const AiOverallActivationSupport = () => {
   const [typedMessage, setTypedMessage] = useState("");
@@ -172,7 +180,7 @@ const AiOverallActivationSupport = () => {
     const hasSeenTypingEffect =
       typeof window !== "undefined" &&
       window.localStorage.getItem(OVERALL_ACTIVATION_TYPING_SEEN_KEY) ===
-        "true";
+      "true";
 
     if (hasSeenTypingEffect) {
       setTypedMessage(overallActivationPrompt);
@@ -186,7 +194,7 @@ const AiOverallActivationSupport = () => {
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => {};
+    let cleanupHeading = () => { };
 
     const typeHeading = () => {
       const headingInterval = setInterval(() => {
@@ -250,9 +258,8 @@ const AiOverallActivationSupport = () => {
             <Box
               component="form"
               onSubmit={handleSubmit(handleFormSubmit)}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${
-                isFormVisible ? "visible" : "invisible"
-              }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
+                }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-4">
                 <Controller
@@ -274,8 +281,11 @@ const AiOverallActivationSupport = () => {
                         Select Support
                       </MenuItem>
                       {activationSupportOptions.map((option) => (
-                        <MenuItem key={option} value={option}>
-                          {option}
+                        <MenuItem key={option} value={option} sx={tickMenuItemSx}>
+                          <Box className="flex w-full items-center gap-2">
+                            <HiCheck className="tick-icon" size={16} />
+                            <span>{option}</span>
+                          </Box>
                         </MenuItem>
                       ))}
                     </TextField>
@@ -354,15 +364,24 @@ const AiOverallActivationSupport = () => {
                         SELECT COUNTRY
                       </MenuItem>
                       {countries.map((country) => (
-                        <MenuItem key={country.isoCode} value={country.name}>
-                          <Box
-                            component="img"
-                            src={getFlagIconUrl(country.isoCode)}
-                            alt={`${country.name} flag`}
-                            sx={{ width: 20, height: 15, mr: 1, flexShrink: 0 }}
-                            loading="lazy"
-                          />
-                          <span>{country.name}</span>
+                        <MenuItem
+                          key={country.isoCode}
+                          value={country.name}
+                          sx={tickMenuItemSx}
+                        >
+                          <Box className="flex w-full items-center gap-2">
+                            <HiCheck className="tick-icon" size={16} />
+                            <Box className="flex items-center gap-1">
+                              <Box
+                                component="img"
+                                src={getFlagIconUrl(country.isoCode)}
+                                alt={`${country.name} flag`}
+                                sx={{ width: 20, height: 15, flexShrink: 0 }}
+                                loading="lazy"
+                              />
+                              <span>{country.name}</span>
+                            </Box>
+                          </Box>
                         </MenuItem>
                       ))}
                     </TextField>
@@ -388,8 +407,24 @@ const AiOverallActivationSupport = () => {
                         SELECT COUNTRY
                       </MenuItem>
                       {countries.map((country) => (
-                        <MenuItem key={country.isoCode} value={country.name}>
-                          {country.name}
+                        <MenuItem
+                          key={country.isoCode}
+                          value={country.name}
+                          sx={tickMenuItemSx}
+                        >
+                          <Box className="flex w-full items-center gap-2">
+                            <HiCheck className="tick-icon" size={16} />
+                            <Box className="flex items-center gap-1">
+                              <Box
+                                component="img"
+                                src={getFlagIconUrl(country.isoCode)}
+                                alt={`${country.name} flag`}
+                                sx={{ width: 20, height: 15, flexShrink: 0 }}
+                                loading="lazy"
+                              />
+                              <span>{country.name}</span>
+                            </Box>
+                          </Box>
                         </MenuItem>
                       ))}
                     </TextField>

@@ -20,6 +20,7 @@ import Swal from "sweetalert2";
 import Container from "../components/Container";
 import axios from "../utils/axios";
 import useAuth from "../hooks/useAuth";
+import { HiCheck } from "react-icons/hi";
 
 const floatingLabelSx = {
   color: "black",
@@ -55,6 +56,13 @@ const CONTRIBUTION_TYPE_OPTIONS = [
   "Become a Remote Jobs Posting Partner",
   "Not Sure - Lets Connect & Explore",
 ];
+
+const tickMenuItemSx = {
+  "& .tick-icon": { opacity: 0, color: "#1976d2" },
+  "&:hover .tick-icon": { opacity: 1 },
+  "&.Mui-selected .tick-icon": { opacity: 1 },
+  "&.Mui-selected:hover .tick-icon": { opacity: 1 },
+};
 
 const AiBecomeContributor = () => {
   const [typedMessage, setTypedMessage] = useState("");
@@ -169,7 +177,7 @@ const AiBecomeContributor = () => {
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => {};
+    let cleanupHeading = () => { };
 
     const typeHeading = () => {
       const headingInterval = setInterval(() => {
@@ -220,9 +228,8 @@ const AiBecomeContributor = () => {
             <Box
               component="form"
               onSubmit={handleSubmit(handleFormSubmit)}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${
-                isFormVisible ? "visible" : "invisible"
-              }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
+                }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 <Controller
@@ -242,8 +249,15 @@ const AiBecomeContributor = () => {
                       onChange={(event) => field.onChange(event.target.value)}
                     >
                       {CONTRIBUTION_TYPE_OPTIONS.map((option) => (
-                        <MenuItem key={option} value={option}>
-                          {option}
+                        <MenuItem
+                          key={option}
+                          value={option}
+                          sx={tickMenuItemSx}
+                        >
+                          <Box className="flex w-full items-center gap-2">
+                            <HiCheck className="tick-icon" size={16} />
+                            <span>{option}</span>
+                          </Box>
                         </MenuItem>
                       ))}
                     </TextField>
@@ -318,15 +332,24 @@ const AiBecomeContributor = () => {
                         SELECT COUNTRY
                       </MenuItem>
                       {countries.map((country) => (
-                        <MenuItem key={country.isoCode} value={country.name}>
-                          <Box
-                            component="img"
-                            src={getFlagIconUrl(country.isoCode)}
-                            alt={`${country.name} flag`}
-                            sx={{ width: 20, height: 15, mr: 1, flexShrink: 0 }}
-                            loading="lazy"
-                          />
-                          <span>{country.name}</span>
+                        <MenuItem
+                          key={country.isoCode}
+                          value={country.name}
+                          sx={tickMenuItemSx}
+                        >
+                          <Box className="flex w-full items-center gap-2">
+                            <HiCheck className="tick-icon" size={16} />
+                            <Box className="flex items-center gap-1">
+                              <Box
+                                component="img"
+                                src={getFlagIconUrl(country.isoCode)}
+                                alt={`${country.name} flag`}
+                                sx={{ width: 20, height: 15, flexShrink: 0 }}
+                                loading="lazy"
+                              />
+                              <span>{country.name}</span>
+                            </Box>
+                          </Box>
                         </MenuItem>
                       ))}
                     </TextField>
