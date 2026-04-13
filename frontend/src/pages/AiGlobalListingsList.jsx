@@ -544,7 +544,9 @@ const AiGlobalListingsList = () => {
     mutationFn: async (data) => {
       dispatch(setFormValues(data));
       setShowMobileSearch(false);
-      navigate(`/verticals?country=${data.country}&location=${data.location}`);
+      navigate(
+        `/ai-verticals?country=${data.country}&location=${data.location}`,
+      );
     },
     onSuccess: () => {
       console.log("success");
@@ -623,7 +625,7 @@ const AiGlobalListingsList = () => {
       return;
     }
 
-    const mapUrl = `/verticals?country=${encodeURIComponent(formData.country)}&location=${encodeURIComponent(formData.location)}&view=map`;
+    const mapUrl = `/ai-verticals?country=${encodeURIComponent(formData.country)}&state=${encodeURIComponent(formData.location)}&view=map`;
     console.log("Navigating to:", mapUrl);
     navigate(mapUrl);
   };
@@ -647,7 +649,7 @@ const AiGlobalListingsList = () => {
         />
         <meta property="og:image" content="/images/homepage.jpeg" />
         <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://wono.co/verticals" />
+        <link rel="canonical" href="https://wono.co/ai-verticals" />
       </Helmet>
 
       {/* ==================== DESKTOP VIEW (lg and above) ==================== */}
