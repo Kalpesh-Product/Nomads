@@ -88,21 +88,8 @@ const AiVisaSupport = () => {
       })),
     [],
   );
-  const travellingDestinationOptions = useMemo(
-    () =>
-      destinationOptions
-        .map((option) => ({
-          label: `${option.country} - ${option.state}`,
-          country: option.country,
-          state: option.state,
-          value: `${option.country}|||${option.state}`,
-        }))
-        .sort((a, b) => a.label.localeCompare(b.label)),
-    [destinationOptions],
-  );
   const selectedNationality = watch("nationality");
   const selectedTravellingCountry = watch("travellingCountry");
-  const selectedTravellingState = watch("travellingState");
   const selectedNationalityCountry = useMemo(
     () =>
       countries.find((country) => country.name === selectedNationality) || null,
@@ -437,78 +424,42 @@ const AiVisaSupport = () => {
                 <Controller
                   name="travellingCountry"
                   control={control}
-                  rules={{ required: "Travelling destination is required" }}
-                  render={({ field, fieldState }) => {
-                    const selectedValue =
-                      travellingDestinationOptions.find(
-                        (option) =>
-                          option.country === selectedTravellingCountry &&
-                          option.state === selectedTravellingState,
-                      )?.value || "";
-
-                    return (
-                      <TextField
-                        {...field}
-                        fullWidth
-                        label="Travelling Destination"
-                        variant="standard"
-                        error={!!fieldState.error}
-                        helperText={fieldState.error?.message}
-                        select
-                        value={selectedValue}
-                        InputLabelProps={{ sx: floatingLabelSx }}
-                        onChange={(event) => {
-                          const nextValue = event.target.value;
-                          if (!nextValue) {
-                            field.onChange("");
-                            setValue("travellingState", "", {
-                              shouldDirty: true,
-                              shouldTouch: true,
-                            });
-                            return;
-                          }
-
-                          const [country, state] = nextValue.split("|||");
-                          field.onChange(country || "");
-                          setValue("travellingState", state || "", {
-                            shouldDirty: true,
-                            shouldTouch: true,
-                          });
-                        }}
-                      >
-                        <MenuItem value="" sx={{ fontWeight: 700 }}>
-                          SELECT COUNTRY - STATE
+                  rules={{ required: "Travelling country is required" }}
+                  render={({ field, fieldState }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Travelling Country"
+                      variant="standard"
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                      select
+                      InputLabelProps={{ sx: floatingLabelSx }}
+                      onChange={(event) => field.onChange(event.target.value)}
+                    >
+                      {countries.map((country) => (
+                        <MenuItem
+                          key={country.isoCode}
+                          value={country.name}
+                          sx={tickMenuItemSx}
+                        >
+                          <Box className="flex w-full items-center gap-2">
+                            <HiCheck className="tick-icon" size={16} />
+                            <Box className="flex items-center gap-1">
+                              <Box
+                                component="img"
+                                src={getFlagIconUrl(country.isoCode)}
+                                alt={`${country.name} flag`}
+                                sx={{ width: 20, height: 15, flexShrink: 0 }}
+                                loading="lazy"
+                              />
+                              <span>{country.name}</span>
+                            </Box>
+                          </Box>
                         </MenuItem>
-                        {travellingDestinationOptions.map((destinationOption) => {
-                          const country = countries.find(
-                            (item) => item.name === destinationOption.country,
-                          );
-
-                          return (
-                            <MenuItem
-                              key={destinationOption.value}
-                              value={destinationOption.value}
-                              sx={tickMenuItemSx}
-                            >
-                              <Box className="flex w-full items-center gap-2">
-                                <HiCheck className="tick-icon" size={16} />
-                                {/* {country?.isoCode ? (
-                                  <Box
-                                    component="img"
-                                    src={getFlagIconUrl(country.isoCode)}
-                                    alt={`${country.name} flag`}
-                                    sx={{ width: 20, height: 15, flexShrink: 0 }}
-                                    loading="lazy"
-                                  />
-                                ): null} */}
-                                <span>{destinationOption.label}</span>
-                              </Box>
-                            </MenuItem>
-                          );
-                        })}
-                      </TextField>
-                    );
-                  }}
+                      ))}
+                    </TextField>
+                  )}
                 />
 
                 <Box sx={{ display: "flex", gap: 2, width: "100%" }}>
