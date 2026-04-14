@@ -35,6 +35,7 @@ const AiProfile = () => {
   const [editMode, setEditMode] = useState(false);
   const [profileForm, setProfileForm] = useState({
     fullName: user?.fullName || "",
+    email: user?.email || "",
     country: user?.country || user?.countryOfResidence || "",
     state: user?.state || "",
     contactCode: user?.contactCode || "",
@@ -146,7 +147,7 @@ const AiProfile = () => {
   };
 
   return (
-    <div className="bg-[#f8f9fc] min-h-screen p-4 sm:p-6 font-sans text-[#364D59]">
+    <div className="bg-white min-h-screen p-4 sm:p-6 font-sans text-[#364D59]">
       {/* Tabs - Desktop style preserved, stacks on very small screens */}
       {/* <div className="flex flex-col sm:flex-row mb-6 border rounded-lg overflow-hidden max-w-3xl mx-auto">
                 <button
@@ -189,13 +190,14 @@ const AiProfile = () => {
 
       {/* PROFILE TAB - Desktop layout preserved, responsive adjustments */}
       {activeTab === "profile" && (
-        <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm max-w-5xl mx-auto">
-          <h2 className="text-lg sm:text-xl font-bold text-[#00AEEF] mb-4">
-            MY PROFILE
+        // <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm max-w-5xl mx-auto">
+        <div className="bg-white p-6   max-w-full">
+          <h2 className="text-xl font-semibold mb-6 text-secondary-dark">
+            My Profile
           </h2>
 
           {/* Profile Header - Stacks on mobile, side-by-side on desktop */}
-          <div className="flex flex-col md:flex-row items-center justify-between border p-4 rounded-lg gap-4 md:gap-0">
+          {/* <div className="flex flex-col md:flex-row items-center justify-between border p-4 rounded-lg gap-4 md:gap-0">
             <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-center sm:text-left">
               <Avatar
                 sx={{
@@ -241,10 +243,10 @@ const AiProfile = () => {
                 </Button>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Personal Info - Desktop: 3 columns, Tablet: 2 columns, Mobile: 1 column */}
-          <div className="mt-6 border rounded-lg p-4">
+          <div className="mt-6 py-4">
             <h3 className="font-semibold mb-4">Personal Information</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
               <TextField
@@ -253,6 +255,24 @@ const AiProfile = () => {
                 fullWidth
                 name="fullName"
                 value={profileForm.fullName}
+                onChange={handleProfileChange}
+                InputProps={{ readOnly: !editMode }}
+              />
+              <TextField
+                label="Email"
+                size="small"
+                fullWidth
+                name="email"
+                value={profileForm.email}
+                onChange={handleProfileChange}
+                InputProps={{ readOnly: true }}
+              />
+              <TextField
+                label="Current Country Of Residence"
+                size="small"
+                fullWidth
+                name="country"
+                value={profileForm.country}
                 onChange={handleProfileChange}
                 InputProps={{ readOnly: !editMode }}
               />

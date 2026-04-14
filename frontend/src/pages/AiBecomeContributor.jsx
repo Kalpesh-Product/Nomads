@@ -17,9 +17,11 @@ import {
 import { Controller, useForm } from "react-hook-form";
 import { Country } from "country-state-city";
 import Swal from "sweetalert2";
+import { useMutation } from "@tanstack/react-query";
 import Container from "../components/Container";
 import axios from "../utils/axios";
 import useAuth from "../hooks/useAuth";
+import { showErrorAlert } from "../utils/alerts";
 import { HiCheck } from "react-icons/hi";
 
 const floatingLabelSx = {
@@ -69,7 +71,6 @@ const AiBecomeContributor = () => {
   const [typedPageHeading, setTypedPageHeading] = useState("");
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showChoiceModal, setShowChoiceModal] = useState(false);
   const { auth } = useAuth();
   const isLoggedIn = Boolean(auth?.user);
   const countries = useMemo(() => Country.getAllCountries(), []);
@@ -81,36 +82,25 @@ const AiBecomeContributor = () => {
     () => countries.find((country) => country.name === selectedCountry) || null,
     [countries, selectedCountry],
   );
-  const messagePrefix = isLoggedIn ? (auth?.user?.fullName?.split(" ")[0] || "User") + ", " : "User, ";
+  const messagePrefix = isLoggedIn
+    ? (auth?.user?.fullName?.split(" ")[0] || "User") + ", "
+    : "User, ";
   const contributorPrompt = `${messagePrefix}${CONTRIBUTOR_PROMPT}`;
 
-  const [isPending, setIsPending] = useState(false);
-
-  // const handleFormSubmit = async () => {
-  //   setIsPending(true);
-
-  //   await Swal.fire({
-  //     title: "Request Submitted!",
-  //     text: "Your form has been submitted. We will get back to you shortly.",
-  //     icon: "success",
-  //     confirmButtonText: "OK",
-  //     confirmButtonColor: "#0BA9EF",
-  //   });
-
-  //   reset(defaultValues);
-  //   setIsPending(false);
-  // };
-
-  const handleFormSubmit = async (formValues) => {
-    try {
-      setIsSubmitting(true);
-      await axios.post("forms/add-new-b2c-form-submission", {
+  const { mutate: submitContributor } = useMutation({
+    mutationFn: async (formValues) => {
+      const response = await axios.post("forms/add-new-b2c-form-submission", {
         ...formValues,
         sheetName: "AI_Become_Contributor",
       });
-      // setSubmittedDestination(formValues.travellingCountry || "");
-      setShowChoiceModal(true);
-      Swal.fire({
+      return response.data;
+    },
+    onSuccess: async (data) => {
+      if (data?.warning) {
+        showErrorAlert(data.warning);
+        return;
+      }
+      await Swal.fire({
         title: "Request Submitted!",
         text: "Your form has been submitted. We will get back to you shortly.",
         icon: "success",
@@ -121,14 +111,21 @@ const AiBecomeContributor = () => {
         },
       });
       reset(defaultValues);
-    } catch (error) {
-      const errorMessage =
+    },
+    onError: (error) => {
+      showErrorAlert(
         error?.response?.data?.message ||
-        "Something went wrong while submitting your request.";
-      window.alert(errorMessage);
-    } finally {
+          "Something went wrong while submitting your request.",
+      );
+    },
+    onSettled: () => {
       setIsSubmitting(false);
-    }
+    },
+  });
+
+  const handleFormSubmit = (formValues) => {
+    setIsSubmitting(true);
+    submitContributor(formValues);
   };
 
   const handleCountryChange = (countryName, onChange) => {
@@ -148,7 +145,14 @@ const AiBecomeContributor = () => {
 
   useEffect(() => {
     if (isLoggedIn && auth?.user) {
-      const { fullName, email, contactCode, contactNumber, country, countryOfResidence } = auth.user;
+      const {
+        fullName,
+        email,
+        contactCode,
+        contactNumber,
+        country,
+        countryOfResidence,
+      } = auth.user;
       setValue("fullName", fullName || "");
       setValue("email", email || "");
       setValue("contactCode", contactCode || "");
@@ -177,7 +181,7 @@ const AiBecomeContributor = () => {
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => { };
+    let cleanupHeading = () => {};
 
     const typeHeading = () => {
       const headingInterval = setInterval(() => {
@@ -228,8 +232,9 @@ const AiBecomeContributor = () => {
             <Box
               component="form"
               onSubmit={handleSubmit(handleFormSubmit)}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
-                }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${
+                isFormVisible ? "visible" : "invisible"
+              }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 <Controller
@@ -483,7 +488,7 @@ const AiBecomeContributor = () => {
                   <Button
                     type="submit"
                     variant="contained"
-                    disabled={isPending}
+                    disabled={isSubmitting}
                     sx={{
                       bgcolor: "black",
                       borderRadius: 20,
@@ -496,13 +501,13 @@ const AiBecomeContributor = () => {
                       width: { xs: "100%", md: "auto" },
                     }}
                   >
-                    {isPending && (
+                    {isSubmitting && (
                       <CircularProgress
                         size={16}
                         sx={{ color: "white", mr: 1 }}
                       />
                     )}
-                    {isPending ? "Submitting..." : "Submit"}
+                    {isSubmitting ? "Submitting..." : "Submit"}
                   </Button>
                 </div>
               </div>

@@ -18,11 +18,12 @@ import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import { Country } from "country-state-city";
 import Swal from "sweetalert2";
+import { useMutation } from "@tanstack/react-query";
 import Container from "../components/Container";
-import useNomadLoginState from "../hooks/useNomadLoginState";
 import useAuth from "../hooks/useAuth";
 import axios from "../utils/axios";
 import { getCountryNameFromSelectedDestination } from "../utils/selectedDestinationSession";
+import { showErrorAlert } from "../utils/alerts";
 import { HiCheck } from "react-icons/hi";
 
 const floatingLabelSx = {
@@ -72,8 +73,6 @@ const AiWorkation = () => {
   const [typedMessage, setTypedMessage] = useState("");
   const [typedPageHeading, setTypedPageHeading] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showChoiceModal, setShowChoiceModal] = useState(false);
-  const [submittedDestination, setSubmittedDestination] = useState("");
   const { auth } = useAuth();
   const isLoggedIn = Boolean(auth?.user);
   const [isFormVisible, setIsFormVisible] = useState(false);
@@ -92,15 +91,20 @@ const AiWorkation = () => {
     : "User, ";
   const workationPrompt = `${messagePrefix}${WORKATION_PROMPT}`;
 
-  const [isPending, setIsPending] = useState(false);
-
-  const handleFormSubmit = async (formValues) => {
-    try {
-      setIsSubmitting(true);
-      await axios.post("workation", formValues);
-      setSubmittedDestination(formValues.workationCountry || "");
-      setShowChoiceModal(true);
-      Swal.fire({
+  const { mutate: submitWorkation } = useMutation({
+    mutationFn: async (formValues) => {
+      const response = await axios.post("forms/add-new-b2c-form-submission", {
+        ...formValues,
+        sheetName: "AI_Workation",
+      });
+      return response.data;
+    },
+    onSuccess: async (data) => {
+      if (data?.warning) {
+        showErrorAlert(data.warning);
+        return;
+      }
+      await Swal.fire({
         title: "Request Submitted!",
         text: "Your form has been submitted. We will get back to you shortly.",
         icon: "success",
@@ -111,19 +115,33 @@ const AiWorkation = () => {
         },
       });
       reset(defaultValues);
-    } catch (error) {
-      const errorMessage =
+    },
+    onError: (error) => {
+      showErrorAlert(
         error?.response?.data?.message ||
-        "Something went wrong while submitting your request.";
-      window.alert(errorMessage);
-    } finally {
+          "Something went wrong while submitting your request.",
+      );
+    },
+    onSettled: () => {
       setIsSubmitting(false);
-    }
+    },
+  });
+
+  const handleFormSubmit = (formValues) => {
+    setIsSubmitting(true);
+    submitWorkation(formValues);
   };
 
   useEffect(() => {
     if (isLoggedIn && auth?.user) {
-      const { fullName, email, contactCode, contactNumber, country, countryOfResidence } = auth.user;
+      const {
+        fullName,
+        email,
+        contactCode,
+        contactNumber,
+        country,
+        countryOfResidence,
+      } = auth.user;
       setValue("fullName", fullName || "");
       setValue("email", email || "");
       setValue("contactCode", contactCode || "");
@@ -144,7 +162,6 @@ const AiWorkation = () => {
       shouldTouch: true,
     });
   }, [countries, workationCountry, setValue]);
-
 
   const handleCountryChange = (countryName, onChange) => {
     const country = countries.find((item) => item.name === countryName);
@@ -178,7 +195,7 @@ const AiWorkation = () => {
 
     let messageIndex = 0;
     let headingIndex = 0;
-    let cleanupHeading = () => { };
+    let cleanupHeading = () => {};
 
     const typeHeading = () => {
       const headingInterval = setInterval(() => {
@@ -422,7 +439,11 @@ const AiWorkation = () => {
                         SELECT COUNTRY
                       </MenuItem>
                       {countries.map((country) => (
-                        <MenuItem key={country.isoCode} value={country.name} sx={tickMenuItemSx}>
+                        <MenuItem
+                          key={country.isoCode}
+                          value={country.name}
+                          sx={tickMenuItemSx}
+                        >
                           <Box className="flex w-full items-center gap-2">
                             <HiCheck className="tick-icon" size={16} />
                             <Box className="flex items-center gap-1">
@@ -599,7 +620,7 @@ const AiWorkation = () => {
                   <Button
                     type="submit"
                     variant="contained"
-                    disabled={isPending}
+                    disabled={isSubmitting}
                     sx={{
                       bgcolor: "black",
                       borderRadius: 20,
@@ -612,13 +633,13 @@ const AiWorkation = () => {
                       width: { xs: "100%", md: "auto" },
                     }}
                   >
-                    {isPending && (
+                    {isSubmitting && (
                       <CircularProgress
                         size={16}
                         sx={{ color: "white", mr: 1 }}
                       />
                     )}
-                    {isPending ? "Submitting..." : "Submit"}
+                    {isSubmitting ? "Submitting..." : "Submit"}
                   </Button>
                 </div>
               </div>
