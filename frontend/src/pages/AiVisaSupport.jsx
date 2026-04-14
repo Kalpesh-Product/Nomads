@@ -31,6 +31,7 @@ const defaultValues = {
   fullName: "",
   nationality: "",
   travellingCountry: "",
+  travellingState: "",
   email: "",
   contactCode: "",
   contactNumber: "",
@@ -62,6 +63,15 @@ const tickMenuItemSx = {
   "&.Mui-selected:hover .tick-icon": { opacity: 1 },
 };
 
+const formatTravellingCountry = (country, state) => {
+  const trimmedCountry = country?.trim() || "";
+  const trimmedState = state?.trim() || "";
+
+  if (!trimmedState) return trimmedCountry;
+
+  return `${trimmedCountry} - ${trimmedState}`;
+};
+
 const AiVisaSupport = () => {
   const [typedMessage, setTypedMessage] = useState("");
   const [typedVisaHeading, setTypedVisaHeading] = useState("");
@@ -87,6 +97,14 @@ const AiVisaSupport = () => {
       })),
     [],
   );
+
+  const destinationCountries = useMemo(
+    () =>
+      Array.from(
+        new Set(destinationOptions.map((option) => option.country)),
+      ).sort(),
+    [destinationOptions],
+  );
   const selectedNationality = watch("nationality");
   const selectedTravellingCountry = watch("travellingCountry");
   const selectedNationalityCountry = useMemo(
@@ -95,21 +113,31 @@ const AiVisaSupport = () => {
     [countries, selectedNationality],
   );
 
-  const navigateToThankYou = (choice, travellingCountry) => {
+  const navigateToThankYou = (choice, travellingCountry, travellingState) => {
     const selectedDestination = destinationOptions.find(
-      (option) => option.state === travellingCountry,
+      (option) =>
+        (travellingState ? option.state === travellingState : false) ||
+        option.state === travellingCountry ||
+        option.country.toLowerCase() === travellingCountry?.toLowerCase(),
     );
 
     // Fallback search: if no direct state match, check if any destination has this as its country to get continent
-    const countryFallback = !selectedDestination ? aiDestinationCards.find(
-      (dest) => dest.country.toLowerCase() === travellingCountry?.toLowerCase()
-    ) : null;
+    const countryFallback = !selectedDestination
+      ? aiDestinationCards.find(
+          (dest) =>
+            dest.country.toLowerCase() === travellingCountry?.toLowerCase(),
+        )
+      : null;
 
     const destinationState = selectedDestination?.state?.toLowerCase() || "";
     const destinationCountry =
-      selectedDestination?.country?.toLowerCase() || travellingCountry?.toLowerCase() || "";
+      selectedDestination?.country?.toLowerCase() ||
+      travellingCountry?.toLowerCase() ||
+      "";
     const destinationContinent =
-      selectedDestination?.continent?.toLowerCase() || countryFallback?.continent?.toLowerCase() || "";
+      selectedDestination?.continent?.toLowerCase() ||
+      countryFallback?.continent?.toLowerCase() ||
+      "";
 
     navigate(
       `/visa-support/thank-you?choice=${choice}&state=${encodeURIComponent(destinationState)}&country=${encodeURIComponent(destinationCountry)}&continent=${encodeURIComponent(destinationContinent)}&destination=${encodeURIComponent(travellingCountry || "")}`,
@@ -118,10 +146,25 @@ const AiVisaSupport = () => {
 
   const { mutate: submitVisaSupport } = useMutation({
     mutationFn: async (formValues) => {
-      const response = await axios.post("forms/add-new-b2c-form-submission", {
-        ...formValues,
+      const payload = {
+        visaType: formValues.visaType,
+        fullName: formValues.fullName,
+        nationality: formValues.nationality,
+        travellingCountry: formatTravellingCountry(
+          formValues.travellingCountry,
+          formValues.travellingState,
+        ),
+        email: formValues.email,
+        contactCode: formValues.contactCode,
+        contactNumber: formValues.contactNumber,
+        comments: formValues.comments,
         sheetName: "AI_Visa_Support",
-      });
+      };
+
+      const response = await axios.post(
+        "forms/add-new-b2c-form-submission",
+        payload,
+      );
       return response.data;
     },
     onSuccess: async (_, formValues) => {
@@ -143,13 +186,14 @@ const AiVisaSupport = () => {
       navigateToThankYou(
         "get-back-to-me",
         formValues.travellingCountry || "",
+        formValues.travellingState || "",
       );
       reset(defaultValues);
     },
     onError: (error) => {
       showErrorAlert(
         error?.response?.data?.message ||
-        "Something went wrong while submitting your request.",
+          "Something went wrong while submitting your request.",
       );
     },
     onSettled: () => {
@@ -225,7 +269,7 @@ const AiVisaSupport = () => {
 
     let messageIndex = 0;
     let visaHeadingIndex = 0;
-    let cleanupHeading = () => { };
+    let cleanupHeading = () => {};
 
     const typeVisaHeading = () => {
       const headingInterval = setInterval(() => {
@@ -286,8 +330,9 @@ const AiVisaSupport = () => {
             <Box
               component="form"
               onSubmit={handleSubmit(handleFormSubmit)}
-              className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"
-                }`}
+              className={`bg-white p-0 md:p-0 rounded-2xl ${
+                isFormVisible ? "visible" : "invisible"
+              }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
                 <Controller
@@ -309,7 +354,11 @@ const AiVisaSupport = () => {
                         SELECT VISA TYPE
                       </MenuItem>
                       {VISA_TYPE_OPTIONS.map((option) => (
-                        <MenuItem key={option} value={option} sx={tickMenuItemSx}>
+                        <MenuItem
+                          key={option}
+                          value={option}
+                          sx={tickMenuItemSx}
+                        >
                           <Box className="flex w-full items-center gap-2">
                             <HiCheck className="tick-icon" size={16} />
                             <span>{option}</span>
@@ -416,49 +465,102 @@ const AiVisaSupport = () => {
                   )}
                 />
 
-                <Controller
-                  name="travellingCountry"
-                  control={control}
-                  rules={{ required: "Travelling country is required" }}
-                  render={({ field, fieldState }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label="Travelling Country"
-                      variant="standard"
-                      error={!!fieldState.error}
-                      helperText={fieldState.error?.message}
-                      select
-                      InputLabelProps={{ sx: floatingLabelSx }}
-                      onChange={(event) => field.onChange(event.target.value)}
-                    >
-                      <MenuItem value="" sx={{ fontWeight: 700 }}>
-                        SELECT COUNTRY
-                      </MenuItem>
-                      {countries.map((country) => (
-                        <MenuItem
-                          key={country.isoCode}
-                          value={country.name}
-                          sx={tickMenuItemSx}
-                        >
-                          <Box className="flex w-full items-center gap-2">
-                            <HiCheck className="tick-icon" size={16} />
-                            <Box className="flex items-center gap-1">
-                              <Box
-                                component="img"
-                                src={getFlagIconUrl(country.isoCode)}
-                                alt={`${country.name} flag`}
-                                sx={{ width: 20, height: 15, flexShrink: 0 }}
-                                loading="lazy"
-                              />
-                              <span>{country.name}</span>
-                            </Box>
-                          </Box>
+                <Box sx={{ display: "flex", gap: 2, width: "100%" }}>
+                  <Controller
+                    name="travellingCountry"
+                    control={control}
+                    rules={{ required: "Travelling country is required" }}
+                    render={({ field, fieldState }) => (
+                      <TextField
+                        {...field}
+                        fullWidth
+                        label="Travelling Country"
+                        variant="standard"
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message}
+                        select
+                        InputLabelProps={{ sx: floatingLabelSx }}
+                        onChange={(event) => field.onChange(event.target.value)}
+                      >
+                        <MenuItem value="" sx={{ fontWeight: 700 }}>
+                          SELECT COUNTRY
                         </MenuItem>
-                      ))}
-                    </TextField>
-                  )}
-                />
+                        {destinationCountries.map((countryName) => {
+                          const country = countries.find(
+                            (c) => c.name === countryName,
+                          );
+                          if (!country) return null;
+                          return (
+                            <MenuItem
+                              key={country.isoCode}
+                              value={country.name}
+                              sx={tickMenuItemSx}
+                            >
+                              <Box className="flex w-full items-center gap-2">
+                                <HiCheck className="tick-icon" size={16} />
+                                <Box className="flex items-center gap-1">
+                                  <Box
+                                    component="img"
+                                    src={getFlagIconUrl(country.isoCode)}
+                                    alt={`${country.name} flag`}
+                                    sx={{
+                                      width: 20,
+                                      height: 15,
+                                      flexShrink: 0,
+                                    }}
+                                    loading="lazy"
+                                  />
+                                  <span>{country.name}</span>
+                                </Box>
+                              </Box>
+                            </MenuItem>
+                          );
+                        })}
+                      </TextField>
+                    )}
+                  />
+
+                  <Controller
+                    name="travellingState"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                      <TextField
+                        {...field}
+                        fullWidth
+                        label="Travelling City / State"
+                        variant="standard"
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message}
+                        select
+                        disabled={!selectedTravellingCountry}
+                        InputLabelProps={{ sx: floatingLabelSx }}
+                      >
+                        <MenuItem value="" sx={{ fontWeight: 700 }}>
+                          {selectedTravellingCountry
+                            ? "SELECT CITY / STATE"
+                            : "SELECT COUNTRY FIRST"}
+                        </MenuItem>
+                        {destinationOptions
+                          .filter(
+                            (option) =>
+                              option.country === selectedTravellingCountry,
+                          )
+                          .map((destinationOption) => (
+                            <MenuItem
+                              key={`${destinationOption.state}-${destinationOption.country}`}
+                              value={destinationOption.state}
+                              sx={tickMenuItemSx}
+                            >
+                              <Box className="flex w-full items-center gap-2">
+                                <HiCheck className="tick-icon" size={16} />
+                                <span>{destinationOption.state}</span>
+                              </Box>
+                            </MenuItem>
+                          ))}
+                      </TextField>
+                    )}
+                  />
+                </Box>
 
                 <Box sx={{ display: "flex", gap: 2, width: "100%" }}>
                   <Controller

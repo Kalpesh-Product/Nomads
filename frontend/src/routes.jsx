@@ -84,6 +84,8 @@ import AiBecomeContributor from "./pages/AiBecomeContributor";
 import AiBlogsFetch from "./components/AiBlogsFetch";
 import AiNewsFetch from "./components/AiNewsFetch";
 import AiBlogDetails from "./pages/AiBlogDetails";
+import AiForgotPassword from "./pages/AiForgotPassword";
+import AiResetPassword from "./pages/AiResetPassword";
 
 function getTenantFromHost() {
   const hostname = window.location.hostname; // e.g. "nomad.wono.co" or "nomad.localhost"
@@ -188,6 +190,8 @@ if (tenant === "main") {
             { path: "home", element: <AiHome /> },
             { path: "ai-login/:redirectGoal?", element: <AiLogin /> },
             { path: "ai-signup", element: <AiSignup /> },
+            { path: "ai-forgot-password", element: <AiForgotPassword /> },
+            { path: "ai-reset-password/:token", element: <AiResetPassword /> },
             { path: "home-logged-in", element: <AiHomeLoggedIn /> },
             { path: "search", element: <AiSearch /> },
             { path: "world-rankings", element: <AiWorldRankings /> },
@@ -203,7 +207,10 @@ if (tenant === "main") {
               path: "career-search/results",
               element: <AiCareerSearchResults />,
             },
-            { path: "search/results/:loc?/:attr?", element: <AiSearchResults /> },
+            {
+              path: "search/results/:loc?/:attr?",
+              element: <AiSearchResults />,
+            },
             {
               path: "search/:goal/results/:loc?/:attr?",
               element: <AiSearchResults />,

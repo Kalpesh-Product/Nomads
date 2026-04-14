@@ -27,6 +27,7 @@ import newCompanySetupRoutes from "./routes/newCompanySetupRoutes.js";
 import consultationRoutes from "./routes/consultationRoutes.js";
 import workationRoutes from "./routes/workationRoutes.js";
 import becomeContributorRoutes from "./routes/becomeContributorRoutes.js";
+import stateWiseWeightRoutes from "./routes/stateWiseWeightRoutes.js";
 
 const app = express();
 config({ override: true });
@@ -53,6 +54,7 @@ app.use("/api/new-company-setup", newCompanySetupRoutes);
 app.use("/api/consultation", consultationRoutes);
 app.use("/api/workation", workationRoutes);
 app.use("/api/become-contributor", becomeContributorRoutes);
+app.use("/api/state-wise-weight", stateWiseWeightRoutes);
 
 app.use("/api/news", newsRoutes);
 app.use("/api/blogs", blogRoutes); // New Blog Route

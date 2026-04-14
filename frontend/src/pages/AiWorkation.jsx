@@ -26,6 +26,8 @@ import { getCountryNameFromSelectedDestination } from "../utils/selectedDestinat
 import { showErrorAlert } from "../utils/alerts";
 import { HiCheck } from "react-icons/hi";
 
+import { aiDestinationCards } from "../constants/aiDestinationCards";
+
 const floatingLabelSx = {
   color: "black",
   "&.Mui-focused": { color: "#1976d2" },
@@ -47,12 +49,22 @@ const defaultValues = {
   companyWebsite: "",
   currentCountry: "",
   workationCountry: "",
+  workationState: "",
   startDate: "",
   endDate: "",
   contactCode: "",
   contactNumber: "",
   email: "",
   comments: "",
+};
+
+const formatWorkationCountry = (country, state) => {
+  const trimmedCountry = country?.trim() || "";
+  const trimmedState = state?.trim() || "";
+
+  if (!trimmedState) return trimmedCountry;
+
+  return `${trimmedCountry} - ${trimmedState}`;
 };
 
 const WORKATION_PROMPT =
@@ -90,11 +102,30 @@ const AiWorkation = () => {
     ? (auth?.user?.fullName?.split(" ")[0] || "User") + ", "
     : "User, ";
   const workationPrompt = `${messagePrefix}${WORKATION_PROMPT}`;
+  const destinationOptions = useMemo(
+    () =>
+      aiDestinationCards.map((destination) => ({
+        state: destination.city,
+        country: destination.country,
+      })),
+    [],
+  );
+  const destinationCountries = useMemo(
+    () =>
+      Array.from(
+        new Set(destinationOptions.map((option) => option.country)),
+      ).sort(),
+    [destinationOptions],
+  );
 
   const { mutate: submitWorkation } = useMutation({
     mutationFn: async (formValues) => {
       const response = await axios.post("forms/add-new-b2c-form-submission", {
         ...formValues,
+        workationCountry: formatWorkationCountry(
+          formValues.workationCountry,
+          formValues.workationState,
+        ),
         sheetName: "AI_Workation",
       });
       return response.data;
@@ -420,48 +451,107 @@ const AiWorkation = () => {
                   )}
                 />
 
-                <Controller
-                  name="workationCountry"
-                  control={control}
-                  rules={{ required: "Workation Country is required" }}
-                  render={({ field, fieldState }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      select
-                      label="Workation Country"
-                      variant="standard"
-                      error={!!fieldState.error}
-                      helperText={fieldState.error?.message}
-                      InputLabelProps={{ sx: floatingLabelSx }}
-                    >
-                      <MenuItem value="" sx={{ fontWeight: 700 }}>
-                        SELECT COUNTRY
-                      </MenuItem>
-                      {countries.map((country) => (
-                        <MenuItem
-                          key={country.isoCode}
-                          value={country.name}
-                          sx={tickMenuItemSx}
-                        >
-                          <Box className="flex w-full items-center gap-2">
-                            <HiCheck className="tick-icon" size={16} />
-                            <Box className="flex items-center gap-1">
-                              <Box
-                                component="img"
-                                src={getFlagIconUrl(country.isoCode)}
-                                alt={`${country.name} flag`}
-                                sx={{ width: 20, height: 15, flexShrink: 0 }}
-                                loading="lazy"
-                              />
-                              <span>{country.name}</span>
-                            </Box>
-                          </Box>
+                <Box sx={{ display: "flex", gap: 2, width: "100%" }}>
+                  <Controller
+                    name="workationCountry"
+                    control={control}
+                    rules={{ required: "Workation Country is required" }}
+                    render={({ field, fieldState }) => (
+                      <TextField
+                        {...field}
+                        fullWidth
+                        select
+                        label="Workation Country"
+                        variant="standard"
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message}
+                        InputLabelProps={{ sx: floatingLabelSx }}
+                        onChange={(event) => {
+                          field.onChange(event.target.value);
+                          setValue("workationState", "", {
+                            shouldDirty: true,
+                            shouldTouch: true,
+                          });
+                        }}
+                      >
+                        <MenuItem value="" sx={{ fontWeight: 700 }}>
+                          SELECT COUNTRY
                         </MenuItem>
-                      ))}
-                    </TextField>
-                  )}
-                />
+                        {destinationCountries.map((countryName) => {
+                          const country = countries.find(
+                            (c) => c.name === countryName,
+                          );
+                          if (!country) return null;
+                          return (
+                            <MenuItem
+                              key={country.isoCode}
+                              value={country.name}
+                              sx={tickMenuItemSx}
+                            >
+                              <Box className="flex w-full items-center gap-2">
+                                <HiCheck className="tick-icon" size={16} />
+                                <Box className="flex items-center gap-1">
+                                  <Box
+                                    component="img"
+                                    src={getFlagIconUrl(country.isoCode)}
+                                    alt={`${country.name} flag`}
+                                    sx={{
+                                      width: 20,
+                                      height: 15,
+                                      flexShrink: 0,
+                                    }}
+                                    loading="lazy"
+                                  />
+                                  <span>{country.name}</span>
+                                </Box>
+                              </Box>
+                            </MenuItem>
+                          );
+                        })}
+                      </TextField>
+                    )}
+                  />
+
+                  <Controller
+                    name="workationState"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                      <TextField
+                        {...field}
+                        fullWidth
+                        label="Workation City / State"
+                        variant="standard"
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message}
+                        select
+                        disabled={!workationCountry}
+                        InputLabelProps={{ sx: floatingLabelSx }}
+                      >
+                        <MenuItem value="" sx={{ fontWeight: 700 }}>
+                          {workationCountry
+                            ? "SELECT CITY / STATE"
+                            : "SELECT COUNTRY FIRST"}
+                        </MenuItem>
+                        {destinationOptions
+                          .filter(
+                            (option) => option.country === workationCountry,
+                          )
+                          .map((destinationOption) => (
+                            <MenuItem
+                              key={`${destinationOption.state}-${destinationOption.country}`}
+                              value={destinationOption.state}
+                              sx={tickMenuItemSx}
+                            >
+                              <Box className="flex w-full items-center gap-2">
+                                <HiCheck className="tick-icon" size={16} />
+                                <span>{destinationOption.state}</span>
+                              </Box>
+                            </MenuItem>
+                          ))}
+                      </TextField>
+                    )}
+                  />
+                </Box>
 
                 <Controller
                   name="startDate"
