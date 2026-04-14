@@ -1,5 +1,5 @@
-import StateWiseWeight from "../models/StateWiseWeight";
-import { stateWiseWeightCalculation } from "../controllers/stateWiseWeightCalculation.js"; // Update path if needed
+import StateWiseWeight from "../models/StateWiseWeight.js";
+import { stateWiseWeightCalculation } from "../controllers/stateWiseWeightCalculation.js";
 
 export const getStateWiseWeight = async (req, res, next) => {
     try {
