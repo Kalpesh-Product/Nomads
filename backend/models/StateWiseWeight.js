@@ -2,9 +2,8 @@ import mongoose from "mongoose";
 
 const stateWiseWeightSchema = new mongoose.Schema(
     {
-        company: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Company",
+        state: {
+            type: String,
             required: true,
         },
 

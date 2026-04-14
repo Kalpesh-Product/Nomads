@@ -3,10 +3,7 @@ import { stateWiseWeightCalculation } from "../controllers/stateWiseWeightCalcul
 
 export const getStateWiseWeight = async (req, res, next) => {
     try {
-        const stateWiseWeight = await StateWiseWeight.find().populate({
-            path: "company",
-            select: "continent country state city"
-        });
+        const stateWiseWeight = await StateWiseWeight.find();
 
         const dataWithScores = stateWiseWeight.map(item => {
             const plainItem = item.toObject();
