@@ -2,6 +2,14 @@ import mongoose from "mongoose";
 
 const stateWiseWeightSchema = new mongoose.Schema(
     {
+        continent: {
+            type: String,
+            required: true,
+        },
+        country: {
+            type: String,
+            required: true,
+        },
         state: {
             type: String,
             required: true,

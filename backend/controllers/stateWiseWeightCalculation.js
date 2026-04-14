@@ -16,6 +16,17 @@ const score = (weights, factors) =>
 
 export const STATEWISE_WEIGHT_FORMULAS = {
     bestForNomads: [
+        ["workInfrastructure", 0.20],
+        ["internet", 0.15],
+        ["costOfLiving", 0.20],
+        ["safety", 0.10],
+        ["visaFlexibility", 0.10],
+        ["nomadCommunity", 0.15],
+        ["healthcareCostIndex", 0.05],
+        ["startupEcosystemScore", 0.03],
+        ["airQualityIndex", 0.02],
+    ],
+    bestWorkInfrastructure: [
         ["workInfrastructure", 0.25],
         ["internet", 0.25],
         ["nomadCommunity", 0.15],
@@ -143,7 +154,7 @@ export const STATEWISE_WEIGHT_FORMULAS = {
         ["directInternationalFlights", 0.1],
         ["costOfLiving", 0.05],
     ],
-    bestWorkInfrastructure: [
+    bestWorkInfrastructureWFA: [
         ["workInfrastructure", 0.4],
         ["internet", 0.25],
         ["nomadCommunity", 0.15],

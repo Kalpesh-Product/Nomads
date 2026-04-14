@@ -1,55 +1,49 @@
 import StateWiseWeight from "../models/StateWiseWeight.js";
-import Company from "../models/Company.js";
 import { stateWiseWeightCalculation } from "../controllers/stateWiseWeightCalculation.js";
 
 export const getStateWiseWeight = async (req, res, next) => {
     try {
-        const { attribute = "bestForNomads" } = req.query;
+        const { continent, attribute = "bestForNomads" } = req.body;
 
-        // 1. Fetch all state weights and calculate scores
-        const stateWeights = await StateWiseWeight.find().lean();
-        const stateScoreMap = {};
+        let query = {};
 
-        stateWeights.forEach(item => {
-            const scores = stateWiseWeightCalculation(item.weight);
-            // Normalize state name for joining
-            const stateKey = item.state.trim().toLowerCase();
-            stateScoreMap[stateKey] = scores;
-        });
+        // 1. Filter by continent if provided and not "World"
+        if (continent && continent.toLowerCase() !== "world") {
+            query.continent = { $regex: new RegExp(`^${continent}$`, "i") };
+        }
 
-        // 2. Fetch all active companies
-        const companies = await Company.find({
-            isActive: true,
-            companyType: { $ne: "privatestay" }
-        })
-            .select("_id companyName companyId companyType country state city address about website businessId registeredEntityName images logo ratings totalReviews inclusions latitude longitude continent")
-            .lean();
+        // 2. Fetch state weights based on query
+        const stateWeights = await StateWiseWeight.find(query).lean();
 
-        // 3. Join companies with their state scores
-        const enrichedCompanies = companies.map(company => {
-            const stateKey = (company.state || "").trim().toLowerCase();
-            const scores = stateScoreMap[stateKey] || {};
+
+        // 3. Calculate scores for each state and pick the requested attribute
+        const results = stateWeights.map(item => {
+            const allScores = stateWiseWeightCalculation(item.weight);
+            const scoreForSorting = allScores[attribute] || 0;
 
             return {
-                ...company,
-                calculatedScores: scores
+                state: item.state,
+                weight: item.weight,
+                calculatedScores: allScores
             };
         });
 
-        // 4. Sort by requested attribute in descending order
-        enrichedCompanies.sort((a, b) => {
+        // 4. Sort by the requested attribute score in descending order
+        results.sort((a, b) => {
             const scoreA = a.calculatedScores[attribute] || 0;
             const scoreB = b.calculatedScores[attribute] || 0;
             return scoreB - scoreA;
         });
 
+
         res.status(200).json({
             success: true,
-            count: enrichedCompanies.length,
+            count: results.length,
             selectedAttribute: attribute,
-            data: enrichedCompanies
+            data: results
         });
     } catch (error) {
         next(error);
     }
 };
+

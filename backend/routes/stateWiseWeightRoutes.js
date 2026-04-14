@@ -3,6 +3,6 @@ import { getStateWiseWeight } from "../controllers/stateWiseWeightController.js"
 
 const router = Router();
 
-router.get("/", getStateWiseWeight);
+router.post("/", getStateWiseWeight);
 
 export default router;
