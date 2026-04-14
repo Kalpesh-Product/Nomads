@@ -138,7 +138,7 @@ export const STATEWISE_WEIGHT_FORMULAS = {
         ["nomadCommunity", 0.1],
         ["costOfLiving", 0.05],
     ],
-    strongNomadCommunityWfa: [
+    strongNomadCommunityWFA: [
         ["nomadCommunity", 0.35],
         ["internet", 0.2],
         ["workInfrastructure", 0.15],
