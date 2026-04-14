@@ -1,70 +1,25 @@
 import StateWiseWeight from "../models/StateWiseWeight";
-import { stateWiseWeightCalculation } from "../controllers/stateWiseWeightCalculation.js"; // <-- Your 37 formulas file
-
-const FORMULA_KEY_MAP = {
-    workInfrastructure: "workInfrastructure",
-    internet: "internet",
-    costOfLiving: "costOfLiving",
-    safety: "safety",
-    visaFlexibility: "visaFlexibility",
-    nomadCommunity: "nomadCommunity",
-    healthcareCostIndex: "healthcareCostIndex",
-    startupEcosystemScore: "startupEcosystemScore",
-    airQualityIndex: "airQualityIndex",
-    airportConnectivity: "airportConnectivity",
-    directInternationalFlights: "directInternationalFlights",
-    purchasingPower: "purchasingPower",
-    inflationStability: "inflationStability",
-    startupSetupCost: "startupSetupCost",
-    founderNomads: "founderNomads",
-    yoga: "yoga",
-    techTalentDensity: "techTalentDensity",
-    taxFriendly: "lowerTaxesTaxFriendly",
-    partyLifestyle: "partyAndEventsNomadTraveller",
-    nightlife: "nightlifeAndPubs",
-    meetupsEvents: "meetupsAndEvents",
-    soloNomad: "soloNomadTraveller",
-    coupleNomads: "coupleNomadTravelletrs",
-    femaleNomads: "girlNomadTraveller",
-    familyNomads: "familyNomadTraveller",
-    nature: "natureNomadTravelling",
-    adventure: "adventureNomadTravelling",
-    ventureCapital: "ventureCapitalPresence",
-    incubators: "startupIncubatorsAndAccelerators",
-    conferences: "conferencesAndEvents",
-    remoteJobs: "remoteJobAvailability",
-    qualityOfLife: "qualityOfLife",
-    lifestyleEntertainment: "lifestyleEntertainment",
-    climateEnvironment: "climateEnvironment",
-    accessibility: "accessibility",
-};
+import { stateWiseWeightCalculation } from "../controllers/stateWiseWeightCalculation.js"; // Update path if needed
 
 export const getStateWiseWeight = async (req, res, next) => {
     try {
+        // 1. Fetch data from Database
         const stateWiseWeight = await StateWiseWeight.find().populate({
             path: "company",
             select: "continent, country, state"
         });
 
+        // 2. Loop through each city and calculate the 37 formulas
         const dataWithScores = stateWiseWeight.map(item => {
             const plainItem = item.toObject();
-            const dbWeight = plainItem.weight;
 
-            // 1. Translate DB keys to Company Formula keys
-            const formattedForFormula = Object.entries(dbWeight).reduce((acc, [dbKey, value]) => {
-                const formulaKey = FORMULA_KEY_MAP[dbKey];
-                if (formulaKey) {
-                    acc[formulaKey] = value;
-                }
-                return acc;
-            }, {});
-
-            // 2. Run the company's exact calculation
-            plainItem.calculatedScores = stateWiseWeightCalculation(formattedForFormula);
+            // 3. Directly pass the DB weights to the calculation function!
+            plainItem.calculatedScores = stateWiseWeightCalculation(plainItem.weight);
 
             return plainItem;
         });
 
+        // 4. Send the final response
         res.status(200).json({
             success: true,
             count: dataWithScores.length,
