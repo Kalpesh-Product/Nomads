@@ -153,6 +153,56 @@ export const forgotPassword = async (req, res) => {
   }
 };
 
+export const aiForgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) return res.status(400).json({ message: "Email is required" });
+
+    const user = await NomadUser.findOne({ email });
+    if (!user)
+      return res
+        .status(404)
+        .json({ message: "User not found with this email" });
+
+    // Generate reset token
+    const resetToken = user.getResetPasswordToken();
+    await user.save({ validateBeforeSave: false });
+
+    // Create reset URL (frontend route)
+    // const resetUrl = `${process.env.FRONTEND_PROD_LINK}/reset-password/${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_PROD_LINK}ai-reset-password/${resetToken}`;
+
+    const message = `
+      <p>Hi ${user.name || ""},</p> 
+      <p>You requested a password reset. Click below to reset your password:</p>
+      <a href="${resetUrl}" target="_blank">Reset Password</a>
+      <p>This link will expire in 15 minutes.</p>
+      <p>If you didn’t request this, please ignore this email.</p>
+    `;
+
+    try {
+      await sendMail({
+        to: user.email,
+        subject: "Password Reset Request",
+        html: message,
+      });
+
+      res.status(200).json({
+        success: true,
+        message: "Password reset email sent successfully",
+      });
+    } catch (error) {
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpire = undefined;
+      await user.save({ validateBeforeSave: false });
+      res.status(500).json({ message: "Email could not be sent" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 export const resetPassword = async (req, res) => {
   try {
     const { token } = req.params;
@@ -210,7 +260,8 @@ export const resetPassword = async (req, res) => {
     const successMessage = `
       <p>Hi ${(user.fullName || user.name || "").split(" ")[0] || ""},</p>
       <p>Your password has been successfully reset.</p>
-      <p>You can now <a href="${process.env.FRONTEND_DEV_LINK
+      <p>You can now <a href="${
+        process.env.FRONTEND_DEV_LINK
       }login" target="_blank">Login</a> with your new password.</p>
       <p>If you did not perform this action, please contact us immediately.</p>
       <br/>
