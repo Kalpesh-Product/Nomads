@@ -63,6 +63,15 @@ const tickMenuItemSx = {
   "&.Mui-selected:hover .tick-icon": { opacity: 1 },
 };
 
+const formatTravellingCountry = (country, state) => {
+  const trimmedCountry = country?.trim() || "";
+  const trimmedState = state?.trim() || "";
+
+  if (!trimmedState) return trimmedCountry;
+
+  return `${trimmedCountry} - ${trimmedState}`;
+};
+
 const AiVisaSupport = () => {
   const [typedMessage, setTypedMessage] = useState("");
   const [typedVisaHeading, setTypedVisaHeading] = useState("");
@@ -137,10 +146,25 @@ const AiVisaSupport = () => {
 
   const { mutate: submitVisaSupport } = useMutation({
     mutationFn: async (formValues) => {
-      const response = await axios.post("forms/add-new-b2c-form-submission", {
-        ...formValues,
+      const payload = {
+        visaType: formValues.visaType,
+        fullName: formValues.fullName,
+        nationality: formValues.nationality,
+        travellingCountry: formatTravellingCountry(
+          formValues.travellingCountry,
+          formValues.travellingState,
+        ),
+        email: formValues.email,
+        contactCode: formValues.contactCode,
+        contactNumber: formValues.contactNumber,
+        comments: formValues.comments,
         sheetName: "AI_Visa_Support",
-      });
+      };
+
+      const response = await axios.post(
+        "forms/add-new-b2c-form-submission",
+        payload,
+      );
       return response.data;
     },
     onSuccess: async (_, formValues) => {
