@@ -1,147 +1,355 @@
-// Core Factors Naming Convention (camelCase)
-const bestForNomads =
-    0.25 * workInfrastructure +
-    0.25 * internet +
-    0.15 * nomadCommunity +
-    0.10 * costOfLiving +
-    0.10 * visaFlexibility +
-    0.05 * safety +
-    0.05 * healthcareCostIndex +
-    0.03 * startupEcosystemScore +
-    0.02 * airQualityIndex;
+const toNumber = (value) => {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+};
 
-const mostAffordable =
-    0.45 * costOfLiving +
-    0.15 * healthcareCostIndex +
-    0.10 * safety +
-    0.10 * airQualityIndex +
-    0.08 * visaFlexibility +
-    0.07 * internet +
-    0.03 * workInfrastructure +
-    0.01 * nomadCommunity +
-    0.01 * startupEcosystemScore;
+const score = (weights, factors) =>
+    Number(
+        factors
+            .reduce(
+                (total, [factor, multiplier]) =>
+                    total + toNumber(weights[factor]) * multiplier,
+                0,
+            )
+            .toFixed(3),
+    );
 
-const safestCities =
-    0.40 * safety +
-    0.15 * healthcareCostIndex +
-    0.10 * airQualityIndex +
-    0.10 * costOfLiving +
-    0.08 * visaFlexibility +
-    0.07 * internet +
-    0.05 * workInfrastructure +
-    0.03 * nomadCommunity +
-    0.02 * startupEcosystemScore;
+export const STATEWISE_WEIGHT_FORMULAS = {
+    bestForNomads: [
+        ["workInfrastructure", 0.25],
+        ["internet", 0.25],
+        ["nomadCommunity", 0.15],
+        ["costOfLiving", 0.1],
+        ["visaFlexibility", 0.1],
+        ["safety", 0.05],
+        ["healthcareCostIndex", 0.05],
+        ["startupEcosystemScore", 0.03],
+        ["airQualityIndex", 0.02],
+    ],
+    mostAffordable: [
+        ["costOfLiving", 0.45],
+        ["healthcareCostIndex", 0.15],
+        ["safety", 0.1],
+        ["airQualityIndex", 0.1],
+        ["visaFlexibility", 0.08],
+        ["internet", 0.07],
+        ["workInfrastructure", 0.03],
+        ["nomadCommunity", 0.01],
+        ["startupEcosystemScore", 0.01],
+    ],
+    safestCities: [
+        ["safety", 0.4],
+        ["healthcareCostIndex", 0.15],
+        ["airQualityIndex", 0.1],
+        ["costOfLiving", 0.1],
+        ["visaFlexibility", 0.08],
+        ["internet", 0.07],
+        ["workInfrastructure", 0.05],
+        ["nomadCommunity", 0.03],
+        ["startupEcosystemScore", 0.02],
+    ],
+    easyVisaLongStay: [
+        ["visaFlexibility", 0.4],
+        ["costOfLiving", 0.2],
+        ["safety", 0.1],
+        ["healthcareCostIndex", 0.08],
+        ["nomadCommunity", 0.07],
+        ["internet", 0.05],
+        ["workInfrastructure", 0.05],
+        ["airQualityIndex", 0.03],
+        ["startupEcosystemScore", 0.02],
+    ],
+    strongNomadCommunity: [
+        ["nomadCommunity", 0.35],
+        ["internet", 0.15],
+        ["workInfrastructure", 0.15],
+        ["costOfLiving", 0.1],
+        ["visaFlexibility", 0.08],
+        ["safety", 0.07],
+        ["healthcareCostIndex", 0.05],
+        ["airQualityIndex", 0.03],
+        ["startupEcosystemScore", 0.02],
+    ],
+    healthcareFriendly: [
+        ["healthcareCostIndex", 0.35],
+        ["safety", 0.2],
+        ["airQualityIndex", 0.1],
+        ["costOfLiving", 0.1],
+        ["visaFlexibility", 0.08],
+        ["internet", 0.07],
+        ["workInfrastructure", 0.05],
+        ["nomadCommunity", 0.03],
+        ["startupEcosystemScore", 0.02],
+    ],
+    startupBusinessOpportunities: [
+        ["startupEcosystemScore", 0.3],
+        ["workInfrastructure", 0.2],
+        ["internet", 0.15],
+        ["nomadCommunity", 0.1],
+        ["visaFlexibility", 0.08],
+        ["costOfLiving", 0.07],
+        ["safety", 0.05],
+        ["healthcareCostIndex", 0.03],
+        ["airQualityIndex", 0.02],
+    ],
+    cleanAirEnvironment: [
+        ["airQualityIndex", 0.4],
+        ["safety", 0.15],
+        ["healthcareCostIndex", 0.1],
+        ["costOfLiving", 0.1],
+        ["visaFlexibility", 0.08],
+        ["internet", 0.07],
+        ["workInfrastructure", 0.05],
+        ["nomadCommunity", 0.03],
+        ["startupEcosystemScore", 0.02],
+    ],
+    bestForRemoteWorkSetup: [
+        ["internet", 0.3],
+        ["workInfrastructure", 0.2],
+        ["nomadCommunity", 0.15],
+        ["costOfLiving", 0.1],
+        ["airportConnectivity", 0.1],
+        ["directInternationalFlights", 0.15],
+    ],
+    cheapestPlaces: [
+        ["costOfLiving", 0.5],
+        ["internet", 0.1],
+        ["workInfrastructure", 0.1],
+        ["nomadCommunity", 0.1],
+        ["airportConnectivity", 0.1],
+        ["directInternationalFlights", 0.1],
+    ],
+    bestConnectedCitiesFlights: [
+        ["directInternationalFlights", 0.35],
+        ["airportConnectivity", 0.3],
+        ["internet", 0.1],
+        ["workInfrastructure", 0.1],
+        ["nomadCommunity", 0.1],
+        ["costOfLiving", 0.05],
+    ],
+    strongNomadCommunityWfa: [
+        ["nomadCommunity", 0.35],
+        ["internet", 0.2],
+        ["workInfrastructure", 0.15],
+        ["airportConnectivity", 0.1],
+        ["directInternationalFlights", 0.1],
+        ["costOfLiving", 0.1],
+    ],
+    fastInternetCities: [
+        ["internet", 0.45],
+        ["workInfrastructure", 0.2],
+        ["nomadCommunity", 0.1],
+        ["airportConnectivity", 0.1],
+        ["directInternationalFlights", 0.1],
+        ["costOfLiving", 0.05],
+    ],
+    bestWorkInfrastructure: [
+        ["workInfrastructure", 0.4],
+        ["internet", 0.25],
+        ["nomadCommunity", 0.15],
+        ["airportConnectivity", 0.1],
+        ["directInternationalFlights", 0.05],
+        ["costOfLiving", 0.05],
+    ],
+    maximumSavings: [
+        ["costOfLiving", 0.3],
+        ["lowerTaxesTaxFriendly", 0.2],
+        ["purchasingPower", 0.2],
+        ["inflationStability", 0.1],
+        ["healthcareCostIndex", 0.1],
+        ["startupSetupCost", 0.1],
+    ],
+    lowTaxation: [
+        ["lowerTaxesTaxFriendly", 0.35],
+        ["costOfLiving", 0.2],
+        ["purchasingPower", 0.2],
+        ["inflationStability", 0.1],
+        ["healthcareCostIndex", 0.1],
+        ["startupSetupCost", 0.05],
+    ],
+    purchasingPower: [
+        ["purchasingPower", 0.35],
+        ["costOfLiving", 0.2],
+        ["lowerTaxesTaxFriendly", 0.15],
+        ["inflationStability", 0.1],
+        ["healthcareCostIndex", 0.1],
+        ["startupSetupCost", 0.1],
+    ],
+    financialStabilityLowRisk: [
+        ["inflationStability", 0.3],
+        ["healthcareCostIndex", 0.2],
+        ["costOfLiving", 0.15],
+        ["lowerTaxesTaxFriendly", 0.15],
+        ["purchasingPower", 0.1],
+        ["startupSetupCost", 0.1],
+    ],
+    startupSetupCost: [
+        ["startupSetupCost", 0.35],
+        ["lowerTaxesTaxFriendly", 0.2],
+        ["costOfLiving", 0.15],
+        ["purchasingPower", 0.1],
+        ["inflationStability", 0.1],
+        ["healthcareCostIndex", 0.1],
+    ],
+    balancedFinancialLifestyle: [
+        ["costOfLiving", 0.2],
+        ["purchasingPower", 0.2],
+        ["lowerTaxesTaxFriendly", 0.15],
+        ["inflationStability", 0.15],
+        ["healthcareCostIndex", 0.15],
+        ["startupSetupCost", 0.15],
+    ],
+    socialPartyLifestyle: [
+        ["partyAndEventsNomadTraveller", 0.25],
+        ["nightlifeAndPubs", 0.2],
+        ["meetupsAndEvents", 0.15],
+        ["nomadCommunity", 0.15],
+        ["soloNomadTraveller", 0.1],
+        ["founderNomads", 0.05],
+        ["coupleNomadTraveller", 0.05],
+        ["girlNomadTraveller", 0.05],
+    ],
+    chillWellnessLifestyle: [
+        ["yoga", 0.25],
+        ["natureNomadTravelling", 0.2],
+        ["nomadCommunity", 0.15],
+        ["soloNomadTraveller", 0.1],
+        ["girlNomadTraveller", 0.1],
+        ["coupleNomadTraveller", 0.1],
+        ["familyNomadTraveller", 0.1],
+    ],
+    adventureExploration: [
+        ["adventureNomadTravelling", 0.3],
+        ["natureNomadTravelling", 0.25],
+        ["soloNomadTraveller", 0.15],
+        ["nomadCommunity", 0.1],
+        ["coupleNomadTraveller", 0.1],
+        ["girlNomadTraveller", 0.1],
+    ],
+    nomadCommunityNetworking: [
+        ["nomadCommunity", 0.3],
+        ["meetupsAndEvents", 0.2],
+        ["founderNomads", 0.15],
+        ["soloNomadTraveller", 0.1],
+        ["coupleNomadTraveller", 0.1],
+        ["girlNomadTraveller", 0.1],
+        ["partyAndEventsNomadTraveller", 0.05],
+    ],
+    coupleFriendlyLifestyle: [
+        ["coupleNomadTraveller", 0.35],
+        ["nomadCommunity", 0.2],
+        ["natureNomadTravelling", 0.15],
+        ["yoga", 0.1],
+        ["safety", 0.1],
+        ["meetupsAndEvents", 0.1],
+    ],
+    familyFriendlyLifestyle: [
+        ["familyNomadTraveller", 0.3],
+        ["safety", 0.2],
+        ["nomadCommunity", 0.15],
+        ["natureNomadTravelling", 0.1],
+        ["yoga", 0.1],
+        ["healthcareCostIndex", 0.1],
+        ["meetupsAndEvents", 0.05],
+    ],
+    femaleFriendlyLifestyle: [
+        ["girlNomadTraveller", 0.3],
+        ["safety", 0.25],
+        ["nomadCommunity", 0.15],
+        ["soloNomadTraveller", 0.1],
+        ["meetupsAndEvents", 0.1],
+        ["coupleNomadTraveller", 0.05],
+        ["healthcareCostIndex", 0.05],
+    ],
+    founderNomads: [
+        ["founderNomads", 0.3],
+        ["nomadCommunity", 0.2],
+        ["meetupsAndEvents", 0.15],
+        ["startupEcosystemScore", 0.15],
+        ["soloNomadTraveller", 0.1],
+        ["coupleNomadTraveller", 0.05],
+        ["girlNomadTraveller", 0.05],
+    ],
+    soloNomads: [
+        ["soloNomadTraveller", 0.3],
+        ["nomadCommunity", 0.2],
+        ["meetupsAndEvents", 0.15],
+        ["safety", 0.1],
+        ["girlNomadTraveller", 0.1],
+        ["adventureNomadTravelling", 0.1],
+        ["partyAndEventsNomadTraveller", 0.05],
+    ],
+    startupEcosystems: [
+        ["startupEcosystemScore", 0.3],
+        ["ventureCapitalPresence", 0.2],
+        ["startupIncubatorsAndAccelerators", 0.15],
+        ["techTalentDensity", 0.15],
+        ["founderNomads", 0.1],
+        ["conferencesAndEvents", 0.1],
+    ],
+    remoteJobOpportunities: [
+        ["remoteJobAvailability", 0.35],
+        ["internet", 0.2],
+        ["workInfrastructure", 0.15],
+        ["nomadCommunity", 0.1],
+        ["startupEcosystemScore", 0.1],
+        ["costOfLiving", 0.1],
+    ],
+    founderNomadsCareer: [
+        ["founderNomads", 0.3],
+        ["conferencesAndEvents", 0.2],
+        ["techTalentDensity", 0.2],
+        ["startupEcosystemScore", 0.15],
+        ["ventureCapitalPresence", 0.1],
+        ["remoteJobAvailability", 0.05],
+    ],
+    techTalentDensity: [
+        ["techTalentDensity", 0.35],
+        ["startupEcosystemScore", 0.2],
+        ["conferencesAndEvents", 0.15],
+        ["founderNomads", 0.1],
+        ["ventureCapitalPresence", 0.1],
+        ["nomadCommunity", 0.1],
+    ],
+    startupIncubatorsAndAccelerators: [
+        ["startupIncubatorsAndAccelerators", 0.35],
+        ["startupEcosystemScore", 0.2],
+        ["founderNomads", 0.15],
+        ["ventureCapitalPresence", 0.1],
+        ["techTalentDensity", 0.1],
+        ["conferencesAndEvents", 0.1],
+    ],
+    balancedCareerGrowth: [
+        ["remoteJobAvailability", 0.2],
+        ["startupEcosystemScore", 0.2],
+        ["techTalentDensity", 0.15],
+        ["conferencesAndEvents", 0.15],
+        ["founderNomads", 0.15],
+        ["ventureCapitalPresence", 0.15],
+    ],
+    ventureCapitalPresence: [
+        ["ventureCapitalPresence", 0.35],
+        ["startupEcosystemScore", 0.2],
+        ["startupIncubatorsAndAccelerators", 0.15],
+        ["conferencesAndEvents", 0.1],
+        ["founderNomads", 0.1],
+        ["techTalentDensity", 0.1],
+    ],
+    conferencesAndEvents: [
+        ["conferencesAndEvents", 0.35],
+        ["founderNomads", 0.2],
+        ["startupEcosystemScore", 0.15],
+        ["ventureCapitalPresence", 0.1],
+        ["techTalentDensity", 0.1],
+        ["nomadCommunity", 0.1],
+    ],
+};
 
-const easyVisaOrLongStay =
-    0.40 * visaFlexibility +
-    0.20 * costOfLiving +
-    0.10 * safety +
-    0.08 * healthcareCostIndex +
-    0.07 * nomadCommunity +
-    0.05 * internet +
-    0.05 * workInfrastructure +
-    0.03 * airQualityIndex +
-    0.02 * startupEcosystemScore;
 
-const bestForRemoteWorkSetup =
-    0.30 * internet +
-    0.20 * workInfrastructure +
-    0.15 * nomadCommunity +
-    0.10 * costOfLiving +
-    0.10 * airportConnectivity +
-    0.15 * directInternationalFlights;
-
-const cheapestPlaces =
-    0.50 * costOfLiving +
-    0.10 * internet +
-    0.10 * workInfrastructure +
-    0.10 * nomadCommunity +
-    0.10 * airportConnectivity +
-    0.10 * directInternationalFlights;
-
-const bestConnectedCities =
-    0.35 * directInternationalFlights +
-    0.30 * airportConnectivity +
-    0.10 * internet +
-    0.10 * workInfrastructure +
-    0.10 * nomadCommunity +
-    0.05 * costOfLiving;
-
-// Financial Factors
-const maximumSavings =
-    0.30 * costOfLiving +
-    0.20 * taxFriendly +
-    0.20 * purchasingPower +
-    0.10 * inflationStability +
-    0.10 * healthcareCostIndex +
-    0.10 * startupSetupCost;
-
-const lowTaxation =
-    0.35 * taxFriendly +
-    0.20 * costOfLiving +
-    0.20 * purchasingPower +
-    0.10 * inflationStability +
-    0.10 * healthcareCostIndex +
-    0.05 * startupSetupCost;
-
-const financialStability =
-    0.30 * inflationStability +
-    0.20 * healthcareCostIndex +
-    0.15 * costOfLiving +
-    0.15 * taxFriendly +
-    0.10 * purchasingPower +
-    0.10 * startupSetupCost;
-
-// Lifestyle Factors
-const socialAndPartyLifestyle =
-    0.25 * partyLifestyle +
-    0.20 * nightlife +
-    0.15 * meetupsEvents +
-    0.15 * nomadCommunity +
-    0.10 * soloNomad +
-    0.05 * founderNomads +
-    0.05 * coupleNomads +
-    0.05 * femaleNomads;
-
-const chillAndWellnessLifestyle =
-    0.25 * yoga +
-    0.20 * nature +
-    0.15 * nomadCommunity +
-    0.10 * soloNomad +
-    0.10 * femaleNomads +
-    0.10 * coupleNomads +
-    0.10 * familyNomads;
-
-const adventureAndExploration =
-    0.30 * adventure +
-    0.25 * nature +
-    0.15 * soloNomad +
-    0.10 * nomadCommunity +
-    0.10 * coupleNomads +
-    0.10 * femaleNomads;
-
-const femaleFriendlyLifestyle =
-    0.30 * femaleNomads +
-    0.25 * safety +
-    0.15 * nomadCommunity +
-    0.10 * soloNomad +
-    0.10 * meetupsEvents +
-    0.05 * coupleNomads +
-    0.05 * healthcareCostIndex;
-
-// Career / Startup
-const startupEcosystems =
-    0.30 * startupEcosystemScore +
-    0.20 * ventureCapital +
-    0.15 * incubators +
-    0.15 * techTalentDensity +
-    0.10 * founderNomads +
-    0.10 * conferences;
-
-const remoteJobOpportunities =
-    0.35 * remoteJobs +
-    0.20 * internet +
-    0.15 * workInfrastructure +
-    0.10 * nomadCommunity +
-    0.10 * startupEcosystemScore +
-    0.10 * costOfLiving;
+export const calculateStateWiseScores = (weight = {}) =>
+    Object.fromEntries(
+        Object.entries(STATEWISE_WEIGHT_FORMULAS).map(([formulaName, factors]) => [
+            formulaName,
+            score(weight, factors),
+        ]),
+    );
