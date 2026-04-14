@@ -395,6 +395,7 @@ export const upsertWorldRankingStates = async (req, res, next) => {
   }
 };
 
+// Old one - Works
 export const bulkInsertWorldRankingCsv = async (req, res, next) => {
   try {
     if (!req.file) {
