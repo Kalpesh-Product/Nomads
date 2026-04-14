@@ -1,7 +1,6 @@
 import StateWiseWeight from "../models/StateWiseWeight";
-import { calculateStateWiseScores } from "../utils/formulas"; // <-- Your 37 formulas file
+import { stateWiseWeightCalculation } from "../controllers/stateWiseWeightCalculation.js"; // <-- Your 37 formulas file
 
-// This simply translates your DB keys to the exact keys the company's formula uses
 const FORMULA_KEY_MAP = {
     workInfrastructure: "workInfrastructure",
     internet: "internet",
@@ -20,14 +19,12 @@ const FORMULA_KEY_MAP = {
     founderNomads: "founderNomads",
     yoga: "yoga",
     techTalentDensity: "techTalentDensity",
-
-    // DB Key -> Company Formula Key
     taxFriendly: "lowerTaxesTaxFriendly",
     partyLifestyle: "partyAndEventsNomadTraveller",
     nightlife: "nightlifeAndPubs",
     meetupsEvents: "meetupsAndEvents",
     soloNomad: "soloNomadTraveller",
-    coupleNomads: "coupleNomadTravelletrs", // kept the exact formula key
+    coupleNomads: "coupleNomadTravelletrs",
     femaleNomads: "girlNomadTraveller",
     familyNomads: "familyNomadTraveller",
     nature: "natureNomadTravelling",
@@ -36,6 +33,10 @@ const FORMULA_KEY_MAP = {
     incubators: "startupIncubatorsAndAccelerators",
     conferences: "conferencesAndEvents",
     remoteJobs: "remoteJobAvailability",
+    qualityOfLife: "qualityOfLife",
+    lifestyleEntertainment: "lifestyleEntertainment",
+    climateEnvironment: "climateEnvironment",
+    accessibility: "accessibility",
 };
 
 export const getStateWiseWeight = async (req, res, next) => {
@@ -59,7 +60,7 @@ export const getStateWiseWeight = async (req, res, next) => {
             }, {});
 
             // 2. Run the company's exact calculation
-            plainItem.calculatedScores = calculateStateWiseScores(formattedForFormula);
+            plainItem.calculatedScores = stateWiseWeightCalculation(formattedForFormula);
 
             return plainItem;
         });

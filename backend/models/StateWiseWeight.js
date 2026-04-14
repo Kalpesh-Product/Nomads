@@ -54,6 +54,13 @@ const stateWiseWeightSchema = new mongoose.Schema(
             techTalentDensity: { type: Number, default: 0, required: true },
             conferences: { type: Number, default: 0, required: true },
             remoteJobs: { type: Number, default: 0, required: true },
+
+            // others
+            qualityOfLife: { type: Number, default: 0, required: true },
+            lifestyleEntertainment: { type: Number, default: 0, required: true },
+            climateEnvironment: { type: Number, default: 0, required: true },
+            accessibility: { type: Number, default: 0, required: true },
+
         },
     },
     { timestamps: true }
