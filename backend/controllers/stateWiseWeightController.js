@@ -30,18 +30,12 @@ export const getStateWiseWeight = async (req, res, next) => {
 
             return {
                 state: item.state,
-                weight: item.weight,
-                calculatedScores: allScores
+                [effectiveAttribute]: scoreForSorting
             };
         });
 
-        // 5. Sort by the effective attribute score in descending order
-        results.sort((a, b) => {
-            const scoreA = a.calculatedScores[effectiveAttribute] || 0;
-            const scoreB = b.calculatedScores[effectiveAttribute] || 0;
-            return scoreB - scoreA;
-        });
-
+        // 5. Sort by the requested attribute score in descending order
+        results.sort((a, b) => b[effectiveAttribute] - a[effectiveAttribute]);
 
 
         res.status(200).json({
@@ -50,8 +44,8 @@ export const getStateWiseWeight = async (req, res, next) => {
             selectedAttribute: attribute,
             data: results
         });
+
     } catch (error) {
         next(error);
     }
 };
-
