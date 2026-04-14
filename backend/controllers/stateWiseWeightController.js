@@ -5,7 +5,7 @@ export const getStateWiseWeight = async (req, res, next) => {
     try {
         const stateWiseWeight = await StateWiseWeight.find().populate({
             path: "company",
-            select: "continent, country, state"
+            select: "continent country state city"
         });
 
         const dataWithScores = stateWiseWeight.map(item => {
