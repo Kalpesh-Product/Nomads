@@ -24,6 +24,7 @@ import axios from "../utils/axios";
 import { getCountryNameFromSelectedDestination } from "../utils/selectedDestinationSession";
 import { showErrorAlert } from "../utils/alerts";
 import { HiCheck } from "react-icons/hi";
+import { aiDestinationCards } from "../constants/aiDestinationCards";
 
 const floatingLabelSx = {
   color: "black",
@@ -50,6 +51,7 @@ const defaultValues = {
   fullName: "",
   currentCountry: "",
   consultationCountry: "",
+  consultationState: "",
   contactCode: "",
   contactNumber: "",
   email: "",
@@ -70,6 +72,15 @@ const tickMenuItemSx = {
   "&.Mui-selected:hover .tick-icon": { opacity: 1 },
 };
 
+const formatCountryWithState = (country, state) => {
+  const trimmedCountry = country?.trim() || "";
+  const trimmedState = state?.trim() || "";
+
+  if (!trimmedState) return trimmedCountry;
+
+  return `${trimmedCountry} - ${trimmedState}`;
+};
+
 const AiConsultation = () => {
   const [typedMessage, setTypedMessage] = useState("");
   const [typedPageHeading, setTypedPageHeading] = useState("");
@@ -79,6 +90,21 @@ const AiConsultation = () => {
   const isLoggedIn = Boolean(auth?.user);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const countries = useMemo(() => Country.getAllCountries(), []);
+  const destinationOptions = useMemo(
+    () =>
+      aiDestinationCards.map((destination) => ({
+        state: destination.city,
+        country: destination.country,
+      })),
+    [],
+  );
+  const destinationCountries = useMemo(
+    () =>
+      Array.from(
+        new Set(destinationOptions.map((option) => option.country)),
+      ).sort(),
+    [destinationOptions],
+  );
   const { handleSubmit, control, reset, setValue, watch } = useForm({
     defaultValues,
   });
@@ -95,10 +121,18 @@ const AiConsultation = () => {
 
   const { mutate: submitConsultation } = useMutation({
     mutationFn: async (formValues) => {
-      const response = await axios.post("forms/add-new-b2c-form-submission", {
+      const payload = {
         ...formValues,
+        consultationCountry: formatCountryWithState(
+          formValues.consultationCountry,
+          formValues.consultationState,
+        ),
         sheetName: "AI_Consultation",
-      });
+      };
+      const response = await axios.post(
+        "forms/add-new-b2c-form-submission",
+        payload,
+      );
       return response.data;
     },
     onSuccess: async (data) => {
@@ -159,11 +193,16 @@ const AiConsultation = () => {
     const destinationCountry = getCountryNameFromSelectedDestination(countries);
     if (!destinationCountry || consultationCountry) return;
 
+    const hasDestination = destinationCountries.some(
+      (country) => country === destinationCountry,
+    );
+    if (!hasDestination) return;
+
     setValue("consultationCountry", destinationCountry, {
       shouldDirty: true,
       shouldTouch: true,
     });
-  }, [countries, consultationCountry, setValue]);
+  }, [countries, destinationCountries, consultationCountry, setValue]);
 
   const handleCountryChange = (countryName, onChange) => {
     const country = countries.find((item) => item.name === countryName);
@@ -388,48 +427,110 @@ const AiConsultation = () => {
                   )}
                 />
 
-                <Controller
-                  name="consultationCountry"
-                  control={control}
-                  rules={{ required: "Consultation Country is required" }}
-                  render={({ field, fieldState }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      select
-                      label="Consultation Country"
-                      variant="standard"
-                      error={!!fieldState.error}
-                      helperText={fieldState.error?.message}
-                      InputLabelProps={{ sx: floatingLabelSx }}
-                    >
-                      <MenuItem value="" sx={{ fontWeight: 700 }}>
-                        SELECT COUNTRY
-                      </MenuItem>
-                      {countries.map((country) => (
-                        <MenuItem
-                          key={country.isoCode}
-                          value={country.name}
-                          sx={tickMenuItemSx}
-                        >
-                          <Box className="flex w-full items-center gap-2">
-                            <HiCheck className="tick-icon" size={16} />
-                            <Box className="flex items-center gap-1">
-                              <Box
-                                component="img"
-                                src={getFlagIconUrl(country.isoCode)}
-                                alt={`${country.name} flag`}
-                                sx={{ width: 20, height: 15, flexShrink: 0 }}
-                                loading="lazy"
-                              />
-                              <span>{country.name}</span>
-                            </Box>
-                          </Box>
+                <Box sx={{ display: "flex", gap: 2, width: "100%" }}>
+                  <Controller
+                    name="consultationCountry"
+                    control={control}
+                    rules={{ required: "Consultation Country is required" }}
+                    render={({ field, fieldState }) => (
+                      <TextField
+                        {...field}
+                        fullWidth
+                        select
+                        label="Consultation Country"
+                        variant="standard"
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message}
+                        InputLabelProps={{ sx: floatingLabelSx }}
+                        onChange={(event) => {
+                          field.onChange(event.target.value);
+                          setValue("consultationState", "", {
+                            shouldDirty: true,
+                            shouldTouch: true,
+                          });
+                        }}
+                      >
+                        <MenuItem value="" sx={{ fontWeight: 700 }}>
+                          SELECT COUNTRY
                         </MenuItem>
-                      ))}
-                    </TextField>
-                  )}
-                />
+                        {destinationCountries.map((countryName) => {
+                          const country = countries.find(
+                            (item) => item.name === countryName,
+                          );
+                          if (!country) return null;
+
+                          return (
+                            <MenuItem
+                              key={country.isoCode}
+                              value={country.name}
+                              sx={tickMenuItemSx}
+                            >
+                              <Box className="flex w-full items-center gap-2">
+                                <HiCheck className="tick-icon" size={16} />
+                                <Box className="flex items-center gap-1">
+                                  <Box
+                                    component="img"
+                                    src={getFlagIconUrl(country.isoCode)}
+                                    alt={`${country.name} flag`}
+                                    sx={{
+                                      width: 20,
+                                      height: 15,
+                                      flexShrink: 0,
+                                    }}
+                                    loading="lazy"
+                                  />
+                                  <span>{country.name}</span>
+                                </Box>
+                              </Box>
+                            </MenuItem>
+                          );
+                        })}
+                      </TextField>
+                    )}
+                  />
+
+                  <Controller
+                    name="consultationState"
+                    control={control}
+                    render={({ field, fieldState }) => {
+                      const states = destinationOptions.filter(
+                        (option) => option.country === consultationCountry,
+                      );
+
+                      return (
+                        <TextField
+                          {...field}
+                          fullWidth
+                          select
+                          label="Consultation City / State"
+                          variant="standard"
+                          error={!!fieldState.error}
+                          helperText={fieldState.error?.message}
+                          disabled={!consultationCountry}
+                          InputLabelProps={{ sx: floatingLabelSx }}
+                        >
+                          <MenuItem value="" sx={{ fontWeight: 700 }}>
+                            {consultationCountry
+                              ? "SELECT CITY / STATE"
+                              : "SELECT COUNTRY FIRST"}
+                          </MenuItem>
+                          {states.map((stateOption) => (
+                            <MenuItem
+                              key={`${stateOption.state}-${stateOption.country}`}
+                              value={stateOption.state}
+                              sx={tickMenuItemSx}
+                            >
+                              <Box className="flex w-full items-center gap-2">
+                                <HiCheck className="tick-icon" size={16} />
+                                <span>{stateOption.state}</span>
+                              </Box>
+                            </MenuItem>
+                          ))}
+                        </TextField>
+                      );
+                    }}
+                  />
+                </Box>
 
                 <Box sx={{ display: "flex", gap: 2, width: "100%" }}>
                   <Controller
