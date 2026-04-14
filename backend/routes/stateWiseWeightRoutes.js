@@ -1,8 +1,17 @@
 import { Router } from "express";
-import { getStateWiseWeight } from "../controllers/stateWiseWeightController.js";
+import upload from "../config/multerConfig.js";
+import {
+    bulkInsertStateWiseWeightCsv,
+    getStateWiseWeight,
+} from "../controllers/stateWiseWeightController.js";
 
 const router = Router();
 
 router.post("/", getStateWiseWeight);
+router.post(
+    "/bulk-upload-csv",
+    upload.single("state-wise-weight-file"),
+    bulkInsertStateWiseWeightCsv
+);
 
 export default router;
