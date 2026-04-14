@@ -50,6 +50,8 @@ const CSV_TO_SCHEMA_MAP = {
     healthcarecostindex: "healthcareCostIndex",
 };
 
+// Normalizes raw CSV keys so we can map inconsistent headers safely.
+// Example: "Cost of Living", "cost_of_living" and "Cost-of-Living" become "costofliving".
 const normalize = (row = {}) =>
     Object.fromEntries(
         Object.entries(row).map(([key, value]) => [
@@ -63,23 +65,26 @@ const normalize = (row = {}) =>
         ]),
     );
 
+// Converts CSV values to numbers and defaults invalid/missing values to 0.
 const toNumber = (value) => {
     const num = Number(value);
     return Number.isFinite(num) ? num : 0;
 };
 
 const mapCsvRowToStateWiseWeight = (rawRow = {}) => {
+    // 1) Normalize incoming headers/values first.
     const row = normalize(rawRow);
 
     const continent = row["continent"];
     const country = row["country"];
     const state = row["destination"];
 
-    // Handles the rank whether the CSV header is named "Rank" or is blank ""
+    // 2) Handle rank whether the CSV header is named "Rank" or accidentally blank.
     const rank = toNumber(row["rank"] !== undefined ? row["rank"] : row[""]);
 
     const weight = {};
 
+    // 3) Build the nested weight object from the mapping table.
     for (const [csvKey, schemaKey] of Object.entries(CSV_TO_SCHEMA_MAP)) {
         weight[schemaKey] = toNumber(row[csvKey]);
     }
@@ -119,6 +124,7 @@ export const getStateWiseWeight = async (req, res, next) => {
 
         // 4. Calculate scores for each state and pick the requested attribute
         const results = stateWeights.map(item => {
+            // Compute all derived scores once, then select the requested attribute.
             const allScores = stateWiseWeightCalculation(item.weight);
             const scoreForSorting = allScores[effectiveAttribute] || 0;
 
@@ -155,6 +161,7 @@ export const bulkInsertStateWiseWeightCsv = async (req, res, next) => {
         const rowErrors = [];
         let rowNumber = 1;
 
+        // Parse uploaded CSV buffer row-by-row to avoid loading a separate temp file.
         Readable.from(req.file.buffer.toString("utf-8"))
             .pipe(csvParser())
             .on("data", (rawRow) => {
@@ -181,6 +188,7 @@ export const bulkInsertStateWiseWeightCsv = async (req, res, next) => {
                         });
                     }
 
+                    // Upsert by country + state so repeated imports update existing records.
                     const operations = rows.map((row) => ({
                         updateOne: {
                             filter: { country: row.country, state: row.state },
