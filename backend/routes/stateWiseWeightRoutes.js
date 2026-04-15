@@ -16,6 +16,6 @@ router.post(
     upload.single("state-wise-weight-file"),
     bulkInsertStateWiseWeightCsv
 );
-router.put("/:id", updateStateWiseWeight);
+router.patch("/:id", updateStateWiseWeight);
 
 export default router;
