@@ -142,6 +142,7 @@ export const getStateWiseWeight = async (req, res, next) => {
 
       return {
         state: item.state,
+        country: item.country,
         [effectiveAttribute]: scoreForSorting,
         imageUrl: item.imageUrl,
         costOfLivingPerMonth: item.costOfLivingPerMonth,
