@@ -497,7 +497,7 @@ const AiSearchResults = () => {
             city: existingDestination?.city || rawState,
             displayCity: existingDestination?.displayCity || rawState,
             routeCity: existingDestination?.routeCity || rawState,
-            country: existingDestination?.country || "Unknown",
+            country: existingDestination?.country || item?.country || "Unknown",
             continent: existingDestination?.continent || selectedContinent,
             suggestions: Number(metricValue.toFixed(3)),
             image: existingDestination?.image || "/images/goa-image.jpg",
