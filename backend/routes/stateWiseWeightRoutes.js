@@ -2,11 +2,13 @@ import { Router } from "express";
 import upload from "../config/multerConfig.js";
 import {
     bulkInsertStateWiseWeightCsv,
+    getAllStateWiseWeight,
     getStateWiseWeight,
 } from "../controllers/stateWiseWeightController.js";
 
 const router = Router();
 
+router.get("/", getAllStateWiseWeight);
 router.post("/", getStateWiseWeight);
 router.post(
     "/bulk-upload-csv",

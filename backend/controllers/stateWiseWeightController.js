@@ -149,6 +149,28 @@ export const getStateWiseWeight = async (req, res, next) => {
     }
 };
 
+export const getAllStateWiseWeight = async (req, res, next) => {
+    try {
+        const stateWiseWeight = await StateWiseWeight.find();
+
+        const dataWithScores = stateWiseWeight.map(item => {
+            const plainItem = item.toObject();
+
+            // plainItem.calculatedScores = stateWiseWeightCalculation(plainItem.weight);
+
+            return plainItem;
+        });
+
+        res.status(200).json({
+            success: true,
+            count: dataWithScores.length,
+            data: dataWithScores
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const bulkInsertStateWiseWeightCsv = async (req, res, next) => {
     try {
         if (!req.file) {
