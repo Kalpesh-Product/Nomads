@@ -186,6 +186,40 @@ export const getAllStateWiseWeight = async (req, res, next) => {
     }
 };
 
+export const updateStateWiseWeight = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+
+        if (!id) {
+            return res.status(400).json({
+                success: false,
+                message: "State-wise weight id is required.",
+            });
+        }
+
+        const updatedStateWiseWeight = await StateWiseWeight.findByIdAndUpdate(
+            id,
+            { $set: req.body },
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedStateWiseWeight) {
+            return res.status(404).json({
+                success: false,
+                message: "State-wise weight data not found.",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "State-wise weight data updated successfully.",
+            data: updatedStateWiseWeight,
+        });
+    } catch (error) {
+        return next(error);
+    }
+};
+
 export const bulkInsertStateWiseWeightCsv = async (req, res, next) => {
     try {
         if (!req.file) {

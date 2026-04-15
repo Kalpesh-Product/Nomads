@@ -4,6 +4,7 @@ import {
     bulkInsertStateWiseWeightCsv,
     getAllStateWiseWeight,
     getStateWiseWeight,
+    updateStateWiseWeight,
 } from "../controllers/stateWiseWeightController.js";
 
 const router = Router();
@@ -15,5 +16,6 @@ router.post(
     upload.single("state-wise-weight-file"),
     bulkInsertStateWiseWeightCsv
 );
+router.put("/:id", updateStateWiseWeight);
 
 export default router;
