@@ -20,7 +20,7 @@ import axios from "../utils/axios";
 
 import {
   defaultGoal,
-  getGoalOptionMetricLabel,
+  // getGoalOptionMetricLabel,
   goalFilterMap,
 } from "../constants/aiGoalFilters";
 
@@ -75,6 +75,29 @@ const goalOptionToApiAttributeMap = {
   "Family - Friendly Lifestyle": "familyFriendlyLifestyle",
   "Female Friendly Lifestyle": "femaleFriendlyLifestyle",
   "Solo Nomads": "soloNomads",
+};
+
+const leftBadgeFieldByGoalOption = {
+  "Fast Internet Cities": "internetSpeed",
+  "Clean Air / Environment": "aqiValue",
+  "Low Taxation": "nomadTax",
+  "Cheapest Places": "costOfLivingPerMonth",
+};
+
+const formatLeftBadgeValue = (value) => {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  if (typeof value === "number") {
+    if (Number.isInteger(value)) {
+      return `${value}`;
+    }
+
+    return `${Number(value.toFixed(2))}`;
+  }
+
+  return `${value}`;
 };
 
 const destinationAliasMap = {
@@ -445,13 +468,19 @@ const AiSearchResults = () => {
   }, []);
 
   const rankedDestinations = useMemo(() => {
-    const goalOptionMetricLabel = getGoalOptionMetricLabel(selectedGoalOption);
+    const leftBadgeField = leftBadgeFieldByGoalOption[selectedGoalOption];
 
-    return apiDestinations.map((destination, index) => ({
-      ...destination,
-      rankLabel: `Rank ${index + 1}`,
-      speedLabel: `${destination.suggestions} ${goalOptionMetricLabel}`,
-    }));
+    return apiDestinations.map((destination, index) => {
+      const leftBadgeValue = leftBadgeField
+        ? formatLeftBadgeValue(destination[leftBadgeField])
+        : null;
+
+      return {
+        ...destination,
+        rankLabel: `Rank ${index + 1}`,
+        leftBadgeLabel: leftBadgeValue,
+      };
+    });
   }, [apiDestinations, selectedGoalOption]);
 
   useEffect(() => {
@@ -500,6 +529,10 @@ const AiSearchResults = () => {
             country: existingDestination?.country || item?.country || "Unknown",
             continent: existingDestination?.continent || selectedContinent,
             suggestions: Number(metricValue.toFixed(3)),
+            internetSpeed: item?.internetSpeed,
+            aqiValue: item?.aqiValue,
+            nomadTax: item?.nomadTax,
+            costOfLivingPerMonth: item?.costOfLivingPerMonth,
             image:
               item?.imageUrl ||
               existingDestination?.image ||
@@ -632,8 +665,8 @@ const AiSearchResults = () => {
     }, 120);
   };
 
-  const isPrimaryGoalOptionSelected =
-    hasSelectedGoalOption && selectedGoalOption === goalOptions[0];
+  // const isPrimaryGoalOptionSelected =
+  //   hasSelectedGoalOption && selectedGoalOption === goalOptions[0];
 
   const initialTopHeadingText =
     "Please select one option from each below so that I can display the best curated results.";
@@ -1102,14 +1135,14 @@ const AiSearchResults = () => {
                             />
                             <div
                               className={`pointer-events-none absolute inset-x-0 bottom-0 flex items-end gap-1.5 bg-gradient-to-t from-black/75 via-black/25 to-transparent px-2 py-2 text-white md:gap-3 md:px-4 md:py-3 ${
-                                isPrimaryGoalOptionSelected
-                                  ? "justify-end"
-                                  : "justify-between"
+                                destination.leftBadgeLabel
+                                  ? "justify-between"
+                                  : "justify-end"
                               }`}
                             >
-                              {!isPrimaryGoalOptionSelected && (
+                              {destination.leftBadgeLabel && (
                                 <span className="rounded-full bg-black/45 px-2 py-0.5 text-[0.7rem] font-semibold tracking-wide backdrop-blur-sm md:px-3 md:py-1 md:text-xs">
-                                  {destination.speedLabel}
+                                  {destination.leftBadgeLabel}
                                 </span>
                               )}
                               <span className="rounded-full bg-black/45 px-2 py-0.5 text-[0.7rem] font-semibold tracking-wide backdrop-blur-sm md:px-3 md:py-1 md:text-xs">
