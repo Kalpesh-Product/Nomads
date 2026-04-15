@@ -51,7 +51,6 @@ const CSV_TO_SCHEMA_MAP = {
 };
 
 // Normalizes raw CSV keys so we can map inconsistent headers safely.
-// Example: "Cost of Living", "cost_of_living" and "Cost-of-Living" become "costofliving".
 const normalize = (row = {}) =>
     Object.fromEntries(
         Object.entries(row).map(([key, value]) => [
@@ -72,19 +71,26 @@ const toNumber = (value) => {
 };
 
 const mapCsvRowToStateWiseWeight = (rawRow = {}) => {
-    // 1) Normalize incoming headers/values first.
     const row = normalize(rawRow);
 
     const continent = row["continent"];
     const country = row["country"];
     const state = row["destination"];
 
-    // 2) Handle rank whether the CSV header is named "Rank" or accidentally blank.
+    // Handle your new root-level fields
+    const imageUrl = row["imagelink"]; // matches "Image Link" after normalize
+    const costOfLivingPerMonth = row["costoflivingpermonth"];
+    const internetSpeed = row["internetspeed"];
+    const aqiValue = row["aqivalue"];
+    const nomadTax = row["nomadtax"];
+    const residentTax = row["residenttax"];
+
+    // Handle rank
     const rank = toNumber(row["rank"] !== undefined ? row["rank"] : row[""]);
 
     const weight = {};
 
-    // 3) Build the nested weight object from the mapping table.
+    // Build the nested weight object from the mapping table.
     for (const [csvKey, schemaKey] of Object.entries(CSV_TO_SCHEMA_MAP)) {
         weight[schemaKey] = toNumber(row[csvKey]);
     }
@@ -95,6 +101,12 @@ const mapCsvRowToStateWiseWeight = (rawRow = {}) => {
         state,
         rank,
         weight,
+        imageUrl,
+        costOfLivingPerMonth,
+        internetSpeed,
+        aqiValue,
+        nomadTax,
+        residentTax,
     };
 };
 
@@ -124,13 +136,18 @@ export const getStateWiseWeight = async (req, res, next) => {
 
         // 4. Calculate scores for each state and pick the requested attribute
         const results = stateWeights.map(item => {
-            // Compute all derived scores once, then select the requested attribute.
             const allScores = stateWiseWeightCalculation(item.weight);
             const scoreForSorting = allScores[effectiveAttribute] || 0;
 
             return {
                 state: item.state,
-                [effectiveAttribute]: scoreForSorting
+                [effectiveAttribute]: scoreForSorting,
+                imageUrl: item.imageUrl,
+                costOfLivingPerMonth: item.costOfLivingPerMonth,
+                internetSpeed: item.internetSpeed,
+                aqiValue: item.aqiValue,
+                nomadTax: item.nomadTax,
+                residentTax: item.residentTax,
             };
         });
 
@@ -155,9 +172,7 @@ export const getAllStateWiseWeight = async (req, res, next) => {
 
         const dataWithScores = stateWiseWeight.map(item => {
             const plainItem = item.toObject();
-
             // plainItem.calculatedScores = stateWiseWeightCalculation(plainItem.weight);
-
             return plainItem;
         });
 
@@ -183,7 +198,6 @@ export const bulkInsertStateWiseWeightCsv = async (req, res, next) => {
         const rowErrors = [];
         let rowNumber = 1;
 
-        // Parse uploaded CSV buffer row-by-row to avoid loading a separate temp file.
         Readable.from(req.file.buffer.toString("utf-8"))
             .pipe(csvParser())
             .on("data", (rawRow) => {
@@ -210,14 +224,47 @@ export const bulkInsertStateWiseWeightCsv = async (req, res, next) => {
                         });
                     }
 
-                    // Upsert by country + state so repeated imports update existing records.
-                    const operations = rows.map((row) => ({
-                        updateOne: {
-                            filter: { country: row.country, state: row.state },
-                            update: { $set: row },
-                            upsert: true,
-                        },
-                    }));
+                    // SAFE BULK WRITE LOGIC
+                    const operations = rows.map((row) => {
+
+                        // 1. Always update these core fields
+                        const updateData = {
+                            continent: row.continent,
+                            country: row.country,
+                            state: row.state,
+                            rank: row.rank,
+                            weight: row.weight
+                        };
+
+                        // 2. Conditionally add new fields ONLY if they exist in the CSV.
+                        // This prevents accidentally deleting existing DB data if a CSV column is missing.
+                        if (row.imageUrl !== undefined && row.imageUrl !== null && row.imageUrl !== "") {
+                            updateData.imageUrl = row.imageUrl;
+                        }
+                        if (row.costOfLivingPerMonth !== "") {
+                            updateData.costOfLivingPerMonth = row.costOfLivingPerMonth;
+                        }
+                        if (row.internetSpeed !== "") {
+                            updateData.internetSpeed = row.internetSpeed;
+                        }
+                        if (row.aqiValue !== "") {
+                            updateData.aqiValue = row.aqiValue;
+                        }
+                        if (row.nomadTax !== "") {
+                            updateData.nomadTax = row.nomadTax;
+                        }
+                        if (row.residentTax !== "") {
+                            updateData.residentTax = row.residentTax;
+                        }
+
+                        return {
+                            updateOne: {
+                                filter: { country: row.country, state: row.state },
+                                update: { $set: updateData },
+                                upsert: true,
+                            },
+                        };
+                    });
 
                     const result = await StateWiseWeight.bulkWrite(operations, {
                         ordered: false,

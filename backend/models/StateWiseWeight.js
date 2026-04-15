@@ -20,6 +20,36 @@ const stateWiseWeightSchema = new mongoose.Schema(
             required: true,
         },
 
+        imageUrl: {
+            type: String,
+            required: true,
+        },
+
+        costOfLivingPerMonth: {
+            type: String,
+            required: true,
+        },
+
+        internetSpeed: {
+            type: String,
+            required: true,
+        },
+
+        aqiValue: {
+            type: String,
+            required: true,
+        },
+
+        nomadTax: {
+            type: String,
+            required: true,
+        },
+
+        residentTax: {
+            type: String,
+            required: true,
+        },
+
         weight: {
             // Core Infra
             workInfrastructure: { type: Number, default: 0, required: true },
