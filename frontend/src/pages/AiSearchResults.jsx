@@ -37,7 +37,9 @@ const continentOptions = [
 const destinationCards = aiDestinationCards;
 
 const SEARCH_RESULTS_API_ENDPOINT =
-  "http://localhost:3000/api/state-wise-weight";
+  "https://wononomadsbe.vercel.app/api/state-wise-weight";
+// API_ENDPOINT =
+//   "http://localhost:3000/api/state-wise-weight";
 
 const goalOptionToApiAttributeMap = {
   "Best for Nomads": "bestForNomads",
