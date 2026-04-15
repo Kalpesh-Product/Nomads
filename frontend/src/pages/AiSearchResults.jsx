@@ -16,9 +16,11 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { aiDestinationCards } from "../constants/aiDestinationCards";
 
+import axios from "../utils/axios";
+
 import {
   defaultGoal,
-  getGoalOptionMetricLabel,
+  // getGoalOptionMetricLabel,
   goalFilterMap,
 } from "../constants/aiGoalFilters";
 
@@ -33,6 +35,115 @@ const continentOptions = [
 ];
 
 const destinationCards = aiDestinationCards;
+
+const SEARCH_RESULTS_API_ENDPOINT =
+  "http://localhost:3000/api/state-wise-weight";
+
+const goalOptionToApiAttributeMap = {
+  "Best for Nomads": "bestForNomads",
+  "Most Affordable": "mostAffordable",
+  "Safest Cities": "safestCities",
+  "Easy Visa / Long Stay": "easyVisaLongStay",
+  "Strong Nomad Community": "strongNomadCommunity",
+  "Healthcare Friendly": "healthcareFriendly",
+  "Startup / Business Opportunities": "startupBusinessOpportunities",
+  "Clean Air / Environment": "cleanAirEnvironment",
+  "Best for Remote Work Setup": "bestForRemoteWorkSetup",
+  "Cheapest Places": "cheapestPlaces",
+  "Best Connected Cities (Flights)": "bestConnectedCitiesFlights",
+  "Fast Internet Cities": "fastInternetCities",
+  "Best Work Infrastructure": "bestWorkInfrastructure",
+  "Maximum Savings": "maximumSavings",
+  "Low Taxation": "lowTaxation",
+  "Purchasing Power": "purchasingPower",
+  "Financial Stability(Low Risk)": "financialStabilityLowRisk",
+  "Startup Setup Cost": "startupSetupCost",
+  "Balanced Financial Lifestyle": "balancedFinancialLifestyle",
+  "Startup Ecosystems": "startupEcosystems",
+  "Remote Job Opportunities": "remoteJobOpportunities",
+  "Founder Nomads": "founderNomads",
+  "Tech Talent Density": "techTalentDensity",
+  "Startup Incubators & Accelerators": "startupIncubatorsAccelerators",
+  "Balanced Career Growth": "balancedCareerGrowth",
+  "Venture Capital Presence": "ventureCapitalPresence",
+  "Conferences & Events": "conferencesEvents",
+  "Social & Party Lifestyle": "socialPartyLifestyle",
+  "Chill & Wellness Lifestyle": "chillWellnessLifestyle",
+  "Adventure & Exploration": "adventureExploration",
+  "Nomad Community & Networking": "nomadCommunityNetworking",
+  "Couple - Friendly Lifestyle": "coupleFriendlyLifestyle",
+  "Family - Friendly Lifestyle": "familyFriendlyLifestyle",
+  "Female Friendly Lifestyle": "femaleFriendlyLifestyle",
+  "Solo Nomads": "soloNomads",
+};
+
+const leftBadgeFieldByGoalOption = {
+  "Fast Internet Cities": "internetSpeed",
+  "Clean Air / Environment": "aqiValue",
+  "Low Taxation": "nomadTax",
+  "Cheapest Places": "costOfLivingPerMonth",
+};
+
+const formatLeftBadgeValue = (value) => {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  if (typeof value === "number") {
+    if (Number.isInteger(value)) {
+      return `${value}`;
+    }
+
+    return `${Number(value.toFixed(2))}`;
+  }
+
+  return `${value}`;
+};
+
+const destinationAliasMap = {
+  "Ho Chi Minh": "Ho Chi Minh City",
+  Surigao: "Surigao del Norte",
+  "Las Palmas": "Canary Islands",
+  Florianopolis: "Santa Catarina",
+  "Playa del Carmen": "Quintana Roo",
+  "Cape Town": "Western Cape",
+  Queensland: "Gold Coast",
+  Amsterdam: "North Holland",
+  Tenerife: "Santa Cruz de Tenerife",
+  Casablanca: "Casablanca-Settat",
+  Cairo: "Cairo Governorate",
+  Queenstown: "Otago Region",
+  Giza: "Giza Governorate",
+};
+
+const normalizeDestinationKey = (value = "") =>
+  value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]/g, "");
+
+const toApiAttribute = (goalOption = "") => {
+  if (goalOptionToApiAttributeMap[goalOption]) {
+    return goalOptionToApiAttributeMap[goalOption];
+  }
+
+  const normalized = goalOption
+    .replace(/&/g, " ")
+    .replace(/[^a-zA-Z0-9 ]/g, " ")
+    .split(/\s+/)
+    .filter(Boolean);
+
+  if (!normalized.length) return "";
+
+  return normalized
+    .map((part, index) =>
+      index === 0
+        ? part.toLowerCase()
+        : `${part.charAt(0).toUpperCase()}${part.slice(1).toLowerCase()}`,
+    )
+    .join("");
+};
 
 const INITIAL_VISIBLE_DESTINATIONS = 18;
 const TYPING_INTERVAL_MS = 7;
@@ -335,32 +446,123 @@ const AiSearchResults = () => {
   const hasSelectedGoalOption = Boolean(selectedGoalOption);
   const hasSelectedFilters = hasSelectedContinent && hasSelectedGoalOption;
 
-  const filteredDestinations = useMemo(() => {
-    if (!hasSelectedFilters) {
-      return [];
-    }
+  const [apiDestinations, setApiDestinations] = useState([]);
 
-    if (selectedContinent === "World") {
-      return destinationCards;
-    }
+  const destinationLookup = useMemo(() => {
+    const map = new Map();
 
-    return destinationCards.filter(
-      (destination) => destination.continent === selectedContinent,
-    );
-  }, [hasSelectedFilters, selectedContinent]);
+    destinationCards.forEach((destination) => {
+      const keys = [
+        destination.city,
+        destination.displayCity,
+        destination.routeCity,
+        destinationAliasMap[destination.city],
+      ].filter(Boolean);
+
+      keys.forEach((key) => {
+        map.set(normalizeDestinationKey(key), destination);
+      });
+    });
+
+    return map;
+  }, []);
 
   const rankedDestinations = useMemo(() => {
-    const goalOptionMetricLabel = getGoalOptionMetricLabel(selectedGoalOption);
-    const sortedSpeeds = filteredDestinations
-      .map((destination) => destination.suggestions)
-      .sort((left, right) => right - left);
+    const leftBadgeField = leftBadgeFieldByGoalOption[selectedGoalOption];
 
-    return filteredDestinations.map((destination, index) => ({
-      ...destination,
-      rankLabel: `Rank ${index + 1}`,
-      speedLabel: `${sortedSpeeds[index]} ${goalOptionMetricLabel}`,
-    }));
-  }, [filteredDestinations, selectedGoalOption]);
+    return apiDestinations.map((destination, index) => {
+      const leftBadgeValue = leftBadgeField
+        ? formatLeftBadgeValue(destination[leftBadgeField])
+        : null;
+
+      return {
+        ...destination,
+        rankLabel: `Rank ${index + 1}`,
+        leftBadgeLabel: leftBadgeValue,
+      };
+    });
+  }, [apiDestinations, selectedGoalOption]);
+
+  useEffect(() => {
+    if (!hasSelectedFilters) {
+      setApiDestinations([]);
+      return;
+    }
+
+    let isMounted = true;
+    const controller = new AbortController();
+
+    const fetchRankedDestinations = async () => {
+      try {
+        const response = await axios.post(
+          SEARCH_RESULTS_API_ENDPOINT,
+          {
+            selectionType: selectedGoal,
+            continent: selectedContinent,
+            attribute: toApiAttribute(selectedGoalOption),
+          },
+          { signal: controller.signal },
+        );
+
+        const responseData = response?.data?.data || [];
+        const selectedAttribute = response?.data?.selectedAttribute;
+
+        const mappedDestinations = responseData.map((item) => {
+          const rawState = item?.state || "";
+          const aliasedState = destinationAliasMap[rawState] || rawState;
+          const existingDestination =
+            destinationLookup.get(normalizeDestinationKey(aliasedState)) ||
+            destinationLookup.get(normalizeDestinationKey(rawState));
+
+          const metricValue =
+            typeof item?.[selectedAttribute] === "number"
+              ? item[selectedAttribute]
+              : Object.entries(item).find(
+                  ([, value]) => typeof value === "number",
+                )?.[1] || 0;
+
+          return {
+            ...(existingDestination || {}),
+            city: existingDestination?.city || rawState,
+            displayCity: existingDestination?.displayCity || rawState,
+            routeCity: existingDestination?.routeCity || rawState,
+            country: existingDestination?.country || item?.country || "Unknown",
+            continent: existingDestination?.continent || selectedContinent,
+            suggestions: Number(metricValue.toFixed(3)),
+            internetSpeed: item?.internetSpeed,
+            aqiValue: item?.aqiValue,
+            nomadTax: item?.nomadTax,
+            costOfLivingPerMonth: item?.costOfLivingPerMonth,
+            image:
+              item?.imageUrl ||
+              existingDestination?.image ||
+              "/images/goa-image.jpg",
+          };
+        });
+
+        if (isMounted) {
+          setApiDestinations(mappedDestinations);
+        }
+      } catch {
+        if (!controller.signal.aborted && isMounted) {
+          setApiDestinations([]);
+        }
+      }
+    };
+
+    fetchRankedDestinations();
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
+  }, [
+    destinationLookup,
+    hasSelectedFilters,
+    selectedContinent,
+    selectedGoal,
+    selectedGoalOption,
+  ]);
 
   const searchBarBadges = useMemo(() => {
     const badges = [selectedGoal];
@@ -463,8 +665,8 @@ const AiSearchResults = () => {
     }, 120);
   };
 
-  const isPrimaryGoalOptionSelected =
-    hasSelectedGoalOption && selectedGoalOption === goalOptions[0];
+  // const isPrimaryGoalOptionSelected =
+  //   hasSelectedGoalOption && selectedGoalOption === goalOptions[0];
 
   const initialTopHeadingText =
     "Please select one option from each below so that I can display the best curated results.";
@@ -933,14 +1135,14 @@ const AiSearchResults = () => {
                             />
                             <div
                               className={`pointer-events-none absolute inset-x-0 bottom-0 flex items-end gap-1.5 bg-gradient-to-t from-black/75 via-black/25 to-transparent px-2 py-2 text-white md:gap-3 md:px-4 md:py-3 ${
-                                isPrimaryGoalOptionSelected
-                                  ? "justify-end"
-                                  : "justify-between"
+                                destination.leftBadgeLabel
+                                  ? "justify-between"
+                                  : "justify-end"
                               }`}
                             >
-                              {!isPrimaryGoalOptionSelected && (
+                              {destination.leftBadgeLabel && (
                                 <span className="rounded-full bg-black/45 px-2 py-0.5 text-[0.7rem] font-semibold tracking-wide backdrop-blur-sm md:px-3 md:py-1 md:text-xs">
-                                  {destination.speedLabel}
+                                  {destination.leftBadgeLabel}
                                 </span>
                               )}
                               <span className="rounded-full bg-black/45 px-2 py-0.5 text-[0.7rem] font-semibold tracking-wide backdrop-blur-sm md:px-3 md:py-1 md:text-xs">

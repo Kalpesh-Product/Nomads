@@ -6,214 +6,321 @@ import { Readable } from "stream";
 // --- CSV MAPPING LOGIC ---
 
 const CSV_TO_SCHEMA_MAP = {
-    // Core Infra
-    costofliving: "costOfLiving",
-    internet: "internet",
-    safety: "safety",
-    nomadcommunity: "nomadCommunity",
-    workinfrastructure: "workInfrastructure",
-    qualityoflife: "qualityOfLife",
-    visaflexibility: "visaFlexibility",
-    lifestyleentertainment: "lifestyleEntertainment",
-    climateenvironment: "climateEnvironment",
-    accessibility: "accessibility",
-    airqualityindex: "airQualityIndex",
-    startupecosystemscore: "startupEcosystemScore",
-    airportconnectivity: "airportConnectivity",
-    directinternationalflights: "directInternationalFlights",
+  // Core Infra
+  costofliving: "costOfLiving",
+  internet: "internet",
+  safety: "safety",
+  nomadcommunity: "nomadCommunity",
+  workinfrastructure: "workInfrastructure",
+  qualityoflife: "qualityOfLife",
+  visaflexibility: "visaFlexibility",
+  lifestyleentertainment: "lifestyleEntertainment",
+  climateenvironment: "climateEnvironment",
+  accessibility: "accessibility",
+  airqualityindex: "airQualityIndex",
+  startupecosystemscore: "startupEcosystemScore",
+  airportconnectivity: "airportConnectivity",
+  directinternationalflights: "directInternationalFlights",
 
-    // Financial
-    "lowertaxes-taxfriendly": "taxFriendly",
-    purchasingpower: "purchasingPower",
-    inflationstability: "inflationStability",
-    startupsetupcost: "startupSetupCost",
+  // Financial
+  "lowertaxes-taxfriendly": "taxFriendly",
+  purchasingpower: "purchasingPower",
+  inflationstability: "inflationStability",
+  startupsetupcost: "startupSetupCost",
 
-    // Career / Startup
-    venturecapitalpresence: "ventureCapital",
-    startupincubatorsaccelerators: "incubators",
-    techtalentdensity: "techTalentDensity",
-    conferencesevents: "conferences",
-    remotejobavailability: "remoteJobs",
+  // Career / Startup
+  venturecapitalpresence: "ventureCapital",
+  startupincubatorsaccelerators: "incubators",
+  techtalentdensity: "techTalentDensity",
+  conferencesevents: "conferences",
+  remotejobavailability: "remoteJobs",
 
-    // Lifestyle
-    foundernomads: "founderNomads",
-    meetupsevents: "meetupsEvents",
-    solonomadtraveller: "soloNomad",
-    familynomadtraveller: "familyNomads",
-    girlnomadtraveller: "femaleNomads",
-    couplenomadtravelletrs: "coupleNomads",
-    partyeventsnomadtraveller: "partyLifestyle",
-    naturenomadtravelling: "nature",
-    adventurenomadtravelling: "adventure",
-    nightlifepubs: "nightlife",
-    yoga: "yoga",
-    healthcarecostindex: "healthcareCostIndex",
+  // Lifestyle
+  foundernomads: "founderNomads",
+  meetupsevents: "meetupsEvents",
+  solonomadtraveller: "soloNomad",
+  familynomadtraveller: "familyNomads",
+  girlnomadtraveller: "femaleNomads",
+  couplenomadtravelletrs: "coupleNomads",
+  partyeventsnomadtraveller: "partyLifestyle",
+  naturenomadtravelling: "nature",
+  adventurenomadtravelling: "adventure",
+  nightlifepubs: "nightlife",
+  yoga: "yoga",
+  healthcarecostindex: "healthcareCostIndex",
 };
 
 // Normalizes raw CSV keys so we can map inconsistent headers safely.
-// Example: "Cost of Living", "cost_of_living" and "Cost-of-Living" become "costofliving".
 const normalize = (row = {}) =>
-    Object.fromEntries(
-        Object.entries(row).map(([key, value]) => [
-            String(key || "")
-                .trim()
-                .toLowerCase()
-                .replace(/\s+/g, "")
-                .replace(/[_-]/g, "")
-                .replace(/&/g, ""),
-            typeof value === "string" ? value.trim() : value,
-        ]),
-    );
+  Object.fromEntries(
+    Object.entries(row).map(([key, value]) => [
+      String(key || "")
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, "")
+        .replace(/[_-]/g, "")
+        .replace(/&/g, ""),
+      typeof value === "string" ? value.trim() : value,
+    ]),
+  );
 
 // Converts CSV values to numbers and defaults invalid/missing values to 0.
 const toNumber = (value) => {
-    const num = Number(value);
-    return Number.isFinite(num) ? num : 0;
+  const num = Number(value);
+  return Number.isFinite(num) ? num : 0;
 };
 
 const mapCsvRowToStateWiseWeight = (rawRow = {}) => {
-    // 1) Normalize incoming headers/values first.
-    const row = normalize(rawRow);
+  const row = normalize(rawRow);
 
-    const continent = row["continent"];
-    const country = row["country"];
-    const state = row["destination"];
+  const continent = row["continent"];
+  const country = row["country"];
+  const state = row["destination"];
 
-    // 2) Handle rank whether the CSV header is named "Rank" or accidentally blank.
-    const rank = toNumber(row["rank"] !== undefined ? row["rank"] : row[""]);
+  // Handle your new root-level fields
+  const imageUrl = row["imagelink"]; // matches "Image Link" after normalize
+  const costOfLivingPerMonth = row["costoflivingpermonth"];
+  const internetSpeed = row["internetspeed"];
+  const aqiValue = row["aqivalue"];
+  const nomadTax = row["nomadtax"];
+  const residentTax = row["residenttax"];
 
-    const weight = {};
+  // Handle rank
+  const rank = toNumber(row["rank"] !== undefined ? row["rank"] : row[""]);
 
-    // 3) Build the nested weight object from the mapping table.
-    for (const [csvKey, schemaKey] of Object.entries(CSV_TO_SCHEMA_MAP)) {
-        weight[schemaKey] = toNumber(row[csvKey]);
-    }
+  const weight = {};
 
-    return {
-        continent,
-        country,
-        state,
-        rank,
-        weight,
-    };
+  // Build the nested weight object from the mapping table.
+  for (const [csvKey, schemaKey] of Object.entries(CSV_TO_SCHEMA_MAP)) {
+    weight[schemaKey] = toNumber(row[csvKey]);
+  }
+
+  return {
+    continent,
+    country,
+    state,
+    rank,
+    weight,
+    imageUrl,
+    costOfLivingPerMonth,
+    internetSpeed,
+    aqiValue,
+    nomadTax,
+    residentTax,
+  };
 };
-
 
 // --- CONTROLLERS ---
 
 export const getStateWiseWeight = async (req, res, next) => {
-    try {
-        const { selectionType, continent, attribute = "bestForNomads" } = req.body;
+  try {
+    const { selectionType, continent, attribute = "bestForNomads" } = req.body;
 
-        let query = {};
+    let query = {};
 
-        // 1. Resolve effective attribute based on selectionType
-        let effectiveAttribute = attribute;
-        if (selectionType === "Work From Anywhere") {
-            if (attribute === "strongNomadCommunity") effectiveAttribute = "strongNomadCommunityWFA";
-            if (attribute === "bestWorkInfrastructure") effectiveAttribute = "bestWorkInfrastructureWFA";
-        }
-
-        // 2. Filter by continent if provided and not "World"
-        if (continent && continent.toLowerCase() !== "world") {
-            query.continent = { $regex: new RegExp(`^${continent}$`, "i") };
-        }
-
-        // 3. Fetch state weights based on query
-        const stateWeights = await StateWiseWeight.find(query).lean();
-
-        // 4. Calculate scores for each state and pick the requested attribute
-        const results = stateWeights.map(item => {
-            // Compute all derived scores once, then select the requested attribute.
-            const allScores = stateWiseWeightCalculation(item.weight);
-            const scoreForSorting = allScores[effectiveAttribute] || 0;
-
-            return {
-                state: item.state,
-                [effectiveAttribute]: scoreForSorting
-            };
-        });
-
-        // 5. Sort by the requested attribute score in descending order
-        results.sort((a, b) => b[effectiveAttribute] - a[effectiveAttribute]);
-
-        res.status(200).json({
-            success: true,
-            count: results.length,
-            selectedAttribute: attribute,
-            data: results
-        });
-
-    } catch (error) {
-        next(error);
+    // 1. Resolve effective attribute based on selectionType
+    let effectiveAttribute = attribute;
+    if (selectionType === "Work From Anywhere") {
+      if (attribute === "strongNomadCommunity")
+        effectiveAttribute = "strongNomadCommunityWFA";
+      if (attribute === "bestWorkInfrastructure")
+        effectiveAttribute = "bestWorkInfrastructureWFA";
     }
+
+    // 2. Filter by continent if provided and not "World"
+    if (continent && continent.toLowerCase() !== "world") {
+      query.continent = { $regex: new RegExp(`^${continent}$`, "i") };
+    }
+
+    // 3. Fetch state weights based on query
+    const stateWeights = await StateWiseWeight.find(query).lean();
+
+    // 4. Calculate scores for each state and pick the requested attribute
+    const results = stateWeights.map((item) => {
+      const allScores = stateWiseWeightCalculation(item.weight);
+      const scoreForSorting = allScores[effectiveAttribute] || 0;
+
+      return {
+        state: item.state,
+        country: item.country,
+        [effectiveAttribute]: scoreForSorting,
+        imageUrl: item.imageUrl,
+        costOfLivingPerMonth: item.costOfLivingPerMonth,
+        internetSpeed: item.internetSpeed,
+        aqiValue: item.aqiValue,
+        nomadTax: item.nomadTax,
+        residentTax: item.residentTax,
+      };
+    });
+
+    // 5. Sort by the requested attribute score in descending order
+    results.sort((a, b) => b[effectiveAttribute] - a[effectiveAttribute]);
+
+    res.status(200).json({
+      success: true,
+      count: results.length,
+      selectedAttribute: attribute,
+      data: results,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getAllStateWiseWeight = async (req, res, next) => {
+  try {
+    const stateWiseWeight = await StateWiseWeight.find();
+
+    const dataWithScores = stateWiseWeight.map((item) => {
+      const plainItem = item.toObject();
+      // plainItem.calculatedScores = stateWiseWeightCalculation(plainItem.weight);
+      return plainItem;
+    });
+
+    res.status(200).json({
+      success: true,
+      count: dataWithScores.length,
+      data: dataWithScores,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateStateWiseWeight = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "State-wise weight id is required.",
+      });
+    }
+
+    const updatedStateWiseWeight = await StateWiseWeight.findByIdAndUpdate(
+      id,
+      { $set: req.body },
+      { new: true, runValidators: true },
+    );
+
+    if (!updatedStateWiseWeight) {
+      return res.status(404).json({
+        success: false,
+        message: "State-wise weight data not found.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "State-wise weight data updated successfully.",
+      data: updatedStateWiseWeight,
+    });
+  } catch (error) {
+    return next(error);
+  }
 };
 
 export const bulkInsertStateWiseWeightCsv = async (req, res, next) => {
-    try {
-        if (!req.file) {
-            return res.status(400).json({
-                message: "Please upload a CSV file using field state-wise-weight-file.",
-            });
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        message: "Please upload a CSV file using field state-wise-weight-file.",
+      });
+    }
+
+    const rows = [];
+    const rowErrors = [];
+    let rowNumber = 1;
+
+    Readable.from(req.file.buffer.toString("utf-8"))
+      .pipe(csvParser())
+      .on("data", (rawRow) => {
+        rowNumber += 1;
+
+        const row = mapCsvRowToStateWiseWeight(rawRow);
+
+        if (!row.continent || !row.country || !row.state || !row.rank) {
+          rowErrors.push({
+            rowNumber,
+            reason: "Missing required fields: continent/country/state/rank",
+          });
+          return;
         }
 
-        const rows = [];
-        const rowErrors = [];
-        let rowNumber = 1;
-
-        // Parse uploaded CSV buffer row-by-row to avoid loading a separate temp file.
-        Readable.from(req.file.buffer.toString("utf-8"))
-            .pipe(csvParser())
-            .on("data", (rawRow) => {
-                rowNumber += 1;
-
-                const row = mapCsvRowToStateWiseWeight(rawRow);
-
-                if (!row.continent || !row.country || !row.state || !row.rank) {
-                    rowErrors.push({
-                        rowNumber,
-                        reason: "Missing required fields: continent/country/state/rank",
-                    });
-                    return;
-                }
-
-                rows.push(row);
-            })
-            .on("end", async () => {
-                try {
-                    if (!rows.length) {
-                        return res.status(400).json({
-                            message: "No valid rows were found in CSV.",
-                            rowErrors,
-                        });
-                    }
-
-                    // Upsert by country + state so repeated imports update existing records.
-                    const operations = rows.map((row) => ({
-                        updateOne: {
-                            filter: { country: row.country, state: row.state },
-                            update: { $set: row },
-                            upsert: true,
-                        },
-                    }));
-
-                    const result = await StateWiseWeight.bulkWrite(operations, {
-                        ordered: false,
-                    });
-
-                    return res.status(200).json({
-                        message: "State-wise weight CSV imported successfully.",
-                        processedRows: rows.length,
-                        rowErrors,
-                        matchedCount: result.matchedCount,
-                        modifiedCount: result.modifiedCount,
-                        upsertedCount: result.upsertedCount,
-                    });
-                } catch (error) {
-                    return next(error);
-                }
+        rows.push(row);
+      })
+      .on("end", async () => {
+        try {
+          if (!rows.length) {
+            return res.status(400).json({
+              message: "No valid rows were found in CSV.",
+              rowErrors,
             });
-    } catch (error) {
-        next(error);
-    }
+          }
+
+          // SAFE BULK WRITE LOGIC
+          const operations = rows.map((row) => {
+            // 1. Always update these core fields
+            const updateData = {
+              continent: row.continent,
+              country: row.country,
+              state: row.state,
+              rank: row.rank,
+              weight: row.weight,
+            };
+
+            // 2. Conditionally add new fields ONLY if they exist in the CSV.
+            // This prevents accidentally deleting existing DB data if a CSV column is missing.
+            if (
+              row.imageUrl !== undefined &&
+              row.imageUrl !== null &&
+              row.imageUrl !== ""
+            ) {
+              updateData.imageUrl = row.imageUrl;
+            }
+            if (row.costOfLivingPerMonth !== "") {
+              updateData.costOfLivingPerMonth = row.costOfLivingPerMonth;
+            }
+            if (row.internetSpeed !== "") {
+              updateData.internetSpeed = row.internetSpeed;
+            }
+            if (row.aqiValue !== "") {
+              updateData.aqiValue = row.aqiValue;
+            }
+            if (row.nomadTax !== "") {
+              updateData.nomadTax = row.nomadTax;
+            }
+            if (row.residentTax !== "") {
+              updateData.residentTax = row.residentTax;
+            }
+
+            return {
+              updateOne: {
+                filter: { country: row.country, state: row.state },
+                update: { $set: updateData },
+                upsert: true,
+              },
+            };
+          });
+
+          const result = await StateWiseWeight.bulkWrite(operations, {
+            ordered: false,
+          });
+
+          return res.status(200).json({
+            message: "State-wise weight CSV imported successfully.",
+            processedRows: rows.length,
+            rowErrors,
+            matchedCount: result.matchedCount,
+            modifiedCount: result.modifiedCount,
+            upsertedCount: result.upsertedCount,
+          });
+        } catch (error) {
+          return next(error);
+        }
+      });
+  } catch (error) {
+    next(error);
+  }
 };
