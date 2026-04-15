@@ -500,7 +500,10 @@ const AiSearchResults = () => {
             country: existingDestination?.country || item?.country || "Unknown",
             continent: existingDestination?.continent || selectedContinent,
             suggestions: Number(metricValue.toFixed(3)),
-            image: existingDestination?.image || "/images/goa-image.jpg",
+            image:
+              item?.imageUrl ||
+              existingDestination?.image ||
+              "/images/goa-image.jpg",
           };
         });
 
