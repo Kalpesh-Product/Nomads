@@ -36,10 +36,10 @@ const continentOptions = [
 
 const destinationCards = aiDestinationCards;
 
-// const SEARCH_RESULTS_API_ENDPOINT =
-//   "https://wononomadsbe.vercel.app/api/state-wise-weight";
 const SEARCH_RESULTS_API_ENDPOINT =
-  "http://localhost:3000/api/state-wise-weight";
+  "https://wononomadsbe.vercel.app/api/state-wise-weight";
+// const SEARCH_RESULTS_API_ENDPOINT =
+//   "http://localhost:3000/api/state-wise-weight";
 
 const goalOptionToApiAttributeMap = {
   "Best for Nomads": "bestForNomads",
@@ -328,10 +328,11 @@ const DropdownBadge = ({
       <button
         type="button"
         onClick={onToggle}
-        className={`flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${isOpen
+        className={`flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${
+          isOpen
             ? "border-sky-500 bg-sky-500 text-white"
             : "border-black/20 bg-white text-black/85 hover:border-sky-500"
-          }`}
+        }`}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
       >
@@ -359,20 +360,22 @@ const DropdownBadge = ({
                   <button
                     type="button"
                     onClick={() => onSelect(option)}
-                    className={`group flex w-full items-center rounded-xl px-4 py-2 text-left text-sm transition-colors ${isSelected
+                    className={`group flex w-full items-center rounded-xl px-4 py-2 text-left text-sm transition-colors ${
+                      isSelected
                         ? "bg-sky-50 font-medium text-sky-600"
                         : "text-black/80 hover:bg-slate-50"
-                      }`}
+                    }`}
                     role="option"
                     aria-selected={isSelected}
                   >
                     <span className="mr-2 inline-flex w-4 shrink-0 items-center justify-center">
                       <FaCheck
                         size={13}
-                        className={`shrink-0 text-primary-blue transition-opacity ${isSelected
+                        className={`shrink-0 text-primary-blue transition-opacity ${
+                          isSelected
                             ? "opacity-100"
                             : "opacity-0 group-hover:opacity-100"
-                          }`}
+                        }`}
                         aria-hidden="true"
                       />
                     </span>
@@ -402,9 +405,9 @@ const AiSearchResults = () => {
     : "/search/results";
   const goalOptions = goalFilterMap[selectedGoal] || goalFilterMap[defaultGoal];
   const getPersistedGoal = () => {
-    if (typeof window === "undefined") return null;
-    return localStorage.getItem(SEARCH_RESULTS_GOAL_STORAGE_KEY);
-  },
+      if (typeof window === "undefined") return null;
+      return localStorage.getItem(SEARCH_RESULTS_GOAL_STORAGE_KEY);
+    },
     getPersistedSelectionSignature = () => {
       if (typeof window === "undefined") return null;
       return localStorage.getItem(
@@ -517,8 +520,8 @@ const AiSearchResults = () => {
             typeof item?.[selectedAttribute] === "number"
               ? item[selectedAttribute]
               : Object.entries(item).find(
-                ([, value]) => typeof value === "number",
-              )?.[1] || 0;
+                  ([, value]) => typeof value === "number",
+                )?.[1] || 0;
 
           return {
             ...(existingDestination || {}),
@@ -1122,10 +1125,11 @@ const AiSearchResults = () => {
                       {visibleDestinations.map((destination, index) => (
                         <article
                           key={`${destination.city}-${destination.country}`}
-                          className={`cursor-pointer transition-all duration-300 ${index < visibleDestinationCount
+                          className={`cursor-pointer transition-all duration-300 ${
+                            index < visibleDestinationCount
                               ? "translate-y-0 opacity-100"
                               : "pointer-events-none translate-y-2 opacity-0"
-                            }`}
+                          }`}
                           role="button"
                           tabIndex={0}
                           onClick={() => handleDestinationClick(destination)}
@@ -1143,10 +1147,11 @@ const AiSearchResults = () => {
                               className="aspect-square w-full rounded-xl object-cover md:rounded-2xl"
                             />
                             <div
-                              className={`pointer-events-none absolute inset-x-0 bottom-0 flex items-end gap-1.5 bg-gradient-to-t from-black/75 via-black/25 to-transparent px-2 py-2 text-white md:gap-3 md:px-4 md:py-3 ${destination.leftBadgeLabel
+                              className={`pointer-events-none absolute inset-x-0 bottom-0 flex items-end gap-1.5 bg-gradient-to-t from-black/75 via-black/25 to-transparent px-2 py-2 text-white md:gap-3 md:px-4 md:py-3 ${
+                                destination.leftBadgeLabel
                                   ? "justify-between"
                                   : "justify-end"
-                                }`}
+                              }`}
                             >
                               {destination.leftBadgeLabel && (
                                 <span className="rounded-full bg-black/45 px-2 py-0.5 text-[0.7rem] font-semibold tracking-wide backdrop-blur-sm md:px-3 md:py-1 md:text-xs">
