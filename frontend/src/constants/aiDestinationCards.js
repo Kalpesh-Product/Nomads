@@ -462,11 +462,18 @@ const destinationCardShortNames = {
   "Egypt|Giza Governorate": "Giza",
 };
 
+const countryCardShortNames = {
+  "United Arab Emirates": "UAE",
+  "Czech Republic": "Czechia",
+};
+
 export const aiDestinationCards = destinations.map(
   ([city, country, continent], index) => ({
     city,
     displayCity: destinationCardShortNames[`${country}|${city}`] || city,
-    routeCity: destinationCardShortNames[`${country}|${city}`] || city,
+    routeCity: city,
+    displayCountry: countryCardShortNames[country] || country,
+    routeCountry: country,
     country,
     continent,
     suggestions: 102 - (index % 30),
