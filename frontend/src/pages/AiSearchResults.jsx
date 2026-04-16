@@ -528,6 +528,16 @@ const AiSearchResults = () => {
             city: existingDestination?.city || rawState,
             displayCity: existingDestination?.displayCity || rawState,
             routeCity: existingDestination?.routeCity || rawState,
+            displayCountry:
+              existingDestination?.displayCountry ||
+              existingDestination?.country ||
+              item?.country ||
+              "Unknown",
+            routeCountry:
+              existingDestination?.routeCountry ||
+              existingDestination?.country ||
+              item?.country ||
+              "Unknown",
             country: existingDestination?.country || item?.country || "Unknown",
             continent: existingDestination?.continent || selectedContinent,
             suggestions: Number(metricValue.toFixed(3)),
@@ -596,7 +606,8 @@ const AiSearchResults = () => {
     !showAllDestinations;
 
   const handleDestinationClick = (destination) => {
-    const country = destination.country.toLowerCase();
+    const routeCountry = destination.routeCountry || destination.country;
+    const country = routeCountry.toLowerCase();
     const selectedLocationLabel = destination.displayCity || destination.city;
     const selectedLocationParam = (
       destination.routeCity || destination.city
@@ -1160,7 +1171,8 @@ const AiSearchResults = () => {
                             </div>
 
                             <p className="truncate text-[0.8rem] font-semibold leading-tight text-black/90  md:text-[1.2rem]">
-                              {destination.country}
+                              {destination.displayCountry ||
+                                destination.country}
                             </p>
                           </div>
                           <div>
