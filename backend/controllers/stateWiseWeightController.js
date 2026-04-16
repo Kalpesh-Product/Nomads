@@ -50,6 +50,50 @@ const CSV_TO_SCHEMA_MAP = {
   healthcarecostindex: "healthcareCostIndex",
 };
 
+const CSV_TO_LABEL_MAP = {
+  "labelcostoflivingpermonth": "labelCostOfLivingPerMonth",
+  "labelinternetspeed": "labelInternetSpeed",
+  "labelaqivalue": "labelAqiValue",
+  "labelnomadtax": "labelNomadTax",
+  "labelresidenttax": "labelResidentTax",
+  "labelmostaffordable": "labelMostAffordable",
+  "labelsafestcities": "labelSafestCities",
+  "labeleasyvisa": "labelEasyVisa",
+  "labelstrongnomadcommunity": "labelStrongNomadCommunity",
+  "labelhealthcarefriendly": "labelHealthcareFriendly",
+  "labelstartupbusinessopportunities": "labelStartupBusinessOpportunities",
+  "labelcleanairenvironment": "labelCleanAirEnvironment",
+  "labelbestworkinfrastructure": "labelBestWorkInfrastructure",
+  "labelcheapestplaces": "labelCheapestPlaces",
+  "labelbestconnectedcitiesflights": "labelBestConnectedCitiesFlights",
+  "labelstrongnomadcommunitywfa": "labelStrongNomadCommunityWfa",
+  "labelfastinternetcities": "labelFastInternetCities",
+  "labelbestworkinfrastructurewfa": "labelBestWorkInfrastructureWfa",
+  "labelmaximumsavings": "labelMaximumSavings",
+  "labellowtaxation": "labelLowTaxation",
+  "labelpurchasingpower": "labelPurchasingPower",
+  "labelfinancialstability": "labelFinancialStability",
+  "labelstartupsetupcost": "labelStartupSetupCost",
+  "labelbalancedfinanciallifestyle": "labelBalancedFinancialLifestyle",
+  "labelsocialpartylifestyle": "labelSocialPartyLifestyle",
+  "labelchillwellnesslifestyle": "labelChillWellnessLifestyle",
+  "labeladventureexploration": "labelAdventureExploration",
+  "labelnomadcommunitynetworking": "labelNomadCommunityNetworking",
+  "labelcouplefriendlylifestyle": "labelCoupleFriendlyLifestyle",
+  "labelfamilyfriendlylifestyle": "labelFamilyFriendlyLifestyle",
+  "labelfemalefriendlylifestyle": "labelFemaleFriendlyLifestyle",
+  "labelfoundernomads": "labelFounderNomads",
+  "labelsolonamads": "labelSoloNomads",
+  "labelstartupecosystems": "labelStartupEcosystems",
+  "labelremotejobopportunities": "labelRemoteJobOpportunities",
+  "labelfoundernomadsayc": "labelFounderNomadsAyc",
+  "labeltechtalentdensity": "labelTechTalentDensity",
+  "labelstartupincubatorsaccelerators": "labelStartupIncubatorsAccelerators",
+  "labelbalancedcareergrowth": "labelBalancedCareerGrowth",
+  "labelventurecapitalpresence": "labelVentureCapitalPresence",
+  "labelconferencesevents": "labelConferencesEvents",
+};
+
 // Normalizes raw CSV keys so we can map inconsistent headers safely.
 const normalize = (row = {}) =>
   Object.fromEntries(
@@ -79,11 +123,6 @@ const mapCsvRowToStateWiseWeight = (rawRow = {}) => {
 
   // Handle your new root-level fields
   const imageUrl = row["imagelink"]; // matches "Image Link" after normalize
-  const costOfLivingPerMonth = row["costoflivingpermonth"];
-  const internetSpeed = row["internetspeed"];
-  const aqiValue = row["aqivalue"];
-  const nomadTax = row["nomadtax"];
-  const residentTax = row["residenttax"];
 
   // Handle rank
   const rank = toNumber(row["rank"] !== undefined ? row["rank"] : row[""]);
@@ -95,6 +134,12 @@ const mapCsvRowToStateWiseWeight = (rawRow = {}) => {
     weight[schemaKey] = toNumber(row[csvKey]);
   }
 
+  const labels = {};
+
+  for (const [csvKey, schemaKey] of Object.entries(CSV_TO_LABEL_MAP)) {
+    labels[schemaKey] = row[csvKey];
+  }
+
   return {
     continent,
     country,
@@ -102,11 +147,7 @@ const mapCsvRowToStateWiseWeight = (rawRow = {}) => {
     rank,
     weight,
     imageUrl,
-    costOfLivingPerMonth,
-    internetSpeed,
-    aqiValue,
-    nomadTax,
-    residentTax,
+    labels,
   };
 };
 
@@ -143,13 +184,10 @@ export const getStateWiseWeight = async (req, res, next) => {
       return {
         state: item.state,
         country: item.country,
+        isActive: item.isActive,
         [effectiveAttribute]: scoreForSorting,
         imageUrl: item.imageUrl,
-        costOfLivingPerMonth: item.costOfLivingPerMonth,
-        internetSpeed: item.internetSpeed,
-        aqiValue: item.aqiValue,
-        nomadTax: item.nomadTax,
-        residentTax: item.residentTax,
+        labels: item.labels,
       };
     });
 
@@ -173,7 +211,7 @@ export const getAllStateWiseWeight = async (req, res, next) => {
 
     const dataWithScores = stateWiseWeight.map((item) => {
       const plainItem = item.toObject();
-      // plainItem.calculatedScores = stateWiseWeightCalculation(plainItem.weight);
+      plainItem.calculatedScores = stateWiseWeightCalculation(plainItem.weight);
       return plainItem;
     });
 
@@ -268,6 +306,7 @@ export const bulkInsertStateWiseWeightCsv = async (req, res, next) => {
               state: row.state,
               rank: row.rank,
               weight: row.weight,
+              labels: row.labels,
             };
 
             // 2. Conditionally add new fields ONLY if they exist in the CSV.
@@ -278,21 +317,6 @@ export const bulkInsertStateWiseWeightCsv = async (req, res, next) => {
               row.imageUrl !== ""
             ) {
               updateData.imageUrl = row.imageUrl;
-            }
-            if (row.costOfLivingPerMonth !== "") {
-              updateData.costOfLivingPerMonth = row.costOfLivingPerMonth;
-            }
-            if (row.internetSpeed !== "") {
-              updateData.internetSpeed = row.internetSpeed;
-            }
-            if (row.aqiValue !== "") {
-              updateData.aqiValue = row.aqiValue;
-            }
-            if (row.nomadTax !== "") {
-              updateData.nomadTax = row.nomadTax;
-            }
-            if (row.residentTax !== "") {
-              updateData.residentTax = row.residentTax;
             }
 
             return {

@@ -25,29 +25,53 @@ const stateWiseWeightSchema = new mongoose.Schema(
             required: true,
         },
 
-        costOfLivingPerMonth: {
-            type: String,
-            required: true,
+        isActive: {
+            type: Boolean,
+            default: true,
         },
 
-        internetSpeed: {
-            type: String,
-            required: true,
-        },
-
-        aqiValue: {
-            type: String,
-            required: true,
-        },
-
-        nomadTax: {
-            type: String,
-            required: true,
-        },
-
-        residentTax: {
-            type: String,
-            required: true,
+        labels: {
+            labelCostOfLivingPerMonth: { type: String, required: true, },
+            labelInternetSpeed: { type: String, required: true, },
+            labelAqiValue: { type: String, required: true, },
+            labelNomadTax: { type: String, required: true, },
+            labelResidentTax: { type: String, required: true, },
+            labelMostAffordable: { type: String, required: true },
+            labelSafestCities: { type: String, required: true },
+            labelEasyVisa: { type: String, required: true },
+            labelStrongNomadCommunity: { type: String, required: true },
+            labelHealthcareFriendly: { type: String, required: true },
+            labelStartupBusinessOpportunities: { type: String, required: true },
+            labelCleanAirEnvironment: { type: String, required: true },
+            labelBestWorkInfrastructure: { type: String, required: true },
+            labelCheapestPlaces: { type: String, required: true },
+            labelBestConnectedCitiesFlights: { type: String, required: true },
+            labelStrongNomadCommunityWfa: { type: String, required: true },
+            labelFastInternetCities: { type: String, required: true },
+            labelBestWorkInfrastructureWfa: { type: String, required: true },
+            labelMaximumSavings: { type: String, required: true },
+            labelLowTaxation: { type: String, required: true },
+            labelPurchasingPower: { type: String, required: true },
+            labelFinancialStability: { type: String, required: true },
+            labelStartupSetupCost: { type: String, required: true },
+            labelBalancedFinancialLifestyle: { type: String, required: true },
+            labelSocialPartyLifestyle: { type: String, required: true },
+            labelChillWellnessLifestyle: { type: String, required: true },
+            labelAdventureExploration: { type: String, required: true },
+            labelNomadCommunityNetworking: { type: String, required: true },
+            labelCoupleFriendlyLifestyle: { type: String, required: true },
+            labelFamilyFriendlyLifestyle: { type: String, required: true },
+            labelFemaleFriendlyLifestyle: { type: String, required: true },
+            labelFounderNomads: { type: String, required: true },
+            labelSoloNomads: { type: String, required: true },
+            labelStartupEcosystems: { type: String, required: true },
+            labelRemoteJobOpportunities: { type: String, required: true },
+            labelFounderNomadsAyc: { type: String, required: true },
+            labelTechTalentDensity: { type: String, required: true },
+            labelStartupIncubatorsAccelerators: { type: String, required: true },
+            labelBalancedCareerGrowth: { type: String, required: true },
+            labelVentureCapitalPresence: { type: String, required: true },
+            labelConferencesEvents: { type: String, required: true },
         },
 
         weight: {
