@@ -36,11 +36,6 @@ const continentOptions = [
 
 const destinationCards = aiDestinationCards;
 
-const SEARCH_RESULTS_API_ENDPOINT =
-  "https://wononomadsbe.vercel.app/api/state-wise-weight";
-// const SEARCH_RESULTS_API_ENDPOINT =
-//   "http://localhost:3000/api/state-wise-weight";
-
 const goalOptionToApiAttributeMap = {
   "Best for Nomads": "bestForNomads",
   "Most Affordable": "mostAffordable",
@@ -497,7 +492,7 @@ const AiSearchResults = () => {
     const fetchRankedDestinations = async () => {
       try {
         const response = await axios.post(
-          SEARCH_RESULTS_API_ENDPOINT,
+          "/state-wise-weight",
           {
             selectionType: selectedGoal,
             continent: selectedContinent,
