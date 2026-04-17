@@ -81,6 +81,17 @@ const leftBadgeFieldByGoalOption = {
   "Cheapest Places": "costOfLivingPerMonth",
 };
 
+const leftBadgeLabelFieldByGoalOption = {
+  "Easy Visa / Long Stay": "labelEasyVisa",
+  "Best for Remote Work Setup": "labelBestWorkInfrastructureWfa",
+  "Financial Stability (Low Risk)": "labelFinancialStability",
+};
+
+const toLabelFieldKey = (apiAttribute = "") =>
+  apiAttribute
+    ? `label${apiAttribute.charAt(0).toUpperCase()}${apiAttribute.slice(1)}`
+    : "";
+
 const formatLeftBadgeValue = (value) => {
   if (value === null || value === undefined || value === "") {
     return null;
@@ -121,11 +132,14 @@ const normalizeDestinationKey = (value = "") =>
     .replace(/[^a-z0-9]/g, "");
 
 const toApiAttribute = (goalOption = "") => {
-  if (goalOptionToApiAttributeMap[goalOption]) {
-    return goalOptionToApiAttributeMap[goalOption];
+  const normalizedGoalOption =
+    typeof goalOption === "string" ? goalOption : `${goalOption || ""}`;
+
+  if (goalOptionToApiAttributeMap[normalizedGoalOption]) {
+    return goalOptionToApiAttributeMap[normalizedGoalOption];
   }
 
-  const normalized = goalOption
+  const normalized = normalizedGoalOption
     .replace(/&/g, " ")
     .replace(/[^a-zA-Z0-9 ]/g, " ")
     .split(/\s+/)
@@ -466,18 +480,25 @@ const AiSearchResults = () => {
 
   const rankedDestinations = useMemo(() => {
     const leftBadgeField = leftBadgeFieldByGoalOption[selectedGoalOption];
+    const leftBadgeLabelField =
+      leftBadgeLabelFieldByGoalOption[selectedGoalOption] ||
+      toLabelFieldKey(toApiAttribute(selectedGoalOption));
 
     return apiDestinations
       .filter((destination) => destination?.isActive === true)
       .map((destination, index) => {
-        const leftBadgeValue = leftBadgeField
+        const leftBadgeValueFromLabel =
+          leftBadgeLabelField && destination?.labels
+            ? formatLeftBadgeValue(destination.labels[leftBadgeLabelField])
+            : null;
+        const leftBadgeValueFromField = leftBadgeField
           ? formatLeftBadgeValue(destination[leftBadgeField])
           : null;
 
         return {
           ...destination,
           rankLabel: `Rank ${index + 1}`,
-          leftBadgeLabel: leftBadgeValue,
+          leftBadgeLabel: leftBadgeValueFromLabel || leftBadgeValueFromField,
         };
       });
   }, [apiDestinations, selectedGoalOption]);
@@ -542,6 +563,7 @@ const AiSearchResults = () => {
             aqiValue: item?.aqiValue,
             nomadTax: item?.nomadTax,
             costOfLivingPerMonth: item?.costOfLivingPerMonth,
+            labels: item?.labels || {},
             isActive: item?.isActive ?? existingDestination?.isActive ?? false,
             image:
               item?.imageUrl ||
