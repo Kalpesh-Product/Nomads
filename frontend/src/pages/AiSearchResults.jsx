@@ -467,17 +467,19 @@ const AiSearchResults = () => {
   const rankedDestinations = useMemo(() => {
     const leftBadgeField = leftBadgeFieldByGoalOption[selectedGoalOption];
 
-    return apiDestinations.map((destination, index) => {
-      const leftBadgeValue = leftBadgeField
-        ? formatLeftBadgeValue(destination[leftBadgeField])
-        : null;
+    return apiDestinations
+      .filter((destination) => destination?.isActive === true)
+      .map((destination, index) => {
+        const leftBadgeValue = leftBadgeField
+          ? formatLeftBadgeValue(destination[leftBadgeField])
+          : null;
 
-      return {
-        ...destination,
-        rankLabel: `Rank ${index + 1}`,
-        leftBadgeLabel: leftBadgeValue,
-      };
-    });
+        return {
+          ...destination,
+          rankLabel: `Rank ${index + 1}`,
+          leftBadgeLabel: leftBadgeValue,
+        };
+      });
   }, [apiDestinations, selectedGoalOption]);
 
   useEffect(() => {
@@ -540,6 +542,7 @@ const AiSearchResults = () => {
             aqiValue: item?.aqiValue,
             nomadTax: item?.nomadTax,
             costOfLivingPerMonth: item?.costOfLivingPerMonth,
+            isActive: item?.isActive ?? existingDestination?.isActive ?? false,
             image:
               item?.imageUrl ||
               existingDestination?.image ||
