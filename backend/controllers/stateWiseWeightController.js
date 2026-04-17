@@ -1,6 +1,5 @@
 import StateWiseWeight from "../models/StateWiseWeight.js";
 import { stateWiseWeightCalculation } from "../controllers/stateWiseWeightCalculation.js";
-import { deleteFileFromS3ByUrl, uploadFileToS3 } from "../config/s3Config.js";
 import csvParser from "csv-parser";
 import { Readable } from "stream";
 
@@ -52,47 +51,47 @@ const CSV_TO_SCHEMA_MAP = {
 };
 
 const CSV_TO_LABEL_MAP = {
-  labelcostoflivingpermonth: "labelCostOfLivingPerMonth",
-  labelinternetspeed: "labelInternetSpeed",
-  labelaqivalue: "labelAqiValue",
-  labelnomadtax: "labelNomadTax",
-  labelresidenttax: "labelResidentTax",
-  labelmostaffordable: "labelMostAffordable",
-  labelsafestcities: "labelSafestCities",
-  labeleasyvisa: "labelEasyVisa",
-  labelstrongnomadcommunity: "labelStrongNomadCommunity",
-  labelhealthcarefriendly: "labelHealthcareFriendly",
-  labelstartupbusinessopportunities: "labelStartupBusinessOpportunities",
-  labelcleanairenvironment: "labelCleanAirEnvironment",
-  labelbestworkinfrastructure: "labelBestWorkInfrastructure",
-  labelcheapestplaces: "labelCheapestPlaces",
-  labelbestconnectedcitiesflights: "labelBestConnectedCitiesFlights",
-  labelstrongnomadcommunitywfa: "labelStrongNomadCommunityWfa",
-  labelfastinternetcities: "labelFastInternetCities",
-  labelbestworkinfrastructurewfa: "labelBestWorkInfrastructureWfa",
-  labelmaximumsavings: "labelMaximumSavings",
-  labellowtaxation: "labelLowTaxation",
-  labelpurchasingpower: "labelPurchasingPower",
-  labelfinancialstability: "labelFinancialStability",
-  labelstartupsetupcost: "labelStartupSetupCost",
-  labelbalancedfinanciallifestyle: "labelBalancedFinancialLifestyle",
-  labelsocialpartylifestyle: "labelSocialPartyLifestyle",
-  labelchillwellnesslifestyle: "labelChillWellnessLifestyle",
-  labeladventureexploration: "labelAdventureExploration",
-  labelnomadcommunitynetworking: "labelNomadCommunityNetworking",
-  labelcouplefriendlylifestyle: "labelCoupleFriendlyLifestyle",
-  labelfamilyfriendlylifestyle: "labelFamilyFriendlyLifestyle",
-  labelfemalefriendlylifestyle: "labelFemaleFriendlyLifestyle",
-  labelfoundernomads: "labelFounderNomads",
-  labelsolonamads: "labelSoloNomads",
-  labelstartupecosystems: "labelStartupEcosystems",
-  labelremotejobopportunities: "labelRemoteJobOpportunities",
-  labelfoundernomadsayc: "labelFounderNomadsAyc",
-  labeltechtalentdensity: "labelTechTalentDensity",
-  labelstartupincubatorsaccelerators: "labelStartupIncubatorsAccelerators",
-  labelbalancedcareergrowth: "labelBalancedCareerGrowth",
-  labelventurecapitalpresence: "labelVentureCapitalPresence",
-  labelconferencesevents: "labelConferencesEvents",
+  "labelcostoflivingpermonth": "labelCostOfLivingPerMonth",
+  "labelinternetspeed": "labelInternetSpeed",
+  "labelaqivalue": "labelAqiValue",
+  "labelnomadtax": "labelNomadTax",
+  "labelresidenttax": "labelResidentTax",
+  "labelmostaffordable": "labelMostAffordable",
+  "labelsafestcities": "labelSafestCities",
+  "labeleasyvisa": "labelEasyVisa",
+  "labelstrongnomadcommunity": "labelStrongNomadCommunity",
+  "labelhealthcarefriendly": "labelHealthcareFriendly",
+  "labelstartupbusinessopportunities": "labelStartupBusinessOpportunities",
+  "labelcleanairenvironment": "labelCleanAirEnvironment",
+  "labelbestworkinfrastructure": "labelBestWorkInfrastructure",
+  "labelcheapestplaces": "labelCheapestPlaces",
+  "labelbestconnectedcitiesflights": "labelBestConnectedCitiesFlights",
+  "labelstrongnomadcommunitywfa": "labelStrongNomadCommunityWfa",
+  "labelfastinternetcities": "labelFastInternetCities",
+  "labelbestworkinfrastructurewfa": "labelBestWorkInfrastructureWfa",
+  "labelmaximumsavings": "labelMaximumSavings",
+  "labellowtaxation": "labelLowTaxation",
+  "labelpurchasingpower": "labelPurchasingPower",
+  "labelfinancialstability": "labelFinancialStability",
+  "labelstartupsetupcost": "labelStartupSetupCost",
+  "labelbalancedfinanciallifestyle": "labelBalancedFinancialLifestyle",
+  "labelsocialpartylifestyle": "labelSocialPartyLifestyle",
+  "labelchillwellnesslifestyle": "labelChillWellnessLifestyle",
+  "labeladventureexploration": "labelAdventureExploration",
+  "labelnomadcommunitynetworking": "labelNomadCommunityNetworking",
+  "labelcouplefriendlylifestyle": "labelCoupleFriendlyLifestyle",
+  "labelfamilyfriendlylifestyle": "labelFamilyFriendlyLifestyle",
+  "labelfemalefriendlylifestyle": "labelFemaleFriendlyLifestyle",
+  "labelfoundernomads": "labelFounderNomads",
+  "labelsolonamads": "labelSoloNomads",
+  "labelstartupecosystems": "labelStartupEcosystems",
+  "labelremotejobopportunities": "labelRemoteJobOpportunities",
+  "labelfoundernomadsayc": "labelFounderNomadsAyc",
+  "labeltechtalentdensity": "labelTechTalentDensity",
+  "labelstartupincubatorsaccelerators": "labelStartupIncubatorsAccelerators",
+  "labelbalancedcareergrowth": "labelBalancedCareerGrowth",
+  "labelventurecapitalpresence": "labelVentureCapitalPresence",
+  "labelconferencesevents": "labelConferencesEvents",
 };
 
 // Normalizes raw CSV keys so we can map inconsistent headers safely.
@@ -121,12 +120,16 @@ const mapCsvRowToStateWiseWeight = (rawRow = {}) => {
   const continent = row["continent"];
   const country = row["country"];
   const state = row["destination"];
-
   // Handle your new root-level fields
   const imageUrl = row["imagelink"]; // matches "Image Link" after normalize
 
   // Handle rank
   const rank = toNumber(row["rank"] !== undefined ? row["rank"] : row[""]);
+
+  // Handle isActive
+  // We use the lowercase key "isactive" because of normalization.
+  // We check strictly against "Active" as per your CSV data.
+  const isactive = row["isactive"] === "Active" ? true : false;
 
   const weight = {};
 
@@ -145,6 +148,7 @@ const mapCsvRowToStateWiseWeight = (rawRow = {}) => {
     continent,
     country,
     state,
+    isactive,
     rank,
     weight,
     imageUrl,
@@ -185,7 +189,7 @@ export const getStateWiseWeight = async (req, res, next) => {
       return {
         state: item.state,
         country: item.country,
-        isActive: item.isActive,
+        isActive: item.isActive, // FIXED: Matches Schema
         [effectiveAttribute]: scoreForSorting,
         imageUrl: item.imageUrl,
         labels: item.labels,
@@ -237,66 +241,18 @@ export const updateStateWiseWeight = async (req, res, next) => {
       });
     }
 
-    const existingStateWiseWeight = await StateWiseWeight.findById(id);
+    const updatedStateWiseWeight = await StateWiseWeight.findByIdAndUpdate(
+      id,
+      { $set: req.body },
+      { new: true, runValidators: true },
+    );
 
-    if (!existingStateWiseWeight) {
+    if (!updatedStateWiseWeight) {
       return res.status(404).json({
         success: false,
         message: "State-wise weight data not found.",
       });
     }
-
-    const updatePayload = { ...req.body };
-
-    if (typeof updatePayload.weight === "string") {
-      try {
-        updatePayload.weight = JSON.parse(updatePayload.weight);
-      } catch (error) {
-        return res.status(400).json({
-          success: false,
-          message: "Invalid JSON format for weight field.",
-        });
-      }
-    }
-
-    if (typeof updatePayload.labels === "string") {
-      try {
-        updatePayload.labels = JSON.parse(updatePayload.labels);
-      } catch (error) {
-        return res.status(400).json({
-          success: false,
-          message: "Invalid JSON format for labels field.",
-        });
-      }
-    }
-
-    if (req.file) {
-      const fileName = String(req.file.originalname || "image")
-        .replace(/[/\\?%*:|"<>]/g, "_")
-        .replace(/\s+/g, "_");
-      const fileKey = `nomads/destinations/${id}/${Date.now()}-${fileName}`;
-      const uploadedImage = await uploadFileToS3(fileKey, req.file);
-      updatePayload.imageUrl = uploadedImage.url;
-
-      const currentImageUrl = existingStateWiseWeight.imageUrl;
-      const bucketHost = `${process.env.PROJECT_S3_BUCKET_NAME}.s3.${process.env.PROJECT_AWS_REGION}.amazonaws.com`;
-
-      if (
-        currentImageUrl &&
-        currentImageUrl.includes(bucketHost) &&
-        currentImageUrl !== uploadedImage.url
-      ) {
-        await deleteFileFromS3ByUrl(currentImageUrl);
-      }
-    }
-
-    const updatedStateWiseWeight = await StateWiseWeight.findByIdAndUpdate(
-      id,
-      {
-        $set: updatePayload,
-      },
-      { new: true, runValidators: true },
-    );
 
     return res.status(200).json({
       success: true,
@@ -327,10 +283,11 @@ export const bulkInsertStateWiseWeightCsv = async (req, res, next) => {
 
         const row = mapCsvRowToStateWiseWeight(rawRow);
 
-        if (!row.continent || !row.country || !row.state || !row.rank) {
+        // Validation: Ensure required fields exist
+        if (!row.continent || !row.country || !row.state || !row.rank || row.isactive === undefined) {
           rowErrors.push({
             rowNumber,
-            reason: "Missing required fields: continent/country/state/rank",
+            reason: "Missing required fields: continent/country/state/rank/isactive",
           });
           return;
         }
@@ -349,6 +306,7 @@ export const bulkInsertStateWiseWeightCsv = async (req, res, next) => {
           // SAFE BULK WRITE LOGIC
           const operations = rows.map((row) => {
             // 1. Always update these core fields
+            // FIXED: 'isActive' key now correctly maps to the schema
             const updateData = {
               continent: row.continent,
               country: row.country,
@@ -356,6 +314,7 @@ export const bulkInsertStateWiseWeightCsv = async (req, res, next) => {
               rank: row.rank,
               weight: row.weight,
               labels: row.labels,
+              isActive: row.isactive,
             };
 
             // 2. Conditionally add new fields ONLY if they exist in the CSV.
