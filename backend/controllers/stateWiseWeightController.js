@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import StateWiseWeight from "../models/StateWiseWeight.js";
 import { stateWiseWeightCalculation } from "../controllers/stateWiseWeightCalculation.js";
 import { deleteFileFromS3ByUrl, uploadFileToS3 } from "../config/s3Config.js";
@@ -225,6 +226,64 @@ export const getAllStateWiseWeight = async (req, res, next) => {
     next(error);
   }
 };
+
+export const createStateWiseWeight = async (req, res, next) => {
+  try {
+    const createPayload = { ...req.body };
+
+    // Parse weight if it's a string (FormData)
+    if (typeof createPayload.weight === "string") {
+      try {
+        createPayload.weight = JSON.parse(createPayload.weight);
+      } catch (error) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid JSON format for weight field.",
+        });
+      }
+    }
+
+    // Parse labels if it's a string (FormData)
+    if (typeof createPayload.labels === "string") {
+      try {
+        createPayload.labels = JSON.parse(createPayload.labels);
+      } catch (error) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid JSON format for labels field.",
+        });
+      }
+    }
+
+    // Generate a new ID for the document so we can use it in the S3 path
+    const newId = new mongoose.Types.ObjectId();
+    createPayload._id = newId;
+
+    if (req.file) {
+      const fileName = String(req.file.originalname || "image")
+        .replace(/[/\\?%*:|"<>]/g, "_")
+        .replace(/\s+/g, "_");
+      const fileKey = `nomads/destinations/${newId}/${Date.now()}-${fileName}`;
+      const uploadedImage = await uploadFileToS3(fileKey, req.file);
+      createPayload.imageUrl = uploadedImage.url;
+    } else {
+      // imageUrl is required in schema, so we should handle its absence
+      // If the frontend doesn't send an image, this will fail validation later
+      // unless we provide a default here or require it in the request.
+    }
+
+    const newStateWiseWeight = await StateWiseWeight.create(createPayload);
+
+    return res.status(201).json({
+      success: true,
+      message: "State-wise weight data created successfully.",
+      data: newStateWiseWeight,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 
 export const updateStateWiseWeight = async (req, res, next) => {
   try {
