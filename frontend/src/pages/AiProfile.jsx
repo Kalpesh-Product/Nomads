@@ -305,11 +305,13 @@ const AiProfile = () => {
                     variant="outlined"
                     sx={{
                       textTransform: "none",
-                      px: 6,
+                      px: { xs: 6, md: 14 },
+                      py: 1.5,
                       color: "black",
                       borderColor: "black",
                       borderRadius: 20,
                       mt: { xs: 2, md: 0 },
+                      width: { xs: "100%", md: "auto" },
                     }}
                     onClick={() => setEditMode(false)}
                   >
