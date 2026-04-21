@@ -28,6 +28,10 @@ const primaryPillButtonSx = {
   width: { xs: "100%", md: "auto" },
 };
 
+const PROFILE_PROMPT =
+  "The more details you fill in, the more customized support we can provide.";
+const PROFILE_TYPING_SEEN_KEY = "wono-ai-profile-typing-seen";
+
 const AiProfile = () => {
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
@@ -42,6 +46,7 @@ const AiProfile = () => {
 
   const initialTab = searchParams.get("tab") || "profile";
   const [activeTab, setActiveTab] = useState(initialTab);
+  const [typedProfilePrompt, setTypedProfilePrompt] = useState("");
 
   const [editMode, setEditMode] = useState(false);
   const [profileForm, setProfileForm] = useState({
@@ -69,6 +74,34 @@ const AiProfile = () => {
     const tab = searchParams.get("tab") || "profile";
     setActiveTab(tab);
   }, [searchParams]);
+
+  useEffect(() => {
+    const hasSeenTypingEffect =
+      typeof window !== "undefined" &&
+      window.localStorage.getItem(PROFILE_TYPING_SEEN_KEY) === "true";
+
+    if (hasSeenTypingEffect) {
+      setTypedProfilePrompt(PROFILE_PROMPT);
+      return;
+    }
+
+    setTypedProfilePrompt("");
+
+    let index = 0;
+    const typingInterval = setInterval(() => {
+      index += 1;
+      setTypedProfilePrompt(PROFILE_PROMPT.slice(0, index));
+
+      if (index >= PROFILE_PROMPT.length) {
+        clearInterval(typingInterval);
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem(PROFILE_TYPING_SEEN_KEY, "true");
+        }
+      }
+    }, 1);
+
+    return () => clearInterval(typingInterval);
+  }, []);
 
   const handleProfileChange = (e) => {
     const { name, value } = e.target;
@@ -190,6 +223,9 @@ const AiProfile = () => {
       {/* PROFILE TAB - Desktop layout preserved, responsive adjustments */}
       {activeTab === "profile" && (
         <div className="bg-white py-8 px-4 sm:px-8 md:px-16 lg:px-24 max-w-4xl mx-auto">
+          <p className="min-h-[3rem] w-full text-center font-play text-[0.95rem] leading-relaxed text-gray-800 sm:text-[1rem]">
+            {typedProfilePrompt}
+          </p>
           <h2 className="text-hero min-h-[3rem] text-center font-play text-black mb-6">
             My Profile
           </h2>
