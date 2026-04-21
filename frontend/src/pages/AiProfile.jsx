@@ -223,7 +223,7 @@ const AiProfile = () => {
       {/* PROFILE TAB - Desktop layout preserved, responsive adjustments */}
       {activeTab === "profile" && (
         <div className="bg-white py-8 px-4 sm:px-8 md:px-16 lg:px-24 max-w-4xl mx-auto">
-          <p className="min-h-[3rem] w-full text-center font-play text-[0.95rem] leading-relaxed text-gray-800 sm:text-[1rem]">
+          <p className="min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:text-[1rem]">
             {typedProfilePrompt}
           </p>
           <h2 className="text-hero min-h-[3rem] text-center font-play text-black mb-6">
