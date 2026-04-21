@@ -10,6 +10,24 @@ import Reviews from "./Reviews";
 import { CircularProgress } from "@mui/material";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 
+const floatingLabelSx = {
+  "&.MuiInputLabel-shrink": {
+    color: "black",
+  },
+};
+
+const primaryPillButtonSx = {
+  bgcolor: "black",
+  borderRadius: 20,
+  px: { xs: 6, md: 14 },
+  py: 1.5,
+  fontSize: "1rem",
+  fontWeight: "600",
+  textTransform: "none",
+  "&:hover": { bgcolor: "#333" },
+  width: { xs: "100%", md: "auto" },
+};
+
 const AiProfile = () => {
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
@@ -17,20 +35,13 @@ const AiProfile = () => {
   const { auth, setAuth } = useAuth();
   const logout = useLogout();
 
-  const [isLogoutLoading, setIsLogoutLoading] = useState(false);
-
   const user = auth?.user || {};
   const userId = auth?.user?._id || auth?.user?.id;
 
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   const initialTab = searchParams.get("tab") || "profile";
   const [activeTab, setActiveTab] = useState(initialTab);
-
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-    setSearchParams({ tab });
-  };
 
   const [editMode, setEditMode] = useState(false);
   const [profileForm, setProfileForm] = useState({
@@ -56,20 +67,6 @@ const AiProfile = () => {
     const tab = searchParams.get("tab") || "profile";
     setActiveTab(tab);
   }, [searchParams]);
-
-  const handleLogout = async () => {
-    if (isLogoutLoading) return;
-    setIsLogoutLoading(true);
-    try {
-      await logout();
-      navigate("/ai-login");
-    } catch (error) {
-      console.error("Logout failed:", error);
-      showErrorAlert("Logout failed");
-    } finally {
-      setIsLogoutLoading(false);
-    }
-  };
 
   const handleProfileChange = (e) => {
     const { name, value } = e.target;
@@ -190,9 +187,8 @@ const AiProfile = () => {
 
       {/* PROFILE TAB - Desktop layout preserved, responsive adjustments */}
       {activeTab === "profile" && (
-        // <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm max-w-5xl mx-auto">
-        <div className="bg-white p-6   max-w-full">
-          <h2 className="text-xl font-semibold mb-6 text-secondary-dark">
+        <div className="bg-white py-8 px-4 sm:px-8 md:px-16 lg:px-24 max-w-4xl mx-auto">
+          <h2 className="text-hero min-h-[3rem] text-center font-play text-black mb-6">
             My Profile
           </h2>
 
@@ -251,39 +247,43 @@ const AiProfile = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
               <TextField
                 label="Full Name"
-                size="small"
+                variant="standard"
                 fullWidth
                 name="fullName"
                 value={profileForm.fullName}
                 onChange={handleProfileChange}
                 InputProps={{ readOnly: !editMode }}
+                InputLabelProps={{ sx: floatingLabelSx }}
               />
               <TextField
                 label="Email"
-                size="small"
+                variant="standard"
                 fullWidth
                 name="email"
                 value={profileForm.email}
                 onChange={handleProfileChange}
                 InputProps={{ readOnly: true }}
+                InputLabelProps={{ sx: floatingLabelSx }}
               />
               <TextField
                 label="Current Country Of Residence"
-                size="small"
+                variant="standard"
                 fullWidth
                 name="country"
                 value={profileForm.country}
                 onChange={handleProfileChange}
                 InputProps={{ readOnly: !editMode }}
+                InputLabelProps={{ sx: floatingLabelSx }}
               />
               <TextField
                 label="Mobile"
-                size="small"
+                variant="standard"
                 fullWidth
                 name="contactNumber"
                 value={profileForm.contactNumber}
                 onChange={handleProfileChange}
                 InputProps={{ readOnly: !editMode }}
+                InputLabelProps={{ sx: floatingLabelSx }}
               />
             </div>
 
@@ -292,19 +292,13 @@ const AiProfile = () => {
                 <>
                   <Button
                     variant="contained"
-                    sx={{
-                      bgcolor: "#00AEEF",
-                      textTransform: "none",
-                      px: 6,
-                      mr: 2,
-                      "&:hover": { bgcolor: "#00AEEF" },
-                    }}
+                    sx={{ ...primaryPillButtonSx, mr: { xs: 0, md: 2 } }}
                     onClick={() =>
                       updateProfile({ userId, profileData: profileForm })
                     }
                     disabled={isUpdatePending}
                   >
-                    {isUpdatePending ? "Saving..." : "Save"}
+                    {isUpdatePending ? "Submitting..." : "Submit"}
                   </Button>
 
                   <Button
@@ -312,8 +306,10 @@ const AiProfile = () => {
                     sx={{
                       textTransform: "none",
                       px: 6,
-                      color: "#00AEEF",
-                      borderColor: "#00AEEF",
+                      color: "black",
+                      borderColor: "black",
+                      borderRadius: 20,
+                      mt: { xs: 2, md: 0 },
                     }}
                     onClick={() => setEditMode(false)}
                   >
@@ -323,12 +319,7 @@ const AiProfile = () => {
               ) : (
                 <Button
                   variant="contained"
-                  sx={{
-                    bgcolor: "#00AEEF",
-                    textTransform: "none",
-                    px: 6,
-                    "&:hover": { bgcolor: "#00AEEF" },
-                  }}
+                  sx={primaryPillButtonSx}
                   onClick={() => setEditMode(true)}
                 >
                   Edit
@@ -386,17 +377,7 @@ const AiProfile = () => {
           <div className="flex justify-center items-center">
             <Button
               variant="contained"
-              sx={{
-                bgcolor: "black",
-                borderRadius: 20,
-                px: { xs: 6, md: 14 },
-                py: 1.5,
-                fontSize: "1rem",
-                fontWeight: "600",
-                textTransform: "none",
-                "&:hover": { bgcolor: "#333" },
-                width: { xs: "100%", md: "auto" },
-              }}
+              sx={primaryPillButtonSx}
               onClick={handlePasswordSubmit}
               disabled={isPasswordPending}
             >
