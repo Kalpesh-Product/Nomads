@@ -38,8 +38,15 @@ export const updateProfile = async (req, res) => {
   try {
     console.log("profile");
     const { userId } = req.params;
-    const { fullName, country, state, contactCode, contactNumber } =
-      req.body;
+    const {
+      fullName,
+      country,
+      state,
+      salary,
+      designation,
+      contactCode,
+      contactNumber,
+    } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ message: "Invalid user ID" });
@@ -53,6 +60,8 @@ export const updateProfile = async (req, res) => {
     if (fullName) user.fullName = fullName.trim();
     if (country) user.country = country.trim();
     if (state) user.state = state.trim();
+    if (salary) user.salary = salary.trim();
+    if (designation) user.designation = designation.trim();
     if (contactCode) user.contactCode = contactCode.trim();
     if (contactNumber) user.contactNumber = contactNumber.trim();
 
@@ -66,6 +75,8 @@ export const updateProfile = async (req, res) => {
         email: updatedUser.email,
         country: updatedUser.country,
         state: updatedUser.state,
+        salary: updatedUser.salary,
+        designation: updatedUser.designation,
         contactCode: updatedUser.contactCode,
         contactNumber: updatedUser.contactNumber,
       },
@@ -151,14 +162,14 @@ export const saveListings = async (req, res, next) => {
       updatedUser = await NomadUser.findByIdAndUpdate(
         userId,
         { $addToSet: { saves: listingId } },
-        { new: true }
+        { new: true },
       );
     } else {
       // Remove from likes
       updatedUser = await NomadUser.findByIdAndUpdate(
         userId,
         { $pull: { saves: listingId } },
-        { new: true }
+        { new: true },
       );
     }
 
@@ -270,14 +281,14 @@ export const likeListings = async (req, res, next) => {
       updatedUser = await NomadUser.findByIdAndUpdate(
         userId,
         { $addToSet: { likes: listingId } },
-        { new: true }
+        { new: true },
       );
     } else {
       // Remove from likes
       updatedUser = await NomadUser.findByIdAndUpdate(
         userId,
         { $pull: { likes: listingId } },
-        { new: true }
+        { new: true },
       );
     }
 
