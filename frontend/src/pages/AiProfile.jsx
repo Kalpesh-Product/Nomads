@@ -341,16 +341,16 @@ const AiProfile = () => {
 
       {/* CHANGE PASSWORD TAB - Desktop style preserved, responsive padding */}
       {activeTab === "password" && (
-        <div className="bg-white py-10 px-4 sm:px-8 md:px-16 lg:px-32 rounded-lg shadow-sm max-w-3xl mx-auto">
-          <h2 className="text-lg sm:text-xl text-center font-bold text-[#00AEEF] mb-4">
-            CHANGE PASSWORD
+        <div className="bg-white py-8 px-4 sm:px-8 md:px-16 lg:px-24 max-w-4xl mx-auto">
+          <h2 className="text-hero min-h-[3rem] text-center font-play text-black mb-6">
+            Change Password
           </h2>
           <div className="grid gap-4 mb-3">
             <TextField
               label="Current Password"
               type="password"
               fullWidth
-              size="small"
+              variant="standard"
               name="oldPassword"
               value={passwordForm.oldPassword}
               onChange={handlePasswordChange}
@@ -359,7 +359,7 @@ const AiProfile = () => {
               label="New Password"
               type="password"
               fullWidth
-              size="small"
+              variant="standard"
               name="newPassword"
               value={passwordForm.newPassword}
               onChange={handlePasswordChange}
@@ -368,7 +368,7 @@ const AiProfile = () => {
               label="Confirm Password"
               type="password"
               fullWidth
-              size="small"
+              variant="standard"
               name="confirmPassword"
               value={passwordForm.confirmPassword}
               onChange={handlePasswordChange}
@@ -387,11 +387,15 @@ const AiProfile = () => {
             <Button
               variant="contained"
               sx={{
-                bgcolor: "#00AEEF",
-                borderRadius: 9999,
-                paddingX: 5,
+                bgcolor: "black",
+                borderRadius: 20,
+                px: { xs: 6, md: 14 },
+                py: 1.5,
+                fontSize: "1rem",
+                fontWeight: "600",
                 textTransform: "none",
-                "&:hover": { bgcolor: "#00AEEF" },
+                "&:hover": { bgcolor: "#333" },
+                width: { xs: "100%", md: "auto" },
               }}
               onClick={handlePasswordSubmit}
               disabled={isPasswordPending}
