@@ -51,6 +51,8 @@ const AiProfile = () => {
     state: user?.state || "",
     contactCode: user?.contactCode || "",
     contactNumber: user?.contactNumber || "",
+    salary: user?.salary || "",
+    designation: user?.designation || "",
   });
 
   const [passwordForm, setPasswordForm] = useState({
@@ -281,6 +283,26 @@ const AiProfile = () => {
                 fullWidth
                 name="contactNumber"
                 value={profileForm.contactNumber}
+                onChange={handleProfileChange}
+                InputProps={{ readOnly: !editMode }}
+                InputLabelProps={{ sx: floatingLabelSx }}
+              />
+              <TextField
+                label="Salary"
+                variant="standard"
+                fullWidth
+                name="salary"
+                value={profileForm.salary}
+                onChange={handleProfileChange}
+                InputProps={{ readOnly: !editMode }}
+                InputLabelProps={{ sx: floatingLabelSx }}
+              />
+              <TextField
+                label="Designation"
+                variant="standard"
+                fullWidth
+                name="designation"
+                value={profileForm.designation}
                 onChange={handleProfileChange}
                 InputProps={{ readOnly: !editMode }}
                 InputLabelProps={{ sx: floatingLabelSx }}
