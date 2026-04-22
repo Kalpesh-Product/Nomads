@@ -344,7 +344,7 @@ export const updateStateWiseWeight = async (req, res, next) => {
       const uploadedImages = await Promise.all(
         req.files.map(async (file, index) => {
           const fileName = String(file.originalname || `image-${index + 1}`).replace(/[/\\?%*:|"<>]/g, "_").replace(/\s+/g, "_");
-          const fileKey = `nomads/destinations/${id}/${Date.now()}-${index}-${fileName}`;
+          const fileKey = `nomads/states/${id}/${Date.now()}-${index}-${fileName}`;
           return uploadFileToS3(fileKey, file);
         })
       );
