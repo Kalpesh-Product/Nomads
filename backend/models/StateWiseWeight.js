@@ -20,9 +20,13 @@ const stateWiseWeightSchema = new mongoose.Schema(
             required: true,
         },
 
-        imageUrl: {
-            type: String,
+        imageUrls: {
+            type: [String],
             required: true,
+            validate: {
+                validator: (value) => Array.isArray(value) && value.length > 0,
+                message: "At least one image URL is required.",
+            },
         },
 
         isActive: {
@@ -31,11 +35,6 @@ const stateWiseWeightSchema = new mongoose.Schema(
         },
 
         labels: {
-            labelCostOfLivingPerMonth: { type: String, required: true, },
-            labelInternetSpeed: { type: String, required: true, },
-            labelAqiValue: { type: String, required: true, },
-            labelNomadTax: { type: String, required: true, },
-            labelResidentTax: { type: String, required: true, },
             labelMostAffordable: { type: String, required: true },
             labelSafestCities: { type: String, required: true },
             labelEasyVisa: { type: String, required: true },

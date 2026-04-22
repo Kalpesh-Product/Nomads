@@ -53,11 +53,6 @@ const CSV_TO_SCHEMA_MAP = {
 };
 
 const CSV_TO_LABEL_MAP = {
-  labelcostoflivingpermonth: "labelCostOfLivingPerMonth",
-  labelinternetspeed: "labelInternetSpeed",
-  labelaqivalue: "labelAqiValue",
-  labelnomadtax: "labelNomadTax",
-  labelresidenttax: "labelResidentTax",
   labelmostaffordable: "labelMostAffordable",
   labelsafestcities: "labelSafestCities",
   labeleasyvisa: "labelEasyVisa",
@@ -123,8 +118,13 @@ const mapCsvRowToStateWiseWeight = (rawRow = {}) => {
   const country = row["country"];
   const state = row["destination"];
 
-  // Handle your new root-level fields
-  const imageUrl = row["imagelink"]; // matches "Image Link" after normalize
+  // Handle root-level image fields
+  const imageUrls = row["imagelink"]
+    ? String(row["imagelink"])
+      .split(",")
+      .map((url) => url.trim())
+      .filter(Boolean)
+    : [];
 
   // Handle rank
   const rank = toNumber(row["rank"] !== undefined ? row["rank"] : row[""]);
@@ -148,7 +148,7 @@ const mapCsvRowToStateWiseWeight = (rawRow = {}) => {
     state,
     rank,
     weight,
-    imageUrl,
+    imageUrls,
     labels,
   };
 };
@@ -188,7 +188,7 @@ export const getStateWiseWeight = async (req, res, next) => {
         country: item.country,
         isActive: item.isActive,
         [effectiveAttribute]: scoreForSorting,
-        imageUrl: item.imageUrl,
+        imageUrl: item.imageUrls || [],
         labels: item.labels,
       };
     });
@@ -255,21 +255,40 @@ export const createStateWiseWeight = async (req, res, next) => {
       }
     }
 
+    if (typeof createPayload.imageUrls === "string") {
+      try {
+        createPayload.imageUrls = JSON.parse(createPayload.imageUrls);
+      } catch (error) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid JSON format for imageUrls field.",
+        });
+      }
+    }
+    if (
+      !Array.isArray(createPayload.imageUrls) &&
+      typeof createPayload.imageUrl === "string" &&
+      createPayload.imageUrl.trim()
+    ) {
+      createPayload.imageUrls = [createPayload.imageUrl.trim()];
+    }
+
     // Generate a new ID for the document so we can use it in the S3 path
     const newId = new mongoose.Types.ObjectId();
     createPayload._id = newId;
 
-    if (req.file) {
-      const fileName = String(req.file.originalname || "image")
-        .replace(/[/\\?%*:|"<>]/g, "_")
-        .replace(/\s+/g, "_");
-      const fileKey = `nomads/destinations/${newId}/${Date.now()}-${fileName}`;
-      const uploadedImage = await uploadFileToS3(fileKey, req.file);
-      createPayload.imageUrl = uploadedImage.url;
-    } else {
-      // imageUrl is required in schema, so we should handle its absence
-      // If the frontend doesn't send an image, this will fail validation later
-      // unless we provide a default here or require it in the request.
+    if (Array.isArray(req.files) && req.files.length > 0) {
+      const uploadedImages = await Promise.all(
+        req.files.map(async (file, index) => {
+          const fileName = String(file.originalname || `image-${index + 1}`)
+            .replace(/[/\\?%*:|"<>]/g, "_")
+            .replace(/\s+/g, "_");
+          const fileKey = `nomads/destinations/${newId}/${Date.now()}-${index}-${fileName}`;
+          return uploadFileToS3(fileKey, file);
+        }),
+      );
+
+      createPayload.imageUrls = uploadedImages.map((img) => img.url);
     }
 
     const newStateWiseWeight = await StateWiseWeight.create(createPayload);
@@ -329,23 +348,47 @@ export const updateStateWiseWeight = async (req, res, next) => {
       }
     }
 
-    if (req.file) {
-      const fileName = String(req.file.originalname || "image")
-        .replace(/[/\\?%*:|"<>]/g, "_")
-        .replace(/\s+/g, "_");
-      const fileKey = `nomads/destinations/${id}/${Date.now()}-${fileName}`;
-      const uploadedImage = await uploadFileToS3(fileKey, req.file);
-      updatePayload.imageUrl = uploadedImage.url;
+    if (typeof updatePayload.imageUrls === "string") {
+      try {
+        updatePayload.imageUrls = JSON.parse(updatePayload.imageUrls);
+      } catch (error) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid JSON format for imageUrls field.",
+        });
+      }
+    }
+    if (
+      !Array.isArray(updatePayload.imageUrls) &&
+      typeof updatePayload.imageUrl === "string" &&
+      updatePayload.imageUrl.trim()
+    ) {
+      updatePayload.imageUrls = [updatePayload.imageUrl.trim()];
+    }
 
-      const currentImageUrl = existingStateWiseWeight.imageUrl;
+    if (Array.isArray(req.files) && req.files.length > 0) {
+      const uploadedImages = await Promise.all(
+        req.files.map(async (file, index) => {
+          const fileName = String(file.originalname || `image-${index + 1}`)
+            .replace(/[/\\?%*:|"<>]/g, "_")
+            .replace(/\s+/g, "_");
+          const fileKey = `nomads/destinations/${id}/${Date.now()}-${index}-${fileName}`;
+          return uploadFileToS3(fileKey, file);
+        }),
+      );
+      updatePayload.imageUrls = uploadedImages.map((img) => img.url);
+
+      const currentImageUrls = existingStateWiseWeight.imageUrls || [];
       const bucketHost = `${process.env.PROJECT_S3_BUCKET_NAME}.s3.${process.env.PROJECT_AWS_REGION}.amazonaws.com`;
 
-      if (
-        currentImageUrl &&
-        currentImageUrl.includes(bucketHost) &&
-        currentImageUrl !== uploadedImage.url
-      ) {
-        await deleteFileFromS3ByUrl(currentImageUrl);
+      for (const currentImageUrl of currentImageUrls) {
+        if (
+          currentImageUrl &&
+          currentImageUrl.includes(bucketHost) &&
+          !updatePayload.imageUrls.includes(currentImageUrl)
+        ) {
+          await deleteFileFromS3ByUrl(currentImageUrl);
+        }
       }
     }
 
@@ -419,12 +462,8 @@ export const bulkInsertStateWiseWeightCsv = async (req, res, next) => {
 
             // 2. Conditionally add new fields ONLY if they exist in the CSV.
             // This prevents accidentally deleting existing DB data if a CSV column is missing.
-            if (
-              row.imageUrl !== undefined &&
-              row.imageUrl !== null &&
-              row.imageUrl !== ""
-            ) {
-              updateData.imageUrl = row.imageUrl;
+            if (Array.isArray(row.imageUrls) && row.imageUrls.length > 0) {
+              updateData.imageUrls = row.imageUrls;
             }
 
             return {

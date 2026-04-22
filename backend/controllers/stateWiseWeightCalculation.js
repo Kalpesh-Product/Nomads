@@ -306,7 +306,7 @@ export const STATEWISE_WEIGHT_FORMULAS = {
         ["startupEcosystemScore", 0.1],
         ["costOfLiving", 0.1],
     ],
-    founderNomadsCareer: [
+    founderNomadsAyc: [
         ["founderNomads", 0.3],
         ["conferences", 0.2],
         ["techTalentDensity", 0.2],
