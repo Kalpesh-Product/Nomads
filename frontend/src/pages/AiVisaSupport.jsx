@@ -9,14 +9,17 @@ import {
 import { Controller, useForm } from "react-hook-form";
 import { Country } from "country-state-city";
 import Swal from "sweetalert2";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import axios from "../utils/axios";
 import Container from "../components/Container";
 import { aiDestinationCards } from "../constants/aiDestinationCards";
 import useNomadLoginState from "../hooks/useNomadLoginState";
 import useAuth from "../hooks/useAuth";
-import { getCountryNameFromSelectedDestination } from "../utils/selectedDestinationSession";
+import {
+  getCountryNameFromSelectedDestination,
+  readSelectedDestination,
+} from "../utils/selectedDestinationSession";
 import { showErrorAlert } from "../utils/alerts";
 import { HiCheck } from "react-icons/hi";
 
@@ -55,6 +58,7 @@ const VISA_SUPPORT_HEADING = "Visa Support";
 const VISA_SUPPORT_TYPING_SEEN_KEY = "wono-visa-support-typing-seen";
 const getFlagIconUrl = (isoCode) =>
   `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
+const normalizePrefillValue = (value) => value?.trim().toLowerCase() || "";
 
 const tickMenuItemSx = {
   "& .tick-icon": { opacity: 0, color: "#1976d2" },
@@ -80,6 +84,7 @@ const AiVisaSupport = () => {
   const { auth } = useAuth();
   const isLoggedIn = Boolean(auth?.user);
   const navigate = useNavigate();
+  const location = useLocation();
   const { control, handleSubmit, reset, setValue, watch } = useForm({
     defaultValues,
   });
@@ -107,6 +112,7 @@ const AiVisaSupport = () => {
   );
   const selectedNationality = watch("nationality");
   const selectedTravellingCountry = watch("travellingCountry");
+  const selectedTravellingState = watch("travellingState");
   const selectedNationalityCountry = useMemo(
     () =>
       countries.find((country) => country.name === selectedNationality) || null,
@@ -243,14 +249,63 @@ const AiVisaSupport = () => {
   }, [isLoggedIn, auth, setValue]);
 
   useEffect(() => {
-    const destinationCountry = getCountryNameFromSelectedDestination(countries);
+    const queryParams = new URLSearchParams(location.search);
+    const queryCountry = normalizePrefillValue(queryParams.get("country"));
+    const prefilledCountryFromQuery = destinationCountries.find(
+      (countryName) => normalizePrefillValue(countryName) === queryCountry,
+    );
+    const destinationCountry =
+      prefilledCountryFromQuery ||
+      getCountryNameFromSelectedDestination(countries);
+
     if (!destinationCountry || selectedTravellingCountry) return;
+
+    const hasDestination = destinationCountries.some(
+      (countryName) => countryName === destinationCountry,
+    );
+    if (!hasDestination) return;
 
     setValue("travellingCountry", destinationCountry, {
       shouldDirty: true,
       shouldTouch: true,
     });
-  }, [countries, selectedTravellingCountry, setValue]);
+  }, [
+    countries,
+    destinationCountries,
+    location.search,
+    selectedTravellingCountry,
+    setValue,
+  ]);
+
+  useEffect(() => {
+    if (!selectedTravellingCountry || selectedTravellingState) return;
+
+    const queryParams = new URLSearchParams(location.search);
+    const queryState = normalizePrefillValue(queryParams.get("state"));
+    const sessionState = readSelectedDestination()?.city || "";
+    const preferredState = queryState || sessionState;
+
+    if (!preferredState) return;
+
+    const matchedDestination = destinationOptions.find(
+      (option) =>
+        option.country === selectedTravellingCountry &&
+        normalizePrefillValue(option.state) === preferredState,
+    );
+
+    if (!matchedDestination) return;
+
+    setValue("travellingState", matchedDestination.state, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+  }, [
+    destinationOptions,
+    location.search,
+    selectedTravellingCountry,
+    selectedTravellingState,
+    setValue,
+  ]);
 
   useEffect(() => {
     const hasSeenTypingEffect =
