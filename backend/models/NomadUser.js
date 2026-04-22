@@ -46,6 +46,14 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    salary: {
+      type: String,
+      trim: true,
+    },
+    designation: {
+      type: String,
+      trim: true,
+    },
     contactCode: { type: String, trim: true, default: "" },
     contactNumber: { type: String, trim: true, required: true },
     saves: [
@@ -64,7 +72,7 @@ const userSchema = new mongoose.Schema(
       type: String,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // Hash password before saving

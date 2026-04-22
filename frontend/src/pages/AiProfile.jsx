@@ -10,6 +10,28 @@ import Reviews from "./Reviews";
 import { CircularProgress } from "@mui/material";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 
+const floatingLabelSx = {
+  "&.MuiInputLabel-shrink": {
+    color: "black",
+  },
+};
+
+const primaryPillButtonSx = {
+  bgcolor: "black",
+  borderRadius: 20,
+  px: { xs: 6, md: 14 },
+  py: 1.5,
+  fontSize: "1rem",
+  fontWeight: "600",
+  textTransform: "none",
+  "&:hover": { bgcolor: "#333" },
+  width: { xs: "100%", md: "auto" },
+};
+
+const PROFILE_PROMPT =
+  "The more details you fill in, the more customized support we can provide.";
+const PROFILE_TYPING_SEEN_KEY = "wono-ai-profile-typing-seen";
+
 const AiProfile = () => {
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
@@ -17,20 +39,14 @@ const AiProfile = () => {
   const { auth, setAuth } = useAuth();
   const logout = useLogout();
 
-  const [isLogoutLoading, setIsLogoutLoading] = useState(false);
-
   const user = auth?.user || {};
   const userId = auth?.user?._id || auth?.user?.id;
 
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   const initialTab = searchParams.get("tab") || "profile";
   const [activeTab, setActiveTab] = useState(initialTab);
-
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-    setSearchParams({ tab });
-  };
+  const [typedProfilePrompt, setTypedProfilePrompt] = useState("");
 
   const [editMode, setEditMode] = useState(false);
   const [profileForm, setProfileForm] = useState({
@@ -40,6 +56,8 @@ const AiProfile = () => {
     state: user?.state || "",
     contactCode: user?.contactCode || "",
     contactNumber: user?.contactNumber || "",
+    salary: user?.salary || "",
+    designation: user?.designation || "",
   });
 
   const [passwordForm, setPasswordForm] = useState({
@@ -57,19 +75,33 @@ const AiProfile = () => {
     setActiveTab(tab);
   }, [searchParams]);
 
-  const handleLogout = async () => {
-    if (isLogoutLoading) return;
-    setIsLogoutLoading(true);
-    try {
-      await logout();
-      navigate("/ai-login");
-    } catch (error) {
-      console.error("Logout failed:", error);
-      showErrorAlert("Logout failed");
-    } finally {
-      setIsLogoutLoading(false);
+  useEffect(() => {
+    const hasSeenTypingEffect =
+      typeof window !== "undefined" &&
+      window.localStorage.getItem(PROFILE_TYPING_SEEN_KEY) === "true";
+
+    if (hasSeenTypingEffect) {
+      setTypedProfilePrompt(PROFILE_PROMPT);
+      return;
     }
-  };
+
+    setTypedProfilePrompt("");
+
+    let index = 0;
+    const typingInterval = setInterval(() => {
+      index += 1;
+      setTypedProfilePrompt(PROFILE_PROMPT.slice(0, index));
+
+      if (index >= PROFILE_PROMPT.length) {
+        clearInterval(typingInterval);
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem(PROFILE_TYPING_SEEN_KEY, "true");
+        }
+      }
+    }, 1);
+
+    return () => clearInterval(typingInterval);
+  }, []);
 
   const handleProfileChange = (e) => {
     const { name, value } = e.target;
@@ -190,9 +222,11 @@ const AiProfile = () => {
 
       {/* PROFILE TAB - Desktop layout preserved, responsive adjustments */}
       {activeTab === "profile" && (
-        // <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm max-w-5xl mx-auto">
-        <div className="bg-white p-6   max-w-full">
-          <h2 className="text-xl font-semibold mb-6 text-secondary-dark">
+        <div className="bg-white py-8 px-4 sm:px-8 md:px-16 lg:px-24 max-w-4xl mx-auto">
+          <p className="min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:text-[1rem]">
+            {typedProfilePrompt}
+          </p>
+          <h2 className="text-hero min-h-[3rem] text-center font-play text-black mb-6">
             My Profile
           </h2>
 
@@ -251,39 +285,63 @@ const AiProfile = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
               <TextField
                 label="Full Name"
-                size="small"
+                variant="standard"
                 fullWidth
                 name="fullName"
                 value={profileForm.fullName}
                 onChange={handleProfileChange}
                 InputProps={{ readOnly: !editMode }}
+                InputLabelProps={{ sx: floatingLabelSx }}
               />
               <TextField
                 label="Email"
-                size="small"
+                variant="standard"
                 fullWidth
                 name="email"
                 value={profileForm.email}
                 onChange={handleProfileChange}
                 InputProps={{ readOnly: true }}
+                InputLabelProps={{ sx: floatingLabelSx }}
               />
               <TextField
                 label="Current Country Of Residence"
-                size="small"
+                variant="standard"
                 fullWidth
                 name="country"
                 value={profileForm.country}
                 onChange={handleProfileChange}
                 InputProps={{ readOnly: !editMode }}
+                InputLabelProps={{ sx: floatingLabelSx }}
               />
               <TextField
                 label="Mobile"
-                size="small"
+                variant="standard"
                 fullWidth
                 name="contactNumber"
                 value={profileForm.contactNumber}
                 onChange={handleProfileChange}
                 InputProps={{ readOnly: !editMode }}
+                InputLabelProps={{ sx: floatingLabelSx }}
+              />
+              <TextField
+                label="Salary"
+                variant="standard"
+                fullWidth
+                name="salary"
+                value={profileForm.salary}
+                onChange={handleProfileChange}
+                InputProps={{ readOnly: !editMode }}
+                InputLabelProps={{ sx: floatingLabelSx }}
+              />
+              <TextField
+                label="Designation"
+                variant="standard"
+                fullWidth
+                name="designation"
+                value={profileForm.designation}
+                onChange={handleProfileChange}
+                InputProps={{ readOnly: !editMode }}
+                InputLabelProps={{ sx: floatingLabelSx }}
               />
             </div>
 
@@ -292,28 +350,26 @@ const AiProfile = () => {
                 <>
                   <Button
                     variant="contained"
-                    sx={{
-                      bgcolor: "#00AEEF",
-                      textTransform: "none",
-                      px: 6,
-                      mr: 2,
-                      "&:hover": { bgcolor: "#00AEEF" },
-                    }}
+                    sx={{ ...primaryPillButtonSx, mr: { xs: 0, md: 2 } }}
                     onClick={() =>
                       updateProfile({ userId, profileData: profileForm })
                     }
                     disabled={isUpdatePending}
                   >
-                    {isUpdatePending ? "Saving..." : "Save"}
+                    {isUpdatePending ? "Submitting..." : "Submit"}
                   </Button>
 
                   <Button
                     variant="outlined"
                     sx={{
                       textTransform: "none",
-                      px: 6,
-                      color: "#00AEEF",
-                      borderColor: "#00AEEF",
+                      px: { xs: 6, md: 14 },
+                      py: 1.5,
+                      color: "black",
+                      borderColor: "black",
+                      borderRadius: 20,
+                      mt: { xs: 2, md: 0 },
+                      width: { xs: "100%", md: "auto" },
                     }}
                     onClick={() => setEditMode(false)}
                   >
@@ -323,12 +379,7 @@ const AiProfile = () => {
               ) : (
                 <Button
                   variant="contained"
-                  sx={{
-                    bgcolor: "#00AEEF",
-                    textTransform: "none",
-                    px: 6,
-                    "&:hover": { bgcolor: "#00AEEF" },
-                  }}
+                  sx={primaryPillButtonSx}
                   onClick={() => setEditMode(true)}
                 >
                   Edit
@@ -341,16 +392,16 @@ const AiProfile = () => {
 
       {/* CHANGE PASSWORD TAB - Desktop style preserved, responsive padding */}
       {activeTab === "password" && (
-        <div className="bg-white py-10 px-4 sm:px-8 md:px-16 lg:px-32 rounded-lg shadow-sm max-w-3xl mx-auto">
-          <h2 className="text-lg sm:text-xl text-center font-bold text-[#00AEEF] mb-4">
-            CHANGE PASSWORD
+        <div className="bg-white py-8 px-4 sm:px-8 md:px-16 lg:px-24 max-w-4xl mx-auto">
+          <h2 className="text-hero min-h-[3rem] text-center font-play text-black mb-6">
+            Change Password
           </h2>
           <div className="grid gap-4 mb-3">
             <TextField
               label="Current Password"
               type="password"
               fullWidth
-              size="small"
+              variant="standard"
               name="oldPassword"
               value={passwordForm.oldPassword}
               onChange={handlePasswordChange}
@@ -359,7 +410,7 @@ const AiProfile = () => {
               label="New Password"
               type="password"
               fullWidth
-              size="small"
+              variant="standard"
               name="newPassword"
               value={passwordForm.newPassword}
               onChange={handlePasswordChange}
@@ -368,7 +419,7 @@ const AiProfile = () => {
               label="Confirm Password"
               type="password"
               fullWidth
-              size="small"
+              variant="standard"
               name="confirmPassword"
               value={passwordForm.confirmPassword}
               onChange={handlePasswordChange}
@@ -386,13 +437,7 @@ const AiProfile = () => {
           <div className="flex justify-center items-center">
             <Button
               variant="contained"
-              sx={{
-                bgcolor: "#00AEEF",
-                borderRadius: 9999,
-                paddingX: 5,
-                textTransform: "none",
-                "&:hover": { bgcolor: "#00AEEF" },
-              }}
+              sx={primaryPillButtonSx}
               onClick={handlePasswordSubmit}
               disabled={isPasswordPending}
             >

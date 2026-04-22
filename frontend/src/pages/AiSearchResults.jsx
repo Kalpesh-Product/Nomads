@@ -1183,22 +1183,24 @@ const AiSearchResults = () => {
                               </span>
                             </div>
                           </div>
-                          <div className="mt-1.5 flex items-start justify-start gap-1 md:mt-2 md:gap-1">
-                            <div className="min-w-0">
-                              <h3 className="truncate text-[0.8rem] font-semibold leading-tight text-black/90 md:text-[1.2rem]">
-                                {`${destination.displayCity || destination.city} - `}
-                              </h3>
-                            </div>
+                          <div className="px-2">
+                            <div className="mt-1.5 flex items-start justify-start gap-1 md:mt-2 md:gap-1 ">
+                              <div className="min-w-0">
+                                <h3 className="truncate text-[0.8rem] font-semibold leading-tight text-black/90 md:text-[1.2rem]">
+                                  {`${destination.displayCity || destination.city} - `}
+                                </h3>
+                              </div>
 
-                            <p className="truncate text-[0.8rem] font-semibold leading-tight text-black/90  md:text-[1.2rem]">
-                              {destination.displayCountry ||
-                                destination.country}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-[0.82rem] text-black/60 md:text-[0.9rem]">
-                              Click to view options
-                            </p>
+                              <p className="truncate text-[0.8rem] font-semibold leading-tight text-black/90  md:text-[1.2rem]">
+                                {destination.displayCountry ||
+                                  destination.country}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-[0.82rem] text-black/60 md:text-[0.9rem]">
+                                Click to view options
+                              </p>
+                            </div>
                           </div>
                         </article>
                       ))}
