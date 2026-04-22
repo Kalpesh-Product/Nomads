@@ -19,11 +19,15 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { Country } from "country-state-city";
 import Swal from "sweetalert2";
 import { useMutation } from "@tanstack/react-query";
+import { useLocation } from "react-router-dom";
 import { FaCheck } from "react-icons/fa";
 import Container from "../components/Container";
 import useAuth from "../hooks/useAuth";
 import axios from "../utils/axios";
-import { getCountryNameFromSelectedDestination } from "../utils/selectedDestinationSession";
+import {
+  getCountryNameFromSelectedDestination,
+  readSelectedDestination,
+} from "../utils/selectedDestinationSession";
 import { showErrorAlert } from "../utils/alerts";
 import { HiCheck } from "react-icons/hi";
 
@@ -67,6 +71,7 @@ const NEW_COMPANY_HEADING = "New Company Setup";
 const NEW_COMPANY_TYPING_SEEN_KEY = "wono-new-company-typing-seen";
 const getFlagIconUrl = (isoCode) =>
   `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
+const normalizePrefillValue = (value) => value?.trim().toLowerCase() || "";
 
 const tickMenuItemSx = {
   "& .tick-icon": { opacity: 0, color: "#1976d2" },
@@ -92,6 +97,7 @@ const AiNewCompanySetup = () => {
   const { auth } = useAuth();
   const isLoggedIn = Boolean(auth?.user);
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const location = useLocation();
   const countries = useMemo(() => Country.getAllCountries(), []);
   const destinationOptions = useMemo(
     () =>
@@ -113,6 +119,7 @@ const AiNewCompanySetup = () => {
   });
   const selectedCountry = watch("currentCompanyCountry");
   const newCompanyCountry = watch("newCompanyCountry");
+  const newCompanyState = watch("newCompanyState");
   const selectedCountryData = useMemo(
     () => countries.find((country) => country.name === selectedCountry) || null,
     [countries, selectedCountry],
@@ -208,14 +215,62 @@ const AiNewCompanySetup = () => {
   };
 
   useEffect(() => {
-    const destinationCountry = getCountryNameFromSelectedDestination(countries);
+    const queryParams = new URLSearchParams(location.search);
+    const queryCountry = normalizePrefillValue(queryParams.get("country"));
+    const prefilledCountryFromQuery = destinationCountries.find(
+      (countryName) => normalizePrefillValue(countryName) === queryCountry,
+    );
+    const destinationCountry =
+      prefilledCountryFromQuery ||
+      getCountryNameFromSelectedDestination(countries);
+
     if (!destinationCountry || newCompanyCountry) return;
+
+    const hasDestination = destinationCountries.some(
+      (countryName) => countryName === destinationCountry,
+    );
+    if (!hasDestination) return;
 
     setValue("newCompanyCountry", destinationCountry, {
       shouldDirty: true,
       shouldTouch: true,
     });
-  }, [countries, newCompanyCountry, setValue]);
+  }, [
+    countries,
+    destinationCountries,
+    location.search,
+    newCompanyCountry,
+    setValue,
+  ]);
+
+  useEffect(() => {
+    if (!newCompanyCountry || newCompanyState) return;
+
+    const queryParams = new URLSearchParams(location.search);
+    const queryState = normalizePrefillValue(queryParams.get("state"));
+    const sessionState = readSelectedDestination()?.city || "";
+    const preferredState = queryState || sessionState;
+
+    if (!preferredState) return;
+
+    const matchedDestination = destinationOptions.find(
+      (option) =>
+        option.country === newCompanyCountry &&
+        normalizePrefillValue(option.state) === preferredState,
+    );
+    if (!matchedDestination) return;
+
+    setValue("newCompanyState", matchedDestination.state, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+  }, [
+    destinationOptions,
+    location.search,
+    newCompanyCountry,
+    newCompanyState,
+    setValue,
+  ]);
 
   useEffect(() => {
     const hasSeenTypingEffect =
