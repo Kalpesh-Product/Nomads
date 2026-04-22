@@ -56,16 +56,16 @@ const valueAddedServiceItems = [
     label: "APPLY FOR JOB",
     badge: "Coming soon",
   },
-  {
-    label: "VIEW LOCATION BLOGS",
-    path: "/ai-blogs",
-    usesSelectedLocation: true,
-  },
-  {
-    label: "VIEW LOCATION NEWS",
-    path: "/ai-news",
-    usesSelectedLocation: true,
-  },
+  // {
+  //   label: "VIEW LOCATION BLOGS",
+  //   path: "/ai-blogs",
+  //   usesSelectedLocation: true,
+  // },
+  // {
+  //   label: "VIEW LOCATION NEWS",
+  //   path: "/ai-news",
+  //   usesSelectedLocation: true,
+  // },
 ];
 
 const AiListings = ({ forceListView = false }) => {
