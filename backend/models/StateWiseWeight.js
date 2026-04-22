@@ -22,10 +22,12 @@ const stateWiseWeightSchema = new mongoose.Schema(
 
         imageUrls: {
             type: [String],
-            required: true,
             validate: {
-                validator: (value) => Array.isArray(value) && value.length > 0,
-                message: "At least one image URL is required.",
+                validator: function (value) {
+                    if (!value) return true;
+                    return Array.isArray(value) && value.length > 0;
+                },
+                message: "imageUrls must be a non-empty array.",
             },
         },
 
@@ -35,6 +37,7 @@ const stateWiseWeightSchema = new mongoose.Schema(
         },
 
         labels: {
+            labelBestForNomads: { type: String, required: true },
             labelMostAffordable: { type: String, required: true },
             labelSafestCities: { type: String, required: true },
             labelEasyVisa: { type: String, required: true },
@@ -44,6 +47,7 @@ const stateWiseWeightSchema = new mongoose.Schema(
             labelCleanAirEnvironment: { type: String, required: true },
             labelBestWorkInfrastructure: { type: String, required: true },
             labelCheapestPlaces: { type: String, required: true },
+            labelBestForRemoteWorkSetup: { type: String, required: true },
             labelBestConnectedCitiesFlights: { type: String, required: true },
             labelStrongNomadCommunityWfa: { type: String, required: true },
             labelFastInternetCities: { type: String, required: true },
