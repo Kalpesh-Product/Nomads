@@ -337,7 +337,7 @@ const getQuickStatsForDestination = (destination, selectedGoalOption) => {
     quickStatsConfigByGoalOption[selectedGoalOption] ||
     fallbackQuickStatsConfig;
 
-  return statConfig.slice(0, 4).map((config) => {
+  const configuredStats = statConfig.slice(0, 4).map((config) => {
     const valueFromLabel =
       config.labelKey && destination?.labels
         ? formatLeftBadgeValue(destination.labels[config.labelKey])
@@ -351,6 +351,14 @@ const getQuickStatsForDestination = (destination, selectedGoalOption) => {
       value: valueFromLabel || valueFromField || "—",
     };
   });
+
+  return [
+    {
+      label: "Rank",
+      value: destination?.rankLabel || "—",
+    },
+    ...configuredStats,
+  ];
 };
 
 const destinationAliasMap = {
@@ -1431,6 +1439,9 @@ const AiSearchResults = () => {
 
                             <div className="absolute inset-0 bg-black/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-center p-3 md:p-4">
                               <div className="translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                                <h4 className="text-white text-sm md:text-base font-semibold text-center mb-2">
+                                  {selectedGoalOption || "Attribute"}
+                                </h4>
                                 <h4 className="text-white text-sm md:text-base font-semibold mb-2">
                                   Quick Stats
                                 </h4>
