@@ -1160,12 +1160,13 @@ const AiSearchResults = () => {
                             }
                           }}
                         >
-                          <div className="relative overflow-hidden rounded-xl md:rounded-2xl">
+                          <div className="relative overflow-hidden rounded-xl md:rounded-2xl group">
                             <img
                               src={destination.image}
                               alt={`${destination.city}, ${destination.country}`}
-                              className="aspect-square w-full rounded-xl object-cover md:rounded-2xl"
+                              className="aspect-square w-full rounded-xl object-cover md:rounded-2xl transition-transform duration-500 group-hover:scale-110"
                             />
+
                             <div
                               className={`pointer-events-none absolute inset-x-0 bottom-0 flex items-end gap-1.5 bg-gradient-to-t from-black/75 via-black/25 to-transparent px-2 py-2 text-white md:gap-3 md:px-4 md:py-3 ${
                                 destination.leftBadgeLabel
@@ -1181,6 +1182,34 @@ const AiSearchResults = () => {
                               <span className="rounded-full bg-black/45 px-2 py-0.5 text-[0.7rem] font-semibold tracking-wide backdrop-blur-sm md:px-3 md:py-1 md:text-xs">
                                 {destination.rankLabel}
                               </span>
+                            </div>
+
+                            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-center p-3 md:p-4">
+                              <div className="translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                                <h4 className="text-white text-sm md:text-base font-semibold mb-2">
+                                  Quick Stats
+                                </h4>
+
+                                <div className="grid grid-cols-2 gap-2 text-xs md:text-sm text-white/90">
+                                  <div className="bg-white/10 rounded-lg px-2 py-1">
+                                    🌐 Internet:{" "}
+                                    {destination.internetSpeed || "—"}
+                                  </div>
+
+                                  <div className="bg-white/10 rounded-lg px-2 py-1">
+                                    💰 Cost:{" "}
+                                    {destination.costOfLivingPerMonth || "—"}
+                                  </div>
+
+                                  <div className="bg-white/10 rounded-lg px-2 py-1">
+                                    🌿 AQI: {destination.aqiValue || "—"}
+                                  </div>
+
+                                  <div className="bg-white/10 rounded-lg px-2 py-1">
+                                    🏝 Score: {destination.suggestions || "—"}
+                                  </div>
+                                </div>
+                              </div>
                             </div>
                           </div>
                           <div className="px-2">
