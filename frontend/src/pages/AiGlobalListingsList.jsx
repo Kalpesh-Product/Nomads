@@ -594,9 +594,20 @@ const AiGlobalListingsList = () => {
   };
 
   const getValueAddedServiceLabel = (service) => {
+    const locationLabel = (selectedLocationLabel || "LOCATION").toUpperCase();
+    const valueAddedServiceLabelMap = {
+      "ANY VISA SUPPORT": `${locationLabel} VISA SUPPORT`,
+      "OVERALL ACTIVATION SUPPORT": `${locationLabel} ACTIVATION SUPPORT`,
+      "NEW COMPANY SUPPORT": `${locationLabel} COMPANY SUPPORT`,
+      "ANY CONSULTATION SUPPORT": `${locationLabel} CONSULTATION SUPPORT`,
+    };
+
+    if (valueAddedServiceLabelMap[service?.label]) {
+      return valueAddedServiceLabelMap[service.label];
+    }
+
     if (!service.usesSelectedLocation) return service.label;
-    const locationLabel = selectedLocationLabel || "LOCATION";
-    return service.label.replace("LOCATION", locationLabel.toUpperCase());
+    return service.label.replace("LOCATION", locationLabel);
   };
 
   const prioritizedCompanies = ["BIZ Nest", "MeWo"];
