@@ -108,259 +108,6 @@ const formatLeftBadgeValue = (value) => {
   return `${value}`;
 };
 
-const quickStatsConfigByGoalOption = {
-  "Best for Nomads": [
-    { label: "Work Infra", labelKey: "labelBestWorkInfrastructure" },
-    { label: "Internet", labelKey: "labelFastInternetCities" },
-    { label: "Community", labelKey: "labelStrongNomadCommunity" },
-    { label: "Cost", labelKey: "labelCostOfLivingPerMonth" },
-  ],
-  "Most Affordable": [
-    { label: "Cost", labelKey: "labelCostOfLivingPerMonth" },
-    { label: "Healthcare", labelKey: "labelHealthcareFriendly" },
-    { label: "Safety", labelKey: "labelSafestCities" },
-    { label: "Livability", labelKey: "labelMostAffordable" },
-  ],
-  "Safest Cities": [
-    { label: "Safety", labelKey: "labelSafestCities" },
-    { label: "Healthcare", labelKey: "labelHealthcareFriendly" },
-    { label: "Livability", labelKey: "labelMostAffordable" },
-    { label: "Air", labelKey: "labelCleanAirEnvironment" },
-  ],
-  "Easy Visa / Long Stay": [
-    { label: "Visa", labelKey: "labelEasyVisa" },
-    { label: "Long Stay", labelKey: "labelEasyVisa" },
-    { label: "Cost", labelKey: "labelCostOfLivingPerMonth" },
-    { label: "Livability", labelKey: "labelMostAffordable" },
-  ],
-  "Strong Nomad Community": [
-    { label: "Community", labelKey: "labelStrongNomadCommunity" },
-    { label: "Social", labelKey: "labelNomadCommunityNetworking" },
-    { label: "Internet", labelKey: "labelFastInternetCities" },
-    { label: "Livability", labelKey: "labelMostAffordable" },
-  ],
-  "Healthcare Friendly": [
-    { label: "Healthcare", labelKey: "labelHealthcareFriendly" },
-    { label: "Safety", labelKey: "labelSafestCities" },
-    { label: "Air", labelKey: "labelCleanAirEnvironment" },
-    { label: "Cost", labelKey: "labelCostOfLivingPerMonth" },
-  ],
-  "Startup / Business Opportunities": [
-    { label: "Startup", labelKey: "labelStartupBusinessOpportunities" },
-    { label: "Talent", labelKey: "labelTechTalentDensity" },
-    { label: "Work Infra", labelKey: "labelBestWorkInfrastructure" },
-    { label: "Connectivity", labelKey: "labelBestConnectedCitiesFlights" },
-  ],
-  "Clean Air / Environment": [
-    { label: "Air", labelKey: "labelCleanAirEnvironment" },
-    { label: "Safety", labelKey: "labelSafestCities" },
-    { label: "Healthcare", labelKey: "labelHealthcareFriendly" },
-    { label: "Livability", labelKey: "labelMostAffordable" },
-  ],
-  "Best for Remote Work Setup": [
-    { label: "Internet", labelKey: "labelFastInternetCities" },
-    { label: "Work Infra", labelKey: "labelBestWorkInfrastructureWfa" },
-    { label: "Community", labelKey: "labelStrongNomadCommunityWfa" },
-    { label: "Flights", labelKey: "labelBestConnectedCitiesFlights" },
-  ],
-  "Cheapest Places": [
-    { label: "Cost", labelKey: "labelCostOfLivingPerMonth" },
-    { label: "Community", labelKey: "labelStrongNomadCommunityWfa" },
-    { label: "Internet", labelKey: "labelFastInternetCities" },
-    { label: "Work Infra", labelKey: "labelBestWorkInfrastructureWfa" },
-  ],
-  "Best Connected Cities (Flights)": [
-    { label: "Flights", labelKey: "labelBestConnectedCitiesFlights" },
-    { label: "Airport", labelKey: "labelBestConnectedCitiesFlights" },
-    { label: "Internet", labelKey: "labelFastInternetCities" },
-    { label: "Work Infra", labelKey: "labelBestWorkInfrastructureWfa" },
-  ],
-  "Fast Internet Cities": [
-    { label: "Internet", labelKey: "labelFastInternetCities" },
-    { label: "Reliability", labelKey: "labelFastInternetCities" },
-    { label: "Work Infra", labelKey: "labelBestWorkInfrastructureWfa" },
-    { label: "Connectivity", labelKey: "labelBestConnectedCitiesFlights" },
-  ],
-  "Best Work Infrastructure": [
-    { label: "Work Infra", labelKey: "labelBestWorkInfrastructureWfa" },
-    { label: "Internet", labelKey: "labelFastInternetCities" },
-    { label: "Community", labelKey: "labelStrongNomadCommunityWfa" },
-    { label: "Access", labelKey: "labelBestConnectedCitiesFlights" },
-  ],
-  "Maximum Savings": [
-    { label: "Cost", labelKey: "labelCostOfLivingPerMonth" },
-    { label: "Tax", labelKey: "labelLowTaxation" },
-    { label: "Power", labelKey: "labelPurchasingPower" },
-    { label: "Stability", labelKey: "labelFinancialStability" },
-  ],
-  "Low Taxation": [
-    { label: "Tax", labelKey: "labelLowTaxation" },
-    { label: "Cost", labelKey: "labelCostOfLivingPerMonth" },
-    { label: "Power", labelKey: "labelPurchasingPower" },
-    { label: "Stability", labelKey: "labelFinancialStability" },
-  ],
-  "Purchasing Power": [
-    { label: "Power", labelKey: "labelPurchasingPower" },
-    { label: "Cost", labelKey: "labelCostOfLivingPerMonth" },
-    { label: "Tax", labelKey: "labelLowTaxation" },
-    { label: "Stability", labelKey: "labelFinancialStability" },
-  ],
-  "Financial Stability(Low Risk)": [
-    { label: "Stability", labelKey: "labelFinancialStability" },
-    { label: "Healthcare", labelKey: "labelHealthcareFriendly" },
-    { label: "Tax", labelKey: "labelLowTaxation" },
-    { label: "Cost", labelKey: "labelCostOfLivingPerMonth" },
-  ],
-  "Startup Setup Cost": [
-    { label: "Setup Cost", labelKey: "labelStartupSetupCost" },
-    { label: "Tax", labelKey: "labelLowTaxation" },
-    { label: "Living Cost", labelKey: "labelCostOfLivingPerMonth" },
-    { label: "Power", labelKey: "labelPurchasingPower" },
-  ],
-  "Balanced Financial Lifestyle": [
-    { label: "Efficiency", labelKey: "labelBalancedFinancialLifestyle" },
-    { label: "Tax", labelKey: "labelLowTaxation" },
-    { label: "Power", labelKey: "labelPurchasingPower" },
-    { label: "Stability", labelKey: "labelFinancialStability" },
-  ],
-  "Startup Ecosystems": [
-    { label: "Startup", labelKey: "labelStartupEcosystems" },
-    { label: "VC", labelKey: "labelVentureCapitalPresence" },
-    { label: "Incubators", labelKey: "labelStartupIncubatorsAccelerators" },
-    { label: "Talent", labelKey: "labelTechTalentDensity" },
-  ],
-  "Remote Job Opportunities": [
-    { label: "Remote Jobs", labelKey: "labelRemoteJobOpportunities" },
-    { label: "Global Access", labelKey: "labelBestConnectedCitiesFlights" },
-    { label: "Career", labelKey: "labelBalancedCareerGrowth" },
-    { label: "Work Ecosystem", labelKey: "labelBestWorkInfrastructure" },
-  ],
-  "Founder Nomads": [
-    { label: "Founder", labelKey: "labelFounderNomadsAyc" },
-    { label: "Events", labelKey: "labelConferencesEvents" },
-    { label: "Talent", labelKey: "labelTechTalentDensity" },
-    { label: "Opportunity", labelKey: "labelStartupEcosystems" },
-  ],
-  "Tech Talent Density": [
-    { label: "Talent", labelKey: "labelTechTalentDensity" },
-    { label: "Builders", labelKey: "labelTechTalentDensity" },
-    { label: "Innovation", labelKey: "labelStartupEcosystems" },
-    { label: "Collaboration", labelKey: "labelNomadCommunityNetworking" },
-  ],
-  "Startup Incubators & Accelerators": [
-    { label: "Incubators", labelKey: "labelStartupIncubatorsAccelerators" },
-    { label: "Mentorship", labelKey: "labelStartupIncubatorsAccelerators" },
-    { label: "Support", labelKey: "labelStartupEcosystems" },
-    { label: "Growth", labelKey: "labelBalancedCareerGrowth" },
-  ],
-  "Balanced Career Growth": [
-    { label: "Jobs", labelKey: "labelRemoteJobOpportunities" },
-    { label: "Startup", labelKey: "labelStartupEcosystems" },
-    { label: "Networking", labelKey: "labelConferencesEvents" },
-    { label: "Talent", labelKey: "labelTechTalentDensity" },
-  ],
-  "Venture Capital Presence": [
-    { label: "VC", labelKey: "labelVentureCapitalPresence" },
-    { label: "Funding", labelKey: "labelVentureCapitalPresence" },
-    { label: "Investors", labelKey: "labelVentureCapitalPresence" },
-    { label: "Growth", labelKey: "labelBalancedCareerGrowth" },
-  ],
-  "Conferences & Events": [
-    { label: "Conferences", labelKey: "labelConferencesEvents" },
-    { label: "Networking", labelKey: "labelConferencesEvents" },
-    { label: "Meetups", labelKey: "labelConferencesEvents" },
-    { label: "Exposure", labelKey: "labelBestConnectedCitiesFlights" },
-  ],
-  "Social & Party Lifestyle": [
-    { label: "Social", labelKey: "labelSocialPartyLifestyle" },
-    { label: "Nightlife", labelKey: "labelSocialPartyLifestyle" },
-    { label: "Community", labelKey: "labelNomadCommunityNetworking" },
-    { label: "Events", labelKey: "labelConferencesEvents" },
-  ],
-  "Chill & Wellness Lifestyle": [
-    { label: "Peaceful", labelKey: "labelChillWellnessLifestyle" },
-    { label: "Wellness", labelKey: "labelChillWellnessLifestyle" },
-    { label: "Nature", labelKey: "labelCleanAirEnvironment" },
-    { label: "Community", labelKey: "labelNomadCommunityNetworking" },
-  ],
-  "Adventure & Exploration": [
-    { label: "Adventure", labelKey: "labelAdventureExploration" },
-    { label: "Nature", labelKey: "labelCleanAirEnvironment" },
-    { label: "Explore", labelKey: "labelAdventureExploration" },
-    { label: "Community", labelKey: "labelNomadCommunityNetworking" },
-  ],
-  "Nomad Community & Networking": [
-    { label: "Community", labelKey: "labelNomadCommunityNetworking" },
-    { label: "Meetups", labelKey: "labelConferencesEvents" },
-    { label: "Founder", labelKey: "labelFounderNomads" },
-    { label: "Ecosystem", labelKey: "labelStrongNomadCommunity" },
-  ],
-  "Couple - Friendly Lifestyle": [
-    { label: "Couples", labelKey: "labelCoupleFriendlyLifestyle" },
-    { label: "Lifestyle", labelKey: "labelCoupleFriendlyLifestyle" },
-    { label: "Community", labelKey: "labelNomadCommunityNetworking" },
-    { label: "Balance", labelKey: "labelChillWellnessLifestyle" },
-  ],
-  "Family - Friendly Lifestyle": [
-    { label: "Family", labelKey: "labelFamilyFriendlyLifestyle" },
-    { label: "Safety", labelKey: "labelSafestCities" },
-    { label: "Livability", labelKey: "labelMostAffordable" },
-    { label: "Community", labelKey: "labelNomadCommunityNetworking" },
-  ],
-  "Female Friendly Lifestyle": [
-    { label: "Safety", labelKey: "labelSafestCities" },
-    { label: "Women-Friendly", labelKey: "labelFemaleFriendlyLifestyle" },
-    { label: "Community", labelKey: "labelNomadCommunityNetworking" },
-    { label: "Ease", labelKey: "labelFemaleFriendlyLifestyle" },
-  ],
-  "Solo Nomads": [
-    { label: "Solo", labelKey: "labelNomadCommunityNetworking" },
-    { label: "Social", labelKey: "labelStrongNomadCommunity" },
-    { label: "Activities", labelKey: "labelConferencesEvents" },
-    { label: "Freedom", labelKey: "labelEasyVisa" },
-  ],
-};
-
-const fallbackQuickStatsConfig = [
-  { label: "Internet", labelKey: "labelInternetSpeed", field: "internetSpeed" },
-  {
-    label: "Cost",
-    labelKey: "labelCostOfLivingPerMonth",
-    field: "costOfLivingPerMonth",
-  },
-  { label: "AQI", labelKey: "labelAqiValue", field: "aqiValue" },
-  { label: "Score", field: "suggestions" },
-];
-
-const getQuickStatsForDestination = (destination, selectedGoalOption) => {
-  const statConfig =
-    quickStatsConfigByGoalOption[selectedGoalOption] ||
-    fallbackQuickStatsConfig;
-
-  const configuredStats = statConfig.slice(0, 4).map((config) => {
-    const valueFromLabel =
-      config.labelKey && destination?.labels
-        ? formatLeftBadgeValue(destination.labels[config.labelKey])
-        : null;
-    const valueFromField = config.field
-      ? formatLeftBadgeValue(destination[config.field])
-      : null;
-
-    return {
-      label: config.label,
-      value: valueFromLabel || valueFromField || "—",
-    };
-  });
-
-  return [
-    {
-      label: "Rank",
-      value: destination?.rankLabel || "—",
-    },
-    ...configuredStats,
-  ];
-};
-
 const destinationAliasMap = {
   "Ho Chi Minh": "Ho Chi Minh City",
   Surigao: "Surigao del Norte",
@@ -1420,6 +1167,7 @@ const AiSearchResults = () => {
                               className="aspect-square w-full rounded-xl object-cover md:rounded-2xl transition-transform duration-500 group-hover:scale-110"
                             />
 
+                            {/* EXISTING BADGES */}
                             <div
                               className={`pointer-events-none absolute inset-x-0 bottom-0 flex items-end gap-1.5 bg-gradient-to-t from-black/75 via-black/25 to-transparent px-2 py-2 text-white md:gap-3 md:px-4 md:py-3 ${
                                 destination.leftBadgeLabel
@@ -1428,61 +1176,60 @@ const AiSearchResults = () => {
                               }`}
                             >
                               {destination.leftBadgeLabel && (
-                                <span className="rounded-full bg-black/45 px-2 py-0.5 text-[0.7rem] font-semibold tracking-wide backdrop-blur-sm md:px-3 md:py-1 md:text-xs">
+                                <span className="rounded-full bg-black/45 px-2 py-0.5 text-[0.7rem] font-semibold backdrop-blur-sm md:px-3 md:py-1 md:text-xs">
                                   {destination.leftBadgeLabel}
                                 </span>
                               )}
-                              <span className="rounded-full bg-black/45 px-2 py-0.5 text-[0.7rem] font-semibold tracking-wide backdrop-blur-sm md:px-3 md:py-1 md:text-xs">
+                              <span className="rounded-full bg-black/45 px-2 py-0.5 text-[0.7rem] font-semibold backdrop-blur-sm md:px-3 md:py-1 md:text-xs">
                                 {destination.rankLabel}
                               </span>
                             </div>
 
+                            {/* 🔥 HOVER STATS OVERLAY */}
                             <div className="absolute inset-0 bg-black/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-center p-3 md:p-4">
                               <div className="translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                                <h4 className="text-white text-sm md:text-base font-semibold text-center mb-2">
-                                  {selectedGoalOption || "Attribute"}
-                                </h4>
                                 <h4 className="text-white text-sm md:text-base font-semibold mb-2">
                                   Quick Stats
                                 </h4>
 
-                                <div className="grid grid-cols-1 gap-2 text-xs md:text-sm text-white/90">
-                                  {getQuickStatsForDestination(
-                                    destination,
-                                    selectedGoalOption,
-                                  ).map((stat, statIndex) => (
-                                    <div
-                                      key={`${destination.city}-${stat.label}-${statIndex}`}
-                                      className="bg-white/10 rounded-lg px-2 py-1 flex items-center justify-between gap-2"
-                                    >
-                                      <span className="font-medium">{`${stat.label}:`}</span>
-                                      <span className="text-right">
-                                        {stat.value}
-                                      </span>
-                                    </div>
-                                  ))}
+                                <div className="grid grid-cols-2 gap-2 text-xs md:text-sm text-white/90">
+                                  <div className="bg-white/10 rounded-lg px-2 py-1">
+                                    🌐 Internet:{" "}
+                                    {destination.internetSpeed || "—"}
+                                  </div>
+
+                                  <div className="bg-white/10 rounded-lg px-2 py-1">
+                                    💰 Cost:{" "}
+                                    {destination.costOfLivingPerMonth || "—"}
+                                  </div>
+
+                                  <div className="bg-white/10 rounded-lg px-2 py-1">
+                                    🌿 AQI: {destination.aqiValue || "—"}
+                                  </div>
+
+                                  <div className="bg-white/10 rounded-lg px-2 py-1">
+                                    🏝 Score: {destination.suggestions || "—"}
+                                  </div>
                                 </div>
                               </div>
                             </div>
                           </div>
-                          <div className="px-2">
-                            <div className="mt-1.5 flex items-start justify-start gap-1 md:mt-2 md:gap-1 ">
-                              <div className="min-w-0">
-                                <h3 className="truncate text-[0.8rem] font-semibold leading-tight text-black/90 md:text-[1.2rem]">
-                                  {`${destination.displayCity || destination.city} - `}
-                                </h3>
-                              </div>
+                          <div className="mt-1.5 flex items-start justify-start gap-1 md:mt-2 md:gap-1">
+                            <div className="min-w-0">
+                              <h3 className="truncate text-[0.8rem] font-semibold leading-tight text-black/90 md:text-[1.2rem]">
+                                {`${destination.displayCity || destination.city} - `}
+                              </h3>
+                            </div>
 
-                              <p className="truncate text-[0.8rem] font-semibold leading-tight text-black/90  md:text-[1.2rem]">
-                                {destination.displayCountry ||
-                                  destination.country}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-[0.82rem] text-black/60 md:text-[0.9rem]">
-                                Click to view options
-                              </p>
-                            </div>
+                            <p className="truncate text-[0.8rem] font-semibold leading-tight text-black/90  md:text-[1.2rem]">
+                              {destination.displayCountry ||
+                                destination.country}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-[0.82rem] text-black/60 md:text-[0.9rem]">
+                              Click to view options
+                            </p>
                           </div>
                         </article>
                       ))}
