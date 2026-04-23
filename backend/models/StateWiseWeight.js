@@ -20,14 +20,22 @@ const stateWiseWeightSchema = new mongoose.Schema(
             required: true,
         },
 
-        imageUrls: {
-            type: [String],
+        images: {
+            type: Map,
+            of: new mongoose.Schema(
+                {
+                    url: { type: String, required: true },
+                    s3Key: { type: String, required: true },
+                },
+                { _id: false }
+            ),
+            default: {},
             validate: {
                 validator: function (value) {
                     if (!value) return true;
-                    return Array.isArray(value) && value.length > 0;
+                    return value.size <= 3;
                 },
-                message: "imageUrls must be a non-empty array.",
+                message: "A maximum of 3 images is allowed.",
             },
         },
 
