@@ -56,16 +56,16 @@ const valueAddedServiceItems = [
     label: "APPLY FOR JOB",
     badge: "Coming soon",
   },
-  {
-    label: "VIEW LOCATION BLOGS",
-    path: "/ai-blogs",
-    usesSelectedLocation: true,
-  },
-  {
-    label: "VIEW LOCATION NEWS",
-    path: "/ai-news",
-    usesSelectedLocation: true,
-  },
+  // {
+  //   label: "VIEW LOCATION BLOGS",
+  //   path: "/ai-blogs",
+  //   usesSelectedLocation: true,
+  // },
+  // {
+  //   label: "VIEW LOCATION NEWS",
+  //   path: "/ai-news",
+  //   usesSelectedLocation: true,
+  // },
 ];
 
 const AiListings = ({ forceListView = false }) => {
@@ -623,9 +623,20 @@ const AiListings = ({ forceListView = false }) => {
   };
 
   const getValueAddedServiceLabel = (service) => {
+    const locationLabel = (selectedStateLabel || "LOCATION").toUpperCase();
+    const valueAddedServiceLabelMap = {
+      "ANY VISA SUPPORT": `${locationLabel} VISA SUPPORT`,
+      "OVERALL ACTIVATION SUPPORT": `${locationLabel} ACTIVATION SUPPORT`,
+      "NEW COMPANY SUPPORT": `${locationLabel} COMPANY SUPPORT`,
+      "ANY CONSULTATION SUPPORT": `${locationLabel} CONSULTATION SUPPORT`,
+    };
+
+    if (valueAddedServiceLabelMap[service?.label]) {
+      return valueAddedServiceLabelMap[service.label];
+    }
+
     if (!service?.usesSelectedLocation) return service.label;
-    const locationLabel = selectedStateLabel || "LOCATION";
-    return service.label.replace("LOCATION", locationLabel.toUpperCase());
+    return service.label.replace("LOCATION", locationLabel);
   };
 
   const [mapOpen, setMapOpen] = useState(!forceListView);
