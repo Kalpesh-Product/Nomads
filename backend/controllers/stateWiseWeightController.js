@@ -265,12 +265,17 @@ export const getStateWiseWeight = async (req, res, next) => {
         ? imagePayload.images
         : buildImagesMapFromUrls(resolvedImageUrls, item.state);
 
+      const resolvedImageUrl = resolvedImageUrls.length > 0
+        ? resolvedImageUrls[Math.floor(Math.random() * resolvedImageUrls.length)]
+        : "";
+
       return {
         state: item.state,
         country: item.country,
         isActive: item.isActive,
         [effectiveAttribute]: scoreForSorting,
-        imageUrl: resolvedImageUrls,
+        imageUrl: resolvedImageUrl,
+        imageUrls: resolvedImageUrls,
         images: resolvedImages,
         labels: item.labels,
       };
@@ -301,8 +306,13 @@ export const getAllStateWiseWeight = async (req, res, next) => {
       const resolvedImageUrls = imagePayload.imageUrls.length
         ? imagePayload.imageUrls
         : fallbackImageUrls;
+      const resolvedImageUrl = resolvedImageUrls.length > 0
+        ? resolvedImageUrls[Math.floor(Math.random() * resolvedImageUrls.length)]
+        : "";
+
       plainItem.calculatedScores = stateWiseWeightCalculation(plainItem.weight);
-      plainItem.imageUrl = resolvedImageUrls;
+      plainItem.imageUrl = resolvedImageUrl;
+      plainItem.imageUrls = resolvedImageUrls;
       plainItem.images = imagePayload.imageUrls.length
         ? imagePayload.images
         : buildImagesMapFromUrls(resolvedImageUrls, plainItem.state);
