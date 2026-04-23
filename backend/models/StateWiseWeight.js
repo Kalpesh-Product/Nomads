@@ -25,7 +25,7 @@ const stateWiseWeightSchema = new mongoose.Schema(
             of: new mongoose.Schema(
                 {
                     url: { type: String, required: true },
-                    s3Key: { type: String, required: true },
+                    s3Key: { type: String, required: false },
                 },
                 { _id: false }
             ),

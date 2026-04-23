@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import StateWiseWeight from "../models/StateWiseWeight.js";
 import { stateWiseWeightCalculation } from "../controllers/stateWiseWeightCalculation.js";
-import { deleteFileFromS3ByUrl, uploadFileToS3 } from "../config/s3Config.js";
+import { deleteFileFromS3ByKey, deleteFileFromS3ByUrl, uploadFileToS3 } from "../config/s3Config.js";
 import csvParser from "csv-parser";
 import { Readable } from "stream";
 
@@ -137,7 +137,16 @@ const buildImagesMapFromUrls = (urls = [], stateName = "") =>
 const normalizeImagesPayload = (images) => {
   if (!images) return {};
   if (images instanceof Map) return Object.fromEntries(images);
-  if (Array.isArray(images)) return buildImagesMapFromUrls(images);
+  if (Array.isArray(images)) {
+    const normalizedUrls = images
+      .map((entry) => {
+        if (typeof entry === "string") return entry;
+        if (entry && typeof entry === "object") return entry.url || entry.imageUrl || "";
+        return "";
+      })
+      .filter(Boolean);
+    return buildImagesMapFromUrls(normalizedUrls);
+  }
   if (typeof images !== "object") return {};
 
   return Object.fromEntries(
@@ -160,6 +169,14 @@ const mapImagesForResponse = (images = {}) => {
   const plainImages = normalizeImagesPayload(images);
   const imageUrls = Object.values(plainImages).map((img) => img?.url).filter(Boolean);
   return { images: plainImages, imageUrls };
+};
+
+const getLegacyImageUrls = (item = {}) => {
+  if (Array.isArray(item.imageUrls)) return item.imageUrls.filter(Boolean);
+  if (Array.isArray(item.imageUrl)) return item.imageUrl.filter(Boolean);
+  if (typeof item.imageUrl === "string" && item.imageUrl.trim()) return [item.imageUrl.trim()];
+  if (typeof item.imagelink === "string" && item.imagelink.trim()) return [item.imagelink.trim()];
+  return [];
 };
 
 const mapCsvRowToStateWiseWeight = (rawRow = {}) => {
@@ -240,14 +257,21 @@ export const getStateWiseWeight = async (req, res, next) => {
       const allScores = stateWiseWeightCalculation(item.weight);
       const scoreForSorting = allScores[effectiveAttribute] || 0;
       const imagePayload = mapImagesForResponse(item.images);
+      const fallbackImageUrls = getLegacyImageUrls(item);
+      const resolvedImageUrls = imagePayload.imageUrls.length
+        ? imagePayload.imageUrls
+        : fallbackImageUrls;
+      const resolvedImages = imagePayload.imageUrls.length
+        ? imagePayload.images
+        : buildImagesMapFromUrls(resolvedImageUrls, item.state);
 
       return {
         state: item.state,
         country: item.country,
         isActive: item.isActive,
         [effectiveAttribute]: scoreForSorting,
-        imageUrl: imagePayload.imageUrls,
-        images: imagePayload.images,
+        imageUrl: resolvedImageUrls,
+        images: resolvedImages,
         labels: item.labels,
       };
     });
@@ -272,7 +296,16 @@ export const getAllStateWiseWeight = async (req, res, next) => {
 
     const dataWithScores = stateWiseWeight.map((item) => {
       const plainItem = item.toObject();
+      const imagePayload = mapImagesForResponse(plainItem.images);
+      const fallbackImageUrls = getLegacyImageUrls(plainItem);
+      const resolvedImageUrls = imagePayload.imageUrls.length
+        ? imagePayload.imageUrls
+        : fallbackImageUrls;
       plainItem.calculatedScores = stateWiseWeightCalculation(plainItem.weight);
+      plainItem.imageUrl = resolvedImageUrls;
+      plainItem.images = imagePayload.imageUrls.length
+        ? imagePayload.images
+        : buildImagesMapFromUrls(resolvedImageUrls, plainItem.state);
       return plainItem;
     });
 
@@ -385,6 +418,7 @@ export const updateStateWiseWeight = async (req, res, next) => {
 
     const updatePayload = { ...req.body };
 
+    // Standard parsers for FormData fields
     if (typeof updatePayload.weight === "string") {
       try { updatePayload.weight = JSON.parse(updatePayload.weight); }
       catch (error) { return res.status(400).json({ success: false, message: "Invalid JSON format for weight field." }); }
@@ -401,22 +435,42 @@ export const updateStateWiseWeight = async (req, res, next) => {
       try { updatePayload.imageUrls = JSON.parse(updatePayload.imageUrls); }
       catch (error) { return res.status(400).json({ success: false, message: "Invalid JSON format for imageUrls field." }); }
     }
+
+    // 1. Determine the "base" images map from the payload
+    let resolvedImages = {};
     if (Array.isArray(updatePayload.imageUrls)) {
-      updatePayload.images = buildImagesMapFromUrls(updatePayload.imageUrls, updatePayload.state || existingStateWiseWeight.state);
+      resolvedImages = buildImagesMapFromUrls(updatePayload.imageUrls, updatePayload.state || existingStateWiseWeight.state);
     } else if (typeof updatePayload.imageUrl === "string" && updatePayload.imageUrl.trim()) {
-      updatePayload.images = buildImagesMapFromUrls([updatePayload.imageUrl.trim()], updatePayload.state || existingStateWiseWeight.state);
+      resolvedImages = buildImagesMapFromUrls([updatePayload.imageUrl.trim()], updatePayload.state || existingStateWiseWeight.state);
     } else if (updatePayload.images) {
-      updatePayload.images = normalizeImagesPayload(updatePayload.images);
+      resolvedImages = normalizeImagesPayload(updatePayload.images);
+    } else {
+      // If images field is missing from payload, we assume it's NOT being updated.
+      // But if it is an empty object/array, we assume they want to clear it.
+      resolvedImages = normalizeImagesPayload(existingStateWiseWeight.images);
     }
 
-    if (updatePayload.images && Object.keys(updatePayload.images).length > 3) {
-      return res.status(400).json({ success: false, message: "A maximum of 3 images is allowed." });
-    }
+    // 2. Preserve existing S3 keys if the URL matches (crucial for deletion logic)
+    const existingImagesMap = normalizeImagesPayload(existingStateWiseWeight.images);
+    const existingImagesList = Object.values(existingImagesMap);
 
+    Object.keys(resolvedImages).forEach((slotKey) => {
+      const img = resolvedImages[slotKey];
+      if (!img.s3Key || img.s3Key === "") {
+        const match = existingImagesList.find((e) => e.url === img.url);
+        if (match) {
+          img.s3Key = match.s3Key;
+        }
+      }
+    });
+
+    // 3. Handle physical file uploads
     if (Array.isArray(req.files) && req.files.length > 0) {
       if (req.files.length > 3) {
         return res.status(400).json({ success: false, message: "A maximum of 3 images is allowed." });
       }
+
+      // Upload new files
       const uploadedImages = await Promise.all(
         req.files.map(async (file, index) => {
           const fileName = String(file.originalname || `image-${index + 1}`).replace(/[/\\?%*:|"<>]/g, "_").replace(/\s+/g, "_");
@@ -424,21 +478,46 @@ export const updateStateWiseWeight = async (req, res, next) => {
           return uploadFileToS3(fileKey, file);
         })
       );
-      updatePayload.images = uploadedImages.reduce((acc, img, index) => {
+
+      // Merge or replace? Usually replacement is intended when files are sent
+      // But let's be smart: if they sent files, they might want to replace certain slots or just append.
+      // For now, consistent with original logic, we replace the Map with ONLY these new files.
+      // (Wait, the original logic deleted ALL current images if new files were sent. Let's stick to that but use keys.)
+      
+      resolvedImages = uploadedImages.reduce((acc, img, index) => {
         const slotKey = buildImageSlotKey(updatePayload.state || existingStateWiseWeight.state, index);
         acc[slotKey] = { url: img.url, s3Key: img.id };
         return acc;
       }, {});
+    }
 
-      const currentImages = normalizeImagesPayload(existingStateWiseWeight.images);
-      for (const image of Object.values(currentImages)) {
-        if (image?.url) await deleteFileFromS3ByUrl(image.url);
+    // 4. Identify and delete removed images from S3
+    const newS3Keys = Object.values(resolvedImages).map((img) => img.s3Key).filter(Boolean);
+
+    for (const oldImg of Object.values(existingImagesMap)) {
+      if (oldImg.s3Key && !newS3Keys.includes(oldImg.s3Key)) {
+        await deleteFileFromS3ByKey(oldImg.s3Key);
       }
     }
 
-    const updatedStateWiseWeight = await StateWiseWeight.findByIdAndUpdate(id, { $set: updatePayload }, { new: true, runValidators: true });
+    // 5. Finalize payload and update
+    if (Object.keys(resolvedImages).length > 3) {
+      return res.status(400).json({ success: false, message: "A maximum of 3 images is allowed." });
+    }
 
-    return res.status(200).json({ success: true, message: "State-wise weight data updated successfully.", data: updatedStateWiseWeight });
+    updatePayload.images = resolvedImages;
+
+    const updatedStateWiseWeight = await StateWiseWeight.findByIdAndUpdate(
+      id,
+      { $set: updatePayload },
+      { new: true, runValidators: true }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "State-wise weight data updated successfully.",
+      data: updatedStateWiseWeight
+    });
   } catch (error) {
     return next(error);
   }
