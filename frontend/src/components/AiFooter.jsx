@@ -97,7 +97,7 @@ const AiFooter = () => {
             nomad living, one update at a time. See Cookie Preferences.
           </span>
           <span className="text-center sm:col-start-3 sm:justify-self-end sm:pr-8">
-            Version 2.0
+            Version 2.7.3
           </span>
         </div>
       </div>
