@@ -322,7 +322,7 @@ export const STATEWISE_WEIGHT_FORMULAS = {
         ["ventureCapital", 0.1],
         ["nomadCommunity", 0.1],
     ],
-    startupIncubatorsAndAccelerators: [
+    startupIncubatorsAccelerators: [
         ["incubators", 0.35],
         ["startupEcosystemScore", 0.2],
         ["founderNomads", 0.15],
@@ -346,7 +346,7 @@ export const STATEWISE_WEIGHT_FORMULAS = {
         ["founderNomads", 0.1],
         ["techTalentDensity", 0.1],
     ],
-    conferencesAndEvents: [
+    conferencesEvents: [
         ["conferences", 0.35],
         ["founderNomads", 0.2],
         ["startupEcosystemScore", 0.15],
