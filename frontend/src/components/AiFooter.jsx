@@ -91,12 +91,12 @@ const AiFooter = () => {
   return (
     <>
       <div className="sticky bottom-0 z-10 bg-white/95 py-6 text-nano text-gray-600 backdrop-blur supports-[backdrop-filter]:bg-white/80">
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center">
-          <span className="col-start-2 text-center">
+        <div className="flex flex-col items-center gap-2 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center">
+          <span className="text-center sm:col-start-2">
             WoNo is in Beta and can make mistakes. Building the future of global
             nomad living, one update at a time. See Cookie Preferences.
           </span>
-          <span className="col-start-3 justify-self-end pr-4 sm:pr-8">
+          <span className="text-center sm:col-start-3 sm:justify-self-end sm:pr-8">
             Version 2.0
           </span>
         </div>
