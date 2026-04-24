@@ -61,3 +61,21 @@ export async function deleteFileFromS3ByUrl(fileUrl) {
 
   return { success: true, message: "File deleted successfully" };
 }
+
+export async function deleteFileFromS3ByKey(key) {
+  try {
+    if (!key) return { success: false, message: "Key is required" };
+    const deleteParams = {
+      Bucket: process.env.PROJECT_S3_BUCKET_NAME,
+      Key: key,
+    };
+
+    const command = new DeleteObjectCommand(deleteParams);
+    await s3Client.send(command);
+
+    return { success: true, message: "File deleted successfully" };
+  } catch (error) {
+    console.error("S3 Deletion Error:", error);
+    return { success: false, message: error.message };
+  }
+}

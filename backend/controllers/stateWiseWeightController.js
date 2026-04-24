@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import StateWiseWeight from "../models/StateWiseWeight.js";
 import { stateWiseWeightCalculation } from "../controllers/stateWiseWeightCalculation.js";
-import { deleteFileFromS3ByUrl, uploadFileToS3 } from "../config/s3Config.js";
+import { deleteFileFromS3ByKey, deleteFileFromS3ByUrl, uploadFileToS3 } from "../config/s3Config.js";
 import csvParser from "csv-parser";
 import { Readable } from "stream";
 
@@ -25,7 +25,7 @@ const CSV_TO_SCHEMA_MAP = {
   directinternationalflights: "directInternationalFlights",
 
   // Financial
-  "lowertaxes-taxfriendly": "taxFriendly",
+  lowertaxestaxfriendly: "taxFriendly", // Handles "Lower Taxes - Tax Friendly"
   purchasingpower: "purchasingPower",
   inflationstability: "inflationStability",
   startupsetupcost: "startupSetupCost",
@@ -52,51 +52,50 @@ const CSV_TO_SCHEMA_MAP = {
   healthcarecostindex: "healthcareCostIndex",
 };
 
+// Updated to EXACTLY match the CSV headers you provided (ignoring the "Score ..." columns)
 const CSV_TO_LABEL_MAP = {
-  labelcostoflivingpermonth: "labelCostOfLivingPerMonth",
-  labelinternetspeed: "labelInternetSpeed",
-  labelaqivalue: "labelAqiValue",
-  labelnomadtax: "labelNomadTax",
-  labelresidenttax: "labelResidentTax",
-  labelmostaffordable: "labelMostAffordable",
-  labelsafestcities: "labelSafestCities",
-  labeleasyvisa: "labelEasyVisa",
-  labelstrongnomadcommunity: "labelStrongNomadCommunity",
-  labelhealthcarefriendly: "labelHealthcareFriendly",
-  labelstartupbusinessopportunities: "labelStartupBusinessOpportunities",
-  labelcleanairenvironment: "labelCleanAirEnvironment",
-  labelbestworkinfrastructure: "labelBestWorkInfrastructure",
-  labelcheapestplaces: "labelCheapestPlaces",
-  labelbestconnectedcitiesflights: "labelBestConnectedCitiesFlights",
-  labelstrongnomadcommunitywfa: "labelStrongNomadCommunityWfa",
-  labelfastinternetcities: "labelFastInternetCities",
-  labelbestworkinfrastructurewfa: "labelBestWorkInfrastructureWfa",
-  labelmaximumsavings: "labelMaximumSavings",
-  labellowtaxation: "labelLowTaxation",
-  labelpurchasingpower: "labelPurchasingPower",
-  labelfinancialstability: "labelFinancialStability",
-  labelstartupsetupcost: "labelStartupSetupCost",
-  labelbalancedfinanciallifestyle: "labelBalancedFinancialLifestyle",
-  labelsocialpartylifestyle: "labelSocialPartyLifestyle",
-  labelchillwellnesslifestyle: "labelChillWellnessLifestyle",
-  labeladventureexploration: "labelAdventureExploration",
-  labelnomadcommunitynetworking: "labelNomadCommunityNetworking",
-  labelcouplefriendlylifestyle: "labelCoupleFriendlyLifestyle",
-  labelfamilyfriendlylifestyle: "labelFamilyFriendlyLifestyle",
-  labelfemalefriendlylifestyle: "labelFemaleFriendlyLifestyle",
-  labelfoundernomads: "labelFounderNomads",
-  labelsolonamads: "labelSoloNomads",
-  labelstartupecosystems: "labelStartupEcosystems",
-  labelremotejobopportunities: "labelRemoteJobOpportunities",
-  labelfoundernomadsayc: "labelFounderNomadsAyc",
-  labeltechtalentdensity: "labelTechTalentDensity",
-  labelstartupincubatorsaccelerators: "labelStartupIncubatorsAccelerators",
-  labelbalancedcareergrowth: "labelBalancedCareerGrowth",
-  labelventurecapitalpresence: "labelVentureCapitalPresence",
-  labelconferencesevents: "labelConferencesEvents",
+  "labelbestfornomads": "labelBestForNomads",
+  "labelmostaffordable": "labelMostAffordable",
+  "labelsafestcities": "labelSafestCities",
+  "labeleasyvisa": "labelEasyVisa",
+  "labelstrongnomadcommunity": "labelStrongNomadCommunity",
+  "labelhealthcarefriendly": "labelHealthcareFriendly",
+  "labelstartupbusinessopportunities": "labelStartupBusinessOpportunities",
+  "labelcleanairenvironment": "labelCleanAirEnvironment",
+  "labelbestworkinfrastructure": "labelBestWorkInfrastructure",
+  "labelbestforremoteworksetup": "labelBestForRemoteWorkSetup",
+  "labelcheapestplaces": "labelCheapestPlaces",
+  "labelbestconnectedcitiesflights": "labelBestConnectedCitiesFlights",
+
+  "labelstrongnomadcommunitywfa": "labelStrongNomadCommunityWfa",
+  "labelfastinternetcities": "labelFastInternetCities",
+  "labelbestworkinfrastructurewfa": "labelBestWorkInfrastructureWfa",
+  "labelmaximumsavings": "labelMaximumSavings",
+  "labellowtaxation": "labelLowTaxation",
+  "labelpurchasingpower": "labelPurchasingPower",
+  "labelfinancialstability": "labelFinancialStability",
+  "labelstartupsetupcost": "labelStartupSetupCost",
+  "labelbalancedfinanciallifestyle": "labelBalancedFinancialLifestyle",
+  "labelsocialpartylifestyle": "labelSocialPartyLifestyle",
+  "labelchillwellnesslifestyle": "labelChillWellnessLifestyle",
+  "labeladventureexploration": "labelAdventureExploration",
+  "labelnomadcommunitynetworking": "labelNomadCommunityNetworking",
+  "labelcouplefriendlylifestyle": "labelCoupleFriendlyLifestyle",
+  "labelfamilyfriendlylifestyle": "labelFamilyFriendlyLifestyle",
+  "labelfemalefriendlylifestyle": "labelFemaleFriendlyLifestyle",
+  "labelfoundernomads": "labelFounderNomads",
+  "labelsolonomads": "labelSoloNomads",
+  "labelstartupecosystems": "labelStartupEcosystems",
+  "labelremotejobopportunities": "labelRemoteJobOpportunities",
+  "labelfoundernomadsayc": "labelFounderNomadsAyc",
+  "labeltechtalentdensity": "labelTechTalentDensity",
+  "labelstartupincubatorsaccelerators": "labelStartupIncubatorsAccelerators",
+  "labelbalancedcareergrowth": "labelBalancedCareerGrowth",
+  "labelventurecapitalpresence": "labelVentureCapitalPresence",
+  "labelconferencesevents": "labelConferencesEvents",
 };
 
-// Normalizes raw CSV keys so we can map inconsistent headers safely.
+// Normalizes raw CSV keys
 const normalize = (row = {}) =>
   Object.fromEntries(
     Object.entries(row).map(([key, value]) => [
@@ -105,15 +104,79 @@ const normalize = (row = {}) =>
         .toLowerCase()
         .replace(/\s+/g, "")
         .replace(/[_-]/g, "")
-        .replace(/&/g, ""),
+        .replace(/&/g, "")
+        .replace(/[()]/g, "") // Added to handle "(flights)"
+        .replace(/\//g, ""),  // Added to handle "Startup / Business"
       typeof value === "string" ? value.trim() : value,
-    ]),
+    ])
   );
 
-// Converts CSV values to numbers and defaults invalid/missing values to 0.
+// Converts CSV values to numbers
 const toNumber = (value) => {
   const num = Number(value);
   return Number.isFinite(num) ? num : 0;
+};
+
+const buildImageSlotKey = (stateName = "", index = 0) => {
+  const normalizedState = String(stateName || "state")
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "")
+    .slice(0, 12) || "STATE";
+  return `${normalizedState}_img${String(index + 1).padStart(2, "0")}`;
+};
+
+const buildImagesMapFromUrls = (urls = [], stateName = "") =>
+  (Array.isArray(urls) ? urls : []).reduce((acc, url, index) => {
+    const cleanedUrl = String(url || "").trim();
+    if (!cleanedUrl) return acc;
+    acc[buildImageSlotKey(stateName, index)] = { url: cleanedUrl, s3Key: "" };
+    return acc;
+  }, {});
+
+const normalizeImagesPayload = (images) => {
+  if (!images) return {};
+  if (images instanceof Map) return Object.fromEntries(images);
+  if (Array.isArray(images)) {
+    const normalizedUrls = images
+      .map((entry) => {
+        if (typeof entry === "string") return entry;
+        if (entry && typeof entry === "object") return entry.url || entry.imageUrl || "";
+        return "";
+      })
+      .filter(Boolean);
+    return buildImagesMapFromUrls(normalizedUrls);
+  }
+  if (typeof images !== "object") return {};
+
+  return Object.fromEntries(
+    Object.entries(images).map(([slotKey, value]) => {
+      if (typeof value === "string") {
+        return [slotKey, { url: value, s3Key: "" }];
+      }
+      return [
+        slotKey,
+        {
+          url: String(value?.url || "").trim(),
+          s3Key: String(value?.s3Key || "").trim(),
+        },
+      ];
+    })
+  );
+};
+
+const mapImagesForResponse = (images = {}) => {
+  const plainImages = normalizeImagesPayload(images);
+  const imageUrls = Object.values(plainImages).map((img) => img?.url).filter(Boolean);
+  return { images: plainImages, imageUrls };
+};
+
+const getLegacyImageUrls = (item = {}) => {
+  if (Array.isArray(item.imageUrls)) return item.imageUrls.filter(Boolean);
+  if (Array.isArray(item.imageUrl)) return item.imageUrl.filter(Boolean);
+  if (typeof item.imageUrl === "string" && item.imageUrl.trim()) return [item.imageUrl.trim()];
+  if (typeof item.imagelink === "string" && item.imagelink.trim()) return [item.imagelink.trim()];
+  return [];
 };
 
 const mapCsvRowToStateWiseWeight = (rawRow = {}) => {
@@ -123,11 +186,22 @@ const mapCsvRowToStateWiseWeight = (rawRow = {}) => {
   const country = row["country"];
   const state = row["destination"];
 
-  // Handle your new root-level fields
-  const imageUrl = row["imagelink"]; // matches "Image Link" after normalize
+  // Handle root-level image fields (handles "Image Link" -> "imagelink")
+  const imageLinkRaw = row["imagelink"];
+  const imageUrls = imageLinkRaw
+    ? String(imageLinkRaw)
+      .split(",")
+      .map((url) => url.trim())
+      .filter(Boolean)
+    : [];
 
-  // Handle rank
-  const rank = toNumber(row["rank"] !== undefined ? row["rank"] : row[""]);
+  // Handle rank - safely grab the first number column
+  const rank = toNumber(row["rank"]);
+
+  // Handle Status -> isActive boolean
+  const isActive = row["status"]
+    ? row["status"].toLowerCase() === "active"
+    : true;
 
   const weight = {};
 
@@ -137,9 +211,8 @@ const mapCsvRowToStateWiseWeight = (rawRow = {}) => {
   }
 
   const labels = {};
-
   for (const [csvKey, schemaKey] of Object.entries(CSV_TO_LABEL_MAP)) {
-    labels[schemaKey] = row[csvKey];
+    labels[schemaKey] = row[csvKey] || ""; // Default to empty string to prevent undefined
   }
 
   return {
@@ -148,8 +221,9 @@ const mapCsvRowToStateWiseWeight = (rawRow = {}) => {
     state,
     rank,
     weight,
-    imageUrl,
+    images: buildImagesMapFromUrls(imageUrls, state),
     labels,
+    isActive,
   };
 };
 
@@ -182,13 +256,27 @@ export const getStateWiseWeight = async (req, res, next) => {
     const results = stateWeights.map((item) => {
       const allScores = stateWiseWeightCalculation(item.weight);
       const scoreForSorting = allScores[effectiveAttribute] || 0;
+      const imagePayload = mapImagesForResponse(item.images);
+      const fallbackImageUrls = getLegacyImageUrls(item);
+      const resolvedImageUrls = imagePayload.imageUrls.length
+        ? imagePayload.imageUrls
+        : fallbackImageUrls;
+      const resolvedImages = imagePayload.imageUrls.length
+        ? imagePayload.images
+        : buildImagesMapFromUrls(resolvedImageUrls, item.state);
+
+      const resolvedImageUrl = resolvedImageUrls.length > 0
+        ? resolvedImageUrls[Math.floor(Math.random() * resolvedImageUrls.length)]
+        : "";
 
       return {
         state: item.state,
         country: item.country,
         isActive: item.isActive,
         [effectiveAttribute]: scoreForSorting,
-        imageUrl: item.imageUrl,
+        imageUrl: resolvedImageUrl,
+        imageUrls: resolvedImageUrls,
+        images: resolvedImages,
         labels: item.labels,
       };
     });
@@ -213,7 +301,21 @@ export const getAllStateWiseWeight = async (req, res, next) => {
 
     const dataWithScores = stateWiseWeight.map((item) => {
       const plainItem = item.toObject();
+      const imagePayload = mapImagesForResponse(plainItem.images);
+      const fallbackImageUrls = getLegacyImageUrls(plainItem);
+      const resolvedImageUrls = imagePayload.imageUrls.length
+        ? imagePayload.imageUrls
+        : fallbackImageUrls;
+      const resolvedImageUrl = resolvedImageUrls.length > 0
+        ? resolvedImageUrls[Math.floor(Math.random() * resolvedImageUrls.length)]
+        : "";
+
       plainItem.calculatedScores = stateWiseWeightCalculation(plainItem.weight);
+      plainItem.imageUrl = resolvedImageUrl;
+      plainItem.imageUrls = resolvedImageUrls;
+      plainItem.images = imagePayload.imageUrls.length
+        ? imagePayload.images
+        : buildImagesMapFromUrls(resolvedImageUrls, plainItem.state);
       return plainItem;
     });
 
@@ -236,10 +338,7 @@ export const createStateWiseWeight = async (req, res, next) => {
       try {
         createPayload.weight = JSON.parse(createPayload.weight);
       } catch (error) {
-        return res.status(400).json({
-          success: false,
-          message: "Invalid JSON format for weight field.",
-        });
+        return res.status(400).json({ success: false, message: "Invalid JSON format for weight field." });
       }
     }
 
@@ -248,28 +347,58 @@ export const createStateWiseWeight = async (req, res, next) => {
       try {
         createPayload.labels = JSON.parse(createPayload.labels);
       } catch (error) {
-        return res.status(400).json({
-          success: false,
-          message: "Invalid JSON format for labels field.",
-        });
+        return res.status(400).json({ success: false, message: "Invalid JSON format for labels field." });
       }
+    }
+
+    if (typeof createPayload.images === "string") {
+      try {
+        createPayload.images = JSON.parse(createPayload.images);
+      } catch (error) {
+        return res.status(400).json({ success: false, message: "Invalid JSON format for images field." });
+      }
+    }
+    if (typeof createPayload.imageUrls === "string") {
+      try {
+        createPayload.imageUrls = JSON.parse(createPayload.imageUrls);
+      } catch (error) {
+        return res.status(400).json({ success: false, message: "Invalid JSON format for imageUrls field." });
+      }
+    }
+    if (Array.isArray(createPayload.imageUrls)) {
+      createPayload.images = buildImagesMapFromUrls(createPayload.imageUrls, createPayload.state);
+    } else if (typeof createPayload.imageUrl === "string" && createPayload.imageUrl.trim()) {
+      createPayload.images = buildImagesMapFromUrls([createPayload.imageUrl.trim()], createPayload.state);
+    } else {
+      createPayload.images = normalizeImagesPayload(createPayload.images);
+    }
+
+    if (Object.keys(createPayload.images || {}).length > 3) {
+      return res.status(400).json({ success: false, message: "A maximum of 3 images is allowed." });
     }
 
     // Generate a new ID for the document so we can use it in the S3 path
     const newId = new mongoose.Types.ObjectId();
     createPayload._id = newId;
 
-    if (req.file) {
-      const fileName = String(req.file.originalname || "image")
-        .replace(/[/\\?%*:|"<>]/g, "_")
-        .replace(/\s+/g, "_");
-      const fileKey = `nomads/destinations/${newId}/${Date.now()}-${fileName}`;
-      const uploadedImage = await uploadFileToS3(fileKey, req.file);
-      createPayload.imageUrl = uploadedImage.url;
-    } else {
-      // imageUrl is required in schema, so we should handle its absence
-      // If the frontend doesn't send an image, this will fail validation later
-      // unless we provide a default here or require it in the request.
+    if (Array.isArray(req.files) && req.files.length > 0) {
+      if (req.files.length > 3) {
+        return res.status(400).json({ success: false, message: "A maximum of 3 images is allowed." });
+      }
+      const uploadedImages = await Promise.all(
+        req.files.map(async (file, index) => {
+          const fileName = String(file.originalname || `image-${index + 1}`)
+            .replace(/[/\\?%*:|"<>]/g, "_")
+            .replace(/\s+/g, "_");
+          const fileKey = `nomads/states/${createPayload.country}/${createPayload.state}/${newId}/${Date.now()}-${index}-${fileName}`;
+          return uploadFileToS3(fileKey, file);
+        })
+      );
+      createPayload.images = uploadedImages.reduce((acc, img, index) => {
+        const slotKey = buildImageSlotKey(createPayload.state, index);
+        acc[slotKey] = { url: img.url, s3Key: img.id };
+        return acc;
+      }, {});
     }
 
     const newStateWiseWeight = await StateWiseWeight.create(createPayload);
@@ -284,83 +413,120 @@ export const createStateWiseWeight = async (req, res, next) => {
   }
 };
 
-
 export const updateStateWiseWeight = async (req, res, next) => {
   try {
     const { id } = req.params;
 
     if (!id) {
-      return res.status(400).json({
-        success: false,
-        message: "State-wise weight id is required.",
-      });
+      return res.status(400).json({ success: false, message: "State-wise weight id is required." });
     }
 
     const existingStateWiseWeight = await StateWiseWeight.findById(id);
-
     if (!existingStateWiseWeight) {
-      return res.status(404).json({
-        success: false,
-        message: "State-wise weight data not found.",
-      });
+      return res.status(404).json({ success: false, message: "State-wise weight data not found." });
     }
 
     const updatePayload = { ...req.body };
 
+    // Standard parsers for FormData fields
     if (typeof updatePayload.weight === "string") {
-      try {
-        updatePayload.weight = JSON.parse(updatePayload.weight);
-      } catch (error) {
-        return res.status(400).json({
-          success: false,
-          message: "Invalid JSON format for weight field.",
-        });
-      }
+      try { updatePayload.weight = JSON.parse(updatePayload.weight); }
+      catch (error) { return res.status(400).json({ success: false, message: "Invalid JSON format for weight field." }); }
     }
-
     if (typeof updatePayload.labels === "string") {
-      try {
-        updatePayload.labels = JSON.parse(updatePayload.labels);
-      } catch (error) {
-        return res.status(400).json({
-          success: false,
-          message: "Invalid JSON format for labels field.",
-        });
+      try { updatePayload.labels = JSON.parse(updatePayload.labels); }
+      catch (error) { return res.status(400).json({ success: false, message: "Invalid JSON format for labels field." }); }
+    }
+    if (typeof updatePayload.images === "string") {
+      try { updatePayload.images = JSON.parse(updatePayload.images); }
+      catch (error) { return res.status(400).json({ success: false, message: "Invalid JSON format for images field." }); }
+    }
+    if (typeof updatePayload.imageUrls === "string") {
+      try { updatePayload.imageUrls = JSON.parse(updatePayload.imageUrls); }
+      catch (error) { return res.status(400).json({ success: false, message: "Invalid JSON format for imageUrls field." }); }
+    }
+
+    // 1. Determine the "base" images map from the payload
+    let resolvedImages = {};
+    if (Array.isArray(updatePayload.imageUrls)) {
+      resolvedImages = buildImagesMapFromUrls(updatePayload.imageUrls, updatePayload.state || existingStateWiseWeight.state);
+    } else if (typeof updatePayload.imageUrl === "string" && updatePayload.imageUrl.trim()) {
+      resolvedImages = buildImagesMapFromUrls([updatePayload.imageUrl.trim()], updatePayload.state || existingStateWiseWeight.state);
+    } else if (updatePayload.images) {
+      resolvedImages = normalizeImagesPayload(updatePayload.images);
+    } else {
+      // If images field is missing from payload, we assume it's NOT being updated.
+      // But if it is an empty object/array, we assume they want to clear it.
+      resolvedImages = normalizeImagesPayload(existingStateWiseWeight.images);
+    }
+
+    // 2. Preserve existing S3 keys if the URL matches (crucial for deletion logic)
+    const existingImagesMap = normalizeImagesPayload(existingStateWiseWeight.images);
+    const existingImagesList = Object.values(existingImagesMap);
+
+    Object.keys(resolvedImages).forEach((slotKey) => {
+      const img = resolvedImages[slotKey];
+      if (!img.s3Key || img.s3Key === "") {
+        const match = existingImagesList.find((e) => e.url === img.url);
+        if (match) {
+          img.s3Key = match.s3Key;
+        }
+      }
+    });
+
+    // 3. Handle physical file uploads
+    if (Array.isArray(req.files) && req.files.length > 0) {
+      if (req.files.length > 3) {
+        return res.status(400).json({ success: false, message: "A maximum of 3 images is allowed." });
+      }
+
+      // Upload new files
+      const uploadedImages = await Promise.all(
+        req.files.map(async (file, index) => {
+          const fileName = String(file.originalname || `image-${index + 1}`).replace(/[/\\?%*:|"<>]/g, "_").replace(/\s+/g, "_");
+          const fileKey = `nomads/states/${updatePayload.country || existingStateWiseWeight.country}/${updatePayload.state || existingStateWiseWeight.state}/${id}/${Date.now()}-${index}-${fileName}`;
+          return uploadFileToS3(fileKey, file);
+        })
+      );
+
+      // Merge or replace? Usually replacement is intended when files are sent
+      // But let's be smart: if they sent files, they might want to replace certain slots or just append.
+      // For now, consistent with original logic, we replace the Map with ONLY these new files.
+      // (Wait, the original logic deleted ALL current images if new files were sent. Let's stick to that but use keys.)
+      
+      resolvedImages = uploadedImages.reduce((acc, img, index) => {
+        const slotKey = buildImageSlotKey(updatePayload.state || existingStateWiseWeight.state, index);
+        acc[slotKey] = { url: img.url, s3Key: img.id };
+        return acc;
+      }, {});
+    }
+
+    // 4. Identify and delete removed images from S3
+    const newS3Keys = Object.values(resolvedImages).map((img) => img.s3Key).filter(Boolean);
+
+    for (const oldImg of Object.values(existingImagesMap)) {
+      if (oldImg.s3Key && !newS3Keys.includes(oldImg.s3Key)) {
+        await deleteFileFromS3ByKey(oldImg.s3Key);
       }
     }
 
-    if (req.file) {
-      const fileName = String(req.file.originalname || "image")
-        .replace(/[/\\?%*:|"<>]/g, "_")
-        .replace(/\s+/g, "_");
-      const fileKey = `nomads/destinations/${id}/${Date.now()}-${fileName}`;
-      const uploadedImage = await uploadFileToS3(fileKey, req.file);
-      updatePayload.imageUrl = uploadedImage.url;
-
-      const currentImageUrl = existingStateWiseWeight.imageUrl;
-      const bucketHost = `${process.env.PROJECT_S3_BUCKET_NAME}.s3.${process.env.PROJECT_AWS_REGION}.amazonaws.com`;
-
-      if (
-        currentImageUrl &&
-        currentImageUrl.includes(bucketHost) &&
-        currentImageUrl !== uploadedImage.url
-      ) {
-        await deleteFileFromS3ByUrl(currentImageUrl);
-      }
+    // 5. Finalize payload and update
+    if (Object.keys(resolvedImages).length > 3) {
+      return res.status(400).json({ success: false, message: "A maximum of 3 images is allowed." });
     }
+
+    updatePayload.images = resolvedImages;
 
     const updatedStateWiseWeight = await StateWiseWeight.findByIdAndUpdate(
       id,
-      {
-        $set: updatePayload,
-      },
-      { new: true, runValidators: true },
+      { $set: updatePayload },
+      { new: true, runValidators: true }
     );
 
     return res.status(200).json({
       success: true,
       message: "State-wise weight data updated successfully.",
-      data: updatedStateWiseWeight,
+      data: updatedStateWiseWeight
     });
   } catch (error) {
     return next(error);
@@ -370,9 +536,7 @@ export const updateStateWiseWeight = async (req, res, next) => {
 export const bulkInsertStateWiseWeightCsv = async (req, res, next) => {
   try {
     if (!req.file) {
-      return res.status(400).json({
-        message: "Please upload a CSV file using field state-wise-weight-file.",
-      });
+      return res.status(400).json({ message: "Please upload a CSV file using field state-wise-weight-file." });
     }
 
     const rows = [];
@@ -383,7 +547,6 @@ export const bulkInsertStateWiseWeightCsv = async (req, res, next) => {
       .pipe(csvParser())
       .on("data", (rawRow) => {
         rowNumber += 1;
-
         const row = mapCsvRowToStateWiseWeight(rawRow);
 
         if (!row.continent || !row.country || !row.state || !row.rank) {
@@ -399,15 +562,10 @@ export const bulkInsertStateWiseWeightCsv = async (req, res, next) => {
       .on("end", async () => {
         try {
           if (!rows.length) {
-            return res.status(400).json({
-              message: "No valid rows were found in CSV.",
-              rowErrors,
-            });
+            return res.status(400).json({ message: "No valid rows were found in CSV.", rowErrors });
           }
 
-          // SAFE BULK WRITE LOGIC
           const operations = rows.map((row) => {
-            // 1. Always update these core fields
             const updateData = {
               continent: row.continent,
               country: row.country,
@@ -415,17 +573,14 @@ export const bulkInsertStateWiseWeightCsv = async (req, res, next) => {
               rank: row.rank,
               weight: row.weight,
               labels: row.labels,
+              isActive: row.isActive, // Added isActive mapping
             };
 
-            // 2. Conditionally add new fields ONLY if they exist in the CSV.
-            // This prevents accidentally deleting existing DB data if a CSV column is missing.
-            if (
-              row.imageUrl !== undefined &&
-              row.imageUrl !== null &&
-              row.imageUrl !== ""
-            ) {
-              updateData.imageUrl = row.imageUrl;
+            // ONLY update images if they actually exist in the CSV
+            if (row.images && Object.keys(row.images).length > 0) {
+              updateData.images = row.images;
             }
+
 
             return {
               updateOne: {
@@ -436,9 +591,7 @@ export const bulkInsertStateWiseWeightCsv = async (req, res, next) => {
             };
           });
 
-          const result = await StateWiseWeight.bulkWrite(operations, {
-            ordered: false,
-          });
+          const result = await StateWiseWeight.bulkWrite(operations, { ordered: false });
 
           return res.status(200).json({
             message: "State-wise weight CSV imported successfully.",

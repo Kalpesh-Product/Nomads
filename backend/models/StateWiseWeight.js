@@ -20,9 +20,23 @@ const stateWiseWeightSchema = new mongoose.Schema(
             required: true,
         },
 
-        imageUrl: {
-            type: String,
-            required: true,
+        images: {
+            type: Map,
+            of: new mongoose.Schema(
+                {
+                    url: { type: String, required: true },
+                    s3Key: { type: String, required: false },
+                },
+                { _id: false }
+            ),
+            default: {},
+            validate: {
+                validator: function (value) {
+                    if (!value) return true;
+                    return value.size <= 3;
+                },
+                message: "A maximum of 3 images is allowed.",
+            },
         },
 
         isActive: {
@@ -31,11 +45,7 @@ const stateWiseWeightSchema = new mongoose.Schema(
         },
 
         labels: {
-            labelCostOfLivingPerMonth: { type: String, required: true, },
-            labelInternetSpeed: { type: String, required: true, },
-            labelAqiValue: { type: String, required: true, },
-            labelNomadTax: { type: String, required: true, },
-            labelResidentTax: { type: String, required: true, },
+            labelBestForNomads: { type: String, required: true },
             labelMostAffordable: { type: String, required: true },
             labelSafestCities: { type: String, required: true },
             labelEasyVisa: { type: String, required: true },
@@ -45,6 +55,7 @@ const stateWiseWeightSchema = new mongoose.Schema(
             labelCleanAirEnvironment: { type: String, required: true },
             labelBestWorkInfrastructure: { type: String, required: true },
             labelCheapestPlaces: { type: String, required: true },
+            labelBestForRemoteWorkSetup: { type: String, required: true },
             labelBestConnectedCitiesFlights: { type: String, required: true },
             labelStrongNomadCommunityWfa: { type: String, required: true },
             labelFastInternetCities: { type: String, required: true },
