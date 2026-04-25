@@ -355,12 +355,10 @@ export const createStateWiseWeight = async (req, res, next) => {
       try {
         createPayload.weight = JSON.parse(createPayload.weight);
       } catch (error) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "Invalid JSON format for weight field.",
-          });
+        return res.status(400).json({
+          success: false,
+          message: "Invalid JSON format for weight field.",
+        });
       }
     }
 
@@ -369,12 +367,10 @@ export const createStateWiseWeight = async (req, res, next) => {
       try {
         createPayload.labels = JSON.parse(createPayload.labels);
       } catch (error) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "Invalid JSON format for labels field.",
-          });
+        return res.status(400).json({
+          success: false,
+          message: "Invalid JSON format for labels field.",
+        });
       }
     }
 
@@ -382,24 +378,20 @@ export const createStateWiseWeight = async (req, res, next) => {
       try {
         createPayload.images = JSON.parse(createPayload.images);
       } catch (error) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "Invalid JSON format for images field.",
-          });
+        return res.status(400).json({
+          success: false,
+          message: "Invalid JSON format for images field.",
+        });
       }
     }
     if (typeof createPayload.imageUrls === "string") {
       try {
         createPayload.imageUrls = JSON.parse(createPayload.imageUrls);
       } catch (error) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "Invalid JSON format for imageUrls field.",
-          });
+        return res.status(400).json({
+          success: false,
+          message: "Invalid JSON format for imageUrls field.",
+        });
       }
     }
     if (Array.isArray(createPayload.imageUrls)) {
@@ -431,12 +423,10 @@ export const createStateWiseWeight = async (req, res, next) => {
 
     if (Array.isArray(req.files) && req.files.length > 0) {
       if (req.files.length > 3) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "A maximum of 3 images is allowed.",
-          });
+        return res.status(400).json({
+          success: false,
+          message: "A maximum of 3 images is allowed.",
+        });
       }
       const uploadedImages = await Promise.all(
         req.files.map(async (file, index) => {
@@ -490,48 +480,40 @@ export const updateStateWiseWeight = async (req, res, next) => {
       try {
         updatePayload.weight = JSON.parse(updatePayload.weight);
       } catch (error) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "Invalid JSON format for weight field.",
-          });
+        return res.status(400).json({
+          success: false,
+          message: "Invalid JSON format for weight field.",
+        });
       }
     }
     if (typeof updatePayload.labels === "string") {
       try {
         updatePayload.labels = JSON.parse(updatePayload.labels);
       } catch (error) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "Invalid JSON format for labels field.",
-          });
+        return res.status(400).json({
+          success: false,
+          message: "Invalid JSON format for labels field.",
+        });
       }
     }
     if (typeof updatePayload.images === "string") {
       try {
         updatePayload.images = JSON.parse(updatePayload.images);
       } catch (error) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "Invalid JSON format for images field.",
-          });
+        return res.status(400).json({
+          success: false,
+          message: "Invalid JSON format for images field.",
+        });
       }
     }
     if (typeof updatePayload.imageUrls === "string") {
       try {
         updatePayload.imageUrls = JSON.parse(updatePayload.imageUrls);
       } catch (error) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "Invalid JSON format for imageUrls field.",
-          });
+        return res.status(400).json({
+          success: false,
+          message: "Invalid JSON format for imageUrls field.",
+        });
       }
     }
 
@@ -577,12 +559,10 @@ export const updateStateWiseWeight = async (req, res, next) => {
     // 3. Handle physical file uploads
     if (Array.isArray(req.files) && req.files.length > 0) {
       if (Object.keys(resolvedImages).length + req.files.length > 3) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "A maximum of 3 images is allowed.",
-          });
+        return res.status(400).json({
+          success: false,
+          message: "A maximum of 3 images is allowed.",
+        });
       }
 
       // Upload new files
@@ -654,12 +634,9 @@ export const updateStateWiseWeight = async (req, res, next) => {
 export const bulkInsertStateWiseWeightCsv = async (req, res, next) => {
   try {
     if (!req.file) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "Please upload a CSV file using field state-wise-weight-file.",
-        });
+      return res.status(400).json({
+        message: "Please upload a CSV file using field state-wise-weight-file.",
+      });
     }
 
     const rows = [];
