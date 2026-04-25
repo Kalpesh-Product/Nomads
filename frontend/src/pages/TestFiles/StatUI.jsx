@@ -380,20 +380,20 @@ const getQuickStatsForDestination = (destination, selectedGoalOption) => {
   return configuredStats;
 };
 
-const getScoreBarColorValue = (score) => {
+const getScoreBarColorClass = (score) => {
   if (!Number.isFinite(score)) {
-    return "rgba(255, 255, 255, 0.3)";
+    return "bg-white/30";
   }
 
   if (score < 7) {
-    return "#ef4444";
+    return "bg-red-500";
   }
 
   if (score <= 8) {
-    return "#facc15";
+    return "bg-yellow-400";
   }
 
-  return "#22c55e";
+  return "bg-green-500";
 };
 
 const destinationAliasMap = {
@@ -1505,32 +1505,27 @@ const AiSearchResults = () => {
                                   ).map((stat, statIndex) => (
                                     <div
                                       key={`${destination.city}-${stat.label}-${statIndex}`}
-                                      className="rounded-lg px-2 py-1.5 transition-all duration-300"
-                                      style={{
-                                        backgroundImage: `linear-gradient(
-                                          90deg,
-                                          ${getScoreBarColorValue(stat.score)} 0%,
-                                          ${getScoreBarColorValue(stat.score)} ${Math.max(
-                                            0,
-                                            Math.min(
-                                              100,
-                                              ((stat.score || 0) / 10) * 100,
-                                            ),
-                                          )}%,
-                                          rgba(255, 255, 255, 0.16) ${Math.max(
-                                            0,
-                                            Math.min(
-                                              100,
-                                              ((stat.score || 0) / 10) * 100,
-                                            ),
-                                          )}%,
-                                          rgba(255, 255, 255, 0.16) 100%
-                                        )`,
-                                      }}
+                                      className="bg-white/10 rounded-lg px-2 py-1.5"
                                     >
                                       <span className="font-medium">
                                         {stat.label}
                                       </span>
+                                      <div className="mt-1 h-1.5 w-full rounded-full bg-white/20 overflow-hidden">
+                                        <div
+                                          className={`h-full rounded-full transition-all duration-300 ${getScoreBarColorClass(
+                                            stat.score,
+                                          )}`}
+                                          style={{
+                                            width: `${Math.max(
+                                              0,
+                                              Math.min(
+                                                100,
+                                                ((stat.score || 0) / 10) * 100,
+                                              ),
+                                            )}%`,
+                                          }}
+                                        />
+                                      </div>
                                     </div>
                                   ))}
                                 </div>
