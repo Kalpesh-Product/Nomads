@@ -332,14 +332,23 @@ const fallbackQuickStatsConfig = [
   { label: "Score", field: "suggestions" },
 ];
 
+const labelToAllScoresKeyMap = {
+  labelCostOfLivingPerMonth: "cheapestPlaces",
+  labelBestWorkInfrastructureWfa: "bestWorkInfrastructureWFA",
+  labelStrongNomadCommunityWfa: "strongNomadCommunityWFA",
+  labelFinancialStability: "financialStabilityLowRisk",
+};
+
 const getQuickStatsForDestination = (destination, selectedGoalOption) => {
   const statConfig =
     quickStatsConfigByGoalOption[selectedGoalOption] ||
     fallbackQuickStatsConfig;
+  const selectedGoalScoreKey = toApiAttribute(selectedGoalOption);
 
   const configuredStats = statConfig.slice(0, 4).map((config) => {
     const scoreKeyFromLabel = config.labelKey
-      ? `${config.labelKey.charAt(5).toLowerCase()}${config.labelKey.slice(6)}`
+      ? labelToAllScoresKeyMap[config.labelKey] ||
+        `${config.labelKey.charAt(5).toLowerCase()}${config.labelKey.slice(6)}`
       : null;
     const scoreKey = config.scoreKey || scoreKeyFromLabel || config.field;
 
@@ -353,7 +362,13 @@ const getQuickStatsForDestination = (destination, selectedGoalOption) => {
         : undefined;
 
     const score = Number(
-      directScore !== undefined ? directScore : caseInsensitiveScore,
+      directScore !== undefined
+        ? directScore
+        : caseInsensitiveScore !== undefined
+          ? caseInsensitiveScore
+          : selectedGoalScoreKey
+            ? allScores[selectedGoalScoreKey]
+            : undefined,
     );
 
     return {
@@ -836,6 +851,7 @@ const AiSearchResults = () => {
             aqiValue: item?.aqiValue,
             nomadTax: item?.nomadTax,
             costOfLivingPerMonth: item?.costOfLivingPerMonth,
+            allScores: item?.allScores || {},
             labels: item?.labels || {},
             isActive: item?.isActive ?? existingDestination?.isActive ?? false,
             image: (() => {
