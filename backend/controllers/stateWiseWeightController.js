@@ -273,7 +273,8 @@ export const getStateWiseWeight = async (req, res, next) => {
         state: item.state,
         country: item.country,
         isActive: item.isActive,
-        [effectiveAttribute]: scoreForSorting,
+        allScores,
+        // [effectiveAttribute]: scoreForSorting,
         imageUrl: resolvedImageUrl,
         imageUrls: resolvedImageUrls,
         images: resolvedImages,
@@ -493,7 +494,7 @@ export const updateStateWiseWeight = async (req, res, next) => {
       // But let's be smart: if they sent files, they might want to replace certain slots or just append.
       // For now, consistent with original logic, we replace the Map with ONLY these new files.
       // (Wait, the original logic deleted ALL current images if new files were sent. Let's stick to that but use keys.)
-      
+
       resolvedImages = uploadedImages.reduce((acc, img, index) => {
         const slotKey = buildImageSlotKey(updatePayload.state || existingStateWiseWeight.state, index);
         acc[slotKey] = { url: img.url, s3Key: img.id };
