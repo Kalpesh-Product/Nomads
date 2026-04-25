@@ -90,9 +90,16 @@ const AiFooter = () => {
 
   return (
     <>
-      <div className="sticky bottom-0 z-10  bg-white/95 py-6 text-center text-nano text-gray-600 backdrop-blur supports-[backdrop-filter]:bg-white/80">
-        WoNo is in Beta and can make mistakes. Building the future of global
-        nomad living, one update at a time. See Cookie Preferences.
+      <div className="sticky bottom-0 z-10 bg-white/95 py-6 text-nano text-gray-600 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+        <div className="flex flex-col items-center gap-2 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center">
+          <span className="text-center sm:col-start-2">
+            WoNo is in Beta and can make mistakes. Building the future of global
+            nomad living, one update at a time. See Cookie Preferences.
+          </span>
+          <span className="text-center sm:col-start-3 sm:justify-self-end sm:pr-8">
+            Version 2.7.3
+          </span>
+        </div>
       </div>
       <footer className="w-full bg-gray-100 text-black flex flex-col justify-center items-center shadow-lg">
         <div className="w-full flex flex-wrap justify-center lg:justify-between items-center pt-12 pb-8 px-4 md:px-[7.5rem]">
@@ -236,10 +243,11 @@ const AiFooter = () => {
                         setShowLangModal(false);
                       }}
                       className={`border rounded-md px-3 py-2 
-        ${isDisabled
-                          ? "opacity-40 cursor-not-allowed"
-                          : "cursor-pointer hover:border-black"
-                        } 
+        ${
+          isDisabled
+            ? "opacity-40 cursor-not-allowed"
+            : "cursor-pointer hover:border-black"
+        } 
         ${selectedLang.code === lang.code ? "border-black" : "border-gray-300"}
       `}
                     >
@@ -276,14 +284,16 @@ const AiFooter = () => {
                         setShowCurrencyModal(false);
                       }}
                       className={`border rounded-md px-3 py-2 
-        ${isDisabled
-                          ? "opacity-40 cursor-not-allowed"
-                          : "cursor-pointer hover:border-black"
-                        } 
-        ${selectedCurrency.code === cur.code
-                          ? "border-black"
-                          : "border-gray-300"
-                        }
+        ${
+          isDisabled
+            ? "opacity-40 cursor-not-allowed"
+            : "cursor-pointer hover:border-black"
+        } 
+        ${
+          selectedCurrency.code === cur.code
+            ? "border-black"
+            : "border-gray-300"
+        }
       `}
                     >
                       <div className="font-medium">{cur.name}</div>
