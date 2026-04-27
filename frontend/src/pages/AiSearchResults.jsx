@@ -376,11 +376,26 @@ const labelToWeightKeyMap = {
   labelFemaleFriendlyLifestyle: "femaleNomads",
 };
 
-const getQuickStatsForDestination = (destination, selectedGoalOption) => {
+const getQuickStatsForDestination = (
+  destination,
+  selectedGoal,
+  selectedGoalOption,
+) => {
   const statConfig =
-    quickStatsConfigByGoalOption[selectedGoalOption] ||
-    fallbackQuickStatsConfig;
-  const selectedGoalScoreKey = toApiAttribute(selectedGoalOption);
+    selectedGoal === "World Ranking" &&
+    selectedGoalOption === "Best Work Infrastructure"
+      ? [
+          { label: "Work Infra", labelKey: "labelBestWorkInfrastructure" },
+          { label: "Internet", labelKey: "labelFastInternetCities" },
+          { label: "Community", labelKey: "labelStrongNomadCommunity" },
+          { label: "Access", labelKey: "labelBestConnectedCitiesFlights" },
+        ]
+      : quickStatsConfigByGoalOption[selectedGoalOption] ||
+        fallbackQuickStatsConfig;
+  const selectedGoalScoreKey = getApiAttributeForSelection(
+    selectedGoal,
+    selectedGoalOption,
+  );
 
   const configuredStats = statConfig.slice(0, 4).map((config) => {
     const scoreKeyFromLabel = config.labelKey
@@ -484,6 +499,29 @@ const toApiAttribute = (goalOption = "") => {
     .join("");
 };
 
+const getApiAttributeForSelection = (selectedGoal, selectedGoalOption) => {
+  if (
+    selectedGoal === "Work From Anywhere" &&
+    selectedGoalOption === "Best Work Infrastructure"
+  ) {
+    return "bestWorkInfrastructureWFA";
+  }
+
+  return toApiAttribute(selectedGoalOption);
+};
+
+const getLabelFieldKeyForSelection = (selectedGoal, selectedGoalOption) => {
+  if (selectedGoalOption === "Best Work Infrastructure") {
+    return selectedGoal === "Work From Anywhere"
+      ? "labelBestWorkInfrastructureWfa"
+      : "labelBestWorkInfrastructure";
+  }
+
+  return toLabelFieldKey(
+    getApiAttributeForSelection(selectedGoal, selectedGoalOption),
+  );
+};
+
 const INITIAL_VISIBLE_DESTINATIONS = 18;
 const TYPING_INTERVAL_MS = 7;
 const SELECTED_HEADING_TRANSITION_DELAY_MS = 1200;
@@ -539,6 +577,8 @@ const goalNarrativeByGoalAndAttribute = {
       "Curated below are the best cities in X for startups, entrepreneurship, and career growth.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🚀 Startup ecosystems\n• 🧠 Talent & innovation density\n• 🏢 Work infrastructure\n• 🌐 Global connectivity\n\n→ Build, scale, and grow faster.",
     [normalizeNarrativeKey("Clean Air / Environment")]:
       "Curated below are the cleanest and most environmentally friendly cities in X.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🌿 Air quality\n• 🛡️ Safe, livable environments\n• 🏥 Health-conscious conditions\n• 🌍 Overall quality of life\n\n→ Breathe better, live better.",
+    [normalizeNarrativeKey("Best Work Infrastructure")]:
+      "Curated below are the best cities in X optimized for productivity and remote work performance.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n•🏢 Work infrastructure (coworking, setup, reliability)\n•⚡ High-speed, stable internet\n•🤝 Strong nomad ecosystems\n•💰 Sustainable cost of living\n•🛂 Visa flexibility for longer stays\n\n→ Work efficiently from anywhere, without compromise.",
   },
   [normalizeNarrativeKey("Work From Anywhere")]: {
     [normalizeNarrativeKey("Best for Remote Work Setup")]:
@@ -810,7 +850,7 @@ const AiSearchResults = () => {
     const leftBadgeField = leftBadgeFieldByGoalOption[selectedGoalOption];
     const leftBadgeLabelField =
       leftBadgeLabelFieldByGoalOption[selectedGoalOption] ||
-      toLabelFieldKey(toApiAttribute(selectedGoalOption));
+      getLabelFieldKeyForSelection(selectedGoal, selectedGoalOption);
 
     return apiDestinations
       .filter((destination) => destination?.isActive === true)
@@ -829,7 +869,7 @@ const AiSearchResults = () => {
           leftBadgeLabel: leftBadgeValueFromLabel || leftBadgeValueFromField,
         };
       });
-  }, [apiDestinations, selectedGoalOption]);
+  }, [apiDestinations, selectedGoal, selectedGoalOption]);
 
   useEffect(() => {
     if (!hasSelectedFilters) {
@@ -847,7 +887,10 @@ const AiSearchResults = () => {
           {
             selectionType: selectedGoal,
             continent: selectedContinent,
-            attribute: toApiAttribute(selectedGoalOption),
+            attribute: getApiAttributeForSelection(
+              selectedGoal,
+              selectedGoalOption,
+            ),
           },
           { signal: controller.signal },
         );
@@ -1542,6 +1585,7 @@ const AiSearchResults = () => {
                                 <div className="grid grid-cols-1 gap-2 text-xs md:text-sm text-white/90">
                                   {getQuickStatsForDestination(
                                     destination,
+                                    selectedGoal,
                                     selectedGoalOption,
                                   ).map((stat, statIndex) => (
                                     <div
