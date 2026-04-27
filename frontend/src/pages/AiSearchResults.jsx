@@ -474,11 +474,11 @@ const getScoreBarColorValue = (score) => {
     return "rgba(255, 255, 255, 0.3)";
   }
 
-  if (score < 7) {
+  if (score < 5) {
     return "#ef4444";
   }
 
-  if (score <= 8) {
+  if (score < 7.5) {
     return "#facc15";
   }
 
