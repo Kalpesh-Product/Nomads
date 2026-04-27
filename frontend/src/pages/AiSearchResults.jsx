@@ -339,6 +339,43 @@ const labelToAllScoresKeyMap = {
   labelFinancialStability: "financialStabilityLowRisk",
 };
 
+const labelToWeightKeyMap = {
+  labelCostOfLivingPerMonth: "costOfLiving",
+  labelBestWorkInfrastructure: "workInfrastructure",
+  labelBestWorkInfrastructureWfa: "workInfrastructure",
+  labelFastInternetCities: "internet",
+  labelStrongNomadCommunity: "nomadCommunity",
+  labelStrongNomadCommunityWfa: "nomadCommunity",
+  labelMostAffordable: "qualityOfLife",
+  labelSafestCities: "safety",
+  labelEasyVisa: "visaFlexibility",
+  labelHealthcareFriendly: "healthcareCostIndex",
+  labelStartupBusinessOpportunities: "startupEcosystemScore",
+  labelCleanAirEnvironment: "airQualityIndex",
+  labelBestConnectedCitiesFlights: "airportConnectivity",
+  labelLowTaxation: "taxFriendly",
+  labelPurchasingPower: "purchasingPower",
+  labelFinancialStability: "inflationStability",
+  labelStartupSetupCost: "startupSetupCost",
+  labelBalancedFinancialLifestyle: "inflationStability",
+  labelStartupEcosystems: "startupEcosystemScore",
+  labelRemoteJobOpportunities: "remoteJobs",
+  labelFounderNomads: "founderNomads",
+  labelFounderNomadsAyc: "founderNomads",
+  labelTechTalentDensity: "techTalentDensity",
+  labelStartupIncubatorsAccelerators: "incubators",
+  labelBalancedCareerGrowth: "remoteJobs",
+  labelVentureCapitalPresence: "ventureCapital",
+  labelConferencesEvents: "conferences",
+  labelSocialPartyLifestyle: "partyLifestyle",
+  labelChillWellnessLifestyle: "yoga",
+  labelAdventureExploration: "adventure",
+  labelNomadCommunityNetworking: "meetupsEvents",
+  labelCoupleFriendlyLifestyle: "coupleNomads",
+  labelFamilyFriendlyLifestyle: "familyNomads",
+  labelFemaleFriendlyLifestyle: "femaleNomads",
+};
+
 const getQuickStatsForDestination = (destination, selectedGoalOption) => {
   const statConfig =
     quickStatsConfigByGoalOption[selectedGoalOption] ||
@@ -351,23 +388,26 @@ const getQuickStatsForDestination = (destination, selectedGoalOption) => {
         `${config.labelKey.charAt(5).toLowerCase()}${config.labelKey.slice(6)}`
       : null;
     const scoreKey = config.scoreKey || scoreKeyFromLabel || config.field;
-
-    const allScores = destination?.allScores || {};
-    const directScore = scoreKey ? allScores[scoreKey] : undefined;
+    const weightKey =
+      config.weightKey ||
+      (config.labelKey ? labelToWeightKeyMap[config.labelKey] : null) ||
+      scoreKey;
+    const weights = destination?.weight || {};
+    const directWeight = weightKey ? weights[weightKey] : undefined;
     const caseInsensitiveScore =
-      directScore === undefined && scoreKey
-        ? Object.entries(allScores).find(
-            ([key]) => key.toLowerCase() === scoreKey.toLowerCase(),
+      directWeight === undefined && weightKey
+        ? Object.entries(weights).find(
+            ([key]) => key.toLowerCase() === weightKey.toLowerCase(),
           )?.[1]
         : undefined;
 
     const score = Number(
-      directScore !== undefined
-        ? directScore
+      directWeight !== undefined
+        ? directWeight
         : caseInsensitiveScore !== undefined
           ? caseInsensitiveScore
           : selectedGoalScoreKey
-            ? allScores[selectedGoalScoreKey]
+            ? weights[selectedGoalScoreKey]
             : undefined,
     );
 
@@ -852,6 +892,7 @@ const AiSearchResults = () => {
             nomadTax: item?.nomadTax,
             costOfLivingPerMonth: item?.costOfLivingPerMonth,
             allScores: item?.allScores || {},
+            weight: item?.weight || {},
             labels: item?.labels || {},
             isActive: item?.isActive ?? existingDestination?.isActive ?? false,
             image: (() => {
