@@ -8,6 +8,7 @@ export const goalFilterMap = {
     "Healthcare Friendly",
     "Startup / Business Opportunities",
     "Clean Air / Environment",
+    "Best Work Infrastructure",
   ],
   "Work From Anywhere": [
     "Best for Remote Work Setup",

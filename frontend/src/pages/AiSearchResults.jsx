@@ -108,6 +108,40 @@ const formatLeftBadgeValue = (value) => {
   return `${value}`;
 };
 
+const SCORE_RANGE_MAX = 10;
+const SCORE_RANGE_MIN_DEFAULT = 0;
+
+const getScoreRangeMin = () => {
+  const configuredMin = Number(import.meta.env.VITE_AI_SCORE_RANGE_MIN);
+
+  if (Number.isFinite(configuredMin)) {
+    return Math.min(SCORE_RANGE_MAX, Math.max(0, configuredMin));
+  }
+
+  return SCORE_RANGE_MIN_DEFAULT;
+};
+
+const getScoreFillPercentage = (score) => {
+  const min = getScoreRangeMin();
+  const normalizedScore = Number(score);
+
+  if (!Number.isFinite(normalizedScore)) {
+    return 0;
+  }
+
+  const clampedScore = Math.max(
+    min,
+    Math.min(SCORE_RANGE_MAX, normalizedScore),
+  );
+  const denominator = SCORE_RANGE_MAX - min;
+
+  if (denominator <= 0) {
+    return 100;
+  }
+
+  return ((clampedScore - min) / denominator) * 100;
+};
+
 const quickStatsConfigByGoalOption = {
   "Best for Nomads": [
     { label: "Work Infra", labelKey: "labelBestWorkInfrastructure" },
@@ -339,11 +373,63 @@ const labelToAllScoresKeyMap = {
   labelFinancialStability: "financialStabilityLowRisk",
 };
 
-const getQuickStatsForDestination = (destination, selectedGoalOption) => {
+const labelToWeightKeyMap = {
+  labelCostOfLivingPerMonth: "costOfLiving",
+  labelBestWorkInfrastructure: "workInfrastructure",
+  labelBestWorkInfrastructureWfa: "workInfrastructure",
+  labelFastInternetCities: "internet",
+  labelStrongNomadCommunity: "nomadCommunity",
+  labelStrongNomadCommunityWfa: "nomadCommunity",
+  labelMostAffordable: "qualityOfLife",
+  labelSafestCities: "safety",
+  labelEasyVisa: "visaFlexibility",
+  labelHealthcareFriendly: "healthcareCostIndex",
+  labelStartupBusinessOpportunities: "startupEcosystemScore",
+  labelCleanAirEnvironment: "airQualityIndex",
+  labelBestConnectedCitiesFlights: "airportConnectivity",
+  labelLowTaxation: "taxFriendly",
+  labelPurchasingPower: "purchasingPower",
+  labelFinancialStability: "inflationStability",
+  labelStartupSetupCost: "startupSetupCost",
+  labelBalancedFinancialLifestyle: "inflationStability",
+  labelStartupEcosystems: "startupEcosystemScore",
+  labelRemoteJobOpportunities: "remoteJobs",
+  labelFounderNomads: "founderNomads",
+  labelFounderNomadsAyc: "founderNomads",
+  labelTechTalentDensity: "techTalentDensity",
+  labelStartupIncubatorsAccelerators: "incubators",
+  labelBalancedCareerGrowth: "remoteJobs",
+  labelVentureCapitalPresence: "ventureCapital",
+  labelConferencesEvents: "conferences",
+  labelSocialPartyLifestyle: "partyLifestyle",
+  labelChillWellnessLifestyle: "yoga",
+  labelAdventureExploration: "adventure",
+  labelNomadCommunityNetworking: "meetupsEvents",
+  labelCoupleFriendlyLifestyle: "coupleNomads",
+  labelFamilyFriendlyLifestyle: "familyNomads",
+  labelFemaleFriendlyLifestyle: "femaleNomads",
+};
+
+const getQuickStatsForDestination = (
+  destination,
+  selectedGoal,
+  selectedGoalOption,
+) => {
   const statConfig =
-    quickStatsConfigByGoalOption[selectedGoalOption] ||
-    fallbackQuickStatsConfig;
-  const selectedGoalScoreKey = toApiAttribute(selectedGoalOption);
+    selectedGoal === "World Ranking" &&
+    selectedGoalOption === "Best Work Infrastructure"
+      ? [
+          { label: "Work Infra", labelKey: "labelBestWorkInfrastructure" },
+          { label: "Internet", labelKey: "labelFastInternetCities" },
+          { label: "Community", labelKey: "labelStrongNomadCommunity" },
+          { label: "Access", labelKey: "labelBestConnectedCitiesFlights" },
+        ]
+      : quickStatsConfigByGoalOption[selectedGoalOption] ||
+        fallbackQuickStatsConfig;
+  const selectedGoalScoreKey = getApiAttributeForSelection(
+    selectedGoal,
+    selectedGoalOption,
+  );
 
   const configuredStats = statConfig.slice(0, 4).map((config) => {
     const scoreKeyFromLabel = config.labelKey
@@ -351,23 +437,26 @@ const getQuickStatsForDestination = (destination, selectedGoalOption) => {
         `${config.labelKey.charAt(5).toLowerCase()}${config.labelKey.slice(6)}`
       : null;
     const scoreKey = config.scoreKey || scoreKeyFromLabel || config.field;
-
-    const allScores = destination?.allScores || {};
-    const directScore = scoreKey ? allScores[scoreKey] : undefined;
+    const weightKey =
+      config.weightKey ||
+      (config.labelKey ? labelToWeightKeyMap[config.labelKey] : null) ||
+      scoreKey;
+    const weights = destination?.weight || {};
+    const directWeight = weightKey ? weights[weightKey] : undefined;
     const caseInsensitiveScore =
-      directScore === undefined && scoreKey
-        ? Object.entries(allScores).find(
-            ([key]) => key.toLowerCase() === scoreKey.toLowerCase(),
+      directWeight === undefined && weightKey
+        ? Object.entries(weights).find(
+            ([key]) => key.toLowerCase() === weightKey.toLowerCase(),
           )?.[1]
         : undefined;
 
     const score = Number(
-      directScore !== undefined
-        ? directScore
+      directWeight !== undefined
+        ? directWeight
         : caseInsensitiveScore !== undefined
           ? caseInsensitiveScore
           : selectedGoalScoreKey
-            ? allScores[selectedGoalScoreKey]
+            ? weights[selectedGoalScoreKey]
             : undefined,
     );
 
@@ -385,11 +474,11 @@ const getScoreBarColorValue = (score) => {
     return "rgba(255, 255, 255, 0.3)";
   }
 
-  if (score < 7) {
+  if (score < 5) {
     return "#ef4444";
   }
 
-  if (score <= 8) {
+  if (score < 7.5) {
     return "#facc15";
   }
 
@@ -442,6 +531,29 @@ const toApiAttribute = (goalOption = "") => {
         : `${part.charAt(0).toUpperCase()}${part.slice(1).toLowerCase()}`,
     )
     .join("");
+};
+
+const getApiAttributeForSelection = (selectedGoal, selectedGoalOption) => {
+  if (
+    selectedGoal === "Work From Anywhere" &&
+    selectedGoalOption === "Best Work Infrastructure"
+  ) {
+    return "bestWorkInfrastructureWFA";
+  }
+
+  return toApiAttribute(selectedGoalOption);
+};
+
+const getLabelFieldKeyForSelection = (selectedGoal, selectedGoalOption) => {
+  if (selectedGoalOption === "Best Work Infrastructure") {
+    return selectedGoal === "Work From Anywhere"
+      ? "labelBestWorkInfrastructureWfa"
+      : "labelBestWorkInfrastructure";
+  }
+
+  return toLabelFieldKey(
+    getApiAttributeForSelection(selectedGoal, selectedGoalOption),
+  );
 };
 
 const INITIAL_VISIBLE_DESTINATIONS = 18;
@@ -499,6 +611,8 @@ const goalNarrativeByGoalAndAttribute = {
       "Curated below are the best cities in X for startups, entrepreneurship, and career growth.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🚀 Startup ecosystems\n• 🧠 Talent & innovation density\n• 🏢 Work infrastructure\n• 🌐 Global connectivity\n\n→ Build, scale, and grow faster.",
     [normalizeNarrativeKey("Clean Air / Environment")]:
       "Curated below are the cleanest and most environmentally friendly cities in X.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🌿 Air quality\n• 🛡️ Safe, livable environments\n• 🏥 Health-conscious conditions\n• 🌍 Overall quality of life\n\n→ Breathe better, live better.",
+    [normalizeNarrativeKey("Best Work Infrastructure")]:
+      "Curated below are the best cities in X optimized for productivity and remote work performance.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n•🏢 Work infrastructure (coworking, setup, reliability)\n•⚡ High-speed, stable internet\n•🤝 Strong nomad ecosystems\n•💰 Sustainable cost of living\n•🛂 Visa flexibility for longer stays\n\n→ Work efficiently from anywhere, without compromise.",
   },
   [normalizeNarrativeKey("Work From Anywhere")]: {
     [normalizeNarrativeKey("Best for Remote Work Setup")]:
@@ -770,7 +884,7 @@ const AiSearchResults = () => {
     const leftBadgeField = leftBadgeFieldByGoalOption[selectedGoalOption];
     const leftBadgeLabelField =
       leftBadgeLabelFieldByGoalOption[selectedGoalOption] ||
-      toLabelFieldKey(toApiAttribute(selectedGoalOption));
+      getLabelFieldKeyForSelection(selectedGoal, selectedGoalOption);
 
     return apiDestinations
       .filter((destination) => destination?.isActive === true)
@@ -789,7 +903,7 @@ const AiSearchResults = () => {
           leftBadgeLabel: leftBadgeValueFromLabel || leftBadgeValueFromField,
         };
       });
-  }, [apiDestinations, selectedGoalOption]);
+  }, [apiDestinations, selectedGoal, selectedGoalOption]);
 
   useEffect(() => {
     if (!hasSelectedFilters) {
@@ -807,7 +921,10 @@ const AiSearchResults = () => {
           {
             selectionType: selectedGoal,
             continent: selectedContinent,
-            attribute: toApiAttribute(selectedGoalOption),
+            attribute: getApiAttributeForSelection(
+              selectedGoal,
+              selectedGoalOption,
+            ),
           },
           { signal: controller.signal },
         );
@@ -852,6 +969,7 @@ const AiSearchResults = () => {
             nomadTax: item?.nomadTax,
             costOfLivingPerMonth: item?.costOfLivingPerMonth,
             allScores: item?.allScores || {},
+            weight: item?.weight || {},
             labels: item?.labels || {},
             isActive: item?.isActive ?? existingDestination?.isActive ?? false,
             image: (() => {
@@ -1501,6 +1619,7 @@ const AiSearchResults = () => {
                                 <div className="grid grid-cols-1 gap-2 text-xs md:text-sm text-white/90">
                                   {getQuickStatsForDestination(
                                     destination,
+                                    selectedGoal,
                                     selectedGoalOption,
                                   ).map((stat, statIndex) => (
                                     <div
@@ -1514,14 +1633,18 @@ const AiSearchResults = () => {
                                             0,
                                             Math.min(
                                               100,
-                                              ((stat.score || 0) / 10) * 100,
+                                              getScoreFillPercentage(
+                                                stat.score,
+                                              ),
                                             ),
                                           )}%,
                                           rgba(255, 255, 255, 0.16) ${Math.max(
                                             0,
                                             Math.min(
                                               100,
-                                              ((stat.score || 0) / 10) * 100,
+                                              getScoreFillPercentage(
+                                                stat.score,
+                                              ),
                                             ),
                                           )}%,
                                           rgba(255, 255, 255, 0.16) 100%
