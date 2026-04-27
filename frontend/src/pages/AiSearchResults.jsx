@@ -1602,10 +1602,12 @@ const AiSearchResults = () => {
 
                             <div className="absolute inset-0 bg-black/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-center p-3 md:p-4">
                               <div className="translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                                <h4 className="text-white text-sm md:text-base font-semibold text-center mb-2">
-                                  {selectedGoalOption || "Attribute"}
-                                </h4>
-                                <h4 className="text-white text-sm md:text-base font-semibold mb-2">
+                                <div className="mb-2 border-b border-white/30 pb-1">
+                                  <h4 className="-translate-y-2 text-white text-base md:text-[0.89rem] font-semibold uppercase tracking-wide text-center">
+                                    {selectedGoalOption || "Attribute"}
+                                  </h4>
+                                </div>
+                                <h4 className="mb-2 text-right text-white text-sm md:text-sm font-semibold py-2">
                                   {`${selectedContinent || "World"} Rank ${
                                     destination?.rankLabel
                                       ? destination.rankLabel.replace(
