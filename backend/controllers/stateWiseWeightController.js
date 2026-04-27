@@ -286,6 +286,7 @@ export const getStateWiseWeight = async (req, res, next) => {
         state: item.state,
         country: item.country,
         isActive: item.isActive,
+        weight: item.weight,
         allScores,
         [effectiveAttribute]: scoreForSorting,
         imageUrl: resolvedImageUrl,
