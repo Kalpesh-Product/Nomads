@@ -108,6 +108,40 @@ const formatLeftBadgeValue = (value) => {
   return `${value}`;
 };
 
+const SCORE_RANGE_MAX = 10;
+const SCORE_RANGE_MIN_DEFAULT = 0;
+
+const getScoreRangeMin = () => {
+  const configuredMin = Number(import.meta.env.VITE_AI_SCORE_RANGE_MIN);
+
+  if (Number.isFinite(configuredMin)) {
+    return Math.min(SCORE_RANGE_MAX, Math.max(0, configuredMin));
+  }
+
+  return SCORE_RANGE_MIN_DEFAULT;
+};
+
+const getScoreFillPercentage = (score) => {
+  const min = getScoreRangeMin();
+  const normalizedScore = Number(score);
+
+  if (!Number.isFinite(normalizedScore)) {
+    return 0;
+  }
+
+  const clampedScore = Math.max(
+    min,
+    Math.min(SCORE_RANGE_MAX, normalizedScore),
+  );
+  const denominator = SCORE_RANGE_MAX - min;
+
+  if (denominator <= 0) {
+    return 100;
+  }
+
+  return ((clampedScore - min) / denominator) * 100;
+};
+
 const quickStatsConfigByGoalOption = {
   "Best for Nomads": [
     { label: "Work Infra", labelKey: "labelBestWorkInfrastructure" },
@@ -1599,14 +1633,18 @@ const AiSearchResults = () => {
                                             0,
                                             Math.min(
                                               100,
-                                              ((stat.score || 0) / 10) * 100,
+                                              getScoreFillPercentage(
+                                                stat.score,
+                                              ),
                                             ),
                                           )}%,
                                           rgba(255, 255, 255, 0.16) ${Math.max(
                                             0,
                                             Math.min(
                                               100,
-                                              ((stat.score || 0) / 10) * 100,
+                                              getScoreFillPercentage(
+                                                stat.score,
+                                              ),
                                             ),
                                           )}%,
                                           rgba(255, 255, 255, 0.16) 100%
