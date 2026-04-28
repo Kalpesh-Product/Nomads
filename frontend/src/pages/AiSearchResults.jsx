@@ -1455,13 +1455,30 @@ const AiSearchResults = () => {
   const shouldShowNarrative =
     hasSelectedFilters && (typedBottomHeading || typedResultsHeading);
 
-  const highlightedResultsHeading = useMemo(
+  const [resultsHeadingFirstLine, resultsHeadingRemainingLines] =
+    useMemo(() => {
+      const [firstLine = "", ...remainingLines] =
+        typedResultsHeading.split("\n");
+
+      return [firstLine, remainingLines.join("\n")];
+    }, [typedResultsHeading]);
+
+  const highlightedResultsHeadingFirstLine = useMemo(
     () =>
-      highlightSelectedTokens(typedResultsHeading, [
+      highlightSelectedTokens(resultsHeadingFirstLine, [
         selectedContinent,
         selectedGoalOption,
       ]),
-    [typedResultsHeading, selectedContinent, selectedGoalOption],
+    [resultsHeadingFirstLine, selectedContinent, selectedGoalOption],
+  );
+
+  const highlightedResultsHeadingRemainingLines = useMemo(
+    () =>
+      highlightSelectedTokens(resultsHeadingRemainingLines, [
+        selectedContinent,
+        selectedGoalOption,
+      ]),
+    [resultsHeadingRemainingLines, selectedContinent, selectedGoalOption],
   );
 
   return (
@@ -1550,8 +1567,15 @@ const AiSearchResults = () => {
                       <p className="text-sm font-medium leading-relaxed text-primary-blue lg:text-[0.9rem] font-play">
                         {typedBottomHeading}
                       </p>
-                      <p className="mt-6 whitespace-pre-line text-sm font-medium leading-relaxed text-black/85 lg:text-[0.9rem] font-play">
-                        {highlightedResultsHeading}
+                      <p className="mt-6 text-sm leading-relaxed text-black/85 lg:text-[0.9rem] font-play">
+                        <span className="block font-bold">
+                          {highlightedResultsHeadingFirstLine}
+                        </span>
+                        {resultsHeadingRemainingLines && (
+                          <span className="mt-1 block whitespace-pre-line">
+                            {highlightedResultsHeadingRemainingLines}
+                          </span>
+                        )}
                       </p>
                     </>
                   )}
