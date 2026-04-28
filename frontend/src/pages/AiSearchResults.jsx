@@ -596,9 +596,9 @@ const getNarrativeContinentLabel = (continent) =>
 const goalNarrativeByGoalAndAttribute = {
   [normalizeNarrativeKey("World Ranking")]: {
     [normalizeNarrativeKey("Best for Nomads")]:
-      "Curated below are the best cities in X optimized for productivity and remote work performance.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n•🏢 Work infrastructure (coworking, setup, reliability)\n•⚡ High-speed, stable internet\n•🤝 Strong nomad ecosystems\n•💰 Sustainable cost of living\n•🛂 Visa flexibility for longer stays\n\n→ Work efficiently from anywhere, without compromise.",
+      "Curated below are the top cities in X based on overall livability for modern remote professionals.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🏢 Work infrastructure (coworking, setup, reliability)\n• ⚡ High-speed, stable internet\n• 💰 Cost of living\n• 🛡️ Safety\n• 🛂 Visa flexibility for longer stays\n• 🤝 Nomad community\n• 🏥 Healthcare affordability\n• 🚀 Startup ecosystem\n• 🌿 Air quality\n\n→ Find the best overall place to live and work.",
     [normalizeNarrativeKey("Most Affordable")]:
-      "Curated below are the most affordable cities in X designed to help you maximize your budget.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💰 Low cost of living\n• 🏥 Affordable healthcare\n• 🛡️ Safety & stability\n• 🌍 Livability factors\n\n→ Stretch your budget further while living comfortably.",
+      "Curated below are the most affordable cities in X designed to help you maximize your budget.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💰 Low cost of living\n• 🏥 Affordable healthcare\n• 🛡️ Safety & stability\n• 🌍 Livability factors\n\n→ Find cities where affordability meets comfort.",
     [normalizeNarrativeKey("Safest Cities")]:
       "Curated below are the safest cities in X based on your preference for security and peace of mind.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🛡️ Safety levels\n• 🏥 Healthcare accessibility\n• 🌍 Stable living conditions\n• 🌿 Clean environments\n\n→ Live confidently, whether short-term or long-term.",
     [normalizeNarrativeKey("Easy Visa / Long Stay")]:
