@@ -669,7 +669,7 @@ const AiGlobalListingsList = () => {
           badges={searchBarBadges}
           stateLabel={selectedLocationLabel}
           onBack={() => navigate(-1)}
-          onClear={() => navigate("/search/results")}
+          onClear={() => navigate(-1)}
           heading={
             <p className=" mt-6 mb-6 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.8rem] font-play">
               {!isSecondHeadingPhase && (
@@ -1016,8 +1016,8 @@ const AiGlobalListingsList = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => navigate("/search/results")}
-                  aria-label="Close and go to search results"
+                  onClick={() => navigate(-1)}
+                  aria-label="Go back to previous page"
                   className="h-8 w-8 shrink-0 rounded-full bg-gray-200 text-black/60 flex items-center justify-center"
                 >
                   <HiOutlineX size={18} />

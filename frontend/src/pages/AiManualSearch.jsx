@@ -15,12 +15,12 @@ import axios from "../utils/axios";
 const searchBarBadgeClassName =
   "inline-flex min-h-[40px] min-w-[5rem] items-center rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85";
 
-const countOptions = [
-  { label: "1 - 5", value: "1-5" },
-  { label: "5 - 10", value: "5-10" },
-  { label: "10 - 25", value: "10-25" },
-  { label: "25+", value: "25+" },
-];
+// const countOptions = [
+//   { label: "1 - 5", value: "1-5" },
+//   { label: "5 - 10", value: "5-10" },
+//   { label: "10 - 25", value: "10-25" },
+//   { label: "25+", value: "25+" },
+// ];
 
 const TYPING_INTERVAL_MS = 7;
 
@@ -39,12 +39,13 @@ const DropdownBadge = ({
         type="button"
         onClick={onToggle}
         disabled={disabled}
-        className={`flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${disabled
-          ? "cursor-not-allowed border-black/10 bg-black/[0.03] text-black/35"
-          : isOpen
-            ? "border-sky-500 bg-sky-500 text-white"
-            : "border-black/20 bg-white text-black/85 hover:border-sky-500"
-          }`}
+        className={`flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${
+          disabled
+            ? "cursor-not-allowed border-black/10 bg-black/[0.03] text-black/35"
+            : isOpen
+              ? "border-sky-500 bg-sky-500 text-white"
+              : "border-black/20 bg-white text-black/85 hover:border-sky-500"
+        }`}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
       >
@@ -70,10 +71,11 @@ const DropdownBadge = ({
                   <button
                     type="button"
                     onClick={() => onSelect(option.value)}
-                    className={`flex w-full items-center rounded-xl px-3 py-2 text-left text-sm transition-colors ${isSelected
-                      ? "bg-sky-50 font-medium text-sky-600"
-                      : "text-black/80 hover:bg-slate-50"
-                      }`}
+                    className={`flex w-full items-center rounded-xl px-3 py-2 text-left text-sm transition-colors ${
+                      isSelected
+                        ? "bg-sky-50 font-medium text-sky-600"
+                        : "text-black/80 hover:bg-slate-50"
+                    }`}
                     role="option"
                     aria-selected={isSelected}
                   >
@@ -99,9 +101,7 @@ const AiManualSearch = () => {
   const [selectedContinent, setSelectedContinent] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
-  const [selectedCount, setSelectedCount] = useState("");
   const [typedTopHeading, setTypedTopHeading] = useState("");
-  const [typedBottomHeading, setTypedBottomHeading] = useState("");
 
   const user = auth?.user || {};
 
@@ -157,9 +157,9 @@ const AiManualSearch = () => {
   const countryOptions = useMemo(() => {
     const filtered = selectedContinent
       ? locations.filter(
-        (item) =>
-          item.continent?.toLowerCase() === selectedContinent?.toLowerCase(),
-      )
+          (item) =>
+            item.continent?.toLowerCase() === selectedContinent?.toLowerCase(),
+        )
       : locations;
 
     return filtered
@@ -194,30 +194,20 @@ const AiManualSearch = () => {
   const locationLabel =
     locationOptions.find((option) => option.value === selectedLocation)
       ?.label || "Location";
-  const countLabel =
-    countOptions.find((option) => option.value === selectedCount)?.label ||
-    "Count";
-
   const topTypingIntervalRef = useRef(null);
-  const bottomTypingIntervalRef = useRef(null);
 
   const hasAllSelections = Boolean(
-    selectedContinent && selectedCountry && selectedLocation && selectedCount,
+    selectedContinent && selectedCountry && selectedLocation,
   );
   const initialTopHeadingText =
     "Please select one option from each below so that I can display the best curated results.";
   const selectedTopHeadingText =
     "Curating the best results for you. Click on Search to continue.";
-  const selectedBottomHeadingText = hasAllSelections
-    ? `You are about to view ${countLabel} nomad destination options in ${locationLabel}, ${countryLabel}, ${continentLabel}. Click search to continue.`
-    : "";
-
   const searchBarBadges = [
     "Search Old School",
     selectedContinent && continentLabel,
     selectedCountry && countryLabel,
     selectedLocation && locationLabel,
-    selectedCount && `${countLabel} Nomads`,
   ].filter(Boolean);
 
   const handleDropdownToggle = (dropdownKey) => {
@@ -226,13 +216,13 @@ const AiManualSearch = () => {
     );
   };
 
-  const navigateToSearchResults = ({ continent, country, location, count }) => {
+  const navigateToSearchResults = ({ continent, country, location }) => {
     const formValues = {
       continent,
       country,
       location,
       category: "",
-      count,
+      count: "",
     };
 
     dispatch(setFormValues(formValues));
@@ -242,8 +232,6 @@ const AiManualSearch = () => {
       continentOptions.find((option) => option.value === continent)?.label,
       countryOptions.find((option) => option.value === country)?.label,
       locationOptions.find((option) => option.value === location)?.label,
-      countOptions.find((option) => option.value === count)?.label &&
-      `${countOptions.find((option) => option.value === count)?.label} Nomads`,
     ].filter(Boolean);
 
     navigate(
@@ -268,7 +256,6 @@ const AiManualSearch = () => {
       continent: selectedContinent,
       country: selectedCountry,
       location: selectedLocation,
-      count: selectedCount,
     });
   };
 
@@ -293,10 +280,6 @@ const AiManualSearch = () => {
         topTypingIntervalRef.current = null;
       }
 
-      if (bottomTypingIntervalRef.current) {
-        clearInterval(bottomTypingIntervalRef.current);
-        bottomTypingIntervalRef.current = null;
-      }
     };
 
     const animateTypedText = (text, setText, onComplete) => {
@@ -328,15 +311,8 @@ const AiManualSearch = () => {
       topTypingIntervalRef.current = animateTypedText(
         selectedTopHeadingText,
         setTypedTopHeading,
-        () => {
-          bottomTypingIntervalRef.current = animateTypedText(
-            selectedBottomHeadingText,
-            setTypedBottomHeading,
-          );
-        },
       );
     } else {
-      setTypedBottomHeading("");
       topTypingIntervalRef.current = animateTypedText(
         initialTopHeadingText,
         setTypedTopHeading,
@@ -349,7 +325,6 @@ const AiManualSearch = () => {
   }, [
     hasAllSelections,
     initialTopHeadingText,
-    selectedBottomHeadingText,
     selectedTopHeadingText,
   ]);
 
@@ -398,10 +373,11 @@ const AiManualSearch = () => {
                 <button
                   type="button"
                   onClick={handleSearch}
-                  className={`inline-flex items-center justify-center rounded-full p-1 transition-colors ${hasAllSelections
-                    ? "text-black/90 hover:text-sky-600"
-                    : "cursor-not-allowed text-black/35"
-                    }`}
+                  className={`inline-flex items-center justify-center rounded-full p-1 transition-colors ${
+                    hasAllSelections
+                      ? "text-black/90 hover:text-sky-600"
+                      : "cursor-not-allowed text-black/35"
+                  }`}
                   aria-label="Search listings"
                   disabled={!hasAllSelections}
                 >
@@ -414,7 +390,7 @@ const AiManualSearch = () => {
               className="relative mt-6 lg:ml-[6.25rem] lg:mr-36"
               ref={dropdownContainerRef}
             >
-              <div className="relative z-30 grid w-full grid-cols-1 gap-4 sm:grid-cols-2 sm:items-stretch lg:grid-cols-4">
+                <div className="relative z-30 grid w-full grid-cols-1 gap-4 sm:grid-cols-2 sm:items-stretch lg:grid-cols-3">
                 <DropdownBadge
                   label="Continent"
                   options={continentOptions}
@@ -458,28 +434,15 @@ const AiManualSearch = () => {
                   onSelect={(value) => {
                     setSelectedLocation(value);
                     setOpenDropdown(null);
+                    navigateToSearchResults({
+                      continent: selectedContinent,
+                      country: selectedCountry,
+                      location: value,
+                    });
                   }}
                   disabled={!selectedCountry}
                 />
 
-                <DropdownBadge
-                  label="Count"
-                  options={countOptions}
-                  selectedValue={selectedCount ? countLabel : "Select Count"}
-                  isOpen={openDropdown === "count"}
-                  onToggle={() => handleDropdownToggle("count")}
-                  onSelect={(value) => {
-                    setSelectedCount(value);
-                    setOpenDropdown(null);
-                    navigateToSearchResults({
-                      continent: selectedContinent,
-                      country: selectedCountry,
-                      location: selectedLocation,
-                      count: value,
-                    });
-                  }}
-                  disabled={!selectedLocation}
-                />
               </div>
 
               {/* <div className="relative mt-8">
