@@ -51,7 +51,7 @@ const recommendationItems = [
     {
         label: "Home",
         icon: TbAward,
-        path: "/host/ai-host-home",
+        path: "/host",
     },
     {
         label: "Dashboard",

@@ -53,7 +53,7 @@ import { HiOutlineArrowLeft } from "react-icons/hi";
 export default function Modules() {
     const navigate = useNavigate();
     const isMobile = useIsMobile();
-    const onBack = () => navigate("/host/ai-host-home");
+    const onBack = () => navigate("/host");
     return (
         <>
             <Container>
@@ -66,6 +66,7 @@ export default function Modules() {
                     >
                         <HiOutlineArrowLeft size={18} />
                     </button>
+                    <span className="text-lg font-medium text-primary-blue">Modules</span>
                     {/* {stateLabel && (
           <span className="text-lg font-medium text-primary-blue">
             {stateLabel}

@@ -1,552 +1,312 @@
-import React, { useState } from "react";
-import { useNavigate, Link, useLocation } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import logo from "../../assets/WONO_LOGO_Black_TP.png";
-import { useSelector } from "react-redux";
-import { Drawer, Avatar, Popover, CircularProgress } from "@mui/material";
-import { IoCloseSharp } from "react-icons/io5";
-import { HiOutlineMenu } from "react-icons/hi";
-import { FiLogOut } from "react-icons/fi";
-import useAuth from "../../hooks/useAuth";
-import useNomadLoginState from "../../hooks/useNomadLoginState";
-import AiContainer from "../../components/AiContainer";
-import useLogout from "../../hooks/useLogout";
-import { clearStoredLoginState } from "../../hooks/useNomadLoginState";
+import { FaTwitter, FaLinkedinIn } from "react-icons/fa";
+import { FaGlobe, FaRupeeSign, FaFacebookF, FaInstagram } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
+import { AiOutlineClose } from "react-icons/ai";
 
-const AiHostFooter = ({ onMobileSidebarToggle }) => {
-    const [open, setOpen] = useState(false);
-    const [anchorEl, setAnchorEl] = useState(null);
-    const [isLogoutLoading, setIsLogoutLoading] = useState(false);
+const languages = [
+    { code: "en-US", name: "English (US)" },
+    { code: "en-IN", name: "English (IN)" },
+    { code: "en-SG", name: "English (Singapore)" },
+    { code: "hi-IN", name: "हिन्दी (India)" },
+    { code: "es-ES", name: "Español (Spain)" },
+    { code: "fr-FR", name: "Français (France)" },
+    { code: "de-DE", name: "Deutsch (Germany)" },
+];
 
-    const navigate = useNavigate();
-    const location = useLocation();
-    const searchParams = new URLSearchParams(location.search);
-    const view = searchParams.get("view");
-    const formData = useSelector((state) => state.location.formValues);
+const currencies = [
+    { code: "USD", name: "US Dollar", symbol: "$" },
+    { code: "INR", name: "Indian Rupee", symbol: "₹" },
+    { code: "EUR", name: "Euro", symbol: "€" },
+    { code: "AED", name: "UAE Dirham", symbol: "د.إ" },
+    { code: "GBP", name: "British Pound", symbol: "£" },
+    { code: "SGD", name: "Singapore Dollar", symbol: "$" },
+];
 
-    const isAiListingsMapPage = location.pathname === "/ai-listings";
-    const isAiListingsListPage = location.pathname === "/ai-listings-list";
-    const showToggle =
-        location.pathname.includes("verticals") ||
-        isAiListingsMapPage ||
-        isAiListingsListPage;
-    const showNewsBlogLinks =
-        showToggle ||
-        location.pathname.startsWith("/ai-listings") ||
-        location.pathname.startsWith("/listings");
+const AiFooter = () => {
+    const [showLangModal, setShowLangModal] = useState(false);
+    const [showCurrencyModal, setShowCurrencyModal] = useState(false);
+    const [selectedLang, setSelectedLang] = useState(languages[0]);
+    const [selectedCurrency, setSelectedCurrency] = useState(currencies[0]);
 
-    const countryParam = searchParams.get("country") || formData?.country || "";
-    const locationParam =
-        searchParams.get("location") || formData?.location || "";
-    const categoryParam =
-        searchParams.get("category") || formData?.category || "";
-
-    const buildListingsQuery = () => {
-        const params = new URLSearchParams();
-        if (countryParam) params.set("country", countryParam);
-        if (locationParam) params.set("location", locationParam);
-        if (categoryParam) params.set("category", categoryParam);
-        return params.toString();
-    };
-
-    const listingsQuery = buildListingsQuery();
-    const mapViewLink = listingsQuery
-        ? `/ai-listings?${listingsQuery}`
-        : "/ai-listings";
-    const listViewLink = listingsQuery
-        ? `/ai-listings-list?${listingsQuery}`
-        : "/ai-listings-list";
-
-    const { auth } = useAuth();
-    const logout = useLogout();
-    const hasNomadLoginState = useNomadLoginState();
-    const isLoggedIn = Boolean(auth?.user) || hasNomadLoginState;
-    const userInitial = auth?.user?.fullName?.charAt(0)?.toUpperCase() || "A";
-    const openPopover = Boolean(anchorEl);
-
-    const handleAvatarClick = (event) => setAnchorEl(event.currentTarget);
-    const handlePopoverClose = () => setAnchorEl(null);
-
-    const handleSignOut = async () => {
-        if (isLogoutLoading) return;
-        setIsLogoutLoading(true);
-        handlePopoverClose();
-
-        try {
-            if (auth?.user) {
-                await logout();
-            }
-            const nextSearchParams = new URLSearchParams(location.search);
-            nextSearchParams.delete("login");
-            clearStoredLoginState();
-
-            navigate(
-                {
-                    pathname: "/ai-login",
-                    search: nextSearchParams.toString()
-                        ? `?${nextSearchParams.toString()}`
-                        : "",
-                },
-                {
-                    state: {
-                        redirectTo: `${location.pathname}${location.search}`,
-                    },
-                },
-            );
-        } catch (error) {
-            console.error("Logout failed:", error);
-        } finally {
-            setIsLogoutLoading(false);
-        }
-    };
-
-    const handleNavigation = (path) => {
-        navigate(path);
-        setOpen(false);
-    };
-
-    const goToHosts = () => {
+    const goToHostsPrivacy = () => {
         if (window.location.hostname.includes("localhost")) {
-            window.location.href = "http://hosts.localhost:5173";
+            window.location.href = "http://nomad.localhost:5173/privacy";
         } else {
-            window.location.href = "https://hosts.wono.co";
+            window.location.href = "https://nomad.wono.co/privacy";
         }
     };
-
-    const goToHostssMain = () => {
+    const goToHostsTC = () => {
         if (window.location.hostname.includes("localhost")) {
-            window.location.href = "http://nomad.localhost:5173/home";
+            window.location.href = "http://nomad.localhost:5173/terms-and-conditions";
         } else {
-            window.location.href = "https://nomad.wono.co/home";
+            window.location.href = "https://nomad.wono.co/terms-and-conditions";
+        }
+    };
+    const goToHostsContentCopyright = () => {
+        if (window.location.hostname.includes("localhost")) {
+            window.location.href =
+                "http://nomad.localhost:5173/content-and-copyright";
+        } else {
+            window.location.href = "https://nomad.wono.co/content-and-copyright";
+        }
+    };
+    const goToHostsContentUseRemoval = () => {
+        if (window.location.hostname.includes("localhost")) {
+            window.location.href = "http://nomad.localhost:5173/content-use-removal";
+        } else {
+            window.location.href = "https://nomad.wono.co/content-use-removal";
         }
     };
 
-    const stateParam =
-        searchParams.get("state") ||
-        searchParams.get("location") ||
-        formData?.state ||
-        formData?.location ||
-        "";
-
-    const formatStateLabel = (value) =>
-        decodeURIComponent(value)
-            .replace(/[-_]+/g, " ")
-            .split(" ")
-            .filter(Boolean)
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-            .join(" ");
-
-    const stateLabel = stateParam ? formatStateLabel(stateParam) : "";
-    const newsLabel = stateLabel ? `${stateLabel} News` : "News";
-    const blogLabel = stateLabel ? `${stateLabel} Blog` : "Blog";
-
-    const currentSearch = location.search || "";
-    const headerLinks = [
-        // { id: 1, text: "Home", to: "/" },
-        { id: 2, type: "news", text: newsLabel, to: `/ai-news${currentSearch}` },
-        { id: 3, type: "blog", text: blogLabel, to: `/ai-blogs${currentSearch}` },
+    const footerSections = [
+        {
+            heading: "Services",
+            links: [
+                { name: "About", link: "/about" },
+                { name: "Career", link: "career" },
+                { name: "FAQs", link: "faq" },
+                // {
+                //   name: "Content and Copyright Policy",
+                //   link: goToHostsContentCopyright,
+                // },
+            ],
+        },
+        {
+            heading: "Corporate",
+            links: [
+                { name: "Privacy", link: goToHostsPrivacy },
+                { name: "T&C", link: goToHostsTC },
+                { name: "Contact", link: "/contact" },
+                // {
+                //   name: "Content Use & Removal Policy",
+                //   link: goToHostsContentUseRemoval,
+                // },
+            ],
+        },
     ];
 
-    const shouldShowHeaderLinks =
-        location.pathname.startsWith("/listings") &&
-        !location.pathname.startsWith("/ai-listings");
-
     return (
-        <div className="bg-white/80 backdrop-blur-md px-1 md:px-10">
-            <AiContainer padding={false}>
-                <div className="flex py-3 justify-between items-center lg:py-[0.625rem]">
-                    {/* Logo */}
-                    <div className="flex items-center">
-                        <button
-                            type="button"
-                            onClick={() => onMobileSidebarToggle?.()}
-                            className="mr-2 rounded p-1 text-black sm:hidden"
-                            aria-label="Open sidebar"
-                        >
-                            <HiOutlineMenu size={24} />
-                        </button>
-                        <div
-                            onClick={goToHostssMain}
-                            className="w-24 h-10 lg:w-48 overflow-x-hidden rounded-lg flex gap-8 justify-start items-start cursor-pointer"
-                        >
-                            <img
-                                src={logo}
-                                alt="logo"
-                                className="w-fit h-full object-contain"
-                            />
-                        </div>
-                        <div className="min-w-[80px] hidden lg:block">
-                            {showToggle && (
-                                <ul>
-                                    {(isAiListingsListPage ||
-                                        (!isAiListingsMapPage && view !== "map")) && (
-                                            <li className="flex items-center">
-                                                <div className="p-4 px-0 whitespace-nowrap">
-                                                    <Link
-                                                        to={
-                                                            isAiListingsListPage
-                                                                ? mapViewLink
-                                                                : `${location.pathname}?country=${formData?.country}&location=${formData?.location}&view=map`
-                                                        }
-                                                        className="group relative text-md text-black"
-                                                    >
-                                                        <span className="relative z-10 group-hover:font-bold mb-2 text-sm font-semibold">
-                                                            Map View
-                                                        </span>
-                                                        <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
-                                                    </Link>
-                                                </div>
-                                            </li>
-                                        )}
-
-                                    {(isAiListingsMapPage || view === "map") && (
-                                        <li className="flex items-center">
-                                            <div className="p-4 px-0 whitespace-nowrap">
-                                                <Link
-                                                    to={
-                                                        isAiListingsMapPage
-                                                            ? listViewLink
-                                                            : `${location.pathname}?country=${formData?.country}&location=${formData?.location}`
-                                                    }
-                                                    className="group relative text-md text-black"
-                                                >
-                                                    <span className="relative z-10 group-hover:font-bold mb-2 text-sm font-semibold">
-                                                        List view
-                                                    </span>
-                                                    <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
-                                                </Link>
-                                            </div>
-                                        </li>
-                                    )}
-                                </ul>
-                            )}
-                        </div>
+        <>
+            <div className="sticky bottom-0 z-10 bg-white/95 py-6 text-nano text-gray-600 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+                <div className="flex flex-col items-center gap-2 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center">
+                    <span className="text-center sm:col-start-2">
+                        WoNo is in Beta and can make mistakes. Building the future of global
+                        nomad living, one update at a time. See Cookie Preferences.
+                    </span>
+                    <span className="text-center sm:col-start-3 sm:justify-self-end sm:pr-8">
+                        Version 2.7.3
+                    </span>
+                </div>
+            </div>
+            <footer className="w-full bg-gray-100 text-black flex flex-col justify-center items-center shadow-lg">
+                <div className="w-full flex flex-wrap justify-center lg:justify-between items-center pt-12 pb-8 px-4 md:px-20">
+                    {/* Left Section */}
+                    <div className="flex flex-col items-center lg:items-start mb-8 lg:mb-0 w-full lg:w-auto text-center lg:text-left">
+                        <img
+                            src={logo}
+                            className="w-36 cursor-pointer mb-4 mx-auto lg:mx-0"
+                            alt="logo"
+                            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                        />
+                        <p className="text-sm leading-6">
+                            WONOCO PRIVATE LIMITED - SINGAPORE
+                            <br />
+                            <Link
+                                to="mailto:response@wono.co"
+                                className="text-primary-blue lowercase hover:underline"
+                            >
+                                response@wono.co
+                            </Link>
+                        </p>
                     </div>
 
-                    {/* Main Nav */}
-                    <div className="w-full">
-                        {shouldShowHeaderLinks && (
-                            <ul className="hidden xl:flex sm:hidden gap-8 justify-end flex-1">
-                                {headerLinks.map((item) => {
-                                    const isActive =
-                                        item.to === "/"
-                                            ? location.pathname === "/"
-                                            : location.pathname.startsWith(item.to);
+                    {/* Links Section */}
+                    <div className="lg:w-fit w-full flex justify-center lg:justify-end">
+                        <div className="grid grid-cols-2 gap-x-10 text-center lg:text-left">
+                            {footerSections.map((section, idx) => (
+                                <div
+                                    key={idx}
+                                    className="flex flex-col items-center lg:items-start"
+                                >
+                                    {section.links.map((linkObj, i) =>
+                                        typeof linkObj.link === "function" ? (
+                                            <span
+                                                key={i}
+                                                onClick={linkObj.link}
+                                                className="text-sm opacity-80 hover:text-gray-500 cursor-pointer uppercase p-2"
+                                            >
+                                                {linkObj.name}
+                                            </span>
+                                        ) : (
+                                            <Link
+                                                key={i}
+                                                to={linkObj.link}
+                                                className="text-sm opacity-80 hover:text-gray-500 uppercase p-2"
+                                            >
+                                                {linkObj.name}
+                                            </Link>
+                                        ),
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Copyright */}
+                {/* <div className="w-full text-center py-4 border-t border-gray-200 text-sm">
+        © {new Date().getFullYear()} WONOCO PRIVATE LIMITED - SINGAPORE. All
+        Rights Reserved.
+      </div> */}
+                {/* Copyright */}
+                <div className="w-full flex flex-col items-center justify-center text-center py-6 border-t-2 border-white px-4 md:px-[7.5rem] lg:flex-row lg:justify-between lg:text-left">
+                    {/* Left side — Copyright */}
+                    <div className="flex flex-col md:flex-row justify-center md:justify-start items-center gap-1 text-[10px] md:text-xs font-semibold text-gray-800 mb-3 lg:mb-0">
+                        <span>
+                            &copy; Copyright {new Date().getFullYear()}-
+                            {(new Date().getFullYear() + 1).toString().slice(-2)}
+                        </span>
+                        <span className="text-[10px] md:text-xs font-semibold md:ml-2">
+                            WONOCO PRIVATE LIMITED - SINGAPORE. All Rights Reserved.
+                        </span>
+                    </div>
+
+                    {/* Right side — Policy Links */}
+                    <div className="flex flex-col md:flex-row justify-center lg:justify-end items-center gap-4 text-[10px] md:text-xs text-gray-800 ">
+                        <span
+                            onClick={goToHostsContentCopyright}
+                            className="hover:opacity-100 hover:text-gray-500 uppercase text-center lg:text-right cursor-pointer"
+                        >
+                            Content and Copyright Policy
+                        </span>
+                        <span
+                            onClick={goToHostsContentUseRemoval}
+                            className="hover:opacity-100 hover:text-gray-500 uppercase text-center lg:text-right cursor-pointer"
+                        >
+                            Content Use & Removal Policy
+                        </span>
+                    </div>
+                </div>
+
+                {/* Bottom Bar */}
+                <div className="w-full flex justify-center items-center gap-4 py-4 bg-gray-50 text-xs font-semibold border-t border-gray-200">
+                    {/* Language Selector */}
+                    <div
+                        onClick={() => setShowLangModal(true)}
+                        className="flex items-center gap-1 cursor-pointer hover:underline"
+                    >
+                        <FaGlobe className="text-[12px]" />
+                        <span>{selectedLang.name}</span>
+                    </div>
+
+                    {/* Currency Selector */}
+                    <div
+                        onClick={() => setShowCurrencyModal(true)}
+                        className="px-2 py-[2px] border border-gray-700 rounded-md flex items-center gap-1 cursor-pointer hover:underline"
+                    >
+                        {/* <FaRupeeSign className="text-[12px]" /> */}
+                        <span>{selectedCurrency.symbol}</span>
+                        <span>{selectedCurrency.code}</span>
+                    </div>
+
+                    <FaFacebookF className="text-[12px]" />
+                    <FaXTwitter className="text-[12px]" />
+                    <FaInstagram className="text-[12px]" />
+                </div>
+
+                {/* Language Modal */}
+                {showLangModal && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 px-4">
+                        <div className="bg-white rounded-lg max-w-2xl w-full p-6 relative overflow-y-auto max-h-[80vh]">
+                            <button
+                                onClick={() => setShowLangModal(false)}
+                                className="absolute top-3 right-3 text-gray-600 hover:text-black"
+                            >
+                                <AiOutlineClose size={20} />
+                            </button>
+                            <h2 className="text-lg font-semibold mb-4">
+                                Choose a language and region
+                            </h2>
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                {languages.map((lang, index) => {
+                                    const isDisabled = index !== 0; // only FIRST item enabled
 
                                     return (
-                                        <li key={item.id} className="flex items-center">
-                                            <div className="p-4 px-0 whitespace-nowrap">
-                                                <Link
-                                                    to={item.to}
-                                                    className="group relative text-md text-black"
-                                                >
-                                                    <span
-                                                        className={`relative z-10 mb-8 uppercase ${isActive ? "text-black" : "group-hover:font-bold"
-                                                            }`}
-                                                    >
-                                                        {item.text}
-                                                    </span>
-                                                    <span
-                                                        className={`absolute left-0 bottom-0 top-6 block h-[2px] bg-blue-500 transition-all duration-300 
-                              ${isActive ? "w-full" : "w-0 group-hover:w-full"}`}
-                                                    ></span>
-                                                </Link>
-                                            </div>
-                                        </li>
+                                        <div
+                                            key={lang.code}
+                                            onClick={() => {
+                                                if (isDisabled) return; // block clicks
+                                                setSelectedLang(lang);
+                                                setShowLangModal(false);
+                                            }}
+                                            className={`border rounded-md px-3 py-2 
+        ${isDisabled
+                                                    ? "opacity-40 cursor-not-allowed"
+                                                    : "cursor-pointer hover:border-black"
+                                                } 
+        ${selectedLang.code === lang.code ? "border-black" : "border-gray-300"}
+      `}
+                                        >
+                                            {lang.name}
+                                        </div>
                                     );
                                 })}
-                            </ul>
-                        )}
-                    </div>
-
-                    {/* Right Section - Desktop */}
-                    <div className="hidden lg:flex items-center pl-10 gap-6">
-                        {!isLoggedIn && (
-                            <div className="flex items-center gap-3">
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        navigate(`/ai-login${location.search}`, {
-                                            state: {
-                                                redirectTo: `${location.pathname}${location.search}`,
-                                            },
-                                        })
-                                    }
-                                    className="rounded-full bg-primary-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-black min-w-28"
-                                >
-                                    Login
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => navigate(`/ai-signup${location.search}`)}
-                                    className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-black transition hover:border-black/20 hover:bg-black/5 min-w-48"
-                                >
-                                    Sign up for free
-                                </button>
-                            </div>
-                        )}
-
-                        <li className="flex items-center gap-6">
-                            {showNewsBlogLinks && (
-                                <ul>
-                                    {/* Blogs and News - Added on the LEFT side of Map/List View */}
-                                    <li className="flex items-center gap-6">
-                                        <Link
-                                            to={`/ai-news${currentSearch}`}
-                                            className="group relative text-md text-black font-semibold whitespace-nowrap"
-                                        >
-                                            <span className="relative z-10 group-hover:font-bold mb-2 text-sm whitespace-nowrap">
-                                                {newsLabel}
-                                            </span>
-                                            <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
-                                        </Link>
-
-                                        <Link
-                                            to={`/ai-blogs${currentSearch}`}
-                                            className="group relative text-md text-black font-semibold whitespace-nowrap"
-                                        >
-                                            <span className="relative z-10 group-hover:font-bold mb-2 text-sm whitespace-nowrap">
-                                                {blogLabel}
-                                            </span>
-                                            <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
-                                        </Link>
-                                    </li>
-
-                                    {/* Original Map View / List View - UNCHANGED */}
-                                </ul>
-                            )}
-                            <div className="p-4 px-0 whitespace-nowrap">
-                                <button
-                                    onClick={goToHosts}
-                                    className="relative pb-1 transition-all cursor-pointer duration-300 group font-semibold bg-transparent border-none text-sm text-primary-blue"
-                                >
-                                    Become A Host
-                                    <span className="absolute left-0 w-0 bottom-0 block h-[2px] bg-black transition-all duration-300 group-hover:w-full"></span>
-                                </button>
-                            </div>
-                        </li>
-
-                        {isLoggedIn && (
-                            <Avatar
-                                onClick={handleAvatarClick}
-                                className="bg-primary-blue"
-                                sx={{
-                                    cursor: "pointer",
-                                    width: 32,
-                                    height: 32,
-                                    fontSize: "0.9rem",
-                                    fontWeight: 600,
-                                    backgroundColor: "#0ba9ef",
-                                }}
-                            >
-                                {userInitial}
-                            </Avatar>
-                        )}
-                    </div>
-
-                    {/* Mobile Menu Button */}
-                    <div className="h-full px-2 lg:hidden flex items-center gap-2">
-                        {isLoggedIn && (
-                            <Avatar
-                                onClick={handleAvatarClick}
-                                className="bg-primary-blue"
-                                sx={{
-                                    cursor: "pointer",
-                                    width: 32,
-                                    height: 32,
-                                    fontSize: "0.9rem",
-                                    fontWeight: 600,
-                                    backgroundColor: "#0ba9ef",
-                                }}
-                            >
-                                {userInitial}
-                            </Avatar>
-                        )}
-
-                        <Popover
-                            open={openPopover}
-                            anchorEl={anchorEl}
-                            onClose={handlePopoverClose}
-                            anchorOrigin={{
-                                vertical: "bottom",
-                                horizontal: "right",
-                            }}
-                            transformOrigin={{
-                                vertical: "top",
-                                horizontal: "right",
-                            }}
-                            slotProps={{
-                                paper: {
-                                    style: {
-                                        marginTop: "5px",
-                                        borderRadius: "20px",
-                                        overflow: "visible",
-                                    },
-                                },
-                            }}
-                        >
-                            <div className="p-[0.3rem]">
-                                <button
-                                    type="button"
-                                    onClick={handleSignOut}
-                                    disabled={isLogoutLoading}
-                                    className="w-full min-w-[140px] h-10 px-5 rounded-2xl bg-white shadow-sm border border-gray-200 flex items-center gap-3 text-[#2f2f2f] text-[15px] font-medium hover:shadow-md active:bg-gray-50 transition-all disabled:opacity-70"
-                                >
-                                    <span className="w-5 h-5 flex items-center justify-center text-gray-500">
-                                        {isLogoutLoading ? (
-                                            <CircularProgress size={18} sx={{ color: "gray" }} />
-                                        ) : (
-                                            <FiLogOut />
-                                        )}
-                                    </span>
-                                    <span>Sign Out</span>
-                                </button>
-                            </div>
-                        </Popover>
-
-                        <button
-                            onClick={() => setOpen(true)}
-                            className={`rounded-lg text-subtitle text-black ${onMobileSidebarToggle ? "hidden" : ""}`}
-                        >
-                            ☰
-                        </button>
-                    </div>
-
-                    {/* Mobile Drawer */}
-                    <Drawer
-                        sx={{
-                            "& .MuiDrawer-paper": {
-                                width: {
-                                    xs: "85%",
-                                    sm: "400px",
-                                },
-                            },
-                        }}
-                        anchor="left"
-                        open={open}
-                        onClose={() => setOpen(false)}
-                    >
-                        <div className="flex flex-col h-full justify-between">
-                            <ul className="flex flex-col gap-2 p-4">
-                                <div className="flex justify-end w-full">
-                                    <span
-                                        className="text-title cursor-pointer text-black"
-                                        onClick={() => setOpen(false)}
-                                    >
-                                        <IoCloseSharp />
-                                    </span>
-                                </div>
-
-                                {(shouldShowHeaderLinks || showNewsBlogLinks) &&
-                                    headerLinks
-                                        .filter((item) =>
-                                            showNewsBlogLinks
-                                                ? item.type === "news" || item.type === "blog"
-                                                : true,
-                                        )
-                                        .map((item) => (
-                                            <li key={item.id} className="items-center text-center">
-                                                <div
-                                                    onClick={() => handleNavigation(item.to)}
-                                                    className="py-4 cursor-pointer"
-                                                >
-                                                    <p className="text-secondary-dark text-lg">
-                                                        {item.text}
-                                                    </p>
-                                                </div>
-                                                <div className="h-[0.2px] bg-gray-300"></div>
-                                            </li>
-                                        ))}
-
-                                <li className="items-center text-center">
-                                    <div
-                                        onClick={() => {
-                                            goToHosts();
-                                            setOpen(false);
-                                        }}
-                                        className="py-4 cursor-pointer"
-                                    >
-                                        <p className="text-secondary-dark text-lg font-semibold">
-                                            Become A Host
-                                        </p>
-                                    </div>
-                                    <div className="h-[0.2px] bg-gray-300"></div>
-                                </li>
-
-                                {/* {auth?.user ? (
-                  <>
-                    <li className="items-center text-center">
-                      <div
-                        onClick={() => {
-                          handleNavigation("/profile?tab=profile");
-                        }}
-                        className="py-4 cursor-pointer"
-                      >
-                        <p className="text-secondary-dark text-lg">Profile</p>
-                      </div>
-                      <div className="h-[0.2px] bg-gray-300"></div>
-                    </li>
-                    <li className="items-center text-center">
-                      <div
-                        onClick={() => {
-                          handleNavigation("/profile?tab=favorites");
-                        }}
-                        className="py-4 cursor-pointer"
-                      >
-                        <p className="text-secondary-dark text-lg">Favorites</p>
-                      </div>
-                      <div className="h-[0.2px] bg-gray-300"></div>
-                    </li>
-
-                    <li className="items-center text-center">
-                      <div
-                        onClick={async () => {
-                          if (isLogoutLoading) return;
-                          await handleSignOut();
-                          setOpen(false);
-                        }}
-                        className="py-4 cursor-pointer flex justify-center"
-                      >
-                        {isLogoutLoading ? (
-                          <CircularProgress size={20} />
-                        ) : (
-                          <p className="text-secondary-dark text-lg">Log Out</p>
-                        )}
-                      </div>
-                    </li>
-                  </>
-                ) : (
-                  <div className="flex justify-center py-4">
-                    <PrimaryButton
-                      title="Login"
-                      padding="py-3"
-                      uppercase
-                      handleSubmit={() => {
-                        navigate("/login");
-                        setOpen(false);
-                      }}
-                      className="bg-[#FF5757] flex text-white font-[500] capitalize hover:bg-[#E14C4C] w-full sm:w-[7rem]"
-                    />
-                  </div>
-                )} */}
-                            </ul>
-
-                            {/* Drawer Footer */}
-                            <div className="w-full text-center flex flex-col gap-4 items-center py-4">
-                                <div className="flex w-full flex-col gap-2 text-small md:text-small">
-                                    <hr />
-                                    <span>
-                                        &copy; Copyright {new Date().getFullYear()} -{" "}
-                                        {(new Date().getFullYear() + 1).toString().slice(-2)}
-                                    </span>
-                                    <span>WoNo. All rights reserved</span>
-                                </div>
                             </div>
                         </div>
-                    </Drawer>
-                </div>
-            </AiContainer>
-        </div>
+                    </div>
+                )}
+
+                {/* Currency Modal */}
+                {showCurrencyModal && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 px-4">
+                        <div className="bg-white rounded-lg max-w-2xl w-full p-6 relative overflow-y-auto max-h-[80vh]">
+                            <button
+                                onClick={() => setShowCurrencyModal(false)}
+                                className="absolute top-3 right-3 text-gray-600 hover:text-black"
+                            >
+                                <AiOutlineClose size={20} />
+                            </button>
+                            <h2 className="text-lg font-semibold mb-4">Choose a currency</h2>
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                {currencies.map((cur, index) => {
+                                    const isDisabled = index !== 0; // only FIRST item enabled
+
+                                    return (
+                                        <div
+                                            key={cur.code}
+                                            onClick={() => {
+                                                if (isDisabled) return; // block clicks
+                                                setSelectedCurrency(cur);
+                                                setShowCurrencyModal(false);
+                                            }}
+                                            className={`border rounded-md px-3 py-2 
+        ${isDisabled
+                                                    ? "opacity-40 cursor-not-allowed"
+                                                    : "cursor-pointer hover:border-black"
+                                                } 
+        ${selectedCurrency.code === cur.code
+                                                    ? "border-black"
+                                                    : "border-gray-300"
+                                                }
+      `}
+                                        >
+                                            <div className="font-medium">{cur.name}</div>
+                                            <div className="text-sm text-gray-500">
+                                                {cur.code} — {cur.symbol}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </footer>
+        </>
     );
 };
 
-export default AiHostFooter;
+export default AiFooter;

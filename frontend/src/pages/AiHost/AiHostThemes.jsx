@@ -123,7 +123,7 @@ const supportItems = [
 
 const Themes = () => {
     const navigate = useNavigate();
-    const onBack = () => navigate("/host/ai-host-home");
+    const onBack = () => navigate("/host");
     return (
         <div className="   text-secondary-dark justify-center items-center">
             <div className="flex min-w-[11rem] items-center gap-3">
@@ -135,6 +135,7 @@ const Themes = () => {
                 >
                     <HiOutlineArrowLeft size={18} />
                 </button>
+                <span className="text-lg font-medium text-primary-blue">Themes</span>
                 {/* {stateLabel && (
                       <span className="text-lg font-medium text-primary-blue">
                         {stateLabel}

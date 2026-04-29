@@ -75,7 +75,7 @@ const contentItems = [
 
 const Leads = () => {
     const navigate = useNavigate()
-    const onBack = () => navigate("/host/ai-host-home");
+    const onBack = () => navigate("/host");
     return (
         <div>
             <div className="flex min-w-[11rem] items-center gap-3">
@@ -87,6 +87,7 @@ const Leads = () => {
                 >
                     <HiOutlineArrowLeft size={18} />
                 </button>
+                <span className="text-lg font-medium text-primary-blue">Leads</span>
                 {/* {stateLabel && (
                       <span className="text-lg font-medium text-primary-blue">
                         {stateLabel}

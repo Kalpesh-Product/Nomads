@@ -8,6 +8,7 @@ import AiSidebar from "./AiHostSidebar";
 import AiFooter from "../../components/AiFooter";
 import AiHome from "../AiHome";
 import AiHostFooter from "./AiHostFooter";
+import AiHostHeader from "./AiHostHeader";
 
 const AiHostLayout = () => {
     const location = useLocation();
@@ -47,7 +48,7 @@ const AiHostLayout = () => {
 
             <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
                 <div className="sticky top-0 z-50 w-full">
-                    <AiHostFooter
+                    <AiHostHeader
                         onMobileSidebarToggle={() => setIsMobileSidebarOpen(true)}
                     />
                 </div>
@@ -56,12 +57,12 @@ const AiHostLayout = () => {
                     ref={contentRef}
                     className="flex-1 overflow-auto custom-scrollbar-hide"
                 >
-                    <div className="px-1 md:px-6 lg:px-6 xl:px-10 2xl:px-12 min-h-[calc(100vh-100px)]">
+                    <div className="px-1 md:px-6 lg:px-10 xl:px-20 2xl:px-12 min-h-[calc(100vh-100px)]">
                         <Outlet />
                     </div>
                     {/* <Toaster /> */}
                     {(location.pathname !== "/verticals" ||
-                        window.innerWidth >= 1024) && <AiFooter />}
+                        window.innerWidth >= 1024) && <AiHostFooter />}
                 </div>
             </div>
         </div>

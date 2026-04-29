@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
-import logo from "../assets/WONO_LOGO_Black_TP.png";
+import logo from "../../assets/WONO_LOGO_Black_TP.png";
 import { useSelector } from "react-redux";
 import { Drawer, Avatar, Popover, CircularProgress } from "@mui/material";
 import { IoCloseSharp } from "react-icons/io5";
 import { HiOutlineMenu } from "react-icons/hi";
 import { FiLogOut } from "react-icons/fi";
-import useAuth from "../hooks/useAuth";
-import useNomadLoginState from "../hooks/useNomadLoginState";
-import AiContainer from "./AiContainer";
-import useLogout from "../hooks/useLogout";
-import { clearStoredLoginState } from "../hooks/useNomadLoginState";
+import useAuth from "../../hooks/useAuth";
+import useNomadLoginState from "../../hooks/useNomadLoginState";
+import AiContainer from "../../components/AiContainer";
+import useLogout from "../../hooks/useLogout";
+import { clearStoredLoginState } from "../../hooks/useNomadLoginState";
 
 const AiHostHeader = ({ onMobileSidebarToggle }) => {
     const [open, setOpen] = useState(false);
@@ -151,7 +151,7 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
         !location.pathname.startsWith("/ai-listings");
 
     return (
-        <div className="bg-white/80 backdrop-blur-md px-1 md:px-10">
+        <div className="bg-white/80 backdrop-blur-md px-1 md:px-20">
             <AiContainer padding={false}>
                 <div className="flex py-3 justify-between items-center lg:py-[0.625rem]">
                     {/* Logo */}

@@ -10,6 +10,7 @@ import GetStartedButton from "../../components/GetStartedButton";
 import { NavLink, useNavigate } from "react-router-dom";
 import MySeperator from "../../components/MySeperator";
 import AiHome from "../AiHome";
+import AiHostPricing from "./AiHostPricing";
 
 const HostHome = () => {
     // mobile screen for globe responsiveness
@@ -82,7 +83,7 @@ const HostHome = () => {
     ];
     return (
         <main>
-            <AiHome />
+            <AiHostPricing />
             <Container>
                 <section className="py-8">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -188,7 +189,7 @@ const HostHome = () => {
                     </div>
                 </Container>
             </section>
-            <section className="bg-[#f7f7f7]">
+            <section className="">
                 <Container>
                     <div className="flex flex-col leading-tight">
                         <ReactFitty>
