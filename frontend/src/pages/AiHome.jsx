@@ -7,7 +7,10 @@ import { RiUserCommunityLine } from "react-icons/ri";
 import { TbAward, TbWorldWww } from "react-icons/tb";
 import useNomadLoginState from "../hooks/useNomadLoginState";
 
-const AI_HOME_TYPING_SEEN_KEY = "wono-ai-home-typing-seen";
+import useAuth from "../hooks/useAuth";
+
+const getTypingSeenKey = (isLoggedIn) =>
+  `wono-ai-home-typing-seen-${isLoggedIn ? "logged-in" : "logged-out"}`;
 
 const gatedRecommendationTitles = new Set([
   "Work From Anywhere",
@@ -91,9 +94,13 @@ const AiHome = () => {
   const [areCardsVisible, setAreCardsVisible] = useState(false);
   const [visibleCardCount, setVisibleCardCount] = useState(0);
 
-  const isLoggedIn = useNomadLoginState();
+  const { auth } = useAuth();
+  const hasNomadLoginState = useNomadLoginState();
+  const isLoggedIn = Boolean(auth?.user) || hasNomadLoginState;
 
-  const greetingText = isLoggedIn ? "hi Abrar" : "Meet Wono";
+  const userFirstName = auth?.user?.fullName?.split(" ")?.[0] || "Abrar";
+
+  const greetingText = isLoggedIn ? `Hi ${userFirstName}` : "Meet WoNo";
   const subheadingText = isLoggedIn
     ? "Welcome back to wono, an intelligent platform for modern nomads."
     : "An intelligent platform for modern nomads … Early adoption of our future lifestyle!";
@@ -105,9 +112,10 @@ const AiHome = () => {
     : "Choose your goals from below so that we can help you design your nomad lifestyle.";
 
   useEffect(() => {
+    const typingSeenKey = getTypingSeenKey(isLoggedIn);
     const hasSeenTypingEffect =
       typeof window !== "undefined" &&
-      window.localStorage.getItem(AI_HOME_TYPING_SEEN_KEY) === "true";
+      window.localStorage.getItem(typingSeenKey) === "true";
 
     if (hasSeenTypingEffect) {
       setTypedGreeting(greetingText);
@@ -169,10 +177,7 @@ const AiHome = () => {
                   if (fourthLineIndex >= fourthLineText.length) {
                     clearInterval(fourthLineInterval);
                     if (typeof window !== "undefined") {
-                      window.localStorage.setItem(
-                        AI_HOME_TYPING_SEEN_KEY,
-                        "true",
-                      );
+                      window.localStorage.setItem(typingSeenKey, "true");
                     }
                     setAreCardsVisible(true);
                   }
@@ -200,7 +205,7 @@ const AiHome = () => {
       cleanupThirdLine();
       cleanupFourthLine();
     };
-  }, [fourthLineText, greetingText, subheadingText, thirdLineText]);
+  }, [fourthLineText, greetingText, isLoggedIn, subheadingText, thirdLineText]);
 
   useEffect(() => {
     if (!areCardsVisible) {
