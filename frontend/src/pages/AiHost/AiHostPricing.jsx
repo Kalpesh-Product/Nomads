@@ -5,6 +5,7 @@ import { HiOutlineCurrencyDollar } from "react-icons/hi";
 import { TbAward } from "react-icons/tb";
 import useNomadLoginState from "../../hooks/useNomadLoginState";
 import { FaCheck } from "react-icons/fa";
+import { HiOutlineArrowLeft } from "react-icons/hi";
 
 const AI_HOME_TYPING_SEEN_KEY = "wono-ai-home-typing-seen";
 
@@ -120,6 +121,7 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
         compact ? recommendationCards.length : 0,
     );
     const [selectedPlanTitle, setSelectedPlanTitle] = useState("");
+    const onBack = () => navigate("/host");
 
     const greetingText = isLoggedIn ? "Hi Abrar" : "Meet Wono";
     const subheadingText = isLoggedIn
@@ -234,113 +236,124 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
         });
     };
 
+
     return (
-        <div className="flex min-h-[calc(100vh-100px)] flex-col bg-white">
-            <main className="flex-1 px-3 py-6 sm:px-6 lg:px-0">
-                <div className="mx-auto max-w-5xl lg:max-w-full text-center">
-                    {!compact && (
-                        <>
-                            <h1 className="text-3xl font-medium text-black/90 font-play">
-                                {typedGreeting}
-                            </h1>
+        <>
+            <button
+                type="button"
+                onClick={onBack}
+                className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
+                aria-label="Go back to search results"
+            >
+                <HiOutlineArrowLeft size={18} />
+            </button>
+            <div className="flex min-h-[calc(100vh-100px)] flex-col bg-white">
+                <main className="flex-1 px-3 py-6 sm:px-6 lg:px-0">
+                    <div className="mx-auto max-w-5xl lg:max-w-full text-center">
+                        {!compact && (
+                            <>
+                                <h1 className="text-3xl font-medium text-black/90 font-play">
+                                    {typedGreeting}
+                                </h1>
 
-                            <h2 className="mt-5 text-sm font-semibold text-black/85 sm:text-lg font-play">
-                                {typedSubheading}
-                            </h2>
+                                <h2 className="mt-5 text-sm font-semibold text-black/85 sm:text-lg font-play">
+                                    {typedSubheading}
+                                </h2>
 
-                            <p className="mt-6 text-sm sm:text-lg font-medium text-primary-blue font-play">
-                                {typedFourthLine}
-                            </p>
-                        </>
-                    )}
+                                <p className="mt-6 text-sm sm:text-lg font-medium text-primary-blue font-play">
+                                    {typedFourthLine}
+                                </p>
+                            </>
+                        )}
 
-                    <div className={`mt-8 ${areCardsVisible ? "visible" : "invisible"}`}>
-                        <div
-                            className={`${recommendationCards.length > 3
-                                ? "flex gap-6 overflow-x-auto pt-3 pb-4 snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-                                : "grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3"
-                                }`}
-                        >
-                            {recommendationCards.map((card, index) => {
-                                const isGated = gatedRecommendationTitles.has(card.title);
+                        <div className={`mt-8 ${areCardsVisible ? "visible" : "invisible"}`}>
+                            <div
+                                className={`${recommendationCards.length > 3
+                                    ? "flex gap-6 overflow-x-auto pt-3 pb-4 snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+                                    : "grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3"
+                                    }`}
+                            >
+                                {recommendationCards.map((card, index) => {
+                                    const isGated = gatedRecommendationTitles.has(card.title);
 
-                                return (
-                                    <div
-                                        key={card.title}
-                                        className={`transition-all duration-300 ${index < visibleCardCount
-                                            ? "translate-y-0 opacity-100"
-                                            : "translate-y-4 opacity-0 pointer-events-none"
-                                            } ${recommendationCards.length > 3 ? "min-w-[280px] sm:min-w-[320px] lg:min-w-[360px] snap-start" : ""}`}
-                                    >
-                                        <article
-                                            onClick={() => handleCardClick(card)}
-                                            className={`relative flex h-full cursor-pointer flex-col rounded-[34px] border bg-[#f5f7fb] p-6 text-left transition-all active:scale-[0.985] sm:p-7 ${selectedPlanTitle === card.title
-                                                ? "border-primary-blue shadow-[0_0_0_2px_rgba(47,102,232,0.2)]"
-                                                : card.highlight
-                                                    ? "border-primary-blue shadow-[0_0_0_2px_rgba(47,102,232,0.1)]"
-                                                    : "border-transparent hover:border-[#d3d9e5]"
-                                                }`}
+                                    return (
+                                        <div
+                                            key={card.title}
+                                            className={`transition-all duration-300 ${index < visibleCardCount
+                                                ? "translate-y-0 opacity-100"
+                                                : "translate-y-4 opacity-0 pointer-events-none"
+                                                } ${recommendationCards.length > 3 ? "min-w-[280px] sm:min-w-[320px] lg:min-w-[360px] snap-start" : ""}`}
                                         >
-                                            {card.badgeText && (
-                                                <span className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary-blue px-5 py-1 text-[11px] font-bold tracking-[0.18em] text-white">
-                                                    {card.badgeText}
-                                                </span>
-                                            )}
-
-                                            <h3 className="mt-2 text-center text-2xl font-bold text-[#121a33]">
-                                                {card.title}
-                                            </h3>
-
-                                            <p className="mx-auto mt-3 max-w-[360px] text-center text-[11px] leading-relaxed text-[#5a6d89]">
-                                                {card.subtitle}
-                                            </p>
-
-                                            <div className="mt-6 flex items-baseline justify-center gap-2">
-                                                <span className="text-2xl font-extrabold text-[#0f1730]">{card.price}</span>
-                                                {card.priceSuffix && (
-                                                    <span className="text-lg font-semibold text-[#60708b]">{card.priceSuffix}</span>
+                                            <article
+                                                onClick={() => handleCardClick(card)}
+                                                className={`relative flex h-full cursor-pointer flex-col rounded-[34px] border bg-[#f5f7fb] p-6 text-left transition-all active:scale-[0.985] sm:p-7 ${selectedPlanTitle === card.title
+                                                    ? "border-primary-blue shadow-[0_0_0_2px_rgba(47,102,232,0.2)]"
+                                                    : card.highlight
+                                                        ? "border-primary-blue shadow-[0_0_0_2px_rgba(47,102,232,0.1)]"
+                                                        : "border-transparent hover:border-primary-blue"
+                                                    }`}
+                                            >
+                                                {card.badgeText && (
+                                                    <span className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary-blue px-5 py-1 text-[11px] font-bold tracking-[0.18em] text-white">
+                                                        {card.badgeText}
+                                                    </span>
                                                 )}
-                                            </div>
 
-                                            <div className="mt-5 border-t border-[#dfe5ef] pt-6" />
+                                                <h3 className="mt-2 text-center text-2xl font-bold text-[#121a33]">
+                                                    {card.title}
+                                                </h3>
 
-                                            <ul className="flex flex-1 flex-col gap-3">
-                                                {card.features.map((feature) => (
-                                                    <li key={feature} className="flex items-center gap-3 text-[#5a6d89]">
-                                                        <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#dff5ea] text-[#16b26a]">
-                                                            <FaCheck size={10} />
-                                                        </span>
-                                                        <span className="text-sm">{feature}</span>
-                                                    </li>
-                                                ))}
-                                            </ul>
+                                                <p className="mx-auto mt-3 max-w-[360px] text-center text-[11px] leading-relaxed text-[#5a6d89]">
+                                                    {card.subtitle}
+                                                </p>
 
-                                            <div className="mt-7">
-                                                <button
-                                                    type="button"
-                                                    className={`w-full rounded-full px-4 py-3 text-base font-medium transition-colors ${card.highlight
-                                                        ? "bg-primary-blue text-white"
-                                                        : "bg-[#e6ebf2] text-[#1e2b45]"
-                                                        }`}
-                                                >
-                                                    {card.ctaText}
-                                                </button>
-                                            </div>
-                                        </article>
+                                                <div className="mt-6 flex items-baseline justify-center gap-2">
+                                                    <span className="text-2xl font-extrabold text-[#0f1730]">{card.price}</span>
+                                                    {card.priceSuffix && (
+                                                        <span className="text-lg font-semibold text-[#60708b]">{card.priceSuffix}</span>
+                                                    )}
+                                                </div>
 
-                                        {!isLoggedIn && (
-                                            <p className="mt-2 text-xs font-medium text-black/60">
-                                                {/* {isGated ? "No login required" : "Login required"} */}
-                                            </p>
-                                        )}
-                                    </div>
-                                );
-                            })}
+                                                <div className="mt-5 border-t border-[#dfe5ef] pt-6" />
+
+                                                <ul className="flex flex-1 flex-col gap-3">
+                                                    {card.features.map((feature) => (
+                                                        <li key={feature} className="flex items-center gap-3 text-[#5a6d89]">
+                                                            <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#dff5ea] text-[#16b26a]">
+                                                                <FaCheck size={10} />
+                                                            </span>
+                                                            <span className="text-sm">{feature}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+
+                                                <div className="mt-7">
+                                                    <button
+                                                        type="button"
+                                                        className={`w-full rounded-full px-4 py-3 text-base font-medium transition-colors ${card.highlight
+                                                            ? "bg-primary-blue text-white"
+                                                            : "bg-[#e6ebf2] text-[#1e2b45]"
+                                                            }`}
+                                                    >
+                                                        {card.ctaText}
+                                                    </button>
+                                                </div>
+                                            </article>
+
+                                            {!isLoggedIn && (
+                                                <p className="mt-2 text-xs font-medium text-black/60">
+                                                    {/* {isGated ? "No login required" : "Login required"} */}
+                                                </p>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         </div>
                     </div>
-                </div>
-            </main>
-        </div>
+                </main>
+            </div>
+        </>
     );
 };
 
