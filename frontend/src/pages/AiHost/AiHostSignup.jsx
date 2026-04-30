@@ -1319,7 +1319,7 @@ const AiHostSignup = () => {
 
                 <form
                     key={activeStep}
-                    className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-4"
+                    className={`${activeStep === 0 ? "block" : "grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-4"}`}
                     // onSubmit={handleSubmit((data) => register(data))}
                     // onSubmit={handleSubmit((data) =>
                     //   register({ ...data, about: data.about.map((a) => a.text) })
