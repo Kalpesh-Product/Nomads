@@ -148,7 +148,7 @@ const Themes = () => {
                         Choose the best Responsive Website Theme for your business
                     </h1>
 
-                    <GetStartedButton handleSubmit={() => navigate("/signup")} />
+                    <GetStartedButton handleSubmit={() => navigate("/host/ai-host-signup")} />
                 </section>
             </Container>
 
@@ -170,7 +170,7 @@ const Themes = () => {
                                 <div
                                     data-aos="fade-up"
                                     className="flex-shrink-0 w-[85vw] md:w-[45vw] h-full overflow-hidden rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.5)] snap-start lg:w-full"
-                                    onClick={() => navigate("products", { state: { image } })}
+                                    onClick={() => navigate("/host/ai-host-product", { state: { image } })}
                                     key={index}
                                 >
                                     <img

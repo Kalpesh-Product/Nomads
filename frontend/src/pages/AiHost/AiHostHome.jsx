@@ -84,8 +84,8 @@ const HostHome = () => {
     return (
         <main>
             <AiHostPricing />
-            <Container>
-                <section className="py-8">
+            <Container padding={false} >
+                <section className="pb-4 pt-16">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {[
                             {
@@ -183,7 +183,7 @@ const HostHome = () => {
                         <div className="flex w-full justify-center lg:justify-end pr-0 lg:pr-20 pb-4">
                             <GetStartedButton
                                 title={"GET STARTED"}
-                                handleSubmit={() => navigate("signup")}
+                                handleSubmit={() => navigate("/host/ai-host-signup")}
                             />
                         </div>
                     </div>
@@ -284,7 +284,7 @@ const HostHome = () => {
             <div className="flex w-full justify-center lg:justify-center my-16">
                 <GetStartedButton
                     title={"Get Started"}
-                    handleSubmit={() => navigate("signup")}
+                    handleSubmit={() => navigate("/host/ai-host-signup")}
                 />
             </div>
             {/* <MySeperator /> */}

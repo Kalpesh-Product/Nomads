@@ -105,7 +105,7 @@ const Leads = () => {
                         </h2>
                     </div>
                     <div className="flex flex-row lg:justify-end md:justify-end  sm:justify-center xs:justify-center items-center py-6">
-                        <button onClick={() => navigate('/signup')} className="bg-black text-white px-10 py-3 rounded-full">
+                        <button onClick={() => navigate('/host/ai-host-signup')} className="bg-black text-white px-10 py-3 rounded-full">
                             Get Started
                         </button>
                     </div>
@@ -216,7 +216,7 @@ const Leads = () => {
                         ))}
                     </div>
                     <div className="flex lg:justify-end xs:justify-center items-center lg:px-8">
-                        <button onClick={() => navigate('/signup')} className="bg-black text-white px-10 py-3 rounded-full">
+                        <button onClick={() => navigate('/host/ai-host-signup')} className="bg-black text-white px-10 py-3 rounded-full">
                             Get Started
                         </button>
                     </div>

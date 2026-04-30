@@ -4,6 +4,7 @@ import { FaGlobeAmericas } from "react-icons/fa";
 import { HiOutlineCurrencyDollar } from "react-icons/hi";
 import { TbAward } from "react-icons/tb";
 import useNomadLoginState from "../../hooks/useNomadLoginState";
+import { FaCheck } from "react-icons/fa";
 
 const AI_HOME_TYPING_SEEN_KEY = "wono-ai-home-typing-seen";
 
@@ -22,73 +23,61 @@ const getSearchPathForGoal = (goalTitle) => {
 
 const recommendationCards = [
     {
-        title: "Free Plan",
-        description: "Up to 10 users",
-        description1: "Basic analytics ",
-        description2: "Task management ",
-        description3: "Email support ",
-        description4: "5 GB storage ",
-        description5: "Mobile app access",
-        footerText: "Free",
-        icon: TbAward,
-        path: getSearchPathForGoal("World Ranking"),
+        title: "Starter",
+        subtitle: "A clean starting plan for smaller teams building better daily operations.",
+        price: "Free",
+        // priceSuffix: "/month",
+        ctaText: "Get Started",
+        highlight: false,
+        features: [
+            "Up to 10 users",
+            "Basic analytics",
+            "Task management",
+            "Email support",
+            "5 GB storage",
+            "Mobile app access",
+        ],
+        path: "/host/ai-host-signup",
     },
     {
-        title: "Plus",
-        description: "Up to 50 users",
-        description1: "Advanced analytics",
-        description2: "Automation workflows",
-        description3: "Priority support",
-        description4: "50 GB storage",
-        description5: "API access",
-        description6: "Custom integrations",
-        description7: "Advanced reporting",
-        footerText: "$99/month",
-        icon: FaGlobeAmericas,
-        path: getSearchPathForGoal("Work From Anywhere"),
+        title: "Professional",
+        subtitle: "A stronger operating layer for growing teams that need more control and automation.",
+        price: "$99",
+        priceSuffix: "/month",
+        ctaText: "Get Started",
+        highlight: true,
+        badgeText: "MOST POPULAR",
+        features: [
+            "Up to 50 users",
+            "Advanced analytics",
+            "Automation workflows",
+            "Priority support",
+            "50 GB storage",
+            "API access",
+            "Custom integrations",
+            "Advanced reporting",
+        ],
+        path: "/host/ai-host-signup",
     },
     {
-        title: "Pro",
-        description: "Unlimited users",
-        description1: "Enterprise analytics",
-        description2: "Custom workflows",
-        description3: "24/7 dedicated support",
-        description4: "Unlimited storage",
-        description5: "Custom integrations",
-        description6: "SLA guarantee",
-        description7: "Dedicated account manager",
-        footerText: "$199/month",
-        icon: HiOutlineCurrencyDollar,
-        path: getSearchPathForGoal("Increase Your Savings"),
+        title: "Enterprise",
+        subtitle: "A tailored plan for larger organizations with deeper operational and security needs.",
+        price: "$499",
+        priceSuffix: "/month",
+        ctaText: "Get Started",
+        highlight: false,
+        features: [
+            "Unlimited users",
+            "Enterprise analytics",
+            "Custom workflows",
+            "24/7 dedicated support",
+            "Unlimited storage",
+            "Custom integrations",
+            "SLA guarantee",
+            "Dedicated account manager",
+        ],
+        path: "/host/ai-host-signup",
     },
-    // {
-    //     title: "Ultra",
-    //     description: "Unlimited users",
-    //     description1: "Enterprise analytics",
-    //     description2: "Custom workflows",
-    //     description3: "24/7 dedicated support",
-    //     description4: "Unlimited storage",
-    //     description5: "Custom integrations",
-    //     description6: "SLA guarantee",
-    //     description7: "Dedicated account manager",
-    //     footerText: "$299/month",
-    //     icon: HiOutlineCurrencyDollar,
-    //     path: getSearchPathForGoal("Increase Your Savings"),
-    // },
-    // {
-    //     title: "Enterprise",
-    //     description: "Unlimited users",
-    //     description1: "Enterprise analytics",
-    //     description2: "Custom workflows",
-    //     description3: "24/7 dedicated support",
-    //     description4: "Unlimited storage",
-    //     description5: "Custom integrations",
-    //     description6: "SLA guarantee",
-    //     description7: "Dedicated account manager",
-    //     footerText: "Custom",
-    //     icon: HiOutlineCurrencyDollar,
-    //     path: getSearchPathForGoal("Increase Your Savings"),
-    // },
 ];
 
 const gatedRecommendationTitles = new Set([
@@ -199,7 +188,7 @@ const AiHostPricing = () => {
 
             navigate(`${loginPath}${location.search}`, {
                 state: {
-                    loginContext: { title: card.title, description: card.description },
+                    loginContext: { title: card.title, description: card.subtitle },
                     redirectTo: targetPath,
                 },
             });
@@ -213,8 +202,8 @@ const AiHostPricing = () => {
 
     return (
         <div className="flex min-h-[calc(100vh-100px)] flex-col bg-white">
-            <main className="flex-1 px-3 py-6 sm:px-6 lg:px-10">
-                <div className="mx-auto max-w-5xl text-center">
+            <main className="flex-1 px-3 py-6 sm:px-6 lg:px-0">
+                <div className="mx-auto max-w-5xl lg:max-w-full text-center">
                     <h1 className="text-3xl font-medium text-black/90 font-play">
                         {typedGreeting}
                     </h1>
@@ -228,9 +217,8 @@ const AiHostPricing = () => {
                     </p>
 
                     <div className={`mt-8 ${areCardsVisible ? "visible" : "invisible"}`}>
-                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3">
                             {recommendationCards.map((card, index) => {
-                                const Icon = card.icon;
                                 const isGated = gatedRecommendationTitles.has(card.title);
 
                                 return (
@@ -243,52 +231,61 @@ const AiHostPricing = () => {
                                     >
                                         <article
                                             onClick={() => handleCardClick(card)}
-                                            className="group cursor-pointer rounded-3xl bg-[#f1f1f3] p-6 text-center transition-all hover:bg-[#e8e8ed] active:scale-[0.985]"
+                                            className={`relative flex h-full cursor-pointer flex-col rounded-[34px] border bg-[#f5f7fb] p-6 text-left transition-all active:scale-[0.985] sm:p-7 ${card.highlight
+                                                ? "border-primary-blue shadow-[0_0_0_2px_rgba(47,102,232,0.1)]"
+                                                : "border-transparent hover:border-[#d3d9e5]"
+                                                }`}
                                         >
-                                            <Icon
-                                                size={32}
-                                                className="mx-auto text-black/80 transition-colors group-hover:text-sky-600"
-                                            />
-                                            <h3 className="mt-4 text-lg font-bold text-black/90 transition-colors group-hover:text-sky-600">
+                                            {card.badgeText && (
+                                                <span className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary-blue px-5 py-1 text-[11px] font-bold tracking-[0.18em] text-white">
+                                                    {card.badgeText}
+                                                </span>
+                                            )}
+
+                                            <h3 className="mt-2 text-center text-2xl font-bold text-[#121a33]">
                                                 {card.title}
                                             </h3>
 
-                                            <p className="mt-3 text-sm leading-relaxed text-black/70">
-                                                {card.description}
+                                            <p className="mx-auto mt-3 max-w-[360px] text-center text-[11px] leading-relaxed text-[#5a6d89]">
+                                                {card.subtitle}
                                             </p>
 
-                                            <p className="mt-3 text-sm leading-relaxed text-black/70">
-                                                {card.description1}
-                                            </p>
-                                            <p className="mt-3 text-sm leading-relaxed text-black/70">
-                                                {card.description2}
-                                            </p>
-                                            <p className="mt-3 text-sm leading-relaxed text-black/70">
-                                                {card.description3}
-                                            </p>
-                                            <p className="mt-3 text-sm leading-relaxed text-black/70">
-                                                {card.description4}
-                                            </p>
-                                            <p className="mt-3 text-sm leading-relaxed text-black/70">
-                                                {card.description5}
-                                            </p>
-                                            <p className="mt-3 text-sm leading-relaxed text-black/70">
-                                                {card.description6}
-                                            </p>
-                                            <p className="mt-3 text-sm leading-relaxed text-black/70">
-                                                {card.description7}
-                                            </p>
+                                            <div className="mt-6 flex items-baseline justify-center gap-2">
+                                                <span className="text-2xl font-extrabold text-[#0f1730]">{card.price}</span>
+                                                {card.priceSuffix && (
+                                                    <span className="text-lg font-semibold text-[#60708b]">{card.priceSuffix}</span>
+                                                )}
+                                            </div>
 
-                                            <div className="mt-6 pt-4 border-t border-black/10">
-                                                <p className="text-sm font-semibold text-black/80">
-                                                    {card.footerText}
-                                                </p>
+                                            <div className="mt-5 border-t border-[#dfe5ef] pt-6" />
+
+                                            <ul className="flex flex-1 flex-col gap-3">
+                                                {card.features.map((feature) => (
+                                                    <li key={feature} className="flex items-center gap-3 text-[#5a6d89]">
+                                                        <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#dff5ea] text-[#16b26a]">
+                                                            <FaCheck size={10} />
+                                                        </span>
+                                                        <span className="text-sm">{feature}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+
+                                            <div className="mt-7">
+                                                <button
+                                                    type="button"
+                                                    className={`w-full rounded-full px-4 py-3 text-base font-medium transition-colors ${card.highlight
+                                                        ? "bg-primary-blue text-white"
+                                                        : "bg-[#e6ebf2] text-[#1e2b45]"
+                                                        }`}
+                                                >
+                                                    {card.ctaText}
+                                                </button>
                                             </div>
                                         </article>
 
                                         {!isLoggedIn && (
                                             <p className="mt-2 text-xs font-medium text-black/60">
-                                                {isGated ? "No login required" : "Login required"}
+                                                {/* {isGated ? "No login required" : "Login required"} */}
                                             </p>
                                         )}
                                     </div>

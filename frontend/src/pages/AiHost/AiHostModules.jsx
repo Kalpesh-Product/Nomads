@@ -100,7 +100,7 @@ export default function Modules() {
                         <div className="flex justify-center items-center sm:justify-end">
                             <GetStartedButton
                                 title="Get Started"
-                                handleSubmit={() => navigate("/signup")}
+                                handleSubmit={() => navigate("/host/ai-host-signup")}
                             />
                         </div>
                     </div>
@@ -255,7 +255,7 @@ export default function Modules() {
                 <div className="flex justify-center w-full my-16">
                     <GetStartedButton
                         title={"Get Started"}
-                        handleSubmit={() => navigate("/signup")}
+                        handleSubmit={() => navigate("/host/ai-host-signup")}
                     />
                 </div>
                 <hr />
