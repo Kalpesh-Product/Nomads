@@ -40,7 +40,7 @@ const recommendationCards = [
         path: "/host/ai-host-signup",
     },
     {
-        title: "PROFESSIONAL",
+        title: "PLUS",
         subtitle: "A stronger operating layer for growing teams that need more control and automation.",
         price: "$99",
         priceSuffix: "/month",
@@ -48,6 +48,7 @@ const recommendationCards = [
         highlight: true,
         badgeText: "MOST POPULAR",
         features: [
+            "All features of STARTER plan",
             "Up to 50 users",
             "Advanced analytics",
             "Automation workflows",
@@ -60,13 +61,14 @@ const recommendationCards = [
         path: "/host/ai-host-signup",
     },
     {
-        title: "ENTERPRISE",
+        title: "PROFESSIONAL",
         subtitle: "A tailored plan for larger organizations with deeper operational and security needs.",
         price: "$499",
         priceSuffix: "/month",
         ctaText: "Get Started",
         highlight: false,
         features: [
+            "All features of PLUS plan",
             "Unlimited users",
             "Enterprise analytics",
             "Custom workflows",
@@ -86,6 +88,7 @@ const recommendationCards = [
         ctaText: "Get Started",
         highlight: false,
         features: [
+            "All features of PROFESSIONAL plan",
             "Unlimited users",
             "Enterprise analytics",
             "Custom workflows",
