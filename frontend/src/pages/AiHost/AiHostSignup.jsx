@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Stepper, Step } from "react-form-stepper";
 import { useForm, Controller } from "react-hook-form";
 import {
@@ -67,6 +67,20 @@ const serviceOptions = [
     // },
 ];
 
+const normalizePlanFromQuery = (plan) => {
+    if (!plan || typeof plan !== "string") return "Starter";
+
+    const normalized = plan.trim().toLowerCase();
+    const planMap = {
+        starter: "Starter",
+        plus: "Plus",
+        professional: "Professional",
+        enterprise: "Enterprise",
+    };
+
+    return planMap[normalized] || "Starter";
+};
+
 const AiHostSignup = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -77,6 +91,10 @@ const AiHostSignup = () => {
         Math.min(5, Number(new URLSearchParams(location.search).get("step")) || 0),
     );
     const [activeStep, setActiveStep] = useState(initialStep);
+    const selectedPlanFromQuery = normalizePlanFromQuery(
+        new URLSearchParams(location.search).get("plan"),
+    );
+    const [selectedPlan, setSelectedPlan] = useState(selectedPlanFromQuery);
 
     const { control, handleSubmit, getValues, trigger, reset, watch, setValue } =
         useForm({
@@ -120,6 +138,9 @@ const AiHostSignup = () => {
             },
         });
 
+    useEffect(() => {
+        setValue("Goals", selectedPlan);
+    }, [selectedPlan, setValue]);
     // inside your HostSignup or CreateWebsite component:
     const {
         fields: aboutFields,
@@ -265,7 +286,17 @@ const AiHostSignup = () => {
             case 0:
                 return (
                     <>
-                        <AiHostPricing compact startStep={1} onSelectPlan={() => setActiveStep(1)} />
+                        <AiHostPricing
+                            compact
+                            startStep={1}
+                            onSelectPlan={(plan) => {
+                                const planTitle = plan?.title || "STARTER";
+                                const normalizedPlan = normalizePlanFromQuery(planTitle);
+                                setSelectedPlan(normalizedPlan);
+                                setValue("Goals", normalizedPlan);
+                                setActiveStep(1);
+                            }}
+                        />
                     </>
                 );
             case 1:
@@ -285,7 +316,7 @@ const AiHostSignup = () => {
                                     variant="standard"
                                     error={!!fieldState.error}
                                     helperText={fieldState.error?.message}
-                                    value={field.value || "Starter"}
+                                    value={field.value || selectedPlan}
                                 >
                                     <MenuItem value="Starter">
                                         Starter
@@ -296,8 +327,8 @@ const AiHostSignup = () => {
                                     <MenuItem value="Professional">
                                         Professional
                                     </MenuItem>
-                                    <MenuItem value="Premium">
-                                        Premium
+                                    <MenuItem value="Enterprise">
+                                        Enterprise
                                     </MenuItem>
                                 </TextField>
                             )}

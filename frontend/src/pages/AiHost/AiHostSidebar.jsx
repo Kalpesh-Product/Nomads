@@ -76,22 +76,22 @@ const recommendationItems = [
     {
         label: "My Calendar",
         icon: RiUserCommunityLine,
-        path: "/host/ai-host-career",
+        path: "/host/ai-host-calendar",
     },
     {
         label: "Leave Requests",
         icon: HiOutlineCurrencyDollar,
-        path: "/host/ai-host-career",
+        path: "/host/ai-host-leave-requests",
     },
     {
         label: "Meeting Room Booking",
         icon: HiOutlineCurrencyDollar,
-        path: "/host/ai-host-career",
+        path: "/host/ai-host-meeting-room-booking",
     },
     {
         label: "Reports",
         icon: TbAward,
-        path: "/host/ai-host-career",
+        path: "/host/ai-host-reports",
     },
 ];
 

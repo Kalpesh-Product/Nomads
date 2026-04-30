@@ -256,6 +256,9 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
         const params = new URLSearchParams(location.search);
         params.delete("step");
         params.set("step", String(startStep));
+        if (card.path.includes("/ai-host-signup")) {
+            params.set("plan", card.title);
+        }
         const queryString = params.toString();
         const targetPath = `${card.path}${queryString ? `?${queryString}` : ""}`;
 
@@ -308,7 +311,7 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
                                         onClick={() => scrollCards("left")}
                                         disabled={!canScrollLeft}
                                         aria-label="Scroll pricing cards left"
-                                        className={`absolute left-2 top-1/2 z-10 -translate-y-1/2 rounded-full border bg-white/95 p-3 shadow-md transition-all ${canScrollLeft
+                                        className={`absolute -left-5 top-1/2 z-10 -translate-y-1/2 rounded-full border bg-white p-3 shadow-md transition-all ${canScrollLeft
                                             ? "border-[#d9e2f0] text-[#1e2b45] hover:bg-white"
                                             : "cursor-not-allowed border-[#e7edf5] text-[#a9b4c8]"
                                             }`}
@@ -320,7 +323,7 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
                                         onClick={() => scrollCards("right")}
                                         disabled={!canScrollRight}
                                         aria-label="Scroll pricing cards right"
-                                        className={`absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-full border bg-white/95 p-3 shadow-md transition-all ${canScrollRight
+                                        className={`absolute -right-5 top-1/2 z-10 -translate-y-1/2 rounded-full border bg-white p-3 shadow-md transition-all ${canScrollRight
                                             ? "border-[#d9e2f0] text-[#1e2b45] hover:bg-white"
                                             : "cursor-not-allowed border-[#e7edf5] text-[#a9b4c8]"
                                             }`}
@@ -332,7 +335,7 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
                             <div
                                 ref={cardsScrollRef}
                                 className={`${recommendationCards.length > 3
-                                    ? "flex gap-6 overflow-x-auto px-12 pt-3 pb-4 snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+                                    ? "flex gap-6 overflow-x-auto px-4 sm:px-6 pt-3 pb-4 snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
                                     : "grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3"
                                     }`}
                             >
