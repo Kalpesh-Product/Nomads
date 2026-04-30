@@ -5,7 +5,6 @@ import { HiOutlineCurrencyDollar } from "react-icons/hi";
 import { TbAward } from "react-icons/tb";
 import useNomadLoginState from "../../hooks/useNomadLoginState";
 import { FaCheck } from "react-icons/fa";
-import { HiOutlineArrowLeft } from "react-icons/hi";
 
 const AI_HOME_TYPING_SEEN_KEY = "wono-ai-home-typing-seen";
 
@@ -24,7 +23,7 @@ const getSearchPathForGoal = (goalTitle) => {
 
 const recommendationCards = [
     {
-        title: "Starter",
+        title: "STARTER",
         subtitle: "A clean starting plan for smaller teams building better daily operations.",
         price: "Free",
         // priceSuffix: "/month",
@@ -41,7 +40,7 @@ const recommendationCards = [
         path: "/host/ai-host-signup",
     },
     {
-        title: "Professional",
+        title: "PROFESSIONAL",
         subtitle: "A stronger operating layer for growing teams that need more control and automation.",
         price: "$99",
         priceSuffix: "/month",
@@ -61,7 +60,7 @@ const recommendationCards = [
         path: "/host/ai-host-signup",
     },
     {
-        title: "Enterprise",
+        title: "ENTERPRISE",
         subtitle: "A tailored plan for larger organizations with deeper operational and security needs.",
         price: "$499",
         priceSuffix: "/month",
@@ -80,7 +79,7 @@ const recommendationCards = [
         path: "/host/ai-host-signup",
     },
     {
-        title: "Enterprise",
+        title: "ENTERPRISE",
         subtitle: "A tailored plan for larger organizations with deeper operational and security needs.",
         price: "$499",
         priceSuffix: "/month",
@@ -121,7 +120,6 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
         compact ? recommendationCards.length : 0,
     );
     const [selectedPlanTitle, setSelectedPlanTitle] = useState("");
-    const onBack = () => navigate("/host");
 
     const greetingText = isLoggedIn ? "Hi Abrar" : "Meet Wono";
     const subheadingText = isLoggedIn
@@ -239,14 +237,6 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
 
     return (
         <>
-            <button
-                type="button"
-                onClick={onBack}
-                className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
-                aria-label="Go back to search results"
-            >
-                <HiOutlineArrowLeft size={18} />
-            </button>
             <div className="flex min-h-[calc(100vh-100px)] flex-col bg-white">
                 <main className="flex-1 px-3 py-6 sm:px-6 lg:px-0">
                     <div className="mx-auto max-w-5xl lg:max-w-full text-center">

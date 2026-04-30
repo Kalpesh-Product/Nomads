@@ -23,6 +23,7 @@ import UploadFileInput from "../../components/UploadFileInput";
 import UploadMultipleFilesInput from "../../components/UploadMultipleFilesInput";
 import { isValidInternationalPhone } from "../../utils/validators";
 import AiHostPricing from "./AiHostPricing";
+import { HiOutlineArrowLeft } from "react-icons/hi";
 
 const steps = [
     "Goal",
@@ -69,6 +70,7 @@ const serviceOptions = [
 const AiHostSignup = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const onBack = () => navigate("/host");
 
     const initialStep = Math.max(
         0,
@@ -1270,6 +1272,16 @@ const AiHostSignup = () => {
 
     return (
         <div className="h-full flex flex-col justify-start gap-10 p-4 lg:p-10 items-center w-full">
+            <div className="flex justify-start w-full">
+                <button
+                    type="button"
+                    onClick={onBack}
+                    className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
+                    aria-label="Go back to search results"
+                >
+                    <HiOutlineArrowLeft size={18} />
+                </button>
+            </div>
             <Stepper
                 className="w-full p-0"
                 connectorStateColors={true}
