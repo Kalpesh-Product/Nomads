@@ -185,7 +185,7 @@ const Themes = () => {
                             ))}
                         </div>
                         <div className="flex justify-center items-center">
-                            <GetStartedButton handleSubmit={() => navigate("/signup")} />
+                            <GetStartedButton handleSubmit={() => navigate("/host/ai-host-signup?step=0")} />
                         </div>
                     </div>
                 </Container>
@@ -208,7 +208,7 @@ const Themes = () => {
                                 <li>Full-stack web dev tools for custom functionality</li>
                             </ul>
                             <div className="flex justify-center md:justify-start w-full">
-                                <GetStartedButton handleSubmit={() => navigate("/signup")} />
+                                <GetStartedButton handleSubmit={() => navigate("/host/ai-host-signup?step=0")} />
                             </div>
                         </div>
                         <div className="w-full lg:w-[50%] h-full">
@@ -241,7 +241,7 @@ const Themes = () => {
                         ))}
                     </div>
                     <div>
-                        <GetStartedButton handleSubmit={() => navigate("/signup")} />
+                        <GetStartedButton handleSubmit={() => navigate("/host/ai-host-signup?step=0")} />
                     </div>
                 </div>
             </Container>

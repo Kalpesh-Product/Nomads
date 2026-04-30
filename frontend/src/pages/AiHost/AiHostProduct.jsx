@@ -236,7 +236,7 @@ const HostProduct = () => {
                                         </div>
                                     ))}
                             </div>
-                            <GetStartedButton handleSubmit={() => navigate("/signup")} />
+                            <GetStartedButton handleSubmit={() => navigate("/host/ai-host-signup?step=0")} />
                         </div>
                     </Container>
                 </section>

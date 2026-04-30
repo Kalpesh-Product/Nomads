@@ -27,7 +27,7 @@ const recommendationCards = [
         subtitle: "A clean starting plan for smaller teams building better daily operations.",
         price: "Free",
         // priceSuffix: "/month",
-        ctaText: "Select",
+        ctaText: "Get Started",
         highlight: false,
         features: [
             "Up to 10 users",
@@ -44,7 +44,7 @@ const recommendationCards = [
         subtitle: "A stronger operating layer for growing teams that need more control and automation.",
         price: "$99",
         priceSuffix: "/month",
-        ctaText: "Select",
+        ctaText: "Get Started",
         highlight: true,
         badgeText: "MOST POPULAR",
         features: [
@@ -64,7 +64,7 @@ const recommendationCards = [
         subtitle: "A tailored plan for larger organizations with deeper operational and security needs.",
         price: "$499",
         priceSuffix: "/month",
-        ctaText: "Select",
+        ctaText: "Get Started",
         highlight: false,
         features: [
             "Unlimited users",
@@ -83,7 +83,7 @@ const recommendationCards = [
         subtitle: "A tailored plan for larger organizations with deeper operational and security needs.",
         price: "$499",
         priceSuffix: "/month",
-        ctaText: "Select",
+        ctaText: "Get Started",
         highlight: false,
         features: [
             "Unlimited users",
