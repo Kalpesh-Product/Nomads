@@ -183,7 +183,7 @@ const HostHome = () => {
                         <div className="flex w-full justify-center lg:justify-end pr-0 lg:pr-20 pb-4">
                             <GetStartedButton
                                 title={"GET STARTED"}
-                                handleSubmit={() => navigate("/host/ai-host-signup?step=1")}
+                                handleSubmit={() => navigate("/host/ai-host-signup?step=0")}
                             />
                         </div>
                     </div>
@@ -284,7 +284,7 @@ const HostHome = () => {
             <div className="flex w-full justify-center lg:justify-center my-16">
                 <GetStartedButton
                     title={"Get Started"}
-                    handleSubmit={() => navigate("/host/ai-host-signup")}
+                    handleSubmit={() => navigate("/host/ai-host-signup?step=0")}
                 />
             </div>
             {/* <MySeperator /> */}

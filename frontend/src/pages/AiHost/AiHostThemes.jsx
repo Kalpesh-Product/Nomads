@@ -148,7 +148,7 @@ const Themes = () => {
                         Choose the best Responsive Website Theme for your business
                     </h1>
 
-                    <GetStartedButton handleSubmit={() => navigate("/host/ai-host-signup")} />
+                    <GetStartedButton handleSubmit={() => navigate("/host/ai-host-signup?step=0")} />
                 </section>
             </Container>
 

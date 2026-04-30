@@ -263,7 +263,7 @@ const AiHostSignup = () => {
             case 0:
                 return (
                     <>
-                        <AiHostPricing compact startStep={1} />
+                        <AiHostPricing compact startStep={1} onSelectPlan={() => setActiveStep(1)} />
                     </>
                 );
             case 1:
@@ -1468,12 +1468,6 @@ const AiHostSignup = () => {
                                 title="Back"
                                 handleSubmit={() => setActiveStep((prev) => prev - 1)}
                             />
-                        )}
-
-                        {activeStep === 0 && (
-                            <div className="flex  justify-center  items-center w-full">
-                                <GetStartedButton title="Next" handleSubmit={handleNext} />
-                            </div>
                         )}
 
                         {activeStep !== 0 && activeStep < steps.length - 2 ? (

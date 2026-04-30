@@ -27,7 +27,7 @@ const recommendationCards = [
         subtitle: "A clean starting plan for smaller teams building better daily operations.",
         price: "Free",
         // priceSuffix: "/month",
-        ctaText: "Get Started",
+        ctaText: "Select",
         highlight: false,
         features: [
             "Up to 10 users",
@@ -44,7 +44,7 @@ const recommendationCards = [
         subtitle: "A stronger operating layer for growing teams that need more control and automation.",
         price: "$99",
         priceSuffix: "/month",
-        ctaText: "Get Started",
+        ctaText: "Select",
         highlight: true,
         badgeText: "MOST POPULAR",
         features: [
@@ -64,7 +64,7 @@ const recommendationCards = [
         subtitle: "A tailored plan for larger organizations with deeper operational and security needs.",
         price: "$499",
         priceSuffix: "/month",
-        ctaText: "Get Started",
+        ctaText: "Select",
         highlight: false,
         features: [
             "Unlimited users",
@@ -83,7 +83,7 @@ const recommendationCards = [
         subtitle: "A tailored plan for larger organizations with deeper operational and security needs.",
         price: "$499",
         priceSuffix: "/month",
-        ctaText: "Get Started",
+        ctaText: "Select",
         highlight: false,
         features: [
             "Unlimited users",
@@ -107,7 +107,7 @@ const gatedRecommendationTitles = new Set([
     "Find Your Community",
 ]);
 
-const AiHostPricing = ({ compact = false, startStep = 1 }) => {
+const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const isLoggedIn = useNomadLoginState();
@@ -119,7 +119,7 @@ const AiHostPricing = ({ compact = false, startStep = 1 }) => {
     const [visibleCardCount, setVisibleCardCount] = useState(
         compact ? recommendationCards.length : 0,
     );
-
+    const [selectedPlanTitle, setSelectedPlanTitle] = useState("");
 
     const greetingText = isLoggedIn ? "Hi Abrar" : "Meet Wono";
     const subheadingText = isLoggedIn
@@ -203,11 +203,17 @@ const AiHostPricing = ({ compact = false, startStep = 1 }) => {
     }, [areCardsVisible]);
 
     const handleCardClick = (card) => {
-        const params = new URLSearchParams(location.search);
-        const queryString = params.toString() ? `?${params.toString()}` : "";
+        setSelectedPlanTitle(card.title);
 
-        const joiner = queryString ? `${queryString}&` : "?";
-        const targetPath = `${card.path}${joiner}step=${startStep}`;
+        if (compact && typeof onSelectPlan === "function") {
+            onSelectPlan(card);
+            return;
+        }
+        const params = new URLSearchParams(location.search);
+        params.delete("step");
+        params.set("step", String(startStep));
+        const queryString = params.toString();
+        const targetPath = `${card.path}${queryString ? `?${queryString}` : ""}`;
 
         // If not logged in and this is a gated feature
         if (!isLoggedIn && gatedRecommendationTitles.has(card.title)) {
@@ -268,9 +274,11 @@ const AiHostPricing = ({ compact = false, startStep = 1 }) => {
                                     >
                                         <article
                                             onClick={() => handleCardClick(card)}
-                                            className={`relative flex h-full cursor-pointer flex-col rounded-[34px] border bg-[#f5f7fb] p-6 text-left transition-all active:scale-[0.985] sm:p-7 ${card.highlight
-                                                ? "border-primary-blue shadow-[0_0_0_2px_rgba(47,102,232,0.1)]"
-                                                : "border-transparent hover:border-[#d3d9e5]"
+                                            className={`relative flex h-full cursor-pointer flex-col rounded-[34px] border bg-[#f5f7fb] p-6 text-left transition-all active:scale-[0.985] sm:p-7 ${selectedPlanTitle === card.title
+                                                ? "border-primary-blue shadow-[0_0_0_2px_rgba(47,102,232,0.2)]"
+                                                : card.highlight
+                                                    ? "border-primary-blue shadow-[0_0_0_2px_rgba(47,102,232,0.1)]"
+                                                    : "border-transparent hover:border-[#d3d9e5]"
                                                 }`}
                                         >
                                             {card.badgeText && (
