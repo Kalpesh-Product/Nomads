@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import Container from "../../components/Container";
 import GetStartedButton from "../../components/GetStartedButton";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import axios from "../../utils/axios";
 import { showErrorAlert, showSuccessAlert } from "../../utils/alerts";
@@ -68,8 +68,13 @@ const serviceOptions = [
 
 const AiHostSignup = () => {
     const navigate = useNavigate();
+    const location = useLocation();
 
-    const [activeStep, setActiveStep] = useState(0);
+    const initialStep = Math.max(
+        0,
+        Math.min(5, Number(new URLSearchParams(location.search).get("step")) || 0),
+    );
+    const [activeStep, setActiveStep] = useState(initialStep);
 
     const { control, handleSubmit, getValues, trigger, reset, watch, setValue } =
         useForm({
@@ -258,7 +263,7 @@ const AiHostSignup = () => {
             case 0:
                 return (
                     <>
-                        <AiHostPricing />
+                        <AiHostPricing compact startStep={1} />
                     </>
                 );
             case 1:

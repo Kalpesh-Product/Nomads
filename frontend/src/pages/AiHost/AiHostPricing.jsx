@@ -78,6 +78,25 @@ const recommendationCards = [
         ],
         path: "/host/ai-host-signup",
     },
+    {
+        title: "Enterprise",
+        subtitle: "A tailored plan for larger organizations with deeper operational and security needs.",
+        price: "$499",
+        priceSuffix: "/month",
+        ctaText: "Get Started",
+        highlight: false,
+        features: [
+            "Unlimited users",
+            "Enterprise analytics",
+            "Custom workflows",
+            "24/7 dedicated support",
+            "Unlimited storage",
+            "Custom integrations",
+            "SLA guarantee",
+            "Dedicated account manager",
+        ],
+        path: "/host/ai-host-signup",
+    },
 ];
 
 const gatedRecommendationTitles = new Set([
@@ -88,16 +107,19 @@ const gatedRecommendationTitles = new Set([
     "Find Your Community",
 ]);
 
-const AiHostPricing = () => {
+const AiHostPricing = ({ compact = false, startStep = 1 }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const isLoggedIn = useNomadLoginState();
 
-    const [typedGreeting, setTypedGreeting] = useState("");
-    const [typedSubheading, setTypedSubheading] = useState("");
-    const [typedFourthLine, setTypedFourthLine] = useState("");
-    const [areCardsVisible, setAreCardsVisible] = useState(false);
-    const [visibleCardCount, setVisibleCardCount] = useState(0);
+    const [typedGreeting, setTypedGreeting] = useState(compact ? "" : "");
+    const [typedSubheading, setTypedSubheading] = useState(compact ? "" : "");
+    const [typedFourthLine, setTypedFourthLine] = useState(compact ? "" : "");
+    const [areCardsVisible, setAreCardsVisible] = useState(compact);
+    const [visibleCardCount, setVisibleCardCount] = useState(
+        compact ? recommendationCards.length : 0,
+    );
+
 
     const greetingText = isLoggedIn ? "Hi Abrar" : "Meet Wono";
     const subheadingText = isLoggedIn
@@ -108,6 +130,11 @@ const AiHostPricing = () => {
 
     // Typing Effect
     useEffect(() => {
+        if (compact) {
+            setAreCardsVisible(true);
+            setVisibleCardCount(recommendationCards.length);
+            return;
+        }
         const hasSeenTyping = window.localStorage.getItem(AI_HOME_TYPING_SEEN_KEY) === "true";
 
         if (hasSeenTyping) {
@@ -154,7 +181,7 @@ const AiHostPricing = () => {
         return () => {
             clearInterval(greetingInterval);
         };
-    }, [greetingText, subheadingText, fourthLineText]);
+    }, [compact, greetingText, subheadingText, fourthLineText]);
 
     // Card Reveal Animation
     useEffect(() => {
@@ -179,7 +206,8 @@ const AiHostPricing = () => {
         const params = new URLSearchParams(location.search);
         const queryString = params.toString() ? `?${params.toString()}` : "";
 
-        const targetPath = `${card.path}${queryString}`;
+        const joiner = queryString ? `${queryString}&` : "?";
+        const targetPath = `${card.path}${joiner}step=${startStep}`;
 
         // If not logged in and this is a gated feature
         if (!isLoggedIn && gatedRecommendationTitles.has(card.title)) {
@@ -204,20 +232,29 @@ const AiHostPricing = () => {
         <div className="flex min-h-[calc(100vh-100px)] flex-col bg-white">
             <main className="flex-1 px-3 py-6 sm:px-6 lg:px-0">
                 <div className="mx-auto max-w-5xl lg:max-w-full text-center">
-                    <h1 className="text-3xl font-medium text-black/90 font-play">
-                        {typedGreeting}
-                    </h1>
+                    {!compact && (
+                        <>
+                            <h1 className="text-3xl font-medium text-black/90 font-play">
+                                {typedGreeting}
+                            </h1>
 
-                    <h2 className="mt-5 text-sm font-semibold text-black/85 sm:text-lg font-play">
-                        {typedSubheading}
-                    </h2>
+                            <h2 className="mt-5 text-sm font-semibold text-black/85 sm:text-lg font-play">
+                                {typedSubheading}
+                            </h2>
 
-                    <p className="mt-6 text-sm sm:text-lg font-medium text-primary-blue font-play">
-                        {typedFourthLine}
-                    </p>
+                            <p className="mt-6 text-sm sm:text-lg font-medium text-primary-blue font-play">
+                                {typedFourthLine}
+                            </p>
+                        </>
+                    )}
 
                     <div className={`mt-8 ${areCardsVisible ? "visible" : "invisible"}`}>
-                        <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3">
+                        <div
+                            className={`${recommendationCards.length > 3
+                                ? "flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory"
+                                : "grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3"
+                                }`}
+                        >
                             {recommendationCards.map((card, index) => {
                                 const isGated = gatedRecommendationTitles.has(card.title);
 
@@ -227,7 +264,7 @@ const AiHostPricing = () => {
                                         className={`transition-all duration-300 ${index < visibleCardCount
                                             ? "translate-y-0 opacity-100"
                                             : "translate-y-4 opacity-0 pointer-events-none"
-                                            }`}
+                                            } ${recommendationCards.length > 3 ? "min-w-[280px] sm:min-w-[320px] lg:min-w-[360px] snap-start" : ""}`}
                                     >
                                         <article
                                             onClick={() => handleCardClick(card)}
