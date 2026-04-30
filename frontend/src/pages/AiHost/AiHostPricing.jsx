@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FaGlobeAmericas } from "react-icons/fa";
 import { HiOutlineCurrencyDollar } from "react-icons/hi";
 import { TbAward } from "react-icons/tb";
 import useNomadLoginState from "../../hooks/useNomadLoginState";
 import { FaCheck } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 const AI_HOME_TYPING_SEEN_KEY = "wono-ai-home-typing-seen";
 
@@ -123,6 +124,9 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
         compact ? recommendationCards.length : 0,
     );
     const [selectedPlanTitle, setSelectedPlanTitle] = useState("");
+    const cardsScrollRef = useRef(null);
+    const [canScrollLeft, setCanScrollLeft] = useState(false);
+    const [canScrollRight, setCanScrollRight] = useState(false);
 
     const greetingText = isLoggedIn ? "Hi Abrar" : "Meet Wono";
     const subheadingText = isLoggedIn
@@ -205,6 +209,43 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
         return () => clearInterval(interval);
     }, [areCardsVisible]);
 
+    useEffect(() => {
+        if (recommendationCards.length <= 3) {
+            setCanScrollLeft(false);
+            setCanScrollRight(false);
+            return;
+        }
+
+        const element = cardsScrollRef.current;
+        if (!element) return;
+
+        const updateScrollButtons = () => {
+            const maxScrollLeft = element.scrollWidth - element.clientWidth;
+            setCanScrollLeft(element.scrollLeft > 0);
+            setCanScrollRight(element.scrollLeft < maxScrollLeft - 1);
+        };
+
+        updateScrollButtons();
+        element.addEventListener("scroll", updateScrollButtons);
+        window.addEventListener("resize", updateScrollButtons);
+
+        return () => {
+            element.removeEventListener("scroll", updateScrollButtons);
+            window.removeEventListener("resize", updateScrollButtons);
+        };
+    }, [visibleCardCount]);
+
+    const scrollCards = (direction) => {
+        const element = cardsScrollRef.current;
+        if (!element) return;
+        const scrollAmount = Math.max(260, Math.floor(element.clientWidth * 0.8));
+        element.scrollBy({
+            left: direction === "left" ? -scrollAmount : scrollAmount,
+            behavior: "smooth",
+        });
+    };
+
+
     const handleCardClick = (card) => {
         setSelectedPlanTitle(card.title);
 
@@ -259,10 +300,39 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
                             </>
                         )}
 
-                        <div className={`mt-8 ${areCardsVisible ? "visible" : "invisible"}`}>
+                        <div className={`relative mt-8 ${areCardsVisible ? "visible" : "invisible"}`}>
+                            {recommendationCards.length > 3 && (
+                                <>
+                                    <button
+                                        type="button"
+                                        onClick={() => scrollCards("left")}
+                                        disabled={!canScrollLeft}
+                                        aria-label="Scroll pricing cards left"
+                                        className={`absolute left-2 top-1/2 z-10 -translate-y-1/2 rounded-full border bg-white/95 p-3 shadow-md transition-all ${canScrollLeft
+                                            ? "border-[#d9e2f0] text-[#1e2b45] hover:bg-white"
+                                            : "cursor-not-allowed border-[#e7edf5] text-[#a9b4c8]"
+                                            }`}
+                                    >
+                                        <FaChevronLeft size={14} />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => scrollCards("right")}
+                                        disabled={!canScrollRight}
+                                        aria-label="Scroll pricing cards right"
+                                        className={`absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-full border bg-white/95 p-3 shadow-md transition-all ${canScrollRight
+                                            ? "border-[#d9e2f0] text-[#1e2b45] hover:bg-white"
+                                            : "cursor-not-allowed border-[#e7edf5] text-[#a9b4c8]"
+                                            }`}
+                                    >
+                                        <FaChevronRight size={14} />
+                                    </button>
+                                </>
+                            )}
                             <div
+                                ref={cardsScrollRef}
                                 className={`${recommendationCards.length > 3
-                                    ? "flex gap-6 overflow-x-auto pt-3 pb-4 snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+                                    ? "flex gap-6 overflow-x-auto px-12 pt-3 pb-4 snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
                                     : "grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3"
                                     }`}
                             >

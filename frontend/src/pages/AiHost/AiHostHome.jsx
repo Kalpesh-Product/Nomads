@@ -90,19 +90,19 @@ const HostHome = () => {
                         {[
                             {
                                 id: 1,
-                                title: "Modules",
+                                title: "MODULES",
                                 icon: images.website,
                                 route: "/host/ai-host-modules",
                             },
                             {
                                 id: 2,
-                                title: "Leads",
+                                title: "LEADS",
                                 icon: images.leadGenerationSM,
                                 route: "/host/ai-host-leads",
                             },
                             {
                                 id: 3,
-                                title: "Themes",
+                                title: "THEMES",
                                 icon: images.analyticsCM,
                                 route: "/host/ai-host-themes",
                             },
@@ -209,7 +209,7 @@ const HostHome = () => {
                             {noCode.map((item) => (
                                 <div
                                     key={item.id}
-                                    className="h-full w-full lg:w-auto flex-shrink-0 w-72 md:w-80 overflow-hidden rounded-lg shadow-lg">
+                                    className="h-full w-full lg:w-auto flex-shrink-0 md:w-80 overflow-hidden rounded-lg shadow-lg">
                                     <img
                                         src={item.image || "/hosts/themes/cafe.webp"}
                                         className="h-full w-full object-cover"

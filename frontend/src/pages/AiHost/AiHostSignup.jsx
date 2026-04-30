@@ -278,13 +278,28 @@ const AiHostSignup = () => {
                             render={({ field, fieldState }) => (
                                 <TextField
                                     {...field}
+                                    select
                                     label="Selected Plan"
                                     fullWidth
                                     margin="normal"
                                     variant="standard"
                                     error={!!fieldState.error}
                                     helperText={fieldState.error?.message}
-                                />
+                                    value={field.value || "Starter"}
+                                >
+                                    <MenuItem value="Starter">
+                                        Starter
+                                    </MenuItem>
+                                    <MenuItem value="Plus">
+                                        Plus
+                                    </MenuItem>
+                                    <MenuItem value="Professional">
+                                        Professional
+                                    </MenuItem>
+                                    <MenuItem value="Premium">
+                                        Premium
+                                    </MenuItem>
+                                </TextField>
                             )}
                         />
                         <Controller
