@@ -272,6 +272,22 @@ const AiHostSignup = () => {
                 return (
                     <>
                         <Controller
+                            name="Goals"
+                            control={control}
+                            rules={{ required: "Selected Plan is required" }}
+                            render={({ field, fieldState }) => (
+                                <TextField
+                                    {...field}
+                                    label="Selected Plan"
+                                    fullWidth
+                                    margin="normal"
+                                    variant="standard"
+                                    error={!!fieldState.error}
+                                    helperText={fieldState.error?.message}
+                                />
+                            )}
+                        />
+                        <Controller
                             name="name"
                             control={control}
                             rules={{ required: "Full Name is required" }}
@@ -322,6 +338,22 @@ const AiHostSignup = () => {
                                     {...field}
                                     type="tel"
                                     label="Phone Number"
+                                    fullWidth
+                                    margin="normal"
+                                    variant="standard"
+                                    error={!!fieldState.error}
+                                    helperText={fieldState.error?.message}
+                                />
+                            )}
+                        />
+                        <Controller
+                            name="designation"
+                            control={control}
+                            rules={{ required: "Designation is required" }}
+                            render={({ field, fieldState }) => (
+                                <TextField
+                                    {...field}
+                                    label="Designation"
                                     fullWidth
                                     margin="normal"
                                     variant="standard"

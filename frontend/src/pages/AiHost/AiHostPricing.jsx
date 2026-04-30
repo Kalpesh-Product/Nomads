@@ -275,8 +275,7 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
                                                 } ${recommendationCards.length > 3 ? "min-w-[280px] sm:min-w-[320px] lg:min-w-[360px] snap-start" : ""}`}
                                         >
                                             <article
-                                                onClick={() => handleCardClick(card)}
-                                                className={`relative flex h-full cursor-pointer flex-col rounded-[34px] border bg-[#f5f7fb] p-6 text-left transition-all active:scale-[0.985] sm:p-7 ${selectedPlanTitle === card.title
+                                                className={`relative flex h-full flex-col rounded-[34px] border bg-[#f5f7fb] p-6 text-left transition-all sm:p-7 ${selectedPlanTitle === card.title
                                                     ? "border-primary-blue shadow-[0_0_0_2px_rgba(47,102,232,0.2)]"
                                                     : card.highlight
                                                         ? "border-primary-blue shadow-[0_0_0_2px_rgba(47,102,232,0.1)]"
@@ -320,12 +319,13 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
                                                 <div className="mt-7">
                                                     <button
                                                         type="button"
+                                                        onClick={() => handleCardClick(card)}
                                                         className={`w-full rounded-full px-4 py-3 text-base font-medium transition-colors ${card.highlight
                                                             ? "bg-primary-blue text-white"
                                                             : "bg-[#e6ebf2] text-[#1e2b45]"
                                                             }`}
                                                     >
-                                                        {card.ctaText}
+                                                        {compact ? "Select" : card.ctaText}
                                                     </button>
                                                 </div>
                                             </article>
