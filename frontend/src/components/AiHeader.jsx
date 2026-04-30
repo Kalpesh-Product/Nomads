@@ -106,9 +106,9 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
 
   const goToHosts = () => {
     if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://hosts.localhost:5173";
+      window.location.href = "http://nomad.localhost:5173/host";
     } else {
-      window.location.href = "https://hosts.wono.co";
+      window.location.href = "https://nomad.wono.co/host";
     }
   };
 
@@ -179,24 +179,24 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                 <ul>
                   {(isAiListingsListPage ||
                     (!isAiListingsMapPage && view !== "map")) && (
-                    <li className="flex items-center">
-                      <div className="p-4 px-0 whitespace-nowrap">
-                        <Link
-                          to={
-                            isAiListingsListPage
-                              ? mapViewLink
-                              : `${location.pathname}?country=${formData?.country}&location=${formData?.location}&view=map`
-                          }
-                          className="group relative text-md text-black"
-                        >
-                          <span className="relative z-10 group-hover:font-bold mb-2 text-sm font-semibold">
-                            Map View
-                          </span>
-                          <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
-                        </Link>
-                      </div>
-                    </li>
-                  )}
+                      <li className="flex items-center">
+                        <div className="p-4 px-0 whitespace-nowrap">
+                          <Link
+                            to={
+                              isAiListingsListPage
+                                ? mapViewLink
+                                : `${location.pathname}?country=${formData?.country}&location=${formData?.location}&view=map`
+                            }
+                            className="group relative text-md text-black"
+                          >
+                            <span className="relative z-10 group-hover:font-bold mb-2 text-sm font-semibold">
+                              Map View
+                            </span>
+                            <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                          </Link>
+                        </div>
+                      </li>
+                    )}
 
                   {(isAiListingsMapPage || view === "map") && (
                     <li className="flex items-center">
@@ -240,9 +240,8 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                           className="group relative text-md text-black"
                         >
                           <span
-                            className={`relative z-10 mb-8 uppercase ${
-                              isActive ? "text-black" : "group-hover:font-bold"
-                            }`}
+                            className={`relative z-10 mb-8 uppercase ${isActive ? "text-black" : "group-hover:font-bold"
+                              }`}
                           >
                             {item.text}
                           </span>

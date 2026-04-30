@@ -1,0 +1,552 @@
+import React, { useState } from "react";
+import { useNavigate, Link, useLocation } from "react-router-dom";
+import logo from "../../assets/WONO_LOGO_Black_TP.png";
+import { useSelector } from "react-redux";
+import { Drawer, Avatar, Popover, CircularProgress } from "@mui/material";
+import { IoCloseSharp } from "react-icons/io5";
+import { HiOutlineMenu } from "react-icons/hi";
+import { FiLogOut } from "react-icons/fi";
+import useAuth from "../../hooks/useAuth";
+import useNomadLoginState from "../../hooks/useNomadLoginState";
+import AiContainer from "../../components/AiContainer";
+import useLogout from "../../hooks/useLogout";
+import { clearStoredLoginState } from "../../hooks/useNomadLoginState";
+
+const AiHostHeader = ({ onMobileSidebarToggle }) => {
+    const [open, setOpen] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [isLogoutLoading, setIsLogoutLoading] = useState(false);
+
+    const navigate = useNavigate();
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const view = searchParams.get("view");
+    const formData = useSelector((state) => state.location.formValues);
+
+    const isAiListingsMapPage = location.pathname === "/ai-listings";
+    const isAiListingsListPage = location.pathname === "/ai-listings-list";
+    const showToggle =
+        location.pathname.includes("verticals") ||
+        isAiListingsMapPage ||
+        isAiListingsListPage;
+    const showNewsBlogLinks =
+        showToggle ||
+        location.pathname.startsWith("/ai-listings") ||
+        location.pathname.startsWith("/listings");
+
+    const countryParam = searchParams.get("country") || formData?.country || "";
+    const locationParam =
+        searchParams.get("location") || formData?.location || "";
+    const categoryParam =
+        searchParams.get("category") || formData?.category || "";
+
+    const buildListingsQuery = () => {
+        const params = new URLSearchParams();
+        if (countryParam) params.set("country", countryParam);
+        if (locationParam) params.set("location", locationParam);
+        if (categoryParam) params.set("category", categoryParam);
+        return params.toString();
+    };
+
+    const listingsQuery = buildListingsQuery();
+    const mapViewLink = listingsQuery
+        ? `/ai-listings?${listingsQuery}`
+        : "/ai-listings";
+    const listViewLink = listingsQuery
+        ? `/ai-listings-list?${listingsQuery}`
+        : "/ai-listings-list";
+
+    const { auth } = useAuth();
+    const logout = useLogout();
+    const hasNomadLoginState = useNomadLoginState();
+    const isLoggedIn = Boolean(auth?.user) || hasNomadLoginState;
+    const userInitial = auth?.user?.fullName?.charAt(0)?.toUpperCase() || "A";
+    const openPopover = Boolean(anchorEl);
+
+    const handleAvatarClick = (event) => setAnchorEl(event.currentTarget);
+    const handlePopoverClose = () => setAnchorEl(null);
+
+    const handleSignOut = async () => {
+        if (isLogoutLoading) return;
+        setIsLogoutLoading(true);
+        handlePopoverClose();
+
+        try {
+            if (auth?.user) {
+                await logout();
+            }
+            const nextSearchParams = new URLSearchParams(location.search);
+            nextSearchParams.delete("login");
+            clearStoredLoginState();
+
+            navigate(
+                {
+                    pathname: "/ai-login",
+                    search: nextSearchParams.toString()
+                        ? `?${nextSearchParams.toString()}`
+                        : "",
+                },
+                {
+                    state: {
+                        redirectTo: `${location.pathname}${location.search}`,
+                    },
+                },
+            );
+        } catch (error) {
+            console.error("Logout failed:", error);
+        } finally {
+            setIsLogoutLoading(false);
+        }
+    };
+
+    const handleNavigation = (path) => {
+        navigate(path);
+        setOpen(false);
+    };
+
+    const goToHosts = () => {
+        if (window.location.hostname.includes("localhost")) {
+            window.location.href = "http://nomad.localhost:5173/home";
+        } else {
+            window.location.href = "https://nomad.wono.co/home";
+        }
+    };
+
+    const goToHostssMain = () => {
+        if (window.location.hostname.includes("localhost")) {
+            window.location.href = "http://nomad.localhost:5173/host";
+        } else {
+            window.location.href = "https://nomad.wono.co/host";
+        }
+    };
+
+    const stateParam =
+        searchParams.get("state") ||
+        searchParams.get("location") ||
+        formData?.state ||
+        formData?.location ||
+        "";
+
+    const formatStateLabel = (value) =>
+        decodeURIComponent(value)
+            .replace(/[-_]+/g, " ")
+            .split(" ")
+            .filter(Boolean)
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join(" ");
+
+    const stateLabel = stateParam ? formatStateLabel(stateParam) : "";
+    const newsLabel = stateLabel ? `${stateLabel} News` : "News";
+    const blogLabel = stateLabel ? `${stateLabel} Blog` : "Blog";
+
+    const currentSearch = location.search || "";
+    const headerLinks = [
+        // { id: 1, text: "Home", to: "/" },
+        { id: 2, type: "news", text: newsLabel, to: `/ai-news${currentSearch}` },
+        { id: 3, type: "blog", text: blogLabel, to: `/ai-blogs${currentSearch}` },
+    ];
+
+    const shouldShowHeaderLinks =
+        location.pathname.startsWith("/listings") &&
+        !location.pathname.startsWith("/ai-listings");
+
+    return (
+        <div className="bg-white/80 backdrop-blur-md px-1 md:px-20">
+            <AiContainer padding={false}>
+                <div className="flex py-3 justify-between items-center lg:py-[0.625rem]">
+                    {/* Logo */}
+                    <div className="flex items-center">
+                        <button
+                            type="button"
+                            onClick={() => onMobileSidebarToggle?.()}
+                            className="mr-2 rounded p-1 text-black sm:hidden"
+                            aria-label="Open sidebar"
+                        >
+                            <HiOutlineMenu size={24} />
+                        </button>
+                        <div
+                            onClick={goToHostssMain}
+                            className="w-24 h-10 lg:w-48 overflow-x-hidden rounded-lg flex gap-8 justify-start items-start cursor-pointer"
+                        >
+                            <img
+                                src={logo}
+                                alt="logo"
+                                className="w-fit h-full object-contain"
+                            />
+                        </div>
+                        <div className="min-w-[80px] hidden lg:block">
+                            {showToggle && (
+                                <ul>
+                                    {(isAiListingsListPage ||
+                                        (!isAiListingsMapPage && view !== "map")) && (
+                                            <li className="flex items-center">
+                                                <div className="p-4 px-0 whitespace-nowrap">
+                                                    <Link
+                                                        to={
+                                                            isAiListingsListPage
+                                                                ? mapViewLink
+                                                                : `${location.pathname}?country=${formData?.country}&location=${formData?.location}&view=map`
+                                                        }
+                                                        className="group relative text-md text-black"
+                                                    >
+                                                        <span className="relative z-10 group-hover:font-bold mb-2 text-sm font-semibold">
+                                                            Map View
+                                                        </span>
+                                                        <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                                                    </Link>
+                                                </div>
+                                            </li>
+                                        )}
+
+                                    {(isAiListingsMapPage || view === "map") && (
+                                        <li className="flex items-center">
+                                            <div className="p-4 px-0 whitespace-nowrap">
+                                                <Link
+                                                    to={
+                                                        isAiListingsMapPage
+                                                            ? listViewLink
+                                                            : `${location.pathname}?country=${formData?.country}&location=${formData?.location}`
+                                                    }
+                                                    className="group relative text-md text-black"
+                                                >
+                                                    <span className="relative z-10 group-hover:font-bold mb-2 text-sm font-semibold">
+                                                        List view
+                                                    </span>
+                                                    <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                                                </Link>
+                                            </div>
+                                        </li>
+                                    )}
+                                </ul>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Main Nav */}
+                    <div className="w-full">
+                        {shouldShowHeaderLinks && (
+                            <ul className="hidden xl:flex sm:hidden gap-8 justify-end flex-1">
+                                {headerLinks.map((item) => {
+                                    const isActive =
+                                        item.to === "/"
+                                            ? location.pathname === "/"
+                                            : location.pathname.startsWith(item.to);
+
+                                    return (
+                                        <li key={item.id} className="flex items-center">
+                                            <div className="p-4 px-0 whitespace-nowrap">
+                                                <Link
+                                                    to={item.to}
+                                                    className="group relative text-md text-black"
+                                                >
+                                                    <span
+                                                        className={`relative z-10 mb-8 uppercase ${isActive ? "text-black" : "group-hover:font-bold"
+                                                            }`}
+                                                    >
+                                                        {item.text}
+                                                    </span>
+                                                    <span
+                                                        className={`absolute left-0 bottom-0 top-6 block h-[2px] bg-blue-500 transition-all duration-300 
+                              ${isActive ? "w-full" : "w-0 group-hover:w-full"}`}
+                                                    ></span>
+                                                </Link>
+                                            </div>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        )}
+                    </div>
+
+                    {/* Right Section - Desktop */}
+                    <div className="hidden lg:flex items-center pl-10 gap-6">
+                        {!isLoggedIn && (
+                            <div className="flex items-center gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        navigate(`/ai-login${location.search}`, {
+                                            state: {
+                                                redirectTo: `${location.pathname}${location.search}`,
+                                            },
+                                        })
+                                    }
+                                    className="rounded-full bg-primary-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-black min-w-28"
+                                >
+                                    Login
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => navigate(`/ai-signup${location.search}`)}
+                                    className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-black transition hover:border-black/20 hover:bg-black/5 min-w-48"
+                                >
+                                    Sign up for free
+                                </button>
+                            </div>
+                        )}
+
+                        <li className="flex items-center gap-6">
+                            {showNewsBlogLinks && (
+                                <ul>
+                                    {/* Blogs and News - Added on the LEFT side of Map/List View */}
+                                    <li className="flex items-center gap-6">
+                                        <Link
+                                            to={`/ai-news${currentSearch}`}
+                                            className="group relative text-md text-black font-semibold whitespace-nowrap"
+                                        >
+                                            <span className="relative z-10 group-hover:font-bold mb-2 text-sm whitespace-nowrap">
+                                                {newsLabel}
+                                            </span>
+                                            <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                                        </Link>
+
+                                        <Link
+                                            to={`/ai-blogs${currentSearch}`}
+                                            className="group relative text-md text-black font-semibold whitespace-nowrap"
+                                        >
+                                            <span className="relative z-10 group-hover:font-bold mb-2 text-sm whitespace-nowrap">
+                                                {blogLabel}
+                                            </span>
+                                            <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                                        </Link>
+                                    </li>
+
+                                    {/* Original Map View / List View - UNCHANGED */}
+                                </ul>
+                            )}
+                            <div className="p-4 px-0 whitespace-nowrap">
+                                <button
+                                    onClick={goToHosts}
+                                    className="relative pb-1 transition-all cursor-pointer duration-300 group font-semibold bg-transparent border-none text-sm text-primary-blue"
+                                >
+                                    Become A Nomad
+                                    <span className="absolute left-0 w-0 bottom-0 block h-[2px] bg-black transition-all duration-300 group-hover:w-full"></span>
+                                </button>
+                            </div>
+                        </li>
+
+                        {isLoggedIn && (
+                            <Avatar
+                                onClick={handleAvatarClick}
+                                className="bg-primary-blue"
+                                sx={{
+                                    cursor: "pointer",
+                                    width: 32,
+                                    height: 32,
+                                    fontSize: "0.9rem",
+                                    fontWeight: 600,
+                                    backgroundColor: "#0ba9ef",
+                                }}
+                            >
+                                {userInitial}
+                            </Avatar>
+                        )}
+                    </div>
+
+                    {/* Mobile Menu Button */}
+                    <div className="h-full px-2 lg:hidden flex items-center gap-2">
+                        {isLoggedIn && (
+                            <Avatar
+                                onClick={handleAvatarClick}
+                                className="bg-primary-blue"
+                                sx={{
+                                    cursor: "pointer",
+                                    width: 32,
+                                    height: 32,
+                                    fontSize: "0.9rem",
+                                    fontWeight: 600,
+                                    backgroundColor: "#0ba9ef",
+                                }}
+                            >
+                                {userInitial}
+                            </Avatar>
+                        )}
+
+                        <Popover
+                            open={openPopover}
+                            anchorEl={anchorEl}
+                            onClose={handlePopoverClose}
+                            anchorOrigin={{
+                                vertical: "bottom",
+                                horizontal: "right",
+                            }}
+                            transformOrigin={{
+                                vertical: "top",
+                                horizontal: "right",
+                            }}
+                            slotProps={{
+                                paper: {
+                                    style: {
+                                        marginTop: "5px",
+                                        borderRadius: "20px",
+                                        overflow: "visible",
+                                    },
+                                },
+                            }}
+                        >
+                            <div className="p-[0.3rem]">
+                                <button
+                                    type="button"
+                                    onClick={handleSignOut}
+                                    disabled={isLogoutLoading}
+                                    className="w-full min-w-[140px] h-10 px-5 rounded-2xl bg-white shadow-sm border border-gray-200 flex items-center gap-3 text-[#2f2f2f] text-[15px] font-medium hover:shadow-md active:bg-gray-50 transition-all disabled:opacity-70"
+                                >
+                                    <span className="w-5 h-5 flex items-center justify-center text-gray-500">
+                                        {isLogoutLoading ? (
+                                            <CircularProgress size={18} sx={{ color: "gray" }} />
+                                        ) : (
+                                            <FiLogOut />
+                                        )}
+                                    </span>
+                                    <span>Sign Out</span>
+                                </button>
+                            </div>
+                        </Popover>
+
+                        <button
+                            onClick={() => setOpen(true)}
+                            className={`rounded-lg text-subtitle text-black ${onMobileSidebarToggle ? "hidden" : ""}`}
+                        >
+                            ☰
+                        </button>
+                    </div>
+
+                    {/* Mobile Drawer */}
+                    <Drawer
+                        sx={{
+                            "& .MuiDrawer-paper": {
+                                width: {
+                                    xs: "85%",
+                                    sm: "400px",
+                                },
+                            },
+                        }}
+                        anchor="left"
+                        open={open}
+                        onClose={() => setOpen(false)}
+                    >
+                        <div className="flex flex-col h-full justify-between">
+                            <ul className="flex flex-col gap-2 p-4">
+                                <div className="flex justify-end w-full">
+                                    <span
+                                        className="text-title cursor-pointer text-black"
+                                        onClick={() => setOpen(false)}
+                                    >
+                                        <IoCloseSharp />
+                                    </span>
+                                </div>
+
+                                {(shouldShowHeaderLinks || showNewsBlogLinks) &&
+                                    headerLinks
+                                        .filter((item) =>
+                                            showNewsBlogLinks
+                                                ? item.type === "news" || item.type === "blog"
+                                                : true,
+                                        )
+                                        .map((item) => (
+                                            <li key={item.id} className="items-center text-center">
+                                                <div
+                                                    onClick={() => handleNavigation(item.to)}
+                                                    className="py-4 cursor-pointer"
+                                                >
+                                                    <p className="text-secondary-dark text-lg">
+                                                        {item.text}
+                                                    </p>
+                                                </div>
+                                                <div className="h-[0.2px] bg-gray-300"></div>
+                                            </li>
+                                        ))}
+
+                                <li className="items-center text-center">
+                                    <div
+                                        onClick={() => {
+                                            goToHosts();
+                                            setOpen(false);
+                                        }}
+                                        className="py-4 cursor-pointer"
+                                    >
+                                        <p className="text-secondary-dark text-lg font-semibold">
+                                            Become A Nomad
+                                        </p>
+                                    </div>
+                                    <div className="h-[0.2px] bg-gray-300"></div>
+                                </li>
+
+                                {/* {auth?.user ? (
+                  <>
+                    <li className="items-center text-center">
+                      <div
+                        onClick={() => {
+                          handleNavigation("/profile?tab=profile");
+                        }}
+                        className="py-4 cursor-pointer"
+                      >
+                        <p className="text-secondary-dark text-lg">Profile</p>
+                      </div>
+                      <div className="h-[0.2px] bg-gray-300"></div>
+                    </li>
+                    <li className="items-center text-center">
+                      <div
+                        onClick={() => {
+                          handleNavigation("/profile?tab=favorites");
+                        }}
+                        className="py-4 cursor-pointer"
+                      >
+                        <p className="text-secondary-dark text-lg">Favorites</p>
+                      </div>
+                      <div className="h-[0.2px] bg-gray-300"></div>
+                    </li>
+
+                    <li className="items-center text-center">
+                      <div
+                        onClick={async () => {
+                          if (isLogoutLoading) return;
+                          await handleSignOut();
+                          setOpen(false);
+                        }}
+                        className="py-4 cursor-pointer flex justify-center"
+                      >
+                        {isLogoutLoading ? (
+                          <CircularProgress size={20} />
+                        ) : (
+                          <p className="text-secondary-dark text-lg">Log Out</p>
+                        )}
+                      </div>
+                    </li>
+                  </>
+                ) : (
+                  <div className="flex justify-center py-4">
+                    <PrimaryButton
+                      title="Login"
+                      padding="py-3"
+                      uppercase
+                      handleSubmit={() => {
+                        navigate("/login");
+                        setOpen(false);
+                      }}
+                      className="bg-[#FF5757] flex text-white font-[500] capitalize hover:bg-[#E14C4C] w-full sm:w-[7rem]"
+                    />
+                  </div>
+                )} */}
+                            </ul>
+
+                            {/* Drawer Footer */}
+                            <div className="w-full text-center flex flex-col gap-4 items-center py-4">
+                                <div className="flex w-full flex-col gap-2 text-small md:text-small">
+                                    <hr />
+                                    <span>
+                                        &copy; Copyright {new Date().getFullYear()} -{" "}
+                                        {(new Date().getFullYear() + 1).toString().slice(-2)}
+                                    </span>
+                                    <span>WoNo. All rights reserved</span>
+                                </div>
+                            </div>
+                        </div>
+                    </Drawer>
+                </div>
+            </AiContainer>
+        </div>
+    );
+};
+
+export default AiHostHeader;
