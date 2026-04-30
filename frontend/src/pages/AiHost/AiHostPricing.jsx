@@ -1,25 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FaGlobeAmericas } from "react-icons/fa";
-import { MdOutlineWorkHistory } from "react-icons/md";
 import { HiOutlineCurrencyDollar } from "react-icons/hi";
-import { RiUserCommunityLine } from "react-icons/ri";
-import { TbAward, TbWorldWww } from "react-icons/tb";
+import { TbAward } from "react-icons/tb";
 import useNomadLoginState from "../../hooks/useNomadLoginState";
 
 const AI_HOME_TYPING_SEEN_KEY = "wono-ai-home-typing-seen";
-
-const gatedRecommendationTitles = new Set([
-    "Work From Anywhere",
-    "Increase Your Savings",
-    "Advance Your Career",
-    "Find Your Community",
-]);
-
-const freeRecommendationTitles = new Set([
-    "World Ranking",
-    "Search Old School",
-]);
 
 const goalSlugByTitle = {
     "World Ranking": "worldranking",
@@ -36,100 +22,116 @@ const getSearchPathForGoal = (goalTitle) => {
 
 const recommendationCards = [
     {
-        title: "World Ranking",
-        description:
-            "Best nomad destinations based on the world index which includes 50+ global factors.",
+        title: "Free Plan",
+        description: "Up to 10 users",
+        description1: "Basic analytics ",
+        description2: "Task management ",
+        description3: "Email support ",
+        description4: "5 GB storage ",
+        description5: "Mobile app access",
+        footerText: "Free",
         icon: TbAward,
         path: getSearchPathForGoal("World Ranking"),
     },
     {
-        title: "Work From Anywhere",
-        description:
-            "Custom suggestions to help you discover and work from the best nomad destinations.",
+        title: "Plus",
+        description: "Up to 50 users",
+        description1: "Advanced analytics",
+        description2: "Automation workflows",
+        description3: "Priority support",
+        description4: "50 GB storage",
+        description5: "API access",
+        description6: "Custom integrations",
+        description7: "Advanced reporting",
+        footerText: "$99/month",
         icon: FaGlobeAmericas,
         path: getSearchPathForGoal("Work From Anywhere"),
     },
     {
-        title: "Increase Your Savings",
-        description:
-            "Tailored nomad destination suggestions to help you increase your savings as a nomad.",
+        title: "Pro",
+        description: "Unlimited users",
+        description1: "Enterprise analytics",
+        description2: "Custom workflows",
+        description3: "24/7 dedicated support",
+        description4: "Unlimited storage",
+        description5: "Custom integrations",
+        description6: "SLA guarantee",
+        description7: "Dedicated account manager",
+        footerText: "$199/month",
         icon: HiOutlineCurrencyDollar,
         path: getSearchPathForGoal("Increase Your Savings"),
     },
     // {
-    //     title: "Advance Your Career",
-    //     description:
-    //         "Discover the most suitable nomad destinations to advance your career.",
-    //     icon: MdOutlineWorkHistory,
-    //     path: getSearchPathForGoal("Advance Your Career"),
+    //     title: "Ultra",
+    //     description: "Unlimited users",
+    //     description1: "Enterprise analytics",
+    //     description2: "Custom workflows",
+    //     description3: "24/7 dedicated support",
+    //     description4: "Unlimited storage",
+    //     description5: "Custom integrations",
+    //     description6: "SLA guarantee",
+    //     description7: "Dedicated account manager",
+    //     footerText: "$299/month",
+    //     icon: HiOutlineCurrencyDollar,
+    //     path: getSearchPathForGoal("Increase Your Savings"),
     // },
     // {
-    //     title: "Find Your Community",
-    //     description:
-    //         "Like minded individuals & communities as per your preferences in nomad destinations.",
-    //     icon: RiUserCommunityLine,
-    //     path: getSearchPathForGoal("Find Your Community"),
-    // },
-    // {
-    //     title: "Search Old School",
-    //     description:
-    //         "Self search & find ideal nomad destinations as per your preference like old times.",
-    //     icon: TbWorldWww,
-    //     path: "/manual-search",
+    //     title: "Enterprise",
+    //     description: "Unlimited users",
+    //     description1: "Enterprise analytics",
+    //     description2: "Custom workflows",
+    //     description3: "24/7 dedicated support",
+    //     description4: "Unlimited storage",
+    //     description5: "Custom integrations",
+    //     description6: "SLA guarantee",
+    //     description7: "Dedicated account manager",
+    //     footerText: "Custom",
+    //     icon: HiOutlineCurrencyDollar,
+    //     path: getSearchPathForGoal("Increase Your Savings"),
     // },
 ];
+
+const gatedRecommendationTitles = new Set([
+    "World Ranking",
+    "Work From Anywhere",
+    "Increase Your Savings",
+    "Advance Your Career",
+    "Find Your Community",
+]);
 
 const AiHostPricing = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const isLoggedIn = useNomadLoginState();
+
     const [typedGreeting, setTypedGreeting] = useState("");
     const [typedSubheading, setTypedSubheading] = useState("");
-
-    const [typedThirdLine, setTypedThirdLine] = useState("");
     const [typedFourthLine, setTypedFourthLine] = useState("");
-
     const [areCardsVisible, setAreCardsVisible] = useState(false);
     const [visibleCardCount, setVisibleCardCount] = useState(0);
 
-    const isLoggedIn = useNomadLoginState();
-
-    const greetingText = isLoggedIn ? "hi Abrar" : "Meet Wono";
+    const greetingText = isLoggedIn ? "Hi Abrar" : "Meet Wono";
     const subheadingText = isLoggedIn
-        ? "Welcome back to wono, an intelligent platform for modern nomads."
+        ? "Welcome back to Wono, an intelligent platform for modern nomads."
         : "An intelligent platform for modern nomads … Early adoption of our future lifestyle!";
-    const thirdLineText = isLoggedIn
-        ? "A global community of nomads & remote workers, who are redefining how the world lives and works. Early adoption of our future lifestyle!"
-        : "A global community of nomads & remote workers, who are redefining how the world lives and works. Early adoption of our future lifestyle!";
-    const fourthLineText = isLoggedIn
-        ? "Choose your goals from below so that we can help you design your nomad lifestyle."
-        : "Choose your goals from below so that we can help you design your nomad lifestyle.";
 
+    const fourthLineText = "Choose your goals from below so that we can help you design your nomad lifestyle.";
+
+    // Typing Effect
     useEffect(() => {
-        const hasSeenTypingEffect =
-            typeof window !== "undefined" &&
-            window.localStorage.getItem(AI_HOME_TYPING_SEEN_KEY) === "true";
+        const hasSeenTyping = window.localStorage.getItem(AI_HOME_TYPING_SEEN_KEY) === "true";
 
-        if (hasSeenTypingEffect) {
+        if (hasSeenTyping) {
             setTypedGreeting(greetingText);
             setTypedSubheading(subheadingText);
-            setTypedThirdLine(thirdLineText);
             setTypedFourthLine(fourthLineText);
             setAreCardsVisible(true);
             return;
         }
-        setTypedGreeting("");
-        setTypedSubheading("");
-        setTypedThirdLine("");
-        setTypedFourthLine("");
-        setAreCardsVisible(false);
 
         let greetingIndex = 0;
         let subheadingIndex = 0;
-        let thirdLineIndex = 0;
-        let fourthLineIndex = 0;
-        let cleanupSubheading = () => { };
-        let cleanupThirdLine = () => { };
-        let cleanupFourthLine = () => { };
+        let fourthIndex = 0;
 
         const greetingInterval = setInterval(() => {
             greetingIndex += 1;
@@ -145,118 +147,68 @@ const AiHostPricing = () => {
                     if (subheadingIndex >= subheadingText.length) {
                         clearInterval(subheadingInterval);
 
-                        if (!thirdLineText) {
-                            setAreCardsVisible(true);
-                            return;
-                        }
+                        const fourthInterval = setInterval(() => {
+                            fourthIndex += 1;
+                            setTypedFourthLine(fourthLineText.slice(0, fourthIndex));
 
-                        const thirdLineInterval = setInterval(() => {
-                            thirdLineIndex += 1;
-                            setTypedThirdLine(thirdLineText.slice(0, thirdLineIndex));
-
-                            if (thirdLineIndex >= thirdLineText.length) {
-                                clearInterval(thirdLineInterval);
-
-                                if (!fourthLineText) {
-                                    setAreCardsVisible(true);
-                                    return;
-                                }
-
-                                const fourthLineInterval = setInterval(() => {
-                                    fourthLineIndex += 1;
-                                    setTypedFourthLine(fourthLineText.slice(0, fourthLineIndex));
-
-                                    if (fourthLineIndex >= fourthLineText.length) {
-                                        clearInterval(fourthLineInterval);
-                                        if (typeof window !== "undefined") {
-                                            window.localStorage.setItem(
-                                                AI_HOME_TYPING_SEEN_KEY,
-                                                "true",
-                                            );
-                                        }
-                                        setAreCardsVisible(true);
-                                    }
-                                }, 7);
-
-                                cleanupFourthLine = () => clearInterval(fourthLineInterval);
+                            if (fourthIndex >= fourthLineText.length) {
+                                clearInterval(fourthInterval);
+                                window.localStorage.setItem(AI_HOME_TYPING_SEEN_KEY, "true");
+                                setAreCardsVisible(true);
                             }
                         }, 7);
-
-                        cleanupThirdLine = () => clearInterval(thirdLineInterval);
                     }
                 }, 7);
-
-                if (!subheadingText) {
-                    setAreCardsVisible(true);
-                }
-
-                cleanupSubheading = () => clearInterval(subheadingInterval);
             }
         }, 7);
 
         return () => {
             clearInterval(greetingInterval);
-            cleanupSubheading();
-            cleanupThirdLine();
-            cleanupFourthLine();
         };
-    }, [fourthLineText, greetingText, subheadingText, thirdLineText]);
+    }, [greetingText, subheadingText, fourthLineText]);
 
+    // Card Reveal Animation
     useEffect(() => {
         if (!areCardsVisible) {
             setVisibleCardCount(0);
             return;
         }
 
-        let currentVisibleCount = 0;
-
-        const revealInterval = setInterval(() => {
-            currentVisibleCount += 1;
-            setVisibleCardCount(currentVisibleCount);
-
-            if (currentVisibleCount >= recommendationCards.length) {
-                clearInterval(revealInterval);
+        let count = 0;
+        const interval = setInterval(() => {
+            count += 1;
+            setVisibleCardCount(count);
+            if (count >= recommendationCards.length) {
+                clearInterval(interval);
             }
         }, 120);
 
-        return () => {
-            clearInterval(revealInterval);
-        };
+        return () => clearInterval(interval);
     }, [areCardsVisible]);
 
     const handleCardClick = (card) => {
         const params = new URLSearchParams(location.search);
-        const targetSearch = params.toString() ? `?${params.toString()}` : "";
-        const targetRoute = `${card.path}${targetSearch}`;
+        const queryString = params.toString() ? `?${params.toString()}` : "";
 
+        const targetPath = `${card.path}${queryString}`;
+
+        // If not logged in and this is a gated feature
         if (!isLoggedIn && gatedRecommendationTitles.has(card.title)) {
             const goalSlug = goalSlugByTitle[card.title];
             const loginPath = goalSlug ? `/ai-login/${goalSlug}` : "/ai-login";
 
             navigate(`${loginPath}${location.search}`, {
                 state: {
-                    loginContext: {
-                        title: card.title,
-                        description: card.description,
-                    },
-                    redirectTo: targetRoute,
+                    loginContext: { title: card.title, description: card.description },
+                    redirectTo: targetPath,
                 },
             });
             return;
         }
 
-        navigate(
-            {
-                pathname: card.path,
-                search: targetSearch,
-            },
-            {
-                state:
-                    card.path.includes("/search") && card.path.includes("/results")
-                        ? { selectedGoal: card.title }
-                        : undefined,
-            },
-        );
+        navigate(targetPath, {
+            state: card.path.includes("/search") ? { selectedGoal: card.title } : undefined,
+        });
     };
 
     return (
@@ -266,62 +218,79 @@ const AiHostPricing = () => {
                     <h1 className="text-3xl font-medium text-black/90 font-play">
                         {typedGreeting}
                     </h1>
-                    <h2 className="mt-5 text-sm font-semibold text-black/85 font-play sm:text-lg">
+
+                    <h2 className="mt-5 text-sm font-semibold text-black/85 sm:text-lg font-play">
                         {typedSubheading}
                     </h2>
-                    {/* <p className="mt-4 text-sm sm:text-lg font-medium text-black/85 font-play">
-            {typedThirdLine}
-          </p> */}
-                    <p className="mt-4 text-sm sm:text-lg font-medium text-primary-blue font-play">
+
+                    <p className="mt-6 text-sm sm:text-lg font-medium text-primary-blue font-play">
                         {typedFourthLine}
                     </p>
 
-                    <div
-                        className={`mt-4 rounded-[40px] px-0 py-4 md:px-6 md:py-8 ${areCardsVisible ? "visible" : "invisible"
-                            }`}
-                    >
-                        <div className="grid grid-cols-2 gap-4 md:grid-cols-2 md:gap-10 xl:grid-cols-3">
+                    <div className={`mt-8 ${areCardsVisible ? "visible" : "invisible"}`}>
+                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                             {recommendationCards.map((card, index) => {
                                 const Icon = card.icon;
-
-                                const isFreeCard = freeRecommendationTitles.has(card.title);
-                                const loggedOutCardText = isFreeCard
-                                    ? "Login not required"
-                                    : "Login required";
+                                const isGated = gatedRecommendationTitles.has(card.title);
 
                                 return (
                                     <div
                                         key={card.title}
                                         className={`transition-all duration-300 ${index < visibleCardCount
                                             ? "translate-y-0 opacity-100"
-                                            : "pointer-events-none translate-y-2 opacity-0"
+                                            : "translate-y-4 opacity-0 pointer-events-none"
                                             }`}
                                     >
                                         <article
                                             onClick={() => handleCardClick(card)}
-                                            className="group cursor-pointer rounded-2xl bg-[#f1f1f3] px-3 py-5 text-center transition-colors duration-200 hover:bg-[#e8e8ed] md:rounded-none md:bg-transparent md:px-0 md:py-0 md:hover:bg-transparent"
+                                            className="group cursor-pointer rounded-3xl bg-[#f1f1f3] p-6 text-center transition-all hover:bg-[#e8e8ed] active:scale-[0.985]"
                                         >
                                             <Icon
-                                                size={24}
-                                                className="mx-auto text-black/80 transition-colors duration-200 group-hover:text-sky-500"
+                                                size={32}
+                                                className="mx-auto text-black/80 transition-colors group-hover:text-sky-600"
                                             />
-                                            <h3 className="mt-2 text-nano sm:text-[0.8rem]  font-bold text-black/90 leading-tight transition-colors duration-200 group-hover:text-sky-500 uppercase">
+                                            <h3 className="mt-4 text-lg font-bold text-black/90 transition-colors group-hover:text-sky-600">
                                                 {card.title}
                                             </h3>
-                                            <div className="mt-2 hidden rounded-2xl bg-[#f1f1f3] p-5 text-left shadow-[0_1px_0_rgba(255,255,255,0.7)] transition-colors duration-200 group-hover:bg-sky-500 md:block">
-                                                <p className="text-micro leading-relaxed text-black/90 transition-colors duration-200 group-hover:text-white">
-                                                    {card.description}
+
+                                            <p className="mt-3 text-sm leading-relaxed text-black/70">
+                                                {card.description}
+                                            </p>
+
+                                            <p className="mt-3 text-sm leading-relaxed text-black/70">
+                                                {card.description1}
+                                            </p>
+                                            <p className="mt-3 text-sm leading-relaxed text-black/70">
+                                                {card.description2}
+                                            </p>
+                                            <p className="mt-3 text-sm leading-relaxed text-black/70">
+                                                {card.description3}
+                                            </p>
+                                            <p className="mt-3 text-sm leading-relaxed text-black/70">
+                                                {card.description4}
+                                            </p>
+                                            <p className="mt-3 text-sm leading-relaxed text-black/70">
+                                                {card.description5}
+                                            </p>
+                                            <p className="mt-3 text-sm leading-relaxed text-black/70">
+                                                {card.description6}
+                                            </p>
+                                            <p className="mt-3 text-sm leading-relaxed text-black/70">
+                                                {card.description7}
+                                            </p>
+
+                                            <div className="mt-6 pt-4 border-t border-black/10">
+                                                <p className="text-sm font-semibold text-black/80">
+                                                    {card.footerText}
                                                 </p>
                                             </div>
                                         </article>
-                                        {!isLoggedIn ? (
-                                            <p
-                                                className={`mt-2 text-[10px] font-semibold tracking-wide md:text-xs ${isFreeCard ? "text-primary-blue" : "text-black/70"
-                                                    }`}
-                                            >
-                                                {loggedOutCardText}
+
+                                        {!isLoggedIn && (
+                                            <p className="mt-2 text-xs font-medium text-black/60">
+                                                {isGated ? "No login required" : "Login required"}
                                             </p>
-                                        ) : null}
+                                        )}
                                     </div>
                                 );
                             })}
@@ -329,11 +298,6 @@ const AiHostPricing = () => {
                     </div>
                 </div>
             </main>
-
-            {/* <div className="sticky bottom-0 z-10  bg-white/95 py-6 text-center text-nano text-gray-600 backdrop-blur supports-[backdrop-filter]:bg-white/80">
-        WoNo is in Beta and can make mistakes. Building the future of global
-        nomad living, one update at a time. See Cookie Preferences.
-      </div> */}
         </div>
     );
 };
