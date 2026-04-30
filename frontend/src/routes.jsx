@@ -87,6 +87,16 @@ import AiBlogDetails from "./pages/AiBlogDetails";
 import AiForgotPassword from "./pages/AiForgotPassword";
 import AiResetPassword from "./pages/AiResetPassword";
 
+// hosts Ai subroutes
+import AiHostLayout from "./pages/AiHost/AiHostLayout";
+import AiHostHome from "./pages/AiHost/AiHostHome";
+import AiHostModules from "./pages/AiHost/AiHostModules";
+import AiHostThemes from "./pages/AiHost/AiHostThemes";
+import AiHostLeads from "./pages/AiHost/AiHostLeads";
+import AiHostCareer from "./pages/AiHost/AiHostCareer";
+import AiHostSignup from "./pages/AiHost/AiHostSignup";
+import AiHostProduct from "./pages/AiHost/AiHostProduct";
+
 function getTenantFromHost() {
   const hostname = window.location.hostname; // e.g. "nomad.wono.co" or "nomad.localhost"
   const rootDomain = "wono.co";
@@ -249,6 +259,19 @@ if (tenant === "main") {
               element: <AiBecomeContributor />,
             },
           ],
+        },
+        {
+          element: <AiHostLayout />,
+          path: "/host",
+          children: [
+            { path: "", element: <AiHostHome /> },
+            { path: "ai-host-signup", element: <AiHostSignup /> },
+            { path: "ai-host-product", element: <AiHostProduct /> },
+            { path: "ai-host-modules", element: <AiHostModules /> },
+            { path: "ai-host-themes", element: <AiHostThemes /> },
+            { path: "ai-host-leads", element: <AiHostLeads /> },
+            { path: "ai-host-career", element: <AiHostCareer /> },
+          ]
         },
       ],
     },
