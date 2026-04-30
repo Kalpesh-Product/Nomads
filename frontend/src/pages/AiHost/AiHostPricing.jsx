@@ -251,7 +251,7 @@ const AiHostPricing = ({ compact = false, startStep = 1 }) => {
                     <div className={`mt-8 ${areCardsVisible ? "visible" : "invisible"}`}>
                         <div
                             className={`${recommendationCards.length > 3
-                                ? "flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+                                ? "flex gap-6 overflow-x-auto pt-3 pb-4 snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
                                 : "grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3"
                                 }`}
                         >
