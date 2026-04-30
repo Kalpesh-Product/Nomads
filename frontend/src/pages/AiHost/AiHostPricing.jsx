@@ -131,9 +131,9 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
     const greetingText = isLoggedIn ? "Hi Abrar" : "Meet Wono";
     const subheadingText = isLoggedIn
         ? "Welcome back to Wono, an intelligent platform for modern nomads."
-        : "An intelligent platform for modern nomads … Early adoption of our future lifestyle!";
+        : "An intelligent platform for modern nomad businesses!";
 
-    const fourthLineText = "Choose your goals from below so that we can help you design your nomad lifestyle.";
+    const fourthLineText = "Choose your goals from below so that we can become your extended team for your business.";
 
     // Typing Effect
     useEffect(() => {
@@ -335,7 +335,7 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
                             <div
                                 ref={cardsScrollRef}
                                 className={`${recommendationCards.length > 3
-                                    ? "flex gap-6 overflow-x-auto px-4 sm:px-6 pt-3 pb-4 snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+                                    ? "flex gap-4 sm:gap-5 lg:gap-6 overflow-x-auto px-4 sm:px-6 pt-10 pb-6 snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
                                     : "grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3"
                                     }`}
                             >
@@ -348,20 +348,24 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
                                             className={`transition-all duration-300 ${index < visibleCardCount
                                                 ? "translate-y-0 opacity-100"
                                                 : "translate-y-4 opacity-0 pointer-events-none"
-                                                } ${recommendationCards.length > 3 ? "min-w-[280px] sm:min-w-[320px] lg:min-w-[360px] snap-start" : ""}`}
+                                                } ${recommendationCards.length > 3 ? "min-w-[86%] sm:min-w-[46%] lg:min-w-[31%] snap-start" : ""}`}
                                         >
                                             <article
-                                                className={`relative flex h-full flex-col rounded-[34px] border bg-[#f5f7fb] p-6 text-left transition-all sm:p-7 ${selectedPlanTitle === card.title
-                                                    ? "border-primary-blue shadow-[0_0_0_2px_rgba(47,102,232,0.2)]"
+                                                className={`relative flex h-full flex-col rounded-[34px] border bg-[#f5f7fb] p-6 text-left transition-all duration-300 sm:p-7 ${selectedPlanTitle === card.title
+                                                    ? "border-primary-blue -translate-y-2 shadow-[0_28px_50px_rgba(15,23,48,0.22)] ring-2 ring-primary-blue/25"
                                                     : card.highlight
-                                                        ? "border-primary-blue shadow-[0_0_0_2px_rgba(47,102,232,0.1)]"
-                                                        : "border-transparent hover:border-primary-blue"
+                                                        ? "border-primary-blue -translate-y-3 shadow-[0_32px_60px_rgba(37,99,235,0.28)] ring-2 ring-primary-blue/20"
+                                                        : "border-transparent shadow-[0_10px_20px_rgba(15,23,48,0.08)] hover:border-primary-blue hover:-translate-y-1 hover:shadow-[0_18px_34px_rgba(15,23,48,0.16)]"
                                                     }`}
                                             >
                                                 {card.badgeText && (
                                                     <span className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary-blue px-5 py-1 text-[11px] font-bold tracking-[0.18em] text-white">
                                                         {card.badgeText}
                                                     </span>
+                                                )}
+
+                                                {(card.highlight || selectedPlanTitle === card.title) && (
+                                                    <span className="pointer-events-none absolute inset-x-8 -bottom-3 h-6 rounded-full bg-primary-blue/25 blur-xl" />
                                                 )}
 
                                                 <h3 className="mt-2 text-center text-2xl font-bold text-[#121a33]">

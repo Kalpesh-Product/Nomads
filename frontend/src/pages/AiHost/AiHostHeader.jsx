@@ -106,17 +106,17 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
 
     const goToHosts = () => {
         if (window.location.hostname.includes("localhost")) {
-            window.location.href = "http://hosts.localhost:5173";
+            window.location.href = "http://nomad.localhost:5173/home";
         } else {
-            window.location.href = "https://hosts.wono.co";
+            window.location.href = "https://nomad.wono.co/home";
         }
     };
 
     const goToHostssMain = () => {
         if (window.location.hostname.includes("localhost")) {
-            window.location.href = "http://nomad.localhost:5173/home";
+            window.location.href = "http://nomad.localhost:5173/host";
         } else {
-            window.location.href = "https://nomad.wono.co/home";
+            window.location.href = "https://nomad.wono.co/host";
         }
     };
 
@@ -319,7 +319,7 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
                                     onClick={goToHosts}
                                     className="relative pb-1 transition-all cursor-pointer duration-300 group font-semibold bg-transparent border-none text-sm text-primary-blue"
                                 >
-                                    Become A Host
+                                    Become A Nomad
                                     <span className="absolute left-0 w-0 bottom-0 block h-[2px] bg-black transition-all duration-300 group-hover:w-full"></span>
                                 </button>
                             </div>
@@ -466,7 +466,7 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
                                         className="py-4 cursor-pointer"
                                     >
                                         <p className="text-secondary-dark text-lg font-semibold">
-                                            Become A Host
+                                            Become A Nomad
                                         </p>
                                     </div>
                                     <div className="h-[0.2px] bg-gray-300"></div>

@@ -49,87 +49,59 @@ const getSearchPathForGoal = (goalLabel) => {
 
 const recommendationItems = [
     {
-        label: "Home",
+        label: "Website Builder",
         icon: TbAward,
         path: "/host",
     },
     {
-        label: "Dashboard",
+        label: "Sales",
         icon: FaGlobeAmericas,
         path: "/host/ai-host-modules",
     },
     {
-        label: "Attendance",
+        label: "Finance",
         icon: HiOutlineCurrencyDollar,
         path: "/host/ai-host-themes",
     },
     {
-        label: "Tasks",
+        label: "Administration",
         icon: MdOutlineWorkHistory,
         path: "/host/ai-host-leads",
     },
     {
-        label: "Tickets",
+        label: "Human Resource",
         icon: RiUserCommunityLine,
         path: "/host/ai-host-career",
     },
     {
-        label: "My Calendar",
+        label: "IT",
         icon: RiUserCommunityLine,
         path: "/host/ai-host-calendar",
     },
     {
-        label: "Leave Requests",
+        label: "Maintenance",
         icon: HiOutlineCurrencyDollar,
         path: "/host/ai-host-leave-requests",
-    },
-    {
-        label: "Meeting Room Booking",
-        icon: HiOutlineCurrencyDollar,
-        path: "/host/ai-host-meeting-room-booking",
-    },
-    {
-        label: "Reports",
-        icon: TbAward,
-        path: "/host/ai-host-reports",
     },
 ];
 
 const valueAdditionItems = [
-    { label: "Extra Common Modules", icon: LuMapPinned, path: "/host/extra-common-modules" },
+    { label: "Meetings", icon: LuMapPinned, path: "/host/extra-common-modules" },
     {
-        label: "Assets",
+        label: "Visitors",
         icon: HiOutlineKey,
         path: "/host/assets",
     },
     {
-        label: "Inventory",
+        label: "Tickets",
         icon: HiOutlineCog,
         path: "/host/inventory",
     },
-    { label: "Finance Management", icon: LuCircleDollarSign, path: "/host/finance-management" },
+    { label: "Calendar", icon: LuCircleDollarSign, path: "/host/finance-management" },
+    { label: "Chat", icon: LuCircleDollarSign, path: "/host/finance-management" },
 ];
 
-const valueAdditionItems1 = [
-    { label: "Organization Management", icon: LuMapPinned, path: "/host/organization-management" },
-    { label: "Module Management", icon: LuMapPinned, path: "/host/module-management" },
-    { label: "Access Grants", icon: LuMapPinned, path: "/host/access-grants" },
-    { label: "Workspace Settings", icon: LuMapPinned, path: "/host/workspace-settings" },
-    { label: "Analytics", icon: LuMapPinned, path: "/host/analytics" },
-];
-
-const valueAdditionItems2 = [
-    { label: "HR Department", icon: LuMapPinned, path: "/host/hr-department" },
-    { label: "Administration Department", icon: LuMapPinned, path: "/host/administration-department" },
-    { label: "Sales Department", icon: LuMapPinned, path: "/host/sales-department" },
-    { label: "Maintenance Department", icon: LuMapPinned, path: "/host/maintenance-department" },
-    { label: "Finance Department", icon: LuMapPinned, path: "/host/finance-department" },
-    { label: "IT Department", icon: LuMapPinned, path: "/host/it-department" },
-    { label: "HR Department", icon: LuMapPinned, path: "/host/hr-department" },
-    { label: "Tech Department", icon: LuMapPinned, path: "/host/tech-department" },
-];
-
-const becomeHostItem = [{ label: "Become A Host", icon: HiOutlineViewGrid }];
+const becomeHostItem = [{ label: "Become A Nomad", icon: HiOutlineViewGrid }];
 
 const loggedOutPrompt = {
     title: "Get responses tailored to you",
@@ -140,8 +112,8 @@ const loggedOutPrompt = {
 
 const profileItems = [
     { label: "userFullName", icon: HiOutlineUserCircle, tab: "profile" },
-    { label: "Favorites", icon: HiOutlineHeart, tab: "favorites" },
-    { label: "Reviews", icon: LuCircleDollarSign, tab: "reviews" },
+    // { label: "Favorites", icon: HiOutlineHeart, tab: "favorites" },
+    // { label: "Reviews", icon: LuCircleDollarSign, tab: "reviews" },
     { label: "Change Password", icon: HiOutlineKey, tab: "password" },
 ];
 
@@ -354,9 +326,9 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
     const handleBecomeHostClick = () => {
         if (window.location.hostname.includes("localhost")) {
-            window.location.href = "http://hosts.localhost:5173";
+            window.location.href = "http://nomad.localhost:5173/home";
         } else {
-            window.location.href = "https://hosts.wono.co";
+            window.location.href = "https://nomad.wono.co/home";
         }
     };
 
@@ -439,34 +411,6 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         };
     });
 
-    const valueAdditionItemsWithActivePath1 = valueAdditionItems1.map((item) => {
-        if (!item.path) return item;
-
-        const normalizedItemPath = item.path.replace(/\/$/, "");
-        const isActivePath =
-            normalizedPath === normalizedItemPath ||
-            normalizedPath.startsWith(`${normalizedItemPath}/`);
-
-        return {
-            ...item,
-            active: isActivePath,
-        };
-    });
-
-    const valueAdditionItemsWithActivePath2 = valueAdditionItems2.map((item) => {
-        if (!item.path) return item;
-
-        const normalizedItemPath = item.path.replace(/\/$/, "");
-        const isActivePath =
-            normalizedPath === normalizedItemPath ||
-            normalizedPath.startsWith(`${normalizedItemPath}/`);
-
-        return {
-            ...item,
-            active: isActivePath,
-        };
-    });
-
     const becomeContributorItemWithActivePath = {
         ...becomeContributorLink,
         active:
@@ -520,7 +464,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
             {/* Sections */}
             <SidebarSection
-                title="Host Dashboard"
+                title="Modules"
                 items={recommendationItemsWithActivePath}
                 collapsed={isCollapsed}
                 isExpandable
@@ -530,28 +474,8 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
             />
 
             <SidebarSection
-                title="Extra Common Modules"
+                title="Key Apps"
                 items={valueAdditionItemsWithActivePath}
-                collapsed={isCollapsed}
-                isExpandable
-                isOpen={isValueAdditionsOpen}
-                onToggle={() => setIsValueAdditionsOpen((prev) => !prev)}
-                onItemClick={handleValueAdditionClick}
-            />
-
-            <SidebarSection
-                title="Common Modules"
-                items={valueAdditionItemsWithActivePath1}
-                collapsed={isCollapsed}
-                isExpandable
-                isOpen={isValueAdditionsOpen}
-                onToggle={() => setIsValueAdditionsOpen((prev) => !prev)}
-                onItemClick={handleValueAdditionClick}
-            />
-
-            <SidebarSection
-                title="Department Access"
-                items={valueAdditionItemsWithActivePath2}
                 collapsed={isCollapsed}
                 isExpandable
                 isOpen={isValueAdditionsOpen}
@@ -561,7 +485,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
             {isLoggedIn ? (
                 <>
-                    {/* <SidebarSection
+                    <SidebarSection
                         title="Profile"
                         items={profileItemsWithUserName}
                         collapsed={isCollapsed}
@@ -569,7 +493,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                         isOpen={isProfileOpen}
                         onToggle={() => setIsProfileOpen((prev) => !prev)}
                         onItemClick={handleProfileClick}
-                    /> */}
+                    />
                     <div className="mx-4 mt-3 border-t border-black/10"></div>
                     {/* Compact sections - minimal spacing */}
                     {/* <SidebarSection
@@ -579,12 +503,12 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                         compact={true}
                     /> */}
                     <div className="mx-4 border-t border-black/10"></div>
-                    {/* <SidebarSection
+                    <SidebarSection
                         items={becomeHostItem}
                         collapsed={isCollapsed}
                         onItemClick={handleBecomeHostClick}
                         compact={true}
-                    /> */}
+                    />
                     <div className="mx-4 border-t border-black/10"></div>
                     <SidebarSection
                         items={signOutItem}

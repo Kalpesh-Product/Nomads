@@ -319,16 +319,16 @@ const AiHostSignup = () => {
                                     value={field.value || selectedPlan}
                                 >
                                     <MenuItem value="Starter">
-                                        Starter
+                                        Starter - Free
                                     </MenuItem>
                                     <MenuItem value="Plus">
-                                        Plus
+                                        Plus - $99/Month
                                     </MenuItem>
                                     <MenuItem value="Professional">
-                                        Professional
+                                        Professional - $199/Month
                                     </MenuItem>
                                     <MenuItem value="Enterprise">
-                                        Enterprise
+                                        Enterprise - $499/Month
                                     </MenuItem>
                                 </TextField>
                             )}
@@ -393,19 +393,37 @@ const AiHostSignup = () => {
                             )}
                         />
                         <Controller
-                            name="designation"
+                            name="role"
                             control={control}
-                            rules={{ required: "Designation is required" }}
+                            rules={{ required: "Role is required" }}
                             render={({ field, fieldState }) => (
                                 <TextField
                                     {...field}
-                                    label="Designation"
+                                    select
+                                    label="Select Role"
                                     fullWidth
                                     margin="normal"
                                     variant="standard"
                                     error={!!fieldState.error}
                                     helperText={fieldState.error?.message}
-                                />
+                                    value={field.value}
+                                >
+                                    <MenuItem value="Owner">
+                                        Owner
+                                    </MenuItem>
+                                    <MenuItem value="Executive">
+                                        Executive
+                                    </MenuItem>
+                                    <MenuItem value="Manager">
+                                        Manager
+                                    </MenuItem>
+                                    <MenuItem value="Employee">
+                                        Employee
+                                    </MenuItem>
+                                    <MenuItem value="Other">
+                                        Other
+                                    </MenuItem>
+                                </TextField>
                             )}
                         />
 
@@ -1399,10 +1417,10 @@ const AiHostSignup = () => {
         )} */}
                 {activeStep !== 3 && (
                     <h1 className="text-title text-center">
-                        {activeStep === 0 && "Let's set up your free account"}
-                        {activeStep === 1 && "Add your company details"}
-                        {activeStep === 2 && "Add Your Website Content"}
-                        {/* {activeStep === 3 && "Choose your services"} */}
+                        {activeStep === 0 && "Select Your Plan"}
+                        {activeStep === 1 && "Let's set up your free account"}
+                        {activeStep === 2 && "Add your company details"}
+                        {activeStep === 3 && "Add Your Website Content"}
                         {/* {activeStep === 4 && "Activate your account"} */}
                     </h1>
                 )}
