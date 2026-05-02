@@ -24,80 +24,64 @@ const getSearchPathForGoal = (goalTitle) => {
 
 const recommendationCards = [
     {
-        title: "STARTER",
-        subtitle: "A clean starting plan for smaller teams building better daily operations.",
-        price: "Free",
-        // priceSuffix: "/month",
+        title: "BASIC",
+        subtitle: "Perfect to run your small business effortlessly and nothing else will be ever required.",
+        price: "FREE",
         ctaText: "Get Started",
         highlight: false,
         features: [
-            "Up to 10 users",
-            "Basic analytics",
-            "Task management",
-            "Email support",
-            "5 GB storage",
-            "Mobile app access",
-        ],
-        path: "/host/ai-host-signup",
-    },
-    {
-        title: "PLUS",
-        subtitle: "A stronger operating layer for growing teams that need more control and automation.",
-        price: "$99",
-        priceSuffix: "/month",
-        ctaText: "Get Started",
-        highlight: true,
-        badgeText: "MOST POPULAR",
-        features: [
-            "All features of STARTER plan",
-            "Up to 50 users",
-            "Advanced analytics",
-            "Automation workflows",
-            "Priority support",
-            "50 GB storage",
-            "API access",
-            "Custom integrations",
-            "Advanced reporting",
+            "Static Website (Desktop + Mobile)",
+            "Automated Lead Generation",
+            "Lead Management System",
+            "Visitor Management",
+            "AI Chat Assistant",
+            "Secure Storage",
+            "Customer Support",
+            "Up to 2 Users",
         ],
         path: "/host/ai-host-signup",
     },
     {
         title: "PROFESSIONAL",
-        subtitle: "A tailored plan for larger organizations with deeper operational and security needs.",
-        price: "$499",
-        priceSuffix: "/month",
+        subtitle: "Supporting your ambitions and goals to scale from a small business to a GROWING COMPANY!",
+        price: "$99",
+        priceSuffix: "/Month",
         ctaText: "Get Started",
-        highlight: false,
+        highlight: true,
         features: [
-            "All features of PLUS plan",
-            "Unlimited users",
-            "Enterprise analytics",
-            "Custom workflows",
-            "24/7 dedicated support",
-            "Unlimited storage",
-            "Custom integrations",
-            "SLA guarantee",
-            "Dedicated account manager",
+            "Everything in Basic, Plus:",
+            "Transactional Website (Desktop + Mobile)",
+            "Payment Gateway",
+            "Advanced Sales Module",
+            "Admin Control Panel",
+            "Meeting Room Booking System",
+            "Visitor Management",
+            "Integrated Ticketing System",
+            "Smart Calendar",
+            "Up to 5 Users",
         ],
         path: "/host/ai-host-signup",
     },
     {
-        title: "ENTERPRISE",
-        subtitle: "A tailored plan for larger organizations with deeper operational and security needs.",
-        price: "$499",
-        priceSuffix: "/month",
+        title: "CUSTOMISE",
+        subtitle: "Tailored solutions for companies scaling into ENTERPRISE LEVEL OPERATIONS!",
+        price: "PERSONALISED",
         ctaText: "Get Started",
         highlight: false,
         features: [
-            "All features of PROFESSIONAL plan",
-            "Unlimited users",
-            "Enterprise analytics",
-            "Custom workflows",
-            "24/7 dedicated support",
-            "Unlimited storage",
-            "Custom integrations",
-            "SLA guarantee",
-            "Dedicated account manager",
+            "Everything in Professional, Plus:",
+            "Advanced Booking Engine (Desktop + Mobile)",
+            "Custom Native Applications",
+            "End-to-End Finance Suite",
+            "Human Resource Management System (HRMS)",
+            "IT Infrastructure Module",
+            "Maintenance & Operations Management",
+            "AI-Driven Lead Generation",
+            "AI Customer Experience Agent",
+            "AI Sales Automation",
+            "AI SEO & Growth Engine",
+            "Fully Custom-Built Technology Stack",
+            "Unlimited Users",
         ],
         path: "/host/ai-host-signup",
     },
@@ -336,7 +320,7 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
                                 ref={cardsScrollRef}
                                 className={`${recommendationCards.length > 3
                                     ? "flex gap-4 sm:gap-5 lg:gap-6 overflow-x-auto px-4 sm:px-6 pt-10 pb-6 snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-                                    : "grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3"
+                                    : "grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3"
                                     }`}
                             >
                                 {recommendationCards.map((card, index) => {
@@ -352,10 +336,10 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
                                         >
                                             <article
                                                 className={`relative flex h-full flex-col rounded-[34px] border bg-[#f5f7fb] p-6 text-left transition-all duration-300 sm:p-7 ${selectedPlanTitle === card.title
-                                                    ? "border-primary-blue -translate-y-2 shadow-[0_28px_50px_rgba(15,23,48,0.22)] ring-2 ring-primary-blue/25"
+                                                    ? "border-primary-blue -translate-y-2 shadow-[0_16px_32px_rgba(15,23,48,0.12)] ring-2 ring-primary-blue/18"
                                                     : card.highlight
-                                                        ? "border-primary-blue -translate-y-3 shadow-[0_32px_60px_rgba(37,99,235,0.28)] ring-2 ring-primary-blue/20"
-                                                        : "border-transparent shadow-[0_10px_20px_rgba(15,23,48,0.08)] hover:border-primary-blue hover:-translate-y-1 hover:shadow-[0_18px_34px_rgba(15,23,48,0.16)]"
+                                                        ? "border-primary-blue -translate-y-2 shadow-[0_18px_36px_rgba(37,99,235,0.14)] ring-2 ring-primary-blue/16"
+                                                        : "border-transparent shadow-[0_8px_18px_rgba(15,23,48,0.06)] hover:border-primary-blue hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(15,23,48,0.10)]"
                                                     }`}
                                             >
                                                 {card.badgeText && (
@@ -365,7 +349,7 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
                                                 )}
 
                                                 {(card.highlight || selectedPlanTitle === card.title) && (
-                                                    <span className="pointer-events-none absolute inset-x-8 -bottom-3 h-6 rounded-full bg-primary-blue/25 blur-xl" />
+                                                    <span className="pointer-events-none absolute inset-x-10 -bottom-2 h-5 rounded-full bg-primary-blue/12 blur-lg" />
                                                 )}
 
                                                 <h3 className="mt-2 text-center text-2xl font-bold text-[#121a33]">
@@ -386,14 +370,24 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
                                                 <div className="mt-5 border-t border-[#dfe5ef] pt-6" />
 
                                                 <ul className="flex flex-1 flex-col gap-3">
-                                                    {card.features.map((feature) => (
-                                                        <li key={feature} className="flex items-center gap-3 text-[#5a6d89]">
-                                                            <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#dff5ea] text-[#16b26a]">
-                                                                <FaCheck size={10} />
-                                                            </span>
-                                                            <span className="text-sm">{feature}</span>
-                                                        </li>
-                                                    ))}
+                                                    {card.features.map((feature) => {
+                                                        const highlightedFeature = feature.replace(
+                                                            /\b(BASIC|PROFESSIONAL|CUSTOMISE|Basic|Professional|Customise|)\b/g,
+                                                            "<strong class=\"font-bold text-black\">$1</strong>",
+                                                        );
+
+                                                        return (
+                                                            <li key={feature} className="flex items-center gap-3 text-[#5a6d89]">
+                                                                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#dff5ea] text-[#16b26a]">
+                                                                    <FaCheck size={10} />
+                                                                </span>
+                                                                <span
+                                                                    className="text-xs"
+                                                                    dangerouslySetInnerHTML={{ __html: highlightedFeature }}
+                                                                />
+                                                            </li>
+                                                        );
+                                                    })}
                                                 </ul>
 
                                                 <div className="mt-7">

@@ -84,7 +84,7 @@ export default function Modules() {
                             </div>
                         </div>
                         <div>
-                            <h4 className="text-lg lg:text-[1.8rem] lg:leading-[2.75rem] text-start md:text-center lg:text-start ">
+                            <h4 className="text-lg lg:text-[1.45rem] lg:leading-[2.75rem] text-start md:text-center lg:text-start ">
                                 No Code Website <span className="text-primary-blue"></span>
                                 <span className="text-primary-blue">+</span> Booking Engine{" "}
                                 <span className="text-primary-blue">+</span> Payment Gateway{" "}

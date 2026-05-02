@@ -51,7 +51,7 @@ const recommendationItems = [
     {
         label: "Website Builder",
         icon: TbAward,
-        path: "/host",
+        path: "/host/ai-host-website-builder",
     },
     {
         label: "Sales",
@@ -81,7 +81,7 @@ const recommendationItems = [
     {
         label: "Maintenance",
         icon: HiOutlineCurrencyDollar,
-        path: "/host/ai-host-leave-requests",
+        suffixText: "...More",
     },
 ];
 
@@ -98,7 +98,11 @@ const valueAdditionItems = [
         path: "/host/inventory",
     },
     { label: "Calendar", icon: LuCircleDollarSign, path: "/host/finance-management" },
-    { label: "Chat", icon: LuCircleDollarSign, path: "/host/finance-management" },
+    {
+        label: "Chat",
+        icon: LuCircleDollarSign,
+        suffixText: "...More",
+    },
 ];
 
 const becomeHostItem = [{ label: "Become A Nomad", icon: HiOutlineViewGrid }];
@@ -138,6 +142,7 @@ const SidebarSection = ({
 }) => {
     const ChevronIcon = isOpen ? HiChevronUp : HiChevronDown;
     const shouldShowItems = collapsed ? true : !isExpandable || isOpen;
+    const navigate = useNavigate();
 
     return (
         <div className={`px-4 ${compact ? "pt-0" : "pt-3"}`}>
@@ -189,9 +194,9 @@ const SidebarSection = ({
                                             >
                                                 {item.label}
                                             </span>
-                                            {item.badge && (
-                                                <span className="ml-auto rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[7px] font-semibold tracking-wide text-black shadow-sm">
-                                                    {item.badge}
+                                            {item.suffixText && (
+                                                <span className="ml-auto text-[12px] font-medium tracking-wide text-black/55">
+                                                    <button onClick={() => navigate("/host/ai-host-signup?step=0")} className="hover:text-primary-blue">{item.suffixText}</button>
                                                 </span>
                                             )}
                                         </>
@@ -260,6 +265,8 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     console.log(isLoggedIn);
 
     const handleRecommendationClick = (item) => {
+        if (!item.path) return;
+
         const params = new URLSearchParams(location.search);
         const targetSearch = params.toString() ? `?${params.toString()}` : "";
         const targetRoute = `${item.path || "/search/results"}${targetSearch}`;

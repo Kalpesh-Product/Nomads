@@ -121,7 +121,7 @@ const HostHome = () => {
                                         />
                                     </div>
 
-                                    <h3 className="text-[clamp(1rem,1.4vw,1.5rem)] font-semibold text-secondary-dark text-center">
+                                    <h3 className="ml-6 text-[clamp(1rem,1.4vw,1.5rem)] font-semibold text-secondary-dark text-center">
                                         {tab.title}
                                     </h3>
                                 </div>

@@ -144,7 +144,7 @@ const Themes = () => {
             </div>
             <Container>
                 <section className="flex flex-col items-end justify-center gap-4 leading-[1.3] text-secondary-dark ">
-                    <h1 className="text-[clamp(1.62rem,4.6vw,4.5rem)] font-medium">
+                    <h1 className="text-[clamp(1.62rem,4.0vw,4.5rem)] font-medium">
                         Choose the best Responsive Website Theme for your business
                     </h1>
 
