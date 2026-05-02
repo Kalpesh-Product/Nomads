@@ -386,14 +386,24 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
                                                 <div className="mt-5 border-t border-[#dfe5ef] pt-6" />
 
                                                 <ul className="flex flex-1 flex-col gap-3">
-                                                    {card.features.map((feature) => (
-                                                        <li key={feature} className="flex items-center gap-3 text-[#5a6d89]">
-                                                            <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#dff5ea] text-[#16b26a]">
-                                                                <FaCheck size={10} />
-                                                            </span>
-                                                            <span className="text-sm">{feature}</span>
-                                                        </li>
-                                                    ))}
+                                                    {card.features.map((feature) => {
+                                                        const highlightedFeature = feature.replace(
+                                                            /\b(STARTER|PLUS|PROFESSIONAL)\b/g,
+                                                            "<strong class=\"font-bold text-black\">$1</strong>",
+                                                        );
+
+                                                        return (
+                                                            <li key={feature} className="flex items-center gap-3 text-[#5a6d89]">
+                                                                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#dff5ea] text-[#16b26a]">
+                                                                    <FaCheck size={10} />
+                                                                </span>
+                                                                <span
+                                                                    className="text-sm"
+                                                                    dangerouslySetInnerHTML={{ __html: highlightedFeature }}
+                                                                />
+                                                            </li>
+                                                        );
+                                                    })}
                                                 </ul>
 
                                                 <div className="mt-7">
