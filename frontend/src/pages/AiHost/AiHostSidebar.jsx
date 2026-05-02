@@ -51,7 +51,7 @@ const recommendationItems = [
     {
         label: "Website Builder",
         icon: TbAward,
-        path: "/host",
+        path: "/host/ai-host-website-builder",
     },
     {
         label: "Sales",

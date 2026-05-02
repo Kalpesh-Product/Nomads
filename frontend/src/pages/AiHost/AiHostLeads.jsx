@@ -98,8 +98,8 @@ const Leads = () => {
             <Container>
                 <div>
                     <div>
-                        <h2 className="lg:text-[2.6rem] md:text-[1.75rem] sm:text-[1.75rem] xs:text-[1.75rem] leading-[1.4] font-semibold text-host">
-                            Generate continuos structured leads for your business with the
+                        <h2 className="lg:text-[1.75rem] md:text-[1.75rem] sm:text-[1.75rem] xs:text-[1.75rem] leading-[1.4] font-semibold text-host">
+                            Generate continuous structured leads for your business with the
                             support of our automated platform and trained and experienced
                             resources.
                         </h2>
