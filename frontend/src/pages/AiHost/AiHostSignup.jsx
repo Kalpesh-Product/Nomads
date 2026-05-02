@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Stepper, Step } from "react-form-stepper";
 import { useForm, Controller } from "react-hook-form";
 import {
     TextField,
     Button,
     Box,
+    InputAdornment,
     FormGroup,
     FormControlLabel,
     Checkbox,
@@ -21,7 +22,6 @@ import { Country, State, City } from "country-state-city";
 import { MenuItem } from "@mui/material";
 import UploadFileInput from "../../components/UploadFileInput";
 import UploadMultipleFilesInput from "../../components/UploadMultipleFilesInput";
-import { isValidInternationalPhone } from "../../utils/validators";
 import AiHostPricing from "./AiHostPricing";
 import { HiOutlineArrowLeft } from "react-icons/hi";
 
@@ -67,18 +67,28 @@ const serviceOptions = [
     // },
 ];
 
+const floatingLabelSx = {
+    color: "black",
+    "&.Mui-focused": { color: "#1976d2" },
+    "&.MuiInputLabel-shrink": { color: "#1976d2" },
+};
+
+const getFlagIconUrl = (isoCode) =>
+    `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
+
 const normalizePlanFromQuery = (plan) => {
-    if (!plan || typeof plan !== "string") return "Starter";
+    if (!plan || typeof plan !== "string") return "BASIC";
 
     const normalized = plan.trim().toLowerCase();
     const planMap = {
-        starter: "Starter",
-        plus: "Plus",
-        professional: "Professional",
-        enterprise: "Enterprise",
+        basic: "BASIC",
+        professional: "PROFESSIONAL",
+        customise: "CUSTOMISE",
+        customized: "CUSTOMISE",
+        customised: "CUSTOMISE",
     };
 
-    return planMap[normalized] || "Starter";
+    return planMap[normalized] || "BASIC";
 };
 
 const AiHostSignup = () => {
@@ -95,14 +105,18 @@ const AiHostSignup = () => {
         new URLSearchParams(location.search).get("plan"),
     );
     const [selectedPlan, setSelectedPlan] = useState(selectedPlanFromQuery);
+    const countries = useMemo(() => Country.getAllCountries(), []);
 
     const { control, handleSubmit, getValues, trigger, reset, watch, setValue } =
         useForm({
             defaultValues: {
+                Goals: selectedPlanFromQuery,
                 name: "",
                 email: "",
                 mobile: "",
+                contactCode: "",
                 country: "",
+                role: "",
                 state: "",
                 city: "",
                 companyName: "",
@@ -141,6 +155,28 @@ const AiHostSignup = () => {
     useEffect(() => {
         setValue("Goals", selectedPlan);
     }, [selectedPlan, setValue]);
+    const selectedCountryName = watch("country");
+    const selectedCountry = useMemo(
+        () => countries.find((country) => country.name === selectedCountryName) || null,
+        [countries, selectedCountryName],
+    );
+
+    const handleCountryChange = (countryName, onChange) => {
+        const country = countries.find((item) => item.name === countryName);
+        const phonePrefix = country?.phonecode ? `+${country.phonecode}` : "";
+
+        onChange(countryName);
+        setValue("contactCode", phonePrefix, {
+            shouldDirty: true,
+            shouldTouch: true,
+        });
+        setValue("mobile", "", {
+            shouldDirty: true,
+            shouldTouch: true,
+        });
+        setValue("state", "");
+        setValue("city", "");
+    };
     // inside your HostSignup or CreateWebsite component:
     const {
         fields: aboutFields,
@@ -239,7 +275,7 @@ const AiHostSignup = () => {
     });
 
     const stepFields = [
-        ["name", "email", "mobile", "country", "state", "city"], // Step 1
+        ["Goals", "name", "email", "country", "mobile", "role", "state", "city"], // Step 1
         [
             "companyName",
             "industry",
@@ -290,7 +326,7 @@ const AiHostSignup = () => {
                             compact
                             startStep={1}
                             onSelectPlan={(plan) => {
-                                const planTitle = plan?.title || "STARTER";
+                                const planTitle = plan?.title || "BASIC";
                                 const normalizedPlan = normalizePlanFromQuery(planTitle);
                                 setSelectedPlan(normalizedPlan);
                                 setValue("Goals", normalizedPlan);
@@ -317,18 +353,14 @@ const AiHostSignup = () => {
                                     error={!!fieldState.error}
                                     helperText={fieldState.error?.message}
                                     value={field.value || selectedPlan}
+                                    InputLabelProps={{ sx: floatingLabelSx }}
                                 >
-                                    <MenuItem value="Starter">
-                                        Starter - Free
+                                    <MenuItem value="BASIC">BASIC - FREE</MenuItem>
+                                    <MenuItem value="PROFESSIONAL">
+                                        PROFESSIONAL - $99 / Month
                                     </MenuItem>
-                                    <MenuItem value="Plus">
-                                        Plus - $99/Month
-                                    </MenuItem>
-                                    <MenuItem value="Professional">
-                                        Professional - $199/Month
-                                    </MenuItem>
-                                    <MenuItem value="Enterprise">
-                                        Enterprise - $499/Month
+                                    <MenuItem value="CUSTOMISE">
+                                        CUSTOMISE - PERSONALISED
                                     </MenuItem>
                                 </TextField>
                             )}
@@ -346,6 +378,7 @@ const AiHostSignup = () => {
                                     variant="standard"
                                     error={!!fieldState.error}
                                     helperText={fieldState.error?.message}
+                                    InputLabelProps={{ sx: floatingLabelSx }}
                                 />
                             )}
                         />
@@ -369,29 +402,127 @@ const AiHostSignup = () => {
                                     margin="normal"
                                     error={!!fieldState.error}
                                     helperText={fieldState.error?.message}
+                                    InputLabelProps={{ sx: floatingLabelSx }}
                                 />
                             )}
                         />
                         <Controller
-                            name="mobile"
+                            name="country"
                             control={control}
-                            rules={{
-                                required: "Phone Number is required",
-                                validate: isValidInternationalPhone,
-                            }}
+                            rules={{ required: "Country is required" }}
                             render={({ field, fieldState }) => (
                                 <TextField
                                     {...field}
-                                    type="tel"
-                                    label="Phone Number"
+                                    select
+                                    label="Country"
                                     fullWidth
                                     margin="normal"
                                     variant="standard"
                                     error={!!fieldState.error}
                                     helperText={fieldState.error?.message}
-                                />
+                                    InputLabelProps={{ sx: floatingLabelSx }}
+                                    SelectProps={{
+                                        renderValue: (value) => {
+                                            const chosenCountry = countries.find(
+                                                (country) => country.name === value,
+                                            );
+                                            if (!chosenCountry) return value;
+
+                                            return (
+                                                <Box
+                                                    sx={{
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        gap: 1,
+                                                    }}
+                                                >
+                                                    <img
+                                                        src={getFlagIconUrl(chosenCountry.isoCode)}
+                                                        alt={`${chosenCountry.name} flag`}
+                                                        width={20}
+                                                        height={15}
+                                                        loading="lazy"
+                                                    />
+                                                    <span>{chosenCountry.name}</span>
+                                                </Box>
+                                            );
+                                        },
+                                    }}
+                                    onChange={(event) =>
+                                        handleCountryChange(event.target.value, field.onChange)
+                                    }
+                                >
+                                    {countries.map((c) => (
+                                        <MenuItem key={c.isoCode} value={c.name}>
+                                            <Box className="flex items-center gap-2">
+                                                <Box
+                                                    component="img"
+                                                    src={getFlagIconUrl(c.isoCode)}
+                                                    alt={`${c.name} flag`}
+                                                    sx={{ width: 20, height: 15, flexShrink: 0 }}
+                                                    loading="lazy"
+                                                />
+                                                <span>{c.name}</span>
+                                            </Box>
+                                        </MenuItem>
+                                    ))}
+                                </TextField>
                             )}
                         />
+                        <Box sx={{ display: "flex", gap: 2, width: "100%", mt: 2 }}>
+                            <Controller
+                                name="contactCode"
+                                control={control}
+                                render={({ field }) => (
+                                    <TextField
+                                        {...field}
+                                        label="Code"
+                                        fullWidth
+                                        variant="standard"
+                                        InputLabelProps={{ sx: floatingLabelSx }}
+                                        InputProps={{
+                                            startAdornment: selectedCountry?.isoCode ? (
+                                                <InputAdornment position="start">
+                                                    <Box
+                                                        component="img"
+                                                        src={getFlagIconUrl(selectedCountry.isoCode)}
+                                                        alt={`${selectedCountry.name} flag`}
+                                                        sx={{ width: 20, height: 15, flexShrink: 0 }}
+                                                        loading="lazy"
+                                                    />
+                                                </InputAdornment>
+                                            ) : null,
+                                            readOnly: true,
+                                        }}
+                                        sx={{ maxWidth: 80 }}
+                                    />
+                                )}
+                            />
+
+                            <Controller
+                                name="mobile"
+                                control={control}
+                                rules={{
+                                    required: "Phone Number is required",
+                                    pattern: {
+                                        value: /^[0-9]{7,15}$/,
+                                        message: "Please enter a valid phone number",
+                                    },
+                                }}
+                                render={({ field, fieldState }) => (
+                                    <TextField
+                                        {...field}
+                                        type="tel"
+                                        label="Phone Number"
+                                        fullWidth
+                                        variant="standard"
+                                        error={!!fieldState.error}
+                                        helperText={fieldState.error?.message}
+                                        InputLabelProps={{ sx: floatingLabelSx }}
+                                    />
+                                )}
+                            />
+                        </Box>
                         <Controller
                             name="role"
                             control={control}
@@ -407,63 +538,23 @@ const AiHostSignup = () => {
                                     error={!!fieldState.error}
                                     helperText={fieldState.error?.message}
                                     value={field.value}
+                                    InputLabelProps={{ sx: floatingLabelSx }}
                                 >
-                                    <MenuItem value="Owner">
-                                        Owner
-                                    </MenuItem>
-                                    <MenuItem value="Executive">
-                                        Executive
-                                    </MenuItem>
-                                    <MenuItem value="Manager">
-                                        Manager
-                                    </MenuItem>
-                                    <MenuItem value="Employee">
-                                        Employee
-                                    </MenuItem>
-                                    <MenuItem value="Other">
-                                        Other
-                                    </MenuItem>
+                                    <MenuItem value="Owner">Owner</MenuItem>
+                                    <MenuItem value="Executive">Executive</MenuItem>
+                                    <MenuItem value="Manager">Manager</MenuItem>
+                                    <MenuItem value="Employee">Employee</MenuItem>
+                                    <MenuItem value="Other">Other</MenuItem>
                                 </TextField>
                             )}
                         />
-
-                        <Controller
-                            name="country"
-                            control={control}
-                            // rules={{ required: "Country is required" }}
-                            render={({ field, fieldState }) => (
-                                <TextField
-                                    {...field}
-                                    select
-                                    label="Country"
-                                    fullWidth
-                                    margin="normal"
-                                    variant="standard"
-                                    error={!!fieldState.error}
-                                    helperText={fieldState.error?.message}
-                                    onChange={(e) => {
-                                        const value = e.target.value;
-                                        field.onChange(value); // update form with country name
-                                        setValue("state", ""); // reset state
-                                        setValue("city", ""); // reset city
-                                    }}
-                                >
-                                    {Country.getAllCountries().map((c) => (
-                                        <MenuItem key={c.isoCode} value={c.name}>
-                                            {c.name}
-                                        </MenuItem>
-                                    ))}
-                                </TextField>
-                            )}
-                        />
-
                         <Controller
                             name="state"
                             control={control}
-                            // rules={{ required: "State is required" }}
+                            rules={{ required: "State is required" }}
                             render={({ field, fieldState }) => {
                                 const countryName = watch("country");
-                                const countryObj = Country.getAllCountries().find(
+                                const countryObj = countries.find(
                                     (c) => c.name === countryName,
                                 );
                                 const states = countryObj
@@ -481,10 +572,11 @@ const AiHostSignup = () => {
                                         error={!!fieldState.error}
                                         helperText={fieldState.error?.message}
                                         disabled={!countryObj}
+                                        InputLabelProps={{ sx: floatingLabelSx }}
                                         onChange={(e) => {
                                             const value = e.target.value;
-                                            field.onChange(value); // store state name
-                                            setValue("city", ""); // reset city when state changes
+                                            field.onChange(value);
+                                            setValue("city", "");
                                         }}
                                     >
                                         {states.map((s) => (
@@ -496,16 +588,15 @@ const AiHostSignup = () => {
                                 );
                             }}
                         />
-
                         <Controller
                             name="city"
                             control={control}
-                            // rules={{ required: "City is required" }}
+                            rules={{ required: "City is required" }}
                             render={({ field, fieldState }) => {
                                 const countryName = watch("country");
                                 const stateName = watch("state");
 
-                                const countryObj = Country.getAllCountries().find(
+                                const countryObj = countries.find(
                                     (c) => c.name === countryName,
                                 );
                                 const stateObj =
@@ -533,6 +624,7 @@ const AiHostSignup = () => {
                                         error={!!fieldState.error}
                                         helperText={fieldState.error?.message}
                                         disabled={!stateObj}
+                                        InputLabelProps={{ sx: floatingLabelSx }}
                                     >
                                         {cities.map((city) => (
                                             <MenuItem key={city.name} value={city.name}>
@@ -1507,12 +1599,20 @@ const AiHostSignup = () => {
                                 key === "heroImages" ||
                                 key === "about" ||
                                 key === "gallery" ||
-                                key === "products"
+                                key === "products" ||
+                                key === "contactCode"
                             )
                                 return;
 
                             fd.set(key, withFallback(val, "N/A")); // 👈 fallback if empty
                         });
+
+                        fd.set(
+                            "mobile",
+                            [values.contactCode, values.mobile].filter(Boolean).join(" ").trim() ||
+                            "N/A",
+                        );
+                        fd.set("contactCode", withFallback(values.contactCode, "N/A"));
 
                         // About (array → join into text or fallback)
                         const aboutArray =
