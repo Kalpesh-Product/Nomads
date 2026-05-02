@@ -1364,7 +1364,7 @@ const AiHostSignup = () => {
     };
 
     return (
-        <div className="h-full flex flex-col justify-start gap-10 p-4 lg:p-10 items-center w-full">
+        <div className="h-full flex flex-col justify-start gap-5 p-4 lg:p-10 items-center w-full">
             <div className="flex justify-start w-full">
                 <button
                     type="button"
