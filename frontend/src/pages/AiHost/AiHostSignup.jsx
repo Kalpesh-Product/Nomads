@@ -27,10 +27,7 @@ import { HiOutlineArrowLeft } from "react-icons/hi";
 
 const steps = [
     "GOAL",
-    "PERSONAL INFO",
-    "COMPANY INFO",
-    "WEBSITE INFO",
-    "SERVICES",
+    "BASIC DETAILS",
     "ACTIVATION",
 ];
 
@@ -98,7 +95,7 @@ const AiHostSignup = () => {
 
     const initialStep = Math.max(
         0,
-        Math.min(5, Number(new URLSearchParams(location.search).get("step")) || 0),
+        Math.min(2, Number(new URLSearchParams(location.search).get("step")) || 0),
     );
     const [activeStep, setActiveStep] = useState(initialStep);
     const selectedPlanFromQuery = normalizePlanFromQuery(
@@ -177,6 +174,7 @@ const AiHostSignup = () => {
         setValue("state", "");
         setValue("city", "");
     };
+
     // inside your HostSignup or CreateWebsite component:
     const {
         fields: aboutFields,
@@ -233,15 +231,13 @@ const AiHostSignup = () => {
             return response.data;
         },
         onSuccess: (data) => {
-            // toast.success(data.message || "Form submitted successfully");
             showSuccessAlert(
                 typeof data.message === "string"
                     ? data.message
                     : data.message?.message || "Form submitted successfully",
             );
 
-            reset();
-            setActiveStep((prev) => prev + 1); // 👈 go to Step 5 after submit
+            setActiveStep(2);
         },
         // onError: (error) => {
         //   // toast.error(error.response?.data?.message || "Something went wrong");
@@ -268,14 +264,12 @@ const AiHostSignup = () => {
             }
 
             showErrorAlert(message);
-
             reset();
-            setActiveStep((prev) => prev + 1); // your temporary thing
         },
     });
 
     const stepFields = [
-        ["Goals", "name", "email", "country", "mobile", "role", "state", "city"], // Step 1
+        [], // Step 1
         [
             "companyName",
             "industry",
@@ -285,6 +279,14 @@ const AiHostSignup = () => {
             "companyCity",
             // "websiteUrl",
             // "linkedInUrl",
+            "Goals",
+            "name",
+            "email",
+            "country",
+            "mobile",
+            "role",
+            "state",
+            "city",
         ], // Step 2
         [
             "title",
@@ -302,12 +304,33 @@ const AiHostSignup = () => {
             "registeredCompanyName",
             "copyrightText",
         ], // Temporary Step 2.5 Website Info ✅
-        ["selectedServices"], // Step 3
+        [], // Step 3
         [], // Step 4
     ];
 
+    const activeFlowStepFields = [
+        [],
+        [
+            "Goals",
+            "name",
+            "email",
+            "country",
+            "mobile",
+            "role",
+            "state",
+            "city",
+            "companyName",
+            "industry",
+            "companySize",
+            "companyCountry",
+            "companyState",
+            "companyCity",
+        ],
+        [],
+    ];
+
     const handleNext = async () => {
-        const fieldsToValidate = stepFields[activeStep];
+        const fieldsToValidate = activeFlowStepFields[activeStep];
         const isValid = await trigger(fieldsToValidate);
         if (!isValid) return; // stop if invalid
 
@@ -498,7 +521,6 @@ const AiHostSignup = () => {
                                     />
                                 )}
                             />
-
                             <Controller
                                 name="mobile"
                                 control={control}
@@ -524,6 +546,45 @@ const AiHostSignup = () => {
                             />
                         </Box>
                         <Controller
+                            name="companyName"
+                            control={control}
+                            rules={{ required: "Company Name is required" }}
+                            render={({ field, fieldState }) => (
+                                <TextField
+                                    {...field}
+                                    label="Company Name"
+                                    fullWidth
+                                    margin="normal"
+                                    variant="standard"
+                                    error={!!fieldState.error}
+                                    helperText={fieldState.error?.message}
+                                    InputLabelProps={{ sx: floatingLabelSx }}
+                                />
+                            )}
+                        />
+                        <Controller
+                            name="companySize"
+                            control={control}
+                            rules={{
+                                pattern: {
+                                    value: /^[0-9]+$/,
+                                    message: "Company Size must be a number",
+                                },
+                            }}
+                            render={({ field, fieldState }) => (
+                                <TextField
+                                    {...field}
+                                    label="Company Size"
+                                    fullWidth
+                                    margin="normal"
+                                    variant="standard"
+                                    error={!!fieldState.error}
+                                    helperText={fieldState.error?.message}
+                                    InputLabelProps={{ sx: floatingLabelSx }}
+                                />
+                            )}
+                        />
+                        <Controller
                             name="role"
                             control={control}
                             rules={{ required: "Role is required" }}
@@ -548,6 +609,7 @@ const AiHostSignup = () => {
                                 </TextField>
                             )}
                         />
+
                         <Controller
                             name="state"
                             control={control}
@@ -640,178 +702,21 @@ const AiHostSignup = () => {
 
             case 2:
                 return (
-                    <>
-                        <Controller
-                            name="companyName"
-                            control={control}
-                            rules={{ required: "Company Name is required" }}
-                            render={({ field, fieldState }) => (
-                                <TextField
-                                    {...field}
-                                    label="Company Name"
-                                    fullWidth
-                                    margin="normal"
-                                    variant="standard"
-                                    error={!!fieldState.error}
-                                    helperText={fieldState.error?.message}
-                                />
-                            )}
-                        />
-                        <Controller
-                            name="industry"
-                            control={control}
-                            // rules={{ required: "Industry is required" }}
-                            render={({ field, fieldState }) => (
-                                <TextField
-                                    {...field}
-                                    label="Industry"
-                                    fullWidth
-                                    margin="normal"
-                                    variant="standard"
-                                    error={!!fieldState.error}
-                                    helperText={fieldState.error?.message}
-                                />
-                            )}
-                        />
-                        <Controller
-                            name="companySize"
-                            control={control}
-                            rules={{
-                                // required: "Company Size is required",
-                                pattern: {
-                                    value: /^[0-9]+$/, // only digits allowed
-                                    message: "Company Size must be a number",
-                                },
-                            }}
-                            render={({ field, fieldState }) => (
-                                <TextField
-                                    {...field}
-                                    label="Company Size"
-                                    fullWidth
-                                    margin="normal"
-                                    variant="standard"
-                                    error={!!fieldState.error}
-                                    helperText={fieldState.error?.message}
-                                />
-                            )}
-                        />
-                        <Controller
-                            name="companyCountry"
-                            control={control}
-                            // rules={{ required: "Company Country is required" }}
-                            render={({ field, fieldState }) => (
-                                <TextField
-                                    {...field}
-                                    select
-                                    label="Company Country"
-                                    fullWidth
-                                    margin="normal"
-                                    variant="standard"
-                                    error={!!fieldState.error}
-                                    helperText={fieldState.error?.message}
-                                    onChange={(e) => {
-                                        const value = e.target.value;
-                                        field.onChange(value); // store country name
-                                        setValue("companyState", ""); // reset state
-                                        setValue("companyCity", ""); // reset city
-                                    }}
-                                >
-                                    {Country.getAllCountries().map((c) => (
-                                        <MenuItem key={c.isoCode} value={c.name}>
-                                            {c.name}
-                                        </MenuItem>
-                                    ))}
-                                </TextField>
-                            )}
-                        />
-
-                        <Controller
-                            name="companyState"
-                            control={control}
-                            // rules={{ required: "Company State is required" }}
-                            render={({ field, fieldState }) => {
-                                const countryName = watch("companyCountry");
-                                const countryObj = Country.getAllCountries().find(
-                                    (c) => c.name === countryName,
-                                );
-                                const states = countryObj
-                                    ? State.getStatesOfCountry(countryObj.isoCode)
-                                    : [];
-
-                                return (
-                                    <TextField
-                                        {...field}
-                                        select
-                                        label="Company State"
-                                        fullWidth
-                                        margin="normal"
-                                        variant="standard"
-                                        error={!!fieldState.error}
-                                        helperText={fieldState.error?.message}
-                                        disabled={!countryObj}
-                                        onChange={(e) => {
-                                            const value = e.target.value;
-                                            field.onChange(value); // store state name
-                                            setValue("companyCity", ""); // reset city when state changes
-                                        }}
-                                    >
-                                        {states.map((s) => (
-                                            <MenuItem key={s.isoCode} value={s.name}>
-                                                {s.name}
-                                            </MenuItem>
-                                        ))}
-                                    </TextField>
-                                );
-                            }}
-                        />
-
-                        <Controller
-                            name="companyCity"
-                            control={control}
-                            // rules={{ required: "Company City is required" }}
-                            render={({ field, fieldState }) => {
-                                const countryName = watch("companyCountry");
-                                const stateName = watch("companyState");
-
-                                const countryObj = Country.getAllCountries().find(
-                                    (c) => c.name === countryName,
-                                );
-                                const stateObj =
-                                    countryObj &&
-                                    State.getStatesOfCountry(countryObj.isoCode).find(
-                                        (s) => s.name === stateName,
-                                    );
-
-                                const cities =
-                                    countryObj && stateObj
-                                        ? City.getCitiesOfState(
-                                            countryObj.isoCode,
-                                            stateObj.isoCode,
-                                        )
-                                        : [];
-
-                                return (
-                                    <TextField
-                                        {...field}
-                                        select
-                                        label="Company City"
-                                        fullWidth
-                                        margin="normal"
-                                        variant="standard"
-                                        error={!!fieldState.error}
-                                        helperText={fieldState.error?.message}
-                                        disabled={!stateObj}
-                                    >
-                                        {cities.map((city) => (
-                                            <MenuItem key={city.name} value={city.name}>
-                                                {city.name}
-                                            </MenuItem>
-                                        ))}
-                                    </TextField>
-                                );
-                            }}
-                        />
-                    </>
+                    <div className="flex flex-col gap-4 col-span-1 lg:col-span-2 py-6">
+                        <h1 className="text-title text-center">Registration Received</h1>
+                        <div className="space-y-5 text-center max-w-3xl mx-auto">
+                            <p>
+                                Thank you for registering with Wono Host.
+                            </p>
+                            <p>
+                                Your selected plan has been received and our team will review
+                                your details shortly.
+                            </p>
+                            <p>
+                                Please log in to continue the next stage of your setup.
+                            </p>
+                        </div>
+                    </div>
                 );
 
             case 3:
@@ -1511,8 +1416,8 @@ const AiHostSignup = () => {
                     <h1 className="text-title text-center">
                         {activeStep === 0 && "Select Your Plan"}
                         {activeStep === 1 && "Let's set up your free account"}
-                        {activeStep === 2 && "Add your company details"}
-                        {activeStep === 3 && "Add Your Website Content"}
+                        {/* {activeStep === 2 && "Add your company details"}
+                        {activeStep === 3 && "Add Your Website Content"} */}
                         {/* {activeStep === 4 && "Activate your account"} */}
                     </h1>
                 )}
@@ -1671,14 +1576,14 @@ const AiHostSignup = () => {
                 handleSubmit={() => setActiveStep((prev) => prev - 1)}
               />
             )} */}
-                        {activeStep > 0 && activeStep < stepFields.length - 1 && (
+                        {activeStep > 0 && (
                             <GetStartedButton
                                 title="Back"
                                 handleSubmit={() => setActiveStep((prev) => prev - 1)}
                             />
                         )}
 
-                        {activeStep !== 0 && activeStep < steps.length - 2 ? (
+                        {activeStep !== 0 && activeStep < activeFlowStepFields.length - 2 ? (
                             <div className="flex   justify-end items-center w-full">
                                 <GetStartedButton title="Next" handleSubmit={handleNext} />
                             </div>
@@ -1709,7 +1614,7 @@ const AiHostSignup = () => {
               </div>
             )} */}
 
-                        {activeStep === stepFields.length - 2 && (
+                        {activeStep === 1 && (
                             <div className="flex justify-end items-center w-full">
                                 <GetStartedButton
                                     title={isRegisterLoading ? "Submitting..." : "Submit"}
@@ -1720,19 +1625,19 @@ const AiHostSignup = () => {
                             </div>
                         )}
 
-                        {/* Go To Home button on 5th step */}
-                        {activeStep === stepFields.length - 1 && (
-                            <div className="flex justify-center items-center w-full">
+                        {activeStep === 2 && (
+                            <div className="flex justify-end items-center w-full">
                                 <GetStartedButton
-                                    title="Go To Home"
+                                    title="Login"
                                     type="button"
                                     handleSubmit={() => {
-                                        navigate("/");
+                                        window.location.href = "https://wonohostfe.vercel.app/";
                                     }}
                                 />
                             </div>
                         )}
 
+                        {/* Go To Home button on 5th step */}
                         {/* {activeStep === stepFields.length - 1 && (
               <GetStartedButton
                 title="Back"
