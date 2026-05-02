@@ -49,7 +49,7 @@ const recommendationCards = [
         highlight: true,
         badgeText: "MOST POPULAR",
         features: [
-            "All features of STARTER plan",
+            "All features of STARTER Plan",
             "Up to 50 users",
             "Advanced analytics",
             "Automation workflows",
@@ -69,7 +69,7 @@ const recommendationCards = [
         ctaText: "Get Started",
         highlight: false,
         features: [
-            "All features of PLUS plan",
+            "All features of PLUS Plan",
             "Unlimited users",
             "Enterprise analytics",
             "Custom workflows",
@@ -89,7 +89,7 @@ const recommendationCards = [
         ctaText: "Get Started",
         highlight: false,
         features: [
-            "All features of PROFESSIONAL plan",
+            "All features of PROFESSIONAL Plan",
             "Unlimited users",
             "Enterprise analytics",
             "Custom workflows",
