@@ -26,12 +26,12 @@ import AiHostPricing from "./AiHostPricing";
 import { HiOutlineArrowLeft } from "react-icons/hi";
 
 const steps = [
-    "Goal",
-    "Personal Info",
-    "Company Info",
-    "Create Website Info",
-    "Services",
-    "Activation",
+    "GOAL",
+    "PERSONAL INFO",
+    "COMPANY INFO",
+    "WEBSITE INFO",
+    "SERVICES",
+    "ACTIVATION",
 ];
 
 const serviceOptions = [
