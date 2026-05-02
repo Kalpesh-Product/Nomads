@@ -359,7 +359,7 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
                                                     }`}
                                             >
                                                 {card.badgeText && (
-                                                    <span className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full bg-primary-blue px-4 py-1 text-[10px] font-bold tracking-[0.12em] text-white sm:px-5 sm:text-[11px] sm:tracking-[0.18em]">
+                                                    <span className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary-blue px-5 py-1 text-[11px] font-bold tracking-[0.18em] text-white">
                                                         {card.badgeText}
                                                     </span>
                                                 )}
@@ -391,13 +391,7 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
                                                             <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#dff5ea] text-[#16b26a]">
                                                                 <FaCheck size={10} />
                                                             </span>
-                                                            <span className={`text-[12.5px] ${[
-                                                                "All features of STARTER plan",
-                                                                "All features of PLUS plan",
-                                                                "All features of PROFESSIONAL plan",
-                                                            ].includes(feature)
-                                                                ? "font-bold text-black"
-                                                                : ""}`}>{feature}</span>
+                                                            <span className="text-sm">{feature}</span>
                                                         </li>
                                                     ))}
                                                 </ul>
