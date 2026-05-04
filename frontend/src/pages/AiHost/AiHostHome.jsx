@@ -200,7 +200,7 @@ const HostHome = () => {
                                 TRANSACTIONAL WEBSITE & MOBILE SITE
                             </p>
                         </ReactFitty>
-                        <p className="text-[clamp(1rem,1.8vw,3rem)] my-4 lg:my-4">
+                        <p className="text-[clamp(1rem,1.5vw,3rem)] my-4 lg:my-4">
                             Free customizable website templates which are strategically
                             tailored for managing Lifestyle Businesses like Co-Working,
                             Co-Living, Hostels, Boutique Properties, Cafes etc
@@ -229,7 +229,10 @@ const HostHome = () => {
                 </Container>
             </section>
             <MySeperator />
-            <div className="flex w-full justify-center lg:justify-center my-16">
+            <div className="flex flex-col items-center w-full justify-center lg:justify-center my-16">
+                <div className="text-[clamp(1rem,3vw,3rem)] my-4 lg:my-4">
+                    Activate Your Modern Nomad Buissness Now.
+                </div>
                 <GetStartedButton
                     title={"Get Started"}
                     handleSubmit={() => navigate("/host/ai-host-signup?step=0")}

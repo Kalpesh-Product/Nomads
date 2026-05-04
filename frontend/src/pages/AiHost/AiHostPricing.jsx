@@ -26,9 +26,10 @@ const recommendationCards = [
     {
         title: "BASIC",
         subtitle: "Everything you need to start, manage, and grow your business at no cost!",
-        price: "FREE",
+        price: "FREE*",
         ctaText: "Get Started",
         highlight: false,
+        note: "* Limited time offer for few months.",
         features: [
             "Static Website (Desktop & Mobile)",
             "Admin Control Panel",
@@ -49,6 +50,7 @@ const recommendationCards = [
         priceSuffix: "/month",
         ctaText: "Get Started",
         highlight: true,
+        note: "Free activation and free for first month.",
         features: [
             "Everything in BASIC +",
             "Transactional Website",
@@ -68,6 +70,7 @@ const recommendationCards = [
         price: "PERSONALISED",
         ctaText: "Get Started",
         highlight: false,
+        note: "Custom activation post testing.",
         features: [
             "Everything in PROFESSIONAL +",
             "Advanced Booking Engine",
@@ -391,6 +394,12 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
                                                 </ul>
 
                                                 <div className="mt-7">
+                                                    {card.note && (
+                                                        <p className="mb-2 text-center text-[10px] text-[#9ca3af]">
+                                                            <hr className="border-[#dfe5ef] mb-2 w-full" />
+                                                            {card.note}
+                                                        </p>
+                                                    )}
                                                     <button
                                                         type="button"
                                                         onClick={() => handleCardClick(card)}
