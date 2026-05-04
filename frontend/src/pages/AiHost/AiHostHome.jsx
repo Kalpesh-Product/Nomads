@@ -220,7 +220,7 @@ const HostHome = () => {
                         </div>
                         <div className="text-center my-4">
                             <NavLink
-                                to={"themes"}
+                                to={"/host/ai-host-themes"}
                                 className={" hover:underline hover:text-primary-blue"}>
                                 View More
                             </NavLink>

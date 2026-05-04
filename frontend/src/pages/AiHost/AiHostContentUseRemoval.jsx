@@ -383,7 +383,7 @@ const AiHostContentUseRemoval = () => {
     return (
         <div className="flex flex-col gap-10 px-6 lg:px-28 pb-4 pt-12 text-[#364D59]">
             {/* Header */}
-            <div className="flex flex-col items-center relative font-comic uppercase font-bold text-secondary-dark text-[clamp(1.5rem,4vw,3rem)] leading-tight">
+            <div className="flex flex-col items-center relative font-comic uppercase font-bold text-secondary-dark text-[clamp(1.5rem,4vw,2.5rem)] leading-tight">
                 <div className="relative inline-block">
                     <h3 className="text-center">Content Use & Removal Policy</h3>
                     <img

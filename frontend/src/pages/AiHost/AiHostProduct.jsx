@@ -11,6 +11,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import GetStartedButton from "../../components/GetStartedButton";
 import { ReactFitty } from "react-fitty";
 import Container from "../../components/Container";
+import { HiOutlineArrowLeft } from "react-icons/hi";
 
 const features = [
     "No Code Website",
@@ -132,6 +133,10 @@ const HostProduct = () => {
     const navigate = useNavigate();
     const [selectedImage, setSelectedImage] = useState(initialImage);
 
+    const onBack = () => {
+        navigate(-1);
+    };
+
     useEffect(() => {
         if (state?.image) {
             setSelectedImage(state.image);
@@ -139,109 +144,119 @@ const HostProduct = () => {
     }, [state]);
 
     return (
-        <div
-            key={location.state?.image?.src || "default"}
-            className="flex flex-col"
-        >
-            <div className="flex flex-col">
-                <section
-                    ref={topRef}
-                    className="w-full bg-black flex flex-col justify-center gap-8 "
-                >
-                    <Container>
-                        <div className="flex flex-wrap gap-10 lg:flex-nowrap lg:gap-60 w-full">
-                            <div className="flex flex-col gap-10 justify-center w-full text-white">
-                                <h1 className="text-hero font-semibold">INCLUSIONS</h1>
-                                <ul className="flex flex-col gap-2 ">
-                                    {features.map((feat) => (
-                                        <li className="flex gap-2 text-content lg:text-subtitle ">
-                                            <span className="text-[#0AA9EF] font-bold">
-                                                ✔&nbsp;&nbsp;
-                                            </span>
-                                            <span>{feat}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                                <GetStartedButton
-                                    handleSubmit={() => navigate("/signup")}
-                                    externalStyles="bg-white text-black lg:w-[70%]"
-                                />
-                            </div>
-                            <div
-                                data-aos="fade-up"
-                                className="w-full overflow-hidden rounded-xl"
-                            >
-                                <img
-                                    className="rounded-xl w-full h-full object-cover"
-                                    src={selectedImage.mockup}
-                                    alt={selectedImage.alt}
-                                />
-                            </div>
-                        </div>
-                    </Container>
-                </section>
-                <section>
-                    <Container>
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-                            <div className="text-hero col-span-1">
-                                <h1>
-                                    Built with confidence — <br />
-                                    The theme store promise
-                                </h1>
-                            </div>
-                            <div className="col-span-2">
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                    {perks.map((perk) => (
-                                        <div className="flex gap-2 items-start">
-                                            <div className="text-content mt-1">{perk.icon}</div>
-                                            <div className="flex flex-col gap-2">
-                                                <h2 className="font-bold">{perk.title}</h2>
-                                                <span className="text-content">{perk.description}</span>
-                                            </div>
-                                        </div>
-                                    ))}
+        <>
+            <button
+                type="button"
+                onClick={onBack}
+                className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
+                aria-label="Go back to search results"
+            >
+                <HiOutlineArrowLeft size={18} />
+            </button>
+            <div
+                key={location.state?.image?.src || "default"}
+                className="flex flex-col"
+            >
+                <div className="flex flex-col">
+                    <section
+                        ref={topRef}
+                        className="w-full flex flex-col justify-center gap-8 "
+                    >
+                        <Container>
+                            <div className="flex flex-wrap gap-10 lg:flex-nowrap lg:gap-60 w-full">
+                                <div className="flex flex-col gap-10 justify-center w-full text-black">
+                                    <h1 className="text-hero font-semibold">INCLUSIONS</h1>
+                                    <ul className="flex flex-col gap-2 ">
+                                        {features.map((feat) => (
+                                            <li className="flex gap-2 text-content lg:text-subtitle ">
+                                                <span className="text-[#0AA9EF] font-bold">
+                                                    ✔&nbsp;&nbsp;
+                                                </span>
+                                                <span>{feat}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                    <GetStartedButton
+                                        handleSubmit={() => navigate("/host/ai-host-signup?step=0")}
+                                        externalStyles="bg-white text-black lg:w-[70%]"
+                                    />
+                                </div>
+                                <div
+                                    data-aos="fade-up"
+                                    className="w-full overflow-hidden rounded-xl"
+                                >
+                                    <img
+                                        className="block rounded-xl w-[1280px] h-[320px] object-contain"
+                                        src={selectedImage.mockup}
+                                        alt={selectedImage.alt}
+                                    />
                                 </div>
                             </div>
-                        </div>
-                    </Container>
-                </section>
-                <section className="bg-[#E9F9FF]">
-                    <Container>
-                        <div className="w-full  flex flex-col justify-center items-center gap-8">
-                            <ReactFitty>Few more suggestions for you</ReactFitty>
-
-                            <div className="grid grid-cols-1 lg:grid-cols-2 justify-between gap-8">
-                                {themes
-                                    .filter((theme) => theme.tag === selectedImage.tag)
-                                    .map((theme) => (
-                                        <div
-                                            className="w-full h-full overflow-hidden rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.5)] cursor-pointer"
-                                            onClick={() => {
-                                                setSelectedImage(theme); // update hero image
-
-                                                // Scroll the hero section into view
-                                                if (topRef.current) {
-                                                    topRef.current.scrollIntoView({
-                                                        behavior: "auto", // or "auto" if you want instant jump
-                                                        block: "start",
-                                                    });
-                                                }
-                                            }}
-                                        >
-                                            <img
-                                                src={theme.src}
-                                                alt={theme.alt}
-                                                className="w-full h-full object-cover hover:scale-[1.2] transition-transform duration-500 ease"
-                                            />
-                                        </div>
-                                    ))}
+                        </Container>
+                    </section>
+                    <section>
+                        <Container>
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                                <div className="text-hero col-span-1">
+                                    <h1>
+                                        Built with confidence — <br />
+                                        The theme store promise
+                                    </h1>
+                                </div>
+                                <div className="col-span-2">
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                        {perks.map((perk) => (
+                                            <div className="flex gap-2 items-start">
+                                                <div className="text-content mt-1">{perk.icon}</div>
+                                                <div className="flex flex-col gap-2">
+                                                    <h2 className="font-bold">{perk.title}</h2>
+                                                    <span className="text-content">{perk.description}</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
                             </div>
-                            <GetStartedButton handleSubmit={() => navigate("/host/ai-host-signup?step=0")} />
-                        </div>
-                    </Container>
-                </section>
+                        </Container>
+                    </section>
+                    <section>
+                        <Container>
+                            <div className="w-full  flex flex-col justify-center items-center gap-8">
+                                <ReactFitty>Few more suggestions for you</ReactFitty>
+
+                                <div className="grid grid-cols-1 lg:grid-cols-2 justify-between gap-8">
+                                    {themes
+                                        .filter((theme) => theme.tag === selectedImage.tag)
+                                        .map((theme) => (
+                                            <div
+                                                className="w-full h-full overflow-hidden rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.5)] cursor-pointer"
+                                                onClick={() => {
+                                                    setSelectedImage(theme); // update hero image
+
+                                                    // Scroll the hero section into view
+                                                    if (topRef.current) {
+                                                        topRef.current.scrollIntoView({
+                                                            behavior: "auto", // or "auto" if you want instant jump
+                                                            block: "start",
+                                                        });
+                                                    }
+                                                }}
+                                            >
+                                                <img
+                                                    src={theme.src}
+                                                    alt={theme.alt}
+                                                    className="w-full h-full object-cover hover:scale-[1.2] transition-transform duration-500 ease"
+                                                />
+                                            </div>
+                                        ))}
+                                </div>
+                                <GetStartedButton handleSubmit={() => navigate("/host/ai-host-signup?step=0")} />
+                            </div>
+                        </Container>
+                    </section>
+                </div>
             </div>
-        </div>
+        </>
     );
 };
 

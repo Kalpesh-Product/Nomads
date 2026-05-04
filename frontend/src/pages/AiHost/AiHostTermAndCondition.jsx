@@ -224,7 +224,7 @@ const AiHostTermsAndCondition = () => {
                             </a>
                             <span
                                 className="text-primary-blue cursor-pointer"
-                                onClick={() => navigate("/contact")}
+                                onClick={() => navigate("/host/ai-host-contact")}
                             >
                                 Contact us
                             </span>

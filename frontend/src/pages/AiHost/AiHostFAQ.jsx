@@ -123,7 +123,7 @@ const faqs = [
 const AiHostFAQ = () => {
     return (
         <div className="flex flex-col gap-10 px-6 lg:px-28 pb-4 pt-12 text-[#364D59]">
-            <div className="flex flex-col items-center relative font-comic uppercase font-bold text-secondary-dark text-[clamp(1.5rem,4vw,3rem)] leading-tight">
+            <div className="flex flex-col items-center relative font-comic uppercase font-bold text-secondary-dark text-[clamp(1.5rem,4vw,2.5rem)] leading-tight">
                 <h3 className="text-center">Frequently Asked Questions (FAQ)</h3>
                 <img
                     src={blueUnderline}
@@ -149,7 +149,7 @@ const AiHostFAQ = () => {
                     Can’t find the answer to your question? Connect with us via our{" "}
                     <Link
                         className="text-primary-blue text-decoration-none"
-                        to="/contact"
+                        to="/host/ai-host-contact"
                     >
                         Contact us
                     </Link>{" "}

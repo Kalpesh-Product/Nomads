@@ -51,7 +51,6 @@ const Career = () => {
 
     return (
         <>
-            <AiHome />
             <Container>
 
                 <div className="py-0 sm:py-12">
