@@ -121,7 +121,7 @@ const Leads = () => {
 
       {/* Our Core focus section */}
       <Container padding={false}>
-        <div className="pt-6 sm:pt-16 pb-8">
+        <div className="pt-6 sm:pt-16 pb-12">
           <div className="pb-6 sm:pb-16">
             <h2 className="lg:text-[2.75rem] md:text-[2.75rem] sm:text-[1.75rem] xs:text-[1.75rem] lg:leading-[3.5rem] xs:leading-9 font-semibold text-host">
               Our core focus is to generate ORGANIC LEADS!
@@ -175,9 +175,12 @@ const Leads = () => {
         </div>
       </Container>
 
+      <div className="flex items-center justify-center h-0">
+        <hr className="w-full h-0 m-0 border-t  border-gray-400" />
+      </div>
       {/* Automated Google Leads Section */}
       <Container padding={false}>
-        <div className="pt-16 pb-8">
+        <div className="pt-10 pb-12">
           <div className="pb-6">
             <h2 className="lg:text-[2.75rem] md:text-[2.75rem] sm:text-[1.75rem] xs:text-[1.75rem] lg:leading-[3.5rem] md:leading-9 sm:leading-9 xs:leading-9 font-semibold text-host">
               Automated Google LEAD SHEET!
@@ -196,9 +199,13 @@ const Leads = () => {
         </div>
       </Container>
 
+      <div className="flex items-center justify-center h-0">
+        <hr className="w-full h-0 m-0 border-t  border-gray-400" />
+      </div>
+
       {/* Run & Scale Grid Section */}
       <Container padding={false}>
-        <div className="pt-16 pb-8">
+        <div className="pt-8 pb-8">
           <ReactFitty className="text-host">
             RUN & SCALE YOUR BUSINESS
           </ReactFitty>
@@ -230,7 +237,7 @@ const Leads = () => {
       </Container>
 
       <div className="flex items-center justify-center h-0">
-        <hr className="w-[80%] h-0 m-0 border-t  border-gray-400" />
+        <hr className="w-full h-0 m-0 border-t  border-gray-400" />
       </div>
 
       {/* Get better ROI Section */}
@@ -255,7 +262,7 @@ const Leads = () => {
       </Container>
 
       <div className="flex items-center justify-center h-0">
-        <hr className="w-[80%] h-0 m-0 border-t  border-gray-400" />
+        <hr className="w-full h-0 m-0 border-t  border-gray-400" />
       </div>
 
       {/* Get a Complete View Section */}
@@ -279,7 +286,7 @@ const Leads = () => {
       </Container>
 
       <div className="flex items-center justify-center h-0">
-        <hr className="w-[80%] h-0 m-0 border-t  border-gray-400" />
+        <hr className="w-full h-0 m-0 border-t  border-gray-400" />
       </div>
 
       {/* The finer points Section */}

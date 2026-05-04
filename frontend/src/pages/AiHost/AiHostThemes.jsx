@@ -143,7 +143,7 @@ const Themes = () => {
                     )} */}
       </div>
       <Container padding={false}>
-        <section className="flex flex-col items-end justify-center gap-4 leading-[1.3] text-secondary-dark lg:pt-16 pt-10">
+        <section className="flex flex-col items-end justify-center gap-4 leading-[1.3] text-secondary-dark lg:pt-16 pt-10 pb-16">
           <h1 className="text-[clamp(1.62rem,4.0vw,4.5rem)] font-medium">
             Choose the best Responsive Website Theme for your business
           </h1>
@@ -153,10 +153,10 @@ const Themes = () => {
           />
         </section>
       </Container>
-
+      <MySeperator />
       {/*Top Recommendations */}
-      <section className="w-full bg-white lg:flex lg:flex-col justify-center items-center gap-8">
-        <Container padding={false}>
+      <section className="w-full bg-white lg:flex lg:flex-col justify-center items-center gap-8 ">
+        <Container >
           <div className="space-y-12">
             <div>
               <h1 className="text-[clamp(2rem,2.5vw,5rem)] font-medium pb-2">
@@ -196,7 +196,7 @@ const Themes = () => {
           </div>
         </Container>
       </section>
-
+      <MySeperator />
       {/*Customize */}
       <section>
         <Container>

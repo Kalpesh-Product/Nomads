@@ -45,12 +45,12 @@ const recommendationCards = [
     {
         title: "PROFESSIONAL",
         subtitle: "Your ambitions and goals to scale from a small business to a GROWING COMPANY!",
-        price: "$99",
+        price: "$199",
         priceSuffix: "/month",
         ctaText: "Get Started",
         highlight: true,
         features: [
-            "Everything in BASIC, Plus:",
+            "Everything in BASIC +",
             "Transactional Website",
             "Payment Gateway",
             "Advanced Sales Module",
@@ -69,7 +69,7 @@ const recommendationCards = [
         ctaText: "Get Started",
         highlight: false,
         features: [
-            "Everything in PROFESSIONAL, Plus:",
+            "Everything in PROFESSIONAL +",
             "Advanced Booking Engine",
             "Custom Native Applications",
             "End-to-End Finance Suite",

@@ -285,7 +285,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         params.set("tab", item.tab);
 
         navigate({
-            pathname: "/ai-profile",
+            pathname: "/host/ai-host-profile",
             search: params.toString() ? `?${params.toString()}` : "",
         });
     };
