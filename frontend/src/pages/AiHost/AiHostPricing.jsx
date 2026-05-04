@@ -25,18 +25,19 @@ const getSearchPathForGoal = (goalTitle) => {
 const recommendationCards = [
     {
         title: "BASIC",
-        subtitle: "Perfect to run your small business effortlessly and nothing else will be ever required.",
+        subtitle: "Everything you need to start, manage, and grow your business at no cost!",
         price: "FREE",
         ctaText: "Get Started",
         highlight: false,
         features: [
-            "Static Website (Desktop + Mobile)",
-            "Automated Lead Generation",
-            "Lead Management System",
-            "Visitor Management",
-            "AI Chat Assistant",
-            "Secure Storage",
-            "Customer Support",
+            "Static Website (Desktop & Mobile)",
+            "Admin Control Panel",
+            "Automated Lead Capture",
+            "Smart Lead Management",
+            "Visitor Tracking System",
+            "Built-in AI Chat",
+            "Cloud Storage",
+            "Dedicated Support",
             "Up to 2 Users",
         ],
         path: "/host/ai-host-signup",
@@ -45,7 +46,7 @@ const recommendationCards = [
         title: "PROFESSIONAL",
         subtitle: "Your ambitions and goals to scale from a small business to a GROWING COMPANY!",
         price: "$99",
-        priceSuffix: "/MONTH",
+        priceSuffix: "/month",
         ctaText: "Get Started",
         highlight: true,
         features: [
@@ -53,7 +54,6 @@ const recommendationCards = [
             "Transactional Website",
             "Payment Gateway",
             "Advanced Sales Module",
-            "Admin Control Panel",
             "Meeting Room Booking System",
             "Visitor Management",
             "Integrated Ticketing System",
@@ -73,7 +73,7 @@ const recommendationCards = [
             "Advanced Booking Engine",
             "Custom Native Applications",
             "End-to-End Finance Suite",
-            "Human Resource Management System (HRMS)",
+            "HR Management System (HRMS)",
             "IT Infrastructure Module",
             "Maintenance Management Module",
             "AI-Driven Lead Generation",
@@ -281,7 +281,7 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
                                     {typedSubheading}
                                 </h2>
 
-                                <p className="mt-6 text-sm sm:text-lg font-medium text-primary-blue font-play">
+                                <p className="mt-2 mb-10 text-sm sm:text-lg font-medium text-primary-blue font-play">
                                     {typedFourthLine}
                                 </p>
                             </>

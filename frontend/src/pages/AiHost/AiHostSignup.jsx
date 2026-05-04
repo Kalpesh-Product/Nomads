@@ -92,6 +92,7 @@ const AiHostSignup = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const onBack = () => navigate("/host");
+    const hostRedirectUrl = "https://wonohostfe.vercel.app/";
 
     const initialStep = Math.max(
         0,
@@ -152,6 +153,16 @@ const AiHostSignup = () => {
     useEffect(() => {
         setValue("Goals", selectedPlan);
     }, [selectedPlan, setValue]);
+
+    useEffect(() => {
+        if (activeStep !== 2) return undefined;
+
+        const redirectTimer = window.setTimeout(() => {
+            window.location.href = hostRedirectUrl;
+        }, 10000);
+
+        return () => window.clearTimeout(redirectTimer);
+    }, [activeStep]);
     const selectedCountryName = watch("country");
     const selectedCountry = useMemo(
         () => countries.find((country) => country.name === selectedCountryName) || null,
@@ -1320,6 +1331,8 @@ const AiHostSignup = () => {
                                     Please let us know if there is any more queries from your
                                     side, or you can contact us at : {"response@wono.co"}
                                 </p>
+                                <br />
+                                <p>You will be redirected automatically in 10 seconds.</p>
                             </div>
                             <div className="flex items-center gap-6">
                                 <div className="flex items-center gap-2">
@@ -1364,17 +1377,19 @@ const AiHostSignup = () => {
     };
 
     return (
-        <div className="h-full flex flex-col justify-start gap-5 p-4 lg:p-10 items-center w-full">
-            <div className="flex justify-start w-full">
-                <button
-                    type="button"
-                    onClick={onBack}
-                    className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
-                    aria-label="Go back to search results"
-                >
-                    <HiOutlineArrowLeft size={18} />
-                </button>
-            </div>
+        <div className="h-full flex flex-col justify-start p-4 lg:p-10 items-center w-full">
+            {activeStep !== 2 && (
+                <div className="flex justify-start w-full">
+                    <button
+                        type="button"
+                        onClick={onBack}
+                        className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
+                        aria-label="Go back to search results"
+                    >
+                        <HiOutlineArrowLeft size={18} />
+                    </button>
+                </div>
+            )}
             <Stepper
                 className="w-full p-0"
                 connectorStateColors={true}
@@ -1569,14 +1584,17 @@ const AiHostSignup = () => {
                     })}
                 >
                     {renderStepFields()}
-                    <div className="col-span-1 lg:col-span-2 flex justify-between items-center">
+                    <div
+                        className={`col-span-1 lg:col-span-2 flex items-center ${activeStep === 2 ? "justify-center" : "justify-between"
+                            }`}
+                    >
                         {/* {activeStep > 0 && (
               <GetStartedButton
                 title="Back"
                 handleSubmit={() => setActiveStep((prev) => prev - 1)}
               />
             )} */}
-                        {activeStep > 0 && (
+                        {activeStep > 0 && activeStep !== 2 && (
                             <GetStartedButton
                                 title="Back"
                                 handleSubmit={() => setActiveStep((prev) => prev - 1)}
@@ -1626,12 +1644,12 @@ const AiHostSignup = () => {
                         )}
 
                         {activeStep === 2 && (
-                            <div className="flex justify-end items-center w-full">
+                            <div className="flex justify-center items-center w-full">
                                 <GetStartedButton
                                     title="Login"
                                     type="button"
                                     handleSubmit={() => {
-                                        window.location.href = "https://wonohostfe.vercel.app/";
+                                        window.location.href = hostRedirectUrl;
                                     }}
                                 />
                             </div>

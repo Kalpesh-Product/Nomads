@@ -47,59 +47,74 @@ const getSearchPathForGoal = (goalLabel) => {
     return goalSlug ? `/search/${goalSlug}/results` : "/search/results";
 };
 
+const hostSignupEntryPath = "/host/ai-host-signup?step=0";
+
 const recommendationItems = [
     {
-        label: "Website Builder",
+        label: "Build & Manage Website",
         icon: TbAward,
         path: "/host/ai-host-website-builder",
     },
     {
-        label: "Sales",
+        label: "Sales Management",
         icon: FaGlobeAmericas,
         path: "/host/ai-host-modules",
     },
     {
-        label: "Finance",
+        label: "Finance Suite",
         icon: HiOutlineCurrencyDollar,
         path: "/host/ai-host-themes",
     },
     {
-        label: "Administration",
+        label: "Operations Module",
         icon: MdOutlineWorkHistory,
         path: "/host/ai-host-leads",
     },
     {
-        label: "Human Resource",
+        label: "HR Management System",
         icon: RiUserCommunityLine,
         path: "/host/ai-host-career",
     },
     {
-        label: "IT",
+        label: "IT Infrastructure Module",
         icon: RiUserCommunityLine,
         path: "/host/ai-host-calendar",
     },
     {
-        label: "Maintenance",
+        label: "Maintenance Module",
         icon: HiOutlineCurrencyDollar,
         suffixText: "...More",
     },
 ];
 
 const valueAdditionItems = [
-    { label: "Meetings", icon: LuMapPinned, path: "/host/extra-common-modules" },
     {
-        label: "Visitors",
+        label: "AI Apps - Automation",
+        icon: LuCircleDollarSign,
+        path: "/host/extra-common-modules",
+    },
+    {
+        label: "Meeting Room System",
+        icon: LuMapPinned,
+        path: "/host/extra-common-modules",
+    },
+    {
+        label: "Visitor Management",
         icon: HiOutlineKey,
         path: "/host/assets",
     },
     {
-        label: "Tickets",
+        label: "Ticketing System",
         icon: HiOutlineCog,
         path: "/host/inventory",
     },
-    { label: "Calendar", icon: LuCircleDollarSign, path: "/host/finance-management" },
     {
-        label: "Chat",
+        label: "Smart Calendar",
+        icon: LuCircleDollarSign,
+        path: "/host/finance-management",
+    },
+    {
+        label: "Chat Bot",
         icon: LuCircleDollarSign,
         suffixText: "...More",
     },
@@ -115,9 +130,7 @@ const loggedOutPrompt = {
 };
 
 const profileItems = [
-    { label: "userFullName", icon: HiOutlineUserCircle, tab: "profile" },
-    // { label: "Favorites", icon: HiOutlineHeart, tab: "favorites" },
-    // { label: "Reviews", icon: LuCircleDollarSign, tab: "reviews" },
+    { label: "Edit Profile", icon: HiOutlineUserCircle, tab: "profile" },
     { label: "Change Password", icon: HiOutlineKey, tab: "password" },
 ];
 
@@ -196,7 +209,7 @@ const SidebarSection = ({
                                             </span>
                                             {item.suffixText && (
                                                 <span className="ml-auto text-[12px] font-medium tracking-wide text-black/55">
-                                                    <button onClick={() => navigate("/host/ai-host-signup?step=0")} className="hover:text-primary-blue">{item.suffixText}</button>
+                                                    <button onClick={() => navigate(hostSignupEntryPath)} className="hover:text-primary-blue">{item.suffixText}</button>
                                                 </span>
                                             )}
                                         </>
@@ -229,13 +242,6 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
     const { auth } = useAuth();
     const logout = useLogout();
-    const userFullName =
-        auth?.user?.fullName?.trim() || "Profile";
-
-    const profileItemsWithUserName = profileItems.map((item) =>
-        item.label === "userFullName" ? { ...item, label: userFullName } : item,
-    );
-
     useEffect(() => {
         const normalizedPath = location.pathname.replace(/\/$/, "") || "/";
         const isAiHomePage = normalizedPath === "/home";
@@ -265,50 +271,11 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     console.log(isLoggedIn);
 
     const handleRecommendationClick = (item) => {
-        if (!item.path) return;
-
-        const params = new URLSearchParams(location.search);
-        const targetSearch = params.toString() ? `?${params.toString()}` : "";
-        const targetRoute = `${item.path || "/search/results"}${targetSearch}`;
-
-        if (!isLoggedIn && gatedRecommendationLabels.has(item.label)) {
-            const goalSlug = goalSlugByLabel[item.label];
-            const loginPath = goalSlug ? `/ai-login/${goalSlug}` : "/ai-login";
-
-            navigate(`${loginPath}${location.search}`, {
-                state: {
-                    loginContext: {
-                        title: item.label,
-                        description: item.description || "",
-                    },
-                    redirectTo: targetRoute,
-                },
-            });
-            return;
-        }
-
-        navigate(
-            {
-                pathname: item.path || "/search/results",
-                search: targetSearch,
-            },
-            {
-                state:
-                    item.path?.includes("/search") && item.path?.includes("/results")
-                        ? { selectedGoal: item.label }
-                        : undefined,
-            },
-        );
+        navigate(hostSignupEntryPath);
     };
 
     const handleValueAdditionClick = (item) => {
-        if (!item.path) return;
-
-        const params = new URLSearchParams(location.search);
-        navigate({
-            pathname: item.path,
-            search: params.toString() ? `?${params.toString()}` : "",
-        });
+        navigate(hostSignupEntryPath);
     };
 
     const handleProfileClick = (item) => {
@@ -494,7 +461,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                 <>
                     <SidebarSection
                         title="Profile"
-                        items={profileItemsWithUserName}
+                        items={profileItems}
                         collapsed={isCollapsed}
                         isExpandable
                         isOpen={isProfileOpen}
@@ -509,13 +476,13 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                         onItemClick={handleBecomeContributorClick}
                         compact={true}
                     /> */}
-                    <div className="mx-4 border-t border-black/10"></div>
+                    {/* <div className="mx-4 border-t border-black/10"></div>
                     <SidebarSection
                         items={becomeHostItem}
                         collapsed={isCollapsed}
                         onItemClick={handleBecomeHostClick}
                         compact={true}
-                    />
+                    /> */}
                     <div className="mx-4 border-t border-black/10"></div>
                     <SidebarSection
                         items={signOutItem}
@@ -534,13 +501,13 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                         onItemClick={handleBecomeContributorClick}
                         compact={true}
                     />
-                    <div className="mx-4 border-t border-black/10"></div>
+                    {/* <div className="mx-4 border-t border-black/10"></div>
                     <SidebarSection
                         items={becomeHostItem}
                         collapsed={isCollapsed}
                         onItemClick={handleBecomeHostClick}
                         compact={true}
-                    />
+                    /> */}
                     {/* <div className="border-t border-black/10 mt-4 mx-4"></div> */}
                     <div className="border-t border-black/10 mx-4"></div>
                     {!isCollapsed && (
