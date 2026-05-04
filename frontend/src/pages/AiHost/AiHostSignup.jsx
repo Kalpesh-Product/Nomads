@@ -28,7 +28,6 @@ import { HiOutlineArrowLeft } from "react-icons/hi";
 const steps = [
     "GOAL",
     "BASIC DETAILS",
-    "ACTIVATION",
 ];
 
 const serviceOptions = [
@@ -92,10 +91,11 @@ const AiHostSignup = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const onBack = () => navigate("/host");
+    const hostRedirectUrl = "https://wonohostfe.vercel.app/";
 
     const initialStep = Math.max(
         0,
-        Math.min(2, Number(new URLSearchParams(location.search).get("step")) || 0),
+        Math.min(1, Number(new URLSearchParams(location.search).get("step")) || 0),
     );
     const [activeStep, setActiveStep] = useState(initialStep);
     const selectedPlanFromQuery = normalizePlanFromQuery(
@@ -152,6 +152,7 @@ const AiHostSignup = () => {
     useEffect(() => {
         setValue("Goals", selectedPlan);
     }, [selectedPlan, setValue]);
+
     const selectedCountryName = watch("country");
     const selectedCountry = useMemo(
         () => countries.find((country) => country.name === selectedCountryName) || null,
@@ -236,8 +237,9 @@ const AiHostSignup = () => {
                     ? data.message
                     : data.message?.message || "Form submitted successfully",
             );
-
-            setActiveStep(2);
+            window.setTimeout(() => {
+                window.location.href = hostRedirectUrl;
+            }, 1500);
         },
         // onError: (error) => {
         //   // toast.error(error.response?.data?.message || "Something went wrong");
@@ -430,6 +432,29 @@ const AiHostSignup = () => {
                             )}
                         />
                         <Controller
+                            name="role"
+                            control={control}
+                            rules={{ required: "Role is required" }}
+                            render={({ field, fieldState }) => (
+                                <TextField
+                                    {...field}
+                                    select
+                                    label="Select Role"
+                                    fullWidth
+                                    margin="normal"
+                                    variant="standard"
+                                    error={!!fieldState.error}
+                                    helperText={fieldState.error?.message}
+                                    value={field.value}
+                                    InputLabelProps={{ sx: floatingLabelSx }}
+                                >
+                                    <MenuItem value="Founder">Founder</MenuItem>
+                                    <MenuItem value="Manager">Manager</MenuItem>
+                                    <MenuItem value="Other">Other</MenuItem>
+                                </TextField>
+                            )}
+                        />
+                        <Controller
                             name="country"
                             control={control}
                             rules={{ required: "Country is required" }}
@@ -584,31 +609,6 @@ const AiHostSignup = () => {
                                 />
                             )}
                         />
-                        <Controller
-                            name="role"
-                            control={control}
-                            rules={{ required: "Role is required" }}
-                            render={({ field, fieldState }) => (
-                                <TextField
-                                    {...field}
-                                    select
-                                    label="Select Role"
-                                    fullWidth
-                                    margin="normal"
-                                    variant="standard"
-                                    error={!!fieldState.error}
-                                    helperText={fieldState.error?.message}
-                                    value={field.value}
-                                    InputLabelProps={{ sx: floatingLabelSx }}
-                                >
-                                    <MenuItem value="Owner">Owner</MenuItem>
-                                    <MenuItem value="Executive">Executive</MenuItem>
-                                    <MenuItem value="Manager">Manager</MenuItem>
-                                    <MenuItem value="Employee">Employee</MenuItem>
-                                    <MenuItem value="Other">Other</MenuItem>
-                                </TextField>
-                            )}
-                        />
 
                         <Controller
                             name="state"
@@ -698,25 +698,6 @@ const AiHostSignup = () => {
                             }}
                         />
                     </>
-                );
-
-            case 2:
-                return (
-                    <div className="flex flex-col gap-4 col-span-1 lg:col-span-2 py-6">
-                        <h1 className="text-title text-center">Registration Received</h1>
-                        <div className="space-y-5 text-center max-w-3xl mx-auto">
-                            <p>
-                                Thank you for registering with Wono Host.
-                            </p>
-                            <p>
-                                Your selected plan has been received and our team will review
-                                your details shortly.
-                            </p>
-                            <p>
-                                Please log in to continue the next stage of your setup.
-                            </p>
-                        </div>
-                    </div>
                 );
 
             case 3:
@@ -1320,6 +1301,8 @@ const AiHostSignup = () => {
                                     Please let us know if there is any more queries from your
                                     side, or you can contact us at : {"response@wono.co"}
                                 </p>
+                                <br />
+                                <p>You will be redirected automatically in 10 seconds.</p>
                             </div>
                             <div className="flex items-center gap-6">
                                 <div className="flex items-center gap-2">
@@ -1364,7 +1347,7 @@ const AiHostSignup = () => {
     };
 
     return (
-        <div className="h-full flex flex-col justify-start gap-5 p-4 lg:p-10 items-center w-full">
+        <div className="h-full flex flex-col justify-start p-4 lg:p-10 items-center w-full">
             <div className="flex justify-start w-full">
                 <button
                     type="button"
@@ -1415,7 +1398,7 @@ const AiHostSignup = () => {
                 {activeStep !== 3 && (
                     <h1 className="text-title text-center">
                         {activeStep === 0 && "Select Your Plan"}
-                        {activeStep === 1 && "Let's set up your free account"}
+                        {activeStep === 1 && "Your Goal is Set... Let's Get You Activated"}
                         {/* {activeStep === 2 && "Add your company details"}
                         {activeStep === 3 && "Add Your Website Content"} */}
                         {/* {activeStep === 4 && "Activate your account"} */}
@@ -1621,18 +1604,6 @@ const AiHostSignup = () => {
                                     type="submit"
                                     disabled={isRegisterLoading}
                                     isLoading={isRegisterLoading}
-                                />
-                            </div>
-                        )}
-
-                        {activeStep === 2 && (
-                            <div className="flex justify-end items-center w-full">
-                                <GetStartedButton
-                                    title="Login"
-                                    type="button"
-                                    handleSubmit={() => {
-                                        window.location.href = "https://wonohostfe.vercel.app/";
-                                    }}
                                 />
                             </div>
                         )}

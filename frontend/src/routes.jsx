@@ -90,12 +90,21 @@ import AiResetPassword from "./pages/AiResetPassword";
 // hosts Ai subroutes
 import AiHostLayout from "./pages/AiHost/AiHostLayout";
 import AiHostHome from "./pages/AiHost/AiHostHome";
+import AiHostProfile from "./pages/AiHost/AiHostProfile";
+import AiHostResetPassword from "./pages/AiHost/AiHostResetPassword";
 import AiHostModules from "./pages/AiHost/AiHostModules";
 import AiHostThemes from "./pages/AiHost/AiHostThemes";
 import AiHostLeads from "./pages/AiHost/AiHostLeads";
 import AiHostCareer from "./pages/AiHost/AiHostCareer";
+import AiHostAbout from "./pages/AiHost/AiHostAbout";
+import AiHostPrivacy from "./pages/AiHost/AiHostPrivacy";
+import AiHostTermsAndCondition from "./pages/AiHost/AiHostTermAndCondition";
+import AiHostFAQ from "./pages/AiHost/AiHostFAQ";
 import AiHostSignup from "./pages/AiHost/AiHostSignup";
 import AiHostProduct from "./pages/AiHost/AiHostProduct";
+import AiHostContact from "./pages/AiHost/AiHostContact";
+import AiHostContentAndCopyright from "./pages/AiHost/AiHostContentAndCopyright";
+import AiHostContentUseRemoval from "./pages/AiHost/AiHostContentUseRemoval";
 
 function getTenantFromHost() {
   const hostname = window.location.hostname; // e.g. "nomad.wono.co" or "nomad.localhost"
@@ -265,12 +274,21 @@ if (tenant === "main") {
           path: "/host",
           children: [
             { path: "", element: <AiHostHome /> },
+            { path: "ai-host-profile", element: <AiHostProfile /> },
+            { path: "ai-host-reset-password/:token", element: <AiHostResetPassword /> },
             { path: "ai-host-signup", element: <AiHostSignup /> },
             { path: "ai-host-product", element: <AiHostProduct /> },
             { path: "ai-host-modules", element: <AiHostModules /> },
             { path: "ai-host-themes", element: <AiHostThemes /> },
             { path: "ai-host-leads", element: <AiHostLeads /> },
             { path: "ai-host-career", element: <AiHostCareer /> },
+            { path: "ai-host-about", element: <AiHostAbout /> },
+            { path: "ai-host-privacy", element: <AiHostPrivacy /> },
+            { path: "ai-host-terms-and-conditions", element: <AiHostTermsAndCondition /> },
+            { path: "ai-host-faq", element: <AiHostFAQ /> },
+            { path: "ai-host-contact", element: <AiHostContact /> },
+            { path: "ai-host-content-and-copyright", element: <AiHostContentAndCopyright /> },
+            { path: "ai-host-content-use-removal", element: <AiHostContentUseRemoval /> },
           ]
         },
       ],

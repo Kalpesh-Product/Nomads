@@ -200,7 +200,7 @@ const HostHome = () => {
                                 TRANSACTIONAL WEBSITE & MOBILE SITE
                             </p>
                         </ReactFitty>
-                        <p className="text-[clamp(1rem,1.8vw,3rem)] my-4 lg:my-4">
+                        <p className="text-[clamp(1rem,1.5vw,3rem)] my-4 lg:my-4">
                             Free customizable website templates which are strategically
                             tailored for managing Lifestyle Businesses like Co-Working,
                             Co-Living, Hostels, Boutique Properties, Cafes etc
@@ -220,7 +220,7 @@ const HostHome = () => {
                         </div>
                         <div className="text-center my-4">
                             <NavLink
-                                to={"themes"}
+                                to={"/host/ai-host-themes"}
                                 className={" hover:underline hover:text-primary-blue"}>
                                 View More
                             </NavLink>
@@ -228,60 +228,11 @@ const HostHome = () => {
                     </div>
                 </Container>
             </section>
-
-            <section>
-                <Container>
-                    <div className="flex flex-col gap-10">
-                        <h1 className="text-title lg:text-[4.3rem] uppercase text-center font-semibold lg:font-medium">
-                            TESTIMONIAL
-                        </h1>
-                        <div className="flex flex-col gap-4 lg:gap-10 md:flex-row justify-between w-full items-stretch">
-                            {/* Left Section */}
-                            <div className="flex flex-col justify-between h-full lg:h-[26rem] w-full lg:w-[90%]">
-                                <div className="w-full lg:w-[80%]">
-                                    {/* MOBILE & TABLET VERSION: Small text with bottom padding, hidden on Desktop */}
-                                    <p className="block lg:hidden text-sm pb-8 font-medium text-[#212529] leading-normal">
-                                        “We went from managing 3,000 sq ft to 50,000+ sq ft in the
-                                        most efficient and seamless manner with tech, processes,
-                                        data analytics, customer & employee management and due to an
-                                        extraordinary extended team like WoNo which integrated with
-                                        us and had no demands!”
-                                    </p>
-
-                                    {/* DESKTOP VERSION: Original style, hidden on Mobile & Tablet */}
-                                    <p className="hidden lg:block text-card-title font-medium text-[#212529] leading-normal">
-                                        “We went from managing 3,000 sq ft to 50,000+ sq ft in the
-                                        most efficient and seamless manner with tech, processes,
-                                        data analytics, customer & employee management and due to an
-                                        extraordinary extended team like WoNo which integrated with
-                                        us and had no demands!”
-                                    </p>
-                                </div>
-                                <div>
-                                    <h4
-                                        className="my-4"
-                                        style={{ fontFamily: "Amsterdam", fontSize: "2rem" }}>
-                                        Kashif Shaikh
-                                    </h4>
-                                    <p className="m-0">Co-Founder & COO</p>
-                                    <p>BIZ Nest, Goa India </p>
-                                </div>
-                            </div>
-
-                            {/* Right Section */}
-                            <div className="h-[26rem] w-full lg:w-1/2 overflow-hidden rounded-xl">
-                                <img
-                                    src="/hosts/themes/Kashif_Edit.png"
-                                    alt="owner-image"
-                                    className="h-full w-full object-cover object-center"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </Container>
-            </section>
             <MySeperator />
-            <div className="flex w-full justify-center lg:justify-center my-16">
+            <div className="flex flex-col items-center w-full justify-center lg:justify-center my-16">
+                <div className="text-[clamp(1rem,3vw,3rem)] my-4 lg:my-4">
+                    Activate Your Modern Nomad Buissness Now.
+                </div>
                 <GetStartedButton
                     title={"Get Started"}
                     handleSubmit={() => navigate("/host/ai-host-signup?step=0")}

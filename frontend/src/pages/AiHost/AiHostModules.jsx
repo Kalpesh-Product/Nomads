@@ -56,7 +56,6 @@ export default function Modules() {
     const onBack = () => navigate("/host");
     return (
         <>
-            <Container>
                 <div className="flex min-w-[11rem] items-center gap-3">
                     <button
                         type="button"
@@ -73,6 +72,7 @@ export default function Modules() {
           </span>
         )} */}
                 </div>
+            <Container>
                 <div className="flex flex-col gap-8 w-full">
                     <div className="flex flex-col gap-8">
                         <div className="text-center">
@@ -84,7 +84,7 @@ export default function Modules() {
                             </div>
                         </div>
                         <div>
-                            <h4 className="text-lg lg:text-[1.45rem] lg:leading-[2.75rem] text-start md:text-center lg:text-start ">
+                            <h4 className="text-lg lg:text-[1.45rem] lg:leading-[2.75rem] text-start md:text-center lg:text-center xl:text-center 2xl:text-start text-secondary-dark">
                                 No Code Website <span className="text-primary-blue"></span>
                                 <span className="text-primary-blue">+</span> Booking Engine{" "}
                                 <span className="text-primary-blue">+</span> Payment Gateway{" "}
