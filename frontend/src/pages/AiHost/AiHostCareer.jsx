@@ -8,6 +8,7 @@ import axios from "../../utils/axios";
 import romans from "romans";
 import { CircularProgress } from "@mui/material";
 import AiHome from "../AiHome";
+import { HiOutlineArrowLeft } from "react-icons/hi";
 
 const Career = () => {
     const [openIndex, setOpenIndex] = useState(null);
@@ -49,8 +50,18 @@ const Career = () => {
 
     // const jobData = isHost ? jobRoles : jobRolesDummy;
 
+    const onBack = () => navigate("/host");
+
     return (
         <>
+            <button
+                type="button"
+                onClick={onBack}
+                className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
+                aria-label="Go back to search results"
+            >
+                <HiOutlineArrowLeft size={18} />
+            </button>
             <Container>
 
                 <div className="py-0 sm:py-12">

@@ -19,10 +19,15 @@ import Container from "../../components/Container";
 import axios from "../../utils/axios";
 import { showErrorAlert, showSuccessAlert } from "../../utils/alerts";
 import { isValidInternationalPhone } from "../../utils/validators";
+import { HiOutlineArrowLeft } from "react-icons/hi";
+import { useNavigate } from "react-router-dom";
 
 const AiHostContact = () => {
     const [loading, setLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
+
+    const navigate = useNavigate();
+    const onBack = () => navigate("/host");
 
     const { control, handleSubmit, reset } = useForm({
         defaultValues: {
@@ -80,14 +85,23 @@ const AiHostContact = () => {
     });
 
     return (
-        <div className="bg-white text-black font-sans">
-            {/* About & Form */}
-            {/* <section className="py-10 px-4 md:px-20"> */}
-            <Container padding={false}>
-                <section className="min-h-[85vh] flex items-center justify-center">
-                    <div className="w-full max-w-5xl">
-                        {/* About Us */}
-                        {/* <div className="space-y-6">
+        <>
+            <button
+                type="button"
+                onClick={onBack}
+                className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
+                aria-label="Go back to search results"
+            >
+                <HiOutlineArrowLeft size={18} />
+            </button>
+            <div className="bg-white text-black font-sans">
+                {/* About & Form */}
+                {/* <section className="py-10 px-4 md:px-20"> */}
+                <Container padding={false}>
+                    <section className="min-h-[85vh] flex items-center justify-center">
+                        <div className="w-full max-w-5xl">
+                            {/* About Us */}
+                            {/* <div className="space-y-6">
               <h2 className="text-title font-semibold uppercase">About WONO</h2>
               <p className="text-tiny leading-relaxed">
                 <strong>WONO</strong> is redefining the global future of work
@@ -178,196 +192,196 @@ const AiHostContact = () => {
               </p>
             </div> */}
 
-                        {/* Connect With Us - MUI Styled Form */}
-                        <div className="md:px-40">
-                            <Box
-                                component="form"
-                                onSubmit={handleSubmit((data) => submitContactForm(data))}
-                                sx={{ mt: 0 }}
-                            >
-                                <h2 className="text-title font-semibold uppercase mb-4 text-center md:text-center">
-                                    Connect With Us
-                                </h2>
+                            {/* Connect With Us - MUI Styled Form */}
+                            <div className="md:px-40">
+                                <Box
+                                    component="form"
+                                    onSubmit={handleSubmit((data) => submitContactForm(data))}
+                                    sx={{ mt: 0 }}
+                                >
+                                    <h2 className="text-title font-semibold uppercase mb-4 text-center md:text-center">
+                                        Connect With Us
+                                    </h2>
 
-                                {/* Responsive grid container */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {/* Name */}
-                                    <div className="pt-0 pl-0 lg:pt-0 lg:pl-0">
-                                        <Controller
-                                            name="name"
-                                            control={control}
-                                            rules={{ required: "Name is required" }}
-                                            render={({ field, fieldState }) => (
-                                                <TextField
-                                                    {...field}
-                                                    required
-                                                    fullWidth
-                                                    label="Name"
-                                                    variant="standard"
-                                                    error={!!fieldState.error}
-                                                    helperText={fieldState.error?.message}
-                                                    InputLabelProps={{ sx: floatingLabelSx }}
-                                                />
-                                            )}
-                                        />
-                                    </div>
+                                    {/* Responsive grid container */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {/* Name */}
+                                        <div className="pt-0 pl-0 lg:pt-0 lg:pl-0">
+                                            <Controller
+                                                name="name"
+                                                control={control}
+                                                rules={{ required: "Name is required" }}
+                                                render={({ field, fieldState }) => (
+                                                    <TextField
+                                                        {...field}
+                                                        required
+                                                        fullWidth
+                                                        label="Name"
+                                                        variant="standard"
+                                                        error={!!fieldState.error}
+                                                        helperText={fieldState.error?.message}
+                                                        InputLabelProps={{ sx: floatingLabelSx }}
+                                                    />
+                                                )}
+                                            />
+                                        </div>
 
-                                    {/* Email */}
-                                    <div className="pt-0 pl-0 lg:pt-0 lg:pl-0">
-                                        <Controller
-                                            name="email"
-                                            control={control}
-                                            rules={{
-                                                required: "Email is required",
-                                                pattern: {
-                                                    value: /^\S+@\S+$/i,
-                                                    message: "Enter a valid email",
-                                                },
-                                            }}
-                                            render={({ field, fieldState }) => (
-                                                <TextField
-                                                    {...field}
-                                                    required
-                                                    fullWidth
-                                                    type="email"
-                                                    label="Email"
-                                                    variant="standard"
-                                                    error={!!fieldState.error}
-                                                    helperText={fieldState.error?.message}
-                                                    InputLabelProps={{ sx: floatingLabelSx }}
-                                                />
-                                            )}
-                                        />
-                                    </div>
+                                        {/* Email */}
+                                        <div className="pt-0 pl-0 lg:pt-0 lg:pl-0">
+                                            <Controller
+                                                name="email"
+                                                control={control}
+                                                rules={{
+                                                    required: "Email is required",
+                                                    pattern: {
+                                                        value: /^\S+@\S+$/i,
+                                                        message: "Enter a valid email",
+                                                    },
+                                                }}
+                                                render={({ field, fieldState }) => (
+                                                    <TextField
+                                                        {...field}
+                                                        required
+                                                        fullWidth
+                                                        type="email"
+                                                        label="Email"
+                                                        variant="standard"
+                                                        error={!!fieldState.error}
+                                                        helperText={fieldState.error?.message}
+                                                        InputLabelProps={{ sx: floatingLabelSx }}
+                                                    />
+                                                )}
+                                            />
+                                        </div>
 
-                                    {/* Mobile */}
-                                    <div className="pt-0 pl-0 lg:pt-0 lg:pl-0">
-                                        <Controller
-                                            name="mobile"
-                                            control={control}
-                                            rules={{
-                                                required: "Mobile number is required",
-                                                validate: isValidInternationalPhone,
-                                            }}
-                                            render={({ field, fieldState }) => (
-                                                <TextField
-                                                    {...field}
-                                                    required
-                                                    fullWidth
-                                                    type="tel"
-                                                    label="Mobile Number"
-                                                    variant="standard"
-                                                    error={!!fieldState.error}
-                                                    helperText={fieldState.error?.message}
-                                                    InputLabelProps={{ sx: floatingLabelSx }}
-                                                />
-                                            )}
-                                        />
-                                    </div>
+                                        {/* Mobile */}
+                                        <div className="pt-0 pl-0 lg:pt-0 lg:pl-0">
+                                            <Controller
+                                                name="mobile"
+                                                control={control}
+                                                rules={{
+                                                    required: "Mobile number is required",
+                                                    validate: isValidInternationalPhone,
+                                                }}
+                                                render={({ field, fieldState }) => (
+                                                    <TextField
+                                                        {...field}
+                                                        required
+                                                        fullWidth
+                                                        type="tel"
+                                                        label="Mobile Number"
+                                                        variant="standard"
+                                                        error={!!fieldState.error}
+                                                        helperText={fieldState.error?.message}
+                                                        InputLabelProps={{ sx: floatingLabelSx }}
+                                                    />
+                                                )}
+                                            />
+                                        </div>
 
-                                    {/* Partnership Type */}
-                                    <div className="pt-0 pl-0 lg:pt-0 lg:pl-0">
-                                        <Controller
-                                            name="partnerstype" // ✅ changed here
-                                            control={control}
-                                            rules={{ required: "Please select a partnership type" }}
-                                            render={({ field, fieldState }) => (
-                                                <TextField
-                                                    {...field}
-                                                    fullWidth
-                                                    required
-                                                    variant="standard"
-                                                    error={!!fieldState.error}
-                                                    label="Reason to Connect"
-                                                    select
-                                                    helperText={fieldState?.error?.message}
-                                                    InputLabelProps={{ sx: floatingLabelSx }}
-                                                >
-                                                    <MenuItem value="" disabled>
-                                                        Select Type
-                                                    </MenuItem>
-                                                    <MenuItem value="Nomad Booking Query">
-                                                        Nomad Booking Query
-                                                    </MenuItem>
-                                                    <MenuItem value="Workation Booking Query">
-                                                        Workation Booking Query
-                                                    </MenuItem>
-                                                    <MenuItem value="Nomad & WoNo Partnerships">
-                                                        Nomad & WoNo Partnerships
-                                                    </MenuItem>
-                                                    <MenuItem value="B2B SaaS Technology Licensing">
-                                                        B2B SaaS Technology Licensing
-                                                    </MenuItem>
-                                                    <MenuItem value="Landlord Partnerships">
-                                                        Landlord Partnerships
-                                                    </MenuItem>
-                                                    <MenuItem value="Investment Related">
-                                                        Investment Related
-                                                    </MenuItem>
-                                                    <MenuItem value="Coffee Meeting to know us better">
-                                                        Coffee Meeting to know us better
-                                                    </MenuItem>
-                                                </TextField>
-                                            )}
-                                        />
-                                    </div>
+                                        {/* Partnership Type */}
+                                        <div className="pt-0 pl-0 lg:pt-0 lg:pl-0">
+                                            <Controller
+                                                name="partnerstype" // ✅ changed here
+                                                control={control}
+                                                rules={{ required: "Please select a partnership type" }}
+                                                render={({ field, fieldState }) => (
+                                                    <TextField
+                                                        {...field}
+                                                        fullWidth
+                                                        required
+                                                        variant="standard"
+                                                        error={!!fieldState.error}
+                                                        label="Reason to Connect"
+                                                        select
+                                                        helperText={fieldState?.error?.message}
+                                                        InputLabelProps={{ sx: floatingLabelSx }}
+                                                    >
+                                                        <MenuItem value="" disabled>
+                                                            Select Type
+                                                        </MenuItem>
+                                                        <MenuItem value="Nomad Booking Query">
+                                                            Nomad Booking Query
+                                                        </MenuItem>
+                                                        <MenuItem value="Workation Booking Query">
+                                                            Workation Booking Query
+                                                        </MenuItem>
+                                                        <MenuItem value="Nomad & WoNo Partnerships">
+                                                            Nomad & WoNo Partnerships
+                                                        </MenuItem>
+                                                        <MenuItem value="B2B SaaS Technology Licensing">
+                                                            B2B SaaS Technology Licensing
+                                                        </MenuItem>
+                                                        <MenuItem value="Landlord Partnerships">
+                                                            Landlord Partnerships
+                                                        </MenuItem>
+                                                        <MenuItem value="Investment Related">
+                                                            Investment Related
+                                                        </MenuItem>
+                                                        <MenuItem value="Coffee Meeting to know us better">
+                                                            Coffee Meeting to know us better
+                                                        </MenuItem>
+                                                    </TextField>
+                                                )}
+                                            />
+                                        </div>
 
-                                    {/* Message */}
-                                    <div className="pt-0 pl-0 lg:pt-0 lg:pl-0 md:col-span-2">
-                                        <Controller
-                                            name="message"
-                                            control={control}
-                                            rules={{ required: "Message is required" }}
-                                            render={({ field, fieldState }) => (
-                                                <TextField
-                                                    {...field}
-                                                    required
-                                                    fullWidth
-                                                    multiline
-                                                    minRows={4}
-                                                    label="Message"
-                                                    variant="standard"
-                                                    error={!!fieldState.error}
-                                                    helperText={fieldState.error?.message}
-                                                    InputLabelProps={{ sx: floatingLabelSx }}
-                                                />
-                                            )}
-                                        />
-                                    </div>
+                                        {/* Message */}
+                                        <div className="pt-0 pl-0 lg:pt-0 lg:pl-0 md:col-span-2">
+                                            <Controller
+                                                name="message"
+                                                control={control}
+                                                rules={{ required: "Message is required" }}
+                                                render={({ field, fieldState }) => (
+                                                    <TextField
+                                                        {...field}
+                                                        required
+                                                        fullWidth
+                                                        multiline
+                                                        minRows={4}
+                                                        label="Message"
+                                                        variant="standard"
+                                                        error={!!fieldState.error}
+                                                        helperText={fieldState.error?.message}
+                                                        InputLabelProps={{ sx: floatingLabelSx }}
+                                                    />
+                                                )}
+                                            />
+                                        </div>
 
-                                    {/* Button */}
-                                    <div className="pt-6 md:col-span-2 text-center">
-                                        <Button
-                                            type="submit"
-                                            variant="contained"
-                                            disabled={isContactPending}
-                                            sx={{
-                                                bgcolor: "black",
-                                                borderRadius: 20,
-                                                px: 14,
-                                                py: 1,
-                                                "&:hover": { bgcolor: "#333" },
-                                            }}
-                                        >
-                                            {isContactPending && (
-                                                <CircularProgress
-                                                    size={16}
-                                                    sx={{ color: "white", mr: 1 }}
-                                                />
-                                            )}
-                                            {isContactPending ? "CONNECTING..." : "CONNECT"}
-                                        </Button>
+                                        {/* Button */}
+                                        <div className="pt-6 md:col-span-2 text-center">
+                                            <Button
+                                                type="submit"
+                                                variant="contained"
+                                                disabled={isContactPending}
+                                                sx={{
+                                                    bgcolor: "black",
+                                                    borderRadius: 20,
+                                                    px: 14,
+                                                    py: 1,
+                                                    "&:hover": { bgcolor: "#333" },
+                                                }}
+                                            >
+                                                {isContactPending && (
+                                                    <CircularProgress
+                                                        size={16}
+                                                        sx={{ color: "white", mr: 1 }}
+                                                    />
+                                                )}
+                                                {isContactPending ? "CONNECTING..." : "CONNECT"}
+                                            </Button>
+                                        </div>
                                     </div>
-                                </div>
-                            </Box>
+                                </Box>
+                            </div>
                         </div>
-                    </div>
-                </section>
-            </Container>
+                    </section>
+                </Container>
 
-            {/* Maps */}
-            {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-4 md:px-20 pb-10"> */}
-            {/* <Container>
+                {/* Maps */}
+                {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-4 md:px-20 pb-10"> */}
+                {/* <Container>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 ">
           <div className="shadow-md">
             <iframe
@@ -401,39 +415,40 @@ const AiHostContact = () => {
         </div>
       </Container> */}
 
-            {/* Modal */}
-            {showModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
-                    <div className="bg-white rounded shadow-lg w-full max-w-md p-6 relative">
-                        <button
-                            onClick={handleCloseModal}
-                            className="absolute top-2 right-2 text-gray-600 hover:text-black"
-                        >
-                            <AiOutlineClose size={20} />
-                        </button>
-                        <h3 className="text-lg font-bold mb-2">Success</h3>
-                        <p className="text-sm mb-4">
-                            Your enquiry has been submitted successfully!
-                        </p>
-                        <div className="text-right">
+                {/* Modal */}
+                {showModal && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+                        <div className="bg-white rounded shadow-lg w-full max-w-md p-6 relative">
                             <button
                                 onClick={handleCloseModal}
-                                className="bg-black text-white px-4 py-2 rounded hover:opacity-90"
+                                className="absolute top-2 right-2 text-gray-600 hover:text-black"
                             >
-                                Close
+                                <AiOutlineClose size={20} />
                             </button>
+                            <h3 className="text-lg font-bold mb-2">Success</h3>
+                            <p className="text-sm mb-4">
+                                Your enquiry has been submitted successfully!
+                            </p>
+                            <div className="text-right">
+                                <button
+                                    onClick={handleCloseModal}
+                                    className="bg-black text-white px-4 py-2 rounded hover:opacity-90"
+                                >
+                                    Close
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
 
-            {/* Loading Spinner */}
-            {loading && (
-                <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-50 z-50">
-                    <Spinner animation="border" variant="dark" />
-                </div>
-            )}
-        </div>
+                {/* Loading Spinner */}
+                {loading && (
+                    <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-50 z-50">
+                        <Spinner animation="border" variant="dark" />
+                    </div>
+                )}
+            </div>
+        </>
     );
 };
 
