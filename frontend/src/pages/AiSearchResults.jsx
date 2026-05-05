@@ -855,6 +855,8 @@ const AiSearchResults = () => {
   const previousSelectedPairRef = useRef(null);
   const previousGoalRef = useRef(getPersistedGoal() || selectedGoal);
 
+  const previousVisibleDestinationsLengthRef = useRef(0);
+
   const hasSelectedContinent = Boolean(selectedContinent);
   const hasSelectedGoalOption = Boolean(selectedGoalOption);
   const hasSelectedFilters = hasSelectedContinent && hasSelectedGoalOption;
@@ -1377,27 +1379,43 @@ const AiSearchResults = () => {
   useEffect(() => {
     if (!hasSelectedFilters || !isResultsReady) {
       setVisibleDestinationCount(0);
+      previousVisibleDestinationsLengthRef.current = 0;
       return;
     }
 
     if (!visibleDestinations.length) {
       setVisibleDestinationCount(0);
+      previousVisibleDestinationsLengthRef.current = 0;
       return;
     }
 
-    let currentVisibleCount = 0;
+    const previousVisibleLength = Math.min(
+      previousVisibleDestinationsLengthRef.current,
+      visibleDestinations.length,
+    );
+    setVisibleDestinationCount(previousVisibleLength);
+
+    if (previousVisibleLength >= visibleDestinations.length) {
+      previousVisibleDestinationsLengthRef.current = visibleDestinations.length;
+      return;
+    }
+
+    let currentVisibleCount = previousVisibleLength;
 
     const revealInterval = setInterval(() => {
       currentVisibleCount += 1;
       setVisibleDestinationCount(currentVisibleCount);
 
       if (currentVisibleCount >= visibleDestinations.length) {
+        previousVisibleDestinationsLengthRef.current =
+          visibleDestinations.length;
         clearInterval(revealInterval);
       }
     }, DESTINATION_REVEAL_INTERVAL_MS);
 
     return () => {
       clearInterval(revealInterval);
+      previousVisibleDestinationsLengthRef.current = currentVisibleCount;
     };
   }, [hasSelectedFilters, isResultsReady, visibleDestinations]);
 
