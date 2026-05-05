@@ -7,61 +7,61 @@ import { HiOutlineArrowLeft } from "react-icons/hi";
 const themes = [
   {
     src: "/hosts/themes/biznest.png",
-    mockup: "/hosts/themes/biznestProduct.png",
+    mockup: "/hosts/themes/biznestProductWhite.png",
     alt: "BiznestImage",
     tag: "co-working",
   },
   {
     src: "/hosts/themes/coworkingMewo.png",
-    mockup: "/hosts/themes/coworkingMewoProduct.png",
+    mockup: "/hosts/themes/coworkingMewoProductWhite.png",
     alt: "CoWorkingMewo",
     tag: "co-working",
   },
   {
     src: "/hosts/themes/coworking.png",
-    mockup: "/hosts/themes/coworkingProduct.png",
+    mockup: "/hosts/themes/coworkingProductWhite.png",
     alt: "Co-Working Image",
     tag: "co-working",
   },
   {
     src: "/hosts/themes/boutique.png",
-    mockup: "/hosts/themes/boutiqueProduct.png",
+    mockup: "/hosts/themes/boutiqueProductTransparent.png",
     alt: "Boutique Image",
     tag: "boutique",
   },
   {
     src: "/hosts/themes/coliving.png",
-    mockup: "/hosts/themes/colivingProduct.png",
+    mockup: "/hosts/themes/colivingProductWhite.png",
     alt: "Co-Living Image",
     tag: "co-living",
   },
   {
     src: "/hosts/themes/coworking2.png",
-    mockup: "/hosts/themes/coworkingNomadProduct.png",
+    mockup: "/hosts/themes/coworkingNomadProductWhite.png",
     alt: "CoLivingImage_2",
     tag: "co-working",
   },
   {
     src: "/hosts/themes/coworking3.png",
-    mockup: "/hosts/themes/coworking3Product.png",
+    mockup: "/hosts/themes/coworking3ProductWhite.png",
     alt: "CoLivingImage_3",
     tag: "co-working",
   },
   {
     src: "/hosts/themes/cafe2.png",
-    mockup: "/hosts/themes/cafe2Product.png",
+    mockup: "/hosts/themes/cafe2ProductWhite.png",
     alt: "Cafe_2",
     tag: "cafe",
   },
   {
     src: "/hosts/themes/cafe3.png",
-    mockup: "/hosts/themes/cafe3Product.png",
+    mockup: "/hosts/themes/cafe3ProductWhite.png",
     alt: "Cafe_3",
     tag: "cafe",
   },
   {
     src: "/hosts/themes/hostels.png",
-    mockup: "/hosts/themes/hostelsProduct.png",
+    mockup: "/hosts/themes/hostelsProductWhite.png",
     alt: "Hostels",
     tag: "hostels",
   },
@@ -156,7 +156,7 @@ const Themes = () => {
       <MySeperator />
       {/*Top Recommendations */}
       <section className="w-full bg-white lg:flex lg:flex-col justify-center items-center gap-8 ">
-        <Container >
+        <Container>
           <div className="space-y-12">
             <div>
               <h1 className="text-[clamp(2rem,2.5vw,5rem)] font-medium pb-2">
