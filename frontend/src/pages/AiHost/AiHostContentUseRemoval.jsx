@@ -13,9 +13,11 @@ import { useMutation } from "@tanstack/react-query";
 import { showErrorAlert, showSuccessAlert } from "../../utils/alerts";
 import axios from "../../utils/axios";
 import { isValidInternationalPhone } from "../../utils/validators";
+import { HiOutlineArrowLeft } from "react-icons/hi";
 
 const AiHostContentUseRemoval = () => {
     const navigate = useNavigate();
+    const onBack = () => navigate("/host");
 
     // -------------------------
     // 🔹 Form Logic
@@ -381,34 +383,46 @@ const AiHostContentUseRemoval = () => {
     ];
 
     return (
-        <div className="flex flex-col gap-10 px-6 lg:px-28 pb-4 pt-12 text-[#364D59]">
-            {/* Header */}
-            <div className="flex flex-col items-center relative font-comic uppercase font-bold text-secondary-dark text-[clamp(1.5rem,4vw,2.5rem)] leading-tight">
-                <div className="relative inline-block">
-                    <h3 className="text-center">Content Use & Removal Policy</h3>
-                    <img
-                        src={blueUnderline}
-                        alt=""
-                        className="absolute top-full left-1/2 -translate-x-1/2 w-full h-[40%]"
-                    />
+        <>
+            {/* BACK BUTTON */}
+            <button
+                type="button"
+                onClick={onBack}
+                className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
+                aria-label="Go back to search results"
+            >
+                <HiOutlineArrowLeft size={18} />
+            </button>
+
+            <div className="flex flex-col gap-10 px-6 lg:px-28 pb-4 pt-12 text-[#364D59]">
+                {/* Header */}
+                <div className="flex flex-col items-center relative font-comic uppercase font-bold text-secondary-dark text-[clamp(1.5rem,4vw,2.5rem)] leading-tight">
+                    <div className="relative inline-block">
+                        <h3 className="text-center">Content Use & Removal Policy</h3>
+                        <img
+                            src={blueUnderline}
+                            alt=""
+                            className="absolute top-full left-1/2 -translate-x-1/2 w-full h-[40%]"
+                        />
+                    </div>
+                </div>
+
+                {/* Sections */}
+                <div>
+                    {sections.map((section, i) => (
+                        <div key={i}>
+                            <div className="flex flex-col gap-4 my-4 font-sans">
+                                <h4 className="font-sans text-subtitle font-semibold">
+                                    {section.title}
+                                </h4>
+                                <div className="text-content">{section.content}</div>
+                            </div>
+                            {i < sections.length - 1 && <hr className="border-gray-300" />}
+                        </div>
+                    ))}
                 </div>
             </div>
-
-            {/* Sections */}
-            <div>
-                {sections.map((section, i) => (
-                    <div key={i}>
-                        <div className="flex flex-col gap-4 my-4 font-sans">
-                            <h4 className="font-sans text-subtitle font-semibold">
-                                {section.title}
-                            </h4>
-                            <div className="text-content">{section.content}</div>
-                        </div>
-                        {i < sections.length - 1 && <hr className="border-gray-300" />}
-                    </div>
-                ))}
-            </div>
-        </div>
+        </>
     );
 };
 
