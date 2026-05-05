@@ -189,6 +189,7 @@ const HostHome = () => {
                     </div>
                 </Container>
             </section>
+            <MySeperator />
             <section className="">
                 <Container>
                     <div className="flex flex-col leading-tight">
