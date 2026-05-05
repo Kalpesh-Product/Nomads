@@ -26,6 +26,19 @@ import { HiOutlineCurrencyDollar } from "react-icons/hi";
 import { RiUserCommunityLine } from "react-icons/ri";
 import { TbAward, TbWorldWww } from "react-icons/tb";
 import { IoMdPersonAdd } from "react-icons/io";
+import { CgWebsite } from "react-icons/cg";
+import { IoMdChatbubbles } from "react-icons/io";
+import { TbCalendarUser } from "react-icons/tb";
+import { MdOutlineSupportAgent } from "react-icons/md";
+import { MdMeetingRoom } from "react-icons/md";
+import { RiApps2AiLine } from "react-icons/ri";
+import { TiSpanner } from "react-icons/ti";
+import { FaDesktop } from "react-icons/fa";
+import { IoSettingsOutline } from "react-icons/io5";
+import { BsPeopleFill } from "react-icons/bs";
+import { MdAccountBalance } from "react-icons/md";
+import { MdOutlineHandshake } from "react-icons/md";
+import { BsPersonVcard } from "react-icons/bs";
 
 const gatedRecommendationLabels = new Set([
     "Work From Anywhere",
@@ -52,37 +65,37 @@ const hostSignupEntryPath = "/host/ai-host-signup?step=0";
 const recommendationItems = [
     {
         label: "Build & Manage Website",
-        icon: TbAward,
+        icon: CgWebsite,
         path: "/host/ai-host-website-builder",
     },
     {
         label: "Sales Management",
-        icon: FaGlobeAmericas,
+        icon: MdOutlineHandshake,
         path: "/host/ai-host-modules",
     },
     {
         label: "Finance Suite",
-        icon: HiOutlineCurrencyDollar,
+        icon: MdAccountBalance,
         path: "/host/ai-host-themes",
     },
     {
         label: "Operations Module",
-        icon: MdOutlineWorkHistory,
+        icon: IoSettingsOutline,
         path: "/host/ai-host-leads",
     },
     {
         label: "HR Management System",
-        icon: RiUserCommunityLine,
+        icon: BsPeopleFill,
         path: "/host/ai-host-career",
     },
     {
         label: "IT Infrastructure Module",
-        icon: RiUserCommunityLine,
+        icon: FaDesktop,
         path: "/host/ai-host-calendar",
     },
     {
         label: "Maintenance Module",
-        icon: HiOutlineCurrencyDollar,
+        icon: TiSpanner,
         suffixText: "...More",
     },
 ];
@@ -90,32 +103,32 @@ const recommendationItems = [
 const valueAdditionItems = [
     {
         label: "AI Apps - Automation",
-        icon: LuCircleDollarSign,
+        icon: RiApps2AiLine,
         path: "/host/extra-common-modules",
     },
     {
         label: "Meeting Room System",
-        icon: LuMapPinned,
+        icon: MdMeetingRoom,
         path: "/host/extra-common-modules",
     },
     {
         label: "Visitor Management",
-        icon: HiOutlineKey,
+        icon: BsPersonVcard,
         path: "/host/assets",
     },
     {
         label: "Ticketing System",
-        icon: HiOutlineCog,
+        icon: MdOutlineSupportAgent,
         path: "/host/inventory",
     },
     {
         label: "Smart Calendar",
-        icon: LuCircleDollarSign,
+        icon: TbCalendarUser,
         path: "/host/finance-management",
     },
     {
         label: "Chat Bot",
-        icon: LuCircleDollarSign,
+        icon: IoMdChatbubbles,
         suffixText: "...More",
     },
 ];
