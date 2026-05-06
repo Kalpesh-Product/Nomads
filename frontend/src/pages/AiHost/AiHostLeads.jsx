@@ -104,7 +104,7 @@ const Leads = () => {
               resources.
             </h2>
           </div>
-          <div className="flex flex-row lg:justify-end md:justify-end  sm:justify-center xs:justify-center items-center pb-8">
+          <div className="flex flex-row lg:justify-end md:justify-end  sm:justify-center xs:justify-center items-center pb-8 pt-4">
             <GetStartedButton
               handleSubmit={() => navigate("/host/ai-host-signup?step=0")}
             />
