@@ -156,8 +156,8 @@ const Themes = () => {
       <MySeperator />
       {/*Top Recommendations */}
       <section className="w-full bg-white lg:flex lg:flex-col justify-center items-center gap-8 ">
-        <Container>
-          <div className="space-y-6">
+        <Container padding={false}>
+          <div className="space-y-6 lg:pt-16 lg:pb-8 pb-10 pt-10">
             <div>
               <h1 className="text-[clamp(2rem,2.5vw,5rem)] font-medium pb-2">
                 Top Theme Recommendations
@@ -199,8 +199,8 @@ const Themes = () => {
       <MySeperator />
       {/*Customize */}
       <section>
-        <Container>
-          <div className="flex lg:flex-nowrap flex-wrap justify-between items-center gap-8">
+        <Container padding={false}>
+          <div className="flex lg:flex-nowrap flex-wrap justify-between items-center gap-8 lg:pt-16 lg:pb-8 pb-10 pt-10">
             <div className="flex flex-col gap-6 w-full lg:w-[50%]">
               <div className="text-[clamp(2rem,4.2vw,6rem)] md:text-[clamp(2rem,8vw,8rem)] lg:text-[clamp(2rem,4.2vw,6rem)] leading-none">
                 <h1 className="font-normal">
@@ -231,8 +231,8 @@ const Themes = () => {
       </section>
       <MySeperator />
       {/*Website Builder */}
-      <Container>
-        <div className="flex flex-col justify-between items-center gap-6">
+      <Container padding={false}>
+        <div className="flex flex-col justify-between items-center gap-6 lg:pt-16 lg:pb-8 pb-10 pt-10">
           <div className="text-[clamp(2rem,4.3vw,4.5rem)] md:text-[clamp(2rem,7vw,8rem)] lg:text-[clamp(2rem,4.3vw,4.5rem)] w-full lg:w-[70%] self-start leading-[1.2]">
             <h1 className="font-normal">
               A website builder engineered for growth
