@@ -33,31 +33,31 @@ const AiFooter = () => {
 
   const goToHostsPrivacy = () => {
     if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://nomad.localhost:5173/privacy";
+      window.location.href = "http://nomad.localhost:5173/ai-privacy";
     } else {
-      window.location.href = "https://nomad.wono.co/privacy";
+      window.location.href = "https://nomad.wono.co/ai-privacy";
     }
   };
   const goToHostsTC = () => {
     if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://nomad.localhost:5173/terms-and-conditions";
+      window.location.href = "http://nomad.localhost:5173/ai-terms-and-conditions";
     } else {
-      window.location.href = "https://nomad.wono.co/terms-and-conditions";
+      window.location.href = "https://nomad.wono.co/ai-terms-and-conditions";
     }
   };
   const goToHostsContentCopyright = () => {
     if (window.location.hostname.includes("localhost")) {
       window.location.href =
-        "http://nomad.localhost:5173/content-and-copyright";
+        "http://nomad.localhost:5173/ai-content-and-copyright";
     } else {
-      window.location.href = "https://nomad.wono.co/content-and-copyright";
+      window.location.href = "https://nomad.wono.co/ai-content-and-copyright";
     }
   };
   const goToHostsContentUseRemoval = () => {
     if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://nomad.localhost:5173/content-use-removal";
+      window.location.href = "http://nomad.localhost:5173/ai-content-use-removal";
     } else {
-      window.location.href = "https://nomad.wono.co/content-use-removal";
+      window.location.href = "https://nomad.wono.co/ai-content-use-removal";
     }
   };
 
@@ -65,9 +65,9 @@ const AiFooter = () => {
     {
       heading: "Services",
       links: [
-        { name: "About", link: "/about" },
-        { name: "Career", link: "career" },
-        { name: "FAQs", link: "faq" },
+        { name: "About", link: "/ai-about" },
+        { name: "Career", link: "ai-career" },
+        { name: "FAQs", link: "ai-faq" },
         // {
         //   name: "Content and Copyright Policy",
         //   link: goToHostsContentCopyright,
@@ -79,7 +79,7 @@ const AiFooter = () => {
       links: [
         { name: "Privacy", link: goToHostsPrivacy },
         { name: "T&C", link: goToHostsTC },
-        { name: "Contact", link: "/contact" },
+        { name: "Contact", link: "/ai-contact" },
         // {
         //   name: "Content Use & Removal Policy",
         //   link: goToHostsContentUseRemoval,
@@ -243,11 +243,10 @@ const AiFooter = () => {
                         setShowLangModal(false);
                       }}
                       className={`border rounded-md px-3 py-2 
-        ${
-          isDisabled
-            ? "opacity-40 cursor-not-allowed"
-            : "cursor-pointer hover:border-black"
-        } 
+        ${isDisabled
+                          ? "opacity-40 cursor-not-allowed"
+                          : "cursor-pointer hover:border-black"
+                        } 
         ${selectedLang.code === lang.code ? "border-black" : "border-gray-300"}
       `}
                     >
@@ -284,16 +283,14 @@ const AiFooter = () => {
                         setShowCurrencyModal(false);
                       }}
                       className={`border rounded-md px-3 py-2 
-        ${
-          isDisabled
-            ? "opacity-40 cursor-not-allowed"
-            : "cursor-pointer hover:border-black"
-        } 
-        ${
-          selectedCurrency.code === cur.code
-            ? "border-black"
-            : "border-gray-300"
-        }
+        ${isDisabled
+                          ? "opacity-40 cursor-not-allowed"
+                          : "cursor-pointer hover:border-black"
+                        } 
+        ${selectedCurrency.code === cur.code
+                          ? "border-black"
+                          : "border-gray-300"
+                        }
       `}
                     >
                       <div className="font-medium">{cur.name}</div>

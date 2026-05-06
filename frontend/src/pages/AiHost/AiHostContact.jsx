@@ -302,26 +302,26 @@ const AiHostContact = () => {
                                                         <MenuItem value="" disabled>
                                                             Select Type
                                                         </MenuItem>
-                                                        <MenuItem value="Nomad Booking Query">
-                                                            Nomad Booking Query
+                                                        <MenuItem value="Add Your Business">
+                                                            Add Your Business
                                                         </MenuItem>
-                                                        <MenuItem value="Workation Booking Query">
-                                                            Workation Booking Query
+                                                        <MenuItem value="Business Activation Query">
+                                                            Business Activation Query
                                                         </MenuItem>
-                                                        <MenuItem value="Nomad & WoNo Partnerships">
-                                                            Nomad & WoNo Partnerships
+                                                        <MenuItem value="Value Adding Partnerships">
+                                                            Value Adding Partnerships
                                                         </MenuItem>
-                                                        <MenuItem value="B2B SaaS Technology Licensing">
-                                                            B2B SaaS Technology Licensing
+                                                        <MenuItem value="Lead a Location for WoNo">
+                                                            Lead a Location for WoNo
                                                         </MenuItem>
-                                                        <MenuItem value="Landlord Partnerships">
-                                                            Landlord Partnerships
+                                                        <MenuItem value="Become a Franchise Partner">
+                                                            Become a Franchise Partner
                                                         </MenuItem>
-                                                        <MenuItem value="Investment Related">
-                                                            Investment Related
+                                                        <MenuItem value="PR Related Query">
+                                                            PR Related Query
                                                         </MenuItem>
-                                                        <MenuItem value="Coffee Meeting to know us better">
-                                                            Coffee Meeting to know us better
+                                                        <MenuItem value="Join Our Team">
+                                                            Join Our Team
                                                         </MenuItem>
                                                     </TextField>
                                                 )}

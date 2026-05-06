@@ -86,6 +86,15 @@ import AiNewsFetch from "./components/AiNewsFetch";
 import AiBlogDetails from "./pages/AiBlogDetails";
 import AiForgotPassword from "./pages/AiForgotPassword";
 import AiResetPassword from "./pages/AiResetPassword";
+import AiAbout from "./pages/AiAbout";
+import AiPrivacy from "./pages/AiPrivacy";
+import AiContact from "./pages/AiContact";
+import AiCareer from "./pages/AiCareer";
+import AiFAQ from "./pages/AiFAQ";
+import AiTermsAndConditions from "./pages/AiTermsAndConditions";
+import AiContentAndCopyright from "./pages/AiContentAndCopyright";
+import AiContentUseRemoval from "./pages/AiContentUseRemoval";
+import AiJobDetail from "./pages/AiJobDetail";
 
 // hosts Ai subroutes
 import AiHostLayout from "./pages/AiHost/AiHostLayout";
@@ -267,6 +276,42 @@ if (tenant === "main") {
             {
               path: "become-a-contributor",
               element: <AiBecomeContributor />,
+            },
+            {
+              path: "ai-about",
+              element: <AiAbout />,
+            },
+            {
+              path: "ai-privacy",
+              element: <AiPrivacy />,
+            },
+            {
+              path: "ai-contact",
+              element: <AiContact />,
+            },
+            {
+              path: "ai-career",
+              element: <AiCareer />,
+            },
+            {
+              path: "ai-career/job/:title",
+              element: <AiJobDetail />,
+            },
+            {
+              path: "ai-faq",
+              element: <AiFAQ />,
+            },
+            {
+              path: "ai-terms-and-conditions",
+              element: <AiTermsAndConditions />,
+            },
+            {
+              path: "ai-content-and-copyright",
+              element: <AiContentAndCopyright />,
+            },
+            {
+              path: "ai-content-use-removal",
+              element: <AiContentUseRemoval />,
             },
           ],
         },
