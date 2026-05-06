@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 import Container from "../../components/Container";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import axios from "../../utils/axios";
 import romans from "romans";
@@ -14,7 +14,7 @@ const Career = () => {
     const [openIndex, setOpenIndex] = useState(null);
     const { pathname } = useLocation();
     const isHost = pathname.includes("host");
-    const customLink = isHost ? `/career/job` : `/career/job`;
+    const customLink = isHost ? `/host/ai-host-career/job` : `/career/job`;
     // const customRoute = isHost ? "job/get-job-posts" : "";
 
     const categoryOrder = [
@@ -54,14 +54,16 @@ const Career = () => {
 
     return (
         <>
-            <button
-                type="button"
-                onClick={onBack}
-                className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
-                aria-label="Go back to search results"
-            >
-                <HiOutlineArrowLeft size={18} />
-            </button>
+            <div className="sticky top-0 z-40 bg-white/95 py-3 backdrop-blur-sm">
+                <button
+                    type="button"
+                    onClick={onBack}
+                    className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500"
+                    aria-label="Go back to search results"
+                >
+                    <HiOutlineArrowLeft size={18} />
+                </button>
+            </div>
             <Container>
 
                 <div className="py-0 sm:py-12">

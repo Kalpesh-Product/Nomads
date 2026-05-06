@@ -1,10 +1,10 @@
 import React from "react";
 
 import { Link, useNavigate } from "react-router-dom";
-import blueUnderline from "../../assets/blue_underline.png";
+import blueUnderline from "../assets/blue_underline.png";
 import { HiOutlineArrowLeft } from "react-icons/hi";
 
-const AiHostPrivacy = () => {
+const AiPrivacy = () => {
     const navigate = useNavigate();
     const sections = [
         {
@@ -273,7 +273,7 @@ const AiHostPrivacy = () => {
                         </a>
                         <span
                             className="text-primary-blue cursor-pointer max-w-fit"
-                            onClick={() => navigate("/host/ai-host-contact")}
+                            onClick={() => navigate("/ai-contact")}
                         >
                             Contact us
                         </span>
@@ -283,48 +283,46 @@ const AiHostPrivacy = () => {
         },
     ];
 
-    const onBack = () => navigate("/host");
-
     return (
-        <>
-            <div className="sticky top-0 z-40 bg-white/95 py-3 backdrop-blur-sm">
+        <div className="flex flex-col gap-10 px-6 md:px-12 lg:px-28 pb-8 md:pb-12 pt-4 text-[#364D59]">
+            <div className="sticky top-0 z-40 -mx-6 bg-white/95 py-3 backdrop-blur-sm md:-mx-12 lg:-mx-28">
                 <button
                     type="button"
-                    onClick={onBack}
+                    onClick={() => navigate("/home")}
                     className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500"
-                    aria-label="Go back to search results"
+                    aria-label="Go back"
                 >
                     <HiOutlineArrowLeft size={18} />
                 </button>
             </div>
-            <div className="flex flex-col gap-10 px-6 lg:px-28 pb-4 pt-12 text-[#364D59]">
-                <div className="flex flex-col items-center relative font-comic uppercase font-bold text-secondary-dark text-[clamp(1.5rem,4vw,3rem)] leading-tight">
-                    <div className="relative inline-block">
-                        <h3 className="text-center">Privacy Policy</h3>
-                        <img
-                            src={blueUnderline}
-                            alt=""
-                            className="absolute top-full left-1/2 -translate-x-1/2 w-full h-[40%]"
-                        />
-                    </div>
-                </div>
-
-                <div>
-                    {sections.map((section, i) => (
-                        <div key={i}>
-                            <div className="flex flex-col gap-4 my-4 font-sans">
-                                <h4 className="font-sans text-subtitle font-semibold">
-                                    {section.title}
-                                </h4>
-                                <p className="text-content">{section.content}</p>
-                            </div>
-                            {i < sections.length - 1 && <hr className="border-gray-300" />}
-                        </div>
-                    ))}
+            <div className="flex flex-col items-center relative font-comic uppercase font-bold text-secondary-dark text-2xl md:text-4xl lg:text-5xl leading-tight">
+                <div className="relative inline-block text-center">
+                    <h3>Privacy Policy</h3>
+                    <img
+                        src={blueUnderline}
+                        alt=""
+                        className="absolute top-full left-1/2 -translate-x-1/2 w-full h-[40%]"
+                    />
                 </div>
             </div>
-        </>
+
+            <div className="space-y-8">
+                {sections.map((section, i) => (
+                    <div key={i} className="group">
+                        <div className="flex flex-col gap-4 font-sans">
+                            {section.title && (
+                                <h4 className="font-sans text-lg md:text-xl lg:text-2xl font-semibold">
+                                    {section.title}
+                                </h4>
+                            )}
+                            <p className="text-content">{section.content}</p>
+                        </div>
+                        {i < sections.length - 1 && <hr className="border-gray-300" />}
+                    </div>
+                ))}
+            </div>
+        </div>
     );
 };
 
-export default AiHostPrivacy;
+export default AiPrivacy;

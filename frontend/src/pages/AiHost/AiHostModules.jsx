@@ -56,22 +56,22 @@ export default function Modules() {
     const onBack = () => navigate("/host");
     return (
         <>
-                <div className="flex min-w-[11rem] items-center gap-3">
-                    <button
-                        type="button"
-                        onClick={onBack}
-                        className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
-                        aria-label="Go back to search results"
-                    >
-                        <HiOutlineArrowLeft size={18} />
-                    </button>
-                    <span className="text-lg font-medium text-primary-blue">Modules</span>
-                    {/* {stateLabel && (
+            <div className="sticky top-0 z-40 flex min-w-[11rem] items-center gap-3 bg-white/95 py-3 backdrop-blur-sm">
+                <button
+                    type="button"
+                    onClick={onBack}
+                    className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500"
+                    aria-label="Go back to search results"
+                >
+                    <HiOutlineArrowLeft size={18} />
+                </button>
+                <span className="text-lg font-medium text-primary-blue">Modules</span>
+                {/* {stateLabel && (
           <span className="text-lg font-medium text-primary-blue">
             {stateLabel}
           </span>
         )} */}
-                </div>
+            </div>
             <Container>
                 <div className="flex flex-col gap-8 w-full">
                     <div className="flex flex-col gap-8">
@@ -252,7 +252,7 @@ export default function Modules() {
                     </div>
                 </div>
                 <hr />
-                <div className="flex justify-center w-full my-16">
+                <div className="flex justify-center w-full my-6">
                     <GetStartedButton
                         title={"Get Started"}
                         handleSubmit={() => navigate("/host/ai-host-signup?step=0")}

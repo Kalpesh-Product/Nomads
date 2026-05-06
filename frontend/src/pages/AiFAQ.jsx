@@ -1,5 +1,5 @@
 import React from "react";
-import blueUnderline from "../../assets/blue_underline.png";
+import blueUnderline from "../assets/blue_underline.png";
 import { Link, useNavigate } from "react-router-dom";
 import { HiOutlineArrowLeft } from "react-icons/hi";
 
@@ -121,60 +121,55 @@ const faqs = [
     },
 ];
 
-const AiHostFAQ = () => {
+const AiFAQ = () => {
     const navigate = useNavigate();
-
-    const onBack = () => navigate("/host");
-
     return (
-        <>
-            <div className="sticky top-0 z-40 bg-white/95 py-3 backdrop-blur-sm">
+        <div className="flex flex-col gap-10 px-6 md:px-12 lg:px-28 pb-8 md:pb-12 pt-12 text-[#364D59]">
+            <div className="sticky top-0 z-40 -mx-6 bg-white/95 py-3 backdrop-blur-sm md:-mx-12 lg:-mx-28">
                 <button
                     type="button"
-                    onClick={onBack}
+                    onClick={() => navigate("/home")}
                     className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500"
-                    aria-label="Go back to search results"
+                    aria-label="Go back"
                 >
                     <HiOutlineArrowLeft size={18} />
                 </button>
             </div>
-            <div className="flex flex-col gap-10 px-6 lg:px-28 pb-4 pt-12 text-[#364D59]">
-                <div className="flex flex-col items-center relative font-comic uppercase font-bold text-secondary-dark text-[clamp(1.5rem,4vw,2.5rem)] leading-tight">
-                    <h3 className="text-center">Frequently Asked Questions (FAQ)</h3>
-                    <img
-                        src={blueUnderline}
-                        alt=""
-                        className="absolute top-full left-1/2 -translate-x-1/2 w-full h-[40%]"
-                    />
-                </div>
-
-                <div>
-                    {faqs.map((item, i) => (
-                        <div key={i}>
-                            <div className="flex flex-col gap-4 my-4 font-sans">
-                                <h4 className="font-sans text-subtitle font-semibold">
-                                    {i + 1}. {item.q}
-                                </h4>
-                                <p className="text-content">{item.a}</p>
-                            </div>
-                            {i < faqs.length - 1 && <hr className="border-gray-300" />}
-                        </div>
-                    ))}
-
-                    <p className="mt-16 mb-8">
-                        Can’t find the answer to your question? Connect with us via our{" "}
-                        <Link
-                            className="text-primary-blue text-decoration-none"
-                            to="/host/ai-host-contact"
-                        >
-                            Contact us
-                        </Link>{" "}
-                        page.
-                    </p>
-                </div>
+            <div className="flex flex-col items-center relative font-comic uppercase font-bold text-secondary-dark text-2xl md:text-3xl lg:text-4xl leading-tight">
+                <h3 className="text-center">Frequently Asked Questions (FAQ)</h3>
+                <img
+                    src={blueUnderline}
+                    alt=""
+                    className="absolute top-full left-1/2 -translate-x-1/2 w-full h-[40%]"
+                />
             </div>
-        </>
+
+            <div className="space-y-8">
+                {faqs.map((item, i) => (
+                    <div key={i}>
+                        <div className="flex flex-col gap-4 font-sans focus-within:bg-gray-50 transition-colors p-2 rounded-lg">
+                            <h4 className="font-sans text-lg md:text-xl font-semibold">
+                                {i + 1}. {item.q}
+                            </h4>
+                            <div className="text-content leading-relaxed">{item.a}</div>
+                        </div>
+                        {i < faqs.length - 1 && <hr className="border-gray-200" />}
+                    </div>
+                ))}
+
+                <p className="mt-16 mb-8">
+                    Can’t find the answer to your question? Connect with us via our{" "}
+                    <Link
+                        className="text-primary-blue text-decoration-none"
+                        to="/ai-contact"
+                    >
+                        Contact us
+                    </Link>{" "}
+                    page.
+                </p>
+            </div>
+        </div>
     );
 };
 
-export default AiHostFAQ;
+export default AiFAQ;

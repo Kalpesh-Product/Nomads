@@ -145,14 +145,16 @@ const HostProduct = () => {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={onBack}
-        className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
-        aria-label="Go back to search results"
-      >
-        <HiOutlineArrowLeft size={18} />
-      </button>
+      <div className="sticky top-0 z-40 bg-white/95 py-3 backdrop-blur-sm">
+        <button
+          type="button"
+          onClick={onBack}
+          className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500"
+          aria-label="Go back to search results"
+        >
+          <HiOutlineArrowLeft size={18} />
+        </button>
+      </div>
       <div
         key={location.state?.image?.src || "default"}
         className="flex flex-col"
@@ -163,7 +165,7 @@ const HostProduct = () => {
             className="w-full flex flex-col justify-center gap-8 "
           >
             <Container>
-              <div className="flex flex-wrap gap-10 lg:flex-nowrap lg:gap-60 w-full">
+              <div className="grid w-full grid-cols-1 items-center gap-0 lg:grid-cols-2">
                 <div className="flex flex-col gap-10 justify-center w-full text-black">
                   <h1 className="text-hero font-semibold">INCLUSIONS</h1>
                   <ul className="flex flex-col gap-2 ">
@@ -178,15 +180,15 @@ const HostProduct = () => {
                   </ul>
                   <GetStartedButton
                     handleSubmit={() => navigate("/host/ai-host-signup?step=0")}
-                    externalStyles="bg-white text-black lg:w-[70%]"
+                    externalStyles="bg-black text-white w-full max-w-[420px] py-4 text-xl font-semibold"
                   />
                 </div>
                 <div
                   data-aos="fade-up"
-                  className="w-full overflow-hidden rounded-xl"
+                  className="w-full overflow-hidden rounded-xl flex justify-center lg:justify-end"
                 >
                   <img
-                    className="block rounded-xl w-[1280px] h-[320px] object-contain"
+                    className="block rounded-xl w-full max-w-[760px] h-auto object-contain"
                     src={selectedImage.mockup}
                     alt={selectedImage.alt}
                   />

@@ -26,6 +26,10 @@ import { HiOutlineCurrencyDollar } from "react-icons/hi";
 import { RiUserCommunityLine } from "react-icons/ri";
 import { TbAward, TbWorldWww } from "react-icons/tb";
 import { IoMdPersonAdd } from "react-icons/io";
+import { HiOutlineUserGroup } from "react-icons/hi";
+import { MdComputer } from "react-icons/md";
+import { IoBriefcaseSharp } from "react-icons/io5";
+import { MdRateReview } from "react-icons/md";
 
 const gatedRecommendationLabels = new Set([
   "Work From Anywhere",
@@ -98,11 +102,11 @@ const valueAdditionItems = [
     icon: HiOutlineCog,
     path: "/new-company-setup",
   },
-  { label: "Consultation", icon: LuCircleDollarSign, path: "/consultation" },
-  { label: "Workation", icon: LuCircleDollarSign, path: "/workation" },
+  { label: "Consultation", icon: HiOutlineUserGroup, path: "/consultation" },
+  { label: "Workation", icon: MdComputer, path: "/workation" },
   {
     label: "Apply for Job",
-    icon: HiOutlineUserCircle,
+    icon: IoBriefcaseSharp,
     badge: "Coming soon",
   },
 ];
@@ -119,7 +123,7 @@ const loggedOutPrompt = {
 const profileItems = [
   { label: "userFullName", icon: HiOutlineUserCircle, tab: "profile" },
   { label: "Favorites", icon: HiOutlineHeart, tab: "favorites" },
-  { label: "Reviews", icon: LuCircleDollarSign, tab: "reviews" },
+  { label: "Reviews", icon: MdRateReview, tab: "reviews" },
   { label: "Change Password", icon: HiOutlineKey, tab: "password" },
 ];
 

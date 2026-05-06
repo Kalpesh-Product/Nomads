@@ -86,19 +86,21 @@ const AiHostContact = () => {
 
     return (
         <>
-            <button
-                type="button"
-                onClick={onBack}
-                className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
-                aria-label="Go back to search results"
-            >
-                <HiOutlineArrowLeft size={18} />
-            </button>
+            <div className="sticky top-0 z-40 bg-white/95 py-3 backdrop-blur-sm">
+                <button
+                    type="button"
+                    onClick={onBack}
+                    className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500"
+                    aria-label="Go back to search results"
+                >
+                    <HiOutlineArrowLeft size={18} />
+                </button>
+            </div>
             <div className="bg-white text-black font-sans">
                 {/* About & Form */}
                 {/* <section className="py-10 px-4 md:px-20"> */}
                 <Container padding={false}>
-                    <section className="min-h-[85vh] flex items-center justify-center">
+                    <section className="min-h-[85vh] flex items-start justify-center pt-10">
                         <div className="w-full max-w-5xl">
                             {/* About Us */}
                             {/* <div className="space-y-6">
@@ -300,26 +302,26 @@ const AiHostContact = () => {
                                                         <MenuItem value="" disabled>
                                                             Select Type
                                                         </MenuItem>
-                                                        <MenuItem value="Nomad Booking Query">
-                                                            Nomad Booking Query
+                                                        <MenuItem value="Add Your Business">
+                                                            Add Your Business
                                                         </MenuItem>
-                                                        <MenuItem value="Workation Booking Query">
-                                                            Workation Booking Query
+                                                        <MenuItem value="Business Activation Query">
+                                                            Business Activation Query
                                                         </MenuItem>
-                                                        <MenuItem value="Nomad & WoNo Partnerships">
-                                                            Nomad & WoNo Partnerships
+                                                        <MenuItem value="Value Adding Partnerships">
+                                                            Value Adding Partnerships
                                                         </MenuItem>
-                                                        <MenuItem value="B2B SaaS Technology Licensing">
-                                                            B2B SaaS Technology Licensing
+                                                        <MenuItem value="Lead a Location for WoNo">
+                                                            Lead a Location for WoNo
                                                         </MenuItem>
-                                                        <MenuItem value="Landlord Partnerships">
-                                                            Landlord Partnerships
+                                                        <MenuItem value="Become a Franchise Partner">
+                                                            Become a Franchise Partner
                                                         </MenuItem>
-                                                        <MenuItem value="Investment Related">
-                                                            Investment Related
+                                                        <MenuItem value="PR Related Query">
+                                                            PR Related Query
                                                         </MenuItem>
-                                                        <MenuItem value="Coffee Meeting to know us better">
-                                                            Coffee Meeting to know us better
+                                                        <MenuItem value="Join Our Team">
+                                                            Join Our Team
                                                         </MenuItem>
                                                     </TextField>
                                                 )}

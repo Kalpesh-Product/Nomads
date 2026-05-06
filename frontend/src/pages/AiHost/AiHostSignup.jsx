@@ -63,6 +63,15 @@ const serviceOptions = [
     // },
 ];
 
+const verticalTypeOptions = [
+    "coworking",
+    "coliving",
+    "hostel",
+    "workation",
+    "meetings",
+    "cafe",
+];
+
 const floatingLabelSx = {
     color: "black",
     "&.Mui-focused": { color: "#1976d2" },
@@ -118,7 +127,7 @@ const AiHostSignup = () => {
                 city: "",
                 companyName: "",
                 industry: "",
-                companySize: "",
+                verticalType: "",
                 companyCountry: "",
                 companyState: "",
                 companyCity: "",
@@ -275,7 +284,7 @@ const AiHostSignup = () => {
         [
             "companyName",
             "industry",
-            "companySize",
+            "verticalType",
             "companyCountry",
             "companyState",
             "companyCity",
@@ -323,7 +332,7 @@ const AiHostSignup = () => {
             "city",
             "companyName",
             "industry",
-            "companySize",
+            "verticalType",
             "companyCountry",
             "companyState",
             "companyCity",
@@ -588,25 +597,27 @@ const AiHostSignup = () => {
                             )}
                         />
                         <Controller
-                            name="companySize"
+                            name="verticalType"
                             control={control}
-                            rules={{
-                                pattern: {
-                                    value: /^[0-9]+$/,
-                                    message: "Company Size must be a number",
-                                },
-                            }}
+                            rules={{ required: "Type of Vertical is required" }}
                             render={({ field, fieldState }) => (
                                 <TextField
                                     {...field}
-                                    label="Company Size"
+                                    select
+                                    label="Type of Vertical"
                                     fullWidth
                                     margin="normal"
                                     variant="standard"
                                     error={!!fieldState.error}
                                     helperText={fieldState.error?.message}
                                     InputLabelProps={{ sx: floatingLabelSx }}
-                                />
+                                >
+                                    {verticalTypeOptions.map((option) => (
+                                        <MenuItem key={option} value={option}>
+                                            {option}
+                                        </MenuItem>
+                                    ))}
+                                </TextField>
                             )}
                         />
 
@@ -1348,11 +1359,11 @@ const AiHostSignup = () => {
 
     return (
         <div className="h-full flex flex-col justify-start p-4 lg:p-10 items-center w-full">
-            <div className="flex justify-start w-full">
+            <div className="sticky top-0 z-40 flex justify-start w-full bg-white/95 py-3 backdrop-blur-sm">
                 <button
                     type="button"
                     onClick={onBack}
-                    className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
+                    className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500"
                     aria-label="Go back to search results"
                 >
                     <HiOutlineArrowLeft size={18} />

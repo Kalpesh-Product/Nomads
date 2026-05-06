@@ -126,11 +126,11 @@ const Themes = () => {
   const onBack = () => navigate("/host");
   return (
     <div className="   text-secondary-dark justify-center items-center">
-      <div className="flex min-w-[11rem] items-center gap-3">
+      <div className="sticky top-0 z-40 flex min-w-[11rem] items-center gap-3 bg-white/95 py-3 backdrop-blur-sm">
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
+          className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500"
           aria-label="Go back to search results"
         >
           <HiOutlineArrowLeft size={18} />
@@ -143,7 +143,7 @@ const Themes = () => {
                     )} */}
       </div>
       <Container padding={false}>
-        <section className="flex flex-col items-end justify-center gap-4 leading-[1.3] text-secondary-dark lg:pt-16 pt-10 pb-16">
+        <section className="flex flex-col items-end justify-center gap-4 leading-[1.3] text-secondary-dark lg:pt-16 pt-10 pb-10">
           <h1 className="text-[clamp(1.62rem,4.0vw,4.5rem)] font-medium">
             Choose the best Responsive Website Theme for your business
           </h1>
@@ -156,8 +156,8 @@ const Themes = () => {
       <MySeperator />
       {/*Top Recommendations */}
       <section className="w-full bg-white lg:flex lg:flex-col justify-center items-center gap-8 ">
-        <Container>
-          <div className="space-y-12">
+        <Container padding={false}>
+          <div className="space-y-6 lg:pt-16 lg:pb-8 pb-10 pt-10">
             <div>
               <h1 className="text-[clamp(2rem,2.5vw,5rem)] font-medium pb-2">
                 Top Theme Recommendations
@@ -167,7 +167,7 @@ const Themes = () => {
                 business growth. Fully tech ready, integrated and responsive.
               </span>
             </div>
-            <div className="flex overflow-x-auto gap-6 snap-x snap-mandatory scrollbar-hide lg:grid lg:grid-cols-2 lg:gap-10 lg:overflow-visible pt-9">
+            <div className="flex overflow-x-auto gap-6 snap-x snap-mandatory scrollbar-hide lg:grid lg:grid-cols-2 lg:gap-10 lg:overflow-visible pt-4">
               {themes.map((image, index) => (
                 <div
                   data-aos="fade-up"
@@ -188,7 +188,7 @@ const Themes = () => {
                 </div>
               ))}
             </div>
-            <div className="flex justify-center items-center">
+            <div className="flex justify-center items-center pt-4">
               <GetStartedButton
                 handleSubmit={() => navigate("/host/ai-host-signup?step=0")}
               />
@@ -199,9 +199,9 @@ const Themes = () => {
       <MySeperator />
       {/*Customize */}
       <section>
-        <Container>
-          <div className="flex lg:flex-nowrap flex-wrap justify-between items-center gap-8">
-            <div className="flex flex-col gap-6 sm:gap-16 w-full lg:w-[50%]">
+        <Container padding={false}>
+          <div className="flex lg:flex-nowrap flex-wrap justify-between items-center gap-8 lg:pt-16 lg:pb-8 pb-10 pt-10">
+            <div className="flex flex-col gap-6 w-full lg:w-[50%]">
               <div className="text-[clamp(2rem,4.2vw,6rem)] md:text-[clamp(2rem,8vw,8rem)] lg:text-[clamp(2rem,4.2vw,6rem)] leading-none">
                 <h1 className="font-normal">
                   Customize it <br className="hidden lg:block" /> your way
@@ -213,7 +213,7 @@ const Themes = () => {
                 <li>Powerful AI features for smart customization</li>
                 <li>Full-stack web dev tools for custom functionality</li>
               </ul>
-              <div className="flex justify-center md:justify-start w-full">
+              <div className="flex justify-center md:justify-start w-full pt-2">
                 <GetStartedButton
                   handleSubmit={() => navigate("/host/ai-host-signup?step=0")}
                 />
@@ -231,8 +231,8 @@ const Themes = () => {
       </section>
       <MySeperator />
       {/*Website Builder */}
-      <Container>
-        <div className="flex flex-col justify-between items-center gap-6 sm:gap-14">
+      <Container padding={false}>
+        <div className="flex flex-col justify-between items-center gap-6 lg:pt-16 lg:pb-8 pb-10 pt-10">
           <div className="text-[clamp(2rem,4.3vw,4.5rem)] md:text-[clamp(2rem,7vw,8rem)] lg:text-[clamp(2rem,4.3vw,4.5rem)] w-full lg:w-[70%] self-start leading-[1.2]">
             <h1 className="font-normal">
               A website builder engineered for growth
@@ -248,7 +248,7 @@ const Themes = () => {
               </div>
             ))}
           </div>
-          <div>
+          <div className="pt-2">
             <GetStartedButton
               handleSubmit={() => navigate("/host/ai-host-signup?step=0")}
             />
