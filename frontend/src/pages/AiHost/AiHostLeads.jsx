@@ -17,6 +17,7 @@ import { ReactFitty } from "react-fitty";
 import { useNavigate } from "react-router-dom";
 import MySeperator from "../../components/MySeperator";
 import { HiOutlineArrowLeft } from "react-icons/hi";
+import GetStartedButton from "../../components/GetStartedButton";
 
 const checklistItems = [
   "Google My Business",
@@ -77,11 +78,11 @@ const Leads = () => {
   const onBack = () => navigate("/host");
   return (
     <div>
-      <div className="flex min-w-[11rem] items-center gap-3">
+      <div className="sticky top-0 z-40 flex min-w-[11rem] items-center gap-3 bg-white/95 py-3 backdrop-blur-sm">
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
+          className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500"
           aria-label="Go back to search results"
         >
           <HiOutlineArrowLeft size={18} />
@@ -103,13 +104,10 @@ const Leads = () => {
               resources.
             </h2>
           </div>
-          <div className="flex flex-row lg:justify-end md:justify-end  sm:justify-center xs:justify-center items-center py-6">
-            <button
-              onClick={() => navigate("/host/ai-host-signup?step=0")}
-              className="bg-black text-white px-10 py-3 rounded-full"
-            >
-              Get Started
-            </button>
+          <div className="flex flex-row lg:justify-end md:justify-end  sm:justify-center xs:justify-center items-center pb-8">
+            <GetStartedButton
+              handleSubmit={() => navigate("/host/ai-host-signup?step=0")}
+            />
           </div>
         </div>
       </Container>
@@ -182,10 +180,10 @@ const Leads = () => {
       <Container padding={false}>
         <div className="pt-10 pb-12">
           <div className="pb-6">
-            <h2 className="lg:text-[2.75rem] md:text-[2.75rem] sm:text-[1.75rem] xs:text-[1.75rem] lg:leading-[3.5rem] md:leading-9 sm:leading-9 xs:leading-9 font-semibold text-host">
+            <h2 className="lg:text-[2.5rem] md:text-[2.75rem] sm:text-[1.75rem] xs:text-[1.75rem] lg:leading-[3.5rem] md:leading-9 sm:leading-9 xs:leading-9 font-semibold text-host">
               Automated Google LEAD SHEET!
             </h2>
-            <h2 className="lg:text-[2.75rem] md:text-[2.75rem] sm:text-[1.75rem] xs:text-[1.75rem]  lg:leading-[3.5rem] md:leading-9 sm:leading-9 xs:leading-9  font-semibold text-host">
+            <h2 className="lg:text-[2.5rem] md:text-[2.75rem] sm:text-[1.75rem] xs:text-[1.75rem]  lg:leading-[3.5rem] md:leading-9 sm:leading-9 xs:leading-9  font-semibold text-host">
               Never miss any leads generated from our platform.
             </h2>
           </div>
@@ -225,13 +223,10 @@ const Leads = () => {
               </div>
             ))}
           </div>
-          <div className="flex lg:justify-end xs:justify-center items-center lg:px-8">
-            <button
-              onClick={() => navigate("/host/ai-host-signup?step=0")}
-              className="bg-black text-white px-10 py-3 rounded-full"
-            >
-              Get Started
-            </button>
+          <div className="flex lg:justify-end xs:justify-center items-center lg:px-8 pt-6">
+            <GetStartedButton
+              handleSubmit={() => navigate("/host/ai-host-signup?step=0")}
+            />
           </div>
         </div>
       </Container>

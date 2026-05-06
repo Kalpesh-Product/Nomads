@@ -145,14 +145,16 @@ const HostProduct = () => {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={onBack}
-        className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
-        aria-label="Go back to search results"
-      >
-        <HiOutlineArrowLeft size={18} />
-      </button>
+      <div className="sticky top-0 z-40 bg-white/95 py-3 backdrop-blur-sm">
+        <button
+          type="button"
+          onClick={onBack}
+          className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500"
+          aria-label="Go back to search results"
+        >
+          <HiOutlineArrowLeft size={18} />
+        </button>
+      </div>
       <div
         key={location.state?.image?.src || "default"}
         className="flex flex-col"

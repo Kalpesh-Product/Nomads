@@ -240,14 +240,16 @@ const AiHostTermsAndCondition = () => {
 
     return (
         <>
-            <button
-                type="button"
-                onClick={onBack}
-                className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
-                aria-label="Go back to search results"
-            >
-                <HiOutlineArrowLeft size={18} />
-            </button>
+            <div className="sticky top-0 z-40 bg-white/95 py-3 backdrop-blur-sm">
+                <button
+                    type="button"
+                    onClick={onBack}
+                    className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500"
+                    aria-label="Go back to search results"
+                >
+                    <HiOutlineArrowLeft size={18} />
+                </button>
+            </div>
             <div className="flex flex-col gap-10 px-6 lg:px-28 pb-4 pt-12 text-[#364D59]">
                 <div className="flex flex-col items-center relative font-comic uppercase font-bold text-secondary-dark text-[clamp(1.5rem,4vw,3rem)] leading-tight">
                     <h3>TERMS AND CONDITIONS</h3>

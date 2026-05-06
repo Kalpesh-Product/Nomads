@@ -151,7 +151,7 @@ const HostHome = () => {
             </Container>
             <section>
                 <Container>
-                    <div className="flex flex-col sm:gap-16 gap-6">
+                    <div className="flex flex-col gap-6">
                         <div className="flex flex-col leading-tight">
                             <ReactFitty>
                                 <h1 className="font-semibold uppercase">
@@ -165,12 +165,12 @@ const HostHome = () => {
                             </ReactFitty>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {onePartner.map((item) => (
                                 <div
                                     key={item.id}
-                                    className="border-t-2 border-black w-full space-y-2 py-2">
-                                    <h1 className="text-title py-4">
+                                    className="border-t-2 border-black w-full space-y-2 pt-2 pb-0">
+                                    <h1 className="text-title py-3">
                                         {item.title || "Title here"}
                                     </h1>
                                     <span className="text-secondary-dark">
@@ -180,7 +180,7 @@ const HostHome = () => {
                             ))}
                         </div>
 
-                        <div className="flex w-full justify-center lg:justify-end pr-0 lg:pr-20 pb-4">
+                        <div className="flex flex-row items-center justify-center pt-2 pb-0 lg:justify-end">
                             <GetStartedButton
                                 title={"GET STARTED"}
                                 handleSubmit={() => navigate("/host/ai-host-signup?step=0")}
@@ -230,14 +230,16 @@ const HostHome = () => {
                 </Container>
             </section>
             <MySeperator />
-            <div className="flex flex-col items-center w-full justify-center lg:justify-center my-16">
-                <div className="text-[clamp(1rem,3vw,3rem)] my-4 lg:my-4">
+            <div className="flex w-full flex-col items-center justify-center pt-4 pb-0">
+                <div className="font-bold text-3xl">
                     Activate Your Modern Nomad Buissness Now.
                 </div>
-                <GetStartedButton
-                    title={"Get Started"}
-                    handleSubmit={() => navigate("/host/ai-host-signup?step=0")}
-                />
+                <div className="justify-center pb-4 pt-4">
+                    <GetStartedButton
+                        title={"Get Started"}
+                        handleSubmit={() => navigate("/host/ai-host-signup?step=0")}
+                    />
+                </div>
             </div>
             {/* <MySeperator /> */}
         </main>
