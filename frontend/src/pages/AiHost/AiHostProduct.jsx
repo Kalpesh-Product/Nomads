@@ -180,7 +180,7 @@ const HostProduct = () => {
                   </ul>
                   <GetStartedButton
                     handleSubmit={() => navigate("/host/ai-host-signup?step=0")}
-                    externalStyles="bg-white text-black lg:w-[70%]"
+                    externalStyles="bg-black text-white lg:w-[70%]"
                   />
                 </div>
                 <div

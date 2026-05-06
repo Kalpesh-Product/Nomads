@@ -105,6 +105,7 @@ import AiHostProduct from "./pages/AiHost/AiHostProduct";
 import AiHostContact from "./pages/AiHost/AiHostContact";
 import AiHostContentAndCopyright from "./pages/AiHost/AiHostContentAndCopyright";
 import AiHostContentUseRemoval from "./pages/AiHost/AiHostContentUseRemoval";
+import AiHostJobDetails from "./pages/AiHost/AiHostJobDetails";
 
 function getTenantFromHost() {
   const hostname = window.location.hostname; // e.g. "nomad.wono.co" or "nomad.localhost"
@@ -282,6 +283,7 @@ if (tenant === "main") {
             { path: "ai-host-themes", element: <AiHostThemes /> },
             { path: "ai-host-leads", element: <AiHostLeads /> },
             { path: "ai-host-career", element: <AiHostCareer /> },
+            { path: "ai-host-career/job/:title", element: <AiHostJobDetails /> },
             { path: "ai-host-about", element: <AiHostAbout /> },
             { path: "ai-host-privacy", element: <AiHostPrivacy /> },
             { path: "ai-host-terms-and-conditions", element: <AiHostTermsAndCondition /> },

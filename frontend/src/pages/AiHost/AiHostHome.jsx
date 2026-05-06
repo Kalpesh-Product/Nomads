@@ -223,7 +223,7 @@ const HostHome = () => {
                             <NavLink
                                 to={"/host/ai-host-themes"}
                                 className={" hover:underline hover:text-primary-blue"}>
-                                View More
+                                View more
                             </NavLink>
                         </div>
                     </div>
@@ -231,8 +231,8 @@ const HostHome = () => {
             </section>
             <MySeperator />
             <div className="flex w-full flex-col items-center justify-center pt-4 pb-0">
-                <div className="font-bold text-3xl">
-                    Activate Your Modern Nomad Buissness Now.
+                <div className="text-[clamp(1.2rem,2.8vw,7rem)] font-semibold text-center text-secondary-dark">
+                    ACTIVATE YOUR MODERN NOMAD BUSINESS NOW.
                 </div>
                 <div className="justify-center pb-4 pt-4">
                     <GetStartedButton

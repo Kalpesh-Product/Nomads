@@ -100,7 +100,7 @@ const AiHostContact = () => {
                 {/* About & Form */}
                 {/* <section className="py-10 px-4 md:px-20"> */}
                 <Container padding={false}>
-                    <section className="min-h-[85vh] flex items-center justify-center">
+                    <section className="min-h-[85vh] flex items-start justify-center pt-10">
                         <div className="w-full max-w-5xl">
                             {/* About Us */}
                             {/* <div className="space-y-6">

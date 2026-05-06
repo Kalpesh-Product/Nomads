@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 import Container from "../../components/Container";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import axios from "../../utils/axios";
 import romans from "romans";
@@ -14,7 +14,7 @@ const Career = () => {
     const [openIndex, setOpenIndex] = useState(null);
     const { pathname } = useLocation();
     const isHost = pathname.includes("host");
-    const customLink = isHost ? `/career/job` : `/career/job`;
+    const customLink = isHost ? `/host/ai-host-career/job` : `/career/job`;
     // const customRoute = isHost ? "job/get-job-posts" : "";
 
     const categoryOrder = [
