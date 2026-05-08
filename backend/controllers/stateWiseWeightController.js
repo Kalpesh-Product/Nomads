@@ -121,6 +121,17 @@ const toNumber = (value) => {
   return Number.isFinite(num) ? num : 0;
 };
 
+const hasValue = (value) =>
+  value !== undefined &&
+  value !== null &&
+  !(typeof value === "string" && value.trim() === "");
+
+const toNumberOrUndefined = (value) => {
+  if (!hasValue(value)) return undefined;
+  const num = Number(value);
+  return Number.isFinite(num) ? num : undefined;
+};
+
 const buildImageSlotKey = (stateName = "", index = 0) => {
   const normalizedState =
     String(stateName || "state")
@@ -196,15 +207,6 @@ const mapCsvRowToStateWiseWeight = (rawRow = {}) => {
   const country = row["country"];
   const state = row["destination"];
 
-  // Handle root-level image fields (handles "Image Link" -> "imagelink")
-  const imageLinkRaw = row["imagelink"];
-  const imageUrls = imageLinkRaw
-    ? String(imageLinkRaw)
-      .split(",")
-      .map((url) => url.trim())
-      .filter(Boolean)
-    : [];
-
   // Handle rank - safely grab the first number column
   const rank = toNumber(row["rank"]);
 
@@ -231,9 +233,51 @@ const mapCsvRowToStateWiseWeight = (rawRow = {}) => {
     state,
     rank,
     weight,
-    images: buildImagesMapFromUrls(imageUrls, state),
     labels,
     isActive,
+    raw: row,
+  };
+};
+
+const buildSelectiveUpdateData = (row = {}) => {
+  const updateData = {};
+  const raw = row.raw || {};
+
+  if (hasValue(raw["continent"])) updateData.continent = row.continent;
+  if (hasValue(raw["country"])) updateData.country = row.country;
+  if (hasValue(raw["destination"])) updateData.state = row.state;
+
+  if (hasValue(raw["rank"])) {
+    const parsedRank = toNumberOrUndefined(raw["rank"]);
+    if (parsedRank !== undefined) updateData.rank = parsedRank;
+  }
+
+  if (hasValue(raw["status"])) {
+    updateData.isActive = row.isActive;
+  }
+
+  const weightUpdates = {};
+  for (const [csvKey, schemaKey] of Object.entries(CSV_TO_SCHEMA_MAP)) {
+    if (!hasValue(raw[csvKey])) continue;
+    const parsedValue = toNumberOrUndefined(raw[csvKey]);
+    if (parsedValue !== undefined) {
+      weightUpdates[`weight.${schemaKey}`] = parsedValue;
+    }
+  }
+
+  const labelUpdates = {};
+  for (const [csvKey, schemaKey] of Object.entries(CSV_TO_LABEL_MAP)) {
+    if (!hasValue(raw[csvKey])) continue;
+    labelUpdates[`labels.${schemaKey}`] = row.labels[schemaKey];
+  }
+
+  return {
+    updateData: {
+      ...updateData,
+      ...weightUpdates,
+      ...labelUpdates,
+    },
+    insertOnlyData: {},
   };
 };
 
@@ -673,15 +717,15 @@ export const bulkInsertStateWiseWeightCsv = async (req, res, next) => {
         rowNumber += 1;
         const row = mapCsvRowToStateWiseWeight(rawRow);
 
-        if (!row.continent || !row.country || !row.state || !row.rank) {
+        if (!row.country || !row.state) {
           rowErrors.push({
             rowNumber,
-            reason: "Missing required fields: continent/country/state/rank",
+            reason: "Missing required fields: country/state",
           });
           return;
         }
 
-        rows.push(row);
+        rows.push({ ...row, rowNumber });
       })
       .on("end", async () => {
         try {
@@ -691,30 +735,42 @@ export const bulkInsertStateWiseWeightCsv = async (req, res, next) => {
               .json({ message: "No valid rows were found in CSV.", rowErrors });
           }
 
-          const operations = rows.map((row) => {
-            const updateData = {
-              continent: row.continent,
-              country: row.country,
-              state: row.state,
-              rank: row.rank,
-              weight: row.weight,
-              labels: row.labels,
-              isActive: row.isActive, // Added isActive mapping
-            };
+          const operations = rows.flatMap((row) => {
+            const { updateData, insertOnlyData } = buildSelectiveUpdateData(row);
 
-            // ONLY update images if they actually exist in the CSV
-            if (row.images && Object.keys(row.images).length > 0) {
-              updateData.images = row.images;
+            if (
+              Object.keys(updateData).length === 0 &&
+              Object.keys(insertOnlyData).length === 0
+            ) {
+              rowErrors.push({
+                rowNumber: row.rowNumber,
+                reason: "No updatable fields found in this row.",
+              });
+              return [];
             }
 
-            return {
+            return [{
               updateOne: {
                 filter: { country: row.country, state: row.state },
-                update: { $set: updateData },
+                update: {
+                  ...(Object.keys(updateData).length > 0
+                    ? { $set: updateData }
+                    : {}),
+                  ...(Object.keys(insertOnlyData).length > 0
+                    ? { $setOnInsert: insertOnlyData }
+                    : {}),
+                },
                 upsert: true,
               },
-            };
+            }];
           });
+
+          if (!operations.length) {
+            return res.status(400).json({
+              message: "No valid update operations were generated from CSV.",
+              rowErrors,
+            });
+          }
 
           const result = await StateWiseWeight.bulkWrite(operations, {
             ordered: false,
