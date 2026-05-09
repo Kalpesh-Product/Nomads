@@ -3,6 +3,7 @@ import { randomUUID } from "crypto";
 import yup from "yup";
 import mongoose from "mongoose";
 import WebsiteTemplate from "../../models/WebsiteTemplate.js";
+import HostUser from "../../models/HostUser.js";
 import sharp from "sharp";
 import { sendMail, sendAdminFormNotification } from "../../config/mailer.js";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
@@ -458,6 +459,27 @@ export const registerFormSubmission = async (req, res) => {
     };
 
     const sheetResult = await postToAppsScript(apsBody);
+
+    // STEP 1.5: also persist host signup user in MongoDB
+    await HostUser.create({
+      name: payload.name,
+      email: payload.email,
+      mobile: payload.mobile,
+      country: payload.country,
+      state: payload.state,
+      city: payload.city,
+      role: payload.role,
+      goals: payload.Goals,
+      companyName: payload.companyName,
+      industry: payload.industry,
+      verticalType: payload.verticalType,
+      companyCountry: payload.companyCountry,
+      companyState: payload.companyState,
+      companyCity: payload.companyCity,
+      formName: payload.formName || "register",
+      source: "AiHostSignup",
+      payload,
+    });
 
     // STEP 2: normalize incoming JSON strings
     let { products, testimonials, about } = payload;
