@@ -64,8 +64,8 @@ const AiAbout = () => {
     };
 
     return (
-        <div className="bg-white text-[#364D59] font-sans">
-            <div className="sticky top-0 z-40 bg-white/95 py-3 backdrop-blur-sm">
+        <div>
+            <div className="sticky top-0 z-40 bg-white/95 py-3 backdrop-blur-sm md:px-28">
                 <button
                     type="button"
                     onClick={() => navigate("/home")}
@@ -75,7 +75,7 @@ const AiAbout = () => {
                     <HiOutlineArrowLeft size={18} />
                 </button>
             </div>
-            <section className="px-6 md:px-12 lg:px-28 py-8 md:py-12 flex flex-col gap-10">
+            <section className="px-6 md:px-12 lg:px-28 py-8 md:py-2 flex flex-col gap-10">
                 {/* Header */}
                 <div className="flex flex-col items-center relative font-comic uppercase font-bold text-secondary-dark text-2xl md:text-4xl lg:text-5xl leading-tight mb-4">
                     <div className="relative inline-block text-center">

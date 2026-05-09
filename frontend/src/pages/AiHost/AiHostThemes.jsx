@@ -149,7 +149,7 @@ const Themes = () => {
           </h1>
 
           <GetStartedButton
-            handleSubmit={() => navigate("/host/ai-host-signup?step=0")}
+            handleSubmit={() => navigate("/host/ai-host-signup?step=1")}
           />
         </section>
       </Container>
@@ -190,7 +190,7 @@ const Themes = () => {
             </div>
             <div className="flex justify-center items-center pt-4">
               <GetStartedButton
-                handleSubmit={() => navigate("/host/ai-host-signup?step=0")}
+                handleSubmit={() => navigate("/host/ai-host-signup?step=1")}
               />
             </div>
           </div>
@@ -215,7 +215,7 @@ const Themes = () => {
               </ul>
               <div className="flex justify-center md:justify-start w-full pt-2">
                 <GetStartedButton
-                  handleSubmit={() => navigate("/host/ai-host-signup?step=0")}
+                  handleSubmit={() => navigate("/host/ai-host-signup?step=1")}
                 />
               </div>
             </div>
@@ -250,7 +250,7 @@ const Themes = () => {
           </div>
           <div className="pt-2">
             <GetStartedButton
-              handleSubmit={() => navigate("/host/ai-host-signup?step=0")}
+              handleSubmit={() => navigate("/host/ai-host-signup?step=1")}
             />
           </div>
         </div>
