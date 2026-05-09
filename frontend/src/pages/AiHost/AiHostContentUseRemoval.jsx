@@ -385,7 +385,7 @@ const AiHostContentUseRemoval = () => {
     return (
         <>
             {/* BACK BUTTON */}
-            <div className="sticky top-0 z-40 bg-white/95 py-3 backdrop-blur-sm">
+            <div className="sticky top-0 z-40 bg-white/95 py-3 backdrop-blur-sm md:px-28">
                 <button
                     type="button"
                     onClick={onBack}
