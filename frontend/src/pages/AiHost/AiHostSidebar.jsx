@@ -470,21 +470,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     const isLoggedIn = Boolean(auth?.user) || readStoredLoginState();
     console.log(isLoggedIn);
 
-    const handleRecommendationClick = (item) => {
-        if (item.path) {
-            navigate("/host/ai-host-model-showcase");
-        } else {
-            navigate("/host/ai-host-model-showcase");
-        }
-    };
-
-    const handleValueAdditionClick = (item) => {
-        if (item.path) {
-            navigate("/host/ai-host-model-showcase");
-        } else {
-            navigate("/host/ai-host-model-showcase");
-        }
-    };
+    const handleSidebarItemClick = () => {};
 
     const handleProfileClick = (item) => {
         if (!item.tab) return;
@@ -708,7 +694,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                 isExpandable
                 isOpen={isRecommendationsOpen}
                 onToggle={() => setIsRecommendationsOpen((prev) => !prev)}
-                onItemClick={handleRecommendationClick}
+                onItemClick={handleSidebarItemClick}
             />
 
             <SidebarSection
@@ -718,7 +704,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                 isExpandable
                 isOpen={isValueAdditionsOpen}
                 onToggle={() => setIsValueAdditionsOpen((prev) => !prev)}
-                onItemClick={handleValueAdditionClick}
+                onItemClick={handleSidebarItemClick}
             />
             <SidebarSection
                 title="Common Features"
@@ -727,7 +713,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                 isExpandable
                 isOpen={isCommonFeaturesOpen}
                 onToggle={() => setIsCommonFeaturesOpen((prev) => !prev)}
-                onItemClick={handleValueAdditionClick}
+                onItemClick={handleSidebarItemClick}
             />
             <SidebarSection
                 title="Extra Common Modules"
@@ -736,7 +722,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                 isExpandable
                 isOpen={isExtraCommonModulesOpen}
                 onToggle={() => setIsExtraCommonModulesOpen((prev) => !prev)}
-                onItemClick={handleValueAdditionClick}
+                onItemClick={handleSidebarItemClick}
             />
             <SidebarSection
                 title="Core Modules"
@@ -745,7 +731,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                 isExpandable
                 isOpen={isCoreModulesOpen}
                 onToggle={() => setIsCoreModulesOpen((prev) => !prev)}
-                onItemClick={handleValueAdditionClick}
+                onItemClick={handleSidebarItemClick}
             />
             <SidebarSection
                 title="Department Accesses"
@@ -754,7 +740,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                 isExpandable
                 isOpen={isDepartmentAccessOpen}
                 onToggle={() => setIsDepartmentAccessOpen((prev) => !prev)}
-                onItemClick={handleValueAdditionClick}
+                onItemClick={handleSidebarItemClick}
             />
 
             {isLoggedIn ? (
