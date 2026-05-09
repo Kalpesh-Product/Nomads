@@ -39,6 +39,21 @@ import { BsPeopleFill } from "react-icons/bs";
 import { MdAccountBalance } from "react-icons/md";
 import { MdOutlineHandshake } from "react-icons/md";
 import { BsPersonVcard } from "react-icons/bs";
+import { HiOutlineClipboardList } from "react-icons/hi";
+import { MdOutlineFingerprint } from "react-icons/md";
+import { HiOutlineDocumentReport } from "react-icons/hi";
+import { HiOutlineArchive } from "react-icons/hi";
+import { HiOutlineLibrary } from "react-icons/hi";
+import { HiOutlineCash } from "react-icons/hi";
+import { HiOutlineTemplate } from "react-icons/hi";
+import { HiOutlineAdjustments } from "react-icons/hi";
+import { HiOutlineChartBar } from "react-icons/hi";
+import { HiOutlineUsers } from "react-icons/hi";
+import { HiOutlineBriefcase } from "react-icons/hi";
+import { HiOutlineTrendingUp } from "react-icons/hi";
+import { HiOutlineWrenchScrewdriver } from "react-icons/hi2";
+import { HiOutlineChip } from "react-icons/hi";
+import { HiOutlineDatabase } from "react-icons/hi";
 
 const gatedRecommendationLabels = new Set([
     "Work From Anywhere",
@@ -60,7 +75,7 @@ const getSearchPathForGoal = (goalLabel) => {
     return goalSlug ? `/search/${goalSlug}/results` : "/search/results";
 };
 
-const hostSignupEntryPath = "/host/ai-host-signup?step=0";
+const hostSignupEntryPath = "/host/ai-host-signup?step=1";
 
 const recommendationItems = [
     {
@@ -96,7 +111,7 @@ const recommendationItems = [
     {
         label: "Maintenance Module",
         icon: TiSpanner,
-        suffixText: "...More",
+        // suffixText: "...More",
     },
 ];
 
@@ -129,7 +144,137 @@ const valueAdditionItems = [
     {
         label: "Chat Bot",
         icon: IoMdChatbubbles,
-        suffixText: "...More",
+        // suffixText: "...More",
+    },
+];
+
+const commonFeatures = [
+    {
+        label: "Dashboard",
+        icon: HiOutlineViewGrid,
+        path: "/host/extra-common-modules",
+    },
+    {
+        label: "Attendance",
+        icon: MdOutlineFingerprint,
+        path: "/host/extra-common-modules",
+    },
+    {
+        label: "Tasks",
+        icon: HiOutlineClipboardList,
+        path: "/host/assets",
+    },
+    {
+        label: "Tickets",
+        icon: MdOutlineSupportAgent,
+        path: "/host/inventory",
+    },
+    {
+        label: "My Calendar",
+        icon: TbCalendarUser,
+        path: "/host/finance-management",
+    },
+    {
+        label: "Leave Requests",
+        icon: HiOutlineLogout,
+    },
+    {
+        label: "Meeting Room Booking",
+        icon: MdMeetingRoom,
+        path: "/host/finance-management",
+    },
+    {
+        label: "Reports",
+        icon: HiOutlineDocumentReport,
+    },
+];
+
+const extraCommonModules = [
+    {
+        label: "Assets",
+        icon: HiOutlineArchive,
+        path: "/host/extra-common-modules",
+    },
+    {
+        label: "Inventory",
+        icon: HiOutlineLibrary,
+        path: "/host/extra-common-modules",
+    },
+    {
+        label: "Finance Management",
+        icon: HiOutlineCash,
+        path: "/host/assets",
+    },
+];
+
+const coreModules = [
+    {
+        label: "Organization Management",
+        icon: HiOutlineLibrary,
+        path: "/host/extra-common-modules",
+    },
+    {
+        label: "Module Management",
+        icon: HiOutlineTemplate,
+        path: "/host/extra-common-modules",
+    },
+    {
+        label: "Access Grants",
+        icon: HiOutlineKey,
+        path: "/host/assets",
+    },
+    {
+        label: "Workspace Settings",
+        icon: HiOutlineAdjustments,
+        path: "/host/extra-common-modules",
+    },
+    {
+        label: "Workspace Management",
+        icon: HiOutlineCog,
+        path: "/host/extra-common-modules",
+    },
+    {
+        label: "Analytics",
+        icon: HiOutlineChartBar,
+        path: "/host/assets",
+    },
+];
+
+const departmentAccess = [
+    {
+        label: "Hr Department",
+        icon: HiOutlineUsers,
+        path: "/host/extra-common-modules",
+    },
+    {
+        label: "Administration Department",
+        icon: HiOutlineBriefcase,
+        path: "/host/extra-common-modules",
+    },
+    {
+        label: "Sales Department",
+        icon: HiOutlineTrendingUp,
+        path: "/host/assets",
+    },
+    {
+        label: "Finance Department",
+        icon: HiOutlineCurrencyDollar,
+        path: "/host/extra-common-modules",
+    },
+    {
+        label: "Maintainence Department",
+        icon: HiOutlineWrenchScrewdriver,
+        path: "/host/extra-common-modules",
+    },
+    {
+        label: "Tech Department",
+        icon: HiOutlineChip,
+        path: "/host/assets",
+    },
+    {
+        label: "IT Department",
+        icon: HiOutlineDatabase,
+        path: "/host/assets",
     },
 ];
 
@@ -248,6 +393,10 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     const [collapsed, setCollapsed] = useState(false);
     const [isRecommendationsOpen, setIsRecommendationsOpen] = useState(true);
     const [isValueAdditionsOpen, setIsValueAdditionsOpen] = useState(false);
+    const [isCommonFeaturesOpen, setIsCommonFeaturesOpen] = useState(false);
+    const [isExtraCommonModulesOpen, setIsExtraCommonModulesOpen] = useState(false);
+    const [isCoreModulesOpen, setIsCoreModulesOpen] = useState(false);
+    const [isDepartmentAccessOpen, setIsDepartmentAccessOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
 
     const location = useLocation();
@@ -268,6 +417,42 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
             );
         });
 
+        const isCommonFeaturePage = commonFeatures.some((item) => {
+            if (!item.path) return false;
+            const normalizedItemPath = item.path.replace(/\/$/, "");
+            return (
+                normalizedPath === normalizedItemPath ||
+                normalizedPath.startsWith(`${normalizedItemPath}/`)
+            );
+        });
+
+        const isExtraModulePage = extraCommonModules.some((item) => {
+            if (!item.path) return false;
+            const normalizedItemPath = item.path.replace(/\/$/, "");
+            return (
+                normalizedPath === normalizedItemPath ||
+                normalizedPath.startsWith(`${normalizedItemPath}/`)
+            );
+        });
+
+        const isCoreModulePage = coreModules.some((item) => {
+            if (!item.path) return false;
+            const normalizedItemPath = item.path.replace(/\/$/, "");
+            return (
+                normalizedPath === normalizedItemPath ||
+                normalizedPath.startsWith(`${normalizedItemPath}/`)
+            );
+        });
+
+        const isDepartmentAccessPage = departmentAccess.some((item) => {
+            if (!item.path) return false;
+            const normalizedItemPath = item.path.replace(/\/$/, "");
+            return (
+                normalizedPath === normalizedItemPath ||
+                normalizedPath.startsWith(`${normalizedItemPath}/`)
+            );
+        });
+
         if (isAiHomePage) {
             setIsRecommendationsOpen(false);
             setIsValueAdditionsOpen(true);
@@ -275,20 +460,30 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         }
 
         setIsRecommendationsOpen(true);
-        if (isValueAddedPage) {
-            setIsValueAdditionsOpen(true);
-        }
+        if (isValueAddedPage) setIsValueAdditionsOpen(true);
+        if (isCommonFeaturePage) setIsCommonFeaturesOpen(true);
+        if (isExtraModulePage) setIsExtraCommonModulesOpen(true);
+        if (isCoreModulePage) setIsCoreModulesOpen(true);
+        if (isDepartmentAccessPage) setIsDepartmentAccessOpen(true);
     }, [location.pathname]);
 
     const isLoggedIn = Boolean(auth?.user) || readStoredLoginState();
     console.log(isLoggedIn);
 
     const handleRecommendationClick = (item) => {
-        navigate(hostSignupEntryPath);
+        if (item.path) {
+            navigate("/host/ai-host-model-showcase");
+        } else {
+            navigate("/host/ai-host-model-showcase");
+        }
     };
 
     const handleValueAdditionClick = (item) => {
-        navigate(hostSignupEntryPath);
+        if (item.path) {
+            navigate("/host/ai-host-model-showcase");
+        } else {
+            navigate("/host/ai-host-model-showcase");
+        }
     };
 
     const handleProfileClick = (item) => {
@@ -398,6 +593,62 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         };
     });
 
+    const commonFeaturesWithActivePath = commonFeatures.map((item) => {
+        if (!item.path) return item;
+
+        const normalizedItemPath = item.path.replace(/\/$/, "");
+        const isActivePath =
+            normalizedPath === normalizedItemPath ||
+            normalizedPath.startsWith(`${normalizedItemPath}/`);
+
+        return {
+            ...item,
+            active: isActivePath,
+        };
+    });
+
+    const extraCommonModulesWithActivePath = extraCommonModules.map((item) => {
+        if (!item.path) return item;
+
+        const normalizedItemPath = item.path.replace(/\/$/, "");
+        const isActivePath =
+            normalizedPath === normalizedItemPath ||
+            normalizedPath.startsWith(`${normalizedItemPath}/`);
+
+        return {
+            ...item,
+            active: isActivePath,
+        };
+    });
+
+    const coreModulesWithActivePath = coreModules.map((item) => {
+        if (!item.path) return item;
+
+        const normalizedItemPath = item.path.replace(/\/$/, "");
+        const isActivePath =
+            normalizedPath === normalizedItemPath ||
+            normalizedPath.startsWith(`${normalizedItemPath}/`);
+
+        return {
+            ...item,
+            active: isActivePath,
+        };
+    });
+
+    const departmentAccessWithActivePath = departmentAccess.map((item) => {
+        if (!item.path) return item;
+
+        const normalizedItemPath = item.path.replace(/\/$/, "");
+        const isActivePath =
+            normalizedPath === normalizedItemPath ||
+            normalizedPath.startsWith(`${normalizedItemPath}/`);
+
+        return {
+            ...item,
+            active: isActivePath,
+        };
+    });
+
     const becomeContributorItemWithActivePath = {
         ...becomeContributorLink,
         active:
@@ -467,6 +718,42 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                 isExpandable
                 isOpen={isValueAdditionsOpen}
                 onToggle={() => setIsValueAdditionsOpen((prev) => !prev)}
+                onItemClick={handleValueAdditionClick}
+            />
+            <SidebarSection
+                title="Common Features"
+                items={commonFeaturesWithActivePath}
+                collapsed={isCollapsed}
+                isExpandable
+                isOpen={isCommonFeaturesOpen}
+                onToggle={() => setIsCommonFeaturesOpen((prev) => !prev)}
+                onItemClick={handleValueAdditionClick}
+            />
+            <SidebarSection
+                title="Extra Common Modules"
+                items={extraCommonModulesWithActivePath}
+                collapsed={isCollapsed}
+                isExpandable
+                isOpen={isExtraCommonModulesOpen}
+                onToggle={() => setIsExtraCommonModulesOpen((prev) => !prev)}
+                onItemClick={handleValueAdditionClick}
+            />
+            <SidebarSection
+                title="Core Modules"
+                items={coreModulesWithActivePath}
+                collapsed={isCollapsed}
+                isExpandable
+                isOpen={isCoreModulesOpen}
+                onToggle={() => setIsCoreModulesOpen((prev) => !prev)}
+                onItemClick={handleValueAdditionClick}
+            />
+            <SidebarSection
+                title="Department Accesses"
+                items={departmentAccessWithActivePath}
+                collapsed={isCollapsed}
+                isExpandable
+                isOpen={isDepartmentAccessOpen}
+                onToggle={() => setIsDepartmentAccessOpen((prev) => !prev)}
                 onItemClick={handleValueAdditionClick}
             />
 

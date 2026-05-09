@@ -280,11 +280,12 @@ const AiHostSignup = () => {
             showSuccessAlert(
                 typeof data.message === "string"
                     ? data.message
-                    : data.message?.message || "Form submitted successfully",
+                    : data.message?.message || "Form submitted successfully, our team will get back to you soon",
             );
-            window.setTimeout(() => {
-                window.location.href = hostRedirectUrl;
-            }, 1500);
+            reset();
+            // window.setTimeout(() => {
+            //     window.location.href = hostRedirectUrl;
+            // }, 1500);
         },
         // onError: (error) => {
         //   // toast.error(error.response?.data?.message || "Something went wrong");
