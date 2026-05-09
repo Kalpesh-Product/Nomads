@@ -491,6 +491,8 @@ export const registerFormSubmission = async (req, res) => {
       companyCity: payload.companyCity,
       formName: payload.formName || "register",
       source: "AiHostSignup",
+      comment: "",
+      status: "pending",
       payload,
     });
 

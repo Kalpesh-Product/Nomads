@@ -18,6 +18,8 @@ const hostUserSchema = new mongoose.Schema(
     companyCity: { type: String, trim: true },
     source: { type: String, trim: true, default: "AiHostSignup" },
     formName: { type: String, trim: true, default: "register" },
+    comment: { type: String, trim: true, default: "" },
+    status: { type: String, trim: true, default: "pending" },
     payload: { type: mongoose.Schema.Types.Mixed },
   },
   { timestamps: true },
