@@ -381,7 +381,7 @@ const AiNewsFetch = () => {
     }
 
     return (
-        <div className="my-6">
+        <div className="my-6 md:px-10">
             <button
                 type="button"
                 onClick={handleBackButtonClick}

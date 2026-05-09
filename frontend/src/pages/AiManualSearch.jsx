@@ -39,13 +39,12 @@ const DropdownBadge = ({
         type="button"
         onClick={onToggle}
         disabled={disabled}
-        className={`flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${
-          disabled
+        className={`flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${disabled
             ? "cursor-not-allowed border-black/10 bg-black/[0.03] text-black/35"
             : isOpen
               ? "border-sky-500 bg-sky-500 text-white"
               : "border-black/20 bg-white text-black/85 hover:border-sky-500"
-        }`}
+          }`}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
       >
@@ -71,11 +70,10 @@ const DropdownBadge = ({
                   <button
                     type="button"
                     onClick={() => onSelect(option.value)}
-                    className={`flex w-full items-center rounded-xl px-3 py-2 text-left text-sm transition-colors ${
-                      isSelected
+                    className={`flex w-full items-center rounded-xl px-3 py-2 text-left text-sm transition-colors ${isSelected
                         ? "bg-sky-50 font-medium text-sky-600"
                         : "text-black/80 hover:bg-slate-50"
-                    }`}
+                      }`}
                     role="option"
                     aria-selected={isSelected}
                   >
@@ -157,9 +155,9 @@ const AiManualSearch = () => {
   const countryOptions = useMemo(() => {
     const filtered = selectedContinent
       ? locations.filter(
-          (item) =>
-            item.continent?.toLowerCase() === selectedContinent?.toLowerCase(),
-        )
+        (item) =>
+          item.continent?.toLowerCase() === selectedContinent?.toLowerCase(),
+      )
       : locations;
 
     return filtered
@@ -333,7 +331,7 @@ const AiManualSearch = () => {
       <main className="pb-8">
         <div className="mx-0 w-full max-w-[80rem] px-1 sm:px-6 lg:mx-auto lg:max-w-[80rem] lg:px-0 lg:min-w-[75%]">
           <div className="rounded-[10px] bg-white px-0 pb-6">
-            <div className="flex">
+            <div className="flex md:px-10">
               <button
                 type="button"
                 onClick={() => navigate(-1)}
@@ -373,11 +371,10 @@ const AiManualSearch = () => {
                 <button
                   type="button"
                   onClick={handleSearch}
-                  className={`inline-flex items-center justify-center rounded-full p-1 transition-colors ${
-                    hasAllSelections
+                  className={`inline-flex items-center justify-center rounded-full p-1 transition-colors ${hasAllSelections
                       ? "text-black/90 hover:text-sky-600"
                       : "cursor-not-allowed text-black/35"
-                  }`}
+                    }`}
                   aria-label="Search listings"
                   disabled={!hasAllSelections}
                 >
@@ -390,7 +387,7 @@ const AiManualSearch = () => {
               className="relative mt-6 lg:ml-[6.25rem] lg:mr-36"
               ref={dropdownContainerRef}
             >
-                <div className="relative z-30 grid w-full grid-cols-1 gap-4 sm:grid-cols-2 sm:items-stretch lg:grid-cols-3">
+              <div className="relative z-30 grid w-full grid-cols-1 gap-4 sm:grid-cols-2 sm:items-stretch lg:grid-cols-3">
                 <DropdownBadge
                   label="Continent"
                   options={continentOptions}

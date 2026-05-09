@@ -117,7 +117,7 @@ const loggedOutPrompt = {
   title: "Get responses tailored to you",
   description:
     "Login to explore your nomad lifestyle and discover where you should live, work, and save more.",
-  actionLabel: "Login",
+  actionLabel: "Login as Nomad",
 };
 
 const profileItems = [

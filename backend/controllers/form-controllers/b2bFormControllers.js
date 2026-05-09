@@ -387,6 +387,74 @@ export const addB2BFormSubmission = async (req, res, next) => {
 
 // controllers/registerController.js
 
+export const getHostUsers = async (req, res, next) => {
+  try {
+    const hostUsers = await HostUser.find({}).sort({ createdAt: -1 }).lean();
+
+    return res.status(200).json({
+      count: hostUsers.length,
+      data: hostUsers,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const updateHostUserStatusAndComment = async (req, res, next) => {
+  try {
+    const { hostUserId } = req.params;
+    const { status, comment } = req.body;
+    const allowedStatuses = ["pending", "contacted", "closed", "rejected"];
+
+    if (!hostUserId) {
+      return res.status(400).json({ message: "hostUserId is required" });
+    }
+
+    if (typeof status === "undefined" && typeof comment === "undefined") {
+      return res.status(400).json({
+        message: "At least one field is required: status or comment",
+      });
+    }
+
+    const updates = {};
+    if (typeof status !== "undefined") {
+      if (typeof status !== "string") {
+        return res.status(400).json({
+          message:
+            "Status must be a string (pending, contacted, closed, rejected)",
+        });
+      }
+
+      const normalizedStatus = status.trim().toLowerCase();
+      if (!allowedStatuses.includes(normalizedStatus)) {
+        return res.status(400).json({
+          message:
+            "Invalid status. Allowed values: pending, contacted, closed, rejected",
+        });
+      }
+
+      updates.status = normalizedStatus;
+    }
+    if (typeof comment !== "undefined") updates.comment = comment;
+
+    const hostUser = await HostUser.findByIdAndUpdate(hostUserId, updates, {
+      new: true,
+      runValidators: true,
+    }).lean();
+
+    if (!hostUser) {
+      return res.status(404).json({ message: "Host user not found" });
+    }
+
+    return res.status(200).json({
+      message: "Host user updated successfully",
+      data: hostUser,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 export const registerFormSubmission = async (req, res) => {
   const url = process.env.B2B_APPS_SCRIPT_URL;
   if (!url) {
@@ -478,6 +546,8 @@ export const registerFormSubmission = async (req, res) => {
       companyCity: payload.companyCity,
       formName: payload.formName || "register",
       source: "AiHostSignup",
+      comment: "",
+      status: "pending",
       payload,
     });
 

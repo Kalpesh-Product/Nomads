@@ -383,8 +383,8 @@ const AiContentUseRemoval = () => {
     ];
 
     return (
-        <div className="flex flex-col gap-10 px-6 md:px-12 lg:px-28 pb-8 md:pb-12 pt-4 text-[#364D59]">
-            <div className="sticky top-0 z-40 -mx-6 bg-white/95 py-3 backdrop-blur-sm md:-mx-12 lg:-mx-28">
+        <div className="flex flex-col gap-10 px-6 md:px-12 lg:px-28 pb-8 md:pb-12 pt-0 text-[#364D59]">
+            <div className="sticky top-0 z-40 bg-white/95 py-3 backdrop-blur-sm">
                 <button
                     type="button"
                     onClick={() => navigate("/home")}
