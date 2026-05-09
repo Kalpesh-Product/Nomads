@@ -24,6 +24,7 @@ import UploadFileInput from "../../components/UploadFileInput";
 import UploadMultipleFilesInput from "../../components/UploadMultipleFilesInput";
 import AiHostPricing from "./AiHostPricing";
 import { HiOutlineArrowLeft } from "react-icons/hi";
+import useAuth from "../../hooks/useAuth";
 
 const steps = [
     "GOAL",
@@ -99,6 +100,7 @@ const normalizePlanFromQuery = (plan) => {
 const AiHostSignup = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { auth } = useAuth();
     const onBack = () => navigate("/host");
     const hostRedirectUrl = "https://wonohostfe.vercel.app/";
 
@@ -161,6 +163,40 @@ const AiHostSignup = () => {
     useEffect(() => {
         setValue("Goals", selectedPlan);
     }, [selectedPlan, setValue]);
+
+    useEffect(() => {
+        if (!auth?.user) return;
+
+        const {
+            fullName,
+            name,
+            email,
+            mobile,
+            contactCode,
+            contactNumber,
+            country,
+            countryOfResidence,
+            state,
+            city,
+        } = auth.user;
+
+        setValue("name", fullName || name || "");
+        const resolvedEmail = email || "";
+        const resolvedContactCode = contactCode || "";
+        const resolvedMobile = contactNumber || mobile || "";
+
+        setValue("email", resolvedEmail);
+        setValue("contactCode", resolvedContactCode);
+        setValue("mobile", resolvedMobile);
+        setValue("country", country || countryOfResidence || "");
+        setValue("state", state || "");
+        setValue("city", city || "");
+        setValue("websiteEmail", resolvedEmail);
+        setValue(
+            "phone",
+            [resolvedContactCode, resolvedMobile].filter(Boolean).join(" ").trim(),
+        );
+    }, [auth, setValue]);
 
     const selectedCountryName = watch("country");
     const selectedCountry = useMemo(
@@ -1369,7 +1405,7 @@ const AiHostSignup = () => {
                     <HiOutlineArrowLeft size={18} />
                 </button>
             </div>
-            <Stepper
+            {/* <Stepper
                 className="w-full p-0"
                 connectorStateColors={true}
                 styleConfig={{
@@ -1399,7 +1435,7 @@ const AiHostSignup = () => {
                 {steps.map((label, index) => (
                     <Step label={label} key={index} />
                 ))}
-            </Stepper>
+            </Stepper> */}
             <div className="max-w-5xl mx-auto w-full">
                 {/* {activeStep !== 3 && (
           <h1 className="text-title text-center">
@@ -1563,28 +1599,21 @@ const AiHostSignup = () => {
                     })}
                 >
                     {renderStepFields()}
-                    <div className="col-span-1 lg:col-span-2 flex justify-between items-center">
-                        {/* {activeStep > 0 && (
-              <GetStartedButton
-                title="Back"
-                handleSubmit={() => setActiveStep((prev) => prev - 1)}
-              />
-            )} */}
-                        {activeStep > 0 && (
-                            <GetStartedButton
-                                title="Back"
-                                handleSubmit={() => setActiveStep((prev) => prev - 1)}
-                            />
-                        )}
+                    <div className="col-span-1 lg:col-span-2 grid grid-cols-1 items-center gap-4">
+                        {/* <div className="flex justify-start">
+                            {activeStep > 0 && (
+                                <GetStartedButton
+                                    title="Back"
+                                    handleSubmit={() => setActiveStep((prev) => prev - 1)}
+                                />
+                            )}
+                        </div> */}
 
-                        {activeStep !== 0 && activeStep < activeFlowStepFields.length - 2 ? (
-                            <div className="flex   justify-end items-center w-full">
+                        <div className="flex justify-center">
+                            {activeStep !== 0 && activeStep < activeFlowStepFields.length - 2 ? (
                                 <GetStartedButton title="Next" handleSubmit={handleNext} />
-                            </div>
-                        ) : (
-                            <></>
-                        )}
-                        {/* {activeStep === stepFields.length - 2 && (
+                            ) : null}
+                            {/* {activeStep === stepFields.length - 2 && (
               <div className="flex  justify-center lg:justify-end  items-center w-full">
                 <GetStartedButton title="Submit" type={"submit"} />
               </div>
@@ -1601,31 +1630,32 @@ const AiHostSignup = () => {
               </div>
             )} */}
 
-                        {/* Submit button on 4th step */}
-                        {/* {activeStep === stepFields.length - 2 && (
+                            {/* Submit button on 4th step */}
+                            {/* {activeStep === stepFields.length - 2 && (
               <div className="flex justify-end items-center w-full">
                 <GetStartedButton title="Submit" type="submit" />
               </div>
             )} */}
 
-                        {activeStep === 1 && (
-                            <div className="flex justify-end items-center w-full">
+                            {activeStep === 1 && (
                                 <GetStartedButton
                                     title={isRegisterLoading ? "Submitting..." : "Submit"}
                                     type="submit"
                                     disabled={isRegisterLoading}
                                     isLoading={isRegisterLoading}
                                 />
-                            </div>
-                        )}
+                            )}
 
-                        {/* Go To Home button on 5th step */}
-                        {/* {activeStep === stepFields.length - 1 && (
+                            {/* Go To Home button on 5th step */}
+                            {/* {activeStep === stepFields.length - 1 && (
               <GetStartedButton
                 title="Back"
                 handleSubmit={() => setActiveStep((prev) => prev - 1)}
               />
             )} */}
+                        </div>
+
+                        <div />
                     </div>
                 </form>
             </div>

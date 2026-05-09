@@ -260,8 +260,9 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
 
           {/* Right Section - Desktop */}
           <div className="hidden lg:flex items-center pl-10 gap-6">
-            {!isLoggedIn && (
-              <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3">
+              {!isLoggedIn && (
+                <>
                 <button
                   type="button"
                   onClick={() =>
@@ -271,19 +272,27 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                       },
                     })
                   }
-                  className="rounded-full bg-primary-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-black min-w-28"
+                  className="rounded-full bg-primary-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-black min-w-40"
                 >
-                  Login
+                  Login as Nomad
                 </button>
                 <button
                   type="button"
                   onClick={() => navigate(`/ai-signup${location.search}`)}
                   className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-black transition hover:border-black/20 hover:bg-black/5 min-w-48"
                 >
-                  Sign up for free
+                  Sign up as Nomad
                 </button>
-              </div>
-            )}
+                </>
+              )}
+              <button
+                type="button"
+                onClick={() => navigate(`/host/ai-host-signup?step=1`)}
+                className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-black transition hover:border-black/20 hover:bg-black/5 min-w-48"
+              >
+                Sign up as Business
+              </button>
+            </div>
 
             <li className="flex items-center gap-6">
               {showNewsBlogLinks && (

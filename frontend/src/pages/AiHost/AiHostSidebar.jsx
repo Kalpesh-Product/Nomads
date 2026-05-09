@@ -472,7 +472,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
             {isLoggedIn ? (
                 <>
-                    <SidebarSection
+                    {/* <SidebarSection
                         title="Profile"
                         items={profileItems}
                         collapsed={isCollapsed}
@@ -480,7 +480,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                         isOpen={isProfileOpen}
                         onToggle={() => setIsProfileOpen((prev) => !prev)}
                         onItemClick={handleProfileClick}
-                    />
+                    /> */}
                     <div className="mx-4 mt-3 border-t border-black/10"></div>
                     {/* Compact sections - minimal spacing */}
                     {/* <SidebarSection
@@ -497,12 +497,12 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                         compact={true}
                     /> */}
                     <div className="mx-4 border-t border-black/10"></div>
-                    <SidebarSection
+                    {/* <SidebarSection
                         items={signOutItem}
                         collapsed={isCollapsed}
                         onItemClick={handleSignOutClick}
                         compact={true}
-                    />
+                    /> */}
                     <div className="mx-4 border-t border-black/10"></div>
                 </>
             ) : (
@@ -523,7 +523,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                     /> */}
                     {/* <div className="border-t border-black/10 mt-4 mx-4"></div> */}
                     <div className="border-t border-black/10 mx-4"></div>
-                    {!isCollapsed && (
+                    {/* {!isCollapsed && (
                         <div className="mt-auto px-4 pb-4 pt-10">
                             <div className="rounded-[28px] p-4 shadow-sm">
                                 <p className="mt-2 text-nano leading-[0.9rem] text-black/55">
@@ -541,7 +541,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                                 </button>
                             </div>
                         </div>
-                    )}
+                    )} */}
                 </>
             )}
         </aside>
