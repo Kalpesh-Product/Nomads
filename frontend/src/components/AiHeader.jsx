@@ -151,7 +151,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
     !location.pathname.startsWith("/ai-listings");
 
   return (
-    <div className="bg-white/80 backdrop-blur-md px-1 md:px-10">
+    <div className="bg-white/80 backdrop-blur-md px-1 md:px-20">
       <AiContainer padding={false}>
         <div className="flex py-3 justify-between items-center lg:py-[0.625rem]">
           {/* Logo */}

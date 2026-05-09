@@ -102,7 +102,7 @@ const AiFooter = () => {
         </div>
       </div>
       <footer className="w-full bg-gray-100 text-black flex flex-col justify-center items-center shadow-lg">
-        <div className="w-full flex flex-wrap justify-center lg:justify-between items-center pt-12 pb-8 px-4 md:px-[7.5rem]">
+        <div className="w-full flex flex-wrap justify-center lg:justify-between items-center pt-12 pb-8 px-4 md:px-20">
           {/* Left Section */}
           <div className="flex flex-col items-center lg:items-start mb-8 lg:mb-0 w-full lg:w-auto text-center lg:text-left">
             <img
@@ -162,7 +162,7 @@ const AiFooter = () => {
         Rights Reserved.
       </div> */}
         {/* Copyright */}
-        <div className="w-full flex flex-col items-center justify-center text-center py-6 border-t-2 border-white px-4 md:px-[7.5rem] lg:flex-row lg:justify-between lg:text-left">
+        <div className="w-full flex flex-col items-center justify-center text-center py-6 border-t-2 border-white px-4 md:px-20 lg:flex-row lg:justify-between lg:text-left">
           {/* Left side — Copyright */}
           <div className="flex flex-col md:flex-row justify-center md:justify-start items-center gap-1 text-[10px] md:text-xs font-semibold text-gray-800 mb-3 lg:mb-0">
             <span>
