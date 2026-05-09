@@ -387,6 +387,19 @@ export const addB2BFormSubmission = async (req, res, next) => {
 
 // controllers/registerController.js
 
+export const getHostUsers = async (req, res, next) => {
+  try {
+    const hostUsers = await HostUser.find({}).sort({ createdAt: -1 }).lean();
+
+    return res.status(200).json({
+      count: hostUsers.length,
+      data: hostUsers,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 export const registerFormSubmission = async (req, res) => {
   const url = process.env.B2B_APPS_SCRIPT_URL;
   if (!url) {
