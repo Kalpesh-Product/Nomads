@@ -183,8 +183,9 @@ const SidebarSection = ({
                   key={item.label}
                   type="button"
                   onClick={() => onItemClick?.(item)}
-                  className={`group relative flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-left transition-all hover:bg-white ${isActive ? "bg-white text-black shadow-sm" : "text-black/80"
-                    }`}
+                  className={`group relative flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-left transition-all hover:bg-white ${
+                    isActive ? "bg-white text-black shadow-sm" : "text-black/80"
+                  }`}
                   title={collapsed ? item.label : ""}
                 >
                   <Icon
@@ -234,8 +235,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
   const { auth } = useAuth();
   const logout = useLogout();
-  const userFullName =
-    auth?.user?.fullName?.trim() || "Profile";
+  const userFullName = auth?.user?.fullName?.trim() || "Profile";
 
   const profileItemsWithUserName = profileItems.map((item) =>
     item.label === "userFullName" ? { ...item, label: userFullName } : item,
@@ -430,12 +430,13 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
   return (
     <aside
-      className={`flex h-full max-h-screen flex-col overflow-y-auto overscroll-contain border-r border-black/10 bg-[#efefef] transition-all duration-300 custom-scrollbar-hide ${isMobileOverlay
-        ? "w-[calc(100%-52px)] max-w-[320px]"
-        : isCollapsed
-          ? "w-[70px]"
-          : "w-[260px]"
-        }`}
+      className={`flex h-full max-h-screen flex-col overflow-y-auto overscroll-contain border-r border-black/10 bg-[#efefef] transition-all duration-300 custom-scrollbar-hide ${
+        isMobileOverlay
+          ? "w-[calc(100%-52px)] max-w-[320px]"
+          : isCollapsed
+            ? "w-[70px]"
+            : "w-[260px]"
+      }`}
       onClick={(event) => {
         if (isMobileOverlay) event.stopPropagation();
       }}
@@ -558,7 +559,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                 <button
                   type="button"
                   onClick={handleLogInClick}
-                  className="mt-6 w-full rounded-full border border-black/10 bg-primary-blue px-3 py-2 text-base font-semibold text-white"
+                  className="mt-6 w-full rounded-full border border-black/10 bg-primary-blue px-3 py-2 text-base text-white"
                 >
                   {loggedOutPrompt.actionLabel}
                 </button>
