@@ -275,7 +275,7 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
                     }
                     className="rounded-full bg-primary-blue px-4 py-2 text-sm  text-white transition hover:bg-black min-w-40"
                   >
-                    Login as Nomad
+                    Login as Business
                   </button>
                   {/* <button
                                     type="button"
@@ -286,13 +286,13 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
                                 </button> */}
                 </>
               )}
-              <button
+              {/* <button
                 type="button"
                 onClick={() => navigate(`/host/ai-host-signup?step=1`)}
                 className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm text-black transition hover:border-black/20 hover:bg-black/5 min-w-48"
               >
                 Sign up as Business
-              </button>
+              </button> */}
             </div>
 
             <li className="flex items-center gap-6">

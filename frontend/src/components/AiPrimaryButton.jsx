@@ -21,8 +21,8 @@ const AiPrimaryButton = ({
       type={type}
       className={`${className} flex rounded-full items-center cursor-pointer justify-center gap-2
         ${baseBgColor} ${hoverBgColor} text-secondary
-        ${fontSize ? fontSize : "text-content leading-5"}
-        ${externalStyles} ${padding ? padding : "px-6 py-3"} `}
+        ${fontSize ? fontSize : "text-sm leading-5"}
+        ${externalStyles} ${padding ? padding : "px-4 py-2"} `}
       onClick={handleSubmit}
     >
       {isLoading && <CircularProgress size={16} sx={{ color: "#ffffff" }} />}
