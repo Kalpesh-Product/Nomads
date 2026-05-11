@@ -179,24 +179,24 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                 <ul>
                   {(isAiListingsListPage ||
                     (!isAiListingsMapPage && view !== "map")) && (
-                      <li className="flex items-center">
-                        <div className="p-4 px-0 whitespace-nowrap">
-                          <Link
-                            to={
-                              isAiListingsListPage
-                                ? mapViewLink
-                                : `${location.pathname}?country=${formData?.country}&location=${formData?.location}&view=map`
-                            }
-                            className="group relative text-md text-black"
-                          >
-                            <span className="relative z-10 group-hover:font-bold mb-2 text-sm font-semibold">
-                              Map View
-                            </span>
-                            <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
-                          </Link>
-                        </div>
-                      </li>
-                    )}
+                    <li className="flex items-center">
+                      <div className="p-4 px-0 whitespace-nowrap">
+                        <Link
+                          to={
+                            isAiListingsListPage
+                              ? mapViewLink
+                              : `${location.pathname}?country=${formData?.country}&location=${formData?.location}&view=map`
+                          }
+                          className="group relative text-md text-black"
+                        >
+                          <span className="relative z-10 group-hover:font-bold mb-2 text-sm font-semibold">
+                            Map View
+                          </span>
+                          <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                        </Link>
+                      </div>
+                    </li>
+                  )}
 
                   {(isAiListingsMapPage || view === "map") && (
                     <li className="flex items-center">
@@ -240,8 +240,9 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                           className="group relative text-md text-black"
                         >
                           <span
-                            className={`relative z-10 mb-8 uppercase ${isActive ? "text-black" : "group-hover:font-bold"
-                              }`}
+                            className={`relative z-10 mb-8 uppercase ${
+                              isActive ? "text-black" : "group-hover:font-bold"
+                            }`}
                           >
                             {item.text}
                           </span>
@@ -263,32 +264,32 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
             <div className="flex items-center gap-3">
               {!isLoggedIn && (
                 <>
-                <button
-                  type="button"
-                  onClick={() =>
-                    navigate(`/ai-login${location.search}`, {
-                      state: {
-                        redirectTo: `${location.pathname}${location.search}`,
-                      },
-                    })
-                  }
-                  className="rounded-full bg-primary-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-black min-w-40"
-                >
-                  Login as Nomad
-                </button>
-                <button
+                  <button
+                    type="button"
+                    onClick={() =>
+                      navigate(`/ai-login${location.search}`, {
+                        state: {
+                          redirectTo: `${location.pathname}${location.search}`,
+                        },
+                      })
+                    }
+                    className="rounded-full bg-primary-blue px-4 py-2 text-sm  text-white transition hover:bg-black min-w-40"
+                  >
+                    Login as Nomad
+                  </button>
+                  {/* <button
                   type="button"
                   onClick={() => navigate(`/ai-signup${location.search}`)}
                   className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-black transition hover:border-black/20 hover:bg-black/5 min-w-48"
                 >
                   Sign up as Nomad
-                </button>
+                </button> */}
                 </>
               )}
               <button
                 type="button"
                 onClick={() => navigate(`/host/ai-host-signup?step=1`)}
-                className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-black transition hover:border-black/20 hover:bg-black/5 min-w-48"
+                className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm  text-black transition hover:border-black/20 hover:bg-black/5 min-w-48"
               >
                 Sign up as Business
               </button>
@@ -326,7 +327,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
               <div className="p-4 px-0 whitespace-nowrap">
                 <button
                   onClick={goToHosts}
-                  className="relative pb-1 transition-all cursor-pointer duration-300 group font-semibold bg-transparent border-none text-sm text-primary-blue"
+                  className="relative pb-1 transition-all cursor-pointer duration-300 group bg-transparent border-none text-sm text-primary-blue"
                 >
                   Become A Host
                   <span className="absolute left-0 w-0 bottom-0 block h-[2px] bg-black transition-all duration-300 group-hover:w-full"></span>
@@ -474,7 +475,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                     }}
                     className="py-4 cursor-pointer"
                   >
-                    <p className="text-secondary-dark text-lg font-semibold">
+                    <p className="text-secondary-dark text-lg ">
                       Become A Host
                     </p>
                   </div>
