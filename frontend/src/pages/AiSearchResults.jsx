@@ -11,7 +11,7 @@ import {
   HiOutlineSearch,
   HiOutlineX,
 } from "react-icons/hi";
-import { FaCheck, FaSyncAlt } from "react-icons/fa";
+import { FaCheck, FaHeart, FaSyncAlt } from "react-icons/fa";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { aiDestinationCards } from "../constants/aiDestinationCards";
@@ -556,7 +556,7 @@ const getLabelFieldKeyForSelection = (selectedGoal, selectedGoalOption) => {
   );
 };
 
-const INITIAL_VISIBLE_DESTINATIONS = 18;
+const INITIAL_VISIBLE_DESTINATIONS = 20;
 const TYPING_INTERVAL_MS = 7;
 const SELECTED_HEADING_TRANSITION_DELAY_MS = 1200;
 const DESTINATION_REVEAL_INTERVAL_MS = 70;
@@ -1625,21 +1625,27 @@ const AiSearchResults = () => {
                               className="aspect-square w-full rounded-xl object-cover md:rounded-2xl transition-transform duration-500 group-hover:scale-110"
                             />
 
-                            <div
-                              className={`pointer-events-none absolute inset-x-0 bottom-0 flex items-end gap-1.5 bg-gradient-to-t from-black/75 via-black/25 to-transparent px-2 py-2 text-white md:gap-3 md:px-4 md:py-3 ${
-                                destination.leftBadgeLabel
-                                  ? "justify-between"
-                                  : "justify-end"
-                              }`}
-                            >
-                              {destination.leftBadgeLabel && (
-                                <span className="rounded-full bg-black/45 px-2 py-0.5 text-[0.7rem] font-semibold tracking-wide backdrop-blur-sm md:px-3 md:py-1 md:text-xs">
-                                  {destination.leftBadgeLabel}
-                                </span>
-                              )}
-                              <span className="rounded-full bg-black/45 px-2 py-0.5 text-[0.7rem] font-semibold tracking-wide backdrop-blur-sm md:px-3 md:py-1 md:text-xs">
-                                {destination.rankLabel}
-                              </span>
+                            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-black/10" />
+
+                            <div className="pointer-events-none absolute left-3 top-3 text-white text-xl  md:left-4 md:top-4 md:text-2xl">
+                              #
+                              {destination?.rankLabel
+                                ? destination.rankLabel.replace(/^Rank\s*/i, "")
+                                : "—"}
+                            </div>
+
+                            <div className="pointer-events-none absolute right-3 top-3 text-red-500 md:right-4 md:top-4">
+                              <FaHeart className="text-xl md:text-2xl" />
+                            </div>
+
+                            <div className="pointer-events-none absolute inset-x-2 bottom-3 text-center text-white md:inset-x-4 md:bottom-4">
+                              <h3 className="text-lg uppercase font-medium tracking-wide md:text-3xl">
+                                {destination.displayCity || destination.city}
+                              </h3>
+                              <p className="text-sm font-light md:text-sm">
+                                {destination.displayCountry ||
+                                  destination.country}
+                              </p>
                             </div>
 
                             <div className="absolute inset-0 bg-black/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-center p-3 md:p-4">
@@ -1704,7 +1710,7 @@ const AiSearchResults = () => {
                               </div>
                             </div>
                           </div>
-                          <div className="px-2">
+                          {/* <div className="px-2">
                             <div className="mt-1.5 flex items-start justify-start gap-1 md:mt-2 md:gap-1 ">
                               <div className="min-w-0">
                                 <h3 className="truncate text-[0.8rem] font-semibold leading-tight text-black/90 md:text-[1.2rem]">
@@ -1722,7 +1728,7 @@ const AiSearchResults = () => {
                                 Click to view options
                               </p>
                             </div>
-                          </div>
+                          </div> */}
                         </article>
                       ))}
                     </div>
