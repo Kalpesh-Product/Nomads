@@ -11,7 +11,7 @@ import {
   HiOutlineSearch,
   HiOutlineX,
 } from "react-icons/hi";
-import { FaCheck, FaSyncAlt } from "react-icons/fa";
+import { FaCheck, FaHeart, FaSyncAlt } from "react-icons/fa";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { aiDestinationCards } from "../constants/aiDestinationCards";
@@ -417,15 +417,15 @@ const getQuickStatsForDestination = (
 ) => {
   const statConfig =
     selectedGoal === "World Ranking" &&
-      selectedGoalOption === "Best Work Infrastructure"
+    selectedGoalOption === "Best Work Infrastructure"
       ? [
-        { label: "Work Infra", labelKey: "labelBestWorkInfrastructure" },
-        { label: "Internet", labelKey: "labelFastInternetCities" },
-        { label: "Community", labelKey: "labelStrongNomadCommunity" },
-        { label: "Access", labelKey: "labelBestConnectedCitiesFlights" },
-      ]
+          { label: "Work Infra", labelKey: "labelBestWorkInfrastructure" },
+          { label: "Internet", labelKey: "labelFastInternetCities" },
+          { label: "Community", labelKey: "labelStrongNomadCommunity" },
+          { label: "Access", labelKey: "labelBestConnectedCitiesFlights" },
+        ]
       : quickStatsConfigByGoalOption[selectedGoalOption] ||
-      fallbackQuickStatsConfig;
+        fallbackQuickStatsConfig;
   const selectedGoalScoreKey = getApiAttributeForSelection(
     selectedGoal,
     selectedGoalOption,
@@ -434,7 +434,7 @@ const getQuickStatsForDestination = (
   const configuredStats = statConfig.slice(0, 4).map((config) => {
     const scoreKeyFromLabel = config.labelKey
       ? labelToAllScoresKeyMap[config.labelKey] ||
-      `${config.labelKey.charAt(5).toLowerCase()}${config.labelKey.slice(6)}`
+        `${config.labelKey.charAt(5).toLowerCase()}${config.labelKey.slice(6)}`
       : null;
     const scoreKey = config.scoreKey || scoreKeyFromLabel || config.field;
     const weightKey =
@@ -446,8 +446,8 @@ const getQuickStatsForDestination = (
     const caseInsensitiveScore =
       directWeight === undefined && weightKey
         ? Object.entries(weights).find(
-          ([key]) => key.toLowerCase() === weightKey.toLowerCase(),
-        )?.[1]
+            ([key]) => key.toLowerCase() === weightKey.toLowerCase(),
+          )?.[1]
         : undefined;
 
     const score = Number(
@@ -556,7 +556,7 @@ const getLabelFieldKeyForSelection = (selectedGoal, selectedGoalOption) => {
   );
 };
 
-const INITIAL_VISIBLE_DESTINATIONS = 18;
+const INITIAL_VISIBLE_DESTINATIONS = 20;
 const TYPING_INTERVAL_MS = 7;
 const SELECTED_HEADING_TRANSITION_DELAY_MS = 1200;
 const DESTINATION_REVEAL_INTERVAL_MS = 70;
@@ -739,10 +739,11 @@ const DropdownBadge = ({
       <button
         type="button"
         onClick={onToggle}
-        className={`flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${isOpen
-          ? "border-sky-500 bg-sky-500 text-white"
-          : "border-black/20 bg-white text-black/85 hover:border-sky-500"
-          }`}
+        className={`flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${
+          isOpen
+            ? "border-sky-500 bg-sky-500 text-white"
+            : "border-black/20 bg-white text-black/85 hover:border-sky-500"
+        }`}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
       >
@@ -770,20 +771,22 @@ const DropdownBadge = ({
                   <button
                     type="button"
                     onClick={() => onSelect(option)}
-                    className={`group flex w-full items-center rounded-xl px-4 py-2 text-left text-sm transition-colors ${isSelected
-                      ? "bg-sky-50 font-medium text-sky-600"
-                      : "text-black/80 hover:bg-slate-50"
-                      }`}
+                    className={`group flex w-full items-center rounded-xl px-4 py-2 text-left text-sm transition-colors ${
+                      isSelected
+                        ? "bg-sky-50 font-medium text-sky-600"
+                        : "text-black/80 hover:bg-slate-50"
+                    }`}
                     role="option"
                     aria-selected={isSelected}
                   >
                     <span className="mr-2 inline-flex w-4 shrink-0 items-center justify-center">
                       <FaCheck
                         size={13}
-                        className={`shrink-0 text-primary-blue transition-opacity ${isSelected
-                          ? "opacity-100"
-                          : "opacity-0 group-hover:opacity-100"
-                          }`}
+                        className={`shrink-0 text-primary-blue transition-opacity ${
+                          isSelected
+                            ? "opacity-100"
+                            : "opacity-0 group-hover:opacity-100"
+                        }`}
                         aria-hidden="true"
                       />
                     </span>
@@ -813,9 +816,9 @@ const AiSearchResults = () => {
     : "/search/results";
   const goalOptions = goalFilterMap[selectedGoal] || goalFilterMap[defaultGoal];
   const getPersistedGoal = () => {
-    if (typeof window === "undefined") return null;
-    return localStorage.getItem(SEARCH_RESULTS_GOAL_STORAGE_KEY);
-  },
+      if (typeof window === "undefined") return null;
+      return localStorage.getItem(SEARCH_RESULTS_GOAL_STORAGE_KEY);
+    },
     getPersistedSelectionSignature = () => {
       if (typeof window === "undefined") return null;
       return localStorage.getItem(
@@ -942,8 +945,8 @@ const AiSearchResults = () => {
             typeof item?.[selectedAttribute] === "number"
               ? item[selectedAttribute]
               : Object.entries(item).find(
-                ([, value]) => typeof value === "number",
-              )?.[1] || 0;
+                  ([, value]) => typeof value === "number",
+                )?.[1] || 0;
 
           return {
             ...(existingDestination || {}),
@@ -1515,7 +1518,7 @@ const AiSearchResults = () => {
               </span>
             </div>
 
-            <div className="mt-6 mb-6 lg:ml-[6.25rem] lg:mr-36">
+            <div className="mt-6 mb-6 lg:ml-[2.5rem] lg:mr-10">
               <p className="flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
                 {isThinkingHeadingVisible && (
                   <span
@@ -1527,7 +1530,7 @@ const AiSearchResults = () => {
               </p>
             </div>
 
-            <div className="mt-4 hidden max-w-full items-center rounded-[30px] border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] sm:flex lg:ml-[6.25rem] lg:mr-36">
+            <div className="mt-4 hidden max-w-full items-center rounded-[30px] border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] sm:flex lg:ml-[2.5rem] lg:mr-10">
               <div className="flex flex-wrap items-center gap-2">
                 {searchBarBadges.map((badgeLabel, index) => (
                   <div
@@ -1551,7 +1554,7 @@ const AiSearchResults = () => {
               </div>
             </div>
 
-            <div className="relative mt-6 lg:ml-[6.25rem] lg:mr-36">
+            <div className="relative mt-6 lg:ml-[2.5rem] lg:mr-10">
               <div
                 ref={dropdownContainerRef}
                 className="relative z-30 flex w-full flex-col gap-4 sm:flex-row sm:items-stretch"
@@ -1596,14 +1599,15 @@ const AiSearchResults = () => {
                   )}
 
                   {shouldShowResultsContent ? (
-                    <div className="mt-8 grid grid-cols-2 gap-3 md:mt-10 md:gap-4 xl:grid-cols-3">
+                    <div className="mt-8 grid grid-cols-2 gap-3 md:mt-10 md:grid-cols-3 md:gap-4 xl:grid-cols-4">
                       {visibleDestinations.map((destination, index) => (
                         <article
                           key={`${destination.city}-${destination.country}`}
-                          className={`cursor-pointer transition-all duration-300 ${index < visibleDestinationCount
-                            ? "translate-y-0 opacity-100"
-                            : "pointer-events-none translate-y-2 opacity-0"
-                            }`}
+                          className={`cursor-pointer transition-all duration-300 ${
+                            index < visibleDestinationCount
+                              ? "translate-y-0 opacity-100"
+                              : "pointer-events-none translate-y-2 opacity-0"
+                          }`}
                           role="button"
                           tabIndex={0}
                           onClick={() => handleDestinationClick(destination)}
@@ -1621,37 +1625,45 @@ const AiSearchResults = () => {
                               className="aspect-square w-full rounded-xl object-cover md:rounded-2xl transition-transform duration-500 group-hover:scale-110"
                             />
 
-                            <div
-                              className={`pointer-events-none absolute inset-x-0 bottom-0 flex items-end gap-1.5 bg-gradient-to-t from-black/75 via-black/25 to-transparent px-2 py-2 text-white md:gap-3 md:px-4 md:py-3 ${destination.leftBadgeLabel
-                                ? "justify-between"
-                                : "justify-end"
-                                }`}
-                            >
-                              {destination.leftBadgeLabel && (
-                                <span className="rounded-full bg-black/45 px-2 py-0.5 text-[0.7rem] font-semibold tracking-wide backdrop-blur-sm md:px-3 md:py-1 md:text-xs">
-                                  {destination.leftBadgeLabel}
-                                </span>
-                              )}
-                              <span className="rounded-full bg-black/45 px-2 py-0.5 text-[0.7rem] font-semibold tracking-wide backdrop-blur-sm md:px-3 md:py-1 md:text-xs">
-                                {destination.rankLabel}
-                              </span>
+                            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-black/10" />
+
+                            <div className="pointer-events-none absolute left-3 top-3 text-white text-xl  md:left-4 md:top-4 md:text-2xl">
+                              #
+                              {destination?.rankLabel
+                                ? destination.rankLabel.replace(/^Rank\s*/i, "")
+                                : "—"}
+                            </div>
+
+                            <div className="pointer-events-none absolute right-3 top-3 text-red-500 md:right-4 md:top-4">
+                              <FaHeart className="text-xl md:text-2xl" />
+                            </div>
+
+                            <div className="pointer-events-none absolute inset-x-2 bottom-3 text-center text-white md:inset-x-4 md:bottom-4">
+                              <h3 className="text-lg uppercase font-medium tracking-wide md:text-3xl">
+                                {destination.displayCity || destination.city}
+                              </h3>
+                              <p className="text-sm font-light md:text-sm">
+                                {destination.displayCountry ||
+                                  destination.country}
+                              </p>
                             </div>
 
                             <div className="absolute inset-0 bg-black/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-center p-3 md:p-4">
                               <div className="translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                                <div className="mb-2 border-b border-white/30 pb-1">
+                                <div className="mb-1 border-b border-white/30 pb-1">
                                   <h4 className="-translate-y-2 text-white text-base md:text-[0.89rem] font-semibold uppercase tracking-wide text-center">
                                     {selectedGoalOption || "Attribute"}
                                   </h4>
                                 </div>
-                                <h4 className="mb-2 text-right text-white text-sm md:text-sm font-semibold py-2">
-                                  {`${selectedContinent || "World"} Rank ${destination?.rankLabel
-                                    ? destination.rankLabel.replace(
-                                      /^Rank\s*/i,
-                                      "",
-                                    )
-                                    : "—"
-                                    }`}
+                                <h4 className="mb-2 text-right text-white text-sm md:text-sm font-semibold py-0">
+                                  {`${selectedContinent || "World"} Rank ${
+                                    destination?.rankLabel
+                                      ? destination.rankLabel.replace(
+                                          /^Rank\s*/i,
+                                          "",
+                                        )
+                                      : "—"
+                                  }`}
                                 </h4>
 
                                 <div className="grid grid-cols-1 gap-2 text-xs md:text-sm text-white/90">
@@ -1668,23 +1680,23 @@ const AiSearchResults = () => {
                                           90deg,
                                           ${getScoreBarColorValue(stat.score)} 0%,
                                           ${getScoreBarColorValue(stat.score)} ${Math.max(
-                                          0,
-                                          Math.min(
-                                            100,
-                                            getScoreFillPercentage(
-                                              stat.score,
+                                            0,
+                                            Math.min(
+                                              100,
+                                              getScoreFillPercentage(
+                                                stat.score,
+                                              ),
                                             ),
-                                          ),
-                                        )}%,
+                                          )}%,
                                           rgba(255, 255, 255, 0.16) ${Math.max(
-                                          0,
-                                          Math.min(
-                                            100,
-                                            getScoreFillPercentage(
-                                              stat.score,
+                                            0,
+                                            Math.min(
+                                              100,
+                                              getScoreFillPercentage(
+                                                stat.score,
+                                              ),
                                             ),
-                                          ),
-                                        )}%,
+                                          )}%,
                                           rgba(255, 255, 255, 0.16) 100%
                                         )`,
                                       }}
@@ -1698,7 +1710,7 @@ const AiSearchResults = () => {
                               </div>
                             </div>
                           </div>
-                          <div className="px-2">
+                          {/* <div className="px-2">
                             <div className="mt-1.5 flex items-start justify-start gap-1 md:mt-2 md:gap-1 ">
                               <div className="min-w-0">
                                 <h3 className="truncate text-[0.8rem] font-semibold leading-tight text-black/90 md:text-[1.2rem]">
@@ -1716,7 +1728,7 @@ const AiSearchResults = () => {
                                 Click to view options
                               </p>
                             </div>
-                          </div>
+                          </div> */}
                         </article>
                       ))}
                     </div>
