@@ -267,11 +267,7 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
                   <button
                     type="button"
                     onClick={() =>
-                      navigate(`/ai-login${location.search}`, {
-                        state: {
-                          redirectTo: `${location.pathname}${location.search}`,
-                        },
-                      })
+                      window.location.assign("https://wonohostfe.vercel.app")
                     }
                     className="rounded-full bg-primary-blue px-4 py-2 text-sm  text-white transition hover:bg-black min-w-40"
                   >
