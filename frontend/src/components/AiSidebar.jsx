@@ -549,7 +549,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
           <div className="border-t border-black/10 mx-4"></div>
           {!isCollapsed && (
             <div className="mt-auto px-4 pb-4 pt-10">
-              <div className="rounded-[28px] p-4 shadow-sm">
+              <div className="rounded-[28px] p-4 ">
                 <p className="mt-2 text-nano leading-[0.9rem] text-black/55">
                   {loggedOutPrompt.description}
                 </p>
@@ -559,7 +559,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                 <button
                   type="button"
                   onClick={handleLogInClick}
-                  className="mt-6 w-full rounded-full border border-black/30  bg-[#efefef]  px-2 py-2 text-sm text-black/80 hover:bg-[#e0e0e0]"
+                  className="mt-6 w-full rounded-full border border-black/30  bg-[#efefef]  px-0 py-2 text-xs text-black/80 hover:bg-[#e0e0e0]"
                 >
                   {loggedOutPrompt.actionLabel}
                 </button>
