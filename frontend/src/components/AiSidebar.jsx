@@ -556,13 +556,15 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                 <p className="text-nano font-semibold leading-5 text-black/55">
                   Powered by your preferences.
                 </p>
-                <button
-                  type="button"
-                  onClick={handleLogInClick}
-                  className="mt-6 w-full rounded-full border border-black/30  bg-[#efefef]  px-0 py-2 text-xs text-black/80 hover:bg-[#e0e0e0]"
-                >
-                  {loggedOutPrompt.actionLabel}
-                </button>
+                <div className="flex justify-center">
+                  <button
+                    type="button"
+                    onClick={handleLogInClick}
+                    className="mt-6 w-[70%] rounded-full border border-black/30  bg-[#efefef]  px-0 py-2 text-nano text-black/80 hover:bg-[#e0e0e0] "
+                  >
+                    {loggedOutPrompt.actionLabel}
+                  </button>
+                </div>
               </div>
             </div>
           )}

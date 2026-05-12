@@ -260,7 +260,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
           </div>
 
           {/* Right Section - Desktop */}
-          <div className="hidden lg:flex items-center pl-10 gap-6">
+          <div className="hidden lg:flex items-center pl-10 gap-12">
             <div className="flex items-center gap-3">
               {!isLoggedIn && (
                 <>
