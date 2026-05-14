@@ -464,10 +464,10 @@ export const createStateWiseWeight = async (req, res, next) => {
       createPayload.images = normalizeImagesPayload(createPayload.images);
     }
 
-    if (Object.keys(createPayload.images || {}).length > 3) {
+    if (Object.keys(createPayload.images || {}).length > 5) {
       return res
         .status(400)
-        .json({ success: false, message: "A maximum of 3 images is allowed." });
+        .json({ success: false, message: "A maximum of 5 images is allowed." });
     }
 
     // Generate a new ID for the document so we can use it in the S3 path
@@ -475,12 +475,12 @@ export const createStateWiseWeight = async (req, res, next) => {
     createPayload._id = newId;
 
     if (Array.isArray(req.files) && req.files.length > 0) {
-      if (req.files.length > 3) {
+      if (req.files.length > 5) {
         return res
           .status(400)
           .json({
             success: false,
-            message: "A maximum of 3 images is allowed.",
+            message: "A maximum of 5 images is allowed.",
           });
       }
       const uploadedImages = await Promise.all(
@@ -621,12 +621,12 @@ export const updateStateWiseWeight = async (req, res, next) => {
 
     // 3. Handle physical file uploads
     if (Array.isArray(req.files) && req.files.length > 0) {
-      if (Object.keys(resolvedImages).length + req.files.length > 3) {
+      if (Object.keys(resolvedImages).length + req.files.length > 5) {
         return res
           .status(400)
           .json({
             success: false,
-            message: "A maximum of 3 images is allowed.",
+            message: "A maximum of 5 images is allowed.",
           });
       }
 
@@ -672,10 +672,10 @@ export const updateStateWiseWeight = async (req, res, next) => {
     }
 
     // 5. Finalize payload and update
-    if (Object.keys(resolvedImages).length > 3) {
+    if (Object.keys(resolvedImages).length > 5) {
       return res
         .status(400)
-        .json({ success: false, message: "A maximum of 3 images is allowed." });
+        .json({ success: false, message: "A maximum of 5 images is allowed." });
     }
 
     updatePayload.images = resolvedImages;

@@ -33,9 +33,9 @@ const stateWiseWeightSchema = new mongoose.Schema(
             validate: {
                 validator: function (value) {
                     if (!value) return true;
-                    return value.size <= 3;
+                    return value.size <= 5;
                 },
-                message: "A maximum of 3 images is allowed.",
+                message: "A maximum of 5 images is allowed.",
             },
         },
 
