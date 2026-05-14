@@ -30,8 +30,8 @@ const continentOptions = [
   "Asia",
   "Europe",
   "North America",
-  "South America",
   "Oceania",
+  "South America",
 ];
 
 const destinationCards = aiDestinationCards;
@@ -417,15 +417,15 @@ const getQuickStatsForDestination = (
 ) => {
   const statConfig =
     selectedGoal === "World Ranking" &&
-    selectedGoalOption === "Best Work Infrastructure"
+      selectedGoalOption === "Best Work Infrastructure"
       ? [
-          { label: "Work Infra", labelKey: "labelBestWorkInfrastructure" },
-          { label: "Internet", labelKey: "labelFastInternetCities" },
-          { label: "Community", labelKey: "labelStrongNomadCommunity" },
-          { label: "Access", labelKey: "labelBestConnectedCitiesFlights" },
-        ]
+        { label: "Work Infra", labelKey: "labelBestWorkInfrastructure" },
+        { label: "Internet", labelKey: "labelFastInternetCities" },
+        { label: "Community", labelKey: "labelStrongNomadCommunity" },
+        { label: "Access", labelKey: "labelBestConnectedCitiesFlights" },
+      ]
       : quickStatsConfigByGoalOption[selectedGoalOption] ||
-        fallbackQuickStatsConfig;
+      fallbackQuickStatsConfig;
   const selectedGoalScoreKey = getApiAttributeForSelection(
     selectedGoal,
     selectedGoalOption,
@@ -434,7 +434,7 @@ const getQuickStatsForDestination = (
   const configuredStats = statConfig.slice(0, 4).map((config) => {
     const scoreKeyFromLabel = config.labelKey
       ? labelToAllScoresKeyMap[config.labelKey] ||
-        `${config.labelKey.charAt(5).toLowerCase()}${config.labelKey.slice(6)}`
+      `${config.labelKey.charAt(5).toLowerCase()}${config.labelKey.slice(6)}`
       : null;
     const scoreKey = config.scoreKey || scoreKeyFromLabel || config.field;
     const weightKey =
@@ -446,8 +446,8 @@ const getQuickStatsForDestination = (
     const caseInsensitiveScore =
       directWeight === undefined && weightKey
         ? Object.entries(weights).find(
-            ([key]) => key.toLowerCase() === weightKey.toLowerCase(),
-          )?.[1]
+          ([key]) => key.toLowerCase() === weightKey.toLowerCase(),
+        )?.[1]
         : undefined;
 
     const score = Number(
@@ -739,11 +739,10 @@ const DropdownBadge = ({
       <button
         type="button"
         onClick={onToggle}
-        className={`flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${
-          isOpen
+        className={`flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${isOpen
             ? "border-sky-500 bg-sky-500 text-white"
             : "border-black/20 bg-white text-black/85 hover:border-sky-500"
-        }`}
+          }`}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
       >
@@ -771,22 +770,20 @@ const DropdownBadge = ({
                   <button
                     type="button"
                     onClick={() => onSelect(option)}
-                    className={`group flex w-full items-center rounded-xl px-4 py-2 text-left text-sm transition-colors ${
-                      isSelected
+                    className={`group flex w-full items-center rounded-xl px-4 py-2 text-left text-sm transition-colors ${isSelected
                         ? "bg-sky-50 font-medium text-sky-600"
                         : "text-black/80 hover:bg-slate-50"
-                    }`}
+                      }`}
                     role="option"
                     aria-selected={isSelected}
                   >
                     <span className="mr-2 inline-flex w-4 shrink-0 items-center justify-center">
                       <FaCheck
                         size={13}
-                        className={`shrink-0 text-primary-blue transition-opacity ${
-                          isSelected
+                        className={`shrink-0 text-primary-blue transition-opacity ${isSelected
                             ? "opacity-100"
                             : "opacity-0 group-hover:opacity-100"
-                        }`}
+                          }`}
                         aria-hidden="true"
                       />
                     </span>
@@ -816,9 +813,9 @@ const AiSearchResults = () => {
     : "/search/results";
   const goalOptions = goalFilterMap[selectedGoal] || goalFilterMap[defaultGoal];
   const getPersistedGoal = () => {
-      if (typeof window === "undefined") return null;
-      return localStorage.getItem(SEARCH_RESULTS_GOAL_STORAGE_KEY);
-    },
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem(SEARCH_RESULTS_GOAL_STORAGE_KEY);
+  },
     getPersistedSelectionSignature = () => {
       if (typeof window === "undefined") return null;
       return localStorage.getItem(
@@ -945,8 +942,8 @@ const AiSearchResults = () => {
             typeof item?.[selectedAttribute] === "number"
               ? item[selectedAttribute]
               : Object.entries(item).find(
-                  ([, value]) => typeof value === "number",
-                )?.[1] || 0;
+                ([, value]) => typeof value === "number",
+              )?.[1] || 0;
 
           return {
             ...(existingDestination || {}),
@@ -1603,11 +1600,10 @@ const AiSearchResults = () => {
                       {visibleDestinations.map((destination, index) => (
                         <article
                           key={`${destination.city}-${destination.country}`}
-                          className={`cursor-pointer transition-all duration-300 ${
-                            index < visibleDestinationCount
+                          className={`cursor-pointer transition-all duration-300 ${index < visibleDestinationCount
                               ? "translate-y-0 opacity-100"
                               : "pointer-events-none translate-y-2 opacity-0"
-                          }`}
+                            }`}
                           role="button"
                           tabIndex={0}
                           onClick={() => handleDestinationClick(destination)}
@@ -1656,14 +1652,13 @@ const AiSearchResults = () => {
                                   </h4>
                                 </div>
                                 <h4 className="mb-2 text-right text-white text-sm md:text-sm font-semibold py-0">
-                                  {`${selectedContinent || "World"} Rank ${
-                                    destination?.rankLabel
+                                  {`${selectedContinent || "World"} Rank ${destination?.rankLabel
                                       ? destination.rankLabel.replace(
-                                          /^Rank\s*/i,
-                                          "",
-                                        )
+                                        /^Rank\s*/i,
+                                        "",
+                                      )
                                       : "—"
-                                  }`}
+                                    }`}
                                 </h4>
 
                                 <div className="grid grid-cols-1 gap-2 text-xs md:text-sm text-white/90">
@@ -1680,23 +1675,23 @@ const AiSearchResults = () => {
                                           90deg,
                                           ${getScoreBarColorValue(stat.score)} 0%,
                                           ${getScoreBarColorValue(stat.score)} ${Math.max(
-                                            0,
-                                            Math.min(
-                                              100,
-                                              getScoreFillPercentage(
-                                                stat.score,
-                                              ),
+                                          0,
+                                          Math.min(
+                                            100,
+                                            getScoreFillPercentage(
+                                              stat.score,
                                             ),
-                                          )}%,
+                                          ),
+                                        )}%,
                                           rgba(255, 255, 255, 0.16) ${Math.max(
-                                            0,
-                                            Math.min(
-                                              100,
-                                              getScoreFillPercentage(
-                                                stat.score,
-                                              ),
+                                          0,
+                                          Math.min(
+                                            100,
+                                            getScoreFillPercentage(
+                                              stat.score,
                                             ),
-                                          )}%,
+                                          ),
+                                        )}%,
                                           rgba(255, 255, 255, 0.16) 100%
                                         )`,
                                       }}
