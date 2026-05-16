@@ -6,10 +6,14 @@ import {
     Button,
     Box,
     InputAdornment,
+    FormControl,
     FormGroup,
     FormControlLabel,
     Checkbox,
     FormHelperText,
+    InputLabel,
+    Select,
+    ListItemText,
 } from "@mui/material";
 import Container from "../../components/Container";
 import GetStartedButton from "../../components/GetStartedButton";
@@ -65,12 +69,12 @@ const serviceOptions = [
 ];
 
 const verticalTypeOptions = [
-    "coworking",
-    "coliving",
-    "hostel",
-    "workation",
-    "meetings",
-    "cafe",
+    "Co-working",
+    "Co-living",
+    "Hostel",
+    "Workation",
+    "Meetings",
+    "Cafe",
 ];
 
 const floatingLabelSx = {
@@ -129,7 +133,7 @@ const AiHostSignup = () => {
                 city: "",
                 companyName: "",
                 industry: "",
-                verticalType: "",
+                verticalType: [],
                 companyCountry: "",
                 companyState: "",
                 companyCity: "",
@@ -636,25 +640,44 @@ const AiHostSignup = () => {
                         <Controller
                             name="verticalType"
                             control={control}
-                            rules={{ required: "Type of Vertical is required" }}
+                            rules={{
+                                validate: (value) =>
+                                    Array.isArray(value) && value.length > 0
+                                        ? true
+                                        : "Type of Vertical is required",
+                            }}
                             render={({ field, fieldState }) => (
-                                <TextField
-                                    {...field}
-                                    select
-                                    label="Type of Vertical"
+                                <FormControl
                                     fullWidth
                                     margin="normal"
                                     variant="standard"
                                     error={!!fieldState.error}
-                                    helperText={fieldState.error?.message}
-                                    InputLabelProps={{ sx: floatingLabelSx }}
                                 >
-                                    {verticalTypeOptions.map((option) => (
-                                        <MenuItem key={option} value={option}>
-                                            {option}
-                                        </MenuItem>
-                                    ))}
-                                </TextField>
+                                    <InputLabel sx={floatingLabelSx}>
+                                        Type of Vertical
+                                    </InputLabel>
+                                    <Select
+                                        multiple
+                                        name={field.name}
+                                        value={field.value || []}
+                                        onChange={(e) => field.onChange(e.target.value)}
+                                        onBlur={field.onBlur}
+                                        inputRef={field.ref}
+                                        renderValue={(selected) => selected.join(", ")}
+                                    >
+                                        {verticalTypeOptions.map((option) => (
+                                            <MenuItem key={option} value={option}>
+                                                <Checkbox
+                                                    checked={(field.value || []).includes(option)}
+                                                />
+                                                <ListItemText primary={option} />
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                    <FormHelperText>
+                                        {fieldState.error?.message}
+                                    </FormHelperText>
+                                </FormControl>
                             )}
                         />
 
@@ -1536,7 +1559,8 @@ const AiHostSignup = () => {
                                 key === "about" ||
                                 key === "gallery" ||
                                 key === "products" ||
-                                key === "contactCode"
+                                key === "contactCode" ||
+                                key === "verticalType"
                             )
                                 return;
 
@@ -1549,7 +1573,7 @@ const AiHostSignup = () => {
                             "N/A",
                         );
                         fd.set("contactCode", withFallback(values.contactCode, "N/A"));
-
+                        fd.set("verticalType", JSON.stringify(values.verticalType || []));
                         // About (array → join into text or fallback)
                         const aboutArray =
                             values.about?.map((a, i) =>

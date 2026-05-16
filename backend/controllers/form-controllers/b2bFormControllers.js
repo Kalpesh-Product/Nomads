@@ -236,8 +236,7 @@ export const addB2BFormSubmission = async (req, res, next) => {
     let resumeLink = "";
     if (req.file) {
       data = await uploadFileToS3(
-        `job-applications/${payload.jobPosition}/${
-          payload.name + randomUUID()
+        `job-applications/${payload.jobPosition}/${payload.name + randomUUID()
         }/${req.file.originalname}`,
         req.file,
       );
@@ -522,11 +521,20 @@ export const registerFormSubmission = async (req, res) => {
 
   try {
     const payload = req.body;
+    const safeParse = (val, fallback) => {
+      try {
+        return typeof val === "string" ? JSON.parse(val) : val || fallback;
+      } catch {
+        return fallback;
+      }
+    };
+
+    payload.verticalType = safeParse(payload.verticalType, []);
 
     try {
       const num = parsePhoneNumberFromString(payload.mobile);
       if (num?.isValid()) payload.mobile = num.number; // normalize
-    } catch {}
+    } catch { }
 
     // STEP 1: send registration data to Google Sheet
     const apsBody = {
@@ -539,7 +547,9 @@ export const registerFormSubmission = async (req, res) => {
       companyName: payload.companyName,
       industry: payload.industry,
       companySize: payload.companySize,
-      companyType: payload.companyType,
+      companyType: Array.isArray(payload.verticalType)
+        ? payload.verticalType.join(", ")
+        : payload.verticalType || "",
       companyCity: payload.companyCity,
       companyState: payload.companyState,
       websiteURL: payload.websiteUrl,
@@ -575,14 +585,6 @@ export const registerFormSubmission = async (req, res) => {
 
     // STEP 2: normalize incoming JSON strings
     let { products, testimonials, about } = payload;
-    const safeParse = (val, fallback) => {
-      try {
-        return typeof val === "string" ? JSON.parse(val) : val || fallback;
-      } catch {
-        return fallback;
-      }
-    };
-
     products = safeParse(products, []);
     testimonials = safeParse(testimonials, []);
     about = safeParse(about, []);
@@ -698,9 +700,8 @@ export const registerFormSubmission = async (req, res) => {
         const buffer = await sharp(logoFile.buffer)
           .webp({ quality: 80 })
           .toBuffer();
-        const route = `${baseFolder}/companyLogo/${Date.now()}_${
-          logoFile.originalname
-        }`;
+        const route = `${baseFolder}/companyLogo/${Date.now()}_${logoFile.originalname
+          }`;
         const data = await uploadFileToS3(route, {
           buffer,
           mimetype: "image/webp",
@@ -806,15 +807,13 @@ export const registerFormSubmission = async (req, res) => {
           await sendMail({
             to: payload.email,
             subject: "Welcome to WONO 🎉",
-            text: `Hi ${
-              payload.name || "User"
-            }, thanks for registering with WONO!`,
+            text: `Hi ${payload.name || "User"
+              }, thanks for registering with WONO!`,
             html: `
             <h2>Welcome to WONO</h2>
             <p>Hi ${payload.name || "User"},</p>
-            <p>Thanks for registering with us. Our team will contact you shortly ${
-              searchKey && "and will inform you once your website is created"
-            }.</p>
+            <p>Thanks for registering with us. Our team will contact you shortly ${searchKey && "and will inform you once your website is created"
+              }.</p>
             <p>Cheers,<br/>The WONO Team</p>
           `,
           });
