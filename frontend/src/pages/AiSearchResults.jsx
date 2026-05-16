@@ -11,7 +11,8 @@ import {
   HiOutlineSearch,
   HiOutlineX,
 } from "react-icons/hi";
-import { FaCheck, FaHeart, FaSyncAlt } from "react-icons/fa";
+import { AiFillHeart, AiTwotoneHeart } from "react-icons/ai";
+import { FaCheck, FaSyncAlt } from "react-icons/fa";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { aiDestinationCards } from "../constants/aiDestinationCards";
@@ -35,6 +36,8 @@ const continentOptions = [
 ];
 
 const destinationCards = aiDestinationCards;
+const getDestinationFavoriteKey = (destination) =>
+  `${destination.city}-${destination.country}`;
 
 const goalOptionToApiAttributeMap = {
   "Best for Nomads": "bestForNomads",
@@ -838,6 +841,7 @@ const AiSearchResults = () => {
   const [showAllDestinations, setShowAllDestinations] = useState(false);
   const [isResultsReady, setIsResultsReady] = useState(false);
   const [visibleDestinationCount, setVisibleDestinationCount] = useState(0);
+  const [likedDestinations, setLikedDestinations] = useState([]);
   const dropdownContainerRef = useRef(null);
   const closeDropdownTimeoutRef = useRef(null);
 
@@ -1063,6 +1067,15 @@ const AiSearchResults = () => {
       },
     );
   };
+  const toggleDestinationLike = useCallback((destination) => {
+    const destinationKey = getDestinationFavoriteKey(destination);
+
+    setLikedDestinations((previousLikes) =>
+      previousLikes.includes(destinationKey)
+        ? previousLikes.filter((key) => key !== destinationKey)
+        : [...previousLikes, destinationKey],
+    );
+  }, []);
 
   const handleDropdownToggle = (dropdownKey) => {
     setOpenDropdown((currentDropdown) =>
@@ -1626,9 +1639,22 @@ const AiSearchResults = () => {
                                 : "—"}
                             </div>
 
-                            <div className="pointer-events-none absolute right-3 top-3 text-red-500 md:right-4 md:top-4">
-                              <FaHeart className="text-xl md:text-2xl" />
-                            </div>
+                            <button
+                              type="button"
+                              className="absolute right-3 top-3 z-20 cursor-pointer md:right-4 md:top-4"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                toggleDestinationLike(destination);
+                              }}
+                            >
+                              {likedDestinations.includes(
+                                getDestinationFavoriteKey(destination),
+                              ) ? (
+                                <AiFillHeart className="text-xl text-[#ff5757] md:text-2xl" />
+                              ) : (
+                                <AiTwotoneHeart className="text-xl text-[#b6b6b6] md:text-2xl" />
+                              )}
+                            </button>
 
                             <div className="pointer-events-none absolute inset-x-2 bottom-3 text-center text-white md:inset-x-4 md:bottom-4">
                               <h3 className="text-lg uppercase font-normal tracking-wide md:text-3xl">
