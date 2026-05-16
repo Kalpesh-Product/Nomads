@@ -144,214 +144,214 @@ const getScoreFillPercentage = (score) => {
 
 const quickStatsConfigByGoalOption = {
   "Best for Nomads": [
-    { label: "Work Infra", labelKey: "labelBestWorkInfrastructure" },
-    { label: "Internet", labelKey: "labelFastInternetCities" },
-    { label: "Community", labelKey: "labelStrongNomadCommunity" },
-    { label: "Cost", labelKey: "labelCostOfLivingPerMonth" },
+    { label: "Work Infra", weightKey: "workInfrastructure" },
+    { label: "Internet", weightKey: "internet" },
+    { label: "Affordability", weightKey: "costOfLiving" },
+    { label: "Community", weightKey: "nomadCommunity" },
   ],
   "Most Affordable": [
-    { label: "Cost", labelKey: "labelCostOfLivingPerMonth" },
-    { label: "Healthcare", labelKey: "labelHealthcareFriendly" },
-    { label: "Safety", labelKey: "labelSafestCities" },
-    { label: "Livability", labelKey: "labelMostAffordable" },
+    { label: "Affordability", weightKey: "costOfLiving" },
+    { label: "Purchasing Power", weightKey: "purchasingPower" },
+    { label: "Heathcare Cost", weightKey: "healthcareCostIndex" },
+    { label: "Inflation Stability", weightKey: "inflationStability" },
   ],
   "Safest Cities": [
-    { label: "Safety", labelKey: "labelSafestCities" },
-    { label: "Healthcare", labelKey: "labelHealthcareFriendly" },
-    { label: "Livability", labelKey: "labelMostAffordable" },
-    { label: "Air", labelKey: "labelCleanAirEnvironment" },
+    { label: "Safety", weightKey: "safety" },
+    { label: "Livability", weightKey: "qualityOfLife" },
+    { label: "Heathcare Cost", weightKey: "healthcareCostIndex" },
+    { label: "Air Quality", weightKey: "airQualityIndex" },
   ],
   "Easy Visa / Long Stay": [
-    { label: "Visa", labelKey: "labelEasyVisa" },
-    { label: "Long Stay", labelKey: "labelEasyVisa" },
-    { label: "Cost", labelKey: "labelCostOfLivingPerMonth" },
-    { label: "Livability", labelKey: "labelMostAffordable" },
+    { label: "Visa-Friendly", weightKey: "visaFlexibility" },
+    { label: "Affordability", weightKey: "costOfLiving" },
+    { label: "Safety", weightKey: "safety" },
+    { label: "Livability", weightKey: "qualityOfLife" },
   ],
   "Strong Nomad Community": [
-    { label: "Community", labelKey: "labelStrongNomadCommunity" },
-    { label: "Social", labelKey: "labelNomadCommunityNetworking" },
-    { label: "Internet", labelKey: "labelFastInternetCities" },
-    { label: "Livability", labelKey: "labelMostAffordable" },
+    { label: "Community", weightKey: "nomadCommunity" },
+    { label: "Meetups & Events", weightKey: "meetupsEvents" },
+    { label: "Lifestyle & Entertainment", weightKey: "lifestyleEntertainment" },
+    { label: "Safety", weightKey: "safety" },
   ],
   "Healthcare Friendly": [
-    { label: "Healthcare", labelKey: "labelHealthcareFriendly" },
-    { label: "Safety", labelKey: "labelSafestCities" },
-    { label: "Air", labelKey: "labelCleanAirEnvironment" },
-    { label: "Cost", labelKey: "labelCostOfLivingPerMonth" },
+    { label: "Livability", weightKey: "qualityOfLife" },
+    { label: "Healthcare Cost", weightKey: "healthcareCostIndex" },
+    { label: "Safety", weightKey: "safety" },
+    { label: "Air Quality", weightKey: "airQualityIndex" },
   ],
   "Startup / Business Opportunities": [
-    { label: "Startup", labelKey: "labelStartupBusinessOpportunities" },
-    { label: "Talent", labelKey: "labelTechTalentDensity" },
-    { label: "Work Infra", labelKey: "labelBestWorkInfrastructure" },
-    { label: "Connectivity", labelKey: "labelBestConnectedCitiesFlights" },
+    { label: "Startup Ecosystem", weightKey: "startupEcosystemScore" },
+    { label: "Tech Talent", weightKey: "techTalentDensity" },
+    { label: "Work Infra", weightKey: "workInfrastructure" },
+    { label: "Startup Support", weightKey: "incubators" },
   ],
   "Clean Air / Environment": [
-    { label: "Air", labelKey: "labelCleanAirEnvironment" },
-    { label: "Safety", labelKey: "labelSafestCities" },
-    { label: "Healthcare", labelKey: "labelHealthcareFriendly" },
-    { label: "Livability", labelKey: "labelMostAffordable" },
-  ],
-  "Best for Remote Work Setup": [
-    { label: "Internet", labelKey: "labelFastInternetCities" },
-    { label: "Work Infra", labelKey: "labelBestWorkInfrastructureWfa" },
-    { label: "Community", labelKey: "labelStrongNomadCommunityWfa" },
-    { label: "Flights", labelKey: "labelBestConnectedCitiesFlights" },
-  ],
-  "Cheapest Places": [
-    { label: "Cost", labelKey: "labelCostOfLivingPerMonth" },
-    { label: "Community", labelKey: "labelStrongNomadCommunityWfa" },
-    { label: "Internet", labelKey: "labelFastInternetCities" },
-    { label: "Work Infra", labelKey: "labelBestWorkInfrastructureWfa" },
-  ],
-  "Best Connected Cities (Flights)": [
-    { label: "Flights", labelKey: "labelBestConnectedCitiesFlights" },
-    { label: "Airport", labelKey: "labelBestConnectedCitiesFlights" },
-    { label: "Internet", labelKey: "labelFastInternetCities" },
-    { label: "Work Infra", labelKey: "labelBestWorkInfrastructureWfa" },
-  ],
-  "Fast Internet Cities": [
-    { label: "Internet", labelKey: "labelFastInternetCities" },
-    { label: "Reliability", labelKey: "labelFastInternetCities" },
-    { label: "Work Infra", labelKey: "labelBestWorkInfrastructureWfa" },
-    { label: "Connectivity", labelKey: "labelBestConnectedCitiesFlights" },
+    { label: "Safety", weightKey: "safety" },
+    { label: "Livability", weightKey: "qualityOfLife" },
+    { label: "Heathcare Cost", weightKey: "healthcareCostIndex" },
+    { label: "Air Quality", weightKey: "airQualityIndex" },
   ],
   "Best Work Infrastructure": [
-    { label: "Work Infra", labelKey: "labelBestWorkInfrastructureWfa" },
-    { label: "Internet", labelKey: "labelFastInternetCities" },
-    { label: "Community", labelKey: "labelStrongNomadCommunityWfa" },
-    { label: "Access", labelKey: "labelBestConnectedCitiesFlights" },
+    { label: "Work Infra", weightKey: "workInfrastructure" },
+    { label: "Internet", weightKey: "internet" },
+    { label: "Affordability", weightKey: "costOfLiving" },
+    { label: "Community", weightKey: "nomadCommunity" },
+  ],
+  "Best for Remote Work Setup": [
+    { label: "Internet", weightKey: "internet" },
+    { label: "Work Infra", weightKey: "workInfrastructure" },
+    { label: "Community", weightKey: "nomadCommunity" },
+    { label: "Affordability", weightKey: "costOfLiving" },
+  ],
+  "Cheapest Places": [
+    { label: "Affordability", weightKey: "costOfLiving" },
+    { label: "Internet", weightKey: "internet" },
+    { label: "Work Infra", weightKey: "workInfrastructure" },
+    { label: "Community", weightKey: "nomadCommunity" },
+  ],
+  "Best Connected Cities (Flights)": [
+    { label: "Direct Flights", weightKey: "directInternationalFlights" },
+    { label: "Connectivity", weightKey: "airportConnectivity" },
+    { label: "Work Infra", weightKey: "workInfrastructure" },
+    { label: "Community", weightKey: "nomadCommunity" },
+  ],
+  "Fast Internet Cities": [
+    { label: "Internet", weightKey: "internet" },
+    { label: "Work Infra", weightKey: "workInfrastructure" },
+    { label: "Community", weightKey: "nomadCommunity" },
+    { label: "Affordability", weightKey: "costOfLiving" },
   ],
   "Maximum Savings": [
-    { label: "Cost", labelKey: "labelCostOfLivingPerMonth" },
-    { label: "Tax", labelKey: "labelLowTaxation" },
-    { label: "Power", labelKey: "labelPurchasingPower" },
-    { label: "Stability", labelKey: "labelFinancialStability" },
+    { label: "Affordability", weightKey: "costOfLiving" },
+    { label: "Tax Friendly", weightKey: "taxFriendly" },
+    { label: "Purchasing Power", weightKey: "purchasingPower" },
+    { label: "Inflation Stability", weightKey: "inflationStability" },
   ],
   "Low Taxation": [
-    { label: "Tax", labelKey: "labelLowTaxation" },
-    { label: "Cost", labelKey: "labelCostOfLivingPerMonth" },
-    { label: "Power", labelKey: "labelPurchasingPower" },
-    { label: "Stability", labelKey: "labelFinancialStability" },
+    { label: "Tax Friendly", weightKey: "taxFriendly" },
+    { label: "Affordability", weightKey: "costOfLiving" },
+    { label: "Purchasing Power", weightKey: "purchasingPower" },
+    { label: "Inflation Stability", weightKey: "inflationStability" },
   ],
   "Purchasing Power": [
-    { label: "Power", labelKey: "labelPurchasingPower" },
-    { label: "Cost", labelKey: "labelCostOfLivingPerMonth" },
-    { label: "Tax", labelKey: "labelLowTaxation" },
-    { label: "Stability", labelKey: "labelFinancialStability" },
+    { label: "Purchasing Power", weightKey: "purchasingPower" },
+    { label: "Affordability", weightKey: "costOfLiving" },
+    { label: "Tax Friendly", weightKey: "taxFriendly" },
+    { label: "Inflation Stability", weightKey: "inflationStability" },
   ],
   "Financial Stability(Low Risk)": [
-    { label: "Stability", labelKey: "labelFinancialStability" },
-    { label: "Healthcare", labelKey: "labelHealthcareFriendly" },
-    { label: "Tax", labelKey: "labelLowTaxation" },
-    { label: "Cost", labelKey: "labelCostOfLivingPerMonth" },
+    { label: "Inflation Stability", weightKey: "inflationStability" },
+    { label: "Heathcare Cost", weightKey: "healthcareCostIndex" },
+    { label: "Affordability", weightKey: "costOfLiving" },
+    { label: "Tax Friendly", weightKey: "taxFriendly" },
   ],
   "Startup Setup Cost": [
-    { label: "Setup Cost", labelKey: "labelStartupSetupCost" },
-    { label: "Tax", labelKey: "labelLowTaxation" },
-    { label: "Living Cost", labelKey: "labelCostOfLivingPerMonth" },
-    { label: "Power", labelKey: "labelPurchasingPower" },
+    { label: "Startup Costs", weightKey: "startupSetupCost" },
+    { label: "Tax Friendly", weightKey: "taxFriendly" },
+    { label: "Affordability", weightKey: "costOfLiving" },
+    { label: "Work Infra", weightKey: "workInfrastructure" },
   ],
   "Balanced Financial Lifestyle": [
-    { label: "Efficiency", labelKey: "labelBalancedFinancialLifestyle" },
-    { label: "Tax", labelKey: "labelLowTaxation" },
-    { label: "Power", labelKey: "labelPurchasingPower" },
-    { label: "Stability", labelKey: "labelFinancialStability" },
-  ],
-  "Startup Ecosystems": [
-    { label: "Startup", labelKey: "labelStartupEcosystems" },
-    { label: "VC", labelKey: "labelVentureCapitalPresence" },
-    { label: "Incubators", labelKey: "labelStartupIncubatorsAccelerators" },
-    { label: "Talent", labelKey: "labelTechTalentDensity" },
-  ],
-  "Remote Job Opportunities": [
-    { label: "Remote Jobs", labelKey: "labelRemoteJobOpportunities" },
-    { label: "Global Access", labelKey: "labelBestConnectedCitiesFlights" },
-    { label: "Career", labelKey: "labelBalancedCareerGrowth" },
-    { label: "Work Ecosystem", labelKey: "labelBestWorkInfrastructure" },
-  ],
-  "Founder Nomads": [
-    { label: "Founder", labelKey: "labelFounderNomadsAyc" },
-    { label: "Events", labelKey: "labelConferencesEvents" },
-    { label: "Talent", labelKey: "labelTechTalentDensity" },
-    { label: "Opportunity", labelKey: "labelStartupEcosystems" },
-  ],
-  "Tech Talent Density": [
-    { label: "Talent", labelKey: "labelTechTalentDensity" },
-    { label: "Builders", labelKey: "labelTechTalentDensity" },
-    { label: "Innovation", labelKey: "labelStartupEcosystems" },
-    { label: "Collaboration", labelKey: "labelNomadCommunityNetworking" },
-  ],
-  "Startup Incubators & Accelerators": [
-    { label: "Incubators", labelKey: "labelStartupIncubatorsAccelerators" },
-    { label: "Mentorship", labelKey: "labelStartupIncubatorsAccelerators" },
-    { label: "Support", labelKey: "labelStartupEcosystems" },
-    { label: "Growth", labelKey: "labelBalancedCareerGrowth" },
-  ],
-  "Balanced Career Growth": [
-    { label: "Jobs", labelKey: "labelRemoteJobOpportunities" },
-    { label: "Startup", labelKey: "labelStartupEcosystems" },
-    { label: "Networking", labelKey: "labelConferencesEvents" },
-    { label: "Talent", labelKey: "labelTechTalentDensity" },
-  ],
-  "Venture Capital Presence": [
-    { label: "VC", labelKey: "labelVentureCapitalPresence" },
-    { label: "Funding", labelKey: "labelVentureCapitalPresence" },
-    { label: "Investors", labelKey: "labelVentureCapitalPresence" },
-    { label: "Growth", labelKey: "labelBalancedCareerGrowth" },
-  ],
-  "Conferences & Events": [
-    { label: "Conferences", labelKey: "labelConferencesEvents" },
-    { label: "Networking", labelKey: "labelConferencesEvents" },
-    { label: "Meetups", labelKey: "labelConferencesEvents" },
-    { label: "Exposure", labelKey: "labelBestConnectedCitiesFlights" },
+    { label: "Affordability", weightKey: "costOfLiving" },
+    { label: "Purchasing Power", weightKey: "purchasingPower" },
+    { label: "Tax Friendly", weightKey: "taxFriendly" },
+    { label: "Startup Costs", weightKey: "startupSetupCost" },
   ],
   "Social & Party Lifestyle": [
-    { label: "Social", labelKey: "labelSocialPartyLifestyle" },
-    { label: "Nightlife", labelKey: "labelSocialPartyLifestyle" },
-    { label: "Community", labelKey: "labelNomadCommunityNetworking" },
-    { label: "Events", labelKey: "labelConferencesEvents" },
+    { label: "Social Scene", weightKey: "partyLifestyle" },
+    { label: "Nightlife", weightKey: "nightlife" },
+    { label: "Lifestyle & Entertainment", weightKey: "lifestyleEntertainment" },
+    { label: "Community", weightKey: "nomadCommunity" },
   ],
   "Chill & Wellness Lifestyle": [
-    { label: "Peaceful", labelKey: "labelChillWellnessLifestyle" },
-    { label: "Wellness", labelKey: "labelChillWellnessLifestyle" },
-    { label: "Nature", labelKey: "labelCleanAirEnvironment" },
-    { label: "Community", labelKey: "labelNomadCommunityNetworking" },
+    { label: "Environment", weightKey: "climateEnvironment" },
+    { label: "Nature", weightKey: "nature" },
+    { label: "Wellness", weightKey: "yoga" },
+    { label: "Community", weightKey: "nomadCommunity" },
   ],
   "Adventure & Exploration": [
-    { label: "Adventure", labelKey: "labelAdventureExploration" },
-    { label: "Nature", labelKey: "labelCleanAirEnvironment" },
-    { label: "Explore", labelKey: "labelAdventureExploration" },
-    { label: "Community", labelKey: "labelNomadCommunityNetworking" },
+    { label: "Adventure", weightKey: "adventure" },
+    { label: "Nature", weightKey: "nature" },
+    { label: "Environment", weightKey: "climateEnvironment" },
+    { label: "Community", weightKey: "nomadCommunity" },
   ],
   "Nomad Community & Networking": [
-    { label: "Community", labelKey: "labelNomadCommunityNetworking" },
-    { label: "Meetups", labelKey: "labelConferencesEvents" },
-    { label: "Founder", labelKey: "labelFounderNomads" },
-    { label: "Ecosystem", labelKey: "labelStrongNomadCommunity" },
+    { label: "Community", weightKey: "nomadCommunity" },
+    { label: "Meetups & Events", weightKey: "meetupsEvents" },
+    { label: "Founder Nomads", weightKey: "founderNomads" },
+    { label: "Conferences", weightKey: "conferences" },
   ],
   "Couple - Friendly Lifestyle": [
-    { label: "Couples", labelKey: "labelCoupleFriendlyLifestyle" },
-    { label: "Lifestyle", labelKey: "labelCoupleFriendlyLifestyle" },
-    { label: "Community", labelKey: "labelNomadCommunityNetworking" },
-    { label: "Balance", labelKey: "labelChillWellnessLifestyle" },
+    { label: "Couple-Friendly", weightKey: "coupleNomads" },
+    { label: "Community", weightKey: "nomadCommunity" },
+    { label: "Lifestyle & Entertainment", weightKey: "lifestyleEntertainment" },
+    { label: "Safety", weightKey: "safety" },
   ],
   "Family - Friendly Lifestyle": [
-    { label: "Family", labelKey: "labelFamilyFriendlyLifestyle" },
-    { label: "Safety", labelKey: "labelSafestCities" },
-    { label: "Livability", labelKey: "labelMostAffordable" },
-    { label: "Community", labelKey: "labelNomadCommunityNetworking" },
+    { label: "Family-Friendly", weightKey: "familyNomads" },
+    { label: "Safety", weightKey: "safety" },
+    { label: "Community", weightKey: "nomadCommunity" },
+    { label: "Lifestyle & Entertainment", weightKey: "lifestyleEntertainment" },
   ],
   "Female Friendly Lifestyle": [
-    { label: "Safety", labelKey: "labelSafestCities" },
-    { label: "Women-Friendly", labelKey: "labelFemaleFriendlyLifestyle" },
-    { label: "Community", labelKey: "labelNomadCommunityNetworking" },
-    { label: "Ease", labelKey: "labelFemaleFriendlyLifestyle" },
+    { label: "Female-Friendly", weightKey: "femaleNomads" },
+    { label: "Safety", weightKey: "safety" },
+    { label: "Community", weightKey: "nomadCommunity" },
+    { label: "Travel Ease", weightKey: "accessibility" },
+  ],
+  "Founder Nomads": [
+    { label: "Founder Nomads", weightKey: "founderNomads" },
+    { label: "Startup Ecosystem", weightKey: "startupEcosystemScore" },
+    { label: "Venture Capital", weightKey: "ventureCapital" },
+    { label: "Community", weightKey: "nomadCommunity" },
   ],
   "Solo Nomads": [
-    { label: "Solo", labelKey: "labelNomadCommunityNetworking" },
-    { label: "Social", labelKey: "labelStrongNomadCommunity" },
-    { label: "Activities", labelKey: "labelConferencesEvents" },
-    { label: "Freedom", labelKey: "labelEasyVisa" },
+    { label: "Social Scene", weightKey: "partyLifestyle" },
+    { label: "Community", weightKey: "nomadCommunity" },
+    { label: "Lifestyle & Entertainment", weightKey: "lifestyleEntertainment" },
+    { label: "Safety", weightKey: "safety" },
+  ],
+  "Startup Ecosystems": [
+    { label: "Startup Ecosystem", weightKey: "startupEcosystemScore" },
+    { label: "Venture Capital", weightKey: "ventureCapital" },
+    { label: "Startup Support", weightKey: "incubators" },
+    { label: "Tech Talent", weightKey: "techTalentDensity" },
+  ],
+  "Remote Job Opportunities": [
+    { label: "Remote Jobs", weightKey: "remoteJobs" },
+    { label: "Community", weightKey: "nomadCommunity" },
+    { label: "Work Infra", weightKey: "workInfrastructure" },
+    { label: "Startup Ecosystem", weightKey: "startupEcosystemScore" },
+  ],
+  "Tech Talent Density": [
+    { label: "Tech Talent", weightKey: "techTalentDensity" },
+    { label: "Startup Ecosystem", weightKey: "startupEcosystemScore" },
+    { label: "Founder Nomads", weightKey: "founderNomads" },
+    { label: "Venture Capital", weightKey: "ventureCapital" },
+  ],
+  "Startup Incubators & Accelerators": [
+    { label: "Startup Support", weightKey: "incubators" },
+    { label: "Startup Ecosystem", weightKey: "startupEcosystemScore" },
+    { label: "Founder Nomads", weightKey: "founderNomads" },
+    { label: "Venture Capital", weightKey: "ventureCapital" },
+  ],
+  "Balanced Career Growth": [
+    { label: "Remote Jobs", weightKey: "remoteJobs" },
+    { label: "Work Infra", weightKey: "workInfrastructure" },
+    { label: "Startup Ecosystem", weightKey: "startupEcosystemScore" },
+    { label: "Tech Talent", weightKey: "techTalentDensity" },
+  ],
+  "Venture Capital Presence": [
+    { label: "Venture Capital", weightKey: "ventureCapital" },
+    { label: "Startup Ecosystem", weightKey: "startupEcosystemScore" },
+    { label: "Startup Support", weightKey: "incubators" },
+    { label: "Tech Talent", weightKey: "techTalentDensity" },
+  ],
+  "Conferences & Events": [
+    { label: "Conferences", weightKey: "conferences" },
+    { label: "Founder Nomads", weightKey: "founderNomads" },
+    { label: "Startup Ecosystem", weightKey: "startupEcosystemScore" },
+    { label: "Community", weightKey: "nomadCommunity" },
   ],
 };
 
@@ -416,16 +416,8 @@ const getQuickStatsForDestination = (
   selectedGoalOption,
 ) => {
   const statConfig =
-    selectedGoal === "World Ranking" &&
-      selectedGoalOption === "Best Work Infrastructure"
-      ? [
-        { label: "Work Infra", labelKey: "labelBestWorkInfrastructure" },
-        { label: "Internet", labelKey: "labelFastInternetCities" },
-        { label: "Community", labelKey: "labelStrongNomadCommunity" },
-        { label: "Access", labelKey: "labelBestConnectedCitiesFlights" },
-      ]
-      : quickStatsConfigByGoalOption[selectedGoalOption] ||
-      fallbackQuickStatsConfig;
+    quickStatsConfigByGoalOption[selectedGoalOption] ||
+    fallbackQuickStatsConfig;
   const selectedGoalScoreKey = getApiAttributeForSelection(
     selectedGoal,
     selectedGoalOption,
@@ -434,7 +426,7 @@ const getQuickStatsForDestination = (
   const configuredStats = statConfig.slice(0, 4).map((config) => {
     const scoreKeyFromLabel = config.labelKey
       ? labelToAllScoresKeyMap[config.labelKey] ||
-      `${config.labelKey.charAt(5).toLowerCase()}${config.labelKey.slice(6)}`
+        `${config.labelKey.charAt(5).toLowerCase()}${config.labelKey.slice(6)}`
       : null;
     const scoreKey = config.scoreKey || scoreKeyFromLabel || config.field;
     const weightKey =
@@ -446,8 +438,8 @@ const getQuickStatsForDestination = (
     const caseInsensitiveScore =
       directWeight === undefined && weightKey
         ? Object.entries(weights).find(
-          ([key]) => key.toLowerCase() === weightKey.toLowerCase(),
-        )?.[1]
+            ([key]) => key.toLowerCase() === weightKey.toLowerCase(),
+          )?.[1]
         : undefined;
 
     const score = Number(
@@ -739,10 +731,11 @@ const DropdownBadge = ({
       <button
         type="button"
         onClick={onToggle}
-        className={`flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${isOpen
+        className={`flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${
+          isOpen
             ? "border-sky-500 bg-sky-500 text-white"
             : "border-black/20 bg-white text-black/85 hover:border-sky-500"
-          }`}
+        }`}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
       >
@@ -770,20 +763,22 @@ const DropdownBadge = ({
                   <button
                     type="button"
                     onClick={() => onSelect(option)}
-                    className={`group flex w-full items-center rounded-xl px-4 py-2 text-left text-sm transition-colors ${isSelected
+                    className={`group flex w-full items-center rounded-xl px-4 py-2 text-left text-sm transition-colors ${
+                      isSelected
                         ? "bg-sky-50 font-medium text-sky-600"
                         : "text-black/80 hover:bg-slate-50"
-                      }`}
+                    }`}
                     role="option"
                     aria-selected={isSelected}
                   >
                     <span className="mr-2 inline-flex w-4 shrink-0 items-center justify-center">
                       <FaCheck
                         size={13}
-                        className={`shrink-0 text-primary-blue transition-opacity ${isSelected
+                        className={`shrink-0 text-primary-blue transition-opacity ${
+                          isSelected
                             ? "opacity-100"
                             : "opacity-0 group-hover:opacity-100"
-                          }`}
+                        }`}
                         aria-hidden="true"
                       />
                     </span>
@@ -813,9 +808,9 @@ const AiSearchResults = () => {
     : "/search/results";
   const goalOptions = goalFilterMap[selectedGoal] || goalFilterMap[defaultGoal];
   const getPersistedGoal = () => {
-    if (typeof window === "undefined") return null;
-    return localStorage.getItem(SEARCH_RESULTS_GOAL_STORAGE_KEY);
-  },
+      if (typeof window === "undefined") return null;
+      return localStorage.getItem(SEARCH_RESULTS_GOAL_STORAGE_KEY);
+    },
     getPersistedSelectionSignature = () => {
       if (typeof window === "undefined") return null;
       return localStorage.getItem(
@@ -942,8 +937,8 @@ const AiSearchResults = () => {
             typeof item?.[selectedAttribute] === "number"
               ? item[selectedAttribute]
               : Object.entries(item).find(
-                ([, value]) => typeof value === "number",
-              )?.[1] || 0;
+                  ([, value]) => typeof value === "number",
+                )?.[1] || 0;
 
           return {
             ...(existingDestination || {}),
@@ -1600,10 +1595,11 @@ const AiSearchResults = () => {
                       {visibleDestinations.map((destination, index) => (
                         <article
                           key={`${destination.city}-${destination.country}`}
-                          className={`cursor-pointer transition-all duration-300 ${index < visibleDestinationCount
+                          className={`cursor-pointer transition-all duration-300 ${
+                            index < visibleDestinationCount
                               ? "translate-y-0 opacity-100"
                               : "pointer-events-none translate-y-2 opacity-0"
-                            }`}
+                          }`}
                           role="button"
                           tabIndex={0}
                           onClick={() => handleDestinationClick(destination)}
@@ -1652,13 +1648,14 @@ const AiSearchResults = () => {
                                   </h4>
                                 </div>
                                 <h4 className="mb-2 text-right text-white text-sm md:text-sm font-semibold py-0">
-                                  {`${selectedContinent || "World"} Rank ${destination?.rankLabel
+                                  {`${selectedContinent || "World"} Rank ${
+                                    destination?.rankLabel
                                       ? destination.rankLabel.replace(
-                                        /^Rank\s*/i,
-                                        "",
-                                      )
+                                          /^Rank\s*/i,
+                                          "",
+                                        )
                                       : "—"
-                                    }`}
+                                  }`}
                                 </h4>
 
                                 <div className="grid grid-cols-1 gap-2 text-xs md:text-sm text-white/90">
@@ -1675,23 +1672,23 @@ const AiSearchResults = () => {
                                           90deg,
                                           ${getScoreBarColorValue(stat.score)} 0%,
                                           ${getScoreBarColorValue(stat.score)} ${Math.max(
-                                          0,
-                                          Math.min(
-                                            100,
-                                            getScoreFillPercentage(
-                                              stat.score,
+                                            0,
+                                            Math.min(
+                                              100,
+                                              getScoreFillPercentage(
+                                                stat.score,
+                                              ),
                                             ),
-                                          ),
-                                        )}%,
+                                          )}%,
                                           rgba(255, 255, 255, 0.16) ${Math.max(
-                                          0,
-                                          Math.min(
-                                            100,
-                                            getScoreFillPercentage(
-                                              stat.score,
+                                            0,
+                                            Math.min(
+                                              100,
+                                              getScoreFillPercentage(
+                                                stat.score,
+                                              ),
                                             ),
-                                          ),
-                                        )}%,
+                                          )}%,
                                           rgba(255, 255, 255, 0.16) 100%
                                         )`,
                                       }}
