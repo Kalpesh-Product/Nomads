@@ -12,7 +12,10 @@ const hostUserSchema = new mongoose.Schema(
     goals: { type: String, trim: true },
     companyName: { type: String, trim: true },
     industry: { type: String, trim: true },
-    verticalType: { type: String, trim: true },
+    verticalType: {
+      type: [{ type: String, trim: true }],
+      default: [],
+    },
     companyCountry: { type: String, trim: true },
     companyState: { type: String, trim: true },
     companyCity: { type: String, trim: true },
