@@ -588,9 +588,9 @@ const getNarrativeContinentLabel = (continent) =>
 const goalNarrativeByGoalAndAttribute = {
   [normalizeNarrativeKey("World Ranking")]: {
     [normalizeNarrativeKey("Best for Nomads")]:
-      "Curated below are the top cities in X based on overall livability for modern remote professionals.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🏢 Work infrastructure (coworking, setup, reliability)\n• ⚡ High-speed, stable internet\n• 💰 Cost of living\n• 🛡️ Safety\n• 🛂 Visa flexibility for longer stays\n• 🤝 Nomad community\n• 🏥 Healthcare affordability\n• 🚀 Startup ecosystem\n• 🌿 Air quality\n\n→ Find the best overall place to live and work.",
+      "Curated below are the top cities in X based on overall livability for modern remote professionals.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🏢 Work infrastructure\n• ⚡ High-speed, stable internet\n• 💰 Cost of living\n• 🛡️ Safety\n• 🛂 Visa flexibility for longer stays\n• 🤝 Nomad community\n• 🏥 Healthcare affordability\n• 🚀 Startup ecosystem\n• 🌿 Air quality\n\n→ Find the best overall place to live and work",
     [normalizeNarrativeKey("Most Affordable")]:
-      "Curated below are the most affordable cities in X designed to help you maximize your budget.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💰 Low cost of living\n• 🏥 Affordable healthcare\n• 🛡️ Safety & stability\n• 🌍 Livability factors\n\n→ Find cities where affordability meets comfort.",
+      "Curated below are the most affordable cities in X designed to help you maximize your budget.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💰 Low cost of living\n• 📊 Strong purchasing power\n• 🏥 Affordable healthcare\n• 🛡️ Safety & stability\n\n→ Stretch your budget further while living comfortably.",
     [normalizeNarrativeKey("Safest Cities")]:
       "Curated below are the safest cities in X based on your preference for security and peace of mind.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🛡️ Safety levels\n• 🏥 Healthcare accessibility\n• 🌍 Stable living conditions\n• 🌿 Clean environments\n\n→ Live confidently, whether short-term or long-term.",
     [normalizeNarrativeKey("Easy Visa / Long Stay")]:
@@ -598,13 +598,13 @@ const goalNarrativeByGoalAndAttribute = {
     [normalizeNarrativeKey("Strong Nomad Community")]:
       "Curated below are the best cities in X with strong and active nomad communities.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🤝 Active nomad communities\n• 🌐 Social & collaborative environments\n• ⚡ Internet & work readiness\n• 🏡 Livability factors\n\n→ Find your people, anywhere you go.",
     [normalizeNarrativeKey("Healthcare Friendly")]:
-      "Curated below are the most healthcare-friendly cities in X for reliable and accessible medical support.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🏥 Healthcare affordability\n• 🛡️ Safety & stability\n• 🌍 Clean, livable environments\n• 💰 Sustainable cost of living\n\n→ Stay covered, wherever you live.",
+      "Curated below are the most healthcare-friendly cities in X for reliable and accessible medical support.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🏥 Healthcare quality & accessibility\n• 🩺 Reliable medical infrastructure\n• 🛡️ Safety & stability\n• 🌍 Clean, healthy living environments\n\n→ Access dependable healthcare wherever you live.",
     [normalizeNarrativeKey("Startup / Business Opportunities")]:
       "Curated below are the best cities in X for startups, entrepreneurship, and career growth.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🚀 Startup ecosystems\n• 🧠 Talent & innovation density\n• 🏢 Work infrastructure\n• 🌐 Global connectivity\n\n→ Build, scale, and grow faster.",
     [normalizeNarrativeKey("Clean Air / Environment")]:
       "Curated below are the cleanest and most environmentally friendly cities in X.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🌿 Air quality\n• 🛡️ Safe, livable environments\n• 🏥 Health-conscious conditions\n• 🌍 Overall quality of life\n\n→ Breathe better, live better.",
     [normalizeNarrativeKey("Best Work Infrastructure")]:
-      "Curated below are the best cities in X optimized for productivity and remote work performance.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n•🏢 Work infrastructure (coworking, setup, reliability)\n•⚡ High-speed, stable internet\n•🤝 Strong nomad ecosystems\n•💰 Sustainable cost of living\n•🛂 Visa flexibility for longer stays\n\n→ Work efficiently from anywhere, without compromise.",
+      "Curated below are the best cities in X optimized for productivity and remote work performance.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n•🏢 Work infrastructure\n•⚡ High-speed, stable internet\n•🤝 Strong nomad ecosystems\n•💰 Sustainable cost of living\n•🛂 Visa flexibility for longer stays\n\n→ Work efficiently from anywhere, without compromise.",
   },
   [normalizeNarrativeKey("Work From Anywhere")]: {
     [normalizeNarrativeKey("Best for Remote Work Setup")]:
