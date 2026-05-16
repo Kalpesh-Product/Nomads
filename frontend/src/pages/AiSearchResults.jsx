@@ -11,7 +11,8 @@ import {
   HiOutlineSearch,
   HiOutlineX,
 } from "react-icons/hi";
-import { FaCheck, FaHeart, FaSyncAlt } from "react-icons/fa";
+import { AiFillHeart, AiTwotoneHeart } from "react-icons/ai";
+import { FaCheck, FaSyncAlt } from "react-icons/fa";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { aiDestinationCards } from "../constants/aiDestinationCards";
@@ -35,6 +36,8 @@ const continentOptions = [
 ];
 
 const destinationCards = aiDestinationCards;
+const getDestinationFavoriteKey = (destination) =>
+  `${destination.city}-${destination.country}`;
 
 const goalOptionToApiAttributeMap = {
   "Best for Nomads": "bestForNomads",
@@ -144,214 +147,214 @@ const getScoreFillPercentage = (score) => {
 
 const quickStatsConfigByGoalOption = {
   "Best for Nomads": [
-    { label: "Work Infra", labelKey: "labelBestWorkInfrastructure" },
-    { label: "Internet", labelKey: "labelFastInternetCities" },
-    { label: "Community", labelKey: "labelStrongNomadCommunity" },
-    { label: "Cost", labelKey: "labelCostOfLivingPerMonth" },
+    { label: "Work Infra", weightKey: "workInfrastructure" },
+    { label: "Internet", weightKey: "internet" },
+    { label: "Affordability", weightKey: "costOfLiving" },
+    { label: "Community", weightKey: "nomadCommunity" },
   ],
   "Most Affordable": [
-    { label: "Cost", labelKey: "labelCostOfLivingPerMonth" },
-    { label: "Healthcare", labelKey: "labelHealthcareFriendly" },
-    { label: "Safety", labelKey: "labelSafestCities" },
-    { label: "Livability", labelKey: "labelMostAffordable" },
+    { label: "Affordability", weightKey: "costOfLiving" },
+    { label: "Purchasing Power", weightKey: "purchasingPower" },
+    { label: "Heathcare Cost", weightKey: "healthcareCostIndex" },
+    { label: "Inflation Stability", weightKey: "inflationStability" },
   ],
   "Safest Cities": [
-    { label: "Safety", labelKey: "labelSafestCities" },
-    { label: "Healthcare", labelKey: "labelHealthcareFriendly" },
-    { label: "Livability", labelKey: "labelMostAffordable" },
-    { label: "Air", labelKey: "labelCleanAirEnvironment" },
+    { label: "Safety", weightKey: "safety" },
+    { label: "Livability", weightKey: "qualityOfLife" },
+    { label: "Heathcare Cost", weightKey: "healthcareCostIndex" },
+    { label: "Air Quality", weightKey: "airQualityIndex" },
   ],
   "Easy Visa / Long Stay": [
-    { label: "Visa", labelKey: "labelEasyVisa" },
-    { label: "Long Stay", labelKey: "labelEasyVisa" },
-    { label: "Cost", labelKey: "labelCostOfLivingPerMonth" },
-    { label: "Livability", labelKey: "labelMostAffordable" },
+    { label: "Visa-Friendly", weightKey: "visaFlexibility" },
+    { label: "Affordability", weightKey: "costOfLiving" },
+    { label: "Safety", weightKey: "safety" },
+    { label: "Livability", weightKey: "qualityOfLife" },
   ],
   "Strong Nomad Community": [
-    { label: "Community", labelKey: "labelStrongNomadCommunity" },
-    { label: "Social", labelKey: "labelNomadCommunityNetworking" },
-    { label: "Internet", labelKey: "labelFastInternetCities" },
-    { label: "Livability", labelKey: "labelMostAffordable" },
+    { label: "Community", weightKey: "nomadCommunity" },
+    { label: "Meetups & Events", weightKey: "meetupsEvents" },
+    { label: "Lifestyle & Entertainment", weightKey: "lifestyleEntertainment" },
+    { label: "Safety", weightKey: "safety" },
   ],
   "Healthcare Friendly": [
-    { label: "Healthcare", labelKey: "labelHealthcareFriendly" },
-    { label: "Safety", labelKey: "labelSafestCities" },
-    { label: "Air", labelKey: "labelCleanAirEnvironment" },
-    { label: "Cost", labelKey: "labelCostOfLivingPerMonth" },
+    { label: "Livability", weightKey: "qualityOfLife" },
+    { label: "Healthcare Cost", weightKey: "healthcareCostIndex" },
+    { label: "Safety", weightKey: "safety" },
+    { label: "Air Quality", weightKey: "airQualityIndex" },
   ],
   "Startup / Business Opportunities": [
-    { label: "Startup", labelKey: "labelStartupBusinessOpportunities" },
-    { label: "Talent", labelKey: "labelTechTalentDensity" },
-    { label: "Work Infra", labelKey: "labelBestWorkInfrastructure" },
-    { label: "Connectivity", labelKey: "labelBestConnectedCitiesFlights" },
+    { label: "Startup Ecosystem", weightKey: "startupEcosystemScore" },
+    { label: "Tech Talent", weightKey: "techTalentDensity" },
+    { label: "Work Infra", weightKey: "workInfrastructure" },
+    { label: "Startup Support", weightKey: "incubators" },
   ],
   "Clean Air / Environment": [
-    { label: "Air", labelKey: "labelCleanAirEnvironment" },
-    { label: "Safety", labelKey: "labelSafestCities" },
-    { label: "Healthcare", labelKey: "labelHealthcareFriendly" },
-    { label: "Livability", labelKey: "labelMostAffordable" },
-  ],
-  "Best for Remote Work Setup": [
-    { label: "Internet", labelKey: "labelFastInternetCities" },
-    { label: "Work Infra", labelKey: "labelBestWorkInfrastructureWfa" },
-    { label: "Community", labelKey: "labelStrongNomadCommunityWfa" },
-    { label: "Flights", labelKey: "labelBestConnectedCitiesFlights" },
-  ],
-  "Cheapest Places": [
-    { label: "Cost", labelKey: "labelCostOfLivingPerMonth" },
-    { label: "Community", labelKey: "labelStrongNomadCommunityWfa" },
-    { label: "Internet", labelKey: "labelFastInternetCities" },
-    { label: "Work Infra", labelKey: "labelBestWorkInfrastructureWfa" },
-  ],
-  "Best Connected Cities (Flights)": [
-    { label: "Flights", labelKey: "labelBestConnectedCitiesFlights" },
-    { label: "Airport", labelKey: "labelBestConnectedCitiesFlights" },
-    { label: "Internet", labelKey: "labelFastInternetCities" },
-    { label: "Work Infra", labelKey: "labelBestWorkInfrastructureWfa" },
-  ],
-  "Fast Internet Cities": [
-    { label: "Internet", labelKey: "labelFastInternetCities" },
-    { label: "Reliability", labelKey: "labelFastInternetCities" },
-    { label: "Work Infra", labelKey: "labelBestWorkInfrastructureWfa" },
-    { label: "Connectivity", labelKey: "labelBestConnectedCitiesFlights" },
+    { label: "Safety", weightKey: "safety" },
+    { label: "Livability", weightKey: "qualityOfLife" },
+    { label: "Heathcare Cost", weightKey: "healthcareCostIndex" },
+    { label: "Air Quality", weightKey: "airQualityIndex" },
   ],
   "Best Work Infrastructure": [
-    { label: "Work Infra", labelKey: "labelBestWorkInfrastructureWfa" },
-    { label: "Internet", labelKey: "labelFastInternetCities" },
-    { label: "Community", labelKey: "labelStrongNomadCommunityWfa" },
-    { label: "Access", labelKey: "labelBestConnectedCitiesFlights" },
+    { label: "Work Infra", weightKey: "workInfrastructure" },
+    { label: "Internet", weightKey: "internet" },
+    { label: "Affordability", weightKey: "costOfLiving" },
+    { label: "Community", weightKey: "nomadCommunity" },
+  ],
+  "Best for Remote Work Setup": [
+    { label: "Internet", weightKey: "internet" },
+    { label: "Work Infra", weightKey: "workInfrastructure" },
+    { label: "Community", weightKey: "nomadCommunity" },
+    { label: "Affordability", weightKey: "costOfLiving" },
+  ],
+  "Cheapest Places": [
+    { label: "Affordability", weightKey: "costOfLiving" },
+    { label: "Internet", weightKey: "internet" },
+    { label: "Work Infra", weightKey: "workInfrastructure" },
+    { label: "Community", weightKey: "nomadCommunity" },
+  ],
+  "Best Connected Cities (Flights)": [
+    { label: "Direct Flights", weightKey: "directInternationalFlights" },
+    { label: "Connectivity", weightKey: "airportConnectivity" },
+    { label: "Work Infra", weightKey: "workInfrastructure" },
+    { label: "Community", weightKey: "nomadCommunity" },
+  ],
+  "Fast Internet Cities": [
+    { label: "Internet", weightKey: "internet" },
+    { label: "Work Infra", weightKey: "workInfrastructure" },
+    { label: "Community", weightKey: "nomadCommunity" },
+    { label: "Affordability", weightKey: "costOfLiving" },
   ],
   "Maximum Savings": [
-    { label: "Cost", labelKey: "labelCostOfLivingPerMonth" },
-    { label: "Tax", labelKey: "labelLowTaxation" },
-    { label: "Power", labelKey: "labelPurchasingPower" },
-    { label: "Stability", labelKey: "labelFinancialStability" },
+    { label: "Affordability", weightKey: "costOfLiving" },
+    { label: "Tax Friendly", weightKey: "taxFriendly" },
+    { label: "Purchasing Power", weightKey: "purchasingPower" },
+    { label: "Inflation Stability", weightKey: "inflationStability" },
   ],
   "Low Taxation": [
-    { label: "Tax", labelKey: "labelLowTaxation" },
-    { label: "Cost", labelKey: "labelCostOfLivingPerMonth" },
-    { label: "Power", labelKey: "labelPurchasingPower" },
-    { label: "Stability", labelKey: "labelFinancialStability" },
+    { label: "Tax Friendly", weightKey: "taxFriendly" },
+    { label: "Affordability", weightKey: "costOfLiving" },
+    { label: "Purchasing Power", weightKey: "purchasingPower" },
+    { label: "Inflation Stability", weightKey: "inflationStability" },
   ],
   "Purchasing Power": [
-    { label: "Power", labelKey: "labelPurchasingPower" },
-    { label: "Cost", labelKey: "labelCostOfLivingPerMonth" },
-    { label: "Tax", labelKey: "labelLowTaxation" },
-    { label: "Stability", labelKey: "labelFinancialStability" },
+    { label: "Purchasing Power", weightKey: "purchasingPower" },
+    { label: "Affordability", weightKey: "costOfLiving" },
+    { label: "Tax Friendly", weightKey: "taxFriendly" },
+    { label: "Inflation Stability", weightKey: "inflationStability" },
   ],
   "Financial Stability(Low Risk)": [
-    { label: "Stability", labelKey: "labelFinancialStability" },
-    { label: "Healthcare", labelKey: "labelHealthcareFriendly" },
-    { label: "Tax", labelKey: "labelLowTaxation" },
-    { label: "Cost", labelKey: "labelCostOfLivingPerMonth" },
+    { label: "Inflation Stability", weightKey: "inflationStability" },
+    { label: "Heathcare Cost", weightKey: "healthcareCostIndex" },
+    { label: "Affordability", weightKey: "costOfLiving" },
+    { label: "Tax Friendly", weightKey: "taxFriendly" },
   ],
   "Startup Setup Cost": [
-    { label: "Setup Cost", labelKey: "labelStartupSetupCost" },
-    { label: "Tax", labelKey: "labelLowTaxation" },
-    { label: "Living Cost", labelKey: "labelCostOfLivingPerMonth" },
-    { label: "Power", labelKey: "labelPurchasingPower" },
+    { label: "Startup Costs", weightKey: "startupSetupCost" },
+    { label: "Tax Friendly", weightKey: "taxFriendly" },
+    { label: "Affordability", weightKey: "costOfLiving" },
+    { label: "Work Infra", weightKey: "workInfrastructure" },
   ],
   "Balanced Financial Lifestyle": [
-    { label: "Efficiency", labelKey: "labelBalancedFinancialLifestyle" },
-    { label: "Tax", labelKey: "labelLowTaxation" },
-    { label: "Power", labelKey: "labelPurchasingPower" },
-    { label: "Stability", labelKey: "labelFinancialStability" },
-  ],
-  "Startup Ecosystems": [
-    { label: "Startup", labelKey: "labelStartupEcosystems" },
-    { label: "VC", labelKey: "labelVentureCapitalPresence" },
-    { label: "Incubators", labelKey: "labelStartupIncubatorsAccelerators" },
-    { label: "Talent", labelKey: "labelTechTalentDensity" },
-  ],
-  "Remote Job Opportunities": [
-    { label: "Remote Jobs", labelKey: "labelRemoteJobOpportunities" },
-    { label: "Global Access", labelKey: "labelBestConnectedCitiesFlights" },
-    { label: "Career", labelKey: "labelBalancedCareerGrowth" },
-    { label: "Work Ecosystem", labelKey: "labelBestWorkInfrastructure" },
-  ],
-  "Founder Nomads": [
-    { label: "Founder", labelKey: "labelFounderNomadsAyc" },
-    { label: "Events", labelKey: "labelConferencesEvents" },
-    { label: "Talent", labelKey: "labelTechTalentDensity" },
-    { label: "Opportunity", labelKey: "labelStartupEcosystems" },
-  ],
-  "Tech Talent Density": [
-    { label: "Talent", labelKey: "labelTechTalentDensity" },
-    { label: "Builders", labelKey: "labelTechTalentDensity" },
-    { label: "Innovation", labelKey: "labelStartupEcosystems" },
-    { label: "Collaboration", labelKey: "labelNomadCommunityNetworking" },
-  ],
-  "Startup Incubators & Accelerators": [
-    { label: "Incubators", labelKey: "labelStartupIncubatorsAccelerators" },
-    { label: "Mentorship", labelKey: "labelStartupIncubatorsAccelerators" },
-    { label: "Support", labelKey: "labelStartupEcosystems" },
-    { label: "Growth", labelKey: "labelBalancedCareerGrowth" },
-  ],
-  "Balanced Career Growth": [
-    { label: "Jobs", labelKey: "labelRemoteJobOpportunities" },
-    { label: "Startup", labelKey: "labelStartupEcosystems" },
-    { label: "Networking", labelKey: "labelConferencesEvents" },
-    { label: "Talent", labelKey: "labelTechTalentDensity" },
-  ],
-  "Venture Capital Presence": [
-    { label: "VC", labelKey: "labelVentureCapitalPresence" },
-    { label: "Funding", labelKey: "labelVentureCapitalPresence" },
-    { label: "Investors", labelKey: "labelVentureCapitalPresence" },
-    { label: "Growth", labelKey: "labelBalancedCareerGrowth" },
-  ],
-  "Conferences & Events": [
-    { label: "Conferences", labelKey: "labelConferencesEvents" },
-    { label: "Networking", labelKey: "labelConferencesEvents" },
-    { label: "Meetups", labelKey: "labelConferencesEvents" },
-    { label: "Exposure", labelKey: "labelBestConnectedCitiesFlights" },
+    { label: "Affordability", weightKey: "costOfLiving" },
+    { label: "Purchasing Power", weightKey: "purchasingPower" },
+    { label: "Tax Friendly", weightKey: "taxFriendly" },
+    { label: "Startup Costs", weightKey: "startupSetupCost" },
   ],
   "Social & Party Lifestyle": [
-    { label: "Social", labelKey: "labelSocialPartyLifestyle" },
-    { label: "Nightlife", labelKey: "labelSocialPartyLifestyle" },
-    { label: "Community", labelKey: "labelNomadCommunityNetworking" },
-    { label: "Events", labelKey: "labelConferencesEvents" },
+    { label: "Social Scene", weightKey: "partyLifestyle" },
+    { label: "Nightlife", weightKey: "nightlife" },
+    { label: "Lifestyle & Entertainment", weightKey: "lifestyleEntertainment" },
+    { label: "Community", weightKey: "nomadCommunity" },
   ],
   "Chill & Wellness Lifestyle": [
-    { label: "Peaceful", labelKey: "labelChillWellnessLifestyle" },
-    { label: "Wellness", labelKey: "labelChillWellnessLifestyle" },
-    { label: "Nature", labelKey: "labelCleanAirEnvironment" },
-    { label: "Community", labelKey: "labelNomadCommunityNetworking" },
+    { label: "Environment", weightKey: "climateEnvironment" },
+    { label: "Nature", weightKey: "nature" },
+    { label: "Wellness", weightKey: "yoga" },
+    { label: "Community", weightKey: "nomadCommunity" },
   ],
   "Adventure & Exploration": [
-    { label: "Adventure", labelKey: "labelAdventureExploration" },
-    { label: "Nature", labelKey: "labelCleanAirEnvironment" },
-    { label: "Explore", labelKey: "labelAdventureExploration" },
-    { label: "Community", labelKey: "labelNomadCommunityNetworking" },
+    { label: "Adventure", weightKey: "adventure" },
+    { label: "Nature", weightKey: "nature" },
+    { label: "Environment", weightKey: "climateEnvironment" },
+    { label: "Community", weightKey: "nomadCommunity" },
   ],
   "Nomad Community & Networking": [
-    { label: "Community", labelKey: "labelNomadCommunityNetworking" },
-    { label: "Meetups", labelKey: "labelConferencesEvents" },
-    { label: "Founder", labelKey: "labelFounderNomads" },
-    { label: "Ecosystem", labelKey: "labelStrongNomadCommunity" },
+    { label: "Community", weightKey: "nomadCommunity" },
+    { label: "Meetups & Events", weightKey: "meetupsEvents" },
+    { label: "Founder Nomads", weightKey: "founderNomads" },
+    { label: "Conferences", weightKey: "conferences" },
   ],
   "Couple - Friendly Lifestyle": [
-    { label: "Couples", labelKey: "labelCoupleFriendlyLifestyle" },
-    { label: "Lifestyle", labelKey: "labelCoupleFriendlyLifestyle" },
-    { label: "Community", labelKey: "labelNomadCommunityNetworking" },
-    { label: "Balance", labelKey: "labelChillWellnessLifestyle" },
+    { label: "Couple-Friendly", weightKey: "coupleNomads" },
+    { label: "Community", weightKey: "nomadCommunity" },
+    { label: "Lifestyle & Entertainment", weightKey: "lifestyleEntertainment" },
+    { label: "Safety", weightKey: "safety" },
   ],
   "Family - Friendly Lifestyle": [
-    { label: "Family", labelKey: "labelFamilyFriendlyLifestyle" },
-    { label: "Safety", labelKey: "labelSafestCities" },
-    { label: "Livability", labelKey: "labelMostAffordable" },
-    { label: "Community", labelKey: "labelNomadCommunityNetworking" },
+    { label: "Family-Friendly", weightKey: "familyNomads" },
+    { label: "Safety", weightKey: "safety" },
+    { label: "Community", weightKey: "nomadCommunity" },
+    { label: "Lifestyle & Entertainment", weightKey: "lifestyleEntertainment" },
   ],
   "Female Friendly Lifestyle": [
-    { label: "Safety", labelKey: "labelSafestCities" },
-    { label: "Women-Friendly", labelKey: "labelFemaleFriendlyLifestyle" },
-    { label: "Community", labelKey: "labelNomadCommunityNetworking" },
-    { label: "Ease", labelKey: "labelFemaleFriendlyLifestyle" },
+    { label: "Female-Friendly", weightKey: "femaleNomads" },
+    { label: "Safety", weightKey: "safety" },
+    { label: "Community", weightKey: "nomadCommunity" },
+    { label: "Travel Ease", weightKey: "accessibility" },
+  ],
+  "Founder Nomads": [
+    { label: "Founder Nomads", weightKey: "founderNomads" },
+    { label: "Startup Ecosystem", weightKey: "startupEcosystemScore" },
+    { label: "Venture Capital", weightKey: "ventureCapital" },
+    { label: "Community", weightKey: "nomadCommunity" },
   ],
   "Solo Nomads": [
-    { label: "Solo", labelKey: "labelNomadCommunityNetworking" },
-    { label: "Social", labelKey: "labelStrongNomadCommunity" },
-    { label: "Activities", labelKey: "labelConferencesEvents" },
-    { label: "Freedom", labelKey: "labelEasyVisa" },
+    { label: "Social Scene", weightKey: "partyLifestyle" },
+    { label: "Community", weightKey: "nomadCommunity" },
+    { label: "Lifestyle & Entertainment", weightKey: "lifestyleEntertainment" },
+    { label: "Safety", weightKey: "safety" },
+  ],
+  "Startup Ecosystems": [
+    { label: "Startup Ecosystem", weightKey: "startupEcosystemScore" },
+    { label: "Venture Capital", weightKey: "ventureCapital" },
+    { label: "Startup Support", weightKey: "incubators" },
+    { label: "Tech Talent", weightKey: "techTalentDensity" },
+  ],
+  "Remote Job Opportunities": [
+    { label: "Remote Jobs", weightKey: "remoteJobs" },
+    { label: "Community", weightKey: "nomadCommunity" },
+    { label: "Work Infra", weightKey: "workInfrastructure" },
+    { label: "Startup Ecosystem", weightKey: "startupEcosystemScore" },
+  ],
+  "Tech Talent Density": [
+    { label: "Tech Talent", weightKey: "techTalentDensity" },
+    { label: "Startup Ecosystem", weightKey: "startupEcosystemScore" },
+    { label: "Founder Nomads", weightKey: "founderNomads" },
+    { label: "Venture Capital", weightKey: "ventureCapital" },
+  ],
+  "Startup Incubators & Accelerators": [
+    { label: "Startup Support", weightKey: "incubators" },
+    { label: "Startup Ecosystem", weightKey: "startupEcosystemScore" },
+    { label: "Founder Nomads", weightKey: "founderNomads" },
+    { label: "Venture Capital", weightKey: "ventureCapital" },
+  ],
+  "Balanced Career Growth": [
+    { label: "Remote Jobs", weightKey: "remoteJobs" },
+    { label: "Work Infra", weightKey: "workInfrastructure" },
+    { label: "Startup Ecosystem", weightKey: "startupEcosystemScore" },
+    { label: "Tech Talent", weightKey: "techTalentDensity" },
+  ],
+  "Venture Capital Presence": [
+    { label: "Venture Capital", weightKey: "ventureCapital" },
+    { label: "Startup Ecosystem", weightKey: "startupEcosystemScore" },
+    { label: "Startup Support", weightKey: "incubators" },
+    { label: "Tech Talent", weightKey: "techTalentDensity" },
+  ],
+  "Conferences & Events": [
+    { label: "Conferences", weightKey: "conferences" },
+    { label: "Founder Nomads", weightKey: "founderNomads" },
+    { label: "Startup Ecosystem", weightKey: "startupEcosystemScore" },
+    { label: "Community", weightKey: "nomadCommunity" },
   ],
 };
 
@@ -416,16 +419,8 @@ const getQuickStatsForDestination = (
   selectedGoalOption,
 ) => {
   const statConfig =
-    selectedGoal === "World Ranking" &&
-      selectedGoalOption === "Best Work Infrastructure"
-      ? [
-        { label: "Work Infra", labelKey: "labelBestWorkInfrastructure" },
-        { label: "Internet", labelKey: "labelFastInternetCities" },
-        { label: "Community", labelKey: "labelStrongNomadCommunity" },
-        { label: "Access", labelKey: "labelBestConnectedCitiesFlights" },
-      ]
-      : quickStatsConfigByGoalOption[selectedGoalOption] ||
-      fallbackQuickStatsConfig;
+    quickStatsConfigByGoalOption[selectedGoalOption] ||
+    fallbackQuickStatsConfig;
   const selectedGoalScoreKey = getApiAttributeForSelection(
     selectedGoal,
     selectedGoalOption,
@@ -434,7 +429,7 @@ const getQuickStatsForDestination = (
   const configuredStats = statConfig.slice(0, 4).map((config) => {
     const scoreKeyFromLabel = config.labelKey
       ? labelToAllScoresKeyMap[config.labelKey] ||
-      `${config.labelKey.charAt(5).toLowerCase()}${config.labelKey.slice(6)}`
+        `${config.labelKey.charAt(5).toLowerCase()}${config.labelKey.slice(6)}`
       : null;
     const scoreKey = config.scoreKey || scoreKeyFromLabel || config.field;
     const weightKey =
@@ -446,8 +441,8 @@ const getQuickStatsForDestination = (
     const caseInsensitiveScore =
       directWeight === undefined && weightKey
         ? Object.entries(weights).find(
-          ([key]) => key.toLowerCase() === weightKey.toLowerCase(),
-        )?.[1]
+            ([key]) => key.toLowerCase() === weightKey.toLowerCase(),
+          )?.[1]
         : undefined;
 
     const score = Number(
@@ -596,9 +591,9 @@ const getNarrativeContinentLabel = (continent) =>
 const goalNarrativeByGoalAndAttribute = {
   [normalizeNarrativeKey("World Ranking")]: {
     [normalizeNarrativeKey("Best for Nomads")]:
-      "Curated below are the top cities in X based on overall livability for modern remote professionals.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🏢 Work infrastructure (coworking, setup, reliability)\n• ⚡ High-speed, stable internet\n• 💰 Cost of living\n• 🛡️ Safety\n• 🛂 Visa flexibility for longer stays\n• 🤝 Nomad community\n• 🏥 Healthcare affordability\n• 🚀 Startup ecosystem\n• 🌿 Air quality\n\n→ Find the best overall place to live and work.",
+      "Curated below are the top cities in X based on overall livability for modern remote professionals.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🏢 Work infrastructure\n• ⚡ High-speed, stable internet\n• 💰 Cost of living\n• 🛡️ Safety\n• 🛂 Visa flexibility for longer stays\n• 🤝 Nomad community\n• 🏥 Healthcare affordability\n• 🚀 Startup ecosystem\n• 🌿 Air quality\n\n→ Find the best overall place to live and work",
     [normalizeNarrativeKey("Most Affordable")]:
-      "Curated below are the most affordable cities in X designed to help you maximize your budget.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💰 Low cost of living\n• 🏥 Affordable healthcare\n• 🛡️ Safety & stability\n• 🌍 Livability factors\n\n→ Find cities where affordability meets comfort.",
+      "Curated below are the most affordable cities in X designed to help you maximize your budget.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💰 Low cost of living\n• 📊 Strong purchasing power\n• 🏥 Affordable healthcare\n• 🛡️ Safety & stability\n\n→ Stretch your budget further while living comfortably.",
     [normalizeNarrativeKey("Safest Cities")]:
       "Curated below are the safest cities in X based on your preference for security and peace of mind.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🛡️ Safety levels\n• 🏥 Healthcare accessibility\n• 🌍 Stable living conditions\n• 🌿 Clean environments\n\n→ Live confidently, whether short-term or long-term.",
     [normalizeNarrativeKey("Easy Visa / Long Stay")]:
@@ -606,13 +601,13 @@ const goalNarrativeByGoalAndAttribute = {
     [normalizeNarrativeKey("Strong Nomad Community")]:
       "Curated below are the best cities in X with strong and active nomad communities.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🤝 Active nomad communities\n• 🌐 Social & collaborative environments\n• ⚡ Internet & work readiness\n• 🏡 Livability factors\n\n→ Find your people, anywhere you go.",
     [normalizeNarrativeKey("Healthcare Friendly")]:
-      "Curated below are the most healthcare-friendly cities in X for reliable and accessible medical support.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🏥 Healthcare affordability\n• 🛡️ Safety & stability\n• 🌍 Clean, livable environments\n• 💰 Sustainable cost of living\n\n→ Stay covered, wherever you live.",
+      "Curated below are the most healthcare-friendly cities in X for reliable and accessible medical support.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🏥 Healthcare quality & accessibility\n• 🩺 Reliable medical infrastructure\n• 🛡️ Safety & stability\n• 🌍 Clean, healthy living environments\n\n→ Access dependable healthcare wherever you live.",
     [normalizeNarrativeKey("Startup / Business Opportunities")]:
       "Curated below are the best cities in X for startups, entrepreneurship, and career growth.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🚀 Startup ecosystems\n• 🧠 Talent & innovation density\n• 🏢 Work infrastructure\n• 🌐 Global connectivity\n\n→ Build, scale, and grow faster.",
     [normalizeNarrativeKey("Clean Air / Environment")]:
       "Curated below are the cleanest and most environmentally friendly cities in X.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🌿 Air quality\n• 🛡️ Safe, livable environments\n• 🏥 Health-conscious conditions\n• 🌍 Overall quality of life\n\n→ Breathe better, live better.",
     [normalizeNarrativeKey("Best Work Infrastructure")]:
-      "Curated below are the best cities in X optimized for productivity and remote work performance.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n•🏢 Work infrastructure (coworking, setup, reliability)\n•⚡ High-speed, stable internet\n•🤝 Strong nomad ecosystems\n•💰 Sustainable cost of living\n•🛂 Visa flexibility for longer stays\n\n→ Work efficiently from anywhere, without compromise.",
+      "Curated below are the best cities in X optimized for productivity and remote work performance.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n•🏢 Work infrastructure\n•⚡ High-speed, stable internet\n•🤝 Strong nomad ecosystems\n•💰 Sustainable cost of living\n•🛂 Visa flexibility for longer stays\n\n→ Work efficiently from anywhere, without compromise.",
   },
   [normalizeNarrativeKey("Work From Anywhere")]: {
     [normalizeNarrativeKey("Best for Remote Work Setup")]:
@@ -739,10 +734,11 @@ const DropdownBadge = ({
       <button
         type="button"
         onClick={onToggle}
-        className={`flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${isOpen
+        className={`flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${
+          isOpen
             ? "border-sky-500 bg-sky-500 text-white"
             : "border-black/20 bg-white text-black/85 hover:border-sky-500"
-          }`}
+        }`}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
       >
@@ -770,20 +766,22 @@ const DropdownBadge = ({
                   <button
                     type="button"
                     onClick={() => onSelect(option)}
-                    className={`group flex w-full items-center rounded-xl px-4 py-2 text-left text-sm transition-colors ${isSelected
+                    className={`group flex w-full items-center rounded-xl px-4 py-2 text-left text-sm transition-colors ${
+                      isSelected
                         ? "bg-sky-50 font-medium text-sky-600"
                         : "text-black/80 hover:bg-slate-50"
-                      }`}
+                    }`}
                     role="option"
                     aria-selected={isSelected}
                   >
                     <span className="mr-2 inline-flex w-4 shrink-0 items-center justify-center">
                       <FaCheck
                         size={13}
-                        className={`shrink-0 text-primary-blue transition-opacity ${isSelected
+                        className={`shrink-0 text-primary-blue transition-opacity ${
+                          isSelected
                             ? "opacity-100"
                             : "opacity-0 group-hover:opacity-100"
-                          }`}
+                        }`}
                         aria-hidden="true"
                       />
                     </span>
@@ -813,9 +811,9 @@ const AiSearchResults = () => {
     : "/search/results";
   const goalOptions = goalFilterMap[selectedGoal] || goalFilterMap[defaultGoal];
   const getPersistedGoal = () => {
-    if (typeof window === "undefined") return null;
-    return localStorage.getItem(SEARCH_RESULTS_GOAL_STORAGE_KEY);
-  },
+      if (typeof window === "undefined") return null;
+      return localStorage.getItem(SEARCH_RESULTS_GOAL_STORAGE_KEY);
+    },
     getPersistedSelectionSignature = () => {
       if (typeof window === "undefined") return null;
       return localStorage.getItem(
@@ -843,6 +841,7 @@ const AiSearchResults = () => {
   const [showAllDestinations, setShowAllDestinations] = useState(false);
   const [isResultsReady, setIsResultsReady] = useState(false);
   const [visibleDestinationCount, setVisibleDestinationCount] = useState(0);
+  const [likedDestinations, setLikedDestinations] = useState([]);
   const dropdownContainerRef = useRef(null);
   const closeDropdownTimeoutRef = useRef(null);
 
@@ -942,8 +941,8 @@ const AiSearchResults = () => {
             typeof item?.[selectedAttribute] === "number"
               ? item[selectedAttribute]
               : Object.entries(item).find(
-                ([, value]) => typeof value === "number",
-              )?.[1] || 0;
+                  ([, value]) => typeof value === "number",
+                )?.[1] || 0;
 
           return {
             ...(existingDestination || {}),
@@ -1068,6 +1067,15 @@ const AiSearchResults = () => {
       },
     );
   };
+  const toggleDestinationLike = useCallback((destination) => {
+    const destinationKey = getDestinationFavoriteKey(destination);
+
+    setLikedDestinations((previousLikes) =>
+      previousLikes.includes(destinationKey)
+        ? previousLikes.filter((key) => key !== destinationKey)
+        : [...previousLikes, destinationKey],
+    );
+  }, []);
 
   const handleDropdownToggle = (dropdownKey) => {
     setOpenDropdown((currentDropdown) =>
@@ -1600,10 +1608,11 @@ const AiSearchResults = () => {
                       {visibleDestinations.map((destination, index) => (
                         <article
                           key={`${destination.city}-${destination.country}`}
-                          className={`cursor-pointer transition-all duration-300 ${index < visibleDestinationCount
+                          className={`cursor-pointer transition-all duration-300 ${
+                            index < visibleDestinationCount
                               ? "translate-y-0 opacity-100"
                               : "pointer-events-none translate-y-2 opacity-0"
-                            }`}
+                          }`}
                           role="button"
                           tabIndex={0}
                           onClick={() => handleDestinationClick(destination)}
@@ -1630,12 +1639,25 @@ const AiSearchResults = () => {
                                 : "—"}
                             </div>
 
-                            <div className="pointer-events-none absolute right-3 top-3 text-red-500 md:right-4 md:top-4">
-                              <FaHeart className="text-xl md:text-2xl" />
-                            </div>
+                            <button
+                              type="button"
+                              className="absolute right-3 top-3 z-20 cursor-pointer md:right-4 md:top-4"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                toggleDestinationLike(destination);
+                              }}
+                            >
+                              {likedDestinations.includes(
+                                getDestinationFavoriteKey(destination),
+                              ) ? (
+                                <AiFillHeart className="text-xl text-[#ff5757] md:text-2xl" />
+                              ) : (
+                                <AiTwotoneHeart className="text-xl text-[#b6b6b6] md:text-2xl" />
+                              )}
+                            </button>
 
                             <div className="pointer-events-none absolute inset-x-2 bottom-3 text-center text-white md:inset-x-4 md:bottom-4">
-                              <h3 className="text-lg uppercase font-medium tracking-wide md:text-3xl">
+                              <h3 className="text-lg uppercase font-normal tracking-wide md:text-3xl">
                                 {destination.displayCity || destination.city}
                               </h3>
                               <p className="text-sm font-light md:text-sm">
@@ -1646,19 +1668,20 @@ const AiSearchResults = () => {
 
                             <div className="absolute inset-0 bg-black/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-center p-3 md:p-4">
                               <div className="translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                                <div className="mb-1 border-b border-white/30 pb-1">
+                                <div className="mb-0 border-b border-white/30 pb-0">
                                   <h4 className="-translate-y-2 text-white text-base md:text-[0.89rem] font-semibold uppercase tracking-wide text-center">
                                     {selectedGoalOption || "Attribute"}
                                   </h4>
                                 </div>
-                                <h4 className="mb-2 text-right text-white text-sm md:text-sm font-semibold py-0">
-                                  {`${selectedContinent || "World"} Rank ${destination?.rankLabel
+                                <h4 className="mb-2 mt-2 text-right text-white text-sm md:text-sm font-semibold py-0">
+                                  {`${selectedContinent || "World"} Rank ${
+                                    destination?.rankLabel
                                       ? destination.rankLabel.replace(
-                                        /^Rank\s*/i,
-                                        "",
-                                      )
+                                          /^Rank\s*/i,
+                                          "",
+                                        )
                                       : "—"
-                                    }`}
+                                  }`}
                                 </h4>
 
                                 <div className="grid grid-cols-1 gap-2 text-xs md:text-sm text-white/90">
@@ -1669,34 +1692,34 @@ const AiSearchResults = () => {
                                   ).map((stat, statIndex) => (
                                     <div
                                       key={`${destination.city}-${stat.label}-${statIndex}`}
-                                      className="rounded-lg px-2 py-1.5 transition-all duration-300"
+                                      className="rounded-lg px-2 py-1 transition-all duration-300"
                                       style={{
                                         backgroundImage: `linear-gradient(
                                           90deg,
                                           ${getScoreBarColorValue(stat.score)} 0%,
                                           ${getScoreBarColorValue(stat.score)} ${Math.max(
-                                          0,
-                                          Math.min(
-                                            100,
-                                            getScoreFillPercentage(
-                                              stat.score,
+                                            0,
+                                            Math.min(
+                                              100,
+                                              getScoreFillPercentage(
+                                                stat.score,
+                                              ),
                                             ),
-                                          ),
-                                        )}%,
+                                          )}%,
                                           rgba(255, 255, 255, 0.16) ${Math.max(
-                                          0,
-                                          Math.min(
-                                            100,
-                                            getScoreFillPercentage(
-                                              stat.score,
+                                            0,
+                                            Math.min(
+                                              100,
+                                              getScoreFillPercentage(
+                                                stat.score,
+                                              ),
                                             ),
-                                          ),
-                                        )}%,
+                                          )}%,
                                           rgba(255, 255, 255, 0.16) 100%
                                         )`,
                                       }}
                                     >
-                                      <span className="font-medium">
+                                      <span className="font-light">
                                         {stat.label}
                                       </span>
                                     </div>
