@@ -69,12 +69,12 @@ const serviceOptions = [
 ];
 
 const verticalTypeOptions = [
-    "coworking",
-    "coliving",
-    "hostel",
-    "workation",
-    "meetings",
-    "cafe",
+    "Co-working",
+    "Co-living",
+    "Hostel",
+    "Workation",
+    "Meetings",
+    "Cafe",
 ];
 
 const floatingLabelSx = {
