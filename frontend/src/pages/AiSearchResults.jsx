@@ -1666,7 +1666,7 @@ const AiSearchResults = () => {
                                   ).map((stat, statIndex) => (
                                     <div
                                       key={`${destination.city}-${stat.label}-${statIndex}`}
-                                      className="rounded-lg px-2 py-1.5 transition-all duration-300"
+                                      className="rounded-lg px-2 py-1 transition-all duration-300"
                                       style={{
                                         backgroundImage: `linear-gradient(
                                           90deg,
