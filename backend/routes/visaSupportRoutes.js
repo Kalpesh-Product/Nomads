@@ -1,8 +1,12 @@
 import { Router } from "express";
-import { createVisaSupport } from "../controllers/visaSupportController.js";
+import {
+  createVisaSupport,
+  getVisaSupportRequests,
+} from "../controllers/visaSupportController.js";
 
 const router = Router();
 
+router.get("/", getVisaSupportRequests);
 router.post("/", createVisaSupport);
 
 export default router;
