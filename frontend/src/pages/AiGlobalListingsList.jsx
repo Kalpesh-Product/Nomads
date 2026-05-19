@@ -613,8 +613,7 @@ const AiGlobalListingsList = () => {
   };
 
   const getValueAddedServiceCardLines = (serviceLabel) => {
-    const [firstWord, ...restWords] = serviceLabel.split(" ");
-    return [firstWord, restWords.join(" ")].filter(Boolean);
+    return [serviceLabel].filter(Boolean);
   };
   const prioritizedCompanies = ["BIZ Nest", "MeWo"];
   const sortedListings = [...(listingsData || [])].sort((a, b) => {
@@ -936,19 +935,19 @@ const AiGlobalListingsList = () => {
                                   backgroundPosition: "center",
                                 }}
                               >
-                                <div className="flex w-full flex-col items-center justify-end">
+                                <div className="flex w-full flex-col items-center justify-end pb-2">
                                   {getValueAddedServiceCardLines(
                                     serviceLabel,
                                   ).map((line) => (
                                     <span
                                       key={`${serviceLabel}-${line}`}
-                                      className="text-base md:text-xl font-bold uppercase text-white leading-tight tracking-wide"
+                                      className="text-base md:text-xl font-normal uppercase text-white leading-tight tracking-wide pb-2"
                                     >
                                       {line}
                                     </span>
                                   ))}
                                   {service.badge && (
-                                    <span className="mt-2 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[9px] font-semibold normal-case text-black shadow-sm">
+                                    <span className="mt-0 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[9px] font-semibold normal-case text-black shadow-sm">
                                       {service.badge}
                                     </span>
                                   )}
@@ -1299,13 +1298,13 @@ const AiGlobalListingsList = () => {
                                 backgroundPosition: "center",
                               }}
                             >
-                              <div className="flex w-full flex-col items-center justify-end">
+                              <div className="flex w-full flex-col items-center justify-end pb-1">
                                 {getValueAddedServiceCardLines(
                                   serviceLabel,
                                 ).map((line) => (
                                   <span
                                     key={`${serviceLabel}-${line}`}
-                                    className="text-base md:text-xl font-bold uppercase text-white leading-tight tracking-wide"
+                                    className="text-base md:text-xl font-normal uppercase text-white leading-tight tracking-wide"
                                   >
                                     {line}
                                   </span>
@@ -1351,7 +1350,7 @@ const AiGlobalListingsList = () => {
                                 ).map((line) => (
                                   <span
                                     key={`${serviceLabel}-${line}`}
-                                    className="text-base md:text-xl font-bold uppercase text-white leading-tight tracking-wide"
+                                    className="text-base md:text-xl font-normal uppercase text-white leading-tight tracking-wide"
                                   >
                                     {line}
                                   </span>

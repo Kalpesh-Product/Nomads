@@ -642,8 +642,7 @@ const AiListings = ({ forceListView = false }) => {
   };
 
   const getValueAddedServiceCardLines = (serviceLabel) => {
-    const [firstWord, ...restWords] = serviceLabel.split(" ");
-    return [firstWord, restWords.join(" ")].filter(Boolean);
+    return [serviceLabel].filter(Boolean);
   };
 
   const [mapOpen, setMapOpen] = useState(!forceListView);
@@ -1221,7 +1220,7 @@ const AiListings = ({ forceListView = false }) => {
                           type="button"
                           onClick={() => handleValueAddedServiceClick(service)}
                           disabled={isDisabled}
-                          className={`relative overflow-hidden rounded-3xl px-4 py-6 min-h-[132px] aspect-square flex items-end justify-center text-center transition-transform ${
+                          className={`relative overflow-hidden rounded-3xl px-1 py-4 min-h-[132px] aspect-square flex items-end justify-center text-center transition-transform ${
                             isDisabled
                               ? "cursor-not-allowed opacity-80"
                               : "hover:scale-[1.02]"
@@ -1237,7 +1236,7 @@ const AiListings = ({ forceListView = false }) => {
                               (line) => (
                                 <span
                                   key={`${serviceLabel}-${line}`}
-                                  className="text-base md:text-xl font-bold uppercase text-white leading-tight tracking-wide"
+                                  className="text-base md:text-xl font-normal uppercase text-white leading-tight tracking-wide"
                                 >
                                   {line}
                                 </span>
