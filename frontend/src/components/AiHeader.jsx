@@ -262,29 +262,6 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
           {/* Right Section - Desktop */}
           <div className="hidden lg:flex items-center pl-10 gap-12">
             <div className="flex items-center gap-3">
-              {!isLoggedIn && (
-                <>
-                  <div className="p-4 px-0 whitespace-nowrap">
-                    <Link
-                      to={`/ai-login${location.search}`}
-                      state={{
-                        redirectTo: `${location.pathname}${location.search}`,
-                      }}
-                      className="relative inline-block pb-1 transition-all cursor-pointer duration-300 group bg-transparent border-none text-sm text-primary-blue whitespace-nowrap"
-                    >
-                      Login as Nomad
-                      <span className="absolute left-0 w-0 bottom-0 block h-[2px] bg-black transition-all duration-300 group-hover:w-full"></span>
-                    </Link>
-                  </div>
-                  {/* <button
-                  type="button"
-                  onClick={() => navigate(`/ai-signup${location.search}`)}
-                  className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-black transition hover:border-black/20 hover:bg-black/5 min-w-48"
-                >
-                  Sign up as Nomad
-                </button> */}
-                </>
-              )}
               {/* <button
                 type="button"
                 onClick={() => navigate(`/host/ai-host-signup?step=1`)}
@@ -322,6 +299,20 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
 
                   {/* Original Map View / List View - UNCHANGED */}
                 </ul>
+              )}
+              {!isLoggedIn && (
+                <div className="p-4 px-0 whitespace-nowrap">
+                  <Link
+                    to={`/ai-login${location.search}`}
+                    state={{
+                      redirectTo: `${location.pathname}${location.search}`,
+                    }}
+                    className="relative inline-block pb-1 transition-all cursor-pointer duration-300 group bg-transparent border-none text-sm text-primary-blue whitespace-nowrap"
+                  >
+                    Login as Nomad
+                    <span className="absolute left-0 w-0 bottom-0 block h-[2px] bg-black transition-all duration-300 group-hover:w-full"></span>
+                  </Link>
+                </div>
               )}
               <div className="p-4 px-0 whitespace-nowrap">
                 <button
