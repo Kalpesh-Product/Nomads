@@ -842,6 +842,7 @@ const AiSearchResults = () => {
   const [isResultsReady, setIsResultsReady] = useState(false);
   const [visibleDestinationCount, setVisibleDestinationCount] = useState(0);
   const [likedDestinations, setLikedDestinations] = useState([]);
+  const [isDestinationsLoading, setIsDestinationsLoading] = useState(false);
   const dropdownContainerRef = useRef(null);
   const closeDropdownTimeoutRef = useRef(null);
 
@@ -906,6 +907,7 @@ const AiSearchResults = () => {
   useEffect(() => {
     if (!hasSelectedFilters) {
       setApiDestinations([]);
+      setIsDestinationsLoading(false);
       return;
     }
 
@@ -913,6 +915,9 @@ const AiSearchResults = () => {
     const controller = new AbortController();
 
     const fetchRankedDestinations = async () => {
+      if (isMounted) {
+        setIsDestinationsLoading(true);
+      }
       try {
         const response = await axios.post(
           "/state-wise-weight",
@@ -992,6 +997,10 @@ const AiSearchResults = () => {
       } catch {
         if (!controller.signal.aborted && isMounted) {
           setApiDestinations([]);
+        }
+      } finally {
+        if (isMounted) {
+          setIsDestinationsLoading(false);
         }
       }
     };
@@ -1770,10 +1779,19 @@ const AiSearchResults = () => {
                   )}
 
                   {shouldShowResultsContent && !rankedDestinations.length && (
-                    <div className="mt-10 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-500">
-                      No destinations are available for {selectedContinent}{" "}
-                      right now.
-                    </div>
+                    <>
+                      {isDestinationsLoading ? (
+                        <div className="mt-10 flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-500">
+                          <FaSyncAlt className="text-xl text-primary-blue animate-spin" />
+                          <p>Loading destinations...</p>
+                        </div>
+                      ) : (
+                        <div className="mt-10 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-500">
+                          No destinations are available for {selectedContinent}{" "}
+                          right now.
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
