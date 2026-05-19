@@ -139,11 +139,14 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
   const newsLabel = stateLabel ? `${stateLabel} News` : "News";
   const blogLabel = stateLabel ? `${stateLabel} Blog` : "Blog";
 
+  const offersLabel = stateLabel ? `${stateLabel} Offers` : "Offers";
+
   const currentSearch = location.search || "";
   const headerLinks = [
     // { id: 1, text: "Home", to: "/" },
     { id: 2, type: "news", text: newsLabel, to: `/ai-news${currentSearch}` },
     { id: 3, type: "blog", text: blogLabel, to: `/ai-blogs${currentSearch}` },
+    { id: 4, type: "offers", text: offersLabel },
   ];
 
   const shouldShowHeaderLinks =
@@ -295,6 +298,12 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                       </span>
                       <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
                     </Link>
+
+                    <span className="group relative text-md text-black font-semibold whitespace-nowrap">
+                      <span className="relative z-10 mb-2 text-sm whitespace-nowrap">
+                        {offersLabel}
+                      </span>
+                    </span>
                   </li>
 
                   {/* Original Map View / List View - UNCHANGED */}
@@ -440,14 +449,16 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                   headerLinks
                     .filter((item) =>
                       showNewsBlogLinks
-                        ? item.type === "news" || item.type === "blog"
+                        ? item.type === "news" ||
+                          item.type === "blog" ||
+                          item.type === "offers"
                         : true,
                     )
                     .map((item) => (
                       <li key={item.id} className="items-center text-center">
                         <div
-                          onClick={() => handleNavigation(item.to)}
-                          className="py-4 cursor-pointer"
+                          onClick={() => item.to && handleNavigation(item.to)}
+                          className={`py-4 ${item.to ? "cursor-pointer" : "cursor-default"}`}
                         >
                           <p className="text-secondary-dark text-lg">
                             {item.text}
