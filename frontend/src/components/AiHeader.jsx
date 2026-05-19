@@ -139,11 +139,14 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
   const newsLabel = stateLabel ? `${stateLabel} News` : "News";
   const blogLabel = stateLabel ? `${stateLabel} Blog` : "Blog";
 
+  const offersLabel = stateLabel ? `${stateLabel} Offers` : "Offers";
+
   const currentSearch = location.search || "";
   const headerLinks = [
     // { id: 1, text: "Home", to: "/" },
     { id: 2, type: "news", text: newsLabel, to: `/ai-news${currentSearch}` },
     { id: 3, type: "blog", text: blogLabel, to: `/ai-blogs${currentSearch}` },
+    { id: 4, type: "offers", text: offersLabel },
   ];
 
   const shouldShowHeaderLinks =
@@ -262,29 +265,6 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
           {/* Right Section - Desktop */}
           <div className="hidden lg:flex items-center pl-10 gap-12">
             <div className="flex items-center gap-3">
-              {!isLoggedIn && (
-                <>
-                  <div className="p-4 px-0 whitespace-nowrap">
-                    <Link
-                      to={`/ai-login${location.search}`}
-                      state={{
-                        redirectTo: `${location.pathname}${location.search}`,
-                      }}
-                      className="relative inline-block pb-1 transition-all cursor-pointer duration-300 group bg-transparent border-none text-sm text-primary-blue whitespace-nowrap"
-                    >
-                      Login as Nomad
-                      <span className="absolute left-0 w-0 bottom-0 block h-[2px] bg-black transition-all duration-300 group-hover:w-full"></span>
-                    </Link>
-                  </div>
-                  {/* <button
-                  type="button"
-                  onClick={() => navigate(`/ai-signup${location.search}`)}
-                  className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-black transition hover:border-black/20 hover:bg-black/5 min-w-48"
-                >
-                  Sign up as Nomad
-                </button> */}
-                </>
-              )}
               {/* <button
                 type="button"
                 onClick={() => navigate(`/host/ai-host-signup?step=1`)}
@@ -318,10 +298,30 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                       </span>
                       <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
                     </Link>
+
+                    <span className="group relative text-md text-black font-semibold whitespace-nowrap">
+                      <span className="relative z-10 mb-2 text-sm whitespace-nowrap">
+                        {offersLabel}
+                      </span>
+                    </span>
                   </li>
 
                   {/* Original Map View / List View - UNCHANGED */}
                 </ul>
+              )}
+              {!isLoggedIn && (
+                <div className="p-4 px-0 whitespace-nowrap">
+                  <Link
+                    to={`/ai-login${location.search}`}
+                    state={{
+                      redirectTo: `${location.pathname}${location.search}`,
+                    }}
+                    className="relative inline-block pb-1 transition-all cursor-pointer duration-300 group bg-transparent border-none text-sm text-primary-blue whitespace-nowrap"
+                  >
+                    Login as Nomad
+                    <span className="absolute left-0 w-0 bottom-0 block h-[2px] bg-black transition-all duration-300 group-hover:w-full"></span>
+                  </Link>
+                </div>
               )}
               <div className="p-4 px-0 whitespace-nowrap">
                 <button
@@ -449,14 +449,16 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                   headerLinks
                     .filter((item) =>
                       showNewsBlogLinks
-                        ? item.type === "news" || item.type === "blog"
+                        ? item.type === "news" ||
+                          item.type === "blog" ||
+                          item.type === "offers"
                         : true,
                     )
                     .map((item) => (
                       <li key={item.id} className="items-center text-center">
                         <div
-                          onClick={() => handleNavigation(item.to)}
-                          className="py-4 cursor-pointer"
+                          onClick={() => item.to && handleNavigation(item.to)}
+                          className={`py-4 ${item.to ? "cursor-pointer" : "cursor-default"}`}
                         >
                           <p className="text-secondary-dark text-lg">
                             {item.text}
