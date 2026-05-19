@@ -341,6 +341,10 @@ const AiListings = ({ forceListView = false }) => {
   });
 
   const categoryOptions = React.useMemo(() => {
+    if (isLisitingLoading) {
+      return [];
+    }
+
     if (!listingsData || listingsData.length === 0) {
       return [
         {
@@ -394,7 +398,7 @@ const AiListings = ({ forceListView = false }) => {
       ...options,
       { label: "Value Adds", value: VALUE_ADDED_SERVICES_CATEGORY },
     ];
-  }, [listingsData]);
+  }, [isLisitingLoading, listingsData]);
 
   const categoryBadgeLabel = useMemo(() => {
     if (!formData?.category) return "";
