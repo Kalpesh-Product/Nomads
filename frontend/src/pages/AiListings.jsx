@@ -626,10 +626,11 @@ const AiListings = ({ forceListView = false }) => {
   const getValueAddedServiceLabel = (service) => {
     const locationLabel = (selectedStateLabel || "LOCATION").toUpperCase();
     const valueAddedServiceLabelMap = {
-      "ANY VISA SUPPORT": `${locationLabel} VISA SUPPORT`,
-      "OVERALL ACTIVATION SUPPORT": `${locationLabel} ACTIVATION SUPPORT`,
-      "NEW COMPANY SUPPORT": `${locationLabel} COMPANY SUPPORT`,
-      "ANY CONSULTATION SUPPORT": `${locationLabel} CONSULTATION SUPPORT`,
+      "ANY VISA SUPPORT": `${locationLabel} VISA`,
+      "OVERALL ACTIVATION SUPPORT": `${locationLabel} ACTIVATION`,
+      "NEW COMPANY SUPPORT": `${locationLabel} COMPANY SETUP`,
+      "ANY CONSULTATION SUPPORT": `${locationLabel} CONSULTATION`,
+      "APPLY FOR JOB": `${locationLabel} JOBS`,
     };
 
     if (valueAddedServiceLabelMap[service?.label]) {
@@ -638,6 +639,11 @@ const AiListings = ({ forceListView = false }) => {
 
     if (!service?.usesSelectedLocation) return service.label;
     return service.label.replace("LOCATION", locationLabel);
+  };
+
+  const getValueAddedServiceCardLines = (serviceLabel) => {
+    const [firstWord, ...restWords] = serviceLabel.split(" ");
+    return [firstWord, restWords.join(" ")].filter(Boolean);
   };
 
   const [mapOpen, setMapOpen] = useState(!forceListView);
@@ -1227,14 +1233,16 @@ const AiListings = ({ forceListView = false }) => {
                           }}
                         >
                           <div className="flex w-full flex-col items-center justify-end">
-                            {serviceLabel.split(" ").map((word) => (
-                              <span
-                                key={`${serviceLabel}-${word}`}
-                                className="text-base md:text-xl font-bold uppercase text-white leading-tight tracking-wide"
-                              >
-                                {word}
-                              </span>
-                            ))}
+                            {getValueAddedServiceCardLines(serviceLabel).map(
+                              (line) => (
+                                <span
+                                  key={`${serviceLabel}-${line}`}
+                                  className="text-base md:text-xl font-bold uppercase text-white leading-tight tracking-wide"
+                                >
+                                  {line}
+                                </span>
+                              ),
+                            )}
                             {service.badge && (
                               <span className="mt-2 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[9px] font-semibold leading-none normal-case text-black shadow-sm">
                                 {service.badge}

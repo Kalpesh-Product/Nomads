@@ -597,10 +597,11 @@ const AiGlobalListingsList = () => {
   const getValueAddedServiceLabel = (service) => {
     const locationLabel = (selectedLocationLabel || "LOCATION").toUpperCase();
     const valueAddedServiceLabelMap = {
-      "ANY VISA SUPPORT": `${locationLabel} VISA SUPPORT`,
-      "OVERALL ACTIVATION SUPPORT": `${locationLabel} ACTIVATION SUPPORT`,
-      "NEW COMPANY SUPPORT": `${locationLabel} COMPANY SUPPORT`,
-      "ANY CONSULTATION SUPPORT": `${locationLabel} CONSULTATION SUPPORT`,
+      "ANY VISA SUPPORT": `${locationLabel} VISA`,
+      "OVERALL ACTIVATION SUPPORT": `${locationLabel} ACTIVATION`,
+      "NEW COMPANY SUPPORT": `${locationLabel} COMPANY SETUP`,
+      "ANY CONSULTATION SUPPORT": `${locationLabel} CONSULTATION`,
+      "APPLY FOR JOB": `${locationLabel} JOBS`,
     };
 
     if (valueAddedServiceLabelMap[service?.label]) {
@@ -611,6 +612,10 @@ const AiGlobalListingsList = () => {
     return service.label.replace("LOCATION", locationLabel);
   };
 
+  const getValueAddedServiceCardLines = (serviceLabel) => {
+    const [firstWord, ...restWords] = serviceLabel.split(" ");
+    return [firstWord, restWords.join(" ")].filter(Boolean);
+  };
   const prioritizedCompanies = ["BIZ Nest", "MeWo"];
   const sortedListings = [...(listingsData || [])].sort((a, b) => {
     const aIsPriority = prioritizedCompanies.includes(a.companyName);
@@ -932,12 +937,14 @@ const AiGlobalListingsList = () => {
                                 }}
                               >
                                 <div className="flex w-full flex-col items-center justify-end">
-                                  {serviceLabel.split(" ").map((word) => (
+                                  {getValueAddedServiceCardLines(
+                                    serviceLabel,
+                                  ).map((line) => (
                                     <span
-                                      key={`${serviceLabel}-${word}`}
+                                      key={`${serviceLabel}-${line}`}
                                       className="text-base md:text-xl font-bold uppercase text-white leading-tight tracking-wide"
                                     >
-                                      {word}
+                                      {line}
                                     </span>
                                   ))}
                                   {service.badge && (
@@ -1293,12 +1300,14 @@ const AiGlobalListingsList = () => {
                               }}
                             >
                               <div className="flex w-full flex-col items-center justify-end">
-                                {serviceLabel.split(" ").map((word) => (
+                                {getValueAddedServiceCardLines(
+                                  serviceLabel,
+                                ).map((line) => (
                                   <span
-                                    key={`${serviceLabel}-${word}`}
+                                    key={`${serviceLabel}-${line}`}
                                     className="text-base md:text-xl font-bold uppercase text-white leading-tight tracking-wide"
                                   >
-                                    {word}
+                                    {line}
                                   </span>
                                 ))}
                                 {service.badge && (
@@ -1337,12 +1346,14 @@ const AiGlobalListingsList = () => {
                               }}
                             >
                               <div className="flex w-full flex-col items-center justify-end">
-                                {serviceLabel.split(" ").map((word) => (
+                                {getValueAddedServiceCardLines(
+                                  serviceLabel,
+                                ).map((line) => (
                                   <span
-                                    key={`${serviceLabel}-${word}`}
+                                    key={`${serviceLabel}-${line}`}
                                     className="text-base md:text-xl font-bold uppercase text-white leading-tight tracking-wide"
                                   >
-                                    {word}
+                                    {line}
                                   </span>
                                 ))}
                                 {service.badge && (
