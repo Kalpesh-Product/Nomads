@@ -34,6 +34,7 @@ import useAuth from "../hooks/useAuth.js";
 import { persistSelectedDestination } from "../utils/selectedDestinationSession.js";
 
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
+const VALUE_ADDED_SERVICE_CARD_BACKGROUND_IMAGE = "/images/goa-image.jpg";
 
 const TYPING_INTERVAL_MS = 7;
 const SECOND_HEADING_DELAY_MS = 250;
@@ -1214,17 +1215,22 @@ const AiListings = ({ forceListView = false }) => {
                           type="button"
                           onClick={() => handleValueAddedServiceClick(service)}
                           disabled={isDisabled}
-                          className={`rounded-3xl bg-[#f1f1f3] px-4 py-6 min-h-[132px] aspect-square flex flex-col items-center justify-center text-center transition-colors ${
+                          className={`relative overflow-hidden rounded-3xl px-4 py-6 min-h-[132px] aspect-square flex items-end justify-center text-center transition-transform ${
                             isDisabled
                               ? "cursor-not-allowed opacity-80"
-                              : "hover:bg-[#e8e8ed]"
+                              : "hover:scale-[1.02]"
                           }`}
+                          style={{
+                            backgroundImage: `linear-gradient(to top, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.2)), url(${VALUE_ADDED_SERVICE_CARD_BACKGROUND_IMAGE})`,
+                            backgroundSize: "cover",
+                            backgroundPosition: "center",
+                          }}
                         >
-                          <div className="flex flex-col items-center justify-center">
+                          <div className="flex w-full flex-col items-center justify-end">
                             {serviceLabel.split(" ").map((word) => (
                               <span
                                 key={`${serviceLabel}-${word}`}
-                                className="text-sm md:text-base font-bold uppercase text-black/90 leading-tight"
+                                className="text-base md:text-xl font-bold uppercase text-white leading-tight tracking-wide"
                               >
                                 {word}
                               </span>
