@@ -1,8 +1,12 @@
 import { Router } from "express";
-import { createWorkation } from "../controllers/workationController.js";
+import {
+  createWorkation,
+  getWorkationRequests,
+} from "../controllers/workationController.js";
 
 const router = Router();
 
+router.get("/", getWorkationRequests);
 router.post("/", createWorkation);
 
 export default router;

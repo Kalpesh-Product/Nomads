@@ -1,8 +1,12 @@
 import { Router } from "express";
-import { createOverallActivationSupport } from "../controllers/overallActivationSupportController.js";
+import {
+  createOverallActivationSupport,
+  getOverallActivationSupportRequests,
+} from "../controllers/overallActivationSupportController.js";
 
 const router = Router();
 
+router.get("/", getOverallActivationSupportRequests);
 router.post("/", createOverallActivationSupport);
 
 export default router;
