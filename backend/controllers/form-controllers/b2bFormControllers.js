@@ -404,7 +404,7 @@ export const updateHostUserStatusAndComment = async (req, res, next) => {
     const { hostUserId } = req.params;
     const { status, comment, goals } = req.body;
     const allowedStatuses = ["pending", "contacted", "closed", "rejected"];
-    const allowedGoals = ["basic", "professional", "custom"];
+    const allowedGoals = ["basic", "professional", "customise"];
 
     if (!hostUserId) {
       return res.status(400).json({ message: "hostUserId is required" });
@@ -443,7 +443,7 @@ export const updateHostUserStatusAndComment = async (req, res, next) => {
     if (typeof goals !== "undefined") {
       if (typeof goals !== "string") {
         return res.status(400).json({
-          message: "Goals must be a string (basic, professional, custom)",
+          message: "Goals must be a string (basic, professional, customise)",
         });
       }
 
@@ -451,7 +451,7 @@ export const updateHostUserStatusAndComment = async (req, res, next) => {
       if (!allowedGoals.includes(normalizedGoals)) {
         return res.status(400).json({
           message:
-            "Invalid goals. Allowed values: basic, professional, custom",
+            "Invalid goals. Allowed values: basic, professional, customise",
         });
       }
 
