@@ -35,6 +35,15 @@ const continentOptions = [
   "South America",
 ];
 
+const visaRequirementOptions = [
+  "Show All",
+  "Traditional Visa",
+  "E Visa",
+  "Visa on Arrival",
+  "Nomad Visa",
+  "Visa Free",
+];
+
 const destinationCards = aiDestinationCards;
 const getDestinationFavoriteKey = (destination) =>
   `${destination.city}-${destination.country}`;
@@ -726,15 +735,23 @@ const DropdownBadge = ({
   onToggle,
   onSelect,
   align = "left",
+  size = "default",
 }) => {
   const menuAlignment = align === "right" ? "right-0" : "left-0";
+  const isSmall = size === "small";
 
   return (
-    <div className="relative w-full min-w-0 flex-1">
+    <div
+      className={`relative min-w-0 ${isSmall ? "w-full sm:flex-1" : "w-full flex-1"}`}
+    >
       <button
         type="button"
         onClick={onToggle}
-        className={`flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${
+        className={`flex w-full items-center justify-between gap-2 rounded-full border font-medium transition-colors ${
+          isSmall
+            ? "min-h-[38px] px-3 py-1.5 text-xs sm:px-4"
+            : "min-h-[44px] px-4 py-2 text-sm sm:px-5"
+        } ${
           isOpen
             ? "border-sky-500 bg-sky-500 text-white"
             : "border-black/20 bg-white text-black/85 hover:border-sky-500"
@@ -839,6 +856,9 @@ const AiSearchResults = () => {
     useState(initialGoalOption);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [showAllDestinations, setShowAllDestinations] = useState(false);
+  const [selectedVisaRequirement, setSelectedVisaRequirement] = useState(
+    visaRequirementOptions[0],
+  );
   const [isResultsReady, setIsResultsReady] = useState(false);
   const [visibleDestinationCount, setVisibleDestinationCount] = useState(0);
   const [likedDestinations, setLikedDestinations] = useState([]);
@@ -1122,6 +1142,16 @@ const AiSearchResults = () => {
       state,
     });
 
+    if (closeDropdownTimeoutRef.current) {
+      clearTimeout(closeDropdownTimeoutRef.current);
+    }
+    closeDropdownTimeoutRef.current = setTimeout(() => {
+      setOpenDropdown(null);
+    }, 120);
+  };
+
+  const handleVisaRequirementSelect = (option) => {
+    setSelectedVisaRequirement(option);
     if (closeDropdownTimeoutRef.current) {
       clearTimeout(closeDropdownTimeoutRef.current);
     }
@@ -1513,6 +1543,32 @@ const AiSearchResults = () => {
     [resultsHeadingRemainingLines, selectedContinent, selectedGoalOption],
   );
 
+  const [resultsHeadingBodyLines, resultsHeadingLastLine] = useMemo(() => {
+    if (!resultsHeadingRemainingLines) {
+      return ["", ""];
+    }
+
+    const lines = resultsHeadingRemainingLines
+      .split("\n")
+      .map((line) => line.trimEnd());
+    const lastLineIndex = [...lines]
+      .reverse()
+      .findIndex((line) => line.trim().startsWith("→"));
+
+    if (lastLineIndex === -1) {
+      return [resultsHeadingRemainingLines, ""];
+    }
+
+    const resolvedLastLineIndex = lines.length - 1 - lastLineIndex;
+    const bodyLines = lines
+      .slice(0, resolvedLastLineIndex)
+      .join("\n")
+      .trimEnd();
+    const lastLine = lines[resolvedLastLineIndex].trim();
+
+    return [bodyLines, lastLine];
+  }, [resultsHeadingRemainingLines]);
+
   return (
     <div className="min-h-full bg-white">
       <main className="pb-8">
@@ -1599,16 +1655,38 @@ const AiSearchResults = () => {
                       <p className="text-sm font-medium leading-relaxed text-primary-blue lg:text-[0.9rem] font-play">
                         {typedBottomHeading}
                       </p>
-                      <p className="mt-6 text-sm leading-relaxed text-black/85 lg:text-[0.9rem] font-play">
+                      <div className="mt-6 text-sm leading-relaxed text-black/85 lg:text-[0.9rem] font-play">
                         <span className="block font-bold">
                           {highlightedResultsHeadingFirstLine}
                         </span>
-                        {resultsHeadingRemainingLines && (
+                        {resultsHeadingBodyLines && (
                           <span className="mt-1 block whitespace-pre-line">
-                            {highlightedResultsHeadingRemainingLines}
+                            {highlightSelectedTokens(resultsHeadingBodyLines, [
+                              selectedContinent,
+                              selectedGoalOption,
+                            ])}
                           </span>
                         )}
-                      </p>
+                        <div className="mt-3 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between lg:gap-6">
+                          <span className="block font-medium">
+                            {resultsHeadingLastLine ||
+                              highlightedResultsHeadingRemainingLines}
+                          </span>
+                          <div className="w-full lg:w-[15.5rem] xl:w-[17rem]">
+                            <DropdownBadge
+                              label="Visa Requirement"
+                              options={visaRequirementOptions}
+                              selectedValue={selectedVisaRequirement}
+                              isOpen={openDropdown === "visaRequirement"}
+                              onToggle={() =>
+                                handleDropdownToggle("visaRequirement")
+                              }
+                              onSelect={handleVisaRequirementSelect}
+                              size="small"
+                            />
+                          </div>
+                        </div>
+                      </div>
                     </>
                   )}
 
