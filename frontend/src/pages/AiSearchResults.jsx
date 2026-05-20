@@ -922,6 +922,9 @@ const AiSearchResults = () => {
   const [apiDestinations, setApiDestinations] = useState([]);
   const [visaRuleDestinationKeys, setVisaRuleDestinationKeys] = useState(null);
 
+  const [visaRuleDurationByCountry, setVisaRuleDurationByCountry] =
+    useState(null);
+
   const destinationLookup = useMemo(() => {
     const map = new Map();
 
@@ -947,45 +950,72 @@ const AiSearchResults = () => {
       leftBadgeLabelFieldByGoalOption[selectedGoalOption] ||
       getLabelFieldKeyForSelection(selectedGoal, selectedGoalOption);
 
-    return apiDestinations
-      .filter((destination) => {
-        if (destination?.isActive !== true) {
-          return false;
-        }
+    const filteredDestinations = apiDestinations.filter((destination) => {
+      if (destination?.isActive !== true) {
+        return false;
+      }
 
-        if (!visaRuleDestinationKeys) {
-          return true;
-        }
+      if (!visaRuleDestinationKeys) {
+        return true;
+      }
 
-        return visaRuleDestinationKeys.has(
-          normalizeCountryKey(destination.country),
-        );
-      })
-      .map((destination, index) => {
-        const leftBadgeValueFromLabel =
-          leftBadgeLabelField && destination?.labels
-            ? formatLeftBadgeValue(destination.labels[leftBadgeLabelField])
-            : null;
-        const leftBadgeValueFromField = leftBadgeField
-          ? formatLeftBadgeValue(destination[leftBadgeField])
+      return visaRuleDestinationKeys.has(
+        normalizeCountryKey(destination.country),
+      );
+    });
+
+    const sortedDestinations =
+      isVisaRequirementFilterActive(selectedVisaRequirement) &&
+      visaRuleDurationByCountry
+        ? filteredDestinations
+            .map((destination, index) => ({ destination, index }))
+            .sort((a, b) => {
+              const aDuration =
+                visaRuleDurationByCountry.get(
+                  normalizeCountryKey(a.destination.country),
+                ) ?? 0;
+              const bDuration =
+                visaRuleDurationByCountry.get(
+                  normalizeCountryKey(b.destination.country),
+                ) ?? 0;
+
+              if (bDuration !== aDuration) {
+                return bDuration - aDuration;
+              }
+
+              return a.index - b.index;
+            })
+            .map(({ destination }) => destination)
+        : filteredDestinations;
+
+    return sortedDestinations.map((destination, index) => {
+      const leftBadgeValueFromLabel =
+        leftBadgeLabelField && destination?.labels
+          ? formatLeftBadgeValue(destination.labels[leftBadgeLabelField])
           : null;
+      const leftBadgeValueFromField = leftBadgeField
+        ? formatLeftBadgeValue(destination[leftBadgeField])
+        : null;
 
-        return {
-          ...destination,
-          rankLabel: `Rank ${index + 1}`,
-          leftBadgeLabel: leftBadgeValueFromLabel || leftBadgeValueFromField,
-        };
-      });
+      return {
+        ...destination,
+        rankLabel: `Rank ${index + 1}`,
+        leftBadgeLabel: leftBadgeValueFromLabel || leftBadgeValueFromField,
+      };
+    });
   }, [
     apiDestinations,
     selectedGoal,
     selectedGoalOption,
+    selectedVisaRequirement,
     visaRuleDestinationKeys,
+    visaRuleDurationByCountry,
   ]);
 
   useEffect(() => {
     if (!isVisaRequirementFilterActive(selectedVisaRequirement)) {
       setVisaRuleDestinationKeys(null);
+      setVisaRuleDurationByCountry(null);
       return;
     }
 
@@ -1007,13 +1037,21 @@ const AiSearchResults = () => {
             normalizeCountryKey(rule.destination),
           ),
         );
+        const durationByCountry = new Map(
+          (response?.data?.data || []).map((rule) => [
+            normalizeCountryKey(rule.destination),
+            Number(rule.durationDays) || 0,
+          ]),
+        );
 
         if (isMounted) {
           setVisaRuleDestinationKeys(allowedDestinationKeys);
+          setVisaRuleDurationByCountry(durationByCountry);
         }
       } catch {
         if (!controller.signal.aborted && isMounted) {
           setVisaRuleDestinationKeys(new Set());
+          setVisaRuleDurationByCountry(new Map());
         }
       }
     };
