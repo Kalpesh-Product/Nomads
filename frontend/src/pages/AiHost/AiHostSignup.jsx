@@ -161,6 +161,7 @@ const AiHostSignup = () => {
                 registeredCompanyName: "",
                 copyrightText: "",
                 selectedServices: [],
+                acceptTerms: false,
             },
         });
 
@@ -1469,7 +1470,7 @@ const AiHostSignup = () => {
                 {activeStep !== 3 && (
                     <h1 className="text-title text-center">
                         {activeStep === 0 && "Select Your Plan"}
-                        {activeStep === 1 && "Your Goal is Set... Let's Get You Activated"}
+                        {activeStep === 1 && "YOUR GOAL IS SET... LET'S GET YOU ACTIVATED"}
                         {/* {activeStep === 2 && "Add your company details"}
                         {activeStep === 3 && "Add Your Website Content"} */}
                         {/* {activeStep === 4 && "Activate your account"} */}
@@ -1663,12 +1664,62 @@ const AiHostSignup = () => {
             )} */}
 
                             {activeStep === 1 && (
-                                <GetStartedButton
-                                    title={isRegisterLoading ? "Submitting..." : "Submit"}
-                                    type="submit"
-                                    disabled={isRegisterLoading}
-                                    isLoading={isRegisterLoading}
-                                />
+                                <div className="w-full flex flex-col items-center gap-3">
+                                    <div className="w-full max-w-2xl">
+                                        <Controller
+                                            name="acceptTerms"
+                                            control={control}
+                                            rules={{
+                                                validate: (value) =>
+                                                    value ||
+                                                    "You must accept the Terms and Conditions to continue",
+                                            }}
+                                            render={({ field, fieldState }) => (
+                                                <div className="flex flex-col items-center">
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Checkbox
+                                                                checked={Boolean(field.value)}
+                                                                onChange={(event) =>
+                                                                    field.onChange(event.target.checked)
+                                                                }
+                                                                sx={{
+                                                                    color: "#000000",
+                                                                    "&.Mui-checked": { color: "#000000" },
+                                                                }}
+                                                            />
+                                                        }
+                                                        label={
+                                                            <span className="text-sm text-gray-700">
+                                                                I agree to the{" "}
+                                                                <NavLink
+                                                                    to="/host/ai-host-terms-and-conditions"
+                                                                    className="text-blue-600 underline"
+                                                                    target="_blank"
+                                                                    rel="noreferrer"
+                                                                >
+                                                                    Terms and Conditions
+                                                                </NavLink>
+                                                                .
+                                                            </span>
+                                                        }
+                                                    />
+                                                    {fieldState.error ? (
+                                                        <p className="mt-1 text-sm text-red-500">
+                                                            {fieldState.error.message}
+                                                        </p>
+                                                    ) : null}
+                                                </div>
+                                            )}
+                                        />
+                                    </div>
+                                    <GetStartedButton
+                                        title={isRegisterLoading ? "Submitting..." : "Submit"}
+                                        type="submit"
+                                        disabled={isRegisterLoading}
+                                        isLoading={isRegisterLoading}
+                                    />
+                                </div>
                             )}
 
                             {/* Go To Home button on 5th step */}

@@ -166,7 +166,7 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
             </button>
             <div
               onClick={goToHostssMain}
-              className="w-24 h-10 lg:w-48 overflow-x-hidden rounded-lg flex gap-8 justify-start items-start cursor-pointer"
+              className="w-24 h-10 lg:w-48 overflow-x-hidden rounded-lg flex gap-8 justify-start items-center cursor-pointer"
             >
               <img
                 src={logo}
@@ -320,7 +320,7 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
                   {/* Original Map View / List View - UNCHANGED */}
                 </ul>
               )}
-              <div className="p-4 px-0 whitespace-nowrap">
+              <div className="p-4 px-0 whitespace-nowrap invisible pointer-events-none">
                 <button
                   onClick={goToHosts}
                   className="relative pb-1 transition-all cursor-pointer duration-300 group bg-transparent border-none text-sm text-primary-blue"
@@ -463,7 +463,7 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
                       </li>
                     ))}
 
-                <li className="items-center text-center">
+                <li className="items-center text-center invisible pointer-events-none">
                   <div
                     onClick={() => {
                       goToHosts();
