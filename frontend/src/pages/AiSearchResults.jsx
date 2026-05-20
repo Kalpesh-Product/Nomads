@@ -18,6 +18,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { aiDestinationCards } from "../constants/aiDestinationCards";
 
 import axios from "../utils/axios";
+import useAuth from "../hooks/useAuth";
 
 import {
   defaultGoal,
@@ -34,6 +35,23 @@ const continentOptions = [
   "Oceania",
   "South America",
 ];
+
+const visaRequirementOptions = [
+  "Show All",
+  "Traditional Visa",
+  "E Visa",
+  "Visa on Arrival",
+  "Visa Free",
+];
+
+const visaRequirementApiValueMap = {
+  "Traditional Visa": "visa required",
+  "E Visa": "e-visa",
+  "Visa on Arrival": "visa on arrival",
+  "Visa Free": "visa free",
+};
+
+const DEFAULT_PASSPORT_COUNTRY = "India";
 
 const destinationCards = aiDestinationCards;
 const getDestinationFavoriteKey = (destination) =>
@@ -503,6 +521,32 @@ const normalizeDestinationKey = (value = "") =>
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]/g, "");
 
+const normalizedCountryAliasMap = {
+  usa: "unitedstates",
+  unitedstatesofamerica: "unitedstates",
+  uae: "unitedarabemirates",
+  turkey: "turkiye",
+  czechrepublic: "czechia",
+  thebahamas: "bahamas",
+  thegambia: "gambia",
+  swaziland: "eswatini",
+  ivorycoast: "cotedivoire",
+  hongkong: "hongkongsarchina",
+  macao: "macaosarchina",
+  macau: "macaosarchina",
+  saintkittsandnevis: "stkittsandnevis",
+  saintlucia: "stlucia",
+  saintvincentandthegrenadines: "stvincentandthegrenadines",
+};
+
+const normalizeCountryKey = (value = "") => {
+  const normalized = normalizeDestinationKey(value).replace(/&/g, "and");
+  return normalizedCountryAliasMap[normalized] || normalized;
+};
+
+const isVisaRequirementFilterActive = (value = "") =>
+  value && value !== visaRequirementOptions[0];
+
 const toApiAttribute = (goalOption = "") => {
   const normalizedGoalOption =
     typeof goalOption === "string" ? goalOption : `${goalOption || ""}`;
@@ -726,15 +770,24 @@ const DropdownBadge = ({
   onToggle,
   onSelect,
   align = "left",
+  size = "default",
 }) => {
   const menuAlignment = align === "right" ? "right-0" : "left-0";
+  const isSmall = size === "small";
 
   return (
-    <div className="relative w-full min-w-0 flex-1">
+    <div
+      className={`relative min-w-0 ${isSmall ? "w-full sm:flex-1" : "w-full flex-1"}`}
+      onClick={(event) => event.stopPropagation()}
+    >
       <button
         type="button"
         onClick={onToggle}
-        className={`flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${
+        className={`flex w-full items-center justify-between gap-2 rounded-full border font-medium transition-colors ${
+          isSmall
+            ? "min-h-[38px] px-3 py-1.5 text-xs sm:px-4"
+            : "min-h-[44px] px-4 py-2 text-sm sm:px-5"
+        } ${
           isOpen
             ? "border-sky-500 bg-sky-500 text-white"
             : "border-black/20 bg-white text-black/85 hover:border-sky-500"
@@ -801,6 +854,7 @@ const AiSearchResults = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { goal, loc, attr } = useParams();
+  const { auth } = useAuth();
   const { state } = location;
   const requestedGoalFromUrl = goal ? goalNameBySlug[goal.toLowerCase()] : null;
   const requestedGoal = state?.selectedGoal || requestedGoalFromUrl;
@@ -839,6 +893,9 @@ const AiSearchResults = () => {
     useState(initialGoalOption);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [showAllDestinations, setShowAllDestinations] = useState(false);
+  const [selectedVisaRequirement, setSelectedVisaRequirement] = useState(
+    visaRequirementOptions[0],
+  );
   const [isResultsReady, setIsResultsReady] = useState(false);
   const [visibleDestinationCount, setVisibleDestinationCount] = useState(0);
   const [likedDestinations, setLikedDestinations] = useState([]);
@@ -857,8 +914,16 @@ const AiSearchResults = () => {
   const hasSelectedContinent = Boolean(selectedContinent);
   const hasSelectedGoalOption = Boolean(selectedGoalOption);
   const hasSelectedFilters = hasSelectedContinent && hasSelectedGoalOption;
+  const passportCountry =
+    auth?.user?.country ||
+    auth?.user?.countryOfResidence ||
+    DEFAULT_PASSPORT_COUNTRY;
 
   const [apiDestinations, setApiDestinations] = useState([]);
+  const [visaRuleDestinationKeys, setVisaRuleDestinationKeys] = useState(null);
+
+  const [visaRuleDurationByCountry, setVisaRuleDurationByCountry] =
+    useState(null);
 
   const destinationLookup = useMemo(() => {
     const map = new Map();
@@ -885,24 +950,119 @@ const AiSearchResults = () => {
       leftBadgeLabelFieldByGoalOption[selectedGoalOption] ||
       getLabelFieldKeyForSelection(selectedGoal, selectedGoalOption);
 
-    return apiDestinations
-      .filter((destination) => destination?.isActive === true)
-      .map((destination, index) => {
-        const leftBadgeValueFromLabel =
-          leftBadgeLabelField && destination?.labels
-            ? formatLeftBadgeValue(destination.labels[leftBadgeLabelField])
-            : null;
-        const leftBadgeValueFromField = leftBadgeField
-          ? formatLeftBadgeValue(destination[leftBadgeField])
-          : null;
+    const filteredDestinations = apiDestinations.filter((destination) => {
+      if (destination?.isActive !== true) {
+        return false;
+      }
 
-        return {
-          ...destination,
-          rankLabel: `Rank ${index + 1}`,
-          leftBadgeLabel: leftBadgeValueFromLabel || leftBadgeValueFromField,
-        };
-      });
-  }, [apiDestinations, selectedGoal, selectedGoalOption]);
+      if (!visaRuleDestinationKeys) {
+        return true;
+      }
+
+      return visaRuleDestinationKeys.has(
+        normalizeCountryKey(destination.country),
+      );
+    });
+
+    const sortedDestinations =
+      isVisaRequirementFilterActive(selectedVisaRequirement) &&
+      visaRuleDurationByCountry
+        ? filteredDestinations
+            .map((destination, index) => ({ destination, index }))
+            .sort((a, b) => {
+              const aDuration =
+                visaRuleDurationByCountry.get(
+                  normalizeCountryKey(a.destination.country),
+                ) ?? 0;
+              const bDuration =
+                visaRuleDurationByCountry.get(
+                  normalizeCountryKey(b.destination.country),
+                ) ?? 0;
+
+              if (bDuration !== aDuration) {
+                return bDuration - aDuration;
+              }
+
+              return a.index - b.index;
+            })
+            .map(({ destination }) => destination)
+        : filteredDestinations;
+
+    return sortedDestinations.map((destination, index) => {
+      const leftBadgeValueFromLabel =
+        leftBadgeLabelField && destination?.labels
+          ? formatLeftBadgeValue(destination.labels[leftBadgeLabelField])
+          : null;
+      const leftBadgeValueFromField = leftBadgeField
+        ? formatLeftBadgeValue(destination[leftBadgeField])
+        : null;
+
+      return {
+        ...destination,
+        rankLabel: `Rank ${index + 1}`,
+        leftBadgeLabel: leftBadgeValueFromLabel || leftBadgeValueFromField,
+      };
+    });
+  }, [
+    apiDestinations,
+    selectedGoal,
+    selectedGoalOption,
+    selectedVisaRequirement,
+    visaRuleDestinationKeys,
+    visaRuleDurationByCountry,
+  ]);
+
+  useEffect(() => {
+    if (!isVisaRequirementFilterActive(selectedVisaRequirement)) {
+      setVisaRuleDestinationKeys(null);
+      setVisaRuleDurationByCountry(null);
+      return;
+    }
+
+    let isMounted = true;
+    const controller = new AbortController();
+
+    const fetchVisaRules = async () => {
+      try {
+        const response = await axios.get("/visa-rules", {
+          params: {
+            passportCountry,
+            requirement: visaRequirementApiValueMap[selectedVisaRequirement],
+          },
+          signal: controller.signal,
+        });
+
+        const allowedDestinationKeys = new Set(
+          (response?.data?.data || []).map((rule) =>
+            normalizeCountryKey(rule.destination),
+          ),
+        );
+        const durationByCountry = new Map(
+          (response?.data?.data || []).map((rule) => [
+            normalizeCountryKey(rule.destination),
+            Number(rule.durationDays) || 0,
+          ]),
+        );
+
+        if (isMounted) {
+          setVisaRuleDestinationKeys(allowedDestinationKeys);
+          setVisaRuleDurationByCountry(durationByCountry);
+        }
+      } catch {
+        if (!controller.signal.aborted && isMounted) {
+          setVisaRuleDestinationKeys(new Set());
+          setVisaRuleDurationByCountry(new Map());
+        }
+      }
+    };
+
+    fetchVisaRules();
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
+  }, [passportCountry, selectedVisaRequirement]);
 
   useEffect(() => {
     if (!hasSelectedFilters) {
@@ -928,6 +1088,8 @@ const AiSearchResults = () => {
               selectedGoal,
               selectedGoalOption,
             ),
+            visaRequirement: selectedVisaRequirement,
+            passportCountry,
           },
           { signal: controller.signal },
         );
@@ -1017,6 +1179,8 @@ const AiSearchResults = () => {
     selectedContinent,
     selectedGoal,
     selectedGoalOption,
+    selectedVisaRequirement,
+    passportCountry,
   ]);
 
   const searchBarBadges = useMemo(() => {
@@ -1122,6 +1286,16 @@ const AiSearchResults = () => {
       state,
     });
 
+    if (closeDropdownTimeoutRef.current) {
+      clearTimeout(closeDropdownTimeoutRef.current);
+    }
+    closeDropdownTimeoutRef.current = setTimeout(() => {
+      setOpenDropdown(null);
+    }, 120);
+  };
+
+  const handleVisaRequirementSelect = (option) => {
+    setSelectedVisaRequirement(option);
     if (closeDropdownTimeoutRef.current) {
       clearTimeout(closeDropdownTimeoutRef.current);
     }
@@ -1282,10 +1456,10 @@ const AiSearchResults = () => {
       }
     };
 
-    document.addEventListener("mousedown", handleOutsideClick);
+    document.addEventListener("click", handleOutsideClick);
 
     return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("click", handleOutsideClick);
     };
   }, []);
 
@@ -1388,7 +1562,7 @@ const AiSearchResults = () => {
 
   useEffect(() => {
     setShowAllDestinations(false);
-  }, [selectedContinent, selectedGoalOption]);
+  }, [selectedContinent, selectedGoalOption, selectedVisaRequirement]);
 
   useEffect(() => {
     if (!hasSelectedFilters || !isResultsReady) {
@@ -1513,6 +1687,32 @@ const AiSearchResults = () => {
     [resultsHeadingRemainingLines, selectedContinent, selectedGoalOption],
   );
 
+  const [resultsHeadingBodyLines, resultsHeadingLastLine] = useMemo(() => {
+    if (!resultsHeadingRemainingLines) {
+      return ["", ""];
+    }
+
+    const lines = resultsHeadingRemainingLines
+      .split("\n")
+      .map((line) => line.trimEnd());
+    const lastLineIndex = [...lines]
+      .reverse()
+      .findIndex((line) => line.trim().startsWith("→"));
+
+    if (lastLineIndex === -1) {
+      return [resultsHeadingRemainingLines, ""];
+    }
+
+    const resolvedLastLineIndex = lines.length - 1 - lastLineIndex;
+    const bodyLines = lines
+      .slice(0, resolvedLastLineIndex)
+      .join("\n")
+      .trimEnd();
+    const lastLine = lines[resolvedLastLineIndex].trim();
+
+    return [bodyLines, lastLine];
+  }, [resultsHeadingRemainingLines]);
+
   return (
     <div className="min-h-full bg-white">
       <main className="pb-8">
@@ -1599,16 +1799,43 @@ const AiSearchResults = () => {
                       <p className="text-sm font-medium leading-relaxed text-primary-blue lg:text-[0.9rem] font-play">
                         {typedBottomHeading}
                       </p>
-                      <p className="mt-6 text-sm leading-relaxed text-black/85 lg:text-[0.9rem] font-play">
+                      <div className="mt-6 text-sm leading-relaxed text-black/85 lg:text-[0.9rem] font-play">
                         <span className="block font-bold">
                           {highlightedResultsHeadingFirstLine}
                         </span>
-                        {resultsHeadingRemainingLines && (
+                        {resultsHeadingBodyLines && (
                           <span className="mt-1 block whitespace-pre-line">
-                            {highlightedResultsHeadingRemainingLines}
+                            {highlightSelectedTokens(resultsHeadingBodyLines, [
+                              selectedContinent,
+                              selectedGoalOption,
+                            ])}
                           </span>
                         )}
-                      </p>
+                        <div className="mt-3 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between lg:gap-6">
+                          {(resultsHeadingLastLine ||
+                            !resultsHeadingBodyLines) && (
+                            <span className="block font-medium">
+                              {resultsHeadingLastLine ||
+                                highlightedResultsHeadingRemainingLines}
+                            </span>
+                          )}
+                          {shouldShowResultsContent && (
+                            <div className="w-full lg:w-[15.5rem] xl:w-[17rem]">
+                              <DropdownBadge
+                                label="Visa Requirement"
+                                options={visaRequirementOptions}
+                                selectedValue={selectedVisaRequirement}
+                                isOpen={openDropdown === "visaRequirement"}
+                                onToggle={() =>
+                                  handleDropdownToggle("visaRequirement")
+                                }
+                                onSelect={handleVisaRequirementSelect}
+                                size="small"
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </>
                   )}
 
