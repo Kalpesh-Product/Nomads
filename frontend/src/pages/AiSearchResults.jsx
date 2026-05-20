@@ -18,6 +18,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { aiDestinationCards } from "../constants/aiDestinationCards";
 
 import axios from "../utils/axios";
+import useAuth from "../hooks/useAuth";
 
 import {
   defaultGoal,
@@ -43,6 +44,8 @@ const visaRequirementOptions = [
   "Nomad Visa",
   "Visa Free",
 ];
+
+const DEFAULT_PASSPORT_COUNTRY = "India";
 
 const destinationCards = aiDestinationCards;
 const getDestinationFavoriteKey = (destination) =>
@@ -512,6 +515,32 @@ const normalizeDestinationKey = (value = "") =>
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]/g, "");
 
+const normalizedCountryAliasMap = {
+  usa: "unitedstates",
+  unitedstatesofamerica: "unitedstates",
+  uae: "unitedarabemirates",
+  turkey: "turkiye",
+  czechrepublic: "czechia",
+  thebahamas: "bahamas",
+  thegambia: "gambia",
+  swaziland: "eswatini",
+  ivorycoast: "cotedivoire",
+  hongkong: "hongkongsarchina",
+  macao: "macaosarchina",
+  macau: "macaosarchina",
+  saintkittsandnevis: "stkittsandnevis",
+  saintlucia: "stlucia",
+  saintvincentandthegrenadines: "stvincentandthegrenadines",
+};
+
+const normalizeCountryKey = (value = "") => {
+  const normalized = normalizeDestinationKey(value).replace(/&/g, "and");
+  return normalizedCountryAliasMap[normalized] || normalized;
+};
+
+const isVisaRequirementFilterActive = (value = "") =>
+  value && value !== visaRequirementOptions[0];
+
 const toApiAttribute = (goalOption = "") => {
   const normalizedGoalOption =
     typeof goalOption === "string" ? goalOption : `${goalOption || ""}`;
@@ -818,6 +847,7 @@ const AiSearchResults = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { goal, loc, attr } = useParams();
+  const { auth } = useAuth();
   const { state } = location;
   const requestedGoalFromUrl = goal ? goalNameBySlug[goal.toLowerCase()] : null;
   const requestedGoal = state?.selectedGoal || requestedGoalFromUrl;
@@ -877,8 +907,14 @@ const AiSearchResults = () => {
   const hasSelectedContinent = Boolean(selectedContinent);
   const hasSelectedGoalOption = Boolean(selectedGoalOption);
   const hasSelectedFilters = hasSelectedContinent && hasSelectedGoalOption;
+  const passportCountry =
+    auth?.user?.country ||
+    auth?.user?.countryOfResidence ||
+    DEFAULT_PASSPORT_COUNTRY;
 
   const [apiDestinations, setApiDestinations] = useState([]);
+  const [visaRuleDestinationKeys, setVisaRuleDestinationKeys] =
+    useState(null);
 
   const destinationLookup = useMemo(() => {
     const map = new Map();
@@ -906,7 +942,19 @@ const AiSearchResults = () => {
       getLabelFieldKeyForSelection(selectedGoal, selectedGoalOption);
 
     return apiDestinations
-      .filter((destination) => destination?.isActive === true)
+      .filter((destination) => {
+        if (destination?.isActive !== true) {
+          return false;
+        }
+
+        if (!visaRuleDestinationKeys) {
+          return true;
+        }
+
+        return visaRuleDestinationKeys.has(
+          normalizeCountryKey(destination.country),
+        );
+      })
       .map((destination, index) => {
         const leftBadgeValueFromLabel =
           leftBadgeLabelField && destination?.labels
@@ -922,7 +970,50 @@ const AiSearchResults = () => {
           leftBadgeLabel: leftBadgeValueFromLabel || leftBadgeValueFromField,
         };
       });
-  }, [apiDestinations, selectedGoal, selectedGoalOption]);
+  }, [apiDestinations, selectedGoal, selectedGoalOption, visaRuleDestinationKeys]);
+
+  useEffect(() => {
+    if (!isVisaRequirementFilterActive(selectedVisaRequirement)) {
+      setVisaRuleDestinationKeys(null);
+      return;
+    }
+
+    let isMounted = true;
+    const controller = new AbortController();
+
+    const fetchVisaRules = async () => {
+      try {
+        const response = await axios.get("/visa-rules", {
+          params: {
+            passportCountry,
+            requirement: selectedVisaRequirement,
+          },
+          signal: controller.signal,
+        });
+
+        const allowedDestinationKeys = new Set(
+          (response?.data?.data || []).map((rule) =>
+            normalizeCountryKey(rule.destination),
+          ),
+        );
+
+        if (isMounted) {
+          setVisaRuleDestinationKeys(allowedDestinationKeys);
+        }
+      } catch {
+        if (!controller.signal.aborted && isMounted) {
+          setVisaRuleDestinationKeys(new Set());
+        }
+      }
+    };
+
+    fetchVisaRules();
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
+  }, [passportCountry, selectedVisaRequirement]);
 
   useEffect(() => {
     if (!hasSelectedFilters) {
@@ -948,6 +1039,8 @@ const AiSearchResults = () => {
               selectedGoal,
               selectedGoalOption,
             ),
+            visaRequirement: selectedVisaRequirement,
+            passportCountry,
           },
           { signal: controller.signal },
         );
@@ -1037,6 +1130,8 @@ const AiSearchResults = () => {
     selectedContinent,
     selectedGoal,
     selectedGoalOption,
+    selectedVisaRequirement,
+    passportCountry,
   ]);
 
   const searchBarBadges = useMemo(() => {
@@ -1418,7 +1513,7 @@ const AiSearchResults = () => {
 
   useEffect(() => {
     setShowAllDestinations(false);
-  }, [selectedContinent, selectedGoalOption]);
+  }, [selectedContinent, selectedGoalOption, selectedVisaRequirement]);
 
   useEffect(() => {
     if (!hasSelectedFilters || !isResultsReady) {
