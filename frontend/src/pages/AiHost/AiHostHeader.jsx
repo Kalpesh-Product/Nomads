@@ -104,12 +104,8 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
     setOpen(false);
   };
 
-  const goToHosts = () => {
-    if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://nomad.localhost:5173/home";
-    } else {
-      window.location.href = "https://nomad.wono.co/home";
-    }
+  const goToBusinessLogin = () => {
+    window.location.href = "https://wonohostfe.vercel.app";
   };
 
   const goToHostssMain = () => {
@@ -166,7 +162,7 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
             </button>
             <div
               onClick={goToHostssMain}
-              className="w-24 h-10 lg:w-48 overflow-x-hidden rounded-lg flex gap-8 justify-start items-start cursor-pointer"
+              className="w-24 h-10 lg:w-48 overflow-x-hidden rounded-lg flex gap-8 justify-start items-center cursor-pointer"
             >
               <img
                 src={logo}
@@ -261,36 +257,6 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
 
           {/* Right Section - Desktop */}
           <div className="hidden lg:flex items-center pl-10 gap-12">
-            <div className="flex items-center gap-3">
-              {!isLoggedIn && (
-                <>
-                  <div className="p-4 px-0 whitespace-nowrap">
-                    <a
-                      href="https://wonohostfe.vercel.app"
-                      className="relative pb-1 transition-all cursor-pointer duration-300 group bg-transparent border-none text-sm text-primary-blue"
-                    >
-                      Login as Business
-                      <span className="absolute left-0 w-0 bottom-0 block h-[2px] bg-black transition-all duration-300 group-hover:w-full"></span>
-                    </a>
-                  </div>
-                  {/* <button
-                                    type="button"
-                                    onClick={() => navigate(`/ai-signup${location.search}`)}
-                                    className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-black transition hover:border-black/20 hover:bg-black/5 min-w-48"
-                                >
-                                    Sign up as Nomad
-                                </button> */}
-                </>
-              )}
-              {/* <button
-                type="button"
-                onClick={() => navigate(`/host/ai-host-signup?step=1`)}
-                className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm text-black transition hover:border-black/20 hover:bg-black/5 min-w-48"
-              >
-                Sign up as Business
-              </button> */}
-            </div>
-
             <li className="flex items-center gap-6">
               {showNewsBlogLinks && (
                 <ul>
@@ -322,10 +288,11 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
               )}
               <div className="p-4 px-0 whitespace-nowrap">
                 <button
-                  onClick={goToHosts}
+                  type="button"
+                  onClick={goToBusinessLogin}
                   className="relative pb-1 transition-all cursor-pointer duration-300 group bg-transparent border-none text-sm text-primary-blue"
                 >
-                  Become A Nomad
+                  Login as Business
                   <span className="absolute left-0 w-0 bottom-0 block h-[2px] bg-black transition-all duration-300 group-hover:w-full"></span>
                 </button>
               </div>
@@ -466,13 +433,13 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
                 <li className="items-center text-center">
                   <div
                     onClick={() => {
-                      goToHosts();
+                      goToBusinessLogin();
                       setOpen(false);
                     }}
                     className="py-4 cursor-pointer"
                   >
                     <p className="text-secondary-dark text-lg">
-                      Become A Nomad
+                      Login as Business
                     </p>
                   </div>
                   <div className="h-[0.2px] bg-gray-300"></div>
