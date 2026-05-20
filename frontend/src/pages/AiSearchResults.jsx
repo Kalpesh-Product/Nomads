@@ -1672,19 +1672,21 @@ const AiSearchResults = () => {
                             {resultsHeadingLastLine ||
                               highlightedResultsHeadingRemainingLines}
                           </span>
-                          <div className="w-full lg:w-[15.5rem] xl:w-[17rem]">
-                            <DropdownBadge
-                              label="Visa Requirement"
-                              options={visaRequirementOptions}
-                              selectedValue={selectedVisaRequirement}
-                              isOpen={openDropdown === "visaRequirement"}
-                              onToggle={() =>
-                                handleDropdownToggle("visaRequirement")
-                              }
-                              onSelect={handleVisaRequirementSelect}
-                              size="small"
-                            />
-                          </div>
+                          {shouldShowResultsContent && (
+                            <div className="w-full lg:w-[15.5rem] xl:w-[17rem]">
+                              <DropdownBadge
+                                label="Visa Requirement"
+                                options={visaRequirementOptions}
+                                selectedValue={selectedVisaRequirement}
+                                isOpen={openDropdown === "visaRequirement"}
+                                onToggle={() =>
+                                  handleDropdownToggle("visaRequirement")
+                                }
+                                onSelect={handleVisaRequirementSelect}
+                                size="small"
+                              />
+                            </div>
+                          )}
                         </div>
                       </div>
                     </>
