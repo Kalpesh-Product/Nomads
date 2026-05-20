@@ -1668,10 +1668,13 @@ const AiSearchResults = () => {
                           </span>
                         )}
                         <div className="mt-3 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between lg:gap-6">
-                          <span className="block font-medium">
-                            {resultsHeadingLastLine ||
-                              highlightedResultsHeadingRemainingLines}
-                          </span>
+                          {(resultsHeadingLastLine ||
+                            !resultsHeadingBodyLines) && (
+                            <span className="block font-medium">
+                              {resultsHeadingLastLine ||
+                                highlightedResultsHeadingRemainingLines}
+                            </span>
+                          )}
                           {shouldShowResultsContent && (
                             <div className="w-full lg:w-[15.5rem] xl:w-[17rem]">
                               <DropdownBadge
