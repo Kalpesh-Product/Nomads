@@ -41,9 +41,15 @@ const visaRequirementOptions = [
   "Traditional Visa",
   "E Visa",
   "Visa on Arrival",
-  "Nomad Visa",
   "Visa Free",
 ];
+
+const visaRequirementApiValueMap = {
+  "Traditional Visa": "visa required",
+  "E Visa": "e-visa",
+  "Visa on Arrival": "visa on arrival",
+  "Visa Free": "visa free",
+};
 
 const DEFAULT_PASSPORT_COUNTRY = "India";
 
@@ -772,6 +778,7 @@ const DropdownBadge = ({
   return (
     <div
       className={`relative min-w-0 ${isSmall ? "w-full sm:flex-1" : "w-full flex-1"}`}
+      onClick={(event) => event.stopPropagation()}
     >
       <button
         type="button"
@@ -913,8 +920,7 @@ const AiSearchResults = () => {
     DEFAULT_PASSPORT_COUNTRY;
 
   const [apiDestinations, setApiDestinations] = useState([]);
-  const [visaRuleDestinationKeys, setVisaRuleDestinationKeys] =
-    useState(null);
+  const [visaRuleDestinationKeys, setVisaRuleDestinationKeys] = useState(null);
 
   const destinationLookup = useMemo(() => {
     const map = new Map();
@@ -970,7 +976,12 @@ const AiSearchResults = () => {
           leftBadgeLabel: leftBadgeValueFromLabel || leftBadgeValueFromField,
         };
       });
-  }, [apiDestinations, selectedGoal, selectedGoalOption, visaRuleDestinationKeys]);
+  }, [
+    apiDestinations,
+    selectedGoal,
+    selectedGoalOption,
+    visaRuleDestinationKeys,
+  ]);
 
   useEffect(() => {
     if (!isVisaRequirementFilterActive(selectedVisaRequirement)) {
@@ -986,7 +997,7 @@ const AiSearchResults = () => {
         const response = await axios.get("/visa-rules", {
           params: {
             passportCountry,
-            requirement: selectedVisaRequirement,
+            requirement: visaRequirementApiValueMap[selectedVisaRequirement],
           },
           signal: controller.signal,
         });
@@ -1407,10 +1418,10 @@ const AiSearchResults = () => {
       }
     };
 
-    document.addEventListener("mousedown", handleOutsideClick);
+    document.addEventListener("click", handleOutsideClick);
 
     return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("click", handleOutsideClick);
     };
   }, []);
 
