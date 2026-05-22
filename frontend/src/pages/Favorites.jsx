@@ -1,17 +1,20 @@
-import React, { useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
-import ListingCard from "../components/ListingCard";
-import Container from "../components/Container";
-import useAuth from "../hooks/useAuth";
+import React, { useEffect, useMemo } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AiFillHeart } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 
-const Favorites = () => {
+import Container from "../components/Container";
+import ListingCard from "../components/ListingCard";
+import useAuth from "../hooks/useAuth";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import { showErrorAlert } from "../utils/alerts";
+
+const Favorites = ({ showDestinationFavorites = false }) => {
   const { auth } = useAuth();
   const userId = auth?.user?._id || auth?.user?.id;
   const navigate = useNavigate();
-  const axiosPrivate = useAxiosPrivate(); // ✅ consistent with Profile.jsx
+  const axiosPrivate = useAxiosPrivate();
+  const queryClient = useQueryClient();
 
   const {
     data: likedListings = [],
@@ -27,19 +30,121 @@ const Favorites = () => {
       return Array.isArray(res.data) ? res.data : [];
     },
     enabled: !!userId,
-    staleTime: 1000 * 60 * 2, // 2 min cache (optional for performance)
-    refetchOnMount: "always", // ✅ forces refetch on every mount
+    staleTime: 1000 * 60 * 2,
+    refetchOnMount: "always",
+  });
+
+  const {
+    data: favoriteDestinations = [],
+    isLoading: isDestinationLoading,
+    isError: isDestinationError,
+    error: destinationError,
+    refetch: refetchDestinations,
+  } = useQuery({
+    queryKey: ["favoriteDestinations", userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      const res = await axiosPrivate.get(`/user/favorite-destination/${userId}`);
+      return Array.isArray(res.data) ? res.data : [];
+    },
+    enabled: !!userId && showDestinationFavorites,
+    staleTime: 1000 * 60 * 2,
+    refetchOnMount: "always",
   });
 
   useEffect(() => {
-    refetch(); // ✅ refresh favorites whenever this component mounts
+    refetch();
   }, [refetch]);
+
+  useEffect(() => {
+    if (showDestinationFavorites) {
+      refetchDestinations();
+    }
+  }, [refetchDestinations, showDestinationFavorites]);
+
+  const { mutate: toggleFavoriteDestination } = useMutation({
+    mutationFn: async ({ destinationId, isFavorited }) => {
+      const response = await axiosPrivate.patch("/user/favorite-destination", {
+        destinationId,
+        isFavorited,
+      });
+      return response.data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.setQueryData(
+        ["favoriteDestinations", userId],
+        (previous = []) => {
+          if (!Array.isArray(previous)) {
+            return previous;
+          }
+
+          return variables.isFavorited
+            ? previous
+            : previous.filter(
+                (destination) => destination?._id !== variables.destinationId,
+              );
+        },
+      );
+      refetchDestinations();
+    },
+    onError: (error) => {
+      showErrorAlert(
+        error?.response?.data?.message ||
+          "Failed to update favorite destination.",
+      );
+    },
+  });
+
+  const favoriteDestinationCards = useMemo(
+    () =>
+      favoriteDestinations.map((destination) => {
+        const imageFromMap =
+          destination?.images && typeof destination.images === "object"
+            ? Object.values(destination.images)
+                .map((image) =>
+                  typeof image === "string"
+                    ? image
+                    : image?.url || image?.imageUrl,
+                )
+                .filter(Boolean)
+            : [];
+        const imageUrls = Array.isArray(destination?.imageUrls)
+          ? destination.imageUrls.filter(Boolean)
+          : [];
+        const directImageUrl =
+          typeof destination?.imageUrl === "string" &&
+          destination.imageUrl.trim()
+            ? destination.imageUrl.trim()
+            : "";
+        const availableImages = imageFromMap.length ? imageFromMap : imageUrls;
+        const destinationImage = availableImages.length
+          ? availableImages[Math.floor(Math.random() * availableImages.length)]
+          : directImageUrl;
+
+        return {
+          ...destination,
+          destinationImage,
+        };
+      }),
+    [favoriteDestinations],
+  );
 
   if (isError) {
     return (
       <Container padding={false}>
-        <div className="py-8 min-h-screen text-center text-red-500">
+        <div className="min-h-screen py-8 text-center text-red-500">
           {error?.response?.data?.message || "Failed to load favorites."}
+        </div>
+      </Container>
+    );
+  }
+
+  if (isDestinationError) {
+    return (
+      <Container padding={false}>
+        <div className="min-h-screen py-8 text-center text-red-500">
+          {destinationError?.response?.data?.message ||
+            "Failed to load favorite destinations."}
         </div>
       </Container>
     );
@@ -47,11 +152,10 @@ const Favorites = () => {
 
   return (
     <Container padding={false}>
-      <div className="p-6 min-h-screen bg-white rounded-xl ">
-        <h1 className="text-xl font-semibold mb-6 text-secondary-dark">
-          {/* My Favorites ❤️ */}
+      <div className="min-h-screen rounded-xl bg-white p-6">
+        <h1 className="mb-6 text-xl font-semibold text-secondary-dark">
           <span className="flex gap-2">
-            <span>My Favorites </span>
+            <span>My Favorites</span>
             <span>
               <AiFillHeart className="text-[#ff5757]" size={24} />
             </span>
@@ -61,30 +165,115 @@ const Favorites = () => {
         {isLoading ? (
           <div className="text-center text-gray-500">Loading...</div>
         ) : likedListings.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
             {likedListings.map((item) => (
               <ListingCard
                 key={item._id}
-                item={{ ...item, isLiked: true }} // ✅ mark as liked
-                showVertical={true}
+                item={{ ...item, isLiked: true }}
+                showVertical
                 handleNavigation={() =>
-                  navigate(
-                    `/listings/${encodeURIComponent(item.companyName)}`,
-                    {
-                      state: {
-                        companyId: item.companyId,
-                        type: item.companyType,
-                      },
-                    }
-                  )
+                  navigate(`/listings/${encodeURIComponent(item.companyName)}`, {
+                    state: {
+                      companyId: item.companyId,
+                      type: item.companyType,
+                    },
+                  })
                 }
               />
             ))}
           </div>
         ) : (
-          <div className="text-center text-gray-500 border border-dotted rounded-lg p-6">
-            You haven’t liked any listings yet.
+          <div className="rounded-lg border border-dotted p-6 text-center text-gray-500">
+            You haven't liked any listings yet.
           </div>
+        )}
+
+        {showDestinationFavorites && (
+          <>
+            <hr className="my-10 border-gray-200" />
+            <div>
+              <h2 className="mb-6 text-lg font-semibold text-secondary-dark">
+                Favorite Destinations
+              </h2>
+
+              {isDestinationLoading ? (
+                <div className="text-center text-gray-500">Loading...</div>
+              ) : favoriteDestinationCards.length > 0 ? (
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                  {favoriteDestinationCards.map((destination) => {
+                    return (
+                      <article
+                        key={destination._id}
+                        className="overflow-hidden rounded-2xl bg-white text-left transition-all hover:-translate-y-1"
+                        onClick={() =>
+                          navigate(
+                            `/ai-verticals?country=${encodeURIComponent(
+                              (destination.country || "").toLowerCase(),
+                            )}&state=${encodeURIComponent(
+                              (destination.state || "").toLowerCase(),
+                            )}`,
+                          )
+                        }
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            navigate(
+                              `/ai-verticals?country=${encodeURIComponent(
+                                (destination.country || "").toLowerCase(),
+                              )}&state=${encodeURIComponent(
+                                (destination.state || "").toLowerCase(),
+                              )}`,
+                            );
+                          }
+                        }}
+                        role="button"
+                        tabIndex={0}
+                      >
+                        <div className="relative aspect-square overflow-hidden rounded-2xl">
+                          <img
+                            src={
+                              destination.destinationImage ||
+                              "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp"
+                            }
+                            alt={`${destination.state}, ${destination.country}`}
+                            className="h-full w-full object-cover"
+                            loading="lazy"
+                          />
+                          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                          <button
+                            type="button"
+                            className="absolute right-3 top-3 z-20 cursor-pointer"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              event.preventDefault();
+                              toggleFavoriteDestination({
+                                destinationId: destination._id,
+                                isFavorited: false,
+                              });
+                            }}
+                          >
+                            <AiFillHeart className="text-[#ff5757]" size={22} />
+                          </button>
+                          <div className="pointer-events-none absolute inset-x-4 bottom-4 text-white">
+                            <p className="text-lg font-semibold uppercase tracking-wide">
+                              {destination.state || "Unknown"}
+                            </p>
+                            <p className="text-sm font-medium text-white/85">
+                              {destination.country || "Unknown"}
+                            </p>
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="rounded-lg border border-dotted p-6 text-center text-gray-500">
+                  You haven't liked any destinations yet.
+                </div>
+              )}
+            </div>
+          </>
         )}
       </div>
     </Container>

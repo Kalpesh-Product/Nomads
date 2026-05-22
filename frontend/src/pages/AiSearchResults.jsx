@@ -19,6 +19,8 @@ import { aiDestinationCards } from "../constants/aiDestinationCards";
 
 import axios from "../utils/axios";
 import useAuth from "../hooks/useAuth";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import { showErrorAlert } from "../utils/alerts";
 
 import {
   defaultGoal,
@@ -55,7 +57,7 @@ const DEFAULT_PASSPORT_COUNTRY = "India";
 
 const destinationCards = aiDestinationCards;
 const getDestinationFavoriteKey = (destination) =>
-  `${destination.city}-${destination.country}`;
+  destination?._id || `${destination.city}-${destination.country}`;
 
 const goalOptionToApiAttributeMap = {
   "Best for Nomads": "bestForNomads",
@@ -855,6 +857,7 @@ const AiSearchResults = () => {
   const location = useLocation();
   const { goal, loc, attr } = useParams();
   const { auth } = useAuth();
+  const axiosPrivate = useAxiosPrivate();
   const { state } = location;
   const requestedGoalFromUrl = goal ? goalNameBySlug[goal.toLowerCase()] : null;
   const requestedGoal = state?.selectedGoal || requestedGoalFromUrl;
@@ -918,6 +921,7 @@ const AiSearchResults = () => {
     auth?.user?.country ||
     auth?.user?.countryOfResidence ||
     DEFAULT_PASSPORT_COUNTRY;
+  const userId = auth?.user?._id || auth?.user?.id;
 
   const [apiDestinations, setApiDestinations] = useState([]);
   const [visaRuleDestinationKeys, setVisaRuleDestinationKeys] = useState(null);
@@ -1065,6 +1069,47 @@ const AiSearchResults = () => {
   }, [passportCountry, selectedVisaRequirement]);
 
   useEffect(() => {
+    if (!userId) {
+      setLikedDestinations([]);
+      return;
+    }
+
+    let isMounted = true;
+
+    const fetchFavoriteDestinations = async () => {
+      try {
+        const response = await axiosPrivate.get(
+          `/user/favorite-destination/${userId}`,
+        );
+
+        if (!isMounted) {
+          return;
+        }
+
+        const favoriteIds =
+          response?.data
+            ?.map((destination) => destination?._id)
+            .filter(Boolean) || [];
+
+        setLikedDestinations(favoriteIds);
+      } catch (error) {
+        if (isMounted) {
+          showErrorAlert(
+            error?.response?.data?.message ||
+              "Failed to load favorite destinations.",
+          );
+        }
+      }
+    };
+
+    fetchFavoriteDestinations();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [axiosPrivate, userId]);
+
+  useEffect(() => {
     if (!hasSelectedFilters) {
       setApiDestinations([]);
       setIsDestinationsLoading(false);
@@ -1113,6 +1158,7 @@ const AiSearchResults = () => {
 
           return {
             ...(existingDestination || {}),
+            _id: item?._id,
             city: existingDestination?.city || rawState,
             displayCity: existingDestination?.displayCity || rawState,
             routeCity: existingDestination?.routeCity || rawState,
@@ -1242,13 +1288,47 @@ const AiSearchResults = () => {
   };
   const toggleDestinationLike = useCallback((destination) => {
     const destinationKey = getDestinationFavoriteKey(destination);
+    const destinationId = destination?._id;
 
-    setLikedDestinations((previousLikes) =>
-      previousLikes.includes(destinationKey)
-        ? previousLikes.filter((key) => key !== destinationKey)
-        : [...previousLikes, destinationKey],
-    );
-  }, []);
+    if (!userId) {
+      navigate("/ai-login", {
+        state: {
+          redirectTo: `${location.pathname}${location.search}`,
+          loginContext: {
+            title: "Save destination favorites",
+            description:
+              "Login to save your favorite destinations and continue from this results page.",
+          },
+        },
+      });
+      return;
+    }
+
+    if (!destinationId) {
+      showErrorAlert("This destination cannot be favorited yet.");
+      return;
+    }
+
+    const isCurrentlyLiked = likedDestinations.includes(destinationKey);
+    const nextLikedDestinations = isCurrentlyLiked
+      ? likedDestinations.filter((key) => key !== destinationKey)
+      : [...likedDestinations, destinationKey];
+
+    setLikedDestinations(nextLikedDestinations);
+
+    axiosPrivate
+      .patch("/user/favorite-destination", {
+        destinationId,
+        isFavorited: !isCurrentlyLiked,
+      })
+      .catch((error) => {
+        setLikedDestinations(likedDestinations);
+        showErrorAlert(
+          error?.response?.data?.message ||
+            "Failed to update favorite destination.",
+        );
+      });
+  }, [axiosPrivate, likedDestinations, location.pathname, location.search, navigate, userId]);
 
   const handleDropdownToggle = (dropdownKey) => {
     setOpenDropdown((currentDropdown) =>
@@ -1877,9 +1957,10 @@ const AiSearchResults = () => {
 
                             <button
                               type="button"
-                              className="absolute right-3 top-3 z-20 cursor-pointer md:right-4 md:top-4"
+                              className="absolute right-3 top-3 z-30 cursor-pointer touch-manipulation md:right-4 md:top-4"
                               onClick={(event) => {
                                 event.stopPropagation();
+                                event.preventDefault();
                                 toggleDestinationLike(destination);
                               }}
                             >
@@ -1902,7 +1983,7 @@ const AiSearchResults = () => {
                               </p>
                             </div>
 
-                            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-center p-3 md:p-4">
+                            <div className="pointer-events-none absolute inset-0 bg-black/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-center p-3 md:p-4">
                               <div className="translate-y-4 group-hover:translate-y-0 transition-all duration-300">
                                 <div className="mb-0 border-b border-white/30 pb-0">
                                   <h4 className="-translate-y-2 text-white text-base md:text-[0.89rem] font-semibold uppercase tracking-wide text-center">

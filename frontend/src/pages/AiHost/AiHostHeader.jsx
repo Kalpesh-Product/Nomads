@@ -108,6 +108,14 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
     window.location.href = "https://wonohostfe.vercel.app";
   };
 
+  const goToHosts = () => {
+    if (window.location.hostname.includes("localhost")) {
+      window.location.href = "http://nomad.localhost:5173/home";
+    } else {
+      window.location.href = "https://nomad.wono.co/home";
+    }
+  };
+
   const goToHostssMain = () => {
     if (window.location.hostname.includes("localhost")) {
       window.location.href = "http://nomad.localhost:5173/host";
@@ -296,6 +304,16 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
                   <span className="absolute left-0 w-0 bottom-0 block h-[2px] bg-black transition-all duration-300 group-hover:w-full"></span>
                 </button>
               </div>
+              <div className="p-4 px-0 whitespace-nowrap">
+                <button
+                  type="button"
+                  onClick={goToHosts}
+                  className="relative pb-1 transition-all cursor-pointer duration-300 group bg-transparent border-none text-sm text-primary-blue"
+                >
+                  Become A Nomad
+                  <span className="absolute left-0 w-0 bottom-0 block h-[2px] bg-black transition-all duration-300 group-hover:w-full"></span>
+                </button>
+              </div>
             </li>
 
             {/* {isLoggedIn && (
@@ -440,6 +458,21 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
                   >
                     <p className="text-secondary-dark text-lg">
                       Login as Business
+                    </p>
+                  </div>
+                  <div className="h-[0.2px] bg-gray-300"></div>
+                </li>
+
+                <li className="items-center text-center">
+                  <div
+                    onClick={() => {
+                      goToHosts();
+                      setOpen(false);
+                    }}
+                    className="py-4 cursor-pointer"
+                  >
+                    <p className="text-secondary-dark text-lg">
+                      Become A Nomad
                     </p>
                   </div>
                   <div className="h-[0.2px] bg-gray-300"></div>
