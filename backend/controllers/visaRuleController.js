@@ -65,6 +65,9 @@ export const normalizeVisaRequirement = (value = "") => {
   return VISA_REQUIREMENT_LABELS[normalized] || normalized;
 };
 
+const escapeRegExp = (value = "") =>
+  String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 const normalizeRow = (row = {}) =>
   Object.fromEntries(
     Object.entries(row).map(([key, value]) => [
@@ -390,8 +393,22 @@ export const updateVisaRuleByPassport = async (req, res, next) => {
 
     const updatedRule = await VisaRule.findOneAndUpdate(
       {
-        normalizedPassport,
-        normalizedDestination,
+        $and: [
+          {
+            $or: [
+              { normalizedPassport },
+              { passport: new RegExp(`^${escapeRegExp(passport)}$`, "i") },
+            ],
+          },
+          {
+            $or: [
+              { normalizedDestination },
+              {
+                destination: new RegExp(`^${escapeRegExp(destination)}$`, "i"),
+              },
+            ],
+          },
+        ],
       },
       { $set: updates },
       { new: true, runValidators: true },
