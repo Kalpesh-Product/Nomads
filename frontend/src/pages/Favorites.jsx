@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AiFillHeart } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
@@ -9,12 +9,19 @@ import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { showErrorAlert } from "../utils/alerts";
 
-const Favorites = ({ showDestinationFavorites = false }) => {
+const INITIAL_PREVIEW_COUNT = 4;
+
+const Favorites = ({
+  showDestinationFavorites = false,
+  useAiListingsRoute = false,
+}) => {
   const { auth } = useAuth();
   const userId = auth?.user?._id || auth?.user?.id;
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
   const queryClient = useQueryClient();
+  const [showAllListings, setShowAllListings] = useState(false);
+  const [showAllDestinations, setShowAllDestinations] = useState(false);
 
   const {
     data: likedListings = [],
@@ -129,6 +136,13 @@ const Favorites = ({ showDestinationFavorites = false }) => {
     [favoriteDestinations],
   );
 
+  const visibleListings = showAllListings
+    ? likedListings
+    : likedListings.slice(0, INITIAL_PREVIEW_COUNT);
+  const visibleDestinations = showAllDestinations
+    ? favoriteDestinationCards
+    : favoriteDestinationCards.slice(0, INITIAL_PREVIEW_COUNT);
+
   if (isError) {
     return (
       <Container padding={false}>
@@ -153,54 +167,21 @@ const Favorites = ({ showDestinationFavorites = false }) => {
   return (
     <Container padding={false}>
       <div className="min-h-screen rounded-xl bg-white p-6">
-        <h1 className="mb-6 text-xl font-semibold text-secondary-dark">
-          <span className="flex gap-2">
-            <span>My Favorites</span>
-            <span>
-              <AiFillHeart className="text-[#ff5757]" size={24} />
-            </span>
-          </span>
-        </h1>
-
-        {isLoading ? (
-          <div className="text-center text-gray-500">Loading...</div>
-        ) : likedListings.length > 0 ? (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
-            {likedListings.map((item) => (
-              <ListingCard
-                key={item._id}
-                item={{ ...item, isLiked: true }}
-                showVertical
-                handleNavigation={() =>
-                  navigate(`/listings/${encodeURIComponent(item.companyName)}`, {
-                    state: {
-                      companyId: item.companyId,
-                      type: item.companyType,
-                    },
-                  })
-                }
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="rounded-lg border border-dotted p-6 text-center text-gray-500">
-            You haven't liked any listings yet.
-          </div>
-        )}
+      
 
         {showDestinationFavorites && (
           <>
-            <hr className="my-10 border-gray-200" />
             <div>
-              <h2 className="mb-6 text-lg font-semibold text-secondary-dark">
-                Favorite Destinations
+              <h2 className="mb-6 flex items-center gap-2 text-lg font-semibold text-secondary-dark">
+                <span>Favorite Destinations</span>
+                    <AiFillHeart className="text-[#ff5757]" size={24} />
               </h2>
 
               {isDestinationLoading ? (
                 <div className="text-center text-gray-500">Loading...</div>
-              ) : favoriteDestinationCards.length > 0 ? (
+              ) : visibleDestinations.length > 0 ? (
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                  {favoriteDestinationCards.map((destination) => {
+                  {visibleDestinations.map((destination) => {
                     return (
                       <article
                         key={destination._id}
@@ -272,9 +253,75 @@ const Favorites = ({ showDestinationFavorites = false }) => {
                   You haven't liked any destinations yet.
                 </div>
               )}
+
+              {favoriteDestinationCards.length > INITIAL_PREVIEW_COUNT && (
+                <div className="mt-6 flex justify-end">
+                  <button
+                    type="button"
+                    className="text-sm font-semibold text-black"
+                    onClick={() =>
+                      setShowAllDestinations((previous) => !previous)
+                    }
+                  >
+                    {showAllDestinations ? "Show less" : "View more →"}
+                  </button>
+                </div>
+              )}
             </div>
+
+            <hr className="my-10 border-gray-200" />
           </>
         )}
+
+        <div>
+          <h2 className="mb-6 flex items-center gap-2 text-lg font-semibold text-secondary-dark">
+            <span>My Favorites</span>
+            <AiFillHeart className="text-[#ff5757]" size={24} />
+          </h2>
+
+          {isLoading ? (
+            <div className="text-center text-gray-500">Loading...</div>
+          ) : visibleListings.length > 0 ? (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {visibleListings.map((item) => (
+                <ListingCard
+                  key={item._id}
+                  item={{ ...item, isLiked: true }}
+                  showVertical
+                  handleNavigation={() =>
+                    navigate(
+                      `${
+                        useAiListingsRoute ? "/ai-listings" : "/listings"
+                      }/${encodeURIComponent(item.companyName)}`,
+                      {
+                        state: {
+                          companyId: item.companyId,
+                          type: item.companyType,
+                        },
+                      },
+                    )
+                  }
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-lg border border-dotted p-6 text-center text-gray-500">
+              You haven't liked any listings yet.
+            </div>
+          )}
+
+          {likedListings.length > INITIAL_PREVIEW_COUNT && (
+            <div className="mt-6 flex justify-end">
+              <button
+                type="button"
+                className="text-sm font-semibold text-black"
+                onClick={() => setShowAllListings((previous) => !previous)}
+              >
+                {showAllListings ? "Show less" : "View more →"}
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </Container>
   );
