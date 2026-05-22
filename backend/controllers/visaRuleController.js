@@ -68,7 +68,9 @@ export const normalizeVisaRequirement = (value = "") => {
 const normalizeRow = (row = {}) =>
   Object.fromEntries(
     Object.entries(row).map(([key, value]) => [
-      String(key || "").replace(/\uFEFF/g, "").trim(),
+      String(key || "")
+        .replace(/\uFEFF/g, "")
+        .trim(),
       typeof value === "string" ? value.trim() : value,
     ]),
   );
@@ -254,32 +256,159 @@ export const getVisaRules = async (req, res, next) => {
     }
     if (requirement) query.requirement = requirement;
 
-    const data = (await VisaRule.find(query)
-      .sort({ passport: 1, destination: 1 })
-      .lean()).filter((rule) => {
-        if (
-          passportCountry &&
-          (rule.normalizedPassport || normalizeCountryKey(rule.passport)) !==
-            normalizeCountryKey(passportCountry)
-        ) {
-          return false;
-        }
+    const data = (
+      await VisaRule.find(query).sort({ passport: 1, destination: 1 }).lean()
+    ).filter((rule) => {
+      if (
+        passportCountry &&
+        (rule.normalizedPassport || normalizeCountryKey(rule.passport)) !==
+          normalizeCountryKey(passportCountry)
+      ) {
+        return false;
+      }
 
-        if (
-          destinationCountry &&
-          (rule.normalizedDestination || normalizeCountryKey(rule.destination)) !==
-            normalizeCountryKey(destinationCountry)
-        ) {
-          return false;
-        }
+      if (
+        destinationCountry &&
+        (rule.normalizedDestination ||
+          normalizeCountryKey(rule.destination)) !==
+          normalizeCountryKey(destinationCountry)
+      ) {
+        return false;
+      }
 
-        return true;
-      });
+      return true;
+    });
 
     return res.status(200).json({
       success: true,
       count: data.length,
       data,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getVisaRuleDetailsByPassport = async (req, res, next) => {
+  try {
+    const passport = String(req.params.passport || "").trim();
+
+    if (!passport) {
+      return res.status(400).json({
+        success: false,
+        message: "passport is required in route params.",
+      });
+    }
+
+    const normalizedPassport = normalizeCountryKey(passport);
+
+    const data = await VisaRule.find({
+      $or: [{ passport }, { normalizedPassport }],
+    })
+      .sort({ destination: 1 })
+      .lean();
+
+    const filteredData = data.filter(
+      (rule) =>
+        (rule.normalizedPassport || normalizeCountryKey(rule.passport)) ===
+        normalizedPassport,
+    );
+
+    return res.status(200).json({
+      success: true,
+      count: filteredData.length,
+      data: filteredData,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateVisaRuleByPassport = async (req, res, next) => {
+  try {
+    const passport = String(req.params.passport || "").trim();
+
+    if (!passport) {
+      return res.status(400).json({
+        success: false,
+        message: "passport is required in route params.",
+      });
+    }
+
+    const destination = String(req.body.destination || "").trim();
+    if (!destination) {
+      return res.status(400).json({
+        success: false,
+        message: "destination is required in request body.",
+      });
+    }
+
+    const updates = {};
+
+    if (Object.prototype.hasOwnProperty.call(req.body, "requirement")) {
+      updates.requirement = normalizeVisaRequirement(req.body.requirement);
+    }
+
+    if (Object.prototype.hasOwnProperty.call(req.body, "durationDays")) {
+      const rawDuration = req.body.durationDays;
+      if (rawDuration === null || rawDuration === "") {
+        updates.durationDays = null;
+      } else {
+        const parsed = Number(rawDuration);
+        if (!Number.isFinite(parsed)) {
+          return res.status(400).json({
+            success: false,
+            message: "durationDays must be a valid number or null.",
+          });
+        }
+        updates.durationDays = parsed;
+      }
+    }
+
+    if (Object.prototype.hasOwnProperty.call(req.body, "newDestination")) {
+      const newDestination = String(req.body.newDestination || "").trim();
+      if (!newDestination) {
+        return res.status(400).json({
+          success: false,
+          message: "newDestination cannot be empty.",
+        });
+      }
+      updates.destination = newDestination;
+      updates.normalizedDestination = normalizeCountryKey(newDestination);
+    }
+
+    if (!Object.keys(updates).length) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Provide at least one editable field (requirement, durationDays, newDestination).",
+      });
+    }
+
+    const normalizedPassport = normalizeCountryKey(passport);
+    const normalizedDestination = normalizeCountryKey(destination);
+
+    const updatedRule = await VisaRule.findOneAndUpdate(
+      {
+        normalizedPassport,
+        normalizedDestination,
+      },
+      { $set: updates },
+      { new: true, runValidators: true },
+    ).lean();
+
+    if (!updatedRule) {
+      return res.status(404).json({
+        success: false,
+        message:
+          "Visa rule not found for the provided passport and destination.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Visa rule updated successfully.",
+      data: updatedRule,
     });
   } catch (error) {
     next(error);
