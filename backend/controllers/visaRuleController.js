@@ -292,6 +292,56 @@ export const getVisaRules = async (req, res, next) => {
   }
 };
 
+export const getUniqueDestinationCountries = async (req, res, next) => {
+  try {
+    const destinationCountries = await VisaRule.aggregate([
+      {
+        $project: {
+          destination: 1,
+          normalizedKey: {
+            $toLower: {
+              $trim: {
+                input: {
+                  $ifNull: ["$normalizedDestination", "$destination"],
+                },
+              },
+            },
+          },
+        },
+      },
+      {
+        $match: {
+          destination: { $type: "string", $ne: "" },
+          normalizedKey: { $ne: "" },
+        },
+      },
+      {
+        $group: {
+          _id: "$normalizedKey",
+          destination: { $first: "$destination" },
+        },
+      },
+      { $sort: { destination: 1 } },
+      {
+        $project: {
+          _id: 0,
+          destination: 1,
+        },
+      },
+    ]);
+
+    const countries = destinationCountries.map((item) => item.destination);
+
+    return res.status(200).json({
+      success: true,
+      count: countries.length,
+      countries,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getVisaRuleDetailsByPassport = async (req, res, next) => {
   try {
     const passport = String(req.params.passport || "").trim();
