@@ -68,6 +68,12 @@ const userSchema = new mongoose.Schema(
         ref: "Company",
       },
     ],
+    favoriteDestination: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "StateWiseWeight",
+      },
+    ],
     refreshToken: {
       type: String,
     },

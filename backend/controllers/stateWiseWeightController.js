@@ -373,6 +373,7 @@ export const getStateWiseWeight = async (req, res, next) => {
           : "";
 
       return [{
+        _id: item._id,
         state: item.state,
         country: item.country,
         isActive: item.isActive,

@@ -2,12 +2,16 @@ import { Router } from "express";
 import upload from "../config/multerConfig.js";
 import {
   getVisaRules,
+  getVisaRuleDetailsByPassport,
   importVisaRulesCsv,
+  updateVisaRuleByPassport,
 } from "../controllers/visaRuleController.js";
 
 const router = Router();
 
 router.get("/", getVisaRules);
+router.get("/passport/:passport", getVisaRuleDetailsByPassport);
+router.patch("/passport/:passport", updateVisaRuleByPassport);
 router.post(
   "/import-csv",
   upload.fields([
