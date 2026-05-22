@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
 import StateWiseWeight from "../models/StateWiseWeight.js";
+import VisaRule from "../models/VisaRule.js";
 import { stateWiseWeightCalculation } from "../controllers/stateWiseWeightCalculation.js";
+import {
+  normalizeCountryKey,
+  normalizeVisaRequirement,
+} from "../controllers/visaRuleController.js";
 import {
   deleteFileFromS3ByKey,
   deleteFileFromS3ByUrl,
@@ -285,9 +290,19 @@ const buildSelectiveUpdateData = (row = {}) => {
 
 export const getStateWiseWeight = async (req, res, next) => {
   try {
-    const { selectionType, continent, attribute = "bestForNomads" } = req.body;
+    const {
+      selectionType,
+      continent,
+      attribute = "bestForNomads",
+      visaRequirement = "Show All",
+      passportCountry = "India",
+    } = req.body;
 
     let query = {};
+    const normalizedVisaRequirement =
+      normalizeVisaRequirement(visaRequirement);
+    let visaRuleByDestination = new Map();
+    let allowedDestinationKeys = null;
 
     // 1. Resolve effective attribute based on selectionType
     let effectiveAttribute = attribute;
@@ -303,11 +318,42 @@ export const getStateWiseWeight = async (req, res, next) => {
       query.continent = { $regex: new RegExp(`^${continent}$`, "i") };
     }
 
+    if (normalizedVisaRequirement) {
+      const normalizedPassportCountry = normalizeCountryKey(passportCountry);
+      const visaRules = (
+        await VisaRule.find({
+          requirement: normalizedVisaRequirement,
+        }).lean()
+      ).filter(
+        (rule) =>
+          (rule.normalizedPassport || normalizeCountryKey(rule.passport)) ===
+          normalizedPassportCountry,
+      );
+
+      visaRuleByDestination = new Map(
+        visaRules.map((rule) => [
+          rule.normalizedDestination || normalizeCountryKey(rule.destination),
+          rule,
+        ]),
+      );
+      allowedDestinationKeys = new Set(visaRuleByDestination.keys());
+    }
+
     // 3. Fetch state weights based on query
     const stateWeights = await StateWiseWeight.find(query).lean();
 
     // 4. Calculate scores for each state and pick the requested attribute
-    const results = stateWeights.map((item) => {
+    const results = stateWeights.flatMap((item) => {
+      const destinationCountryKey = normalizeCountryKey(item.country);
+
+      if (
+        allowedDestinationKeys &&
+        !allowedDestinationKeys.has(destinationCountryKey)
+      ) {
+        return [];
+      }
+
+      const visaRule = visaRuleByDestination.get(destinationCountryKey);
       const allScores = stateWiseWeightCalculation(item.weight);
       const scoreForSorting = allScores[effectiveAttribute] || 0;
       const imagePayload = mapImagesForResponse(item.images);
@@ -326,7 +372,8 @@ export const getStateWiseWeight = async (req, res, next) => {
           ]
           : "";
 
-      return {
+      return [{
+        _id: item._id,
         state: item.state,
         country: item.country,
         isActive: item.isActive,
@@ -337,7 +384,15 @@ export const getStateWiseWeight = async (req, res, next) => {
         imageUrls: resolvedImageUrls,
         images: resolvedImages,
         labels: item.labels,
-      };
+        visa: visaRule
+          ? {
+            passport: visaRule.passport,
+            destination: visaRule.destination,
+            requirement: visaRule.requirement,
+            durationDays: visaRule.durationDays,
+          }
+          : null,
+      }];
     });
 
     // 5. Sort by the requested attribute score in descending order
@@ -347,6 +402,8 @@ export const getStateWiseWeight = async (req, res, next) => {
       success: true,
       count: results.length,
       selectedAttribute: attribute,
+      selectedVisaRequirement: normalizedVisaRequirement || "show all",
+      passportCountry,
       data: results,
     });
   } catch (error) {

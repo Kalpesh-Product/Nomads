@@ -1,6 +1,51 @@
 import mongoose from "mongoose";
 import NomadUser from "../models/NomadUser.js";
+import StateWiseWeight from "../models/StateWiseWeight.js";
 import bcrypt from "bcrypt";
+
+const normalizeFavoriteDestinationImages = (destination = {}) => {
+  const rawImages =
+    destination.images instanceof Map
+      ? Object.fromEntries(destination.images)
+      : destination.images && typeof destination.images === "object"
+        ? destination.images
+        : {};
+  const images = Object.fromEntries(
+    Object.entries(rawImages).map(([slotKey, image]) => [
+      slotKey,
+      typeof image === "string"
+        ? { url: image, s3Key: "" }
+        : {
+            url: String(image?.url || image?.imageUrl || "").trim(),
+            s3Key: String(image?.s3Key || "").trim(),
+          },
+    ]),
+  );
+
+  const imageUrls = Object.values(images)
+    .map((image) => image?.url)
+    .filter(Boolean);
+
+  const fallbackImageUrls = Array.isArray(destination.imageUrls)
+    ? destination.imageUrls.filter(Boolean)
+    : typeof destination.imageUrl === "string" && destination.imageUrl.trim()
+      ? [destination.imageUrl.trim()]
+      : typeof destination.imagelink === "string" && destination.imagelink.trim()
+        ? [destination.imagelink.trim()]
+        : [];
+
+  const resolvedImageUrls = imageUrls.length ? imageUrls : fallbackImageUrls;
+  const resolvedImageUrl = resolvedImageUrls.length
+    ? resolvedImageUrls[Math.floor(Math.random() * resolvedImageUrls.length)]
+    : "";
+
+  return {
+    ...destination,
+    images,
+    imageUrls: resolvedImageUrls,
+    imageUrl: resolvedImageUrl,
+  };
+};
 
 export const getUsers = async (req, res, next) => {
   try {
@@ -19,6 +64,7 @@ export const getUsers = async (req, res, next) => {
     const users = await NomadUser.find(query).populate([
       { path: "saves", select: "" },
       { path: "likes", select: "" },
+      { path: "favoriteDestination", select: "" },
     ]);
 
     if (!users || !users.length) {
@@ -263,6 +309,91 @@ export const getLikes = async (req, res) => {
   } catch (error) {
     console.error("[getLikes] error:", error);
     return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getUserFavoriteDestinations = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const authenticatedUserId = req.userData?._id?.toString();
+
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid userId" });
+    }
+
+    if (!authenticatedUserId || authenticatedUserId !== userId) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    const user = await NomadUser.findById(userId)
+      .populate({ path: "favoriteDestination" })
+      .lean();
+
+    if (!user || !user.favoriteDestination?.length) {
+      return res.status(200).json([]);
+    }
+
+    return res
+      .status(200)
+      .json(user.favoriteDestination.map(normalizeFavoriteDestinationImages));
+  } catch (error) {
+    console.error("[getUserFavoriteDestinations] error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const favoriteDestinations = async (req, res, next) => {
+  try {
+    const { destinationId, isFavorited } = req.body;
+    const userId = req.userData?._id;
+
+    if (
+      !destinationId ||
+      !userId ||
+      typeof isFavorited !== "boolean" ||
+      !mongoose.Types.ObjectId.isValid(destinationId)
+    ) {
+      return res.status(400).json({ message: "Missing or invalid fields" });
+    }
+
+    const destinationExists = await StateWiseWeight.exists({
+      _id: destinationId,
+    });
+
+    if (!destinationExists) {
+      return res.status(404).json({ message: "Destination not found" });
+    }
+
+    let updatedUser;
+
+    if (isFavorited) {
+      updatedUser = await NomadUser.findByIdAndUpdate(
+        userId,
+        { $addToSet: { favoriteDestination: destinationId } },
+        { new: true },
+      );
+    } else {
+      updatedUser = await NomadUser.findByIdAndUpdate(
+        userId,
+        { $pull: { favoriteDestination: destinationId } },
+        { new: true },
+      );
+    }
+
+    if (!updatedUser) {
+      return res
+        .status(400)
+        .json({ message: "Failed to update favorite destinations" });
+    }
+
+    return res.status(200).json({
+      message: isFavorited
+        ? "Destination added to favorites"
+        : "Destination removed from favorites",
+      favoriteDestination: updatedUser.favoriteDestination,
+    });
+  } catch (error) {
+    next(error);
   }
 };
 
