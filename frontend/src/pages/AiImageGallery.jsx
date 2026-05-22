@@ -1,14 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { ColumnsPhotoAlbum, MasonryPhotoAlbum } from "react-photo-album";
+import { ColumnsPhotoAlbum } from "react-photo-album";
 import "react-photo-album/masonry.css";
 import "react-photo-album/columns.css";
 import { useKeenSlider } from "keen-slider/react";
-import MuiModal from "../components/Modal";
 import TransparentModal from "../components/TransparentModal";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { useDispatch } from "react-redux";
 import { setFormValues } from "../features/locationSlice.js";
+import { ArrowLeft } from "lucide-react";
 
 const AiImageGallery = () => {
   const location = useLocation();
@@ -131,7 +131,7 @@ const AiImageGallery = () => {
       onClick: () => {
         const target = companyParam || companyName;
         if (!target) return;
-        navigate(`/listings/${encodeURIComponent(target)}`);
+        navigate(`/ai-listings/${encodeURIComponent(target)}`);
       },
     },
     { key: "gallery", label: "Gallery", isLink: false },
@@ -160,7 +160,7 @@ const AiImageGallery = () => {
 
     if (isCompanyTypeClick) {
       navigate(
-        `/listings?country=${normalizedCountry || ""}&location=${
+        `/ai-listings-list?country=${normalizedCountry || ""}&location=${
           normalizedLocation || ""
         }&category=${normalizedCategory || ""}`,
       );
@@ -174,10 +174,26 @@ const AiImageGallery = () => {
     );
   };
 
+  const handleBackButtonClick = () => {
+    navigate(-1);
+  };
+
   return (
     <div className="max-w-6xl mx-auto px-4 pb-6 flex flex-col gap-4">
       <div>
-        <p className="text-lg text-gray-500 my-4">
+        <nav
+          aria-label="Breadcrumb"
+          className="my-4 flex items-center text-primary-blue text-[10px] md:text-sm lg:text-base"
+        >
+          <button
+            type="button"
+            onClick={handleBackButtonClick}
+            aria-label="Go back"
+            className="inline-flex items-center justify-center rounded-full border border-primary-blue p-1 text-primary-blue"
+          >
+            <ArrowLeft size={14} />
+          </button>
+          <span className="mx-1 md:mx-2">{">"}</span>
           {breadcrumbItems.map((item, index) => (
             <span key={`${item.label}-${index}`}>
               {item.isLink ? (
@@ -186,21 +202,23 @@ const AiImageGallery = () => {
                   onClick={
                     item.onClick || (() => handleBreadcrumbNavigate(item.key))
                   }
-                  className="text-gray-500 hover:text-gray-700 transition-colors"
+                  className="text-primary-blue hover:text-primary-dark transition-colors"
                 >
                   {item.label}
                 </button>
               ) : (
-                item.label
+                <span className="truncate max-w-[80px] md:max-w-none inline-block align-bottom">
+                  {item.label}
+                </span>
               )}
               {index < breadcrumbItems.length - 1 ? (
-                <span className="mx-2">{">"}</span>
+                <span className="mx-1 md:mx-2">{">"}</span>
               ) : null}
             </span>
           ))}
-        </p>
+        </nav>
         <h1 className="text-title font-semibold text-secondary-dark">
-          {companyName || "Unknown"} Gallery
+          {resolvedCompanyName} Gallery
         </h1>
       </div>
       <ColumnsPhotoAlbum

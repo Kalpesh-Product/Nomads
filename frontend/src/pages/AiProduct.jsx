@@ -252,7 +252,7 @@ const AiProduct = () => {
 
     if (isCompanyTypeClick) {
       navigate(
-        `/ai-listings?country=${normalizedCountry || ""}&location=${normalizedLocation || ""
+        `/ai-listings-list?country=${normalizedCountry || ""}&location=${normalizedLocation || ""
         }&category=${normalizedCategory || ""}`,
       );
       return;
