@@ -2,6 +2,7 @@ import { Router } from "express";
 import upload from "../config/multerConfig.js";
 import {
   getVisaRules,
+  getUniqueDestinationCountries,
   getVisaRuleDetailsByPassport,
   importVisaRulesCsv,
   updateVisaRuleByPassport,
@@ -10,6 +11,7 @@ import {
 const router = Router();
 
 router.get("/", getVisaRules);
+router.get("/destinations/countries", getUniqueDestinationCountries);
 router.get("/passport/:passport", getVisaRuleDetailsByPassport);
 router.patch("/passport/:passport", updateVisaRuleByPassport);
 router.post(
