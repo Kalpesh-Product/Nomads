@@ -16,9 +16,12 @@ import axios from "../../../utils/axios";
 import TempButton from "./TempButton";
 import { useOutletContext } from "react-router-dom";
 import { showErrorAlert, showSuccessAlert } from "../../../utils/alerts";
+import { normalizeVertical } from "../utils/vertical";
 
-const ProductModalContent = ({ product, onClose }) => {
+const ProductModalContent = ({ product, onClose, vertical }) => {
   const [current, setCurrent] = useState(0);
+  const normalizedVertical = normalizeVertical(vertical);
+  const isCafe = normalizedVertical === "cafe";
   const {
     handleSubmit,
     control,
@@ -44,7 +47,7 @@ const ProductModalContent = ({ product, onClose }) => {
     queryKey: ["companyDetails", companyName],
     queryFn: async () =>
       (await axios.get(`company/get-company-data/${companyName}`)).data,
-    enabled: !!companyName,
+    enabled: !!companyName && !isCafe,
   });
 
   const { mutate, isPending: isEnquiry } = useMutation({
@@ -102,6 +105,59 @@ const ProductModalContent = ({ product, onClose }) => {
   const nextSlide = () => setCurrent((p) => (p + 1) % images.length);
   const prevSlide = () =>
     setCurrent((p) => (p - 1 + images.length) % images.length);
+
+  if (isCafe) {
+    return (
+      <div className="relative w-full bg-white rounded-xl grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 z-50 bg-white/90 hover:bg-white rounded-full p-1 shadow-md transition"
+        >
+          <IoMdClose size={22} className="text-black" />
+        </button>
+
+        <div className="relative">
+          <div className="overflow-hidden rounded-xl relative h-full">
+            <img
+              src={images[current]?.url || images[current]}
+              alt={product?.name || "Menu Item"}
+              className="w-full h-48 md:h-full object-cover lg:object-contain bg-black"
+            />
+            <div className="absolute inset-0 bg-black/20"></div>
+          </div>
+
+          {images.length > 1 && (
+            <div className="absolute inset-0 flex items-center justify-between px-2">
+              <button
+                onClick={prevSlide}
+                className="bg-white text-black p-2 rounded-full"
+              >
+                <FaChevronLeft size={16} />
+              </button>
+
+              <button
+                onClick={nextSlide}
+                className="bg-white text-black p-2 rounded-full"
+              >
+                <FaChevronRight size={16} />
+              </button>
+            </div>
+          )}
+        </div>
+
+        <div className="flex flex-col w-full">
+          <h2 className="text-xl font-bold uppercase">{product?.type}</h2>
+          <p className="text-gray-600">{product?.name}</p>
+          <p className="mt-2 font-semibold text-secondary-dark">
+            {product?.cost || "500"}
+          </p>
+          <div className="mt-4 text-sm text-gray-700">
+            {product?.description}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     // Root no longer forces full height; panel handles scroll/max height

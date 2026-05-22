@@ -1,46 +1,39 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Drawer } from "@mui/material";
 import { IoCloseSharp } from "react-icons/io5";
-import PrimaryButton from "../../../components/PrimaryButton";
-import defaultlogo from "../../../assets/WONO_LOGO_Black_TP.png";
-import { useLocation } from "react-router-dom";
+import { getNavLabelByVertical } from "../utils/vertical";
+// import { Link, useLocation } from "react-router-dom";
+// import PrimaryButton from "../../../components/PrimaryButton";
+// import defaultlogo from "../../../assets/WONO_LOGO_Black_TP.png";
 
-const TempHeader = ({ logo }) => {
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-  const view = searchParams.get("view"); // could be 'map', 'list', or null
-
-  const currentPath = location.pathname;
-
-  const isNomadOrListings =
-    /^\/nomad(\/listings\/[^/]+)?$/.test(currentPath) ||
-    currentPath === "/nomad/login" ||
-    currentPath === "/nomad/signup";
-
-  const hideMapListLinks = isNomadOrListings;
-  const isNomadHome = isNomadOrListings;
-
-  const pathRegex = /^\/nomad\/[^/]+\/[^/]+$/; // e.g., /nomad/india/goa
-  const isNomadLocation = /^\/nomad\/[^/]+\/[^/]+$/.test(location.pathname); // Matches /nomad/:country/:state
-
-  const isNomadListingsPage = location.pathname === "/nomad/listings";
-
-  // NEW: listings detail page like /nomad/listings/BIZ%20Nest
-  const isNomadListingsDetail = /^\/nomad\/listings\/[^/]+$/.test(currentPath);
-
+const TempHeader = ({ logo, vertical }) => {
+  // const location = useLocation();
+  // const searchParams = new URLSearchParams(location.search);
+  // const view = searchParams.get("view"); // could be "map", "list", or null
+  // const currentPath = location.pathname;
+  // const isNomadOrListings =
+  //   /^\/nomad(\/listings\/[^/]+)?$/.test(currentPath) ||
+  //   currentPath === "/nomad/login" ||
+  //   currentPath === "/nomad/signup";
+  // const hideMapListLinks = isNomadOrListings;
+  // const isNomadHome = isNomadOrListings;
+  // const pathRegex = /^\/nomad\/[^/]+\/[^/]+$/; // e.g., /nomad/india/goa
+  // const isNomadLocation = /^\/nomad\/[^/]+\/[^/]+$/.test(location.pathname);
+  // const isNomadListingsPage = location.pathname === "/nomad/listings";
+  // const isNomadListingsDetail = /^\/nomad\/listings\/[^/]+$/.test(currentPath);
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
-  const handleNavigation = (path) => {
-    navigate(path);
-    setOpen(false);
-  };
+  // const handleNavigation = (path) => {
+  //   navigate(path);
+  //   setOpen(false);
+  // };
 
   // Only the two links you want, and absolute paths so they work from nested routes
   const headerLinks = [
     { id: 1, text: "Home", to: "hero" },
     { id: 2, text: "About", to: "about" },
-    { id: 3, text: "Products", to: "products" },
+    { id: 3, text: getNavLabelByVertical(vertical), to: "products" },
     { id: 4, text: "Gallery", to: "gallery" },
     { id: 5, text: "Testimonials", to: "testimonials" },
     { id: 6, text: "Contact", to: "contact" },
