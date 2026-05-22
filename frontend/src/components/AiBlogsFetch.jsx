@@ -287,7 +287,7 @@ const AiBlogsFetch = () => {
             } else {
                 // URL has an unknown destination -> keep original behavior (null + clear)
                 setDest(null);
-                setSearchParams({});
+                setSearchParams({}, { replace: true });
                 return;
             }
         }
@@ -300,19 +300,19 @@ const AiBlogsFetch = () => {
             );
             if (foundByKeyword) {
                 setDest(foundByKeyword);
-                setSearchParams({ dest: foundByKeyword.label });
+                setSearchParams({ dest: foundByKeyword.label }, { replace: true });
                 return;
             } else {
                 // No matching destination -> original behavior
                 setDest(null);
-                setSearchParams({});
+                setSearchParams({}, { replace: true });
                 return;
             }
         }
 
         // 3) No location in Redux -> default to All
         setDest(DESTS[0]);
-        setSearchParams({});
+        setSearchParams({}, { replace: true });
     }, [formData, searchParams, setSearchParams]);
 
     const handleChange = (val) => {

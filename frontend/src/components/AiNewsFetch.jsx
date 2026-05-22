@@ -274,7 +274,7 @@ const AiNewsFetch = () => {
             } else {
                 // 🚫 Unknown destination in URL → original behavior
                 setDest(null);
-                setSearchParams({});
+                setSearchParams({}, { replace: true });
                 return;
             }
         }
@@ -287,19 +287,19 @@ const AiNewsFetch = () => {
             );
             if (foundByKeyword) {
                 setDest(foundByKeyword);
-                setSearchParams({ dest: foundByKeyword.label });
+                setSearchParams({ dest: foundByKeyword.label }, { replace: true });
                 return;
             } else {
                 // 🚫 No matching destination → original behavior
                 setDest(null);
-                setSearchParams({});
+                setSearchParams({}, { replace: true });
                 return;
             }
         }
 
         // 3️⃣ No destination at all → default to All
         setDest(DESTS[0]);
-        setSearchParams({});
+        setSearchParams({}, { replace: true });
     }, [formData, searchParams, setSearchParams]);
 
     const handleChange = (val) => {
