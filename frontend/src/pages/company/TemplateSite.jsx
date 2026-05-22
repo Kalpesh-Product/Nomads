@@ -4,6 +4,7 @@ import TempHeader from "./components/TempHeader";
 import TempFooter from "./components/TempFooter";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { normalizeVertical } from "./utils/vertical";
 // import { Toaster } from "react-hot-toast";
 
 const TemplateSite = () => {
@@ -27,23 +28,36 @@ const TemplateSite = () => {
     enabled: !!tenant,
   });
 
+  const normalizedData = data
+    ? {
+        ...data,
+        vertical: normalizeVertical(data?.vertical),
+        productTitle:
+          typeof data?.productTitle === "string" ? data.productTitle : "",
+        products: Array.isArray(data?.products) ? data.products : [],
+      }
+    : data;
+
   return (
     <div className="h-screen relative overflow-y-auto overflow-hidden flex flex-col custom-scrollbar-hide">
       <header className="sticky top-0 z-20">
-        <TempHeader logo={data?.companyLogo?.url} />
+        <TempHeader
+          logo={normalizedData?.companyLogo?.url}
+          vertical={normalizedData?.vertical}
+        />
       </header>
       <main className="flex-1">
-        <Outlet context={{ data, isPending, error }} />
+        <Outlet context={{ data: normalizedData, isPending, error }} />
         {/* <Toaster /> */}
       </main>
       <footer>
         <TempFooter
-          address={data?.address}
-          contact={data?.contact}
-          email={data?.email}
-          phone={data?.phone}
-          registeredCompany={data?.registeredCompanyName}
-          logo={data?.companyLogo?.url}
+          address={normalizedData?.address}
+          contact={normalizedData?.contact}
+          email={normalizedData?.email}
+          phone={normalizedData?.phone}
+          registeredCompany={normalizedData?.registeredCompanyName}
+          logo={normalizedData?.companyLogo?.url}
           isPending={isPending}
         />
       </footer>

@@ -1,7 +1,4 @@
-// src/pages/TemplateHome.jsx
-import { useQuery } from "@tanstack/react-query";
 import React, { useEffect, useRef, useState } from "react";
-import axios from "axios";
 import { useKeenSlider } from "keen-slider/react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 import Container from "../../components/Container";
@@ -11,11 +8,14 @@ import { BsEnvelope } from "react-icons/bs";
 import { MdOutlinePhone } from "react-icons/md";
 import { CiMap } from "react-icons/ci";
 import TempButton from "./components/TempButton";
-import TransparentModal from "../../components/TransparentModal";
 import ProductModalContent from "./components/ProductModalContent";
 import TempModal from "./components/TempModal";
 import { useOutletContext } from "react-router-dom";
 import GallerySection from "./components/GallerySection";
+import { getSectionTitleByVertical, normalizeVertical } from "./utils/vertical";
+// import { useQuery } from "@tanstack/react-query";
+// import axios from "axios";
+// import TransparentModal from "../../components/TransparentModal";
 
 function getTenantFromHost() {
   const hostname = window.location.hostname;
@@ -82,20 +82,12 @@ const TemplateHome = () => {
     setTimeout(() => setOpen(false), 650);
   };
 
-  const slides = [
-    {
-      id: 1,
-      img: "https://picsum.photos/id/1015/1600/900",
-    },
-    {
-      id: 2,
-      img: "https://picsum.photos/id/1016/1600/900",
-    },
-    {
-      id: 3,
-      img: "https://picsum.photos/id/1018/1600/900",
-    },
-  ];
+  // Legacy static slides kept for future fallback/testing.
+  // const slides = [
+  //   { id: 1, img: "https://picsum.photos/id/1015/1600/900" },
+  //   { id: 2, img: "https://picsum.photos/id/1016/1600/900" },
+  //   { id: 3, img: "https://picsum.photos/id/1018/1600/900" },
+  // ];
 
   const tenant = getTenantFromHost();
 
@@ -126,6 +118,12 @@ const TemplateHome = () => {
   const galleryImages = isPending ? [] : data?.gallery;
   const products = isPending ? [] : data?.products;
   const testimonials = isPending ? [] : data?.testimonials;
+  const vertical = normalizeVertical(data?.vertical);
+  const isCafe = vertical === "cafe";
+  const safeProductTitle =
+    typeof data?.productTitle === "string" ? data.productTitle.trim() : "";
+  const productsSectionTitle =
+    safeProductTitle || getSectionTitleByVertical(vertical);
 
   return (
     <div className="w-screen ">
@@ -203,18 +201,19 @@ const TemplateHome = () => {
         <Container>
           <div className="flex flex-col gap-6">
             <h1 className="uppercase text-center text-title font-semibold">
-              Our products
+              {productsSectionTitle}
             </h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {products?.map((item) => (
                 <div
                   key={item.id}
                   onClick={() => {
+                    if (isCafe) return;
                     setSelectedProduct(item);
                     setOpen(true);
                   }}
                 >
-                  <ProductCard product={item} />
+                  <ProductCard product={item} vertical={vertical} />
                 </div>
               ))}
             </div>
@@ -332,18 +331,21 @@ const TemplateHome = () => {
       </section>
 
       {/* product modal */}
-      <TempModal
-        width="w-[80%] lg:w-[60%]"
-        bgColor="bg-white"
-        open={open}
-        onClose={() => setOpen(false)}
-      >
-        <ProductModalContent
-          product={selectedProduct}
-          company={isPending ? [] : data}
+      {!isCafe && (
+        <TempModal
+          width="w-[80%] lg:w-[60%]"
+          bgColor="bg-white"
+          open={open}
           onClose={() => setOpen(false)}
-        />
-      </TempModal>
+        >
+          <ProductModalContent
+            product={selectedProduct}
+            company={isPending ? [] : data}
+            onClose={() => setOpen(false)}
+            vertical={vertical}
+          />
+        </TempModal>
+      )}
 
       {/* product modal */}
     </div>
