@@ -93,7 +93,7 @@ const goalOptionToApiAttributeMap = {
   "Nomad Community & Networking": "nomadCommunityNetworking",
   "Couple - Friendly Lifestyle": "coupleFriendlyLifestyle",
   "Family - Friendly Lifestyle": "familyFriendlyLifestyle",
-  "Female Friendly Lifestyle": "femaleFriendlyLifestyle",
+  "Female - Friendly Lifestyle": "femaleFriendlyLifestyle",
   "Solo Nomads": "soloNomads",
 };
 
@@ -316,7 +316,7 @@ const quickStatsConfigByGoalOption = {
     { label: "Community", weightKey: "nomadCommunity" },
     { label: "Lifestyle & Entertainment", weightKey: "lifestyleEntertainment" },
   ],
-  "Female Friendly Lifestyle": [
+  "Female - Friendly Lifestyle": [
     { label: "Female-Friendly", weightKey: "femaleNomads" },
     { label: "Safety", weightKey: "safety" },
     { label: "Community", weightKey: "nomadCommunity" },
@@ -699,7 +699,7 @@ const goalNarrativeByGoalAndAttribute = {
       "Curated below are the best cities in X for couples seeking a balanced and enjoyable lifestyle.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💑 Couple-friendly environments\n• 🌿 Lifestyle & shared experiences\n• 🤝 Supportive communities\n• 🧘 Balanced living\n\n→ Build a life together, not just travel.",
     [normalizeNarrativeKey("Family-Friendly Lifestyle")]:
       "Curated below are the best cities in X for families seeking a safe and comfortable lifestyle.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 👨‍👩‍👧 Family-friendly environments\n• 🛡️ Safety & stability\n• 🌿 Calm & livable surroundings\n• 🤝 Supportive communities\n\n→ Build a secure and balanced life for your family.",
-    [normalizeNarrativeKey("Female Friendly Lifestyle")]:
+    [normalizeNarrativeKey("Female - Friendly Lifestyle")]:
       "Curated below are the best cities in X for solo female travelers seeking safety and comfort.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🛡️ Safety & security\n• 👩 Female-friendly environments\n• 🤝 Supportive communities\n• 🌍 Ease of navigation\n\n→ Travel independently with confidence.",
     [normalizeNarrativeKey("Founder Nomads")]:
       "Curated below are the best cities in X for founder nomads and startup builders.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🚀 Strong founder ecosystems\n• 🤝 High-value networking\n• 📅 Events & startup activity\n• 🌍 Collaborative communities\n\n→ Build, connect, scale.",
@@ -918,7 +918,8 @@ const AiSearchResults = () => {
   const previousVisibleDestinationsLengthRef = useRef(0);
 
   const hasSelectedContinent = Boolean(selectedContinent);
-  const selectedContinentDisplay = normalizeSelectedContinent(selectedContinent);
+  const selectedContinentDisplay =
+    normalizeSelectedContinent(selectedContinent);
   const hasSelectedGoalOption = Boolean(selectedGoalOption);
   const hasSelectedFilters = hasSelectedContinent && hasSelectedGoalOption;
   const passportCountry =
@@ -1177,7 +1178,8 @@ const AiSearchResults = () => {
               item?.country ||
               "Unknown",
             country: existingDestination?.country || item?.country || "Unknown",
-            continent: existingDestination?.continent || selectedContinentDisplay,
+            continent:
+              existingDestination?.continent || selectedContinentDisplay,
             suggestions: Number(metricValue.toFixed(3)),
             internetSpeed: item?.internetSpeed,
             aqiValue: item?.aqiValue,
@@ -1292,49 +1294,59 @@ const AiSearchResults = () => {
       },
     );
   };
-  const toggleDestinationLike = useCallback((destination) => {
-    const destinationKey = getDestinationFavoriteKey(destination);
-    const destinationId = destination?._id;
+  const toggleDestinationLike = useCallback(
+    (destination) => {
+      const destinationKey = getDestinationFavoriteKey(destination);
+      const destinationId = destination?._id;
 
-    if (!userId) {
-      navigate("/ai-login", {
-        state: {
-          redirectTo: `${location.pathname}${location.search}`,
-          loginContext: {
-            title: "Save destination favorites",
-            description:
-              "Login to save your favorite destinations and continue from this results page.",
+      if (!userId) {
+        navigate("/ai-login", {
+          state: {
+            redirectTo: `${location.pathname}${location.search}`,
+            loginContext: {
+              title: "Save destination favorites",
+              description:
+                "Login to save your favorite destinations and continue from this results page.",
+            },
           },
-        },
-      });
-      return;
-    }
+        });
+        return;
+      }
 
-    if (!destinationId) {
-      showErrorAlert("This destination cannot be favorited yet.");
-      return;
-    }
+      if (!destinationId) {
+        showErrorAlert("This destination cannot be favorited yet.");
+        return;
+      }
 
-    const isCurrentlyLiked = likedDestinations.includes(destinationKey);
-    const nextLikedDestinations = isCurrentlyLiked
-      ? likedDestinations.filter((key) => key !== destinationKey)
-      : [...likedDestinations, destinationKey];
+      const isCurrentlyLiked = likedDestinations.includes(destinationKey);
+      const nextLikedDestinations = isCurrentlyLiked
+        ? likedDestinations.filter((key) => key !== destinationKey)
+        : [...likedDestinations, destinationKey];
 
-    setLikedDestinations(nextLikedDestinations);
+      setLikedDestinations(nextLikedDestinations);
 
-    axiosPrivate
-      .patch("/user/favorite-destination", {
-        destinationId,
-        isFavorited: !isCurrentlyLiked,
-      })
-      .catch((error) => {
-        setLikedDestinations(likedDestinations);
-        showErrorAlert(
-          error?.response?.data?.message ||
-            "Failed to update favorite destination.",
-        );
-      });
-  }, [axiosPrivate, likedDestinations, location.pathname, location.search, navigate, userId]);
+      axiosPrivate
+        .patch("/user/favorite-destination", {
+          destinationId,
+          isFavorited: !isCurrentlyLiked,
+        })
+        .catch((error) => {
+          setLikedDestinations(likedDestinations);
+          showErrorAlert(
+            error?.response?.data?.message ||
+              "Failed to update favorite destination.",
+          );
+        });
+    },
+    [
+      axiosPrivate,
+      likedDestinations,
+      location.pathname,
+      location.search,
+      navigate,
+      userId,
+    ],
+  );
 
   const handleDropdownToggle = (dropdownKey) => {
     setOpenDropdown((currentDropdown) =>
@@ -1407,8 +1419,9 @@ const AiSearchResults = () => {
       return "";
     }
 
-    const narrativeContinentLabel =
-      getNarrativeContinentLabel(selectedContinentDisplay);
+    const narrativeContinentLabel = getNarrativeContinentLabel(
+      selectedContinentDisplay,
+    );
 
     const goalNarratives =
       goalNarrativeByGoalAndAttribute[normalizeNarrativeKey(selectedGoal)] ||
@@ -1770,7 +1783,11 @@ const AiSearchResults = () => {
         selectedContinentDisplay,
         selectedGoalOption,
       ]),
-    [resultsHeadingRemainingLines, selectedContinentDisplay, selectedGoalOption],
+    [
+      resultsHeadingRemainingLines,
+      selectedContinentDisplay,
+      selectedGoalOption,
+    ],
   );
 
   const [resultsHeadingBodyLines, resultsHeadingLastLine] = useMemo(() => {
@@ -1862,7 +1879,9 @@ const AiSearchResults = () => {
                 <DropdownBadge
                   label="Continent"
                   options={continentOptions}
-                  selectedValue={selectedContinent || "Where Do You Want To Go?"}
+                  selectedValue={
+                    selectedContinent || "Where Do You Want To Go?"
+                  }
                   isOpen={openDropdown === "continent"}
                   onToggle={() => handleDropdownToggle("continent")}
                   onSelect={handleContinentSelect}
@@ -2101,8 +2120,8 @@ const AiSearchResults = () => {
                         </div>
                       ) : (
                         <div className="mt-10 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-500">
-                          No destinations are available for {selectedContinentDisplay}{" "}
-                          right now.
+                          No destinations are available for{" "}
+                          {selectedContinentDisplay} right now.
                         </div>
                       )}
                     </>

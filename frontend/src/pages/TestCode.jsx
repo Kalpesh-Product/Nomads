@@ -70,7 +70,7 @@ const goalOptionToApiAttributeMap = {
   "Nomad Community & Networking": "nomadCommunityNetworking",
   "Couple - Friendly Lifestyle": "coupleFriendlyLifestyle",
   "Family - Friendly Lifestyle": "familyFriendlyLifestyle",
-  "Female Friendly Lifestyle": "femaleFriendlyLifestyle",
+  "Female - Friendly Lifestyle": "femaleFriendlyLifestyle",
   "Solo Nomads": "soloNomads",
 };
 
@@ -253,7 +253,7 @@ const goalNarrativeByGoalAndAttribute = {
       "Curated below are the best cities in X for couples seeking a balanced and enjoyable lifestyle.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💑 Couple-friendly environments\n• 🌿 Lifestyle & shared experiences\n• 🤝 Supportive communities\n• 🧘 Balanced living\n\n→ Build a life together, not just travel.",
     [normalizeNarrativeKey("Family-Friendly Lifestyle")]:
       "Curated below are the best cities in X for families seeking a safe and comfortable lifestyle.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 👨‍👩‍👧 Family-friendly environments\n• 🛡️ Safety & stability\n• 🌿 Calm & livable surroundings\n• 🤝 Supportive communities\n\n→ Build a secure and balanced life for your family.",
-    [normalizeNarrativeKey("Female Friendly Lifestyle")]:
+    [normalizeNarrativeKey("Female - Friendly Lifestyle")]:
       "Curated below are the best cities in X for solo female travelers seeking safety and comfort.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🛡️ Safety & security\n• 👩 Female-friendly environments\n• 🤝 Supportive communities\n• 🌍 Ease of navigation\n\n→ Travel independently with confidence.",
     [normalizeNarrativeKey("Founder Nomads")]:
       "Curated below are the best cities in X for founder nomads and startup builders.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🚀 Strong founder ecosystems\n• 🤝 High-value networking\n• 📅 Events & startup activity\n• 🌍 Collaborative communities\n\n→ Build, connect, scale.",
