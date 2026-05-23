@@ -34,9 +34,9 @@ const DESTS = [
     { label: "Abuja (FCT)", country: "ng", keyword: "abuja (fct)", lang: "en" },
 
     {
-        label: "Cairo Governorate",
+        label: "Cairo",
         country: "eg",
-        keyword: "cairo governorate",
+        keyword: "cairo",
         lang: "ar",
     },
 
@@ -110,9 +110,9 @@ const DESTS = [
     { label: "Gold Coast", country: "au", keyword: "gold coast", lang: "en" },
     { label: "Fes‑Meknes", country: "ma", keyword: "fes-meknes", lang: "ar" },
     {
-        label: "Giza Governorate",
+        label: "Giza",
         country: "eg",
-        keyword: "giza governorate",
+        keyword: "giza",
         lang: "ar",
     },
     { label: "Istanbul", country: "tr", keyword: "istanbul", lang: "tr" },
