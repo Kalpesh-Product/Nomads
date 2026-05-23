@@ -645,8 +645,22 @@ const AiListings = ({ forceListView = false }) => {
     return service.label.replace("LOCATION", locationLabel);
   };
 
-  const getValueAddedServiceCardLines = (serviceLabel) => {
-    return [serviceLabel].filter(Boolean);
+  const getValueAddedServiceCardLines = (serviceLabel, service) => {
+    if (!serviceLabel) return [];
+
+    if (service?.label === "APPLY FOR JOB") {
+      return [serviceLabel];
+    }
+
+    const [firstWord, ...remainingWords] = serviceLabel
+      .split(" ")
+      .filter(Boolean);
+
+    if (!firstWord || remainingWords.length === 0) {
+      return [serviceLabel];
+    }
+
+    return [firstWord, remainingWords.join(" ")];
   };
 
   const [mapOpen, setMapOpen] = useState(!forceListView);
@@ -739,6 +753,7 @@ const AiListings = ({ forceListView = false }) => {
               </p>
             }
             className="mb-4"
+            fullWidth
           />
           <div className={isHeadingSequenceComplete ? "block" : "hidden"}>
             <div className="lg:hidden w-full flex flex-col gap-4 mb-4">
@@ -1236,16 +1251,17 @@ const AiListings = ({ forceListView = false }) => {
                           }}
                         >
                           <div className="flex w-full flex-col items-center justify-end">
-                            {getValueAddedServiceCardLines(serviceLabel).map(
-                              (line) => (
-                                <span
-                                  key={`${serviceLabel}-${line}`}
-                                  className="text-base md:text-xl font-normal uppercase text-white leading-tight tracking-wide"
-                                >
-                                  {line}
-                                </span>
-                              ),
-                            )}
+                            {getValueAddedServiceCardLines(
+                              serviceLabel,
+                              service,
+                            ).map((line) => (
+                              <span
+                                key={`${serviceLabel}-${line}`}
+                                className="text-base md:text-xl font-normal uppercase text-white leading-tight tracking-wide"
+                              >
+                                {line}
+                              </span>
+                            ))}
                             {service.badge && (
                               <span className="mt-2 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[9px] font-semibold leading-none normal-case text-black shadow-sm">
                                 {service.badge}

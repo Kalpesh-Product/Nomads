@@ -532,7 +532,9 @@ const AiGlobalListingsList = () => {
 
     if (hasRestoredPageStateRef.current) return;
 
-    const savedState = window.sessionStorage.getItem(listingPageStateStorageKey);
+    const savedState = window.sessionStorage.getItem(
+      listingPageStateStorageKey,
+    );
     if (!savedState) return;
 
     try {
@@ -757,8 +759,22 @@ const AiGlobalListingsList = () => {
     return service.label.replace("LOCATION", locationLabel);
   };
 
-  const getValueAddedServiceCardLines = (serviceLabel) => {
-    return [serviceLabel].filter(Boolean);
+  const getValueAddedServiceCardLines = (serviceLabel, service) => {
+    if (!serviceLabel) return [];
+
+    if (service?.label === "APPLY FOR JOB") {
+      return [serviceLabel];
+    }
+
+    const [firstWord, ...remainingWords] = serviceLabel
+      .split(" ")
+      .filter(Boolean);
+
+    if (!firstWord || remainingWords.length === 0) {
+      return [serviceLabel];
+    }
+
+    return [firstWord, remainingWords.join(" ")];
   };
   const prioritizedCompanies = ["BIZ Nest", "MeWo"];
   const sortedListings = [...(listingsData || [])].sort((a, b) => {
@@ -1086,6 +1102,7 @@ const AiGlobalListingsList = () => {
                                 <div className="flex w-full flex-col items-center justify-end pb-2">
                                   {getValueAddedServiceCardLines(
                                     serviceLabel,
+                                    service,
                                   ).map((line) => (
                                     <span
                                       key={`${serviceLabel}-${line}`}
@@ -1441,6 +1458,7 @@ const AiGlobalListingsList = () => {
                               <div className="flex w-full flex-col items-center justify-end pb-1">
                                 {getValueAddedServiceCardLines(
                                   serviceLabel,
+                                  service,
                                 ).map((line) => (
                                   <span
                                     key={`${serviceLabel}-${line}`}
@@ -1487,6 +1505,7 @@ const AiGlobalListingsList = () => {
                               <div className="flex w-full flex-col items-center justify-end">
                                 {getValueAddedServiceCardLines(
                                   serviceLabel,
+                                  service,
                                 ).map((line) => (
                                   <span
                                     key={`${serviceLabel}-${line}`}
