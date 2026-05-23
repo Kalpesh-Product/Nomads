@@ -34,8 +34,6 @@ import useAuth from "../hooks/useAuth.js";
 import { persistSelectedDestination } from "../utils/selectedDestinationSession.js";
 
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
-const VALUE_ADDED_SERVICE_CARD_BACKGROUND_IMAGE = "/images/goa-image.jpg";
-
 const TYPING_INTERVAL_MS = 7;
 const SECOND_HEADING_DELAY_MS = 250;
 const THINKING_HEADING_TEXT = "Curating the best results for you";
@@ -43,19 +41,36 @@ const CURATED_RESULTS_HEADING_TEXT =
   "Please find below the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
 
 const valueAddedServiceItems = [
-  { label: "ANY VISA SUPPORT", path: "/visa-support" },
+  {
+    label: "ANY VISA SUPPORT",
+    path: "/visa-support",
+    imageUrl:
+      // "https://img.magnific.com/free-photo/american-visa-document_1101-820.jpg?semt=ais_hybrid&w=740&q=80",
+      "https://img.magnific.com/free-photo/american-visa-document_1101-820.jpg?semt=ais_hybrid&w=740&q=80",
+  },
   {
     label: "OVERALL ACTIVATION SUPPORT",
     path: "/overall-activation-support",
+    imageUrl:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbhxwe7kd7j-UFpFp7tS2Ka0_L2iZ_zI_07Q&s",
   },
   {
     label: "NEW COMPANY SUPPORT",
     path: "/new-company-setup",
+    imageUrl:
+      "https://3.imimg.com/data3/KB/OY/MY-1439773/new-business-setup.jpg",
   },
-  { label: "ANY CONSULTATION SUPPORT", path: "/consultation" },
+  {
+    label: "ANY CONSULTATION SUPPORT",
+    path: "/consultation",
+    imageUrl:
+      "https://images.unsplash.com/photo-1553877522-43269d4ea984?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y29uc3VsdGF0aW9ufGVufDB8fDB8fHww",
+  },
   {
     label: "APPLY FOR JOB",
     badge: "Coming soon",
+    imageUrl:
+      "https://img.freepik.com/premium-vector/people-seeking-jobs-internet-job-search-recruitment_773186-499.jpg?semt=ais_hybrid&w=740&q=80",
   },
   // {
   //   label: "VIEW LOCATION BLOGS",
@@ -645,8 +660,22 @@ const AiListings = ({ forceListView = false }) => {
     return service.label.replace("LOCATION", locationLabel);
   };
 
-  const getValueAddedServiceCardLines = (serviceLabel) => {
-    return [serviceLabel].filter(Boolean);
+  const getValueAddedServiceCardLines = (serviceLabel, service) => {
+    if (!serviceLabel) return [];
+
+    if (service?.label === "APPLY FOR JOB") {
+      return [serviceLabel];
+    }
+
+    const [firstWord, ...remainingWords] = serviceLabel
+      .split(" ")
+      .filter(Boolean);
+
+    if (!firstWord || remainingWords.length === 0) {
+      return [serviceLabel];
+    }
+
+    return [firstWord, remainingWords.join(" ")];
   };
 
   const [mapOpen, setMapOpen] = useState(!forceListView);
@@ -739,6 +768,7 @@ const AiListings = ({ forceListView = false }) => {
               </p>
             }
             className="mb-4"
+            fullWidth
           />
           <div className={isHeadingSequenceComplete ? "block" : "hidden"}>
             <div className="lg:hidden w-full flex flex-col gap-4 mb-4">
@@ -1230,22 +1260,23 @@ const AiListings = ({ forceListView = false }) => {
                               : "hover:scale-[1.02]"
                           }`}
                           style={{
-                            backgroundImage: `linear-gradient(to top, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.2)), url(${VALUE_ADDED_SERVICE_CARD_BACKGROUND_IMAGE})`,
+                            backgroundImage: `linear-gradient(to top, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.2)), url(${service.imageUrl})`,
                             backgroundSize: "cover",
                             backgroundPosition: "center",
                           }}
                         >
                           <div className="flex w-full flex-col items-center justify-end">
-                            {getValueAddedServiceCardLines(serviceLabel).map(
-                              (line) => (
-                                <span
-                                  key={`${serviceLabel}-${line}`}
-                                  className="text-base md:text-xl font-normal uppercase text-white leading-tight tracking-wide"
-                                >
-                                  {line}
-                                </span>
-                              ),
-                            )}
+                            {getValueAddedServiceCardLines(
+                              serviceLabel,
+                              service,
+                            ).map((line) => (
+                              <span
+                                key={`${serviceLabel}-${line}`}
+                                className="text-base md:text-xl font-normal uppercase text-white leading-tight tracking-wide"
+                              >
+                                {line}
+                              </span>
+                            ))}
                             {service.badge && (
                               <span className="mt-2 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[9px] font-semibold leading-none normal-case text-black shadow-sm">
                                 {service.badge}
