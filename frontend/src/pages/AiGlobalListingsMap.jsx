@@ -28,6 +28,10 @@ import PaginatedGrid from "../components/PaginatedGrid.jsx";
 import { Helmet } from "@dr.pogodin/react-helmet";
 import useAuth from "../hooks/useAuth.js";
 import { persistSelectedDestination } from "../utils/selectedDestinationSession.js";
+import {
+  buildAiSearchBadgesWithLocation,
+  dedupeAiSearchBadges,
+} from "../utils/aiSearchBarBadges.js";
 
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
 
@@ -36,6 +40,13 @@ const SECOND_HEADING_DELAY_MS = 250;
 const THINKING_HEADING_TEXT = "Curating the best results for you";
 const CURATED_RESULTS_HEADING_TEXT =
   "Please find below the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
+const getAiVerticalsPageStateKey = (country = "", location = "") => {
+  const countryKey = country.trim().toLowerCase();
+  const locationKey = location.trim().toLowerCase();
+
+  if (!countryKey || !locationKey) return null;
+  return `ai-verticals-page-state:${countryKey}:${locationKey}`;
+};
 
 const HorizontalScrollWrapper = ({ children, title }) => {
   const scrollRef = React.useRef(null);
@@ -116,42 +127,56 @@ const AiGlobalListingsMap = () => {
   const [isSecondHeadingPhase, setIsSecondHeadingPhase] = useState(false);
   const [isHeadingSequenceComplete, setIsHeadingSequenceComplete] =
     useState(false);
+  const listingPageStateStorageKey = useMemo(
+    () => getAiVerticalsPageStateKey(formData?.country || "", formData?.location || ""),
+    [formData?.country, formData?.location],
+  );
 
   const searchBarBadges = useMemo(() => {
-    const formatBadgeValue = (value) =>
-      value
-        ?.split(" ")
-        .filter(Boolean)
-        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-        .join(" ");
-
     const params = new URLSearchParams(location.search);
     const selectedStateFromQuery =
       params.get("state") || params.get("location") || "";
-    const selectedStateBadge = formatBadgeValue(selectedStateFromQuery);
+    const selectedStateBadge = selectedStateFromQuery;
     const locationStateBadges = location.state?.searchBarBadges;
 
-    const replaceTrailingLocationBadge = (badges) => {
-      const cleanedBadges = badges.filter(Boolean);
-      if (!selectedStateBadge) return cleanedBadges;
-      if (cleanedBadges.length === 0) return [selectedStateBadge];
-
-      const existingWithoutLast = cleanedBadges.slice(0, -1);
-      return [...existingWithoutLast, selectedStateBadge];
-    };
-
     if (Array.isArray(locationStateBadges) && locationStateBadges.length > 0) {
-      return replaceTrailingLocationBadge(locationStateBadges);
+      return buildAiSearchBadgesWithLocation({
+        badges: locationStateBadges,
+        selectedStateBadge,
+      });
     }
 
     if (persistedSearchBarBadges.length > 0) {
-      return replaceTrailingLocationBadge(persistedSearchBarBadges);
+      return buildAiSearchBadgesWithLocation({
+        badges: persistedSearchBarBadges,
+        selectedStateBadge,
+      });
     }
 
-    return selectedStateBadge ? [selectedStateBadge] : [];
+    return buildAiSearchBadgesWithLocation({
+      badges: [],
+      selectedStateBadge,
+    });
   }, [location.search, location.state, persistedSearchBarBadges]);
 
   useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const restoreKey = getAiVerticalsPageStateKey(
+      (params.get("country") || "").trim().toLowerCase(),
+      ((params.get("state") || params.get("location") || "").trim().toLowerCase()),
+    );
+
+    if (typeof window !== "undefined" && restoreKey) {
+      const hasSavedPageState = window.sessionStorage.getItem(restoreKey);
+
+      if (hasSavedPageState) {
+        setTypedHeading(CURATED_RESULTS_HEADING_TEXT);
+        setIsSecondHeadingPhase(true);
+        setIsHeadingSequenceComplete(true);
+        return undefined;
+      }
+    }
+
     let timeoutId;
     let intervalId;
     const typeText = (text, onComplete) => {
@@ -180,7 +205,7 @@ const AiGlobalListingsMap = () => {
       clearTimeout(timeoutId);
       clearInterval(intervalId);
     };
-  }, []);
+  }, [location.search]);
 
   const specialUserEmails = [
     "allan.wono@gmail.com",
@@ -425,7 +450,7 @@ const AiGlobalListingsMap = () => {
     try {
       const parsedBadges = JSON.parse(savedBadges);
       if (Array.isArray(parsedBadges)) {
-        setPersistedSearchBarBadges(parsedBadges.filter(Boolean));
+        setPersistedSearchBarBadges(dedupeAiSearchBadges(parsedBadges));
       }
     } catch (error) {
       console.error("Failed to restore AI search badges", error);
@@ -538,6 +563,29 @@ const AiGlobalListingsMap = () => {
     );
   };
 
+  const handleListingNavigation = (item) => {
+    if (listingPageStateStorageKey) {
+      window.sessionStorage.setItem(
+        listingPageStateStorageKey,
+        JSON.stringify({
+          from: "map",
+          savedAt: Date.now(),
+        }),
+      );
+    }
+
+    navigate(`/ai-listings/${encodeURIComponent(item.companyName)}`, {
+      state: {
+        companyId: item.companyId,
+        type: item.companyType || "ss",
+        returnTo: {
+          pathname: "/ai-verticals",
+          search: location.search,
+        },
+      },
+    });
+  };
+
   const forMapsData = isLisitingLoading
     ? []
     : listingsData.map((item) => ({
@@ -581,29 +629,32 @@ const AiGlobalListingsMap = () => {
       </Helmet>
 
       {/* ==================== DESKTOP VIEW (lg and above) ==================== */}
-      <div className="hidden lg:flex flex-col gap-6 md:px-10">
-        <AiSelectedBadgesSearchBar
-          badges={searchBarBadges}
-          stateLabel={selectedLocationLabel}
-          onBack={() => navigate(-1)}
-          onClear={() => navigate("/search/results")}
-          heading={
-            <p className="mt-6 mb-6 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.8rem] font-play">
-              {!isSecondHeadingPhase && (
-                <span
-                  className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-b-transparent"
-                  aria-hidden="true"
-                />
-              )}
-              {typedHeading}
-            </p>
-          }
-          className="mb-2"
-        />
+      <div className="hidden lg:flex flex-col gap-6 px-1 md:px-10">
+        <div className="min-w-[75%] max-w-[80rem] lg:max-w-[80rem] mx-0 lg:mx-auto px-1 sm:px-6 lg:px-0 w-full">
+          <AiSelectedBadgesSearchBar
+            badges={searchBarBadges}
+            stateLabel={selectedLocationLabel}
+            onBack={() => navigate(-1)}
+            onClear={() => navigate("/search/results")}
+            heading={
+              <p className="mt-6 mb-6 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.8rem] font-play">
+                {!isSecondHeadingPhase && (
+                  <span
+                    className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-b-transparent"
+                    aria-hidden="true"
+                  />
+                )}
+                {typedHeading}
+              </p>
+            }
+            className="mb-2"
+            fullWidth
+          />
+        </div>
         <div
           className={`${isHeadingSequenceComplete ? "flex" : "hidden"} flex-col gap-4 justify-center items-center w-full`}
         >
-          <div className="min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0">
+          <div className="min-w-[75%] max-w-[80rem] lg:max-w-[80rem] mx-0 lg:mx-auto px-1 sm:px-6 lg:px-0">
             <div className="flex flex-col gap-4 justify-between items-center">
               <div className="w-11/12 pb-4">
                 <div className="flex justify-between items-center">
@@ -760,19 +811,7 @@ const AiGlobalListingsMap = () => {
                               <ListingCard
                                 item={item}
                                 showVertical={true}
-                                handleNavigation={() =>
-                                  navigate(
-                                    `/ai-listings/${encodeURIComponent(
-                                      item.companyName,
-                                    )}`,
-                                    {
-                                      state: {
-                                        companyId: item.companyId,
-                                        type: item.companyType || "ss",
-                                      },
-                                    },
-                                  )
-                                }
+                                handleNavigation={() => handleListingNavigation(item)}
                               />
                             </motion.div>
                           )
@@ -1068,17 +1107,7 @@ const AiGlobalListingsMap = () => {
                                   key={item._id}
                                   item={item}
                                   showVertical={true}
-                                  handleNavigation={() =>
-                                    navigate(
-                                      `/ai-listings/${encodeURIComponent(item.companyName)}`,
-                                      {
-                                        state: {
-                                          companyId: item.companyId,
-                                          type: item.companyType || "ss",
-                                        },
-                                      },
-                                    )
-                                  }
+                                  handleNavigation={() => handleListingNavigation(item)}
                                 />
                               )}
                             />
@@ -1141,19 +1170,7 @@ const AiGlobalListingsMap = () => {
                               >
                                 <ListingCard
                                   item={item}
-                                  handleNavigation={() =>
-                                    navigate(
-                                      `/ai-listings/${encodeURIComponent(
-                                        item.companyName,
-                                      )}`,
-                                      {
-                                        state: {
-                                          companyId: item.companyId,
-                                          type: item.companyType,
-                                        },
-                                      },
-                                    )
-                                  }
+                                  handleNavigation={() => handleListingNavigation(item)}
                                 />
                               </div>
                             ))}

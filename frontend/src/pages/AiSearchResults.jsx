@@ -29,7 +29,7 @@ import {
 } from "../constants/aiGoalFilters";
 
 const continentOptions = [
-  "World",
+  "Explore The World",
   "Africa",
   "Asia",
   "Europe",
@@ -93,7 +93,7 @@ const goalOptionToApiAttributeMap = {
   "Nomad Community & Networking": "nomadCommunityNetworking",
   "Couple - Friendly Lifestyle": "coupleFriendlyLifestyle",
   "Family - Friendly Lifestyle": "familyFriendlyLifestyle",
-  "Female Friendly Lifestyle": "femaleFriendlyLifestyle",
+  "Female - Friendly Lifestyle": "femaleFriendlyLifestyle",
   "Solo Nomads": "soloNomads",
 };
 
@@ -316,7 +316,7 @@ const quickStatsConfigByGoalOption = {
     { label: "Community", weightKey: "nomadCommunity" },
     { label: "Lifestyle & Entertainment", weightKey: "lifestyleEntertainment" },
   ],
-  "Female Friendly Lifestyle": [
+  "Female - Friendly Lifestyle": [
     { label: "Female-Friendly", weightKey: "femaleNomads" },
     { label: "Safety", weightKey: "safety" },
     { label: "Community", weightKey: "nomadCommunity" },
@@ -511,9 +511,9 @@ const destinationAliasMap = {
   Amsterdam: "North Holland",
   Tenerife: "Santa Cruz de Tenerife",
   Casablanca: "Casablanca-Settat",
-  Cairo: "Cairo Governorate",
+  Cairo: "Cairo",
   Queenstown: "Otago Region",
-  Giza: "Giza Governorate",
+  Giza: "Giza",
 };
 
 const normalizeDestinationKey = (value = "") =>
@@ -634,12 +634,15 @@ const normalizeNarrativeKey = (value = "") =>
 const getNarrativeContinentLabel = (continent) =>
   continent === "World" ? "the World" : continent;
 
+const normalizeSelectedContinent = (continent) =>
+  continent === "Explore The World" ? "World" : continent;
+
 const goalNarrativeByGoalAndAttribute = {
   [normalizeNarrativeKey("World Ranking")]: {
     [normalizeNarrativeKey("Best for Nomads")]:
-      "Curated below are the top cities in X based on overall livability for modern remote professionals.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🏢 Work infrastructure\n• ⚡ High-speed, stable internet\n• 💰 Cost of living\n• 🛡️ Safety\n• 🛂 Visa flexibility for longer stays\n• 🤝 Nomad community\n• 🏥 Healthcare affordability\n• 🚀 Startup ecosystem\n• 🌿 Air quality\n\n→ Find the best overall place to live and work",
+      "Curated below are the top cities in X based on overall livability for modern remote professionals.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🏢 Work infrastructure\n• ⚡ High-speed, stable internet\n• 💰 Cost of living\n• 🛡️ Safety\n• 🛂 Visa flexibility for longer stays\n• 🤝 Nomad community\n• 🏥 Healthcare affordability\n• 🚀 Startup ecosystem\n• 🌿 Air quality\n\n→ Find the best overall place to live and work.",
     [normalizeNarrativeKey("Most Affordable")]:
-      "Curated below are the most affordable cities in X designed to help you maximize your budget.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💰 Low cost of living\n• 📊 Strong purchasing power\n• 🏥 Affordable healthcare\n• 🛡️ Safety & stability\n\n→ Stretch your budget further while living comfortably.",
+      "Curated below are the most affordable cities in X designed to help you maximize your budget.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💰 Low cost of living\n• 📊 Strong purchasing power\n• 🏥 Affordable healthcare\n• 🛡️ Safety & stability\n\n→ Find cities where affordability meets comfort.",
     [normalizeNarrativeKey("Safest Cities")]:
       "Curated below are the safest cities in X based on your preference for security and peace of mind.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🛡️ Safety levels\n• 🏥 Healthcare accessibility\n• 🌍 Stable living conditions\n• 🌿 Clean environments\n\n→ Live confidently, whether short-term or long-term.",
     [normalizeNarrativeKey("Easy Visa / Long Stay")]:
@@ -675,7 +678,7 @@ const goalNarrativeByGoalAndAttribute = {
     [normalizeNarrativeKey("Low Taxation")]:
       "Curated below are the best cities in X for a low-tax and financially efficient lifestyle.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🏦 Tax-friendly environments\n• 💰 Low cost of living\n• 📊 Strong purchasing power\n• 📉 Economic stability\n\n→ Keep more, spend smarter.",
     [normalizeNarrativeKey("Purchasing Power")]:
-      "Curated below are the best cities in X to grow your wealth through stronger purchasing power.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 📊 Strong purchasing power\n• 💰 Low cost of living\n• 🏦 Tax efficiency\n• 📉 Stable economic conditions\n\n→ Increase your financial capacity.",
+      "Curated below are the best cities in X with the strongest purchasing power.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 📊 Strong purchasing power\n• 💰 Low cost of living\n• 🏦 Tax efficiency\n• 📉 Stable economic conditions\n\n→ Maximize the value of your income.",
     [normalizeNarrativeKey("Financial Stability (Low Risk)")]:
       "Curated below are the best cities in X for a financially stable and low-risk lifestyle.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 📉 Stable inflation\n• 🏥 Affordable healthcare\n• 🏦 Tax efficiency\n• 💰 Cost control\n\n→ Protect what you’ve built.",
     [normalizeNarrativeKey("Startup Setup Cost")]:
@@ -696,7 +699,7 @@ const goalNarrativeByGoalAndAttribute = {
       "Curated below are the best cities in X for couples seeking a balanced and enjoyable lifestyle.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💑 Couple-friendly environments\n• 🌿 Lifestyle & shared experiences\n• 🤝 Supportive communities\n• 🧘 Balanced living\n\n→ Build a life together, not just travel.",
     [normalizeNarrativeKey("Family-Friendly Lifestyle")]:
       "Curated below are the best cities in X for families seeking a safe and comfortable lifestyle.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 👨‍👩‍👧 Family-friendly environments\n• 🛡️ Safety & stability\n• 🌿 Calm & livable surroundings\n• 🤝 Supportive communities\n\n→ Build a secure and balanced life for your family.",
-    [normalizeNarrativeKey("Female Friendly Lifestyle")]:
+    [normalizeNarrativeKey("Female - Friendly Lifestyle")]:
       "Curated below are the best cities in X for solo female travelers seeking safety and comfort.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🛡️ Safety & security\n• 👩 Female-friendly environments\n• 🤝 Supportive communities\n• 🌍 Ease of navigation\n\n→ Travel independently with confidence.",
     [normalizeNarrativeKey("Founder Nomads")]:
       "Curated below are the best cities in X for founder nomads and startup builders.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🚀 Strong founder ecosystems\n• 🤝 High-value networking\n• 📅 Events & startup activity\n• 🌍 Collaborative communities\n\n→ Build, connect, scale.",
@@ -915,6 +918,8 @@ const AiSearchResults = () => {
   const previousVisibleDestinationsLengthRef = useRef(0);
 
   const hasSelectedContinent = Boolean(selectedContinent);
+  const selectedContinentDisplay =
+    normalizeSelectedContinent(selectedContinent);
   const hasSelectedGoalOption = Boolean(selectedGoalOption);
   const hasSelectedFilters = hasSelectedContinent && hasSelectedGoalOption;
   const passportCountry =
@@ -1128,7 +1133,7 @@ const AiSearchResults = () => {
           "/state-wise-weight",
           {
             selectionType: selectedGoal,
-            continent: selectedContinent,
+            continent: selectedContinentDisplay,
             attribute: getApiAttributeForSelection(
               selectedGoal,
               selectedGoalOption,
@@ -1173,7 +1178,8 @@ const AiSearchResults = () => {
               item?.country ||
               "Unknown",
             country: existingDestination?.country || item?.country || "Unknown",
-            continent: existingDestination?.continent || selectedContinent,
+            continent:
+              existingDestination?.continent || selectedContinentDisplay,
             suggestions: Number(metricValue.toFixed(3)),
             internetSpeed: item?.internetSpeed,
             aqiValue: item?.aqiValue,
@@ -1232,7 +1238,9 @@ const AiSearchResults = () => {
   const searchBarBadges = useMemo(() => {
     const badges = [selectedGoal];
 
-    const displayLoc = loc ? decodeURIComponent(loc) : selectedContinent;
+    const displayLoc = normalizeSelectedContinent(
+      loc ? decodeURIComponent(loc) : selectedContinentDisplay,
+    );
     const displayAttr = attr ? decodeURIComponent(attr) : selectedGoalOption;
 
     if (displayLoc) {
@@ -1244,7 +1252,7 @@ const AiSearchResults = () => {
     }
 
     return badges;
-  }, [loc, attr, selectedContinent, selectedGoalOption, selectedGoal]);
+  }, [loc, attr, selectedContinentDisplay, selectedGoalOption, selectedGoal]);
 
   const visibleDestinations = useMemo(() => {
     if (showAllDestinations) {
@@ -1286,49 +1294,59 @@ const AiSearchResults = () => {
       },
     );
   };
-  const toggleDestinationLike = useCallback((destination) => {
-    const destinationKey = getDestinationFavoriteKey(destination);
-    const destinationId = destination?._id;
+  const toggleDestinationLike = useCallback(
+    (destination) => {
+      const destinationKey = getDestinationFavoriteKey(destination);
+      const destinationId = destination?._id;
 
-    if (!userId) {
-      navigate("/ai-login", {
-        state: {
-          redirectTo: `${location.pathname}${location.search}`,
-          loginContext: {
-            title: "Save destination favorites",
-            description:
-              "Login to save your favorite destinations and continue from this results page.",
+      if (!userId) {
+        navigate("/ai-login", {
+          state: {
+            redirectTo: `${location.pathname}${location.search}`,
+            loginContext: {
+              title: "Save destination favorites",
+              description:
+                "Login to save your favorite destinations and continue from this results page.",
+            },
           },
-        },
-      });
-      return;
-    }
+        });
+        return;
+      }
 
-    if (!destinationId) {
-      showErrorAlert("This destination cannot be favorited yet.");
-      return;
-    }
+      if (!destinationId) {
+        showErrorAlert("This destination cannot be favorited yet.");
+        return;
+      }
 
-    const isCurrentlyLiked = likedDestinations.includes(destinationKey);
-    const nextLikedDestinations = isCurrentlyLiked
-      ? likedDestinations.filter((key) => key !== destinationKey)
-      : [...likedDestinations, destinationKey];
+      const isCurrentlyLiked = likedDestinations.includes(destinationKey);
+      const nextLikedDestinations = isCurrentlyLiked
+        ? likedDestinations.filter((key) => key !== destinationKey)
+        : [...likedDestinations, destinationKey];
 
-    setLikedDestinations(nextLikedDestinations);
+      setLikedDestinations(nextLikedDestinations);
 
-    axiosPrivate
-      .patch("/user/favorite-destination", {
-        destinationId,
-        isFavorited: !isCurrentlyLiked,
-      })
-      .catch((error) => {
-        setLikedDestinations(likedDestinations);
-        showErrorAlert(
-          error?.response?.data?.message ||
-            "Failed to update favorite destination.",
-        );
-      });
-  }, [axiosPrivate, likedDestinations, location.pathname, location.search, navigate, userId]);
+      axiosPrivate
+        .patch("/user/favorite-destination", {
+          destinationId,
+          isFavorited: !isCurrentlyLiked,
+        })
+        .catch((error) => {
+          setLikedDestinations(likedDestinations);
+          showErrorAlert(
+            error?.response?.data?.message ||
+              "Failed to update favorite destination.",
+          );
+        });
+    },
+    [
+      axiosPrivate,
+      likedDestinations,
+      location.pathname,
+      location.search,
+      navigate,
+      userId,
+    ],
+  );
 
   const handleDropdownToggle = (dropdownKey) => {
     setOpenDropdown((currentDropdown) =>
@@ -1359,7 +1377,7 @@ const AiSearchResults = () => {
   const handleGoalOptionSelect = (option) => {
     setSelectedGoalOption(option);
     const encodedLoc = selectedContinent
-      ? encodeURIComponent(selectedContinent)
+      ? encodeURIComponent(selectedContinentDisplay)
       : "World";
     const encodedAttr = encodeURIComponent(option);
     navigate(`${searchResultsBasePath}/${encodedLoc}/${encodedAttr}`, {
@@ -1401,8 +1419,9 @@ const AiSearchResults = () => {
       return "";
     }
 
-    const narrativeContinentLabel =
-      getNarrativeContinentLabel(selectedContinent);
+    const narrativeContinentLabel = getNarrativeContinentLabel(
+      selectedContinentDisplay,
+    );
 
     const goalNarratives =
       goalNarrativeByGoalAndAttribute[normalizeNarrativeKey(selectedGoal)] ||
@@ -1415,7 +1434,7 @@ const AiSearchResults = () => {
     }
 
     return `Curated below are the best cities in ${narrativeContinentLabel} as per the ${selectedGoalOption} for you. The results below are ranked using WoNo’s Intelligence Model, analyzing 50+ global factors — including safety, nomad population, healthcare, visa flexibility, cost of living, taxation, work infrastructure, lifestyle quality, and community — tailored to your personal profile.`;
-  }, [selectedContinent, selectedGoal, selectedGoalOption]);
+  }, [selectedContinentDisplay, selectedGoal, selectedGoalOption]);
 
   const thinkingHeadingText = "Curating the best results for you";
 
@@ -1752,19 +1771,23 @@ const AiSearchResults = () => {
   const highlightedResultsHeadingFirstLine = useMemo(
     () =>
       highlightSelectedTokens(resultsHeadingFirstLine, [
-        selectedContinent,
+        selectedContinentDisplay,
         selectedGoalOption,
       ]),
-    [resultsHeadingFirstLine, selectedContinent, selectedGoalOption],
+    [resultsHeadingFirstLine, selectedContinentDisplay, selectedGoalOption],
   );
 
   const highlightedResultsHeadingRemainingLines = useMemo(
     () =>
       highlightSelectedTokens(resultsHeadingRemainingLines, [
-        selectedContinent,
+        selectedContinentDisplay,
         selectedGoalOption,
       ]),
-    [resultsHeadingRemainingLines, selectedContinent, selectedGoalOption],
+    [
+      resultsHeadingRemainingLines,
+      selectedContinentDisplay,
+      selectedGoalOption,
+    ],
   );
 
   const [resultsHeadingBodyLines, resultsHeadingLastLine] = useMemo(() => {
@@ -1856,7 +1879,9 @@ const AiSearchResults = () => {
                 <DropdownBadge
                   label="Continent"
                   options={continentOptions}
-                  selectedValue={selectedContinent || "Select Location"}
+                  selectedValue={
+                    selectedContinent || "Where Do You Want To Go?"
+                  }
                   isOpen={openDropdown === "continent"}
                   onToggle={() => handleDropdownToggle("continent")}
                   onSelect={handleContinentSelect}
@@ -1865,7 +1890,7 @@ const AiSearchResults = () => {
                 <DropdownBadge
                   label={selectedGoal}
                   options={goalOptions}
-                  selectedValue={selectedGoalOption || "Select Attribute"}
+                  selectedValue={selectedGoalOption || "Choose Your Goal!"}
                   isOpen={openDropdown === "goalOption"}
                   onToggle={() => handleDropdownToggle("goalOption")}
                   onSelect={handleGoalOptionSelect}
@@ -1991,7 +2016,7 @@ const AiSearchResults = () => {
                                   </h4>
                                 </div>
                                 <h4 className="mb-2 mt-2 text-right text-white text-sm md:text-sm font-semibold py-0">
-                                  {`${selectedContinent || "World"} Rank ${
+                                  {`${selectedContinentDisplay || "World"} Rank ${
                                     destination?.rankLabel
                                       ? destination.rankLabel.replace(
                                           /^Rank\s*/i,
@@ -2095,8 +2120,8 @@ const AiSearchResults = () => {
                         </div>
                       ) : (
                         <div className="mt-10 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-500">
-                          No destinations are available for {selectedContinent}{" "}
-                          right now.
+                          No destinations are available for{" "}
+                          {selectedContinentDisplay} right now.
                         </div>
                       )}
                     </>

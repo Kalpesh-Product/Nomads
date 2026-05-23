@@ -287,7 +287,7 @@ const destinationImageLinks = [
       "https://www.placesofjuma.com/wp-content/uploads/2019/04/Koh-Phangan-thailand-1n-scaled.jpg",
   },
   {
-    city: "Cairo Governorate",
+    city: "Cairo",
     image:
       "https://cdn.destguides.com/files/store/itinerary/2561/background_image/jpeg_large_4x3_202112291737-c44b72fcd918b3a8c0e78c4c2841e77f.jpeg",
   },
@@ -357,7 +357,7 @@ const destinationImageLinks = [
       "https://images.trvl-media.com/place/275/037843f8-40d3-4776-bc98-ae70aa909659.jpg",
   },
   {
-    city: "Giza Governorate",
+    city: "Giza",
     image: "https://egyptra.pro/uploads/photo_library/photo_688beaf65c7fc.webp",
   },
 ];
@@ -426,7 +426,7 @@ const destinations = [
   ["Casablanca-Settat", "Morocco", "Africa"],
   ["Lagos (Portugal)", "Portugal", "Europe"],
   ["Koh Phangan", "Thailand", "Asia"],
-  ["Cairo Governorate", "Egypt", "Africa"],
+  ["Cairo", "Egypt", "Africa"],
   ["Surigao del Norte", "Philippines", "Asia"],
   ["Nassau", "Bahamas", "North America"],
   ["Otago Region", "New Zealand", "Oceania"],
@@ -441,7 +441,7 @@ const destinations = [
   ["Pittsburgh", "USA", "North America"],
   ["Lagos State", "Nigeria", "Africa"],
   ["Abuja", "Nigeria", "Africa"],
-  ["Giza Governorate", "Egypt", "Africa"],
+  ["Giza", "Egypt", "Africa"],
 ];
 
 const destinationCardShortNames = {
@@ -456,10 +456,10 @@ const destinationCardShortNames = {
   "Spain|Santa Cruz de Tenerife": "Tenerife",
   "Morocco|Casablanca-Settat": "Casablanca",
   "Portugal|Lagos": "Lagos",
-  "Egypt|Cairo Governorate": "Cairo",
+  "Egypt|Cairo": "Cairo",
   "Philippines|Surigao del Norte": "Surigao",
   "New Zealand|Otago Region": "Queenstown",
-  "Egypt|Giza Governorate": "Giza",
+  "Egypt|Giza": "Giza",
 };
 
 const countryCardShortNames = {

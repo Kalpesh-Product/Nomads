@@ -1,5 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { TextField, Button, Avatar } from "@mui/material";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  Box,
+  Button,
+  InputAdornment,
+  MenuItem,
+  TextField,
+} from "@mui/material";
 import useAuth from "../hooks/useAuth";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import useLogout from "../hooks/useLogout";
@@ -9,10 +15,14 @@ import Favorites from "./Favorites";
 import Reviews from "./Reviews";
 import { CircularProgress } from "@mui/material";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
+import { Country } from "country-state-city";
+import { HiCheck } from "react-icons/hi";
 
 const floatingLabelSx = {
+  color: "black",
+  "&.Mui-focused": { color: "#1976d2" },
   "&.MuiInputLabel-shrink": {
-    color: "black",
+    color: "#1976d2",
   },
 };
 
@@ -31,6 +41,14 @@ const primaryPillButtonSx = {
 const PROFILE_PROMPT =
   "The more details you fill in, the more customized support we can provide.";
 const PROFILE_TYPING_SEEN_KEY = "wono-ai-profile-typing-seen";
+const getFlagIconUrl = (isoCode) =>
+  `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
+const tickMenuItemSx = {
+  "& .tick-icon": { opacity: 0, color: "#1976d2" },
+  "&:hover .tick-icon": { opacity: 1 },
+  "&.Mui-selected .tick-icon": { opacity: 1 },
+  "&.Mui-selected:hover .tick-icon": { opacity: 1 },
+};
 
 const AiProfile = () => {
   const navigate = useNavigate();
@@ -43,22 +61,48 @@ const AiProfile = () => {
   const userId = auth?.user?._id || auth?.user?.id;
 
   const [searchParams] = useSearchParams();
+  const countries = useMemo(() => Country.getAllCountries(), []);
 
   const initialTab = searchParams.get("tab") || "profile";
   const [activeTab, setActiveTab] = useState(initialTab);
   const [typedProfilePrompt, setTypedProfilePrompt] = useState("");
 
+  const getPhonePrefixByCountryName = (countryName) => {
+    const selectedCountry = countries.find((item) => item.name === countryName);
+    return selectedCountry?.phonecode ? `+${selectedCountry.phonecode}` : "";
+  };
+
+  const initialProfileForm = useMemo(() => {
+    const userCountry = user?.country || user?.countryOfResidence || "";
+    const selectedCountry = countries.find((item) => item.name === userCountry);
+
+    return {
+      fullName: user?.fullName || "",
+      email: user?.email || "",
+      country: userCountry,
+      state: user?.state || "",
+      contactCode:
+        user?.contactCode ||
+        (selectedCountry?.phonecode ? `+${selectedCountry.phonecode}` : ""),
+      contactNumber: user?.contactNumber || "",
+      salary: user?.salary || "",
+      designation: user?.designation || "",
+    };
+  }, [
+    user?.fullName,
+    user?.email,
+    user?.country,
+    user?.countryOfResidence,
+    user?.state,
+    user?.contactCode,
+    user?.contactNumber,
+    user?.salary,
+    user?.designation,
+    countries,
+  ]);
+
   const [editMode, setEditMode] = useState(false);
-  const [profileForm, setProfileForm] = useState({
-    fullName: user?.fullName || "",
-    email: user?.email || "",
-    country: user?.country || user?.countryOfResidence || "",
-    state: user?.state || "",
-    contactCode: user?.contactCode || "",
-    contactNumber: user?.contactNumber || "",
-    salary: user?.salary || "",
-    designation: user?.designation || "",
-  });
+  const [profileForm, setProfileForm] = useState(initialProfileForm);
 
   const [passwordForm, setPasswordForm] = useState({
     oldPassword: "",
@@ -74,6 +118,10 @@ const AiProfile = () => {
     const tab = searchParams.get("tab") || "profile";
     setActiveTab(tab);
   }, [searchParams]);
+
+  useEffect(() => {
+    setProfileForm(initialProfileForm);
+  }, [initialProfileForm]);
 
   useEffect(() => {
     const hasSeenTypingEffect =
@@ -107,6 +155,19 @@ const AiProfile = () => {
     const { name, value } = e.target;
     setProfileForm((prev) => ({ ...prev, [name]: value }));
   };
+
+  const handleCountryChange = (countryName) => {
+    setProfileForm((prev) => ({
+      ...prev,
+      country: countryName,
+      contactCode: getPhonePrefixByCountryName(countryName),
+    }));
+  };
+
+  const selectedCountryData = useMemo(
+    () => countries.find((country) => country.name === profileForm.country) || null,
+    [countries, profileForm.country],
+  );
 
   const { mutate: updateProfile, isPending: isUpdatePending } = useMutation({
     mutationKey: ["updateProfile"],
@@ -307,22 +368,103 @@ const AiProfile = () => {
                 label="Current Country Of Residence"
                 variant="standard"
                 fullWidth
+                select
                 name="country"
                 value={profileForm.country}
-                onChange={handleProfileChange}
-                InputProps={{ readOnly: !editMode }}
+                onChange={(event) => handleCountryChange(event.target.value)}
+                disabled={!editMode}
                 InputLabelProps={{ sx: floatingLabelSx }}
-              />
-              <TextField
-                label="Mobile"
-                variant="standard"
-                fullWidth
-                name="contactNumber"
-                value={profileForm.contactNumber}
-                onChange={handleProfileChange}
-                InputProps={{ readOnly: !editMode }}
-                InputLabelProps={{ sx: floatingLabelSx }}
-              />
+                SelectProps={{
+                  renderValue: (value) => {
+                    const selectedOption = countries.find(
+                      (country) => country.name === value,
+                    );
+
+                    if (!selectedOption) {
+                      return value;
+                    }
+
+                    return (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                        }}
+                      >
+                        <img
+                          src={getFlagIconUrl(selectedOption.isoCode)}
+                          alt={`${selectedOption.name} flag`}
+                          width={20}
+                          height={15}
+                          loading="lazy"
+                        />
+                        <span>{selectedOption.name}</span>
+                      </Box>
+                    );
+                  },
+                }}
+              >
+                <MenuItem value="" sx={{ fontWeight: 700 }}>
+                  SELECT COUNTRY
+                </MenuItem>
+                {countries.map((country) => (
+                  <MenuItem
+                    key={country.isoCode}
+                    value={country.name}
+                    sx={tickMenuItemSx}
+                  >
+                    <Box className="flex w-full items-center gap-2">
+                      <HiCheck className="tick-icon" size={16} />
+                      <Box className="flex items-center gap-1">
+                        <Box
+                          component="img"
+                          src={getFlagIconUrl(country.isoCode)}
+                          alt={`${country.name} flag`}
+                          sx={{ width: 20, height: 15, flexShrink: 0 }}
+                          loading="lazy"
+                        />
+                        <span>{country.name}</span>
+                      </Box>
+                    </Box>
+                  </MenuItem>
+                ))}
+              </TextField>
+              <Box sx={{ display: "flex", gap: 2, width: "100%" }}>
+                <TextField
+                  label="Code"
+                  variant="standard"
+                  name="contactCode"
+                  value={profileForm.contactCode}
+                  InputLabelProps={{ sx: floatingLabelSx }}
+                  InputProps={{
+                    readOnly: true,
+                    startAdornment: selectedCountryData?.isoCode ? (
+                      <InputAdornment position="start">
+                        <Box
+                          component="img"
+                          src={getFlagIconUrl(selectedCountryData.isoCode)}
+                          alt={`${selectedCountryData.name} flag`}
+                          sx={{ width: 20, height: 15, flexShrink: 0 }}
+                          loading="lazy"
+                        />
+                      </InputAdornment>
+                    ) : null,
+                  }}
+                  sx={{ width: "28%" }}
+                />
+                <TextField
+                  label="Mobile"
+                  variant="standard"
+                  fullWidth
+                  name="contactNumber"
+                  value={profileForm.contactNumber}
+                  onChange={handleProfileChange}
+                  InputProps={{ readOnly: !editMode }}
+                  InputLabelProps={{ sx: floatingLabelSx }}
+                  sx={{ flex: 1 }}
+                />
+              </Box>
               <TextField
                 label="Salary"
                 variant="standard"
@@ -371,7 +513,10 @@ const AiProfile = () => {
                       mt: { xs: 2, md: 0 },
                       width: { xs: "100%", md: "auto" },
                     }}
-                    onClick={() => setEditMode(false)}
+                    onClick={() => {
+                      setProfileForm(initialProfileForm);
+                      setEditMode(false);
+                    }}
                   >
                     Cancel
                   </Button>

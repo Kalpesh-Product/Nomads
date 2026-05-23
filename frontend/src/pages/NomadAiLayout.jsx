@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import AiHeader from "../components/AiHeader";
 import AiSidebar from "../components/AiSidebar";
 import AiFooter from "../components/AiFooter";
+import BackToTopButton from "../components/BackToTopButton";
 
 const NomadAiLayout = () => {
   const location = useLocation();
@@ -52,6 +53,7 @@ const NomadAiLayout = () => {
         </div>
 
         <div
+          id="nomad-ai-scroll-container"
           ref={contentRef}
           className="flex-1 overflow-auto custom-scrollbar-hide"
         >
@@ -62,6 +64,7 @@ const NomadAiLayout = () => {
           {(location.pathname !== "/verticals" ||
             window.innerWidth >= 1024) && <AiFooter />}
         </div>
+        <BackToTopButton scrollContainerRef={contentRef} />
       </div>
     </div>
   );
