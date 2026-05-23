@@ -308,17 +308,25 @@ const AiHome = () => {
                       onClick={() => handleCardClick(card)}
                       className="group cursor-pointer rounded-2xl bg-[#f1f1f3] px-3 py-5 text-center transition-colors duration-200 hover:bg-[#e8e8ed] md:rounded-none md:bg-transparent md:px-0 md:py-0 md:hover:bg-transparent"
                     >
-                      <Icon
-                        size={24}
-                        className="mx-auto text-black/80 transition-colors duration-200 group-hover:text-sky-500"
-                      />
-                      <h3 className="mt-2 text-nano sm:text-[0.8rem]  font-bold text-black/90 leading-tight transition-colors duration-200 group-hover:text-sky-500 uppercase">
-                        {card.title}
-                      </h3>
-                      <div className="mt-2 hidden rounded-2xl bg-[#f1f1f3] p-5 text-left shadow-[0_1px_0_rgba(255,255,255,0.7)] transition-colors duration-200 group-hover:bg-sky-500 md:block">
-                        <p className="text-micro leading-relaxed text-black/90 transition-colors duration-200 group-hover:text-white">
-                          {card.description}
-                        </p>
+                      <div className="md:hidden">
+                        <Icon
+                          size={24}
+                          className="mx-auto text-black/80 transition-colors duration-200 group-hover:text-sky-500"
+                        />
+                        <h3 className="mt-2 text-nano font-bold uppercase leading-tight text-black/90 transition-colors duration-200 group-hover:text-sky-500 sm:text-[0.8rem]">
+                          {card.title}
+                        </h3>
+                      </div>
+                      <div className="hidden rounded-2xl bg-[#f1f1f3] px-4 py-5 shadow-[0_1px_0_rgba(255,255,255,0.7)] transition-colors duration-200 group-hover:bg-sky-500 md:block">
+                        <div className="grid grid-cols-[24px_1fr] items-center gap-3 text-left pl-5">
+                          <Icon
+                            size={24}
+                            className="shrink-0 text-black/80 transition-colors duration-200 group-hover:text-white"
+                          />
+                          <h3 className="text-nano font-bold uppercase leading-tight text-black/90 transition-colors duration-200 group-hover:text-white sm:text-[0.8rem] pl-5">
+                            {card.title}
+                          </h3>
+                        </div>
                       </div>
                     </article>
                     {!isLoggedIn ? (
