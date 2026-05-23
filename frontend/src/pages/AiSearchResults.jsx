@@ -513,7 +513,7 @@ const destinationAliasMap = {
   Casablanca: "Casablanca-Settat",
   Cairo: "Cairo",
   Queenstown: "Otago Region",
-  Giza: "Giza Governorate",
+  Giza: "Giza",
 };
 
 const normalizeDestinationKey = (value = "") =>
