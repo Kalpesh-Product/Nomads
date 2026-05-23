@@ -36,7 +36,7 @@ import { buildAiSearchBadgesWithLocation } from "../utils/aiSearchBarBadges.js";
 // } from "react-icons/hi";
 
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
-const VALUE_ADDED_SERVICE_CARD_BACKGROUND_IMAGE = "/images/goa-image.jpg";
+// const VALUE_ADDED_SERVICE_CARD_BACKGROUND_IMAGE = "/images/goa-image.jpg";
 const VALUE_ADDED_SERVICES_DEFAULT_VISIBLE_COUNT = 5;
 
 const TYPING_INTERVAL_MS = 7;
@@ -103,19 +103,35 @@ const HorizontalScrollWrapper = ({ children, title }) => {
 };
 
 const valueAddedServiceItems = [
-  { label: "ANY VISA SUPPORT", path: "/visa-support" },
+  {
+    label: "ANY VISA SUPPORT",
+    path: "/visa-support",
+    imageUrl:
+      "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1400&q=80",
+  },
   {
     label: "OVERALL ACTIVATION SUPPORT",
     path: "/overall-activation-support",
+    imageUrl:
+      "https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=1400&q=80",
   },
   {
     label: "NEW COMPANY SUPPORT",
     path: "/new-company-setup",
+    imageUrl:
+      "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1400&q=80",
   },
-  { label: "ANY CONSULTATION SUPPORT", path: "/consultation" },
+  {
+    label: "ANY CONSULTATION SUPPORT",
+    path: "/consultation",
+    imageUrl:
+      "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1400&q=80",
+  },
   {
     label: "APPLY FOR JOB",
     badge: "Coming soon",
+    imageUrl:
+      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1400&q=80",
   },
   // {
   //   label: "VIEW LOCATION BLOGS",
@@ -1094,7 +1110,7 @@ const AiGlobalListingsList = () => {
                                     : "hover:scale-[1.02]"
                                 }`}
                                 style={{
-                                  backgroundImage: `linear-gradient(to top, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.2)), url(${VALUE_ADDED_SERVICE_CARD_BACKGROUND_IMAGE})`,
+                                  backgroundImage: `linear-gradient(to top, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.2)), url(${service.imageUrl})`,
                                   backgroundSize: "cover",
                                   backgroundPosition: "center",
                                 }}
@@ -1450,7 +1466,7 @@ const AiGlobalListingsList = () => {
                                   : "hover:scale-[1.02]"
                               }`}
                               style={{
-                                backgroundImage: `linear-gradient(to top, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.2)), url(${VALUE_ADDED_SERVICE_CARD_BACKGROUND_IMAGE})`,
+                                backgroundImage: `linear-gradient(to top, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.2)), url(${service.imageUrl})`,
                                 backgroundSize: "cover",
                                 backgroundPosition: "center",
                               }}
@@ -1497,7 +1513,7 @@ const AiGlobalListingsList = () => {
                                   : "hover:scale-[1.02]"
                               }`}
                               style={{
-                                backgroundImage: `linear-gradient(to top, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.2)), url(${VALUE_ADDED_SERVICE_CARD_BACKGROUND_IMAGE})`,
+                                backgroundImage: `linear-gradient(to top, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.2)), url(${service.imageUrl})`,
                                 backgroundSize: "cover",
                                 backgroundPosition: "center",
                               }}
