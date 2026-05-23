@@ -265,6 +265,36 @@ const AiProduct = () => {
   };
 
   const handleBackButtonClick = () => {
+    const normalizeValue = (value) =>
+      typeof value === "string" ? value.trim().toLowerCase() : "";
+
+    const fallbackCountry = normalizeValue(companyDetails?.country);
+    const fallbackState = normalizeValue(companyDetails?.state);
+    const returnTo = location.state?.returnTo;
+
+    if (returnTo?.pathname) {
+      navigate(
+        {
+          pathname: returnTo.pathname,
+          search:
+            returnTo.search ||
+            `?country=${fallbackCountry || ""}&state=${fallbackState || ""}`,
+        },
+        { state: location.state },
+      );
+      return;
+    }
+
+    if (fallbackCountry && fallbackState) {
+      navigate(
+        `/ai-verticals?country=${fallbackCountry}&state=${fallbackState}`,
+        {
+          state: location.state,
+        },
+      );
+      return;
+    }
+
     navigate(-1);
   };
 

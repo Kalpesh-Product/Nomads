@@ -53,6 +53,7 @@ const NomadAiLayout = () => {
         </div>
 
         <div
+          id="nomad-ai-scroll-container"
           ref={contentRef}
           className="flex-1 overflow-auto custom-scrollbar-hide"
         >

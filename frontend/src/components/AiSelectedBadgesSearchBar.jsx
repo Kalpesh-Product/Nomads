@@ -4,6 +4,7 @@ import {
   HiOutlineSearch,
   HiOutlineX,
 } from "react-icons/hi";
+import { dedupeAiSearchBadges } from "../utils/aiSearchBarBadges.js";
 
 const badgeClassName =
   "inline-flex min-h-[40px] min-w-[5rem] items-center rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85";
@@ -16,7 +17,7 @@ const AiSelectedBadgesSearchBar = ({
   heading = null,
   className = "",
 }) => {
-  const visibleBadges = badges.filter(Boolean);
+  const visibleBadges = dedupeAiSearchBadges(badges);
 
   return (
     <div className={`hidden lg:block ${className}`}>

@@ -26,6 +26,7 @@ import { Helmet } from "@dr.pogodin/react-helmet";
 import useAuth from "../hooks/useAuth.js";
 import { HiOutlineX } from "react-icons/hi";
 import { persistSelectedDestination } from "../utils/selectedDestinationSession.js";
+import { buildAiSearchBadgesWithLocation } from "../utils/aiSearchBarBadges.js";
 
 // import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
 // import {
@@ -43,6 +44,14 @@ const SECOND_HEADING_DELAY_MS = 250;
 const THINKING_HEADING_TEXT = "Curating the best results for you";
 const CURATED_RESULTS_HEADING_TEXT =
   "Please find below the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
+const AI_SCROLL_CONTAINER_ID = "nomad-ai-scroll-container";
+const getAiVerticalsPageStateKey = (country = "", location = "") => {
+  const countryKey = country.trim().toLowerCase();
+  const locationKey = location.trim().toLowerCase();
+
+  if (!countryKey || !locationKey) return null;
+  return `ai-verticals-page-state:${countryKey}:${locationKey}`;
+};
 
 const HorizontalScrollWrapper = ({ children, title }) => {
   const scrollRef = React.useRef(null);
@@ -163,54 +172,58 @@ const AiGlobalListingsList = () => {
     useState(false);
 
   const searchBarBadges = useMemo(() => {
-    const formatBadgeValue = (value) =>
-      value
-        ?.split(/[-_\s]+/)
-        .filter(Boolean)
-        .map(
-          (part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase(),
-        )
-        .join(" ");
-
     const params = new URLSearchParams(location.search);
     const selectedStateFromQuery =
       params.get("state") || params.get("location") || "";
-    const selectedStateBadge = formatBadgeValue(selectedStateFromQuery);
+    const selectedStateBadge = selectedStateFromQuery;
     const locationStateBadges = location.state?.searchBarBadges;
 
-    const replaceTrailingLocationBadge = (badges) => {
-      const cleanedBadges = badges.filter(Boolean);
-      if (!selectedStateBadge) return cleanedBadges;
-
-      if (cleanedBadges.length === 0) return [selectedStateBadge];
-
-      // If the last badge is already the selected state, just return
-      const lastBadge = cleanedBadges[cleanedBadges.length - 1];
-      if (lastBadge?.toLowerCase() === selectedStateBadge.toLowerCase()) {
-        return cleanedBadges;
-      }
-
-      // Check if the selected state is already in the badges but not at the end
-      const badgesWithoutSelected = cleanedBadges.filter(
-        (b) => b.toLowerCase() !== selectedStateBadge.toLowerCase(),
-      );
-
-      // Re-add it to the end
-      return [...badgesWithoutSelected, selectedStateBadge];
-    };
-
     if (Array.isArray(locationStateBadges) && locationStateBadges.length > 0) {
-      return replaceTrailingLocationBadge(locationStateBadges);
+      return buildAiSearchBadgesWithLocation({
+        badges: locationStateBadges,
+        selectedStateBadge,
+      });
     }
 
     if (persistedSearchBarBadges.length > 0) {
-      return replaceTrailingLocationBadge(persistedSearchBarBadges);
+      return buildAiSearchBadgesWithLocation({
+        badges: persistedSearchBarBadges,
+        selectedStateBadge,
+      });
     }
 
-    return selectedStateBadge ? [selectedStateBadge] : [];
+    return buildAiSearchBadgesWithLocation({
+      badges: [],
+      selectedStateBadge,
+    });
   }, [location.search, location.state, persistedSearchBarBadges]);
 
   useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const currentCountry = (params.get("country") || "").trim().toLowerCase();
+    const currentLocation = (
+      params.get("state") ||
+      params.get("location") ||
+      ""
+    )
+      .trim()
+      .toLowerCase();
+
+    if (typeof window !== "undefined" && currentCountry && currentLocation) {
+      const restoreKey = getAiVerticalsPageStateKey(
+        currentCountry,
+        currentLocation,
+      );
+      const hasSavedPageState = window.sessionStorage.getItem(restoreKey);
+
+      if (hasSavedPageState) {
+        setTypedHeading(CURATED_RESULTS_HEADING_TEXT);
+        setIsSecondHeadingPhase(true);
+        setIsHeadingSequenceComplete(true);
+        return undefined;
+      }
+    }
+
     let timeoutId;
     let intervalId;
 
@@ -243,7 +256,7 @@ const AiGlobalListingsList = () => {
       clearTimeout(timeoutId);
       clearInterval(intervalId);
     };
-  }, []);
+  }, [location.search]);
 
   // Special users who can see all locations
   const specialUserEmails = [
@@ -356,11 +369,67 @@ const AiGlobalListingsList = () => {
     "cafe",
   ];
 
+  const expandedCategoriesStorageKey = useMemo(() => {
+    const countryKey = (formData?.country || "").toLowerCase();
+    const locationKey = (formData?.location || "").toLowerCase();
+
+    if (!countryKey || !locationKey) return null;
+    return `ai-verticals-expanded-categories:${countryKey}:${locationKey}`;
+  }, [formData?.country, formData?.location]);
+
+  const listingPageStateStorageKey = useMemo(() => {
+    const countryKey = (formData?.country || "").toLowerCase();
+    const locationKey = (formData?.location || "").toLowerCase();
+
+    if (!countryKey || !locationKey) return null;
+    return getAiVerticalsPageStateKey(countryKey, locationKey);
+  }, [formData?.country, formData?.location]);
+
+  const hasRestoredPageStateRef = React.useRef(false);
+  const sectionRefs = React.useRef({});
+
+  const getScrollContainer = () =>
+    typeof document === "undefined"
+      ? null
+      : document.getElementById(AI_SCROLL_CONTAINER_ID);
+
   const handleShowMoreClick = (type) => {
     setExpandedCategories((prev) =>
       prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type],
     );
   };
+
+  useEffect(() => {
+    if (!expandedCategoriesStorageKey) {
+      setExpandedCategories([]);
+      return;
+    }
+
+    const savedState = window.sessionStorage.getItem(
+      expandedCategoriesStorageKey,
+    );
+
+    if (!savedState) {
+      setExpandedCategories([]);
+      return;
+    }
+
+    try {
+      const parsedState = JSON.parse(savedState);
+      setExpandedCategories(Array.isArray(parsedState) ? parsedState : []);
+    } catch {
+      setExpandedCategories([]);
+    }
+  }, [expandedCategoriesStorageKey]);
+
+  useEffect(() => {
+    if (!expandedCategoriesStorageKey) return;
+
+    window.sessionStorage.setItem(
+      expandedCategoriesStorageKey,
+      JSON.stringify(expandedCategories),
+    );
+  }, [expandedCategories, expandedCategoriesStorageKey]);
 
   const { data: listingsData, isPending: isLisitingLoading } = useQuery({
     queryKey: ["globallistings", formData],
@@ -452,10 +521,86 @@ const AiGlobalListingsList = () => {
     default: (type) => `${type[0].toUpperCase() + type.slice(1)} Spaces`,
   };
 
+  useEffect(() => {
+    if (
+      !listingPageStateStorageKey ||
+      isLisitingLoading ||
+      !isHeadingSequenceComplete
+    ) {
+      return;
+    }
+
+    if (hasRestoredPageStateRef.current) return;
+
+    const savedState = window.sessionStorage.getItem(listingPageStateStorageKey);
+    if (!savedState) return;
+
+    try {
+      const parsedState = JSON.parse(savedState);
+      const scrollContainer = getScrollContainer();
+      const targetCategory = parsedState?.category;
+      const targetSection = targetCategory
+        ? sectionRefs.current[targetCategory]
+        : null;
+
+      window.requestAnimationFrame(() => {
+        if (targetSection) {
+          targetSection.scrollIntoView({ block: "start", behavior: "auto" });
+        }
+
+        if (
+          scrollContainer &&
+          typeof parsedState?.scrollTop === "number" &&
+          parsedState.scrollTop >= 0
+        ) {
+          scrollContainer.scrollTo({
+            top: parsedState.scrollTop,
+            behavior: "auto",
+          });
+        }
+      });
+
+      hasRestoredPageStateRef.current = true;
+      window.sessionStorage.removeItem(listingPageStateStorageKey);
+    } catch {
+      window.sessionStorage.removeItem(listingPageStateStorageKey);
+    }
+  }, [
+    getScrollContainer,
+    isHeadingSequenceComplete,
+    isLisitingLoading,
+    listingPageStateStorageKey,
+  ]);
+
   const toggleFavorite = (id) => {
     setFavorites((prev) =>
       prev.includes(id) ? prev.filter((fav) => fav !== id) : [...prev, id],
     );
+  };
+
+  const handleListingNavigation = (item) => {
+    const scrollContainer = getScrollContainer();
+
+    if (listingPageStateStorageKey) {
+      window.sessionStorage.setItem(
+        listingPageStateStorageKey,
+        JSON.stringify({
+          category: item.companyType || "",
+          scrollTop: scrollContainer?.scrollTop ?? 0,
+        }),
+      );
+    }
+
+    navigate(`/ai-listings/${encodeURIComponent(item.companyName)}`, {
+      state: {
+        companyId: item.companyId,
+        type: item.companyType,
+        returnTo: {
+          pathname: "/ai-verticals",
+          search: location.search,
+        },
+      },
+    });
   };
 
   const [showMobileSearch, setShowMobileSearch] = useState(false);
@@ -861,6 +1006,14 @@ const AiGlobalListingsList = () => {
                           return (
                             <div
                               key={type}
+                              ref={(element) => {
+                                if (element) {
+                                  sectionRefs.current[type] = element;
+                                  return;
+                                }
+
+                                delete sectionRefs.current[type];
+                              }}
                               className={`col-span-full ${
                                 index > 0
                                   ? "border-t border-gray-300 mt-6 pt-6"
@@ -877,15 +1030,7 @@ const AiGlobalListingsList = () => {
                                     item={item}
                                     showVertical={false}
                                     handleNavigation={() =>
-                                      navigate(
-                                        `/ai-listings/${encodeURIComponent(item.companyName)}`,
-                                        {
-                                          state: {
-                                            companyId: item.companyId,
-                                            type: item.companyType,
-                                          },
-                                        },
-                                      )
+                                      handleListingNavigation(item)
                                     }
                                   />
                                 ))}
@@ -1224,15 +1369,7 @@ const AiGlobalListingsList = () => {
                                   item={item}
                                   showVertical={false}
                                   handleNavigation={() =>
-                                    navigate(
-                                      `/ai-listings/${encodeURIComponent(item.companyName)}`,
-                                      {
-                                        state: {
-                                          companyId: item.companyId,
-                                          type: item.companyType,
-                                        },
-                                      },
-                                    )
+                                    handleListingNavigation(item)
                                   }
                                 />
                               </div>
