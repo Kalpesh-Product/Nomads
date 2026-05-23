@@ -45,32 +45,32 @@ const valueAddedServiceItems = [
     label: "ANY VISA SUPPORT",
     path: "/visa-support",
     imageUrl:
-      // "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1400&q=80",
+      // "https://img.magnific.com/free-photo/american-visa-document_1101-820.jpg?semt=ais_hybrid&w=740&q=80",
       "https://img.magnific.com/free-photo/american-visa-document_1101-820.jpg?semt=ais_hybrid&w=740&q=80",
   },
   {
     label: "OVERALL ACTIVATION SUPPORT",
     path: "/overall-activation-support",
     imageUrl:
-      "https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=1400&q=80",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbhxwe7kd7j-UFpFp7tS2Ka0_L2iZ_zI_07Q&s",
   },
   {
     label: "NEW COMPANY SUPPORT",
     path: "/new-company-setup",
     imageUrl:
-      "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1400&q=80",
+      "https://3.imimg.com/data3/KB/OY/MY-1439773/new-business-setup.jpg",
   },
   {
     label: "ANY CONSULTATION SUPPORT",
     path: "/consultation",
     imageUrl:
-      "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1553877522-43269d4ea984?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y29uc3VsdGF0aW9ufGVufDB8fDB8fHww",
   },
   {
     label: "APPLY FOR JOB",
     badge: "Coming soon",
     imageUrl:
-      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1400&q=80",
+      "https://img.freepik.com/premium-vector/people-seeking-jobs-internet-job-search-recruitment_773186-499.jpg?semt=ais_hybrid&w=740&q=80",
   },
   // {
   //   label: "VIEW LOCATION BLOGS",
