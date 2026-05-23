@@ -161,16 +161,16 @@ const DESTS = [
     { label: "Athens", country: "gr", keyword: "athens", lang: "el" },
     { label: "Tbilisi", country: "ge", keyword: "tbilisi", lang: "ka" },
     {
-        label: "Miami, Florida",
+        label: "Florida",
         country: "us",
-        keyword: "miami, florida",
+        keyword: "florida",
         lang: "en",
     },
     { label: "Kraków", country: "pl", keyword: "kraków", lang: "pl" },
     {
-        label: "Austin, Texas",
+        label: "Texas",
         country: "us",
-        keyword: "austin, texas",
+        keyword: "texas",
         lang: "en",
     },
 ];
