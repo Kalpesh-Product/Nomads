@@ -14,6 +14,7 @@ import axios from "../utils/axios";
 
 const searchBarBadgeClassName =
   "inline-flex min-h-[40px] min-w-[5rem] items-center rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85";
+const contentAlignClassName = "md:px-10";
 
 // const countOptions = [
 //   { label: "1 - 5", value: "1-5" },
@@ -354,7 +355,7 @@ const AiManualSearch = () => {
   return (
     <div className="min-h-full bg-white">
       <main className="pb-8">
-        <div className="mx-0 w-full max-w-[80rem] px-1 sm:px-6 lg:mx-auto lg:max-w-[80rem] lg:px-0 lg:min-w-[75%]">
+               <div className="mx-0 w-full max-w-[80rem] px-3 sm:px-6 lg:mx-auto lg:max-w-[80rem] lg:px-0 lg:min-w-[75%]">
           <div className="rounded-[10px] bg-white px-0 pb-6">
             <div className="flex md:px-10">
               <button
@@ -367,49 +368,51 @@ const AiManualSearch = () => {
               </button>
             </div>
 
-            <div className="mt-6 mb-6 lg:ml-[6.25rem] lg:mr-36">
+            <div className={`mt-6 mb-6 ${contentAlignClassName}`}>
               <p className="text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
                 {typedTopHeading}
               </p>
             </div>
 
-            <div className="mt-4 hidden max-w-full items-center rounded-[30px] border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] sm:flex lg:ml-[6.25rem] lg:mr-36">
-              <div className="flex flex-wrap items-center gap-2">
-                {searchBarBadges.map((badgeLabel, index) => (
-                  <div
-                    key={`${badgeLabel}-${index}`}
-                    className={searchBarBadgeClassName}
+            <div className={contentAlignClassName}>
+              <div className="mt-4 hidden max-w-full items-center rounded-[30px] border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] sm:flex">
+                <div className="flex flex-wrap items-center gap-2">
+                  {searchBarBadges.map((badgeLabel, index) => (
+                    <div
+                      key={`${badgeLabel}-${index}`}
+                      className={searchBarBadgeClassName}
+                    >
+                      <span className="truncate">{badgeLabel}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="ml-auto flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => navigate("/home")}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-black/70 transition-colors hover:bg-black/5 hover:text-black"
+                    aria-label="Clear search and go back"
                   >
-                    <span className="truncate">{badgeLabel}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="ml-auto flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => navigate("/home")}
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-black/70 transition-colors hover:bg-black/5 hover:text-black"
-                  aria-label="Clear search and go back"
-                >
-                  <HiOutlineX size={24} />
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSearch}
-                  className={`inline-flex items-center justify-center rounded-full p-1 transition-colors ${hasAllSelections
-                      ? "text-black/90 hover:text-sky-600"
-                      : "cursor-not-allowed text-black/35"
-                    }`}
-                  aria-label="Search listings"
-                  disabled={!hasAllSelections}
-                >
-                  <HiOutlineSearch size={34} />
-                </button>
+                    <HiOutlineX size={24} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSearch}
+                    className={`inline-flex items-center justify-center rounded-full p-1 transition-colors ${hasAllSelections
+                        ? "text-black/90 hover:text-sky-600"
+                        : "cursor-not-allowed text-black/35"
+                      }`}
+                    aria-label="Search listings"
+                    disabled={!hasAllSelections}
+                  >
+                    <HiOutlineSearch size={34} />
+                  </button>
+                </div>
               </div>
             </div>
 
             <div
-              className="relative mt-6 lg:ml-[6.25rem] lg:mr-36"
+              className={`relative mt-6 ${contentAlignClassName}`}
               ref={dropdownContainerRef}
             >
               <div className="relative z-30 grid w-full grid-cols-1 gap-4 sm:grid-cols-2 sm:items-stretch lg:grid-cols-3">
