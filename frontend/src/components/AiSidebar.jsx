@@ -225,7 +225,7 @@ const SidebarSection = ({
 };
 
 const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const [isRecommendationsOpen, setIsRecommendationsOpen] = useState(true);
   const [isValueAdditionsOpen, setIsValueAdditionsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
