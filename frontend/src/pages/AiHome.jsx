@@ -102,7 +102,7 @@ const AiHome = () => {
 
   const greetingText = isLoggedIn ? `Hi ${userFirstName}` : "Meet WoNo";
   const subheadingText = isLoggedIn
-    ? "Welcome back to wono, an intelligent platform for modern nomads."
+    ? ""
     : "An intelligent platform for modern nomads … Early adoption of our future lifestyle!";
   const thirdLineText = isLoggedIn
     ? "A global community of nomads & remote workers, who are redefining how the world lives and works. Early adoption of our future lifestyle!"
@@ -271,9 +271,11 @@ const AiHome = () => {
           <h1 className="text-3xl font-medium text-black/90 font-play">
             {typedGreeting}
           </h1>
-          <h2 className="mt-5 text-sm font-semibold text-black/85 font-play sm:text-lg">
-            {typedSubheading}
-          </h2>
+          {typedSubheading ? (
+            <h2 className="mt-5 text-sm font-semibold text-black/85 font-play sm:text-lg">
+              {typedSubheading}
+            </h2>
+          ) : null}
           {/* <p className="mt-4 text-sm sm:text-lg font-medium text-black/85 font-play">
             {typedThirdLine}
           </p> */}
