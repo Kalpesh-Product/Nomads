@@ -190,7 +190,7 @@ const SidebarSection = ({
                 >
                   <Icon
                     size={18}
-                    className={`shrink-0 ${isActive ? "text-black" : "text-black/80"}`}
+                    className={`shrink-0 ${isActive ? "text-primary-blue" : "text-black/80"}`}
                   />
 
                   {!collapsed && (
