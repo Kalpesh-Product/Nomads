@@ -245,7 +245,10 @@ if (tenant === "main") {
               path: "search/:goal/results/:loc?/:attr?",
               element: <AiSearchResults />,
             },
-            { path: "manual-search", element: <AiManualSearch /> },
+            {
+              path: "manual-search/:continent?/:country?",
+              element: <AiManualSearch />,
+            },
             { path: "ai-verticals", element: <AiGlobalListings /> },
             { path: "ai-blogs", element: <AiBlogsFetch /> },
             { path: "ai-blogs/ai-blog-details", element: <AiBlogDetails /> },

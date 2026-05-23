@@ -9,21 +9,15 @@ import {
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import { useMutation } from "@tanstack/react-query";
-import React, { useState } from "react";
+import React from "react";
 import { Controller, useForm } from "react-hook-form";
 import axios from "../utils/axios";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import dayjs from "dayjs";
 // import toast from "react-hot-toast";
-import GetStartedButton from "../components/GetStartedButton";
-import { useLocation } from "react-router-dom";
 import { isValidInternationalPhone } from "../utils/validators";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 
 const JobApplicationForm = ({ title }) => {
-  const { pathname } = useLocation();
   const isHost = window.location.hostname.includes("hosts");
 
   const customLink = isHost
@@ -35,7 +29,7 @@ const JobApplicationForm = ({ title }) => {
     control,
     reset,
     formState: { errors },
-    watch,
+    setError,
   } = useForm({
     defaultValues: {
       name: "",
@@ -128,7 +122,18 @@ const JobApplicationForm = ({ title }) => {
       </h3>
 
       <form
-        onSubmit={handleSubmit((data) => submitJobApplication(data))}
+        onSubmit={handleSubmit((data) => {
+          if (!data.resumeLink) {
+            setError("resumeLink", {
+              type: "required",
+              message: "Please upload your resume before submitting.",
+            });
+            showErrorAlert("Please upload your resume before submitting.");
+            return;
+          }
+
+          submitJobApplication(data);
+        })}
         className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:max-w-4xl mx-auto"
       >
         {/* Name */}
@@ -262,6 +267,7 @@ const JobApplicationForm = ({ title }) => {
         <Controller
           name="resumeLink"
           control={control}
+          rules={{ required: "Please upload your resume before submitting." }}
           render={({ field }) => (
             <>
               <TextField
@@ -269,6 +275,8 @@ const JobApplicationForm = ({ title }) => {
                 fullWidth
                 label="Upload Resume / CV"
                 value={field.value?.name || ""}
+                error={!!errors.resumeLink}
+                helperText={errors.resumeLink?.message}
                 InputProps={{ readOnly: true }}
                 onClick={() =>
                   document.getElementById("resumeLink-upload").click()

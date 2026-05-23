@@ -190,7 +190,7 @@ const SidebarSection = ({
                 >
                   <Icon
                     size={18}
-                    className={`shrink-0 ${isActive ? "text-black" : "text-black/80"}`}
+                    className={`shrink-0 ${isActive ? "text-primary-blue" : "text-black/80"}`}
                   />
 
                   {!collapsed && (
@@ -225,7 +225,7 @@ const SidebarSection = ({
 };
 
 const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const [isRecommendationsOpen, setIsRecommendationsOpen] = useState(true);
   const [isValueAdditionsOpen, setIsValueAdditionsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);

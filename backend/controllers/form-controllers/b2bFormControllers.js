@@ -232,17 +232,20 @@ export const addB2BFormSubmission = async (req, res, next) => {
     // 2) ensure IST stamps if missing
     addIstSubmissionStampsIfMissing(payload);
 
-    // 3) optional resume upload
-    let resumeLink = "";
-    if (req.file) {
-      data = await uploadFileToS3(
-        `job-applications/${payload.jobPosition}/${payload.name + randomUUID()
-        }/${req.file.originalname}`,
-        req.file,
-      );
-
-      resumeLink = data.url;
+    // 3) required resume upload
+    if (!req.file) {
+      return res.status(400).json({
+        message: "Please upload your resume before submitting.",
+      });
     }
+
+    const data = await uploadFileToS3(
+      `job-applications/${payload.jobPosition}/${
+        payload.name + randomUUID()
+      }/${req.file.originalname}`,
+      req.file,
+    );
+    const resumeLink = data.url;
 
     // 4) forward to Apps Script
     const apsBody = {

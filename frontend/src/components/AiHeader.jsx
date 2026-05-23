@@ -11,6 +11,7 @@ import useNomadLoginState from "../hooks/useNomadLoginState";
 import AiContainer from "./AiContainer";
 import useLogout from "../hooks/useLogout";
 import { clearStoredLoginState } from "../hooks/useNomadLoginState";
+import useLocationContentAvailability from "../hooks/useLocationContentAvailability";
 
 const AiHeader = ({ onMobileSidebarToggle }) => {
   const [open, setOpen] = useState(false);
@@ -29,7 +30,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
     location.pathname.includes("verticals") ||
     isAiListingsMapPage ||
     isAiListingsListPage;
-  const showNewsBlogLinks =
+  const shouldCheckNewsBlogLinks =
     showToggle ||
     location.pathname.startsWith("/ai-listings") ||
     location.pathname.startsWith("/listings");
@@ -138,6 +139,15 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
   const stateLabel = stateParam ? formatStateLabel(stateParam) : "";
   const newsLabel = stateLabel ? `${stateLabel} News` : "News";
   const blogLabel = stateLabel ? `${stateLabel} Blog` : "Blog";
+  const {
+    hasBlogs,
+    hasNews,
+    hasNewsOrBlogs,
+  } = useLocationContentAvailability({
+    enabled: shouldCheckNewsBlogLinks,
+    keyword: stateParam,
+  });
+  const showNewsBlogLinks = shouldCheckNewsBlogLinks && hasNewsOrBlogs;
 
   const offersLabel = stateLabel ? `${stateLabel} Offers` : "Offers";
 
@@ -279,25 +289,29 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                 <ul>
                   {/* Blogs and News - Added on the LEFT side of Map/List View */}
                   <li className="flex items-center gap-6">
-                    <Link
-                      to={`/ai-news${currentSearch}`}
-                      className="group relative text-md text-black font-semibold whitespace-nowrap"
-                    >
-                      <span className="relative z-10 group-hover:font-bold mb-2 text-sm whitespace-nowrap">
-                        {newsLabel}
-                      </span>
-                      <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
-                    </Link>
+                    {hasNews && (
+                      <Link
+                        to={`/ai-news${currentSearch}`}
+                        className="group relative text-md text-black font-semibold whitespace-nowrap"
+                      >
+                        <span className="relative z-10 group-hover:font-bold mb-2 text-sm whitespace-nowrap">
+                          {newsLabel}
+                        </span>
+                        <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                      </Link>
+                    )}
 
-                    <Link
-                      to={`/ai-blogs${currentSearch}`}
-                      className="group relative text-md text-black font-semibold whitespace-nowrap"
-                    >
-                      <span className="relative z-10 group-hover:font-bold mb-2 text-sm whitespace-nowrap">
-                        {blogLabel}
-                      </span>
-                      <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
-                    </Link>
+                    {hasBlogs && (
+                      <Link
+                        to={`/ai-blogs${currentSearch}`}
+                        className="group relative text-md text-black font-semibold whitespace-nowrap"
+                      >
+                        <span className="relative z-10 group-hover:font-bold mb-2 text-sm whitespace-nowrap">
+                          {blogLabel}
+                        </span>
+                        <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                      </Link>
+                    )}
 
                     <span className="group relative text-md text-black font-semibold whitespace-nowrap">
                       <span className="relative z-10 mb-2 text-sm whitespace-nowrap">
@@ -449,8 +463,8 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                   headerLinks
                     .filter((item) =>
                       showNewsBlogLinks
-                        ? item.type === "news" ||
-                          item.type === "blog" ||
+                        ? (item.type === "news" && hasNews) ||
+                          (item.type === "blog" && hasBlogs) ||
                           item.type === "offers"
                         : true,
                     )
