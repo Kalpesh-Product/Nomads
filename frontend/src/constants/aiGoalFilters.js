@@ -43,7 +43,7 @@ export const goalFilterMap = {
     "Nomad Community & Networking",
     "Couple - Friendly Lifestyle",
     "Family - Friendly Lifestyle",
-    "Female Friendly Lifestyle",
+    "Female - Friendly Lifestyle",
     "Founder Nomads",
     "Solo Nomads",
   ],

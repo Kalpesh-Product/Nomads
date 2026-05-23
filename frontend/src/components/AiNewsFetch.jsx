@@ -161,16 +161,16 @@ const DESTS = [
     { label: "Athens", country: "gr", keyword: "athens", lang: "el" },
     { label: "Tbilisi", country: "ge", keyword: "tbilisi", lang: "ka" },
     {
-        label: "Miami, Florida",
+        label: "Florida",
         country: "us",
-        keyword: "miami, florida",
+        keyword: "florida",
         lang: "en",
     },
     { label: "Kraków", country: "pl", keyword: "kraków", lang: "pl" },
     {
-        label: "Austin, Texas",
+        label: "Texas",
         country: "us",
-        keyword: "austin, texas",
+        keyword: "texas",
         lang: "en",
     },
 ];
@@ -274,7 +274,7 @@ const AiNewsFetch = () => {
             } else {
                 // 🚫 Unknown destination in URL → original behavior
                 setDest(null);
-                setSearchParams({});
+                setSearchParams({}, { replace: true });
                 return;
             }
         }
@@ -287,19 +287,19 @@ const AiNewsFetch = () => {
             );
             if (foundByKeyword) {
                 setDest(foundByKeyword);
-                setSearchParams({ dest: foundByKeyword.label });
+                setSearchParams({ dest: foundByKeyword.label }, { replace: true });
                 return;
             } else {
                 // 🚫 No matching destination → original behavior
                 setDest(null);
-                setSearchParams({});
+                setSearchParams({}, { replace: true });
                 return;
             }
         }
 
         // 3️⃣ No destination at all → default to All
         setDest(DESTS[0]);
-        setSearchParams({});
+        setSearchParams({}, { replace: true });
     }, [formData, searchParams, setSearchParams]);
 
     const handleChange = (val) => {

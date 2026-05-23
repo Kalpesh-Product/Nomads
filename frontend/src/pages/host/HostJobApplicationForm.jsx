@@ -35,8 +35,6 @@ const HostJobApplicationForm = () => {
     willing: "",
     message: "",
     jobPosition: "",
-    submissionDate: null,
-    submissionTime: null,
     status: "",
     remarks: "",
   });
@@ -77,8 +75,6 @@ const HostJobApplicationForm = () => {
       willing: "",
       message: "",
       jobPosition: "",
-      submissionDate: null,
-      submissionTime: null,
       status: "",
       remarks: "",
     });
@@ -183,6 +179,11 @@ const HostJobApplicationForm = () => {
     const phoneValidation = isValidInternationalPhone(formValues.mobile);
     if (phoneValidation !== true) {
       showErrorAlert(phoneValidation);
+      return;
+    }
+
+    if (!formValues.resume) {
+      showErrorAlert("Please upload your resume before submitting.");
       return;
     }
 
@@ -320,24 +321,6 @@ const HostJobApplicationForm = () => {
           hidden
           onChange={handleChange}
           accept=".pdf,.doc,.docx"
-        />
-
-        {/* Keeping these fields in UI for now; submission uses current date/time */}
-        <DatePicker
-          label="Submission Date"
-          value={formValues.submissionDate}
-          onChange={(v) => setFormValues((p) => ({ ...p, submissionDate: v }))}
-          slotProps={{
-            textField: { fullWidth: true, variant: "standard" },
-          }}
-        />
-        <DatePicker
-          label="Submission Time"
-          value={formValues.submissionTime}
-          onChange={(v) => setFormValues((p) => ({ ...p, submissionTime: v }))}
-          slotProps={{
-            textField: { fullWidth: true, variant: "standard" },
-          }}
         />
 
         <FormControl fullWidth variant="standard">

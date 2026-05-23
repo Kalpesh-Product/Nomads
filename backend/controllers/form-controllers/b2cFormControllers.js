@@ -487,16 +487,19 @@ export const addB2CformSubmission = async (req, res, next) => {
 
       const { submissionDate, submissionTime } = istNowPieces();
 
-      let resumeLink = "";
-      if (req.file) {
-        const data = await uploadFileToS3(
-          `job-applications/${payload.jobPosition}/${
-            payload.name
-          }_${randomUUID()}/${req.file.originalname}`,
-          req.file,
-        );
-        resumeLink = data.url;
+      if (!req.file) {
+        return res.status(400).json({
+          message: "Please upload your resume before submitting.",
+        });
       }
+
+      const data = await uploadFileToS3(
+        `job-applications/${payload.jobPosition}/${
+          payload.name
+        }_${randomUUID()}/${req.file.originalname}`,
+        req.file,
+      );
+      const resumeLink = data.url;
 
       // Post to Google Apps Script
       const apsBody = {

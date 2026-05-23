@@ -7,7 +7,7 @@ import {
   HiOutlineX,
 } from "react-icons/hi";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { setFormValues } from "../features/locationSlice";
 import useAuth from "../hooks/useAuth";
 import axios from "../utils/axios";
@@ -90,14 +90,20 @@ const DropdownBadge = ({
 };
 
 const AiManualSearch = () => {
+  const location = useLocation();
   const navigate = useNavigate();
+  const { continent: continentParam, country: countryParam } = useParams();
   const dispatch = useDispatch();
   const dropdownContainerRef = useRef(null);
   const { auth } = useAuth();
 
   const [openDropdown, setOpenDropdown] = useState(null);
-  const [selectedContinent, setSelectedContinent] = useState("");
-  const [selectedCountry, setSelectedCountry] = useState("");
+  const [selectedContinent, setSelectedContinent] = useState(
+    () => (continentParam ? decodeURIComponent(continentParam) : ""),
+  );
+  const [selectedCountry, setSelectedCountry] = useState(
+    () => (countryParam ? decodeURIComponent(countryParam) : ""),
+  );
   const [selectedLocation, setSelectedLocation] = useState("");
   const [typedTopHeading, setTypedTopHeading] = useState("");
 
@@ -214,6 +220,16 @@ const AiManualSearch = () => {
     );
   };
 
+  const navigateToManualSearchStep = ({ continent = "", country = "" }) => {
+    const encodedContinent = continent ? `/${encodeURIComponent(continent)}` : "";
+    const encodedCountry = country ? `/${encodeURIComponent(country)}` : "";
+
+    navigate({
+      pathname: `/manual-search${encodedContinent}${encodedCountry}`,
+      search: location.search,
+    });
+  };
+
   const navigateToSearchResults = ({ continent, country, location }) => {
     const formValues = {
       continent,
@@ -270,6 +286,15 @@ const AiManualSearch = () => {
     document.addEventListener("mousedown", handleOutsideClick);
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
+
+  useEffect(() => {
+    setSelectedContinent(
+      continentParam ? decodeURIComponent(continentParam) : "",
+    );
+    setSelectedCountry(countryParam ? decodeURIComponent(countryParam) : "");
+    setSelectedLocation("");
+    setOpenDropdown(null);
+  }, [continentParam, countryParam]);
 
   useEffect(() => {
     const clearTypingAnimations = () => {
@@ -401,6 +426,7 @@ const AiManualSearch = () => {
                     setSelectedCountry("");
                     setSelectedLocation("");
                     setOpenDropdown(null);
+                    navigateToManualSearchStep({ continent: value });
                   }}
                 />
 
@@ -416,6 +442,10 @@ const AiManualSearch = () => {
                     setSelectedCountry(value);
                     setSelectedLocation("");
                     setOpenDropdown(null);
+                    navigateToManualSearchStep({
+                      continent: selectedContinent,
+                      country: value,
+                    });
                   }}
                   disabled={!selectedContinent}
                 />

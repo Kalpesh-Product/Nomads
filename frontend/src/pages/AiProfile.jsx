@@ -448,7 +448,9 @@ const AiProfile = () => {
       )}
 
       {/* FAVORITES TAB */}
-      {activeTab === "favorites" && <Favorites showDestinationFavorites />}
+      {activeTab === "favorites" && (
+        <Favorites showDestinationFavorites useAiListingsRoute />
+      )}
       {activeTab === "reviews" && <Reviews />}
     </div>
   );
