@@ -29,7 +29,7 @@ import {
 } from "../constants/aiGoalFilters";
 
 const continentOptions = [
-  "World",
+  "Explore The World",
   "Africa",
   "Asia",
   "Europe",
@@ -511,7 +511,7 @@ const destinationAliasMap = {
   Amsterdam: "North Holland",
   Tenerife: "Santa Cruz de Tenerife",
   Casablanca: "Casablanca-Settat",
-  Cairo: "Cairo Governorate",
+  Cairo: "Cairo",
   Queenstown: "Otago Region",
   Giza: "Giza Governorate",
 };
@@ -633,6 +633,9 @@ const normalizeNarrativeKey = (value = "") =>
 
 const getNarrativeContinentLabel = (continent) =>
   continent === "World" ? "the World" : continent;
+
+const normalizeSelectedContinent = (continent) =>
+  continent === "Explore The World" ? "World" : continent;
 
 const goalNarrativeByGoalAndAttribute = {
   [normalizeNarrativeKey("World Ranking")]: {
@@ -915,6 +918,7 @@ const AiSearchResults = () => {
   const previousVisibleDestinationsLengthRef = useRef(0);
 
   const hasSelectedContinent = Boolean(selectedContinent);
+  const selectedContinentDisplay = normalizeSelectedContinent(selectedContinent);
   const hasSelectedGoalOption = Boolean(selectedGoalOption);
   const hasSelectedFilters = hasSelectedContinent && hasSelectedGoalOption;
   const passportCountry =
@@ -1128,7 +1132,7 @@ const AiSearchResults = () => {
           "/state-wise-weight",
           {
             selectionType: selectedGoal,
-            continent: selectedContinent,
+            continent: selectedContinentDisplay,
             attribute: getApiAttributeForSelection(
               selectedGoal,
               selectedGoalOption,
@@ -1173,7 +1177,7 @@ const AiSearchResults = () => {
               item?.country ||
               "Unknown",
             country: existingDestination?.country || item?.country || "Unknown",
-            continent: existingDestination?.continent || selectedContinent,
+            continent: existingDestination?.continent || selectedContinentDisplay,
             suggestions: Number(metricValue.toFixed(3)),
             internetSpeed: item?.internetSpeed,
             aqiValue: item?.aqiValue,
@@ -1232,7 +1236,9 @@ const AiSearchResults = () => {
   const searchBarBadges = useMemo(() => {
     const badges = [selectedGoal];
 
-    const displayLoc = loc ? decodeURIComponent(loc) : selectedContinent;
+    const displayLoc = normalizeSelectedContinent(
+      loc ? decodeURIComponent(loc) : selectedContinentDisplay,
+    );
     const displayAttr = attr ? decodeURIComponent(attr) : selectedGoalOption;
 
     if (displayLoc) {
@@ -1244,7 +1250,7 @@ const AiSearchResults = () => {
     }
 
     return badges;
-  }, [loc, attr, selectedContinent, selectedGoalOption, selectedGoal]);
+  }, [loc, attr, selectedContinentDisplay, selectedGoalOption, selectedGoal]);
 
   const visibleDestinations = useMemo(() => {
     if (showAllDestinations) {
@@ -1359,7 +1365,7 @@ const AiSearchResults = () => {
   const handleGoalOptionSelect = (option) => {
     setSelectedGoalOption(option);
     const encodedLoc = selectedContinent
-      ? encodeURIComponent(selectedContinent)
+      ? encodeURIComponent(selectedContinentDisplay)
       : "World";
     const encodedAttr = encodeURIComponent(option);
     navigate(`${searchResultsBasePath}/${encodedLoc}/${encodedAttr}`, {
@@ -1402,7 +1408,7 @@ const AiSearchResults = () => {
     }
 
     const narrativeContinentLabel =
-      getNarrativeContinentLabel(selectedContinent);
+      getNarrativeContinentLabel(selectedContinentDisplay);
 
     const goalNarratives =
       goalNarrativeByGoalAndAttribute[normalizeNarrativeKey(selectedGoal)] ||
@@ -1415,7 +1421,7 @@ const AiSearchResults = () => {
     }
 
     return `Curated below are the best cities in ${narrativeContinentLabel} as per the ${selectedGoalOption} for you. The results below are ranked using WoNo’s Intelligence Model, analyzing 50+ global factors — including safety, nomad population, healthcare, visa flexibility, cost of living, taxation, work infrastructure, lifestyle quality, and community — tailored to your personal profile.`;
-  }, [selectedContinent, selectedGoal, selectedGoalOption]);
+  }, [selectedContinentDisplay, selectedGoal, selectedGoalOption]);
 
   const thinkingHeadingText = "Curating the best results for you";
 
@@ -1752,19 +1758,19 @@ const AiSearchResults = () => {
   const highlightedResultsHeadingFirstLine = useMemo(
     () =>
       highlightSelectedTokens(resultsHeadingFirstLine, [
-        selectedContinent,
+        selectedContinentDisplay,
         selectedGoalOption,
       ]),
-    [resultsHeadingFirstLine, selectedContinent, selectedGoalOption],
+    [resultsHeadingFirstLine, selectedContinentDisplay, selectedGoalOption],
   );
 
   const highlightedResultsHeadingRemainingLines = useMemo(
     () =>
       highlightSelectedTokens(resultsHeadingRemainingLines, [
-        selectedContinent,
+        selectedContinentDisplay,
         selectedGoalOption,
       ]),
-    [resultsHeadingRemainingLines, selectedContinent, selectedGoalOption],
+    [resultsHeadingRemainingLines, selectedContinentDisplay, selectedGoalOption],
   );
 
   const [resultsHeadingBodyLines, resultsHeadingLastLine] = useMemo(() => {
@@ -1856,7 +1862,7 @@ const AiSearchResults = () => {
                 <DropdownBadge
                   label="Continent"
                   options={continentOptions}
-                  selectedValue={selectedContinent || "Select Location"}
+                  selectedValue={selectedContinent || "Where Do You Want To Go?"}
                   isOpen={openDropdown === "continent"}
                   onToggle={() => handleDropdownToggle("continent")}
                   onSelect={handleContinentSelect}
@@ -1865,7 +1871,7 @@ const AiSearchResults = () => {
                 <DropdownBadge
                   label={selectedGoal}
                   options={goalOptions}
-                  selectedValue={selectedGoalOption || "Select Attribute"}
+                  selectedValue={selectedGoalOption || "Choose Your Goal!"}
                   isOpen={openDropdown === "goalOption"}
                   onToggle={() => handleDropdownToggle("goalOption")}
                   onSelect={handleGoalOptionSelect}
@@ -1991,7 +1997,7 @@ const AiSearchResults = () => {
                                   </h4>
                                 </div>
                                 <h4 className="mb-2 mt-2 text-right text-white text-sm md:text-sm font-semibold py-0">
-                                  {`${selectedContinent || "World"} Rank ${
+                                  {`${selectedContinentDisplay || "World"} Rank ${
                                     destination?.rankLabel
                                       ? destination.rankLabel.replace(
                                           /^Rank\s*/i,
@@ -2095,7 +2101,7 @@ const AiSearchResults = () => {
                         </div>
                       ) : (
                         <div className="mt-10 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-500">
-                          No destinations are available for {selectedContinent}{" "}
+                          No destinations are available for {selectedContinentDisplay}{" "}
                           right now.
                         </div>
                       )}

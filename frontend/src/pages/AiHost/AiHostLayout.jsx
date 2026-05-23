@@ -9,6 +9,7 @@ import AiFooter from "../../components/AiFooter";
 import AiHome from "../AiHome";
 import AiHostFooter from "./AiHostFooter";
 import AiHostHeader from "./AiHostHeader";
+import BackToTopButton from "../../components/BackToTopButton";
 
 const AiHostLayout = () => {
     const location = useLocation();
@@ -64,6 +65,7 @@ const AiHostLayout = () => {
                     {(location.pathname !== "/verticals" ||
                         window.innerWidth >= 1024) && <AiHostFooter />}
                 </div>
+                <BackToTopButton scrollContainerRef={contentRef} />
             </div>
         </div>
     );
