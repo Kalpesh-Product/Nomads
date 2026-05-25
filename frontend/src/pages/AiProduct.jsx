@@ -216,6 +216,59 @@ const AiProduct = () => {
     companyType: companyDetails?.companyType,
   };
 
+  useEffect(() => {
+    const trail = [
+      { label: breadcrumbState.continent, path: "/ai-verticals" },
+      {
+        label: breadcrumbState.country,
+        path: `/ai-verticals?country=${encodeURIComponent(
+          breadcrumbState.country || "",
+        )}&state=${encodeURIComponent(breadcrumbState.state || "")}`,
+      },
+      {
+        label: breadcrumbState.state,
+        path: `/ai-verticals?country=${encodeURIComponent(
+          breadcrumbState.country || "",
+        )}&state=${encodeURIComponent(breadcrumbState.state || "")}`,
+      },
+      {
+        label: getCompanyTypeBreadcrumbLabel(breadcrumbState.companyType),
+        path: `/ai-listings-list?country=${encodeURIComponent(
+          breadcrumbState.country || "",
+        )}&location=${encodeURIComponent(
+          breadcrumbState.state || "",
+        )}&category=${encodeURIComponent(breadcrumbState.companyType || "")}`,
+      },
+      {
+        label: companyDetails?.companyName || companyName,
+        truncate: true,
+      },
+    ].filter((item) => item.label);
+
+    if (trail.length === 0) return;
+    const currentTrail = location.state?.stickyBreadcrumbs || [];
+    if (JSON.stringify(currentTrail) === JSON.stringify(trail)) return;
+
+    navigate(location.pathname + location.search, {
+      replace: true,
+      state: {
+        ...location.state,
+        stickyBreadcrumbs: trail,
+      },
+    });
+  }, [
+    breadcrumbState.companyType,
+    breadcrumbState.continent,
+    breadcrumbState.country,
+    breadcrumbState.state,
+    companyDetails?.companyName,
+    companyName,
+    location.pathname,
+    location.search,
+    location.state,
+    navigate,
+  ]);
+
   const getCompanyTypeBreadcrumbLabel = (companyType) => {
     const companyTypeLabelMap = {
       coworking: "Co-Working",
@@ -689,7 +742,7 @@ const AiProduct = () => {
           {/* Breadcrumb - Desktop Only */}
           <nav
             aria-label="Breadcrumb"
-            className="mb-4 flex items-center text-primary-blue"
+            className="hidden mb-4 items-center text-primary-blue"
           >
             <button
               type="button"
@@ -1567,7 +1620,7 @@ const AiProduct = () => {
           {/* Breadcrumb - Mobile/Tablet */}
           <nav
             aria-label="Breadcrumb"
-            className="mb-4 flex items-center text-primary-blue text-[10px] md:text-sm"
+            className="hidden mb-4 items-center text-primary-blue text-[10px] md:text-sm"
           >
             <button
               type="button"

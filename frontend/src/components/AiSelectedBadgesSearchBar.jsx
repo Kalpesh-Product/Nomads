@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  HiOutlineArrowLeft,
   HiOutlineSearch,
   HiOutlineX,
 } from "react-icons/hi";
@@ -25,21 +24,6 @@ const AiSelectedBadgesSearchBar = ({
 
   return (
     <div className={`hidden lg:block ${className}`}>
-      <div className="flex min-w-[11rem] items-center gap-3">
-        <button
-          type="button"
-          onClick={onBack}
-          className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
-          aria-label="Go back to search results"
-        >
-          <HiOutlineArrowLeft size={18} />
-        </button>
-        {/* {stateLabel && (
-          <span className="text-lg font-medium text-primary-blue">
-            {stateLabel}
-          </span>
-        )} */}
-      </div>
       {heading && (
         <div className={`mx-auto mt-4 w-full ${widthClassName}`}>
           {heading}

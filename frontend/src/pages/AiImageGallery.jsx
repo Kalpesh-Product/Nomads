@@ -137,6 +137,61 @@ const AiImageGallery = () => {
     { key: "gallery", label: "Gallery", isLink: false },
   ].filter((item) => item.label);
 
+  useEffect(() => {
+    const trail = [
+      { label: continent, path: "/ai-verticals" },
+      {
+        label: country,
+        path: `/ai-verticals?country=${encodeURIComponent(
+          country || "",
+        )}&state=${encodeURIComponent(companyState || "")}`,
+      },
+      {
+        label: companyState,
+        path: `/ai-verticals?country=${encodeURIComponent(
+          country || "",
+        )}&state=${encodeURIComponent(companyState || "")}`,
+      },
+      {
+        label: getCompanyTypeBreadcrumbLabel(companyType),
+        path: `/ai-listings-list?country=${encodeURIComponent(
+          country || "",
+        )}&location=${encodeURIComponent(
+          companyState || "",
+        )}&category=${encodeURIComponent(companyType || "")}`,
+      },
+      {
+        label: resolvedCompanyName,
+        path: `/ai-listings/${encodeURIComponent(companyParam || companyName || "")}`,
+      },
+      { label: "Gallery", truncate: true },
+    ].filter((item) => item.label);
+
+    if (trail.length === 0) return;
+    const currentTrail = location.state?.stickyBreadcrumbs || [];
+    if (JSON.stringify(currentTrail) === JSON.stringify(trail)) return;
+
+    navigate(location.pathname + location.search, {
+      replace: true,
+      state: {
+        ...location.state,
+        stickyBreadcrumbs: trail,
+      },
+    });
+  }, [
+    companyName,
+    companyParam,
+    companyState,
+    companyType,
+    continent,
+    country,
+    location.pathname,
+    location.search,
+    location.state,
+    navigate,
+    resolvedCompanyName,
+  ]);
+
   const handleBreadcrumbNavigate = (breadcrumbKey) => {
     const normalizeValue = (value) =>
       typeof value === "string" ? value.trim().toLowerCase() : value;
@@ -183,7 +238,7 @@ const AiImageGallery = () => {
       <div>
         <nav
           aria-label="Breadcrumb"
-          className="my-4 flex items-center text-primary-blue text-[10px] md:text-sm lg:text-base"
+          className="hidden my-4 items-center text-primary-blue text-[10px] md:text-sm lg:text-base"
         >
           <button
             type="button"

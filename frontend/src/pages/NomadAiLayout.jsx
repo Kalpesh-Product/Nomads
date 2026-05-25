@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
 import Footer from "../components/Footer";
 // import { Toaster } from "react-hot-toast";
@@ -8,9 +8,52 @@ import AiHeader from "../components/AiHeader";
 import AiSidebar from "../components/AiSidebar";
 import AiFooter from "../components/AiFooter";
 import BackToTopButton from "../components/BackToTopButton";
+import AiStickyBackBreadcrumb from "../components/AiStickyBackBreadcrumb";
+
+const EXCLUDED_STICKY_BAR_PATHS = new Set([
+]);
+
+const HIDE_STICKY_BAR_EXACT_PATHS = new Set([
+  "/home",
+  "/home-logged-in",
+  "/search",
+]);
+
+const HIDE_STICKY_BAR_PREFIXES = [
+  "/ai-login",
+  "/ai-signup",
+  "/ai-forgot-password",
+  "/ai-reset-password",
+];
+
+const toTitle = (value) =>
+  decodeURIComponent(value || "")
+    .replace(/[-_]+/g, " ")
+    .split(" ")
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+
+const normalizeBreadcrumbLabel = (segment) => {
+  const normalized = (segment || "").toLowerCase();
+  if (normalized === "ai-blogs") return "Blogs";
+  if (normalized === "ai-news") return "News";
+  if (normalized === "ai-about") return "About";
+  if (normalized === "ai-career") return "Career";
+  if (normalized === "ai-faq") return "FAQs";
+  if (normalized === "ai-privacy") return "Privacy";
+  if (normalized === "ai-terms-and-conditions") return "T&C";
+  if (normalized === "ai-contact") return "Contact";
+  if (normalized === "ai-content-and-copyright")
+    return "Content and Copyright Policy";
+  if (normalized === "ai-content-use-removal")
+    return "Content Use & Removal Policy";
+  return toTitle(segment);
+};
 
 const NomadAiLayout = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const contentRef = useRef(null);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
@@ -25,6 +68,65 @@ const NomadAiLayout = () => {
   useEffect(() => {
     setIsMobileSidebarOpen(false);
   }, [location.pathname, location.search]);
+
+  const shouldShowStickyBar = (() => {
+    if (EXCLUDED_STICKY_BAR_PATHS.has(location.pathname)) return false;
+    if (HIDE_STICKY_BAR_EXACT_PATHS.has(location.pathname)) return false;
+    if (
+      HIDE_STICKY_BAR_PREFIXES.some((prefix) =>
+        location.pathname.startsWith(prefix),
+      )
+    ) {
+      return false;
+    }
+    return true;
+  })();
+
+  const routeBreadcrumbs = (() => {
+    if (
+      location.pathname === "/world-rankings" ||
+      location.pathname === "/ai-verticals" ||
+      location.pathname === "/ai-profile" ||
+      location.pathname.startsWith("/manual-search") ||
+      location.pathname.startsWith("/search/worldranking/results") ||
+      location.pathname.startsWith("/search/workfromanywhere/results") ||
+      location.pathname.startsWith("/search/increaseyoursavings/results") ||
+      location.pathname.startsWith("/search/advanceyourcareer/results") ||
+      location.pathname.startsWith("/search/findyourcommunity/results")
+    ) {
+      return [];
+    }
+
+    const customBreadcrumbs = location.state?.stickyBreadcrumbs;
+    if (Array.isArray(customBreadcrumbs) && customBreadcrumbs.length > 0) {
+      return customBreadcrumbs
+        .map((item, index) => {
+          const isLast = index === customBreadcrumbs.length - 1;
+          return {
+            label: item?.label,
+            onClick:
+              !isLast && item?.path ? () => navigate(item.path) : null,
+            truncate: Boolean(isLast || item?.truncate),
+          };
+        })
+        .filter((item) => item.label);
+    }
+
+    const segments = location.pathname.split("/").filter(Boolean);
+    if (segments.length === 0) return [];
+    return segments
+      .map((segment, index) => {
+        const isLast = index === segments.length - 1;
+        return {
+          label: normalizeBreadcrumbLabel(segment),
+          onClick: isLast
+            ? null
+            : () => navigate(`/${segments.slice(0, index + 1).join("/")}`),
+          truncate: isLast,
+        };
+      })
+      .filter((item) => item.label);
+  })();
 
   return (
     <div className="flex h-screen bg-white">
@@ -51,6 +153,18 @@ const NomadAiLayout = () => {
             onMobileSidebarToggle={() => setIsMobileSidebarOpen(true)}
           />
         </div>
+        {shouldShowStickyBar && (
+          <div className="w-full bg-white/95">
+            <div className="px-3 md:px-8 lg:px-10 xl:px-12 2xl:px-14">
+              <AiStickyBackBreadcrumb
+                onBack={() => navigate(-1)}
+                breadcrumbs={routeBreadcrumbs}
+                sticky={false}
+                textSizeClassName="text-[10px] md:text-sm lg:text-base"
+              />
+            </div>
+          </div>
+        )}
 
         <div
           id="nomad-ai-scroll-container"
