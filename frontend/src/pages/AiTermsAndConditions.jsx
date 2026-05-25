@@ -216,8 +216,8 @@ const AiTermsAndConditions = () => {
                     <br />
                     <div className="flex flex-col">
                         <span>WONOCO PRIVATE LIMITED</span>
-                        <span>10 ANSON ROAD #33-10 INTERNATIONAL PLAZA</span>
-                        <span>SINGAPORE - 079903</span>
+                        <span>77 HIGH STREET, #10-12B HIGH STREET PLAZA</span>
+                        <span>SINGAPORE 179433</span>
                         <div className="flex flex-col mt-1">
                             <a className="text-primary-blue" href="mailto:response@wono.co">
                                 response@wono.co
