@@ -355,7 +355,7 @@ const AiManualSearch = () => {
   return (
     <div className="min-h-full bg-white">
       <main className="pb-8">
-               <div className="mx-0 w-full max-w-[80rem] px-3 sm:px-6 lg:mx-auto lg:max-w-[80rem] lg:px-0 lg:min-w-[75%]">
+               <div className="mx-0 w-full max-w-[20rem] px-3 sm:px-6 lg:mx-auto lg:max-w-[85rem] lg:px-0 lg:min-w-[75%]">
           <div className="rounded-[10px] bg-white px-0 pb-6">
             <div className="flex md:px-10">
               <button
