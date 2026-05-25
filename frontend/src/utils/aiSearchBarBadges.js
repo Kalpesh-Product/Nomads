@@ -10,6 +10,19 @@ export const formatAiSearchBadge = (value = "") => {
 
   if (!normalizedValue) return "";
 
+  const strictLabelMap = {
+    coworking: "Co-Working",
+    "co working": "Co-Working",
+    coliving: "Co-Living",
+    "co living": "Co-Living",
+    meetingroom: "MeetingRooms",
+    "meeting room": "MeetingRooms",
+  };
+
+  if (strictLabelMap[normalizedValue]) {
+    return strictLabelMap[normalizedValue];
+  }
+
   return normalizedValue
     .split(" ")
     .filter(Boolean)

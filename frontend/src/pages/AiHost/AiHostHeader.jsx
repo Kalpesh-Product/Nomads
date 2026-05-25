@@ -206,7 +206,7 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
                           <span className="relative z-10 group-hover:font-bold mb-2 text-sm font-semibold">
                             Map View
                           </span>
-                          <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                          <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-primary-blue transition-all duration-300 group-hover:w-full"></span>
                         </Link>
                       </div>
                     </li>
@@ -226,7 +226,7 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
                           <span className="relative z-10 group-hover:font-bold mb-2 text-sm font-semibold">
                             List view
                           </span>
-                          <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                          <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-primary-blue transition-all duration-300 group-hover:w-full"></span>
                         </Link>
                       </div>
                     </li>
@@ -261,7 +261,7 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
                             {item.text}
                           </span>
                           <span
-                            className={`absolute left-0 bottom-0 top-6 block h-[2px] bg-blue-500 transition-all duration-300 
+                            className={`absolute left-0 bottom-0 top-6 block h-[2px] bg-primary-blue transition-all duration-300 
                               ${isActive ? "w-full" : "w-0 group-hover:w-full"}`}
                           ></span>
                         </Link>
@@ -288,7 +288,7 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
                         <span className="relative z-10 group-hover:font-bold mb-2 text-sm whitespace-nowrap">
                           {newsLabel}
                         </span>
-                        <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                        <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-primary-blue transition-all duration-300 group-hover:w-full"></span>
                       </Link>
                     )}
 
@@ -300,7 +300,7 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
                         <span className="relative z-10 group-hover:font-bold mb-2 text-sm whitespace-nowrap">
                           {blogLabel}
                         </span>
-                        <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                        <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-primary-blue transition-all duration-300 group-hover:w-full"></span>
                       </Link>
                     )}
                   </li>
@@ -315,7 +315,7 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
                   className="relative pb-1 transition-all cursor-pointer duration-300 group bg-transparent border-none text-sm text-primary-blue"
                 >
                   Login as Business
-                  <span className="absolute left-0 w-0 bottom-0 block h-[2px] bg-black transition-all duration-300 group-hover:w-full"></span>
+                  <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-primary-blue transition-all duration-300 group-hover:w-full"></span>
                 </button>
               </div>
               <div className="p-4 px-0 whitespace-nowrap">
@@ -325,7 +325,7 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
                   className="relative pb-1 transition-all cursor-pointer duration-300 group bg-transparent border-none text-sm text-primary-blue"
                 >
                   Become A Nomad
-                  <span className="absolute left-0 w-0 bottom-0 block h-[2px] bg-black transition-all duration-300 group-hover:w-full"></span>
+                  <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-primary-blue transition-all duration-300 group-hover:w-full"></span>
                 </button>
               </div>
             </li>

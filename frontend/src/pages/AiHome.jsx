@@ -100,7 +100,7 @@ const AiHome = () => {
 
   const userFirstName = auth?.user?.fullName?.split(" ")?.[0] || "Abrar";
 
-  const greetingText = isLoggedIn ? `Hi ${userFirstName}` : "Meet WoNo";
+  const greetingText = isLoggedIn ? `Hi ${userFirstName}` : "Meet wono";
   const subheadingText = isLoggedIn
     ? ""
     : "An intelligent platform for modern nomads … Early adoption of our future lifestyle!";
@@ -110,6 +110,23 @@ const AiHome = () => {
   const fourthLineText = isLoggedIn
     ? "Choose your goals from below so that we can help you design your nomad lifestyle."
     : "Choose your goals from below so that we can help you design your nomad lifestyle.";
+
+  const renderBracketBrand = (text) =>
+    text.split("").map((char, index) => {
+      const normalizedText = text.toLowerCase();
+      const inOfWord =
+        normalizedText.slice(index, index + 2) === "of" ||
+        normalizedText.slice(index - 1, index + 1) === "of";
+      const isBlueO = (char === "o" || char === "O") && !inOfWord;
+      return (
+        <span
+          key={`${char}-${index}`}
+          className={isBlueO ? "text-sky-500" : "text-black/90"}
+        >
+          {char}
+        </span>
+      );
+    });
 
   useEffect(() => {
     const typingSeenKey = getTypingSeenKey(isLoggedIn);
@@ -271,6 +288,13 @@ const AiHome = () => {
           <h1 className="text-3xl font-medium text-black/90 font-play">
             {typedGreeting}
           </h1>
+          {!isLoggedIn ? (
+            <h2 className="mt-1 text-ls font-medium font-play">
+              <span className="text-black/90">(</span>
+              {renderBracketBrand("World of Nomads")}
+              <span className="text-black/90">)</span>
+            </h2>
+          ) : null}
           {typedSubheading ? (
             <h2 className="mt-5 text-sm font-semibold text-black/85 font-play sm:text-lg">
               {typedSubheading}
@@ -279,7 +303,7 @@ const AiHome = () => {
           {/* <p className="mt-4 text-sm sm:text-lg font-medium text-black/85 font-play">
             {typedThirdLine}
           </p> */}
-          <p className="mt-4 text-sm sm:text-lg font-medium text-primary-blue font-play">
+          <p className="mt-4 text-sm sm:text-xl font-medium text-primary-blue font-play">
             {typedFourthLine}
           </p>
 

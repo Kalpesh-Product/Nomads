@@ -952,7 +952,7 @@ const AiListings = ({ forceListView = false }) => {
                                   className="h-full w-full object-contain"
                                 />
                                 <span
-                                  className={`text-tiny border-b-4 ${
+                                  className={`text-tiny border-b-2 ${
                                     isActive
                                       ? "border-primary-blue"
                                       : "border-transparent"
@@ -1091,7 +1091,7 @@ const AiListings = ({ forceListView = false }) => {
                       className="h-full w-[90%] object-contain"
                     />
                     <span
-                      className={`text-[10px] font-medium whitespace-nowrap border-b-2 ${isActive ? "border-[#2563EB] text-[#2563EB]" : "border-transparent text-black"
+                      className={`text-[10px] font-medium whitespace-nowrap border-b-2 ${isActive ? "border-primary-blue text-primary-blue" : "border-transparent text-black"
                         }`}
                     >
                       {cat.label}
