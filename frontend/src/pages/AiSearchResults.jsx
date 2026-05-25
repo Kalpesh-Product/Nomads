@@ -897,7 +897,6 @@ const AiSearchResults = () => {
   const [selectedGoalOption, setSelectedGoalOption] =
     useState(initialGoalOption);
   const [openDropdown, setOpenDropdown] = useState(null);
-  const [showAllDestinations, setShowAllDestinations] = useState(false);
   const [selectedVisaRequirement, setSelectedVisaRequirement] = useState(
     visaRequirementOptions[0],
   );
@@ -1253,17 +1252,10 @@ const AiSearchResults = () => {
     return badges;
   }, [loc, attr, selectedContinentDisplay, selectedGoalOption, selectedGoal]);
 
-  const visibleDestinations = useMemo(() => {
-    if (showAllDestinations) {
-      return rankedDestinations;
-    }
-
-    return rankedDestinations.slice(0, INITIAL_VISIBLE_DESTINATIONS);
-  }, [rankedDestinations, showAllDestinations]);
-
-  const shouldShowViewMore =
-    rankedDestinations.length > INITIAL_VISIBLE_DESTINATIONS &&
-    !showAllDestinations;
+  const visibleDestinations = useMemo(
+    () => rankedDestinations,
+    [rankedDestinations],
+  );
 
   const handleDestinationClick = (destination) => {
     const routeCountry = destination.routeCountry || destination.country;
@@ -1657,10 +1649,6 @@ const AiSearchResults = () => {
       setTypedResultsHeading("");
     }
   }, [hasSelectedFilters]);
-
-  useEffect(() => {
-    setShowAllDestinations(false);
-  }, [selectedContinent, selectedGoalOption, selectedVisaRequirement]);
 
   useEffect(() => {
     if (!hasSelectedFilters || !isResultsReady) {
@@ -2084,16 +2072,6 @@ const AiSearchResults = () => {
                       above.
                     </div> */}
                     </>
-                  )}
-
-                  {shouldShowResultsContent && shouldShowViewMore && (
-                    <button
-                      type="button"
-                      onClick={() => setShowAllDestinations(true)}
-                      className="mx-auto mt-8 block text-center text-base font-semibold text-sky-600 transition-colors hover:text-sky-700"
-                    >
-                      View more
-                    </button>
                   )}
 
                   {shouldShowResultsContent && !rankedDestinations.length && (

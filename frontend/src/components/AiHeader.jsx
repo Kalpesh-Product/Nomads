@@ -156,7 +156,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
     // { id: 1, text: "Home", to: "/" },
     { id: 2, type: "news", text: newsLabel, to: `/ai-news${currentSearch}` },
     { id: 3, type: "blog", text: blogLabel, to: `/ai-blogs${currentSearch}` },
-    { id: 4, type: "offers", text: offersLabel },
+    // { id: 4, type: "offers", text: offersLabel },
   ];
 
   const shouldShowHeaderLinks =
@@ -313,11 +313,11 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                       </Link>
                     )}
 
-                    <span className="group relative text-md text-black font-semibold whitespace-nowrap">
+                    {/* <span className="group relative text-md text-black font-semibold whitespace-nowrap">
                       <span className="relative z-10 mb-2 text-sm whitespace-nowrap">
                         {offersLabel}
                       </span>
-                    </span>
+                    </span> */}
                   </li>
 
                   {/* Original Map View / List View - UNCHANGED */}
