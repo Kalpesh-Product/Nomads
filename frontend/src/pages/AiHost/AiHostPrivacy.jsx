@@ -263,8 +263,8 @@ const AiHostPrivacy = () => {
                     </p>
                     <div className="flex flex-col mt-2">
                         <span>WONOCO PRIVATE LIMITED</span>
-                        <span>10 ANSON ROAD #33-10 INTERNATIONAL PLAZA</span>
-                        <span>SINGAPORE - 079903</span>
+                        <span>77 HIGH STREET, #10-12B HIGH STREET PLAZA</span>
+                        <span>SINGAPORE 179433</span>
                         <a
                             className="text-primary-blue mt-1"
                             href="mailto:response@wono.co"

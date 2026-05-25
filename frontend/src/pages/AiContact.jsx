@@ -20,13 +20,10 @@ import { useMutation } from "@tanstack/react-query";
 // import toast from "react-hot-toast";
 import { isValidInternationalPhone } from "../utils/validators";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
-import { HiOutlineArrowLeft } from "react-icons/hi";
-import { useNavigate } from "react-router-dom";
 
 const AiContact = () => {
     const [loading, setLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
-    const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
         name: "",
@@ -74,16 +71,6 @@ const AiContact = () => {
 
     return (
         <div className="bg-white text-black font-sans">
-            <div className="sticky top-0 z-40 bg-white/95 py-3 backdrop-blur-sm md:px-10">
-                <button
-                    type="button"
-                    onClick={() => navigate("/home")}
-                    className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500"
-                    aria-label="Go back"
-                >
-                    <HiOutlineArrowLeft size={18} />
-                </button>
-            </div>
             {/* About & Form */}
             {/* <section className="py-10 px-4 md:px-20"> */}
             <Container padding={false}>
@@ -370,12 +357,12 @@ const AiContact = () => {
               title="Singapore Office"
               className="w-full h-[25rem]"
               loading="lazy"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.8288436496055!2d103.8432645747905!3d1.2760650987118065!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31da191343eb5b27%3A0x1781b571e2363017!2s10%20Anson%20Rd%2C%20Singapore%20079903!5e0!3m2!1sen!2sin!4v1723629468618!5m2!1sen!2sin"></iframe>
+              src="https://www.google.com/maps?q=77%20HIGH%20STREET%2C%20%2310-12B%20HIGH%20STREET%20PLAZA%2C%20SINGAPORE%20179433&output=embed"></iframe>
             <div className="p-4 flex gap-2 text-sm items-start">
               <FaMapMarkerAlt className="mt-1 text-black" />
               <span>
-                SINGAPORE OFFICE - WONOCO PRIVATE LIMITED, 10 ANSON ROAD,
-                #33-10, INTERNATIONAL PLAZA, SINGAPORE - 079903
+                SINGAPORE OFFICE - WONOCO PRIVATE LIMITED, 77 HIGH STREET,
+                #10-12B HIGH STREET PLAZA, SINGAPORE 179433
               </span>
             </div>
           </div>

@@ -6,7 +6,6 @@ import React, {
   useState,
 } from "react";
 import {
-  HiOutlineArrowLeft,
   HiOutlineChevronDown,
   HiOutlineSearch,
   HiOutlineX,
@@ -898,7 +897,6 @@ const AiSearchResults = () => {
   const [selectedGoalOption, setSelectedGoalOption] =
     useState(initialGoalOption);
   const [openDropdown, setOpenDropdown] = useState(null);
-  const [showAllDestinations, setShowAllDestinations] = useState(false);
   const [selectedVisaRequirement, setSelectedVisaRequirement] = useState(
     visaRequirementOptions[0],
   );
@@ -1254,17 +1252,10 @@ const AiSearchResults = () => {
     return badges;
   }, [loc, attr, selectedContinentDisplay, selectedGoalOption, selectedGoal]);
 
-  const visibleDestinations = useMemo(() => {
-    if (showAllDestinations) {
-      return rankedDestinations;
-    }
-
-    return rankedDestinations.slice(0, INITIAL_VISIBLE_DESTINATIONS);
-  }, [rankedDestinations, showAllDestinations]);
-
-  const shouldShowViewMore =
-    rankedDestinations.length > INITIAL_VISIBLE_DESTINATIONS &&
-    !showAllDestinations;
+  const visibleDestinations = useMemo(
+    () => rankedDestinations,
+    [rankedDestinations],
+  );
 
   const handleDestinationClick = (destination) => {
     const routeCountry = destination.routeCountry || destination.country;
@@ -1660,10 +1651,6 @@ const AiSearchResults = () => {
   }, [hasSelectedFilters]);
 
   useEffect(() => {
-    setShowAllDestinations(false);
-  }, [selectedContinent, selectedGoalOption, selectedVisaRequirement]);
-
-  useEffect(() => {
     if (!hasSelectedFilters || !isResultsReady) {
       setVisibleDestinationCount(0);
       previousVisibleDestinationsLengthRef.current = 0;
@@ -1819,22 +1806,8 @@ const AiSearchResults = () => {
   return (
     <div className="min-h-full bg-white">
       <main className="pb-8">
-        <div className="mx-0 w-full max-w-[80rem] px-3 sm:px-6 lg:mx-auto lg:max-w-[80rem] lg:px-0 lg:min-w-[75%]">
+        <div className="mx-0 w-full max-w-[80rem] px-3 sm:px-6 lg:mx-auto lg:max-w-[85rem] lg:px-0 lg:min-w-[75%]">
           <div className="rounded-[10px] bg-white px-0 pb-6">
-            <div className="flex items-center gap-2 md:px-10">
-              <button
-                type="button"
-                onClick={() => navigate(-1)}
-                className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
-                aria-label="Go back"
-              >
-                <HiOutlineArrowLeft size={18} />
-              </button>
-              <span className="text-lg font-semibold text-primary-blue sm:hidden">
-                {selectedGoal}
-              </span>
-            </div>
-
             <div className="mt-6 mb-6 lg:ml-[2.5rem] lg:mr-10">
               <p className="flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
                 {isThinkingHeadingVisible && (
@@ -2099,16 +2072,6 @@ const AiSearchResults = () => {
                       above.
                     </div> */}
                     </>
-                  )}
-
-                  {shouldShowResultsContent && shouldShowViewMore && (
-                    <button
-                      type="button"
-                      onClick={() => setShowAllDestinations(true)}
-                      className="mx-auto mt-8 block text-center text-base font-semibold text-sky-600 transition-colors hover:text-sky-700"
-                    >
-                      View more
-                    </button>
                   )}
 
                   {shouldShowResultsContent && !rankedDestinations.length && (

@@ -1,9 +1,8 @@
 // Career.jsx
 import React, { useState } from "react";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
-import { HiOutlineArrowLeft } from "react-icons/hi";
 import Container from "../components/Container";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import axios from "../utils/axios";
 import romans from "romans";
@@ -12,7 +11,6 @@ import { CircularProgress } from "@mui/material";
 const AiCareer = () => {
     const [openIndex, setOpenIndex] = useState(null);
     const { pathname } = useLocation();
-    const navigate = useNavigate();
     const isHost = pathname.includes("host");
     const customLink = isHost ? `/career/job` : `/ai-career/job`;
     // const customRoute = isHost ? "job/get-job-posts" : "";
@@ -52,16 +50,6 @@ const AiCareer = () => {
 
     return (
         <>
-            <div className="sticky top-0 z-40 bg-white/95 py-3 backdrop-blur-sm md:px-28">
-                <button
-                    type="button"
-                    onClick={() => navigate("/home")}
-                    className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500"
-                    aria-label="Go back"
-                >
-                    <HiOutlineArrowLeft size={18} />
-                </button>
-            </div>
             <Container padding={false}>
                 <div className="py-8 md:py-12 lg:px-28 px-6">
                     <h3 className="text-3xl md:text-5xl lg:text-6xl font-semibold text-host mb-2">

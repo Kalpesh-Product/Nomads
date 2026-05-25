@@ -6,7 +6,6 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import humanDate from "../utils/humanDate";
 import { useSelector } from "react-redux";
 import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
-import { ArrowLeft } from "lucide-react";
 
 const DESTS = [
     { label: "All", country: null, keyword: null, lang: null }, // ✅ New option
@@ -267,10 +266,6 @@ const AiBlogsFetch = () => {
     const initialized = useRef(false);
     const navigate = useNavigate();
 
-    const handleBackButtonClick = () => {
-        navigate(-1);
-    };
-
     useEffect(() => {
         if (initialized.current) return;
         initialized.current = true;
@@ -401,14 +396,6 @@ const AiBlogsFetch = () => {
 
     return (
         <div className="my-6 min-w-[75%] max-w-[80rem] lg:max-w-[80rem] mx-0 lg:mx-auto px-1 sm:px-6 lg:px-0 w-full">
-            <button
-                type="button"
-                onClick={handleBackButtonClick}
-                aria-label="Go back"
-                className="inline-flex items-center justify-center rounded-full border border-primary-blue p-1 text-primary-blue"
-            >
-                <ArrowLeft size={16} />
-            </button>
             <div className="flex justify-between items-center mb-4 flex-col sm:flex-col xs:flex-col md:flex-row lg:flex-row">
                 <h2 className="text-title font-semibold text-host">Blog</h2>
                 {/* Controls */}

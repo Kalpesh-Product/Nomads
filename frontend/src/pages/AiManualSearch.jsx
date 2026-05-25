@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import React, { useMemo, useRef, useState, useEffect } from "react";
 import {
-  HiOutlineArrowLeft,
   HiOutlineChevronDown,
   HiOutlineSearch,
   HiOutlineX,
@@ -355,19 +354,8 @@ const AiManualSearch = () => {
   return (
     <div className="min-h-full bg-white">
       <main className="pb-8">
-               <div className="mx-0 w-full max-w-[80rem] px-3 sm:px-6 lg:mx-auto lg:max-w-[80rem] lg:px-0 lg:min-w-[75%]">
+               <div className="mx-0 w-full max-w-[20rem] px-3 sm:px-6 lg:mx-auto lg:max-w-[85rem] lg:px-0 lg:min-w-[75%]">
           <div className="rounded-[10px] bg-white px-0 pb-6">
-            <div className="flex md:px-10">
-              <button
-                type="button"
-                onClick={() => navigate(-1)}
-                className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
-                aria-label="Go back"
-              >
-                <HiOutlineArrowLeft size={18} />
-              </button>
-            </div>
-
             <div className={`mt-6 mb-6 ${contentAlignClassName}`}>
               <p className="text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
                 {typedTopHeading}

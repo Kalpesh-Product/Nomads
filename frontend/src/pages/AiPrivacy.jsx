@@ -2,7 +2,6 @@ import React from "react";
 
 import { Link, useNavigate } from "react-router-dom";
 import blueUnderline from "../assets/blue_underline.png";
-import { HiOutlineArrowLeft } from "react-icons/hi";
 
 const AiPrivacy = () => {
     const navigate = useNavigate();
@@ -263,8 +262,8 @@ const AiPrivacy = () => {
                     </p>
                     <div className="flex flex-col mt-2">
                         <span>WONOCO PRIVATE LIMITED</span>
-                        <span>10 ANSON ROAD #33-10 INTERNATIONAL PLAZA</span>
-                        <span>SINGAPORE - 079903</span>
+                        <span>77 HIGH STREET, #10-12B HIGH STREET PLAZA</span>
+                        <span>SINGAPORE 179433</span>
                         <a
                             className="text-primary-blue mt-1"
                             href="mailto:response@wono.co"
@@ -285,16 +284,6 @@ const AiPrivacy = () => {
 
     return (
         <div className="flex flex-col gap-10 px-6 md:px-12 lg:px-28 pb-8 md:pb-12 pt-0 text-[#364D59]">
-            <div className="sticky top-0 z-40 bg-white/95 py-3 backdrop-blur-sm">
-                <button
-                    type="button"
-                    onClick={() => navigate("/home")}
-                    className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500"
-                    aria-label="Go back"
-                >
-                    <HiOutlineArrowLeft size={18} />
-                </button>
-            </div>
             <div className="flex flex-col items-center relative font-comic uppercase font-bold text-secondary-dark text-2xl md:text-4xl lg:text-5xl leading-tight">
                 <div className="relative inline-block text-center">
                     <h3>Privacy Policy</h3>

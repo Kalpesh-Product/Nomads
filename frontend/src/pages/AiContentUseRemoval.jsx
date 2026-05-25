@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import blueUnderline from "../assets/blue_underline.png";
 import {
     TextField,
@@ -14,11 +13,8 @@ import { useMutation } from "@tanstack/react-query";
 import axios from "../utils/axios";
 import { isValidInternationalPhone } from "../utils/validators";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
-import { HiOutlineArrowLeft } from "react-icons/hi";
 
 const AiContentUseRemoval = () => {
-    const navigate = useNavigate();
-
     // -------------------------
     // 🔹 Form Logic
     // -------------------------
@@ -384,16 +380,6 @@ const AiContentUseRemoval = () => {
 
     return (
         <div className="flex flex-col gap-10 px-6 md:px-12 lg:px-28 pb-8 md:pb-12 pt-0 text-[#364D59]">
-            <div className="sticky top-0 z-40 bg-white/95 py-3 backdrop-blur-sm">
-                <button
-                    type="button"
-                    onClick={() => navigate("/home")}
-                    className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500"
-                    aria-label="Go back"
-                >
-                    <HiOutlineArrowLeft size={18} />
-                </button>
-            </div>
             {/* Header */}
             <div className="flex flex-col items-center relative font-comic uppercase font-bold text-secondary-dark text-2xl md:text-4xl lg:text-5xl leading-tight">
                 <div className="relative inline-block text-center">
