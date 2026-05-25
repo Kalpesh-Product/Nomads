@@ -135,6 +135,21 @@ const becomeContributorLink = {
   path: "/become-a-contributor",
 };
 
+const collapsedSectionLabels = {
+  "WoNo Intelligence": "WOI",
+  "Value Added Services": "VAS",
+  Profile: "PRO",
+};
+
+const getCollapsedSectionLabel = (title = "") =>
+  collapsedSectionLabels[title] ||
+  title
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase();
+
 const SidebarSection = ({
   title,
   items,
@@ -148,25 +163,47 @@ const SidebarSection = ({
   onTooltipChange,
 }) => {
   const ChevronIcon = isOpen ? HiChevronUp : HiChevronDown;
-  const shouldShowItems = collapsed ? true : !isExpandable || isOpen;
+  const shouldShowItems = !isExpandable || isOpen;
 
   return (
     <div className={`px-4 ${compact ? "pt-0" : "pt-3"}`}>
       <div
         className={`${showTopBorder && !compact ? "border-t border-black/10" : ""} ${compact ? "pt-0" : "pt-2"}`}
       >
-        {collapsed ? null : isExpandable ? (
+        {isExpandable ? (
           <button
             type="button"
             onClick={onToggle}
+            onMouseEnter={(event) => {
+              if (!collapsed) return;
+
+              const rect = event.currentTarget.getBoundingClientRect();
+              onTooltipChange?.({
+                label: title.toUpperCase(),
+                top: rect.top + rect.height / 2,
+                left: rect.right + 14,
+              });
+            }}
+            onMouseLeave={() => onTooltipChange?.(null)}
+            onFocus={(event) => {
+              if (!collapsed) return;
+
+              const rect = event.currentTarget.getBoundingClientRect();
+              onTooltipChange?.({
+                label: title.toUpperCase(),
+                top: rect.top + rect.height / 2,
+                left: rect.right + 14,
+              });
+            }}
+            onBlur={() => onTooltipChange?.(null)}
             className="flex w-full items-center justify-between text-left text-xs font-semibold uppercase tracking-wide text-black/80"
             aria-expanded={isOpen}
             aria-label={`${isOpen ? "Collapse" : "Expand"} ${title}`}
           >
-            <span>{title}</span>
+            <span>{collapsed ? getCollapsedSectionLabel(title) : title}</span>
             <ChevronIcon size={16} className="shrink-0" />
           </button>
-        ) : (
+        ) : collapsed ? null : (
           <h3 className="text-xs font-semibold uppercase tracking-wide text-black/80">
             {title}
           </h3>
