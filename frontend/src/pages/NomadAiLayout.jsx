@@ -92,7 +92,23 @@ const NomadAiLayout = () => {
       location.pathname.startsWith("/search/workfromanywhere/results") ||
       location.pathname.startsWith("/search/increaseyoursavings/results") ||
       location.pathname.startsWith("/search/advanceyourcareer/results") ||
-      location.pathname.startsWith("/search/findyourcommunity/results")
+      location.pathname.startsWith("/search/findyourcommunity/results") ||
+      location.pathname.startsWith("/ai-listings-list") ||
+      location.pathname.startsWith("/visa-support") ||
+      location.pathname.startsWith("/overall-activation-support") ||
+      location.pathname.startsWith("/new-company-setup") ||
+      location.pathname.startsWith("/consultation") ||
+      location.pathname.startsWith("/workation") ||
+      location.pathname.startsWith("/ai-about") ||
+      location.pathname.startsWith("/ai-privacy") ||
+      location.pathname.startsWith("/ai-career") ||
+      location.pathname.startsWith("/ai-terms-and-conditions") ||
+      location.pathname.startsWith("/ai-faq") ||
+      location.pathname.startsWith("/ai-contact") ||
+      location.pathname.startsWith("/ai-career") ||
+      location.pathname.startsWith("/ai-content-and-copyright") ||
+      location.pathname.startsWith("/ai-content-use-removal") ||
+      location.pathname.startsWith("/ai-contact") 
     ) {
       return [];
     }

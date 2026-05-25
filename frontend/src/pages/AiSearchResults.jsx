@@ -1803,6 +1803,42 @@ const AiSearchResults = () => {
     return [bodyLines, lastLine];
   }, [resultsHeadingRemainingLines]);
 
+  const formattedNarrative = useMemo(() => {
+    const lines = (resultsHeadingBodyLines || "")
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean);
+
+    const poweredByLine = lines.find((line) =>
+      line.toLowerCase().startsWith("powered by"),
+    );
+
+    const priorityPoints = lines
+      .filter((line) => line.startsWith("•"))
+      .map((line) => line.replace(/^•\s*/, "").trim());
+
+    const introLine =
+      highlightedResultsHeadingFirstLine ||
+      lines.find((line) => !line.startsWith("•") && !line.toLowerCase().startsWith("powered by")) ||
+      "";
+
+    const endingLine =
+      resultsHeadingLastLine ||
+      lines.find((line) => line.startsWith("→")) ||
+      "";
+
+    return {
+      introLine,
+      poweredByLine,
+      priorityPoints,
+      endingLine,
+    };
+  }, [
+    highlightedResultsHeadingFirstLine,
+    resultsHeadingBodyLines,
+    resultsHeadingLastLine,
+  ]);
+
   return (
     <div className="min-h-full bg-white">
       <main className="pb-8">
@@ -1879,21 +1915,34 @@ const AiSearchResults = () => {
                       </p>
                       <div className="mt-6 text-sm leading-relaxed text-black/85 lg:text-[0.9rem] font-play">
                         <span className="block font-bold">
-                          {highlightedResultsHeadingFirstLine}
+                          {formattedNarrative.introLine}
                         </span>
-                        {resultsHeadingBodyLines && (
-                          <span className="mt-1 block whitespace-pre-line">
-                            {highlightSelectedTokens(resultsHeadingBodyLines, [
-                              selectedContinent,
-                              selectedGoalOption,
-                            ])}
-                          </span>
+                        {formattedNarrative.poweredByLine && (
+                          <div className="mt-2">
+                            <span>
+                              {formattedNarrative.poweredByLine}
+                            </span>
+                            {formattedNarrative.priorityPoints.length > 0 && (
+                              <span className="ml-1">
+                                {formattedNarrative.priorityPoints.map(
+                                  (point, index) => (
+                                    <React.Fragment key={`${point}-${index}`}>
+                                      <span>{point}</span>
+                                      {index <
+                                        formattedNarrative.priorityPoints.length -
+                                          1 && <span>{", "}</span>}
+                                    </React.Fragment>
+                                  ),
+                                )}
+                              </span>
+                            )}
+                          </div>
                         )}
                         <div className="mt-3 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between lg:gap-6">
-                          {(resultsHeadingLastLine ||
+                          {(formattedNarrative.endingLine ||
                             !resultsHeadingBodyLines) && (
                             <span className="block font-medium">
-                              {resultsHeadingLastLine ||
+                              {formattedNarrative.endingLine ||
                                 highlightedResultsHeadingRemainingLines}
                             </span>
                           )}

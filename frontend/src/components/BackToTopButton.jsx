@@ -37,7 +37,7 @@ const BackToTopButton = ({ scrollContainerRef, threshold = 240 }) => {
       type="button"
       aria-label="Back to top"
       onClick={handleBackToTop}
-      className={`fixed bottom-14 right-6 z-[65] flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg transition-all duration-300 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 ${
+      className={`fixed bottom-14 right-6 z-[65] flex h-12 w-12 items-center justify-center rounded-full bg-primary-blue text-white shadow-lg transition-all duration-300 hover:bg-primary-blue focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 ${
         isVisible
           ? "pointer-events-auto translate-y-0 opacity-100"
           : "pointer-events-none translate-y-3 opacity-0"

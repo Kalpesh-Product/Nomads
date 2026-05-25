@@ -886,7 +886,7 @@ const AiGlobalListingsMap = () => {
                     key={cat.value}
                     onClick={() => handleCategoryClick(cat.value)}
                     className={`flex-shrink-0 snap-start px-4 py-1.5 rounded-full text-[11px] font-semibold shadow-md transition-colors ${isActive
-                        ? "bg-blue-50 border border-blue-500 text-blue-600"
+                        ? "bg-blue-50 border border-primary-blue text-primary-blue"
                         : "bg-white/95 backdrop-blur-md border border-gray-200 text-gray-800 hover:bg-gray-50"
                       }`}
                   >
