@@ -36,7 +36,7 @@ import { buildAiSearchBadgesWithLocation } from "../utils/aiSearchBarBadges.js";
 // } from "react-icons/hi";
 
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
-const VALUE_ADDED_SERVICE_CARD_BACKGROUND_IMAGE = "/images/goa-image.jpg";
+// const VALUE_ADDED_SERVICE_CARD_BACKGROUND_IMAGE = "/images/goa-image.jpg";
 const VALUE_ADDED_SERVICES_DEFAULT_VISIBLE_COUNT = 5;
 
 const TYPING_INTERVAL_MS = 7;
@@ -103,19 +103,35 @@ const HorizontalScrollWrapper = ({ children, title }) => {
 };
 
 const valueAddedServiceItems = [
-  { label: "ANY VISA SUPPORT", path: "/visa-support" },
+  {
+    label: "ANY VISA SUPPORT",
+    path: "/visa-support",
+    imageUrl:
+      "https://img.magnific.com/free-photo/american-visa-document_1101-820.jpg?semt=ais_hybrid&w=740&q=80",
+  },
   {
     label: "OVERALL ACTIVATION SUPPORT",
     path: "/overall-activation-support",
+    imageUrl:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbhxwe7kd7j-UFpFp7tS2Ka0_L2iZ_zI_07Q&s",
   },
   {
     label: "NEW COMPANY SUPPORT",
     path: "/new-company-setup",
+    imageUrl:
+      "https://3.imimg.com/data3/KB/OY/MY-1439773/new-business-setup.jpg",
   },
-  { label: "ANY CONSULTATION SUPPORT", path: "/consultation" },
+  {
+    label: "ANY CONSULTATION SUPPORT",
+    path: "/consultation",
+    imageUrl:
+      "https://images.unsplash.com/photo-1553877522-43269d4ea984?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y29uc3VsdGF0aW9ufGVufDB8fDB8fHww",
+  },
   {
     label: "APPLY FOR JOB",
     badge: "Coming soon",
+    imageUrl:
+      "https://img.freepik.com/premium-vector/people-seeking-jobs-internet-job-search-recruitment_773186-499.jpg?semt=ais_hybrid&w=740&q=80",
   },
   // {
   //   label: "VIEW LOCATION BLOGS",
@@ -532,7 +548,9 @@ const AiGlobalListingsList = () => {
 
     if (hasRestoredPageStateRef.current) return;
 
-    const savedState = window.sessionStorage.getItem(listingPageStateStorageKey);
+    const savedState = window.sessionStorage.getItem(
+      listingPageStateStorageKey,
+    );
     if (!savedState) return;
 
     try {
@@ -757,8 +775,22 @@ const AiGlobalListingsList = () => {
     return service.label.replace("LOCATION", locationLabel);
   };
 
-  const getValueAddedServiceCardLines = (serviceLabel) => {
-    return [serviceLabel].filter(Boolean);
+  const getValueAddedServiceCardLines = (serviceLabel, service) => {
+    if (!serviceLabel) return [];
+
+    if (service?.label === "APPLY FOR JOB") {
+      return [serviceLabel];
+    }
+
+    const [firstWord, ...remainingWords] = serviceLabel
+      .split(" ")
+      .filter(Boolean);
+
+    if (!firstWord || remainingWords.length === 0) {
+      return [serviceLabel];
+    }
+
+    return [firstWord, remainingWords.join(" ")];
   };
   const prioritizedCompanies = ["BIZ Nest", "MeWo"];
   const sortedListings = [...(listingsData || [])].sort((a, b) => {
@@ -1078,7 +1110,7 @@ const AiGlobalListingsList = () => {
                                     : "hover:scale-[1.02]"
                                 }`}
                                 style={{
-                                  backgroundImage: `linear-gradient(to top, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.2)), url(${VALUE_ADDED_SERVICE_CARD_BACKGROUND_IMAGE})`,
+                                  backgroundImage: `linear-gradient(to top, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.2)), url(${service.imageUrl})`,
                                   backgroundSize: "cover",
                                   backgroundPosition: "center",
                                 }}
@@ -1086,6 +1118,7 @@ const AiGlobalListingsList = () => {
                                 <div className="flex w-full flex-col items-center justify-end pb-2">
                                   {getValueAddedServiceCardLines(
                                     serviceLabel,
+                                    service,
                                   ).map((line) => (
                                     <span
                                       key={`${serviceLabel}-${line}`}
@@ -1433,7 +1466,7 @@ const AiGlobalListingsList = () => {
                                   : "hover:scale-[1.02]"
                               }`}
                               style={{
-                                backgroundImage: `linear-gradient(to top, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.2)), url(${VALUE_ADDED_SERVICE_CARD_BACKGROUND_IMAGE})`,
+                                backgroundImage: `linear-gradient(to top, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.2)), url(${service.imageUrl})`,
                                 backgroundSize: "cover",
                                 backgroundPosition: "center",
                               }}
@@ -1441,6 +1474,7 @@ const AiGlobalListingsList = () => {
                               <div className="flex w-full flex-col items-center justify-end pb-1">
                                 {getValueAddedServiceCardLines(
                                   serviceLabel,
+                                  service,
                                 ).map((line) => (
                                   <span
                                     key={`${serviceLabel}-${line}`}
@@ -1479,7 +1513,7 @@ const AiGlobalListingsList = () => {
                                   : "hover:scale-[1.02]"
                               }`}
                               style={{
-                                backgroundImage: `linear-gradient(to top, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.2)), url(${VALUE_ADDED_SERVICE_CARD_BACKGROUND_IMAGE})`,
+                                backgroundImage: `linear-gradient(to top, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.2)), url(${service.imageUrl})`,
                                 backgroundSize: "cover",
                                 backgroundPosition: "center",
                               }}
@@ -1487,6 +1521,7 @@ const AiGlobalListingsList = () => {
                               <div className="flex w-full flex-col items-center justify-end">
                                 {getValueAddedServiceCardLines(
                                   serviceLabel,
+                                  service,
                                 ).map((line) => (
                                   <span
                                     key={`${serviceLabel}-${line}`}

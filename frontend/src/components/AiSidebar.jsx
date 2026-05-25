@@ -145,6 +145,7 @@ const SidebarSection = ({
   compact = false,
   onToggle,
   onItemClick,
+  onTooltipChange,
 }) => {
   const ChevronIcon = isOpen ? HiChevronUp : HiChevronDown;
   const shouldShowItems = collapsed ? true : !isExpandable || isOpen;
@@ -183,10 +184,32 @@ const SidebarSection = ({
                   key={item.label}
                   type="button"
                   onClick={() => onItemClick?.(item)}
+                  onMouseEnter={(event) => {
+                    if (!collapsed) return;
+
+                    const rect = event.currentTarget.getBoundingClientRect();
+                    onTooltipChange?.({
+                      label: item.label,
+                      top: rect.top + rect.height / 2,
+                      left: rect.right + 14,
+                    });
+                  }}
+                  onMouseLeave={() => onTooltipChange?.(null)}
+                  onFocus={(event) => {
+                    if (!collapsed) return;
+
+                    const rect = event.currentTarget.getBoundingClientRect();
+                    onTooltipChange?.({
+                      label: item.label,
+                      top: rect.top + rect.height / 2,
+                      left: rect.right + 14,
+                    });
+                  }}
+                  onBlur={() => onTooltipChange?.(null)}
                   className={`group relative flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-left transition-all hover:bg-white ${
                     isActive ? "bg-white text-black shadow-sm" : "text-black/80"
                   }`}
-                  title={collapsed ? item.label : ""}
+                  aria-label={collapsed ? item.label : undefined}
                 >
                   <Icon
                     size={18}
@@ -229,6 +252,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   const [isRecommendationsOpen, setIsRecommendationsOpen] = useState(true);
   const [isValueAdditionsOpen, setIsValueAdditionsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [tooltip, setTooltip] = useState(null);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -429,148 +453,172 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   };
 
   return (
-    <aside
-      className={`flex h-full max-h-screen flex-col overflow-y-auto overscroll-contain border-r border-black/10 bg-[#efefef] transition-all duration-300 custom-scrollbar-hide ${
-        isMobileOverlay
-          ? "w-[calc(100%-52px)] max-w-[320px]"
-          : isCollapsed
-            ? "w-[70px]"
-            : "w-[260px]"
-      }`}
-      onClick={(event) => {
-        if (isMobileOverlay) event.stopPropagation();
-      }}
-    >
-      {/* Logo / Collapse Button */}
-      <div className="px-4 py-4">
-        {isMobileOverlay ? (
-          <div className="flex items-center justify-between gap-3">
-            <div className="h-10 w-24 overflow-x-hidden rounded-lg">
-              <img
-                src={logo}
-                alt="WONO logo"
-                className="h-full w-fit object-contain"
-              />
+    <>
+      <aside
+        className={`flex h-full max-h-screen flex-col overflow-y-auto overscroll-contain border-r border-black/10 bg-[#efefef] transition-all duration-300 custom-scrollbar-hide ${
+          isMobileOverlay
+            ? "w-[calc(100%-52px)] max-w-[320px]"
+            : isCollapsed
+              ? "w-[70px]"
+              : "w-[260px]"
+        }`}
+        onClick={(event) => {
+          if (isMobileOverlay) event.stopPropagation();
+        }}
+      >
+        {/* Logo / Collapse Button */}
+        <div className="px-4 py-4">
+          {isMobileOverlay ? (
+            <div className="flex items-center justify-between gap-3">
+              <div className="h-10 w-24 overflow-x-hidden rounded-lg">
+                <img
+                  src={logo}
+                  alt="WONO logo"
+                  className="h-full w-fit object-contain"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded p-1 text-black/80"
+                aria-label="Close sidebar"
+              >
+                <HiX size={24} />
+              </button>
             </div>
+          ) : (
             <button
               type="button"
-              onClick={onClose}
+              onClick={() => {
+                setTooltip(null);
+                setCollapsed((prev) => !prev);
+              }}
               className="rounded p-1 text-black/80"
-              aria-label="Close sidebar"
+              aria-label="Toggle sidebar"
             >
-              <HiX size={24} />
+              <HiOutlineMenu size={24} />
             </button>
-          </div>
+          )}
+        </div>
+
+        {/* Sections */}
+        <SidebarSection
+          title="WoNo Intelligence"
+          items={recommendationItemsWithActivePath}
+          collapsed={isCollapsed}
+          isExpandable
+          isOpen={isRecommendationsOpen}
+          onToggle={() => setIsRecommendationsOpen((prev) => !prev)}
+          onItemClick={handleRecommendationClick}
+          onTooltipChange={setTooltip}
+        />
+
+        <SidebarSection
+          title="Value Added Services"
+          items={valueAdditionItemsWithActivePath}
+          collapsed={isCollapsed}
+          isExpandable
+          isOpen={isValueAdditionsOpen}
+          onToggle={() => setIsValueAdditionsOpen((prev) => !prev)}
+          onItemClick={handleValueAdditionClick}
+          onTooltipChange={setTooltip}
+        />
+
+        {isLoggedIn ? (
+          <>
+            <SidebarSection
+              title="Profile"
+              items={profileItemsWithUserName}
+              collapsed={isCollapsed}
+              isExpandable
+              isOpen={isProfileOpen}
+              onToggle={() => setIsProfileOpen((prev) => !prev)}
+              onItemClick={handleProfileClick}
+              onTooltipChange={setTooltip}
+            />
+            <div className="mx-4 mt-3 border-t border-black/10"></div>
+            {/* Compact sections - minimal spacing */}
+            <SidebarSection
+              items={[becomeContributorItemWithActivePath]}
+              collapsed={isCollapsed}
+              onItemClick={handleBecomeContributorClick}
+              compact={true}
+              onTooltipChange={setTooltip}
+            />
+            <div className="mx-4 border-t border-black/10"></div>
+            <SidebarSection
+              items={becomeHostItem}
+              collapsed={isCollapsed}
+              onItemClick={handleBecomeHostClick}
+              compact={true}
+              onTooltipChange={setTooltip}
+            />
+            <div className="mx-4 border-t border-black/10"></div>
+            <SidebarSection
+              items={signOutItem}
+              collapsed={isCollapsed}
+              onItemClick={handleSignOutClick}
+              compact={true}
+              onTooltipChange={setTooltip}
+            />
+            <div className="mx-4 border-t border-black/10"></div>
+          </>
         ) : (
-          <button
-            type="button"
-            onClick={() => setCollapsed((prev) => !prev)}
-            className="rounded p-1 text-black/80"
-            aria-label="Toggle sidebar"
-          >
-            <HiOutlineMenu size={24} />
-          </button>
-        )}
-      </div>
-
-      {/* Sections */}
-      <SidebarSection
-        title="WoNo Intelligence"
-        items={recommendationItemsWithActivePath}
-        collapsed={isCollapsed}
-        isExpandable
-        isOpen={isRecommendationsOpen}
-        onToggle={() => setIsRecommendationsOpen((prev) => !prev)}
-        onItemClick={handleRecommendationClick}
-      />
-
-      <SidebarSection
-        title="Value Added Services"
-        items={valueAdditionItemsWithActivePath}
-        collapsed={isCollapsed}
-        isExpandable
-        isOpen={isValueAdditionsOpen}
-        onToggle={() => setIsValueAdditionsOpen((prev) => !prev)}
-        onItemClick={handleValueAdditionClick}
-      />
-
-      {isLoggedIn ? (
-        <>
-          <SidebarSection
-            title="Profile"
-            items={profileItemsWithUserName}
-            collapsed={isCollapsed}
-            isExpandable
-            isOpen={isProfileOpen}
-            onToggle={() => setIsProfileOpen((prev) => !prev)}
-            onItemClick={handleProfileClick}
-          />
-          <div className="mx-4 mt-3 border-t border-black/10"></div>
-          {/* Compact sections - minimal spacing */}
-          <SidebarSection
-            items={[becomeContributorItemWithActivePath]}
-            collapsed={isCollapsed}
-            onItemClick={handleBecomeContributorClick}
-            compact={true}
-          />
-          <div className="mx-4 border-t border-black/10"></div>
-          <SidebarSection
-            items={becomeHostItem}
-            collapsed={isCollapsed}
-            onItemClick={handleBecomeHostClick}
-            compact={true}
-          />
-          <div className="mx-4 border-t border-black/10"></div>
-          <SidebarSection
-            items={signOutItem}
-            collapsed={isCollapsed}
-            onItemClick={handleSignOutClick}
-            compact={true}
-          />
-          <div className="mx-4 border-t border-black/10"></div>
-        </>
-      ) : (
-        <>
-          <div className="mx-4 mt-3 border-t border-black/10"></div>
-          <SidebarSection
-            items={[becomeContributorItemWithActivePath]}
-            collapsed={isCollapsed}
-            onItemClick={handleBecomeContributorClick}
-            compact={true}
-          />
-          <div className="mx-4 border-t border-black/10"></div>
-          <SidebarSection
-            items={becomeHostItem}
-            collapsed={isCollapsed}
-            onItemClick={handleBecomeHostClick}
-            compact={true}
-          />
-          {/* <div className="border-t border-black/10 mt-4 mx-4"></div> */}
-          <div className="border-t border-black/10 mx-4"></div>
-          {!isCollapsed && (
-            <div className="mt-auto px-4 pb-4 pt-10">
-              <div className="rounded-[28px] p-4 ">
-                <p className="mt-2 text-nano leading-[0.9rem] text-black/55">
-                  {loggedOutPrompt.description}
-                </p>
-                <p className="text-nano font-semibold leading-5 text-black/55">
-                  Powered by your preferences.
-                </p>
-                <div className="flex justify-center">
-                  <button
-                    type="button"
-                    onClick={handleLogInClick}
-                    className="mt-6 w-[70%] rounded-full border border-black/30  bg-[#efefef]  px-0 py-2 text-nano text-black/80 hover:bg-[#e0e0e0] "
-                  >
-                    {loggedOutPrompt.actionLabel}
-                  </button>
+          <>
+            <div className="mx-4 mt-3 border-t border-black/10"></div>
+            <SidebarSection
+              items={[becomeContributorItemWithActivePath]}
+              collapsed={isCollapsed}
+              onItemClick={handleBecomeContributorClick}
+              compact={true}
+              onTooltipChange={setTooltip}
+            />
+            <div className="mx-4 border-t border-black/10"></div>
+            <SidebarSection
+              items={becomeHostItem}
+              collapsed={isCollapsed}
+              onItemClick={handleBecomeHostClick}
+              compact={true}
+              onTooltipChange={setTooltip}
+            />
+            {/* <div className="border-t border-black/10 mt-4 mx-4"></div> */}
+            <div className="border-t border-black/10 mx-4"></div>
+            {!isCollapsed && (
+              <div className="mt-auto px-4 pb-4 pt-10">
+                <div className="rounded-[28px] p-4 ">
+                  <p className="mt-2 text-nano leading-[0.9rem] text-black/55">
+                    {loggedOutPrompt.description}
+                  </p>
+                  <p className="text-nano font-semibold leading-5 text-black/55">
+                    Powered by your preferences.
+                  </p>
+                  <div className="flex justify-center">
+                    <button
+                      type="button"
+                      onClick={handleLogInClick}
+                      className="mt-6 w-[70%] rounded-full border border-black/30  bg-[#efefef]  px-0 py-2 text-nano text-black/80 hover:bg-[#e0e0e0] "
+                    >
+                      {loggedOutPrompt.actionLabel}
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-        </>
+            )}
+          </>
+        )}
+      </aside>
+
+      {isCollapsed && tooltip && (
+        <div
+          className="pointer-events-none fixed z-[1000] -translate-y-1/2 whitespace-nowrap rounded-md bg-black px-3 py-1.5 text-xs font-medium text-white shadow-lg"
+          style={{ top: `${tooltip.top}px`, left: `${tooltip.left}px` }}
+          role="tooltip"
+        >
+          <span className="absolute left-[-5px] top-1/2 h-2.5 w-2.5 -translate-y-1/2 rotate-45 bg-black" />
+          {tooltip.label}
+        </div>
       )}
-    </aside>
+    </>
   );
 };
 
