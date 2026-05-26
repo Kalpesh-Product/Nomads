@@ -1938,7 +1938,7 @@ const AiSearchResults = () => {
                             )}
                           </div>
                         )}
-                        <div className="mt-3 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between lg:gap-6">
+                        <div className="mt-3 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-6">
                           {(formattedNarrative.endingLine ||
                             !resultsHeadingBodyLines) && (
                             <span className="block font-medium">
