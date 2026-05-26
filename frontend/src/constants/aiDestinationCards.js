@@ -238,7 +238,7 @@ const destinationImageLinks = [
       "https://palmsrealtycr.com/wp-content/uploads/2013/01/la-sabana-4.jpg",
   },
   {
-    city: "Santa Cruz de Tenerife",
+    city: "Tenerife",
     image:
       "https://st3.depositphotos.com/1001146/19442/i/450/depositphotos_194426338-stock-photo-aerial-view-santa-cruz-tenerife.jpg",
   },
@@ -416,7 +416,7 @@ const destinations = [
   ["Auckland", "New Zealand", "Oceania"],
   ["Amsterdam", "Netherlands", "Europe"],
   ["San José Province", "Costa Rica", "South America"],
-  ["Santa Cruz de Tenerife", "Spain", "Europe"],
+  ["Tenerife", "Spain", "Europe"],
   ["Funchal", "Portugal", "Europe"],
   ["Tulum", "Mexico", "North America"],
   ["Bogota", "Colombia", "South America"],
@@ -453,7 +453,7 @@ const destinationCardShortNames = {
   "Australia|Gold Coast": "Queensland",
   "Netherlands|Amsterdam": "Amsterdam",
   "Costa Rica|San José Province": "San José",
-  "Spain|Santa Cruz de Tenerife": "Tenerife",
+  "Spain|Tenerife": "Tenerife",
   "Morocco|Casablanca": "Casablanca",
   "Portugal|Lagos": "Lagos",
   "Egypt|Cairo": "Cairo",

@@ -90,9 +90,9 @@ const DESTS = [
     },
     { label: "Sydney", country: "au", keyword: "sydney", lang: "en" },
     {
-        label: "Santa Cruz de Tenerife",
+        label: "Tenerife",
         country: "es",
-        keyword: "santa cruz de tenerife",
+        keyword: "tenerife",
         lang: "es",
     },
     { label: "Cebu City", country: "ph", keyword: "cebu city", lang: "en" },

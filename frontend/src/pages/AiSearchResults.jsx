@@ -508,7 +508,7 @@ const destinationAliasMap = {
   "Cape Town": "Cape Town",
   Queensland: "Gold Coast",
   Amsterdam: "Amsterdam",
-  Tenerife: "Santa Cruz de Tenerife",
+  Tenerife: "Tenerife",
   Casablanca: "Casablanca",
   Cairo: "Cairo",
   Queenstown: "Otago Region",
