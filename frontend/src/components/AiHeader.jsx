@@ -100,6 +100,20 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
     }
   };
 
+  const getNomadLoginRedirectPath = () => {
+    const authPages = new Set([
+      "/ai-signup",
+      "/ai-login",
+      "/ai-forgot-password",
+    ]);
+
+    if (authPages.has(location.pathname)) {
+      return "/home";
+    }
+
+    return `${location.pathname}${location.search}`;
+  };
+
   const handleNavigation = (path) => {
     navigate(path);
     setOpen(false);
@@ -139,11 +153,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
   const stateLabel = stateParam ? formatStateLabel(stateParam) : "";
   const newsLabel = stateLabel ? `${stateLabel} News` : "News";
   const blogLabel = stateLabel ? `${stateLabel} Blog` : "Blog";
-  const {
-    hasBlogs,
-    hasNews,
-    hasNewsOrBlogs,
-  } = useLocationContentAvailability({
+  const { hasBlogs, hasNews, hasNewsOrBlogs } = useLocationContentAvailability({
     enabled: shouldCheckNewsBlogLinks,
     keyword: stateParam,
   });
@@ -328,7 +338,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                   <Link
                     to={`/ai-login${location.search}`}
                     state={{
-                      redirectTo: `${location.pathname}${location.search}`,
+                      redirectTo: getNomadLoginRedirectPath(),
                     }}
                     className="relative inline-block pb-1 transition-all cursor-pointer duration-300 group bg-transparent border-none text-sm text-primary-blue whitespace-nowrap"
                   >

@@ -387,10 +387,24 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     });
   };
 
+  const getNomadLoginRedirectPath = () => {
+    const authPages = new Set([
+      "/ai-signup",
+      "/ai-login",
+      "/ai-forgot-password",
+    ]);
+
+    if (authPages.has(location.pathname)) {
+      return "/home";
+    }
+
+    return `${location.pathname}${location.search}`;
+  };
+
   const handleLogInClick = () => {
     navigate(`/ai-login${location.search}`, {
       state: {
-        redirectTo: `${location.pathname}${location.search}`,
+        redirectTo: getNomadLoginRedirectPath(),
       },
     });
   };
