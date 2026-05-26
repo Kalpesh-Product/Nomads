@@ -115,8 +115,8 @@ const AiHome = () => {
     text.split("").map((char, index) => {
       const normalizedText = text.toLowerCase();
       const inOfWord =
-        normalizedText.slice(index, index + 2) === "of" ||
-        normalizedText.slice(index - 1, index + 1) === "of";
+        normalizedText.slice(index, index + 2) === "" ||
+        normalizedText.slice(index - 1, index + 1) === "";
       const isBlueO = (char === "o" || char === "O") && !inOfWord;
       return (
         <span
