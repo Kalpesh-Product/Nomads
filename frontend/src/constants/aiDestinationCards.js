@@ -445,7 +445,7 @@ const destinations = [
 ];
 
 const destinationCardShortNames = {
-  "Vietnam|Ho Chi Minh City": "Ho Chi Minh",
+  "Vietnam|Ho Chi Minh City": "Ho Chi Minh City",
   "Spain|Canary Islands": "Las Palmas",
   "Brazil|Santa Catarina": "Florianopolis",
   "Mexico|Quintana Roo": "Playa del Carmen",

@@ -275,7 +275,7 @@ const Favorites = ({
 
         <div>
           <h2 className="mb-6 flex items-center gap-2 text-lg font-semibold text-secondary-dark">
-            <span>My Favorites</span>
+            <span>Favorite Listings</span>
             <AiFillHeart className="text-[#ff5757]" size={24} />
           </h2>
 

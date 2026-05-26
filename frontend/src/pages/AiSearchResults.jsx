@@ -500,7 +500,7 @@ const getScoreBarColorValue = (score) => {
 };
 
 const destinationAliasMap = {
-  "Ho Chi Minh": "Ho Chi Minh City",
+  "Ho Chi Minh City": "Ho Chi Minh City",
   Surigao: "Surigao del Norte",
   "Las Palmas": "Canary Islands",
   Florianopolis: "Santa Catarina",
@@ -1403,7 +1403,7 @@ const AiSearchResults = () => {
     goalNarrativeTopHeadingMap[selectedGoal] ||
     goalNarrativeTopHeadingMap["World Ranking"];
   const selectedBottomHeadingText =
-    "Feel free to edit your above selection anytime and I will curate the new set of best results for you.";
+    "Feel free to edit your above selection anytime, and I will curate a new set of the best results for you.";
 
   const selectedResultsHeadingText = useMemo(() => {
     if (!selectedContinent || !selectedGoalOption) {
@@ -1938,7 +1938,7 @@ const AiSearchResults = () => {
                             )}
                           </div>
                         )}
-                        <div className="mt-3 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between lg:gap-6">
+                        <div className="mt-3 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-6">
                           {(formattedNarrative.endingLine ||
                             !resultsHeadingBodyLines) && (
                             <span className="block font-medium">

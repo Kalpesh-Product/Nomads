@@ -13,7 +13,7 @@ const DESTS = [
     { label: "Bali", country: "id", keyword: "bali", lang: "en" },
     { label: "Bangkok", country: "th", keyword: "bangkok", lang: "en" },
     { label: "Phuket", country: "th", keyword: "phuket", lang: "en" },
-    { label: "Ho Chi Minh", country: "vn", keyword: "ho chi minh", lang: "en" },
+    { label: "Ho Chi Minh City", country: "vn", keyword: "ho chi minh city", lang: "en" },
     {
         label: "Rio de Janeiro",
         country: "br",
@@ -30,7 +30,7 @@ const DESTS = [
 
     { label: "Montreal", country: "ca", keyword: "montreal", lang: "fr" },
 
-    { label: "Abuja (FCT)", country: "ng", keyword: "abuja (fct)", lang: "en" },
+    { label: "Abuja", country: "ng", keyword: "abuja", lang: "en" },
 
     {
         label: "Cairo",
@@ -376,7 +376,7 @@ const AiNewsFetch = () => {
     }
 
     return (
-        <div className="my-6 min-w-[75%] max-w-[80rem] lg:max-w-[80rem] mx-0 lg:mx-auto px-1 sm:px-6 lg:px-0 w-full">
+        <div className="hidden lg:flex flex-col gap-6 px-1 md:px-10 my-6 min-w-[75%] max-w-[80rem] lg:max-w-full mx-0 lg:mx-auto w-full">
             <div className="flex justify-between items-center mb-4 flex-col sm:flex-col xs:flex-col md:flex-row lg:flex-row">
                 <h2 className="text-title font-semibold text-host">News</h2>
                 {/* Controls */}
