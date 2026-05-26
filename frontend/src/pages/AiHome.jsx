@@ -308,7 +308,7 @@ const AiHome = () => {
           </p>
 
           <div
-            className={`mt-12 rounded-[40px] px-0 py-4 md:px-6 md:py-8 ${
+            className={`mt-8 rounded-[40px] px-0 py-4 md:px-6 md:py-8 ${
               areCardsVisible ? "visible" : "invisible"
             }`}
           >
