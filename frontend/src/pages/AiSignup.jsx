@@ -110,13 +110,13 @@ export default function AiSignup() {
 
     const messageInterval = setInterval(() => {
       messageIndex += 1;
-      setTypedMessage(SIGNUP_PROMPT.slice(0, messageIndex));
+      // setTypedMessage(SIGNUP_PROMPT.slice(0, messageIndex));
 
       if (messageIndex >= SIGNUP_PROMPT.length) {
         clearInterval(messageInterval);
         typeSignupHeading();
       }
-    }, 25);
+    }, 0);
 
     return () => {
       clearInterval(messageInterval);
