@@ -40,14 +40,14 @@ const continentOptions = [
 const visaRequirementOptions = [
   "Show All",
   "Traditional Visa",
-  "E Visa",
+  "e-Visa",
   "Visa on Arrival",
   "Visa Free",
 ];
 
 const visaRequirementApiValueMap = {
   "Traditional Visa": "visa required",
-  "E Visa": "e-visa",
+  "e-Visa": "e-visa",
   "Visa on Arrival": "visa on arrival",
   "Visa Free": "visa free",
 };
@@ -500,16 +500,16 @@ const getScoreBarColorValue = (score) => {
 };
 
 const destinationAliasMap = {
-  "Ho Chi Minh": "Ho Chi Minh City",
+  "Ho Chi Minh City": "Ho Chi Minh City",
   Surigao: "Surigao del Norte",
   "Las Palmas": "Canary Islands",
   Florianopolis: "Santa Catarina",
   "Playa del Carmen": "Quintana Roo",
-  "Cape Town": "Western Cape",
+  "Cape Town": "Cape Town",
   Queensland: "Gold Coast",
-  Amsterdam: "North Holland",
+  Amsterdam: "Amsterdam",
   Tenerife: "Santa Cruz de Tenerife",
-  Casablanca: "Casablanca-Settat",
+  Casablanca: "Casablanca",
   Cairo: "Cairo",
   Queenstown: "Otago Region",
   Giza: "Giza",
@@ -1403,7 +1403,7 @@ const AiSearchResults = () => {
     goalNarrativeTopHeadingMap[selectedGoal] ||
     goalNarrativeTopHeadingMap["World Ranking"];
   const selectedBottomHeadingText =
-    "Feel free to edit your above selection anytime and I will curate the new set of best results for you.";
+    "Feel free to edit your above selection anytime, and I will curate a new set of the best results for you.";
 
   const selectedResultsHeadingText = useMemo(() => {
     if (!selectedContinent || !selectedGoalOption) {
@@ -1819,7 +1819,10 @@ const AiSearchResults = () => {
 
     const introLine =
       highlightedResultsHeadingFirstLine ||
-      lines.find((line) => !line.startsWith("•") && !line.toLowerCase().startsWith("powered by")) ||
+      lines.find(
+        (line) =>
+          !line.startsWith("•") && !line.toLowerCase().startsWith("powered by"),
+      ) ||
       "";
 
     const endingLine =
@@ -1919,9 +1922,7 @@ const AiSearchResults = () => {
                         </span>
                         {formattedNarrative.poweredByLine && (
                           <div className="mt-2">
-                            <span>
-                              {formattedNarrative.poweredByLine}
-                            </span>
+                            <span>{formattedNarrative.poweredByLine}</span>
                             {formattedNarrative.priorityPoints.length > 0 && (
                               <span className="ml-1">
                                 {formattedNarrative.priorityPoints.map(
@@ -1929,7 +1930,8 @@ const AiSearchResults = () => {
                                     <React.Fragment key={`${point}-${index}`}>
                                       <span>{point}</span>
                                       {index <
-                                        formattedNarrative.priorityPoints.length -
+                                        formattedNarrative.priorityPoints
+                                          .length -
                                           1 && <span>{", "}</span>}
                                     </React.Fragment>
                                   ),
@@ -1938,7 +1940,7 @@ const AiSearchResults = () => {
                             )}
                           </div>
                         )}
-                        <div className="mt-3 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between lg:gap-6">
+                        <div className="mt-3 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-6">
                           {(formattedNarrative.endingLine ||
                             !resultsHeadingBodyLines) && (
                             <span className="block font-medium">
@@ -1947,18 +1949,23 @@ const AiSearchResults = () => {
                             </span>
                           )}
                           {shouldShowResultsContent && (
-                            <div className="w-full lg:w-[15.5rem] xl:w-[17rem]">
-                              <DropdownBadge
-                                label="Visa Requirement"
-                                options={visaRequirementOptions}
-                                selectedValue={selectedVisaRequirement}
-                                isOpen={openDropdown === "visaRequirement"}
-                                onToggle={() =>
-                                  handleDropdownToggle("visaRequirement")
-                                }
-                                onSelect={handleVisaRequirementSelect}
-                                size="small"
-                              />
+                            <div className="flex w-full items-center gap-3 lg:w-auto lg:justify-end">
+                              <span className="text-sm font-medium text-black/80 font-play">
+                                Visa Options
+                              </span>
+                              <div className="w-full sm:w-[13rem]">
+                                <DropdownBadge
+                                  label="Visa Requirement"
+                                  options={visaRequirementOptions}
+                                  selectedValue={selectedVisaRequirement}
+                                  isOpen={openDropdown === "visaRequirement"}
+                                  onToggle={() =>
+                                    handleDropdownToggle("visaRequirement")
+                                  }
+                                  onSelect={handleVisaRequirementSelect}
+                                  size="small"
+                                />
+                              </div>
                             </div>
                           )}
                         </div>

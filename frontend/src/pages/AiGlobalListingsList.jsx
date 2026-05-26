@@ -464,12 +464,7 @@ const AiGlobalListingsList = () => {
 
   const categoryOptions = useMemo(() => {
     if (!listingsData || listingsData.length === 0) {
-      return [
-        {
-          label: "Value Adds",
-          value: VALUE_ADDED_SERVICES_CATEGORY,
-        },
-      ];
+      return [];
     }
 
     const uniqueTypes = [
