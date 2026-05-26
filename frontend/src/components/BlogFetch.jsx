@@ -22,7 +22,7 @@ const DESTS = [
   },
   { label: "Dubai", country: "uae", keyword: "dubai", lang: "en" },
   { label: "Auckland", country: "nz", keyword: "auckland", lang: "en" },
-  { label: "Western Cape", country: "za", keyword: "western cape", lang: "en" },
+  { label: "Cape Town", country: "za", keyword: "cape town", lang: "en" },
   { label: "Budapest", country: "hu", keyword: "budapest", lang: "hu" },
   { label: "Mexico City", country: "mx", keyword: "mexico city", lang: "es" },
   { label: "Quintana Roo", country: "mx", keyword: "quintana roo", lang: "es" },
@@ -40,9 +40,9 @@ const DESTS = [
   },
 
   {
-    label: "North Holland",
+    label: "Amsterdam",
     country: "nl",
-    keyword: "north holland",
+    keyword: "amsterdam",
     lang: "nl",
   },
 
@@ -68,9 +68,9 @@ const DESTS = [
   { label: "Toronto", country: "ca", keyword: "toronto", lang: "en" },
   { label: "Vancouver", country: "ca", keyword: "vancouver", lang: "en" },
   {
-    label: "Casablanca‑Settat",
+    label: "Casablanca",
     country: "ma",
-    keyword: "casablanca-settat",
+    keyword: "casablanca",
     lang: "ar",
   },
   { label: "Marrakech", country: "ma", keyword: "marrakech", lang: "ar" },
@@ -120,7 +120,7 @@ const DESTS = [
   { label: "Da Nang", country: "vn", keyword: "da nang", lang: "en" },
   { label: "Nassau", country: "bs", keyword: "nassau", lang: "en" },
   { label: "Victoria", country: "ca", keyword: "victoria", lang: "en" },
-  { label: "Bogota D.C.", country: "co", keyword: "bogota d.c.", lang: "es" },
+  { label: "Bogota", country: "co", keyword: "bogota", lang: "es" },
   { label: "Medellin", country: "co", keyword: "medellin", lang: "es" },
   { label: "Quito", country: "ec", keyword: "quito", lang: "es" },
 
