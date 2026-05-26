@@ -13,7 +13,7 @@ const DESTS = [
     { label: "Bali", country: "id", keyword: "bali", lang: "en" },
     { label: "Bangkok", country: "th", keyword: "bangkok", lang: "en" },
     { label: "Phuket", country: "th", keyword: "phuket", lang: "en" },
-    { label: "Ho Chi Minh", country: "vn", keyword: "ho chi minh", lang: "en" },
+    { label: "Ho Chi Minh City", country: "vn", keyword: "ho chi minh city", lang: "en" },
     {
         label: "Rio de Janeiro",
         country: "br",
@@ -30,7 +30,7 @@ const DESTS = [
 
     { label: "Montreal", country: "ca", keyword: "montreal", lang: "fr" },
 
-    { label: "Abuja (FCT)", country: "ng", keyword: "abuja (fct)", lang: "en" },
+    { label: "Abuja", country: "ng", keyword: "abuja", lang: "en" },
 
     {
         label: "Cairo",
