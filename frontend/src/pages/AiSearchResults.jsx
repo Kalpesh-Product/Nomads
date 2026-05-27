@@ -39,17 +39,29 @@ const continentOptions = [
 
 const visaRequirementOptions = [
   "Show All",
-  "Traditional Visa",
+  "Physical Visa",
   "e-Visa",
   "Visa on Arrival",
   "Visa Free",
 ];
 
 const visaRequirementApiValueMap = {
-  "Traditional Visa": "visa required",
+  "Physical Visa": "visa required",
   "e-Visa": "e-visa",
   "Visa on Arrival": "visa on arrival",
   "Visa Free": "visa free",
+};
+
+const formatVisaRequirementLabel = (value) => {
+  if (!value) return "Visa";
+
+  const normalizedValue = value.trim().toLowerCase();
+
+  if (normalizedValue === "e-visa") {
+    return "e-Visa";
+  }
+
+  return `${normalizedValue.charAt(0).toUpperCase()}${normalizedValue.slice(1)}`;
 };
 
 const DEFAULT_PASSPORT_COUNTRY = "India";
@@ -859,6 +871,7 @@ const AiSearchResults = () => {
   const location = useLocation();
   const { goal, loc, attr } = useParams();
   const { auth } = useAuth();
+  const isLoggedIn = Boolean(auth?.user);
   const axiosPrivate = useAxiosPrivate();
   const { state } = location;
   const requestedGoalFromUrl = goal ? goalNameBySlug[goal.toLowerCase()] : null;
@@ -1948,7 +1961,7 @@ const AiSearchResults = () => {
                                 highlightedResultsHeadingRemainingLines}
                             </span>
                           )}
-                          {shouldShowResultsContent && (
+                          {shouldShowResultsContent && isLoggedIn && (
                             <div className="flex w-full items-center gap-3 lg:w-auto lg:justify-end">
                               <span className="text-sm font-medium text-black/80 font-play">
                                 Visa Options
@@ -1975,97 +1988,134 @@ const AiSearchResults = () => {
 
                   {shouldShowResultsContent ? (
                     <div className="mt-8 grid grid-cols-2 gap-3 md:mt-10 md:grid-cols-3 md:gap-4 xl:grid-cols-4">
-                      {visibleDestinations.map((destination, index) => (
-                        <article
-                          key={`${destination.city}-${destination.country}`}
-                          className={`cursor-pointer transition-all duration-300 ${
-                            index < visibleDestinationCount
-                              ? "translate-y-0 opacity-100"
-                              : "pointer-events-none translate-y-2 opacity-0"
-                          }`}
-                          role="button"
-                          tabIndex={0}
-                          onClick={() => handleDestinationClick(destination)}
-                          onKeyDown={(event) => {
-                            if (event.key === "Enter" || event.key === " ") {
-                              event.preventDefault();
-                              handleDestinationClick(destination);
-                            }
-                          }}
-                        >
-                          <div className="relative overflow-hidden rounded-xl md:rounded-2xl group">
-                            <img
-                              src={destination.image}
-                              alt={`${destination.city}, ${destination.country}`}
-                              className="aspect-square w-full rounded-xl object-cover md:rounded-2xl transition-transform duration-500 group-hover:scale-110"
-                            />
+                      {visibleDestinations.map((destination, index) => {
+                        const shouldShowVisaDuration =
+                          isVisaRequirementFilterActive(
+                            selectedVisaRequirement,
+                          ) && Boolean(visaRuleDurationByCountry);
+                        const visaDurationDays = shouldShowVisaDuration
+                          ? visaRuleDurationByCountry.get(
+                              normalizeCountryKey(destination.country),
+                            )
+                          : null;
+                        const visaDurationLabel =
+                          visaDurationDays !== null &&
+                          visaDurationDays !== undefined
+                            ? `${formatVisaRequirementLabel(
+                                visaRequirementApiValueMap[
+                                  selectedVisaRequirement
+                                ],
+                              )}: ${visaDurationDays} days`
+                            : null;
 
-                            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-black/10" />
-
-                            <div className="pointer-events-none absolute left-3 top-3 text-white text-xl  md:left-4 md:top-4 md:text-2xl">
-                              #
-                              {destination?.rankLabel
-                                ? destination.rankLabel.replace(/^Rank\s*/i, "")
-                                : "—"}
-                            </div>
-
-                            <button
-                              type="button"
-                              className="absolute right-3 top-3 z-30 cursor-pointer touch-manipulation md:right-4 md:top-4"
-                              onClick={(event) => {
-                                event.stopPropagation();
+                        return (
+                          <article
+                            key={`${destination.city}-${destination.country}`}
+                            className={`cursor-pointer transition-all duration-300 ${
+                              index < visibleDestinationCount
+                                ? "translate-y-0 opacity-100"
+                                : "pointer-events-none translate-y-2 opacity-0"
+                            }`}
+                            role="button"
+                            tabIndex={0}
+                            onClick={() => handleDestinationClick(destination)}
+                            onKeyDown={(event) => {
+                              if (event.key === "Enter" || event.key === " ") {
                                 event.preventDefault();
-                                toggleDestinationLike(destination);
-                              }}
-                            >
-                              {likedDestinations.includes(
-                                getDestinationFavoriteKey(destination),
-                              ) ? (
-                                <AiFillHeart className="text-xl text-[#ff5757] md:text-2xl" />
-                              ) : (
-                                <AiTwotoneHeart className="text-xl text-[#b6b6b6] md:text-2xl" />
-                              )}
-                            </button>
+                                handleDestinationClick(destination);
+                              }
+                            }}
+                          >
+                            <div className="relative overflow-hidden rounded-xl md:rounded-2xl group">
+                              <img
+                                src={destination.image}
+                                alt={`${destination.city}, ${destination.country}`}
+                                className="aspect-square w-full rounded-xl object-cover md:rounded-2xl transition-transform duration-500 group-hover:scale-110"
+                              />
 
-                            <div className="pointer-events-none absolute inset-x-2 bottom-3 text-center text-white md:inset-x-4 md:bottom-4">
-                              <h3 className="text-lg uppercase font-normal tracking-wide md:text-3xl">
-                                {destination.displayCity || destination.city}
-                              </h3>
-                              <p className="text-sm font-light md:text-sm">
-                                {destination.displayCountry ||
-                                  destination.country}
-                              </p>
-                            </div>
+                              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-black/10" />
 
-                            <div className="pointer-events-none absolute inset-0 bg-black/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-center p-3 md:p-4">
-                              <div className="translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                                <div className="mb-0 border-b border-white/30 pb-0">
-                                  <h4 className="-translate-y-2 text-white text-base md:text-[0.89rem] font-semibold uppercase tracking-wide text-center">
-                                    {selectedGoalOption || "Attribute"}
-                                  </h4>
-                                </div>
-                                <h4 className="mb-2 mt-2 text-right text-white text-sm md:text-sm font-semibold py-0">
-                                  {`${selectedContinentDisplay || "World"} Rank ${
-                                    destination?.rankLabel
-                                      ? destination.rankLabel.replace(
-                                          /^Rank\s*/i,
-                                          "",
-                                        )
-                                      : "—"
-                                  }`}
-                                </h4>
+                              <div className="pointer-events-none absolute left-3 top-3 text-white text-xl  md:left-4 md:top-4 md:text-2xl">
+                                #
+                                {destination?.rankLabel
+                                  ? destination.rankLabel.replace(
+                                      /^Rank\s*/i,
+                                      "",
+                                    )
+                                  : "—"}
+                              </div>
 
-                                <div className="grid grid-cols-1 gap-2 text-xs md:text-sm text-white/90">
-                                  {getQuickStatsForDestination(
-                                    destination,
-                                    selectedGoal,
-                                    selectedGoalOption,
-                                  ).map((stat, statIndex) => (
-                                    <div
-                                      key={`${destination.city}-${stat.label}-${statIndex}`}
-                                      className="rounded-lg px-2 py-1 transition-all duration-300"
-                                      style={{
-                                        backgroundImage: `linear-gradient(
+                              <button
+                                type="button"
+                                className="absolute right-3 top-3 z-30 cursor-pointer touch-manipulation md:right-4 md:top-4"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  event.preventDefault();
+                                  toggleDestinationLike(destination);
+                                }}
+                              >
+                                {likedDestinations.includes(
+                                  getDestinationFavoriteKey(destination),
+                                ) ? (
+                                  <AiFillHeart className="text-xl text-[#ff5757] md:text-2xl" />
+                                ) : (
+                                  <AiTwotoneHeart className="text-xl text-[#b6b6b6] md:text-2xl" />
+                                )}
+                              </button>
+
+                              <div className="pointer-events-none absolute inset-x-2 bottom-3 text-center text-white md:inset-x-4 md:bottom-4">
+                                <h3 className="text-lg uppercase font-normal tracking-wide md:text-3xl">
+                                  {destination.displayCity || destination.city}
+                                </h3>
+                                <p className="text-sm font-light md:text-sm">
+                                  {destination.displayCountry ||
+                                    destination.country}
+                                </p>
+                              </div>
+
+                              <div className="pointer-events-none absolute inset-0 bg-black/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-center p-3 md:p-4">
+                                <div className="translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                                  <div className="mb-0 border-b border-white/30 pb-0">
+                                    <h4 className="-translate-y-2 text-white text-base md:text-[0.89rem] font-semibold uppercase tracking-wide text-center">
+                                      {selectedGoalOption || "Attribute"}
+                                    </h4>
+                                  </div>
+                                  <div className="mb-2 mt-2 flex items-center justify-between gap-2 text-white text-sm md:text-sm font-semibold py-0">
+                                    <h4
+                                      className={
+                                        shouldShowVisaDuration
+                                          ? "text-left"
+                                          : "ml-auto text-right"
+                                      }
+                                    >
+                                      {`${selectedContinentDisplay || "World"} Rank ${
+                                        destination?.rankLabel
+                                          ? destination.rankLabel.replace(
+                                              /^Rank\s*/i,
+                                              "",
+                                            )
+                                          : "—"
+                                      }`}
+                                    </h4>
+                                    {shouldShowVisaDuration &&
+                                      visaDurationLabel && (
+                                        <span className="text-right text-[0.72rem] font-medium text-white/90">
+                                          {visaDurationLabel}
+                                        </span>
+                                      )}
+                                  </div>
+
+                                  <div className="grid grid-cols-1 gap-2 text-xs md:text-sm text-white/90">
+                                    {getQuickStatsForDestination(
+                                      destination,
+                                      selectedGoal,
+                                      selectedGoalOption,
+                                    ).map((stat, statIndex) => (
+                                      <div
+                                        key={`${destination.city}-${stat.label}-${statIndex}`}
+                                        className="rounded-lg px-2 py-1 transition-all duration-300"
+                                        style={{
+                                          backgroundImage: `linear-gradient(
                                           90deg,
                                           ${getScoreBarColorValue(stat.score)} 0%,
                                           ${getScoreBarColorValue(stat.score)} ${Math.max(
@@ -2088,18 +2138,18 @@ const AiSearchResults = () => {
                                           )}%,
                                           rgba(255, 255, 255, 0.16) 100%
                                         )`,
-                                      }}
-                                    >
-                                      <span className="font-light">
-                                        {stat.label}
-                                      </span>
-                                    </div>
-                                  ))}
+                                        }}
+                                      >
+                                        <span className="font-light">
+                                          {stat.label}
+                                        </span>
+                                      </div>
+                                    ))}
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                          {/* <div className="px-2">
+                            {/* <div className="px-2">
                             <div className="mt-1.5 flex items-start justify-start gap-1 md:mt-2 md:gap-1 ">
                               <div className="min-w-0">
                                 <h3 className="truncate text-[0.8rem] font-semibold leading-tight text-black/90 md:text-[1.2rem]">
@@ -2118,8 +2168,9 @@ const AiSearchResults = () => {
                               </p>
                             </div>
                           </div> */}
-                        </article>
-                      ))}
+                          </article>
+                        );
+                      })}
                     </div>
                   ) : (
                     <>
