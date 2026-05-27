@@ -871,6 +871,7 @@ const AiSearchResults = () => {
   const location = useLocation();
   const { goal, loc, attr } = useParams();
   const { auth } = useAuth();
+  const isLoggedIn = Boolean(auth?.user);
   const axiosPrivate = useAxiosPrivate();
   const { state } = location;
   const requestedGoalFromUrl = goal ? goalNameBySlug[goal.toLowerCase()] : null;
@@ -1960,7 +1961,7 @@ const AiSearchResults = () => {
                                 highlightedResultsHeadingRemainingLines}
                             </span>
                           )}
-                          {shouldShowResultsContent && (
+                          {shouldShowResultsContent && isLoggedIn && (
                             <div className="flex w-full items-center gap-3 lg:w-auto lg:justify-end">
                               <span className="text-sm font-medium text-black/80 font-play">
                                 Visa Options
