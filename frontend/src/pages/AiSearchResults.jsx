@@ -39,14 +39,14 @@ const continentOptions = [
 
 const visaRequirementOptions = [
   "Show All",
-  "Traditional Visa",
+  "Physical Visa",
   "e-Visa",
   "Visa on Arrival",
   "Visa Free",
 ];
 
 const visaRequirementApiValueMap = {
-  "Traditional Visa": "visa required",
+  "Physical Visa": "visa required",
   "e-Visa": "e-visa",
   "Visa on Arrival": "visa on arrival",
   "Visa Free": "visa free",
