@@ -651,11 +651,11 @@ const normalizeSelectedContinent = (continent) =>
 const goalNarrativeByGoalAndAttribute = {
   [normalizeNarrativeKey("World Ranking")]: {
     [normalizeNarrativeKey("Best for Nomads")]:
-      "Curated below are the top cities in X based on overall livability for modern remote professionals.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🏢 Work infrastructure\n• ⚡ High-speed, stable internet\n• 💰 Cost of living\n• 🛡️ Safety\n• 🛂 Visa flexibility for longer stays\n• 🤝 Nomad community\n• 🏥 Healthcare affordability\n• 🚀 Startup ecosystem\n• 🌿 Air quality\n\n→ Find the best overall place to live and work.",
+      "Curated below are the top cities in X based on overall livability for modern remote professionals.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💰 Cost of living\n• 🏢 Work infrastructure\n• ⚡ High-speed, stable internet\n• 🤝 Nomad community\n• 🚀 Startup ecosystem\n• 🛡️ Safety\n• 🛂 Visa flexibility for longer stays\n\n→ Find the best overall place to live and work.",
     [normalizeNarrativeKey("Most Affordable")]:
       "Curated below are the most affordable cities in X designed to help you maximize your budget.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💰 Low cost of living\n• 📊 Strong purchasing power\n• 🏥 Affordable healthcare\n• 🛡️ Safety & stability\n\n→ Find cities where affordability meets comfort.",
     [normalizeNarrativeKey("Safest Cities")]:
-      "Curated below are the safest cities in X based on your preference for security and peace of mind.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🛡️ Safety levels\n• 🏥 Healthcare accessibility\n• 🌍 Stable living conditions\n• 🌿 Clean environments\n\n→ Live confidently, whether short-term or long-term.",
+      "Curated below are the safest cities in X based on your preference for security and peace of mind.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🛡️ Safety levels\n• 🏥 Healthcare accessibility\n• 🌿 Clean environments\n\n→ Live confidently, whether short-term or long-term.",
     [normalizeNarrativeKey("Easy Visa / Long Stay")]:
       "Curated below are the most visa-friendly cities in X for extended stays.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🛂 Visa flexibility\n• ⏳ Ease of long stays\n• 💰 Cost of living\n• 🏡 Overall livability\n\n→ Stay longer, with fewer restrictions.",
     [normalizeNarrativeKey("Strong Nomad Community")]:

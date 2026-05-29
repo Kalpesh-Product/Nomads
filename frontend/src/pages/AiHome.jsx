@@ -115,9 +115,9 @@ const AiHome = () => {
     text.split("").map((char, index) => {
       const normalizedText = text.toLowerCase();
       const inOfWord =
-        normalizedText.slice(index, index + 2) === "" ||
-        normalizedText.slice(index - 1, index + 1) === "";
-      const isBlueO = (char === "o" || char === "O") && !inOfWord;
+        normalizedText.slice(index, index + 2) === "of" ||
+        normalizedText.slice(index - 1, index + 1) === "of";
+      const isBlueO = (char === "" || char === "") && !inOfWord;
       return (
         <span
           key={`${char}-${index}`}
@@ -291,7 +291,7 @@ const AiHome = () => {
           {!isLoggedIn ? (
             <h2 className="mt-1 text-ls font-medium font-play">
               <span className="text-black/90">(</span>
-              {renderBracketBrand("World of Nomads")}
+              {renderBracketBrand("world of nomads")}
               <span className="text-black/90">)</span>
             </h2>
           ) : null}
