@@ -94,7 +94,7 @@ const goalOptionToApiAttributeMap = {
   "Remote Job Opportunities": "remoteJobOpportunities",
   "Founder Nomads": "founderNomads",
   "Tech Talent Density": "techTalentDensity",
-  "Startup Incubators & Accelerators": "startupIncubatorsAccelerators",
+  "Startup Funding & Support": "startupIncubatorsAccelerators",
   "Balanced Career Growth": "balancedCareerGrowth",
   "Venture Capital Presence": "ventureCapitalPresence",
   "Conferences & Events": "conferencesEvents",
@@ -363,7 +363,7 @@ const quickStatsConfigByGoalOption = {
     { label: "Founder Nomads", weightKey: "founderNomads" },
     { label: "Venture Capital", weightKey: "ventureCapital" },
   ],
-  "Startup Incubators & Accelerators": [
+  "Startup Funding & Support": [
     { label: "Startup Support", weightKey: "incubators" },
     { label: "Startup Ecosystem", weightKey: "startupEcosystemScore" },
     { label: "Founder Nomads", weightKey: "founderNomads" },
@@ -726,7 +726,7 @@ const goalNarrativeByGoalAndAttribute = {
       "Curated below are the best cities in X for building strong networks and valuable connections.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🤝 Founder & professional communities\n• 📅 Conferences & networking events\n• 🧑‍💻 Talent density\n• 🌍 Opportunity-rich environments\n\n→ Meet the right people, unlock opportunities.",
     [normalizeNarrativeKey("Tech Talent Density")]:
       "Curated below are the best cities in X with high tech talent density and innovation-driven ecosystems.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🧠 Skilled tech workforce\n• 👩‍💻 Developer & builder density\n• 🚀 Innovation-driven environments\n• 🤝 Collaboration opportunities\n\n→ Build faster with the right people around you.",
-    [normalizeNarrativeKey("Startup Incubators & Accelerators")]:
+    [normalizeNarrativeKey("Startup Funding & Support")]:
       "Curated below are the best cities in X for startup support through incubators and accelerators.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🚀 Incubators & accelerator programs\n• 🧠 Mentorship & founder guidance\n• 💼 Structured startup support\n• 📈 Early-stage growth opportunities\n\n→ Build faster with guidance and support.",
     [normalizeNarrativeKey("Balanced Career Growth")]:
       "Curated below are the best cities in X for balanced career growth and long-term opportunities.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💼 Job opportunities\n• 🚀 Startup ecosystems\n• 🤝 Networking access\n• 🧑‍💻 Talent-rich environments\n\n→ Grow consistently while staying balanced.",
