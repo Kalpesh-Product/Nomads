@@ -671,17 +671,17 @@ const goalNarrativeByGoalAndAttribute = {
   },
   [normalizeNarrativeKey("Work From Anywhere")]: {
     [normalizeNarrativeKey("Best for Remote Work Setup")]:
-      "Curated below are the best cities in X optimized for a seamless remote work setup.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• ⚡ Fast, reliable internet\n• 🏢 Strong work infrastructure\n• 🤝 Active nomad communities\n• ✈️ Global connectivity\n\n→ Work efficiently, from anywhere in the world.",
+      "Curated below are the best cities in X optimized for a seamless remote work setup.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• ⚡ Fast, reliable internet\n• 🏢 Strong work infrastructure\n\n→ Work efficiently, from anywhere in the world.",
     [normalizeNarrativeKey("Cheapest Places")]:
       "Curated below are the cheapest cities in X designed to help you minimize your living expenses.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💰 Low cost of living\n• 🤝 Affordable community ecosystems\n• ⚡ Essential internet access\n• 🏢 Basic work infrastructure\n\n→ Spend less, live comfortably.",
     [normalizeNarrativeKey("Best Connected Cities (Flights)")]:
-      "Curated below are the best-connected cities in X for global travel and accessibility.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• ✈️ Direct international flights\n• 🌐 Airport connectivity\n• ⚡ Reliable internet\n• 🏢 Work-ready environments\n\n→ Travel easily, stay connected.",
+      "Curated below are the best-connected cities in X for global travel and accessibility.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• ✈️ Direct international flights\n• 🌐 Airport connectivity\n\n→ Travel easily, stay connected.",
     [normalizeNarrativeKey("Strong Nomad Community")]:
-      "Curated below are the best cities in X with strong and active nomad communities.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🤝 Strong nomad communities\n• ⚡ Reliable internet\n• 🏢 Work-friendly infrastructure\n• ✈️ Easy global access\n\n→ Meet people, plug in, and belong.",
+      "Curated below are the best cities in X with strong and active nomad communities.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🤝 Strong nomad communities\n• 🚀 Startup ecosystems\n\n→ Meet people, plug in, and belong.",
     [normalizeNarrativeKey("Fast Internet Cities")]:
-      "Curated below are the cities in X with the fastest and most reliable internet connectivity.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• ⚡ High-speed internet\n• 📡 Network reliability\n• 🏢 Work-ready infrastructure\n• 🌍 Connected environments\n\n→ Stay fast, stay online.",
+      "Curated below are the cities in X with the fastest and most reliable internet connectivity.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• ⚡ High-speed internet\n• 📡 Network reliability\n• 🏢 Work-ready infrastructure\n\n→ Stay fast, stay online.",
     [normalizeNarrativeKey("Best Work Infrastructure")]:
-      "Curated below are the best cities in X with strong work infrastructure and professional environments.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🏢 Strong work infrastructure\n• ⚡ Reliable internet\n• 🤝 Professional & nomad ecosystems\n• 🌍 Global accessibility\n\n→ Work smarter, not harder.",
+      "Curated below are the best cities in X with strong work infrastructure and professional environments.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🏢 Strong work infrastructure\n• ⚡ Reliable internet\n• 🚀 Strong startup activity\n\n→ Work smarter, not harder.",
   },
   [normalizeNarrativeKey("Increase Your Savings")]: {
     [normalizeNarrativeKey("Maximum Savings")]:
