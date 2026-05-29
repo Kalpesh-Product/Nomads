@@ -685,17 +685,17 @@ const goalNarrativeByGoalAndAttribute = {
   },
   [normalizeNarrativeKey("Increase Your Savings")]: {
     [normalizeNarrativeKey("Maximum Savings")]:
-      "Curated below are the best cities in X to maximize your savings after expenses.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💰 Low cost of living\n• 🏦 Tax-friendly environments\n• 📊 Strong purchasing power\n• 📉 Stable inflation\n\n→ Keep more of what you earn.",
+      "Curated below are the best cities in X to maximize your savings after expenses.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💰 Low cost of living\n• 🏦 Tax-friendly environments\n• 🏥 Affordable healthcare\n\n→ Keep more of what you earn.",
     [normalizeNarrativeKey("Low Taxation")]:
-      "Curated below are the best cities in X for a low-tax and financially efficient lifestyle.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🏦 Tax-friendly environments\n• 💰 Low cost of living\n• 📊 Strong purchasing power\n• 📉 Economic stability\n\n→ Keep more, spend smarter.",
+      "Curated below are the best cities in X for a low-tax and financially efficient lifestyle.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🏦 Tax-friendly environments\n• 📉 Economic stability\n\n→ Keep more, spend smarter.",
     [normalizeNarrativeKey("Purchasing Power")]:
       "Curated below are the best cities in X with the strongest purchasing power.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 📊 Strong purchasing power\n• 💰 Low cost of living\n• 🏦 Tax efficiency\n• 📉 Stable economic conditions\n\n→ Maximize the value of your income.",
     [normalizeNarrativeKey("Financial Stability (Low Risk)")]:
-      "Curated below are the best cities in X for a financially stable and low-risk lifestyle.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 📉 Stable inflation\n• 🏥 Affordable healthcare\n• 🏦 Tax efficiency\n• 💰 Cost control\n\n→ Protect what you’ve built.",
+      "Curated below are the best cities in X for a financially stable and low-risk lifestyle.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 📉 Stable inflation\n• 🏦 Tax efficiency\n• 💰 Cost control\n\n→ Protect what you’ve built.",
     [normalizeNarrativeKey("Startup Setup Cost")]:
-      "Curated below are the best cities in X to start and run a business cost-effectively.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🚀 Low startup setup costs\n• 🏦 Tax-friendly environments\n• 💰 Affordable living\n• 📊 Strong purchasing power\n\n→ Build lean, scale smart.",
+      "Curated below are the best cities in X to start and run a business cost-effectively.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🚀 Low startup setup costs\n• 🏦 Tax-friendly environments\n• 💰 Affordable living\n\n→ Build lean, scale smart.",
     [normalizeNarrativeKey("Balanced Financial Lifestyle")]:
-      "Curated below are the best cities in X for a well-balanced financial lifestyle.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💰 Cost efficiency\n• 🏦 Tax balance\n• 📊 Purchasing power\n• 📉 Economic stability\n\n→ Live well, spend wisely, stay secure.",
+      "Curated below are the best cities in X for a well-balanced financial lifestyle.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💰 Cost efficiency\n• 🏦 Tax balance\n• 📊 Purchasing power\n\n→ Live well, spend wisely, stay secure.",
   },
   [normalizeNarrativeKey("Find Your Community")]: {
     [normalizeNarrativeKey("Social & Party Lifestyle")]:
