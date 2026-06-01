@@ -94,7 +94,7 @@ const goalOptionToApiAttributeMap = {
   "Remote Job Opportunities": "remoteJobOpportunities",
   "Founder Nomads": "founderNomads",
   "Tech Talent Density": "techTalentDensity",
-  "Startup Incubators & Accelerators": "startupIncubatorsAccelerators",
+  "Startup Funding & Support": "startupIncubatorsAccelerators",
   "Balanced Career Growth": "balancedCareerGrowth",
   "Venture Capital Presence": "ventureCapitalPresence",
   "Conferences & Events": "conferencesEvents",
@@ -363,7 +363,7 @@ const quickStatsConfigByGoalOption = {
     { label: "Founder Nomads", weightKey: "founderNomads" },
     { label: "Venture Capital", weightKey: "ventureCapital" },
   ],
-  "Startup Incubators & Accelerators": [
+  "Startup Funding & Support": [
     { label: "Startup Support", weightKey: "incubators" },
     { label: "Startup Ecosystem", weightKey: "startupEcosystemScore" },
     { label: "Founder Nomads", weightKey: "founderNomads" },
@@ -514,13 +514,13 @@ const getScoreBarColorValue = (score) => {
 const destinationAliasMap = {
   "Ho Chi Minh City": "Ho Chi Minh City",
   Surigao: "Surigao del Norte",
-  "Las Palmas": "Canary Islands",
+  "Las Palmas": "Las Palmas",
   Florianopolis: "Santa Catarina",
-  "Playa del Carmen": "Quintana Roo",
+  "Playa del Carmen": "Playa del Carmen",
   "Cape Town": "Cape Town",
   Queensland: "Gold Coast",
   Amsterdam: "Amsterdam",
-  Tenerife: "Santa Cruz de Tenerife",
+  Tenerife: "Tenerife",
   Casablanca: "Casablanca",
   Cairo: "Cairo",
   Queenstown: "Otago Region",
@@ -615,6 +615,10 @@ const DESTINATION_REVEAL_INTERVAL_MS = 70;
 const SEARCH_RESULTS_GOAL_STORAGE_KEY = "aiSearchResults.selectedGoal";
 const SEARCH_RESULTS_SELECTION_SIGNATURE_STORAGE_KEY =
   "aiSearchResults.selectionSignature";
+
+const PRIORITY_POINTS_VISIBLE_LIMIT = 4;
+const ADDITIONAL_PRIORITY_POINTS_TEXT =
+  "along with other aspects calculated by our proprietary algorithm.";
 
 const goalNameBySlug = {
   worldranking: "World Ranking",
@@ -726,7 +730,7 @@ const goalNarrativeByGoalAndAttribute = {
       "Curated below are the best cities in X for building strong networks and valuable connections.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🤝 Founder & professional communities\n• 📅 Conferences & networking events\n• 🧑‍💻 Talent density\n• 🌍 Opportunity-rich environments\n\n→ Meet the right people, unlock opportunities.",
     [normalizeNarrativeKey("Tech Talent Density")]:
       "Curated below are the best cities in X with high tech talent density and innovation-driven ecosystems.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🧠 Skilled tech workforce\n• 👩‍💻 Developer & builder density\n• 🚀 Innovation-driven environments\n• 🤝 Collaboration opportunities\n\n→ Build faster with the right people around you.",
-    [normalizeNarrativeKey("Startup Incubators & Accelerators")]:
+    [normalizeNarrativeKey("Startup Funding & Support")]:
       "Curated below are the best cities in X for startup support through incubators and accelerators.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🚀 Incubators & accelerator programs\n• 🧠 Mentorship & founder guidance\n• 💼 Structured startup support\n• 📈 Early-stage growth opportunities\n\n→ Build faster with guidance and support.",
     [normalizeNarrativeKey("Balanced Career Growth")]:
       "Curated below are the best cities in X for balanced career growth and long-term opportunities.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💼 Job opportunities\n• 🚀 Startup ecosystems\n• 🤝 Networking access\n• 🧑‍💻 Talent-rich environments\n\n→ Grow consistently while staying balanced.",
@@ -739,6 +743,68 @@ const goalNarrativeByGoalAndAttribute = {
 
 const searchBarBadgeClassName =
   "inline-flex min-h-[40px] min-w-[5rem] items-center rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85";
+
+const searchBarBroaderGoalLabelMap = {
+  "World Ranking": "Worldwide Nomad Destinations Ranking",
+  "Work From Anywhere": "Best Nomad Destinations for Remote Work",
+  "Increase Your Savings": "Budget-Friendly Nomad Destinations",
+  "Find Your Community": "Be with your Community",
+  "Advance Your Career": "Advance your Career",
+};
+
+const searchBarEndGoalLabelMap = {
+  "World Ranking": {
+    "Best for Nomads": "Best Overall Nomad Destinations",
+    "Most Affordable": "Most Affordable Nomad Destinations",
+    "Safest Cities": "Safest Nomad Destinations",
+    "Easy Visa / Long Stay": "Visa-Friendly Nomad Destinations",
+    "Strong Nomad Community": "Most Active Nomad Destinations",
+    "Healthcare Friendly": "Healthcare-Friendly Nomad Destinations",
+    "Startup / Business Opportunities": "Startup/Business Ready Nomad Destinations",
+    "Clean Air / Environment": "Environment-Friendly Nomad Destinations",
+    "Best Work Infrastructure": "Best Work Infrastructure Nomad Destinations",
+  },
+  "Work From Anywhere": {
+    "Best for Remote Work Setup":
+      "Best Overall Nomad Destinations for Remote Work",
+    "Cheapest Places": "Cheapest Nomad Destinations",
+    "Best Connected Cities (Flights)": "Globally Accessible Nomad Destinations",
+    "Strong Nomad Community": "Most Active Nomad Destinations",
+    "Fast Internet Cities": "Nomad Destinations with the Fastest Internet",
+    "Best Work Infrastructure": "Best Work Infrastructure Nomad Destinations",
+  },
+  "Increase Your Savings": {
+    "Maximum Savings": "Best Nomad Destinations to Maximize you Savings",
+    "Low Taxation": "Tax-Friendly Nomad Destinations",
+    "Purchasing Power": "Nomad Destinations with Strong Purchasing Power",
+    "Financial Stability(Low Risk)": "Financially Stable Nomad Destinations",
+    "Startup Setup Cost": "Cheapest Nomad Destinations for Startups",
+    "Balanced Financial Lifestyle":
+      "Best Overall Nomad Destinations for Savings",
+  },
+  "Find Your Community": {
+    "Social & Party Lifestyle": "Party & Social Lifestyle Nomad Destinations",
+    "Chill & Wellness Lifestyle": "Chill & Wellness Lifestyle Nomad Destinations",
+    "Adventure & Exploration": "Adventurous Nomad Destinations",
+    "Nomad Community & Networking": "Nomad Destinations for Networking",
+    "Couple - Friendly Lifestyle": "Couple-Friendly Nomad Destinations",
+    "Family - Friendly Lifestyle": "Nomad Destinations for Family Travel",
+    "Female - Friendly Lifestyle": "Safe Nomad Destinations for Females",
+    "Founder Nomads": "Nomad Destinations for Founders",
+    "Solo Nomads": "Nomad Destinations for Solo Travellers",
+  },
+  "Advance Your Career": {
+    "Startup Ecosystems": "Best Startup Ecosystems",
+    "Remote Job Opportunities": "Destinations with Remote Job Opportunities",
+    "Founder Nomads": "Grow Connections through Founders",
+    "Tech Talent Density": "Tech Dense Nomad Destinations",
+    "Startup Incubators & Accelerators": "Startup Incubators & Accelerators",
+    "Balanced Career Growth": "Balanced Career Growth",
+    "Venture Capital Presence": "Venture Capital Presence",
+    "Conferences & Events":
+      "Best Nomad Destinations for Conferences & Events",
+  },
+};
 
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -933,6 +999,17 @@ const AiSearchResults = () => {
     normalizeSelectedContinent(selectedContinent);
   const hasSelectedGoalOption = Boolean(selectedGoalOption);
   const hasSelectedFilters = hasSelectedContinent && hasSelectedGoalOption;
+  const selectedContinentDropdownValue = hasSelectedContinent
+    ? selectedContinentDisplay === "World"
+      ? "You Intend To > Explore the World"
+      : `You Intend To > Explore ${selectedContinentDisplay}`
+    : "Where Do You Want To Go?";
+  const selectedGoalOptionDropdownValue = hasSelectedGoalOption
+    ? `Your End Goal > ${
+        searchBarEndGoalLabelMap[selectedGoal]?.[selectedGoalOption] ||
+        selectedGoalOption
+      }`
+    : "Choose Your Goal!";
   const passportCountry =
     auth?.user?.country ||
     auth?.user?.countryOfResidence ||
@@ -1247,23 +1324,10 @@ const AiSearchResults = () => {
   ]);
 
   const searchBarBadges = useMemo(() => {
-    const badges = [selectedGoal];
-
-    const displayLoc = normalizeSelectedContinent(
-      loc ? decodeURIComponent(loc) : selectedContinentDisplay,
-    );
-    const displayAttr = attr ? decodeURIComponent(attr) : selectedGoalOption;
-
-    if (displayLoc) {
-      badges.push(displayLoc);
-    }
-
-    if (displayAttr) {
-      badges.push(displayAttr);
-    }
-
-    return badges;
-  }, [loc, attr, selectedContinentDisplay, selectedGoalOption, selectedGoal]);
+    const broaderGoal =
+      searchBarBroaderGoalLabelMap[selectedGoal] || selectedGoal;
+    return [`Your Broader Goal > ${broaderGoal}`];
+  }, [selectedGoal]);
 
   const visibleDestinations = useMemo(
     () => rankedDestinations,
@@ -1829,6 +1893,14 @@ const AiSearchResults = () => {
     const priorityPoints = lines
       .filter((line) => line.startsWith("•"))
       .map((line) => line.replace(/^•\s*/, "").trim());
+    const visiblePriorityPoints =
+      priorityPoints.length > PRIORITY_POINTS_VISIBLE_LIMIT
+        ? priorityPoints.slice(0, PRIORITY_POINTS_VISIBLE_LIMIT)
+        : priorityPoints;
+    const additionalPriorityPointsText =
+      priorityPoints.length > PRIORITY_POINTS_VISIBLE_LIMIT
+        ? ADDITIONAL_PRIORITY_POINTS_TEXT
+        : "";
 
     const introLine =
       highlightedResultsHeadingFirstLine ||
@@ -1846,7 +1918,8 @@ const AiSearchResults = () => {
     return {
       introLine,
       poweredByLine,
-      priorityPoints,
+      priorityPoints: visiblePriorityPoints,
+      additionalPriorityPointsText,
       endingLine,
     };
   }, [
@@ -1879,7 +1952,9 @@ const AiSearchResults = () => {
                     key={`${badgeLabel}-${index}`}
                     className={searchBarBadgeClassName}
                   >
-                    <span className="truncate">{badgeLabel}</span>
+                    <span className="whitespace-normal break-words">
+                      {badgeLabel}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -1904,9 +1979,7 @@ const AiSearchResults = () => {
                 <DropdownBadge
                   label="Continent"
                   options={continentOptions}
-                  selectedValue={
-                    selectedContinent || "Where Do You Want To Go?"
-                  }
+                  selectedValue={selectedContinentDropdownValue}
                   isOpen={openDropdown === "continent"}
                   onToggle={() => handleDropdownToggle("continent")}
                   onSelect={handleContinentSelect}
@@ -1915,7 +1988,7 @@ const AiSearchResults = () => {
                 <DropdownBadge
                   label={selectedGoal}
                   options={goalOptions}
-                  selectedValue={selectedGoalOption || "Choose Your Goal!"}
+                  selectedValue={selectedGoalOptionDropdownValue}
                   isOpen={openDropdown === "goalOption"}
                   onToggle={() => handleDropdownToggle("goalOption")}
                   onSelect={handleGoalOptionSelect}
@@ -1948,6 +2021,15 @@ const AiSearchResults = () => {
                                           1 && <span>{", "}</span>}
                                     </React.Fragment>
                                   ),
+                                )}
+
+                                {formattedNarrative.additionalPriorityPointsText && (
+                                  <span>
+                                    {" "}
+                                    {
+                                      formattedNarrative.additionalPriorityPointsText
+                                    }
+                                  </span>
                                 )}
                               </span>
                             )}

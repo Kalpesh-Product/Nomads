@@ -26,7 +26,10 @@ import { Helmet } from "@dr.pogodin/react-helmet";
 import useAuth from "../hooks/useAuth.js";
 import { HiOutlineX } from "react-icons/hi";
 import { persistSelectedDestination } from "../utils/selectedDestinationSession.js";
-import { buildAiSearchBadgesWithLocation } from "../utils/aiSearchBarBadges.js";
+import {
+  dedupeAiSearchBadges,
+  buildAiVerticalsSearchBadges,
+} from "../utils/aiSearchBarBadges.js";
 
 // import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
 // import {
@@ -38,7 +41,6 @@ import { buildAiSearchBadgesWithLocation } from "../utils/aiSearchBarBadges.js";
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
 // const VALUE_ADDED_SERVICE_CARD_BACKGROUND_IMAGE = "/images/goa-image.jpg";
 const VALUE_ADDED_SERVICES_DEFAULT_VISIBLE_COUNT = 5;
-
 const TYPING_INTERVAL_MS = 7;
 const SECOND_HEADING_DELAY_MS = 250;
 const THINKING_HEADING_TEXT = "Curating the best results for you";
@@ -191,26 +193,10 @@ const AiGlobalListingsList = () => {
     const params = new URLSearchParams(location.search);
     const selectedStateFromQuery =
       params.get("state") || params.get("location") || "";
-    const selectedStateBadge = selectedStateFromQuery;
-    const locationStateBadges = location.state?.searchBarBadges;
-
-    if (Array.isArray(locationStateBadges) && locationStateBadges.length > 0) {
-      return buildAiSearchBadgesWithLocation({
-        badges: locationStateBadges,
-        selectedStateBadge,
-      });
-    }
-
-    if (persistedSearchBarBadges.length > 0) {
-      return buildAiSearchBadgesWithLocation({
-        badges: persistedSearchBarBadges,
-        selectedStateBadge,
-      });
-    }
-
-    return buildAiSearchBadgesWithLocation({
-      badges: [],
-      selectedStateBadge,
+    return buildAiVerticalsSearchBadges({
+      locationState: location.state,
+      selectedStateValue: selectedStateFromQuery,
+      persistedBadges: persistedSearchBarBadges,
     });
   }, [location.search, location.state, persistedSearchBarBadges]);
 
@@ -606,8 +592,25 @@ const AiGlobalListingsList = () => {
 
     navigate(`/ai-listings/${encodeURIComponent(item.companyName)}`, {
       state: {
+        breadcrumbLoading: true,
         companyId: item.companyId,
         type: item.companyType,
+        selectedFilters: location.state?.selectedFilters,
+        searchBarBadges,
+        breadcrumbFilters: {
+          continent:
+            formData?.continent ||
+            location.state?.breadcrumbFilters?.continent ||
+            "",
+          country:
+            formData?.country ||
+            location.state?.breadcrumbFilters?.country ||
+            "",
+          location:
+            formData?.location ||
+            location.state?.breadcrumbFilters?.location ||
+            "",
+        },
         returnTo: {
           pathname: "/ai-verticals",
           search: location.search,
@@ -639,7 +642,7 @@ const AiGlobalListingsList = () => {
   }, []);
 
   useEffect(() => {
-    if (typeof window === "undefined" || searchBarBadges.length === 0) return;
+    if (typeof window === "undefined" || searchBarBadges.length < 2) return;
 
     window.sessionStorage.setItem(
       "aiSearchBarBadges",
@@ -815,7 +818,18 @@ const AiGlobalListingsList = () => {
 
     const mapUrl = `/ai-verticals?country=${encodeURIComponent(formData.country)}&state=${encodeURIComponent(formData.location)}&view=map`;
     console.log("Navigating to:", mapUrl);
-    navigate(mapUrl);
+    navigate(mapUrl, {
+      state: {
+        ...location.state,
+        selectedFilters: location.state?.selectedFilters,
+        searchBarBadges,
+        breadcrumbFilters: {
+          continent: formData?.continent || location.state?.breadcrumbFilters?.continent || "",
+          country: formData?.country || location.state?.breadcrumbFilters?.country || "",
+          location: formData?.location || location.state?.breadcrumbFilters?.location || "",
+        },
+      },
+    });
   };
 
   return (
