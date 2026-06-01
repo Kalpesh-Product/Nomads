@@ -217,6 +217,25 @@ const AiProduct = () => {
   };
 
   useEffect(() => {
+    const currentLoading = Boolean(location.state?.breadcrumbLoading);
+    if (currentLoading === isCompanyDetails) return;
+
+    navigate(location.pathname + location.search, {
+      replace: true,
+      state: {
+        ...location.state,
+        breadcrumbLoading: isCompanyDetails,
+      },
+    });
+  }, [
+    isCompanyDetails,
+    location.pathname,
+    location.search,
+    location.state,
+    navigate,
+  ]);
+
+  useEffect(() => {
     const trail = [
       { label: breadcrumbState.continent, path: "/ai-verticals" },
       {
@@ -307,6 +326,17 @@ const AiProduct = () => {
       navigate(
         `/ai-listings-list?country=${normalizedCountry || ""}&location=${normalizedLocation || ""
         }&category=${normalizedCategory || ""}`,
+        {
+          state: {
+            ...location.state,
+            breadcrumbFilters: {
+              continent: normalizedContinent || "",
+              country: normalizedCountry || "",
+              location: normalizedLocation || "",
+              category: normalizedCategory || "",
+            },
+          },
+        },
       );
       return;
     }
@@ -314,6 +344,16 @@ const AiProduct = () => {
     navigate(
       `/ai-verticals?country=${normalizedCountry || ""}&state=${normalizedLocation || ""
       }`,
+      {
+        state: {
+          ...location.state,
+          breadcrumbFilters: {
+            continent: normalizedContinent || "",
+            country: normalizedCountry || "",
+            location: normalizedLocation || "",
+          },
+        },
+      },
     );
   };
 

@@ -123,7 +123,14 @@ const NomadAiLayout = () => {
           return {
             label: item?.label,
             onClick:
-              !isLast && item?.path ? () => navigate(item.path) : null,
+              !isLast && item?.path
+                ? () =>
+                    navigate(item.path, {
+                      state: {
+                        ...location.state,
+                      },
+                    })
+                : null,
             truncate: Boolean(isLast || item?.truncate),
           };
         })
@@ -145,6 +152,10 @@ const NomadAiLayout = () => {
       })
       .filter((item) => item.label);
   })();
+
+  const isAiProductPage = location.pathname.startsWith("/ai-listings/");
+  const isBreadcrumbLoading =
+    isAiProductPage && Boolean(location.state?.breadcrumbLoading);
 
   return (
     <div className="flex h-screen bg-white">
@@ -177,6 +188,7 @@ const NomadAiLayout = () => {
               <AiStickyBackBreadcrumb
                 onBack={() => navigate(-1)}
                 breadcrumbs={routeBreadcrumbs}
+                isLoading={isBreadcrumbLoading}
                 sticky={false}
                 textSizeClassName="text-[10px] md:text-sm lg:text-base"
               />

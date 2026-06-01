@@ -4,6 +4,7 @@ import { HiOutlineArrowLeft } from "react-icons/hi";
 const AiStickyBackBreadcrumb = ({
   onBack,
   breadcrumbs = [],
+  isLoading = false,
   className = "",
   rowClassName = "",
   topClassName = "top-[70px]",
@@ -29,7 +30,12 @@ const AiStickyBackBreadcrumb = ({
 
         {label ? <span className="text-lg font-semibold text-primary-blue sm:hidden">{label}</span> : null}
 
-        {breadcrumbs.length > 0 ? (
+        {isLoading ? (
+          <div className="ml-1 flex items-center gap-2" aria-live="polite">
+            <span className="h-3 w-3 animate-spin rounded-full border-2 border-sky-500 border-t-transparent" />
+            <span className={`text-primary-blue ${textSizeClassName}`}>Loading...</span>
+          </div>
+        ) : breadcrumbs.length > 0 ? (
           <nav
             aria-label="Breadcrumb"
             className={`flex items-center text-primary-blue ${textSizeClassName}`}

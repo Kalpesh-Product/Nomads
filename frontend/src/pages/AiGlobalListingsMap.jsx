@@ -559,8 +559,25 @@ const AiGlobalListingsMap = () => {
 
     navigate(`/ai-listings/${encodeURIComponent(item.companyName)}`, {
       state: {
+        breadcrumbLoading: true,
         companyId: item.companyId,
         type: item.companyType || "ss",
+        selectedFilters: location.state?.selectedFilters,
+        searchBarBadges,
+        breadcrumbFilters: {
+          continent:
+            formData?.continent ||
+            location.state?.breadcrumbFilters?.continent ||
+            "",
+          country:
+            formData?.country ||
+            location.state?.breadcrumbFilters?.country ||
+            "",
+          location:
+            formData?.location ||
+            location.state?.breadcrumbFilters?.location ||
+            "",
+        },
         returnTo: {
           pathname: "/ai-verticals",
           search: location.search,
