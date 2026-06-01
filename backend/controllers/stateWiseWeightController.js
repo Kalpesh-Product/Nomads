@@ -45,6 +45,9 @@ const CSV_TO_SCHEMA_MAP = {
 
   // Career / Startup
   venturecapitalpresence: "ventureCapital",
+  localgovernmentsupport: "localGovernmentSupport",
+  venturecapitalinvestments: "ventureCapitalInvestments",
+  governmentstartupevents: "governmentStartupEvents",
   startupincubatorsaccelerators: "incubators",
   techtalentdensity: "techTalentDensity",
   conferencesevents: "conferences",

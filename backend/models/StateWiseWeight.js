@@ -126,6 +126,9 @@ const stateWiseWeightSchema = new mongoose.Schema(
 
       // Career / Startup
       ventureCapital: { type: Number, default: 0, required: true },
+      localGovernmentSupport: { type: Number, default: 0, required: true },
+      ventureCapitalInvestments: { type: Number, default: 0, required: true },
+      governmentStartupEvents: { type: Number, default: 0, required: true },
       incubators: { type: Number, default: 0, required: true },
       techTalentDensity: { type: Number, default: 0, required: true },
       conferences: { type: Number, default: 0, required: true },
