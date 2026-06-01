@@ -84,7 +84,7 @@ const destinationImageLinks = [
       "https://www.emperortraveline.com/wp-content/uploads/2018/12/Kek-lok.png",
   },
   {
-    city: "Canary Islands",
+    city: "Las Palmas",
     image:
       "https://cdn.rtvc.es/archivos/2023/06/Las-Palmas-de-Gran-Canaria-.jpeg",
   },
@@ -209,7 +209,7 @@ const destinationImageLinks = [
       "https://media.digitalnomads.world/wp-content/uploads/2021/10/20114835/floriano%CC%81polis-digital-nomads.jpg",
   },
   {
-    city: "Quintana Roo",
+    city: "Playa del Carmen",
     image: "https://g.denik.cz/1/85/chichen-itza-04.jpg",
   },
   {
@@ -233,7 +233,7 @@ const destinationImageLinks = [
       "https://res.klook.com/image/upload/fl_lossy.progressive,q_60/Mobile/City/fmrbscgpo5jtrqlqg47u.jpg",
   },
   {
-    city: "San José Province",
+    city: "San José",
     image:
       "https://palmsrealtycr.com/wp-content/uploads/2013/01/la-sabana-4.jpg",
   },
@@ -384,7 +384,7 @@ const destinations = [
   ["Tbilisi", "Georgia", "Europe"],
   ["Phuket", "Thailand", "Asia"],
   ["Penang", "Malaysia", "Asia"],
-  ["Canary Islands", "Spain", "Europe"],
+  ["Las Palmas", "Spain", "Europe"],
   ["Goa", "India", "Asia"],
   ["Tallinn", "Estonia", "Europe"],
   ["Montreal", "Canada", "North America"],
@@ -410,12 +410,12 @@ const destinations = [
   ["Yogyakarta", "Indonesia", "Asia"],
   ["Bologna", "Italy", "Europe"],
   ["Santa Catarina", "Brazil", "South America"],
-  ["Quintana Roo", "Mexico", "North America"],
+  ["Playa del Carmen", "Mexico", "North America"],
   ["Cape Town", "South Africa", "Africa"],
   ["Gold Coast", "Australia", "Oceania"],
   ["Auckland", "New Zealand", "Oceania"],
   ["Amsterdam", "Netherlands", "Europe"],
-  ["San José Province", "Costa Rica", "South America"],
+  ["San José", "Costa Rica", "South America"],
   ["Tenerife", "Spain", "Europe"],
   ["Funchal", "Portugal", "Europe"],
   ["Tulum", "Mexico", "North America"],
@@ -437,7 +437,7 @@ const destinations = [
   ["Manila", "Philippines", "Asia"],
   ["Cali", "Colombia", "South America"],
   ["Oaxaca", "Mexico", "North America"],
-  ["Victoria", "Canada", "North America"],
+  ["Melbourne", "Canada", "North America"],
   ["Pittsburgh", "USA", "North America"],
   ["Lagos State", "Nigeria", "Africa"],
   ["Abuja", "Nigeria", "Africa"],
@@ -446,13 +446,13 @@ const destinations = [
 
 const destinationCardShortNames = {
   "Vietnam|Ho Chi Minh City": "Ho Chi Minh City",
-  "Spain|Canary Islands": "Las Palmas",
+  "Spain|Las Palmas": "Las Palmas",
   "Brazil|Santa Catarina": "Florianopolis",
-  "Mexico|Quintana Roo": "Playa del Carmen",
+  "Mexico|Playa del Carmen": "Playa del Carmen",
   "South Africa|Cape Town": "Cape Town",
   "Australia|Gold Coast": "Queensland",
   "Netherlands|Amsterdam": "Amsterdam",
-  "Costa Rica|San José Province": "San José",
+  "Costa Rica|San José": "San José",
   "Spain|Tenerife": "Tenerife",
   "Morocco|Casablanca": "Casablanca",
   "Portugal|Lagos": "Lagos",
