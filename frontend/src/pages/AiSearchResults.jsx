@@ -616,6 +616,10 @@ const SEARCH_RESULTS_GOAL_STORAGE_KEY = "aiSearchResults.selectedGoal";
 const SEARCH_RESULTS_SELECTION_SIGNATURE_STORAGE_KEY =
   "aiSearchResults.selectionSignature";
 
+const PRIORITY_POINTS_VISIBLE_LIMIT = 4;
+const ADDITIONAL_PRIORITY_POINTS_TEXT =
+  "along with other aspects calculated by our proprietary algorithm.";
+
 const goalNameBySlug = {
   worldranking: "World Ranking",
   workfromanywhere: "Work From Anywhere",
@@ -1829,6 +1833,14 @@ const AiSearchResults = () => {
     const priorityPoints = lines
       .filter((line) => line.startsWith("•"))
       .map((line) => line.replace(/^•\s*/, "").trim());
+    const visiblePriorityPoints =
+      priorityPoints.length > PRIORITY_POINTS_VISIBLE_LIMIT
+        ? priorityPoints.slice(0, PRIORITY_POINTS_VISIBLE_LIMIT)
+        : priorityPoints;
+    const additionalPriorityPointsText =
+      priorityPoints.length > PRIORITY_POINTS_VISIBLE_LIMIT
+        ? ADDITIONAL_PRIORITY_POINTS_TEXT
+        : "";
 
     const introLine =
       highlightedResultsHeadingFirstLine ||
@@ -1846,7 +1858,8 @@ const AiSearchResults = () => {
     return {
       introLine,
       poweredByLine,
-      priorityPoints,
+      priorityPoints: visiblePriorityPoints,
+      additionalPriorityPointsText,
       endingLine,
     };
   }, [
@@ -1948,6 +1961,15 @@ const AiSearchResults = () => {
                                           1 && <span>{", "}</span>}
                                     </React.Fragment>
                                   ),
+                                )}
+
+                                {formattedNarrative.additionalPriorityPointsText && (
+                                  <span>
+                                    {" "}
+                                    {
+                                      formattedNarrative.additionalPriorityPointsText
+                                    }
+                                  </span>
                                 )}
                               </span>
                             )}
