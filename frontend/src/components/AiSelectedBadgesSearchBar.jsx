@@ -36,7 +36,7 @@ const AiSelectedBadgesSearchBar = ({
         <div className="flex flex-1 flex-wrap items-center gap-2 overflow-hidden">
           {visibleBadges.map((badgeLabel, index) => (
             <div key={`${badgeLabel}-${index}`} className={badgeClassName}>
-              <span className="truncate">{badgeLabel}</span>
+              <span className="whitespace-normal break-words">{badgeLabel}</span>
             </div>
           ))}
           {/* {stateLabel && <span className={badgeClassName}>{stateLabel}</span>} */}

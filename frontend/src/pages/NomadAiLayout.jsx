@@ -87,6 +87,7 @@ const NomadAiLayout = () => {
       location.pathname === "/world-rankings" ||
       location.pathname === "/ai-verticals" ||
       location.pathname === "/ai-profile" ||
+      location.pathname === "/ai-listings" ||
       location.pathname.startsWith("/manual-search") ||
       location.pathname.startsWith("/search/worldranking/results") ||
       location.pathname.startsWith("/search/workfromanywhere/results") ||
@@ -99,6 +100,7 @@ const NomadAiLayout = () => {
       location.pathname.startsWith("/new-company-setup") ||
       location.pathname.startsWith("/consultation") ||
       location.pathname.startsWith("/workation") ||
+      location.pathname.startsWith("/become-a-contributor") ||
       location.pathname.startsWith("/ai-about") ||
       location.pathname.startsWith("/ai-privacy") ||
       location.pathname.startsWith("/ai-career") ||
@@ -108,7 +110,7 @@ const NomadAiLayout = () => {
       location.pathname.startsWith("/ai-career") ||
       location.pathname.startsWith("/ai-content-and-copyright") ||
       location.pathname.startsWith("/ai-content-use-removal") ||
-      location.pathname.startsWith("/ai-contact") 
+      location.pathname.startsWith("/ai-contact")
     ) {
       return [];
     }
@@ -121,7 +123,14 @@ const NomadAiLayout = () => {
           return {
             label: item?.label,
             onClick:
-              !isLast && item?.path ? () => navigate(item.path) : null,
+              !isLast && item?.path
+                ? () =>
+                    navigate(item.path, {
+                      state: {
+                        ...location.state,
+                      },
+                    })
+                : null,
             truncate: Boolean(isLast || item?.truncate),
           };
         })
@@ -143,6 +152,10 @@ const NomadAiLayout = () => {
       })
       .filter((item) => item.label);
   })();
+
+  const isAiProductPage = location.pathname.startsWith("/ai-listings/");
+  const isBreadcrumbLoading =
+    isAiProductPage && Boolean(location.state?.breadcrumbLoading);
 
   return (
     <div className="flex h-screen bg-white">
@@ -175,6 +188,7 @@ const NomadAiLayout = () => {
               <AiStickyBackBreadcrumb
                 onBack={() => navigate(-1)}
                 breadcrumbs={routeBreadcrumbs}
+                isLoading={isBreadcrumbLoading}
                 sticky={false}
                 textSizeClassName="text-[10px] md:text-sm lg:text-base"
               />

@@ -195,9 +195,9 @@ const ListingCard = ({
         <div className="flex w-full justify-between items-center">
           <p
             className="text-xs md:text-sm text-gray-600 font-medium truncate"
-            title={`${item.city || "Unknown"}, ${item.state || "Unknown"}`}
+            title={`${item.city || "Unknown"}`}
           >
-            {`${item.city || "Unknown"}, ${item.state || "Unknown"}`}
+            {`${item.city || "Unknown"}`}
           </p>
 
           <div className="flex items-center gap-1 text-gray-600">

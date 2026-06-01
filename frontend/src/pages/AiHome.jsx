@@ -117,7 +117,7 @@ const AiHome = () => {
       const inOfWord =
         normalizedText.slice(index, index + 2) === "of" ||
         normalizedText.slice(index - 1, index + 1) === "of";
-      const isBlueO = (char === "" || char === "") && !inOfWord;
+      const isBlueO = (char === "o" || char === "O") && !inOfWord;
       return (
         <span
           key={`${char}-${index}`}
@@ -152,9 +152,9 @@ const AiHome = () => {
     let subheadingIndex = 0;
     let thirdLineIndex = 0;
     let fourthLineIndex = 0;
-    let cleanupSubheading = () => {};
-    let cleanupThirdLine = () => {};
-    let cleanupFourthLine = () => {};
+    let cleanupSubheading = () => { };
+    let cleanupThirdLine = () => { };
+    let cleanupFourthLine = () => { };
 
     const greetingInterval = setInterval(() => {
       greetingIndex += 1;
@@ -308,9 +308,8 @@ const AiHome = () => {
           </p>
 
           <div
-            className={`mt-8 rounded-[40px] px-0 py-4 md:px-6 md:py-8 ${
-              areCardsVisible ? "visible" : "invisible"
-            }`}
+            className={`mt-8 rounded-[40px] px-0 py-4 md:px-6 md:py-8 ${areCardsVisible ? "visible" : "invisible"
+              }`}
           >
             <div className="grid grid-cols-2 gap-4 md:grid-cols-2 md:gap-10 xl:grid-cols-3">
               {recommendationCards.map((card, index) => {
@@ -324,11 +323,10 @@ const AiHome = () => {
                 return (
                   <div
                     key={card.title}
-                    className={`transition-all duration-300 ${
-                      index < visibleCardCount
-                        ? "translate-y-0 opacity-100"
-                        : "pointer-events-none translate-y-2 opacity-0"
-                    }`}
+                    className={`transition-all duration-300 ${index < visibleCardCount
+                      ? "translate-y-0 opacity-100"
+                      : "pointer-events-none translate-y-2 opacity-0"
+                      }`}
                   >
                     <article
                       onClick={() => handleCardClick(card)}
@@ -357,9 +355,8 @@ const AiHome = () => {
                     </article>
                     {!isLoggedIn ? (
                       <p
-                        className={`mt-2 text-[10px] font-semibold tracking-wide md:text-xs ${
-                          isFreeCard ? "text-primary-blue" : "text-black/70"
-                        }`}
+                        className={`mt-2 text-[10px] font-semibold tracking-wide md:text-xs ${isFreeCard ? "text-primary-blue" : "text-black/70"
+                          }`}
                       >
                         {loggedOutCardText}
                       </p>

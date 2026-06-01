@@ -162,6 +162,35 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
   const offersLabel = stateLabel ? `${stateLabel} Offers` : "Offers";
 
   const currentSearch = location.search || "";
+  const aiVerticalsToggleState = (() => {
+    const stateFromRoute = location.state || {};
+    let fallbackBadges = [];
+
+    if (typeof window !== "undefined") {
+      try {
+        const raw = window.sessionStorage.getItem("aiSearchBarBadges");
+        const parsed = raw ? JSON.parse(raw) : [];
+        fallbackBadges = Array.isArray(parsed) ? parsed : [];
+      } catch {
+        fallbackBadges = [];
+      }
+    }
+
+    return {
+      ...stateFromRoute,
+      searchBarBadges:
+        stateFromRoute?.searchBarBadges || fallbackBadges || [],
+      selectedFilters: stateFromRoute?.selectedFilters,
+      breadcrumbFilters: {
+        continent:
+          formData?.continent || stateFromRoute?.breadcrumbFilters?.continent || "",
+        country: formData?.country || stateFromRoute?.breadcrumbFilters?.country || "",
+        location:
+          formData?.location || stateFromRoute?.breadcrumbFilters?.location || "",
+      },
+    };
+  })();
+
   const headerLinks = [
     // { id: 1, text: "Home", to: "/" },
     { id: 2, type: "news", text: newsLabel, to: `/ai-news${currentSearch}` },
@@ -210,6 +239,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                               ? mapViewLink
                               : `${location.pathname}?country=${formData?.country}&location=${formData?.location}&view=map`
                           }
+                          state={aiVerticalsToggleState}
                           className="group relative text-md text-black"
                         >
                           <span className="relative z-10 group-hover:font-bold mb-2 text-sm font-semibold">
@@ -230,6 +260,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                               ? listViewLink
                               : `${location.pathname}?country=${formData?.country}&location=${formData?.location}`
                           }
+                          state={aiVerticalsToggleState}
                           className="group relative text-md text-black"
                         >
                           <span className="relative z-10 group-hover:font-bold mb-2 text-sm font-semibold">

@@ -514,13 +514,13 @@ const getScoreBarColorValue = (score) => {
 const destinationAliasMap = {
   "Ho Chi Minh City": "Ho Chi Minh City",
   Surigao: "Surigao del Norte",
-  "Las Palmas": "Canary Islands",
+  "Las Palmas": "Las Palmas",
   Florianopolis: "Santa Catarina",
-  "Playa del Carmen": "Quintana Roo",
+  "Playa del Carmen": "Playa del Carmen",
   "Cape Town": "Cape Town",
   Queensland: "Gold Coast",
   Amsterdam: "Amsterdam",
-  Tenerife: "Santa Cruz de Tenerife",
+  Tenerife: "Tenerife",
   Casablanca: "Casablanca",
   Cairo: "Cairo",
   Queenstown: "Otago Region",
@@ -744,6 +744,68 @@ const goalNarrativeByGoalAndAttribute = {
 const searchBarBadgeClassName =
   "inline-flex min-h-[40px] min-w-[5rem] items-center rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85";
 
+const searchBarBroaderGoalLabelMap = {
+  "World Ranking": "Worldwide Nomad Destinations Ranking",
+  "Work From Anywhere": "Best Nomad Destinations for Remote Work",
+  "Increase Your Savings": "Budget-Friendly Nomad Destinations",
+  "Find Your Community": "Be with your Community",
+  "Advance Your Career": "Advance your Career",
+};
+
+const searchBarEndGoalLabelMap = {
+  "World Ranking": {
+    "Best for Nomads": "Best Overall Nomad Destinations",
+    "Most Affordable": "Most Affordable Nomad Destinations",
+    "Safest Cities": "Safest Nomad Destinations",
+    "Easy Visa / Long Stay": "Visa-Friendly Nomad Destinations",
+    "Strong Nomad Community": "Most Active Nomad Destinations",
+    "Healthcare Friendly": "Healthcare-Friendly Nomad Destinations",
+    "Startup / Business Opportunities": "Startup/Business Ready Nomad Destinations",
+    "Clean Air / Environment": "Environment-Friendly Nomad Destinations",
+    "Best Work Infrastructure": "Best Work Infrastructure Nomad Destinations",
+  },
+  "Work From Anywhere": {
+    "Best for Remote Work Setup":
+      "Best Overall Nomad Destinations for Remote Work",
+    "Cheapest Places": "Cheapest Nomad Destinations",
+    "Best Connected Cities (Flights)": "Globally Accessible Nomad Destinations",
+    "Strong Nomad Community": "Most Active Nomad Destinations",
+    "Fast Internet Cities": "Nomad Destinations with the Fastest Internet",
+    "Best Work Infrastructure": "Best Work Infrastructure Nomad Destinations",
+  },
+  "Increase Your Savings": {
+    "Maximum Savings": "Best Nomad Destinations to Maximize you Savings",
+    "Low Taxation": "Tax-Friendly Nomad Destinations",
+    "Purchasing Power": "Nomad Destinations with Strong Purchasing Power",
+    "Financial Stability(Low Risk)": "Financially Stable Nomad Destinations",
+    "Startup Setup Cost": "Cheapest Nomad Destinations for Startups",
+    "Balanced Financial Lifestyle":
+      "Best Overall Nomad Destinations for Savings",
+  },
+  "Find Your Community": {
+    "Social & Party Lifestyle": "Party & Social Lifestyle Nomad Destinations",
+    "Chill & Wellness Lifestyle": "Chill & Wellness Lifestyle Nomad Destinations",
+    "Adventure & Exploration": "Adventurous Nomad Destinations",
+    "Nomad Community & Networking": "Nomad Destinations for Networking",
+    "Couple - Friendly Lifestyle": "Couple-Friendly Nomad Destinations",
+    "Family - Friendly Lifestyle": "Nomad Destinations for Family Travel",
+    "Female - Friendly Lifestyle": "Safe Nomad Destinations for Females",
+    "Founder Nomads": "Nomad Destinations for Founders",
+    "Solo Nomads": "Nomad Destinations for Solo Travellers",
+  },
+  "Advance Your Career": {
+    "Startup Ecosystems": "Best Startup Ecosystems",
+    "Remote Job Opportunities": "Destinations with Remote Job Opportunities",
+    "Founder Nomads": "Grow Connections through Founders",
+    "Tech Talent Density": "Tech Dense Nomad Destinations",
+    "Startup Incubators & Accelerators": "Startup Incubators & Accelerators",
+    "Balanced Career Growth": "Balanced Career Growth",
+    "Venture Capital Presence": "Venture Capital Presence",
+    "Conferences & Events":
+      "Best Nomad Destinations for Conferences & Events",
+  },
+};
+
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 const highlightSelectedTokens = (text, tokens) => {
@@ -937,6 +999,17 @@ const AiSearchResults = () => {
     normalizeSelectedContinent(selectedContinent);
   const hasSelectedGoalOption = Boolean(selectedGoalOption);
   const hasSelectedFilters = hasSelectedContinent && hasSelectedGoalOption;
+  const selectedContinentDropdownValue = hasSelectedContinent
+    ? selectedContinentDisplay === "World"
+      ? "You Intend To > Explore the World"
+      : `You Intend To > Explore ${selectedContinentDisplay}`
+    : "Where Do You Want To Go?";
+  const selectedGoalOptionDropdownValue = hasSelectedGoalOption
+    ? `Your End Goal > ${
+        searchBarEndGoalLabelMap[selectedGoal]?.[selectedGoalOption] ||
+        selectedGoalOption
+      }`
+    : "Choose Your Goal!";
   const passportCountry =
     auth?.user?.country ||
     auth?.user?.countryOfResidence ||
@@ -1251,23 +1324,10 @@ const AiSearchResults = () => {
   ]);
 
   const searchBarBadges = useMemo(() => {
-    const badges = [selectedGoal];
-
-    const displayLoc = normalizeSelectedContinent(
-      loc ? decodeURIComponent(loc) : selectedContinentDisplay,
-    );
-    const displayAttr = attr ? decodeURIComponent(attr) : selectedGoalOption;
-
-    if (displayLoc) {
-      badges.push(displayLoc);
-    }
-
-    if (displayAttr) {
-      badges.push(displayAttr);
-    }
-
-    return badges;
-  }, [loc, attr, selectedContinentDisplay, selectedGoalOption, selectedGoal]);
+    const broaderGoal =
+      searchBarBroaderGoalLabelMap[selectedGoal] || selectedGoal;
+    return [`Your Broader Goal > ${broaderGoal}`];
+  }, [selectedGoal]);
 
   const visibleDestinations = useMemo(
     () => rankedDestinations,
@@ -1892,7 +1952,9 @@ const AiSearchResults = () => {
                     key={`${badgeLabel}-${index}`}
                     className={searchBarBadgeClassName}
                   >
-                    <span className="truncate">{badgeLabel}</span>
+                    <span className="whitespace-normal break-words">
+                      {badgeLabel}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -1917,9 +1979,7 @@ const AiSearchResults = () => {
                 <DropdownBadge
                   label="Continent"
                   options={continentOptions}
-                  selectedValue={
-                    selectedContinent || "Where Do You Want To Go?"
-                  }
+                  selectedValue={selectedContinentDropdownValue}
                   isOpen={openDropdown === "continent"}
                   onToggle={() => handleDropdownToggle("continent")}
                   onSelect={handleContinentSelect}
@@ -1928,7 +1988,7 @@ const AiSearchResults = () => {
                 <DropdownBadge
                   label={selectedGoal}
                   options={goalOptions}
-                  selectedValue={selectedGoalOption || "Choose Your Goal!"}
+                  selectedValue={selectedGoalOptionDropdownValue}
                   isOpen={openDropdown === "goalOption"}
                   onToggle={() => handleDropdownToggle("goalOption")}
                   onSelect={handleGoalOptionSelect}

@@ -29,12 +29,11 @@ import { Helmet } from "@dr.pogodin/react-helmet";
 import useAuth from "../hooks/useAuth.js";
 import { persistSelectedDestination } from "../utils/selectedDestinationSession.js";
 import {
-  buildAiSearchBadgesWithLocation,
   dedupeAiSearchBadges,
+  buildAiVerticalsSearchBadges,
 } from "../utils/aiSearchBarBadges.js";
 
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
-
 const TYPING_INTERVAL_MS = 7;
 const SECOND_HEADING_DELAY_MS = 250;
 const THINKING_HEADING_TEXT = "Curating the best results for you";
@@ -136,26 +135,10 @@ const AiGlobalListingsMap = () => {
     const params = new URLSearchParams(location.search);
     const selectedStateFromQuery =
       params.get("state") || params.get("location") || "";
-    const selectedStateBadge = selectedStateFromQuery;
-    const locationStateBadges = location.state?.searchBarBadges;
-
-    if (Array.isArray(locationStateBadges) && locationStateBadges.length > 0) {
-      return buildAiSearchBadgesWithLocation({
-        badges: locationStateBadges,
-        selectedStateBadge,
-      });
-    }
-
-    if (persistedSearchBarBadges.length > 0) {
-      return buildAiSearchBadgesWithLocation({
-        badges: persistedSearchBarBadges,
-        selectedStateBadge,
-      });
-    }
-
-    return buildAiSearchBadgesWithLocation({
-      badges: [],
-      selectedStateBadge,
+    return buildAiVerticalsSearchBadges({
+      locationState: location.state,
+      selectedStateValue: selectedStateFromQuery,
+      persistedBadges: persistedSearchBarBadges,
     });
   }, [location.search, location.state, persistedSearchBarBadges]);
 
@@ -458,7 +441,7 @@ const AiGlobalListingsMap = () => {
   }, []);
 
   useEffect(() => {
-    if (typeof window === "undefined" || searchBarBadges.length === 0) return;
+    if (typeof window === "undefined" || searchBarBadges.length < 2) return;
 
     window.sessionStorage.setItem(
       "aiSearchBarBadges",
@@ -576,8 +559,25 @@ const AiGlobalListingsMap = () => {
 
     navigate(`/ai-listings/${encodeURIComponent(item.companyName)}`, {
       state: {
+        breadcrumbLoading: true,
         companyId: item.companyId,
         type: item.companyType || "ss",
+        selectedFilters: location.state?.selectedFilters,
+        searchBarBadges,
+        breadcrumbFilters: {
+          continent:
+            formData?.continent ||
+            location.state?.breadcrumbFilters?.continent ||
+            "",
+          country:
+            formData?.country ||
+            location.state?.breadcrumbFilters?.country ||
+            "",
+          location:
+            formData?.location ||
+            location.state?.breadcrumbFilters?.location ||
+            "",
+        },
         returnTo: {
           pathname: "/ai-verticals",
           search: location.search,
@@ -1225,6 +1225,27 @@ const AiGlobalListingsMap = () => {
           onClick={() =>
             navigate(
               `/ai-verticals?country=${formData?.country}&location=${formData?.location}`,
+              {
+                state: {
+                  ...location.state,
+                  selectedFilters: location.state?.selectedFilters,
+                  searchBarBadges,
+                  breadcrumbFilters: {
+                    continent:
+                      formData?.continent ||
+                      location.state?.breadcrumbFilters?.continent ||
+                      "",
+                    country:
+                      formData?.country ||
+                      location.state?.breadcrumbFilters?.country ||
+                      "",
+                    location:
+                      formData?.location ||
+                      location.state?.breadcrumbFilters?.location ||
+                      "",
+                  },
+                },
+              },
             )
           }
           className="bg-[#222222] text-white px-5 py-3 rounded-full flex items-center gap-2 shadow-xl hover:scale-105 transition-transform active:scale-95"
