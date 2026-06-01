@@ -703,41 +703,41 @@ const goalNarrativeByGoalAndAttribute = {
   },
   [normalizeNarrativeKey("Find Your Community")]: {
     [normalizeNarrativeKey("Social & Party Lifestyle")]:
-      "Curated below are the best cities in X for a vibrant social and party lifestyle.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🎉 Party & events culture\n• 🍸 Nightlife & pubs\n• 🤝 Active nomad community\n• 📅 Meetups & social scenes\n\n→ Go out, meet people, enjoy the vibe.",
+      "Curated below are the best cities in X for a vibrant social and party lifestyle.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🎉 Party & events culture\n• 🍸 Nightlife & pubs\n• 🤝 Active nomad community\n\n→ Go out, meet people, enjoy the vibe.",
     [normalizeNarrativeKey("Chill & Wellness Lifestyle")]:
-      "Curated below are the best cities in X for a calm and wellness-focused lifestyle.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🌿 Peaceful environments\n• 🧘 Wellness & yoga culture\n• 🌱 Nature & slow living\n• 🤝 Supportive communities\n\n→ Slow down, recharge, feel better.",
+      "Curated below are the best cities in X for a calm and wellness-focused lifestyle.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🌿 Peaceful environments\n• 🧘 Wellness & yoga culture\n• 🌱 Nature & slow living\n\n→ Slow down, recharge, feel better.",
     [normalizeNarrativeKey("Adventure & Exploration")]:
-      "Curated below are the best cities in X for adventure and exploration.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🧗 Adventure activities\n• 🌿 Nature access\n• 🌍 Exploration potential\n• 🤝 Active nomad community\n\n→ Go beyond the ordinary.",
+      "Curated below are the best cities in X for adventure and exploration.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🧗 Adventure activities\n• 🌿 Nature access\n\n→ Go beyond the ordinary.",
     [normalizeNarrativeKey("Nomad Community & Networking")]:
-      "Curated below are the best cities in X for building connections and expanding your network.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🤝 Active nomad communities\n• 📅 Meetups & events\n• 🧑‍💼 Founder & professional circles\n• 🌍 Diverse social ecosystems\n\n→ Connect, collaborate, grow.",
+      "Curated below are the best cities in X for building connections and expanding your network.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🤝 Active nomad communities\n• 📅 Meetups & events\n• 🧑‍💼 Founder & professional circles\n\n→ Connect, collaborate, grow.",
     [normalizeNarrativeKey("Couple-Friendly Lifestyle")]:
-      "Curated below are the best cities in X for couples seeking a balanced and enjoyable lifestyle.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💑 Couple-friendly environments\n• 🌿 Lifestyle & shared experiences\n• 🤝 Supportive communities\n• 🧘 Balanced living\n\n→ Build a life together, not just travel.",
+      "Curated below are the best cities in X for couples seeking a balanced and enjoyable lifestyle.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💑 Couple-friendly destinations\n• 🌿 Lifestyle & shared experiences\n• 🛡️ Safety and comfort for couples\n\n→ Build a life together, not just travel.",
     [normalizeNarrativeKey("Family-Friendly Lifestyle")]:
-      "Curated below are the best cities in X for families seeking a safe and comfortable lifestyle.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 👨‍👩‍👧 Family-friendly environments\n• 🛡️ Safety & stability\n• 🌿 Calm & livable surroundings\n• 🤝 Supportive communities\n\n→ Build a secure and balanced life for your family.",
+      "Curated below are the best cities in X for families seeking a safe and comfortable lifestyle.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 👨‍👩‍👧 Family-friendly destinations\n• 🛡️ Safety & stability\n• 🌿 Calm & livable surroundings\n\n→ Build a secure and balanced life for your family.",
     [normalizeNarrativeKey("Female - Friendly Lifestyle")]:
-      "Curated below are the best cities in X for solo female travelers seeking safety and comfort.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🛡️ Safety & security\n• 👩 Female-friendly environments\n• 🤝 Supportive communities\n• 🌍 Ease of navigation\n\n→ Travel independently with confidence.",
+      "Curated below are the best cities in X for solo female travelers seeking safety and comfort.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 👩 Female-friendly destinations\n• 🛡️ Safety & security\n• 🤝 Supportive communities\n• 🌍 Ease of navigation\n\n→ Travel independently with confidence.",
     [normalizeNarrativeKey("Founder Nomads")]:
-      "Curated below are the best cities in X for founder nomads and startup builders.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🚀 Strong founder ecosystems\n• 🤝 High-value networking\n• 📅 Events & startup activity\n• 🌍 Collaborative communities\n\n→ Build, connect, scale.",
+      "Curated below are the best cities in X for founder nomads and startup builders.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💎 Strong founder destinations\n• 🚀 Startup ecosystems\n• 🤝 Startup investors presence for networking\n• 📅 Startup events & activities\n\n→ Build, connect, scale.",
     [normalizeNarrativeKey("Solo Nomads")]:
-      "Curated below are the best cities in X for solo nomad travelers.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🧍 Solo-friendly environments\n• 🤝 Easy social integration\n• 📅 Meetups & activities\n• 🌍 Freedom & flexibility\n\n→ Explore freely, connect easily.",
+      "Curated below are the best cities in X for solo nomad travelers.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🧍 Solo-friendly destinations\n• 🤝 Easy social integration\n• 🌍 Freedom & flexibility\n\n→ Explore freely, connect easily.",
   },
   [normalizeNarrativeKey("Advance Your Career")]: {
     [normalizeNarrativeKey("Startup Ecosystems")]:
-      "Curated below are the best cities in X with strong startup ecosystems and innovation-driven environments.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🚀 Strong startup activity\n• 💰 Access to venture capital\n• 🏢 Incubators & accelerators\n• 🧑‍💻 Tech talent density\n\n→ Build, scale, and thrive.",
+      "Curated below are the best cities in X with strong startup ecosystems and innovation-driven environments.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🚀 Strong startup activity\n• 💰 Access to venture capital\n• 🏢 Incubators & accelerators\n• 📅 Startup events & activities\n\n→ Build, scale, and thrive.",
     [normalizeNarrativeKey("Remote Job Opportunities")]:
-      "Curated below are the best cities in X for accessing remote job opportunities and global work.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💼 Availability of remote jobs\n• 🌍 Access to global employers\n• 📈 Career opportunities\n• 🧑‍💻 Digital work ecosystem\n\n→ Work globally, earn flexibly.",
+      "Curated below are the best cities in X for accessing remote job opportunities and global work.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💼 Availability of remote jobs\n• 🧑‍💻 Digital work ecosystem\n• 🚀 Startup ecosystems\n\n→ Work globally, earn flexibly.",
     [normalizeNarrativeKey("Founder Nomads")]:
-      "Curated below are the best cities in X for building strong networks and valuable connections.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🤝 Founder & professional communities\n• 📅 Conferences & networking events\n• 🧑‍💻 Talent density\n• 🌍 Opportunity-rich environments\n\n→ Meet the right people, unlock opportunities.",
+      "Curated below are the best cities in X for building strong networks and valuable connections.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💎 Strong founder destinations\n• 📅 Startup conferences & networking events\n• 📈 Emerging startup ecosystems\n\n→ Meet the right people, unlock opportunities.",
     [normalizeNarrativeKey("Tech Talent Density")]:
-      "Curated below are the best cities in X with high tech talent density and innovation-driven ecosystems.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🧠 Skilled tech workforce\n• 👩‍💻 Developer & builder density\n• 🚀 Innovation-driven environments\n• 🤝 Collaboration opportunities\n\n→ Build faster with the right people around you.",
+      "Curated below are the best cities in X with high tech talent density and innovation-driven ecosystems.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🧠 Skilled tech workforce\n• 💻 Tech startups ecosystem\n• 🚀 Innovation-driven environments\n\n→ Build faster with the right people around you.",
     [normalizeNarrativeKey("Startup Funding & Support")]:
-      "Curated below are the best cities in X for startup support through incubators and accelerators.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🚀 Incubators & accelerator programs\n• 🧠 Mentorship & founder guidance\n• 💼 Structured startup support\n• 📈 Early-stage growth opportunities\n\n→ Build faster with guidance and support.",
+      "Curated below are the best cities in X for startup support through incubators and accelerators.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🚀 Incubators & accelerator presence\n• 🧠 Mentorship & founder community\n• 🏛️ Local government support\n\n→ Build faster with guidance and support.",
     [normalizeNarrativeKey("Balanced Career Growth")]:
-      "Curated below are the best cities in X for balanced career growth and long-term opportunities.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💼 Job opportunities\n• 🚀 Startup ecosystems\n• 🤝 Networking access\n• 🧑‍💻 Talent-rich environments\n\n→ Grow consistently while staying balanced.",
+      "Curated below are the best cities in X for balanced career growth and long-term opportunities.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💼 Growing job opportunities\n• 🚀 Emerging startup ecosystems\n• 🤝 Startup networking communities\n• 🏛️ Government support towards startups\n\n→ Grow consistently while staying balanced.",
     [normalizeNarrativeKey("Venture Capital Presence")]:
-      "Curated below are the best cities in X for accessing venture capital and startup funding.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💰 Active venture capital networks\n• 🚀 Startup funding activity\n• 🤝 Investor accessibility\n• 📈 Growth-stage opportunities\n\n→ Raise faster, scale bigger.",
+      "Curated below are the best cities in X for accessing venture capital and startup funding.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💰 Active venture capital communities\n• 💸 Venture capital investments\n\n→ Raise faster, scale bigger.",
     [normalizeNarrativeKey("Conferences & Events")]:
-      "Curated below are the best cities in X for conferences, events, and professional networking.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🎤 Conferences & industry events\n• 🤝 Networking opportunities\n• 🚀 Startup & tech meetups\n• 🌍 Global exposure\n\n→ Learn, connect, and unlock opportunities.",
+      "Curated below are the best cities in X for conferences, events, and professional networking.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 📅 Startup programs\n• 🏛️ Government startup events\n• 🎤 Conferences & industry events\n\n→ Learn, connect, and unlock opportunities.",
   },
 };
 
@@ -760,7 +760,8 @@ const searchBarEndGoalLabelMap = {
     "Easy Visa / Long Stay": "Visa-Friendly Nomad Destinations",
     "Strong Nomad Community": "Most Active Nomad Destinations",
     "Healthcare Friendly": "Healthcare-Friendly Nomad Destinations",
-    "Startup / Business Opportunities": "Startup/Business Ready Nomad Destinations",
+    "Startup / Business Opportunities":
+      "Startup/Business Ready Nomad Destinations",
     "Clean Air / Environment": "Environment-Friendly Nomad Destinations",
     "Best Work Infrastructure": "Best Work Infrastructure Nomad Destinations",
   },
@@ -784,7 +785,8 @@ const searchBarEndGoalLabelMap = {
   },
   "Find Your Community": {
     "Social & Party Lifestyle": "Party & Social Lifestyle Nomad Destinations",
-    "Chill & Wellness Lifestyle": "Chill & Wellness Lifestyle Nomad Destinations",
+    "Chill & Wellness Lifestyle":
+      "Chill & Wellness Lifestyle Nomad Destinations",
     "Adventure & Exploration": "Adventurous Nomad Destinations",
     "Nomad Community & Networking": "Nomad Destinations for Networking",
     "Couple - Friendly Lifestyle": "Couple-Friendly Nomad Destinations",
@@ -801,8 +803,7 @@ const searchBarEndGoalLabelMap = {
     "Startup Incubators & Accelerators": "Startup Incubators & Accelerators",
     "Balanced Career Growth": "Balanced Career Growth",
     "Venture Capital Presence": "Venture Capital Presence",
-    "Conferences & Events":
-      "Best Nomad Destinations for Conferences & Events",
+    "Conferences & Events": "Best Nomad Destinations for Conferences & Events",
   },
 };
 
