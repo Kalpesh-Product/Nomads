@@ -13,7 +13,12 @@ const DESTS = [
   { label: "Bali", country: "id", keyword: "bali", lang: "en" },
   { label: "Bangkok", country: "th", keyword: "bangkok", lang: "en" },
   { label: "Phuket", country: "th", keyword: "phuket", lang: "en" },
-  { label: "Ho Chi Minh City", country: "vn", keyword: "ho chi minh city", lang: "en" },
+  {
+    label: "Ho Chi Minh City",
+    country: "vn",
+    keyword: "ho chi minh city",
+    lang: "en",
+  },
   {
     label: "Rio de Janeiro",
     country: "br",
@@ -25,7 +30,12 @@ const DESTS = [
   { label: "Cape Town", country: "za", keyword: "cape town", lang: "en" },
   { label: "Budapest", country: "hu", keyword: "budapest", lang: "hu" },
   { label: "Mexico City", country: "mx", keyword: "mexico city", lang: "es" },
-  { label: "Playa del Carmen", country: "mx", keyword: "playa del carmen", lang: "es" },
+  {
+    label: "Playa del Carmen",
+    country: "mx",
+    keyword: "playa del carmen",
+    lang: "es",
+  },
   { label: "Tulum", country: "mx", keyword: "tulum", lang: "es" },
 
   { label: "Montreal", country: "ca", keyword: "montreal", lang: "fr" },
@@ -136,6 +146,37 @@ const DESTS = [
   { label: "Bologna", country: "it", keyword: "bologna", lang: "it" },
   { label: "Porto", country: "pt", keyword: "porto", lang: "pt" },
   { label: "Belgrade", country: "rs", keyword: "belgrade", lang: "sr" },
+
+  { label: "Riga", country: "lv", keyword: "riga", lang: "lv" },
+  { label: "Vilnius", country: "lt", keyword: "vilnius", lang: "lt" },
+  { label: "Ljubljana", country: "si", keyword: "ljubljana", lang: "sl" },
+  { label: "Cluj-Napoca", country: "ro", keyword: "cluj-napoca", lang: "ro" },
+  { label: "Tirana", country: "al", keyword: "tirana", lang: "sq" },
+  { label: "Sarajevo", country: "ba", keyword: "sarajevo", lang: "bs" },
+  { label: "Novi Sad", country: "rs", keyword: "novi sad", lang: "sr" },
+  { label: "Berlin", country: "de", keyword: "berlin", lang: "de" },
+  { label: "Madrid", country: "es", keyword: "madrid", lang: "es" },
+  { label: "Seville", country: "es", keyword: "seville", lang: "es" },
+  { label: "Warsaw", country: "pl", keyword: "warsaw", lang: "pl" },
+  { label: "Rome", country: "it", keyword: "rome", lang: "it" },
+  { label: "Milan", country: "it", keyword: "milan", lang: "it" },
+
+  // Asia
+  { label: "Yerevan", country: "am", keyword: "yerevan", lang: "hy" },
+  { label: "Almaty", country: "kz", keyword: "almaty", lang: "kk" },
+  { label: "Tashkent", country: "uz", keyword: "tashkent", lang: "uz" },
+  { label: "Tokyo", country: "jp", keyword: "tokyo", lang: "ja" },
+  { label: "Osaka", country: "jp", keyword: "osaka", lang: "ja" },
+  { label: "Seoul", country: "kr", keyword: "seoul", lang: "ko" },
+  { label: "Taipei", country: "tw", keyword: "taipei", lang: "zh" },
+  { label: "Bishkek", country: "kg", keyword: "bishkek", lang: "ky" },
+  { label: "Siem Reap", country: "kh", keyword: "siem reap", lang: "km" },
+  { label: "Phnom Penh", country: "kh", keyword: "phnom penh", lang: "km" },
+  { label: "Weligama", country: "lk", keyword: "weligama", lang: "en" },
+
+  // South America
+  { label: "Cuenca", country: "ec", keyword: "cuenca", lang: "es" },
+  { label: "Córdoba", country: "ar", keyword: "córdoba", lang: "es" },
 
   // North America
   { label: "Pittsburgh", country: "us", keyword: "pittsburgh", lang: "en" },
