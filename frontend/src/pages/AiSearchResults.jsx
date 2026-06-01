@@ -39,17 +39,29 @@ const continentOptions = [
 
 const visaRequirementOptions = [
   "Show All",
-  "Traditional Visa",
+  "Physical Visa",
   "e-Visa",
   "Visa on Arrival",
   "Visa Free",
 ];
 
 const visaRequirementApiValueMap = {
-  "Traditional Visa": "visa required",
+  "Physical Visa": "visa required",
   "e-Visa": "e-visa",
   "Visa on Arrival": "visa on arrival",
   "Visa Free": "visa free",
+};
+
+const formatVisaRequirementLabel = (value) => {
+  if (!value) return "Visa";
+
+  const normalizedValue = value.trim().toLowerCase();
+
+  if (normalizedValue === "e-visa") {
+    return "e-Visa";
+  }
+
+  return `${normalizedValue.charAt(0).toUpperCase()}${normalizedValue.slice(1)}`;
 };
 
 const DEFAULT_PASSPORT_COUNTRY = "India";
@@ -639,51 +651,51 @@ const normalizeSelectedContinent = (continent) =>
 const goalNarrativeByGoalAndAttribute = {
   [normalizeNarrativeKey("World Ranking")]: {
     [normalizeNarrativeKey("Best for Nomads")]:
-      "Curated below are the top cities in X based on overall livability for modern remote professionals.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🏢 Work infrastructure\n• ⚡ High-speed, stable internet\n• 💰 Cost of living\n• 🛡️ Safety\n• 🛂 Visa flexibility for longer stays\n• 🤝 Nomad community\n• 🏥 Healthcare affordability\n• 🚀 Startup ecosystem\n• 🌿 Air quality\n\n→ Find the best overall place to live and work.",
+      "Curated below are the top cities in X based on overall livability for modern remote professionals.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💰 Cost of living\n• 🏢 Work infrastructure\n• ⚡ High-speed, stable internet\n• 🤝 Nomad community\n• 🚀 Startup ecosystem\n• 🛡️ Safety\n• 🛂 Visa flexibility for longer stays\n\n→ Find the best overall place to live and work.",
     [normalizeNarrativeKey("Most Affordable")]:
       "Curated below are the most affordable cities in X designed to help you maximize your budget.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💰 Low cost of living\n• 📊 Strong purchasing power\n• 🏥 Affordable healthcare\n• 🛡️ Safety & stability\n\n→ Find cities where affordability meets comfort.",
     [normalizeNarrativeKey("Safest Cities")]:
-      "Curated below are the safest cities in X based on your preference for security and peace of mind.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🛡️ Safety levels\n• 🏥 Healthcare accessibility\n• 🌍 Stable living conditions\n• 🌿 Clean environments\n\n→ Live confidently, whether short-term or long-term.",
+      "Curated below are the safest cities in X based on your preference for security and peace of mind.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🛡️ Safety levels\n• 🏥 Healthcare accessibility\n• 🌿 Clean environments\n\n→ Live confidently, whether short-term or long-term.",
     [normalizeNarrativeKey("Easy Visa / Long Stay")]:
-      "Curated below are the most visa-friendly cities in X for extended stays.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🛂 Visa flexibility\n• ⏳ Ease of long stays\n• 💰 Cost of living\n• 🏡 Overall livability\n\n→ Stay longer, with fewer restrictions.",
+      "Curated below are the most visa-friendly cities in X for extended stays.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🛂 Visa flexibility\n• 💰 Visa cost\n• 🔄 Visa renewal ease\n\n→ Stay longer, with fewer restrictions.",
     [normalizeNarrativeKey("Strong Nomad Community")]:
-      "Curated below are the best cities in X with strong and active nomad communities.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🤝 Active nomad communities\n• 🌐 Social & collaborative environments\n• ⚡ Internet & work readiness\n• 🏡 Livability factors\n\n→ Find your people, anywhere you go.",
+      "Curated below are the best cities in X with strong and active nomad communities.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🤝 Active nomad communities\n• 🌐 Social & collaborative environments\n\n→ Find your people, anywhere you go.",
     [normalizeNarrativeKey("Healthcare Friendly")]:
-      "Curated below are the most healthcare-friendly cities in X for reliable and accessible medical support.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🏥 Healthcare quality & accessibility\n• 🩺 Reliable medical infrastructure\n• 🛡️ Safety & stability\n• 🌍 Clean, healthy living environments\n\n→ Access dependable healthcare wherever you live.",
+      "Curated below are the most healthcare-friendly cities in X for reliable and accessible medical support.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🏥 Healthcare quality & accessibility\n• 🩺 Reliable medical infrastructure\n• 📄 Easy Medical Insurance \n\n→ Access dependable healthcare wherever you live.",
     [normalizeNarrativeKey("Startup / Business Opportunities")]:
-      "Curated below are the best cities in X for startups, entrepreneurship, and career growth.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🚀 Startup ecosystems\n• 🧠 Talent & innovation density\n• 🏢 Work infrastructure\n• 🌐 Global connectivity\n\n→ Build, scale, and grow faster.",
+      "Curated below are the best cities in X for startups, entrepreneurship, and career growth.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🤝 Startup ecosystems/communities \n• 🧠 Talent density\n• 🏢 Work infrastructure\n• 🚀 Incubators & accelerator programs\n\n→ Build, scale, and grow faster.",
     [normalizeNarrativeKey("Clean Air / Environment")]:
-      "Curated below are the cleanest and most environmentally friendly cities in X.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🌿 Air quality\n• 🛡️ Safe, livable environments\n• 🏥 Health-conscious conditions\n• 🌍 Overall quality of life\n\n→ Breathe better, live better.",
+      "Curated below are the cleanest and most environmentally friendly cities in X.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🌿 Air quality\n• 🛡️ Safe, livable environments\n• 🏥 Health-conscious conditions\n\n→ Breathe better, live better.",
     [normalizeNarrativeKey("Best Work Infrastructure")]:
-      "Curated below are the best cities in X optimized for productivity and remote work performance.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n•🏢 Work infrastructure\n•⚡ High-speed, stable internet\n•🤝 Strong nomad ecosystems\n•💰 Sustainable cost of living\n•🛂 Visa flexibility for longer stays\n\n→ Work efficiently from anywhere, without compromise.",
+      "Curated below are the best cities in X optimized for productivity and remote work performance.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🏢 Work infrastructure\n• ⚡ High-speed, stable internet\n• 🚌 Internal Commuting\n\n→ Work efficiently from anywhere, without compromise.",
   },
   [normalizeNarrativeKey("Work From Anywhere")]: {
     [normalizeNarrativeKey("Best for Remote Work Setup")]:
-      "Curated below are the best cities in X optimized for a seamless remote work setup.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• ⚡ Fast, reliable internet\n• 🏢 Strong work infrastructure\n• 🤝 Active nomad communities\n• ✈️ Global connectivity\n\n→ Work efficiently, from anywhere in the world.",
+      "Curated below are the best cities in X optimized for a seamless remote work setup.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• ⚡ Fast, reliable internet\n• 🏢 Strong work infrastructure\n\n→ Work efficiently, from anywhere in the world.",
     [normalizeNarrativeKey("Cheapest Places")]:
       "Curated below are the cheapest cities in X designed to help you minimize your living expenses.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💰 Low cost of living\n• 🤝 Affordable community ecosystems\n• ⚡ Essential internet access\n• 🏢 Basic work infrastructure\n\n→ Spend less, live comfortably.",
     [normalizeNarrativeKey("Best Connected Cities (Flights)")]:
-      "Curated below are the best-connected cities in X for global travel and accessibility.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• ✈️ Direct international flights\n• 🌐 Airport connectivity\n• ⚡ Reliable internet\n• 🏢 Work-ready environments\n\n→ Travel easily, stay connected.",
+      "Curated below are the best-connected cities in X for global travel and accessibility.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• ✈️ Direct international flights\n• 🌐 Airport connectivity\n\n→ Travel easily, stay connected.",
     [normalizeNarrativeKey("Strong Nomad Community")]:
-      "Curated below are the best cities in X with strong and active nomad communities.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🤝 Strong nomad communities\n• ⚡ Reliable internet\n• 🏢 Work-friendly infrastructure\n• ✈️ Easy global access\n\n→ Meet people, plug in, and belong.",
+      "Curated below are the best cities in X with strong and active nomad communities.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🤝 Strong nomad communities\n• 🚀 Startup ecosystems\n\n→ Meet people, plug in, and belong.",
     [normalizeNarrativeKey("Fast Internet Cities")]:
-      "Curated below are the cities in X with the fastest and most reliable internet connectivity.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• ⚡ High-speed internet\n• 📡 Network reliability\n• 🏢 Work-ready infrastructure\n• 🌍 Connected environments\n\n→ Stay fast, stay online.",
+      "Curated below are the cities in X with the fastest and most reliable internet connectivity.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• ⚡ High-speed internet\n• 📡 Network reliability\n• 🏢 Work-ready infrastructure\n\n→ Stay fast, stay online.",
     [normalizeNarrativeKey("Best Work Infrastructure")]:
-      "Curated below are the best cities in X with strong work infrastructure and professional environments.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🏢 Strong work infrastructure\n• ⚡ Reliable internet\n• 🤝 Professional & nomad ecosystems\n• 🌍 Global accessibility\n\n→ Work smarter, not harder.",
+      "Curated below are the best cities in X with strong work infrastructure and professional environments.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🏢 Strong work infrastructure\n• ⚡ Reliable internet\n• 🚀 Strong startup activity\n\n→ Work smarter, not harder.",
   },
   [normalizeNarrativeKey("Increase Your Savings")]: {
     [normalizeNarrativeKey("Maximum Savings")]:
-      "Curated below are the best cities in X to maximize your savings after expenses.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💰 Low cost of living\n• 🏦 Tax-friendly environments\n• 📊 Strong purchasing power\n• 📉 Stable inflation\n\n→ Keep more of what you earn.",
+      "Curated below are the best cities in X to maximize your savings after expenses.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💰 Low cost of living\n• 🏦 Tax-friendly environments\n• 🏥 Affordable healthcare\n\n→ Keep more of what you earn.",
     [normalizeNarrativeKey("Low Taxation")]:
-      "Curated below are the best cities in X for a low-tax and financially efficient lifestyle.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🏦 Tax-friendly environments\n• 💰 Low cost of living\n• 📊 Strong purchasing power\n• 📉 Economic stability\n\n→ Keep more, spend smarter.",
+      "Curated below are the best cities in X for a low-tax and financially efficient lifestyle.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🏦 Tax-friendly environments\n• 📉 Economic stability\n\n→ Keep more, spend smarter.",
     [normalizeNarrativeKey("Purchasing Power")]:
       "Curated below are the best cities in X with the strongest purchasing power.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 📊 Strong purchasing power\n• 💰 Low cost of living\n• 🏦 Tax efficiency\n• 📉 Stable economic conditions\n\n→ Maximize the value of your income.",
     [normalizeNarrativeKey("Financial Stability (Low Risk)")]:
-      "Curated below are the best cities in X for a financially stable and low-risk lifestyle.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 📉 Stable inflation\n• 🏥 Affordable healthcare\n• 🏦 Tax efficiency\n• 💰 Cost control\n\n→ Protect what you’ve built.",
+      "Curated below are the best cities in X for a financially stable and low-risk lifestyle.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 📉 Stable inflation\n• 🏦 Tax efficiency\n• 💰 Cost control\n\n→ Protect what you’ve built.",
     [normalizeNarrativeKey("Startup Setup Cost")]:
-      "Curated below are the best cities in X to start and run a business cost-effectively.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🚀 Low startup setup costs\n• 🏦 Tax-friendly environments\n• 💰 Affordable living\n• 📊 Strong purchasing power\n\n→ Build lean, scale smart.",
+      "Curated below are the best cities in X to start and run a business cost-effectively.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🚀 Low startup setup costs\n• 🏦 Tax-friendly environments\n• 💰 Affordable living\n\n→ Build lean, scale smart.",
     [normalizeNarrativeKey("Balanced Financial Lifestyle")]:
-      "Curated below are the best cities in X for a well-balanced financial lifestyle.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💰 Cost efficiency\n• 🏦 Tax balance\n• 📊 Purchasing power\n• 📉 Economic stability\n\n→ Live well, spend wisely, stay secure.",
+      "Curated below are the best cities in X for a well-balanced financial lifestyle.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💰 Cost efficiency\n• 🏦 Tax balance\n• 📊 Purchasing power\n\n→ Live well, spend wisely, stay secure.",
   },
   [normalizeNarrativeKey("Find Your Community")]: {
     [normalizeNarrativeKey("Social & Party Lifestyle")]:
@@ -859,6 +871,7 @@ const AiSearchResults = () => {
   const location = useLocation();
   const { goal, loc, attr } = useParams();
   const { auth } = useAuth();
+  const isLoggedIn = Boolean(auth?.user);
   const axiosPrivate = useAxiosPrivate();
   const { state } = location;
   const requestedGoalFromUrl = goal ? goalNameBySlug[goal.toLowerCase()] : null;
@@ -1948,7 +1961,7 @@ const AiSearchResults = () => {
                                 highlightedResultsHeadingRemainingLines}
                             </span>
                           )}
-                          {shouldShowResultsContent && (
+                          {shouldShowResultsContent && isLoggedIn && (
                             <div className="flex w-full items-center gap-3 lg:w-auto lg:justify-end">
                               <span className="text-sm font-medium text-black/80 font-play">
                                 Visa Options
@@ -1975,97 +1988,134 @@ const AiSearchResults = () => {
 
                   {shouldShowResultsContent ? (
                     <div className="mt-8 grid grid-cols-2 gap-3 md:mt-10 md:grid-cols-3 md:gap-4 xl:grid-cols-4">
-                      {visibleDestinations.map((destination, index) => (
-                        <article
-                          key={`${destination.city}-${destination.country}`}
-                          className={`cursor-pointer transition-all duration-300 ${
-                            index < visibleDestinationCount
-                              ? "translate-y-0 opacity-100"
-                              : "pointer-events-none translate-y-2 opacity-0"
-                          }`}
-                          role="button"
-                          tabIndex={0}
-                          onClick={() => handleDestinationClick(destination)}
-                          onKeyDown={(event) => {
-                            if (event.key === "Enter" || event.key === " ") {
-                              event.preventDefault();
-                              handleDestinationClick(destination);
-                            }
-                          }}
-                        >
-                          <div className="relative overflow-hidden rounded-xl md:rounded-2xl group">
-                            <img
-                              src={destination.image}
-                              alt={`${destination.city}, ${destination.country}`}
-                              className="aspect-square w-full rounded-xl object-cover md:rounded-2xl transition-transform duration-500 group-hover:scale-110"
-                            />
+                      {visibleDestinations.map((destination, index) => {
+                        const shouldShowVisaDuration =
+                          isVisaRequirementFilterActive(
+                            selectedVisaRequirement,
+                          ) && Boolean(visaRuleDurationByCountry);
+                        const visaDurationDays = shouldShowVisaDuration
+                          ? visaRuleDurationByCountry.get(
+                              normalizeCountryKey(destination.country),
+                            )
+                          : null;
+                        const visaDurationLabel =
+                          visaDurationDays !== null &&
+                          visaDurationDays !== undefined
+                            ? `${formatVisaRequirementLabel(
+                                visaRequirementApiValueMap[
+                                  selectedVisaRequirement
+                                ],
+                              )}: ${visaDurationDays} days`
+                            : null;
 
-                            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-black/10" />
-
-                            <div className="pointer-events-none absolute left-3 top-3 text-white text-xl  md:left-4 md:top-4 md:text-2xl">
-                              #
-                              {destination?.rankLabel
-                                ? destination.rankLabel.replace(/^Rank\s*/i, "")
-                                : "—"}
-                            </div>
-
-                            <button
-                              type="button"
-                              className="absolute right-3 top-3 z-30 cursor-pointer touch-manipulation md:right-4 md:top-4"
-                              onClick={(event) => {
-                                event.stopPropagation();
+                        return (
+                          <article
+                            key={`${destination.city}-${destination.country}`}
+                            className={`cursor-pointer transition-all duration-300 ${
+                              index < visibleDestinationCount
+                                ? "translate-y-0 opacity-100"
+                                : "pointer-events-none translate-y-2 opacity-0"
+                            }`}
+                            role="button"
+                            tabIndex={0}
+                            onClick={() => handleDestinationClick(destination)}
+                            onKeyDown={(event) => {
+                              if (event.key === "Enter" || event.key === " ") {
                                 event.preventDefault();
-                                toggleDestinationLike(destination);
-                              }}
-                            >
-                              {likedDestinations.includes(
-                                getDestinationFavoriteKey(destination),
-                              ) ? (
-                                <AiFillHeart className="text-xl text-[#ff5757] md:text-2xl" />
-                              ) : (
-                                <AiTwotoneHeart className="text-xl text-[#b6b6b6] md:text-2xl" />
-                              )}
-                            </button>
+                                handleDestinationClick(destination);
+                              }
+                            }}
+                          >
+                            <div className="relative overflow-hidden rounded-xl md:rounded-2xl group">
+                              <img
+                                src={destination.image}
+                                alt={`${destination.city}, ${destination.country}`}
+                                className="aspect-square w-full rounded-xl object-cover md:rounded-2xl transition-transform duration-500 group-hover:scale-110"
+                              />
 
-                            <div className="pointer-events-none absolute inset-x-2 bottom-3 text-center text-white md:inset-x-4 md:bottom-4">
-                              <h3 className="text-lg uppercase font-normal tracking-wide md:text-3xl">
-                                {destination.displayCity || destination.city}
-                              </h3>
-                              <p className="text-sm font-light md:text-sm">
-                                {destination.displayCountry ||
-                                  destination.country}
-                              </p>
-                            </div>
+                              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-black/10" />
 
-                            <div className="pointer-events-none absolute inset-0 bg-black/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-center p-3 md:p-4">
-                              <div className="translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                                <div className="mb-0 border-b border-white/30 pb-0">
-                                  <h4 className="-translate-y-2 text-white text-base md:text-[0.89rem] font-semibold uppercase tracking-wide text-center">
-                                    {selectedGoalOption || "Attribute"}
-                                  </h4>
-                                </div>
-                                <h4 className="mb-2 mt-2 text-right text-white text-sm md:text-sm font-semibold py-0">
-                                  {`${selectedContinentDisplay || "World"} Rank ${
-                                    destination?.rankLabel
-                                      ? destination.rankLabel.replace(
-                                          /^Rank\s*/i,
-                                          "",
-                                        )
-                                      : "—"
-                                  }`}
-                                </h4>
+                              <div className="pointer-events-none absolute left-3 top-3 text-white text-xl  md:left-4 md:top-4 md:text-2xl">
+                                #
+                                {destination?.rankLabel
+                                  ? destination.rankLabel.replace(
+                                      /^Rank\s*/i,
+                                      "",
+                                    )
+                                  : "—"}
+                              </div>
 
-                                <div className="grid grid-cols-1 gap-2 text-xs md:text-sm text-white/90">
-                                  {getQuickStatsForDestination(
-                                    destination,
-                                    selectedGoal,
-                                    selectedGoalOption,
-                                  ).map((stat, statIndex) => (
-                                    <div
-                                      key={`${destination.city}-${stat.label}-${statIndex}`}
-                                      className="rounded-lg px-2 py-1 transition-all duration-300"
-                                      style={{
-                                        backgroundImage: `linear-gradient(
+                              <button
+                                type="button"
+                                className="absolute right-3 top-3 z-30 cursor-pointer touch-manipulation md:right-4 md:top-4"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  event.preventDefault();
+                                  toggleDestinationLike(destination);
+                                }}
+                              >
+                                {likedDestinations.includes(
+                                  getDestinationFavoriteKey(destination),
+                                ) ? (
+                                  <AiFillHeart className="text-xl text-[#ff5757] md:text-2xl" />
+                                ) : (
+                                  <AiTwotoneHeart className="text-xl text-[#b6b6b6] md:text-2xl" />
+                                )}
+                              </button>
+
+                              <div className="pointer-events-none absolute inset-x-2 bottom-3 text-center text-white md:inset-x-4 md:bottom-4">
+                                <h3 className="text-lg uppercase font-normal tracking-wide md:text-3xl">
+                                  {destination.displayCity || destination.city}
+                                </h3>
+                                <p className="text-sm font-light md:text-sm">
+                                  {destination.displayCountry ||
+                                    destination.country}
+                                </p>
+                              </div>
+
+                              <div className="pointer-events-none absolute inset-0 bg-black/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-center p-3 md:p-4">
+                                <div className="translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                                  <div className="mb-0 border-b border-white/30 pb-0">
+                                    <h4 className="-translate-y-2 text-white text-base md:text-[0.89rem] font-semibold uppercase tracking-wide text-center">
+                                      {selectedGoalOption || "Attribute"}
+                                    </h4>
+                                  </div>
+                                  <div className="mb-2 mt-2 flex items-center justify-between gap-2 text-white text-sm md:text-sm font-semibold py-0">
+                                    <h4
+                                      className={
+                                        shouldShowVisaDuration
+                                          ? "text-left"
+                                          : "ml-auto text-right"
+                                      }
+                                    >
+                                      {`${selectedContinentDisplay || "World"} Rank ${
+                                        destination?.rankLabel
+                                          ? destination.rankLabel.replace(
+                                              /^Rank\s*/i,
+                                              "",
+                                            )
+                                          : "—"
+                                      }`}
+                                    </h4>
+                                    {shouldShowVisaDuration &&
+                                      visaDurationLabel && (
+                                        <span className="text-right text-[0.72rem] font-medium text-white/90">
+                                          {visaDurationLabel}
+                                        </span>
+                                      )}
+                                  </div>
+
+                                  <div className="grid grid-cols-1 gap-2 text-xs md:text-sm text-white/90">
+                                    {getQuickStatsForDestination(
+                                      destination,
+                                      selectedGoal,
+                                      selectedGoalOption,
+                                    ).map((stat, statIndex) => (
+                                      <div
+                                        key={`${destination.city}-${stat.label}-${statIndex}`}
+                                        className="rounded-lg px-2 py-1 transition-all duration-300"
+                                        style={{
+                                          backgroundImage: `linear-gradient(
                                           90deg,
                                           ${getScoreBarColorValue(stat.score)} 0%,
                                           ${getScoreBarColorValue(stat.score)} ${Math.max(
@@ -2088,18 +2138,18 @@ const AiSearchResults = () => {
                                           )}%,
                                           rgba(255, 255, 255, 0.16) 100%
                                         )`,
-                                      }}
-                                    >
-                                      <span className="font-light">
-                                        {stat.label}
-                                      </span>
-                                    </div>
-                                  ))}
+                                        }}
+                                      >
+                                        <span className="font-light">
+                                          {stat.label}
+                                        </span>
+                                      </div>
+                                    ))}
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                          {/* <div className="px-2">
+                            {/* <div className="px-2">
                             <div className="mt-1.5 flex items-start justify-start gap-1 md:mt-2 md:gap-1 ">
                               <div className="min-w-0">
                                 <h3 className="truncate text-[0.8rem] font-semibold leading-tight text-black/90 md:text-[1.2rem]">
@@ -2118,8 +2168,9 @@ const AiSearchResults = () => {
                               </p>
                             </div>
                           </div> */}
-                        </article>
-                      ))}
+                          </article>
+                        );
+                      })}
                     </div>
                   ) : (
                     <>
