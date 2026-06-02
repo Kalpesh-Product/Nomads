@@ -620,6 +620,33 @@ const PRIORITY_POINTS_VISIBLE_LIMIT = 4;
 const ADDITIONAL_PRIORITY_POINTS_TEXT =
   "along with other aspects calculated by our proprietary algorithm.";
 
+const addAdditionalPriorityPointsText = (narrative = "") => {
+  let priorityPointsCount = 0;
+  const visibleNarrativeLines = narrative.split("\n").filter((line) => {
+    if (!line.trim().startsWith("•")) {
+      return true;
+    }
+
+    priorityPointsCount += 1;
+    return priorityPointsCount <= PRIORITY_POINTS_VISIBLE_LIMIT;
+  });
+  const endingLineIndex = visibleNarrativeLines.findIndex((line) =>
+    line.trim().startsWith("→"),
+  );
+
+  if (endingLineIndex === -1) {
+    return narrative;
+  }
+
+  visibleNarrativeLines.splice(
+    endingLineIndex,
+    0,
+    ADDITIONAL_PRIORITY_POINTS_TEXT,
+  );
+
+  return visibleNarrativeLines.join("\n");
+};
+
 const goalNameBySlug = {
   worldranking: "World Ranking",
   workfromanywhere: "Work From Anywhere",
@@ -657,7 +684,7 @@ const goalNarrativeByGoalAndAttribute = {
     [normalizeNarrativeKey("Best for Nomads")]:
       "Curated below are the top cities in X based on overall livability for modern remote professionals.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💰 Cost of living\n• 🏢 Work infrastructure\n• ⚡ High-speed, stable internet\n• 🤝 Nomad community\n• 🚀 Startup ecosystem\n• 🛡️ Safety\n• 🛂 Visa flexibility for longer stays\n\n→ Find the best overall place to live and work.",
     [normalizeNarrativeKey("Most Affordable")]:
-      "Curated below are the most affordable cities in X designed to help you maximize your budget.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💰 Low cost of living\n• 📊 Strong purchasing power\n• 🏥 Affordable healthcare\n• 🛡️ Safety & stability\n\n→ Find cities where affordability meets comfort.",
+      "Curated below are the most affordable cities in X designed to help you maximize your budget.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💰 Low cost of living\n• 📊 Strong purchasing power\n• 🎫 Visa cost\n\n→ Find cities where affordability meets comfort.",
     [normalizeNarrativeKey("Safest Cities")]:
       "Curated below are the safest cities in X based on your preference for security and peace of mind.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🛡️ Safety levels\n• 🏥 Healthcare accessibility\n• 🌿 Clean environments\n\n→ Live confidently, whether short-term or long-term.",
     [normalizeNarrativeKey("Easy Visa / Long Stay")]:
@@ -677,7 +704,7 @@ const goalNarrativeByGoalAndAttribute = {
     [normalizeNarrativeKey("Best for Remote Work Setup")]:
       "Curated below are the best cities in X optimized for a seamless remote work setup.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• ⚡ Fast, reliable internet\n• 🏢 Strong work infrastructure\n\n→ Work efficiently, from anywhere in the world.",
     [normalizeNarrativeKey("Cheapest Places")]:
-      "Curated below are the cheapest cities in X designed to help you minimize your living expenses.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💰 Low cost of living\n• 🤝 Affordable community ecosystems\n• ⚡ Essential internet access\n• 🏢 Basic work infrastructure\n\n→ Spend less, live comfortably.",
+      "Curated below are the cheapest cities in X designed to help you minimize your living expenses.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 💰 Low cost of living\n• 📊 Strong purchasing power\n\n→ Spend less, live comfortably.",
     [normalizeNarrativeKey("Best Connected Cities (Flights)")]:
       "Curated below are the best-connected cities in X for global travel and accessibility.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• ✈️ Direct international flights\n• 🌐 Airport connectivity\n\n→ Travel easily, stay connected.",
     [normalizeNarrativeKey("Strong Nomad Community")]:
@@ -693,7 +720,7 @@ const goalNarrativeByGoalAndAttribute = {
     [normalizeNarrativeKey("Low Taxation")]:
       "Curated below are the best cities in X for a low-tax and financially efficient lifestyle.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 🏦 Tax-friendly environments\n• 📉 Economic stability\n\n→ Keep more, spend smarter.",
     [normalizeNarrativeKey("Purchasing Power")]:
-      "Curated below are the best cities in X with the strongest purchasing power.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 📊 Strong purchasing power\n• 💰 Low cost of living\n• 🏦 Tax efficiency\n• 📉 Stable economic conditions\n\n→ Maximize the value of your income.",
+      "Curated below are the best cities in X with the strongest purchasing power.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 📊 Strong purchasing power\n• 💰 Low cost of living\n• 🏦 Tax efficiency\n\n→ Maximize the value of your income.",
     [normalizeNarrativeKey("Financial Stability (Low Risk)")]:
       "Curated below are the best cities in X for a financially stable and low-risk lifestyle.\nPowered by WoNo’s Intelligence Model, prioritizing:\n\n• 📉 Stable inflation\n• 🏦 Tax efficiency\n• 💰 Cost control\n\n→ Protect what you’ve built.",
     [normalizeNarrativeKey("Startup Setup Cost")]:
@@ -1499,7 +1526,9 @@ const AiSearchResults = () => {
       goalNarratives[normalizeNarrativeKey(selectedGoalOption)];
 
     if (narrativeTemplate) {
-      return narrativeTemplate.replaceAll("X", narrativeContinentLabel);
+      return addAdditionalPriorityPointsText(
+        narrativeTemplate.replaceAll("X", narrativeContinentLabel),
+      );
     }
 
     return `Curated below are the best cities in ${narrativeContinentLabel} as per the ${selectedGoalOption} for you. The results below are ranked using WoNo’s Intelligence Model, analyzing 50+ global factors — including safety, nomad population, healthcare, visa flexibility, cost of living, taxation, work infrastructure, lifestyle quality, and community — tailored to your personal profile.`;
@@ -1899,9 +1928,8 @@ const AiSearchResults = () => {
         ? priorityPoints.slice(0, PRIORITY_POINTS_VISIBLE_LIMIT)
         : priorityPoints;
     const additionalPriorityPointsText =
-      priorityPoints.length > PRIORITY_POINTS_VISIBLE_LIMIT
-        ? ADDITIONAL_PRIORITY_POINTS_TEXT
-        : "";
+      lines.find((line) => ADDITIONAL_PRIORITY_POINTS_TEXT.startsWith(line)) ||
+      "";
 
     const introLine =
       highlightedResultsHeadingFirstLine ||
@@ -2010,7 +2038,8 @@ const AiSearchResults = () => {
                         {formattedNarrative.poweredByLine && (
                           <div className="mt-2">
                             <span>{formattedNarrative.poweredByLine}</span>
-                            {formattedNarrative.priorityPoints.length > 0 && (
+                            {(formattedNarrative.priorityPoints.length > 0 ||
+                              formattedNarrative.additionalPriorityPointsText) && (
                               <span className="ml-1">
                                 {formattedNarrative.priorityPoints.map(
                                   (point, index) => (
