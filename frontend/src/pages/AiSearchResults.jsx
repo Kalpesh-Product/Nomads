@@ -620,6 +620,33 @@ const PRIORITY_POINTS_VISIBLE_LIMIT = 4;
 const ADDITIONAL_PRIORITY_POINTS_TEXT =
   "along with other aspects calculated by our proprietary algorithm.";
 
+const addAdditionalPriorityPointsText = (narrative = "") => {
+  let priorityPointsCount = 0;
+  const visibleNarrativeLines = narrative.split("\n").filter((line) => {
+    if (!line.trim().startsWith("•")) {
+      return true;
+    }
+
+    priorityPointsCount += 1;
+    return priorityPointsCount <= PRIORITY_POINTS_VISIBLE_LIMIT;
+  });
+  const endingLineIndex = visibleNarrativeLines.findIndex((line) =>
+    line.trim().startsWith("→"),
+  );
+
+  if (endingLineIndex === -1) {
+    return narrative;
+  }
+
+  visibleNarrativeLines.splice(
+    endingLineIndex,
+    0,
+    ADDITIONAL_PRIORITY_POINTS_TEXT,
+  );
+
+  return visibleNarrativeLines.join("\n");
+};
+
 const goalNameBySlug = {
   worldranking: "World Ranking",
   workfromanywhere: "Work From Anywhere",
@@ -1499,7 +1526,9 @@ const AiSearchResults = () => {
       goalNarratives[normalizeNarrativeKey(selectedGoalOption)];
 
     if (narrativeTemplate) {
-      return narrativeTemplate.replaceAll("X", narrativeContinentLabel);
+      return addAdditionalPriorityPointsText(
+        narrativeTemplate.replaceAll("X", narrativeContinentLabel),
+      );
     }
 
     return `Curated below are the best cities in ${narrativeContinentLabel} as per the ${selectedGoalOption} for you. The results below are ranked using WoNo’s Intelligence Model, analyzing 50+ global factors — including safety, nomad population, healthcare, visa flexibility, cost of living, taxation, work infrastructure, lifestyle quality, and community — tailored to your personal profile.`;
@@ -1899,9 +1928,8 @@ const AiSearchResults = () => {
         ? priorityPoints.slice(0, PRIORITY_POINTS_VISIBLE_LIMIT)
         : priorityPoints;
     const additionalPriorityPointsText =
-      priorityPoints.length > PRIORITY_POINTS_VISIBLE_LIMIT
-        ? ADDITIONAL_PRIORITY_POINTS_TEXT
-        : "";
+      lines.find((line) => ADDITIONAL_PRIORITY_POINTS_TEXT.startsWith(line)) ||
+      "";
 
     const introLine =
       highlightedResultsHeadingFirstLine ||
@@ -2010,7 +2038,8 @@ const AiSearchResults = () => {
                         {formattedNarrative.poweredByLine && (
                           <div className="mt-2">
                             <span>{formattedNarrative.poweredByLine}</span>
-                            {formattedNarrative.priorityPoints.length > 0 && (
+                            {(formattedNarrative.priorityPoints.length > 0 ||
+                              formattedNarrative.additionalPriorityPointsText) && (
                               <span className="ml-1">
                                 {formattedNarrative.priorityPoints.map(
                                   (point, index) => (
