@@ -38,15 +38,10 @@ export const STATEWISE_WEIGHT_FORMULAS = {
     // ["airQualityIndex", 0.02],
   ],
   mostAffordable: [
-    ["costOfLiving", 0.45],
-    ["healthcareCostIndex", 0.15],
-    ["safety", 0.1],
-    ["airQualityIndex", 0.1],
-    ["visaFlexibility", 0.08],
-    ["internet", 0.07],
-    ["workInfrastructure", 0.03],
-    ["nomadCommunity", 0.01],
-    ["startupEcosystemScore", 0.01],
+    ["costOfLiving", 0.5],
+    ["purchasingPower", 0.2],
+    ["visaCost", 0.2],
+    ["inflationStability", 0.1],
   ],
   safestCities: [
     ["safety", 0.7],
@@ -124,11 +119,7 @@ export const STATEWISE_WEIGHT_FORMULAS = {
   ],
   cheapestPlaces: [
     ["costOfLiving", 0.5],
-    ["internet", 0.1],
-    ["workInfrastructure", 0.1],
-    ["nomadCommunity", 0.1],
-    ["airportConnectivity", 0.1],
-    ["directInternationalFlights", 0.1],
+    ["purchasingPower", 0.5],
   ],
   bestConnectedCitiesFlights: [
     ["directInternationalFlights", 0.5],
@@ -179,12 +170,9 @@ export const STATEWISE_WEIGHT_FORMULAS = {
     // ["startupSetupCost", 0.05],
   ],
   purchasingPower: [
-    ["purchasingPower", 0.35],
-    ["costOfLiving", 0.2],
-    ["taxFriendly", 0.15],
-    ["inflationStability", 0.1],
-    ["healthcareCostIndex", 0.1],
-    ["startupSetupCost", 0.1],
+    ["purchasingPower", 0.6],
+    ["costOfLiving", 0.3],
+    ["taxFriendly", 0.1],
   ],
   financialStabilityLowRisk: [
     ["inflationStability", 0.7],
