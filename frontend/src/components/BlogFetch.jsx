@@ -294,7 +294,7 @@ const normalizeLabel = (label) =>
 const buildExactKeyword = (label) => {
   if (!label) return null;
   const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  return escaped; // flexible partial match — no strict ^...$ anchors
+  return `^${escaped}$`; // match the complete destination, not substrings
 };
 
 const BlogFetch = () => {
