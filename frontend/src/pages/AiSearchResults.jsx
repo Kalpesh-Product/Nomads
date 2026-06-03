@@ -2120,6 +2120,10 @@ const AiSearchResults = () => {
                               )}: ${visaDurationDays} days`
                             : null;
 
+                        const isDestinationLiked = likedDestinations.includes(
+                          getDestinationFavoriteKey(destination),
+                        );
+
                         return (
                           <article
                             key={`${destination.city}-${destination.country}`}
@@ -2159,16 +2163,18 @@ const AiSearchResults = () => {
 
                               <button
                                 type="button"
-                                className="absolute right-3 top-3 z-30 cursor-pointer touch-manipulation md:right-4 md:top-4"
+                                className={`absolute right-3 top-3 z-30 cursor-pointer touch-manipulation md:right-4 md:top-4 ${
+                                  isDestinationLiked
+                                    ? ""
+                                    : "[&_path]:transition-colors [&_path]:duration-200 [&:hover_path]:fill-[#ff8a8a]"
+                                }`}
                                 onClick={(event) => {
                                   event.stopPropagation();
                                   event.preventDefault();
                                   toggleDestinationLike(destination);
                                 }}
                               >
-                                {likedDestinations.includes(
-                                  getDestinationFavoriteKey(destination),
-                                ) ? (
+                                {isDestinationLiked ? (
                                   <AiFillHeart className="text-xl text-[#ff5757] md:text-2xl" />
                                 ) : (
                                   <AiTwotoneHeart className="text-xl text-[#b6b6b6] md:text-2xl" />
