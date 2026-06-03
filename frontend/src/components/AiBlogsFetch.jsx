@@ -1,234 +1,27 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import axios from "../utils/axios"; // your custom axios instance
-import { IoChevronDown } from "react-icons/io5";
+import axios from "../utils/axios";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import humanDate from "../utils/humanDate";
 import { useSelector } from "react-redux";
-import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
-
-const DESTS = [
-    { label: "All", country: null, keyword: null, lang: null }, // ✅ New option
-    { label: "Goa", country: "in", keyword: "goa", lang: "en" },
-    { label: "Bali", country: "id", keyword: "bali", lang: "en" },
-    { label: "Bangkok", country: "th", keyword: "bangkok", lang: "en" },
-    { label: "Phuket", country: "th", keyword: "phuket", lang: "en" },
-    {
-        label: "Ho Chi Minh City",
-        country: "vn",
-        keyword: "ho chi minh city",
-        lang: "en",
-    },
-    {
-        label: "Rio de Janeiro",
-        country: "br",
-        keyword: "rio de janeiro",
-        lang: "en",
-    },
-    { label: "Dubai", country: "uae", keyword: "dubai", lang: "en" },
-    { label: "Auckland", country: "nz", keyword: "auckland", lang: "en" },
-    { label: "Western Cape", country: "za", keyword: "western cape", lang: "en" },
-    { label: "Budapest", country: "hu", keyword: "budapest", lang: "hu" },
-    { label: "Mexico City", country: "mx", keyword: "mexico city", lang: "es" },
-    {
-        label: "Playa del Carmen",
-        country: "mx",
-        keyword: "playa del carmen",
-        lang: "es",
-    },
-    { label: "Tulum", country: "mx", keyword: "tulum", lang: "es" },
-
-    { label: "Montreal", country: "ca", keyword: "montreal", lang: "fr" },
-
-    { label: "Abuja", country: "ng", keyword: "abuja", lang: "en" },
-
-    {
-        label: "Cairo Governorate",
-        country: "eg",
-        keyword: "cairo governorate",
-        lang: "ar",
-    },
-
-    {
-        label: "Amsterdam",
-        country: "nl",
-        keyword: "amsterdam",
-        lang: "nl",
-    },
-
-    { label: "Lagos", country: "ng", keyword: "lagos", lang: "en" },
-    { label: "Lagos State", country: "ng", keyword: "lagos state", lang: "en" },
-
-    { label: "Lisbon", country: "pt", keyword: "lisbon", lang: "pt" },
-    { label: "Fiji", country: "fj", keyword: "fiji", lang: "en" },
-
-    { label: "Buenos Aires", country: "ar", keyword: "buenos aires", lang: "es" },
-    {
-        label: "Funchal",
-        country: "pt",
-        keyword: "funchal",
-        lang: "pt",
-    },
-    {
-        label: "Las Palmas",
-        country: "es",
-        keyword: "las palmas",
-        lang: "es",
-    },
-    { label: "Toronto", country: "ca", keyword: "toronto", lang: "en" },
-    { label: "Vancouver", country: "ca", keyword: "vancouver", lang: "en" },
-    {
-        label: "Casablanca",
-        country: "ma",
-        keyword: "casablanca",
-        lang: "ar",
-    },
-    { label: "Marrakech", country: "ma", keyword: "marrakech", lang: "ar" },
-    { label: "Otago Region", country: "nz", keyword: "otago region", lang: "en" },
-    {
-        label: "Santa Catarina",
-        country: "br",
-        keyword: "santa catarina",
-        lang: "pt",
-    },
-    { label: "Sao Paulo", country: "br", keyword: "sao paulo", lang: "pt" },
-    {
-        label: "San José",
-        country: "cr",
-        keyword: "san josé",
-        lang: "es",
-    },
-    { label: "Sydney", country: "au", keyword: "sydney", lang: "en" },
-    {
-        label: "Tenerife",
-        country: "es",
-        keyword: "tenerife",
-        lang: "es",
-    },
-    { label: "Cebu City", country: "ph", keyword: "cebu city", lang: "en" },
-    { label: "Chiang Mai", country: "th", keyword: "chiang mai", lang: "en" },
-    { label: "Barcelona", country: "es", keyword: "barcelona", lang: "es" },
-    { label: "Lima", country: "pe", keyword: "lima", lang: "es" },
-    { label: "Santiago", country: "cl", keyword: "santiago", lang: "es" },
-    { label: "Koh Phangan", country: "th", keyword: "koh phangan", lang: "en" },
-    {
-        label: "Surigao del Norte",
-        country: "ph",
-        keyword: "surigao del norte",
-        lang: "en",
-    },
-    { label: "Gold Coast", country: "au", keyword: "gold coast", lang: "en" },
-    { label: "Fes‑Meknes", country: "ma", keyword: "fes-meknes", lang: "ar" },
-    {
-        label: "Giza Governorate",
-        country: "eg",
-        keyword: "giza governorate",
-        lang: "ar",
-    },
-    { label: "Istanbul", country: "tr", keyword: "istanbul", lang: "tr" },
-    { label: "Valencia", country: "es", keyword: "valencia", lang: "es" },
-    { label: "Da Nang", country: "vn", keyword: "da nang", lang: "en" },
-    { label: "Nassau", country: "bs", keyword: "nassau", lang: "en" },
-    { label: "Victoria", country: "au", keyword: "victoria", lang: "en" },
-    { label: "Bogota", country: "co", keyword: "bogota", lang: "es" },
-    { label: "Medellin", country: "co", keyword: "medellin", lang: "es" },
-    { label: "Quito", country: "ec", keyword: "quito", lang: "es" },
-
-    // ----------- NEW DESTINATIONS -----------
-
-    // Asia
-    { label: "Colombo", country: "lk", keyword: "colombo", lang: "en" },
-
-    // Europe
-    { label: "Krakow", country: "pl", keyword: "krakow", lang: "pl" },
-    { label: "Sofia", country: "bg", keyword: "sofia", lang: "bg" },
-    { label: "Bucharest", country: "ro", keyword: "bucharest", lang: "ro" },
-    { label: "Bologna", country: "it", keyword: "bologna", lang: "it" },
-    { label: "Porto", country: "pt", keyword: "porto", lang: "pt" },
-    { label: "Belgrade", country: "rs", keyword: "belgrade", lang: "sr" },
-
-    { label: "Riga", country: "lv", keyword: "riga", lang: "lv" },
-    { label: "Vilnius", country: "lt", keyword: "vilnius", lang: "lt" },
-    { label: "Ljubljana", country: "si", keyword: "ljubljana", lang: "sl" },
-    { label: "Cluj-Napoca", country: "ro", keyword: "cluj-napoca", lang: "ro" },
-    { label: "Tirana", country: "al", keyword: "tirana", lang: "sq" },
-    { label: "Sarajevo", country: "ba", keyword: "sarajevo", lang: "bs" },
-    { label: "Novi Sad", country: "rs", keyword: "novi sad", lang: "sr" },
-    { label: "Berlin", country: "de", keyword: "berlin", lang: "de" },
-    { label: "Madrid", country: "es", keyword: "madrid", lang: "es" },
-    { label: "Seville", country: "es", keyword: "seville", lang: "es" },
-    { label: "Warsaw", country: "pl", keyword: "warsaw", lang: "pl" },
-    { label: "Rome", country: "it", keyword: "rome", lang: "it" },
-    { label: "Milan", country: "it", keyword: "milan", lang: "it" },
-
-    // Asia
-    { label: "Yerevan", country: "am", keyword: "yerevan", lang: "hy" },
-    { label: "Almaty", country: "kz", keyword: "almaty", lang: "kk" },
-    { label: "Tashkent", country: "uz", keyword: "tashkent", lang: "uz" },
-    { label: "Tokyo", country: "jp", keyword: "tokyo", lang: "ja" },
-    { label: "Osaka", country: "jp", keyword: "osaka", lang: "ja" },
-    { label: "Seoul", country: "kr", keyword: "seoul", lang: "ko" },
-    { label: "Taipei", country: "tw", keyword: "taipei", lang: "zh" },
-    { label: "Bishkek", country: "kg", keyword: "bishkek", lang: "ky" },
-    { label: "Siem Reap", country: "kh", keyword: "siem reap", lang: "km" },
-    { label: "Phnom Penh", country: "kh", keyword: "phnom penh", lang: "km" },
-    { label: "Weligama", country: "lk", keyword: "weligama", lang: "en" },
-
-    // South America
-    { label: "Cuenca", country: "ec", keyword: "cuenca", lang: "es" },
-    { label: "Córdoba", country: "ar", keyword: "córdoba", lang: "es" },
-
-    // North America
-    { label: "Pittsburgh", country: "us", keyword: "pittsburgh", lang: "en" },
-    { label: "Austin", country: "us", keyword: "austin", lang: "en" },
-    { label: "Oaxaca", country: "mx", keyword: "oaxaca", lang: "es" },
-
-    // South America
-    { label: "Cali", country: "co", keyword: "cali", lang: "es" },
-    { label: "Montevideo", country: "uy", keyword: "montevideo", lang: "es" },
-    { label: "Yogyakarta", country: "id", keyword: "yogyakarta", lang: "id" },
-    { label: "Manila", country: "ph", keyword: "manila", lang: "en" },
-    {
-        label: "Kuala Lumpur",
-        country: "my",
-        keyword: "kuala lumpur",
-        lang: "ms",
-    },
-    { label: "Penang", country: "my", keyword: "penang", lang: "ms" },
-    { label: "Nairobi", country: "ke", keyword: "nairobi", lang: "en" },
-    { label: "Kigali", country: "rw", keyword: "kigali", lang: "en" },
-    { label: "Prague", country: "cz", keyword: "prague", lang: "cs" },
-    { label: "Tallinn", country: "ee", keyword: "tallinn", lang: "et" },
-    { label: "Athens", country: "gr", keyword: "athens", lang: "el" },
-    { label: "Tbilisi", country: "ge", keyword: "tbilisi", lang: "ka" },
-    {
-        label: "Florida",
-        country: "us",
-        keyword: "florida",
-        lang: "en",
-    },
-    { label: "Kraków", country: "pl", keyword: "kraków", lang: "pl" },
-    {
-        label: "Texas",
-        country: "us",
-        keyword: "texas",
-        lang: "en",
-    },
-];
-
-const stripHTML = (html) => {
-    const div = document.createElement("div");
-    div.innerHTML = html;
-    return div.textContent || div.innerText || "";
-};
-
-const selectClasses =
-    "text-[0.7rem] leading-6 min-h-12 px-2.5 py-1 flex items-center justify-start font-normal";
-const menuListClasses = "py-2 h-60";
 
 const extractImageFromContent = (content) => {
     const match = content?.match(/<img.*?src=["'](.*?)["']/);
     return match ? match[1] : null;
+};
+
+const normalizeLabel = (label) =>
+    label
+        ? label
+            .replace(/\+/g, " ")
+            .replace(/[\u2010-\u2015\u2212\u{FE63}\u{FF0D}]/gu, "-")
+            .trim()
+        : "";
+
+const buildExactKeyword = (label) => {
+    if (!label) return null;
+    const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return `^${escaped}$`;
 };
 
 const BlogCard = ({ b }) => {
@@ -254,6 +47,7 @@ const BlogCard = ({ b }) => {
 
             <div className="p-4">
                 <h3 className="font-semibold text-lg line-clamp-2">{b.mainTitle}</h3>
+
                 <p className="text-sm text-gray-600 mt-2 line-clamp-3">
                     {b.mainContent}
                 </p>
@@ -262,242 +56,77 @@ const BlogCard = ({ b }) => {
                     <span className="truncate">{b.author || "Author"}</span>
                     <time dateTime={b.date}>{b.date ? humanDate(b.date) : ""}</time>
                 </div>
-
-                {/* <NavLink
-          to={"blog-details"}
-          className={"underline"}
-      
-        >
-          Read full blog →
-        </NavLink> */}
-
-                {/* <a
-          href={b.link}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-block mt-3 text-blue-600 font-medium hover:underline">
-          Read full blog →
-        </a> */}
             </div>
         </article>
     );
 };
 
-const normalizeLabel = (label) =>
-    label
-        ? label
-            .replace(/\+/g, " ")
-            .replace(/[\u2010-\u2015\u2212\u{FE63}\u{FF0D}]/gu, "-")
-            .trim()
-        : label;
-
-const buildExactKeyword = (label) => {
-    if (!label) return null;
-    const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    return `^${escaped}$`; // match the complete destination, not substrings
-};
-
 const AiBlogsFetch = () => {
-    // const [dest, setDest] = useState(DESTS[0]);
-    const [searchParams, setSearchParams] = useSearchParams();
-    // const initialDest =
-    //   DESTS.find((d) => d.label === searchParams.get("dest")) || DESTS[0];
-    const [dest, setDest] = useState(DESTS[0]);
+    const [searchParams] = useSearchParams();
     const formData = useSelector((state) => state.location.formValues);
-    const initialized = useRef(false);
-    const navigate = useNavigate();
 
-    useEffect(() => {
-        if (initialized.current) return;
-        initialized.current = true;
+    const urlDest = normalizeLabel(searchParams.get("dest"));
+    const reduxDest = normalizeLabel(formData?.location || formData?.state);
 
-        // 1) Priority: URL (?dest=...)
-        const urlDestLabel = normalizeLabel(searchParams.get("dest"));
-        if (urlDestLabel) {
-            const foundByLabel = DESTS.find(
-                (d) => d.label.toLowerCase() === urlDestLabel.toLowerCase(),
-            );
-            if (foundByLabel) {
-                setDest(foundByLabel);
-                return;
-            } else {
-                // URL has an unknown destination -> keep original behavior (null + clear)
-                setDest(null);
-                setSearchParams({}, { replace: true });
-                return;
-            }
-        }
-
-        // 2) Fallback: Redux (formData.location uses keyword)
-        const selectedDest = normalizeLabel(formData?.location);
-        if (selectedDest) {
-            const foundByKeyword = DESTS.find(
-                (d) => d.keyword?.toLowerCase() === selectedDest.toLowerCase(),
-            );
-            if (foundByKeyword) {
-                setDest(foundByKeyword);
-                setSearchParams({ dest: foundByKeyword.label }, { replace: true });
-                return;
-            } else {
-                // No matching destination -> original behavior
-                setDest(null);
-                setSearchParams({}, { replace: true });
-                return;
-            }
-        }
-
-        // 3) No location in Redux -> default to All
-        setDest(DESTS[0]);
-        setSearchParams({}, { replace: true });
-    }, [formData, searchParams, setSearchParams]);
-
-    const handleChange = (val) => {
-        const selected = DESTS.find((d) => d.label === val);
-        setDest(selected);
-        setSearchParams({ dest: selected.label });
-    };
+    const dest = urlDest || reduxDest || "";
 
     const params = useMemo(() => {
-        if (!dest || dest.label === "All") return null;
+        if (!dest) return undefined;
+
         return {
-            country: dest.country,
-            keyword: buildExactKeyword(dest.label),
-            lang: dest.lang,
-            category: "general",
-            max: 10,
+            keyword: buildExactKeyword(dest),
         };
     }, [dest]);
 
-    // const { data, isPending, isError, refetch, isFetching } = useQuery({
-    //   queryKey: ["blogs", dest.keyword],
-    //   queryFn: async () => {
-    //     const res = await axios.get("/blogs/get-blogs", { params });
-    //     return res.data;
-    //   },
-    // });
-
     const { data, isPending, isError } = useQuery({
-        queryKey: ["blogs", dest?.label], // optional chaining
+        queryKey: ["blogs", dest],
         queryFn: async () => {
-            if (!dest) return []; // early return if dest is null
-            if (dest.label === "All") {
-                const res = await axios.get("/blogs/get-blogs");
-                return res.data;
-            }
-            const res = await axios.get("/blogs/get-blogs", { params });
+            const res = await axios.get("/blogs/get-blogs", {
+                params,
+            });
+
             return res.data;
         },
+        enabled: !!dest,
         refetchOnWindowFocus: false,
     });
 
-    //   const blogs = Array.isArray(data?.articles) ? data.articles : [];
-    const blogs = Array.isArray(data) ? data : [];
-
-    if (!dest) {
-        return (
-            <div className="my-6">
-                <div className="flex justify-between items-center mb-4 flex-col sm:flex-col xs:flex-col md:flex-row lg:flex-row">
-                    <h2 className="text-title font-semibold text-host">Blog</h2>
-
-                    {/* Controls */}
-                    <div className="flex items-center justify-end gap-3 mb-5">
-                        {/* <label className="text-sm font-medium text-gray-700">
-              Destination
-            </label>
-            <FormControl variant="standard" sx={{ minWidth: 140 }}>
-              <Select
-                className={selectClasses}
-                MenuProps={{ MenuListProps: { className: menuListClasses } }}
-                value={""}
-                onChange={(e) => handleChange(e.target.value)}
-                label="Destination"
-              >
-                <MenuItem value="" disabled>
-                  Select
-                </MenuItem>
-                {DESTS.map((d) => (
-                  <MenuItem
-                    key={d.label}
-                    value={d.label}
-                    sx={{ fontSize: "12px" }}
-                  >
-                    {d.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl> */}
-                    </div>
-                </div>
-                <div className="text-subtitle text-gray-600 my-36">
-                    No blog posts available for this location.
-                </div>
-            </div>
-        );
-    }
+    const blogs = dest && Array.isArray(data) ? data : [];
 
     return (
         <div className="hidden lg:flex flex-col gap-6 px-1 md:px-10 my-6 min-w-[75%] max-w-[80rem] lg:max-w-full mx-0 lg:mx-auto w-full">
             <div className="flex justify-between items-center mb-4 flex-col sm:flex-col xs:flex-col md:flex-row lg:flex-row">
                 <h2 className="text-title font-semibold text-host">Blog</h2>
-                {/* Controls */}
-                <div className="flex items-center justify-end gap-3 mb-5">
-                    {/* <label className="text-sm font-medium text-gray-700">
-            Destination
-          </label>
-          <FormControl variant="standard" sx={{ minWidth: 140 }}>
-            <Select
-              className={selectClasses}
-              MenuProps={{ MenuListProps: { className: menuListClasses } }}
-              value={dest.label}
-              onChange={(e) => handleChange(e.target.value)}
-              label="Destination"
-            >
-              {DESTS.map((d) => (
-                <MenuItem
-                  key={d.label}
-                  value={d.label}
-                  sx={{ fontSize: "12px" }}
-                >
-                  {d.label}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl> */}
-
-                    {/* <button
-            type="button"
-            onClick={() => refetch()}
-            className="text-xs border rounded px-2 py-1 hover:bg-gray-50"
-            disabled={isFetching}>
-            {isFetching ? "Refreshing…" : "Refresh"}
-          </button> */}
-
-                    {/* {isPending && <span className="text-sm text-gray-500">Loading…</span>}
-          {isError && (
-            <span className="text-sm text-red-600">Could not load blogs.</span>
-          )} */}
-                </div>
             </div>
 
-            {/* Results */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
-                {isPending && (
+                {dest && isPending && (
                     <div className="h-screen">
                         <span className="text-sm text-gray-500">Loading…</span>
                     </div>
                 )}
-                {isError && (
+
+                {dest && isError && (
                     <div className="h-screen">
                         <span className="text-sm text-red-600">Could not load blogs.</span>
                     </div>
                 )}
+
                 {blogs.map((b) => (
-                    <BlogCard key={b.guid} b={b} />
+                    <BlogCard key={b.guid || b._id} b={b} />
                 ))}
             </div>
 
-            {!isPending && !isError && blogs.length === 0 && (
-                <p className="text-sm text-gray-500 mt-4">No blog posts found.</p>
+            {!dest && (
+                <p className="text-sm text-gray-500 mt-4">
+                    No blog posts available for this location.
+                </p>
+            )}
+
+            {dest && !isPending && !isError && blogs.length === 0 && (
+                <p className="text-sm text-gray-500 mt-4">
+                    No blog posts found for {dest}.
+                </p>
             )}
         </div>
     );
