@@ -460,7 +460,7 @@ const getQuickStatsForDestination = (
   const configuredStats = statConfig.slice(0, 4).map((config) => {
     const scoreKeyFromLabel = config.labelKey
       ? labelToAllScoresKeyMap[config.labelKey] ||
-        `${config.labelKey.charAt(5).toLowerCase()}${config.labelKey.slice(6)}`
+      `${config.labelKey.charAt(5).toLowerCase()}${config.labelKey.slice(6)}`
       : null;
     const scoreKey = config.scoreKey || scoreKeyFromLabel || config.field;
     const weightKey =
@@ -472,8 +472,8 @@ const getQuickStatsForDestination = (
     const caseInsensitiveScore =
       directWeight === undefined && weightKey
         ? Object.entries(weights).find(
-            ([key]) => key.toLowerCase() === weightKey.toLowerCase(),
-          )?.[1]
+          ([key]) => key.toLowerCase() === weightKey.toLowerCase(),
+        )?.[1]
         : undefined;
 
     const score = Number(
@@ -517,7 +517,7 @@ const destinationAliasMap = {
   "Las Palmas": "Las Palmas",
   Florianopolis: "Santa Catarina",
   "Playa del Carmen": "Playa del Carmen",
-  "Cape Town": "Cape Town",
+  "Western Cape": "Western Cape",
   Queensland: "Gold Coast",
   Amsterdam: "Amsterdam",
   Tenerife: "Tenerife",
@@ -893,15 +893,13 @@ const DropdownBadge = ({
       <button
         type="button"
         onClick={onToggle}
-        className={`flex w-full items-center justify-between gap-2 rounded-full border font-medium transition-colors ${
-          isSmall
+        className={`flex w-full items-center justify-between gap-2 rounded-full border font-medium transition-colors ${isSmall
             ? "min-h-[38px] px-3 py-1.5 text-xs sm:px-4"
             : "min-h-[44px] px-4 py-2 text-sm sm:px-5"
-        } ${
-          isOpen
+          } ${isOpen
             ? "border-sky-500 bg-sky-500 text-white"
             : "border-black/20 bg-white text-black/85 hover:border-sky-500"
-        }`}
+          }`}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
       >
@@ -929,22 +927,20 @@ const DropdownBadge = ({
                   <button
                     type="button"
                     onClick={() => onSelect(option)}
-                    className={`group flex w-full items-center rounded-xl px-4 py-2 text-left text-sm transition-colors ${
-                      isSelected
+                    className={`group flex w-full items-center rounded-xl px-4 py-2 text-left text-sm transition-colors ${isSelected
                         ? "bg-sky-50 font-medium text-sky-600"
                         : "text-black/80 hover:bg-slate-50"
-                    }`}
+                      }`}
                     role="option"
                     aria-selected={isSelected}
                   >
                     <span className="mr-2 inline-flex w-4 shrink-0 items-center justify-center">
                       <FaCheck
                         size={13}
-                        className={`shrink-0 text-primary-blue transition-opacity ${
-                          isSelected
+                        className={`shrink-0 text-primary-blue transition-opacity ${isSelected
                             ? "opacity-100"
                             : "opacity-0 group-hover:opacity-100"
-                        }`}
+                          }`}
                         aria-hidden="true"
                       />
                     </span>
@@ -977,9 +973,9 @@ const AiSearchResults = () => {
     : "/search/results";
   const goalOptions = goalFilterMap[selectedGoal] || goalFilterMap[defaultGoal];
   const getPersistedGoal = () => {
-      if (typeof window === "undefined") return null;
-      return localStorage.getItem(SEARCH_RESULTS_GOAL_STORAGE_KEY);
-    },
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem(SEARCH_RESULTS_GOAL_STORAGE_KEY);
+  },
     getPersistedSelectionSignature = () => {
       if (typeof window === "undefined") return null;
       return localStorage.getItem(
@@ -1033,10 +1029,9 @@ const AiSearchResults = () => {
       : `You Intend To > Explore ${selectedContinentDisplay}`
     : "Where Do You Want To Go?";
   const selectedGoalOptionDropdownValue = hasSelectedGoalOption
-    ? `Your End Goal > ${
-        searchBarEndGoalLabelMap[selectedGoal]?.[selectedGoalOption] ||
-        selectedGoalOption
-      }`
+    ? `Your End Goal > ${searchBarEndGoalLabelMap[selectedGoal]?.[selectedGoalOption] ||
+    selectedGoalOption
+    }`
     : "Choose Your Goal!";
   const passportCountry =
     auth?.user?.country ||
@@ -1091,26 +1086,26 @@ const AiSearchResults = () => {
 
     const sortedDestinations =
       isVisaRequirementFilterActive(selectedVisaRequirement) &&
-      visaRuleDurationByCountry
+        visaRuleDurationByCountry
         ? filteredDestinations
-            .map((destination, index) => ({ destination, index }))
-            .sort((a, b) => {
-              const aDuration =
-                visaRuleDurationByCountry.get(
-                  normalizeCountryKey(a.destination.country),
-                ) ?? 0;
-              const bDuration =
-                visaRuleDurationByCountry.get(
-                  normalizeCountryKey(b.destination.country),
-                ) ?? 0;
+          .map((destination, index) => ({ destination, index }))
+          .sort((a, b) => {
+            const aDuration =
+              visaRuleDurationByCountry.get(
+                normalizeCountryKey(a.destination.country),
+              ) ?? 0;
+            const bDuration =
+              visaRuleDurationByCountry.get(
+                normalizeCountryKey(b.destination.country),
+              ) ?? 0;
 
-              if (bDuration !== aDuration) {
-                return bDuration - aDuration;
-              }
+            if (bDuration !== aDuration) {
+              return bDuration - aDuration;
+            }
 
-              return a.index - b.index;
-            })
-            .map(({ destination }) => destination)
+            return a.index - b.index;
+          })
+          .map(({ destination }) => destination)
         : filteredDestinations;
 
     return sortedDestinations.map((destination, index) => {
@@ -1217,7 +1212,7 @@ const AiSearchResults = () => {
         if (isMounted) {
           showErrorAlert(
             error?.response?.data?.message ||
-              "Failed to load favorite destinations.",
+            "Failed to load favorite destinations.",
           );
         }
       }
@@ -1274,8 +1269,8 @@ const AiSearchResults = () => {
             typeof item?.[selectedAttribute] === "number"
               ? item[selectedAttribute]
               : Object.entries(item).find(
-                  ([, value]) => typeof value === "number",
-                )?.[1] || 0;
+                ([, value]) => typeof value === "number",
+              )?.[1] || 0;
 
           return {
             ...(existingDestination || {}),
@@ -1430,7 +1425,7 @@ const AiSearchResults = () => {
           setLikedDestinations(likedDestinations);
           showErrorAlert(
             error?.response?.data?.message ||
-              "Failed to update favorite destination.",
+            "Failed to update favorite destination.",
           );
         });
     },
@@ -2048,7 +2043,7 @@ const AiSearchResults = () => {
                                       {index <
                                         formattedNarrative.priorityPoints
                                           .length -
-                                          1 && <span>{", "}</span>}
+                                        1 && <span>{", "}</span>}
                                     </React.Fragment>
                                   ),
                                 )}
@@ -2068,11 +2063,11 @@ const AiSearchResults = () => {
                         <div className="mt-3 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-6">
                           {(formattedNarrative.endingLine ||
                             !resultsHeadingBodyLines) && (
-                            <span className="block font-medium">
-                              {formattedNarrative.endingLine ||
-                                highlightedResultsHeadingRemainingLines}
-                            </span>
-                          )}
+                              <span className="block font-medium">
+                                {formattedNarrative.endingLine ||
+                                  highlightedResultsHeadingRemainingLines}
+                              </span>
+                            )}
                           {shouldShowResultsContent && isLoggedIn && (
                             <div className="flex w-full items-center gap-3 lg:w-auto lg:justify-end">
                               <span className="text-sm font-medium text-black/80 font-play">
@@ -2107,27 +2102,26 @@ const AiSearchResults = () => {
                           ) && Boolean(visaRuleDurationByCountry);
                         const visaDurationDays = shouldShowVisaDuration
                           ? visaRuleDurationByCountry.get(
-                              normalizeCountryKey(destination.country),
-                            )
+                            normalizeCountryKey(destination.country),
+                          )
                           : null;
                         const visaDurationLabel =
                           visaDurationDays !== null &&
-                          visaDurationDays !== undefined
+                            visaDurationDays !== undefined
                             ? `${formatVisaRequirementLabel(
-                                visaRequirementApiValueMap[
-                                  selectedVisaRequirement
-                                ],
-                              )}: ${visaDurationDays} days`
+                              visaRequirementApiValueMap[
+                              selectedVisaRequirement
+                              ],
+                            )}: ${visaDurationDays} days`
                             : null;
 
                         return (
                           <article
                             key={`${destination.city}-${destination.country}`}
-                            className={`cursor-pointer transition-all duration-300 ${
-                              index < visibleDestinationCount
+                            className={`cursor-pointer transition-all duration-300 ${index < visibleDestinationCount
                                 ? "translate-y-0 opacity-100"
                                 : "pointer-events-none translate-y-2 opacity-0"
-                            }`}
+                              }`}
                             role="button"
                             tabIndex={0}
                             onClick={() => handleDestinationClick(destination)}
@@ -2151,9 +2145,9 @@ const AiSearchResults = () => {
                                 #
                                 {destination?.rankLabel
                                   ? destination.rankLabel.replace(
-                                      /^Rank\s*/i,
-                                      "",
-                                    )
+                                    /^Rank\s*/i,
+                                    "",
+                                  )
                                   : "—"}
                               </div>
 
@@ -2200,14 +2194,13 @@ const AiSearchResults = () => {
                                           : "ml-auto text-right"
                                       }
                                     >
-                                      {`${selectedContinentDisplay || "World"} Rank ${
-                                        destination?.rankLabel
+                                      {`${selectedContinentDisplay || "World"} Rank ${destination?.rankLabel
                                           ? destination.rankLabel.replace(
-                                              /^Rank\s*/i,
-                                              "",
-                                            )
+                                            /^Rank\s*/i,
+                                            "",
+                                          )
                                           : "—"
-                                      }`}
+                                        }`}
                                     </h4>
                                     {shouldShowVisaDuration &&
                                       visaDurationLabel && (
