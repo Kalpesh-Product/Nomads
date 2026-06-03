@@ -18,6 +18,7 @@ import {
   HiOutlineUserCircle,
   HiOutlineKey,
   HiOutlineLogout,
+  HiOutlineLogin,
 } from "react-icons/hi";
 import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
 import { FaGlobeAmericas } from "react-icons/fa";
@@ -634,7 +635,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
             />
             {/* <div className="border-t border-black/10 mt-4 mx-4"></div> */}
             <div className="border-t border-black/10 mx-4"></div>
-            {!isCollapsed && (
+            {!isCollapsed ? (
               <div className="mt-auto px-4 pb-4 pt-10">
                 <div className="rounded-[28px] p-4 ">
                   <p className="mt-2 text-nano leading-[0.9rem] text-black/55">
@@ -643,16 +644,38 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                   <p className="text-nano font-semibold leading-5 text-black/55">
                     Powered by your preferences.
                   </p>
+
                   <div className="flex justify-center">
                     <button
                       type="button"
                       onClick={handleLogInClick}
-                      className="mt-6 w-[70%] rounded-full border border-black/30  bg-[#efefef]  px-0 py-2 text-nano text-black/80 hover:bg-[#e0e0e0] "
+                      className="mt-6 w-[70%] rounded-full border border-black/30 bg-[#efefef] px-0 py-2 text-nano text-black/80 hover:bg-[#e0e0e0]"
                     >
                       {loggedOutPrompt.actionLabel}
                     </button>
                   </div>
                 </div>
+              </div>
+            ) : (
+              <div className="mt-auto flex justify-center px-2 pb-4">
+                <button
+                  type="button"
+                  onClick={handleLogInClick}
+                  onMouseEnter={(event) => {
+                    const rect = event.currentTarget.getBoundingClientRect();
+
+                    setTooltip({
+                      label: loggedOutPrompt.actionLabel,
+                      top: rect.top + rect.height / 2,
+                      left: rect.right + 14,
+                    });
+                  }}
+                  onMouseLeave={() => setTooltip(null)}
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-black/20 bg-white text-black/80 transition-all hover:bg-[#e0e0e0]"
+                  aria-label={loggedOutPrompt.actionLabel}
+                >
+                  <HiOutlineLogin size={20} />
+                </button>
               </div>
             )}
           </>
