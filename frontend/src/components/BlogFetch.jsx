@@ -27,7 +27,7 @@ const DESTS = [
   },
   { label: "Dubai", country: "uae", keyword: "dubai", lang: "en" },
   { label: "Auckland", country: "nz", keyword: "auckland", lang: "en" },
-  { label: "Cape Town", country: "za", keyword: "cape town", lang: "en" },
+  { label: "Western Cape", country: "za", keyword: "western cape", lang: "en" },
   { label: "Budapest", country: "hu", keyword: "budapest", lang: "hu" },
   { label: "Mexico City", country: "mx", keyword: "mexico city", lang: "es" },
   {
@@ -129,7 +129,7 @@ const DESTS = [
   { label: "Valencia", country: "es", keyword: "valencia", lang: "es" },
   { label: "Da Nang", country: "vn", keyword: "da nang", lang: "en" },
   { label: "Nassau", country: "bs", keyword: "nassau", lang: "en" },
-  { label: "Melbourne", country: "ca", keyword: "melbourne", lang: "en" },
+  { label: "Victoria", country: "au", keyword: "victoria", lang: "en" },
   { label: "Bogota", country: "co", keyword: "bogota", lang: "es" },
   { label: "Medellin", country: "co", keyword: "medellin", lang: "es" },
   { label: "Quito", country: "ec", keyword: "quito", lang: "es" },
@@ -286,9 +286,9 @@ const BlogCard = ({ b }) => {
 const normalizeLabel = (label) =>
   label
     ? label
-        .replace(/\+/g, " ")
-        .replace(/[\u2010-\u2015\u2212\u{FE63}\u{FF0D}]/gu, "-")
-        .trim()
+      .replace(/\+/g, " ")
+      .replace(/[\u2010-\u2015\u2212\u{FE63}\u{FF0D}]/gu, "-")
+      .trim()
     : label;
 
 const buildExactKeyword = (label) => {

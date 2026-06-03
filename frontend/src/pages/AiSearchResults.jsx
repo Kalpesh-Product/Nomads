@@ -517,7 +517,7 @@ const destinationAliasMap = {
   "Las Palmas": "Las Palmas",
   Florianopolis: "Santa Catarina",
   "Playa del Carmen": "Playa del Carmen",
-  "Cape Town": "Cape Town",
+  "Western Cape": "Western Cape",
   Queensland: "Gold Coast",
   Amsterdam: "Amsterdam",
   Tenerife: "Tenerife",
