@@ -187,7 +187,7 @@ const quickStatsConfigByGoalOption = {
     { label: "Affordability", weightKey: "costOfLiving" },
     { label: "Purchasing Power", weightKey: "purchasingPower" },
     { label: "Heathcare Cost", weightKey: "healthcareCostIndex" },
-    { label: "Inflation Stability", weightKey: "inflationStability" },
+    { label: "Visa Cost", weightKey: "inflationStability" },
   ],
   "Safest Cities": [
     { label: "Safety", weightKey: "safety" },
@@ -259,22 +259,22 @@ const quickStatsConfigByGoalOption = {
     { label: "Affordability", weightKey: "costOfLiving" },
     { label: "Tax Friendly", weightKey: "taxFriendly" },
     { label: "Purchasing Power", weightKey: "purchasingPower" },
-    { label: "Inflation Stability", weightKey: "inflationStability" },
+    { label: "Visa Cost", weightKey: "inflationStability" },
   ],
   "Low Taxation": [
     { label: "Tax Friendly", weightKey: "taxFriendly" },
     { label: "Affordability", weightKey: "costOfLiving" },
     { label: "Purchasing Power", weightKey: "purchasingPower" },
-    { label: "Inflation Stability", weightKey: "inflationStability" },
+    { label: "Visa Cost", weightKey: "inflationStability" },
   ],
   "Purchasing Power": [
     { label: "Purchasing Power", weightKey: "purchasingPower" },
     { label: "Affordability", weightKey: "costOfLiving" },
     { label: "Tax Friendly", weightKey: "taxFriendly" },
-    { label: "Inflation Stability", weightKey: "inflationStability" },
+    { label: "Visa Cost", weightKey: "inflationStability" },
   ],
   "Financial Stability(Low Risk)": [
-    { label: "Inflation Stability", weightKey: "inflationStability" },
+    { label: "Visa Cost", weightKey: "inflationStability" },
     { label: "Heathcare Cost", weightKey: "healthcareCostIndex" },
     { label: "Affordability", weightKey: "costOfLiving" },
     { label: "Tax Friendly", weightKey: "taxFriendly" },
@@ -2028,9 +2028,9 @@ const AiSearchResults = () => {
                 <div className="relative z-10">
                   {shouldShowNarrative && (
                     <>
-                      <p className="text-sm font-medium leading-relaxed text-primary-blue lg:text-[0.9rem] font-play">
+                      {/* <p className="text-sm font-medium leading-relaxed text-primary-blue lg:text-[0.9rem] font-play">
                         {typedBottomHeading}
-                      </p>
+                      </p> */}
                       <div className="mt-6 text-sm leading-relaxed text-black/85 lg:text-[0.9rem] font-play">
                         <span className="block font-bold">
                           {formattedNarrative.introLine}
