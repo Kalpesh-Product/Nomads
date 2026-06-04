@@ -777,6 +777,7 @@ export const registerFormSubmission = async (req, res) => {
 
       // STEP 3: send Mongo saved data to external API
       let websiteResult = "";
+      let websiteCreatedOk = false; // track real HTTP success
 
       if (searchKey) {
         try {
@@ -788,12 +789,20 @@ export const registerFormSubmission = async (req, res) => {
               body: JSON.stringify(template),
             },
           );
+          websiteCreatedOk = submit.ok; // true only for 2xx HTTP status
           const raw = await submit.text();
           try {
             websiteResult = JSON.parse(raw);
           } catch {
             console.error("Non-JSON response:", raw);
             websiteResult = { message: "Invalid JSON response", raw };
+          }
+
+          if (!websiteCreatedOk) {
+            console.error(
+              `❌ create-website returned HTTP ${submit.status}:`,
+              websiteResult,
+            );
           }
 
           await session.commitTransaction();
@@ -833,16 +842,22 @@ export const registerFormSubmission = async (req, res) => {
       });
 
       // STEP 4: respond
-      // console.log("sheetResult", sheetResult);
-
+      // Lead + email are already saved/sent above regardless of website creation.
+      // Always return success to the user — if website creation failed, our team
+      // will handle it manually (the lead is in MongoDB & Google Sheet).
       if (searchKey) {
-        if (websiteResult.status === 201) {
+        if (websiteCreatedOk) {
           return res.status(201).json({
             message: "Form submitted successfully",
           });
         } else {
-          return res.status(400).json({
-            message: websiteResult.message,
+          // Lead is saved; website setup will be done manually by the team.
+          console.error(
+            "⚠️ Website creation failed but lead was saved. Returning success to user.",
+          );
+          return res.status(201).json({
+            message:
+              "Form submitted successfully, our team will get back to you soon",
           });
         }
       }

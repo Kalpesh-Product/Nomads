@@ -896,7 +896,7 @@ const DropdownBadge = ({
         className={`flex w-full items-center justify-between gap-2 rounded-full border font-medium transition-colors ${
           isSmall
             ? "min-h-[38px] px-3 py-1.5 text-xs sm:px-4"
-            : "min-h-[44px] px-4 py-2 text-sm sm:px-5"
+            : "min-h-[44px] px-4 py-2 text-xs sm:px-5"
         } ${
           isOpen
             ? "border-sky-500 bg-sky-500 text-white"
@@ -929,7 +929,7 @@ const DropdownBadge = ({
                   <button
                     type="button"
                     onClick={() => onSelect(option)}
-                    className={`group flex w-full items-center rounded-xl px-4 py-2 text-left text-sm transition-colors ${
+                    className={`group flex w-full items-center rounded-xl px-4 py-2 text-left text-xs transition-colors ${
                       isSelected
                         ? "bg-sky-50 font-medium text-sky-600"
                         : "text-black/80 hover:bg-slate-50"
@@ -2191,21 +2191,21 @@ const AiSearchResults = () => {
                                 </p>
                               </div>
 
-                              <div className="pointer-events-none absolute inset-0 bg-black/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-center p-3 md:p-4">
+                              <div className="pointer-events-none absolute inset-0 bg-black/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-center p-2 md:p-4">
                                 <div className="translate-y-4 group-hover:translate-y-0 transition-all duration-300">
                                   <div className="mb-0 border-b border-white/30 pb-1">
-                                    <p className="mb-1 text-center text-[0.7rem] font-medium uppercase tracking-wide text-white/85 md:text-base">
+                                    <p className="mb-1 text-center text-[0.55rem] font-medium uppercase tracking-wide text-white/85 sm:text-[0.65rem] md:text-base">
                                       {`${destination.displayCity || destination.city} - ${
                                         destination.displayCountry ||
                                         destination.country
                                       }`.toUpperCase()}
                                     </p>
 
-                                    <h4 className="text-center text-base font-semibold uppercase tracking-wide text-white md:text-[0.89rem]">
+                                    <h4 className="text-center text-[0.7rem] font-semibold uppercase tracking-wide text-white sm:text-[0.8rem] md:text-[0.89rem]">
                                       {selectedGoalOption || "Attribute"}
                                     </h4>
                                   </div>
-                                  <div className="mb-2 mt-2 flex items-center justify-between gap-2 py-0 text-sm font-semibold text-white md:text-sm">
+                                  <div className="mb-1 mt-1 flex items-center justify-between gap-1 py-0 text-[0.65rem] font-semibold text-white sm:text-xs md:mb-2 md:mt-2 md:gap-2 md:text-sm">
                                     <h4 className="text-left">
                                       {`${selectedContinentDisplay || "World"} Rank ${
                                         destination?.rankLabel
@@ -2225,7 +2225,7 @@ const AiSearchResults = () => {
                                       )}
                                   </div>
 
-                                  <div className="grid grid-cols-1 gap-2 text-xs md:text-sm text-white/90">
+                                  <div className="grid grid-cols-1 gap-1 md:gap-2 text-[0.6rem] sm:text-xs md:text-sm text-white/90">
                                     {getQuickStatsForDestination(
                                       destination,
                                       selectedGoal,
@@ -2233,7 +2233,7 @@ const AiSearchResults = () => {
                                     ).map((stat, statIndex) => (
                                       <div
                                         key={`${destination.city}-${stat.label}-${statIndex}`}
-                                        className="rounded-lg px-2 py-1 transition-all duration-300"
+                                        className="rounded-lg px-2 py-[3px] md:py-1 transition-all duration-300"
                                         style={{
                                           backgroundImage: `linear-gradient(
                                           90deg,
@@ -2260,7 +2260,7 @@ const AiSearchResults = () => {
                                         )`,
                                         }}
                                       >
-                                        <span className="font-light">
+                                        <span className="font-light text-[0.6rem] sm:text-xs md:text-sm">
                                           {stat.label}
                                         </span>
                                       </div>
