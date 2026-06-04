@@ -2074,11 +2074,11 @@ const AiSearchResults = () => {
                             </span>
                           )}
                           {shouldShowResultsContent && isLoggedIn && (
-                            <div className="flex w-full items-center gap-3 lg:w-auto lg:justify-end">
+                            <div className="flex w-full items-center justify-end gap-3 lg:w-auto">
                               <span className="text-sm font-medium text-black/80 font-play">
                                 Visa Options
                               </span>
-                              <div className="w-full sm:w-[13rem]">
+                              <div className="w-[11rem] shrink-0 sm:w-[13rem]">
                                 <DropdownBadge
                                   label="Visa Requirement"
                                   options={visaRequirementOptions}
