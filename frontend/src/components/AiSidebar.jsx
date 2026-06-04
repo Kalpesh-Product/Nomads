@@ -307,15 +307,6 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     const normalizedPath = location.pathname.replace(/\/$/, "") || "/";
     const isAiHomePage = normalizedPath === "/home";
 
-    const isValueAddedPage = valueAdditionItems.some((item) => {
-      if (!item.path) return false;
-      const normalizedItemPath = item.path.replace(/\/$/, "");
-      return (
-        normalizedPath === normalizedItemPath ||
-        normalizedPath.startsWith(`${normalizedItemPath}/`)
-      );
-    });
-
     if (isAiHomePage) {
       setIsRecommendationsOpen(false);
       setIsValueAdditionsOpen(true);
@@ -323,9 +314,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     }
 
     setIsRecommendationsOpen(true);
-    if (isValueAddedPage) {
-      setIsValueAdditionsOpen(true);
-    }
+    setIsValueAdditionsOpen(false);
   }, [location.pathname]);
 
   const isLoggedIn = Boolean(auth?.user) || readStoredLoginState();

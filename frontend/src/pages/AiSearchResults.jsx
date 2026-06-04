@@ -187,7 +187,7 @@ const quickStatsConfigByGoalOption = {
     { label: "Affordability", weightKey: "costOfLiving" },
     { label: "Purchasing Power", weightKey: "purchasingPower" },
     { label: "Heathcare Cost", weightKey: "healthcareCostIndex" },
-    { label: "Inflation Stability", weightKey: "inflationStability" },
+    { label: "Visa Cost", weightKey: "inflationStability" },
   ],
   "Safest Cities": [
     { label: "Safety", weightKey: "safety" },
@@ -259,22 +259,22 @@ const quickStatsConfigByGoalOption = {
     { label: "Affordability", weightKey: "costOfLiving" },
     { label: "Tax Friendly", weightKey: "taxFriendly" },
     { label: "Purchasing Power", weightKey: "purchasingPower" },
-    { label: "Inflation Stability", weightKey: "inflationStability" },
+    { label: "Visa Cost", weightKey: "inflationStability" },
   ],
   "Low Taxation": [
     { label: "Tax Friendly", weightKey: "taxFriendly" },
     { label: "Affordability", weightKey: "costOfLiving" },
     { label: "Purchasing Power", weightKey: "purchasingPower" },
-    { label: "Inflation Stability", weightKey: "inflationStability" },
+    { label: "Visa Cost", weightKey: "inflationStability" },
   ],
   "Purchasing Power": [
     { label: "Purchasing Power", weightKey: "purchasingPower" },
     { label: "Affordability", weightKey: "costOfLiving" },
     { label: "Tax Friendly", weightKey: "taxFriendly" },
-    { label: "Inflation Stability", weightKey: "inflationStability" },
+    { label: "Visa Cost", weightKey: "inflationStability" },
   ],
   "Financial Stability(Low Risk)": [
-    { label: "Inflation Stability", weightKey: "inflationStability" },
+    { label: "Visa Cost", weightKey: "inflationStability" },
     { label: "Heathcare Cost", weightKey: "healthcareCostIndex" },
     { label: "Affordability", weightKey: "costOfLiving" },
     { label: "Tax Friendly", weightKey: "taxFriendly" },
@@ -1974,7 +1974,7 @@ const AiSearchResults = () => {
               </p>
             </div>
 
-            <div className="mt-4 hidden max-w-full items-center rounded-[30px] border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] sm:flex lg:ml-[2.5rem] lg:mr-10">
+            <div className="mt-4 hidden max-w-full items-center rounded-[30px] border border-black/80 bg-white px-4 py-2 shadow-[0_5px_14px_rgba(0,0,0,0.12)] sm:flex lg:ml-[2.5rem] lg:mr-10">
               <div className="flex flex-wrap items-center gap-2">
                 {searchBarBadges.map((badgeLabel, index) => (
                   <div
@@ -2028,9 +2028,9 @@ const AiSearchResults = () => {
                 <div className="relative z-10">
                   {shouldShowNarrative && (
                     <>
-                      <p className="text-sm font-medium leading-relaxed text-primary-blue lg:text-[0.9rem] font-play">
+                      {/* <p className="text-sm font-medium leading-relaxed text-primary-blue lg:text-[0.9rem] font-play">
                         {typedBottomHeading}
-                      </p>
+                      </p> */}
                       <div className="mt-6 text-sm leading-relaxed text-black/85 lg:text-[0.9rem] font-play">
                         <span className="block font-bold">
                           {formattedNarrative.introLine}
@@ -2074,11 +2074,11 @@ const AiSearchResults = () => {
                             </span>
                           )}
                           {shouldShowResultsContent && isLoggedIn && (
-                            <div className="flex w-full items-center gap-3 lg:w-auto lg:justify-end">
+                            <div className="flex w-full items-center justify-end gap-3 lg:w-auto">
                               <span className="text-sm font-medium text-black/80 font-play">
                                 Visa Options
                               </span>
-                              <div className="w-full sm:w-[13rem]">
+                              <div className="w-[11rem] shrink-0 sm:w-[13rem]">
                                 <DropdownBadge
                                   label="Visa Requirement"
                                   options={visaRequirementOptions}
