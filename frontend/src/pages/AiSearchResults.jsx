@@ -1974,7 +1974,7 @@ const AiSearchResults = () => {
               </p>
             </div>
 
-            <div className="mt-4 hidden max-w-full items-center rounded-[30px] border border-black/80 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] sm:flex lg:ml-[2.5rem] lg:mr-10">
+            <div className="mt-4 hidden max-w-full items-center rounded-[30px] border border-black/80 bg-white px-4 py-2 shadow-[0_5px_14px_rgba(0,0,0,0.12)] sm:flex lg:ml-[2.5rem] lg:mr-10">
               <div className="flex flex-wrap items-center gap-2">
                 {searchBarBadges.map((badgeLabel, index) => (
                   <div
