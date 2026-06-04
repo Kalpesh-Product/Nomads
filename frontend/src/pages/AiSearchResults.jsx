@@ -896,7 +896,7 @@ const DropdownBadge = ({
         className={`flex w-full items-center justify-between gap-2 rounded-full border font-medium transition-colors ${
           isSmall
             ? "min-h-[38px] px-3 py-1.5 text-xs sm:px-4"
-            : "min-h-[44px] px-4 py-2 text-sm sm:px-5"
+            : "min-h-[44px] px-4 py-2 text-xs sm:px-5"
         } ${
           isOpen
             ? "border-sky-500 bg-sky-500 text-white"
@@ -929,7 +929,7 @@ const DropdownBadge = ({
                   <button
                     type="button"
                     onClick={() => onSelect(option)}
-                    className={`group flex w-full items-center rounded-xl px-4 py-2 text-left text-sm transition-colors ${
+                    className={`group flex w-full items-center rounded-xl px-4 py-2 text-left text-xs transition-colors ${
                       isSelected
                         ? "bg-sky-50 font-medium text-sky-600"
                         : "text-black/80 hover:bg-slate-50"
