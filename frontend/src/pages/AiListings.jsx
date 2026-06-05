@@ -342,7 +342,8 @@ const AiListings = ({ forceListView = false }) => {
     queryFn: async () => {
       const { country, location } = formData || {};
       const response = await axios.get(
-        `company/companiesn?country=${country}&state=${location}&userId=${userId || ""
+        `company/companiesn?country=${country}&state=${location}&userId=${
+          userId || ""
         }`,
       );
 
@@ -521,6 +522,7 @@ const AiListings = ({ forceListView = false }) => {
     const queryCountry = params.get("country");
     const queryLocation = params.get("state") || params.get("location");
     const queryContinent = params.get("continent");
+    const queryCategory = params.get("category");
 
     const breadcrumbFilters = location.state?.breadcrumbFilters;
 
@@ -532,13 +534,17 @@ const AiListings = ({ forceListView = false }) => {
     const continent = normalizeValue(
       breadcrumbFilters?.continent || queryContinent,
     );
+    const category = normalizeValue(
+      location.state?.category || breadcrumbFilters?.category || queryCategory,
+    );
 
     if (!country || !loc) return;
 
     if (
       country === normalizeValue(formData.country) &&
       loc === normalizeValue(formData.location) &&
-      (!continent || continent === normalizeValue(formData.continent))
+      (!continent || continent === normalizeValue(formData.continent)) &&
+      (!category || category === normalizeValue(formData.category))
     ) {
       return;
     }
@@ -548,6 +554,7 @@ const AiListings = ({ forceListView = false }) => {
       country: country || "",
       location: loc || "",
       continent: continent || formData.continent || "",
+      category: category || formData.category || "",
     };
 
     dispatch(setFormValues(nextFormValues));
@@ -585,23 +592,23 @@ const AiListings = ({ forceListView = false }) => {
   const forMapsData = isLisitingLoading
     ? []
     : listingsData.map((item) => ({
-      ...item,
-      id: item._id,
-      lat: item.latitude,
-      lng: item.longitude,
-      name: item.companyName,
-      location: item.city,
-      reviews: item.reviews?.length,
-      rating: item.reviews?.length
-        ? (() => {
-          const avg =
-            item.reviews.reduce((sum, r) => sum + r.starCount, 0) /
-            item.reviews.length;
-          return avg % 1 === 0 ? avg : avg.toFixed(1);
-        })()
-        : "0",
-      image: item.images?.[0]?.url,
-    }));
+        ...item,
+        id: item._id,
+        lat: item.latitude,
+        lng: item.longitude,
+        name: item.companyName,
+        location: item.city,
+        reviews: item.reviews?.length,
+        rating: item.reviews?.length
+          ? (() => {
+              const avg =
+                item.reviews.reduce((sum, r) => sum + r.starCount, 0) /
+                item.reviews.length;
+              return avg % 1 === 0 ? avg : avg.toFixed(1);
+            })()
+          : "0",
+        image: item.images?.[0]?.url,
+      }));
 
   const handleCategoryClick = (categoryValue) => {
     const formData = getValues(); // from react-hook-form
@@ -693,11 +700,11 @@ const AiListings = ({ forceListView = false }) => {
   const backLabel = selectedStateFromParams || formData?.location || "";
   const selectedStateLabel = backLabel
     ? backLabel
-      .split(" ")
-      .map(
-        (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
-      )
-      .join(" ")
+        .split(" ")
+        .map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
+        )
+        .join(" ")
     : "";
 
   // Prioritize BIZ Nest and MeWo first, then sort the rest by rating descending
@@ -724,23 +731,27 @@ const AiListings = ({ forceListView = false }) => {
 
   return (
     <div className="flex flex-col gap:2 lg:gap-6 ">
-      <div className="hidden lg:flex flex-col gap-6 md:px-10">
+      <div
+        className={`${forceListView ? "flex" : "hidden lg:flex"} flex-col gap-6 md:px-10`}
+      >
         <div className="w-full lg:min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-4 sm:px-6 lg:px-0">
-          <div className="mb-4 flex items-center gap-3 lg:hidden">
-            <button
-              type="button"
-              onClick={() => navigate("/search/results")}
-              className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
-              aria-label="Go back to search results"
-            >
-              <HiOutlineArrowLeft size={18} />
-            </button>
-            {/* {selectedStateLabel && (
-            <span className="text-lg font-medium text-primary-blue">
-              {selectedStateLabel}
-            </span>
-          )} */}
-          </div>
+          {!forceListView && (
+            <div className="mb-4 flex items-center gap-3 lg:hidden">
+              <button
+                type="button"
+                onClick={() => navigate("/search/results")}
+                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-sky-500 text-sky-500"
+                aria-label="Go back to search results"
+              >
+                <HiOutlineArrowLeft size={18} />
+              </button>
+              {/* {selectedStateLabel && (
+              <span className="text-lg font-medium text-primary-blue">
+                {selectedStateLabel}
+              </span>
+            )} */}
+            </div>
+          )}
           <p className="mb-4 mt-6 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:hidden font-play">
             {!isSecondHeadingPhase && (
               <span
@@ -778,24 +789,26 @@ const AiListings = ({ forceListView = false }) => {
                 <div className="flex items-center gap-2">
                   <IoSearch className="text-primary-red" />
                   <span className="text-[11px] font-bold text-gray-900 truncate w-full text-left">
-                    {`${(formData?.country || "Country").charAt(0).toUpperCase() + (formData?.country || "Country").slice(1)} . ${formData?.location
-                      ? formData.location
-                        .split(" ")
-                        .map(
-                          (word) =>
-                            word.charAt(0).toUpperCase() +
-                            word.slice(1).toLowerCase(),
-                        )
-                        .join(" ")
-                      : "Unknown"
-                      } . ${formData?.category
+                    {`${(formData?.country || "Country").charAt(0).toUpperCase() + (formData?.country || "Country").slice(1)} . ${
+                      formData?.location
+                        ? formData.location
+                            .split(" ")
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() +
+                                word.slice(1).toLowerCase(),
+                            )
+                            .join(" ")
+                        : "Unknown"
+                    } . ${
+                      formData?.category
                         ? categoryOptions.find(
-                          (c) => c.value === formData.category,
-                        )?.label ||
-                        formData.category.charAt(0).toUpperCase() +
-                        formData.category.slice(1)
+                            (c) => c.value === formData.category,
+                          )?.label ||
+                          formData.category.charAt(0).toUpperCase() +
+                            formData.category.slice(1)
                         : "All"
-                      }`}
+                    }`}
                   </span>
                 </div>
                 <span className="text-[10px] text-gray-500">
@@ -949,10 +962,11 @@ const AiListings = ({ forceListView = false }) => {
                                   className="h-full w-full object-contain"
                                 />
                                 <span
-                                  className={`text-tiny border-b-2 pb-1 ${isActive
-                                    ? "border-primary-blue"
-                                    : "border-transparent"
-                                    }`}
+                                  className={`text-tiny border-b-2 pb-1 ${
+                                    isActive
+                                      ? "border-primary-blue"
+                                      : "border-transparent"
+                                  }`}
                                 >
                                   {cat.label}
                                 </span>
@@ -1213,13 +1227,13 @@ const AiListings = ({ forceListView = false }) => {
                   in{" "}
                   {formData?.location
                     ? formData.location
-                      .split(" ")
-                      .map(
-                        (word) =>
-                          word.charAt(0).toUpperCase() +
-                          word.slice(1).toLowerCase(),
-                      )
-                      .join(" ")
+                        .split(" ")
+                        .map(
+                          (word) =>
+                            word.charAt(0).toUpperCase() +
+                            word.slice(1).toLowerCase(),
+                        )
+                        .join(" ")
                     : "Unknown"}
                 </h1>
               </div>
@@ -1233,8 +1247,9 @@ const AiListings = ({ forceListView = false }) => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -50 }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
-                className={`${showDesktopMap ? "col-span-5" : "col-span-9"
-                  } font-semibold text-lg`}
+                className={`${
+                  showDesktopMap ? "col-span-5" : "col-span-9"
+                } font-semibold text-lg`}
               >
                 {formData?.category === VALUE_ADDED_SERVICES_CATEGORY ? (
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-5">
@@ -1249,10 +1264,11 @@ const AiListings = ({ forceListView = false }) => {
                           type="button"
                           onClick={() => handleValueAddedServiceClick(service)}
                           disabled={isDisabled}
-                          className={`relative overflow-hidden rounded-3xl px-1 py-4 min-h-[132px] aspect-square flex items-end justify-center text-center transition-transform ${isDisabled
-                            ? "cursor-not-allowed opacity-80"
-                            : "hover:scale-[1.02]"
-                            }`}
+                          className={`relative overflow-hidden rounded-3xl px-1 py-4 min-h-[132px] aspect-square flex items-end justify-center text-center transition-transform ${
+                            isDisabled
+                              ? "cursor-not-allowed opacity-80"
+                              : "hover:scale-[1.02]"
+                          }`}
                           style={{
                             backgroundImage: `linear-gradient(to top, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.2)), url(${service.imageUrl})`,
                             backgroundSize: "cover",
@@ -1290,10 +1306,11 @@ const AiListings = ({ forceListView = false }) => {
                     }
                     persistPage={true}
                     resetPageKey={resetPageKey}
-                    columns={`grid-cols-2 md:grid-cols-3 ${showDesktopMap
-                      ? "lg:grid-cols-3"
-                      : "lg:grid-cols-4 xl:grid-cols-5"
-                      } gap-4 md:gap-5`}
+                    columns={`grid-cols-2 md:grid-cols-3 ${
+                      showDesktopMap
+                        ? "lg:grid-cols-3"
+                        : "lg:grid-cols-4 xl:grid-cols-5"
+                    } gap-4 md:gap-5`}
                     renderItem={(item, index) =>
                       isLisitingLoading ? (
                         <Box key={index} className="w-full h-full">
