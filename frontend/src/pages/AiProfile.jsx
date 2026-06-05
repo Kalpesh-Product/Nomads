@@ -17,6 +17,7 @@ import { CircularProgress } from "@mui/material";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 import { Country } from "country-state-city";
 import { HiCheck } from "react-icons/hi";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
 
 const floatingLabelSx = {
   color: "black",
@@ -48,6 +49,60 @@ const tickMenuItemSx = {
   "&:hover .tick-icon": { opacity: 1 },
   "&.Mui-selected .tick-icon": { opacity: 1 },
   "&.Mui-selected:hover .tick-icon": { opacity: 1 },
+};
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const contactCodeRegex = /^\+\d{1,4}$/;
+const fullNameRegex = /^[A-Za-z][A-Za-z .'-]*$/;
+
+const validateProfileForm = (values) => {
+  const errors = {};
+  const fullName = values.fullName.trim();
+  const email = values.email.trim();
+  const country = values.country.trim();
+  const contactCode = values.contactCode.trim();
+  const contactNumber = values.contactNumber.trim();
+
+  if (!fullName) {
+    errors.fullName = "Full Name is required";
+  } else if (!/[A-Za-z]/.test(fullName)) {
+    errors.fullName = "Full Name must include at least one letter";
+  } else if (!fullNameRegex.test(fullName)) {
+    errors.fullName =
+      "Full Name can include letters, spaces, periods, apostrophes, and hyphens";
+  }
+
+  if (!email) {
+    errors.email = "Email is required";
+  } else if (!emailRegex.test(email)) {
+    errors.email = "Enter a valid email address";
+  }
+
+  if (!country) {
+    errors.country = "Current Country Of Residence is required";
+  }
+
+  if (!contactCode) {
+    errors.contactCode = "Code is required";
+  } else if (!contactCodeRegex.test(contactCode)) {
+    errors.contactCode = "Enter a valid code";
+  }
+
+  if (!contactNumber) {
+    errors.contactNumber = "Mobile number is required";
+  } else if (!/^\d{6,15}$/.test(contactNumber)) {
+    errors.contactNumber = "Enter a valid mobile number";
+  } else if (contactCodeRegex.test(contactCode)) {
+    const phoneNumber = parsePhoneNumberFromString(
+      `${contactCode}${contactNumber}`,
+    );
+
+    if (!phoneNumber?.isValid()) {
+      errors.contactNumber = "Enter a valid mobile number";
+    }
+  }
+
+  return errors;
 };
 
 const AiProfile = () => {
@@ -103,6 +158,7 @@ const AiProfile = () => {
 
   const [editMode, setEditMode] = useState(false);
   const [profileForm, setProfileForm] = useState(initialProfileForm);
+  const [profileErrors, setProfileErrors] = useState({});
 
   const [passwordForm, setPasswordForm] = useState({
     oldPassword: "",
@@ -121,6 +177,7 @@ const AiProfile = () => {
 
   useEffect(() => {
     setProfileForm(initialProfileForm);
+    setProfileErrors({});
   }, [initialProfileForm]);
 
   useEffect(() => {
@@ -154,6 +211,7 @@ const AiProfile = () => {
   const handleProfileChange = (e) => {
     const { name, value } = e.target;
     setProfileForm((prev) => ({ ...prev, [name]: value }));
+    setProfileErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
   const handleCountryChange = (countryName) => {
@@ -161,6 +219,12 @@ const AiProfile = () => {
       ...prev,
       country: countryName,
       contactCode: getPhonePrefixByCountryName(countryName),
+    }));
+    setProfileErrors((prev) => ({
+      ...prev,
+      country: "",
+      contactCode: "",
+      contactNumber: "",
     }));
   };
 
@@ -237,6 +301,27 @@ const AiProfile = () => {
     if (newPassword !== confirmPassword)
       return showErrorAlert("New passwords do not match");
     changePassword({ userId, oldPassword, newPassword, confirmPassword });
+  };
+
+  const handleProfileSubmit = () => {
+    const errors = validateProfileForm(profileForm);
+    setProfileErrors(errors);
+
+    if (Object.keys(errors).length > 0) {
+      return showErrorAlert(Object.values(errors)[0]);
+    }
+
+    updateProfile({
+      userId,
+      profileData: {
+        ...profileForm,
+        fullName: profileForm.fullName.trim(),
+        email: profileForm.email.trim(),
+        country: profileForm.country.trim(),
+        contactCode: profileForm.contactCode.trim(),
+        contactNumber: profileForm.contactNumber.trim(),
+      },
+    });
   };
 
   return (
@@ -351,6 +436,8 @@ const AiProfile = () => {
                 name="fullName"
                 value={profileForm.fullName}
                 onChange={handleProfileChange}
+                error={!!profileErrors.fullName}
+                helperText={profileErrors.fullName}
                 InputProps={{ readOnly: !editMode }}
                 InputLabelProps={{ sx: floatingLabelSx }}
               />
@@ -361,6 +448,8 @@ const AiProfile = () => {
                 name="email"
                 value={profileForm.email}
                 onChange={handleProfileChange}
+                error={!!profileErrors.email}
+                helperText={profileErrors.email}
                 InputProps={{ readOnly: true }}
                 InputLabelProps={{ sx: floatingLabelSx }}
               />
@@ -372,6 +461,8 @@ const AiProfile = () => {
                 name="country"
                 value={profileForm.country}
                 onChange={(event) => handleCountryChange(event.target.value)}
+                error={!!profileErrors.country}
+                helperText={profileErrors.country}
                 disabled={!editMode}
                 InputLabelProps={{ sx: floatingLabelSx }}
                 SelectProps={{
@@ -436,6 +527,8 @@ const AiProfile = () => {
                   variant="standard"
                   name="contactCode"
                   value={profileForm.contactCode}
+                  error={!!profileErrors.contactCode}
+                  helperText={profileErrors.contactCode}
                   InputLabelProps={{ sx: floatingLabelSx }}
                   InputProps={{
                     readOnly: true,
@@ -460,6 +553,8 @@ const AiProfile = () => {
                   name="contactNumber"
                   value={profileForm.contactNumber}
                   onChange={handleProfileChange}
+                  error={!!profileErrors.contactNumber}
+                  helperText={profileErrors.contactNumber}
                   InputProps={{ readOnly: !editMode }}
                   InputLabelProps={{ sx: floatingLabelSx }}
                   sx={{ flex: 1 }}
@@ -493,9 +588,7 @@ const AiProfile = () => {
                   <Button
                     variant="contained"
                     sx={{ ...primaryPillButtonSx, mr: { xs: 0, md: 2 } }}
-                    onClick={() =>
-                      updateProfile({ userId, profileData: profileForm })
-                    }
+                    onClick={handleProfileSubmit}
                     disabled={isUpdatePending}
                   >
                     {isUpdatePending ? "Submitting..." : "Submit"}
@@ -515,6 +608,7 @@ const AiProfile = () => {
                     }}
                     onClick={() => {
                       setProfileForm(initialProfileForm);
+                      setProfileErrors({});
                       setEditMode(false);
                     }}
                   >

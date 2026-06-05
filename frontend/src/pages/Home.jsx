@@ -292,7 +292,9 @@ const Home = () => {
     },
   ];
 
-  const infiniteReviews = reviewData.length ? [...reviewData, ...reviewData] : [];
+  const infiniteReviews = reviewData.length
+    ? [...reviewData, ...reviewData]
+    : [];
 
   useEffect(() => {
     const setupAutoScroll = (containerRef) => {
@@ -301,14 +303,15 @@ const Home = () => {
 
       const interval = setInterval(() => {
         const { scrollLeft, offsetWidth, scrollWidth } = container;
-        const singleSetWidth = scrollWidth / 2;           // ← key part
+        const singleSetWidth = scrollWidth / 2; // ← key part
 
-        if (scrollLeft >= singleSetWidth - 10) {          // small buffer
-          container.scrollTo({ left: 0, behavior: 'auto' }); // instant reset
+        if (scrollLeft >= singleSetWidth - 10) {
+          // small buffer
+          container.scrollTo({ left: 0, behavior: "auto" }); // instant reset
         } else {
-          container.scrollBy({ left: 300, behavior: 'smooth' });
+          container.scrollBy({ left: 300, behavior: "smooth" });
         }
-      }, 3000);   // same speed as Product page
+      }, 3000); // same speed as Product page
 
       return interval;
     };
@@ -320,7 +323,7 @@ const Home = () => {
       if (desktopInterval) clearInterval(desktopInterval);
       if (mobileInterval) clearInterval(mobileInterval);
     };
-  }, [infiniteReviews]);   // depend on infiniteReviews
+  }, [infiniteReviews]); // depend on infiniteReviews
 
   const { mutate: locationData, isPending: isLocation } = useMutation({
     mutationFn: async (data) => {
@@ -418,7 +421,7 @@ const Home = () => {
               <form
                 onSubmit={handleSubmit(onSubmit)}
                 className=" flex justify-around md:w-full lg:w-full border-2 bg-gray-50 rounded-full p-0 items-center"
-              // className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
+                // className=" flex justify-around md:w-full lg:w-3/4 border-2 bg-gray-50 rounded-full p-0 items-center"
               >
                 <Controller
                   name="continent"
@@ -630,10 +633,13 @@ const Home = () => {
 
                 <div className="flex flex-col gap-4 text-start text-pretty lg:text-center">
                   <p className=" text-gray-700 text-sm md:leading-7 md:text-[1.08rem]">
-                    A global community of remote workers, creators, entrepreneurs, hosts and investors redefining how the world lives and works.
+                    A global community of remote workers, creators,
+                    entrepreneurs, hosts and investors redefining how the world
+                    lives and works.
                   </p>
                   <p className=" text-gray-700 text-sm md:leading-7 md:text-[1.03rem]">
-                    Driven by freedom and flexibility, nomads are shaping the future—one destination at a time.
+                    Driven by freedom and flexibility, nomads are shaping the
+                    future—one destination at a time.
                   </p>
                   <b className="text-center text-x sm:text-base">
                     Early ADOPTION of THE FUTURE LIFESTYLE!
@@ -734,7 +740,7 @@ const Home = () => {
               {infiniteReviews.length > 0 ? (
                 infiniteReviews.map((review, index) => (
                   <div
-                    key={`${review.name}-${index}`}   // better key when duplicating
+                    key={`${review.name}-${index}`} // better key when duplicating
                     className="w-full md:w-[calc((100%-3rem)/3)] flex-shrink-0 snap-center"
                   >
                     <ReviewCard
