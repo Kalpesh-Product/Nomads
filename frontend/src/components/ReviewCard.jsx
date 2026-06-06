@@ -4,7 +4,7 @@ import { AiFillStar } from "react-icons/ai";
 import { NavLink } from "react-router-dom";
 import renderStars from "../utils/renderStarts";
 
-const ReviewCard = ({ review, handleClick }) => {
+const ReviewCard = ({ review, handleClick, reviewTextClassName = "" }) => {
   const {
     name,
     avatar,
@@ -51,7 +51,9 @@ const ReviewCard = ({ review, handleClick }) => {
       </div>
 
       {/* Review */}
-      <p className="text-sm text-gray-700 line-clamp-3">
+      <p
+        className={`text-sm text-gray-700 line-clamp-3 ${reviewTextClassName}`}
+      >
         {message || reviewText || description}
       </p>
 
