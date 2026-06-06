@@ -824,9 +824,18 @@ const AiGlobalListingsList = () => {
         selectedFilters: location.state?.selectedFilters,
         searchBarBadges,
         breadcrumbFilters: {
-          continent: formData?.continent || location.state?.breadcrumbFilters?.continent || "",
-          country: formData?.country || location.state?.breadcrumbFilters?.country || "",
-          location: formData?.location || location.state?.breadcrumbFilters?.location || "",
+          continent:
+            formData?.continent ||
+            location.state?.breadcrumbFilters?.continent ||
+            "",
+          country:
+            formData?.country ||
+            location.state?.breadcrumbFilters?.country ||
+            "",
+          location:
+            formData?.location ||
+            location.state?.breadcrumbFilters?.location ||
+            "",
         },
       },
     });
@@ -1182,11 +1191,7 @@ const AiGlobalListingsList = () => {
           <div className="w-full lg:min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-4 sm:px-6 lg:px-0">
             <div className="lg:hidden w-full flex flex-col gap-4 mb-4">
               <div className="w-[92%] mx-auto bg-white shadow-md border-2 rounded-full pl-16 pr-4 py-2 flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowMobileSearch((prev) => !prev)}
-                  className="flex items-center flex-1 text-center justify-center font-medium text-secondary-dark flex-col gap-1 min-w-0"
-                >
+                <div className="flex items-center flex-1 text-center justify-center font-medium text-secondary-dark flex-col gap-1 min-w-0">
                   <div className="flex items-center gap-2 w-full">
                     <IoSearch className="text-primary-red" />
                     <span className="text-[11px] font-bold text-gray-900 truncate w-full text-left">
@@ -1215,7 +1220,7 @@ const AiGlobalListingsList = () => {
                   <span className="text-[10px] text-gray-500">
                     {formData?.count || "1-5"} Nomads
                   </span>
-                </button>
+                </div>
                 <button
                   type="button"
                   onClick={() => navigate(-1)}

@@ -664,6 +664,10 @@ const AiVisaSupport = () => {
                         value: /^[0-9]{7,15}$/,
                         message: "Please enter a valid phone number",
                       },
+                      validate: (value) =>
+                        selectedNationalityCountry?.isoCode !== "IN" ||
+                        value.length <= 10 ||
+                        "Indian phone numbers cannot exceed 10 digits",
                     }}
                     render={({ field, fieldState }) => (
                       <TextField
@@ -673,6 +677,13 @@ const AiVisaSupport = () => {
                         variant="standard"
                         type="tel"
                         InputLabelProps={{ sx: floatingLabelSx }}
+                        inputProps={{
+                          inputMode: "numeric",
+                          maxLength:
+                            selectedNationalityCountry?.isoCode === "IN"
+                              ? 10
+                              : 15,
+                        }}
                         sx={{ flex: 1 }}
                         error={!!fieldState.error}
                         helperText={fieldState.error?.message}

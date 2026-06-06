@@ -782,10 +782,7 @@ const AiListings = ({ forceListView = false }) => {
           />
           <div className={isHeadingSequenceComplete ? "block" : "hidden"}>
             <div className="lg:hidden w-full flex flex-col gap-4 mb-4">
-              <button
-                onClick={() => setShowMobileSearch((prev) => !prev)}
-                className="bg-white shadow-md flex items-center w-[92%] mx-auto text-center justify-center font-medium text-secondary-dark border-2 px-6 py-2 rounded-full flex-col gap-1"
-              >
+              <div className="bg-white shadow-md flex items-center w-[92%] mx-auto text-center justify-center font-medium text-secondary-dark border-2 px-6 py-2 rounded-full flex-col gap-1">
                 <div className="flex items-center gap-2">
                   <IoSearch className="text-primary-red" />
                   <span className="text-[11px] font-bold text-gray-900 truncate w-full text-left">
@@ -814,7 +811,7 @@ const AiListings = ({ forceListView = false }) => {
                 <span className="text-[10px] text-gray-500">
                   {formData?.count || "1-5"} Nomads
                 </span>
-              </button>
+              </div>
             </div>
 
             <div className="lg:hidden flex overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 md:justify-center">
