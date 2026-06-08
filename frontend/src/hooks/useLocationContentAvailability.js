@@ -1,15 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "../utils/axios";
 
-const escapeKeyword = (value) =>
-  value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const escapeKeyword = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 const normalizeKeyword = (value) => {
   if (!value) return "";
 
   return decodeURIComponent(value)
     .replace(/\+/g, " ")
-    .replace(/[-_]+/g, " ")
+    .replace(/[\u2010-\u2015\u2212\u{FE63}\u{FF0D}]/gu, "-")
     .trim();
 };
 

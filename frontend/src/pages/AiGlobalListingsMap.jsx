@@ -885,15 +885,15 @@ const AiGlobalListingsMap = () => {
               <div className="flex flex-col items-start overflow-hidden flex-1">
                 <span className="text-[11px] font-bold text-gray-900 truncate w-full text-left">
                   {`${(formData?.country || "Country").charAt(0).toUpperCase() + (formData?.country || "Country").slice(1)} . ${formData?.location
-                      ? formData.location
-                        .split(" ")
-                        .map(
-                          (word) =>
-                            word.charAt(0).toUpperCase() +
-                            word.slice(1).toLowerCase(),
-                        )
-                        .join(" ")
-                      : "Unknown"
+                    ? formData.location
+                      .split(" ")
+                      .map(
+                        (word) =>
+                          word.charAt(0).toUpperCase() +
+                          word.slice(1).toLowerCase(),
+                      )
+                      .join(" ")
+                    : "Unknown"
                     } . ${formData?.category
                       ? categoryOptions.find(
                         (c) => c.value === formData.category,
@@ -918,8 +918,8 @@ const AiGlobalListingsMap = () => {
                     key={cat.value}
                     onClick={() => handleCategoryClick(cat.value)}
                     className={`flex-shrink-0 snap-start px-4 py-1.5 rounded-full text-[11px] font-semibold shadow-md transition-colors ${isActive
-                        ? "bg-blue-50 border border-primary-blue text-primary-blue"
-                        : "bg-white/95 backdrop-blur-md border border-gray-200 text-gray-800 hover:bg-gray-50"
+                      ? "bg-blue-50 border border-primary-blue text-primary-blue"
+                      : "bg-white/95 backdrop-blur-md border border-gray-200 text-gray-800 hover:bg-gray-50"
                       }`}
                   >
                     {cat.label}
@@ -1093,8 +1093,8 @@ const AiGlobalListingsMap = () => {
 
               <div
                 className={`custom-scrollbar-hide py-6 overscroll-contain transition-all duration-300 ${showListings
-                    ? "overflow-y-auto h-[calc(75vh-70px)]"
-                    : "overflow-hidden mb-10"
+                  ? "overflow-y-auto h-[calc(75vh-70px)]"
+                  : "overflow-hidden mb-10"
                   }`}
                 style={{
                   WebkitOverflowScrolling: "touch",
