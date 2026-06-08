@@ -130,7 +130,11 @@ const AiGlobalListingsMap = () => {
   const [isHeadingSequenceComplete, setIsHeadingSequenceComplete] =
     useState(false);
   const listingPageStateStorageKey = useMemo(
-    () => getAiVerticalsPageStateKey(formData?.country || "", formData?.location || ""),
+    () =>
+      getAiVerticalsPageStateKey(
+        formData?.country || "",
+        formData?.location || "",
+      ),
     [formData?.country, formData?.location],
   );
 
@@ -149,7 +153,9 @@ const AiGlobalListingsMap = () => {
     const params = new URLSearchParams(location.search);
     const restoreKey = getAiVerticalsPageStateKey(
       (params.get("country") || "").trim().toLowerCase(),
-      ((params.get("state") || params.get("location") || "").trim().toLowerCase()),
+      (params.get("state") || params.get("location") || "")
+        .trim()
+        .toLowerCase(),
     );
 
     if (typeof window !== "undefined" && restoreKey) {
@@ -551,8 +557,13 @@ const AiGlobalListingsMap = () => {
     setShowMobileSearch(false);
     setShowListings(false);
 
+    const listingsPath =
+      categoryValue === VALUE_ADDED_SERVICES_CATEGORY
+        ? "/ai-listings-list"
+        : "/ai-listings";
+
     navigate(
-      `/ai-listings?country=${currentFormData.country}&location=${currentFormData.location}&category=${state.category}`,
+      `${listingsPath}?country=${currentFormData.country}&location=${currentFormData.location}&category=${state.category}`,
       {
         state: {
           country: currentFormData.country,
@@ -830,7 +841,9 @@ const AiGlobalListingsMap = () => {
                               <ListingCard
                                 item={item}
                                 showVertical={true}
-                                handleNavigation={() => handleListingNavigation(item)}
+                                handleNavigation={() =>
+                                  handleListingNavigation(item)
+                                }
                               />
                             </motion.div>
                           )
@@ -1117,7 +1130,9 @@ const AiGlobalListingsMap = () => {
                                   key={item._id}
                                   item={item}
                                   showVertical={true}
-                                  handleNavigation={() => handleListingNavigation(item)}
+                                  handleNavigation={() =>
+                                    handleListingNavigation(item)
+                                  }
                                 />
                               )}
                             />
@@ -1180,7 +1195,9 @@ const AiGlobalListingsMap = () => {
                               >
                                 <ListingCard
                                   item={item}
-                                  handleNavigation={() => handleListingNavigation(item)}
+                                  handleNavigation={() =>
+                                    handleListingNavigation(item)
+                                  }
                                 />
                               </div>
                             ))}
