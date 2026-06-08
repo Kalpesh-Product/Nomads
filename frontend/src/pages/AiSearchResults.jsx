@@ -15,6 +15,7 @@ import { FaCheck, FaSyncAlt } from "react-icons/fa";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { aiDestinationCards } from "../constants/aiDestinationCards";
+import { persistSelectedDestination } from "../utils/selectedDestinationSession";
 
 import axios from "../utils/axios";
 import useAuth from "../hooks/useAuth";
@@ -460,7 +461,7 @@ const getQuickStatsForDestination = (
   const configuredStats = statConfig.slice(0, 4).map((config) => {
     const scoreKeyFromLabel = config.labelKey
       ? labelToAllScoresKeyMap[config.labelKey] ||
-        `${config.labelKey.charAt(5).toLowerCase()}${config.labelKey.slice(6)}`
+      `${config.labelKey.charAt(5).toLowerCase()}${config.labelKey.slice(6)}`
       : null;
     const scoreKey = config.scoreKey || scoreKeyFromLabel || config.field;
     const weightKey =
@@ -472,8 +473,8 @@ const getQuickStatsForDestination = (
     const caseInsensitiveScore =
       directWeight === undefined && weightKey
         ? Object.entries(weights).find(
-            ([key]) => key.toLowerCase() === weightKey.toLowerCase(),
-          )?.[1]
+          ([key]) => key.toLowerCase() === weightKey.toLowerCase(),
+        )?.[1]
         : undefined;
 
     const score = Number(
@@ -893,15 +894,13 @@ const DropdownBadge = ({
       <button
         type="button"
         onClick={onToggle}
-        className={`flex w-full items-center justify-between gap-2 rounded-full border font-medium transition-colors ${
-          isSmall
-            ? "min-h-[38px] px-3 py-1.5 text-xs sm:px-4"
-            : "min-h-[44px] px-4 py-2 text-xs sm:px-5"
-        } ${
-          isOpen
+        className={`flex w-full items-center justify-between gap-2 rounded-full border font-medium transition-colors ${isSmall
+          ? "min-h-[38px] px-3 py-1.5 text-xs sm:px-4"
+          : "min-h-[44px] px-4 py-2 text-xs sm:px-5"
+          } ${isOpen
             ? "border-sky-500 bg-sky-500 text-white"
             : "border-black/20 bg-white text-black/85 hover:border-sky-500"
-        }`}
+          }`}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
       >
@@ -929,22 +928,20 @@ const DropdownBadge = ({
                   <button
                     type="button"
                     onClick={() => onSelect(option)}
-                    className={`group flex w-full items-center rounded-xl px-4 py-2 text-left text-xs transition-colors ${
-                      isSelected
-                        ? "bg-sky-50 font-medium text-sky-600"
-                        : "text-black/80 hover:bg-slate-50"
-                    }`}
+                    className={`group flex w-full items-center rounded-xl px-4 py-2 text-left text-xs transition-colors ${isSelected
+                      ? "bg-sky-50 font-medium text-sky-600"
+                      : "text-black/80 hover:bg-slate-50"
+                      }`}
                     role="option"
                     aria-selected={isSelected}
                   >
                     <span className="mr-2 inline-flex w-4 shrink-0 items-center justify-center">
                       <FaCheck
                         size={13}
-                        className={`shrink-0 text-primary-blue transition-opacity ${
-                          isSelected
-                            ? "opacity-100"
-                            : "opacity-0 group-hover:opacity-100"
-                        }`}
+                        className={`shrink-0 text-primary-blue transition-opacity ${isSelected
+                          ? "opacity-100"
+                          : "opacity-0 group-hover:opacity-100"
+                          }`}
                         aria-hidden="true"
                       />
                     </span>
@@ -977,9 +974,9 @@ const AiSearchResults = () => {
     : "/search/results";
   const goalOptions = goalFilterMap[selectedGoal] || goalFilterMap[defaultGoal];
   const getPersistedGoal = () => {
-      if (typeof window === "undefined") return null;
-      return localStorage.getItem(SEARCH_RESULTS_GOAL_STORAGE_KEY);
-    },
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem(SEARCH_RESULTS_GOAL_STORAGE_KEY);
+  },
     getPersistedSelectionSignature = () => {
       if (typeof window === "undefined") return null;
       return localStorage.getItem(
@@ -1033,10 +1030,9 @@ const AiSearchResults = () => {
       : `You Intend To > Explore ${selectedContinentDisplay}`
     : "Where Do You Want To Go?";
   const selectedGoalOptionDropdownValue = hasSelectedGoalOption
-    ? `Your End Goal > ${
-        searchBarEndGoalLabelMap[selectedGoal]?.[selectedGoalOption] ||
-        selectedGoalOption
-      }`
+    ? `Your End Goal > ${searchBarEndGoalLabelMap[selectedGoal]?.[selectedGoalOption] ||
+    selectedGoalOption
+    }`
     : "Choose Your Goal!";
   const passportCountry =
     auth?.user?.country ||
@@ -1091,26 +1087,26 @@ const AiSearchResults = () => {
 
     const sortedDestinations =
       isVisaRequirementFilterActive(selectedVisaRequirement) &&
-      visaRuleDurationByCountry
+        visaRuleDurationByCountry
         ? filteredDestinations
-            .map((destination, index) => ({ destination, index }))
-            .sort((a, b) => {
-              const aDuration =
-                visaRuleDurationByCountry.get(
-                  normalizeCountryKey(a.destination.country),
-                ) ?? 0;
-              const bDuration =
-                visaRuleDurationByCountry.get(
-                  normalizeCountryKey(b.destination.country),
-                ) ?? 0;
+          .map((destination, index) => ({ destination, index }))
+          .sort((a, b) => {
+            const aDuration =
+              visaRuleDurationByCountry.get(
+                normalizeCountryKey(a.destination.country),
+              ) ?? 0;
+            const bDuration =
+              visaRuleDurationByCountry.get(
+                normalizeCountryKey(b.destination.country),
+              ) ?? 0;
 
-              if (bDuration !== aDuration) {
-                return bDuration - aDuration;
-              }
+            if (bDuration !== aDuration) {
+              return bDuration - aDuration;
+            }
 
-              return a.index - b.index;
-            })
-            .map(({ destination }) => destination)
+            return a.index - b.index;
+          })
+          .map(({ destination }) => destination)
         : filteredDestinations;
 
     return sortedDestinations.map((destination, index) => {
@@ -1217,7 +1213,7 @@ const AiSearchResults = () => {
         if (isMounted) {
           showErrorAlert(
             error?.response?.data?.message ||
-              "Failed to load favorite destinations.",
+            "Failed to load favorite destinations.",
           );
         }
       }
@@ -1274,13 +1270,14 @@ const AiSearchResults = () => {
             typeof item?.[selectedAttribute] === "number"
               ? item[selectedAttribute]
               : Object.entries(item).find(
-                  ([, value]) => typeof value === "number",
-                )?.[1] || 0;
+                ([, value]) => typeof value === "number",
+              )?.[1] || 0;
 
           return {
             ...(existingDestination || {}),
             _id: item?._id,
             city: existingDestination?.city || rawState,
+            title: existingDestination?.title || item?.title || rawState,
             displayCity: existingDestination?.displayCity || rawState,
             routeCity: existingDestination?.routeCity || rawState,
             displayCountry:
@@ -1370,12 +1367,21 @@ const AiSearchResults = () => {
       destination.routeCity || destination.city
     ).toLowerCase();
     const continent = destination.continent.toLowerCase();
-    const nextSearchBarBadges = [...searchBarBadges, selectedLocationLabel];
+    const destinationTitle = destination.title || selectedLocationLabel;
+    const nextSearchBarBadges = [...searchBarBadges, destinationTitle];
+
+    persistSelectedDestination({
+      continent,
+      country,
+      city: selectedLocationParam,
+      title: destinationTitle,
+    });
 
     navigate(
       `/ai-verticals?country=${encodeURIComponent(country)}&state=${encodeURIComponent(selectedLocationParam)}`,
       {
         state: {
+          selectedStateLabel: destinationTitle,
           breadcrumbFilters: {
             continent,
             country,
@@ -1430,7 +1436,7 @@ const AiSearchResults = () => {
           setLikedDestinations(likedDestinations);
           showErrorAlert(
             error?.response?.data?.message ||
-              "Failed to update favorite destination.",
+            "Failed to update favorite destination.",
           );
         });
     },
@@ -2040,39 +2046,39 @@ const AiSearchResults = () => {
                             <span>{formattedNarrative.poweredByLine}</span>
                             {(formattedNarrative.priorityPoints.length > 0 ||
                               formattedNarrative.additionalPriorityPointsText) && (
-                              <span className="ml-1">
-                                {formattedNarrative.priorityPoints.map(
-                                  (point, index) => (
-                                    <React.Fragment key={`${point}-${index}`}>
-                                      <span>{point}</span>
-                                      {index <
-                                        formattedNarrative.priorityPoints
-                                          .length -
+                                <span className="ml-1">
+                                  {formattedNarrative.priorityPoints.map(
+                                    (point, index) => (
+                                      <React.Fragment key={`${point}-${index}`}>
+                                        <span>{point}</span>
+                                        {index <
+                                          formattedNarrative.priorityPoints
+                                            .length -
                                           1 && <span>{", "}</span>}
-                                    </React.Fragment>
-                                  ),
-                                )}
+                                      </React.Fragment>
+                                    ),
+                                  )}
 
-                                {formattedNarrative.additionalPriorityPointsText && (
-                                  <span>
-                                    {" "}
-                                    {
-                                      formattedNarrative.additionalPriorityPointsText
-                                    }
-                                  </span>
-                                )}
-                              </span>
-                            )}
+                                  {formattedNarrative.additionalPriorityPointsText && (
+                                    <span>
+                                      {" "}
+                                      {
+                                        formattedNarrative.additionalPriorityPointsText
+                                      }
+                                    </span>
+                                  )}
+                                </span>
+                              )}
                           </div>
                         )}
                         <div className="mt-3 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-6">
                           {(formattedNarrative.endingLine ||
                             !resultsHeadingBodyLines) && (
-                            <span className="block font-medium">
-                              {formattedNarrative.endingLine ||
-                                highlightedResultsHeadingRemainingLines}
-                            </span>
-                          )}
+                              <span className="block font-medium">
+                                {formattedNarrative.endingLine ||
+                                  highlightedResultsHeadingRemainingLines}
+                              </span>
+                            )}
                           {shouldShowResultsContent && isLoggedIn && (
                             <div className="flex w-full items-center justify-end gap-3 lg:w-auto">
                               <span className="text-sm font-medium text-black/80 font-play">
@@ -2107,17 +2113,17 @@ const AiSearchResults = () => {
                           ) && Boolean(visaRuleDurationByCountry);
                         const visaDurationDays = shouldShowVisaDuration
                           ? visaRuleDurationByCountry.get(
-                              normalizeCountryKey(destination.country),
-                            )
+                            normalizeCountryKey(destination.country),
+                          )
                           : null;
                         const visaDurationLabel =
                           visaDurationDays !== null &&
-                          visaDurationDays !== undefined
+                            visaDurationDays !== undefined
                             ? `${formatVisaRequirementLabel(
-                                visaRequirementApiValueMap[
-                                  selectedVisaRequirement
-                                ],
-                              )}: ${visaDurationDays} days`
+                              visaRequirementApiValueMap[
+                              selectedVisaRequirement
+                              ],
+                            )}: ${visaDurationDays} days`
                             : null;
 
                         const isDestinationLiked = likedDestinations.includes(
@@ -2127,11 +2133,10 @@ const AiSearchResults = () => {
                         return (
                           <article
                             key={`${destination.city}-${destination.country}`}
-                            className={`cursor-pointer transition-all duration-300 ${
-                              index < visibleDestinationCount
-                                ? "translate-y-0 opacity-100"
-                                : "pointer-events-none translate-y-2 opacity-0"
-                            }`}
+                            className={`cursor-pointer transition-all duration-300 ${index < visibleDestinationCount
+                              ? "translate-y-0 opacity-100"
+                              : "pointer-events-none translate-y-2 opacity-0"
+                              }`}
                             role="button"
                             tabIndex={0}
                             onClick={() => handleDestinationClick(destination)}
@@ -2155,19 +2160,18 @@ const AiSearchResults = () => {
                                 #
                                 {destination?.rankLabel
                                   ? destination.rankLabel.replace(
-                                      /^Rank\s*/i,
-                                      "",
-                                    )
+                                    /^Rank\s*/i,
+                                    "",
+                                  )
                                   : "—"}
                               </div>
 
                               <button
                                 type="button"
-                                className={`absolute right-3 top-3 z-30 cursor-pointer touch-manipulation md:right-4 md:top-4 ${
-                                  isDestinationLiked
-                                    ? ""
-                                    : "[&_path]:transition-colors [&_path]:duration-200 [&:hover_path]:fill-[#ff8a8a]"
-                                }`}
+                                className={`absolute right-3 top-3 z-30 cursor-pointer touch-manipulation md:right-4 md:top-4 ${isDestinationLiked
+                                  ? ""
+                                  : "[&_path]:transition-colors [&_path]:duration-200 [&:hover_path]:fill-[#ff8a8a]"
+                                  }`}
                                 onClick={(event) => {
                                   event.stopPropagation();
                                   event.preventDefault();
@@ -2183,7 +2187,8 @@ const AiSearchResults = () => {
 
                               <div className="pointer-events-none absolute inset-x-2 bottom-3 text-center text-white md:inset-x-4 md:bottom-4">
                                 <h3 className="text-lg uppercase font-normal tracking-wide md:text-3xl">
-                                  {destination.displayCity || destination.city}
+                                  {destination.title}
+                                  {/* {destination.displayCity || destination.city} */}
                                 </h3>
                                 <p className="text-sm font-light md:text-sm">
                                   {destination.displayCountry ||
@@ -2195,10 +2200,9 @@ const AiSearchResults = () => {
                                 <div className="translate-y-4 group-hover:translate-y-0 transition-all duration-300">
                                   <div className="mb-0 border-b border-white/30 pb-1">
                                     <p className="mb-1 text-center text-[0.55rem] font-medium uppercase tracking-wide text-white/85 sm:text-[0.65rem] md:text-base">
-                                      {`${destination.displayCity || destination.city} - ${
-                                        destination.displayCountry ||
+                                      {`${destination.displayCity || destination.city} - ${destination.displayCountry ||
                                         destination.country
-                                      }`.toUpperCase()}
+                                        }`.toUpperCase()}
                                     </p>
 
                                     <h4 className="text-center text-[0.7rem] font-semibold uppercase tracking-wide text-white sm:text-[0.8rem] md:text-[0.89rem]">
@@ -2207,14 +2211,13 @@ const AiSearchResults = () => {
                                   </div>
                                   <div className="mb-1 mt-1 flex items-center justify-between gap-1 py-0 text-[0.65rem] font-semibold text-white sm:text-xs md:mb-2 md:mt-2 md:gap-2 md:text-sm">
                                     <h4 className="text-left">
-                                      {`${selectedContinentDisplay || "World"} Rank ${
-                                        destination?.rankLabel
-                                          ? destination.rankLabel.replace(
-                                              /^Rank\s*/i,
-                                              "",
-                                            )
-                                          : "—"
-                                      }`}
+                                      {`${selectedContinentDisplay || "World"} Rank ${destination?.rankLabel
+                                        ? destination.rankLabel.replace(
+                                          /^Rank\s*/i,
+                                          "",
+                                        )
+                                        : "—"
+                                        }`}
                                     </h4>
 
                                     {shouldShowVisaDuration &&

@@ -14,6 +14,10 @@ const stateWiseWeightSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    title: {
+      type: String,
+      trim: true,
+    },
 
     rank: {
       type: Number,

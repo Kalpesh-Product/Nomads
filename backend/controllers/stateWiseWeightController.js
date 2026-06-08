@@ -144,6 +144,11 @@ const toNumberOrUndefined = (value) => {
   return Number.isFinite(num) ? num : undefined;
 };
 
+const normalizeOptionalString = (value) => {
+  if (!hasValue(value)) return undefined;
+  return String(value).trim();
+};
+
 const buildImageSlotKey = (stateName = "", index = 0) => {
   const normalizedState =
     String(stateName || "state")
@@ -218,6 +223,7 @@ const mapCsvRowToStateWiseWeight = (rawRow = {}) => {
   const continent = row["continent"];
   const country = row["country"];
   const state = row["destination"];
+  const title = normalizeOptionalString(row["title"]);
 
   // Handle rank - safely grab the first number column
   const rank = toNumber(row["rank"]);
@@ -243,6 +249,7 @@ const mapCsvRowToStateWiseWeight = (rawRow = {}) => {
     continent,
     country,
     state,
+    title,
     rank,
     weight,
     labels,
@@ -258,6 +265,7 @@ const buildSelectiveUpdateData = (row = {}) => {
   if (hasValue(raw["continent"])) updateData.continent = row.continent;
   if (hasValue(raw["country"])) updateData.country = row.country;
   if (hasValue(raw["destination"])) updateData.state = row.state;
+  if (hasValue(raw["title"])) updateData.title = row.title;
 
   if (hasValue(raw["rank"])) {
     const parsedRank = toNumberOrUndefined(raw["rank"]);
@@ -382,6 +390,7 @@ export const getStateWiseWeight = async (req, res, next) => {
         {
           _id: item._id,
           state: item.state,
+          title: item.title,
           country: item.country,
           isActive: item.isActive,
           weight: item.weight,
@@ -459,6 +468,7 @@ export const getAllStateWiseWeight = async (req, res, next) => {
 export const createStateWiseWeight = async (req, res, next) => {
   try {
     const createPayload = { ...req.body };
+    createPayload.title = normalizeOptionalString(createPayload.title);
 
     // Parse weight if it's a string (FormData)
     if (typeof createPayload.weight === "string") {
@@ -584,6 +594,9 @@ export const updateStateWiseWeight = async (req, res, next) => {
     }
 
     const updatePayload = { ...req.body };
+    if (Object.prototype.hasOwnProperty.call(updatePayload, "title")) {
+      updatePayload.title = normalizeOptionalString(updatePayload.title);
+    }
 
     // Standard parsers for FormData fields
     if (typeof updatePayload.weight === "string") {
