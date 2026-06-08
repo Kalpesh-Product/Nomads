@@ -25,7 +25,10 @@ import { AnimatePresence, motion } from "motion/react";
 import { Helmet } from "@dr.pogodin/react-helmet";
 import useAuth from "../hooks/useAuth.js";
 import { HiOutlineX } from "react-icons/hi";
-import { persistSelectedDestination } from "../utils/selectedDestinationSession.js";
+import {
+  persistSelectedDestination,
+  readSelectedDestination,
+} from "../utils/selectedDestinationSession.js";
 import {
   dedupeAiSearchBadges,
   buildAiVerticalsSearchBadges,
@@ -345,14 +348,23 @@ const AiGlobalListingsList = () => {
   }, [filteredLocation]);
 
   const selectedLocationLabel = useMemo(() => {
+    const selectedDestination = readSelectedDestination();
+    const normalizedCountry = formData?.country?.trim().toLowerCase();
+    const normalizedLocation = formData?.location?.trim().toLowerCase();
+    const sessionTitle =
+      selectedDestination?.country === normalizedCountry &&
+        selectedDestination?.city === normalizedLocation
+        ? selectedDestination?.title
+        : "";
+
+    if (sessionTitle) return sessionTitle;
     if (!formData?.location) return "";
-    const normalizedLocation = formData.location.toLowerCase();
     return (
       locationOptions.find(
         (option) => option.value?.toLowerCase() === normalizedLocation,
       )?.label || formData.location
     );
-  }, [formData?.location, locationOptions]);
+  }, [formData?.country, formData?.location, locationOptions]);
 
   const countOptions = [
     { label: "1 - 5", value: "1-5" },
@@ -595,6 +607,7 @@ const AiGlobalListingsList = () => {
         breadcrumbLoading: true,
         companyId: item.companyId,
         type: item.companyType,
+        selectedStateLabel: selectedLocationLabel,
         selectedFilters: location.state?.selectedFilters,
         searchBarBadges,
         breadcrumbFilters: {
@@ -662,8 +675,14 @@ const AiGlobalListingsList = () => {
       continent: formData.continent,
       country: formData.country,
       city: formData.location,
+      title: selectedLocationLabel,
     });
-  }, [formData.continent, formData.country, formData.location]);
+  }, [
+    formData.continent,
+    formData.country,
+    formData.location,
+    selectedLocationLabel,
+  ]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -821,6 +840,7 @@ const AiGlobalListingsList = () => {
     navigate(mapUrl, {
       state: {
         ...location.state,
+        selectedStateLabel: selectedLocationLabel,
         selectedFilters: location.state?.selectedFilters,
         searchBarBadges,
         breadcrumbFilters: {
@@ -1196,16 +1216,7 @@ const AiGlobalListingsList = () => {
                     <IoSearch className="text-primary-red" />
                     <span className="text-[11px] font-bold text-gray-900 truncate w-full text-left">
                       {`${(formData?.country || "Country").charAt(0).toUpperCase() + (formData?.country || "Country").slice(1)} . ${
-                        formData?.location
-                          ? formData.location
-                              .split(" ")
-                              .map(
-                                (word) =>
-                                  word.charAt(0).toUpperCase() +
-                                  word.slice(1).toLowerCase(),
-                              )
-                              .join(" ")
-                          : "Unknown"
+                        selectedLocationLabel || "Unknown"
                       } . ${
                         formData?.category
                           ? categoryOptions.find(

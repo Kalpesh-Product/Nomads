@@ -12,6 +12,7 @@ import AiContainer from "./AiContainer";
 import useLogout from "../hooks/useLogout";
 import { clearStoredLoginState } from "../hooks/useNomadLoginState";
 import useLocationContentAvailability from "../hooks/useLocationContentAvailability";
+import { readSelectedDestination } from "../utils/selectedDestinationSession";
 
 const AiHeader = ({ onMobileSidebarToggle }) => {
   const [open, setOpen] = useState(false);
@@ -150,7 +151,18 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(" ");
 
-  const stateLabel = stateParam ? formatStateLabel(stateParam) : "";
+  const selectedDestination = readSelectedDestination();
+  const normalizedStateParam = stateParam?.trim().toLowerCase();
+  const normalizedCountryParam = countryParam?.trim().toLowerCase();
+  const matchedSessionTitle =
+    selectedDestination?.city === normalizedStateParam &&
+    selectedDestination?.country === normalizedCountryParam
+      ? selectedDestination?.title
+      : "";
+  const stateLabel =
+    location.state?.selectedStateLabel ||
+    matchedSessionTitle ||
+    (stateParam ? formatStateLabel(stateParam) : "");
   const newsLabel = stateLabel ? `${stateLabel} News` : "News";
   const blogLabel = stateLabel ? `${stateLabel} Blog` : "Blog";
   const { hasBlogs, hasNews, hasNewsOrBlogs } = useLocationContentAvailability({
@@ -158,8 +170,6 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
     keyword: stateParam,
   });
   const showNewsBlogLinks = shouldCheckNewsBlogLinks && hasNewsOrBlogs;
-
-  const offersLabel = stateLabel ? `${stateLabel} Offers` : "Offers";
 
   const currentSearch = location.search || "";
   const aiVerticalsToggleState = (() => {

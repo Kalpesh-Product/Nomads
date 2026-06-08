@@ -74,7 +74,9 @@ const AiNewsFetch = () => {
   const [searchParams] = useSearchParams();
   const formData = useSelector((state) => state.location.formValues);
 
-  const urlDest = normalizeLabel(searchParams.get("dest"));
+  const urlDest = normalizeLabel(
+    searchParams.get("dest") || searchParams.get("location"),
+  );
   const reduxDest = normalizeLabel(formData?.location || formData?.state);
 
   const dest = urlDest || reduxDest || "";

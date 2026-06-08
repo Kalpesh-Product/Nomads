@@ -46,6 +46,7 @@ import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 import { setFormValues } from "../features/locationSlice.js";
+import { readSelectedDestination } from "../utils/selectedDestinationSession";
 
 dayjs.extend(relativeTime);
 
@@ -102,6 +103,14 @@ const AiProduct = () => {
 
   const normalizePhoneNumber = (value) =>
     value ? value.replace(/\s+/g, "") : "";
+
+  const handleEnquiryMobileChange = (onChange, value, info) => {
+    const nationalNumber = info?.nationalNumber?.replace(/\D/g, "") || "";
+
+    if (info?.countryCode === "IN" && nationalNumber.length > 10) return;
+
+    onChange(value);
+  };
 
   const axiosPrivate = useAxiosPrivate();
 
@@ -209,10 +218,19 @@ const AiProduct = () => {
 
   const companyImages = companyDetails?.images?.slice(0, 4) || [];
   const showMore = (companyDetails?.images?.length || 0) > 4;
+  const selectedDestination = readSelectedDestination();
+  const matchedSessionTitle =
+    selectedDestination?.country === companyDetails?.country?.trim().toLowerCase() &&
+      selectedDestination?.city === companyDetails?.state?.trim().toLowerCase()
+      ? selectedDestination?.title
+      : "";
+  const displayStateLabel =
+    location.state?.selectedStateLabel || matchedSessionTitle || companyDetails?.state;
   const breadcrumbState = {
     continent: companyDetails?.continent || "Asia",
     country: companyDetails?.country,
     state: companyDetails?.state,
+    stateLabel: displayStateLabel,
     companyType: companyDetails?.companyType,
   };
 
@@ -237,15 +255,13 @@ const AiProduct = () => {
 
   useEffect(() => {
     const trail = [
-      { label: breadcrumbState.continent, path: "/ai-verticals" },
+      { label: breadcrumbState.continent, path: "/search/worldranking/results" },
       {
         label: breadcrumbState.country,
-        path: `/ai-verticals?country=${encodeURIComponent(
-          breadcrumbState.country || "",
-        )}&state=${encodeURIComponent(breadcrumbState.state || "")}`,
+        path: `/search/worldranking/results`,
       },
       {
-        label: breadcrumbState.state,
+        label: breadcrumbState.stateLabel,
         path: `/ai-verticals?country=${encodeURIComponent(
           breadcrumbState.country || "",
         )}&state=${encodeURIComponent(breadcrumbState.state || "")}`,
@@ -280,6 +296,7 @@ const AiProduct = () => {
     breadcrumbState.continent,
     breadcrumbState.country,
     breadcrumbState.state,
+    breadcrumbState.stateLabel,
     companyDetails?.companyName,
     companyName,
     location.pathname,
@@ -330,6 +347,7 @@ const AiProduct = () => {
         {
           state: {
             ...location.state,
+            selectedStateLabel: breadcrumbState.stateLabel,
             breadcrumbFilters: {
               continent: normalizedContinent || "",
               country: normalizedCountry || "",
@@ -349,6 +367,7 @@ const AiProduct = () => {
       {
         state: {
           ...location.state,
+          selectedStateLabel: breadcrumbState.stateLabel,
           breadcrumbFilters: {
             continent: normalizedContinent || "",
             country: normalizedCountry || "",
@@ -1193,8 +1212,12 @@ const AiProduct = () => {
                         variant="standard"
                         size="small"
                         value={field.value || ""}
-                        onChange={(value) => {
-                          field.onChange(value);
+                        onChange={(value, info) => {
+                          handleEnquiryMobileChange(
+                            field.onChange,
+                            value,
+                            info,
+                          );
                         }}
                         helperText={errors?.mobileNumber?.message}
                         error={!!errors.mobileNumber}
@@ -2134,8 +2157,12 @@ const AiProduct = () => {
                           variant="standard"
                           size="small"
                           value={field.value || ""}
-                          onChange={(value) => {
-                            field.onChange(value);
+                          onChange={(value, info) => {
+                            handleEnquiryMobileChange(
+                              field.onChange,
+                              value,
+                              info,
+                            );
                           }}
                           helperText={errors?.mobileNumber?.message}
                           error={!!errors.mobileNumber}
