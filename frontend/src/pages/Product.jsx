@@ -1230,6 +1230,7 @@ const Product = () => {
                           setOpen(true);
                         }}
                         review={review}
+                        reviewTextClassName="h-[60px]"
                       />
                     </div>
                   ))}
@@ -2168,6 +2169,7 @@ const Product = () => {
                           setOpen(true);
                         }}
                         review={review}
+                        reviewTextClassName="h-[60px]"
                       />
                     </div>
                   ))}
