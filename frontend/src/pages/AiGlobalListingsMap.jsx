@@ -27,7 +27,10 @@ import { AnimatePresence, motion } from "motion/react";
 import PaginatedGrid from "../components/PaginatedGrid.jsx";
 import { Helmet } from "@dr.pogodin/react-helmet";
 import useAuth from "../hooks/useAuth.js";
-import { persistSelectedDestination } from "../utils/selectedDestinationSession.js";
+import {
+  persistSelectedDestination,
+  readSelectedDestination,
+} from "../utils/selectedDestinationSession.js";
 import {
   dedupeAiSearchBadges,
   buildAiVerticalsSearchBadges,
@@ -275,14 +278,23 @@ const AiGlobalListingsMap = () => {
   }, [filteredLocation]);
 
   const selectedLocationLabel = useMemo(() => {
+    const selectedDestination = readSelectedDestination();
+    const normalizedCountry = formData?.country?.trim().toLowerCase();
+    const normalizedLocation = formData?.location?.trim().toLowerCase();
+    const sessionTitle =
+      selectedDestination?.country === normalizedCountry &&
+        selectedDestination?.city === normalizedLocation
+        ? selectedDestination?.title
+        : "";
+
+    if (sessionTitle) return sessionTitle;
     if (!formData?.location) return "";
-    const normalizedLocation = formData.location.toLowerCase();
     return (
       locationOptions.find(
         (option) => option.value?.toLowerCase() === normalizedLocation,
       )?.label || formData.location
     );
-  }, [formData?.location, locationOptions]);
+  }, [formData?.country, formData?.location, locationOptions]);
 
   const skeletonArray = Array.from({ length: 6 });
   const countOptions = [
@@ -461,8 +473,14 @@ const AiGlobalListingsMap = () => {
       continent: formData.continent,
       country: formData.country,
       city: formData.location,
+      title: selectedLocationLabel,
     });
-  }, [formData.continent, formData.country, formData.location]);
+  }, [
+    formData.continent,
+    formData.country,
+    formData.location,
+    selectedLocationLabel,
+  ]);
 
   useEffect(() => {
     const breadcrumbFilters = location.state?.breadcrumbFilters;
@@ -562,6 +580,7 @@ const AiGlobalListingsMap = () => {
         breadcrumbLoading: true,
         companyId: item.companyId,
         type: item.companyType || "ss",
+        selectedStateLabel: selectedLocationLabel,
         selectedFilters: location.state?.selectedFilters,
         searchBarBadges,
         breadcrumbFilters: {
@@ -1074,16 +1093,7 @@ const AiGlobalListingsMap = () => {
                   <div className="pb-20">
                     <div className="flex justify-between items-center mb-4">
                       <h2 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight">
-                        {`Popular ${categoryOptions.find((c) => c.value === formData.category)?.label || "Listings"} in ${formData?.location
-                            ? formData.location
-                              .split(" ")
-                              .map(
-                                (word) =>
-                                  word.charAt(0).toUpperCase() +
-                                  word.slice(1).toLowerCase(),
-                              )
-                              .join(" ")
-                            : "Unknown"
+                        {`Popular ${categoryOptions.find((c) => c.value === formData.category)?.label || "Listings"} in ${selectedLocationLabel || "Unknown"
                           }`}
                       </h2>
                     </div>
@@ -1228,6 +1238,7 @@ const AiGlobalListingsMap = () => {
               {
                 state: {
                   ...location.state,
+                  selectedStateLabel: selectedLocationLabel,
                   selectedFilters: location.state?.selectedFilters,
                   searchBarBadges,
                   breadcrumbFilters: {

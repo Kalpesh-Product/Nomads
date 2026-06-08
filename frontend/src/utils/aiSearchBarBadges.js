@@ -91,7 +91,11 @@ export const buildAiVerticalsSearchBadges = ({
 
   const selectedContinentBadge = formatAiSearchBadge(selectedFilters.continent);
   const selectedGoalOptionBadge = formatAiSearchBadge(selectedFilters.goalOption);
-  const selectedStateBadge = formatAiSearchBadge(selectedStateValue);
+  const selectedStateLabel =
+    locationState?.selectedStateLabel ||
+    locationState?.stateLabel ||
+    selectedStateValue;
+  const selectedStateBadge = formatAiSearchBadge(selectedStateLabel);
 
   const cleanIncomingBadges = dedupeAiSearchBadges(incomingBadges).filter(
     (badge) => !badge.toLowerCase().startsWith("your broader goal >"),

@@ -31,7 +31,10 @@ import { IoSearch } from "react-icons/io5";
 import { HiOutlineArrowLeft } from "react-icons/hi";
 import { AnimatePresence, motion } from "motion/react";
 import useAuth from "../hooks/useAuth.js";
-import { persistSelectedDestination } from "../utils/selectedDestinationSession.js";
+import {
+  persistSelectedDestination,
+  readSelectedDestination,
+} from "../utils/selectedDestinationSession.js";
 
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
 const TYPING_INTERVAL_MS = 7;
@@ -135,11 +138,15 @@ const AiListings = ({ forceListView = false }) => {
           (part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase(),
         )
         .join(" ");
+    const selectedStateDisplayLabel =
+      location.state?.selectedStateLabel ||
+      formatBadgeValue(readSelectedDestination()?.title || "");
 
     const params = new URLSearchParams(location.search);
     const selectedStateFromQuery =
       params.get("state") || params.get("location") || "";
-    const selectedStateBadge = formatBadgeValue(selectedStateFromQuery);
+    const selectedStateBadge =
+      selectedStateDisplayLabel || formatBadgeValue(selectedStateFromQuery);
     const locationStateBadges = location.state?.searchBarBadges;
 
     const replaceTrailingLocationBadge = (badges) => {
@@ -510,10 +517,12 @@ const AiListings = ({ forceListView = false }) => {
   }, [formData, setValue]);
 
   useEffect(() => {
+    const selectedDestination = readSelectedDestination();
     persistSelectedDestination({
       continent: formData.continent,
       country: formData.country,
       city: formData.location,
+      title: selectedDestination?.title,
     });
   }, [formData.continent, formData.country, formData.location]);
 
@@ -632,6 +641,7 @@ const AiListings = ({ forceListView = false }) => {
           country: formData.country,
           location: formData.location,
           category: categoryValue,
+          selectedStateLabel,
           searchBarBadges,
         },
       },
@@ -698,8 +708,16 @@ const AiListings = ({ forceListView = false }) => {
   const selectedStateFromParams =
     searchParams.get("state") || searchParams.get("location") || "";
   const backLabel = selectedStateFromParams || formData?.location || "";
-  const selectedStateLabel = backLabel
-    ? backLabel
+  const selectedDestination = readSelectedDestination();
+  const sessionTitleMatchesSelection =
+    selectedDestination?.country === formData?.country?.trim().toLowerCase() &&
+    selectedDestination?.city === backLabel?.trim().toLowerCase();
+  const displayStateName =
+    sessionTitleMatchesSelection && selectedDestination?.title
+      ? selectedDestination.title
+      : backLabel;
+  const selectedStateLabel = displayStateName
+    ? displayStateName
         .split(" ")
         .map(
           (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
@@ -1225,16 +1243,7 @@ const AiListings = ({ forceListView = false }) => {
                     [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
                   }[formData.category] || `${formData.category} Spaces`}{" "}
                   in{" "}
-                  {formData?.location
-                    ? formData.location
-                        .split(" ")
-                        .map(
-                          (word) =>
-                            word.charAt(0).toUpperCase() +
-                            word.slice(1).toLowerCase(),
-                        )
-                        .join(" ")
-                    : "Unknown"}
+                  {selectedStateLabel || "Unknown"}
                 </h1>
               </div>
             )}
@@ -1343,6 +1352,8 @@ const AiListings = ({ forceListView = false }) => {
                                   state: {
                                     companyId: item.companyId,
                                     type: item.companyType,
+                                    selectedStateLabel,
+                                    searchBarBadges,
                                   },
                                 },
                               );

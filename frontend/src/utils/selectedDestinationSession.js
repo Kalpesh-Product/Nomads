@@ -3,11 +3,15 @@ export const SELECTED_DESTINATION_SESSION_KEY = "wonoSelectedDestination";
 const normalizeValue = (value) =>
     typeof value === "string" ? value.trim().toLowerCase() : "";
 
-export const persistSelectedDestination = ({ continent, country, city }) => {
+const normalizeDisplayValue = (value) =>
+    typeof value === "string" ? value.trim() : "";
+
+export const persistSelectedDestination = ({ continent, country, city, title }) => {
     if (typeof window === "undefined") return;
 
     const normalizedCountry = normalizeValue(country);
     const normalizedCity = normalizeValue(city);
+    const normalizedTitle = normalizeDisplayValue(title);
 
     if (!normalizedCountry || !normalizedCity) return;
 
@@ -17,6 +21,7 @@ export const persistSelectedDestination = ({ continent, country, city }) => {
             continent: normalizeValue(continent),
             country: normalizedCountry,
             city: normalizedCity,
+            title: normalizedTitle,
             updatedAt: Date.now(),
         }),
     );
@@ -44,6 +49,7 @@ export const readSelectedDestination = () => {
             continent: normalizeValue(parsed.continent),
             country,
             city,
+            title: normalizeDisplayValue(parsed.title),
             updatedAt:
                 typeof parsed.updatedAt === "number" ? parsed.updatedAt : undefined,
         };
