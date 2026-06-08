@@ -103,6 +103,14 @@ const Product = () => {
   const normalizePhoneNumber = (value) =>
     value ? value.replace(/\s+/g, "") : "";
 
+  const handleEnquiryMobileChange = (onChange, value, info) => {
+    const nationalNumber = info?.nationalNumber?.replace(/\D/g, "") || "";
+
+    if (info?.countryCode === "IN" && nationalNumber.length > 10) return;
+
+    onChange(value);
+  };
+
   const axiosPrivate = useAxiosPrivate();
 
   const { data: companyDetails, isPending: isCompanyDetails } = useQuery({
@@ -1055,8 +1063,12 @@ const Product = () => {
                         variant="standard"
                         size="small"
                         value={field.value || ""}
-                        onChange={(value) => {
-                          field.onChange(value);
+                        onChange={(value, info) => {
+                          handleEnquiryMobileChange(
+                            field.onChange,
+                            value,
+                            info,
+                          );
                         }}
                         helperText={errors?.mobileNumber?.message}
                         error={!!errors.mobileNumber}
@@ -1991,8 +2003,12 @@ const Product = () => {
                           variant="standard"
                           size="small"
                           value={field.value || ""}
-                          onChange={(value) => {
-                            field.onChange(value);
+                          onChange={(value, info) => {
+                            handleEnquiryMobileChange(
+                              field.onChange,
+                              value,
+                              info,
+                            );
                           }}
                           helperText={errors?.mobileNumber?.message}
                           error={!!errors.mobileNumber}
