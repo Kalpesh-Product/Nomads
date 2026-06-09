@@ -1439,7 +1439,7 @@ const AiGlobalListingsList = () => {
                               <div className="w-[calc(85%-0.5rem)] md:w-[calc(33.33%-1rem)] lg:w-[calc(20%-1.5rem)] flex-shrink-0 snap-start">
                                 <button
                                   onClick={() => handleCategoryClick(type)}
-                                  className="w-full aspect-square border-2 border-gray-100 rounded-3xl flex flex-col items-center justify-start pt-12 gap-3 hover:border-primary-blue hover:shadow-md transition-all bg-gray-50/30 group"
+                                  className="w-full aspect-square border-2 border-gray-100 rounded-3xl flex flex-col items-center justify-center gap-3 hover:border-primary-blue hover:shadow-md transition-all bg-gray-50/30 group md:justify-start md:pt-12"
                                 >
                                   <div className="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-gray-100 transition-colors">
                                     <svg
