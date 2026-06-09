@@ -2200,7 +2200,7 @@ const AiSearchResults = () => {
                                 <div className="translate-y-4 group-hover:translate-y-0 transition-all duration-300">
                                   <div className="mb-0 border-b border-white/30 pb-1">
                                     <p className="mb-1 text-center text-[0.55rem] font-medium uppercase tracking-wide text-white/85 sm:text-[0.65rem] md:text-base">
-                                      {`${destination.displayCity || destination.city} - ${destination.displayCountry ||
+                                      {`${destination.title || destination.displayCity || destination.city} - ${destination.displayCountry ||
                                         destination.country
                                         }`.toUpperCase()}
                                     </p>
@@ -2276,7 +2276,7 @@ const AiSearchResults = () => {
                             <div className="mt-1.5 flex items-start justify-start gap-1 md:mt-2 md:gap-1 ">
                               <div className="min-w-0">
                                 <h3 className="truncate text-[0.8rem] font-semibold leading-tight text-black/90 md:text-[1.2rem]">
-                                  {`${destination.displayCity || destination.city} - `}
+                                  {`${destination.title || destination.displayCity || destination.city} - `}
                                 </h3>
                               </div>
 

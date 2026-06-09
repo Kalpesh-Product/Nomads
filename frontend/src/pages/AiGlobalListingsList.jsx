@@ -348,6 +348,7 @@ const AiGlobalListingsList = () => {
   }, [filteredLocation]);
 
   const selectedLocationLabel = useMemo(() => {
+    const routeStateLabel = location.state?.selectedStateLabel;
     const selectedDestination = readSelectedDestination();
     const normalizedCountry = formData?.country?.trim().toLowerCase();
     const normalizedLocation = formData?.location?.trim().toLowerCase();
@@ -357,6 +358,7 @@ const AiGlobalListingsList = () => {
         ? selectedDestination?.title
         : "";
 
+    if (routeStateLabel) return routeStateLabel;
     if (sessionTitle) return sessionTitle;
     if (!formData?.location) return "";
     return (
@@ -364,7 +366,7 @@ const AiGlobalListingsList = () => {
         (option) => option.value?.toLowerCase() === normalizedLocation,
       )?.label || formData.location
     );
-  }, [formData?.country, formData?.location, locationOptions]);
+  }, [formData?.country, formData?.location, location.state?.selectedStateLabel, locationOptions]);
 
   const countOptions = [
     { label: "1 - 5", value: "1-5" },
