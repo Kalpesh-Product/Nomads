@@ -2080,7 +2080,7 @@ const AiSearchResults = () => {
                               </span>
                             )}
                           {shouldShowResultsContent && isLoggedIn && (
-                            <div className="flex w-full items-center justify-end gap-3 lg:w-auto">
+                            <div className="flex w-full items-center justify-center gap-3 sm:justify-end lg:w-auto">
                               <span className="text-sm font-medium text-black/80 font-play">
                                 Visa Options
                               </span>
