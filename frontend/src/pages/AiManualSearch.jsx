@@ -354,7 +354,7 @@ const AiManualSearch = () => {
   return (
     <div className="min-h-full bg-white">
       <main className="pb-8">
-               <div className="mx-0 w-full max-w-[20rem] px-3 sm:px-6 lg:mx-auto lg:max-w-[85rem] lg:px-0 lg:min-w-[75%]">
+        <div className="mx-0 w-full max-w-none px-3 sm:max-w-[20rem] sm:px-6 lg:mx-auto lg:max-w-[85rem] lg:px-0 lg:min-w-[75%]">
           <div className="rounded-[10px] bg-white px-0 pb-6">
             <div className={`mt-6 mb-6 ${contentAlignClassName}`}>
               <p className="text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">

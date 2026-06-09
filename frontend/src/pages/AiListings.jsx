@@ -752,7 +752,11 @@ const AiListings = ({ forceListView = false }) => {
       <div
         className={`${forceListView ? "flex" : "hidden lg:flex"} flex-col gap-6 md:px-10`}
       >
-        <div className="w-full lg:min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-4 sm:px-6 lg:px-0">
+        <div
+          className={`w-full lg:min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto ${
+            forceListView ? "px-2 sm:px-6 lg:px-0" : "px-4 sm:px-6 lg:px-0"
+          }`}
+        >
           {!forceListView && (
             <div className="mb-4 flex items-center gap-3 lg:hidden">
               <button
@@ -1223,7 +1227,10 @@ const AiListings = ({ forceListView = false }) => {
               </motion.div>
             )}
           </AnimatePresence>
-          <Container padding={false}>
+          <Container
+            padding={false}
+            className={forceListView ? "!px-0 sm:!px-6 lg:!px-0" : ""}
+          >
             {/* Dynamic Header */}
             {formData?.category && formData?.location && (
               <div className="mt-6 mb-2 px-1 border-t border-gray-300">
