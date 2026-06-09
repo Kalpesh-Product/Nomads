@@ -11,6 +11,8 @@ import { setFormValues } from "../features/locationSlice";
 import useAuth from "../hooks/useAuth";
 import axios from "../utils/axios";
 
+import { persistSelectedDestination } from "../utils/selectedDestinationSession";
+
 const searchBarBadgeClassName =
   "inline-flex min-h-[40px] min-w-[5rem] items-center rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85";
 const contentAlignClassName = "md:px-10";
@@ -23,6 +25,17 @@ const contentAlignClassName = "md:px-10";
 // ];
 
 const TYPING_INTERVAL_MS = 7;
+
+const normalizeLocationKey = (value = "") =>
+  value
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]/g, "");
+
+const getLocationKey = (country, state) =>
+  `${normalizeLocationKey(country)}|${normalizeLocationKey(state)}`;
 
 const DropdownBadge = ({
   label,
@@ -39,12 +52,13 @@ const DropdownBadge = ({
         type="button"
         onClick={onToggle}
         disabled={disabled}
-        className={`flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${disabled
+        className={`flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${
+          disabled
             ? "cursor-not-allowed border-black/10 bg-black/[0.03] text-black/35"
             : isOpen
               ? "border-sky-500 bg-sky-500 text-white"
               : "border-black/20 bg-white text-black/85 hover:border-sky-500"
-          }`}
+        }`}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
       >
@@ -70,10 +84,11 @@ const DropdownBadge = ({
                   <button
                     type="button"
                     onClick={() => onSelect(option.value)}
-                    className={`flex w-full items-center rounded-xl px-3 py-2 text-left text-sm transition-colors ${isSelected
+                    className={`flex w-full items-center rounded-xl px-3 py-2 text-left text-sm transition-colors ${
+                      isSelected
                         ? "bg-sky-50 font-medium text-sky-600"
                         : "text-black/80 hover:bg-slate-50"
-                      }`}
+                    }`}
                     role="option"
                     aria-selected={isSelected}
                   >
@@ -98,11 +113,11 @@ const AiManualSearch = () => {
   const { auth } = useAuth();
 
   const [openDropdown, setOpenDropdown] = useState(null);
-  const [selectedContinent, setSelectedContinent] = useState(
-    () => (continentParam ? decodeURIComponent(continentParam) : ""),
+  const [selectedContinent, setSelectedContinent] = useState(() =>
+    continentParam ? decodeURIComponent(continentParam) : "",
   );
-  const [selectedCountry, setSelectedCountry] = useState(
-    () => (countryParam ? decodeURIComponent(countryParam) : ""),
+  const [selectedCountry, setSelectedCountry] = useState(() =>
+    countryParam ? decodeURIComponent(countryParam) : "",
   );
   const [selectedLocation, setSelectedLocation] = useState("");
   const [typedTopHeading, setTypedTopHeading] = useState("");
@@ -145,6 +160,28 @@ const AiManualSearch = () => {
     },
   });
 
+  const { data: destinationTitleLookup = new Map() } = useQuery({
+    queryKey: ["state-wise-destination-titles"],
+    queryFn: async () => {
+      try {
+        const response = await axios.get("state-wise-weight");
+        const destinations = response?.data?.data || [];
+
+        return new Map(
+          destinations
+            .filter((destination) => destination?.title && destination?.state)
+            .map((destination) => [
+              getLocationKey(destination.country, destination.state),
+              destination.title,
+            ]),
+        );
+      } catch (error) {
+        console.error(error?.response?.data?.message);
+        return new Map();
+      }
+    },
+  });
+
   const continentOptions = useMemo(() => {
     const uniqueContinents = [
       ...new Set(locations.map((item) => item.continent).filter(Boolean)),
@@ -161,9 +198,9 @@ const AiManualSearch = () => {
   const countryOptions = useMemo(() => {
     const filtered = selectedContinent
       ? locations.filter(
-        (item) =>
-          item.continent?.toLowerCase() === selectedContinent?.toLowerCase(),
-      )
+          (item) =>
+            item.continent?.toLowerCase() === selectedContinent?.toLowerCase(),
+        )
       : locations;
 
     return filtered
@@ -183,11 +220,16 @@ const AiManualSearch = () => {
 
     return (
       countryData?.states?.map((item) => ({
-        label: item.name,
+        label:
+          destinationTitleLookup.get(
+            getLocationKey(countryData.country, item.name),
+          ) ||
+          item.title ||
+          item.name,
         value: item.name?.toLowerCase(),
       })) || []
     );
-  }, [locations, selectedCountry]);
+  }, [destinationTitleLookup, locations, selectedCountry]);
 
   const continentLabel =
     continentOptions.find((option) => option.value === selectedContinent)
@@ -221,7 +263,9 @@ const AiManualSearch = () => {
   };
 
   const navigateToManualSearchStep = ({ continent = "", country = "" }) => {
-    const encodedContinent = continent ? `/${encodeURIComponent(continent)}` : "";
+    const encodedContinent = continent
+      ? `/${encodeURIComponent(continent)}`
+      : "";
     const encodedCountry = country ? `/${encodeURIComponent(country)}` : "";
 
     navigate({
@@ -241,17 +285,28 @@ const AiManualSearch = () => {
 
     dispatch(setFormValues(formValues));
 
+    const selectedLocationTitle =
+      locationOptions.find((option) => option.value === location)?.label ||
+      location;
     const badges = [
       "Search Old School",
       continentOptions.find((option) => option.value === continent)?.label,
       countryOptions.find((option) => option.value === country)?.label,
-      locationOptions.find((option) => option.value === location)?.label,
+      selectedLocationTitle,
     ].filter(Boolean);
+
+    persistSelectedDestination({
+      continent,
+      country,
+      city: location,
+      title: selectedLocationTitle,
+    });
 
     navigate(
       `/ai-verticals?country=${encodeURIComponent(country)}&location=${encodeURIComponent(location)}`,
       {
         state: {
+          selectedStateLabel: selectedLocationTitle,
           breadcrumbFilters: {
             continent,
             country,
@@ -302,7 +357,6 @@ const AiManualSearch = () => {
         clearInterval(topTypingIntervalRef.current);
         topTypingIntervalRef.current = null;
       }
-
     };
 
     const animateTypedText = (text, setText, onComplete) => {
@@ -345,11 +399,7 @@ const AiManualSearch = () => {
     return () => {
       clearTypingAnimations();
     };
-  }, [
-    hasAllSelections,
-    initialTopHeadingText,
-    selectedTopHeadingText,
-  ]);
+  }, [hasAllSelections, initialTopHeadingText, selectedTopHeadingText]);
 
   return (
     <div className="min-h-full bg-white">
@@ -386,10 +436,11 @@ const AiManualSearch = () => {
                   <button
                     type="button"
                     onClick={handleSearch}
-                    className={`inline-flex items-center justify-center rounded-full p-1 transition-colors ${hasAllSelections
+                    className={`inline-flex items-center justify-center rounded-full p-1 transition-colors ${
+                      hasAllSelections
                         ? "text-black/90 hover:text-sky-600"
                         : "cursor-not-allowed text-black/35"
-                      }`}
+                    }`}
                     aria-label="Search listings"
                     disabled={!hasAllSelections}
                   >
@@ -460,7 +511,6 @@ const AiManualSearch = () => {
                   }}
                   disabled={!selectedCountry}
                 />
-
               </div>
 
               {/* <div className="relative mt-8">
