@@ -37,6 +37,12 @@ import HostProduct from "./pages/host/Product";
 // Tenant imports
 import TemplateSite from "./pages/company/TemplateSite";
 import TemplateHome from "./pages/company/TemplateHome";
+import TemplateAboutPage from "./pages/company/TemplateAboutPage";
+import TemplateProductsPage from "./pages/company/TemplateProductsPage";
+import TemplateProductDetailPage from "./pages/company/TemplateProductDetailPage";
+import TemplateGalleryPage from "./pages/company/TemplateGalleryPage";
+import TemplateTestimonialsPage from "./pages/company/TemplateTestimonialsPage";
+import TemplateContactPage from "./pages/company/TemplateContactPage";
 import NomadAbout from "./pages/NomadAbout";
 import Profile from "./pages/Profile";
 import PersistLogin from "./layout/PersistsLogin";
@@ -374,9 +380,24 @@ if (tenant === "main") {
   // Company tenant subdomain
   routerConfig = [
     {
-      path: "*",
+      path: "/",
       element: <TemplateSite />,
-      children: [{ path: "", index: true, element: <TemplateHome /> }],
+      children: [
+        { path: "", index: true, element: <TemplateHome /> },
+        { path: "page/home", element: <TemplateHome /> },
+        { path: "about", element: <TemplateAboutPage /> },
+        { path: "page/about", element: <TemplateAboutPage /> },
+        { path: "products", element: <TemplateProductsPage /> },
+        { path: "page/products", element: <TemplateProductsPage /> },
+        { path: "products/:slug", element: <TemplateProductDetailPage /> },
+        { path: "page/products/:slug", element: <TemplateProductDetailPage /> },
+        { path: "gallery", element: <TemplateGalleryPage /> },
+        { path: "page/gallery", element: <TemplateGalleryPage /> },
+        { path: "testimonials", element: <TemplateTestimonialsPage /> },
+        { path: "page/testimonials", element: <TemplateTestimonialsPage /> },
+        { path: "contact", element: <TemplateContactPage /> },
+        { path: "page/contact", element: <TemplateContactPage /> },
+      ],
     },
   ];
 }

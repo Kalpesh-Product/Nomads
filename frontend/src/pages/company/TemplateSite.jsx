@@ -1,13 +1,24 @@
-import React from "react";
-import { Outlet } from "react-router-dom";
+import React, { useMemo, useRef } from "react";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import TempHeader from "./components/TempHeader";
 import TempFooter from "./components/TempFooter";
+import TemplateBreadcrumbs from "./components/TemplateBreadcrumbs";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import { normalizeVertical } from "./utils/vertical";
+import { api } from "../../utils/axios";
+// import { normalizeVertical } from "./utils/vertical";
 // import { Toaster } from "react-hot-toast";
+import {
+  getTemplateBreadcrumbItems,
+  getTemplateRouteContext,
+  normalizeTemplateData,
+} from "./utils/templateRouteUtils";
+import { mapTestimonialItem } from "./utils/pageTemplateUtils";
 
 const TemplateSite = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const headerRef = useRef(null);
+
   function getTenantFromHost() {
     const hostname = window.location.hostname;
     const parts = hostname.split(".");
@@ -19,46 +30,92 @@ const TemplateSite = () => {
   const { data, isPending, error } = useQuery({
     queryKey: ["company", tenant],
     queryFn: async () => {
-      const res = await axios.get(
-        `https://wonomasterbe.vercel.app/api/editor/get-website/${tenant}`,
-      );
+      const res = await api.get(`/editor/get-website/${tenant}`);
       return res.data;
     },
 
     enabled: !!tenant,
   });
 
-  const normalizedData = data
-    ? {
-        ...data,
-        vertical: normalizeVertical(data?.vertical),
-        productTitle:
-          typeof data?.productTitle === "string" ? data.productTitle : "",
-        products: Array.isArray(data?.products) ? data.products : [],
-      }
-    : data;
+  const normalizedData = data ? normalizeTemplateData(data) : data;
+  const routeContext = getTemplateRouteContext(location.pathname);
+  const breadcrumbItems = useMemo(
+    () =>
+      getTemplateBreadcrumbItems({
+        data: normalizedData,
+        pathname: location.pathname,
+        routeContext,
+      }).map((item) => ({
+        label: item.label,
+        onClick: item.path ? () => navigate(item.path) : undefined,
+      })),
+    [location.pathname, navigate, normalizedData, routeContext],
+  );
+  const companyId = normalizedData?.companyId || "";
+  const workspaceId = normalizedData?.workspaceId || "";
+  const searchKey = normalizedData?.searchKey || "";
+
+  const { data: reviewResponse } = useQuery({
+    queryKey: ["public-reviews", companyId, workspaceId, searchKey],
+    queryFn: async () => {
+      const res = await api.get("/review", {
+        params: {
+          companyId,
+        },
+      });
+      return res.data;
+    },
+    enabled: !!companyId,
+  });
+
+  const approvedReviews = Array.isArray(reviewResponse?.data)
+    ? reviewResponse.data
+        .filter((item) => {
+          const status = String(item?.status || "").toLowerCase();
+          return status === "approved" || !status;
+        })
+        .map(mapTestimonialItem)
+        .filter(Boolean)
+    : [];
 
   return (
     <div className="h-screen relative overflow-y-auto overflow-hidden flex flex-col custom-scrollbar-hide">
-      <header className="sticky top-0 z-20">
-        <TempHeader
-          logo={normalizedData?.companyLogo?.url}
-          vertical={normalizedData?.vertical}
-        />
-      </header>
+      <TempHeader
+        ref={headerRef}
+        logo={normalizedData?.companyLogoUrl}
+        pageNavItems={normalizedData?.pageNavItems}
+        navItems={normalizedData?.navItems}
+        productDropdownPages={normalizedData?.productDropdownPages}
+        productPages={normalizedData?.productPages}
+        pathname={location.pathname}
+      />
+      {breadcrumbItems.length > 1 ? (
+        <TemplateBreadcrumbs items={breadcrumbItems} />
+      ) : null}
       <main className="flex-1">
-        <Outlet context={{ data: normalizedData, isPending, error }} />
+        <Outlet
+          context={{
+            data: normalizedData,
+            isPending,
+            error,
+            routeContext,
+            approvedReviews,
+          }}
+        />
         {/* <Toaster /> */}
       </main>
       <footer>
         <TempFooter
           address={normalizedData?.address}
-          contact={normalizedData?.contact}
-          email={normalizedData?.email}
+          contact={normalizedData?.contactTitle}
+          email={normalizedData?.websiteEmail}
           phone={normalizedData?.phone}
           registeredCompany={normalizedData?.registeredCompanyName}
-          logo={normalizedData?.companyLogo?.url}
+          logo={normalizedData?.companyLogoUrl}
           isPending={isPending}
+          pageNavItems={normalizedData?.pageNavItems}
+          productDropdownPages={normalizedData?.productDropdownPages}
+          pathname={location.pathname}
         />
       </footer>
     </div>

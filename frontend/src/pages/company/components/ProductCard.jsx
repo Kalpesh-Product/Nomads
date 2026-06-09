@@ -1,40 +1,49 @@
 import React from "react";
-import TempButton from "./TempButton";
-import { normalizeVertical } from "../utils/vertical";
+import { getMediaSrc } from "../utils/templateRouteUtils";
 
-const ProductCard = ({ product, vertical }) => {
-  const isCafe = normalizeVertical(vertical) === "cafe";
+const ProductCard = ({ product, onClick }) => {
+  const imageSrc =
+    getMediaSrc(product?.cardImage) ||
+    getMediaSrc(product?.homeCardImage) ||
+    getMediaSrc(product?.heroImage) ||
+    getMediaSrc(product?.heroImages) ||
+    getMediaSrc(product?.images);
+  const heading =
+    product?.heading ||
+    product?.homeCardHeading ||
+    product?.name ||
+    product?.type ||
+    "Product";
 
   return (
-    <div className="h-full flex flex-col gap-2">
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={onClick}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onClick?.(event);
+        }
+      }}
+      className="flex h-full w-full cursor-pointer flex-col gap-3 text-left"
+    >
       <div className="text-center">
-        <h1 className="text-subtitle">
-          {product?.type || (isCafe ? "Menu Item" : "Co-Working")}
+        <h1 className="text-[20px] font-medium text-[#5b5b5b] md:text-[20px]">
+          {heading}
         </h1>
       </div>
-      <div className="relative h-[16rem] overflow-hidden rounded-xl ">
+      <div className="relative h-[220px] overflow-hidden rounded-[10px] shadow-md md:h-[13.5rem]">
         <img
-          src={product?.images?.[0]?.url}
+          src={imageSrc}
           alt="img"
-          className="h-full w-full rounded-xl overflow-hidden object-cover"
+          className="h-full w-full rounded-[10px] overflow-hidden object-cover"
         />
-        {isCafe ? (
-          <div className="absolute inset-0 bg-black/55 flex flex-col justify-end p-6 overflow-hidden text-white">
-            <h2 className="text-lg font-semibold truncate">
-              {product?.name || "Menu Item"}
-            </h2>
-            <p className="text-base font-medium">{product?.cost || ""}</p>
-            {product?.description && (
-              <p className="text-sm text-white/90 line-clamp-2">
-                {product.description}
-              </p>
-            )}
+        <div className="absolute inset-0 flex items-end justify-center bg-black/18 p-4">
+          <div className="rounded-full border border-white/85 bg-black/55 px-5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-white shadow-md">
+            VIEW DETAILS
           </div>
-        ) : (
-          <div className="absolute inset-0 bg-black/50 flex flex-col justify-end items-center p-8 overflow-hidden">
-            <TempButton buttonText="View Details" />
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );

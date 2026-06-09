@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useKeenSlider } from "keen-slider/react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import Container from "../../components/Container";
 import ProductCard from "./components/ProductCard";
 import TestimonialCard from "./components/TestimonialCard";
@@ -10,9 +11,18 @@ import { CiMap } from "react-icons/ci";
 import TempButton from "./components/TempButton";
 import ProductModalContent from "./components/ProductModalContent";
 import TempModal from "./components/TempModal";
-import { useOutletContext } from "react-router-dom";
 import GallerySection from "./components/GallerySection";
-import { getSectionTitleByVertical, normalizeVertical } from "./utils/vertical";
+import ReviewFormModal from "./components/ReviewFormModal";
+import {
+  getMediaSrc,
+  getProductPath,
+  getSectionPath,
+} from "./utils/templateRouteUtils";
+// import { getSectionTitleByVertical, normalizeVertical } from "./utils/vertical";
+import {
+  getEnabledProductPages,
+  getPreviewTestimonials,
+} from "./utils/pageTemplateUtils";
 // import { useQuery } from "@tanstack/react-query";
 // import axios from "axios";
 // import TransparentModal from "../../components/TransparentModal";
@@ -24,44 +34,18 @@ function getTenantFromHost() {
 }
 
 const TemplateHome = () => {
+  const navigate = useNavigate();
   const intervalRef = useRef(null);
   const [open, setOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
 
-  const [pageLoading, setPageLoading] = useState(true);
-
-  useEffect(() => {
-    const handleLoad = () => setPageLoading(false);
-    window.addEventListener("load", handleLoad);
-
-    return () => window.removeEventListener("load", handleLoad);
-  }, []);
-
-  const { data, isPending, error } = useOutletContext();
-  const sliderCount =
-    data?.testimonials?.length > 3 ? 3 : data?.testimonials?.length;
+  const { data, isPending, error, routeContext, approvedReviews = [] } =
+    useOutletContext();
   const [sliderRef, slider] = useKeenSlider({
     loop: data?.heroImages?.length > 1,
     mode: "snap",
     slides: { perView: 1 },
-  });
-
-  const [testimonialRef, testimonialSlider] = useKeenSlider({
-    loop: true,
-    mode: "snap",
-    spacing: 16,
-    slides: {
-      perView: 1, // default (mobile)
-      spacing: 16,
-    },
-    breakpoints: {
-      "(min-width: 768px)": {
-        slides: { perView: sliderCount - 1, spacing: 24 },
-      },
-      "(min-width: 1024px)": {
-        slides: { perView: sliderCount, spacing: 32 },
-      },
-    },
   });
 
   useEffect(() => {
@@ -92,8 +76,7 @@ const TemplateHome = () => {
   const tenant = getTenantFromHost();
 
   if (!tenant) return <div>No tenant specified</div>;
-  // if (isPending) return <div>Loading site...</div>;
-  if (pageLoading || isPending) {
+  if (isPending) {
     return (
       <div className="fixed inset-0 z-[9999] bg-white flex items-center justify-center">
         <div className="animate-spin h-12 w-12 border-4 border-gray-300 border-t-primary-blue rounded-full"></div>
@@ -117,26 +100,42 @@ const TemplateHome = () => {
   const about = isPending ? [] : data?.about;
   const galleryImages = isPending ? [] : data?.gallery;
   const products = isPending ? [] : data?.products;
-  const testimonials = isPending ? [] : data?.testimonials;
-  const vertical = normalizeVertical(data?.vertical);
-  const isCafe = vertical === "cafe";
+  const productPages = isPending
+    ? []
+    : Array.isArray(data?.productPages) && data.productPages.length > 0
+      ? data.productPages
+      : getEnabledProductPages(data?.productDropdownPages);
+  const testimonials = isPending
+    ? []
+    : getPreviewTestimonials(data, approvedReviews);
+  const homeTestimonials = testimonials.slice(0, 2);
+  // Legacy vertical-based rendering retained as backup only:
+  // const vertical = normalizeVertical(data?.vertical);
+  // const isCafe = vertical === "cafe";
   const safeProductTitle =
     typeof data?.productTitle === "string" ? data.productTitle.trim() : "";
-  const productsSectionTitle =
-    safeProductTitle || getSectionTitleByVertical(vertical);
+  const productsSectionTitle = safeProductTitle || "Our Products";
+  const heroButtonText =
+    typeof data?.CTAButtonText === "string" && data.CTAButtonText.trim()
+      ? data.CTAButtonText.trim()
+      : "Explore";
+  const galleryPath = getSectionPath(
+    "gallery",
+    routeContext?.prefix || window.location.pathname,
+  );
 
   return (
-    <div className="w-screen ">
-      <div className="relative h-screen  overflow-hidden" id="hero">
+    <div className="min-h-screen w-full bg-[#efefef]">
+      <div className="relative h-screen overflow-hidden" id="hero">
         {/* Slider (only images) */}
         <div ref={sliderRef} className="keen-slider w-full h-full">
-          {heroImages.map((slide) => (
+          {heroImages.map((slide, index) => (
             <div
-              key={slide._id}
+              key={slide?._id || slide?.id || `hero-${index}`}
               className="keen-slider__slide w-full h-full relative"
             >
               <img
-                src={slide.url}
+                src={getMediaSrc(slide)}
                 alt=""
                 className="w-full h-full object-cover"
               />
@@ -145,15 +144,15 @@ const TemplateHome = () => {
         </div>
 
         {/* Static Overlay (independent of slides) */}
-        <div className="absolute inset-0 bg-black/40 flex flex-col gap-6 justify-end items-center text-center text-white p-6 py-24 pointer-events-none">
-          <h1 className="text-4xl md:text-6xl font-bold drop-shadow-lg">
+        <div className="absolute inset-0 flex flex-col items-center justify-end gap-6 bg-black/40 p-6 py-24 text-center text-white pointer-events-none">
+          <h1 className="text-4xl font-bold drop-shadow-lg md:text-6xl">
             {data?.title || "Unknown"}
           </h1>
-          <p className="text-lg md:text-2xl drop-shadow-md">{data?.subTitle}</p>
+          <p className="text-lg drop-shadow-md md:text-2xl">{data?.subTitle}</p>
 
           <TempButton
             handleClick={() => handleScroll("contact")}
-            buttonText={data?.CTAButtonText}
+            buttonText={heroButtonText}
           />
         </div>
 
@@ -177,19 +176,19 @@ const TemplateHome = () => {
         )}
       </div>
 
-      <section className="bg-black py-8" id="about">
+      <section className="bg-black py-0" id="about">
         <Container>
-          <div className="flex flex-col gap-6">
-            <h1 className="text-accent text-center text-title font-semibold">
-              About Our Vision
+          <div className="flex flex-col gap-8">
+            <h1 className="text-center text-title font-semibold text-[#f4e01a]">
+              {data?.aboutPageIntro || "About Our Vision"}
             </h1>
-            <div className="text-center text-subtitle">
+            <div className="mx-auto max-w-7xl space-y-4 text-center text-subtitle">
               {about?.length > 0
-                ? about?.map((para) => (
-                    <>
+                ? about?.map((para, index) => (
+                    <React.Fragment key={`${String(para).slice(0, 24)}-${index}`}>
                       <p className="text-white">{para}</p>
                       <br />
-                    </>
+                    </React.Fragment>
                   ))
                 : "About section here"}
             </div>
@@ -197,116 +196,134 @@ const TemplateHome = () => {
         </Container>
       </section>
 
-      <section id="products" className="py-8">
+      <section id="products" className="bg-[#efefef] py-10">
         <Container>
           <div className="flex flex-col gap-6">
             <h1 className="uppercase text-center text-title font-semibold">
               {productsSectionTitle}
             </h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {products?.map((item) => (
-                <div
-                  key={item.id}
-                  onClick={() => {
-                    if (isCafe) return;
-                    setSelectedProduct(item);
-                    setOpen(true);
-                  }}
-                >
-                  <ProductCard product={item} vertical={vertical} />
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {productPages.length > 0
+                ? productPages.map((item) => (
+                    <div key={item?.slug || item?.name}>
+                      <ProductCard
+                        product={item}
+                        onClick={() => {
+                          if (item?.slug) {
+                            navigate(
+                              getProductPath(
+                                item.slug,
+                                routeContext?.prefix || window.location.pathname,
+                              ),
+                            );
+                            return;
+                          }
+                          setSelectedProduct(item);
+                          setOpen(true);
+                        }}
+                      />
+                    </div>
+                  ))
+                : products?.map((item, index) => (
+                <div key={item?._id || item?.id || `product-${index}`}>
+                  <ProductCard
+                    product={item}
+                    onClick={() => {
+                      if (item?.slug) {
+                        navigate(
+                          getProductPath(
+                            item.slug,
+                            routeContext?.prefix || window.location.pathname,
+                          ),
+                        );
+                        return;
+                      }
+                      setSelectedProduct(item);
+                      setOpen(true);
+                    }}
+                  />
                 </div>
               ))}
             </div>
           </div>
         </Container>
       </section>
-      <section id="gallery" className="py-8">
+      <section id="gallery" className="bg-[#efefef] py-10">
         <Container>
           <div className="flex flex-col gap-6">
             <h1 className="uppercase text-center text-title font-semibold">
-              Gallery
+              {data?.galleryPageHeading || "Gallery"}
             </h1>
             <div>
-              <GallerySection gallery={galleryImages} />
+              <GallerySection
+                gallery={galleryImages}
+                mode="preview"
+                onViewAll={() => navigate(galleryPath)}
+              />
             </div>
           </div>
         </Container>
       </section>
-      <section id="testimonials" className="py-8">
+      <section id="testimonials" className="bg-[#efefef] py-10">
         <Container>
           <div className="flex flex-col gap-6">
             <h1 className="uppercase text-center text-title font-semibold">
-              Testimonials
+              {data?.testimonialsPageHeading || "Testimonials"}
             </h1>
+            {data?.testimonialsPageIntro && (
+              <p className="text-center text-gray-600">{data.testimonialsPageIntro}</p>
+            )}
 
-            <div className="relative">
-              {/* Prev */}
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              {homeTestimonials.map((t) => (
+                <TestimonialCard key={t._id || t.key} item={t} />
+              ))}
+            </div>
+            <div className="flex justify-center pt-4">
               <button
                 type="button"
-                onClick={() => testimonialSlider.current?.prev()}
-                className="hidden md:flex absolute -left-4 top-1/2 -translate-y-1/2 z-10
-                     bg-black/60 text-white p-3 rounded-full hover:bg-black/80 transition"
-                aria-label="Previous testimonials"
+                onClick={() => setIsReviewOpen(true)}
+                className="rounded-full border border-[#7d7d7d] px-7 py-3 text-sm font-semibold uppercase text-[#2f3b58] transition hover:bg-white"
               >
-                <FaChevronLeft size={18} />
-              </button>
-
-              {/* Slider */}
-              <div ref={testimonialRef} className="keen-slider">
-                {testimonials.map((t) => (
-                  <div key={t._id} className="keen-slider__slide px-10">
-                    <TestimonialCard item={t} />
-                  </div>
-                ))}
-              </div>
-
-              {/* Next */}
-              <button
-                type="button"
-                onClick={() => testimonialSlider.current?.next()}
-                className="hidden md:flex absolute -right-4 top-1/2 -translate-y-1/2 z-10
-                     bg-black/60 text-white p-3 rounded-full hover:bg-black/80 transition"
-                aria-label="Next testimonials"
-              >
-                <FaChevronRight size={18} />
+                Write a Review
               </button>
             </div>
           </div>
         </Container>
       </section>
 
-      <section id="contact" className="py-8">
+      <section id="contact" className="bg-[#efefef] py-10">
         <Container>
           <div className="flex flex-col gap-6">
             <h1 className="uppercase text-center text-title font-semibold">
-              Contact
+              {data?.contactPageHeading || "Contact"}
             </h1>
-            <div className="flex md:flex-nowrap flex-wrap items-stretch gap-4">
+            <div className="flex flex-wrap items-stretch gap-4 md:flex-nowrap">
               <iframe
                 title="India Office"
                 className="w-full h-[25rem]"
                 loading="lazy"
                 src={data?.mapUrl}
               ></iframe>
-              <div className="shadow-md w-full lg:w-[40%] p-4">
-                <div className="flex flex-col gap-4 h-full">
+              <div className="w-full p-4 shadow-md lg:w-[40%]">
+                <div className="flex h-full flex-col gap-4">
                   <div className="h-16 w-full overflow-hidden">
                     <img
-                      src={data?.companyLogo?.url}
+                      src={getMediaSrc(data?.companyLogo)}
                       alt="company-logo"
                       className="h-full w-full object-contain"
                     />
                   </div>
-                  <div className="flex flex-col gap-4 h-full justify-center items-center">
-                    <div className="flex gap-4 w-full items-center">
+                  <div className="flex h-full flex-col items-center justify-center gap-4">
+                    <div className="flex w-full items-center gap-4">
                       <div className="text-subtitle p-2 rounded-full border-2 border-accent">
                         <BsEnvelope />
                       </div>
                       <div className="text-small pl-2">
-                        <span>{data.email}</span>
+                        <span>{data.websiteEmail || data.email}</span>
                       </div>
                     </div>
-                    <div className="flex gap-4 w-full items-center">
+                    <div className="flex w-full items-center gap-4">
                       <div className="text-subtitle p-2 rounded-full border-2 border-accent">
                         <MdOutlinePhone />
                       </div>
@@ -314,7 +331,7 @@ const TemplateHome = () => {
                         <span>{data.phone}</span>
                       </div>
                     </div>
-                    <div className="flex gap-4 w-full items-center">
+                    <div className="flex w-full items-center gap-4">
                       <div className="text-subtitle p-2 rounded-full ">
                         <CiMap />
                       </div>
@@ -331,21 +348,25 @@ const TemplateHome = () => {
       </section>
 
       {/* product modal */}
-      {!isCafe && (
-        <TempModal
-          width="w-[80%] lg:w-[60%]"
-          bgColor="bg-white"
-          open={open}
+      <TempModal
+        width="w-[80%] lg:w-[60%]"
+        bgColor="bg-white"
+        open={open}
+        onClose={() => setOpen(false)}
+      >
+        <ProductModalContent
+          product={selectedProduct}
+          company={isPending ? [] : data}
           onClose={() => setOpen(false)}
-        >
-          <ProductModalContent
-            product={selectedProduct}
-            company={isPending ? [] : data}
-            onClose={() => setOpen(false)}
-            vertical={vertical}
-          />
-        </TempModal>
-      )}
+        />
+      </TempModal>
+
+      <ReviewFormModal
+        open={isReviewOpen}
+        onClose={() => setIsReviewOpen(false)}
+        companyId={data?.companyId || ""}
+        companyName={data?.companyName || ""}
+      />
 
       {/* product modal */}
     </div>
