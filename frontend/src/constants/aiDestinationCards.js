@@ -443,6 +443,9 @@ const destinations = [
   ["Lagos State", "Nigeria", "Africa"],
   ["Abuja", "Nigeria", "Africa"],
   ["Giza", "Egypt", "Africa"],
+  ["Sarajevo", "Bosnia and Herzegovina", "Europe"],
+  ["San Jose", "Costa Rica", "North America"],
+  ["Texas", "USA", "North America"],
 ];
 
 const destinationCardShortNames = {
