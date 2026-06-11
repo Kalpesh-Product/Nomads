@@ -6,13 +6,15 @@ const HighlightCard = ({ item, kind, onClick }) => (
     onClick={() => onClick(item)}
     className="flex w-full flex-col gap-2 rounded-lg bg-white text-left transition-transform hover:scale-[1.01]"
   >
-    <div className="aspect-square w-full overflow-hidden rounded-3xl">
-      <img
-        src={item.image}
-        alt={item.title}
-        className="h-full w-full object-cover transition-transform hover:scale-105"
-        loading="lazy"
-      />
+    <div className="aspect-square w-full overflow-hidden rounded-3xl bg-gray-100">
+      {item.image && (
+        <img
+          src={item.image}
+          alt={item.title}
+          className="h-full w-full object-cover transition-transform hover:scale-105"
+          loading="lazy"
+        />
+      )}
     </div>
     <div className="flex min-w-0 flex-col gap-1 px-4">
       <p className="line-clamp-2 text-xs font-semibold md:text-sm">
@@ -36,6 +38,7 @@ const AiDestinationHighlightSection = ({
   items,
   kind,
   onCardClick,
+  onViewMore,
   sectionRef,
   mobile = false,
 }) => {
@@ -55,6 +58,17 @@ const AiDestinationHighlightSection = ({
             </div>
           ))}
         </div>
+        {onViewMore && (
+          <div className="mt-0 text-right">
+            <button
+              type="button"
+              onClick={onViewMore}
+              className="text-sm font-semibold text-primary-blue hover:underline"
+            >
+              View more &rarr;
+            </button>
+          </div>
+        )}
       </div>
     );
   }
@@ -77,14 +91,26 @@ const AiDestinationHighlightSection = ({
           />
         ))}
       </div>
-      <div className="mt-0 text-right">
-        <span className="text-sm font-semibold text-primary-blue">
-          View more &rarr;
-        </span>
-      </div>
+      {onViewMore && (
+        <div className="mt-0 text-right">
+          <button
+            type="button"
+            onClick={onViewMore}
+            className="text-sm font-semibold text-primary-blue hover:underline"
+          >
+            View more &rarr;
+          </button>
+        </div>
+      )}
+      {!onViewMore && (
+        <div className="mt-0 text-right">
+          <span className="text-sm font-semibold text-primary-blue">
+            View more &rarr;
+          </span>
+        </div>
+      )}
     </div>
   );
 };
 
 export default AiDestinationHighlightSection;
-

@@ -37,8 +37,6 @@ import AiDestinationHighlightSection from "../components/AiDestinationHighlightS
 import {
   DESTINATION_HIGHLIGHT_FILTERS,
   annualEvents,
-  popularBlogs,
-  popularNews,
   popularVenues,
 } from "../data/aiDestinationHighlights.js";
 
@@ -58,6 +56,22 @@ const THINKING_HEADING_TEXT = "Curating the best results for you";
 const CURATED_RESULTS_HEADING_TEXT =
   "Please find below the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
 const AI_SCROLL_CONTAINER_ID = "nomad-ai-scroll-container";
+const extractImageFromContent = (content) => {
+  const match = content?.match(/<img.*?src=["'](.*?)["']/);
+  return match ? match[1] : null;
+};
+const normalizeContentDestination = (label) =>
+  label
+    ? label
+        .replace(/\+/g, " ")
+        .replace(/[\u2010-\u2015\u2212\u{FE63}\u{FF0D}]/gu, "-")
+        .trim()
+    : "";
+const buildExactContentKeyword = (label) => {
+  if (!label) return null;
+  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return `^${escaped}$`;
+};
 const getAiVerticalsPageStateKey = (country = "", location = "") => {
   const countryKey = country.trim().toLowerCase();
   const locationKey = location.trim().toLowerCase();
@@ -380,6 +394,59 @@ const AiGlobalListingsList = () => {
     location.state?.selectedStateLabel,
     locationOptions,
   ]);
+  const contentDestination = normalizeContentDestination(formData?.location);
+  const { data: blogsData } = useQuery({
+    queryKey: ["blogs", contentDestination],
+    queryFn: async () => {
+      const response = await axios.get("/blogs/get-blogs", {
+        params: {
+          keyword: buildExactContentKeyword(contentDestination),
+        },
+      });
+
+      return response.data;
+    },
+    enabled: !!contentDestination,
+    refetchOnWindowFocus: false,
+  });
+  const { data: newsData } = useQuery({
+    queryKey: ["ai-news", contentDestination],
+    queryFn: async () => {
+      const response = await axios.get("/news/get-news", {
+        params: {
+          keyword: buildExactContentKeyword(contentDestination),
+        },
+      });
+
+      return response.data;
+    },
+    enabled: !!contentDestination,
+    refetchOnWindowFocus: false,
+  });
+  const popularLocationBlogs = useMemo(
+    () =>
+      (Array.isArray(blogsData) ? blogsData : []).slice(0, 5).map((blog) => ({
+        ...blog,
+        id: blog.guid || blog._id || blog.mainTitle,
+        title: blog.mainTitle || blog.title,
+        image:
+          blog.mainImage ||
+          extractImageFromContent(blog.content || blog.description),
+      })),
+    [blogsData],
+  );
+  const popularLocationNews = useMemo(
+    () =>
+      (Array.isArray(newsData) ? newsData : []).slice(0, 5).map((newsItem) => ({
+        ...newsItem,
+        id: newsItem.guid || newsItem._id || newsItem.mainTitle,
+        title: newsItem.mainTitle || newsItem.title,
+        image:
+          newsItem.mainImage ||
+          extractImageFromContent(newsItem.content || newsItem.description),
+      })),
+    [newsData],
+  );
 
   const countOptions = [
     { label: "1 - 5", value: "1-5" },
@@ -829,6 +896,34 @@ const AiGlobalListingsList = () => {
     );
   };
 
+  const handleBlogsViewMore = () => {
+    navigate(
+      {
+        pathname: "/ai-blogs",
+        search: location.search,
+      },
+      {
+        state: {
+          selectedStateLabel: selectedLocationLabel,
+        },
+      },
+    );
+  };
+
+  const handleNewsViewMore = () => {
+    navigate(
+      {
+        pathname: "/ai-news",
+        search: location.search,
+      },
+      {
+        state: {
+          selectedStateLabel: selectedLocationLabel,
+        },
+      },
+    );
+  };
+
   const handleValueAddedServiceClick = (service) => {
     if (!service.path) return;
 
@@ -1227,22 +1322,24 @@ const AiGlobalListingsList = () => {
                       />
                       <AiDestinationHighlightSection
                         title={`Popular News in ${selectedLocationLabel}`}
-                        items={popularNews}
+                        items={popularLocationNews}
                         kind="news"
                         onCardClick={(item) =>
                           handleHighlightCardClick(item, "news")
                         }
+                        onViewMore={handleNewsViewMore}
                         sectionRef={(element) => {
                           sectionRefs.current["news-desktop"] = element;
                         }}
                       />
                       <AiDestinationHighlightSection
                         title={`Popular Blogs in ${selectedLocationLabel}`}
-                        items={popularBlogs}
+                        items={popularLocationBlogs}
                         kind="blog"
                         onCardClick={(item) =>
                           handleHighlightCardClick(item, "blog")
                         }
+                        onViewMore={handleBlogsViewMore}
                         sectionRef={(element) => {
                           sectionRefs.current["blogs-desktop"] = element;
                         }}
@@ -1623,11 +1720,12 @@ const AiGlobalListingsList = () => {
                     <AiDestinationHighlightSection
                       mobile
                       title={`Popular News in ${selectedLocationLabel}`}
-                      items={popularNews}
+                      items={popularLocationNews}
                       kind="news"
                       onCardClick={(item) =>
                         handleHighlightCardClick(item, "news")
                       }
+                      onViewMore={handleNewsViewMore}
                       sectionRef={(element) => {
                         sectionRefs.current["news-mobile"] = element;
                       }}
@@ -1635,11 +1733,12 @@ const AiGlobalListingsList = () => {
                     <AiDestinationHighlightSection
                       mobile
                       title={`Popular Blogs in ${selectedLocationLabel}`}
-                      items={popularBlogs}
+                      items={popularLocationBlogs}
                       kind="blog"
                       onCardClick={(item) =>
                         handleHighlightCardClick(item, "blog")
                       }
+                      onViewMore={handleBlogsViewMore}
                       sectionRef={(element) => {
                         sectionRefs.current["blogs-mobile"] = element;
                       }}
