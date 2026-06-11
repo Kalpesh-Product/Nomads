@@ -989,9 +989,9 @@ const AiGlobalListingsList = () => {
         <div
           className={`${isHeadingSequenceComplete ? "flex" : "hidden"} flex-col gap-4 justify-center items-center w-full`}
         >
-          <div className="min-w-[75%] max-w-[80rem] lg:max-w-[80rem] mx-0 lg:mx-auto px-1 sm:px-6 lg:px-0">
+          <div className="w-full px-0">
             <div className="flex flex-col gap-4 justify-between items-center w-full h-full">
-              <div className="w-11/12 pb-4">
+              <div className="w-full pb-4">
                 <div className="flex justify-between items-center">
                   {categoryOptions.map((cat) => {
                     const iconSrc = newIcons[cat.value];

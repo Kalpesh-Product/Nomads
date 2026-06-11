@@ -982,7 +982,7 @@ const AiListings = ({ forceListView = false }) => {
                 <div className="hidden lg:flex flex-col gap-4 justify-between items-center w-full h-full">
                   {/* the 5 icons */}
 
-                  <div className=" w-9/12 pb-4">
+                  <div className="w-full pb-4">
                     <div className="flex justify-between items-center">
                       {categoryOptions.map((cat) => {
                         const iconSrc = newIcons[cat.value];
