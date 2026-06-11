@@ -354,7 +354,7 @@ const AiGlobalListingsList = () => {
     const normalizedLocation = formData?.location?.trim().toLowerCase();
     const sessionTitle =
       selectedDestination?.country === normalizedCountry &&
-        selectedDestination?.city === normalizedLocation
+      selectedDestination?.city === normalizedLocation
         ? selectedDestination?.title
         : "";
 
@@ -366,7 +366,12 @@ const AiGlobalListingsList = () => {
         (option) => option.value?.toLowerCase() === normalizedLocation,
       )?.label || formData.location
     );
-  }, [formData?.country, formData?.location, location.state?.selectedStateLabel, locationOptions]);
+  }, [
+    formData?.country,
+    formData?.location,
+    location.state?.selectedStateLabel,
+    locationOptions,
+  ]);
 
   const countOptions = [
     { label: "1 - 5", value: "1-5" },
@@ -472,7 +477,9 @@ const AiGlobalListingsList = () => {
         listingsData
           .filter((item) => item.companyType !== "privatestay")
           .map((item) => item.companyType)
-          .filter(Boolean),
+          .filter(Boolean)
+          // Temporarily hide Workation from the category icon filters.
+          .filter((type) => type !== "workation"),
       ),
     ];
 

@@ -381,7 +381,9 @@ const AiListings = ({ forceListView = false }) => {
         listingsData
           .filter((item) => item.companyType !== "privatestay")
           .map((item) => item.companyType)
-          .filter(Boolean),
+          .filter(Boolean)
+          // Temporarily hide Workation from the category icon filters.
+          .filter((type) => type !== "workation"),
       ),
     ];
 
@@ -1246,8 +1248,7 @@ const AiListings = ({ forceListView = false }) => {
                     cafe: "Cafes",
                     [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
                   }[formData.category] || `${formData.category} Spaces`}{" "}
-                  in{" "}
-                  {selectedStateLabel || "Unknown"}
+                  in {selectedStateLabel || "Unknown"}
                 </h1>
               </div>
             )}
