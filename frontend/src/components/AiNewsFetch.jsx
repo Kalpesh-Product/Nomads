@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "../utils/axios.js";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import humanDate from "../utils/humanDate.js";
 import { useSelector } from "react-redux";
 
@@ -24,7 +24,7 @@ const buildExactKeyword = (label) => {
   return `^${escaped}$`;
 };
 
-const NewsCard = ({ a }) => {
+const NewsCard = ({ a, stateName }) => {
   const navigate = useNavigate();
 
   const fallbackImg = extractImageFromContent(a.content || a.description);
@@ -32,7 +32,11 @@ const NewsCard = ({ a }) => {
 
   return (
     <article
-      onClick={() => navigate("ai-news-details", { state: { content: a } })}
+      onClick={() =>
+        navigate("ai-news-details", {
+          state: { content: a, selectedStateLabel: stateName },
+        })
+      }
       className="group relative rounded-xl border bg-white transition hover:shadow-md cursor-pointer overflow-hidden max-w-full"
     >
       <div className="flex flex-col sm:flex-row gap-4 p-4">
@@ -72,6 +76,7 @@ const NewsCard = ({ a }) => {
 
 const AiNewsFetch = () => {
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const formData = useSelector((state) => state.location.formValues);
 
   const urlDest = normalizeLabel(
@@ -80,6 +85,7 @@ const AiNewsFetch = () => {
   const reduxDest = normalizeLabel(formData?.location || formData?.state);
 
   const dest = urlDest || reduxDest || "";
+  const stateName = location.state?.selectedStateLabel || dest;
 
   const params = useMemo(() => {
     if (!dest) return undefined;
@@ -124,7 +130,7 @@ const AiNewsFetch = () => {
         )}
 
         {news.map((a) => (
-          <NewsCard key={a.guid || a._id} a={a} />
+          <NewsCard key={a.guid || a._id} a={a} stateName={stateName} />
         ))}
       </div>
 

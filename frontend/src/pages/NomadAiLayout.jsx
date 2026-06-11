@@ -10,8 +10,7 @@ import AiFooter from "../components/AiFooter";
 import BackToTopButton from "../components/BackToTopButton";
 import AiStickyBackBreadcrumb from "../components/AiStickyBackBreadcrumb";
 
-const EXCLUDED_STICKY_BAR_PATHS = new Set([
-]);
+const EXCLUDED_STICKY_BAR_PATHS = new Set([]);
 
 const HIDE_STICKY_BAR_EXACT_PATHS = new Set([
   "/home",
@@ -139,11 +138,20 @@ const NomadAiLayout = () => {
 
     const segments = location.pathname.split("/").filter(Boolean);
     if (segments.length === 0) return [];
+
+    const isContentDetailPage =
+      location.pathname === "/ai-blogs/ai-blog-details" ||
+      location.pathname === "/ai-news/ai-news-details";
+    const detailStateName = location.state?.selectedStateLabel;
+
     return segments
       .map((segment, index) => {
         const isLast = index === segments.length - 1;
         return {
-          label: normalizeBreadcrumbLabel(segment),
+          label:
+            isLast && isContentDetailPage && detailStateName
+              ? toTitle(detailStateName)
+              : normalizeBreadcrumbLabel(segment),
           onClick: isLast
             ? null
             : () => navigate(`/${segments.slice(0, index + 1).join("/")}`),

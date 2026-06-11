@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "../utils/axios";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import humanDate from "../utils/humanDate";
 import { useSelector } from "react-redux";
 
@@ -24,14 +24,18 @@ const buildExactKeyword = (label) => {
   return `^${escaped}$`;
 };
 
-const BlogCard = ({ b }) => {
+const BlogCard = ({ b, stateName }) => {
   const fallbackImg = extractImageFromContent(b.content || b.description);
   const thumbnail = b.mainImage || fallbackImg;
   const navigate = useNavigate();
 
   return (
     <article
-      onClick={() => navigate("ai-blog-details", { state: { content: b } })}
+      onClick={() =>
+        navigate("ai-blog-details", {
+          state: { content: b, selectedStateLabel: stateName },
+        })
+      }
       className="border rounded-xl overflow-hidden shadow-sm hover:shadow-xl cursor-pointer transition"
     >
       {thumbnail ? (
@@ -63,6 +67,7 @@ const BlogCard = ({ b }) => {
 
 const AiBlogsFetch = () => {
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const formData = useSelector((state) => state.location.formValues);
 
   const urlDest = normalizeLabel(
@@ -71,6 +76,7 @@ const AiBlogsFetch = () => {
   const reduxDest = normalizeLabel(formData?.location || formData?.state);
 
   const dest = urlDest || reduxDest || "";
+  const stateName = location.state?.selectedStateLabel || dest;
 
   const params = useMemo(() => {
     if (!dest) return undefined;
@@ -115,7 +121,7 @@ const AiBlogsFetch = () => {
         )}
 
         {blogs.map((b) => (
-          <BlogCard key={b.guid || b._id} b={b} />
+          <BlogCard key={b.guid || b._id} b={b} stateName={stateName} />
         ))}
       </div>
 
