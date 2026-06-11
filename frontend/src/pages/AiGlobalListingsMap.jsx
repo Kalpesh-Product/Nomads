@@ -35,6 +35,7 @@ import {
   dedupeAiSearchBadges,
   buildAiVerticalsSearchBadges,
 } from "../utils/aiSearchBarBadges.js";
+import { DESTINATION_HIGHLIGHT_FILTERS } from "../data/aiDestinationHighlights.js";
 
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
 const TYPING_INTERVAL_MS = 7;
@@ -375,6 +376,7 @@ const AiGlobalListingsMap = () => {
   const categoryOptions = useMemo(() => {
     if (!listingsData || listingsData.length === 0) {
       return [
+        ...DESTINATION_HIGHLIGHT_FILTERS,
         {
           label: "Value Adds",
           value: VALUE_ADDED_SERVICES_CATEGORY,
@@ -417,14 +419,11 @@ const AiGlobalListingsMap = () => {
       .map((type) => ({ label: labelMap[type] || type, value: type }))
       .sort((a, b) => typeOrder.indexOf(a.value) - typeOrder.indexOf(b.value));
 
-    if (
-      result.some((option) => option.value === VALUE_ADDED_SERVICES_CATEGORY)
-    ) {
-      return result;
-    }
-
     return [
-      ...result,
+      ...result.filter(
+        (option) => option.value !== VALUE_ADDED_SERVICES_CATEGORY,
+      ),
+      ...DESTINATION_HIGHLIGHT_FILTERS,
       {
         label: "Value Adds",
         value: VALUE_ADDED_SERVICES_CATEGORY,
@@ -550,6 +549,28 @@ const AiGlobalListingsMap = () => {
       alert("Please select Country and Location first.");
       return;
     }
+
+    if (
+      DESTINATION_HIGHLIGHT_FILTERS.some(
+        (filter) => filter.value === categoryValue,
+      ) ||
+      categoryValue === VALUE_ADDED_SERVICES_CATEGORY
+    ) {
+      const params = new URLSearchParams({
+        country: currentFormData.country,
+        location: currentFormData.location,
+        highlight: categoryValue,
+      });
+      navigate(`/ai-verticals?${params.toString()}`, {
+        state: {
+          ...location.state,
+          selectedStateLabel: selectedLocationLabel,
+          searchBarBadges,
+        },
+      });
+      return;
+    }
+
     dispatch(setFormValues({ ...currentFormData, category: categoryValue }));
 
     if (isMobileOrTablet && categoryValue !== VALUE_ADDED_SERVICES_CATEGORY) {

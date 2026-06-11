@@ -37,6 +37,8 @@ const normalizeBreadcrumbLabel = (segment) => {
   const normalized = (segment || "").toLowerCase();
   if (normalized === "ai-blogs") return "Blogs";
   if (normalized === "ai-news") return "News";
+  if (normalized === "ai-events") return "Events";
+  if (normalized === "ai-venues") return "Venues";
   if (normalized === "ai-about") return "About";
   if (normalized === "ai-career") return "Career";
   if (normalized === "ai-faq") return "FAQs";

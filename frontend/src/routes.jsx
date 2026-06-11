@@ -95,6 +95,7 @@ import AiTermsAndConditions from "./pages/AiTermsAndConditions";
 import AiContentAndCopyright from "./pages/AiContentAndCopyright";
 import AiContentUseRemoval from "./pages/AiContentUseRemoval";
 import AiJobDetail from "./pages/AiJobDetail";
+import AiDestinationDetail from "./pages/AiDestinationDetail";
 
 // hosts Ai subroutes
 import AiHostLayout from "./pages/AiHost/AiHostLayout";
@@ -254,6 +255,14 @@ if (tenant === "main") {
             { path: "ai-blogs/ai-blog-details", element: <AiBlogDetails /> },
             { path: "ai-news", element: <AiNewsFetch /> },
             { path: "ai-news/ai-news-details", element: <AiBlogDetails /> },
+            {
+              path: "ai-events/:eventId",
+              element: <AiDestinationDetail type="event" />,
+            },
+            {
+              path: "ai-venues/:venueId",
+              element: <AiDestinationDetail type="venue" />,
+            },
             { path: "ai-listings", element: <AiListings /> },
             { path: "ai-listings-list", element: <AiListingsListView /> },
             { path: "ai-listings/:company", element: <AiProduct /> },

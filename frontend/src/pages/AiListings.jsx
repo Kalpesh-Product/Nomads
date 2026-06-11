@@ -25,6 +25,7 @@ import { useSearchParams } from "react-router-dom";
 import ListingCard from "../components/ListingCard.jsx";
 import PaginatedGrid from "../components/PaginatedGrid.jsx";
 import newIcons from "../assets/newIcons.js";
+import { DESTINATION_HIGHLIGHT_FILTERS } from "../data/aiDestinationHighlights.js";
 import SearchBarCombobox from "../components/SearchBarCombobox.jsx";
 import AiSelectedBadgesSearchBar from "../components/AiSelectedBadgesSearchBar.jsx";
 import { IoSearch } from "react-icons/io5";
@@ -369,6 +370,7 @@ const AiListings = ({ forceListView = false }) => {
 
     if (!listingsData || listingsData.length === 0) {
       return [
+        ...DESTINATION_HIGHLIGHT_FILTERS,
         {
           label: "Value Adds",
           value: VALUE_ADDED_SERVICES_CATEGORY,
@@ -412,14 +414,11 @@ const AiListings = ({ forceListView = false }) => {
       .map((type) => ({ label: labelMap[type] || type, value: type }))
       .sort((a, b) => typeOrder.indexOf(a.value) - typeOrder.indexOf(b.value));
 
-    if (
-      options.some((option) => option.value === VALUE_ADDED_SERVICES_CATEGORY)
-    ) {
-      return options;
-    }
-
     return [
-      ...options,
+      ...options.filter(
+        (option) => option.value !== VALUE_ADDED_SERVICES_CATEGORY,
+      ),
+      ...DESTINATION_HIGHLIGHT_FILTERS,
       { label: "Value Adds", value: VALUE_ADDED_SERVICES_CATEGORY },
     ];
   }, [isLisitingLoading, listingsData]);
@@ -628,6 +627,27 @@ const AiListings = ({ forceListView = false }) => {
       alert("Please select Country and Location first.");
       return;
     }
+
+    if (
+      DESTINATION_HIGHLIGHT_FILTERS.some(
+        (filter) => filter.value === categoryValue,
+      ) ||
+      categoryValue === VALUE_ADDED_SERVICES_CATEGORY
+    ) {
+      const params = new URLSearchParams({
+        country: formData.country,
+        location: formData.location,
+        highlight: categoryValue,
+      });
+      navigate(`/ai-verticals?${params.toString()}`, {
+        state: {
+          selectedStateLabel,
+          searchBarBadges,
+        },
+      });
+      return;
+    }
+
     dispatch(setFormValues({ ...formData, category: categoryValue }));
 
     // const url = `/nomads/${formData.country}.${formData.location}/${categoryValue}`;

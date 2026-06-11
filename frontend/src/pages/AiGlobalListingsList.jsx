@@ -33,6 +33,14 @@ import {
   dedupeAiSearchBadges,
   buildAiVerticalsSearchBadges,
 } from "../utils/aiSearchBarBadges.js";
+import AiDestinationHighlightSection from "../components/AiDestinationHighlightSection.jsx";
+import {
+  DESTINATION_HIGHLIGHT_FILTERS,
+  annualEvents,
+  popularBlogs,
+  popularNews,
+  popularVenues,
+} from "../data/aiDestinationHighlights.js";
 
 // import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
 // import {
@@ -408,6 +416,10 @@ const AiGlobalListingsList = () => {
 
   const hasRestoredPageStateRef = React.useRef(false);
   const sectionRefs = React.useRef({});
+  const getDiscoverySectionRef = React.useCallback((categoryValue) => {
+    const viewport = window.innerWidth >= 1024 ? "desktop" : "mobile";
+    return sectionRefs.current[`${categoryValue}-${viewport}`];
+  }, []);
 
   const getScrollContainer = () =>
     typeof document === "undefined"
@@ -469,7 +481,10 @@ const AiGlobalListingsList = () => {
 
   const categoryOptions = useMemo(() => {
     if (!listingsData || listingsData.length === 0) {
-      return [];
+      return [
+        ...DESTINATION_HIGHLIGHT_FILTERS,
+        { label: "Value Adds", value: VALUE_ADDED_SERVICES_CATEGORY },
+      ];
     }
 
     const uniqueTypes = [
@@ -507,18 +522,14 @@ const AiGlobalListingsList = () => {
       .map((type) => ({ label: labelMap[type] || type, value: type }))
       .sort((a, b) => typeOrder.indexOf(a.value) - typeOrder.indexOf(b.value));
 
-    if (
-      options.some((option) => option.value === VALUE_ADDED_SERVICES_CATEGORY)
-    ) {
-      return options;
-    }
+    const optionsWithoutValueAdds = options.filter(
+      (option) => option.value !== VALUE_ADDED_SERVICES_CATEGORY,
+    );
 
     return [
-      ...options,
-      {
-        label: "Value Adds",
-        value: VALUE_ADDED_SERVICES_CATEGORY,
-      },
+      ...optionsWithoutValueAdds,
+      ...DESTINATION_HIGHLIGHT_FILTERS,
+      { label: "Value Adds", value: VALUE_ADDED_SERVICES_CATEGORY },
     ];
   }, [listingsData]);
 
@@ -753,6 +764,20 @@ const AiGlobalListingsList = () => {
       alert("Please select Country and Location first.");
       return;
     }
+
+    if (
+      DESTINATION_HIGHLIGHT_FILTERS.some(
+        (filter) => filter.value === categoryValue,
+      ) ||
+      categoryValue === VALUE_ADDED_SERVICES_CATEGORY
+    ) {
+      getDiscoverySectionRef(categoryValue)?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+      return;
+    }
+
     dispatch(setFormValues({ ...formData, category: categoryValue }));
 
     const state = {
@@ -768,6 +793,37 @@ const AiGlobalListingsList = () => {
           location: formData.location,
           category: categoryValue,
           searchBarBadges,
+        },
+      },
+    );
+  };
+
+  const handleHighlightCardClick = (item, type) => {
+    if (type === "event" || type === "venue") {
+      navigate(`/ai-${type}s/${item.id}`, {
+        state: {
+          item,
+          selectedStateLabel: selectedLocationLabel,
+          stickyBreadcrumbs: [
+            {
+              label: selectedLocationLabel || "Destination",
+              path: location.pathname,
+            },
+            { label: item.title },
+          ],
+        },
+      });
+      return;
+    }
+
+    navigate(
+      type === "news"
+        ? "/ai-news/ai-news-details"
+        : "/ai-blogs/ai-blog-details",
+      {
+        state: {
+          content: item,
+          selectedStateLabel: selectedLocationLabel,
         },
       },
     );
@@ -869,6 +925,21 @@ const AiGlobalListingsList = () => {
       },
     });
   };
+
+  useEffect(() => {
+    if (!isHeadingSequenceComplete) return;
+
+    const params = new URLSearchParams(location.search);
+    const highlight = params.get("highlight");
+    if (!highlight) return;
+
+    window.requestAnimationFrame(() => {
+      getDiscoverySectionRef(highlight)?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  }, [getDiscoverySectionRef, isHeadingSequenceComplete, location.search]);
 
   return (
     <>
@@ -1132,7 +1203,57 @@ const AiGlobalListingsList = () => {
                             </div>
                           );
                         })}
-                      <div className="col-span-full border-t border-gray-300 mt-6 pt-6 mb-6">
+                      <AiDestinationHighlightSection
+                        title={`Popular Annual Events in ${selectedLocationLabel}`}
+                        items={annualEvents}
+                        kind="event"
+                        onCardClick={(item) =>
+                          handleHighlightCardClick(item, "event")
+                        }
+                        sectionRef={(element) => {
+                          sectionRefs.current["annualevents-desktop"] = element;
+                        }}
+                      />
+                      <AiDestinationHighlightSection
+                        title={`Popular Venues to visit in ${selectedLocationLabel}`}
+                        items={popularVenues}
+                        kind="venue"
+                        onCardClick={(item) =>
+                          handleHighlightCardClick(item, "venue")
+                        }
+                        sectionRef={(element) => {
+                          sectionRefs.current["venues-desktop"] = element;
+                        }}
+                      />
+                      <AiDestinationHighlightSection
+                        title={`Popular News in ${selectedLocationLabel}`}
+                        items={popularNews}
+                        kind="news"
+                        onCardClick={(item) =>
+                          handleHighlightCardClick(item, "news")
+                        }
+                        sectionRef={(element) => {
+                          sectionRefs.current["news-desktop"] = element;
+                        }}
+                      />
+                      <AiDestinationHighlightSection
+                        title={`Popular Blogs in ${selectedLocationLabel}`}
+                        items={popularBlogs}
+                        kind="blog"
+                        onCardClick={(item) =>
+                          handleHighlightCardClick(item, "blog")
+                        }
+                        sectionRef={(element) => {
+                          sectionRefs.current["blogs-desktop"] = element;
+                        }}
+                      />
+                      <div
+                        ref={(element) => {
+                          sectionRefs.current["valueaddedservices-desktop"] =
+                            element;
+                        }}
+                        className="col-span-full border-t border-gray-300 mt-6 pt-6 mb-6 scroll-mt-24"
+                      >
                         <h2 className="text-subtitle font-semibold mb-5 text-secondary-dark">
                           Value Added Services in {selectedLocationLabel}
                         </h2>
@@ -1475,7 +1596,61 @@ const AiGlobalListingsList = () => {
                           </HorizontalScrollWrapper>
                         );
                       })}
-                    <div className="mb-6">
+                    <AiDestinationHighlightSection
+                      mobile
+                      title={`Popular Annual Events in ${selectedLocationLabel}`}
+                      items={annualEvents}
+                      kind="event"
+                      onCardClick={(item) =>
+                        handleHighlightCardClick(item, "event")
+                      }
+                      sectionRef={(element) => {
+                        sectionRefs.current["annualevents-mobile"] = element;
+                      }}
+                    />
+                    <AiDestinationHighlightSection
+                      mobile
+                      title={`Popular Venues to visit in ${selectedLocationLabel}`}
+                      items={popularVenues}
+                      kind="venue"
+                      onCardClick={(item) =>
+                        handleHighlightCardClick(item, "venue")
+                      }
+                      sectionRef={(element) => {
+                        sectionRefs.current["venues-mobile"] = element;
+                      }}
+                    />
+                    <AiDestinationHighlightSection
+                      mobile
+                      title={`Popular News in ${selectedLocationLabel}`}
+                      items={popularNews}
+                      kind="news"
+                      onCardClick={(item) =>
+                        handleHighlightCardClick(item, "news")
+                      }
+                      sectionRef={(element) => {
+                        sectionRefs.current["news-mobile"] = element;
+                      }}
+                    />
+                    <AiDestinationHighlightSection
+                      mobile
+                      title={`Popular Blogs in ${selectedLocationLabel}`}
+                      items={popularBlogs}
+                      kind="blog"
+                      onCardClick={(item) =>
+                        handleHighlightCardClick(item, "blog")
+                      }
+                      sectionRef={(element) => {
+                        sectionRefs.current["blogs-mobile"] = element;
+                      }}
+                    />
+                    <div
+                      ref={(element) => {
+                        sectionRefs.current["valueaddedservices-mobile"] =
+                          element;
+                      }}
+                      className="mb-6 scroll-mt-24"
+                    >
                       <h2 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold leading-tight mb-4">
                         Value Added Services in {selectedLocationLabel}
                       </h2>
