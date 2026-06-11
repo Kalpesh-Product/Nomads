@@ -40,7 +40,7 @@ const destinationImageLinks = [
       "https://i.natgeofe.com/n/6c02ad5a-977b-4f12-b9c0-02ffb0736e07/metropolitan-cathedral-zocalo-mexico-city.JPG",
   },
   {
-    city: "Medellín",
+    city: "Medellin",
     image:
       "https://medellin-tours.com/wp-content/uploads/2025/12/colorful-street-in-comuna-13-in-medellin.jpg",
   },
@@ -368,6 +368,7 @@ const destinationImageMap = new Map(
 
 const destinations = [
   ["Lisbon", "Portugal", "Europe"],
+  ["Abu Dhabi", "United Arab Emirates", "Asia"],
   ["Dubai", "United Arab Emirates", "Asia"],
   ["Barcelona", "Spain", "Europe"],
   ["Bali", "Indonesia", "Asia"],
@@ -375,7 +376,7 @@ const destinations = [
   ["Prague", "Czech Republic", "Europe"],
   ["Kuala Lumpur", "Malaysia", "Asia"],
   ["Mexico City", "Mexico", "North America"],
-  ["Medellín", "Colombia", "South America"],
+  ["Medellin", "Colombia", "South America"],
   ["Porto", "Portugal", "Europe"],
   ["Valencia", "Spain", "Europe"],
   ["Budapest", "Hungary", "Europe"],
@@ -442,6 +443,9 @@ const destinations = [
   ["Lagos State", "Nigeria", "Africa"],
   ["Abuja", "Nigeria", "Africa"],
   ["Giza", "Egypt", "Africa"],
+  ["Sarajevo", "Bosnia and Herzegovina", "Europe"],
+  ["San Jose", "Costa Rica", "North America"],
+  ["Texas", "USA", "North America"],
 ];
 
 const destinationCardShortNames = {
