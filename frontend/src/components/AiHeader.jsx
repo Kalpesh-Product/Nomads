@@ -31,8 +31,12 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
     location.pathname.includes("verticals") ||
     isAiListingsMapPage ||
     isAiListingsListPage;
+  const isAiEditorialPage =
+    location.pathname.startsWith("/ai-blogs") ||
+    location.pathname.startsWith("/ai-news");
   const shouldCheckNewsBlogLinks =
     showToggle ||
+    isAiEditorialPage ||
     location.pathname.startsWith("/ai-listings") ||
     location.pathname.startsWith("/listings");
 
@@ -188,15 +192,19 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
 
     return {
       ...stateFromRoute,
-      searchBarBadges:
-        stateFromRoute?.searchBarBadges || fallbackBadges || [],
+      searchBarBadges: stateFromRoute?.searchBarBadges || fallbackBadges || [],
       selectedFilters: stateFromRoute?.selectedFilters,
       breadcrumbFilters: {
         continent:
-          formData?.continent || stateFromRoute?.breadcrumbFilters?.continent || "",
-        country: formData?.country || stateFromRoute?.breadcrumbFilters?.country || "",
+          formData?.continent ||
+          stateFromRoute?.breadcrumbFilters?.continent ||
+          "",
+        country:
+          formData?.country || stateFromRoute?.breadcrumbFilters?.country || "",
         location:
-          formData?.location || stateFromRoute?.breadcrumbFilters?.location || "",
+          formData?.location ||
+          stateFromRoute?.breadcrumbFilters?.location ||
+          "",
       },
     };
   })();
