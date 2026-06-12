@@ -36,7 +36,6 @@ import {
 import AiDestinationHighlightSection from "../components/AiDestinationHighlightSection.jsx";
 import {
   DESTINATION_HIGHLIGHT_FILTERS,
-  annualEvents,
   popularVenues,
 } from "../data/aiDestinationHighlights.js";
 
@@ -423,6 +422,20 @@ const AiGlobalListingsList = () => {
     enabled: !!contentDestination,
     refetchOnWindowFocus: false,
   });
+  const { data: eventsData } = useQuery({
+    queryKey: ["ai-events", contentDestination],
+    queryFn: async () => {
+      const response = await axios.get("/events", {
+        params: {
+          destination: contentDestination,
+        },
+      });
+
+      return response.data;
+    },
+    enabled: !!contentDestination,
+    refetchOnWindowFocus: false,
+  });
   const popularLocationBlogs = useMemo(
     () =>
       (Array.isArray(blogsData) ? blogsData : []).slice(0, 5).map((blog) => ({
@@ -446,6 +459,20 @@ const AiGlobalListingsList = () => {
           extractImageFromContent(newsItem.content || newsItem.description),
       })),
     [newsData],
+  );
+  const popularLocationEvents = useMemo(
+    () =>
+      (Array.isArray(eventsData) ? eventsData : []).slice(0, 5).map((event) => ({
+        ...event,
+        id: event._id || event.serialNumber || event.eventName,
+        title: event.eventName,
+        image: event.mainImage,
+        location: event.venue || event.destination,
+        meta: event.month,
+        subtitle: event.month,
+        description: event.shortDescription,
+      })),
+    [eventsData],
   );
 
   const countOptions = [
@@ -1300,7 +1327,7 @@ const AiGlobalListingsList = () => {
                         })}
                       <AiDestinationHighlightSection
                         title={`Popular Annual Events in ${selectedLocationLabel}`}
-                        items={annualEvents}
+                        items={popularLocationEvents}
                         kind="event"
                         onCardClick={(item) =>
                           handleHighlightCardClick(item, "event")
@@ -1696,7 +1723,7 @@ const AiGlobalListingsList = () => {
                     <AiDestinationHighlightSection
                       mobile
                       title={`Popular Annual Events in ${selectedLocationLabel}`}
-                      items={annualEvents}
+                      items={popularLocationEvents}
                       kind="event"
                       onCardClick={(item) =>
                         handleHighlightCardClick(item, "event")
