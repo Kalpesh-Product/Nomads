@@ -462,16 +462,18 @@ const AiGlobalListingsList = () => {
   );
   const popularLocationEvents = useMemo(
     () =>
-      (Array.isArray(eventsData) ? eventsData : []).slice(0, 5).map((event) => ({
-        ...event,
-        id: event._id || event.serialNumber || event.eventName,
-        title: event.eventName,
-        image: event.mainImage,
-        location: event.venue || event.destination,
-        meta: event.month,
-        subtitle: event.month,
-        description: event.shortDescription,
-      })),
+      (Array.isArray(eventsData) ? eventsData : [])
+        .slice(0, 5)
+        .map((event) => ({
+          ...event,
+          id: event._id || event.serialNumber || event.eventName,
+          title: event.eventName,
+          image: event.mainImage,
+          location: event.venue || event.destination,
+          meta: event.month,
+          subtitle: event.month,
+          description: event.shortDescription,
+        })),
     [eventsData],
   );
 
@@ -1336,7 +1338,7 @@ const AiGlobalListingsList = () => {
                           sectionRefs.current["annualevents-desktop"] = element;
                         }}
                       />
-                      <AiDestinationHighlightSection
+                      {/* <AiDestinationHighlightSection
                         title={`Popular Venues to visit in ${selectedLocationLabel}`}
                         items={popularVenues}
                         kind="venue"
@@ -1346,7 +1348,7 @@ const AiGlobalListingsList = () => {
                         sectionRef={(element) => {
                           sectionRefs.current["venues-desktop"] = element;
                         }}
-                      />
+                      /> */}
                       <AiDestinationHighlightSection
                         title={`Popular News in ${selectedLocationLabel}`}
                         items={popularLocationNews}
@@ -1732,7 +1734,7 @@ const AiGlobalListingsList = () => {
                         sectionRefs.current["annualevents-mobile"] = element;
                       }}
                     />
-                    <AiDestinationHighlightSection
+                    {/* <AiDestinationHighlightSection
                       mobile
                       title={`Popular Venues to visit in ${selectedLocationLabel}`}
                       items={popularVenues}
@@ -1743,7 +1745,7 @@ const AiGlobalListingsList = () => {
                       sectionRef={(element) => {
                         sectionRefs.current["venues-mobile"] = element;
                       }}
-                    />
+                    /> */}
                     <AiDestinationHighlightSection
                       mobile
                       title={`Popular News in ${selectedLocationLabel}`}

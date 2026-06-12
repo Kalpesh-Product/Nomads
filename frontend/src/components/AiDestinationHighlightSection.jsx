@@ -42,6 +42,8 @@ const AiDestinationHighlightSection = ({
   sectionRef,
   mobile = false,
 }) => {
+  if (!items?.length) return null;
+
   if (mobile) {
     return (
       <div ref={sectionRef} className="mb-6 scroll-mt-24">
