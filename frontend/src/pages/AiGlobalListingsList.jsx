@@ -463,7 +463,6 @@ const AiGlobalListingsList = () => {
   const popularLocationEvents = useMemo(
     () =>
       (Array.isArray(eventsData) ? eventsData : [])
-        .slice(0, 5)
         .map((event) => ({
           ...event,
           id: event._id || event.serialNumber || event.eventName,
@@ -476,6 +475,12 @@ const AiGlobalListingsList = () => {
         })),
     [eventsData],
   );
+  const isAnnualEventsExpanded =
+    expandedCategories.includes("annualevents");
+  const displayedPopularLocationEvents = isAnnualEventsExpanded
+    ? popularLocationEvents
+    : popularLocationEvents.slice(0, 5);
+  const showAnnualEventsToggle = popularLocationEvents.length > 5;
 
   const countOptions = [
     { label: "1 - 5", value: "1-5" },
@@ -1336,10 +1341,20 @@ const AiGlobalListingsList = () => {
                         })}
                       <AiDestinationHighlightSection
                             title={`Popular Annual Events in ${selectedLocationLabel}`}
-                            items={popularLocationEvents}
+                            items={displayedPopularLocationEvents}
                             kind="event"
                             onCardClick={(item) =>
                               handleHighlightCardClick(item, "event")
+                            }
+                            onViewMore={
+                              showAnnualEventsToggle
+                                ? () => handleShowMoreClick("annualevents")
+                                : undefined
+                            }
+                            viewMoreLabel={
+                              isAnnualEventsExpanded
+                                ? "View less \u2190"
+                                : "View more \u2192"
                             }
                             sectionRef={(element) => {
                           sectionRefs.current["annualevents-desktop"] = element;
@@ -1732,10 +1747,20 @@ const AiGlobalListingsList = () => {
                     <AiDestinationHighlightSection
                           mobile
                           title={`Popular Annual Events in ${selectedLocationLabel}`}
-                          items={popularLocationEvents}
+                          items={displayedPopularLocationEvents}
                           kind="event"
                           onCardClick={(item) =>
                             handleHighlightCardClick(item, "event")
+                          }
+                          onViewMore={
+                            showAnnualEventsToggle
+                              ? () => handleShowMoreClick("annualevents")
+                              : undefined
+                          }
+                          viewMoreLabel={
+                            isAnnualEventsExpanded
+                              ? "View less \u2190"
+                              : "View more \u2192"
                           }
                           sectionRef={(element) => {
                         sectionRefs.current["annualevents-mobile"] = element;
