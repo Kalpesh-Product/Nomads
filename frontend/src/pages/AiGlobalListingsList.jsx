@@ -47,6 +47,7 @@ import {
 // } from "react-icons/hi";
 
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
+const ANNUAL_EVENTS_CATEGORY = "annualevents";
 // const VALUE_ADDED_SERVICE_CARD_BACKGROUND_IMAGE = "/images/goa-image.jpg";
 const VALUE_ADDED_SERVICES_DEFAULT_VISIBLE_COUNT = 5;
 const TYPING_INTERVAL_MS = 7;
@@ -876,7 +877,9 @@ const AiGlobalListingsList = () => {
 
     if (
       DESTINATION_HIGHLIGHT_FILTERS.some(
-        (filter) => filter.value === categoryValue,
+        (filter) =>
+          filter.value === categoryValue &&
+          categoryValue !== ANNUAL_EVENTS_CATEGORY,
       )
     ) {
       getDiscoverySectionRef(categoryValue)?.scrollIntoView({

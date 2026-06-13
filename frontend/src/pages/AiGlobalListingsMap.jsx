@@ -38,6 +38,7 @@ import {
 import { DESTINATION_HIGHLIGHT_FILTERS } from "../data/aiDestinationHighlights.js";
 
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
+const ANNUAL_EVENTS_CATEGORY = "annualevents";
 const TYPING_INTERVAL_MS = 7;
 const SECOND_HEADING_DELAY_MS = 250;
 const THINKING_HEADING_TEXT = "Curating the best results for you";
@@ -560,7 +561,9 @@ const AiGlobalListingsMap = () => {
 
     if (
       DESTINATION_HIGHLIGHT_FILTERS.some(
-        (filter) => filter.value === categoryValue,
+        (filter) =>
+          filter.value === categoryValue &&
+          categoryValue !== ANNUAL_EVENTS_CATEGORY,
       )
     ) {
       const params = new URLSearchParams({
@@ -580,7 +583,11 @@ const AiGlobalListingsMap = () => {
 
     dispatch(setFormValues({ ...currentFormData, category: categoryValue }));
 
-    if (isMobileOrTablet && categoryValue !== VALUE_ADDED_SERVICES_CATEGORY) {
+    if (
+      isMobileOrTablet &&
+      categoryValue !== VALUE_ADDED_SERVICES_CATEGORY &&
+      categoryValue !== ANNUAL_EVENTS_CATEGORY
+    ) {
       setShowListings(true);
       // Optional: Clear mobile search if open
       setShowMobileSearch(false);
@@ -596,7 +603,8 @@ const AiGlobalListingsMap = () => {
     setShowListings(false);
 
     const listingsPath =
-      categoryValue === VALUE_ADDED_SERVICES_CATEGORY
+      categoryValue === VALUE_ADDED_SERVICES_CATEGORY ||
+      categoryValue === ANNUAL_EVENTS_CATEGORY
         ? "/ai-listings-list"
         : "/ai-listings";
 
