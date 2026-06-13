@@ -861,6 +861,14 @@ const AiGlobalListingsList = () => {
       return;
     }
 
+    if (categoryValue === "news" || categoryValue === "blogs") {
+      navigate({
+        pathname: categoryValue === "news" ? "/ai-news" : "/ai-blogs",
+        search: location.search,
+      });
+      return;
+    }
+
     if (
       DESTINATION_HIGHLIGHT_FILTERS.some(
         (filter) => filter.value === categoryValue,
