@@ -631,8 +631,7 @@ const AiListings = ({ forceListView = false }) => {
     if (
       DESTINATION_HIGHLIGHT_FILTERS.some(
         (filter) => filter.value === categoryValue,
-      ) ||
-      categoryValue === VALUE_ADDED_SERVICES_CATEGORY
+      )
     ) {
       const params = new URLSearchParams({
         country: formData.country,

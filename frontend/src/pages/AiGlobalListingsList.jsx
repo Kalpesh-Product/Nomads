@@ -864,8 +864,7 @@ const AiGlobalListingsList = () => {
     if (
       DESTINATION_HIGHLIGHT_FILTERS.some(
         (filter) => filter.value === categoryValue,
-      ) ||
-      categoryValue === VALUE_ADDED_SERVICES_CATEGORY
+      )
     ) {
       getDiscoverySectionRef(categoryValue)?.scrollIntoView({
         behavior: "smooth",
@@ -1328,16 +1327,16 @@ const AiGlobalListingsList = () => {
                           );
                         })}
                       <AiDestinationHighlightSection
-                        title={`Popular Annual Events in ${selectedLocationLabel}`}
-                        items={popularLocationEvents}
-                        kind="event"
-                        onCardClick={(item) =>
-                          handleHighlightCardClick(item, "event")
-                        }
-                        sectionRef={(element) => {
+                            title={`Popular Annual Events in ${selectedLocationLabel}`}
+                            items={popularLocationEvents}
+                            kind="event"
+                            onCardClick={(item) =>
+                              handleHighlightCardClick(item, "event")
+                            }
+                            sectionRef={(element) => {
                           sectionRefs.current["annualevents-desktop"] = element;
-                        }}
-                      />
+                            }}
+                          />
                       {/* <AiDestinationHighlightSection
                         title={`Popular Venues to visit in ${selectedLocationLabel}`}
                         items={popularVenues}
@@ -1349,29 +1348,29 @@ const AiGlobalListingsList = () => {
                           sectionRefs.current["venues-desktop"] = element;
                         }}
                       /> */}
-                      <AiDestinationHighlightSection
-                        title={`Popular News in ${selectedLocationLabel}`}
-                        items={popularLocationNews}
-                        kind="news"
-                        onCardClick={(item) =>
-                          handleHighlightCardClick(item, "news")
-                        }
-                        onViewMore={handleNewsViewMore}
-                        sectionRef={(element) => {
-                          sectionRefs.current["news-desktop"] = element;
-                        }}
-                      />
-                      <AiDestinationHighlightSection
-                        title={`Popular Blogs in ${selectedLocationLabel}`}
-                        items={popularLocationBlogs}
-                        kind="blog"
-                        onCardClick={(item) =>
-                          handleHighlightCardClick(item, "blog")
-                        }
-                        onViewMore={handleBlogsViewMore}
-                        sectionRef={(element) => {
-                          sectionRefs.current["blogs-desktop"] = element;
-                        }}
+                          <AiDestinationHighlightSection
+                            title={`Popular News in ${selectedLocationLabel}`}
+                            items={popularLocationNews}
+                            kind="news"
+                            onCardClick={(item) =>
+                              handleHighlightCardClick(item, "news")
+                            }
+                            onViewMore={handleNewsViewMore}
+                            sectionRef={(element) => {
+                              sectionRefs.current["news-desktop"] = element;
+                            }}
+                          />
+                          <AiDestinationHighlightSection
+                            title={`Popular Blogs in ${selectedLocationLabel}`}
+                            items={popularLocationBlogs}
+                            kind="blog"
+                            onCardClick={(item) =>
+                              handleHighlightCardClick(item, "blog")
+                            }
+                            onViewMore={handleBlogsViewMore}
+                            sectionRef={(element) => {
+                              sectionRefs.current["blogs-desktop"] = element;
+                            }}
                       />
                       <div
                         ref={(element) => {
@@ -1723,17 +1722,17 @@ const AiGlobalListingsList = () => {
                         );
                       })}
                     <AiDestinationHighlightSection
-                      mobile
-                      title={`Popular Annual Events in ${selectedLocationLabel}`}
-                      items={popularLocationEvents}
-                      kind="event"
-                      onCardClick={(item) =>
-                        handleHighlightCardClick(item, "event")
-                      }
-                      sectionRef={(element) => {
+                          mobile
+                          title={`Popular Annual Events in ${selectedLocationLabel}`}
+                          items={popularLocationEvents}
+                          kind="event"
+                          onCardClick={(item) =>
+                            handleHighlightCardClick(item, "event")
+                          }
+                          sectionRef={(element) => {
                         sectionRefs.current["annualevents-mobile"] = element;
-                      }}
-                    />
+                          }}
+                        />
                     {/* <AiDestinationHighlightSection
                       mobile
                       title={`Popular Venues to visit in ${selectedLocationLabel}`}
@@ -1746,31 +1745,31 @@ const AiGlobalListingsList = () => {
                         sectionRefs.current["venues-mobile"] = element;
                       }}
                     /> */}
-                    <AiDestinationHighlightSection
-                      mobile
-                      title={`Popular News in ${selectedLocationLabel}`}
-                      items={popularLocationNews}
-                      kind="news"
-                      onCardClick={(item) =>
-                        handleHighlightCardClick(item, "news")
-                      }
-                      onViewMore={handleNewsViewMore}
-                      sectionRef={(element) => {
-                        sectionRefs.current["news-mobile"] = element;
-                      }}
-                    />
-                    <AiDestinationHighlightSection
-                      mobile
-                      title={`Popular Blogs in ${selectedLocationLabel}`}
-                      items={popularLocationBlogs}
-                      kind="blog"
-                      onCardClick={(item) =>
-                        handleHighlightCardClick(item, "blog")
-                      }
-                      onViewMore={handleBlogsViewMore}
-                      sectionRef={(element) => {
-                        sectionRefs.current["blogs-mobile"] = element;
-                      }}
+                        <AiDestinationHighlightSection
+                          mobile
+                          title={`Popular News in ${selectedLocationLabel}`}
+                          items={popularLocationNews}
+                          kind="news"
+                          onCardClick={(item) =>
+                            handleHighlightCardClick(item, "news")
+                          }
+                          onViewMore={handleNewsViewMore}
+                          sectionRef={(element) => {
+                            sectionRefs.current["news-mobile"] = element;
+                          }}
+                        />
+                        <AiDestinationHighlightSection
+                          mobile
+                          title={`Popular Blogs in ${selectedLocationLabel}`}
+                          items={popularLocationBlogs}
+                          kind="blog"
+                          onCardClick={(item) =>
+                            handleHighlightCardClick(item, "blog")
+                          }
+                          onViewMore={handleBlogsViewMore}
+                          sectionRef={(element) => {
+                            sectionRefs.current["blogs-mobile"] = element;
+                          }}
                     />
                     <div
                       ref={(element) => {
