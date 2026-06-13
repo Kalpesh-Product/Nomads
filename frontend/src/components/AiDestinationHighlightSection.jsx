@@ -39,6 +39,7 @@ const AiDestinationHighlightSection = ({
   kind,
   onCardClick,
   onViewMore,
+  viewMoreLabel = "View more \u2192",
   sectionRef,
   mobile = false,
 }) => {
@@ -67,7 +68,7 @@ const AiDestinationHighlightSection = ({
               onClick={onViewMore}
               className="text-sm font-semibold text-primary-blue hover:underline"
             >
-              View more &rarr;
+              {viewMoreLabel}
             </button>
           </div>
         )}
@@ -100,15 +101,8 @@ const AiDestinationHighlightSection = ({
             onClick={onViewMore}
             className="text-sm font-semibold text-primary-blue hover:underline"
           >
-            View more &rarr;
+            {viewMoreLabel}
           </button>
-        </div>
-      )}
-      {!onViewMore && (
-        <div className="mt-0 text-right">
-          <span className="text-sm font-semibold text-primary-blue">
-            View more &rarr;
-          </span>
         </div>
       )}
     </div>

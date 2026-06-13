@@ -24,6 +24,7 @@ import { setFormValues } from "../features/locationSlice.js";
 import { useSearchParams } from "react-router-dom";
 import ListingCard from "../components/ListingCard.jsx";
 import PaginatedGrid from "../components/PaginatedGrid.jsx";
+import AiDestinationHighlightSection from "../components/AiDestinationHighlightSection.jsx";
 import newIcons from "../assets/newIcons.js";
 import { DESTINATION_HIGHLIGHT_FILTERS } from "../data/aiDestinationHighlights.js";
 import SearchBarCombobox from "../components/SearchBarCombobox.jsx";
@@ -38,6 +39,7 @@ import {
 } from "../utils/selectedDestinationSession.js";
 
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
+const ANNUAL_EVENTS_CATEGORY = "annualevents";
 const TYPING_INTERVAL_MS = 7;
 const SECOND_HEADING_DELAY_MS = 250;
 const THINKING_HEADING_TEXT = "Curating the best results for you";
@@ -440,6 +442,7 @@ const AiListings = ({ forceListView = false }) => {
       meetingroom: "Meetings",
       cafe: "Cafe’s",
       [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
+      [ANNUAL_EVENTS_CATEGORY]: "Events",
     };
 
     return (
@@ -457,7 +460,12 @@ const AiListings = ({ forceListView = false }) => {
 
   const filteredListings = React.useMemo(() => {
     if (!listingsData) return [];
-    if (formData?.category === VALUE_ADDED_SERVICES_CATEGORY) return [];
+    if (
+      formData?.category === VALUE_ADDED_SERVICES_CATEGORY ||
+      formData?.category === ANNUAL_EVENTS_CATEGORY
+    ) {
+      return [];
+    }
 
     if (!formData?.category) return listingsData;
 
@@ -571,7 +579,12 @@ const AiListings = ({ forceListView = false }) => {
   }, [dispatch, formData, location.state, location.search]);
   useEffect(() => {
     if (formData?.category && listingsData?.length > 0) {
-      if (formData.category === VALUE_ADDED_SERVICES_CATEGORY) return;
+      if (
+        formData.category === VALUE_ADDED_SERVICES_CATEGORY ||
+        formData.category === ANNUAL_EVENTS_CATEGORY
+      ) {
+        return;
+      }
       const hasCategory = listingsData.some(
         (item) => item.companyType === formData.category,
       );
@@ -628,9 +641,19 @@ const AiListings = ({ forceListView = false }) => {
       return;
     }
 
+    if (categoryValue === "news" || categoryValue === "blogs") {
+      navigate({
+        pathname: categoryValue === "news" ? "/ai-news" : "/ai-blogs",
+        search: location.search,
+      });
+      return;
+    }
+
     if (
       DESTINATION_HIGHLIGHT_FILTERS.some(
-        (filter) => filter.value === categoryValue,
+        (filter) =>
+          filter.value === categoryValue &&
+          categoryValue !== ANNUAL_EVENTS_CATEGORY,
       )
     ) {
       const params = new URLSearchParams({
@@ -720,8 +743,12 @@ const AiListings = ({ forceListView = false }) => {
   const isTablet = useMediaQuery("(max-width:1023px)");
   const isValueAddedServicesSelected =
     formData?.category === VALUE_ADDED_SERVICES_CATEGORY;
+  const isAnnualEventsSelected =
+    formData?.category === ANNUAL_EVENTS_CATEGORY;
+  const isFocusedContentSelected =
+    isValueAddedServicesSelected || isAnnualEventsSelected;
   const showDesktopMap =
-    !forceListView && mapOpen && !isValueAddedServicesSelected;
+    !forceListView && mapOpen && !isFocusedContentSelected;
   const listingsBasePath =
     location.pathname === "/ai-listings-list"
       ? "/ai-listings-list"
@@ -745,6 +772,50 @@ const AiListings = ({ forceListView = false }) => {
         )
         .join(" ")
     : "";
+  const { data: eventsData = [], isPending: isEventsLoading } = useQuery({
+    queryKey: ["ai-events", selectedStateLabel],
+    queryFn: async () => {
+      const response = await axios.get("/events", {
+        params: {
+          destination: selectedStateLabel,
+        },
+      });
+
+      return Array.isArray(response.data) ? response.data : [];
+    },
+    enabled: isAnnualEventsSelected && !!selectedStateLabel,
+    refetchOnWindowFocus: false,
+  });
+  const annualEvents = useMemo(
+    () =>
+      eventsData.map((event) => ({
+        ...event,
+        id: event._id || event.serialNumber || event.eventName,
+        title: event.eventName,
+        image: event.mainImage,
+        location: event.venue || event.destination,
+        meta: event.month,
+        subtitle: event.month,
+        description: event.shortDescription,
+      })),
+    [eventsData],
+  );
+
+  const handleEventClick = (event) => {
+    navigate(`/ai-events/${event.id}`, {
+      state: {
+        item: event,
+        selectedStateLabel,
+        stickyBreadcrumbs: [
+          {
+            label: selectedStateLabel || "Destination",
+            path: location.pathname,
+          },
+          { label: event.title },
+        ],
+      },
+    });
+  };
 
   // Prioritize BIZ Nest and MeWo first, then sort the rest by rating descending
   const prioritizedCompanies = ["BIZ Nest", "MeWo"];
@@ -1253,7 +1324,9 @@ const AiListings = ({ forceListView = false }) => {
             className={forceListView ? "!px-0 sm:!px-6 lg:!px-0" : ""}
           >
             {/* Dynamic Header */}
-            {formData?.category && formData?.location && (
+            {formData?.category &&
+              formData?.location &&
+              !isAnnualEventsSelected && (
               <div className="mt-6 mb-2 px-1 border-t border-gray-300">
                 <h1 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight mt-6">
                   Popular{" "}
@@ -1266,6 +1339,7 @@ const AiListings = ({ forceListView = false }) => {
                     meetingroom: "Meeting Rooms",
                     cafe: "Cafes",
                     [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
+                    [ANNUAL_EVENTS_CATEGORY]: "Annual Events",
                   }[formData.category] || `${formData.category} Spaces`}{" "}
                   in {selectedStateLabel || "Unknown"}
                 </h1>
@@ -1284,7 +1358,7 @@ const AiListings = ({ forceListView = false }) => {
                   showDesktopMap ? "col-span-5" : "col-span-9"
                 } font-semibold text-lg`}
               >
-                {formData?.category === VALUE_ADDED_SERVICES_CATEGORY ? (
+                {isValueAddedServicesSelected ? (
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-5">
                     {valueAddedServiceItems.map((service) => {
                       const isDisabled = !service.path;
@@ -1330,6 +1404,32 @@ const AiListings = ({ forceListView = false }) => {
                       );
                     })}
                   </div>
+                ) : isAnnualEventsSelected ? (
+                  isEventsLoading ? (
+                    <PaginatedGrid
+                      data={skeletonArray}
+                      entriesPerPage={isMobile ? 10 : isTablet ? 9 : 100}
+                      columns="grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5"
+                      renderItem={(_, index) => (
+                        <Box key={index} className="w-full h-full">
+                          <Skeleton
+                            variant="rectangular"
+                            height={200}
+                            sx={{ borderRadius: 2 }}
+                          />
+                          <Skeleton variant="text" width="80%" sx={{ mt: 1 }} />
+                          <Skeleton variant="text" width="60%" />
+                        </Box>
+                      )}
+                    />
+                  ) : (
+                    <AiDestinationHighlightSection
+                      title={`Popular Annual Events in ${selectedStateLabel || "Unknown"}`}
+                      items={annualEvents}
+                      kind="event"
+                      onCardClick={handleEventClick}
+                    />
+                  )
                 ) : (
                   <PaginatedGrid
                     // data={isLisitingLoading ? skeletonArray : sortedListings}
@@ -1416,7 +1516,7 @@ const AiListings = ({ forceListView = false }) => {
             </div>
           </Container>
 
-          {!isValueAddedServicesSelected && (
+          {!isFocusedContentSelected && (
             <div className="lg:hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-[1000]">
               <button
                 onClick={() =>

@@ -47,6 +47,7 @@ import {
 // } from "react-icons/hi";
 
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
+const ANNUAL_EVENTS_CATEGORY = "annualevents";
 // const VALUE_ADDED_SERVICE_CARD_BACKGROUND_IMAGE = "/images/goa-image.jpg";
 const VALUE_ADDED_SERVICES_DEFAULT_VISIBLE_COUNT = 5;
 const TYPING_INTERVAL_MS = 7;
@@ -463,7 +464,6 @@ const AiGlobalListingsList = () => {
   const popularLocationEvents = useMemo(
     () =>
       (Array.isArray(eventsData) ? eventsData : [])
-        .slice(0, 5)
         .map((event) => ({
           ...event,
           id: event._id || event.serialNumber || event.eventName,
@@ -476,6 +476,12 @@ const AiGlobalListingsList = () => {
         })),
     [eventsData],
   );
+  const isAnnualEventsExpanded =
+    expandedCategories.includes("annualevents");
+  const displayedPopularLocationEvents = isAnnualEventsExpanded
+    ? popularLocationEvents
+    : popularLocationEvents.slice(0, 5);
+  const showAnnualEventsToggle = popularLocationEvents.length > 5;
 
   const countOptions = [
     { label: "1 - 5", value: "1-5" },
@@ -861,9 +867,19 @@ const AiGlobalListingsList = () => {
       return;
     }
 
+    if (categoryValue === "news" || categoryValue === "blogs") {
+      navigate({
+        pathname: categoryValue === "news" ? "/ai-news" : "/ai-blogs",
+        search: location.search,
+      });
+      return;
+    }
+
     if (
       DESTINATION_HIGHLIGHT_FILTERS.some(
-        (filter) => filter.value === categoryValue,
+        (filter) =>
+          filter.value === categoryValue &&
+          categoryValue !== ANNUAL_EVENTS_CATEGORY,
       )
     ) {
       getDiscoverySectionRef(categoryValue)?.scrollIntoView({
@@ -1095,7 +1111,7 @@ const AiGlobalListingsList = () => {
             onBack={() => navigate(-1)}
             onClear={() => navigate(-1)}
             heading={
-              <p className=" mt-6 mb-6 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.8rem] font-play">
+              <p className=" mt-6 mb-6 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
                 {!isSecondHeadingPhase && (
                   <span
                     className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-b-transparent"
@@ -1328,10 +1344,20 @@ const AiGlobalListingsList = () => {
                         })}
                       <AiDestinationHighlightSection
                             title={`Popular Annual Events in ${selectedLocationLabel}`}
-                            items={popularLocationEvents}
+                            items={displayedPopularLocationEvents}
                             kind="event"
                             onCardClick={(item) =>
                               handleHighlightCardClick(item, "event")
+                            }
+                            onViewMore={
+                              showAnnualEventsToggle
+                                ? () => handleShowMoreClick("annualevents")
+                                : undefined
+                            }
+                            viewMoreLabel={
+                              isAnnualEventsExpanded
+                                ? "View less \u2190"
+                                : "View more \u2192"
                             }
                             sectionRef={(element) => {
                           sectionRefs.current["annualevents-desktop"] = element;
@@ -1724,10 +1750,20 @@ const AiGlobalListingsList = () => {
                     <AiDestinationHighlightSection
                           mobile
                           title={`Popular Annual Events in ${selectedLocationLabel}`}
-                          items={popularLocationEvents}
+                          items={displayedPopularLocationEvents}
                           kind="event"
                           onCardClick={(item) =>
                             handleHighlightCardClick(item, "event")
+                          }
+                          onViewMore={
+                            showAnnualEventsToggle
+                              ? () => handleShowMoreClick("annualevents")
+                              : undefined
+                          }
+                          viewMoreLabel={
+                            isAnnualEventsExpanded
+                              ? "View less \u2190"
+                              : "View more \u2192"
                           }
                           sectionRef={(element) => {
                         sectionRefs.current["annualevents-mobile"] = element;

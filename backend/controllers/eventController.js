@@ -7,6 +7,21 @@ const REQUIRED_COLUMNS = ["Event Name", "Short Description", "Destination"];
 const escapeRegex = (value) =>
   value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
+const DASH_VARIANTS = /[-\u2010-\u2015\u2212\uFE63\uFF0D]/u;
+const DASH_VARIANT_PATTERN = [
+  "[-",
+  String.fromCodePoint(0x2010),
+  "-",
+  String.fromCodePoint(0x2015, 0x2212, 0xfe63, 0xff0d),
+  "]",
+].join("");
+
+const buildExactDestinationPattern = (destination) =>
+  destination
+    .split(DASH_VARIANTS)
+    .map(escapeRegex)
+    .join(DASH_VARIANT_PATTERN);
+
 const normalizeRow = (row) =>
   Object.fromEntries(
     Object.entries(row).map(([key, value]) => [
@@ -56,7 +71,7 @@ export const getEvents = async (req, res, next) => {
 
     if (destination) {
       query.destination = {
-        $regex: `^${escapeRegex(destination)}$`,
+        $regex: `^${buildExactDestinationPattern(destination)}$`,
         $options: "i",
       };
     }
