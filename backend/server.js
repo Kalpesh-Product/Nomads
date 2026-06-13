@@ -29,6 +29,7 @@ import consultationRoutes from "./routes/consultationRoutes.js";
 import workationRoutes from "./routes/workationRoutes.js";
 import becomeContributorRoutes from "./routes/becomeContributorRoutes.js";
 import stateWiseWeightRoutes from "./routes/stateWiseWeightRoutes.js";
+import eventRoutes from "./routes/eventRoutes.js";
 
 const app = express();
 config({ override: true });
@@ -60,6 +61,7 @@ app.use("/api/state-wise-weight", stateWiseWeightRoutes);
 
 app.use("/api/news", newsRoutes);
 app.use("/api/blogs", blogRoutes); // New Blog Route
+app.use("/api/events", eventRoutes);
 
 app.all("/*splat", (req, res) => {
   if (req.accepts("html")) {

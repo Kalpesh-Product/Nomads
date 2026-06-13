@@ -33,6 +33,11 @@ import {
   dedupeAiSearchBadges,
   buildAiVerticalsSearchBadges,
 } from "../utils/aiSearchBarBadges.js";
+import AiDestinationHighlightSection from "../components/AiDestinationHighlightSection.jsx";
+import {
+  DESTINATION_HIGHLIGHT_FILTERS,
+  popularVenues,
+} from "../data/aiDestinationHighlights.js";
 
 // import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
 // import {
@@ -50,6 +55,22 @@ const THINKING_HEADING_TEXT = "Curating the best results for you";
 const CURATED_RESULTS_HEADING_TEXT =
   "Please find below the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
 const AI_SCROLL_CONTAINER_ID = "nomad-ai-scroll-container";
+const extractImageFromContent = (content) => {
+  const match = content?.match(/<img.*?src=["'](.*?)["']/);
+  return match ? match[1] : null;
+};
+const normalizeContentDestination = (label) =>
+  label
+    ? label
+        .replace(/\+/g, " ")
+        .replace(/[\u2010-\u2015\u2212\u{FE63}\u{FF0D}]/gu, "-")
+        .trim()
+    : "";
+const buildExactContentKeyword = (label) => {
+  if (!label) return null;
+  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return `^${escaped}$`;
+};
 const getAiVerticalsPageStateKey = (country = "", location = "") => {
   const countryKey = country.trim().toLowerCase();
   const locationKey = location.trim().toLowerCase();
@@ -354,7 +375,7 @@ const AiGlobalListingsList = () => {
     const normalizedLocation = formData?.location?.trim().toLowerCase();
     const sessionTitle =
       selectedDestination?.country === normalizedCountry &&
-        selectedDestination?.city === normalizedLocation
+      selectedDestination?.city === normalizedLocation
         ? selectedDestination?.title
         : "";
 
@@ -366,7 +387,95 @@ const AiGlobalListingsList = () => {
         (option) => option.value?.toLowerCase() === normalizedLocation,
       )?.label || formData.location
     );
-  }, [formData?.country, formData?.location, location.state?.selectedStateLabel, locationOptions]);
+  }, [
+    formData?.country,
+    formData?.location,
+    location.state?.selectedStateLabel,
+    locationOptions,
+  ]);
+  const contentDestination = normalizeContentDestination(formData?.location);
+  const { data: blogsData } = useQuery({
+    queryKey: ["blogs", contentDestination],
+    queryFn: async () => {
+      const response = await axios.get("/blogs/get-blogs", {
+        params: {
+          keyword: buildExactContentKeyword(contentDestination),
+        },
+      });
+
+      return response.data;
+    },
+    enabled: !!contentDestination,
+    refetchOnWindowFocus: false,
+  });
+  const { data: newsData } = useQuery({
+    queryKey: ["ai-news", contentDestination],
+    queryFn: async () => {
+      const response = await axios.get("/news/get-news", {
+        params: {
+          keyword: buildExactContentKeyword(contentDestination),
+        },
+      });
+
+      return response.data;
+    },
+    enabled: !!contentDestination,
+    refetchOnWindowFocus: false,
+  });
+  const { data: eventsData } = useQuery({
+    queryKey: ["ai-events", contentDestination],
+    queryFn: async () => {
+      const response = await axios.get("/events", {
+        params: {
+          destination: contentDestination,
+        },
+      });
+
+      return response.data;
+    },
+    enabled: !!contentDestination,
+    refetchOnWindowFocus: false,
+  });
+  const popularLocationBlogs = useMemo(
+    () =>
+      (Array.isArray(blogsData) ? blogsData : []).slice(0, 5).map((blog) => ({
+        ...blog,
+        id: blog.guid || blog._id || blog.mainTitle,
+        title: blog.mainTitle || blog.title,
+        image:
+          blog.mainImage ||
+          extractImageFromContent(blog.content || blog.description),
+      })),
+    [blogsData],
+  );
+  const popularLocationNews = useMemo(
+    () =>
+      (Array.isArray(newsData) ? newsData : []).slice(0, 5).map((newsItem) => ({
+        ...newsItem,
+        id: newsItem.guid || newsItem._id || newsItem.mainTitle,
+        title: newsItem.mainTitle || newsItem.title,
+        image:
+          newsItem.mainImage ||
+          extractImageFromContent(newsItem.content || newsItem.description),
+      })),
+    [newsData],
+  );
+  const popularLocationEvents = useMemo(
+    () =>
+      (Array.isArray(eventsData) ? eventsData : [])
+        .slice(0, 5)
+        .map((event) => ({
+          ...event,
+          id: event._id || event.serialNumber || event.eventName,
+          title: event.eventName,
+          image: event.mainImage,
+          location: event.venue || event.destination,
+          meta: event.month,
+          subtitle: event.month,
+          description: event.shortDescription,
+        })),
+    [eventsData],
+  );
 
   const countOptions = [
     { label: "1 - 5", value: "1-5" },
@@ -403,6 +512,10 @@ const AiGlobalListingsList = () => {
 
   const hasRestoredPageStateRef = React.useRef(false);
   const sectionRefs = React.useRef({});
+  const getDiscoverySectionRef = React.useCallback((categoryValue) => {
+    const viewport = window.innerWidth >= 1024 ? "desktop" : "mobile";
+    return sectionRefs.current[`${categoryValue}-${viewport}`];
+  }, []);
 
   const getScrollContainer = () =>
     typeof document === "undefined"
@@ -464,7 +577,10 @@ const AiGlobalListingsList = () => {
 
   const categoryOptions = useMemo(() => {
     if (!listingsData || listingsData.length === 0) {
-      return [];
+      return [
+        ...DESTINATION_HIGHLIGHT_FILTERS,
+        { label: "Value Adds", value: VALUE_ADDED_SERVICES_CATEGORY },
+      ];
     }
 
     const uniqueTypes = [
@@ -472,7 +588,9 @@ const AiGlobalListingsList = () => {
         listingsData
           .filter((item) => item.companyType !== "privatestay")
           .map((item) => item.companyType)
-          .filter(Boolean),
+          .filter(Boolean)
+          // Temporarily hide Workation from the category icon filters.
+          .filter((type) => type !== "workation"),
       ),
     ];
 
@@ -500,18 +618,14 @@ const AiGlobalListingsList = () => {
       .map((type) => ({ label: labelMap[type] || type, value: type }))
       .sort((a, b) => typeOrder.indexOf(a.value) - typeOrder.indexOf(b.value));
 
-    if (
-      options.some((option) => option.value === VALUE_ADDED_SERVICES_CATEGORY)
-    ) {
-      return options;
-    }
+    const optionsWithoutValueAdds = options.filter(
+      (option) => option.value !== VALUE_ADDED_SERVICES_CATEGORY,
+    );
 
     return [
-      ...options,
-      {
-        label: "Value Adds",
-        value: VALUE_ADDED_SERVICES_CATEGORY,
-      },
+      ...optionsWithoutValueAdds,
+      ...DESTINATION_HIGHLIGHT_FILTERS,
+      { label: "Value Adds", value: VALUE_ADDED_SERVICES_CATEGORY },
     ];
   }, [listingsData]);
 
@@ -746,6 +860,19 @@ const AiGlobalListingsList = () => {
       alert("Please select Country and Location first.");
       return;
     }
+
+    if (
+      DESTINATION_HIGHLIGHT_FILTERS.some(
+        (filter) => filter.value === categoryValue,
+      )
+    ) {
+      getDiscoverySectionRef(categoryValue)?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+      return;
+    }
+
     dispatch(setFormValues({ ...formData, category: categoryValue }));
 
     const state = {
@@ -761,6 +888,65 @@ const AiGlobalListingsList = () => {
           location: formData.location,
           category: categoryValue,
           searchBarBadges,
+        },
+      },
+    );
+  };
+
+  const handleHighlightCardClick = (item, type) => {
+    if (type === "event" || type === "venue") {
+      navigate(`/ai-${type}s/${item.id}`, {
+        state: {
+          item,
+          selectedStateLabel: selectedLocationLabel,
+          stickyBreadcrumbs: [
+            {
+              label: selectedLocationLabel || "Destination",
+              path: location.pathname,
+            },
+            { label: item.title },
+          ],
+        },
+      });
+      return;
+    }
+
+    navigate(
+      type === "news"
+        ? "/ai-news/ai-news-details"
+        : "/ai-blogs/ai-blog-details",
+      {
+        state: {
+          content: item,
+          selectedStateLabel: selectedLocationLabel,
+        },
+      },
+    );
+  };
+
+  const handleBlogsViewMore = () => {
+    navigate(
+      {
+        pathname: "/ai-blogs",
+        search: location.search,
+      },
+      {
+        state: {
+          selectedStateLabel: selectedLocationLabel,
+        },
+      },
+    );
+  };
+
+  const handleNewsViewMore = () => {
+    navigate(
+      {
+        pathname: "/ai-news",
+        search: location.search,
+      },
+      {
+        state: {
+          selectedStateLabel: selectedLocationLabel,
         },
       },
     );
@@ -863,6 +1049,21 @@ const AiGlobalListingsList = () => {
     });
   };
 
+  useEffect(() => {
+    if (!isHeadingSequenceComplete) return;
+
+    const params = new URLSearchParams(location.search);
+    const highlight = params.get("highlight");
+    if (!highlight) return;
+
+    window.requestAnimationFrame(() => {
+      getDiscoverySectionRef(highlight)?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  }, [getDiscoverySectionRef, isHeadingSequenceComplete, location.search]);
+
   return (
     <>
       <Helmet>
@@ -911,9 +1112,9 @@ const AiGlobalListingsList = () => {
         <div
           className={`${isHeadingSequenceComplete ? "flex" : "hidden"} flex-col gap-4 justify-center items-center w-full`}
         >
-          <div className="min-w-[75%] max-w-[80rem] lg:max-w-[80rem] mx-0 lg:mx-auto px-1 sm:px-6 lg:px-0">
+          <div className="w-full px-0">
             <div className="flex flex-col gap-4 justify-between items-center w-full h-full">
-              <div className="w-11/12 pb-4">
+              <div className="w-full pb-4">
                 <div className="flex justify-between items-center">
                   {categoryOptions.map((cat) => {
                     const iconSrc = newIcons[cat.value];
@@ -1125,7 +1326,59 @@ const AiGlobalListingsList = () => {
                             </div>
                           );
                         })}
-                      <div className="col-span-full border-t border-gray-300 mt-6 pt-6 mb-6">
+                      <AiDestinationHighlightSection
+                            title={`Popular Annual Events in ${selectedLocationLabel}`}
+                            items={popularLocationEvents}
+                            kind="event"
+                            onCardClick={(item) =>
+                              handleHighlightCardClick(item, "event")
+                            }
+                            sectionRef={(element) => {
+                          sectionRefs.current["annualevents-desktop"] = element;
+                            }}
+                          />
+                      {/* <AiDestinationHighlightSection
+                        title={`Popular Venues to visit in ${selectedLocationLabel}`}
+                        items={popularVenues}
+                        kind="venue"
+                        onCardClick={(item) =>
+                          handleHighlightCardClick(item, "venue")
+                        }
+                        sectionRef={(element) => {
+                          sectionRefs.current["venues-desktop"] = element;
+                        }}
+                      /> */}
+                          <AiDestinationHighlightSection
+                            title={`Popular News in ${selectedLocationLabel}`}
+                            items={popularLocationNews}
+                            kind="news"
+                            onCardClick={(item) =>
+                              handleHighlightCardClick(item, "news")
+                            }
+                            onViewMore={handleNewsViewMore}
+                            sectionRef={(element) => {
+                              sectionRefs.current["news-desktop"] = element;
+                            }}
+                          />
+                          <AiDestinationHighlightSection
+                            title={`Popular Blogs in ${selectedLocationLabel}`}
+                            items={popularLocationBlogs}
+                            kind="blog"
+                            onCardClick={(item) =>
+                              handleHighlightCardClick(item, "blog")
+                            }
+                            onViewMore={handleBlogsViewMore}
+                            sectionRef={(element) => {
+                              sectionRefs.current["blogs-desktop"] = element;
+                            }}
+                      />
+                      <div
+                        ref={(element) => {
+                          sectionRefs.current["valueaddedservices-desktop"] =
+                            element;
+                        }}
+                        className="col-span-full border-t border-gray-300 mt-6 pt-6 mb-6 scroll-mt-24"
+                      >
                         <h2 className="text-subtitle font-semibold mb-5 text-secondary-dark">
                           Value Added Services in {selectedLocationLabel}
                         </h2>
@@ -1468,7 +1721,63 @@ const AiGlobalListingsList = () => {
                           </HorizontalScrollWrapper>
                         );
                       })}
-                    <div className="mb-6">
+                    <AiDestinationHighlightSection
+                          mobile
+                          title={`Popular Annual Events in ${selectedLocationLabel}`}
+                          items={popularLocationEvents}
+                          kind="event"
+                          onCardClick={(item) =>
+                            handleHighlightCardClick(item, "event")
+                          }
+                          sectionRef={(element) => {
+                        sectionRefs.current["annualevents-mobile"] = element;
+                          }}
+                        />
+                    {/* <AiDestinationHighlightSection
+                      mobile
+                      title={`Popular Venues to visit in ${selectedLocationLabel}`}
+                      items={popularVenues}
+                      kind="venue"
+                      onCardClick={(item) =>
+                        handleHighlightCardClick(item, "venue")
+                      }
+                      sectionRef={(element) => {
+                        sectionRefs.current["venues-mobile"] = element;
+                      }}
+                    /> */}
+                        <AiDestinationHighlightSection
+                          mobile
+                          title={`Popular News in ${selectedLocationLabel}`}
+                          items={popularLocationNews}
+                          kind="news"
+                          onCardClick={(item) =>
+                            handleHighlightCardClick(item, "news")
+                          }
+                          onViewMore={handleNewsViewMore}
+                          sectionRef={(element) => {
+                            sectionRefs.current["news-mobile"] = element;
+                          }}
+                        />
+                        <AiDestinationHighlightSection
+                          mobile
+                          title={`Popular Blogs in ${selectedLocationLabel}`}
+                          items={popularLocationBlogs}
+                          kind="blog"
+                          onCardClick={(item) =>
+                            handleHighlightCardClick(item, "blog")
+                          }
+                          onViewMore={handleBlogsViewMore}
+                          sectionRef={(element) => {
+                            sectionRefs.current["blogs-mobile"] = element;
+                          }}
+                    />
+                    <div
+                      ref={(element) => {
+                        sectionRefs.current["valueaddedservices-mobile"] =
+                          element;
+                      }}
+                      className="mb-6 scroll-mt-24"
+                    >
                       <h2 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold leading-tight mb-4">
                         Value Added Services in {selectedLocationLabel}
                       </h2>
