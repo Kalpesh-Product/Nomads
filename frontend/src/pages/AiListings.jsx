@@ -45,6 +45,13 @@ const SECOND_HEADING_DELAY_MS = 250;
 const THINKING_HEADING_TEXT = "Curating the best results for you";
 const CURATED_RESULTS_HEADING_TEXT =
   "Please find below the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
+const normalizeContentDestination = (label) =>
+  label
+    ? label
+        .replace(/\+/g, " ")
+        .replace(/[\u2010-\u2015\u2212\u{FE63}\u{FF0D}]/gu, "-")
+        .trim()
+    : "";
 
 const valueAddedServiceItems = [
   {
@@ -772,18 +779,21 @@ const AiListings = ({ forceListView = false }) => {
         )
         .join(" ")
     : "";
+  const eventDestination = normalizeContentDestination(
+    selectedStateFromParams || formData?.location,
+  );
   const { data: eventsData = [], isPending: isEventsLoading } = useQuery({
-    queryKey: ["ai-events", selectedStateLabel],
+    queryKey: ["ai-events", eventDestination],
     queryFn: async () => {
       const response = await axios.get("/events", {
         params: {
-          destination: selectedStateLabel,
+          destination: eventDestination,
         },
       });
 
       return Array.isArray(response.data) ? response.data : [];
     },
-    enabled: isAnnualEventsSelected && !!selectedStateLabel,
+    enabled: isAnnualEventsSelected && !!eventDestination,
     refetchOnWindowFocus: false,
   });
   const annualEvents = useMemo(
