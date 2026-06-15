@@ -2,6 +2,33 @@ import mongoose from "mongoose";
 import Event from "../models/Event.js";
 import EventReview from "../models/EventReview.js";
 
+export const getApprovedEventReviews = async (req, res, next) => {
+  try {
+    const { eventId } = req.query;
+
+    if (!eventId || !mongoose.isValidObjectId(eventId)) {
+      return res
+        .status(400)
+        .json({ message: "Valid event identifier is required" });
+    }
+
+    const reviews = await EventReview.find({
+      status: "approved",
+      $or: [{ event: eventId }, { eventId }],
+    })
+      .select("name starCount description createdAt")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return res.status(200).json({
+      count: reviews.length,
+      data: reviews,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const addEventReview = async (req, res, next) => {
   try {
     const { eventId, name, starCount, description } = req.body;

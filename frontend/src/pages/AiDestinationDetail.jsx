@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { TextField } from "@mui/material";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 import { CalendarDays, MapPin, Star } from "lucide-react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -11,20 +11,16 @@ import { annualEvents, popularVenues } from "../data/aiDestinationHighlights";
 import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
+import axios from "../utils/axios";
 import { noOnlyWhitespace } from "../utils/validators";
 
-const reviews = [
-  {
-    initials: "VF",
-    name: "Valentina Ferrao",
-    text: "A memorable experience with a welcoming atmosphere and plenty to discover.",
-  },
-  {
-    initials: "AC",
-    name: "Avtar Chodankar",
-    text: "Very well set up, easy to visit, and worth adding to a Goa itinerary.",
-  },
-];
+const getInitials = (name = "") =>
+  name
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2);
 
 const AiDestinationDetail = ({ type }) => {
   const location = useLocation();
@@ -38,6 +34,19 @@ const AiDestinationDetail = ({ type }) => {
   const isEvent = type === "event";
   const userId = auth?.user?._id || auth?.user?.id;
   const reviewerName = auth?.user?.fullName?.trim() || "";
+
+  const { data: reviews = [], isPending: isReviewsLoading } = useQuery({
+    queryKey: ["approvedEventReviews", eventId],
+    queryFn: async () => {
+      const response = await axios.get("/event-reviews", {
+        params: { eventId },
+      });
+
+      return Array.isArray(response.data?.data) ? response.data.data : [];
+    },
+    enabled: isEvent && !!eventId,
+    refetchOnWindowFocus: false,
+  });
 
   const {
     handleSubmit: handleSubmitReview,
@@ -157,22 +166,37 @@ const AiDestinationDetail = ({ type }) => {
           </button>
         </div>
         <div className="space-y-7">
-          {reviews.map((review) => (
-            <article key={review.initials}>
-              <div className="mb-2 flex items-center gap-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-blue text-xs font-semibold text-white">
-                  {review.initials}
-                </span>
-                <strong className="text-sm">{review.name}</strong>
-              </div>
-              <div className="mb-1 flex gap-1">
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <Star key={index} size={14} fill="currentColor" />
-                ))}
-              </div>
-              <p className="text-sm">{review.text}</p>
-            </article>
-          ))}
+          {isReviewsLoading ? (
+            <p className="text-sm text-gray-500">Loading reviews...</p>
+          ) : reviews.length === 0 ? (
+            <p className="text-sm text-gray-500">No approved reviews yet.</p>
+          ) : (
+            reviews.map((review) => (
+              <article key={review._id}>
+                <div className="mb-2 flex items-center gap-3">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-blue text-xs font-semibold text-white">
+                    {getInitials(review.name) || "A"}
+                  </span>
+                  <strong className="text-sm">{review.name}</strong>
+                </div>
+                <div className="mb-1 flex gap-1">
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <Star
+                      key={index}
+                      size={14}
+                      fill={index < review.starCount ? "currentColor" : "none"}
+                      className={
+                        index < review.starCount
+                          ? "text-black"
+                          : "text-gray-300"
+                      }
+                    />
+                  ))}
+                </div>
+                <p className="text-sm">{review.description}</p>
+              </article>
+            ))
+          )}
         </div>
       </section>
 
