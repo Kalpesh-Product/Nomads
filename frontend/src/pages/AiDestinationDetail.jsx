@@ -1,25 +1,98 @@
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { TextField } from "@mui/material";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 import { CalendarDays, MapPin, Star } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import MuiModal from "../components/Modal";
+import SecondaryButton from "../components/SecondaryButton";
 import { annualEvents, popularVenues } from "../data/aiDestinationHighlights";
+import useAuth from "../hooks/useAuth";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
+import axios from "../utils/axios";
+import { noOnlyWhitespace } from "../utils/validators";
 
-const reviews = [
-  {
-    initials: "VF",
-    name: "Valentina Ferrao",
-    text: "A memorable experience with a welcoming atmosphere and plenty to discover.",
-  },
-  {
-    initials: "AC",
-    name: "Avtar Chodankar",
-    text: "Very well set up, easy to visit, and worth adding to a Goa itinerary.",
-  },
-];
+const getInitials = (name = "") =>
+  name
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2);
 
 const AiDestinationDetail = ({ type }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { eventId } = useParams();
+  const { auth } = useAuth();
+  const axiosPrivate = useAxiosPrivate();
+  const [isAddReviewOpen, setIsAddReviewOpen] = useState(false);
   const fallback = type === "event" ? annualEvents[0] : popularVenues[0];
   const item = location.state?.item || fallback;
   const isEvent = type === "event";
+  const userId = auth?.user?._id || auth?.user?.id;
+  const reviewerName = auth?.user?.fullName?.trim() || "";
+
+  const { data: reviews = [], isPending: isReviewsLoading } = useQuery({
+    queryKey: ["approvedEventReviews", eventId],
+    queryFn: async () => {
+      const response = await axios.get("/event-reviews", {
+        params: { eventId },
+      });
+
+      return Array.isArray(response.data?.data) ? response.data.data : [];
+    },
+    enabled: isEvent && !!eventId,
+    refetchOnWindowFocus: false,
+  });
+
+  const {
+    handleSubmit: handleSubmitReview,
+    control: reviewControl,
+    reset: resetReview,
+    formState: { errors: reviewErrors },
+  } = useForm({
+    defaultValues: {
+      starCount: 5,
+      description: "",
+    },
+    mode: "onChange",
+  });
+
+  const handleWriteReviewClick = () => {
+    if (!userId) {
+      navigate("/ai-login");
+      return;
+    }
+
+    setIsAddReviewOpen(true);
+  };
+
+  const { mutate: submitReview, isPending: isSubmittingReview } = useMutation({
+    mutationKey: ["submitEventReview", eventId],
+    mutationFn: async (data) => {
+      const response = await axiosPrivate.post("/event-reviews", {
+        eventId,
+        name: reviewerName || auth?.user?.name || "Anonymous",
+        starCount: Number(data.starCount),
+        description: data.description?.trim(),
+      });
+
+      return response.data;
+    },
+    onSuccess: () => {
+      showSuccessAlert("Review submitted successfully.");
+      resetReview();
+      setIsAddReviewOpen(false);
+    },
+    onError: (error) => {
+      showErrorAlert(
+        error?.response?.data?.message || "Unable to submit review.",
+      );
+    },
+  });
 
   return (
     <main className="mx-auto w-full max-w-[75rem] px-4 pb-8 lg:px-0">
@@ -86,28 +159,44 @@ const AiDestinationDetail = ({ type }) => {
         <div className="mb-8 text-center">
           <button
             type="button"
+            onClick={isEvent ? handleWriteReviewClick : undefined}
             className="rounded-full bg-primary-blue px-8 py-3 text-sm font-semibold text-white"
           >
             WRITE A REVIEW
           </button>
         </div>
         <div className="space-y-7">
-          {reviews.map((review) => (
-            <article key={review.initials}>
-              <div className="mb-2 flex items-center gap-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-blue text-xs font-semibold text-white">
-                  {review.initials}
-                </span>
-                <strong className="text-sm">{review.name}</strong>
-              </div>
-              <div className="mb-1 flex gap-1">
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <Star key={index} size={14} fill="currentColor" />
-                ))}
-              </div>
-              <p className="text-sm">{review.text}</p>
-            </article>
-          ))}
+          {isReviewsLoading ? (
+            <p className="text-sm text-gray-500 text-center">Loading reviews...</p>
+          ) : reviews.length === 0 ? (
+            <p className="text-sm text-gray-500 text-center">No reviews yet.</p>
+          ) : (
+            reviews.map((review) => (
+              <article key={review._id}>
+                <div className="mb-2 flex items-center gap-3">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-blue text-xs font-semibold text-white">
+                    {getInitials(review.name) || "A"}
+                  </span>
+                  <strong className="text-sm">{review.name}</strong>
+                </div>
+                <div className="mb-1 flex gap-1">
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <Star
+                      key={index}
+                      size={14}
+                      fill={index < review.starCount ? "currentColor" : "none"}
+                      className={
+                        index < review.starCount
+                          ? "text-black"
+                          : "text-gray-300"
+                      }
+                    />
+                  ))}
+                </div>
+                <p className="text-sm">{review.description}</p>
+              </article>
+            ))
+          )}
         </div>
       </section>
 
@@ -118,6 +207,100 @@ const AiDestinationDetail = ({ type }) => {
           publicly available information.
         </p>
       </div>
+
+      {isEvent && (
+        <MuiModal
+          open={isAddReviewOpen}
+          onClose={() => setIsAddReviewOpen(false)}
+          title={item.title || "Add a review"}
+        >
+          <form
+            onSubmit={handleSubmitReview((data) => submitReview(data))}
+            className="grid grid-cols-1 gap-6"
+          >
+            <div className="flex items-center gap-4">
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary-blue text-2xl font-semibold uppercase text-white">
+                {(reviewerName || auth?.user?.name || "U")
+                  .split(" ")
+                  .map((name) => name[0])
+                  .join("")
+                  .slice(0, 2)}
+              </div>
+              <p className="text-card-title font-semibold text-gray-900">
+                {reviewerName || auth?.user?.name || "Unknown User"}
+              </p>
+            </div>
+
+            <Controller
+              name="starCount"
+              control={reviewControl}
+              rules={{
+                required: "Star rating is required",
+                min: { value: 1, message: "Minimum rating is 1" },
+                max: { value: 5, message: "Maximum rating is 5" },
+              }}
+              render={({ field }) => (
+                <div>
+                  <div className="flex items-center gap-2">
+                    {[1, 2, 3, 4, 5].map((rating) => (
+                      <button
+                        key={rating}
+                        type="button"
+                        onClick={() => field.onChange(rating)}
+                        className="transition-transform hover:scale-105"
+                        aria-label={`Rate ${rating} star`}
+                      >
+                        {rating <= field.value ? (
+                          <AiFillStar size={56} className="text-yellow-400" />
+                        ) : (
+                          <AiOutlineStar size={56} className="text-gray-300" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                  {reviewErrors?.starCount?.message ? (
+                    <p className="mt-1 text-xs text-red-600">
+                      {reviewErrors.starCount.message}
+                    </p>
+                  ) : null}
+                </div>
+              )}
+            />
+
+            <Controller
+              name="description"
+              control={reviewControl}
+              rules={{
+                required: "Review details are required",
+                validate: { noOnlyWhitespace },
+              }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  placeholder="Share details of your own experience at this event"
+                  fullWidth
+                  variant="standard"
+                  size="small"
+                  multiline
+                  minRows={3}
+                  error={!!reviewErrors?.description}
+                  helperText={reviewErrors?.description?.message}
+                />
+              )}
+            />
+
+            <div className="flex justify-center">
+              <SecondaryButton
+                title="Submit Review"
+                type="submit"
+                externalStyles="mt-4"
+                disabled={isSubmittingReview}
+                isLoading={isSubmittingReview}
+              />
+            </div>
+          </form>
+        </MuiModal>
+      )}
     </main>
   );
 };
