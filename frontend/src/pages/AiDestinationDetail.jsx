@@ -169,7 +169,7 @@ const AiDestinationDetail = ({ type }) => {
           {isReviewsLoading ? (
             <p className="text-sm text-gray-500">Loading reviews...</p>
           ) : reviews.length === 0 ? (
-            <p className="text-sm text-gray-500">No approved reviews yet.</p>
+            <p className="text-sm text-gray-500">No reviews yet.</p>
           ) : (
             reviews.map((review) => (
               <article key={review._id}>
