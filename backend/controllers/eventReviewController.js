@@ -96,3 +96,40 @@ export const addEventReview = async (req, res, next) => {
     next(error);
   }
 };
+
+export const updateEventReviewStatus = async (req, res, next) => {
+  try {
+    const { reviewId } = req.params;
+    const { status } = req.body;
+    const allowedStatuses = ["pending", "approved", "rejected"];
+
+    if (!mongoose.isValidObjectId(reviewId)) {
+      return res
+        .status(400)
+        .json({ message: "Valid review identifier is required" });
+    }
+
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({
+        message: `Status must be one of: ${allowedStatuses.join(", ")}`,
+      });
+    }
+
+    const review = await EventReview.findByIdAndUpdate(
+      reviewId,
+      { status },
+      { new: true, runValidators: true },
+    );
+
+    if (!review) {
+      return res.status(404).json({ message: "Event review not found" });
+    }
+
+    return res.status(200).json({
+      message: `Event review status updated to ${status}`,
+      review,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
