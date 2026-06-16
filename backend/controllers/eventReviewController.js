@@ -2,6 +2,21 @@ import mongoose from "mongoose";
 import Event from "../models/Event.js";
 import EventReview from "../models/EventReview.js";
 
+export const getAllEventReviews = async (req, res, next) => {
+  try {
+    const reviews = await EventReview.find({})
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return res.status(200).json({
+      count: reviews.length,
+      data: reviews,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getApprovedEventReviews = async (req, res, next) => {
   try {
     const { eventId } = req.query;
