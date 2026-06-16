@@ -10,6 +10,6 @@ const router = Router();
 
 router.get("/", getApprovedEventReviews);
 router.post("/", verifyJwt, addEventReview);
-router.patch("/:reviewId/status", verifyJwt, updateEventReviewStatus);
+router.patch("/:reviewId/status", updateEventReviewStatus);
 
 export default router;
