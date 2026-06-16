@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 import Event from "../models/Event.js";
 import EventReview from "../models/EventReview.js";
+import StateWiseWeight from "../models/StateWiseWeight.js";
+
+const escapeRegExp = (value = "") =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 export const getAllEventReviews = async (req, res, next) => {
   try {
@@ -71,10 +75,24 @@ export const addEventReview = async (req, res, next) => {
         .json({ message: "Reviewer name and review details are required" });
     }
 
-    const event = await Event.findById(eventId).select("_id").lean();
+    const event = await Event.findById(eventId)
+      .select("_id eventName destination")
+      .lean();
     if (!event) {
       return res.status(404).json({ message: "Event not found" });
     }
+
+    const destinationMetadata = event.destination
+      ? await StateWiseWeight.findOne({
+          state: {
+            $regex: new RegExp(`^${escapeRegExp(event.destination)}$`, "i"),
+          },
+        })
+          .select("continent country state")
+          .lean()
+      : null;
+
+    const reviewerName = name.trim();
 
     const existingReview = await EventReview.findOne({
       event: event._id,
@@ -90,7 +108,12 @@ export const addEventReview = async (req, res, next) => {
     const review = await EventReview.create({
       event: event._id,
       eventId: event._id.toString(),
-      name: name.trim(),
+      eventName: event.eventName || "",
+      name: reviewerName,
+      reviewerName,
+      continent: destinationMetadata?.continent || "",
+      country: destinationMetadata?.country || "",
+      state: destinationMetadata?.state || event.destination || "",
       starCount: parsedStarCount,
       description: description.trim(),
       status: "pending",
