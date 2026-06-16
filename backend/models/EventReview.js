@@ -12,10 +12,35 @@ const eventReviewSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    eventName: {
+      type: String,
+      trim: true,
+      default: "",
+    },
     name: {
       type: String,
       required: true,
       trim: true,
+    },
+    reviewerName: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    continent: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    country: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    state: {
+      type: String,
+      trim: true,
+      default: "",
     },
     starCount: {
       type: Number,
