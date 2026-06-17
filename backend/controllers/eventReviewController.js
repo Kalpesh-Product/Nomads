@@ -48,6 +48,22 @@ export const getApprovedEventReviews = async (req, res, next) => {
   }
 };
 
+export const getEventReviewsByUser = async (req, res, next) => {
+  try {
+    const reviews = await EventReview.find({ reviewer: req.userData._id })
+      .populate("event", "eventName mainImage destination venue month category")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return res.status(200).json({
+      count: reviews.length,
+      data: reviews,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const addEventReview = async (req, res, next) => {
   try {
     const { eventId, name, starCount, description } = req.body;
