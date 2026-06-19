@@ -7,6 +7,7 @@ import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useAuth from "../hooks/useAuth";
 import ListingCard from "../components/ListingCard";
 import MuiModal from "../components/Modal";
+import { showSuccessAlert } from "../utils/alerts";
 
 const FALLBACK_IMAGE =
   "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp";
@@ -116,9 +117,10 @@ const Reviews = () => {
         starCount,
         description,
       });
-      return res.data?.review;
+      return res.data;
     },
-    onSuccess: (updatedReview) => {
+    onSuccess: (response) => {
+      const updatedReview = response?.review;
       const mergedReview = {
         ...selectedReview,
         ...updatedReview,
@@ -129,6 +131,7 @@ const Reviews = () => {
       setSelectedReview(mergedReview);
       setIsEditingReview(false);
       setEditError("");
+      showSuccessAlert(response?.message || "Review updated successfully");
       queryClient.invalidateQueries({ queryKey: ["userEventReviews", userId] });
     },
     onError: (mutationError) => {
