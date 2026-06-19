@@ -375,6 +375,10 @@ const AiGlobalListingsMap = () => {
   }, [listingsData]);
 
   const categoryOptions = useMemo(() => {
+    if (isLisitingLoading) {
+      return [];
+    }
+
     if (!listingsData || listingsData.length === 0) {
       return [
         ...DESTINATION_HIGHLIGHT_FILTERS,
@@ -430,7 +434,7 @@ const AiGlobalListingsMap = () => {
         value: VALUE_ADDED_SERVICES_CATEGORY,
       },
     ];
-  }, [listingsData]);
+  }, [isLisitingLoading, listingsData]);
 
   const groupedListings = sortedListings?.reduce((acc, item) => {
     if (!acc[item.companyType]) acc[item.companyType] = [];
