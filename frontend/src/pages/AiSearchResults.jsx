@@ -686,7 +686,7 @@ const normalizeSelectedContinent = (continent) =>
 const goalNarrativeByGoalAndAttribute = {
   [normalizeNarrativeKey("World Ranking")]: {
     [normalizeNarrativeKey("Best for Nomads")]:
-      "Curated below are the top cities in X based on overall livability for modern remote professionals.\nPowered by wono’s intelligence model, prioritizing:\n\n• 💰 Cost of living\n• 🏢 Work infrastructure\n• ⚡ High-speed, stable internet\n• 🤝 Nomad community\n• 🚀 Startup ecosystem\n• 🛡️ Safety\n• 🛂 Visa flexibility for longer stays\n\n→ Find the best overall place to live and work.",
+      "Curated below are the top cities in X based on overall livability for modern remote professionals.\nPowered by wono’s intelligence model, prioritizing:\n\n• 💰 Cost of living\n• 🏢 Work infrastructure\n• ⚡ High-speed & stable internet\n• 🤝 Nomad community\n• 🚀 Startup ecosystem\n• 🛡️ Safety\n• 🛂 Visa flexibility for longer stays\n\n→ Find the best overall place to live and work.",
     [normalizeNarrativeKey("Most Affordable")]:
       "Curated below are the most affordable cities in X designed to help you maximize your budget.\nPowered by wono’s intelligence model, prioritizing:\n\n• 💰 Low cost of living\n• 📊 Strong purchasing power\n• 🎫 Visa cost\n\n→ Find cities where affordability meets comfort.",
     [normalizeNarrativeKey("Safest Cities")]:
@@ -702,7 +702,7 @@ const goalNarrativeByGoalAndAttribute = {
     [normalizeNarrativeKey("Clean Air / Environment")]:
       "Curated below are the cleanest and most environmentally friendly cities in X.\nPowered by wono’s intelligence model, prioritizing:\n\n• 🌿 Air quality\n• 🛡️ Safe, livable environments\n• 🏥 Health-conscious conditions\n\n→ Breathe better, live better.",
     [normalizeNarrativeKey("Best Work Infrastructure")]:
-      "Curated below are the best cities in X optimized for productivity and remote work performance.\nPowered by wono’s intelligence model, prioritizing:\n\n• 🏢 Work infrastructure\n• ⚡ High-speed, stable internet\n• 🚌 Internal Commuting\n\n→ Work efficiently from anywhere, without compromise.",
+      "Curated below are the best cities in X optimized for productivity and remote work performance.\nPowered by wono’s intelligence model, prioritizing:\n\n• 🏢 Work infrastructure\n• ⚡ High-speed & stable internet\n• 🚌 Internal Commuting\n\n→ Work efficiently from anywhere, without compromise.",
   },
   [normalizeNarrativeKey("Work From Anywhere")]: {
     [normalizeNarrativeKey("Best for Remote Work Setup")]:

@@ -608,6 +608,12 @@ const AiProduct = () => {
         date: dayjs(item.createdAt).fromNow(),
       }));
 
+  const reviewCount =
+    companyDetails?.reviewCount || companyDetails?.totalReviews || 0;
+  const formattedReviewCount = Number.isFinite(Number(reviewCount))
+    ? Number(reviewCount).toLocaleString("en-US")
+    : reviewCount;
+
   const forMapsData = {
     id: companyDetails?._id,
     lat: companyDetails?.latitude,
@@ -1094,9 +1100,7 @@ const AiProduct = () => {
                   <div className="w-px h-10 bg-gray-300 mx-2 my-auto" />
                   <div className="flex flex-col gap-4 lg:gap-0 justify-center items-center">
                     <p className="text-tiny lg:text-subtitle mt-1">
-                      {companyDetails?.reviewCount ||
-                        companyDetails?.totalReviews ||
-                        0}
+                      {formattedReviewCount}
                     </p>
                     <span className="text-tiny lg:text-small font-medium">
                       Reviews
@@ -2038,9 +2042,7 @@ const AiProduct = () => {
                     <div className="w-px h-8 bg-gray-100" />
                     <div className="flex flex-col items-center">
                       <span className="text-lg font-bold text-gray-900">
-                        {companyDetails?.reviewCount ||
-                          companyDetails?.totalReviews ||
-                          0}
+                        {formattedReviewCount}
                       </span>
                       <span className="text-[10px] text-gray-400 uppercase font-medium">
                         Reviews

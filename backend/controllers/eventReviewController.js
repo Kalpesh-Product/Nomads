@@ -187,3 +187,54 @@ export const updateEventReviewStatus = async (req, res, next) => {
     next(error);
   }
 };
+
+export const updateEventReview = async (req, res, next) => {
+  try {
+    const { reviewId } = req.params;
+    const { starCount, description } = req.body;
+
+    if (!mongoose.isValidObjectId(reviewId)) {
+      return res
+        .status(400)
+        .json({ message: "Valid review identifier is required" });
+    }
+
+    const parsedStarCount = Number(starCount);
+    if (
+      Number.isNaN(parsedStarCount) ||
+      parsedStarCount < 1 ||
+      parsedStarCount > 5
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Star count must be between 1 and 5" });
+    }
+
+    if (!description?.trim()) {
+      return res
+        .status(400)
+        .json({ message: "Review details are required" });
+    }
+
+    const review = await EventReview.findOneAndUpdate(
+      { _id: reviewId, reviewer: req.userData._id },
+      {
+        starCount: parsedStarCount,
+        description: description.trim(),
+        status: "pending",
+      },
+      { new: true, runValidators: true },
+    );
+
+    if (!review) {
+      return res.status(404).json({ message: "Event review not found" });
+    }
+
+    return res.status(200).json({
+      message: "Review updated successfully",
+      review,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

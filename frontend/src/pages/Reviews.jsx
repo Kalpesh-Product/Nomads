@@ -1,20 +1,27 @@
 import React, { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AiFillStar } from "react-icons/ai";
+import { FiEdit2 } from "react-icons/fi";
 import Container from "../components/Container";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useAuth from "../hooks/useAuth";
 import ListingCard from "../components/ListingCard";
 import MuiModal from "../components/Modal";
+import { showSuccessAlert } from "../utils/alerts";
 
 const FALLBACK_IMAGE =
   "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp";
 
 const Reviews = () => {
   const axiosPrivate = useAxiosPrivate();
+  const queryClient = useQueryClient();
   const { auth } = useAuth();
   const [selectedReview, setSelectedReview] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditingReview, setIsEditingReview] = useState(false);
+  const [editStarCount, setEditStarCount] = useState(5);
+  const [editDescription, setEditDescription] = useState("");
+  const [editError, setEditError] = useState("");
 
   const userId = auth?.user?._id || auth?.user?.id;
 
@@ -104,16 +111,59 @@ const Reviews = () => {
     });
   }, [selectedReview]);
 
+  const updateEventReviewMutation = useMutation({
+    mutationFn: async ({ reviewId, starCount, description }) => {
+      const res = await axiosPrivate.patch(`/event-reviews/${reviewId}`, {
+        starCount,
+        description,
+      });
+      return res.data;
+    },
+    onSuccess: (response) => {
+      const updatedReview = response?.review;
+      const mergedReview = {
+        ...selectedReview,
+        ...updatedReview,
+        event: selectedReview?.event,
+        status: "pending",
+      };
+
+      setSelectedReview(mergedReview);
+      setIsEditingReview(false);
+      setEditError("");
+      showSuccessAlert(response?.message || "Review updated successfully");
+      queryClient.invalidateQueries({ queryKey: ["userEventReviews", userId] });
+    },
+    onError: (mutationError) => {
+      setEditError(
+        mutationError?.response?.data?.message ||
+          "Failed to update this review.",
+      );
+    },
+  });
+
   const openReviewModal = (review) => {
     setSelectedReview(review || null);
+    setEditStarCount(review?.starCount || 5);
+    setEditDescription(review?.description || "");
+    setIsEditingReview(false);
+    setEditError("");
     setIsModalOpen(true);
   };
 
   const closeReviewModal = () => {
     setIsModalOpen(false);
     setSelectedReview(null);
+    setIsEditingReview(false);
+    setEditError("");
   };
   const reviewStatus = (selectedReview?.status || "pending").toLowerCase();
+  const isSelectedEventReview = Boolean(
+    selectedReview?._id &&
+    (selectedReview?.event ||
+      selectedReview?.eventId ||
+      selectedReview?.eventName),
+  );
   const modalTitle =
     selectedReview?.eventName ||
     selectedReview?.company?.companyName ||
@@ -124,6 +174,37 @@ const Reviews = () => {
     approved: "bg-green-100 text-green-700 border-green-200",
     rejected: "bg-red-100 text-red-700 border-red-200",
     pending: "bg-yellow-100 text-yellow-700 border-yellow-200",
+  };
+
+  const handleStartEdit = () => {
+    setEditStarCount(selectedReview?.starCount || 5);
+    setEditDescription(selectedReview?.description || "");
+    setIsEditingReview(true);
+    setEditError("");
+  };
+
+  const handleCancelEdit = () => {
+    setEditStarCount(selectedReview?.starCount || 5);
+    setEditDescription(selectedReview?.description || "");
+    setIsEditingReview(false);
+    setEditError("");
+  };
+
+  const handleSubmitEdit = (event) => {
+    event.preventDefault();
+
+    if (!selectedReview?._id) return;
+
+    if (!editDescription.trim()) {
+      setEditError("Review details are required.");
+      return;
+    }
+
+    updateEventReviewMutation.mutate({
+      reviewId: selectedReview._id,
+      starCount: editStarCount,
+      description: editDescription,
+    });
   };
 
   if (isError || isEventReviewsError) {
@@ -242,7 +323,7 @@ const Reviews = () => {
         onClose={closeReviewModal}
         title={modalTitle}
       >
-        <div className="flex flex-col gap-6">
+        <form className="flex flex-col gap-6" onSubmit={handleSubmitEdit}>
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-4 min-w-0">
               <div className="w-16 h-16 shrink-0 rounded-full bg-[#ff5757] flex items-center justify-center text-white text-3xl font-medium uppercase">
@@ -260,34 +341,101 @@ const Reviews = () => {
               </div>
             </div>
 
-            <span
-              className={`text-xs font-medium px-3 py-1.5 rounded-full border capitalize shrink-0 ${
-                statusBadgeStyles[reviewStatus] || statusBadgeStyles.pending
-              }`}
-            >
-              {reviewStatus}
-            </span>
+            <div className="flex shrink-0 items-center gap-2">
+              {isSelectedEventReview && (
+                <button
+                  type="button"
+                  className={`flex items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                    isEditingReview
+                      ? "border-sky-200 bg-sky-100 text-sky-700"
+                      : "border-gray-200 bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                  onClick={handleStartEdit}
+                  disabled={updateEventReviewMutation.isPending}
+                >
+                  <FiEdit2 size={13} />
+                  Edit
+                </button>
+              )}
+              <span
+                className={`text-xs font-medium px-3 py-1.5 rounded-full border capitalize ${
+                  statusBadgeStyles[reviewStatus] || statusBadgeStyles.pending
+                }`}
+              >
+                {reviewStatus}
+              </span>
+            </div>
           </div>
 
           <div className="flex items-center gap-3 text-4xl">
             {Array.from({ length: 5 }).map((_, index) => (
-              <AiFillStar
+              <button
                 key={index}
-                className={
-                  index < (selectedReview?.starCount || 0)
-                    ? "text-yellow-400"
-                    : "text-gray-300"
+                type="button"
+                className={`leading-none ${
+                  isEditingReview ? "cursor-pointer" : "cursor-default"
+                }`}
+                onClick={() => {
+                  if (isEditingReview) setEditStarCount(index + 1);
+                }}
+                disabled={
+                  !isEditingReview || updateEventReviewMutation.isPending
                 }
-              />
+                aria-label={`Set ${index + 1} star rating`}
+              >
+                <AiFillStar
+                  className={
+                    index <
+                    (isEditingReview
+                      ? editStarCount
+                      : selectedReview?.starCount || 0)
+                      ? "text-yellow-400"
+                      : "text-gray-300"
+                  }
+                />
+              </button>
             ))}
           </div>
 
           <div className="pt-5 border-t border-borderGray">
-            <p className="text-sm text-gray-800 whitespace-pre-line leading-relaxed">
-              {selectedReview?.description || "No review details available."}
-            </p>
+            {isEditingReview ? (
+              <textarea
+                className="min-h-28 w-full rounded-lg border border-borderGray px-3 py-2 text-sm text-gray-800 outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                value={editDescription}
+                onChange={(event) => setEditDescription(event.target.value)}
+                disabled={updateEventReviewMutation.isPending}
+              />
+            ) : (
+              <p className="text-sm text-gray-800 whitespace-pre-line leading-relaxed">
+                {selectedReview?.description || "No review details available."}
+              </p>
+            )}
           </div>
-        </div>
+
+          {editError && <p className="text-sm text-red-500">{editError}</p>}
+
+          {isEditingReview && (
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                className="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700"
+                onClick={handleCancelEdit}
+                disabled={updateEventReviewMutation.isPending}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="rounded-full bg-primary-blue hover:bg-primary-light px-5 py-2 text-sm font-semibold text-white disabled:opacity-60"
+                disabled={updateEventReviewMutation.isPending}
+              >
+                {updateEventReviewMutation.isPending
+                  ? "Submitting..."
+                  : "Submit"}
+              </button>
+            </div>
+          )}
+        </form>
       </MuiModal>
     </Container>
   );

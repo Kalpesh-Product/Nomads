@@ -588,6 +588,10 @@ const AiGlobalListingsList = () => {
   });
 
   const categoryOptions = useMemo(() => {
+    if (isLisitingLoading) {
+      return [];
+    }
+
     if (!listingsData || listingsData.length === 0) {
       return [
         ...DESTINATION_HIGHLIGHT_FILTERS,
@@ -639,7 +643,7 @@ const AiGlobalListingsList = () => {
       ...DESTINATION_HIGHLIGHT_FILTERS,
       { label: "Value Adds", value: VALUE_ADDED_SERVICES_CATEGORY },
     ];
-  }, [listingsData]);
+  }, [isLisitingLoading, listingsData]);
 
   const groupedListings = listingsData?.reduce((acc, item) => {
     if (item.companyType === "privatestay") return acc;
