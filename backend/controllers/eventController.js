@@ -89,6 +89,27 @@ export const getEvents = async (req, res, next) => {
   }
 };
 
+export const getEventsByDestination = async (req, res, next) => {
+  try {
+    const destination = String(req.params.destination || "").trim();
+
+    if (!destination) {
+      return res.status(400).json({ message: "Destination is required." });
+    }
+
+    const events = await Event.find({
+      destination: {
+        $regex: `^${buildExactDestinationPattern(destination)}$`,
+        $options: "i",
+      },
+    }).sort({ eventName: 1 });
+
+    return res.status(200).json(events);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const bulkInsertEvents = async (req, res, next) => {
   try {
     if (!req.file) {
