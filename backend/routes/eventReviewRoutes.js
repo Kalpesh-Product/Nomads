@@ -4,6 +4,7 @@ import {
   getAllEventReviews,
   getApprovedEventReviews,
   getEventReviewsByUser,
+  updateEventReview,
   updateEventReviewStatus,
 } from "../controllers/eventReviewController.js";
 import { verifyJwt } from "../middlewares/verifyJwt.js";
@@ -15,5 +16,6 @@ router.get("/my", verifyJwt, getEventReviewsByUser);
 router.get("/", getApprovedEventReviews);
 router.post("/", verifyJwt, addEventReview);
 router.patch("/:reviewId/status", updateEventReviewStatus);
+router.patch("/:reviewId", verifyJwt, updateEventReview);
 
 export default router;
