@@ -402,7 +402,7 @@ const AiGlobalListingsMap = () => {
       hostel: "Hostels",
       workation: "Workation",
       meetingroom: "Meetings",
-      cafe: "Cafe's",
+      cafe: "Cafes",
       [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
     };
 
