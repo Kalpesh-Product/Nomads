@@ -67,6 +67,12 @@ const normalizeContentDestination = (label) =>
         .replace(/[\u2010-\u2015\u2212\u{FE63}\u{FF0D}]/gu, "-")
         .trim()
     : "";
+const formatDestinationDisplayLabel = (label) =>
+  normalizeContentDestination(label)
+    .replace(/\s+/g, " ")
+    .replace(/(^|[\s-])([a-z])/g, (_, separator, character) =>
+      `${separator}${character.toUpperCase()}`,
+    );
 const buildExactContentKeyword = (label) => {
   if (!label) return null;
   const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -380,13 +386,13 @@ const AiGlobalListingsList = () => {
         ? selectedDestination?.title
         : "";
 
-    if (routeStateLabel) return routeStateLabel;
-    if (sessionTitle) return sessionTitle;
+    if (routeStateLabel) return formatDestinationDisplayLabel(routeStateLabel);
+    if (sessionTitle) return formatDestinationDisplayLabel(sessionTitle);
     if (!formData?.location) return "";
-    return (
+    return formatDestinationDisplayLabel(
       locationOptions.find(
         (option) => option.value?.toLowerCase() === normalizedLocation,
-      )?.label || formData.location
+      )?.label || formData.location,
     );
   }, [
     formData?.country,

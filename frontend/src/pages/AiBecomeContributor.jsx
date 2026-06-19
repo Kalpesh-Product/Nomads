@@ -54,7 +54,7 @@ const CONTRIBUTION_TYPE_OPTIONS = [
   "Become a Tax & Financial Advisory Partner",
   "Become a Company Setup Services Partner",
   "Become a Nomad Blog & News Writer",
-  "Become a Content Contributor",
+  "Become A Content Contributor",
   "Become a Remote Jobs Posting Partner",
   "Not Sure - Lets Connect & Explore",
 ];

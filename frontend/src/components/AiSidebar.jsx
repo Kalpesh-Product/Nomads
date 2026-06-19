@@ -131,7 +131,7 @@ const profileItems = [
 const signOutItem = [{ label: "Sign Out", icon: HiOutlineLogout }];
 
 const becomeContributorLink = {
-  label: "Become a Contributor",
+  label: "Become A Contributor",
   icon: IoMdPersonAdd,
   path: "/become-a-contributor",
 };
