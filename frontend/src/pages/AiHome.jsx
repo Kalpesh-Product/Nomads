@@ -100,7 +100,7 @@ const AiHome = () => {
 
   const userFirstName = auth?.user?.fullName?.split(" ")?.[0] || "Abrar";
 
-  const greetingText = isLoggedIn ? `Hi ${userFirstName}` : "Meet wono";
+  const greetingText = isLoggedIn ? `Hi ${userFirstName}!` : "Meet wono";
   const subheadingText = isLoggedIn
     ? ""
     : "An intelligent platform for modern nomads … Early adoption of our future lifestyle!";
