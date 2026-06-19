@@ -54,7 +54,7 @@ const TYPING_INTERVAL_MS = 7;
 const SECOND_HEADING_DELAY_MS = 250;
 const THINKING_HEADING_TEXT = "Curating the best results for you";
 const CURATED_RESULTS_HEADING_TEXT =
-  "Please find below the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
+  "Please find below, the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
 const AI_SCROLL_CONTAINER_ID = "nomad-ai-scroll-container";
 const extractImageFromContent = (content) => {
   const match = content?.match(/<img.*?src=["'](.*?)["']/);
@@ -67,6 +67,12 @@ const normalizeContentDestination = (label) =>
         .replace(/[\u2010-\u2015\u2212\u{FE63}\u{FF0D}]/gu, "-")
         .trim()
     : "";
+const formatDestinationDisplayLabel = (label) =>
+  normalizeContentDestination(label)
+    .replace(/\s+/g, " ")
+    .replace(/(^|[\s-])([a-z])/g, (_, separator, character) =>
+      `${separator}${character.toUpperCase()}`,
+    );
 const buildExactContentKeyword = (label) => {
   if (!label) return null;
   const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -380,13 +386,13 @@ const AiGlobalListingsList = () => {
         ? selectedDestination?.title
         : "";
 
-    if (routeStateLabel) return routeStateLabel;
-    if (sessionTitle) return sessionTitle;
+    if (routeStateLabel) return formatDestinationDisplayLabel(routeStateLabel);
+    if (sessionTitle) return formatDestinationDisplayLabel(sessionTitle);
     if (!formData?.location) return "";
-    return (
+    return formatDestinationDisplayLabel(
       locationOptions.find(
         (option) => option.value?.toLowerCase() === normalizedLocation,
-      )?.label || formData.location
+      )?.label || formData.location,
     );
   }, [
     formData?.country,
@@ -606,7 +612,7 @@ const AiGlobalListingsList = () => {
       hostel: "Hostels",
       workation: "Workation",
       meetingroom: "Meetings",
-      cafe: "Cafe's",
+      cafe: "Cafes",
       [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
     };
 

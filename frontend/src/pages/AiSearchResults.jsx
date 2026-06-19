@@ -661,17 +661,17 @@ const goalNameBySlug = {
 
 const goalNarrativeTopHeadingMap = {
   "World Ranking":
-    "Please find below the best curated results from the options you suggested to me based on world ranking index.",
+    "Please find below, the best curated results from the options you suggested to me based on world ranking index.",
   "Work From Anywhere":
-    "Please find below the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.",
+    "Please find below, the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.",
   "Increase Your Savings":
-    "Please find below the best curated results from the options you suggested to me to help you increase your savings.",
+    "Please find below, the best curated results from the options you suggested to me to help you increase your savings.",
   "Advance Your Career":
-    "Please find below the best curated results from the options you suggested to me to help you advance your career.",
+    "Please find below, the best curated results from the options you suggested to me to help you advance your career.",
   "Find Your Community":
-    "Please find below the best curated results from the options you suggested to me to help you discover your preferred community in nomad destinations.",
+    "Please find below, the best curated results from the options you suggested to me to help you discover your preferred community in nomad destinations.",
   "Search Old School":
-    "Please find below the best curated results from the options you suggested to me to help you discover your preferred nomad destinations.",
+    "Please find below, the best curated results from the options you suggested to me to help you discover your preferred nomad destinations.",
 };
 
 const normalizeNarrativeKey = (value = "") =>

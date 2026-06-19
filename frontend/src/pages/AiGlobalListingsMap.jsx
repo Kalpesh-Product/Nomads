@@ -43,7 +43,7 @@ const TYPING_INTERVAL_MS = 7;
 const SECOND_HEADING_DELAY_MS = 250;
 const THINKING_HEADING_TEXT = "Curating the best results for you";
 const CURATED_RESULTS_HEADING_TEXT =
-  "Please find below the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
+  "Please find below, the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
 const getAiVerticalsPageStateKey = (country = "", location = "") => {
   const countryKey = country.trim().toLowerCase();
   const locationKey = location.trim().toLowerCase();
@@ -402,7 +402,7 @@ const AiGlobalListingsMap = () => {
       hostel: "Hostels",
       workation: "Workation",
       meetingroom: "Meetings",
-      cafe: "Cafe's",
+      cafe: "Cafes",
       [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
     };
 

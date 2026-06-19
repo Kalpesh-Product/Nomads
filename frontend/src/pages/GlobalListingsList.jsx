@@ -284,7 +284,7 @@ const GlobalListingsList = () => {
       hostel: "Hostels",
       workation: "Workation",
       meetingroom: "Meetings",
-      cafe: "Cafe's",
+      cafe: "Cafes",
     };
 
     const typeOrder = [
