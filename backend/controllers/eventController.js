@@ -261,6 +261,26 @@ export const addEvent = async (req, res, next) => {
   }
 };
 
+export const getEventById = async (req, res, next) => {
+  try {
+    const { eventId } = req.params;
+
+    if (!mongoose.isValidObjectId(eventId)) {
+      return res.status(400).json({ message: "Valid event identifier is required" });
+    }
+
+    const event = await Event.findById(eventId);
+
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    return res.status(200).json(event);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const updateEvent = async (req, res, next) => {
   try {
     const { eventId } = req.params;
