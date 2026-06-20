@@ -1,8 +1,65 @@
 import { Readable } from "stream";
 import csvParser from "csv-parser";
+import mongoose from "mongoose";
 import Event from "../models/Event.js";
 
 const REQUIRED_COLUMNS = ["Event Name", "Short Description", "Destination"];
+
+const EVENT_FIELDS = [
+  "serialNumber",
+  "link",
+  "mainImage",
+  "eventName",
+  "shortDescription",
+  "category",
+  "month",
+  "venue",
+  "destination",
+  "eventType",
+  "sections",
+];
+
+const normalizeString = (value) =>
+  typeof value === "string" ? value.trim() : value;
+
+const buildSectionsFromPayload = (sections) => {
+  if (!Array.isArray(sections)) return [];
+
+  return sections.map((section = {}) => ({
+    title: normalizeString(section.title) || "",
+    image: normalizeString(section.image) || "",
+    content: normalizeString(section.content) || "",
+  }));
+};
+
+const buildEventPayload = (body, { partial = false } = {}) => {
+  const payload = {};
+
+  for (const field of EVENT_FIELDS) {
+    if (!Object.prototype.hasOwnProperty.call(body, field)) continue;
+
+    payload[field] =
+      field === "sections"
+        ? buildSectionsFromPayload(body[field])
+        : normalizeString(body[field]);
+  }
+
+  if (!partial) {
+    payload.sections = Object.prototype.hasOwnProperty.call(body, "sections")
+      ? buildSectionsFromPayload(body.sections)
+      : [];
+  }
+
+  return payload;
+};
+
+const validateRequiredEventFields = (payload) => {
+  const missingFields = ["eventName", "shortDescription", "destination"].filter(
+    (field) => !payload[field],
+  );
+
+  return missingFields;
+};
 
 const escapeRegex = (value) =>
   value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -174,6 +231,134 @@ export const bulkInsertEvents = async (req, res, next) => {
       } catch (error) {
         return next(error);
       }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+export const addEvent = async (req, res, next) => {
+  try {
+    const payload = buildEventPayload(req.body || {});
+    const missingFields = validateRequiredEventFields(payload);
+
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        message: "Required event fields are missing.",
+        missingFields,
+      });
+    }
+
+    const event = await Event.create(payload);
+
+    return res.status(201).json({
+      message: "Event created successfully",
+      event,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getEventById = async (req, res, next) => {
+  try {
+    const { eventId } = req.params;
+
+    if (!mongoose.isValidObjectId(eventId)) {
+      return res.status(400).json({ message: "Valid event identifier is required" });
+    }
+
+    const event = await Event.findById(eventId);
+
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    return res.status(200).json(event);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateEvent = async (req, res, next) => {
+  try {
+    const { eventId } = req.params;
+
+    if (!mongoose.isValidObjectId(eventId)) {
+      return res.status(400).json({ message: "Valid event identifier is required" });
+    }
+
+    const payload = buildEventPayload(req.body || {}, { partial: true });
+
+    if (Object.keys(payload).length === 0) {
+      return res.status(400).json({
+        message: "At least one event field is required to update.",
+      });
+    }
+
+    const emptyRequiredFields = [
+      "eventName",
+      "shortDescription",
+      "destination",
+    ].filter(
+      (field) =>
+        Object.prototype.hasOwnProperty.call(payload, field) && !payload[field],
+    );
+
+    if (emptyRequiredFields.length > 0) {
+      return res.status(400).json({
+        message: "Required event fields cannot be empty.",
+        missingFields: emptyRequiredFields,
+      });
+    }
+
+    const event = await Event.findByIdAndUpdate(eventId, payload, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    return res.status(200).json({
+      message: "Event updated successfully",
+      event,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateEventStatus = async (req, res, next) => {
+  try {
+    const { eventId } = req.params;
+    const { isActive } = req.body || {};
+
+    if (!mongoose.isValidObjectId(eventId)) {
+      return res.status(400).json({ message: "Valid event identifier is required" });
+    }
+
+    if (typeof isActive !== "boolean") {
+      return res.status(400).json({
+        message: "isActive must be a boolean value.",
+      });
+    }
+
+    const event = await Event.findByIdAndUpdate(
+      eventId,
+      { isActive },
+      { new: true, runValidators: true },
+    );
+
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    return res.status(200).json({
+      message: `Event status updated to ${isActive ? "active" : "inactive"}`,
+      event,
     });
   } catch (error) {
     next(error);
