@@ -90,7 +90,7 @@ const TemplateSite = () => {
         pathname={location.pathname}
       />
       {breadcrumbItems.length > 1 ? (
-        <TemplateBreadcrumbs items={breadcrumbItems} />
+        <TemplateBreadcrumbs items={breadcrumbItems} className="bg-[#efefef]" />
       ) : null}
       <main className="flex-1">
         <Outlet

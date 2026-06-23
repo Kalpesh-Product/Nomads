@@ -1,10 +1,10 @@
 import React from "react";
 
-const TemplateBreadcrumbs = ({ items = [] }) => {
+const TemplateBreadcrumbs = ({ items = [], className = "" }) => {
   if (!Array.isArray(items) || items.length <= 1) return null;
 
   return (
-    <div className="border-b border-slate-200 px-4 py-2 text-[12px] text-slate-600 md:px-6">
+    <div className={` px-4 py-2 text-[12px] text-slate-600 md:px-6 ${className}`}>
       <div className="mx-auto flex w-full max-w-7xl items-center gap-3 overflow-x-auto whitespace-nowrap py-1">
         {items.map((item, index) => {
           const isCurrent = index === items.length - 1;

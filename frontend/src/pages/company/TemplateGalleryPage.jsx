@@ -12,7 +12,7 @@ const TemplateGalleryPage = () => {
   const galleryImages = Array.isArray(data?.gallery) ? data.gallery : [];
 
   return (
-    <section className="min-h-[60vh] py-10">
+    <section className="min-h-[60vh] bg-[#efefef] py-10">
       <Container>
         <div className="flex flex-col gap-6">
           <h1 className="text-center text-title font-semibold uppercase">

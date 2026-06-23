@@ -3,10 +3,11 @@ import { getMediaSrc, normalizeSlug } from "./templateRouteUtils";
 export const getMediaUrl = (item) => getMediaSrc(item);
 
 const normalizeCatalogItem = (item, fallbackType = "") => {
-  const images = Array.isArray(item?.images)
-    ? item.images
-    : item?.image
-      ? [item.image]
+  const rawImages = item?.images || item?.image;
+  const images = Array.isArray(rawImages)
+    ? rawImages
+    : rawImages
+      ? [rawImages]
       : [];
 
   return {

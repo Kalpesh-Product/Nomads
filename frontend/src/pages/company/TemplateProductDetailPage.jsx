@@ -10,6 +10,7 @@ import {
   getEnabledProductPages,
 } from "./utils/pageTemplateUtils";
 import {
+  getMediaSrc,
   getSectionPath,
   normalizeSlug,
 } from "./utils/templateRouteUtils";
@@ -59,6 +60,9 @@ const TemplateProductDetailPage = () => {
 
   const heroImages = getPageHeroImages(page);
   const heroImage = heroImages[0] || "";
+  const [productHeroIndex, setProductHeroIndex] = useState(0);
+  const selectedProductHeroImages = heroImages.length > 0 ? heroImages : [];
+  const selectedProductHeroImage = selectedProductHeroImages[productHeroIndex] || heroImage;
   const isCafePage = normalizeSlug(page?.slug || page?.name || "").includes("cafe");
   const productSummary =
     page?.description || page?.heroSubHeading || page?.homeCardSubText || "";
@@ -71,48 +75,61 @@ const TemplateProductDetailPage = () => {
 
   return (
     <div className="w-full bg-[#efefef]">
-      <section className="relative overflow-hidden">
-        <div className="relative h-[60vh]">
-          {heroImage ? (
+      <Container>
+        <section className="relative h-[30svh] min-h-[220px] overflow-hidden rounded-xl bg-[#1f1f1f] md:h-[44vh] md:min-h-[280px]">
+          {selectedProductHeroImage ? (
             <img
-              src={heroImage}
-              alt={page?.name || "Product"}
-              className="h-full w-full object-cover"
+              src={selectedProductHeroImage}
+              alt={page?.name || "Product Hero"}
+              className="absolute inset-0 h-full w-full object-cover opacity-60"
             />
-          ) : (
-            <div className="h-full w-full bg-gray-200" />
-          )}
+          ) : null}
 
-          <div className="absolute inset-0 bg-black/35" />
-
-          <Container>
-            <div className="absolute inset-0 flex items-end justify-center pb-10 text-center text-white">
-              <div className="max-w-4xl">
-                <h1 className="text-4xl font-bold md:text-5xl">
-                  {page?.heroHeading || page?.name}
-                </h1>
-                {page?.heroSubHeading ? (
-                  <p className="mt-3 text-lg md:text-xl">{page.heroSubHeading}</p>
-                ) : null}
-                <button
-                  type="button"
-                  onClick={() =>
-                    document.getElementById("product-catalog")?.scrollIntoView({
-                      behavior: "smooth",
-                    })
-                  }
-                  className="mt-6 rounded-full border border-white px-5 py-2 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-white/10"
-                >
-                  View More
+          <div className="relative z-10 flex h-full items-end pb-8">
+            <div className="w-full text-center text-white">
+              <h1 className="text-[26px] font-bold md:text-4xl">
+                {page?.heroHeading || page?.name || "Product"}
+              </h1>
+              {page?.heroSubHeading ? (
+                <p className="mt-2 text-[13px] leading-relaxed md:mt-3 md:text-lg">{page.heroSubHeading}</p>
+              ) : null}
+              {page?.heroButtonText ? (
+                <button type="button" className="mt-4 rounded-full border border-white px-5 py-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-white/10 md:mt-6 md:px-6 md:text-sm">
+                  {String(page.heroButtonText).toUpperCase()}
                 </button>
-              </div>
+              ) : null}
             </div>
-          </Container>
-        </div>
-      </section>
+          </div>
 
-      <section id="product-catalog" className="py-10">
-        <Container>
+          {page?.heroMode === "carousel" && selectedProductHeroImages.length > 1 ? (
+            <>
+              <button
+                type="button"
+                onClick={() =>
+                  setProductHeroIndex((prev) =>
+                    (prev - 1 + selectedProductHeroImages.length) % selectedProductHeroImages.length,
+                  )
+                }
+                className="absolute left-5 top-1/2 hidden -translate-y-1/2 rounded-full bg-black/45 px-4 py-2 text-2xl text-white md:block"
+              >
+                {"<"}
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  setProductHeroIndex((prev) => (prev + 1) % selectedProductHeroImages.length)
+                }
+                className="absolute right-5 top-1/2 hidden -translate-y-1/2 rounded-full bg-black/45 px-4 py-2 text-2xl text-white md:block"
+              >
+                {">"}
+              </button>
+            </>
+          ) : null}
+        </section>
+      </Container>
+
+      <section id="product-catalog" className="pb-10 pt-4">
+        <Container padding={false}>
           <div className="flex flex-col gap-6">
             <h2 className="text-center text-title font-semibold uppercase">
               {isCafePage ? data?.productTitle || "Our Menu" : data?.productTitle || "Our Products"}
@@ -120,15 +137,52 @@ const TemplateProductDetailPage = () => {
             {productSummary && isCafePage ? (
               <p className="text-center text-gray-600">{productSummary}</p>
             ) : null}
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {productCatalog.map((item, index) => (
-                <ProductCard
-                  key={item?.slug || item?.name || item?.title || `product-${index}`}
-                  product={item}
-                  onClick={() => openProductDetails(item)}
-                />
-              ))}
-            </div>
+            {isCafePage ? (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+                {productCatalog.map((item, index) => (
+                  <article key={item?.name || item?.title || `menu-${index}`} className="flex flex-col items-center">
+                    <h3 className="mb-3 text-base font-medium md:text-xl">{item?.category || item?.name || `Item ${index + 1}`}</h3>
+                    <div className="relative w-full overflow-hidden rounded-2xl bg-slate-200">
+                      {(() => {
+                        const imgSrc = getMediaSrc(item?.image) || getMediaSrc(item?.cardImage) || getMediaSrc(item?.heroImage) || getMediaSrc(item?.images);
+                        return imgSrc ? (
+                          <img
+                            src={imgSrc}
+                            alt={item?.name || `Menu Item ${index + 1}`}
+                            className="h-[220px] w-full object-cover md:h-[300px]"
+                          />
+                        ) : (
+                          <div className="h-[220px] w-full bg-slate-200 md:h-[300px]" />
+                        );
+                      })()}
+                      <div className="absolute inset-0 bg-black/35" />
+                      <div className="absolute inset-x-0 bottom-0 p-4 text-left text-white md:p-5">
+                        <p className="text-[16px] font-semibold md:text-[18px]">{item?.name || `Item ${index + 1}`}</p>
+                        {item?.price || item?.cost ? (
+                          <p className="mt-1 text-[14px] font-semibold md:text-[16px]">{item?.price || item?.cost}</p>
+                        ) : null}
+                        {item?.description ? (
+                          <p className="mt-2 max-w-[90%] text-[12px] leading-5 text-white/95 md:text-[15px] md:leading-6">
+                            {item.description}
+                          </p>
+                        ) : null}
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {productCatalog.map((item, index) => (
+                  <ProductCard
+                    key={item?.slug || item?.name || item?.title || `product-${index}`}
+                    product={item}
+                    showButton={true}
+                    onClick={() => openProductDetails(item)}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </Container>
       </section>

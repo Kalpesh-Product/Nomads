@@ -18,6 +18,88 @@ import { useOutletContext } from "react-router-dom";
 import { showErrorAlert, showSuccessAlert } from "../../../utils/alerts";
 import { getMediaSrc, normalizeSlug } from "../utils/templateRouteUtils";
 
+const getLeadFieldsForProduct = (slug) => {
+  const normalized = normalizeSlug(slug || "", "");
+  if (normalized.includes("meeting")) {
+    return [
+      { key: "fullName", label: "Full Name", type: "text", required: true },
+      { key: "mobile", label: "Mobile Number", type: "text", required: true },
+      { key: "email", label: "Email", type: "email", required: true },
+      { key: "people", label: "No. Of Attendees", type: "number", required: true },
+      { key: "startDate", label: "Meeting Date", type: "date", required: true },
+      { key: "endDate", label: "Meeting End Date", type: "date", required: false },
+    ];
+  }
+  if (normalized.includes("workation")) {
+    return [
+      { key: "fullName", label: "Full Name", type: "text", required: true },
+      { key: "mobile", label: "Mobile Number", type: "text", required: true },
+      { key: "email", label: "Email", type: "email", required: true },
+      { key: "people", label: "No. Of Guests", type: "number", required: true },
+      { key: "startDate", label: "Check-In Date", type: "date", required: true },
+      { key: "endDate", label: "Check-Out Date", type: "date", required: true },
+    ];
+  }
+  if (normalized.includes("co-living") || normalized.includes("coliving")) {
+    return [
+      { key: "fullName", label: "Full Name", type: "text", required: true },
+      { key: "mobile", label: "Mobile Number", type: "text", required: true },
+      { key: "email", label: "Email", type: "email", required: true },
+      { key: "people", label: "No. Of Occupants", type: "number", required: true },
+      { key: "startDate", label: "Move-In Date", type: "date", required: true },
+      { key: "endDate", label: "Preferred Stay Until", type: "date", required: false },
+    ];
+  }
+  if (normalized.includes("hostel")) {
+    return [
+      { key: "fullName", label: "Full Name", type: "text", required: true },
+      { key: "mobile", label: "Mobile Number", type: "text", required: true },
+      { key: "email", label: "Email", type: "email", required: true },
+      { key: "people", label: "Beds Required", type: "number", required: true },
+      { key: "startDate", label: "Check-In Date", type: "date", required: true },
+      { key: "endDate", label: "Check-Out Date", type: "date", required: true },
+    ];
+  }
+  return [
+    { key: "fullName", label: "Full Name", type: "text", required: true },
+    { key: "mobile", label: "Mobile Number", type: "text", required: true },
+    { key: "email", label: "Email", type: "email", required: true },
+    { key: "people", label: "No. Of People", type: "number", required: false },
+    { key: "startDate", label: "Start Date", type: "date", required: false },
+    { key: "endDate", label: "End Date", type: "date", required: false },
+  ];
+};
+
+const getLeadMetaForProduct = (product) => {
+  const slug = normalizeSlug(product?.slug || product?.name || product?.type || "", "");
+  const dynamicPrice = [product?.price, product?.cost, product?.duration]
+    .filter(Boolean)
+    .join(" | ");
+  const dynamicDescription = String(product?.description || product?.subText || "").trim();
+
+  if (dynamicPrice || dynamicDescription) {
+    return {
+      priceLine: dynamicPrice || "Starting at 5,900 + GST",
+      description: dynamicDescription || "",
+      label: "Enquire & Receive Quote",
+    };
+  }
+
+  if (slug.includes("meeting")) {
+    return { priceLine: "Starting at 2,499 + GST", description: "", label: "Enquire & Receive Quote" };
+  }
+  if (slug.includes("workation")) {
+    return { priceLine: "Starting at 7,900 + GST", description: "", label: "Plan Your Workation" };
+  }
+  if (slug.includes("co-living") || slug.includes("coliving")) {
+    return { priceLine: "Starting at 14,900 + GST", description: "", label: "Enquire About Stay" };
+  }
+  if (slug.includes("hostel")) {
+    return { priceLine: "Starting at 799 + GST", description: "", label: "Check Bed Availability" };
+  }
+  return { priceLine: "Starting at 5,900 + GST", description: "", label: "Enquire & Receive Quote" };
+};
+
 const ProductModalContent = ({
   product,
   onClose,
@@ -25,9 +107,10 @@ const ProductModalContent = ({
   forceCafeMode = false,
 }) => {
   const [current, setCurrent] = useState(0);
-  // Legacy vertical-based cafe modal behavior kept as backup only:
-  // const normalizedVertical = normalizeVertical(vertical);
-  // const isCafe = normalizedVertical === "cafe";
+  const productSlug = product?.slug || product?.type || product?.name || "";
+  const leadFields = getLeadFieldsForProduct(productSlug);
+  const leadMeta = getLeadMetaForProduct(product);
+
   const {
     handleSubmit,
     control,
@@ -35,14 +118,9 @@ const ProductModalContent = ({
     formState: { errors },
     watch,
   } = useForm({
-    defaultValues: {
-      fullName: "",
-      noOfPeople: 0,
-      mobileNumber: "",
-      email: "",
-      startDate: null,
-      endDate: null,
-    },
+    defaultValues: Object.fromEntries(
+      leadFields.map((f) => [f.key, f.type === "date" ? null : f.type === "number" ? 0 : ""]),
+    ),
   });
 
   const selectedStartDate = watch("startDate");
@@ -50,8 +128,7 @@ const ProductModalContent = ({
   const companyName = data?.companyName || "";
   const isCafeProduct =
     forceCafeMode ||
-    normalizeSlug(product?.slug || product?.type || product?.name || "", "")
-      .includes("cafe");
+    normalizeSlug(productSlug, "").includes("cafe");
 
   const { mutate, isPending: isEnquiry } = useMutation({
     mutationKey: ["enquiryForm"],
@@ -70,9 +147,9 @@ const ProductModalContent = ({
         endDate: cleanEnd,
         fullName: formData.fullName,
         name: formData.fullName,
-        mobileNumber: formData.mobileNumber,
-        mobile: formData.mobileNumber,
-        phone: formData.mobileNumber,
+        mobileNumber: formData.mobile,
+        mobile: formData.mobile,
+        phone: formData.mobile,
         email: formData.email,
         companyName,
         companyId: data?.companyId || "",
@@ -85,8 +162,8 @@ const ProductModalContent = ({
         roomType: product?.type || product?.name || "",
         packageName: product?.type || product?.name || "",
         dormType: product?.type || product?.name || "",
-        noOfPeople: formData?.noOfPeople,
-        attendees: formData?.noOfPeople,
+        noOfPeople: formData?.people,
+        attendees: formData?.people,
         stayDuration: cleanEnd ? `${cleanStart || ""} to ${cleanEnd}` : "",
         timeSlot: "",
         inquiryType: product?.type || "",
@@ -115,15 +192,24 @@ const ProductModalContent = ({
     },
   });
 
-  const images = Array.isArray(product?.images) && product.images.length > 0
-    ? product.images
-    : Array.isArray(product?.heroImages) && product.heroImages.length > 0
-      ? product.heroImages
-      : product?.heroImage
-        ? [product.heroImage]
-        : product?.cardImage
-          ? [product.cardImage]
-          : ["/sample1.jpg", "/sample2.jpg", "/sample3.jpg"];
+  const resolveValidImages = (product) => {
+    const raw = Array.isArray(product?.images) && product.images.length > 0
+      ? product.images
+      : Array.isArray(product?.heroImages) && product.heroImages.length > 0
+        ? product.heroImages
+        : [];
+    const valid = raw
+      .map((img) => {
+        const resolved = getMediaSrc(img);
+        return resolved || (typeof img === "string" ? img : null);
+      })
+      .filter((src) => src && typeof src === "string");
+    if (valid.length > 0) return valid;
+    if (product?.heroImage) return [getMediaSrc(product.heroImage) || product.heroImage].filter(Boolean);
+    if (product?.cardImage) return [typeof product.cardImage === "string" ? product.cardImage : getMediaSrc(product.cardImage)].filter(Boolean);
+    return ["/sample1.jpg", "/sample2.jpg", "/sample3.jpg"];
+  };
+  const images = resolveValidImages(product);
   const nextSlide = () => setCurrent((p) => (p + 1) % images.length);
   const prevSlide = () =>
     setCurrent((p) => (p - 1 + images.length) % images.length);
@@ -215,141 +301,81 @@ const ProductModalContent = ({
         <div className="mt-4 text-sm text-gray-700">{product?.description}</div>
 
         <div className="mt-6 border-t pt-4">
-          <h3 className="font-semibold text-gray-800 mb-2">
-            Enquire & Receive Quote
+          <h3 className="mb-2 font-semibold text-gray-800">
+            {leadMeta.label || "Enquire & Receive Quote"}
           </h3>
 
           <form
             onSubmit={handleSubmit((formData) => mutate(formData))}
             className="grid grid-cols-1 gap-6 lg:grid-cols-2"
           >
-            <Controller
-              name="fullName"
-              control={control}
-              rules={{
-                required: "Full Name is required",
-                validate: { noOnlyWhitespace, isAlphanumeric },
-              }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Full Name"
-                  fullWidth
-                  variant="standard"
-                  size="small"
-                  helperText={errors?.fullName?.message}
-                  error={!!errors.fullName}
-                />
-              )}
-            />
-            <Controller
-              name="noOfPeople"
-              control={control}
-              rules={{ required: "No. of people is required" }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="No. Of People"
-                  fullWidth
-                  type="number"
-                  variant="standard"
-                  size="small"
-                  helperText={errors?.noOfPeople?.message}
-                  error={!!errors.noOfPeople}
-                />
-              )}
-            />
-            <Controller
-              name="mobileNumber"
-              control={control}
-              rules={{
-                required: "Mobile number is required",
-                validate: isValidInternationalPhone,
-              }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Mobile Number"
-                  fullWidth
-                  variant="standard"
-                  size="small"
-                  helperText={errors?.mobileNumber?.message}
-                  error={!!errors.mobileNumber}
-                />
-              )}
-            />
-
-            <Controller
-              name="email"
-              control={control}
-              rules={{
-                required: "Email is required",
-                validate: { isValidEmail },
-              }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Email"
-                  fullWidth
-                  type="email"
-                  variant="standard"
-                  size="small"
-                  helperText={errors?.email?.message}
-                  error={!!errors.email}
-                />
-              )}
-            />
-            <Controller
-              name="startDate"
-              control={control}
-              render={({ field }) => (
-                <DesktopDatePicker
-                  {...field}
-                  label="Start Date"
-                  disablePast
-                  format="DD-MM-YYYY"
-                  value={field.value ? dayjs(field.value) : null}
-                  onChange={field.onChange}
-                  slotProps={{
-                    textField: {
-                      size: "small",
-                      fullWidth: true,
-                      variant: "standard",
-                    },
+            {leadFields.map((field) => {
+              if (field.type === "date") {
+                return (
+                  <Controller
+                    key={field.key}
+                    name={field.key}
+                    control={control}
+                    rules={field.required ? { required: `${field.label} is required` } : {}}
+                    render={({ field: controllerField }) => (
+                      <DesktopDatePicker
+                        {...controllerField}
+                        label={field.label}
+                        disablePast
+                        format="DD-MM-YYYY"
+                        value={controllerField.value ? dayjs(controllerField.value) : null}
+                        onChange={controllerField.onChange}
+                        disabled={field.key === "endDate" && !selectedStartDate}
+                        slotProps={{
+                          textField: {
+                            size: "small",
+                            fullWidth: true,
+                            variant: "standard",
+                            helperText: errors?.[field.key]?.message,
+                            error: !!errors?.[field.key],
+                          },
+                        }}
+                      />
+                    )}
+                  />
+                );
+              }
+              return (
+                <Controller
+                  key={field.key}
+                  name={field.key}
+                  control={control}
+                  rules={{
+                    ...(field.required ? { required: `${field.label} is required` } : {}),
+                    ...(field.key === "email" ? { validate: { isValidEmail } } : {}),
+                    ...(field.key === "mobile" ? { validate: isValidInternationalPhone } : {}),
+                    ...(field.type === "text" && !["email", "mobile"].includes(field.key)
+                      ? { validate: { noOnlyWhitespace, isAlphanumeric } }
+                      : {}),
                   }}
+                  render={({ field: controllerField }) => (
+                    <TextField
+                      {...controllerField}
+                      label={field.label}
+                      fullWidth
+                      variant="standard"
+                      size="small"
+                      type={field.type === "number" ? "number" : field.type === "email" ? "email" : "text"}
+                      helperText={errors?.[field.key]?.message}
+                      error={!!errors?.[field.key]}
+                    />
+                  )}
                 />
-              )}
-            />
-            <Controller
-              name="endDate"
-              control={control}
-              render={({ field }) => (
-                <DesktopDatePicker
-                  {...field}
-                  label="End Date"
-                  format="DD-MM-YYYY"
-                  disablePast
-                  disabled={!selectedStartDate}
-                  value={field.value ? dayjs(field.value) : null}
-                  onChange={field.onChange}
-                  slotProps={{
-                    textField: {
-                      size: "small",
-                      fullWidth: true,
-                      variant: "standard",
-                    },
-                  }}
-                />
-              )}
-            />
-            <div className="flex justify-center items-center lg:col-span-2">
+              );
+            })}
+            <div className="flex items-center justify-center lg:col-span-2">
               <TempButton
                 disabled={isEnquiry}
                 type="submit"
                 buttonText={
                   isEnquiry ? (
                     <div className="flex items-center justify-center gap-2">
-                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-transparent"></span>
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-transparent" />
                       Submitting...
                     </div>
                   ) : (

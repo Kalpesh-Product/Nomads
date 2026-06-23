@@ -1,7 +1,7 @@
 import React from "react";
 import { getMediaSrc } from "../utils/templateRouteUtils";
 
-const ProductCard = ({ product, onClick }) => {
+const ProductCard = ({ product, onClick, buttonText = "VIEW DETAILS", showButton = true }) => {
   const imageSrc =
     getMediaSrc(product?.cardImage) ||
     getMediaSrc(product?.homeCardImage) ||
@@ -39,11 +39,13 @@ const ProductCard = ({ product, onClick }) => {
           alt="img"
           className="h-full w-full rounded-[10px] overflow-hidden object-cover"
         />
-        <div className="absolute inset-0 flex items-end justify-center bg-black/18 p-4">
-          <div className="rounded-full border border-white/85 bg-black/55 px-5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-white shadow-md">
-            VIEW DETAILS
+        {showButton ? (
+          <div className="absolute inset-0 flex items-end justify-center bg-black/18 p-4">
+            <div className="rounded-full border border-white/85 bg-black/55 px-5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-white shadow-md">
+              {buttonText}
+            </div>
           </div>
-        </div>
+        ) : null}
       </div>
     </div>
   );
