@@ -1,3 +1,6 @@
+// Legacy vertical-mapping helpers are intentionally retained for fallback
+// compatibility with older templates. New page-template rendering uses
+// pageNavItems/productDropdownPages first.
 export const normalizeVertical = (value) => {
   const raw = typeof value === "string" ? value.trim().toLowerCase() : "";
   const compact = raw.replace(/[\s_-]+/g, "");
