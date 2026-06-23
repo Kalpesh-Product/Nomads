@@ -2071,7 +2071,9 @@ const AiSearchResults = () => {
 
                                 {formattedNarrative.additionalPriorityPointsText && (
                                   <span>
-                                    {" "}
+                                    {formattedNarrative.priorityPoints.length > 0
+                                      ? ", "
+                                      : " "}
                                     {
                                       formattedNarrative.additionalPriorityPointsText
                                     }
