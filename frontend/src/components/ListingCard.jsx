@@ -5,11 +5,12 @@ import {
   AiOutlineHeart,
   AiTwotoneHeart,
 } from "react-icons/ai";
-import { X } from "lucide-react";
+import { IoClose } from "react-icons/io5";
+import Swal from "sweetalert2";
 
 import { useNavigate } from "react-router-dom";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
 import useAuth from "../hooks/useAuth";
@@ -33,9 +34,8 @@ const ListingCard = ({
   const user = auth?.user || {};
   const userId = auth?.user?._id || auth?.user?.id;
 
-  // const queryClient = useQueryClient();
-
   const axiosPrivate = useAxiosPrivate();
+  const queryClient = useQueryClient();
 
   const { mutate: likeListing } = useMutation({
     mutationFn: async ({ listingId, isLiked, userId }) => {
@@ -50,13 +50,14 @@ const ListingCard = ({
       // toast.success(data?.message || "Updated successfully");
       // ✅ Update local favorites immediately for better UX
       setFavorites(data.likes || []);
+      queryClient.invalidateQueries({ queryKey: ["userLikes", userId] });
     },
     onError: (err) => {
       showErrorAlert(err.response?.data?.message || "Something went wrong");
     },
   });
 
-  const toggleFavorite = (id) => {
+  const toggleFavorite = async (id) => {
     if (!userId) {
       // toast.error("You need to login to access this feature");
       navigate("/login");
@@ -66,6 +67,22 @@ const ListingCard = ({
     // Determine the current like state based on both backend and local data
     const isCurrentlyLiked = favorites.includes(id) || isInitiallyLiked;
     const newLikedState = !isCurrentlyLiked; // what we’re switching to
+
+    if (showRemoveFavoriteIcon && isCurrentlyLiked) {
+      const result = await Swal.fire({
+        title: "Remove from favorites?",
+        text: "Are you sure you want to delete this favorite listing?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#111827",
+      });
+
+      if (!result.isConfirmed) {
+        return;
+      }
+    }
 
     // Optimistically update UI
     if (newLikedState) {
@@ -88,7 +105,7 @@ const ListingCard = ({
       const likedIds = res.data?.map((item) => item._id) || [];
       setFavorites(likedIds);
     });
-  }, [user?._id]);
+  }, [axiosPrivate, user?._id]);
 
   // useEffect(() => {
   //   if (!user?._id) return;
@@ -103,16 +120,6 @@ const ListingCard = ({
   //   };
   //   fetchLikes();
   // }, [user?._id]);
-
-  const typeLabels = {
-    coworking: "CoWorking",
-    coliving: "CoLiving",
-    hostel: "Hostel",
-    privatestay: "Private Stay",
-    cafe: "Cafe",
-    workation: "Workation",
-    meetingroom: "Meeting Rooms",
-  };
 
   const thumbnailImage = item?.images?.[0]?.url;
 
@@ -169,7 +176,10 @@ const ListingCard = ({
               }}
             >
               {showRemoveFavoriteIcon ? (
-                <X className="text-[#ff5757]" size={26} strokeWidth={4} />
+                <IoClose
+                  className="rounded-full bg-white p-1 text-black"
+                  size={28}
+                />
               ) : favorites.includes(item._id) || isInitiallyLiked ? (
                 <AiFillHeart className="text-[#ff5757]" size={22} />
               ) : (

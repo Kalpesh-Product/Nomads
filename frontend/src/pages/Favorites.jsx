@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AiFillHeart } from "react-icons/ai";
-import { X } from "lucide-react";
+import { IoClose } from "react-icons/io5";
+import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 
 import Container from "../components/Container";
@@ -70,6 +71,25 @@ const Favorites = ({
       refetchDestinations();
     }
   }, [refetchDestinations, showDestinationFavorites]);
+
+  const confirmRemoveDestination = async (destinationId) => {
+    const result = await Swal.fire({
+      title: "Remove from favorites?",
+      text: "Are you sure you want to delete this favorite destination?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#111827",
+    });
+
+    if (result.isConfirmed) {
+      toggleFavoriteDestination({
+        destinationId,
+        isFavorited: false,
+      });
+    }
+  };
 
   const { mutate: toggleFavoriteDestination } = useMutation({
     mutationFn: async ({ destinationId, isFavorited }) => {
@@ -230,17 +250,13 @@ const Favorites = ({
                             onClick={(event) => {
                               event.stopPropagation();
                               event.preventDefault();
-                              toggleFavoriteDestination({
-                                destinationId: destination._id,
-                                isFavorited: false,
-                              });
+                              confirmRemoveDestination(destination._id);
                             }}
                           >
                             {showRemoveFavoriteIcons ? (
-                              <X
-                                className="text-[#ff5757]"
-                                size={26}
-                                strokeWidth={4}
+                              <IoClose
+                                className="rounded-full bg-white p-1 text-black"
+                                size={28}
                               />
                             ) : (
                               <AiFillHeart

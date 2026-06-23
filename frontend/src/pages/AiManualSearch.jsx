@@ -5,6 +5,7 @@ import {
   HiOutlineSearch,
   HiOutlineX,
 } from "react-icons/hi";
+import { FaCheck } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { setFormValues } from "../features/locationSlice";
@@ -77,14 +78,15 @@ const DropdownBadge = ({
             aria-label={label}
           >
             {options.map((option) => {
-              const isSelected = option.value === selectedValue;
+              const isSelected =
+                option.value === selectedValue || option.label === selectedValue;
 
               return (
                 <li key={option.value}>
                   <button
                     type="button"
                     onClick={() => onSelect(option.value)}
-                    className={`flex w-full items-center rounded-xl px-3 py-2 text-left text-sm transition-colors ${
+                    className={`group flex w-full items-center rounded-xl px-3 py-2 text-left text-sm transition-colors ${
                       isSelected
                         ? "bg-sky-50 font-medium text-sky-600"
                         : "text-black/80 hover:bg-slate-50"
@@ -92,7 +94,18 @@ const DropdownBadge = ({
                     role="option"
                     aria-selected={isSelected}
                   >
-                    {option.label}
+                    <span className="mr-2 inline-flex w-4 shrink-0 items-center justify-center">
+                      <FaCheck
+                        size={13}
+                        className={`shrink-0 text-primary-blue transition-opacity ${
+                          isSelected
+                            ? "opacity-100"
+                            : "opacity-0 group-hover:opacity-100"
+                        }`}
+                        aria-hidden="true"
+                      />
+                    </span>
+                    <span>{option.label}</span>
                   </button>
                 </li>
               );
@@ -413,7 +426,7 @@ const AiManualSearch = () => {
             </div>
 
             <div className={contentAlignClassName}>
-              <div className="mt-4 hidden max-w-full items-center rounded-[30px] border border-black/15 bg-white px-4 py-2 shadow-[0_2px_6px_rgba(0,0,0,0.03)] sm:flex">
+              <div className="mt-4 hidden max-w-full items-center rounded-[30px] border bg-white px-4 py-2 shadow-[0_5px_14px_rgba(0,0,0,0.12)] sm:flex">
                 <div className="flex flex-wrap items-center gap-2">
                   {searchBarBadges.map((badgeLabel, index) => (
                     <div
