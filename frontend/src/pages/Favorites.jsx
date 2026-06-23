@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AiFillHeart } from "react-icons/ai";
+import { X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import Container from "../components/Container";
@@ -14,6 +15,7 @@ const INITIAL_PREVIEW_COUNT = 4;
 const Favorites = ({
   showDestinationFavorites = false,
   useAiListingsRoute = false,
+  showRemoveFavoriteIcons = false,
 }) => {
   const { auth } = useAuth();
   const userId = auth?.user?._id || auth?.user?.id;
@@ -224,6 +226,7 @@ const Favorites = ({
                           <button
                             type="button"
                             className="absolute right-3 top-3 z-20 cursor-pointer"
+                            aria-label="Remove from favorites"
                             onClick={(event) => {
                               event.stopPropagation();
                               event.preventDefault();
@@ -233,7 +236,18 @@ const Favorites = ({
                               });
                             }}
                           >
-                            <AiFillHeart className="text-[#ff5757]" size={22} />
+                            {showRemoveFavoriteIcons ? (
+                              <X
+                                className="text-[#ff5757]"
+                                size={26}
+                                strokeWidth={4}
+                              />
+                            ) : (
+                              <AiFillHeart
+                                className="text-[#ff5757]"
+                                size={22}
+                              />
+                            )}
                           </button>
                           <div className="pointer-events-none absolute inset-x-4 bottom-4 text-white">
                             <p className="text-lg font-semibold uppercase tracking-wide">
@@ -288,6 +302,7 @@ const Favorites = ({
                   key={item._id}
                   item={{ ...item, isLiked: true }}
                   showVertical
+                  showRemoveFavoriteIcon={showRemoveFavoriteIcons}
                   handleNavigation={() =>
                     navigate(
                       `${

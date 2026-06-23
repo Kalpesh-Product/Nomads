@@ -5,6 +5,7 @@ import {
   AiOutlineHeart,
   AiTwotoneHeart,
 } from "react-icons/ai";
+import { X } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
 
@@ -19,6 +20,7 @@ const ListingCard = ({
   handleNavigation,
   showVertical = true,
   imageOverlayLabel,
+  showRemoveFavoriteIcon = false,
 }) => {
   const navigate = useNavigate();
   const [favorites, setFavorites] = useState([]);
@@ -156,12 +158,19 @@ const ListingCard = ({
             <button
               type="button"
               className="cursor-pointer pointer-events-auto"
+              aria-label={
+                showRemoveFavoriteIcon
+                  ? "Remove from favorites"
+                  : "Toggle favorite"
+              }
               onClick={(e) => {
                 e.stopPropagation(); // ✅ stop navigation only for heart
                 toggleFavorite(item._id);
               }}
             >
-              {favorites.includes(item._id) || isInitiallyLiked ? (
+              {showRemoveFavoriteIcon ? (
+                <X className="text-[#ff5757]" size={26} strokeWidth={4} />
+              ) : favorites.includes(item._id) || isInitiallyLiked ? (
                 <AiFillHeart className="text-[#ff5757]" size={22} />
               ) : (
                 <AiTwotoneHeart className="text-white" size={22} />

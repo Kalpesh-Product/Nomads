@@ -688,7 +688,11 @@ const AiProfile = () => {
 
       {/* FAVORITES TAB */}
       {activeTab === "favorites" && (
-        <Favorites showDestinationFavorites useAiListingsRoute />
+        <Favorites
+          showDestinationFavorites
+          useAiListingsRoute
+          showRemoveFavoriteIcons
+        />
       )}
       {activeTab === "reviews" && <Reviews />}
     </div>
