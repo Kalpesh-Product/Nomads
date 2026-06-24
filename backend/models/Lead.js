@@ -19,12 +19,10 @@ const leadSchema = new mongoose.Schema(
     },
     verticalType: {
       type: String,
-      required: true,
       trim: true,
     },
     country: {
       type: String,
-      required: true,
       trim: true,
     },
     state: {
@@ -51,17 +49,16 @@ const leadSchema = new mongoose.Schema(
     },
     startDate: {
       type: Date,
-      required: true,
     },
     source: {
       type: String,
       required: true,
       trim: true,
+      lowercase: true,
       enum: ["nomad", "website"],
     },
     productType: {
       type: String,
-      required: true,
       trim: true,
     },
     endDate: {
@@ -82,6 +79,35 @@ const leadSchema = new mongoose.Schema(
       type: String,
       default: "Pending",
       enum: ["Pending", "Contacted", "In Progress", "Converted", "Lost"],
+    },
+    // Website builder lead fields
+    workspaceId: {
+      type: String,
+      trim: true,
+    },
+    packageName: {
+      type: String,
+      trim: true,
+    },
+    inquiryType: {
+      type: String,
+      trim: true,
+    },
+    searchKey: {
+      type: String,
+      trim: true,
+    },
+    websiteUrl: {
+      type: String,
+      trim: true,
+    },
+    stayDuration: {
+      type: String,
+      trim: true,
+    },
+    timeSlot: {
+      type: String,
+      trim: true,
     },
   },
   { timestamps: true }

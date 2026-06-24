@@ -32,6 +32,7 @@ import stateWiseWeightRoutes from "./routes/stateWiseWeightRoutes.js";
 import eventRoutes from "./routes/eventRoutes.js";
 import eventReviewRoutes from "./routes/eventReviewRoutes.js";
 import editorRoutes from "./routes/editorRoutes.js";
+import leadsRoutes from "./routes/leadsRoutes.js";
 
 const app = express();
 config({ override: true });
@@ -61,6 +62,7 @@ app.use("/api/workation", workationRoutes);
 app.use("/api/become-contributor", becomeContributorRoutes);
 app.use("/api/state-wise-weight", stateWiseWeightRoutes);
 app.use("/api/editor", editorRoutes);
+app.use("/api/leads", leadsRoutes);
 
 app.use("/api/news", newsRoutes);
 app.use("/api/blogs", blogRoutes); // New Blog Route

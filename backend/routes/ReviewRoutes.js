@@ -7,17 +7,23 @@ import {
   getReviewsByCompany,
   getReviewsByUser,
   updateReviewStatus,
+  createWebsiteReview,
+  getApprovedReviewsByCompany,
+  updateWebsiteReviewStatus,
 } from "../controllers/reviewControllers.js";
 
 const router = Router();
 
 // PUBLIC
 router.post(
-  "/bulk-insert-reviews",
-  upload.single("reviews"),
+  "/bulk-insert-reviews", 
+  upload.single("reviews"), 
   bulkInsertReviews,
 );
 router.get("/", getReviewsByCompany);
+router.post("/website-review", createWebsiteReview);
+router.get("/approved", getApprovedReviewsByCompany);
+router.patch("/website-review/:reviewId", updateWebsiteReviewStatus);
 
 // PROTECTED
 router.post("/", verifyJwt, addReview);

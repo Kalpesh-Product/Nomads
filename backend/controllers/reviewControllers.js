@@ -432,3 +432,144 @@ export const getReviewsByUser = async (req, res, next) => {
     next(error);
   }
 };
+
+export const createWebsiteReview = async (req, res, next) => {
+  try {
+    const {
+      companyId,
+      businessId,
+      companyName,
+      name,
+      starCount,
+      description,
+      reviewSource,
+      reviewLink,
+      workspaceId,
+    } = req.body;
+
+    // Accept either companyId or businessId
+    const resolvedBusinessId = (businessId || companyId || "").trim();
+
+    if (!resolvedBusinessId) {
+      return res.status(400).json({ message: "Company identifier is required" });
+    }
+
+    if (!name?.trim()) {
+      return res.status(400).json({ message: "Reviewer name is required" });
+    }
+
+    const parsedStarCount = starCount ? Number(starCount) : undefined;
+    if (
+      parsedStarCount !== undefined &&
+      (Number.isNaN(parsedStarCount) || parsedStarCount < 1 || parsedStarCount > 5)
+    ) {
+      return res.status(400).json({ message: "Star count must be between 1 and 5" });
+    }
+
+    // Look up company by businessId first, then fall back to companyId
+    const company = await Company.findOne({
+      $or: [
+        { businessId: resolvedBusinessId },
+        { companyId: resolvedBusinessId },
+      ],
+    }).lean();
+
+    if (!company) {
+      return res.status(404).json({ message: "Company not found" });
+    }
+
+    // Check for duplicate review (same name + company)
+    const reviewExists = await Review.findOne({
+      company: company._id,
+      name: name.trim(),
+    });
+
+    if (reviewExists) {
+      return res.status(400).json({ message: "A review from this person already exists for this company" });
+    }
+
+    const review = await Review.create({
+      company: company._id,
+      companyId: company.companyId,
+      name: name.trim(),
+      starCount: parsedStarCount,
+      description: description?.trim(),
+      reviewSource: reviewSource?.trim() || "Website",
+      reviewLink: reviewLink?.trim() || "",
+      status: "pending",
+      workspaceId: workspaceId?.trim() || "",
+      source: "website",
+    });
+
+    return res.status(201).json({
+      message: "Review submitted successfully",
+      review,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getApprovedReviewsByCompany = async (req, res, next) => {
+  try {
+    const { companyId, workspaceId } = req.query;
+
+    if (!companyId && !workspaceId) {
+      return res.status(400).json({ message: "companyId or workspaceId is required" });
+    }
+
+    let query = { status: "approved" };
+
+    if (companyId) {
+      query.companyId = companyId;
+    } else if (workspaceId) {
+      query.workspaceId = workspaceId;
+    }
+
+    const reviews = await Review.find(query)
+      .select("name starCount description reviewSource reviewLink createdAt companyId workspaceId")
+      .sort({ createdAt: -1 })
+      .lean()
+      .exec();
+
+    return res.status(200).json({
+      count: reviews.length,
+      data: reviews,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateWebsiteReviewStatus = async (req, res, next) => {
+  try {
+    const { reviewId } = req.params;
+    const { status } = req.body;
+
+    if (!reviewId) {
+      return res.status(400).json({ message: "Review ID is required" });
+    }
+
+    const allowedStatuses = ["approved", "rejected", "pending"];
+    if (!status || !allowedStatuses.includes(status)) {
+      return res.status(400).json({ message: "Status must be approved, rejected or pending" });
+    }
+
+    const review = await Review.findByIdAndUpdate(
+      reviewId,
+      { status },
+      { new: true },
+    );
+
+    if (!review) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    return res.status(200).json({
+      message: `Review ${status} successfully`,
+      review,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
