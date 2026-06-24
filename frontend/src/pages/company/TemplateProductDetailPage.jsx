@@ -75,61 +75,62 @@ const TemplateProductDetailPage = () => {
 
   return (
     <div className="w-full bg-[#efefef]">
-      <Container>
-        <section className="relative h-[30svh] min-h-[220px] overflow-hidden rounded-xl bg-[#1f1f1f] md:h-[44vh] md:min-h-[280px]">
-          {selectedProductHeroImage ? (
-            <img
-              src={selectedProductHeroImage}
-              alt={page?.name || "Product Hero"}
-              className="absolute inset-0 h-full w-full object-cover opacity-60"
-            />
-          ) : null}
+      {/* Full-bleed hero — no Container, no rounded corners, no horizontal margins */}
+      <section className="relative h-[62svh] min-h-[380px] overflow-hidden bg-[#1f1f1f] md:h-[84vh] md:min-h-[520px]">
+        {selectedProductHeroImage ? (
+          <img
+            src={selectedProductHeroImage}
+            alt={page?.name || "Product Hero"}
+            className="absolute inset-0 h-full w-full object-cover opacity-60"
+          />
+        ) : null}
 
-          <div className="relative z-10 flex h-full items-end pb-8">
-            <div className="w-full text-center text-white">
-              <h1 className="text-[26px] font-bold md:text-4xl">
-                {page?.heroHeading || page?.name || "Product"}
-              </h1>
-              {page?.heroSubHeading ? (
-                <p className="mt-2 text-[13px] leading-relaxed md:mt-3 md:text-lg">{page.heroSubHeading}</p>
-              ) : null}
-              {page?.heroButtonText ? (
-                <button type="button" className="mt-4 rounded-full border border-white px-5 py-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-white/10 md:mt-6 md:px-6 md:text-sm">
-                  {String(page.heroButtonText).toUpperCase()}
-                </button>
-              ) : null}
-            </div>
+        {/* Text overlay — bottom center */}
+        <div className="absolute inset-0 z-10 flex items-end justify-center pb-10 md:pb-16">
+          <div className="w-full text-center text-white">
+            <h1 className="text-[26px] font-bold md:text-4xl">
+              {page?.heroHeading || page?.name || "Product"}
+            </h1>
+            {page?.heroSubHeading ? (
+              <p className="mt-2 text-[13px] leading-relaxed md:mt-3 md:text-lg">{page.heroSubHeading}</p>
+            ) : null}
+            {page?.heroButtonText ? (
+              <button type="button" className="mt-4 rounded-full border border-white px-5 py-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-white/10 md:mt-6 md:px-6 md:text-sm">
+                {String(page.heroButtonText).toUpperCase()}
+              </button>
+            ) : null}
           </div>
+        </div>
 
-          {page?.heroMode === "carousel" && selectedProductHeroImages.length > 1 ? (
-            <>
-              <button
-                type="button"
-                onClick={() =>
-                  setProductHeroIndex((prev) =>
-                    (prev - 1 + selectedProductHeroImages.length) % selectedProductHeroImages.length,
-                  )
-                }
-                className="absolute left-5 top-1/2 hidden -translate-y-1/2 rounded-full bg-black/45 px-4 py-2 text-2xl text-white md:block"
-              >
-                {"<"}
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  setProductHeroIndex((prev) => (prev + 1) % selectedProductHeroImages.length)
-                }
-                className="absolute right-5 top-1/2 hidden -translate-y-1/2 rounded-full bg-black/45 px-4 py-2 text-2xl text-white md:block"
-              >
-                {">"}
-              </button>
-            </>
-          ) : null}
-        </section>
-      </Container>
+        {page?.heroMode === "carousel" && selectedProductHeroImages.length > 1 ? (
+          <>
+            <button
+              type="button"
+              onClick={() =>
+                setProductHeroIndex((prev) =>
+                  (prev - 1 + selectedProductHeroImages.length) % selectedProductHeroImages.length,
+                )
+              }
+              className="absolute left-5 top-1/2 hidden -translate-y-1/2 rounded-full bg-black/45 px-4 py-2 text-2xl text-white md:block"
+            >
+              {"<"}
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                setProductHeroIndex((prev) => (prev + 1) % selectedProductHeroImages.length)
+              }
+              className="absolute right-5 top-1/2 hidden -translate-y-1/2 rounded-full bg-black/45 px-4 py-2 text-2xl text-white md:block"
+            >
+              {">"}
+            </button>
+          </>
+        ) : null}
+      </section>
 
-      <section id="product-catalog" className="pb-10 pt-4">
-        <Container padding={false}>
+      {/* "Our Products" section — 32px top breathing room, standard side padding */}
+      <section id="product-catalog" className="pb-10 pt-8">
+        <Container padding={false} className="px-4 md:px-6">
           <div className="flex flex-col gap-6">
             <h2 className="text-center text-title font-semibold uppercase">
               {isCafePage ? data?.productTitle || "Our Menu" : data?.productTitle || "Our Products"}
