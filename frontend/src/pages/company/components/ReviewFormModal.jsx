@@ -43,7 +43,7 @@ const ReviewFormModal = ({
           typeof window !== "undefined" ? window.location.href : "",
       };
 
-      const response = await api.post("/review", payload);
+      const response = await api.post("/review/website-review", payload);
       return response.data;
     },
     onSuccess: (response) => {

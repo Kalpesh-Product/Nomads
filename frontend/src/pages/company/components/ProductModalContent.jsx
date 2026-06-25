@@ -141,7 +141,7 @@ const ProductModalContent = ({
         ? dayjs(formData.endDate).format("YYYY-MM-DD")
         : null;
 
-      const res = await axios.post("/api/leads/create-lead", {
+      const res = await axios.post("/leads/create-lead", {
         ...formData,
         startDate: cleanStart,
         endDate: cleanEnd,
