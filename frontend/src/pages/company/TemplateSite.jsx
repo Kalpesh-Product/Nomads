@@ -1,5 +1,5 @@
 import React, { useMemo, useRef } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate, useNavigation } from "react-router-dom";
 import TempHeader from "./components/TempHeader";
 import TempFooter from "./components/TempFooter";
 import TemplateBreadcrumbs from "./components/TemplateBreadcrumbs";
@@ -48,6 +48,9 @@ const TemplateSite = () => {
   });
 
   const normalizedData = data ? normalizeTemplateData(data) : data;
+  const navigation = useNavigation();
+  const isPageChanging = navigation.state === "loading";
+  const isLoading = isPending || isPageChanging;
   const routeContext = getTemplateRouteContext(location.pathname);
   const breadcrumbItems = useMemo(
     () =>
@@ -90,6 +93,12 @@ const TemplateSite = () => {
 
   return (
     <div className="h-screen relative overflow-y-auto overflow-hidden flex flex-col custom-scrollbar-hide">
+      {/* Page loader overlay */}
+      {isLoading && (
+        <div className="fixed inset-0 z-[9999] bg-white flex items-center justify-center">
+          <div className="animate-spin h-12 w-12 border-4 border-gray-300 border-t-primary-blue rounded-full" />
+        </div>
+      )}
       <TempHeader
         ref={headerRef}
         logo={normalizedData?.companyLogoUrl}
