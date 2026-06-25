@@ -361,9 +361,9 @@ export const getTemplateBreadcrumbItems = ({
     items.push({
       label:
         normalizeString(
-          matchedProduct?.heroHeading ||
-            matchedProduct?.name ||
-            matchedProduct?.homeCardHeading,
+          matchedProduct?.name ||
+            matchedProduct?.homeCardHeading ||
+            matchedProduct?.heroHeading,
         ) || "Product",
     });
   }

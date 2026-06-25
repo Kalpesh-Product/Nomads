@@ -31,9 +31,19 @@ const TemplateSite = () => {
     queryKey: ["company", tenant],
     queryFn: async () => {
       const res = await api.get(`/editor/get-website/${tenant}`);
-      return res.data;
+      const d = res.data;
+      // If the local backend returned empty data (no companyName, no heroImages),
+      // fall back directly to the master backend which has the correct data.
+      if (!d?.companyName && !d?.heroImages?.length) {
+        const fallback = await fetch(
+          `https://wonomasterbe.vercel.app/api/editor/get-website/${encodeURIComponent(tenant)}`
+        );
+        if (fallback.ok) {
+          return fallback.json();
+        }
+      }
+      return d;
     },
-
     enabled: !!tenant,
   });
 
@@ -90,7 +100,7 @@ const TemplateSite = () => {
         pathname={location.pathname}
       />
       {breadcrumbItems.length > 1 ? (
-        <TemplateBreadcrumbs items={breadcrumbItems} className="bg-[#efefef]" />
+        <TemplateBreadcrumbs items={breadcrumbItems} className="bg-[#e9e9e9]" />
       ) : null}
       <main className="flex-1">
         <Outlet

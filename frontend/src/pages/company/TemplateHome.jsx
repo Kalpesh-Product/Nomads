@@ -105,7 +105,7 @@ const TemplateHome = () => {
   if (!data) {
     return <div>Site data is currently unavailable</div>;
   }
-  if (!data.isActive) return <div>Website is currently inactive</div>;
+  if (data.isActive === false) return <div>Website is currently inactive</div>;
 
   const heroImages = isPending ? [] : data?.heroImages;
 

@@ -71,6 +71,16 @@ const reviewSchema = new mongoose.Schema(
     rejectedDate: {
       type: Date,
     },
+    // Website builder review fields
+    workspaceId: {
+      type: String,
+      trim: true,
+    },
+    source: {
+      type: String,
+      trim: true,
+      default: "nomad",
+    },
   },
   {
     timestamps: true,
