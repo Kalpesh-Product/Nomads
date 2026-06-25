@@ -449,10 +449,10 @@ const AiManualSearch = () => {
                   <button
                     type="button"
                     onClick={handleSearch}
-                    className={`inline-flex items-center justify-center rounded-full p-1 transition-colors ${
+                    className={`inline-flex items-center justify-center rounded-full transition-colors ${
                       hasAllSelections
                         ? "text-black/90 hover:text-sky-600"
-                        : "cursor-not-allowed text-black/35"
+                        : "cursor-not-allowed text-black/90"
                     }`}
                     aria-label="Search listings"
                     disabled={!hasAllSelections}
