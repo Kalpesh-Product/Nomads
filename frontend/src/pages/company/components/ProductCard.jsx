@@ -14,9 +14,14 @@ const ProductCard = ({ product, onClick, buttonText = "VIEW DETAILS", showButton
     product?.name ||
     product?.type ||
     "Product";
+  const description =
+    product?.homeCardSubText ||
+    product?.subText ||
+    product?.description ||
+    "";
 
   return (
-    <div
+    <article
       role="button"
       tabIndex={0}
       onClick={onClick}
@@ -26,28 +31,43 @@ const ProductCard = ({ product, onClick, buttonText = "VIEW DETAILS", showButton
           onClick?.(event);
         }
       }}
-      className="flex h-full w-full cursor-pointer flex-col gap-3 text-left"
+      className="flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-2xl shadow-md"
     >
-      <div className="text-center">
-        <h1 className="text-[20px] font-medium text-[#5b5b5b] md:text-[20px]">
-          {heading}
-        </h1>
+      {/* Image */}
+      <div className="w-full overflow-hidden bg-slate-200">
+        {imageSrc ? (
+          <img
+            src={imageSrc}
+            alt={heading}
+            className="h-[200px] w-full object-cover md:h-[230px]"
+          />
+        ) : (
+          <div className="h-[200px] w-full md:h-[230px]" />
+        )}
       </div>
-      <div className="relative h-[220px] overflow-hidden rounded-[10px] shadow-md md:h-[13.5rem]">
-        <img
-          src={imageSrc}
-          alt="img"
-          className="h-full w-full rounded-[10px] overflow-hidden object-cover"
-        />
+      
+      {/* Dark card: name + description + explore button */}
+      <div className="flex flex-1 flex-col items-center gap-3 bg-[#1a1a1a] px-5 py-5 text-center">
+        <h3 className="text-[15px] font-semibold uppercase tracking-wide text-white font-['Poppins',ui-sans-serif,system-ui,sans-serif] md:text-[17px]">
+          {heading}
+        </h3>
+        {description ? (
+          <p className="text-[12px] leading-relaxed text-white/75 font-['Poppins',ui-sans-serif,system-ui,sans-serif] md:text-[13px]">
+            {description}
+          </p>
+        ) : null}
         {showButton ? (
-          <div className="absolute inset-0 flex items-end justify-center bg-black/18 p-4">
-            <div className="rounded-full border border-white/85 bg-black/55 px-5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-white shadow-md">
+          <div className="mt-auto pt-1">
+            <button
+              type="button"
+              className="rounded-full border border-white/60 px-6 py-2 text-[11px] font-semibold uppercase tracking-widest text-white transition hover:bg-white hover:text-[#1a1a1a] font-['Poppins',ui-sans-serif,system-ui,sans-serif]"
+            >
               {buttonText}
-            </div>
+            </button>
           </div>
         ) : null}
       </div>
-    </div>
+    </article>
   );
 };
 

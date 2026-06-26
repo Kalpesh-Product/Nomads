@@ -5,6 +5,7 @@ import Container from "../../components/Container";
 import ProductCard from "./components/ProductCard";
 import ProductModalContent from "./components/ProductModalContent";
 import TempModal from "./components/TempModal";
+import LinedHeading from "./components/LinedHeading";
 import {
   getEnabledProductPages,
 } from "./utils/pageTemplateUtils";
@@ -34,12 +35,10 @@ const TemplateProductsPage = () => {
   const catalogItems = productPages.length > 0 ? productPages : products;
 
   return (
-    <section className="min-h-[60vh] bg-[#efefef] py-10">
+    <section className="min-h-[60vh] bg-[#efefef] py-0">
       <Container>
         <div className="flex flex-col gap-6">
-          <h1 className="text-center text-title font-semibold uppercase">
-            {productsSectionTitle}
-          </h1>
+          <LinedHeading title={productsSectionTitle} />
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {catalogItems.map((item, index) => (

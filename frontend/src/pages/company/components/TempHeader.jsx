@@ -40,15 +40,18 @@ const TempHeader = forwardRef(
           "about",
           "products",
           "gallery",
+          "partner",
           "testimonials",
           "contact",
         ];
         const normalizedItems = normalizePageNavItems(pageNavItems, navItems);
 
+        // Build links from normalized items, keeping order
         return orderedSlugs
-          .map((slug) =>
-            normalizedItems.find((item) => resolveSectionFromSlug(item.slug) === slug),
-          )
+          .map((slug) => {
+            const item = normalizedItems.find((item) => resolveSectionFromSlug(item.slug) === slug);
+            return item;
+          })
           .filter(Boolean)
           .map((item, index) => ({
             ...item,

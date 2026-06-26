@@ -5,6 +5,7 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import Container from "../../components/Container";
 import ProductCard from "./components/ProductCard";
 import TestimonialCard from "./components/TestimonialCard";
+import LinedHeading from "./components/LinedHeading";
 import { BsEnvelope } from "react-icons/bs";
 import { MdOutlinePhone } from "react-icons/md";
 import { CiMap } from "react-icons/ci";
@@ -13,6 +14,8 @@ import ProductModalContent from "./components/ProductModalContent";
 import TempModal from "./components/TempModal";
 import GallerySection from "./components/GallerySection";
 import ReviewFormModal from "./components/ReviewFormModal";
+import LogoCarousel from "./components/LogoCarousel";
+import InclusionsSection from "./components/InclusionsSection";
 import {
   getMediaSrc,
   getProductPath,
@@ -64,7 +67,7 @@ const TemplateHome = () => {
     if (total <= 1) return;
     const timer = setInterval(() => {
       setTestimonialIndex((prev) => (prev + 1) % total);
-    }, 4000);
+    }, 5000);
     return () => clearInterval(timer);
   }, [data, approvedReviews, isPending]);
 
@@ -192,9 +195,10 @@ const TemplateHome = () => {
       <section className="bg-black py-0" id="about">
         <Container>
           <div className="flex flex-col gap-8">
-            <h1 className="text-center text-title font-semibold text-[#f4e01a]">
-              {data?.aboutPageIntro || "About Our Vision"}
-            </h1>
+            <LinedHeading 
+              title={data?.aboutPageIntro || "About Our Vision"} 
+              className="[&>div]:border-[#f4e01a] [&>h2]:text-[#f4e01a]"
+            />
             <div className="mx-auto max-w-7xl space-y-4 text-center text-subtitle">
               {about?.length > 0
                 ? about?.map((para, index) => (
@@ -212,9 +216,7 @@ const TemplateHome = () => {
       <section id="products" className="bg-[#efefef] py-10">
         <Container>
           <div className="flex flex-col gap-6">
-            <h1 className="uppercase text-center text-title font-semibold">
-              {productsSectionTitle}
-            </h1>
+            <LinedHeading title={productsSectionTitle} />
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {productPages.length > 0
                 ? productPages.map((item) => (
@@ -263,12 +265,16 @@ const TemplateHome = () => {
           </div>
         </Container>
       </section>
+
+      {/* Inclusions section: home-page amenities grid */}
+      {Array.isArray(data?.inclusions) && data.inclusions.length > 0 ? (
+        <InclusionsSection inclusions={data.inclusions} />
+      ) : null}
+
       <section id="gallery" className="bg-[#efefef] py-10">
         <Container>
           <div className="flex flex-col gap-6">
-            <h1 className="uppercase text-center text-title font-semibold">
-              {data?.galleryPageHeading || "Gallery"}
-            </h1>
+            <LinedHeading title={data?.galleryPageHeading || "Gallery"} />
             <div>
               <GallerySection
                 gallery={galleryImages}
@@ -282,9 +288,7 @@ const TemplateHome = () => {
       <section id="testimonials" className="bg-[#efefef] py-10">
         <Container>
           <div className="flex flex-col gap-6">
-            <h1 className="uppercase text-center text-title font-semibold">
-              {data?.testimonialsPageHeading || "Testimonials"}
-            </h1>
+            <LinedHeading title={data?.testimonialsPageHeading || "Testimonials"} />
             {data?.testimonialsPageIntro && (
               <p className="text-center text-gray-600">{data.testimonialsPageIntro}</p>
             )}
@@ -327,9 +331,7 @@ const TemplateHome = () => {
       <section id="contact" className="bg-[#efefef] py-10">
         <Container>
           <div className="flex flex-col gap-6">
-            <h1 className="uppercase text-center text-title font-semibold">
-              {data?.contactPageHeading || "Contact"}
-            </h1>
+            <LinedHeading title={data?.contactPageHeading || "Contact"} />
             <div className="flex flex-wrap items-stretch gap-4 md:flex-nowrap">
               <iframe
                 title="India Office"
@@ -364,7 +366,7 @@ const TemplateHome = () => {
                       </div>
                     </div>
                     <div className="flex w-full items-center gap-4">
-                      <div className="text-subtitle p-2 rounded-full ">
+                      <div className="text-subtitle p-2 rounded-full border-2 border-accent">
                         <CiMap />
                       </div>
                       <div className="text-small pl-2">
@@ -378,6 +380,21 @@ const TemplateHome = () => {
           </div>
         </Container>
       </section>
+
+      {/* Logo Carousel - optional section after contact */}
+      {data?.logoCarousel?.enabled &&
+      Array.isArray(data.logoCarousel.logos) &&
+      data.logoCarousel.logos.length > 0 ? (
+        <LogoCarousel
+          logos={data.logoCarousel.logos
+            .map((item) => {
+              if (typeof item === "string") return item;
+              return getMediaSrc(item);
+            })
+            .filter(Boolean)}
+          title={data?.logoCarousel?.title || undefined}
+        />
+      ) : null}
 
       {/* product modal */}
       <TempModal
