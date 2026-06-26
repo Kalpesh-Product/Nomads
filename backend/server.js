@@ -30,6 +30,7 @@ import workationRoutes from "./routes/workationRoutes.js";
 import becomeContributorRoutes from "./routes/becomeContributorRoutes.js";
 import stateWiseWeightRoutes from "./routes/stateWiseWeightRoutes.js";
 import eventRoutes from "./routes/eventRoutes.js";
+import placeRoutes from "./routes/placeRoutes.js";
 import eventReviewRoutes from "./routes/eventReviewRoutes.js";
 import editorRoutes from "./routes/editorRoutes.js";
 import leadsRoutes from "./routes/leadsRoutes.js";
@@ -67,6 +68,7 @@ app.use("/api/leads", leadsRoutes);
 app.use("/api/news", newsRoutes);
 app.use("/api/blogs", blogRoutes); // New Blog Route
 app.use("/api/events", eventRoutes);
+app.use("/api/places", placeRoutes);
 app.use("/api/event-reviews", eventReviewRoutes);
 
 app.all("/*splat", (req, res) => {
