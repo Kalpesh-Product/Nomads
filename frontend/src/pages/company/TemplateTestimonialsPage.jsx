@@ -3,6 +3,7 @@ import { useOutletContext } from "react-router-dom";
 import Container from "../../components/Container";
 import TestimonialCard from "./components/TestimonialCard";
 import ReviewFormModal from "./components/ReviewFormModal";
+import LinedHeading from "./components/LinedHeading";
 import { getApprovedTestimonials } from "./utils/pageTemplateUtils";
 
 const TemplateTestimonialsPage = () => {
@@ -35,9 +36,7 @@ const TemplateTestimonialsPage = () => {
     <section className="min-h-[60vh] bg-[#efefef] py-10">
       <Container>
         <div className="flex flex-col gap-6">
-          <h1 className="text-center text-title font-semibold uppercase">
-            {data?.testimonialsPageHeading || "Testimonials"}
-          </h1>
+          <LinedHeading title={data?.testimonialsPageHeading || "Testimonials"} />
           {data?.testimonialsPageIntro ? (
             <p className="text-center text-gray-600">
               {data.testimonialsPageIntro}

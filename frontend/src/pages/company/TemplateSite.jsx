@@ -1,8 +1,9 @@
 import React, { useMemo, useRef } from "react";
-import { Outlet, useLocation, useNavigate, useNavigation } from "react-router-dom";
+import { Outlet, useLocation, useNavigate, useNavigation, useParams } from "react-router-dom";
 import TempHeader from "./components/TempHeader";
 import TempFooter from "./components/TempFooter";
 import TemplateBreadcrumbs from "./components/TemplateBreadcrumbs";
+import ScrollToTop from "../../components/ScrollToTop";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../../utils/axios";
 // import { normalizeVertical } from "./utils/vertical";
@@ -11,6 +12,7 @@ import {
   getTemplateBreadcrumbItems,
   getTemplateRouteContext,
   normalizeTemplateData,
+  normalizeSlug,
 } from "./utils/templateRouteUtils";
 import { mapTestimonialItem } from "./utils/pageTemplateUtils";
 
@@ -18,6 +20,7 @@ const TemplateSite = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const headerRef = useRef(null);
+  const { slug, itemSlug } = useParams();
 
   function getTenantFromHost() {
     const hostname = window.location.hostname;
@@ -52,17 +55,47 @@ const TemplateSite = () => {
   const isPageChanging = navigation.state === "loading";
   const isLoading = isPending || isPageChanging;
   const routeContext = getTemplateRouteContext(location.pathname);
+  
+  // Get item name for breadcrumb if we're on an item detail page
+  let itemName = "";
+  if (slug && itemSlug && normalizedData) {
+    const productPages = Array.isArray(normalizedData?.productPages) ? normalizedData.productPages : [];
+    const productDropdownPages = Array.isArray(normalizedData?.productDropdownPages) ? normalizedData.productDropdownPages : [];
+    const allPages = [...productPages, ...productDropdownPages];
+    
+    const page = allPages.find((item) => 
+      normalizeSlug(item?.slug || item?.name || "") === normalizeSlug(slug)
+    );
+    
+    if (page) {
+      // Get catalog items for this page
+      const catalog = Array.isArray(page?.catalog) ? page.catalog : 
+                     Array.isArray(page?.menuItems) ? page.menuItems :
+                     Array.isArray(normalizedData?.products) ? normalizedData.products :
+                     Array.isArray(normalizedData?.menuItems) ? normalizedData.menuItems : [];
+      
+      const item = catalog.find((catalogItem) => 
+        normalizeSlug(catalogItem?.name || catalogItem?.title || "") === normalizeSlug(itemSlug)
+      );
+      
+      if (item) {
+        itemName = item?.name || item?.title || "";
+      }
+    }
+  }
+  
   const breadcrumbItems = useMemo(
     () =>
       getTemplateBreadcrumbItems({
         data: normalizedData,
         pathname: location.pathname,
         routeContext,
+        itemName,
       }).map((item) => ({
         label: item.label,
         onClick: item.path ? () => navigate(item.path) : undefined,
       })),
-    [location.pathname, navigate, normalizedData, routeContext],
+    [location.pathname, navigate, normalizedData, routeContext, itemName],
   );
   const companyId = normalizedData?.companyId || "";
   const workspaceId = normalizedData?.workspaceId || "";
@@ -93,6 +126,7 @@ const TemplateSite = () => {
 
   return (
     <div className="h-screen relative overflow-y-auto overflow-hidden flex flex-col custom-scrollbar-hide">
+      <ScrollToTop />
       {/* Page loader overlay */}
       {isLoading && (
         <div className="fixed inset-0 z-[9999] bg-white flex items-center justify-center">
