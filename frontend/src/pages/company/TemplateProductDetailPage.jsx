@@ -446,9 +446,7 @@ const TemplateProductDetailPage = () => {
                 ? `${productPageName} Menu` 
                 : `${productPageName} Products`}
             />
-            {productSummary && isCafePage ? (
-              <p className="text-center text-gray-600">{productSummary}</p>
-            ) : null}
+
             {isCafePage ? (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
                 {productCatalog.map((item, index) => (
