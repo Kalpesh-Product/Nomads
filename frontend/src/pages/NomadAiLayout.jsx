@@ -1,4 +1,9 @@
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import {
+  Outlet,
+  useLocation,
+  useNavigate,
+  useNavigationType,
+} from "react-router-dom";
 
 import Footer from "../components/Footer";
 // import { Toaster } from "react-hot-toast";
@@ -17,6 +22,39 @@ const HIDE_STICKY_BAR_EXACT_PATHS = new Set([
   "/home-logged-in",
   "/search",
 ]);
+
+const AI_SCROLL_POSITIONS_STORAGE_KEY = "nomadAiScrollPositions";
+
+const getAiScrollPositionKey = (location) =>
+  location.key && location.key !== "default"
+    ? location.key
+    : `${location.pathname}${location.search}${location.hash}`;
+
+const readAiScrollPositions = () => {
+  try {
+    return JSON.parse(
+      window.sessionStorage.getItem(AI_SCROLL_POSITIONS_STORAGE_KEY) || "{}",
+    );
+  } catch {
+    return {};
+  }
+};
+
+const writeAiScrollPosition = (location, scrollTop) => {
+  try {
+    const positions = readAiScrollPositions();
+    positions[getAiScrollPositionKey(location)] = scrollTop;
+    window.sessionStorage.setItem(
+      AI_SCROLL_POSITIONS_STORAGE_KEY,
+      JSON.stringify(positions),
+    );
+  } catch {
+    // Ignore storage failures so navigation still works in restricted browsers.
+  }
+};
+
+const readAiScrollPosition = (location) =>
+  readAiScrollPositions()[getAiScrollPositionKey(location)];
 
 const HIDE_STICKY_BAR_PREFIXES = [
   "/ai-login",
@@ -55,16 +93,43 @@ const normalizeBreadcrumbLabel = (segment) => {
 const NomadAiLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const navigationType = useNavigationType();
   const contentRef = useRef(null);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const formData = useSelector((state) => state.location.formValues);
   console.log("formData from layout : ", formData);
   useEffect(() => {
-    if (contentRef.current) {
-      contentRef.current.scrollTo({ behavior: "smooth", top: "0" });
+    const scrollContainer = contentRef.current;
+    if (!scrollContainer) return undefined;
+
+    const restoreScrollTop = (top) => {
+      scrollContainer.scrollTo({
+        top,
+        behavior: "auto",
+      });
+    };
+
+    const restoreTimers = [];
+
+    if (navigationType === "POP") {
+      const savedScrollTop = readAiScrollPosition(location);
+      const nextScrollTop = Number.isFinite(savedScrollTop) ? savedScrollTop : 0;
+
+      requestAnimationFrame(() => restoreScrollTop(nextScrollTop));
+      restoreTimers.push(
+        window.setTimeout(() => restoreScrollTop(nextScrollTop), 150),
+        window.setTimeout(() => restoreScrollTop(nextScrollTop), 500),
+      );
+    } else {
+      restoreScrollTop(0);
     }
-  }, [location.pathname]);
+
+    return () => {
+      restoreTimers.forEach((timer) => window.clearTimeout(timer));
+      writeAiScrollPosition(location, scrollContainer.scrollTop);
+    };
+  }, [location, navigationType]);
 
   useEffect(() => {
     setIsMobileSidebarOpen(false);

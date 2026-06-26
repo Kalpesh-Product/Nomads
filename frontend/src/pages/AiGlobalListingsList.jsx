@@ -34,10 +34,7 @@ import {
   buildAiVerticalsSearchBadges,
 } from "../utils/aiSearchBarBadges.js";
 import AiDestinationHighlightSection from "../components/AiDestinationHighlightSection.jsx";
-import {
-  DESTINATION_HIGHLIGHT_FILTERS,
-  popularVenues,
-} from "../data/aiDestinationHighlights.js";
+import { DESTINATION_HIGHLIGHT_FILTERS } from "../data/aiDestinationHighlights.js";
 
 // import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
 // import {
@@ -443,6 +440,20 @@ const AiGlobalListingsList = () => {
     enabled: !!contentDestination,
     refetchOnWindowFocus: false,
   });
+  const { data: placesData } = useQuery({
+    queryKey: ["ai-places", contentDestination],
+    queryFn: async () => {
+      const response = await axios.get("/places", {
+        params: {
+          destination: contentDestination,
+        },
+      });
+
+      return response.data;
+    },
+    enabled: !!contentDestination,
+    refetchOnWindowFocus: false,
+  });
   const popularLocationBlogs = useMemo(
     () =>
       (Array.isArray(blogsData) ? blogsData : []).slice(0, 5).map((blog) => ({
@@ -482,12 +493,32 @@ const AiGlobalListingsList = () => {
         })),
     [eventsData],
   );
+  const popularLocationVenues = useMemo(
+    () =>
+      (Array.isArray(placesData) ? placesData : []).map((place) => ({
+        ...place,
+        id: place._id || place.serialNumber || place.placeName,
+        title: place.placeName,
+        image: place.mainImage,
+        location: place.address || place.destination,
+        meta: place.rating,
+        category: place.category || place.placeType,
+        region: place.destination,
+        description: place.shortDescription || place.sections?.[0]?.content,
+      })),
+    [placesData],
+  );
   const isAnnualEventsExpanded =
     expandedCategories.includes("annualevents");
   const displayedPopularLocationEvents = isAnnualEventsExpanded
     ? popularLocationEvents
     : popularLocationEvents.slice(0, 5);
   const showAnnualEventsToggle = popularLocationEvents.length > 5;
+  const isPopularVenuesExpanded = expandedCategories.includes("venues");
+  const displayedPopularLocationVenues = isPopularVenuesExpanded
+    ? popularLocationVenues
+    : popularLocationVenues.slice(0, 5);
+  const showPopularVenuesToggle = popularLocationVenues.length > 5;
 
   const countOptions = [
     { label: "1 - 5", value: "1-5" },
@@ -1373,17 +1404,27 @@ const AiGlobalListingsList = () => {
                           sectionRefs.current["annualevents-desktop"] = element;
                             }}
                           />
-                      {/* <AiDestinationHighlightSection
+                      <AiDestinationHighlightSection
                         title={`Popular Venues to visit in ${selectedLocationLabel}`}
-                        items={popularVenues}
+                        items={displayedPopularLocationVenues}
                         kind="venue"
                         onCardClick={(item) =>
                           handleHighlightCardClick(item, "venue")
                         }
+                        onViewMore={
+                          showPopularVenuesToggle
+                            ? () => handleShowMoreClick("venues")
+                            : undefined
+                        }
+                        viewMoreLabel={
+                          isPopularVenuesExpanded
+                            ? "View less \u2190"
+                            : "View more \u2192"
+                        }
                         sectionRef={(element) => {
                           sectionRefs.current["venues-desktop"] = element;
                         }}
-                      /> */}
+                      />
                           <AiDestinationHighlightSection
                             title={`Popular News in ${selectedLocationLabel}`}
                             items={popularLocationNews}
@@ -1779,18 +1820,28 @@ const AiGlobalListingsList = () => {
                         sectionRefs.current["annualevents-mobile"] = element;
                           }}
                         />
-                    {/* <AiDestinationHighlightSection
+                    <AiDestinationHighlightSection
                       mobile
                       title={`Popular Venues to visit in ${selectedLocationLabel}`}
-                      items={popularVenues}
+                      items={displayedPopularLocationVenues}
                       kind="venue"
                       onCardClick={(item) =>
                         handleHighlightCardClick(item, "venue")
                       }
+                      onViewMore={
+                        showPopularVenuesToggle
+                          ? () => handleShowMoreClick("venues")
+                          : undefined
+                      }
+                      viewMoreLabel={
+                        isPopularVenuesExpanded
+                          ? "View less \u2190"
+                          : "View more \u2192"
+                      }
                       sectionRef={(element) => {
                         sectionRefs.current["venues-mobile"] = element;
                       }}
-                    /> */}
+                    />
                         <AiDestinationHighlightSection
                           mobile
                           title={`Popular News in ${selectedLocationLabel}`}
