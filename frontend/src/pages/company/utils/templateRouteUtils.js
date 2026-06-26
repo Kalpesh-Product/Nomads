@@ -5,6 +5,7 @@ const FALLBACK_PAGE_NAV_ITEMS = [
   { name: "About Us", slug: "about", enabled: true },
   { name: "Products", slug: "products", enabled: true },
   { name: "Gallery", slug: "gallery", enabled: true },
+  { name: "Partner", slug: "partner", enabled: true },
   { name: "Testimonials", slug: "testimonials", enabled: true },
   { name: "Contact Us", slug: "contact", enabled: true },
 ];
@@ -14,8 +15,9 @@ const PAGE_NAV_ORDER = {
   about: 1,
   products: 2,
   gallery: 3,
-  testimonials: 4,
-  contact: 5,
+  partner: 4,
+  testimonials: 5,
+  contact: 6,
 };
 
 const DEFAULT_PRODUCT_DROPDOWN_PAGES = [];
@@ -25,6 +27,7 @@ const SECTION_LABELS = {
   about: "About Us",
   products: "Products",
   gallery: "Gallery",
+  partner: "Partner",
   testimonials: "Testimonials",
   contact: "Contact Us",
 };
@@ -52,6 +55,7 @@ export const resolveSectionFromSlug = (slug) => {
   if (normalized.includes("about")) return "about";
   if (normalized.includes("product")) return "products";
   if (normalized.includes("gallery")) return "gallery";
+  if (normalized.includes("partner")) return "partner";
   if (normalized.includes("testimonial") || normalized.includes("review"))
     return "testimonials";
   if (normalized.includes("contact")) return "contact";
@@ -225,12 +229,15 @@ export const getTemplateRouteContext = (pathname = "") => {
   const { prefix, parts } = getTemplateRouteParts(pathname);
   const section = resolveSectionFromSlug(parts[0] || "home");
   const productSlug = parts[1] ? normalizeSlug(parts[1], "") : "";
+  const itemSlug = parts[2] ? normalizeSlug(parts[2], "") : "";
 
   return {
     prefix,
     currentSection: section,
     currentProductSlug: productSlug,
+    currentItemSlug: itemSlug,
     isProductDetail: section === "products" && !!productSlug,
+    isItemDetail: section === "products" && !!productSlug && !!itemSlug,
   };
 };
 
@@ -320,10 +327,12 @@ export const getTemplateBreadcrumbItems = ({
   data,
   pathname = "",
   routeContext = {},
+  itemName = "",
 } = {}) => {
   const homePath = getSectionPath("home", pathname);
   const currentSection = routeContext?.currentSection || "home";
   const currentProductSlug = routeContext?.currentProductSlug || "";
+  const currentItemSlug = routeContext?.currentItemSlug || "";
   const items = [
     {
       label: "Home",
@@ -358,6 +367,8 @@ export const getTemplateBreadcrumbItems = ({
           normalizeSlug(item?.slug || item?.name || "", "") === currentProductSlug,
       );
 
+    const productPath = getProductPath(currentProductSlug, pathname);
+    
     items.push({
       label:
         normalizeString(
@@ -365,7 +376,15 @@ export const getTemplateBreadcrumbItems = ({
             matchedProduct?.homeCardHeading ||
             matchedProduct?.heroHeading,
         ) || "Product",
+      path: productPath,
     });
+
+    // If we have an item detail (itemSlug), add it to breadcrumbs
+    if (currentItemSlug && itemName) {
+      items.push({
+        label: normalizeString(itemName) || "Item",
+      });
+    }
   }
 
   return items;

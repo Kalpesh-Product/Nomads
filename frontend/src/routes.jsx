@@ -42,6 +42,7 @@ import TemplateProductsPage from "./pages/company/TemplateProductsPage";
 import TemplateProductDetailPage from "./pages/company/TemplateProductDetailPage";
 import TemplateGalleryPage from "./pages/company/TemplateGalleryPage";
 import TemplateTestimonialsPage from "./pages/company/TemplateTestimonialsPage";
+import TemplatePartnerPage from "./pages/company/TemplatePartnerPage";
 import TemplateContactPage from "./pages/company/TemplateContactPage";
 import NomadAbout from "./pages/NomadAbout";
 import Profile from "./pages/Profile";
@@ -403,10 +404,14 @@ if (tenant === "main") {
         { path: "page/products", element: <TemplateProductsPage /> },
         { path: "products/:slug", element: <TemplateProductDetailPage /> },
         { path: "page/products/:slug", element: <TemplateProductDetailPage /> },
+        { path: "products/:slug/:itemSlug", element: <TemplateProductDetailPage /> },
+        { path: "page/products/:slug/:itemSlug", element: <TemplateProductDetailPage /> },
         { path: "gallery", element: <TemplateGalleryPage /> },
         { path: "page/gallery", element: <TemplateGalleryPage /> },
         { path: "testimonials", element: <TemplateTestimonialsPage /> },
         { path: "page/testimonials", element: <TemplateTestimonialsPage /> },
+        { path: "partner", element: <TemplatePartnerPage /> },
+        { path: "page/partner", element: <TemplatePartnerPage /> },
         { path: "contact", element: <TemplateContactPage /> },
         { path: "page/contact", element: <TemplateContactPage /> },
       ],
@@ -414,6 +419,11 @@ if (tenant === "main") {
   ];
 }
 
-const router = createBrowserRouter(routerConfig);
+const router = createBrowserRouter(routerConfig, {
+  future: {
+    v7_startTransition: true,
+    v7_relativeSplatPath: true,
+  },
+});
 
 export default router;
