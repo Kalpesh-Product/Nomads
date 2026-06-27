@@ -1,6 +1,6 @@
 export const DESTINATION_HIGHLIGHT_FILTERS = [
   { label: "Events", value: "annualevents" },
-  // { label: "Venues", value: "venues" },
+  { label: "Venues", value: "venues" },
   { label: "News", value: "news" },
   { label: "Blogs", value: "blogs" },
 ];

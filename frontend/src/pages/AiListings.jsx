@@ -40,6 +40,7 @@ import {
 
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
 const ANNUAL_EVENTS_CATEGORY = "annualevents";
+const VENUES_CATEGORY = "venues";
 const TYPING_INTERVAL_MS = 7;
 const SECOND_HEADING_DELAY_MS = 250;
 const THINKING_HEADING_TEXT = "Curating the best results for you";
@@ -450,6 +451,7 @@ const AiListings = ({ forceListView = false }) => {
       cafe: "Cafe’s",
       [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
       [ANNUAL_EVENTS_CATEGORY]: "Events",
+      [VENUES_CATEGORY]: "Venues",
     };
 
     return (
@@ -469,7 +471,8 @@ const AiListings = ({ forceListView = false }) => {
     if (!listingsData) return [];
     if (
       formData?.category === VALUE_ADDED_SERVICES_CATEGORY ||
-      formData?.category === ANNUAL_EVENTS_CATEGORY
+      formData?.category === ANNUAL_EVENTS_CATEGORY ||
+      formData?.category === VENUES_CATEGORY
     ) {
       return [];
     }
@@ -588,7 +591,8 @@ const AiListings = ({ forceListView = false }) => {
     if (formData?.category && listingsData?.length > 0) {
       if (
         formData.category === VALUE_ADDED_SERVICES_CATEGORY ||
-        formData.category === ANNUAL_EVENTS_CATEGORY
+        formData.category === ANNUAL_EVENTS_CATEGORY ||
+        formData.category === VENUES_CATEGORY
       ) {
         return;
       }
@@ -660,7 +664,8 @@ const AiListings = ({ forceListView = false }) => {
       DESTINATION_HIGHLIGHT_FILTERS.some(
         (filter) =>
           filter.value === categoryValue &&
-          categoryValue !== ANNUAL_EVENTS_CATEGORY,
+          categoryValue !== ANNUAL_EVENTS_CATEGORY &&
+          categoryValue !== VENUES_CATEGORY,
       )
     ) {
       const params = new URLSearchParams({
@@ -752,8 +757,9 @@ const AiListings = ({ forceListView = false }) => {
     formData?.category === VALUE_ADDED_SERVICES_CATEGORY;
   const isAnnualEventsSelected =
     formData?.category === ANNUAL_EVENTS_CATEGORY;
+  const isVenuesSelected = formData?.category === VENUES_CATEGORY;
   const isFocusedContentSelected =
-    isValueAddedServicesSelected || isAnnualEventsSelected;
+    isValueAddedServicesSelected || isAnnualEventsSelected || isVenuesSelected;
   const showDesktopMap =
     !forceListView && mapOpen && !isFocusedContentSelected;
   const listingsBasePath =
@@ -796,6 +802,20 @@ const AiListings = ({ forceListView = false }) => {
     enabled: isAnnualEventsSelected && !!eventDestination,
     refetchOnWindowFocus: false,
   });
+  const { data: venuesData = [], isPending: isVenuesLoading } = useQuery({
+    queryKey: ["ai-places", eventDestination],
+    queryFn: async () => {
+      const response = await axios.get("/places", {
+        params: {
+          destination: eventDestination,
+        },
+      });
+
+      return Array.isArray(response.data) ? response.data : [];
+    },
+    enabled: isVenuesSelected && !!eventDestination,
+    refetchOnWindowFocus: false,
+  });
   const annualEvents = useMemo(
     () =>
       eventsData.map((event) => ({
@@ -810,6 +830,21 @@ const AiListings = ({ forceListView = false }) => {
       })),
     [eventsData],
   );
+  const venues = useMemo(
+    () =>
+      venuesData.map((place) => ({
+        ...place,
+        id: place._id || place.serialNumber || place.placeName,
+        title: place.placeName,
+        image: place.mainImage,
+        location: place.address || place.destination,
+        meta: place.rating,
+        category: place.category || place.placeType,
+        region: place.destination,
+        description: place.shortDescription || place.sections?.[0]?.content,
+      })),
+    [venuesData],
+  );
 
   const handleEventClick = (event) => {
     navigate(`/ai-events/${event.id}`, {
@@ -822,6 +857,22 @@ const AiListings = ({ forceListView = false }) => {
             path: location.pathname,
           },
           { label: event.title },
+        ],
+      },
+    });
+  };
+
+  const handleVenueClick = (venue) => {
+    navigate(`/ai-venues/${venue.id}`, {
+      state: {
+        item: venue,
+        selectedStateLabel,
+        stickyBreadcrumbs: [
+          {
+            label: selectedStateLabel || "Destination",
+            path: location.pathname,
+          },
+          { label: venue.title },
         ],
       },
     });
@@ -1336,7 +1387,8 @@ const AiListings = ({ forceListView = false }) => {
             {/* Dynamic Header */}
             {formData?.category &&
               formData?.location &&
-              !isAnnualEventsSelected && (
+              !isAnnualEventsSelected &&
+              !isVenuesSelected && (
               <div className="mt-6 mb-2 px-1 border-t border-gray-300">
                 <h1 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight mt-6">
                   Popular{" "}
@@ -1350,6 +1402,7 @@ const AiListings = ({ forceListView = false }) => {
                     cafe: "Cafes",
                     [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
                     [ANNUAL_EVENTS_CATEGORY]: "Annual Events",
+                    [VENUES_CATEGORY]: "Venues",
                   }[formData.category] || `${formData.category} Spaces`}{" "}
                   in {selectedStateLabel || "Unknown"}
                 </h1>
@@ -1438,6 +1491,32 @@ const AiListings = ({ forceListView = false }) => {
                       items={annualEvents}
                       kind="event"
                       onCardClick={handleEventClick}
+                    />
+                  )
+                ) : isVenuesSelected ? (
+                  isVenuesLoading ? (
+                    <PaginatedGrid
+                      data={skeletonArray}
+                      entriesPerPage={isMobile ? 10 : isTablet ? 9 : 100}
+                      columns="grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5"
+                      renderItem={(_, index) => (
+                        <Box key={index} className="w-full h-full">
+                          <Skeleton
+                            variant="rectangular"
+                            height={200}
+                            sx={{ borderRadius: 2 }}
+                          />
+                          <Skeleton variant="text" width="80%" sx={{ mt: 1 }} />
+                          <Skeleton variant="text" width="60%" />
+                        </Box>
+                      )}
+                    />
+                  ) : (
+                    <AiDestinationHighlightSection
+                      title={`Popular Venues to visit in ${selectedStateLabel || "Unknown"}`}
+                      items={venues}
+                      kind="venue"
+                      onCardClick={handleVenueClick}
                     />
                   )
                 ) : (
