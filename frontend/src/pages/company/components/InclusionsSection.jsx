@@ -606,38 +606,16 @@ const InclusionsSection = ({ inclusions, title = "INCLUSIONS" }) => {
         </div>
         <div className="grid grid-cols-3 gap-6 sm:grid-cols-4 md:grid-cols-6">
           {inclusions.map(({ key, enabled }) => {
+            if (!enabled) return null;
             const item = ALL_INCLUSIONS.find((i) => i.key === key);
             if (!item) return null;
             return (
               <div
                 key={key}
-                className={`flex flex-col items-center gap-2 text-center ${
-                  enabled ? "text-[#111827]" : "text-slate-400"
-                }`}
+                className="flex flex-col items-center gap-2 text-center text-[#111827]"
               >
-                {/* Icon with optional cross overlay */}
-                <div className="relative">
-                  {item.icon}
-                  {!enabled ? (
-                    <svg
-                      viewBox="0 0 40 40"
-                      className="absolute inset-0 h-10 w-10 text-slate-500"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                    >
-                      <line x1="8" y1="8" x2="32" y2="32" />
-                      <line x1="32" y1="8" x2="8" y2="32" />
-                    </svg>
-                  ) : null}
-                </div>
-                {/* Label — strikethrough when disabled */}
-                <span
-                  className={`text-[10px] font-semibold uppercase tracking-wider font-['Poppins',ui-sans-serif,system-ui,sans-serif] md:text-[11px] ${
-                    !enabled ? "line-through" : ""
-                  }`}
-                >
+                <div className="relative">{item.icon}</div>
+                <span className="text-[10px] font-semibold uppercase tracking-wider font-['Poppins',ui-sans-serif,system-ui,sans-serif] md:text-[11px]">
                   {item.label}
                 </span>
               </div>

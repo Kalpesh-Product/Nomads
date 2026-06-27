@@ -143,7 +143,15 @@ const TemplateSite = () => {
         pathname={location.pathname}
       />
       {breadcrumbItems.length > 1 ? (
-        <TemplateBreadcrumbs items={breadcrumbItems} className="bg-[#e9e9e9]" />
+        <TemplateBreadcrumbs
+          items={breadcrumbItems}
+          dark={routeContext?.currentSection === "about"}
+          className={
+            routeContext?.currentSection === "about"
+              ? "bg-black"
+              : "bg-[#efefef]"
+          }
+        />
       ) : null}
       <main className="flex-1">
         <Outlet
