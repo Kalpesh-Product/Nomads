@@ -920,7 +920,8 @@ const AiGlobalListingsList = () => {
       DESTINATION_HIGHLIGHT_FILTERS.some(
         (filter) =>
           filter.value === categoryValue &&
-          categoryValue !== ANNUAL_EVENTS_CATEGORY,
+          categoryValue !== ANNUAL_EVENTS_CATEGORY &&
+          categoryValue !== "venues",
       )
     ) {
       getDiscoverySectionRef(categoryValue)?.scrollIntoView({

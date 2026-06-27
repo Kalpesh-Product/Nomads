@@ -567,7 +567,8 @@ const AiGlobalListingsMap = () => {
       DESTINATION_HIGHLIGHT_FILTERS.some(
         (filter) =>
           filter.value === categoryValue &&
-          categoryValue !== ANNUAL_EVENTS_CATEGORY,
+          categoryValue !== ANNUAL_EVENTS_CATEGORY &&
+          categoryValue !== "venues",
       )
     ) {
       const params = new URLSearchParams({
@@ -590,7 +591,8 @@ const AiGlobalListingsMap = () => {
     if (
       isMobileOrTablet &&
       categoryValue !== VALUE_ADDED_SERVICES_CATEGORY &&
-      categoryValue !== ANNUAL_EVENTS_CATEGORY
+      categoryValue !== ANNUAL_EVENTS_CATEGORY &&
+      categoryValue !== "venues"
     ) {
       setShowListings(true);
       // Optional: Clear mobile search if open
@@ -608,7 +610,8 @@ const AiGlobalListingsMap = () => {
 
     const listingsPath =
       categoryValue === VALUE_ADDED_SERVICES_CATEGORY ||
-      categoryValue === ANNUAL_EVENTS_CATEGORY
+      categoryValue === ANNUAL_EVENTS_CATEGORY ||
+      categoryValue === "venues"
         ? "/ai-listings-list"
         : "/ai-listings";
 
