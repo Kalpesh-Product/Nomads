@@ -623,9 +623,23 @@ const AiGlobalListingsList = () => {
       return [];
     }
 
+    const visibleDestinationHighlightFilters = DESTINATION_HIGHLIGHT_FILTERS.filter(
+      (option) => {
+        if (option.value === ANNUAL_EVENTS_CATEGORY) {
+          return popularLocationEvents.length > 0;
+        }
+
+        if (option.value === "venues") {
+          return popularLocationVenues.length > 0;
+        }
+
+        return true;
+      },
+    );
+
     if (!listingsData || listingsData.length === 0) {
       return [
-        ...DESTINATION_HIGHLIGHT_FILTERS,
+        ...visibleDestinationHighlightFilters,
         { label: "Value Adds", value: VALUE_ADDED_SERVICES_CATEGORY },
       ];
     }
@@ -671,10 +685,15 @@ const AiGlobalListingsList = () => {
 
     return [
       ...optionsWithoutValueAdds,
-      ...DESTINATION_HIGHLIGHT_FILTERS,
+      ...visibleDestinationHighlightFilters,
       { label: "Value Adds", value: VALUE_ADDED_SERVICES_CATEGORY },
     ];
-  }, [isLisitingLoading, listingsData]);
+  }, [
+    isLisitingLoading,
+    listingsData,
+    popularLocationEvents.length,
+    popularLocationVenues.length,
+  ]);
 
   const groupedListings = listingsData?.reduce((acc, item) => {
     if (item.companyType === "privatestay") return acc;
