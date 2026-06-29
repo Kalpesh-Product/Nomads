@@ -373,14 +373,62 @@ const AiListings = ({ forceListView = false }) => {
     refetchOnMount: "always", // ✅ forces refetch on every mount
   });
 
+  const destinationAvailability = normalizeContentDestination(
+    searchParams.get("state") ||
+      searchParams.get("location") ||
+      formData?.location,
+  );
+  const { data: destinationEventsData = [] } = useQuery({
+    queryKey: ["ai-events-availability", destinationAvailability],
+    queryFn: async () => {
+      const response = await axios.get("/events", {
+        params: {
+          destination: destinationAvailability,
+        },
+      });
+
+      return Array.isArray(response.data) ? response.data : [];
+    },
+    enabled: !!destinationAvailability,
+    refetchOnWindowFocus: false,
+  });
+  const { data: destinationVenuesData = [] } = useQuery({
+    queryKey: ["ai-places-availability", destinationAvailability],
+    queryFn: async () => {
+      const response = await axios.get("/places", {
+        params: {
+          destination: destinationAvailability,
+        },
+      });
+
+      return Array.isArray(response.data) ? response.data : [];
+    },
+    enabled: !!destinationAvailability,
+    refetchOnWindowFocus: false,
+  });
+
   const categoryOptions = React.useMemo(() => {
     if (isLisitingLoading) {
       return [];
     }
 
+    const visibleDestinationHighlightFilters = DESTINATION_HIGHLIGHT_FILTERS.filter(
+      (option) => {
+        if (option.value === ANNUAL_EVENTS_CATEGORY) {
+          return destinationEventsData.length > 0;
+        }
+
+        if (option.value === VENUES_CATEGORY) {
+          return destinationVenuesData.length > 0;
+        }
+
+        return true;
+      },
+    );
+
     if (!listingsData || listingsData.length === 0) {
       return [
-        ...DESTINATION_HIGHLIGHT_FILTERS,
+        ...visibleDestinationHighlightFilters,
         {
           label: "Value Adds",
           value: VALUE_ADDED_SERVICES_CATEGORY,
@@ -428,10 +476,15 @@ const AiListings = ({ forceListView = false }) => {
       ...options.filter(
         (option) => option.value !== VALUE_ADDED_SERVICES_CATEGORY,
       ),
-      ...DESTINATION_HIGHLIGHT_FILTERS,
+      ...visibleDestinationHighlightFilters,
       { label: "Value Adds", value: VALUE_ADDED_SERVICES_CATEGORY },
     ];
-  }, [isLisitingLoading, listingsData]);
+  }, [
+    destinationEventsData.length,
+    destinationVenuesData.length,
+    isLisitingLoading,
+    listingsData,
+  ]);
 
   const categoryBadgeLabel = useMemo(() => {
     if (!formData?.category) return "";
