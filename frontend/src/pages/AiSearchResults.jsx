@@ -538,6 +538,48 @@ const normalizeDestinationKey = (value = "") =>
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]/g, "");
 
+const getSearchResultDestinationKey = (destination = {}) =>
+  [
+    destination._id,
+    destination.city,
+    destination.routeCity,
+    destination.country,
+    destination.routeCountry,
+  ]
+    .filter(Boolean)
+    .map((part) => normalizeDestinationKey(String(part)))
+    .join("-");
+
+const AI_SCROLL_CONTAINER_ID = "nomad-ai-scroll-container";
+const AI_SCROLL_POSITIONS_STORAGE_KEY = "nomadAiScrollPositions";
+
+const getAiScrollContainer = () =>
+  typeof document === "undefined"
+    ? null
+    : document.getElementById(AI_SCROLL_CONTAINER_ID);
+
+const getAiScrollPositionKey = (location) =>
+  location.key && location.key !== "default"
+    ? location.key
+    : `${location.pathname}${location.search}${location.hash}`;
+
+const writeAiLayoutScrollPosition = (location, scrollTop) => {
+  if (typeof window === "undefined") return;
+
+  try {
+    const positions = JSON.parse(
+      window.sessionStorage.getItem(AI_SCROLL_POSITIONS_STORAGE_KEY) || "{}",
+    );
+    positions[getAiScrollPositionKey(location)] = scrollTop;
+    window.sessionStorage.setItem(
+      AI_SCROLL_POSITIONS_STORAGE_KEY,
+      JSON.stringify(positions),
+    );
+  } catch {
+    // Ignore storage failures so regular navigation still works.
+  }
+};
+
 const normalizedCountryAliasMap = {
   usa: "unitedstates",
   unitedstatesofamerica: "unitedstates",
@@ -619,10 +661,53 @@ const DESTINATION_REVEAL_INTERVAL_MS = 70;
 const SEARCH_RESULTS_GOAL_STORAGE_KEY = "aiSearchResults.selectedGoal";
 const SEARCH_RESULTS_SELECTION_SIGNATURE_STORAGE_KEY =
   "aiSearchResults.selectionSignature";
+const SEARCH_RESULTS_PAGE_STATE_STORAGE_KEY_PREFIX = "aiSearchResults.page";
 
 const PRIORITY_POINTS_VISIBLE_LIMIT = 4;
 const ADDITIONAL_PRIORITY_POINTS_TEXT =
   "along with other aspects calculated by our proprietary algorithm.";
+
+const getSearchResultsPageStateKey = (
+  selectedGoal,
+  selectedContinent,
+  selectedGoalOption,
+) => {
+  if (!selectedGoal || !selectedContinent || !selectedGoalOption) {
+    return null;
+  }
+
+  return [
+    SEARCH_RESULTS_PAGE_STATE_STORAGE_KEY_PREFIX,
+    selectedGoal,
+    selectedContinent,
+    selectedGoalOption,
+  ]
+    .map((part) => normalizeDestinationKey(part))
+    .join(":");
+};
+
+const readSearchResultsPageState = (storageKey, location) => {
+  if (typeof window === "undefined" || !storageKey) return null;
+
+  try {
+    const savedState = window.sessionStorage.getItem(storageKey);
+    const parsedState = savedState ? JSON.parse(savedState) : null;
+    const currentLocationKey = getAiScrollPositionKey(location);
+
+    if (
+      !parsedState?.sourceLocationKey ||
+      parsedState.sourceLocationKey !== currentLocationKey
+    ) {
+      window.sessionStorage.removeItem(storageKey);
+      return null;
+    }
+
+    return parsedState;
+  } catch {
+    window.sessionStorage.removeItem(storageKey);
+    return null;
+  }
+};
 
 const addAdditionalPriorityPointsText = (narrative = "") => {
   let priorityPointsCount = 0;
@@ -1001,18 +1086,39 @@ const AiSearchResults = () => {
     return state?.selectedFilters?.goalOption || null;
   }, [attr, state?.selectedFilters?.goalOption]);
 
-  const [typedTopHeading, setTypedTopHeading] = useState("");
-  const [typedBottomHeading, setTypedBottomHeading] = useState("");
-  const [typedResultsHeading, setTypedResultsHeading] = useState("");
+  const initialSearchResultsPageState = useMemo(() => {
+    const initialStateKey = getSearchResultsPageStateKey(
+      selectedGoal,
+      normalizeSelectedContinent(initialContinent),
+      initialGoalOption,
+    );
+
+    return readSearchResultsPageState(initialStateKey, location);
+  }, [initialContinent, initialGoalOption, location, selectedGoal]);
+
+  const [typedTopHeading, setTypedTopHeading] = useState(
+    initialSearchResultsPageState?.typedTopHeading || "",
+  );
+  const [typedBottomHeading, setTypedBottomHeading] = useState(
+    initialSearchResultsPageState?.typedBottomHeading || "",
+  );
+  const [typedResultsHeading, setTypedResultsHeading] = useState(
+    initialSearchResultsPageState?.typedResultsHeading || "",
+  );
   const [selectedContinent, setSelectedContinent] = useState(initialContinent);
   const [selectedGoalOption, setSelectedGoalOption] =
     useState(initialGoalOption);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [selectedVisaRequirement, setSelectedVisaRequirement] = useState(
-    visaRequirementOptions[0],
+    initialSearchResultsPageState?.selectedVisaRequirement ||
+      visaRequirementOptions[0],
   );
-  const [isResultsReady, setIsResultsReady] = useState(false);
-  const [visibleDestinationCount, setVisibleDestinationCount] = useState(0);
+  const [isResultsReady, setIsResultsReady] = useState(
+    Boolean(initialSearchResultsPageState?.isResultsReady),
+  );
+  const [visibleDestinationCount, setVisibleDestinationCount] = useState(
+    initialSearchResultsPageState?.visibleDestinationCount || 0,
+  );
   const [likedDestinations, setLikedDestinations] = useState([]);
   const [isDestinationsLoading, setIsDestinationsLoading] = useState(false);
   const dropdownContainerRef = useRef(null);
@@ -1023,8 +1129,18 @@ const AiSearchResults = () => {
   const selectedHeadingDelayTimeoutRef = useRef(null);
   const previousSelectedPairRef = useRef(null);
   const previousGoalRef = useRef(getPersistedGoal() || selectedGoal);
+  const hasRestoredSearchScrollRef = useRef(false);
+  const hasHydratedSearchResultsPageRef = useRef(
+    Boolean(initialSearchResultsPageState),
+  );
+  const hasHydratedVisaRulesRef = useRef(Boolean(initialSearchResultsPageState));
+  const hasHydratedDestinationRevealRef = useRef(
+    Boolean(initialSearchResultsPageState),
+  );
 
-  const previousVisibleDestinationsLengthRef = useRef(0);
+  const previousVisibleDestinationsLengthRef = useRef(
+    initialSearchResultsPageState?.visibleDestinationCount || 0,
+  );
 
   const hasSelectedContinent = Boolean(selectedContinent);
   const selectedContinentDisplay =
@@ -1048,11 +1164,33 @@ const AiSearchResults = () => {
     DEFAULT_PASSPORT_COUNTRY;
   const userId = auth?.user?._id || auth?.user?.id;
 
-  const [apiDestinations, setApiDestinations] = useState([]);
-  const [visaRuleDestinationKeys, setVisaRuleDestinationKeys] = useState(null);
+  const searchResultsPageStateStorageKey = useMemo(
+    () =>
+      getSearchResultsPageStateKey(
+        selectedGoal,
+        selectedContinentDisplay,
+        selectedGoalOption,
+      ),
+    [selectedContinentDisplay, selectedGoal, selectedGoalOption],
+  );
 
-  const [visaRuleDurationByCountry, setVisaRuleDurationByCountry] =
-    useState(null);
+  const [apiDestinations, setApiDestinations] = useState(
+    Array.isArray(initialSearchResultsPageState?.apiDestinations)
+      ? initialSearchResultsPageState.apiDestinations
+      : [],
+  );
+  const [visaRuleDestinationKeys, setVisaRuleDestinationKeys] = useState(() => {
+    const savedKeys = initialSearchResultsPageState?.visaRuleDestinationKeys;
+    return Array.isArray(savedKeys) ? new Set(savedKeys) : null;
+  });
+
+  const [visaRuleDurationByCountry, setVisaRuleDurationByCountry] = useState(
+    () => {
+      const savedEntries =
+        initialSearchResultsPageState?.visaRuleDurationByCountry;
+      return Array.isArray(savedEntries) ? new Map(savedEntries) : null;
+    },
+  );
 
   const destinationLookup = useMemo(() => {
     const map = new Map();
@@ -1143,8 +1281,14 @@ const AiSearchResults = () => {
 
   useEffect(() => {
     if (!isVisaRequirementFilterActive(selectedVisaRequirement)) {
+      hasHydratedVisaRulesRef.current = false;
       setVisaRuleDestinationKeys(null);
       setVisaRuleDurationByCountry(null);
+      return;
+    }
+
+    if (hasHydratedVisaRulesRef.current) {
+      hasHydratedVisaRulesRef.current = false;
       return;
     }
 
@@ -1237,6 +1381,12 @@ const AiSearchResults = () => {
   useEffect(() => {
     if (!hasSelectedFilters) {
       setApiDestinations([]);
+      setIsDestinationsLoading(false);
+      return;
+    }
+
+    if (hasHydratedSearchResultsPageRef.current) {
+      hasHydratedSearchResultsPageRef.current = false;
       setIsDestinationsLoading(false);
       return;
     }
@@ -1352,6 +1502,7 @@ const AiSearchResults = () => {
     destinationLookup,
     hasSelectedFilters,
     selectedContinent,
+    selectedContinentDisplay,
     selectedGoal,
     selectedGoalOption,
     selectedVisaRequirement,
@@ -1369,7 +1520,7 @@ const AiSearchResults = () => {
     [rankedDestinations],
   );
 
-  const handleDestinationClick = (destination) => {
+  const handleDestinationClick = (destination, event) => {
     const routeCountry = destination.routeCountry || destination.country;
     const country = routeCountry.toLowerCase();
     const selectedLocationLabel = destination.displayCity || destination.city;
@@ -1379,6 +1530,15 @@ const AiSearchResults = () => {
     const continent = destination.continent.toLowerCase();
     const destinationTitle = destination.title || selectedLocationLabel;
     const nextSearchBarBadges = [...searchBarBadges, destinationTitle];
+    const clickedCardKey = getSearchResultDestinationKey(destination);
+    const scrollContainer = getAiScrollContainer();
+    const clickedCardRect = event?.currentTarget?.getBoundingClientRect?.();
+    const scrollContainerRect = scrollContainer?.getBoundingClientRect?.();
+    const currentScrollTop = scrollContainer?.scrollTop || 0;
+    const clickedCardContainerTop =
+      clickedCardRect && scrollContainerRect
+        ? clickedCardRect.top - scrollContainerRect.top
+        : null;
 
     persistSelectedDestination({
       continent,
@@ -1386,6 +1546,36 @@ const AiSearchResults = () => {
       city: selectedLocationParam,
       title: destinationTitle,
     });
+
+    if (typeof window !== "undefined" && searchResultsPageStateStorageKey) {
+      writeAiLayoutScrollPosition(location, currentScrollTop);
+
+      window.sessionStorage.setItem(
+        searchResultsPageStateStorageKey,
+        JSON.stringify({
+          apiDestinations,
+          clickedCardKey,
+          clickedCardContainerTop:
+            typeof clickedCardContainerTop === "number"
+              ? clickedCardContainerTop
+              : null,
+          isResultsReady,
+          selectedVisaRequirement,
+          scrollTop: currentScrollTop,
+          sourceLocationKey: getAiScrollPositionKey(location),
+          typedBottomHeading,
+          typedResultsHeading,
+          typedTopHeading,
+          visaRuleDestinationKeys: visaRuleDestinationKeys
+            ? Array.from(visaRuleDestinationKeys)
+            : null,
+          visaRuleDurationByCountry: visaRuleDurationByCountry
+            ? Array.from(visaRuleDurationByCountry.entries())
+            : null,
+          visibleDestinationCount,
+        }),
+      );
+    }
 
     navigate(
       `/ai-verticals?country=${encodeURIComponent(country)}&state=${encodeURIComponent(selectedLocationParam)}`,
@@ -1548,7 +1738,12 @@ const AiSearchResults = () => {
     }
 
     return `Curated below are the best cities in ${narrativeContinentLabel} as per the ${selectedGoalOption} for you. The results below are ranked using WoNo’s Intelligence Model, analyzing 50+ global factors — including safety, nomad population, healthcare, visa flexibility, cost of living, taxation, work infrastructure, lifestyle quality, and community — tailored to your personal profile.`;
-  }, [selectedContinentDisplay, selectedGoal, selectedGoalOption]);
+  }, [
+    selectedContinent,
+    selectedContinentDisplay,
+    selectedGoal,
+    selectedGoalOption,
+  ]);
 
   const thinkingHeadingText = "Curating the best results for you";
 
@@ -1652,12 +1847,22 @@ const AiSearchResults = () => {
   ]);
 
   useEffect(() => {
+    if (initialSearchResultsPageState) {
+      return () => {
+        clearTypingAnimations();
+      };
+    }
+
     playInitialHeadingAnimation();
 
     return () => {
       clearTypingAnimations();
     };
-  }, [clearTypingAnimations, playInitialHeadingAnimation]);
+  }, [
+    clearTypingAnimations,
+    initialSearchResultsPageState,
+    playInitialHeadingAnimation,
+  ]);
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
@@ -1786,6 +1991,11 @@ const AiSearchResults = () => {
       return;
     }
 
+    if (hasHydratedDestinationRevealRef.current) {
+      hasHydratedDestinationRevealRef.current = false;
+      return;
+    }
+
     const previousVisibleLength = Math.min(
       previousVisibleDestinationsLengthRef.current,
       visibleDestinations.length,
@@ -1815,6 +2025,109 @@ const AiSearchResults = () => {
       previousVisibleDestinationsLengthRef.current = currentVisibleCount;
     };
   }, [hasSelectedFilters, isResultsReady, visibleDestinations]);
+
+  useEffect(() => {
+    hasRestoredSearchScrollRef.current = false;
+  }, [searchResultsPageStateStorageKey]);
+
+  useEffect(() => {
+    if (
+      typeof window === "undefined" ||
+      !searchResultsPageStateStorageKey ||
+      !hasSelectedFilters ||
+      !isResultsReady ||
+      !visibleDestinations.length ||
+      hasRestoredSearchScrollRef.current
+    ) {
+      return;
+    }
+
+    const savedState = window.sessionStorage.getItem(
+      searchResultsPageStateStorageKey,
+    );
+
+    if (!savedState) {
+      return;
+    }
+
+    try {
+      const parsedState = JSON.parse(savedState);
+      const targetScrollTop = Number(
+        parsedState?.scrollTop ?? parsedState?.scrollY,
+      );
+      const clickedCardKey = parsedState?.clickedCardKey;
+      const clickedCardContainerTop = Number(
+        parsedState?.clickedCardContainerTop ??
+          parsedState?.clickedCardViewportTop,
+      );
+
+      const hasScrollFallback =
+        Number.isFinite(targetScrollTop) && targetScrollTop >= 0;
+      const hasClickedCardPosition =
+        clickedCardKey &&
+        Number.isFinite(clickedCardContainerTop);
+
+      if (!hasClickedCardPosition && !hasScrollFallback) {
+        return;
+      }
+
+      const restoreSearchResultsPosition = () => {
+        const scrollContainer = getAiScrollContainer();
+        if (!scrollContainer) return;
+
+        const clickedCard = hasClickedCardPosition
+          ? scrollContainer.querySelector(
+              `[data-search-result-card-key="${clickedCardKey}"]`,
+            )
+          : null;
+
+        if (clickedCard) {
+          const scrollContainerRect = scrollContainer.getBoundingClientRect();
+          const clickedCardRect = clickedCard.getBoundingClientRect();
+          const cardTop =
+            scrollContainer.scrollTop +
+            clickedCardRect.top -
+            scrollContainerRect.top -
+            clickedCardContainerTop;
+
+          scrollContainer.scrollTo({
+            top: Math.max(0, cardTop),
+            behavior: "auto",
+          });
+          return;
+        }
+
+        if (!hasScrollFallback) {
+          return;
+        }
+
+        scrollContainer.scrollTo({
+          top: targetScrollTop,
+          behavior: "auto",
+        });
+      };
+
+      window.requestAnimationFrame(restoreSearchResultsPosition);
+      const restoreTimers = [
+        window.setTimeout(restoreSearchResultsPosition, 50),
+        window.setTimeout(restoreSearchResultsPosition, 175),
+        window.setTimeout(restoreSearchResultsPosition, 525),
+      ];
+
+      hasRestoredSearchScrollRef.current = true;
+      window.sessionStorage.removeItem(searchResultsPageStateStorageKey);
+      return () => {
+        restoreTimers.forEach((timer) => window.clearTimeout(timer));
+      };
+    } catch {
+      window.sessionStorage.removeItem(searchResultsPageStateStorageKey);
+    }
+  }, [
+    hasSelectedFilters,
+    isResultsReady,
+    searchResultsPageStateStorageKey,
+    visibleDestinations.length,
+  ]);
 
   useEffect(() => {
     const persistedSignature = getPersistedSelectionSignature();
@@ -2141,10 +2454,13 @@ const AiSearchResults = () => {
                         const isDestinationLiked = likedDestinations.includes(
                           getDestinationFavoriteKey(destination),
                         );
+                        const destinationCardKey =
+                          getSearchResultDestinationKey(destination);
 
                         return (
                           <article
                             key={`${destination.city}-${destination.country}`}
+                            data-search-result-card-key={destinationCardKey}
                             className={`cursor-pointer transition-all duration-300 ${
                               index < visibleDestinationCount
                                 ? "translate-y-0 opacity-100"
@@ -2152,11 +2468,13 @@ const AiSearchResults = () => {
                             }`}
                             role="button"
                             tabIndex={0}
-                            onClick={() => handleDestinationClick(destination)}
+                            onClick={(event) =>
+                              handleDestinationClick(destination, event)
+                            }
                             onKeyDown={(event) => {
                               if (event.key === "Enter" || event.key === " ") {
                                 event.preventDefault();
-                                handleDestinationClick(destination);
+                                handleDestinationClick(destination, event);
                               }
                             }}
                           >
