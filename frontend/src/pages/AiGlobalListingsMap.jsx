@@ -367,6 +367,36 @@ const AiGlobalListingsMap = () => {
     refetchOnMount: "always",
   });
 
+  const destinationAvailability = formData?.location || "";
+  const { data: destinationEventsData = [] } = useQuery({
+    queryKey: ["ai-events-availability", destinationAvailability],
+    queryFn: async () => {
+      const response = await axios.get("/events", {
+        params: {
+          destination: destinationAvailability,
+        },
+      });
+
+      return Array.isArray(response.data) ? response.data : [];
+    },
+    enabled: !!destinationAvailability,
+    refetchOnWindowFocus: false,
+  });
+  const { data: destinationVenuesData = [] } = useQuery({
+    queryKey: ["ai-places-availability", destinationAvailability],
+    queryFn: async () => {
+      const response = await axios.get("/places", {
+        params: {
+          destination: destinationAvailability,
+        },
+      });
+
+      return Array.isArray(response.data) ? response.data : [];
+    },
+    enabled: !!destinationAvailability,
+    refetchOnWindowFocus: false,
+  });
+
   const sortedListings = useMemo(() => {
     if (!listingsData || listingsData.length === 0) return [];
     return [...listingsData].sort(
@@ -379,9 +409,23 @@ const AiGlobalListingsMap = () => {
       return [];
     }
 
+    const visibleDestinationHighlightFilters = DESTINATION_HIGHLIGHT_FILTERS.filter(
+      (option) => {
+        if (option.value === ANNUAL_EVENTS_CATEGORY) {
+          return destinationEventsData.length > 0;
+        }
+
+        if (option.value === "venues") {
+          return destinationVenuesData.length > 0;
+        }
+
+        return true;
+      },
+    );
+
     if (!listingsData || listingsData.length === 0) {
       return [
-        ...DESTINATION_HIGHLIGHT_FILTERS,
+        ...visibleDestinationHighlightFilters,
         {
           label: "Value Adds",
           value: VALUE_ADDED_SERVICES_CATEGORY,
@@ -428,13 +472,18 @@ const AiGlobalListingsMap = () => {
       ...result.filter(
         (option) => option.value !== VALUE_ADDED_SERVICES_CATEGORY,
       ),
-      ...DESTINATION_HIGHLIGHT_FILTERS,
+      ...visibleDestinationHighlightFilters,
       {
         label: "Value Adds",
         value: VALUE_ADDED_SERVICES_CATEGORY,
       },
     ];
-  }, [isLisitingLoading, listingsData]);
+  }, [
+    destinationEventsData.length,
+    destinationVenuesData.length,
+    isLisitingLoading,
+    listingsData,
+  ]);
 
   const groupedListings = sortedListings?.reduce((acc, item) => {
     if (!acc[item.companyType]) acc[item.companyType] = [];
