@@ -32,6 +32,7 @@ import stateWiseWeightRoutes from "./routes/stateWiseWeightRoutes.js";
 import eventRoutes from "./routes/eventRoutes.js";
 import placeRoutes from "./routes/placeRoutes.js";
 import eventReviewRoutes from "./routes/eventReviewRoutes.js";
+import placeReviewRoutes from "./routes/placeReviewRoutes.js";
 import editorRoutes from "./routes/editorRoutes.js";
 import leadsRoutes from "./routes/leadsRoutes.js";
 
@@ -70,6 +71,7 @@ app.use("/api/blogs", blogRoutes); // New Blog Route
 app.use("/api/events", eventRoutes);
 app.use("/api/places", placeRoutes);
 app.use("/api/event-reviews", eventReviewRoutes);
+app.use("/api/place-reviews", placeReviewRoutes);
 
 app.all("/*splat", (req, res) => {
   if (req.accepts("html")) {
