@@ -69,6 +69,22 @@ const Reviews = () => {
     staleTime: 1000 * 60,
   });
 
+  const {
+    data: placeReviews = [],
+    isLoading: isPlaceReviewsLoading,
+    isError: isPlaceReviewsError,
+    error: placeReviewsError,
+  } = useQuery({
+    queryKey: ["userPlaceReviews", userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      const res = await axiosPrivate.get("/place-reviews/my");
+      return Array.isArray(res.data?.data) ? res.data.data : [];
+    },
+    enabled: !!userId,
+    staleTime: 1000 * 60,
+  });
+
   const reviewedListings = reviews.reduce((acc, review) => {
     const company = review?.company;
 
@@ -91,10 +107,28 @@ const Reviews = () => {
       ...review,
       event,
       eventName,
+      reviewType: "event",
       cardTitle: eventName,
       cardImage: event.mainImage || FALLBACK_IMAGE,
       cardLocation: event.destination || review.state || "Unknown",
       cardType: event.category || "Event",
+    };
+  });
+
+  const placeReviewCards = placeReviews.map((review) => {
+    const place = review?.place || {};
+    const placeName = place.placeName || review.placeName || "Venue";
+
+    return {
+      ...review,
+      place,
+      placeName,
+      reviewType: "place",
+      cardTitle: placeName,
+      cardImage: place.mainImage || FALLBACK_IMAGE,
+      cardLocation:
+        place.destination || place.address || review.state || "Unknown",
+      cardType: place.category || "Venue",
     };
   });
 
@@ -111,20 +145,24 @@ const Reviews = () => {
     });
   }, [selectedReview]);
 
-  const updateEventReviewMutation = useMutation({
-    mutationFn: async ({ reviewId, starCount, description }) => {
-      const res = await axiosPrivate.patch(`/event-reviews/${reviewId}`, {
+  const updateReviewMutation = useMutation({
+    mutationFn: async ({ reviewId, reviewType, starCount, description }) => {
+      const endpoint =
+        reviewType === "place" ? "/place-reviews" : "/event-reviews";
+      const res = await axiosPrivate.patch(`${endpoint}/${reviewId}`, {
         starCount,
         description,
       });
       return res.data;
     },
-    onSuccess: (response) => {
+    onSuccess: (response, variables) => {
       const updatedReview = response?.review;
       const mergedReview = {
         ...selectedReview,
         ...updatedReview,
         event: selectedReview?.event,
+        place: selectedReview?.place,
+        reviewType: selectedReview?.reviewType,
         status: "pending",
       };
 
@@ -132,7 +170,12 @@ const Reviews = () => {
       setIsEditingReview(false);
       setEditError("");
       showSuccessAlert(response?.message || "Review updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["userEventReviews", userId] });
+      queryClient.invalidateQueries({
+        queryKey:
+          variables.reviewType === "place"
+            ? ["userPlaceReviews", userId]
+            : ["userEventReviews", userId],
+      });
     },
     onError: (mutationError) => {
       setEditError(
@@ -158,14 +201,18 @@ const Reviews = () => {
     setEditError("");
   };
   const reviewStatus = (selectedReview?.status || "pending").toLowerCase();
-  const isSelectedEventReview = Boolean(
+  const isSelectedDestinationReview = Boolean(
     selectedReview?._id &&
-    (selectedReview?.event ||
+      (selectedReview?.event ||
       selectedReview?.eventId ||
-      selectedReview?.eventName),
+      selectedReview?.eventName ||
+      selectedReview?.place ||
+      selectedReview?.placeId ||
+      selectedReview?.placeName),
   );
   const modalTitle =
     selectedReview?.eventName ||
+    selectedReview?.placeName ||
     selectedReview?.company?.companyName ||
     selectedReview?.company?.companyTitle ||
     "Review";
@@ -200,19 +247,96 @@ const Reviews = () => {
       return;
     }
 
-    updateEventReviewMutation.mutate({
+    updateReviewMutation.mutate({
       reviewId: selectedReview._id,
+      reviewType: selectedReview.reviewType,
       starCount: editStarCount,
       description: editDescription,
     });
   };
 
-  if (isError || isEventReviewsError) {
+  const renderDestinationReviewCards = (
+    reviewCards,
+    isSectionLoading,
+    emptyMessage,
+  ) => {
+    if (isSectionLoading) {
+      return <div className="text-center text-gray-500">Loading...</div>;
+    }
+
+    if (reviewCards.length === 0) {
+      return (
+        <div className="text-center text-gray-500 border border-dotted rounded-lg p-6">
+          {emptyMessage}
+        </div>
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+        {reviewCards.map((review) => (
+          <button
+            key={review._id}
+            type="button"
+            className="flex w-full flex-col gap-2 rounded-lg bg-white text-left transition-all"
+            onClick={() => openReviewModal(review)}
+          >
+            <div className="relative aspect-square w-full overflow-hidden rounded-3xl">
+              <img
+                src={review.cardImage}
+                alt={review.cardTitle}
+                className="h-full w-full object-cover transition-all hover:scale-105"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <span className="rounded-full bg-black/55 px-3 py-1 text-sm font-medium text-white">
+                  View Review
+                </span>
+              </div>
+              <div className="pointer-events-none absolute inset-x-2 bottom-2 flex justify-end">
+                <div className="rounded-lg bg-white px-2">
+                  <span className="text-xs font-normal leading-normal">
+                    {review.cardType}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex h-[25%] flex-col gap-1 px-4 pr-1">
+              <p
+                className="truncate text-xs font-semibold md:text-sm"
+                title={review.cardTitle}
+              >
+                {review.cardTitle}
+              </p>
+              <div className="flex w-full items-center justify-between">
+                <p
+                  className="truncate text-xs font-medium text-gray-600 md:text-sm"
+                  title={review.cardLocation}
+                >
+                  {review.cardLocation}
+                </p>
+                <div className="flex items-center gap-1 text-gray-600">
+                  <AiFillStar size={14} className="md:h-4 md:w-4" />
+                  <p className="text-xs font-medium text-gray-600 md:text-sm">
+                    ({review.starCount || 0})
+                  </p>
+                </div>
+              </div>
+            </div>
+          </button>
+        ))}
+      </div>
+    );
+  };
+
+  if (isError || isEventReviewsError || isPlaceReviewsError) {
     return (
       <Container padding={false}>
         <div className="py-8 min-h-screen text-center text-red-500">
           {error?.response?.data?.message ||
             eventReviewsError?.response?.data?.message ||
+            placeReviewsError?.response?.data?.message ||
             "Failed to load your reviews."}
         </div>
       </Container>
@@ -253,67 +377,24 @@ const Reviews = () => {
             My Reviews - Events
           </h2>
 
-          {isEventReviewsLoading ? (
-            <div className="text-center text-gray-500">Loading...</div>
-          ) : eventReviewCards.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-              {eventReviewCards.map((review) => (
-                <button
-                  key={review._id}
-                  type="button"
-                  className="flex w-full flex-col gap-2 rounded-lg bg-white text-left transition-all"
-                  onClick={() => openReviewModal(review)}
-                >
-                  <div className="relative aspect-square w-full overflow-hidden rounded-3xl">
-                    <img
-                      src={review.cardImage}
-                      alt={review.cardTitle}
-                      className="h-full w-full object-cover transition-all hover:scale-105"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <span className="rounded-full bg-black/55 px-3 py-1 text-sm font-medium text-white">
-                        View Review
-                      </span>
-                    </div>
-                    <div className="pointer-events-none absolute inset-x-2 bottom-2 flex justify-end">
-                      <div className="rounded-lg bg-white px-2">
-                        <span className="text-xs font-normal leading-normal">
-                          {review.cardType}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
+          {renderDestinationReviewCards(
+            eventReviewCards,
+            isEventReviewsLoading,
+            "You haven't reviewed any events yet.",
+          )}
+        </div>
 
-                  <div className="flex h-[25%] flex-col gap-1 px-4 pr-1">
-                    <p
-                      className="truncate text-xs font-semibold md:text-sm"
-                      title={review.cardTitle}
-                    >
-                      {review.cardTitle}
-                    </p>
-                    <div className="flex w-full items-center justify-between">
-                      <p
-                        className="truncate text-xs font-medium text-gray-600 md:text-sm"
-                        title={review.cardLocation}
-                      >
-                        {review.cardLocation}
-                      </p>
-                      <div className="flex items-center gap-1 text-gray-600">
-                        <AiFillStar size={14} className="md:h-4 md:w-4" />
-                        <p className="text-xs font-medium text-gray-600 md:text-sm">
-                          ({review.starCount || 0})
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center text-gray-500 border border-dotted rounded-lg p-6">
-              You haven't reviewed any events yet.
-            </div>
+        <hr className="my-10 border-gray-200" />
+
+        <div>
+          <h2 className="text-xl font-semibold mb-6 text-secondary-dark">
+            My Reviews - Venues
+          </h2>
+
+          {renderDestinationReviewCards(
+            placeReviewCards,
+            isPlaceReviewsLoading,
+            "You haven't reviewed any venues yet.",
           )}
         </div>
       </div>
@@ -342,7 +423,7 @@ const Reviews = () => {
             </div>
 
             <div className="flex shrink-0 items-center gap-2">
-              {isSelectedEventReview && (
+              {isSelectedDestinationReview && (
                 <button
                   type="button"
                   className={`flex items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
@@ -351,7 +432,7 @@ const Reviews = () => {
                       : "border-gray-200 bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
                   onClick={handleStartEdit}
-                  disabled={updateEventReviewMutation.isPending}
+                  disabled={updateReviewMutation.isPending}
                 >
                   <FiEdit2 size={13} />
                   Edit
@@ -379,7 +460,7 @@ const Reviews = () => {
                   if (isEditingReview) setEditStarCount(index + 1);
                 }}
                 disabled={
-                  !isEditingReview || updateEventReviewMutation.isPending
+                  !isEditingReview || updateReviewMutation.isPending
                 }
                 aria-label={`Set ${index + 1} star rating`}
               >
@@ -403,7 +484,7 @@ const Reviews = () => {
                 className="min-h-28 w-full rounded-lg border border-borderGray px-3 py-2 text-sm text-gray-800 outline-none focus:border-primary focus:ring-1 focus:ring-primary"
                 value={editDescription}
                 onChange={(event) => setEditDescription(event.target.value)}
-                disabled={updateEventReviewMutation.isPending}
+                disabled={updateReviewMutation.isPending}
               />
             ) : (
               <p className="text-sm text-gray-800 whitespace-pre-line leading-relaxed">
@@ -420,18 +501,16 @@ const Reviews = () => {
                 type="button"
                 className="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700"
                 onClick={handleCancelEdit}
-                disabled={updateEventReviewMutation.isPending}
+                disabled={updateReviewMutation.isPending}
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 className="rounded-full bg-primary-blue hover:bg-primary-light px-5 py-2 text-sm font-semibold text-white disabled:opacity-60"
-                disabled={updateEventReviewMutation.isPending}
+                disabled={updateReviewMutation.isPending}
               >
-                {updateEventReviewMutation.isPending
-                  ? "Submitting..."
-                  : "Submit"}
+                {updateReviewMutation.isPending ? "Submitting..." : "Submit"}
               </button>
             </div>
           )}
