@@ -1,6 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { getSectionPath, normalizePageNavItems } from "../utils/templateRouteUtils";
+import {
+  getProductPath,
+  getSectionPath,
+  normalizePageNavItems,
+  normalizeProductDropdownPages,
+} from "../utils/templateRouteUtils";
 
 const TempFooter = ({
   address,
@@ -11,6 +16,7 @@ const TempFooter = ({
   logo,
   isPending,
   pageNavItems = [],
+  productDropdownPages = [],
   pathname = "",
 }) => {
   const quickLinks =
@@ -31,16 +37,23 @@ const TempFooter = ({
           { name: "Contact Us", to: getSectionPath("contact", pathname) },
         ];
 
+  const productLinks = normalizeProductDropdownPages(
+    Array.isArray(productDropdownPages) ? productDropdownPages : [],
+  ).map((p) => ({
+    name: p.name || p.slug || "",
+    to: getProductPath(p.slug, pathname),
+  }));
+
   return (
     <footer className="border-t border-gray-200 bg-white text-sm text-gray-700">
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-6 py-8 text-center md:grid-cols-[1.35fr_0.8fr_0.9fr] md:text-left">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-6 py-8 text-center md:grid-cols-[1.35fr_1fr_1fr_1fr] md:text-left">
         <div>
           <img src={logo} alt="logo" className="mx-auto mb-3 h-10 md:mx-0" />
           <p className="font-semibold">{!isPending && registeredCompany}</p>
           <p className="mt-2 text-sm leading-relaxed">{!isPending && address}</p>
         </div>
 
-        <div className="mx-auto">
+        <div>
           <h4 className="mb-3 font-semibold">Quick Links</h4>
           <ul className="space-y-1">
             {quickLinks.map((link, idx) => (
@@ -52,6 +65,21 @@ const TempFooter = ({
             ))}
           </ul>
         </div>
+
+        {productLinks.length > 0 ? (
+          <div>
+            <h4 className="mb-3 font-semibold">Products</h4>
+            <ul className="space-y-1">
+              {productLinks.map((p, idx) => (
+                <li key={idx}>
+                  <Link to={p.to} className="hover:underline">
+                    {p.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
 
         <div>
           <h4 className="mb-3 font-semibold">Contact Us</h4>

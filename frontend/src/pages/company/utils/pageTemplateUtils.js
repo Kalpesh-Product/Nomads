@@ -58,11 +58,7 @@ export const getApprovedTestimonials = (testimonials = []) => {
 };
 
 export const getPreviewTestimonials = (data, approvedReviews = []) => {
-  const previewCount = Number(data?.testimonialsHomePreviewCount) || 3;
-  return [...getApprovedTestimonials(data?.testimonials), ...approvedReviews].slice(
-    0,
-    previewCount,
-  );
+  return [...getApprovedTestimonials(data?.testimonials), ...approvedReviews];
 };
 
 export const getEnabledProductPages = (pages = []) => {

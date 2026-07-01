@@ -83,6 +83,7 @@ const TempHeader = forwardRef(
       if (!productsOpen) return undefined;
 
       const handlePointerDown = (event) => {
+        if (open) return;
         const headerElement = ref && typeof ref === "object" ? ref.current : null;
         if (headerElement && !headerElement.contains(event.target)) {
           setProductsOpen(false);
@@ -96,7 +97,7 @@ const TempHeader = forwardRef(
         document.removeEventListener("mousedown", handlePointerDown);
         document.removeEventListener("touchstart", handlePointerDown);
       };
-    }, [productsOpen, ref]);
+    }, [productsOpen, ref, open]);
 
     const handleNavigate = (path) => {
       navigate(path);
@@ -193,14 +194,14 @@ const TempHeader = forwardRef(
         ref={ref}
         className="sticky top-0 z-30 border-b border-slate-300 bg-[#ffffff] shadow-sm"
       >
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-end gap-4 px-4 py-3 md:px-0 md:py-3">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-3 md:px-0 md:py-3">
           <button
             type="button"
             onClick={() => handleNavigate(getSectionPath("home", location.pathname))}
-            className="flex h-16 w-24 items-center justify-end overflow-hidden lg:w-36"
+            className="flex h-16 w-24 items-center justify-start overflow-hidden lg:w-36"
             aria-label="Go to home"
           >
-            <img src={logo} alt="logo" className="h-full w-full object-contain" />
+            <img src={logo} alt="logo" className="h-full w-full object-contain object-left" />
           </button>
 
           <nav className="ml-auto hidden items-center gap-6 xl:flex">

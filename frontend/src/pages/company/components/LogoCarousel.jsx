@@ -3,17 +3,34 @@ import React, { useEffect, useState } from "react";
 const LinedHeading = ({ title }) => (
   <div className="flex items-center gap-4">
     <div className="flex-1 border-t border-[#111827]" />
-    <h2 className="shrink-0 text-center text-[20px] font-semibold uppercase tracking-[0.15em] text-[#111827] font-['Poppins',ui-sans-serif,system-ui,sans-serif] md:text-[26px]">
+    <h2 className="shrink-0 text-center text-sm font-semibold uppercase tracking-[0.15em] text-[#111827] font-['Poppins',ui-sans-serif,system-ui,sans-serif] sm:text-base md:text-xl lg:text-[26px]">
       {title}
     </h2>
     <div className="flex-1 border-t border-[#111827]" />
   </div>
 );
 
+const getVisibleCount = () => {
+  if (typeof window === "undefined") return 4;
+  if (window.innerWidth < 768) return 2;
+  return 4;
+};
+
 const LogoCarousel = ({ logos, title }) => {
   const [offset, setOffset] = useState(0);
-  const visible = 4;
+  const [visible, setVisible] = useState(getVisibleCount);
   const total = logos.length;
+
+  useEffect(() => {
+    const handleResize = () => setVisible(getVisibleCount());
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (total <= visible) return;
+    setOffset(0);
+  }, [visible, total]);
 
   useEffect(() => {
     if (total <= visible) return;
@@ -25,7 +42,6 @@ const LogoCarousel = ({ logos, title }) => {
 
   if (!total) return null;
 
-  // Build the display list — always show `visible` items, cycling
   const displayed = Array.from({ length: visible }, (_, i) =>
     logos[(offset + i) % total]
   );
@@ -39,11 +55,11 @@ const LogoCarousel = ({ logos, title }) => {
           </div>
         ) : null}
         <div className="overflow-hidden">
-          <div className="flex items-center justify-center gap-8 transition-all duration-700 md:gap-16">
+          <div className="flex items-center justify-center gap-6 transition-all duration-700 md:gap-16">
             {displayed.map((src, idx) => (
               <div
                 key={`logo-${offset}-${idx}`}
-                className="flex h-[72px] w-[200px] shrink-0 items-center justify-center md:h-[80px] md:w-[220px]"
+                className="flex h-[60px] w-[140px] shrink-0 items-center justify-center md:h-[80px] md:w-[220px]"
               >
                 <img
                   src={src}
