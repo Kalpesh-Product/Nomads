@@ -32,6 +32,13 @@ const AiDestinationDetail = ({ type }) => {
   const fallback = type === "event" ? annualEvents[0] : popularVenues[0];
   const item = location.state?.item || fallback;
   const isEvent = type === "event";
+  const venueMapsLink =
+    typeof item.googleMapsLink === "string" ? item.googleMapsLink.trim() : "";
+  const venueDirectionHref =
+    venueMapsLink ||
+    `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+      item.address || item.title,
+    )}`;
   const reviewTargetId = isEvent ? eventId : venueId;
   const reviewEndpoint = isEvent ? "/event-reviews" : "/place-reviews";
   const reviewIdParam = isEvent ? "eventId" : "placeId";
@@ -116,7 +123,7 @@ const AiDestinationDetail = ({ type }) => {
           </p>
           {!isEvent && (
             <a
-              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.address || item.title)}`}
+              href={venueDirectionHref}
               target="_blank"
               rel="noreferrer"
               className="font-medium text-blue-600 underline"
