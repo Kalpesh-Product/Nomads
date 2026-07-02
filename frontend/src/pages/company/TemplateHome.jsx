@@ -4,7 +4,6 @@ import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import Container from "../../components/Container";
 import ProductCard from "./components/ProductCard";
-import TestimonialCard from "./components/TestimonialCard";
 import LinedHeading from "./components/LinedHeading";
 import { BsEnvelope } from "react-icons/bs";
 import { MdOutlinePhone } from "react-icons/md";
@@ -15,6 +14,8 @@ import TempModal from "./components/TempModal";
 import GallerySection from "./components/GallerySection";
 import ReviewFormModal from "./components/ReviewFormModal";
 import LogoCarousel from "./components/LogoCarousel";
+import TestimonialCarousel from "./components/TestimonialCarousel";
+import OverallRating from "./components/OverallRating";
 import InclusionsSection from "./components/InclusionsSection";
 import {
   getMediaSrc,
@@ -42,9 +43,6 @@ const TemplateHome = () => {
   const [open, setOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
-  const [testimonialIndex, setTestimonialIndex] = useState(0);
-  const testimonialPerPage = 3;
-
   const { data, isPending, error, routeContext, approvedReviews = [] } =
     useOutletContext();
   const [sliderRef, slider] = useKeenSlider({
@@ -60,16 +58,6 @@ const TemplateHome = () => {
     }, 5000);
     return () => clearInterval(intervalRef.current);
   }, [slider]);
-
-  useEffect(() => {
-    const t = isPending ? [] : getPreviewTestimonials(data, approvedReviews);
-    const total = Math.ceil(t.length / testimonialPerPage);
-    if (total <= 1) return;
-    const timer = setInterval(() => {
-      setTestimonialIndex((prev) => (prev + 1) % total);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [data, approvedReviews, isPending]);
 
   const handleScroll = (id) => {
     const section = document.getElementById(id);
@@ -123,8 +111,6 @@ const TemplateHome = () => {
   const testimonials = isPending
     ? []
     : getPreviewTestimonials(data, approvedReviews);
-  const totalTestPages = Math.ceil(testimonials.length / testimonialPerPage);
-  const visibleTestimonials = testimonials.slice(testimonialIndex * testimonialPerPage, (testimonialIndex + 1) * testimonialPerPage);
   // Legacy vertical-based rendering retained as backup only:
   // const vertical = normalizeVertical(data?.vertical);
   // const isCafe = vertical === "cafe";
@@ -293,28 +279,9 @@ const TemplateHome = () => {
               <p className="text-center text-gray-600">{data.testimonialsPageIntro}</p>
             )}
 
-            <div className="relative">
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {visibleTestimonials.map((t) => (
-                  <TestimonialCard key={t._id || t.key} item={t} />
-                ))}
-              </div>
+            <OverallRating testimonials={testimonials} />
 
-              {totalTestPages > 1 ? (
-                <div className="mt-4 flex justify-center gap-2">
-                  {Array.from({ length: totalTestPages }).map((_, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      onClick={() => setTestimonialIndex(i)}
-                      className={`h-2 w-2 rounded-full transition ${
-                        i === testimonialIndex ? "bg-slate-700" : "bg-slate-300"
-                      }`}
-                    />
-                  ))}
-                </div>
-              ) : null}
-            </div>
+            <TestimonialCarousel testimonials={testimonials} />
             <div className="flex justify-center pt-4">
               <button
                 type="button"

@@ -1,56 +1,43 @@
-// src/components/TestimonialCard.jsx
-import React from "react";
+import React, { useState } from "react";
 import { FaStar } from "react-icons/fa";
-import { getMediaSrc } from "../utils/templateRouteUtils";
+
+const MAX_CHARS = 200;
 
 const TestimonialCard = ({ item }) => {
-  const initials = String(item?.name || "")
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join("") || "RT";
-  const imageSrc = getMediaSrc(item?.image);
+  const [expanded, setExpanded] = useState(false);
+  const text = item?.testimony || item?.text || "";
+  const isLong = text.length > MAX_CHARS;
+  const rating = item?.rating || 0;
 
   return (
-    <div className="w-full rounded-2xl bg-white p-6 text-left shadow-sm">
-      {/* Profile Image */}
-      <div className="mb-4 flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black text-xs font-semibold text-white">
-          {imageSrc ? (
-            <img
-              src={imageSrc}
-              alt={item?.name || "reviewer"}
-              className="h-full w-full rounded-full object-cover"
-            />
-          ) : (
-            initials
-          )}
-        </div>
-        <div>
-          <h3 className="text-base font-semibold text-gray-800">
-            {item?.name || "name"}
-          </h3>
-          <p className="text-xs text-gray-500">
-            {item?.jobPosition || item?.role || "position"}
-          </p>
-        </div>
-      </div>
+    <div className="flex h-full w-full min-w-0 flex-col text-left">
+      <h3 className="text-base font-semibold text-gray-800">
+        {item?.name || "name"}
+      </h3>
 
-      {/* Testimonial Text */}
-      <p className="mb-4 text-sm leading-relaxed text-gray-600">
-        "{item?.testimony || item?.text || "testimony"}"
-      </p>
-
-      {/* Rating */}
-      <div className="flex gap-1 text-black">
+      <div className="mt-1 flex gap-1 text-black">
         {Array.from({ length: 5 }).map((_, i) => (
           <FaStar
             key={i}
-            className={i < item?.rating ? "fill-current" : "fill-gray-300"}
+            size={14}
+            className={i < rating ? "fill-current" : "fill-gray-300"}
           />
         ))}
+      </div>
+
+      <div className="mt-3 min-w-0 flex-1">
+        <p className="break-words whitespace-normal text-sm leading-relaxed text-gray-600">
+          "{text || "testimony"}"
+        </p>
+        {isLong && (
+          <button
+            type="button"
+            onClick={() => setExpanded((prev) => !prev)}
+            className="mt-1 text-xs font-semibold text-gray-500 hover:text-gray-800 transition"
+          >
+            {expanded ? "Show less" : "Read more"}
+          </button>
+        )}
       </div>
     </div>
   );

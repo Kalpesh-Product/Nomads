@@ -104,9 +104,10 @@ const TemplateSite = () => {
   const { data: reviewResponse } = useQuery({
     queryKey: ["public-reviews", companyId, workspaceId, searchKey],
     queryFn: async () => {
-      const res = await api.get("/review", {
+      const res = await api.get("/review/approved", {
         params: {
           companyId,
+          source: "website",
         },
       });
       return res.data;
@@ -115,13 +116,7 @@ const TemplateSite = () => {
   });
 
   const approvedReviews = Array.isArray(reviewResponse?.data)
-    ? reviewResponse.data
-        .filter((item) => {
-          const status = String(item?.status || "").toLowerCase();
-          return status === "approved" || !status;
-        })
-        .map(mapTestimonialItem)
-        .filter(Boolean)
+    ? reviewResponse.data.map(mapTestimonialItem).filter(Boolean)
     : [];
 
   return (

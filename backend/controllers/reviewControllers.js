@@ -512,13 +512,17 @@ export const createWebsiteReview = async (req, res, next) => {
 
 export const getApprovedReviewsByCompany = async (req, res, next) => {
   try {
-    const { companyId, workspaceId } = req.query;
+    const { companyId, workspaceId, source } = req.query;
 
     if (!companyId && !workspaceId) {
       return res.status(400).json({ message: "companyId or workspaceId is required" });
     }
 
     let query = { status: "approved" };
+
+    if (source) {
+      query.source = source;
+    }
 
     if (companyId) {
       query.companyId = companyId;
@@ -527,7 +531,7 @@ export const getApprovedReviewsByCompany = async (req, res, next) => {
     }
 
     const reviews = await Review.find(query)
-      .select("name starCount description reviewSource reviewLink createdAt companyId workspaceId")
+      .select("name starCount description reviewSource reviewLink createdAt companyId workspaceId source")
       .sort({ createdAt: -1 })
       .lean()
       .exec();
