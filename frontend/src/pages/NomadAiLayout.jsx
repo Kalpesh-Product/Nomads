@@ -265,7 +265,7 @@ const NomadAiLayout = () => {
                 breadcrumbs={routeBreadcrumbs}
                 isLoading={isBreadcrumbLoading}
                 sticky={false}
-                textSizeClassName="text-[10px] md:text-sm lg:text-base"
+                textSizeClassName="text-sm md:text-sm lg:text-base"
               />
             </div>
           </div>

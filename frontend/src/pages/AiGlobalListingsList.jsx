@@ -53,6 +53,14 @@ const THINKING_HEADING_TEXT = "Curating the best results for you";
 const CURATED_RESULTS_HEADING_TEXT =
   "Please find below, the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
 const AI_SCROLL_CONTAINER_ID = "nomad-ai-scroll-container";
+const MOBILE_SHORTCUT_ICON_OVERRIDES = {
+  annualevents: "/icons-new/Events-cropped.png",
+  venues: "/icons-new/Venues-cropped.png",
+  news: "/icons-new/News-cropped.png",
+  blogs: "/icons-new/Blogs-cropped.png",
+};
+const getMobileShortcutIconSrc = (value) =>
+  MOBILE_SHORTCUT_ICON_OVERRIDES[value] || newIcons[value];
 const extractImageFromContent = (content) => {
   const match = content?.match(/<img.*?src=["'](.*?)["']/);
   return match ? match[1] : null;
@@ -1597,7 +1605,7 @@ const AiGlobalListingsList = () => {
 
             <div className="lg:hidden flex overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 md:justify-center">
               {categoryOptions.map((cat) => {
-                const iconSrc = newIcons[cat.value];
+                const iconSrc = getMobileShortcutIconSrc(cat.value);
                 return (
                   <button
                     key={cat.value}
