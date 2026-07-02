@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import Container from "../../components/Container";
-import TestimonialCard from "./components/TestimonialCard";
+import TestimonialCarousel from "./components/TestimonialCarousel";
+import OverallRating from "./components/OverallRating";
 import ReviewFormModal from "./components/ReviewFormModal";
 import LinedHeading from "./components/LinedHeading";
 import { getApprovedTestimonials } from "./utils/pageTemplateUtils";
 
 const TemplateTestimonialsPage = () => {
   const [isReviewOpen, setIsReviewOpen] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
   const { data, isPending, error, approvedReviews = [] } =
     useOutletContext();
   if (isPending) return null;
@@ -20,18 +20,6 @@ const TemplateTestimonialsPage = () => {
     ...approvedReviews,
   ];
 
-  const perPage = 3;
-  const totalPages = Math.ceil(testimonials.length / perPage);
-  const visible = testimonials.slice(currentIndex * perPage, (currentIndex + 1) * perPage);
-
-  useEffect(() => {
-    if (totalPages <= 1) return;
-    const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % totalPages);
-    }, 4000);
-    return () => clearInterval(timer);
-  }, [totalPages]);
-
   return (
     <section className="min-h-[60vh] bg-[#efefef] py-10">
       <Container>
@@ -42,32 +30,11 @@ const TemplateTestimonialsPage = () => {
               {data.testimonialsPageIntro}
             </p>
           ) : null}
-          
-          <div className="relative">
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {visible.map((item, index) => (
-                <TestimonialCard
-                  key={item?._id || item?.key || `testimonial-${index}`}
-                  item={item}
-                />
-              ))}
-            </div>
 
-            {totalPages > 1 ? (
-              <div className="mt-4 flex justify-center gap-2">
-                {Array.from({ length: totalPages }).map((_, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => setCurrentIndex(i)}
-                    className={`h-2 w-2 rounded-full transition ${
-                      i === currentIndex ? "bg-slate-700" : "bg-slate-300"
-                    }`}
-                  />
-                ))}
-              </div>
-            ) : null}
-          </div>
+          <OverallRating testimonials={testimonials} />
+
+          <TestimonialCarousel testimonials={testimonials} />
+
           <div className="flex justify-center">
             <button
               type="button"
