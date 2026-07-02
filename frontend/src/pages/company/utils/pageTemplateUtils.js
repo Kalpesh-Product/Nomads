@@ -30,19 +30,21 @@ const normalizeCatalogItem = (item, fallbackType = "") => {
 
 export const mapTestimonialItem = (item) => {
   if (!item) return null;
+  const name = String(
+    item?.reviewerName ||
+      item?.reviewreName ||
+      item?.fullName ||
+      item?.name ||
+      "",
+  ).trim();
+  const text = String(item?.text || item?.review || item?.comment || item?.description || item?.testimony || "").trim();
+  if (!name && !text) return null;
   return {
     key: String(item?._id || item?.upstreamReviewId || item?.id || "").trim(),
     image: getMediaUrl(item?.reviewerImage || item?.image),
-    name:
-      String(
-        item?.reviewerName ||
-          item?.reviewreName ||
-          item?.fullName ||
-          item?.name ||
-          "",
-      ).trim() || "Reviewer",
+    name: name || "Reviewer",
     role: String(item?.role || item?.designation || item?.jobPosition || "").trim(),
-    text: String(item?.text || item?.review || item?.comment || item?.description || item?.testimony || "").trim(),
+    text: text || "testimony",
     rating: Number(item?.starCount ?? item?.rating ?? item?.rate ?? 0) || 0,
   };
 };
