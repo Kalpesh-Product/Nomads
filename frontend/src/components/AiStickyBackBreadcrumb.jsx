@@ -18,7 +18,7 @@ const AiStickyBackBreadcrumb = ({
     <div
       className={`${stickyClassName} z-40 bg-white/95 py-3 backdrop-blur-sm md:px-10 ${className}`}
     >
-      <div className={`flex items-center gap-2 ${rowClassName}`}>
+      <div className={`flex min-w-0 items-center gap-2 ${rowClassName}`}>
         <button
           type="button"
           onClick={onBack}
@@ -38,11 +38,11 @@ const AiStickyBackBreadcrumb = ({
         ) : breadcrumbs.length > 0 ? (
           <nav
             aria-label="Breadcrumb"
-            className={`flex items-center text-primary-blue ${textSizeClassName}`}
+            className={`flex min-w-0 flex-1 items-center overflow-x-auto whitespace-nowrap text-primary-blue custom-scrollbar-hide sm:overflow-visible ${textSizeClassName}`}
           >
-            <span className="mx-1 md:mx-2">{">"}</span>
+            <span className="mx-1 shrink-0 md:mx-2">{">"}</span>
             {breadcrumbs.map((item, index) => (
-              <span key={`${item.label}-${index}`}>
+              <span key={`${item.label}-${index}`} className="shrink-0">
                 {item.onClick ? (
                   <button
                     type="button"
@@ -52,12 +52,12 @@ const AiStickyBackBreadcrumb = ({
                     {item.label}
                   </button>
                 ) : (
-                  <span className={item.truncate ? "inline-block max-w-[80px] truncate align-bottom md:max-w-none" : ""}>
+                  <span className={item.truncate ? "inline-block align-bottom md:max-w-none" : ""}>
                     {item.label}
                   </span>
                 )}
                 {index < breadcrumbs.length - 1 ? (
-                  <span className="mx-1 md:mx-2">{">"}</span>
+                  <span className="mx-1 shrink-0 md:mx-2">{">"}</span>
                 ) : null}
               </span>
             ))}
