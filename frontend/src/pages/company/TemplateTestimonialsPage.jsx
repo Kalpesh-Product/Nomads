@@ -51,6 +51,7 @@ const TemplateTestimonialsPage = () => {
         onClose={() => setIsReviewOpen(false)}
         companyId={data?.companyId || ""}
         companyName={data?.companyName || ""}
+        workspaceId={data?.workspaceId || ""}
       />
     </section>
   );
