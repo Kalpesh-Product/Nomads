@@ -340,7 +340,7 @@ export const updateReviewStatus = async (req, res, next) => {
 
 export const getReviewsByCompany = async (req, res, next) => {
   try {
-    const { companyId, companyType = "", status = "pending" } = req.query;
+    const { companyId, companyType = "", workspaceId, status = "pending" } = req.query;
 
     let cmpQuery = {};
 
@@ -365,6 +365,7 @@ export const getReviewsByCompany = async (req, res, next) => {
     let query = {
       $or: [
         { status: "pending" },
+        { status: "approved" },
         { "approvedBy.userId": { $exists: true, $ne: null } },
         { "rejectedBy.userId": { $exists: true, $ne: null } },
       ],
@@ -378,9 +379,9 @@ export const getReviewsByCompany = async (req, res, next) => {
       query = { ...query, company: company._id };
     }
 
-    // if (status) {
-    //   query = { ...query, status };
-    // }
+    if (workspaceId) {
+      query = { ...query, workspaceId };
+    }
 
     // 2️⃣ Fetch reviews using ObjectId (fast)
     const reviews = await Review.find(query)
