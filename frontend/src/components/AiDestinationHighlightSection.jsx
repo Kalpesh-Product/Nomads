@@ -24,7 +24,9 @@ const HighlightCard = ({ item, kind, onClick }) => (
         <div className="flex items-center justify-between gap-2 text-xs font-medium text-gray-600 md:text-sm">
           <span className="truncate">{item.location}</span>
           <span className="flex shrink-0 items-center gap-1">
-            {kind === "venue" && <AiFillStar size={14} />}
+            {(kind === "venue" || kind === "restaurant") && (
+              <AiFillStar size={14} />
+            )}
             {item.meta}
           </span>
         </div>

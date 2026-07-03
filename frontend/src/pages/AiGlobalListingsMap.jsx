@@ -39,6 +39,7 @@ import { DESTINATION_HIGHLIGHT_FILTERS } from "../data/aiDestinationHighlights.j
 
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
 const ANNUAL_EVENTS_CATEGORY = "annualevents";
+const RESTAURANTS_CATEGORY = "restaurants";
 const TYPING_INTERVAL_MS = 7;
 const SECOND_HEADING_DELAY_MS = 250;
 const THINKING_HEADING_TEXT = "Curating the best results for you";
@@ -396,6 +397,20 @@ const AiGlobalListingsMap = () => {
     enabled: !!destinationAvailability,
     refetchOnWindowFocus: false,
   });
+  const { data: destinationRestaurantsData = [] } = useQuery({
+    queryKey: ["ai-restaurants-availability", destinationAvailability],
+    queryFn: async () => {
+      const response = await axios.get("/restaurants", {
+        params: {
+          destination: destinationAvailability,
+        },
+      });
+
+      return Array.isArray(response.data) ? response.data : [];
+    },
+    enabled: !!destinationAvailability,
+    refetchOnWindowFocus: false,
+  });
 
   const sortedListings = useMemo(() => {
     if (!listingsData || listingsData.length === 0) return [];
@@ -417,6 +432,10 @@ const AiGlobalListingsMap = () => {
 
         if (option.value === "venues") {
           return destinationVenuesData.length > 0;
+        }
+
+        if (option.value === RESTAURANTS_CATEGORY) {
+          return destinationRestaurantsData.length > 0;
         }
 
         return true;
@@ -480,6 +499,7 @@ const AiGlobalListingsMap = () => {
     ];
   }, [
     destinationEventsData.length,
+    destinationRestaurantsData.length,
     destinationVenuesData.length,
     isLisitingLoading,
     listingsData,
@@ -617,7 +637,8 @@ const AiGlobalListingsMap = () => {
         (filter) =>
           filter.value === categoryValue &&
           categoryValue !== ANNUAL_EVENTS_CATEGORY &&
-          categoryValue !== "venues",
+          categoryValue !== "venues" &&
+          categoryValue !== RESTAURANTS_CATEGORY,
       )
     ) {
       const params = new URLSearchParams({
@@ -641,7 +662,8 @@ const AiGlobalListingsMap = () => {
       isMobileOrTablet &&
       categoryValue !== VALUE_ADDED_SERVICES_CATEGORY &&
       categoryValue !== ANNUAL_EVENTS_CATEGORY &&
-      categoryValue !== "venues"
+      categoryValue !== "venues" &&
+      categoryValue !== RESTAURANTS_CATEGORY
     ) {
       setShowListings(true);
       // Optional: Clear mobile search if open
@@ -660,7 +682,8 @@ const AiGlobalListingsMap = () => {
     const listingsPath =
       categoryValue === VALUE_ADDED_SERVICES_CATEGORY ||
       categoryValue === ANNUAL_EVENTS_CATEGORY ||
-      categoryValue === "venues"
+      categoryValue === "venues" ||
+      categoryValue === RESTAURANTS_CATEGORY
         ? "/ai-listings-list"
         : "/ai-listings";
 

@@ -270,6 +270,10 @@ if (tenant === "main") {
               path: "ai-venues/:venueId",
               element: <AiDestinationDetail type="venue" />,
             },
+            {
+              path: "ai-restaurants/:restaurantId",
+              element: <AiDestinationDetail type="restaurant" />,
+            },
             { path: "ai-listings", element: <AiListings /> },
             { path: "ai-listings-list", element: <AiListingsListView /> },
             { path: "ai-listings/:company", element: <AiProduct /> },

@@ -25,13 +25,15 @@ const getInitials = (name = "") =>
 const AiDestinationDetail = ({ type }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { eventId, venueId } = useParams();
+  const { eventId, venueId, restaurantId } = useParams();
   const { auth } = useAuth();
   const axiosPrivate = useAxiosPrivate();
   const [isAddReviewOpen, setIsAddReviewOpen] = useState(false);
   const fallback = type === "event" ? annualEvents[0] : popularVenues[0];
   const item = location.state?.item || fallback;
   const isEvent = type === "event";
+  const isRestaurant = type === "restaurant";
+  const isReviewEnabled = !isRestaurant;
   const venueMapsLink =
     typeof item.googleMapsLink === "string" ? item.googleMapsLink.trim() : "";
   const venueDirectionHref =
@@ -39,7 +41,7 @@ const AiDestinationDetail = ({ type }) => {
     `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
       item.address || item.title,
     )}`;
-  const reviewTargetId = isEvent ? eventId : venueId;
+  const reviewTargetId = isEvent ? eventId : venueId || restaurantId;
   const reviewEndpoint = isEvent ? "/event-reviews" : "/place-reviews";
   const reviewIdParam = isEvent ? "eventId" : "placeId";
   const userId = auth?.user?._id || auth?.user?.id;
@@ -57,7 +59,7 @@ const AiDestinationDetail = ({ type }) => {
 
       return Array.isArray(response.data?.data) ? response.data.data : [];
     },
-    enabled: !!reviewTargetId,
+    enabled: isReviewEnabled && !!reviewTargetId,
     refetchOnWindowFocus: false,
   });
 
@@ -171,54 +173,58 @@ const AiDestinationDetail = ({ type }) => {
         </p>
       </section>
 
-      <section className="py-8">
-        <div className="mb-8 text-center">
-          <button
-            type="button"
-            onClick={handleWriteReviewClick}
-            className="rounded-full bg-primary-blue px-8 py-3 text-sm font-semibold text-white"
-          >
-            WRITE A REVIEW
-          </button>
-        </div>
-        <div className="space-y-7">
-          {isReviewsLoading ? (
-            <p className="text-sm text-gray-500 text-center">
-              Loading reviews...
-            </p>
-          ) : reviews.length === 0 ? (
-            <p className="text-sm text-gray-500 text-center h-20">
-              Share your experience and leave a review.
-            </p>
-          ) : (
-            reviews.map((review) => (
-              <article key={review._id}>
-                <div className="mb-2 flex items-center gap-3">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-blue text-xs font-semibold text-white">
-                    {getInitials(review.name) || "A"}
-                  </span>
-                  <strong className="text-sm">{review.name}</strong>
-                </div>
-                <div className="mb-1 flex gap-1">
-                  {Array.from({ length: 5 }).map((_, index) => (
-                    <Star
-                      key={index}
-                      size={14}
-                      fill={index < review.starCount ? "currentColor" : "none"}
-                      className={
-                        index < review.starCount
-                          ? "text-black"
-                          : "text-gray-300"
-                      }
-                    />
-                  ))}
-                </div>
-                <p className="text-sm">{review.description}</p>
-              </article>
-            ))
-          )}
-        </div>
-      </section>
+      {isReviewEnabled && (
+        <section className="py-8">
+          <div className="mb-8 text-center">
+            <button
+              type="button"
+              onClick={handleWriteReviewClick}
+              className="rounded-full bg-primary-blue px-8 py-3 text-sm font-semibold text-white"
+            >
+              WRITE A REVIEW
+            </button>
+          </div>
+          <div className="space-y-7">
+            {isReviewsLoading ? (
+              <p className="text-sm text-gray-500 text-center">
+                Loading reviews...
+              </p>
+            ) : reviews.length === 0 ? (
+              <p className="text-sm text-gray-500 text-center h-20">
+                Share your experience and leave a review.
+              </p>
+            ) : (
+              reviews.map((review) => (
+                <article key={review._id}>
+                  <div className="mb-2 flex items-center gap-3">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-blue text-xs font-semibold text-white">
+                      {getInitials(review.name) || "A"}
+                    </span>
+                    <strong className="text-sm">{review.name}</strong>
+                  </div>
+                  <div className="mb-1 flex gap-1">
+                    {Array.from({ length: 5 }).map((_, index) => (
+                      <Star
+                        key={index}
+                        size={14}
+                        fill={
+                          index < review.starCount ? "currentColor" : "none"
+                        }
+                        className={
+                          index < review.starCount
+                            ? "text-black"
+                            : "text-gray-300"
+                        }
+                      />
+                    ))}
+                  </div>
+                  <p className="text-sm">{review.description}</p>
+                </article>
+              ))
+            )}
+          </div>
+        </section>
+      )}
 
       <div className="mt-5 text-[0.5rem] leading-relaxed text-gray-500">
         <p>

@@ -45,6 +45,7 @@ import { DESTINATION_HIGHLIGHT_FILTERS } from "../data/aiDestinationHighlights.j
 
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
 const ANNUAL_EVENTS_CATEGORY = "annualevents";
+const RESTAURANTS_CATEGORY = "restaurants";
 // const VALUE_ADDED_SERVICE_CARD_BACKGROUND_IMAGE = "/images/goa-image.jpg";
 const VALUE_ADDED_SERVICES_DEFAULT_VISIBLE_COUNT = 5;
 const TYPING_INTERVAL_MS = 7;
@@ -56,6 +57,7 @@ const AI_SCROLL_CONTAINER_ID = "nomad-ai-scroll-container";
 const MOBILE_SHORTCUT_ICON_OVERRIDES = {
   annualevents: "/icons-new/Events-cropped.png",
   venues: "/icons-new/Venues-cropped.png",
+  restaurants: "/icons-new/Restaurants.png",
   news: "/icons-new/News-cropped.png",
   blogs: "/icons-new/Blogs-cropped.png",
 };
@@ -462,6 +464,20 @@ const AiGlobalListingsList = () => {
     enabled: !!contentDestination,
     refetchOnWindowFocus: false,
   });
+  const { data: restaurantsData } = useQuery({
+    queryKey: ["ai-restaurants", contentDestination],
+    queryFn: async () => {
+      const response = await axios.get("/restaurants", {
+        params: {
+          destination: contentDestination,
+        },
+      });
+
+      return response.data;
+    },
+    enabled: !!contentDestination,
+    refetchOnWindowFocus: false,
+  });
   const popularLocationBlogs = useMemo(
     () =>
       (Array.isArray(blogsData) ? blogsData : []).slice(0, 5).map((blog) => ({
@@ -516,6 +532,27 @@ const AiGlobalListingsList = () => {
       })),
     [placesData],
   );
+  const popularLocationRestaurants = useMemo(
+    () =>
+      (Array.isArray(restaurantsData) ? restaurantsData : []).map(
+        (restaurant) => ({
+          ...restaurant,
+          id:
+            restaurant._id ||
+            restaurant.serialNumber ||
+            restaurant.restaurantName,
+          title: restaurant.restaurantName,
+          image: restaurant.mainImage,
+          location: restaurant.address || restaurant.destination,
+          meta: restaurant.rating,
+          category: restaurant.category || restaurant.restaurantType,
+          region: restaurant.destination,
+          description:
+            restaurant.shortDescription || restaurant.sections?.[0]?.content,
+        }),
+      ),
+    [restaurantsData],
+  );
   const isAnnualEventsExpanded =
     expandedCategories.includes("annualevents");
   const displayedPopularLocationEvents = isAnnualEventsExpanded
@@ -527,6 +564,12 @@ const AiGlobalListingsList = () => {
     ? popularLocationVenues
     : popularLocationVenues.slice(0, 5);
   const showPopularVenuesToggle = popularLocationVenues.length > 5;
+  const isPopularRestaurantsExpanded =
+    expandedCategories.includes(RESTAURANTS_CATEGORY);
+  const displayedPopularLocationRestaurants = isPopularRestaurantsExpanded
+    ? popularLocationRestaurants
+    : popularLocationRestaurants.slice(0, 5);
+  const showPopularRestaurantsToggle = popularLocationRestaurants.length > 5;
 
   const countOptions = [
     { label: "1 - 5", value: "1-5" },
@@ -641,6 +684,10 @@ const AiGlobalListingsList = () => {
           return popularLocationVenues.length > 0;
         }
 
+        if (option.value === RESTAURANTS_CATEGORY) {
+          return popularLocationRestaurants.length > 0;
+        }
+
         return true;
       },
     );
@@ -700,6 +747,7 @@ const AiGlobalListingsList = () => {
     isLisitingLoading,
     listingsData,
     popularLocationEvents.length,
+    popularLocationRestaurants.length,
     popularLocationVenues.length,
   ]);
 
@@ -948,7 +996,8 @@ const AiGlobalListingsList = () => {
         (filter) =>
           filter.value === categoryValue &&
           categoryValue !== ANNUAL_EVENTS_CATEGORY &&
-          categoryValue !== "venues",
+          categoryValue !== "venues" &&
+          categoryValue !== RESTAURANTS_CATEGORY,
       )
     ) {
       getDiscoverySectionRef(categoryValue)?.scrollIntoView({
@@ -979,8 +1028,10 @@ const AiGlobalListingsList = () => {
   };
 
   const handleHighlightCardClick = (item, type) => {
-    if (type === "event" || type === "venue") {
-      navigate(`/ai-${type}s/${item.id}`, {
+    if (type === "event" || type === "venue" || type === "restaurant") {
+      const detailType = type === "restaurant" ? "restaurants" : `${type}s`;
+
+      navigate(`/ai-${detailType}/${item.id}`, {
         state: {
           item,
           selectedStateLabel: selectedLocationLabel,
@@ -1453,6 +1504,27 @@ const AiGlobalListingsList = () => {
                           sectionRefs.current["venues-desktop"] = element;
                         }}
                       />
+                      <AiDestinationHighlightSection
+                        title={`Popular Restaurants in ${selectedLocationLabel}`}
+                        items={displayedPopularLocationRestaurants}
+                        kind="restaurant"
+                        onCardClick={(item) =>
+                          handleHighlightCardClick(item, "restaurant")
+                        }
+                        onViewMore={
+                          showPopularRestaurantsToggle
+                            ? () => handleShowMoreClick(RESTAURANTS_CATEGORY)
+                            : undefined
+                        }
+                        viewMoreLabel={
+                          isPopularRestaurantsExpanded
+                            ? "View less \u2190"
+                            : "View more \u2192"
+                        }
+                        sectionRef={(element) => {
+                          sectionRefs.current["restaurants-desktop"] = element;
+                        }}
+                      />
                           <AiDestinationHighlightSection
                             title={`Popular News in ${selectedLocationLabel}`}
                             items={popularLocationNews}
@@ -1868,6 +1940,28 @@ const AiGlobalListingsList = () => {
                       }
                       sectionRef={(element) => {
                         sectionRefs.current["venues-mobile"] = element;
+                      }}
+                    />
+                    <AiDestinationHighlightSection
+                      mobile
+                      title={`Popular Restaurants in ${selectedLocationLabel}`}
+                      items={displayedPopularLocationRestaurants}
+                      kind="restaurant"
+                      onCardClick={(item) =>
+                        handleHighlightCardClick(item, "restaurant")
+                      }
+                      onViewMore={
+                        showPopularRestaurantsToggle
+                          ? () => handleShowMoreClick(RESTAURANTS_CATEGORY)
+                          : undefined
+                      }
+                      viewMoreLabel={
+                        isPopularRestaurantsExpanded
+                          ? "View less \u2190"
+                          : "View more \u2192"
+                      }
+                      sectionRef={(element) => {
+                        sectionRefs.current["restaurants-mobile"] = element;
                       }}
                     />
                         <AiDestinationHighlightSection
