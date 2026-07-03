@@ -11,6 +11,7 @@ const ReviewFormModal = ({
   onClose,
   companyId = "",
   companyName = "",
+  workspaceId = "",
 }) => {
   const [name, setName] = useState("");
   const [starCount, setStarCount] = useState(5);
@@ -38,6 +39,7 @@ const ReviewFormModal = ({
         name: name.trim() || "Anonymous",
         starCount: Number(starCount),
         description: description.trim(),
+        workspaceId,
         reviewSource: "Nomads Website",
         reviewLink:
           typeof window !== "undefined" ? window.location.href : "",
