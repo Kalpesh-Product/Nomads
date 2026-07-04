@@ -1594,7 +1594,7 @@ const AiListings = ({ forceListView = false }) => {
                             ).map((line) => (
                               <span
                                 key={`${serviceLabel}-${line}`}
-                                className="text-base md:text-xl font-normal uppercase text-white leading-tight tracking-wide"
+                                className="text-base md:text-xl font-normal uppercase text-white !leading-[1.05rem] tracking-wide"
                               >
                                 {line}
                               </span>
