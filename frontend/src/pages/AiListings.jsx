@@ -818,12 +818,8 @@ const AiListings = ({ forceListView = false }) => {
     return service.label.replace("LOCATION", locationLabel);
   };
 
-  const getValueAddedServiceCardLines = (serviceLabel, service) => {
+  const getValueAddedServiceCardLines = (serviceLabel) => {
     if (!serviceLabel) return [];
-
-    if (service?.label === "APPLY FOR JOB") {
-      return [serviceLabel];
-    }
 
     const [firstWord, ...remainingWords] = serviceLabel
       .split(" ")
@@ -1587,10 +1583,14 @@ const AiListings = ({ forceListView = false }) => {
                             backgroundPosition: "center",
                           }}
                         >
+                          {service.badge && (
+                            <span className="absolute right-2 top-2 z-10 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[9px] font-semibold leading-none normal-case text-black shadow-sm">
+                              {service.badge}
+                            </span>
+                          )}
                           <div className="flex w-full flex-col items-center justify-end">
                             {getValueAddedServiceCardLines(
                               serviceLabel,
-                              service,
                             ).map((line) => (
                               <span
                                 key={`${serviceLabel}-${line}`}
@@ -1599,11 +1599,6 @@ const AiListings = ({ forceListView = false }) => {
                                 {line}
                               </span>
                             ))}
-                            {service.badge && (
-                              <span className="mt-2 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[9px] font-semibold leading-none normal-case text-black shadow-sm">
-                                {service.badge}
-                              </span>
-                            )}
                           </div>
                         </button>
                       );

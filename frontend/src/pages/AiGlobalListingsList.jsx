@@ -1116,12 +1116,8 @@ const AiGlobalListingsList = () => {
     return service.label.replace("LOCATION", locationLabel);
   };
 
-  const getValueAddedServiceCardLines = (serviceLabel, service) => {
+  const getValueAddedServiceCardLines = (serviceLabel) => {
     if (!serviceLabel) return [];
-
-    if (service?.label === "APPLY FOR JOB") {
-      return [serviceLabel];
-    }
 
     const [firstWord, ...remainingWords] = serviceLabel
       .split(" ")
@@ -1585,10 +1581,14 @@ const AiGlobalListingsList = () => {
                                   backgroundPosition: "center",
                                 }}
                               >
+                                {service.badge && (
+                                  <span className="absolute right-2 top-2 z-10 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[9px] font-semibold leading-none normal-case text-black shadow-sm">
+                                    {service.badge}
+                                  </span>
+                                )}
                                 <div className="flex w-full flex-col items-center justify-end pb-2">
                                   {getValueAddedServiceCardLines(
                                     serviceLabel,
-                                    service,
                                   ).map((line) => (
                                     <span
                                       key={`${serviceLabel}-${line}`}
@@ -1597,11 +1597,6 @@ const AiGlobalListingsList = () => {
                                       {line}
                                     </span>
                                   ))}
-                                  {service.badge && (
-                                    <span className="mt-0 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[9px] font-semibold normal-case text-black shadow-sm">
-                                      {service.badge}
-                                    </span>
-                                  )}
                                 </div>
                               </button>
                             );
@@ -2026,10 +2021,14 @@ const AiGlobalListingsList = () => {
                                 backgroundPosition: "center",
                               }}
                             >
+                              {service.badge && (
+                                <span className="absolute right-2 top-2 z-10 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[8px] font-semibold leading-none normal-case text-black shadow-sm">
+                                  {service.badge}
+                                </span>
+                              )}
                               <div className="flex w-full flex-col items-center justify-end pb-1">
                                 {getValueAddedServiceCardLines(
                                   serviceLabel,
-                                  service,
                                 ).map((line) => (
                                   <span
                                     key={`${serviceLabel}-${line}`}
@@ -2038,11 +2037,6 @@ const AiGlobalListingsList = () => {
                                     {line}
                                   </span>
                                 ))}
-                                {service.badge && (
-                                  <span className="mt-1.5 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[8px] font-semibold normal-case text-black shadow-sm">
-                                    {service.badge}
-                                  </span>
-                                )}
                               </div>
                             </button>
                           );
@@ -2073,10 +2067,14 @@ const AiGlobalListingsList = () => {
                                 backgroundPosition: "center",
                               }}
                             >
+                              {service.badge && (
+                                <span className="absolute right-2 top-2 z-10 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[8px] font-semibold leading-none normal-case text-black shadow-sm">
+                                  {service.badge}
+                                </span>
+                              )}
                               <div className="flex w-full flex-col items-center justify-end">
                                 {getValueAddedServiceCardLines(
                                   serviceLabel,
-                                  service,
                                 ).map((line) => (
                                   <span
                                     key={`${serviceLabel}-${line}`}
@@ -2085,11 +2083,6 @@ const AiGlobalListingsList = () => {
                                     {line}
                                   </span>
                                 ))}
-                                {service.badge && (
-                                  <span className="mt-1.5 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[8px] font-semibold normal-case text-black shadow-sm">
-                                    {service.badge}
-                                  </span>
-                                )}
                               </div>
                             </button>
                           );
