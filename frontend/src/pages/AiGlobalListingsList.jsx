@@ -519,17 +519,23 @@ const AiGlobalListingsList = () => {
   );
   const popularLocationVenues = useMemo(
     () =>
-      (Array.isArray(placesData) ? placesData : []).map((place) => ({
-        ...place,
-        id: place._id || place.serialNumber || place.placeName,
-        title: place.placeName,
-        image: place.mainImage,
-        location: place.address || place.destination,
-        meta: place.rating,
-        category: place.category || place.placeType,
-        region: place.destination,
-        description: place.shortDescription || place.sections?.[0]?.content,
-      })),
+      (Array.isArray(placesData) ? placesData : [])
+        .map((place) => ({
+          ...place,
+          id: place._id || place.serialNumber || place.placeName,
+          title: place.placeName,
+          image: place.mainImage,
+          location: place.address || place.destination,
+          meta: place.rating,
+          category: place.category || place.placeType,
+          region: place.destination,
+          description: place.shortDescription || place.sections?.[0]?.content,
+        }))
+        .sort((a, b) => {
+          const aRating = Number.parseFloat(a.rating) || 0;
+          const bRating = Number.parseFloat(b.rating) || 0;
+          return bRating - aRating;
+        }),
     [placesData],
   );
   const popularLocationRestaurants = useMemo(
