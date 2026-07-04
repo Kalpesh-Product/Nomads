@@ -117,7 +117,7 @@ const Reviews = () => {
 
   const placeReviewCards = placeReviews.map((review) => {
     const place = review?.place || {};
-    const placeName = place.placeName || review.placeName || "Venue";
+    const placeName = place.placeName || review.placeName || "Place";
 
     return {
       ...review,
@@ -128,7 +128,7 @@ const Reviews = () => {
       cardImage: place.mainImage || FALLBACK_IMAGE,
       cardLocation:
         place.destination || place.address || review.state || "Unknown",
-      cardType: place.category || "Venue",
+      cardType: place.category || "Place",
     };
   });
 
@@ -388,13 +388,13 @@ const Reviews = () => {
 
         <div>
           <h2 className="text-xl font-semibold mb-6 text-secondary-dark">
-            My Reviews - Venues
+            My Reviews - Places
           </h2>
 
           {renderDestinationReviewCards(
             placeReviewCards,
             isPlaceReviewsLoading,
-            "You haven't reviewed any venues yet.",
+            "You haven't reviewed any places yet.",
           )}
         </div>
       </div>

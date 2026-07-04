@@ -1484,7 +1484,7 @@ const AiGlobalListingsList = () => {
                             }}
                           />
                       <AiDestinationHighlightSection
-                        title={`Popular Venues to visit in ${selectedLocationLabel}`}
+                        title={`Popular Places to visit in ${selectedLocationLabel}`}
                         items={displayedPopularLocationVenues}
                         kind="venue"
                         onCardClick={(item) =>
@@ -1922,7 +1922,7 @@ const AiGlobalListingsList = () => {
                         />
                     <AiDestinationHighlightSection
                       mobile
-                      title={`Popular Venues to visit in ${selectedLocationLabel}`}
+                      title={`Popular Places to visit in ${selectedLocationLabel}`}
                       items={displayedPopularLocationVenues}
                       kind="venue"
                       onCardClick={(item) =>

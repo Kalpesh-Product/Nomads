@@ -533,7 +533,7 @@ const AiListings = ({ forceListView = false }) => {
       cafe: "Cafe’s",
       [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
       [ANNUAL_EVENTS_CATEGORY]: "Events",
-      [VENUES_CATEGORY]: "Venues",
+      [VENUES_CATEGORY]: "Places",
       [RESTAURANTS_CATEGORY]: "Restaurants",
     };
 
@@ -1543,7 +1543,7 @@ const AiListings = ({ forceListView = false }) => {
                     cafe: "Cafes",
                     [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
                     [ANNUAL_EVENTS_CATEGORY]: "Annual Events",
-                    [VENUES_CATEGORY]: "Venues",
+                    [VENUES_CATEGORY]: "Places",
                     [RESTAURANTS_CATEGORY]: "Restaurants",
                   }[formData.category] || `${formData.category} Spaces`}{" "}
                   in {selectedStateLabel || "Unknown"}
@@ -1655,7 +1655,7 @@ const AiListings = ({ forceListView = false }) => {
                     />
                   ) : (
                     <AiDestinationHighlightSection
-                      title={`Popular Venues to visit in ${selectedStateLabel || "Unknown"}`}
+                      title={`Popular Places to visit in ${selectedStateLabel || "Unknown"}`}
                       items={venues}
                       kind="venue"
                       onCardClick={handleVenueClick}
