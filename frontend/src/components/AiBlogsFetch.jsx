@@ -28,13 +28,24 @@ const BlogCard = ({ b, stateName }) => {
   const fallbackImg = extractImageFromContent(b.content || b.description);
   const thumbnail = b.mainImage || fallbackImg;
   const navigate = useNavigate();
+  const location = useLocation();
 
   return (
     <article
       onClick={() =>
-        navigate("ai-blog-details", {
-          state: { content: b, selectedStateLabel: stateName },
-        })
+        navigate(
+          {
+            pathname: "ai-blog-details",
+            search: location.search,
+          },
+          {
+            state: {
+              content: b,
+              selectedStateLabel: stateName,
+              sourceSearch: location.search,
+            },
+          },
+        )
       }
       className="border rounded-xl overflow-hidden shadow-sm hover:shadow-xl cursor-pointer transition"
     >
@@ -71,12 +82,14 @@ const AiBlogsFetch = () => {
   const formData = useSelector((state) => state.location.formValues);
 
   const urlDest = normalizeLabel(
-    searchParams.get("dest") || searchParams.get("location"),
+    searchParams.get("dest") ||
+      searchParams.get("state") ||
+      searchParams.get("location"),
   );
   const reduxDest = normalizeLabel(formData?.location || formData?.state);
 
   const dest = urlDest || reduxDest || "";
-  const stateName = location.state?.selectedStateLabel || dest;
+  const stateName = location.state?.selectedStateLabel || urlDest || dest;
 
   const params = useMemo(() => {
     if (!dest) return undefined;
