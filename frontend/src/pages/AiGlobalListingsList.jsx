@@ -1526,7 +1526,7 @@ const AiGlobalListingsList = () => {
                         }}
                       />
                           <AiDestinationHighlightSection
-                            title={`Popular News in ${selectedLocationLabel}`}
+                            title={`Latest ${selectedLocationLabel} News`}
                             items={popularLocationNews}
                             kind="news"
                             onCardClick={(item) =>
@@ -1538,7 +1538,7 @@ const AiGlobalListingsList = () => {
                             }}
                           />
                           <AiDestinationHighlightSection
-                            title={`Popular Blogs in ${selectedLocationLabel}`}
+                            title={`Latest ${selectedLocationLabel} Blogs`}
                             items={popularLocationBlogs}
                             kind="blog"
                             onCardClick={(item) =>
@@ -1966,7 +1966,7 @@ const AiGlobalListingsList = () => {
                     />
                         <AiDestinationHighlightSection
                           mobile
-                          title={`Popular News in ${selectedLocationLabel}`}
+                          title={`Latest ${selectedLocationLabel} News`}
                           items={popularLocationNews}
                           kind="news"
                           onCardClick={(item) =>
@@ -1979,7 +1979,7 @@ const AiGlobalListingsList = () => {
                         />
                         <AiDestinationHighlightSection
                           mobile
-                          title={`Popular Blogs in ${selectedLocationLabel}`}
+                          title={`Latest ${selectedLocationLabel} Blogs`}
                           items={popularLocationBlogs}
                           kind="blog"
                           onCardClick={(item) =>
