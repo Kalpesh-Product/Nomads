@@ -31,7 +31,7 @@ const Home = () => {
   const destinationData = [
     { label: "Co-Working", image: coworking },
     { label: "Hostels", image: hostels },
-    { label: "Cafe’s & Meeting Rooms", image: cafes },
+    { label: "Cafes & Meeting Rooms", image: cafes },
     { label: "Private Stay", image: privateStay },
     { label: "Company Workation", image: companyWorkation },
   ];
