@@ -29,6 +29,7 @@ const AiDestinationDetail = ({ type }) => {
   const { auth } = useAuth();
   const axiosPrivate = useAxiosPrivate();
   const [isAddReviewOpen, setIsAddReviewOpen] = useState(false);
+  const [activeImage, setActiveImage] = useState(null);
   const fallback = type === "event" ? annualEvents[0] : popularVenues[0];
   const item = location.state?.item || fallback;
   const isEvent = type === "event";
@@ -46,6 +47,16 @@ const AiDestinationDetail = ({ type }) => {
   const reviewIdParam = isEvent ? "eventId" : "placeId";
   const userId = auth?.user?._id || auth?.user?.id;
   const reviewerName = auth?.user?.fullName?.trim() || "";
+
+  const handleImageOpen = (imageUrl) => {
+    if (imageUrl) {
+      setActiveImage(imageUrl);
+    }
+  };
+
+  const handleImageClose = () => {
+    setActiveImage(null);
+  };
 
   const { data: reviews = [], isPending: isReviewsLoading } = useQuery({
     queryKey: [
@@ -140,7 +151,8 @@ const AiDestinationDetail = ({ type }) => {
         <img
           src={item.image}
           alt={item.title}
-          className="h-full w-full object-cover"
+          className="h-full w-full cursor-pointer object-cover"
+          onClick={() => handleImageOpen(item.image)}
         />
       </div>
 
@@ -233,6 +245,32 @@ const AiDestinationDetail = ({ type }) => {
           publicly available information.
         </p>
       </div>
+
+      {activeImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black p-4"
+          onClick={handleImageClose}
+        >
+          <div
+            className="relative max-h-full max-w-5xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="absolute -right-3 -top-3 rounded-full bg-white px-2 py-1 text-sm font-semibold text-gray-700 shadow"
+              onClick={handleImageClose}
+              aria-label="Close image preview"
+            >
+              x
+            </button>
+            <img
+              src={activeImage}
+              alt="Expanded content"
+              className="max-h-[85vh] w-full rounded-lg object-contain shadow-xl"
+            />
+          </div>
+        </div>
+      )}
 
       <MuiModal
         open={isAddReviewOpen}
