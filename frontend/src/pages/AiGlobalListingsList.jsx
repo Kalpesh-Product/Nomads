@@ -519,17 +519,23 @@ const AiGlobalListingsList = () => {
   );
   const popularLocationVenues = useMemo(
     () =>
-      (Array.isArray(placesData) ? placesData : []).map((place) => ({
-        ...place,
-        id: place._id || place.serialNumber || place.placeName,
-        title: place.placeName,
-        image: place.mainImage,
-        location: place.address || place.destination,
-        meta: place.rating,
-        category: place.category || place.placeType,
-        region: place.destination,
-        description: place.shortDescription || place.sections?.[0]?.content,
-      })),
+      (Array.isArray(placesData) ? placesData : [])
+        .map((place) => ({
+          ...place,
+          id: place._id || place.serialNumber || place.placeName,
+          title: place.placeName,
+          image: place.mainImage,
+          location: place.address || place.destination,
+          meta: place.rating,
+          category: place.category || place.placeType,
+          region: place.destination,
+          description: place.shortDescription || place.sections?.[0]?.content,
+        }))
+        .sort((a, b) => {
+          const aRating = Number.parseFloat(a.rating) || 0;
+          const bRating = Number.parseFloat(b.rating) || 0;
+          return bRating - aRating;
+        }),
     [placesData],
   );
   const popularLocationRestaurants = useMemo(
@@ -1116,12 +1122,8 @@ const AiGlobalListingsList = () => {
     return service.label.replace("LOCATION", locationLabel);
   };
 
-  const getValueAddedServiceCardLines = (serviceLabel, service) => {
+  const getValueAddedServiceCardLines = (serviceLabel) => {
     if (!serviceLabel) return [];
-
-    if (service?.label === "APPLY FOR JOB") {
-      return [serviceLabel];
-    }
 
     const [firstWord, ...remainingWords] = serviceLabel
       .split(" ")
@@ -1526,7 +1528,7 @@ const AiGlobalListingsList = () => {
                         }}
                       />
                           <AiDestinationHighlightSection
-                            title={`Popular News in ${selectedLocationLabel}`}
+                            title={`Latest ${selectedLocationLabel} News`}
                             items={popularLocationNews}
                             kind="news"
                             onCardClick={(item) =>
@@ -1538,7 +1540,7 @@ const AiGlobalListingsList = () => {
                             }}
                           />
                           <AiDestinationHighlightSection
-                            title={`Popular Blogs in ${selectedLocationLabel}`}
+                            title={`Latest ${selectedLocationLabel} Blogs`}
                             items={popularLocationBlogs}
                             kind="blog"
                             onCardClick={(item) =>
@@ -1585,23 +1587,22 @@ const AiGlobalListingsList = () => {
                                   backgroundPosition: "center",
                                 }}
                               >
+                                {service.badge && (
+                                  <span className="absolute right-2 top-2 z-10 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[9px] font-semibold leading-none normal-case text-black shadow-sm">
+                                    {service.badge}
+                                  </span>
+                                )}
                                 <div className="flex w-full flex-col items-center justify-end pb-2">
                                   {getValueAddedServiceCardLines(
                                     serviceLabel,
-                                    service,
                                   ).map((line) => (
                                     <span
                                       key={`${serviceLabel}-${line}`}
-                                      className="text-base md:text-xl font-normal uppercase text-white leading-tight tracking-wide pb-2"
+                                      className="text-base md:text-xl font-normal uppercase text-white !leading-[1.05rem] tracking-wide pb-2"
                                     >
                                       {line}
                                     </span>
                                   ))}
-                                  {service.badge && (
-                                    <span className="mt-0 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[9px] font-semibold normal-case text-black shadow-sm">
-                                      {service.badge}
-                                    </span>
-                                  )}
                                 </div>
                               </button>
                             );
@@ -1966,7 +1967,7 @@ const AiGlobalListingsList = () => {
                     />
                         <AiDestinationHighlightSection
                           mobile
-                          title={`Popular News in ${selectedLocationLabel}`}
+                          title={`Latest ${selectedLocationLabel} News`}
                           items={popularLocationNews}
                           kind="news"
                           onCardClick={(item) =>
@@ -1979,7 +1980,7 @@ const AiGlobalListingsList = () => {
                         />
                         <AiDestinationHighlightSection
                           mobile
-                          title={`Popular Blogs in ${selectedLocationLabel}`}
+                          title={`Latest ${selectedLocationLabel} Blogs`}
                           items={popularLocationBlogs}
                           kind="blog"
                           onCardClick={(item) =>
@@ -2026,23 +2027,22 @@ const AiGlobalListingsList = () => {
                                 backgroundPosition: "center",
                               }}
                             >
+                              {service.badge && (
+                                <span className="absolute right-2 top-2 z-10 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[8px] font-semibold leading-none normal-case text-black shadow-sm">
+                                  {service.badge}
+                                </span>
+                              )}
                               <div className="flex w-full flex-col items-center justify-end pb-1">
                                 {getValueAddedServiceCardLines(
                                   serviceLabel,
-                                  service,
                                 ).map((line) => (
                                   <span
                                     key={`${serviceLabel}-${line}`}
-                                    className="text-base md:text-xl font-normal uppercase text-white leading-tight tracking-wide"
+                                    className="text-base md:text-xl font-normal uppercase text-white !leading-[1.05rem] tracking-wide"
                                   >
                                     {line}
                                   </span>
                                 ))}
-                                {service.badge && (
-                                  <span className="mt-1.5 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[8px] font-semibold normal-case text-black shadow-sm">
-                                    {service.badge}
-                                  </span>
-                                )}
                               </div>
                             </button>
                           );
@@ -2073,23 +2073,22 @@ const AiGlobalListingsList = () => {
                                 backgroundPosition: "center",
                               }}
                             >
+                              {service.badge && (
+                                <span className="absolute right-2 top-2 z-10 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[8px] font-semibold leading-none normal-case text-black shadow-sm">
+                                  {service.badge}
+                                </span>
+                              )}
                               <div className="flex w-full flex-col items-center justify-end">
                                 {getValueAddedServiceCardLines(
                                   serviceLabel,
-                                  service,
                                 ).map((line) => (
                                   <span
                                     key={`${serviceLabel}-${line}`}
-                                    className="text-base md:text-xl font-normal uppercase text-white leading-tight tracking-wide"
+                                    className="text-base md:text-xl font-normal uppercase text-white !leading-[1.05rem] tracking-wide"
                                   >
                                     {line}
                                   </span>
                                 ))}
-                                {service.badge && (
-                                  <span className="mt-1.5 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[8px] font-semibold normal-case text-black shadow-sm">
-                                    {service.badge}
-                                  </span>
-                                )}
                               </div>
                             </button>
                           );

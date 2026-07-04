@@ -17,7 +17,12 @@ const HighlightCard = ({ item, kind, onClick }) => (
       )}
     </div>
     <div className="flex min-w-0 flex-col gap-1 px-4">
-      <p className="line-clamp-2 text-xs font-semibold md:text-sm">
+      <p
+        className={`text-xs font-semibold md:text-sm ${
+          kind === "blog" || kind === "news" ? "line-clamp-2" : "truncate"
+        }`}
+        title={item.title}
+      >
         {item.title}
       </p>
       {(item.location || item.meta) && (
@@ -64,7 +69,7 @@ const AiDestinationHighlightSection = ({
           ))}
         </div>
         {onViewMore && (
-          <div className="mt-0 text-right">
+          <div className="mt-4 text-right">
             <button
               type="button"
               onClick={onViewMore}
@@ -86,7 +91,7 @@ const AiDestinationHighlightSection = ({
       <h2 className="mb-5 text-subtitle font-semibold text-secondary-dark">
         {title}
       </h2>
-      <div className="grid grid-cols-1 gap-x-5 gap-y-0 md:grid-cols-3 lg:grid-cols-5">
+      <div className="grid grid-cols-1 gap-x-5 gap-y-6 md:grid-cols-3 lg:grid-cols-5">
         {items.map((item) => (
           <HighlightCard
             key={item.id}
@@ -97,7 +102,7 @@ const AiDestinationHighlightSection = ({
         ))}
       </div>
       {onViewMore && (
-        <div className="mt-0 text-right">
+        <div className="mt-4 text-right">
           <button
             type="button"
             onClick={onViewMore}

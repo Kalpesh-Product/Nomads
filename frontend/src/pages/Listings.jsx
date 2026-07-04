@@ -183,7 +183,7 @@ const Listings = () => {
   //   { label: "Workation", value: "workation" },
   //   { label: "Private Stay", value: "privatestay" },
   //   { label: "Meetings", value: "meetingroom" },
-  //   { label: "Cafe’s", value: "cafe" },
+  //   { label: "Cafes", value: "cafe" },
   // ];
 
   const activeCategory = searchParams.get("category");
@@ -226,7 +226,7 @@ const Listings = () => {
       workation: "Workation",
       // privatestay: "Private Stay",
       meetingroom: "Meetings",
-      cafe: "Cafe’s",
+      cafe: "Cafes",
     };
 
     const typeOrder = [
