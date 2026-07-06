@@ -1054,13 +1054,18 @@ const AiGlobalListingsList = () => {
     }
 
     navigate(
-      type === "news"
-        ? "/ai-news/ai-news-details"
-        : "/ai-blogs/ai-blog-details",
+      {
+        pathname:
+          type === "news"
+            ? "/ai-news/ai-news-details"
+            : "/ai-blogs/ai-blog-details",
+        search: location.search,
+      },
       {
         state: {
           content: item,
           selectedStateLabel: selectedLocationLabel,
+          sourceSearch: location.search,
         },
       },
     );

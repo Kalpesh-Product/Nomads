@@ -163,10 +163,11 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
     selectedDestination?.country === normalizedCountryParam
       ? selectedDestination?.title
       : "";
-  const stateLabel =
+  const rawStateLabel =
     location.state?.selectedStateLabel ||
     matchedSessionTitle ||
     (stateParam ? formatStateLabel(stateParam) : "");
+  const stateLabel = rawStateLabel ? formatStateLabel(rawStateLabel) : "";
   const newsLabel = stateLabel ? `${stateLabel} News` : "News";
   const blogLabel = stateLabel ? `${stateLabel} Blog` : "Blog";
   const { hasBlogs, hasNews, hasNewsOrBlogs } = useLocationContentAvailability({
@@ -175,7 +176,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
   });
   const showNewsBlogLinks = shouldCheckNewsBlogLinks && hasNewsOrBlogs;
 
-  const currentSearch = location.search || "";
+  const currentSearch = location.search || location.state?.sourceSearch || "";
   const aiVerticalsToggleState = (() => {
     const stateFromRoute = location.state || {};
     let fallbackBadges = [];

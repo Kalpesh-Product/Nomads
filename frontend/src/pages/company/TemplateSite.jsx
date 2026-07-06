@@ -152,6 +152,7 @@ const TemplateSite = () => {
         <Outlet
           context={{
             data: normalizedData,
+            rawProductDropdownPages: Array.isArray(data?.productDropdownPages) ? data.productDropdownPages : [],
             isPending,
             error,
             routeContext,
