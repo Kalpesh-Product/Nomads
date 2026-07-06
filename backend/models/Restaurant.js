@@ -2,27 +2,49 @@ import mongoose from "mongoose";
 
 const restaurantSchema = new mongoose.Schema(
   {
-    serialNumber: {
+    businessId: {
       type: String,
+      required: true,
+      unique: true,
       trim: true,
-      default: "",
     },
-    link: {
+    restaurantId: {
       type: String,
+      required: true,
       trim: true,
-      default: "",
     },
-    mainImage: {
+    businessName: {
       type: String,
+      required: true,
       trim: true,
-      default: "",
     },
     restaurantName: {
       type: String,
       required: true,
       trim: true,
     },
-    shortDescription: {
+    restaurantTitle: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    registeredEntityName: {
+      type: String,
+      trim: true,
+    },
+    website: {
+      type: String,
+      trim: true,
+    },
+    logo: {
+      type: String,
+      trim: true,
+    },
+    images: {
+      type: String,
+      trim: true,
+    },
+    mainImage: {
       type: String,
       trim: true,
       default: "",
@@ -30,69 +52,116 @@ const restaurantSchema = new mongoose.Schema(
     address: {
       type: String,
       trim: true,
-      default: "",
     },
-    contact: {
+    continent: {
       type: String,
+      required: true,
       trim: true,
-      default: "",
     },
-    timeAvailability: {
+    country: {
       type: String,
+      required: true,
       trim: true,
-      default: "",
     },
-    googleMapsLink: {
+    state: {
       type: String,
+      required: true,
       trim: true,
-      default: "",
     },
-    rating: {
+    city: {
       type: String,
+      required: true,
       trim: true,
-      default: "",
-    },
-    category: {
-      type: String,
-      trim: true,
-      default: "",
-    },
-    month: {
-      type: String,
-      trim: true,
-      default: "",
-    },
-    venue: {
-      type: String,
-      trim: true,
-      default: "",
     },
     destination: {
       type: String,
       required: true,
       trim: true,
     },
-    restaurantType: {
+    about: {
+      type: String,
+      trim: true,
+    },
+    shortDescription: {
       type: String,
       trim: true,
       default: "",
     },
-    sections: [
-      {
-        title: { type: String, default: "" },
-        image: { type: String, default: "" },
-        content: { type: String, default: "" },
-      },
-    ],
+    totalSeats: {
+      type: Number,
+    },
+    latitude: {
+      type: Number,
+    },
+    longitude: {
+      type: Number,
+    },
+    googleMap: {
+      type: String,
+      trim: true,
+    },
+    googleMapsLink: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    ratings: {
+      type: Number,
+      min: 0,
+      max: 5,
+    },
+    rating: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    totalReviews: {
+      type: Number,
+      default: 0,
+    },
+    reviews: {
+      type: String,
+      trim: true,
+    },
+    poc: {
+      type: String,
+      trim: true,
+    },
+    inclusions: {
+      type: String,
+      trim: true,
+    },
+    services: {
+      type: String,
+      trim: true,
+    },
+    units: {
+      type: String,
+      trim: true,
+    },
+    restaurantType: {
+      type: String,
+      trim: true,
+      default: "Restaurants",
+    },
     isActive: {
       type: Boolean,
       default: true,
+    },
+    isPublic: {
+      type: Boolean,
+      default: false,
+    },
+    isRegistered: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true },
 );
 
 restaurantSchema.index({ destination: 1 });
+restaurantSchema.index({ restaurantType: 1 });
 
 const Restaurant = mongoose.model("Restaurant", restaurantSchema, "restaurants");
 
