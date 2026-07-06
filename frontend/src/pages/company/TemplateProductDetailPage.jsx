@@ -193,7 +193,7 @@ const TemplateProductDetailPage = () => {
     setLeadSubmitError("");
 
     try {
-      await api.post("/api/leads/create-lead", {
+      await api.post("/leads/create-lead", {
         fullName: leadForm.fullName,
         name: leadForm.fullName,
         mobileNumber: leadForm.mobile,
