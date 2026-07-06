@@ -71,6 +71,8 @@ export const getEnabledProductPages = (pages = []) => {
       name: typeof item?.name === "string" ? item.name.trim() : "",
       slug: normalizeSlug(item?.slug || item?.name, ""),
       enabled: item?.enabled !== false,
+      inclusions: Array.isArray(item?.inclusions) ? item.inclusions : [],
+      faqs: Array.isArray(item?.faqs) ? item.faqs : [],
     }))
     .filter((item) => item?.enabled !== false && item?.slug && item?.name);
 };
