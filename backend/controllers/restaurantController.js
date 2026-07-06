@@ -3,25 +3,49 @@ import csvParser from "csv-parser";
 import mongoose from "mongoose";
 import Restaurant from "../models/Restaurant.js";
 
-const REQUIRED_COLUMNS = ["Place Name", "Destination"];
+const REQUIRED_COLUMNS = [
+  "Business ID",
+  "Business Name",
+  "Continent",
+  "Country",
+  "State",
+  "City",
+  "Type",
+];
 
 const RESTAURANT_FIELDS = [
-  "serialNumber",
-  "link",
+  "businessId",
+  "restaurantId",
+  "businessName",
   "mainImage",
+  "logo",
+  "images",
   "restaurantName",
+  "restaurantTitle",
+  "registeredEntityName",
+  "website",
   "shortDescription",
   "address",
-  "contact",
-  "timeAvailability",
+  "continent",
+  "country",
+  "state",
+  "city",
+  "about",
+  "totalSeats",
+  "latitude",
+  "longitude",
+  "googleMap",
   "googleMapsLink",
+  "ratings",
   "rating",
-  "category",
-  "month",
-  "venue",
+  "totalReviews",
+  "reviews",
+  "poc",
+  "inclusions",
+  "services",
+  "units",
   "destination",
   "restaurantType",
-  "sections",
 ];
 
 const normalizeString = (value) =>
@@ -44,9 +68,37 @@ const buildRestaurantPayload = (body, { partial = false } = {}) => {
 
   if (
     !Object.prototype.hasOwnProperty.call(bodyWithAliases, "restaurantName") &&
-    Object.prototype.hasOwnProperty.call(bodyWithAliases, "placeName")
+    Object.prototype.hasOwnProperty.call(bodyWithAliases, "businessName")
   ) {
-    bodyWithAliases.restaurantName = bodyWithAliases.placeName;
+    bodyWithAliases.restaurantName = bodyWithAliases.businessName;
+  }
+
+  if (
+    !Object.prototype.hasOwnProperty.call(bodyWithAliases, "businessName") &&
+    Object.prototype.hasOwnProperty.call(bodyWithAliases, "restaurantName")
+  ) {
+    bodyWithAliases.businessName = bodyWithAliases.restaurantName;
+  }
+
+  if (
+    !Object.prototype.hasOwnProperty.call(bodyWithAliases, "restaurantTitle") &&
+    Object.prototype.hasOwnProperty.call(bodyWithAliases, "restaurantName")
+  ) {
+    bodyWithAliases.restaurantTitle = bodyWithAliases.restaurantName;
+  }
+
+  if (
+    !Object.prototype.hasOwnProperty.call(bodyWithAliases, "restaurantId") &&
+    Object.prototype.hasOwnProperty.call(bodyWithAliases, "businessId")
+  ) {
+    bodyWithAliases.restaurantId = bodyWithAliases.businessId;
+  }
+
+  if (
+    !Object.prototype.hasOwnProperty.call(bodyWithAliases, "destination") &&
+    Object.prototype.hasOwnProperty.call(bodyWithAliases, "state")
+  ) {
+    bodyWithAliases.destination = bodyWithAliases.state;
   }
 
   if (
@@ -65,17 +117,23 @@ const buildRestaurantPayload = (body, { partial = false } = {}) => {
         : normalizeString(bodyWithAliases[field]);
   }
 
-  if (!partial) {
-    payload.sections = Object.prototype.hasOwnProperty.call(bodyWithAliases, "sections")
-      ? buildSectionsFromPayload(bodyWithAliases.sections)
-      : [];
-  }
-
   return payload;
 };
 
 const validateRequiredRestaurantFields = (payload) => {
-  const missingFields = ["restaurantName", "destination"].filter(
+  const missingFields = [
+    "businessId",
+    "restaurantId",
+    "businessName",
+    "restaurantName",
+    "restaurantTitle",
+    "continent",
+    "country",
+    "state",
+    "city",
+    "destination",
+    "restaurantType",
+  ].filter(
     (field) => !payload[field],
   );
 
@@ -128,23 +186,44 @@ const buildSections = (row) => {
   return sections;
 };
 
+const parseNumber = (value) => {
+  const parsed = Number(String(value || "").replace(/,/g, "").trim());
+  return Number.isFinite(parsed) ? parsed : undefined;
+};
+
 const buildRestaurant = (row) => ({
-  serialNumber: row["S. No"] || "",
-  link: row["Link"] || "",
-  mainImage: row["Main Image URL"] || "",
-  restaurantName: row["Place Name"],
-  shortDescription: row["Short Description"] || "",
+  businessId: row["Business ID"],
+  restaurantId: row["Business ID"],
+  businessName: row["Business Name"],
+  restaurantName: row["Business Name"],
+  restaurantTitle: row["Business Name"],
+  registeredEntityName: row["Registered Entity name"] || "",
+  website: row["Website"] || "",
+  logo: row["Logo"] || "",
+  images: row["Images"] || "",
+  mainImage: row["Images"] || row["Logo"] || "",
+  shortDescription: row["About"] || "",
   address: row["Address"] || "",
-  contact: row["Contact"] || "",
-  timeAvailability: row["Time Availability"] || "",
-  googleMapsLink: row["Google Maps Link"] || "",
-  rating: row["Rating"] || "",
-  category: row["Category"] || "",
-  month: row["Month"] || "",
-  venue: row["Venue"] || "",
-  destination: row["Destination"],
+  continent: row["Continent"],
+  country: row["Country"],
+  state: row["State"],
+  city: row["City"],
+  about: row["About"] || "",
+  totalSeats: parseNumber(row["Total Seats"]),
+  latitude: parseNumber(row["latitude"]),
+  longitude: parseNumber(row["longitude"]),
+  googleMap: row["Google map"] || "",
+  googleMapsLink: row["Google map"] || "",
+  ratings: parseNumber(row["Ratings"]),
+  rating: row["Ratings"] || "",
+  totalReviews: parseNumber(row["Total Reviews"]) || 0,
+  reviews: row["Reviews"] || "",
+  poc: row["POC"] || "",
+  inclusions: row["Inclusions"] || "",
+  services: row["Services"] || "",
+  units: row["Units"] || "",
+  destination: row["Destination"] || row["State"] || row["City"],
   restaurantType: row["Type"] || "",
-  sections: buildSections(row),
 });
 
 export const getRestaurants = async (req, res, next) => {
@@ -202,6 +281,13 @@ export const bulkInsertRestaurants = async (req, res, next) => {
       return res.status(400).json({ message: "Please upload a CSV file." });
     }
 
+    const existingRestaurants = await Restaurant.find()
+      .select("businessId restaurantName")
+      .lean();
+    const existingBusinessIds = new Set(
+      existingRestaurants.map((restaurant) => restaurant.businessId?.trim()),
+    );
+
     const rows = [];
     const errors = [];
     let rowNumber = 1;
@@ -229,7 +315,7 @@ export const bulkInsertRestaurants = async (req, res, next) => {
         }
       }
 
-      rows.push(row);
+      rows.push({ rowNumber, row });
     });
 
     parser.on("error", next);
@@ -250,12 +336,63 @@ export const bulkInsertRestaurants = async (req, res, next) => {
       }
 
       try {
-        const restaurants = rows.map(buildRestaurant);
-        await Restaurant.insertMany(restaurants, { ordered: true });
+        const seenInCSV = new Set();
+        const duplicateExistingRows = [];
+        const duplicateCSVRows = [];
+        const restaurants = [];
+
+        for (const item of rows) {
+          const businessId = item.row["Business ID"]?.trim();
+
+          if (existingBusinessIds.has(businessId)) {
+            duplicateExistingRows.push({
+              row: item.rowNumber,
+              businessId,
+              businessName: item.row["Business Name"],
+              reason: "Already exists in database",
+            });
+            continue;
+          }
+
+          if (seenInCSV.has(businessId)) {
+            duplicateCSVRows.push({
+              row: item.rowNumber,
+              businessId,
+              businessName: item.row["Business Name"],
+              reason: "Duplicate within CSV",
+            });
+            continue;
+          }
+
+          seenInCSV.add(businessId);
+          restaurants.push(buildRestaurant(item.row));
+        }
+
+        if (restaurants.length === 0) {
+          return res.status(400).json({
+            message: "No valid restaurant data found in CSV.",
+            skippedExisting: duplicateExistingRows.length,
+            duplicateExistingRows,
+            skippedDuplicateInCSV: duplicateCSVRows.length,
+            duplicateCSVRows,
+          });
+        }
+
+        const result = await Restaurant.insertMany(restaurants, {
+          ordered: false,
+        });
 
         return res.status(201).json({
           message: "Restaurants uploaded successfully",
-          count: restaurants.length,
+          total:
+            restaurants.length +
+            duplicateExistingRows.length +
+            duplicateCSVRows.length,
+          inserted: result.length,
+          skippedExisting: duplicateExistingRows.length,
+          duplicateExistingRows,
+          skippedDuplicateInCSV: duplicateCSVRows.length,
+          duplicateCSVRows,
         });
       } catch (error) {
         return next(error);

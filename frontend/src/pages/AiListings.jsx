@@ -731,6 +731,8 @@ const AiListings = ({ forceListView = false }) => {
 
   const handleCategoryClick = (categoryValue) => {
     const formData = getValues(); // from react-hook-form
+    const normalizeFilterValue = (value) =>
+      typeof value === "string" ? value.trim().toLowerCase() : "";
 
     if (!formData.country || !formData.location) {
       alert("Please select Country and Location first.");
@@ -765,6 +767,23 @@ const AiListings = ({ forceListView = false }) => {
           searchBarBadges,
         },
       });
+      return;
+    }
+
+    const currentCountry = searchParams.get("country");
+    const currentLocation =
+      searchParams.get("state") || searchParams.get("location");
+    const currentCategory = searchParams.get("category");
+    const isCurrentCategory =
+      normalizeFilterValue(currentCountry) ===
+        normalizeFilterValue(formData.country) &&
+      normalizeFilterValue(currentLocation) ===
+        normalizeFilterValue(formData.location) &&
+      normalizeFilterValue(currentCategory) ===
+        normalizeFilterValue(categoryValue);
+
+    if (isCurrentCategory) {
+      setShowMobileSearch(false);
       return;
     }
 

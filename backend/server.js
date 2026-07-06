@@ -32,6 +32,8 @@ import stateWiseWeightRoutes from "./routes/stateWiseWeightRoutes.js";
 import eventRoutes from "./routes/eventRoutes.js";
 import placeRoutes from "./routes/placeRoutes.js";
 import restaurantRoutes from "./routes/restaurantRoutes.js";
+import restaurantReviewRoutes from "./routes/restaurantReviewRoutes.js";
+import restaurantPocRoutes from "./routes/restaurantPocRoutes.js";
 import eventReviewRoutes from "./routes/eventReviewRoutes.js";
 import placeReviewRoutes from "./routes/placeReviewRoutes.js";
 import editorRoutes from "./routes/editorRoutes.js";
@@ -72,6 +74,10 @@ app.use("/api/blogs", blogRoutes); // New Blog Route
 app.use("/api/events", eventRoutes);
 app.use("/api/places", placeRoutes);
 app.use("/api/restaurants", restaurantRoutes);
+app.use("/api/restaurant-reviews", restaurantReviewRoutes);
+app.use("/api/restaurantreviews", restaurantReviewRoutes);
+app.use("/api/restaurantpocs", restaurantPocRoutes);
+app.use("/api/restaurant-pocs", restaurantPocRoutes);
 app.use("/api/event-reviews", eventReviewRoutes);
 app.use("/api/place-reviews", placeReviewRoutes);
 
