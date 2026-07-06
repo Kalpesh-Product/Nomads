@@ -182,6 +182,8 @@ export const normalizeProductDropdownPages = (items) => {
         homeCardImage,
         leadEnabled: item?.leadEnabled !== false,
         leadFormLabel: normalizeString(item?.leadFormLabel),
+        inclusions: Array.isArray(item?.inclusions) ? item.inclusions : [],
+        faqs: Array.isArray(item?.faqs) ? item.faqs : [],
       };
     })
     .filter((item) => item.name && item.slug && item.enabled !== false);

@@ -22,10 +22,15 @@ import {
 const TemplateProductDetailPage = () => {
   const { slug, itemSlug } = useParams();
   const navigate = useNavigate();
-  const { data, isPending, error, routeContext } = useOutletContext();
+  const { data, isPending, error, routeContext, rawProductDropdownPages } = useOutletContext();
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [open, setOpen] = useState(false);
-  
+  const [productHeroIndex, setProductHeroIndex] = useState(0);
+  const [leadForm, setLeadForm] = useState({ fullName: "", people: "", mobile: "", email: "", startDate: "", endDate: "" });
+  const [leadSubmitted, setLeadSubmitted] = useState(false);
+  const [leadSubmitPending, setLeadSubmitPending] = useState(false);
+  const [leadSubmitError, setLeadSubmitError] = useState("");
+
   if (isPending) return null;
   if (error) return <div>Error loading product page.</div>;
   if (!data) return <div>Site data is currently unavailable</div>;
@@ -62,9 +67,24 @@ const TemplateProductDetailPage = () => {
     );
   }
 
+  // Look up inclusions from raw (un-normalized) productDropdownPages to bypass any normalization loss
+  const pageInclusions = (() => {
+    const sources = [
+      rawProductDropdownPages,
+      data?.productDropdownPages,
+    ];
+    for (const source of sources) {
+      if (!Array.isArray(source)) continue;
+      const match = source.find(
+        (p) => normalizeSlug(p?.slug || p?.name || "") === slug,
+      );
+      if (Array.isArray(match?.inclusions) && match.inclusions.length > 0) return match.inclusions;
+    }
+    return [];
+  })();
+
   const heroImages = getPageHeroImages(page);
   const heroImage = heroImages[0] || "";
-  const [productHeroIndex, setProductHeroIndex] = useState(0);
   const selectedProductHeroImages = heroImages.length > 0 ? heroImages : [];
   const selectedProductHeroImage = selectedProductHeroImages[productHeroIndex] || heroImage;
   const isCafePage = normalizeSlug(page?.slug || page?.name || "").includes("cafe");
@@ -152,10 +172,6 @@ const TemplateProductDetailPage = () => {
   };
 
   const leadConfig = getLeadFields();
-  const [leadForm, setLeadForm] = useState(leadConfig.initialValues);
-  const [leadSubmitted, setLeadSubmitted] = useState(false);
-  const [leadSubmitPending, setLeadSubmitPending] = useState(false);
-  const [leadSubmitError, setLeadSubmitError] = useState("");
 
   const openProductDetails = (item) => {
     // Navigate to the item detail page
@@ -367,15 +383,10 @@ const TemplateProductDetailPage = () => {
           </section>
 
           {/* Inclusions for this specific product */}
-          {(Array.isArray(page?.inclusions) && page.inclusions.length > 0) ? (
-            <InclusionsSection 
-              inclusions={page.inclusions} 
-              title={`${productPageName} Inclusions`} 
-            />
-          ) : (Array.isArray(data?.inclusions) && data.inclusions.length > 0) ? (
-            <InclusionsSection 
-              inclusions={data.inclusions} 
-              title={`${productPageName} Inclusions`} 
+          {pageInclusions.length > 0 ? (
+            <InclusionsSection
+              inclusions={pageInclusions}
+              title={`${productPageName} Inclusions`}
             />
           ) : null}
 
@@ -498,15 +509,10 @@ const TemplateProductDetailPage = () => {
       </section>
 
       {/* Inclusions for this product page */}
-      {(Array.isArray(page?.inclusions) && page.inclusions.length > 0) ? (
-        <InclusionsSection 
-          inclusions={page.inclusions} 
-          title={`${productPageName} Inclusions`} 
-        />
-      ) : (Array.isArray(data?.inclusions) && data.inclusions.length > 0) ? (
-        <InclusionsSection 
-          inclusions={data.inclusions} 
-          title={`${productPageName} Inclusions`} 
+      {pageInclusions.length > 0 ? (
+        <InclusionsSection
+          inclusions={pageInclusions}
+          title={`${productPageName} Inclusions`}
         />
       ) : null}
 
