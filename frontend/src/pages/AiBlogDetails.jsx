@@ -86,7 +86,7 @@ const AiBlogDetails = () => {
                 "https://wallpapercave.com/wp/w8Lgiy5.jpg"
               }
               alt="main-image"
-              className="object-cover h-full w-full cursor-pointer"
+              className="object-contain h-full w-full cursor-pointer"
               onClick={() =>
                 handleImageOpen(
                   content?.mainImage ||
@@ -113,7 +113,7 @@ const AiBlogDetails = () => {
                     <img
                       src={item.image}
                       alt="main-image"
-                      className="object-cover h-full w-full cursor-pointer"
+                      className="object-contain h-full w-full cursor-pointer"
                       onClick={() => handleImageOpen(item.image)}
                     />
                   </div>
