@@ -42,6 +42,8 @@ const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
 const ANNUAL_EVENTS_CATEGORY = "annualevents";
 const VENUES_CATEGORY = "venues";
 const RESTAURANTS_CATEGORY = "restaurants";
+const NEWS_CATEGORY = "news";
+const BLOGS_CATEGORY = "blogs";
 const TYPING_INTERVAL_MS = 7;
 const SECOND_HEADING_DELAY_MS = 250;
 const THINKING_HEADING_TEXT = "Curating the best results for you";
@@ -63,6 +65,15 @@ const normalizeContentDestination = (label) =>
         .replace(/[\u2010-\u2015\u2212\u{FE63}\u{FF0D}]/gu, "-")
         .trim()
     : "";
+const buildExactKeyword = (label) => {
+  if (!label) return null;
+  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return `^${escaped}$`;
+};
+const extractImageFromContent = (content) => {
+  const match = content?.match(/<img.*?src=["'](.*?)["']/);
+  return match ? match[1] : null;
+};
 
 const valueAddedServiceItems = [
   {
@@ -535,6 +546,8 @@ const AiListings = ({ forceListView = false }) => {
       [ANNUAL_EVENTS_CATEGORY]: "Events",
       [VENUES_CATEGORY]: "Places",
       [RESTAURANTS_CATEGORY]: "Restaurants",
+      [NEWS_CATEGORY]: "News",
+      [BLOGS_CATEGORY]: "Blogs",
     };
 
     return (
@@ -556,7 +569,9 @@ const AiListings = ({ forceListView = false }) => {
       formData?.category === VALUE_ADDED_SERVICES_CATEGORY ||
       formData?.category === ANNUAL_EVENTS_CATEGORY ||
       formData?.category === VENUES_CATEGORY ||
-      formData?.category === RESTAURANTS_CATEGORY
+      formData?.category === RESTAURANTS_CATEGORY ||
+      formData?.category === NEWS_CATEGORY ||
+      formData?.category === BLOGS_CATEGORY
     ) {
       return [];
     }
@@ -677,7 +692,9 @@ const AiListings = ({ forceListView = false }) => {
         formData.category === VALUE_ADDED_SERVICES_CATEGORY ||
         formData.category === ANNUAL_EVENTS_CATEGORY ||
         formData.category === VENUES_CATEGORY ||
-        formData.category === RESTAURANTS_CATEGORY
+        formData.category === RESTAURANTS_CATEGORY ||
+        formData.category === NEWS_CATEGORY ||
+        formData.category === BLOGS_CATEGORY
       ) {
         return;
       }
@@ -739,21 +756,15 @@ const AiListings = ({ forceListView = false }) => {
       return;
     }
 
-    if (categoryValue === "news" || categoryValue === "blogs") {
-      navigate({
-        pathname: categoryValue === "news" ? "/ai-news" : "/ai-blogs",
-        search: location.search,
-      });
-      return;
-    }
-
     if (
       DESTINATION_HIGHLIGHT_FILTERS.some(
         (filter) =>
           filter.value === categoryValue &&
           categoryValue !== ANNUAL_EVENTS_CATEGORY &&
           categoryValue !== VENUES_CATEGORY &&
-          categoryValue !== RESTAURANTS_CATEGORY,
+          categoryValue !== RESTAURANTS_CATEGORY &&
+          categoryValue !== NEWS_CATEGORY &&
+          categoryValue !== BLOGS_CATEGORY,
       )
     ) {
       const params = new URLSearchParams({
@@ -860,11 +871,15 @@ const AiListings = ({ forceListView = false }) => {
     formData?.category === ANNUAL_EVENTS_CATEGORY;
   const isVenuesSelected = formData?.category === VENUES_CATEGORY;
   const isRestaurantsSelected = formData?.category === RESTAURANTS_CATEGORY;
+  const isNewsSelected = formData?.category === NEWS_CATEGORY;
+  const isBlogsSelected = formData?.category === BLOGS_CATEGORY;
   const isFocusedContentSelected =
     isValueAddedServicesSelected ||
     isAnnualEventsSelected ||
     isVenuesSelected ||
-    isRestaurantsSelected;
+    isRestaurantsSelected ||
+    isNewsSelected ||
+    isBlogsSelected;
   const showDesktopMap =
     !forceListView && mapOpen && !isFocusedContentSelected;
   const listingsBasePath =
@@ -936,6 +951,37 @@ const AiListings = ({ forceListView = false }) => {
       enabled: isRestaurantsSelected && !!eventDestination,
       refetchOnWindowFocus: false,
     });
+  const contentParams = useMemo(() => {
+    if (!eventDestination) return undefined;
+
+    return {
+      keyword: buildExactKeyword(eventDestination),
+    };
+  }, [eventDestination]);
+  const { data: newsData = [], isPending: isNewsLoading } = useQuery({
+    queryKey: ["ai-news", eventDestination],
+    queryFn: async () => {
+      const response = await axios.get("/news/get-news", {
+        params: contentParams,
+      });
+
+      return Array.isArray(response.data) ? response.data : [];
+    },
+    enabled: isNewsSelected && !!eventDestination,
+    refetchOnWindowFocus: false,
+  });
+  const { data: blogsData = [], isPending: isBlogsLoading } = useQuery({
+    queryKey: ["blogs", eventDestination],
+    queryFn: async () => {
+      const response = await axios.get("/blogs/get-blogs", {
+        params: contentParams,
+      });
+
+      return Array.isArray(response.data) ? response.data : [];
+    },
+    enabled: isBlogsSelected && !!eventDestination,
+    refetchOnWindowFocus: false,
+  });
   const annualEvents = useMemo(
     () =>
       eventsData.map((event) => ({
@@ -990,6 +1036,36 @@ const AiListings = ({ forceListView = false }) => {
       })),
     [restaurantsData],
   );
+  const newsItems = useMemo(
+    () =>
+      newsData.map((newsItem) => ({
+        ...newsItem,
+        id: newsItem.guid || newsItem._id || newsItem.mainTitle,
+        title: newsItem.mainTitle || newsItem.title,
+        image:
+          newsItem.mainImage ||
+          extractImageFromContent(newsItem.content || newsItem.description),
+        location: newsItem.author || newsItem.source || "Source",
+        meta: newsItem.date ? new Date(newsItem.date).toLocaleDateString() : "",
+        description: newsItem.mainContent || newsItem.description,
+      })),
+    [newsData],
+  );
+  const blogItems = useMemo(
+    () =>
+      blogsData.map((blog) => ({
+        ...blog,
+        id: blog.guid || blog._id || blog.mainTitle,
+        title: blog.mainTitle || blog.title,
+        image:
+          blog.mainImage ||
+          extractImageFromContent(blog.content || blog.description),
+        location: blog.author || "Author",
+        meta: blog.date ? new Date(blog.date).toLocaleDateString() : "",
+        description: blog.mainContent || blog.description,
+      })),
+    [blogsData],
+  );
 
   const handleEventClick = (event) => {
     navigate(`/ai-events/${event.id}`, {
@@ -1037,6 +1113,36 @@ const AiListings = ({ forceListView = false }) => {
         ],
       },
     });
+  };
+  const handleNewsClick = (newsItem) => {
+    navigate(
+      {
+        pathname: "/ai-news/ai-news-details",
+        search: location.search,
+      },
+      {
+        state: {
+          content: newsItem,
+          selectedStateLabel,
+          sourceSearch: location.search,
+        },
+      },
+    );
+  };
+  const handleBlogClick = (blog) => {
+    navigate(
+      {
+        pathname: "/ai-blogs/ai-blog-details",
+        search: location.search,
+      },
+      {
+        state: {
+          content: blog,
+          selectedStateLabel,
+          sourceSearch: location.search,
+        },
+      },
+    );
   };
 
   // Prioritize BIZ Nest and MeWo first, then sort the rest by rating descending
@@ -1550,7 +1656,9 @@ const AiListings = ({ forceListView = false }) => {
               formData?.location &&
               !isAnnualEventsSelected &&
               !isVenuesSelected &&
-              !isRestaurantsSelected && (
+              !isRestaurantsSelected &&
+              !isNewsSelected &&
+              !isBlogsSelected && (
               <div className="mt-6 mb-2 px-1 border-t border-gray-300">
                 <h1 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight mt-6">
                   Popular{" "}
@@ -1566,6 +1674,8 @@ const AiListings = ({ forceListView = false }) => {
                     [ANNUAL_EVENTS_CATEGORY]: "Annual Events",
                     [VENUES_CATEGORY]: "Places",
                     [RESTAURANTS_CATEGORY]: "Restaurants",
+                    [NEWS_CATEGORY]: "News",
+                    [BLOGS_CATEGORY]: "Blogs",
                   }[formData.category] || `${formData.category} Spaces`}{" "}
                   in {selectedStateLabel || "Unknown"}
                 </h1>
@@ -1705,6 +1815,58 @@ const AiListings = ({ forceListView = false }) => {
                       items={restaurants}
                       kind="restaurant"
                       onCardClick={handleRestaurantClick}
+                    />
+                  )
+                ) : isNewsSelected ? (
+                  isNewsLoading ? (
+                    <PaginatedGrid
+                      data={skeletonArray}
+                      entriesPerPage={isMobile ? 10 : isTablet ? 9 : 100}
+                      columns="grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5"
+                      renderItem={(_, index) => (
+                        <Box key={index} className="w-full h-full">
+                          <Skeleton
+                            variant="rectangular"
+                            height={200}
+                            sx={{ borderRadius: 2 }}
+                          />
+                          <Skeleton variant="text" width="80%" sx={{ mt: 1 }} />
+                          <Skeleton variant="text" width="60%" />
+                        </Box>
+                      )}
+                    />
+                  ) : (
+                    <AiDestinationHighlightSection
+                      title={`Latest ${selectedStateLabel || "Unknown"} News`}
+                      items={newsItems}
+                      kind="news"
+                      onCardClick={handleNewsClick}
+                    />
+                  )
+                ) : isBlogsSelected ? (
+                  isBlogsLoading ? (
+                    <PaginatedGrid
+                      data={skeletonArray}
+                      entriesPerPage={isMobile ? 10 : isTablet ? 9 : 100}
+                      columns="grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5"
+                      renderItem={(_, index) => (
+                        <Box key={index} className="w-full h-full">
+                          <Skeleton
+                            variant="rectangular"
+                            height={200}
+                            sx={{ borderRadius: 2 }}
+                          />
+                          <Skeleton variant="text" width="80%" sx={{ mt: 1 }} />
+                          <Skeleton variant="text" width="60%" />
+                        </Box>
+                      )}
+                    />
+                  ) : (
+                    <AiDestinationHighlightSection
+                      title={`Latest ${selectedStateLabel || "Unknown"} Blogs`}
+                      items={blogItems}
+                      kind="blog"
+                      onCardClick={handleBlogClick}
                     />
                   )
                 ) : (

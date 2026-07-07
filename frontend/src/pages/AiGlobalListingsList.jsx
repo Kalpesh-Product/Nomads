@@ -46,6 +46,8 @@ import { DESTINATION_HIGHLIGHT_FILTERS } from "../data/aiDestinationHighlights.j
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
 const ANNUAL_EVENTS_CATEGORY = "annualevents";
 const RESTAURANTS_CATEGORY = "restaurants";
+const NEWS_CATEGORY = "news";
+const BLOGS_CATEGORY = "blogs";
 // const VALUE_ADDED_SERVICE_CARD_BACKGROUND_IMAGE = "/images/goa-image.jpg";
 const VALUE_ADDED_SERVICES_DEFAULT_VISIBLE_COUNT = 5;
 const TYPING_INTERVAL_MS = 7;
@@ -989,21 +991,15 @@ const AiGlobalListingsList = () => {
       return;
     }
 
-    if (categoryValue === "news" || categoryValue === "blogs") {
-      navigate({
-        pathname: categoryValue === "news" ? "/ai-news" : "/ai-blogs",
-        search: location.search,
-      });
-      return;
-    }
-
     if (
       DESTINATION_HIGHLIGHT_FILTERS.some(
         (filter) =>
           filter.value === categoryValue &&
           categoryValue !== ANNUAL_EVENTS_CATEGORY &&
           categoryValue !== "venues" &&
-          categoryValue !== RESTAURANTS_CATEGORY,
+          categoryValue !== RESTAURANTS_CATEGORY &&
+          categoryValue !== NEWS_CATEGORY &&
+          categoryValue !== BLOGS_CATEGORY,
       )
     ) {
       getDiscoverySectionRef(categoryValue)?.scrollIntoView({
