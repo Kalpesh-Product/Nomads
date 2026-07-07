@@ -40,6 +40,8 @@ import { DESTINATION_HIGHLIGHT_FILTERS } from "../data/aiDestinationHighlights.j
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
 const ANNUAL_EVENTS_CATEGORY = "annualevents";
 const RESTAURANTS_CATEGORY = "restaurants";
+const NEWS_CATEGORY = "news";
+const BLOGS_CATEGORY = "blogs";
 const TYPING_INTERVAL_MS = 7;
 const SECOND_HEADING_DELAY_MS = 250;
 const THINKING_HEADING_TEXT = "Curating the best results for you";
@@ -624,21 +626,15 @@ const AiGlobalListingsMap = () => {
       return;
     }
 
-    if (categoryValue === "news" || categoryValue === "blogs") {
-      navigate({
-        pathname: categoryValue === "news" ? "/ai-news" : "/ai-blogs",
-        search: location.search,
-      });
-      return;
-    }
-
     if (
       DESTINATION_HIGHLIGHT_FILTERS.some(
         (filter) =>
           filter.value === categoryValue &&
           categoryValue !== ANNUAL_EVENTS_CATEGORY &&
           categoryValue !== "venues" &&
-          categoryValue !== RESTAURANTS_CATEGORY,
+          categoryValue !== RESTAURANTS_CATEGORY &&
+          categoryValue !== NEWS_CATEGORY &&
+          categoryValue !== BLOGS_CATEGORY,
       )
     ) {
       const params = new URLSearchParams({
@@ -663,7 +659,9 @@ const AiGlobalListingsMap = () => {
       categoryValue !== VALUE_ADDED_SERVICES_CATEGORY &&
       categoryValue !== ANNUAL_EVENTS_CATEGORY &&
       categoryValue !== "venues" &&
-      categoryValue !== RESTAURANTS_CATEGORY
+      categoryValue !== RESTAURANTS_CATEGORY &&
+      categoryValue !== NEWS_CATEGORY &&
+      categoryValue !== BLOGS_CATEGORY
     ) {
       setShowListings(true);
       // Optional: Clear mobile search if open
@@ -683,7 +681,9 @@ const AiGlobalListingsMap = () => {
       categoryValue === VALUE_ADDED_SERVICES_CATEGORY ||
       categoryValue === ANNUAL_EVENTS_CATEGORY ||
       categoryValue === "venues" ||
-      categoryValue === RESTAURANTS_CATEGORY
+      categoryValue === RESTAURANTS_CATEGORY ||
+      categoryValue === NEWS_CATEGORY ||
+      categoryValue === BLOGS_CATEGORY
         ? "/ai-listings-list"
         : "/ai-listings";
 
