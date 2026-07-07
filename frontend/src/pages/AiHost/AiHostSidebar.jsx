@@ -300,6 +300,26 @@ const becomeContributorLink = {
   path: "/become-a-contributor",
 };
 
+const collapsedSectionLabels = {
+  Modules: "MOD",
+  "Key Apps": "APP",
+  "Common Features": "COM",
+  "Extra Common Modules": "EXT",
+  "Core Modules": "COR",
+  "Department Accesses": "DEP",
+  Profile: "PRO",
+};
+
+const getCollapsedSectionLabel = (title = "") =>
+  collapsedSectionLabels[title] ||
+  title
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((word) => word[0])
+    .join("")
+    .slice(0, 3)
+    .toUpperCase();
+
 const SidebarSection = ({
   title,
   items,
@@ -310,9 +330,10 @@ const SidebarSection = ({
   compact = false,
   onToggle,
   onItemClick,
+  onTooltipChange,
 }) => {
   const ChevronIcon = isOpen ? HiChevronUp : HiChevronDown;
-  const shouldShowItems = collapsed ? true : !isExpandable || isOpen;
+  const shouldShowItems = !isExpandable || isOpen;
   const navigate = useNavigate();
 
   return (
@@ -320,18 +341,40 @@ const SidebarSection = ({
       <div
         className={`${showTopBorder && !compact ? "border-t border-black/10" : ""} ${compact ? "pt-0" : "pt-2"}`}
       >
-        {collapsed ? null : isExpandable ? (
+        {isExpandable ? (
           <button
             type="button"
             onClick={onToggle}
+            onMouseEnter={(event) => {
+              if (!collapsed) return;
+
+              const rect = event.currentTarget.getBoundingClientRect();
+              onTooltipChange?.({
+                label: title.toUpperCase(),
+                top: rect.top + rect.height / 2,
+                left: rect.right + 14,
+              });
+            }}
+            onMouseLeave={() => onTooltipChange?.(null)}
+            onFocus={(event) => {
+              if (!collapsed) return;
+
+              const rect = event.currentTarget.getBoundingClientRect();
+              onTooltipChange?.({
+                label: title.toUpperCase(),
+                top: rect.top + rect.height / 2,
+                left: rect.right + 14,
+              });
+            }}
+            onBlur={() => onTooltipChange?.(null)}
             className="flex w-full items-center justify-between text-left text-xs font-semibold uppercase tracking-wide text-black/80"
             aria-expanded={isOpen}
             aria-label={`${isOpen ? "Collapse" : "Expand"} ${title}`}
           >
-            <span>{title}</span>
+            <span>{collapsed ? getCollapsedSectionLabel(title) : title}</span>
             <ChevronIcon size={16} className="shrink-0" />
           </button>
-        ) : (
+        ) : collapsed ? null : (
           <h3 className="text-xs font-semibold uppercase tracking-wide text-black/80">
             {title}
           </h3>
@@ -349,10 +392,32 @@ const SidebarSection = ({
                   key={item.label}
                   type="button"
                   onClick={() => onItemClick?.(item)}
+                  onMouseEnter={(event) => {
+                    if (!collapsed) return;
+
+                    const rect = event.currentTarget.getBoundingClientRect();
+                    onTooltipChange?.({
+                      label: item.label,
+                      top: rect.top + rect.height / 2,
+                      left: rect.right + 14,
+                    });
+                  }}
+                  onMouseLeave={() => onTooltipChange?.(null)}
+                  onFocus={(event) => {
+                    if (!collapsed) return;
+
+                    const rect = event.currentTarget.getBoundingClientRect();
+                    onTooltipChange?.({
+                      label: item.label,
+                      top: rect.top + rect.height / 2,
+                      left: rect.right + 14,
+                    });
+                  }}
+                  onBlur={() => onTooltipChange?.(null)}
                   className={`group relative flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-left transition-all hover:bg-white ${
                     isActive ? "bg-white text-black shadow-sm" : "text-black/80"
                   }`}
-                  title={collapsed ? item.label : ""}
+                  aria-label={collapsed ? item.label : undefined}
                 >
                   <Icon
                     size={18}
@@ -396,7 +461,7 @@ const SidebarSection = ({
 };
 
 const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const [isRecommendationsOpen, setIsRecommendationsOpen] = useState(true);
   const [isValueAdditionsOpen, setIsValueAdditionsOpen] = useState(false);
   const [isCommonFeaturesOpen, setIsCommonFeaturesOpen] = useState(false);
@@ -405,6 +470,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   const [isCoreModulesOpen, setIsCoreModulesOpen] = useState(false);
   const [isDepartmentAccessOpen, setIsDepartmentAccessOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [tooltip, setTooltip] = useState(null);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -703,6 +769,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         isOpen={isRecommendationsOpen}
         onToggle={() => setIsRecommendationsOpen((prev) => !prev)}
         onItemClick={handleSidebarItemClick}
+        onTooltipChange={setTooltip}
       />
 
       <SidebarSection
@@ -713,6 +780,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         isOpen={isValueAdditionsOpen}
         onToggle={() => setIsValueAdditionsOpen((prev) => !prev)}
         onItemClick={handleSidebarItemClick}
+        onTooltipChange={setTooltip}
       />
       <SidebarSection
         title="Common Features"
@@ -722,6 +790,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         isOpen={isCommonFeaturesOpen}
         onToggle={() => setIsCommonFeaturesOpen((prev) => !prev)}
         onItemClick={handleSidebarItemClick}
+        onTooltipChange={setTooltip}
       />
       <SidebarSection
         title="Extra Common Modules"
@@ -731,6 +800,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         isOpen={isExtraCommonModulesOpen}
         onToggle={() => setIsExtraCommonModulesOpen((prev) => !prev)}
         onItemClick={handleSidebarItemClick}
+        onTooltipChange={setTooltip}
       />
       <SidebarSection
         title="Core Modules"
@@ -740,6 +810,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         isOpen={isCoreModulesOpen}
         onToggle={() => setIsCoreModulesOpen((prev) => !prev)}
         onItemClick={handleSidebarItemClick}
+        onTooltipChange={setTooltip}
       />
       <SidebarSection
         title="Department Accesses"
@@ -749,6 +820,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         isOpen={isDepartmentAccessOpen}
         onToggle={() => setIsDepartmentAccessOpen((prev) => !prev)}
         onItemClick={handleSidebarItemClick}
+        onTooltipChange={setTooltip}
       />
 
       {isLoggedIn ? (
@@ -794,6 +866,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
             collapsed={isCollapsed}
             onItemClick={handleBecomeContributorClick}
             compact={true}
+            onTooltipChange={setTooltip}
           />
           {/* <div className="mx-4 border-t border-black/10"></div>
                     <SidebarSection
@@ -824,6 +897,16 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                         </div>
                     )} */}
         </>
+      )}
+      {isCollapsed && tooltip && (
+        <div
+          className="pointer-events-none fixed z-[1000] -translate-y-1/2 whitespace-nowrap rounded-md bg-black px-3 py-1.5 text-xs font-medium text-white shadow-lg"
+          style={{ top: `${tooltip.top}px`, left: `${tooltip.left}px` }}
+          role="tooltip"
+        >
+          <span className="absolute left-[-5px] top-1/2 h-2.5 w-2.5 -translate-y-1/2 rotate-45 bg-black" />
+          {tooltip.label}
+        </div>
       )}
     </aside>
   );

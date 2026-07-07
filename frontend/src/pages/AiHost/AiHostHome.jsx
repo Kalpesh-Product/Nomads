@@ -110,18 +110,18 @@ const HostHome = () => {
               <div
                 key={tab.id}
                 onClick={() => navigate(tab.route)}
-                className="group bg-white border border-gray-200 rounded-2xl px-6 py-5 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+                className="group cursor-pointer rounded-2xl bg-[#f1f1f3] px-6 py-5 text-center shadow-[0_1px_0_rgba(255,255,255,0.7)] transition-colors duration-200 hover:bg-sky-500"
               >
                 <div className="flex items-center justify-center gap-4">
-                  <div className="h-12 w-12 rounded-xl bg-[#f7f7f7] flex items-center justify-center group-hover:bg-secondary-dark transition-all duration-300">
+                  <div className="h-12 w-12 rounded-xl bg-white/55 flex items-center justify-center transition-colors duration-200 group-hover:bg-transparent">
                     <img
                       src={tab.icon}
                       alt={tab.title}
-                      className="h-8 w-8 object-contain group-hover:invert transition-all duration-300"
+                      className="h-8 w-8 object-contain transition-all duration-200 group-hover:invert"
                     />
                   </div>
 
-                  <h3 className="ml-6 text-[clamp(1rem,1.4vw,1.5rem)] font-semibold text-secondary-dark text-center">
+                  <h3 className="ml-6 text-[clamp(1rem,1.4vw,1.5rem)] font-semibold text-secondary-dark text-center transition-colors duration-200 group-hover:text-white">
                     {tab.title}
                   </h3>
                 </div>
