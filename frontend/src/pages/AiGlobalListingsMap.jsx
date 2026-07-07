@@ -47,6 +47,13 @@ const SECOND_HEADING_DELAY_MS = 250;
 const THINKING_HEADING_TEXT = "Curating the best results for you";
 const CURATED_RESULTS_HEADING_TEXT =
   "Please find below, the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
+const normalizeContentDestination = (label) =>
+  label
+    ? label
+        .replace(/\+/g, " ")
+        .replace(/[\u2010-\u2015\u2212\u{FE63}\u{FF0D}]/gu, "-")
+        .trim()
+    : "";
 const getAiVerticalsPageStateKey = (country = "", location = "") => {
   const countryKey = country.trim().toLowerCase();
   const locationKey = location.trim().toLowerCase();
@@ -370,7 +377,11 @@ const AiGlobalListingsMap = () => {
     refetchOnMount: "always",
   });
 
-  const destinationAvailability = formData?.location || "";
+  const destinationAvailability = normalizeContentDestination(
+    new URLSearchParams(location.search).get("state") ||
+      new URLSearchParams(location.search).get("location") ||
+      formData?.location,
+  );
   const { data: destinationEventsData = [] } = useQuery({
     queryKey: ["ai-events-availability", destinationAvailability],
     queryFn: async () => {
@@ -574,15 +585,27 @@ const AiGlobalListingsMap = () => {
   ]);
 
   useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const queryCountry = params.get("country");
+    const queryLocation = params.get("state") || params.get("location");
+    const queryContinent = params.get("continent");
+
     const breadcrumbFilters = location.state?.breadcrumbFilters;
-    if (!breadcrumbFilters) return;
 
     const normalizeValue = (value) =>
       typeof value === "string" ? value.trim().toLowerCase() : value;
 
-    const normalizedContinent = normalizeValue(breadcrumbFilters.continent);
-    const normalizedCountry = normalizeValue(breadcrumbFilters.country);
-    const normalizedLocation = normalizeValue(breadcrumbFilters.location);
+    const normalizedContinent = normalizeValue(
+      breadcrumbFilters?.continent || queryContinent,
+    );
+    const normalizedCountry = normalizeValue(
+      breadcrumbFilters?.country || queryCountry,
+    );
+    const normalizedLocation = normalizeValue(
+      breadcrumbFilters?.location || queryLocation,
+    );
+
+    if (!normalizedCountry || !normalizedLocation) return;
 
     if (
       normalizedContinent === normalizeValue(formData.continent) &&
@@ -600,7 +623,7 @@ const AiGlobalListingsMap = () => {
     };
 
     dispatch(setFormValues(nextFormValues));
-  }, [dispatch, formData, location.state]);
+  }, [dispatch, formData, location.state, location.search]);
 
   const { mutate: locationData, isPending: isLocation } = useMutation({
     mutationFn: async (data) => {

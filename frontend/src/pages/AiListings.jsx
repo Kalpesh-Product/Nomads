@@ -1019,21 +1019,33 @@ const AiListings = ({ forceListView = false }) => {
   );
   const restaurants = useMemo(
     () =>
-      restaurantsData.map((restaurant) => ({
-        ...restaurant,
-        id:
-          restaurant._id ||
-          restaurant.serialNumber ||
-          restaurant.restaurantName,
-        title: restaurant.restaurantName,
-        image: restaurant.mainImage,
-        location: restaurant.address || restaurant.destination,
-        meta: restaurant.rating,
-        category: restaurant.category || restaurant.restaurantType,
-        region: restaurant.destination,
-        description:
-          restaurant.shortDescription || restaurant.sections?.[0]?.content,
-      })),
+      restaurantsData.map((restaurant) => {
+        const title =
+          restaurant.restaurantName ||
+          restaurant.businessName ||
+          restaurant.restaurantTitle;
+        const rating = restaurant.rating || restaurant.ratings;
+
+        return {
+          ...restaurant,
+          id:
+            restaurant._id ||
+            restaurant.restaurantId ||
+            restaurant.businessId ||
+            restaurant.serialNumber ||
+            title,
+          title,
+          image: restaurant.mainImage || restaurant.images || restaurant.logo,
+          location: restaurant.address || restaurant.destination,
+          meta: rating,
+          category: restaurant.category || restaurant.restaurantType,
+          region: restaurant.destination,
+          description:
+            restaurant.shortDescription ||
+            restaurant.about ||
+            restaurant.sections?.[0]?.content,
+        };
+      }),
     [restaurantsData],
   );
   const newsItems = useMemo(
