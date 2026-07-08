@@ -31,6 +31,8 @@ import { HiOutlineArrowLeft } from "react-icons/hi";
 import useAuth from "../../hooks/useAuth";
 
 const steps = ["GOAL", "BASIC DETAILS"];
+const ACTIVATION_TITLE = "Your goal is set... let's get you activated";
+const ACTIVATION_TITLE_TYPING_INTERVAL_MS = 7;
 
 const serviceOptions = [
   {
@@ -114,6 +116,7 @@ const AiHostSignup = () => {
     Math.min(1, Number(new URLSearchParams(location.search).get("step")) || 0),
   );
   const [activeStep, setActiveStep] = useState(initialStep);
+  const [typedActivationTitle, setTypedActivationTitle] = useState("");
   const selectedPlanFromQuery = normalizePlanFromQuery(
     new URLSearchParams(location.search).get("plan"),
   );
@@ -169,6 +172,27 @@ const AiHostSignup = () => {
   useEffect(() => {
     setValue("Goals", selectedPlan);
   }, [selectedPlan, setValue]);
+
+  useEffect(() => {
+    if (activeStep !== 1) {
+      setTypedActivationTitle("");
+      return undefined;
+    }
+
+    let currentIndex = 0;
+    setTypedActivationTitle("");
+
+    const typingInterval = setInterval(() => {
+      currentIndex += 1;
+      setTypedActivationTitle(ACTIVATION_TITLE.slice(0, currentIndex));
+
+      if (currentIndex >= ACTIVATION_TITLE.length) {
+        clearInterval(typingInterval);
+      }
+    }, ACTIVATION_TITLE_TYPING_INTERVAL_MS);
+
+    return () => clearInterval(typingInterval);
+  }, [activeStep]);
 
   useEffect(() => {
     if (!auth?.user) return;
@@ -1477,9 +1501,13 @@ const AiHostSignup = () => {
           </h1>
         )} */}
         {activeStep !== 3 && (
-          <h1 className="text-title text-center">
+          <h1
+            className={`text-title text-center ${
+              activeStep === 1 ? "min-h-[3rem] font-play" : ""
+            }`}
+          >
             {activeStep === 0 && "Select Your Plan"}
-            {activeStep === 1 && "YOUR GOAL IS SET... LET'S GET YOU ACTIVATED"}
+            {activeStep === 1 && typedActivationTitle}
             {/* {activeStep === 2 && "Add your company details"}
                         {activeStep === 3 && "Add Your Website Content"} */}
             {/* {activeStep === 4 && "Activate your account"} */}
