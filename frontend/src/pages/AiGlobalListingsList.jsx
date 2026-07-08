@@ -1466,8 +1466,9 @@ const AiGlobalListingsList = () => {
                                 <div className="mt-0 text-right">
                                   <button
                                     onClick={() => handleShowMoreClick(type)}
-                                    className="text-primary-blue text-sm font-semibold hover:underline"
+                                    className="relative inline-block pb-1 text-primary-blue text-sm font-semibold transition-all cursor-pointer duration-300 group bg-transparent border-none"
                                   >
+                                    <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-primary-blue transition-all duration-300 group-hover:w-full"></span>
                                     {expandedCategories.includes(type)
                                       ? "View less ←"
                                       : "View more →"}
@@ -1629,8 +1630,9 @@ const AiGlobalListingsList = () => {
                                   (prevState) => !prevState,
                                 )
                               }
-                              className="text-primary-blue text-sm font-semibold hover:underline"
+                              className="relative inline-block pb-1 text-primary-blue text-sm font-semibold transition-all cursor-pointer duration-300 group bg-transparent border-none"
                             >
+                              <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-primary-blue transition-all duration-300 group-hover:w-full"></span>
                               {isValueAddedServicesExpanded
                                 ? "View less ←"
                                 : "View more →"}
@@ -2115,8 +2117,9 @@ const AiGlobalListingsList = () => {
                                 (prevState) => !prevState,
                               )
                             }
-                            className="text-primary-blue text-sm font-semibold hover:underline"
+                            className="relative inline-block pb-1 text-primary-blue text-sm font-semibold transition-all cursor-pointer duration-300 group bg-transparent border-none"
                           >
+                            <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-primary-blue transition-all duration-300 group-hover:w-full"></span>
                             {isValueAddedServicesExpanded
                               ? "View less ←"
                               : "View more →"}
