@@ -33,6 +33,8 @@ const TempFooter = ({
           { name: "About Us", to: getSectionPath("about", pathname) },
           { name: "Products", to: getSectionPath("products", pathname) },
           { name: "Gallery", to: getSectionPath("gallery", pathname) },
+          { name: "Partner", to: getSectionPath("partner", pathname) },
+          { name: "Careers", to: getSectionPath("careers", pathname) },
           { name: "Testimonials", to: getSectionPath("testimonials", pathname) },
           { name: "Contact Us", to: getSectionPath("contact", pathname) },
         ];

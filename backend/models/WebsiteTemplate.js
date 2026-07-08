@@ -113,6 +113,13 @@ const templateSchema = new mongoose.Schema(
     websiteEmail: { type: String },
     phone: { type: String, required: true },
     address: { type: String, required: true },
+    //careers
+    careersPageHeading: { type: String },
+    careersPageIntro: { type: String },
+    careersApplyButtonText: { type: String },
+    careersClosingText: { type: String },
+    careersClosingHeading: { type: String },
+    careersFormFields: { type: mongoose.Schema.Types.Mixed },
     //footer
     registeredCompanyName: { type: String },
     copyrightText: { type: String, required: true },

@@ -182,6 +182,26 @@ const normalizeTemplatePayload = (template) => {
   };
 };
 
+export const getRecruitmentJobs = async (req, res, next) => {
+  try {
+    const workspaceId = String(req.params.workspaceId || "").trim();
+    if (!workspaceId) {
+      return res.status(400).json({ message: "workspaceId is required" });
+    }
+
+    const upstream = await axios.get(
+      `${process.env.WONOMASTER_BE || "https://wonomasterbe.vercel.app"}/api/recruitment/jobs/public`,
+      { params: { workspaceId } },
+    );
+
+    return res.json(upstream.data?.data || upstream.data);
+  } catch (error) {
+    const status = error?.response?.status || 500;
+    const message = error?.response?.data?.message || error?.message || "Failed to load jobs";
+    return res.status(status).json({ message });
+  }
+};
+
 export const getWebsiteByTenant = async (req, res, next) => {
   try {
     const tenant = normalizeTenant(req.params.tenant);
