@@ -461,7 +461,7 @@ const AiHostSignup = () => {
                 >
                   <MenuItem value="BASIC">BASIC - FREE</MenuItem>
                   <MenuItem value="PROFESSIONAL">
-                    PROFESSIONAL - $99 / Month
+                    PROFESSIONAL - $199 / Month
                   </MenuItem>
                   <MenuItem value="CUSTOMISE">
                     CUSTOMISE - PERSONALISED
