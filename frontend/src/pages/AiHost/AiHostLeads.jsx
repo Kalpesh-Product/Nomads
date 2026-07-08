@@ -15,7 +15,6 @@ import CompanyLogosMobile from "/hosts/leads-page/leads-companies-image-phone.pn
 import { PiCheckFatFill } from "react-icons/pi";
 import { ReactFitty } from "react-fitty";
 import { useNavigate } from "react-router-dom";
-import MySeperator from "../../components/MySeperator";
 import { HiOutlineArrowLeft } from "react-icons/hi";
 import GetStartedButton from "../../components/GetStartedButton";
 
@@ -174,7 +173,7 @@ const Leads = () => {
       </Container>
 
       <div className="flex items-center justify-center h-0">
-        <hr className="w-full h-0 m-0 border-t  border-gray-400" />
+        <hr className="w-full h-0 m-0 border-t-4" />
       </div>
       {/* Automated Google Leads Section */}
       <Container padding={false}>
@@ -198,7 +197,7 @@ const Leads = () => {
       </Container>
 
       <div className="flex items-center justify-center h-0">
-        <hr className="w-full h-0 m-0 border-t  border-gray-400" />
+        <hr className="w-full h-0 m-0 border-t-4" />
       </div>
 
       {/* Run & Scale Grid Section */}
@@ -232,7 +231,7 @@ const Leads = () => {
       </Container>
 
       <div className="flex items-center justify-center h-0">
-        <hr className="w-full h-0 m-0 border-t  border-gray-400" />
+        <hr className="w-full h-0 m-0 border-t-4" />
       </div>
 
       {/* Get better ROI Section */}
@@ -257,7 +256,7 @@ const Leads = () => {
       </Container>
 
       <div className="flex items-center justify-center h-0">
-        <hr className="w-full h-0 m-0 border-t  border-gray-400" />
+        <hr className="w-full h-0 m-0 border-t-4" />
       </div>
 
       {/* Get a Complete View Section */}
@@ -281,7 +280,7 @@ const Leads = () => {
       </Container>
 
       <div className="flex items-center justify-center h-0">
-        <hr className="w-full h-0 m-0 border-t  border-gray-400" />
+        <hr className="w-full h-0 m-0 border-t-4" />
       </div>
 
       {/* The finer points Section */}
