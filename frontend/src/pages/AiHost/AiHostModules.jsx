@@ -251,7 +251,6 @@ export default function Modules() {
                         … More coming soon
                     </div>
                 </div>
-                <hr />
                 <div className="flex justify-center w-full my-6">
                     <GetStartedButton
                         title={"Get Started"}
