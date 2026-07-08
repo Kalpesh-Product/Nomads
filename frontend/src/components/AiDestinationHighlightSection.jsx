@@ -73,9 +73,10 @@ const AiDestinationHighlightSection = ({
             <button
               type="button"
               onClick={onViewMore}
-              className="text-sm font-semibold text-primary-blue hover:underline"
+              className="relative inline-block pb-1 text-sm font-semibold text-primary-blue transition-all duration-300 group bg-transparent border-none cursor-pointer"
             >
               {viewMoreLabel}
+              <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-primary-blue transition-all duration-300 group-hover:w-full"></span>
             </button>
           </div>
         )}
@@ -106,9 +107,10 @@ const AiDestinationHighlightSection = ({
           <button
             type="button"
             onClick={onViewMore}
-            className="text-sm font-semibold text-primary-blue hover:underline"
+            className="relative inline-block pb-1 text-sm font-semibold text-primary-blue transition-all duration-300 group bg-transparent border-none cursor-pointer"
           >
             {viewMoreLabel}
+            <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-primary-blue transition-all duration-300 group-hover:w-full"></span>
           </button>
         </div>
       )}

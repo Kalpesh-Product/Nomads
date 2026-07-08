@@ -146,10 +146,7 @@ export default function Modules() {
                             </div>
                         )}
                     </div>
-                    <hr
-                        className="h-[1px] text-gray-500 bg-gray-500 mb-2
-         lg:mt-10"
-                    />
+                    <hr className="border-t-4 mb-2 lg:mt-10" />
                 </div>
                 <Container padding={false}>
                     <div data-aos="fade-up" className="flex flex-col gap-8">
@@ -170,7 +167,7 @@ export default function Modules() {
                             imagePosition={"left top"}
                             rowReverse={false}
                         />
-                        <hr />
+                        <hr className="border-t-4" />
                         <SaaSFeatureBlock
                             title="Apps"
                             description1={[
@@ -184,7 +181,7 @@ export default function Modules() {
                             image={TicketsImage}
                             rowReverse={true}
                         />
-                        <hr />
+                        <hr className="border-t-4" />
                         <SaaSFeatureBlock
                             title="Sales"
                             description1={[
@@ -198,7 +195,7 @@ export default function Modules() {
                             image={SalesImage}
                             rowReverse={false}
                         />
-                        <hr />
+                        <hr className="border-t-4" />
                         <SaaSFeatureBlock
                             title="Finance"
                             description1={[
@@ -213,7 +210,7 @@ export default function Modules() {
                             imageFit={"cover"}
                             rowReverse={true}
                         />
-                        <hr />
+                        <hr className="border-t-4" />
                         {/* <SaaSFeatureBlock
             title="Human Resources"
             description1={[

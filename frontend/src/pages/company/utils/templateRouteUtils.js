@@ -6,6 +6,7 @@ const FALLBACK_PAGE_NAV_ITEMS = [
   { name: "Products", slug: "products", enabled: true },
   { name: "Gallery", slug: "gallery", enabled: true },
   { name: "Partner", slug: "partner", enabled: true },
+  { name: "Careers", slug: "careers", enabled: true },
   { name: "Testimonials", slug: "testimonials", enabled: true },
   { name: "Contact Us", slug: "contact", enabled: true },
 ];
@@ -16,8 +17,9 @@ const PAGE_NAV_ORDER = {
   products: 2,
   gallery: 3,
   partner: 4,
-  testimonials: 5,
-  contact: 6,
+  careers: 5,
+  testimonials: 6,
+  contact: 7,
 };
 
 const DEFAULT_PRODUCT_DROPDOWN_PAGES = [];
@@ -28,6 +30,7 @@ const SECTION_LABELS = {
   products: "Products",
   gallery: "Gallery",
   partner: "Partner",
+  careers: "Careers",
   testimonials: "Testimonials",
   contact: "Contact Us",
 };
@@ -56,10 +59,12 @@ export const resolveSectionFromSlug = (slug) => {
   if (normalized.includes("product")) return "products";
   if (normalized.includes("gallery")) return "gallery";
   if (normalized.includes("partner")) return "partner";
+  if (normalized.includes("career")) return "careers";
   if (normalized.includes("testimonial") || normalized.includes("review"))
     return "testimonials";
   if (normalized.includes("contact")) return "contact";
-  return "home";
+  if (normalized === "home" || normalized === "") return "home";
+  return null;
 };
 
 export const getMediaSrc = (value) => {
@@ -84,8 +89,10 @@ export const getMediaSrc = (value) => {
   return "";
 };
 
-export const getSectionLabel = (section) =>
-  SECTION_LABELS[resolveSectionFromSlug(section)] || "Home";
+export const getSectionLabel = (section) => {
+  const resolved = resolveSectionFromSlug(section);
+  return resolved ? SECTION_LABELS[resolved] || "Home" : "Home";
+};
 
 export const normalizePageNavItems = (items, fallbackItems = FALLBACK_PAGE_NAV_ITEMS) => {
   const sourceItems = Array.isArray(items) && items.length > 0 ? items : fallbackItems;
@@ -115,6 +122,7 @@ export const normalizePageNavItems = (items, fallbackItems = FALLBACK_PAGE_NAV_I
     if (item.slug === "products") return "Products";
     if (item.slug === "gallery") return "Gallery";
     if (item.slug === "testimonials") return "Testimonials";
+    if (item.slug === "careers") return "Careers";
     return item.name;
   };
 
@@ -229,22 +237,25 @@ const getTemplateRouteParts = (pathname = "") => {
 
 export const getTemplateRouteContext = (pathname = "") => {
   const { prefix, parts } = getTemplateRouteParts(pathname);
-  const section = resolveSectionFromSlug(parts[0] || "home");
+  const section = resolveSectionFromSlug(parts[0] || "home") || "home";
   const productSlug = parts[1] ? normalizeSlug(parts[1], "") : "";
   const itemSlug = parts[2] ? normalizeSlug(parts[2], "") : "";
+  const careerJobCode = section === "careers" && parts[1] ? parts[1] : "";
 
   return {
     prefix,
     currentSection: section,
     currentProductSlug: productSlug,
     currentItemSlug: itemSlug,
+    currentCareerJobCode: careerJobCode,
     isProductDetail: section === "products" && !!productSlug,
     isItemDetail: section === "products" && !!productSlug && !!itemSlug,
+    isCareerDetail: !!careerJobCode,
   };
 };
 
 export const getSectionPath = (section, pathname = "") => {
-  const normalizedSection = resolveSectionFromSlug(section);
+  const normalizedSection = resolveSectionFromSlug(section) || "home";
   const { prefix } = getTemplateRouteContext(pathname);
 
   if (prefix) {
@@ -254,6 +265,12 @@ export const getSectionPath = (section, pathname = "") => {
   }
 
   return normalizedSection === "home" ? "/" : `/${normalizedSection}`;
+};
+
+export const getCareerJobPath = (jobCode, pathname = "") => {
+  const { prefix } = getTemplateRouteContext(pathname);
+  const base = prefix ? `${prefix}/careers` : "/careers";
+  return `${base}/${encodeURIComponent(jobCode)}`;
 };
 
 export const getProductPath = (slug, pathname = "") => {
@@ -316,6 +333,12 @@ export const normalizeTemplateData = (data) => {
       ? data.aboutPageImageCards
       : [],
     heroImages: Array.isArray(data?.heroImages) ? data.heroImages : [],
+    careersPageHeading: normalizeString(data?.careersPageHeading),
+    careersPageIntro: normalizeString(data?.careersPageIntro),
+    careersApplyButtonText: normalizeString(data?.careersApplyButtonText),
+    careersClosingText: normalizeString(data?.careersClosingText),
+    careersClosingHeading: normalizeString(data?.careersClosingHeading),
+    careersFormFields: data?.careersFormFields ?? [],
     heroVariant: normalizeString(data?.heroVariant || "text-image"),
     themeVariant: normalizeString(data?.themeVariant || "default"),
     activeSections: Array.isArray(data?.activeSections) ? data.activeSections : [],
@@ -387,6 +410,12 @@ export const getTemplateBreadcrumbItems = ({
         label: normalizeString(itemName) || "Item",
       });
     }
+  }
+
+  if (currentSection === "careers" && routeContext?.currentCareerJobCode) {
+    items.push({
+      label: itemName || routeContext.currentCareerJobCode,
+    });
   }
 
   return items;

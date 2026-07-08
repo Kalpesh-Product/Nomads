@@ -266,11 +266,9 @@ const Themes = () => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             {supportItems.map((item, index) => (
-              <div
-                className="flex flex-col gap-8 border-t-2 border-black pt-10"
-                key={index}
-              >
+              <div className="flex flex-col gap-8" key={index}>
                 <h2 className="font-medium text-content">{item.title}</h2>
+                <div className="border-t-2 border-black" />
                 <p>{item.description}</p>
                 <span
                   className="cursor-pointer font-semibold underline hover:no-underline underline-offset-8 transition-hover duration-500 ease max-w-fit"

@@ -41,6 +41,7 @@ const TempHeader = forwardRef(
           "products",
           "gallery",
           "partner",
+          "careers",
           "testimonials",
           "contact",
         ];
@@ -210,7 +211,7 @@ const TempHeader = forwardRef(
               <li>
                 <button
                   type="button"
-                  onClick={() => window.location.href = "https://wonofe.vercel.app/"}
+                  onClick={() => window.location.href = "https://wonohostfe.vercel.app/"}
                   className={navButtonClass(false)}
                 >
                   Login

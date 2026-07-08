@@ -27,10 +27,12 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
 
   const isAiListingsMapPage = location.pathname === "/ai-listings";
   const isAiListingsListPage = location.pathname === "/ai-listings-list";
-  const showToggle =
-    location.pathname.includes("verticals") ||
+  const isAiDestinationListingsPage =
+    location.pathname === "/ai-verticals" ||
     isAiListingsMapPage ||
     isAiListingsListPage;
+  const showToggle =
+    location.pathname.includes("verticals") || isAiDestinationListingsPage;
   const isAiEditorialPage =
     location.pathname.startsWith("/ai-blogs") ||
     location.pathname.startsWith("/ai-news");
@@ -174,7 +176,8 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
     enabled: shouldCheckNewsBlogLinks,
     keyword: stateParam,
   });
-  const showNewsBlogLinks = shouldCheckNewsBlogLinks && hasNewsOrBlogs;
+  const showNewsBlogLinks =
+    shouldCheckNewsBlogLinks && hasNewsOrBlogs && !isAiDestinationListingsPage;
 
   const currentSearch = location.search || location.state?.sourceSearch || "";
   const aiVerticalsToggleState = (() => {
