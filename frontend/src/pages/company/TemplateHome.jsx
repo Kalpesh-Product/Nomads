@@ -21,6 +21,7 @@ import {
   getMediaSrc,
   getProductPath,
   getSectionPath,
+  resolveSectionFromSlug,
 } from "./utils/templateRouteUtils";
 // import { getSectionTitleByVertical, normalizeVertical } from "./utils/vertical";
 import {
@@ -121,6 +122,10 @@ const TemplateHome = () => {
     typeof data?.CTAButtonText === "string" && data.CTAButtonText.trim()
       ? data.CTAButtonText.trim()
       : "Explore";
+  const pageNavItems = data?.pageNavItems || [];
+  const isSectionEnabled = (slug) =>
+    pageNavItems.some((item) => resolveSectionFromSlug(item.slug) === slug);
+
   const galleryPath = getSectionPath(
     "gallery",
     routeContext?.prefix || window.location.pathname,
@@ -178,27 +183,30 @@ const TemplateHome = () => {
         )}
       </div>
 
-      <section className="bg-black py-0" id="about">
-        <Container>
-          <div className="flex flex-col gap-8">
-            <LinedHeading 
-              title={data?.aboutPageIntro || "About Our Vision"} 
-              className="[&>div]:border-[#f4e01a] [&>h2]:text-[#f4e01a]"
-            />
-            <div className="mx-auto max-w-7xl space-y-4 text-center text-subtitle">
-              {about?.length > 0
-                ? about?.map((para, index) => (
-                    <React.Fragment key={`${String(para).slice(0, 24)}-${index}`}>
-                      <p className="text-white">{para}</p>
-                      <br />
-                    </React.Fragment>
-                  ))
-                : "About section here"}
+      {isSectionEnabled("about") ? (
+        <section className="bg-black py-0" id="about">
+          <Container>
+            <div className="flex flex-col gap-8">
+              <LinedHeading
+                title={data?.aboutPageIntro || "About Our Vision"}
+                className="[&>div]:border-[#f4e01a] [&>h2]:text-[#f4e01a]"
+              />
+              <div className="mx-auto max-w-7xl space-y-4 text-center text-subtitle">
+                {about?.length > 0
+                  ? about?.map((para, index) => (
+                      <React.Fragment key={`${String(para).slice(0, 24)}-${index}`}>
+                        <p className="text-white">{para}</p>
+                        <br />
+                      </React.Fragment>
+                    ))
+                  : "About section here"}
+              </div>
             </div>
-          </div>
-        </Container>
-      </section>
+          </Container>
+        </section>
+      ) : null}
 
+      {isSectionEnabled("products") ? (
       <section id="products" className="bg-[#efefef] py-10">
         <Container>
           <div className="flex flex-col gap-6">
@@ -251,12 +259,14 @@ const TemplateHome = () => {
           </div>
         </Container>
       </section>
+      ) : null}
 
       {/* Inclusions section: home-page amenities grid */}
       {Array.isArray(data?.inclusions) && data.inclusions.length > 0 ? (
         <InclusionsSection inclusions={data.inclusions} />
       ) : null}
 
+      {isSectionEnabled("gallery") ? (
       <section id="gallery" className="bg-[#efefef] py-10">
         <Container>
           <div className="flex flex-col gap-6">
@@ -271,6 +281,7 @@ const TemplateHome = () => {
           </div>
         </Container>
       </section>
+      ) : null}
       <section id="testimonials" className="bg-[#efefef] py-10">
         <Container>
           <div className="flex flex-col gap-6">
@@ -295,6 +306,7 @@ const TemplateHome = () => {
         </Container>
       </section>
 
+      {isSectionEnabled("contact") ? (
       <section id="contact" className="bg-[#efefef] py-10">
         <Container>
           <div className="flex flex-col gap-6">
@@ -347,6 +359,7 @@ const TemplateHome = () => {
           </div>
         </Container>
       </section>
+      ) : null}
 
       {/* Logo Carousel - optional section after contact */}
       {data?.logoCarousel?.enabled &&

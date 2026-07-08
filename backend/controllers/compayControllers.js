@@ -2074,3 +2074,30 @@ export const updateLeads = async (req, res, next) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+const WONOMASTER_BE = `${process.env.WONOMASTER_BE || "https://wonomasterbe.vercel.app"}/api`;
+
+export const applyToCompanyJob = async (req, res, next) => {
+  try {
+    const FormData = (await import("form-data")).default;
+    const fd = new FormData();
+    for (const [key, val] of Object.entries(req.body || {})) {
+      fd.append(key, val);
+    }
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        fd.append(file.fieldname, file.buffer, { filename: file.originalname, contentType: file.mimetype });
+      }
+    }
+    const upstream = await axios.post(
+      `${WONOMASTER_BE}/recruitment/jobs/apply`,
+      fd,
+      { headers: fd.getHeaders() },
+    );
+    return res.status(upstream.status).json(upstream.data);
+  } catch (error) {
+    const status = error?.response?.status || 500;
+    const message = error?.response?.data?.message || error?.message || "Failed to submit application";
+    return res.status(status).json({ message });
+  }
+};
