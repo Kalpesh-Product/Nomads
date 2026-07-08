@@ -143,11 +143,7 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
   const stateLabel = stateParam ? formatStateLabel(stateParam) : "";
   const newsLabel = stateLabel ? `${stateLabel} News` : "News";
   const blogLabel = stateLabel ? `${stateLabel} Blog` : "Blog";
-  const {
-    hasBlogs,
-    hasNews,
-    hasNewsOrBlogs,
-  } = useLocationContentAvailability({
+  const { hasBlogs, hasNews, hasNewsOrBlogs } = useLocationContentAvailability({
     enabled: shouldCheckNewsBlogLinks,
     keyword: stateParam,
   });
@@ -204,7 +200,7 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
                           className="group relative text-md text-black"
                         >
                           <span className="relative z-10 group-hover:font-bold mb-2 text-sm font-semibold">
-                            Map View
+                            Map view
                           </span>
                           <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-primary-blue transition-all duration-300 group-hover:w-full"></span>
                         </Link>
