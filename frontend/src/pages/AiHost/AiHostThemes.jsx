@@ -143,7 +143,7 @@ const Themes = () => {
                     )} */}
       </div>
       <Container padding={false}>
-        <section className="flex flex-col items-end justify-center gap-4 leading-[1.3] text-secondary-dark lg:pt-16 pt-10 pb-10">
+        <section className="flex flex-col items-end justify-center gap-4 leading-[1.3] text-secondary-dark lg:pt-0 pt-10 pb-10">
           <h1 className="text-[clamp(1.62rem,4.0vw,4.5rem)] font-medium">
             Choose the best Responsive Website Theme for your business
           </h1>
