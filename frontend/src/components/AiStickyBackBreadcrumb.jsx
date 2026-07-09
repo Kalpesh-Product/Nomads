@@ -16,7 +16,7 @@ const AiStickyBackBreadcrumb = ({
 
   return (
     <div
-      className={`${stickyClassName} z-40 bg-white/95 py-3 backdrop-blur-sm md:px-10 ${className}`}
+      className={`${stickyClassName} z-40 bg-white/95 pt-0 pb-4 backdrop-blur-sm md:px-10 ${className}`}
     >
       <div className={`flex min-w-0 items-center gap-2 ${rowClassName}`}>
         <button
@@ -28,12 +28,18 @@ const AiStickyBackBreadcrumb = ({
           <HiOutlineArrowLeft size={18} />
         </button>
 
-        {label ? <span className="text-lg font-semibold text-primary-blue sm:hidden">{label}</span> : null}
+        {label ? (
+          <span className="text-lg font-semibold text-primary-blue sm:hidden">
+            {label}
+          </span>
+        ) : null}
 
         {isLoading ? (
           <div className="ml-1 flex items-center gap-2" aria-live="polite">
             <span className="h-3 w-3 animate-spin rounded-full border-2 border-sky-500 border-t-transparent" />
-            <span className={`text-primary-blue ${textSizeClassName}`}>Loading...</span>
+            <span className={`text-primary-blue ${textSizeClassName}`}>
+              Loading...
+            </span>
           </div>
         ) : breadcrumbs.length > 0 ? (
           <nav
@@ -52,7 +58,13 @@ const AiStickyBackBreadcrumb = ({
                     {item.label}
                   </button>
                 ) : (
-                  <span className={item.truncate ? "inline-block align-bottom md:max-w-none" : ""}>
+                  <span
+                    className={
+                      item.truncate
+                        ? "inline-block align-bottom md:max-w-none"
+                        : ""
+                    }
+                  >
                     {item.label}
                   </span>
                 )}
