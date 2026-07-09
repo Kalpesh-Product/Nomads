@@ -11,6 +11,11 @@ import { NavLink, useNavigate } from "react-router-dom";
 import MySeperator from "../../components/MySeperator";
 import AiHome from "../AiHome";
 import AiHostPricing from "./AiHostPricing";
+import {
+  TbFileDescription,
+  TbLayoutDashboard,
+  TbWorldWww,
+} from "react-icons/tb";
 
 const HostHome = () => {
   // mobile screen for globe responsiveness
@@ -91,42 +96,44 @@ const HostHome = () => {
               {
                 id: 1,
                 title: "MODULES",
-                icon: images.website,
+                icon: TbWorldWww,
                 route: "/host/ai-host-modules",
               },
               {
                 id: 2,
                 title: "LEADS",
-                icon: images.leadGenerationSM,
+                icon: TbFileDescription,
                 route: "/host/ai-host-leads",
               },
               {
                 id: 3,
                 title: "THEMES",
-                icon: images.analyticsCM,
+                icon: TbLayoutDashboard,
                 route: "/host/ai-host-themes",
               },
-            ].map((tab) => (
-              <div
-                key={tab.id}
-                onClick={() => navigate(tab.route)}
-                className="group cursor-pointer rounded-2xl bg-[#f1f1f3] px-6 py-5 text-center shadow-[0_1px_0_rgba(255,255,255,0.7)] transition-colors duration-200 hover:bg-sky-500"
-              >
-                <div className="flex items-center justify-center gap-4">
-                  <div className="h-12 w-12 rounded-xl bg-white/55 flex items-center justify-center transition-colors duration-200 group-hover:bg-transparent">
-                    <img
-                      src={tab.icon}
-                      alt={tab.title}
-                      className="h-8 w-8 object-contain transition-all duration-200 group-hover:invert"
-                    />
-                  </div>
+            ].map((tab) => {
+              const Icon = tab.icon;
 
-                  <h3 className="ml-6 text-[clamp(1rem,1.4vw,1.5rem)] font-semibold text-secondary-dark text-center transition-colors duration-200 group-hover:text-white">
-                    {tab.title}
-                  </h3>
+              return (
+                <div
+                  key={tab.id}
+                  onClick={() => navigate(tab.route)}
+                  className="group cursor-pointer rounded-2xl bg-[#f1f1f3] px-6 py-5 text-center shadow-[0_1px_0_rgba(255,255,255,0.7)] transition-colors duration-200 hover:bg-sky-500"
+                >
+                  <div className="mx-auto grid w-fit grid-cols-[24px_auto] items-center gap-3 text-left">
+                    <Icon
+                      size={24}
+                      strokeWidth={2.2}
+                      aria-hidden="true"
+                      className="shrink-0 text-black/90 transition-colors duration-200 group-hover:text-white"
+                    />
+                    <h3 className="text-nano font-bold uppercase leading-tight text-black/90 transition-colors duration-200 group-hover:text-white sm:text-[0.8rem] pl-5">
+                      {tab.title}
+                    </h3>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
       </Container>

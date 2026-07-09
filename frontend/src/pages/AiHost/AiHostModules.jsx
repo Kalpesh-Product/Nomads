@@ -254,7 +254,6 @@ export default function Modules() {
                         handleSubmit={() => navigate("/host/ai-host-signup?step=1")}
                     />
                 </div>
-                <hr />
             </Container>
         </>
     );
