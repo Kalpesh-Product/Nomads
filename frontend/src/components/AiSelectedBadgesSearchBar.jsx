@@ -1,8 +1,5 @@
 import React from "react";
-import {
-  HiOutlineSearch,
-  HiOutlineX,
-} from "react-icons/hi";
+import { HiOutlineSearch, HiOutlineX } from "react-icons/hi";
 import { dedupeAiSearchBadges } from "../utils/aiSearchBarBadges.js";
 
 const badgeClassName =
@@ -25,9 +22,7 @@ const AiSelectedBadgesSearchBar = ({
   return (
     <div className={`hidden lg:block ${className}`}>
       {heading && (
-        <div className={`mx-auto mt-4 w-full ${widthClassName}`}>
-          {heading}
-        </div>
+        <div className={`mx-auto mt-2 w-full ${widthClassName}`}>{heading}</div>
       )}
 
       <div
@@ -36,7 +31,9 @@ const AiSelectedBadgesSearchBar = ({
         <div className="flex flex-1 flex-wrap items-center gap-2 overflow-hidden">
           {visibleBadges.map((badgeLabel, index) => (
             <div key={`${badgeLabel}-${index}`} className={badgeClassName}>
-              <span className="whitespace-normal break-words">{badgeLabel}</span>
+              <span className="whitespace-normal break-words">
+                {badgeLabel}
+              </span>
             </div>
           ))}
           {/* {stateLabel && <span className={badgeClassName}>{stateLabel}</span>} */}

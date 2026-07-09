@@ -79,8 +79,9 @@ const normalizeContentDestination = (label) =>
 const formatDestinationDisplayLabel = (label) =>
   normalizeContentDestination(label)
     .replace(/\s+/g, " ")
-    .replace(/(^|[\s-])([a-z])/g, (_, separator, character) =>
-      `${separator}${character.toUpperCase()}`,
+    .replace(
+      /(^|[\s-])([a-z])/g,
+      (_, separator, character) => `${separator}${character.toUpperCase()}`,
     );
 const buildExactContentKeyword = (label) => {
   if (!label) return null;
@@ -506,17 +507,16 @@ const AiGlobalListingsList = () => {
   );
   const popularLocationEvents = useMemo(
     () =>
-      (Array.isArray(eventsData) ? eventsData : [])
-        .map((event) => ({
-          ...event,
-          id: event._id || event.serialNumber || event.eventName,
-          title: event.eventName,
-          image: event.mainImage,
-          location: event.venue || event.destination,
-          meta: event.month,
-          subtitle: event.month,
-          description: event.shortDescription,
-        })),
+      (Array.isArray(eventsData) ? eventsData : []).map((event) => ({
+        ...event,
+        id: event._id || event.serialNumber || event.eventName,
+        title: event.eventName,
+        image: event.mainImage,
+        location: event.venue || event.destination,
+        meta: event.month,
+        subtitle: event.month,
+        description: event.shortDescription,
+      })),
     [eventsData],
   );
   const popularLocationVenues = useMemo(
@@ -573,8 +573,7 @@ const AiGlobalListingsList = () => {
       ),
     [restaurantsData],
   );
-  const isAnnualEventsExpanded =
-    expandedCategories.includes("annualevents");
+  const isAnnualEventsExpanded = expandedCategories.includes("annualevents");
   const displayedPopularLocationEvents = isAnnualEventsExpanded
     ? popularLocationEvents
     : popularLocationEvents.slice(0, 5);
@@ -694,8 +693,8 @@ const AiGlobalListingsList = () => {
       return [];
     }
 
-    const visibleDestinationHighlightFilters = DESTINATION_HIGHLIGHT_FILTERS.filter(
-      (option) => {
+    const visibleDestinationHighlightFilters =
+      DESTINATION_HIGHLIGHT_FILTERS.filter((option) => {
         if (option.value === ANNUAL_EVENTS_CATEGORY) {
           return popularLocationEvents.length > 0;
         }
@@ -709,8 +708,7 @@ const AiGlobalListingsList = () => {
         }
 
         return true;
-      },
-    );
+      });
 
     if (!listingsData || listingsData.length === 0) {
       return [
@@ -1246,7 +1244,7 @@ const AiGlobalListingsList = () => {
             onBack={() => navigate(-1)}
             onClear={() => navigate(-1)}
             heading={
-              <p className=" mt-6 mb-6 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
+              <p className=" mt-0 mb-5 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
                 {!isSecondHeadingPhase && (
                   <span
                     className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-b-transparent"
@@ -1479,26 +1477,26 @@ const AiGlobalListingsList = () => {
                           );
                         })}
                       <AiDestinationHighlightSection
-                            title={`Popular Annual Events in ${selectedLocationLabel}`}
-                            items={displayedPopularLocationEvents}
-                            kind="event"
-                            onCardClick={(item) =>
-                              handleHighlightCardClick(item, "event")
-                            }
-                            onViewMore={
-                              showAnnualEventsToggle
-                                ? () => handleShowMoreClick("annualevents")
-                                : undefined
-                            }
-                            viewMoreLabel={
-                              isAnnualEventsExpanded
-                                ? "View less \u2190"
-                                : "View more \u2192"
-                            }
-                            sectionRef={(element) => {
+                        title={`Popular Annual Events in ${selectedLocationLabel}`}
+                        items={displayedPopularLocationEvents}
+                        kind="event"
+                        onCardClick={(item) =>
+                          handleHighlightCardClick(item, "event")
+                        }
+                        onViewMore={
+                          showAnnualEventsToggle
+                            ? () => handleShowMoreClick("annualevents")
+                            : undefined
+                        }
+                        viewMoreLabel={
+                          isAnnualEventsExpanded
+                            ? "View less \u2190"
+                            : "View more \u2192"
+                        }
+                        sectionRef={(element) => {
                           sectionRefs.current["annualevents-desktop"] = element;
-                            }}
-                          />
+                        }}
+                      />
                       <AiDestinationHighlightSection
                         title={`Popular Places to visit in ${selectedLocationLabel}`}
                         items={displayedPopularLocationVenues}
@@ -1541,29 +1539,29 @@ const AiGlobalListingsList = () => {
                           sectionRefs.current["restaurants-desktop"] = element;
                         }}
                       />
-                          <AiDestinationHighlightSection
-                            title={`Latest ${selectedLocationLabel} News`}
-                            items={popularLocationNews}
-                            kind="news"
-                            onCardClick={(item) =>
-                              handleHighlightCardClick(item, "news")
-                            }
-                            onViewMore={handleNewsViewMore}
-                            sectionRef={(element) => {
-                              sectionRefs.current["news-desktop"] = element;
-                            }}
-                          />
-                          <AiDestinationHighlightSection
-                            title={`Latest ${selectedLocationLabel} Blogs`}
-                            items={popularLocationBlogs}
-                            kind="blog"
-                            onCardClick={(item) =>
-                              handleHighlightCardClick(item, "blog")
-                            }
-                            onViewMore={handleBlogsViewMore}
-                            sectionRef={(element) => {
-                              sectionRefs.current["blogs-desktop"] = element;
-                            }}
+                      <AiDestinationHighlightSection
+                        title={`Latest ${selectedLocationLabel} News`}
+                        items={popularLocationNews}
+                        kind="news"
+                        onCardClick={(item) =>
+                          handleHighlightCardClick(item, "news")
+                        }
+                        onViewMore={handleNewsViewMore}
+                        sectionRef={(element) => {
+                          sectionRefs.current["news-desktop"] = element;
+                        }}
+                      />
+                      <AiDestinationHighlightSection
+                        title={`Latest ${selectedLocationLabel} Blogs`}
+                        items={popularLocationBlogs}
+                        kind="blog"
+                        onCardClick={(item) =>
+                          handleHighlightCardClick(item, "blog")
+                        }
+                        onViewMore={handleBlogsViewMore}
+                        sectionRef={(element) => {
+                          sectionRefs.current["blogs-desktop"] = element;
+                        }}
                       />
                       <div
                         ref={(element) => {
@@ -1915,27 +1913,27 @@ const AiGlobalListingsList = () => {
                         );
                       })}
                     <AiDestinationHighlightSection
-                          mobile
-                          title={`Popular Annual Events in ${selectedLocationLabel}`}
-                          items={displayedPopularLocationEvents}
-                          kind="event"
-                          onCardClick={(item) =>
-                            handleHighlightCardClick(item, "event")
-                          }
-                          onViewMore={
-                            showAnnualEventsToggle
-                              ? () => handleShowMoreClick("annualevents")
-                              : undefined
-                          }
-                          viewMoreLabel={
-                            isAnnualEventsExpanded
-                              ? "View less \u2190"
-                              : "View more \u2192"
-                          }
-                          sectionRef={(element) => {
+                      mobile
+                      title={`Popular Annual Events in ${selectedLocationLabel}`}
+                      items={displayedPopularLocationEvents}
+                      kind="event"
+                      onCardClick={(item) =>
+                        handleHighlightCardClick(item, "event")
+                      }
+                      onViewMore={
+                        showAnnualEventsToggle
+                          ? () => handleShowMoreClick("annualevents")
+                          : undefined
+                      }
+                      viewMoreLabel={
+                        isAnnualEventsExpanded
+                          ? "View less \u2190"
+                          : "View more \u2192"
+                      }
+                      sectionRef={(element) => {
                         sectionRefs.current["annualevents-mobile"] = element;
-                          }}
-                        />
+                      }}
+                    />
                     <AiDestinationHighlightSection
                       mobile
                       title={`Popular Places to visit in ${selectedLocationLabel}`}
@@ -1980,31 +1978,31 @@ const AiGlobalListingsList = () => {
                         sectionRefs.current["restaurants-mobile"] = element;
                       }}
                     />
-                        <AiDestinationHighlightSection
-                          mobile
-                          title={`Latest ${selectedLocationLabel} News`}
-                          items={popularLocationNews}
-                          kind="news"
-                          onCardClick={(item) =>
-                            handleHighlightCardClick(item, "news")
-                          }
-                          onViewMore={handleNewsViewMore}
-                          sectionRef={(element) => {
-                            sectionRefs.current["news-mobile"] = element;
-                          }}
-                        />
-                        <AiDestinationHighlightSection
-                          mobile
-                          title={`Latest ${selectedLocationLabel} Blogs`}
-                          items={popularLocationBlogs}
-                          kind="blog"
-                          onCardClick={(item) =>
-                            handleHighlightCardClick(item, "blog")
-                          }
-                          onViewMore={handleBlogsViewMore}
-                          sectionRef={(element) => {
-                            sectionRefs.current["blogs-mobile"] = element;
-                          }}
+                    <AiDestinationHighlightSection
+                      mobile
+                      title={`Latest ${selectedLocationLabel} News`}
+                      items={popularLocationNews}
+                      kind="news"
+                      onCardClick={(item) =>
+                        handleHighlightCardClick(item, "news")
+                      }
+                      onViewMore={handleNewsViewMore}
+                      sectionRef={(element) => {
+                        sectionRefs.current["news-mobile"] = element;
+                      }}
+                    />
+                    <AiDestinationHighlightSection
+                      mobile
+                      title={`Latest ${selectedLocationLabel} Blogs`}
+                      items={popularLocationBlogs}
+                      kind="blog"
+                      onCardClick={(item) =>
+                        handleHighlightCardClick(item, "blog")
+                      }
+                      onViewMore={handleBlogsViewMore}
+                      sectionRef={(element) => {
+                        sectionRefs.current["blogs-mobile"] = element;
+                      }}
                     />
                     <div
                       ref={(element) => {
