@@ -304,12 +304,12 @@ const TemplateCareerPage = () => {
           <option key={c.name} value={c.name}>{c.name}</option>
         ))}
       </select>
-      <div className="rounded-lg border border-dashed border-slate-300 bg-white px-3 py-2 text-[13px]">
+      <div className="rounded-lg border border-dashed border-slate-300 bg-white px-3 py-2 text-[11px] sm:text-[13px]">
         <label className="flex cursor-pointer items-center justify-between gap-3">
-          <span className="font-medium text-[#111827]">
+          <span className="min-w-0 flex-1 truncate font-medium leading-tight text-[#111827]">
             {resumeFile ? resumeFile.name : "Upload Resume / CV *"}
           </span>
-          <span className="rounded-md border border-slate-300 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-[#374151]">
+          <span className="shrink-0 rounded-md border border-slate-300 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#374151] sm:px-3 sm:text-[11px]">
             Choose File
           </span>
           <input
@@ -494,7 +494,10 @@ const TemplateCareerPage = () => {
   return (
     <section className="bg-[#efefef] px-4 py-10 md:px-6">
       <div className="mx-auto mt-6 w-full max-w-7xl">
-        <LinedHeading title={CAREERS_PAGE_HEADING} />
+        <LinedHeading
+          title={CAREERS_PAGE_HEADING}
+          titleClassName="max-w-[72vw] text-[clamp(0.72rem,4vw,26px)] leading-tight tracking-[0.08em] sm:max-w-none sm:text-base sm:tracking-[0.15em]"
+        />
 
         <div className="mx-auto mt-10 max-w-4xl text-center text-[15px] leading-[1.9] text-[#374151] font-['Poppins',ui-sans-serif,system-ui,sans-serif] md:text-[17px]">
           {introParagraphs.map((para, i) => (
@@ -504,7 +507,7 @@ const TemplateCareerPage = () => {
 
         <div className="mt-10 flex items-center gap-4">
           <div className="flex-1 border-t border-[#111827]" />
-          <h2 className="shrink-0 text-center text-[20px] font-semibold uppercase tracking-[0.15em] text-[#111827] md:text-[28px] lg:text-[32px]">
+          <h2 className="shrink-0 text-center text-[20px] font-semibold uppercase tracking-[0.15em] text-[#111827] md:text-[28px] lg:text-[26px]">
             Open Positions
           </h2>
           <div className="flex-1 border-t border-[#111827]" />
@@ -515,7 +518,7 @@ const TemplateCareerPage = () => {
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-[#111827]" />
           </div>
         ) : jobs.length === 0 ? (
-          <div className="mt-10 rounded-[28px] border border-[#111827]/10 bg-white px-6 py-10 text-center shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
+          <div className="mt-10 rounded-[28px] px-6 py-10 text-center ">
             <p className="text-[16px] font-semibold text-[#111827]">No job openings at the moment.</p>
             <p className="mt-2 text-[14px] text-[#374151]">Please check back later or use the apply button to share your resume.</p>
           </div>
