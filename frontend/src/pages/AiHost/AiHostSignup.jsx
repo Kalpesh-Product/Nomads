@@ -27,8 +27,8 @@ import { MenuItem } from "@mui/material";
 import UploadFileInput from "../../components/UploadFileInput";
 import UploadMultipleFilesInput from "../../components/UploadMultipleFilesInput";
 import AiHostPricing from "./AiHostPricing";
-import { HiOutlineArrowLeft } from "react-icons/hi";
 import useAuth from "../../hooks/useAuth";
+import AiStickyBackBreadcrumb from "../../components/AiStickyBackBreadcrumb";
 
 const steps = ["GOAL", "BASIC DETAILS"];
 const ACTIVATION_TITLE = "Your goal is set... let's get you activated";
@@ -83,7 +83,7 @@ const floatingLabelSx = {
 };
 
 const compactStepFieldSx = {
-  my: 0.5,
+  my: 0,
 };
 
 const getFlagIconUrl = (isoCode) =>
@@ -1452,16 +1452,15 @@ const AiHostSignup = () => {
   };
 
   return (
-    <div className="h-full flex flex-col justify-start p-4 lg:p-10 items-center w-full">
-      <div className="sticky top-0 z-40 flex justify-start w-full bg-white/95 py-3 backdrop-blur-sm">
-        <button
-          type="button"
-          onClick={onBack}
-          className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500"
-          aria-label="Go back to search results"
-        >
-          <HiOutlineArrowLeft size={18} />
-        </button>
+    <div className="h-full flex flex-col justify-start items-center w-full">
+      <div className="w-[calc(100%+0.5rem)] -mx-1 bg-white/95 md:w-[calc(100%+3rem)] md:-mx-6 lg:w-[calc(100%+5rem)] lg:-mx-10 xl:w-[calc(100%+12rem)] xl:-mx-24">
+        <div className="px-3 md:px-8 lg:px-10 xl:px-12 2xl:px-14">
+          <AiStickyBackBreadcrumb
+            onBack={onBack}
+            breadcrumbs={[]}
+            sticky={false}
+          />
+        </div>
       </div>
       {/* <Stepper
                 className="w-full p-0"
@@ -1494,7 +1493,11 @@ const AiHostSignup = () => {
                     <Step label={label} key={index} />
                 ))}
             </Stepper> */}
-      <div className="max-w-5xl mx-auto w-full">
+      <div
+        className={`max-w-5xl mx-auto w-full ${
+          activeStep === 1 ? "md:px-20 lg:px-20 flex flex-col gap-1" : ""
+        }`}
+      >
         {/* {activeStep !== 3 && (
           <h1 className="text-title text-center">
             Let's set up your free account
@@ -1516,7 +1519,7 @@ const AiHostSignup = () => {
 
         <form
           key={activeStep}
-          className={`${activeStep === 0 ? "block" : "grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-4"}`}
+          className={`${activeStep === 0 ? "block" : "grid grid-cols-1 md:grid-cols-2 gap-4"}`}
           // onSubmit={handleSubmit((data) => register(data))}
           // onSubmit={handleSubmit((data) =>
           //   register({ ...data, about: data.about.map((a) => a.text) })
@@ -1753,12 +1756,24 @@ const AiHostSignup = () => {
                       )}
                     />
                   </div>
-                  <GetStartedButton
-                    title={isRegisterLoading ? "Submitting..." : "Submit"}
+                  <Button
                     type="submit"
                     disabled={isRegisterLoading}
-                    isLoading={isRegisterLoading}
-                  />
+                    variant="contained"
+                    sx={{
+                      bgcolor: "black",
+                      borderRadius: 20,
+                      px: { xs: 6, md: 14 },
+                      py: 1.5,
+                      fontSize: "1rem",
+                      fontWeight: "600",
+                      textTransform: "none",
+                      "&:hover": { bgcolor: "#333" },
+                      width: { xs: "100%", md: "auto" },
+                    }}
+                  >
+                    {isRegisterLoading ? "Submitting..." : "Submit"}
+                  </Button>
                 </div>
               )}
 

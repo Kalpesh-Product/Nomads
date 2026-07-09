@@ -95,20 +95,20 @@ const Leads = () => {
       </div>
       {/* Top Text section */}
       <Container padding={false}>
-        <div className="lg:pt-16 pt-10">
-          <div>
-            <h2 className="lg:text-[1.67rem] md:text-[1.75rem] sm:text-[1.75rem] xs:text-[1.75rem] leading-[1.4] font-semibold text-host">
-              Generate continuous structured leads for your business with the
-              support of our automated platform and trained and experienced
-              resources.
-            </h2>
-          </div>
-          <div className="flex flex-row lg:justify-end md:justify-end  sm:justify-center xs:justify-center items-center pb-8 pt-4">
-            <GetStartedButton
-              handleSubmit={() => navigate("/host/ai-host-signup?step=1")}
-            />
-          </div>
+        {/* <div className="lg:pt-16 pt-10"> */}
+        <div>
+          <h2 className="lg:text-[1.67rem] md:text-[1.75rem] sm:text-[1.75rem] xs:text-[1.75rem] leading-[1.4] font-semibold text-host">
+            Generate continuous structured leads for your business with the
+            support of our automated platform and trained and experienced
+            resources.
+          </h2>
         </div>
+        <div className="flex flex-row lg:justify-end md:justify-end  sm:justify-center xs:justify-center items-center pb-8 pt-4">
+          <GetStartedButton
+            handleSubmit={() => navigate("/host/ai-host-signup?step=1")}
+          />
+        </div>
+        {/* </div> */}
       </Container>
 
       {/* Social media icons banner */}
