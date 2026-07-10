@@ -1,5 +1,4 @@
 import express from "express";
-import mongoose from "mongoose";
 import { config } from "dotenv";
 import { corsConfig } from "./config/corsConfig.js";
 import cors from "cors";
@@ -41,7 +40,6 @@ import leadsRoutes from "./routes/leadsRoutes.js";
 
 const app = express();
 config({ override: true });
-connectDb(process.env.MONGO_URL);
 
 app.use(credentials);
 app.use(cors(corsConfig));
@@ -112,10 +110,14 @@ app.use((err, req, res, next) => {
 });
 
 app.use(errorHandler);
-app.listen(
-  PORT,
-  mongoose.connection.once("open", () => {
+
+try {
+  await connectDb(process.env.MONGO_URL);
+
+  app.listen(PORT, () => {
     console.log("connected");
     console.log(`Server is running on port ${PORT}`);
-  }),
-);
+  });
+} catch (error) {
+  process.exit(1);
+}
