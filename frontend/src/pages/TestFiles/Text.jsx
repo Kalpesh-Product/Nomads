@@ -1,6 +1,6 @@
 //  Become a contributor, Capitalised state name in list view
 //  Home page Exclamation & comma in please find below
-//  changed Cafe's to Cafes
+//  changed Cafes label
 //  Event Reviews edit
 //  Alert after editing event review
 //  Text change: High speed & Stable internet

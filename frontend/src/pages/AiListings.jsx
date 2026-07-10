@@ -41,6 +41,9 @@ import {
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
 const ANNUAL_EVENTS_CATEGORY = "annualevents";
 const VENUES_CATEGORY = "venues";
+const RESTAURANTS_CATEGORY = "restaurants";
+const NEWS_CATEGORY = "news";
+const BLOGS_CATEGORY = "blogs";
 const TYPING_INTERVAL_MS = 7;
 const SECOND_HEADING_DELAY_MS = 250;
 const THINKING_HEADING_TEXT = "Curating the best results for you";
@@ -49,6 +52,7 @@ const CURATED_RESULTS_HEADING_TEXT =
 const MOBILE_SHORTCUT_ICON_OVERRIDES = {
   annualevents: "/icons-new/Events-cropped.png",
   venues: "/icons-new/Venues-cropped.png",
+  restaurants: "/icons-new/Restaurants.png",
   news: "/icons-new/News-cropped.png",
   blogs: "/icons-new/Blogs-cropped.png",
 };
@@ -61,6 +65,15 @@ const normalizeContentDestination = (label) =>
         .replace(/[\u2010-\u2015\u2212\u{FE63}\u{FF0D}]/gu, "-")
         .trim()
     : "";
+const buildExactKeyword = (label) => {
+  if (!label) return null;
+  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return `^${escaped}$`;
+};
+const extractImageFromContent = (content) => {
+  const match = content?.match(/<img.*?src=["'](.*?)["']/);
+  return match ? match[1] : null;
+};
 
 const valueAddedServiceItems = [
   {
@@ -356,7 +369,7 @@ const AiListings = ({ forceListView = false }) => {
   //   { label: "Workation", value: "workation" },
   //   { label: "Private Stay", value: "privatestay" },
   //   { label: "Meetings", value: "meetingroom" },
-  //   { label: "Cafe’s", value: "cafe" },
+  //   { label: "Cafes", value: "cafe" },
   // ];
 
   const activeCategory = searchParams.get("category");
@@ -414,6 +427,20 @@ const AiListings = ({ forceListView = false }) => {
     enabled: !!destinationAvailability,
     refetchOnWindowFocus: false,
   });
+  const { data: destinationRestaurantsData = [] } = useQuery({
+    queryKey: ["ai-restaurants-availability", destinationAvailability],
+    queryFn: async () => {
+      const response = await axios.get("/restaurants", {
+        params: {
+          destination: destinationAvailability,
+        },
+      });
+
+      return Array.isArray(response.data) ? response.data : [];
+    },
+    enabled: !!destinationAvailability,
+    refetchOnWindowFocus: false,
+  });
 
   const categoryOptions = React.useMemo(() => {
     if (isLisitingLoading) {
@@ -428,6 +455,10 @@ const AiListings = ({ forceListView = false }) => {
 
         if (option.value === VENUES_CATEGORY) {
           return destinationVenuesData.length > 0;
+        }
+
+        if (option.value === RESTAURANTS_CATEGORY) {
+          return destinationRestaurantsData.length > 0;
         }
 
         return true;
@@ -462,7 +493,7 @@ const AiListings = ({ forceListView = false }) => {
       workation: "Workation",
       // privatestay: "Private Stay",
       meetingroom: "Meetings",
-      cafe: "Cafe’s",
+      cafe: "Cafes",
     };
 
     const typeOrder = [
@@ -489,6 +520,7 @@ const AiListings = ({ forceListView = false }) => {
     ];
   }, [
     destinationEventsData.length,
+    destinationRestaurantsData.length,
     destinationVenuesData.length,
     isLisitingLoading,
     listingsData,
@@ -509,10 +541,13 @@ const AiListings = ({ forceListView = false }) => {
       hostel: "Hostels",
       workation: "Workation",
       meetingroom: "Meetings",
-      cafe: "Cafe’s",
+      cafe: "Cafes",
       [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
       [ANNUAL_EVENTS_CATEGORY]: "Events",
-      [VENUES_CATEGORY]: "Venues",
+      [VENUES_CATEGORY]: "Places",
+      [RESTAURANTS_CATEGORY]: "Restaurants",
+      [NEWS_CATEGORY]: "News",
+      [BLOGS_CATEGORY]: "Blogs",
     };
 
     return (
@@ -533,7 +568,10 @@ const AiListings = ({ forceListView = false }) => {
     if (
       formData?.category === VALUE_ADDED_SERVICES_CATEGORY ||
       formData?.category === ANNUAL_EVENTS_CATEGORY ||
-      formData?.category === VENUES_CATEGORY
+      formData?.category === VENUES_CATEGORY ||
+      formData?.category === RESTAURANTS_CATEGORY ||
+      formData?.category === NEWS_CATEGORY ||
+      formData?.category === BLOGS_CATEGORY
     ) {
       return [];
     }
@@ -653,7 +691,10 @@ const AiListings = ({ forceListView = false }) => {
       if (
         formData.category === VALUE_ADDED_SERVICES_CATEGORY ||
         formData.category === ANNUAL_EVENTS_CATEGORY ||
-        formData.category === VENUES_CATEGORY
+        formData.category === VENUES_CATEGORY ||
+        formData.category === RESTAURANTS_CATEGORY ||
+        formData.category === NEWS_CATEGORY ||
+        formData.category === BLOGS_CATEGORY
       ) {
         return;
       }
@@ -707,17 +748,11 @@ const AiListings = ({ forceListView = false }) => {
 
   const handleCategoryClick = (categoryValue) => {
     const formData = getValues(); // from react-hook-form
+    const normalizeFilterValue = (value) =>
+      typeof value === "string" ? value.trim().toLowerCase() : "";
 
     if (!formData.country || !formData.location) {
       alert("Please select Country and Location first.");
-      return;
-    }
-
-    if (categoryValue === "news" || categoryValue === "blogs") {
-      navigate({
-        pathname: categoryValue === "news" ? "/ai-news" : "/ai-blogs",
-        search: location.search,
-      });
       return;
     }
 
@@ -726,7 +761,10 @@ const AiListings = ({ forceListView = false }) => {
         (filter) =>
           filter.value === categoryValue &&
           categoryValue !== ANNUAL_EVENTS_CATEGORY &&
-          categoryValue !== VENUES_CATEGORY,
+          categoryValue !== VENUES_CATEGORY &&
+          categoryValue !== RESTAURANTS_CATEGORY &&
+          categoryValue !== NEWS_CATEGORY &&
+          categoryValue !== BLOGS_CATEGORY,
       )
     ) {
       const params = new URLSearchParams({
@@ -740,6 +778,23 @@ const AiListings = ({ forceListView = false }) => {
           searchBarBadges,
         },
       });
+      return;
+    }
+
+    const currentCountry = searchParams.get("country");
+    const currentLocation =
+      searchParams.get("state") || searchParams.get("location");
+    const currentCategory = searchParams.get("category");
+    const isCurrentCategory =
+      normalizeFilterValue(currentCountry) ===
+        normalizeFilterValue(formData.country) &&
+      normalizeFilterValue(currentLocation) ===
+        normalizeFilterValue(formData.location) &&
+      normalizeFilterValue(currentCategory) ===
+        normalizeFilterValue(categoryValue);
+
+    if (isCurrentCategory) {
+      setShowMobileSearch(false);
       return;
     }
 
@@ -793,12 +848,8 @@ const AiListings = ({ forceListView = false }) => {
     return service.label.replace("LOCATION", locationLabel);
   };
 
-  const getValueAddedServiceCardLines = (serviceLabel, service) => {
+  const getValueAddedServiceCardLines = (serviceLabel) => {
     if (!serviceLabel) return [];
-
-    if (service?.label === "APPLY FOR JOB") {
-      return [serviceLabel];
-    }
 
     const [firstWord, ...remainingWords] = serviceLabel
       .split(" ")
@@ -819,8 +870,16 @@ const AiListings = ({ forceListView = false }) => {
   const isAnnualEventsSelected =
     formData?.category === ANNUAL_EVENTS_CATEGORY;
   const isVenuesSelected = formData?.category === VENUES_CATEGORY;
+  const isRestaurantsSelected = formData?.category === RESTAURANTS_CATEGORY;
+  const isNewsSelected = formData?.category === NEWS_CATEGORY;
+  const isBlogsSelected = formData?.category === BLOGS_CATEGORY;
   const isFocusedContentSelected =
-    isValueAddedServicesSelected || isAnnualEventsSelected || isVenuesSelected;
+    isValueAddedServicesSelected ||
+    isAnnualEventsSelected ||
+    isVenuesSelected ||
+    isRestaurantsSelected ||
+    isNewsSelected ||
+    isBlogsSelected;
   const showDesktopMap =
     !forceListView && mapOpen && !isFocusedContentSelected;
   const listingsBasePath =
@@ -877,6 +936,52 @@ const AiListings = ({ forceListView = false }) => {
     enabled: isVenuesSelected && !!eventDestination,
     refetchOnWindowFocus: false,
   });
+  const { data: restaurantsData = [], isPending: isRestaurantsLoading } =
+    useQuery({
+      queryKey: ["ai-restaurants", eventDestination],
+      queryFn: async () => {
+        const response = await axios.get("/restaurants", {
+          params: {
+            destination: eventDestination,
+          },
+        });
+
+        return Array.isArray(response.data) ? response.data : [];
+      },
+      enabled: isRestaurantsSelected && !!eventDestination,
+      refetchOnWindowFocus: false,
+    });
+  const contentParams = useMemo(() => {
+    if (!eventDestination) return undefined;
+
+    return {
+      keyword: buildExactKeyword(eventDestination),
+    };
+  }, [eventDestination]);
+  const { data: newsData = [], isPending: isNewsLoading } = useQuery({
+    queryKey: ["ai-news", eventDestination],
+    queryFn: async () => {
+      const response = await axios.get("/news/get-news", {
+        params: contentParams,
+      });
+
+      return Array.isArray(response.data) ? response.data : [];
+    },
+    enabled: isNewsSelected && !!eventDestination,
+    refetchOnWindowFocus: false,
+  });
+  const { data: blogsData = [], isPending: isBlogsLoading } = useQuery({
+    queryKey: ["blogs", eventDestination],
+    queryFn: async () => {
+      const response = await axios.get("/blogs/get-blogs", {
+        params: contentParams,
+      });
+
+      return Array.isArray(response.data) ? response.data : [];
+    },
+    enabled: isBlogsSelected && !!eventDestination,
+    refetchOnWindowFocus: false,
+  });
   const annualEvents = useMemo(
     () =>
       eventsData.map((event) => ({
@@ -893,18 +998,85 @@ const AiListings = ({ forceListView = false }) => {
   );
   const venues = useMemo(
     () =>
-      venuesData.map((place) => ({
-        ...place,
-        id: place._id || place.serialNumber || place.placeName,
-        title: place.placeName,
-        image: place.mainImage,
-        location: place.address || place.destination,
-        meta: place.rating,
-        category: place.category || place.placeType,
-        region: place.destination,
-        description: place.shortDescription || place.sections?.[0]?.content,
-      })),
+      venuesData
+        .map((place) => ({
+          ...place,
+          id: place._id || place.serialNumber || place.placeName,
+          title: place.placeName,
+          image: place.mainImage,
+          location: place.address || place.destination,
+          meta: place.rating,
+          category: place.category || place.placeType,
+          region: place.destination,
+          description: place.shortDescription || place.sections?.[0]?.content,
+        }))
+        .sort((a, b) => {
+          const aRating = Number.parseFloat(a.rating) || 0;
+          const bRating = Number.parseFloat(b.rating) || 0;
+          return bRating - aRating;
+        }),
     [venuesData],
+  );
+  const restaurants = useMemo(
+    () =>
+      restaurantsData.map((restaurant) => {
+        const title =
+          restaurant.restaurantName ||
+          restaurant.businessName ||
+          restaurant.restaurantTitle;
+        const rating = restaurant.rating || restaurant.ratings;
+
+        return {
+          ...restaurant,
+          id:
+            restaurant._id ||
+            restaurant.restaurantId ||
+            restaurant.businessId ||
+            restaurant.serialNumber ||
+            title,
+          title,
+          image: restaurant.mainImage || restaurant.images || restaurant.logo,
+          location: restaurant.address || restaurant.destination,
+          meta: rating,
+          category: restaurant.category || restaurant.restaurantType,
+          region: restaurant.destination,
+          description:
+            restaurant.shortDescription ||
+            restaurant.about ||
+            restaurant.sections?.[0]?.content,
+        };
+      }),
+    [restaurantsData],
+  );
+  const newsItems = useMemo(
+    () =>
+      newsData.map((newsItem) => ({
+        ...newsItem,
+        id: newsItem.guid || newsItem._id || newsItem.mainTitle,
+        title: newsItem.mainTitle || newsItem.title,
+        image:
+          newsItem.mainImage ||
+          extractImageFromContent(newsItem.content || newsItem.description),
+        location: newsItem.author || newsItem.source || "Source",
+        meta: newsItem.date ? new Date(newsItem.date).toLocaleDateString() : "",
+        description: newsItem.mainContent || newsItem.description,
+      })),
+    [newsData],
+  );
+  const blogItems = useMemo(
+    () =>
+      blogsData.map((blog) => ({
+        ...blog,
+        id: blog.guid || blog._id || blog.mainTitle,
+        title: blog.mainTitle || blog.title,
+        image:
+          blog.mainImage ||
+          extractImageFromContent(blog.content || blog.description),
+        location: blog.author || "Author",
+        meta: blog.date ? new Date(blog.date).toLocaleDateString() : "",
+        description: blog.mainContent || blog.description,
+      })),
+    [blogsData],
   );
 
   const handleEventClick = (event) => {
@@ -937,6 +1109,52 @@ const AiListings = ({ forceListView = false }) => {
         ],
       },
     });
+  };
+
+  const handleRestaurantClick = (restaurant) => {
+    navigate(`/ai-restaurants/${restaurant.id}`, {
+      state: {
+        item: restaurant,
+        selectedStateLabel,
+        stickyBreadcrumbs: [
+          {
+            label: selectedStateLabel || "Destination",
+            path: location.pathname,
+          },
+          { label: restaurant.title },
+        ],
+      },
+    });
+  };
+  const handleNewsClick = (newsItem) => {
+    navigate(
+      {
+        pathname: "/ai-news/ai-news-details",
+        search: location.search,
+      },
+      {
+        state: {
+          content: newsItem,
+          selectedStateLabel,
+          sourceSearch: location.search,
+        },
+      },
+    );
+  };
+  const handleBlogClick = (blog) => {
+    navigate(
+      {
+        pathname: "/ai-blogs/ai-blog-details",
+        search: location.search,
+      },
+      {
+        state: {
+          content: blog,
+          selectedStateLabel,
+          sourceSearch: location.search,
+        },
+      },
+    );
   };
 
   // Prioritize BIZ Nest and MeWo first, then sort the rest by rating descending
@@ -1449,7 +1667,10 @@ const AiListings = ({ forceListView = false }) => {
             {formData?.category &&
               formData?.location &&
               !isAnnualEventsSelected &&
-              !isVenuesSelected && (
+              !isVenuesSelected &&
+              !isRestaurantsSelected &&
+              !isNewsSelected &&
+              !isBlogsSelected && (
               <div className="mt-6 mb-2 px-1 border-t border-gray-300">
                 <h1 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight mt-6">
                   Popular{" "}
@@ -1463,7 +1684,10 @@ const AiListings = ({ forceListView = false }) => {
                     cafe: "Cafes",
                     [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
                     [ANNUAL_EVENTS_CATEGORY]: "Annual Events",
-                    [VENUES_CATEGORY]: "Venues",
+                    [VENUES_CATEGORY]: "Places",
+                    [RESTAURANTS_CATEGORY]: "Restaurants",
+                    [NEWS_CATEGORY]: "News",
+                    [BLOGS_CATEGORY]: "Blogs",
                   }[formData.category] || `${formData.category} Spaces`}{" "}
                   in {selectedStateLabel || "Unknown"}
                 </h1>
@@ -1506,23 +1730,22 @@ const AiListings = ({ forceListView = false }) => {
                             backgroundPosition: "center",
                           }}
                         >
+                          {service.badge && (
+                            <span className="absolute right-2 top-2 z-10 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[9px] font-semibold leading-none normal-case text-black shadow-sm">
+                              {service.badge}
+                            </span>
+                          )}
                           <div className="flex w-full flex-col items-center justify-end">
                             {getValueAddedServiceCardLines(
                               serviceLabel,
-                              service,
                             ).map((line) => (
                               <span
                                 key={`${serviceLabel}-${line}`}
-                                className="text-base md:text-xl font-normal uppercase text-white leading-tight tracking-wide"
+                                className="text-base md:text-xl font-normal uppercase text-white !leading-[1.05rem] tracking-wide"
                               >
                                 {line}
                               </span>
                             ))}
-                            {service.badge && (
-                              <span className="mt-2 rounded-full border border-red-400 bg-red-200 px-1.5 py-0.5 text-[9px] font-semibold leading-none normal-case text-black shadow-sm">
-                                {service.badge}
-                              </span>
-                            )}
                           </div>
                         </button>
                       );
@@ -1574,10 +1797,88 @@ const AiListings = ({ forceListView = false }) => {
                     />
                   ) : (
                     <AiDestinationHighlightSection
-                      title={`Popular Venues to visit in ${selectedStateLabel || "Unknown"}`}
+                      title={`Popular Places to visit in ${selectedStateLabel || "Unknown"}`}
                       items={venues}
                       kind="venue"
                       onCardClick={handleVenueClick}
+                    />
+                  )
+                ) : isRestaurantsSelected ? (
+                  isRestaurantsLoading ? (
+                    <PaginatedGrid
+                      data={skeletonArray}
+                      entriesPerPage={isMobile ? 10 : isTablet ? 9 : 100}
+                      columns="grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5"
+                      renderItem={(_, index) => (
+                        <Box key={index} className="w-full h-full">
+                          <Skeleton
+                            variant="rectangular"
+                            height={200}
+                            sx={{ borderRadius: 2 }}
+                          />
+                          <Skeleton variant="text" width="80%" sx={{ mt: 1 }} />
+                          <Skeleton variant="text" width="60%" />
+                        </Box>
+                      )}
+                    />
+                  ) : (
+                    <AiDestinationHighlightSection
+                      title={`Popular Restaurants in ${selectedStateLabel || "Unknown"}`}
+                      items={restaurants}
+                      kind="restaurant"
+                      onCardClick={handleRestaurantClick}
+                    />
+                  )
+                ) : isNewsSelected ? (
+                  isNewsLoading ? (
+                    <PaginatedGrid
+                      data={skeletonArray}
+                      entriesPerPage={isMobile ? 10 : isTablet ? 9 : 100}
+                      columns="grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5"
+                      renderItem={(_, index) => (
+                        <Box key={index} className="w-full h-full">
+                          <Skeleton
+                            variant="rectangular"
+                            height={200}
+                            sx={{ borderRadius: 2 }}
+                          />
+                          <Skeleton variant="text" width="80%" sx={{ mt: 1 }} />
+                          <Skeleton variant="text" width="60%" />
+                        </Box>
+                      )}
+                    />
+                  ) : (
+                    <AiDestinationHighlightSection
+                      title={`Latest ${selectedStateLabel || "Unknown"} News`}
+                      items={newsItems}
+                      kind="news"
+                      onCardClick={handleNewsClick}
+                    />
+                  )
+                ) : isBlogsSelected ? (
+                  isBlogsLoading ? (
+                    <PaginatedGrid
+                      data={skeletonArray}
+                      entriesPerPage={isMobile ? 10 : isTablet ? 9 : 100}
+                      columns="grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5"
+                      renderItem={(_, index) => (
+                        <Box key={index} className="w-full h-full">
+                          <Skeleton
+                            variant="rectangular"
+                            height={200}
+                            sx={{ borderRadius: 2 }}
+                          />
+                          <Skeleton variant="text" width="80%" sx={{ mt: 1 }} />
+                          <Skeleton variant="text" width="60%" />
+                        </Box>
+                      )}
+                    />
+                  ) : (
+                    <AiDestinationHighlightSection
+                      title={`Latest ${selectedStateLabel || "Unknown"} Blogs`}
+                      items={blogItems}
+                      kind="blog"
+                      onCardClick={handleBlogClick}
                     />
                   )
                 ) : (

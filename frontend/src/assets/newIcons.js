@@ -8,6 +8,7 @@ const newIcons = {
   meetingroom: "/icons-new/meeting-room.png",
   annualevents: "/icons-new/Events.png",
   venues: "/icons-new/Venues.png",
+  restaurants: "/icons-new/Restaurants.png",
   news: "/icons-new/News.png",
   blogs: "/icons-new/Blogs.png",
   valueaddedservices: "/icons-new/valueAddedServices.png",

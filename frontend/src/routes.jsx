@@ -43,6 +43,7 @@ import TemplateProductDetailPage from "./pages/company/TemplateProductDetailPage
 import TemplateGalleryPage from "./pages/company/TemplateGalleryPage";
 import TemplateTestimonialsPage from "./pages/company/TemplateTestimonialsPage";
 import TemplatePartnerPage from "./pages/company/TemplatePartnerPage";
+import TemplateCareerPage from "./pages/company/TemplateCareerPage";
 import TemplateContactPage from "./pages/company/TemplateContactPage";
 import NomadAbout from "./pages/NomadAbout";
 import Profile from "./pages/Profile";
@@ -270,6 +271,10 @@ if (tenant === "main") {
               path: "ai-venues/:venueId",
               element: <AiDestinationDetail type="venue" />,
             },
+            {
+              path: "ai-restaurants/:restaurantId",
+              element: <AiDestinationDetail type="restaurant" />,
+            },
             { path: "ai-listings", element: <AiListings /> },
             { path: "ai-listings-list", element: <AiListingsListView /> },
             { path: "ai-listings/:company", element: <AiProduct /> },
@@ -412,6 +417,10 @@ if (tenant === "main") {
         { path: "page/testimonials", element: <TemplateTestimonialsPage /> },
         { path: "partner", element: <TemplatePartnerPage /> },
         { path: "page/partner", element: <TemplatePartnerPage /> },
+        { path: "careers", element: <TemplateCareerPage /> },
+        { path: "careers/:jobCode", element: <TemplateCareerPage /> },
+        { path: "page/careers", element: <TemplateCareerPage /> },
+        { path: "page/careers/:jobCode", element: <TemplateCareerPage /> },
         { path: "contact", element: <TemplateContactPage /> },
         { path: "page/contact", element: <TemplateContactPage /> },
       ],

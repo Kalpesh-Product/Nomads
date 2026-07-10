@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { Outlet, useLocation, useNavigate, useNavigation, useParams } from "react-router-dom";
 import TempHeader from "./components/TempHeader";
 import TempFooter from "./components/TempFooter";
@@ -9,10 +9,12 @@ import { api } from "../../utils/axios";
 // import { normalizeVertical } from "./utils/vertical";
 // import { Toaster } from "react-hot-toast";
 import {
+  getSectionPath,
   getTemplateBreadcrumbItems,
   getTemplateRouteContext,
   normalizeTemplateData,
   normalizeSlug,
+  resolveSectionFromSlug,
 } from "./utils/templateRouteUtils";
 import { mapTestimonialItem } from "./utils/pageTemplateUtils";
 
@@ -83,6 +85,8 @@ const TemplateSite = () => {
       }
     }
   }
+
+  const jobTitleFromState = location.state?.jobTitle || "";
   
   const breadcrumbItems = useMemo(
     () =>
@@ -90,12 +94,12 @@ const TemplateSite = () => {
         data: normalizedData,
         pathname: location.pathname,
         routeContext,
-        itemName,
+        itemName: routeContext.currentCareerJobCode ? (jobTitleFromState || routeContext.currentCareerJobCode) : itemName,
       }).map((item) => ({
         label: item.label,
         onClick: item.path ? () => navigate(item.path) : undefined,
       })),
-    [location.pathname, navigate, normalizedData, routeContext, itemName],
+    [location.pathname, navigate, normalizedData, routeContext, itemName, jobTitleFromState],
   );
   const companyId = normalizedData?.companyId || "";
   const workspaceId = normalizedData?.workspaceId || "";
@@ -118,6 +122,24 @@ const TemplateSite = () => {
   const approvedReviews = Array.isArray(reviewResponse?.data)
     ? reviewResponse.data.map(mapTestimonialItem).filter(Boolean)
     : [];
+
+  // Redirect to home if the current page section is disabled in pageNavItems
+  // testimonials and home are always accessible (no dedicated page to disable)
+  // Only run guard after data is loaded to prevent redirect during initial load
+  const pageNavItems = normalizedData?.pageNavItems || [];
+  const guardedSections = ["about", "products", "gallery", "partner", "careers", "contact"];
+  const isCurrentSectionEnabled = guardedSections.includes(routeContext.currentSection)
+    ? pageNavItems.some(
+        (item) => resolveSectionFromSlug(item.slug) === routeContext.currentSection,
+      )
+    : true;
+
+  useEffect(() => {
+    if (!isPending && !isCurrentSectionEnabled) {
+      navigate(getSectionPath("home", location.pathname), { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPending, isCurrentSectionEnabled]);
 
   return (
     <div className="h-screen relative overflow-y-auto overflow-hidden flex flex-col custom-scrollbar-hide">
@@ -152,6 +174,7 @@ const TemplateSite = () => {
         <Outlet
           context={{
             data: normalizedData,
+            rawProductDropdownPages: Array.isArray(data?.productDropdownPages) ? data.productDropdownPages : [],
             isPending,
             error,
             routeContext,

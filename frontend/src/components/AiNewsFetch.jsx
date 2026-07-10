@@ -26,6 +26,7 @@ const buildExactKeyword = (label) => {
 
 const NewsCard = ({ a, stateName }) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const fallbackImg = extractImageFromContent(a.content || a.description);
   const thumbnail = a.mainImage || fallbackImg;
@@ -33,9 +34,19 @@ const NewsCard = ({ a, stateName }) => {
   return (
     <article
       onClick={() =>
-        navigate("ai-news-details", {
-          state: { content: a, selectedStateLabel: stateName },
-        })
+        navigate(
+          {
+            pathname: "ai-news-details",
+            search: location.search,
+          },
+          {
+            state: {
+              content: a,
+              selectedStateLabel: stateName,
+              sourceSearch: location.search,
+            },
+          },
+        )
       }
       className="group relative rounded-xl border bg-white transition hover:shadow-md cursor-pointer overflow-hidden max-w-full"
     >
@@ -80,12 +91,14 @@ const AiNewsFetch = () => {
   const formData = useSelector((state) => state.location.formValues);
 
   const urlDest = normalizeLabel(
-    searchParams.get("dest") || searchParams.get("location"),
+    searchParams.get("dest") ||
+      searchParams.get("state") ||
+      searchParams.get("location"),
   );
   const reduxDest = normalizeLabel(formData?.location || formData?.state);
 
   const dest = urlDest || reduxDest || "";
-  const stateName = location.state?.selectedStateLabel || dest;
+  const stateName = location.state?.selectedStateLabel || urlDest || dest;
 
   const params = useMemo(() => {
     if (!dest) return undefined;

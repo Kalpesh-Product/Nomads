@@ -1,4 +1,5 @@
 import { Router } from "express";
+import multer from "multer";
 import upload from "../config/multerConfig.js";
 import {
   bulkInsertCompanies,
@@ -21,7 +22,10 @@ import {
   editCompanyImagesBulk,
   getCompaniesDataNomads,
   getCompaniesDataMaster,
+  applyToCompanyJob,
 } from "../controllers/compayControllers.js";
+
+const proxyUpload = multer({ storage: multer.memoryStorage() });
 
 const router = Router();
 router.post(
@@ -63,5 +67,7 @@ router.post("/create-company", upload.any(), createCompany);
 router.get("/all-leads", getAllLeads);
 router.get("/leads", getCompanyLeads);
 router.patch("/update-lead", updateLeads);
+
+router.post("/jobs/apply", proxyUpload.any(), applyToCompanyJob);
 
 export default router;

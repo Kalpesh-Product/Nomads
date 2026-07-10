@@ -25,13 +25,16 @@ const getInitials = (name = "") =>
 const AiDestinationDetail = ({ type }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { eventId, venueId } = useParams();
+  const { eventId, venueId, restaurantId } = useParams();
   const { auth } = useAuth();
   const axiosPrivate = useAxiosPrivate();
   const [isAddReviewOpen, setIsAddReviewOpen] = useState(false);
+  const [activeImage, setActiveImage] = useState(null);
   const fallback = type === "event" ? annualEvents[0] : popularVenues[0];
   const item = location.state?.item || fallback;
   const isEvent = type === "event";
+  const isRestaurant = type === "restaurant";
+  const isReviewEnabled = !isRestaurant;
   const venueMapsLink =
     typeof item.googleMapsLink === "string" ? item.googleMapsLink.trim() : "";
   const venueDirectionHref =
@@ -39,11 +42,21 @@ const AiDestinationDetail = ({ type }) => {
     `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
       item.address || item.title,
     )}`;
-  const reviewTargetId = isEvent ? eventId : venueId;
+  const reviewTargetId = isEvent ? eventId : venueId || restaurantId;
   const reviewEndpoint = isEvent ? "/event-reviews" : "/place-reviews";
   const reviewIdParam = isEvent ? "eventId" : "placeId";
   const userId = auth?.user?._id || auth?.user?.id;
   const reviewerName = auth?.user?.fullName?.trim() || "";
+
+  const handleImageOpen = (imageUrl) => {
+    if (imageUrl) {
+      setActiveImage(imageUrl);
+    }
+  };
+
+  const handleImageClose = () => {
+    setActiveImage(null);
+  };
 
   const { data: reviews = [], isPending: isReviewsLoading } = useQuery({
     queryKey: [
@@ -57,7 +70,7 @@ const AiDestinationDetail = ({ type }) => {
 
       return Array.isArray(response.data?.data) ? response.data.data : [];
     },
-    enabled: !!reviewTargetId,
+    enabled: isReviewEnabled && !!reviewTargetId,
     refetchOnWindowFocus: false,
   });
 
@@ -138,7 +151,8 @@ const AiDestinationDetail = ({ type }) => {
         <img
           src={item.image}
           alt={item.title}
-          className="h-full w-full object-cover"
+          className="h-full w-full cursor-pointer object-cover"
+          onClick={() => handleImageOpen(item.image)}
         />
       </div>
 
@@ -171,54 +185,58 @@ const AiDestinationDetail = ({ type }) => {
         </p>
       </section>
 
-      <section className="py-8">
-        <div className="mb-8 text-center">
-          <button
-            type="button"
-            onClick={handleWriteReviewClick}
-            className="rounded-full bg-primary-blue px-8 py-3 text-sm font-semibold text-white"
-          >
-            WRITE A REVIEW
-          </button>
-        </div>
-        <div className="space-y-7">
-          {isReviewsLoading ? (
-            <p className="text-sm text-gray-500 text-center">
-              Loading reviews...
-            </p>
-          ) : reviews.length === 0 ? (
-            <p className="text-sm text-gray-500 text-center h-20">
-              Share your experience and leave a review.
-            </p>
-          ) : (
-            reviews.map((review) => (
-              <article key={review._id}>
-                <div className="mb-2 flex items-center gap-3">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-blue text-xs font-semibold text-white">
-                    {getInitials(review.name) || "A"}
-                  </span>
-                  <strong className="text-sm">{review.name}</strong>
-                </div>
-                <div className="mb-1 flex gap-1">
-                  {Array.from({ length: 5 }).map((_, index) => (
-                    <Star
-                      key={index}
-                      size={14}
-                      fill={index < review.starCount ? "currentColor" : "none"}
-                      className={
-                        index < review.starCount
-                          ? "text-black"
-                          : "text-gray-300"
-                      }
-                    />
-                  ))}
-                </div>
-                <p className="text-sm">{review.description}</p>
-              </article>
-            ))
-          )}
-        </div>
-      </section>
+      {isReviewEnabled && (
+        <section className="py-8">
+          <div className="mb-8 text-center">
+            <button
+              type="button"
+              onClick={handleWriteReviewClick}
+              className="rounded-full bg-primary-blue px-8 py-3 text-sm font-semibold text-white"
+            >
+              WRITE A REVIEW
+            </button>
+          </div>
+          <div className="space-y-7">
+            {isReviewsLoading ? (
+              <p className="text-sm text-gray-500 text-center">
+                Loading reviews...
+              </p>
+            ) : reviews.length === 0 ? (
+              <p className="text-sm text-gray-500 text-center h-20">
+                Share your experience and leave a review.
+              </p>
+            ) : (
+              reviews.map((review) => (
+                <article key={review._id}>
+                  <div className="mb-2 flex items-center gap-3">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-blue text-xs font-semibold text-white">
+                      {getInitials(review.name) || "A"}
+                    </span>
+                    <strong className="text-sm">{review.name}</strong>
+                  </div>
+                  <div className="mb-1 flex gap-1">
+                    {Array.from({ length: 5 }).map((_, index) => (
+                      <Star
+                        key={index}
+                        size={14}
+                        fill={
+                          index < review.starCount ? "currentColor" : "none"
+                        }
+                        className={
+                          index < review.starCount
+                            ? "text-black"
+                            : "text-gray-300"
+                        }
+                      />
+                    ))}
+                  </div>
+                  <p className="text-sm">{review.description}</p>
+                </article>
+              ))
+            )}
+          </div>
+        </section>
+      )}
 
       <div className="mt-5 text-[0.5rem] leading-relaxed text-gray-500">
         <p>
@@ -227,6 +245,32 @@ const AiDestinationDetail = ({ type }) => {
           publicly available information.
         </p>
       </div>
+
+      {activeImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black p-4"
+          onClick={handleImageClose}
+        >
+          <div
+            className="relative max-h-full max-w-5xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="absolute -right-3 -top-3 rounded-full bg-white px-2 py-1 text-sm font-semibold text-gray-700 shadow"
+              onClick={handleImageClose}
+              aria-label="Close image preview"
+            >
+              x
+            </button>
+            <img
+              src={activeImage}
+              alt="Expanded content"
+              className="max-h-[85vh] w-full rounded-lg object-contain shadow-xl"
+            />
+          </div>
+        </div>
+      )}
 
       <MuiModal
         open={isAddReviewOpen}
