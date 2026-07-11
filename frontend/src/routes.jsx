@@ -69,6 +69,7 @@ import AiGlobalListings from "./pages/AiGlobalListings";
 import AiListings from "./pages/AiListings";
 import AiListingsListView from "./pages/AiListingsListView";
 import AiProduct from "./pages/AiProduct";
+import AiRestaurantProduct from "./pages/AiRestaurantProduct";
 import AiImageGallery from "./pages/AiImageGallery";
 import AiWorldRankings from "./pages/AiWorldRankingsSearchResults";
 import AiSavingsSearch from "./pages/AiSavingsSearch";
@@ -232,7 +233,11 @@ if (tenant === "main") {
             },
             {
               path: "ai-restaurants/:restaurantId",
-              element: <AiDestinationDetail type="restaurant" />,
+              element: <AiRestaurantProduct />,
+            },
+            {
+              path: "ai-restaurants/:restaurantId/images",
+              element: <AiImageGallery />,
             },
             { path: "ai-listings", element: <AiListings /> },
             { path: "ai-listings-list", element: <AiListingsListView /> },
