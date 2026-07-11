@@ -483,7 +483,7 @@ const AiGlobalListingsList = () => {
   });
   const popularLocationBlogs = useMemo(
     () =>
-      (Array.isArray(blogsData) ? blogsData : []).slice(0, 5).map((blog) => ({
+      (Array.isArray(blogsData) ? blogsData : []).map((blog) => ({
         ...blog,
         id: blog.guid || blog._id || blog.mainTitle,
         title: blog.mainTitle || blog.title,
@@ -495,7 +495,7 @@ const AiGlobalListingsList = () => {
   );
   const popularLocationNews = useMemo(
     () =>
-      (Array.isArray(newsData) ? newsData : []).slice(0, 5).map((newsItem) => ({
+      (Array.isArray(newsData) ? newsData : []).map((newsItem) => ({
         ...newsItem,
         id: newsItem.guid || newsItem._id || newsItem.mainTitle,
         title: newsItem.mainTitle || newsItem.title,
@@ -589,6 +589,16 @@ const AiGlobalListingsList = () => {
     ? popularLocationRestaurants
     : popularLocationRestaurants.slice(0, 5);
   const showPopularRestaurantsToggle = popularLocationRestaurants.length > 5;
+  const isNewsExpanded = expandedCategories.includes(NEWS_CATEGORY);
+  const displayedPopularLocationNews = isNewsExpanded
+    ? popularLocationNews
+    : popularLocationNews.slice(0, 5);
+  const showNewsToggle = popularLocationNews.length > 5;
+  const isBlogsExpanded = expandedCategories.includes(BLOGS_CATEGORY);
+  const displayedPopularLocationBlogs = isBlogsExpanded
+    ? popularLocationBlogs
+    : popularLocationBlogs.slice(0, 5);
+  const showBlogsToggle = popularLocationBlogs.length > 5;
 
   const countOptions = [
     { label: "1 - 5", value: "1-5" },
@@ -1077,34 +1087,6 @@ const AiGlobalListingsList = () => {
     );
   };
 
-  const handleBlogsViewMore = () => {
-    navigate(
-      {
-        pathname: "/ai-blogs",
-        search: location.search,
-      },
-      {
-        state: {
-          selectedStateLabel: selectedLocationLabel,
-        },
-      },
-    );
-  };
-
-  const handleNewsViewMore = () => {
-    navigate(
-      {
-        pathname: "/ai-news",
-        search: location.search,
-      },
-      {
-        state: {
-          selectedStateLabel: selectedLocationLabel,
-        },
-      },
-    );
-  };
-
   const handleValueAddedServiceClick = (service) => {
     if (!service.path) return;
 
@@ -1541,24 +1523,42 @@ const AiGlobalListingsList = () => {
                       />
                       <AiDestinationHighlightSection
                         title={`Latest ${selectedLocationLabel} News`}
-                        items={popularLocationNews}
+                        items={displayedPopularLocationNews}
                         kind="news"
                         onCardClick={(item) =>
                           handleHighlightCardClick(item, "news")
                         }
-                        onViewMore={handleNewsViewMore}
+                        onViewMore={
+                          showNewsToggle
+                            ? () => handleShowMoreClick(NEWS_CATEGORY)
+                            : undefined
+                        }
+                        viewMoreLabel={
+                          isNewsExpanded
+                            ? "View less \u2190"
+                            : "View more \u2192"
+                        }
                         sectionRef={(element) => {
                           sectionRefs.current["news-desktop"] = element;
                         }}
                       />
                       <AiDestinationHighlightSection
                         title={`Latest ${selectedLocationLabel} Blogs`}
-                        items={popularLocationBlogs}
+                        items={displayedPopularLocationBlogs}
                         kind="blog"
                         onCardClick={(item) =>
                           handleHighlightCardClick(item, "blog")
                         }
-                        onViewMore={handleBlogsViewMore}
+                        onViewMore={
+                          showBlogsToggle
+                            ? () => handleShowMoreClick(BLOGS_CATEGORY)
+                            : undefined
+                        }
+                        viewMoreLabel={
+                          isBlogsExpanded
+                            ? "View less \u2190"
+                            : "View more \u2192"
+                        }
                         sectionRef={(element) => {
                           sectionRefs.current["blogs-desktop"] = element;
                         }}
@@ -1981,12 +1981,21 @@ const AiGlobalListingsList = () => {
                     <AiDestinationHighlightSection
                       mobile
                       title={`Latest ${selectedLocationLabel} News`}
-                      items={popularLocationNews}
+                      items={displayedPopularLocationNews}
                       kind="news"
                       onCardClick={(item) =>
                         handleHighlightCardClick(item, "news")
                       }
-                      onViewMore={handleNewsViewMore}
+                      onViewMore={
+                        showNewsToggle
+                          ? () => handleShowMoreClick(NEWS_CATEGORY)
+                          : undefined
+                      }
+                      viewMoreLabel={
+                        isNewsExpanded
+                          ? "View less \u2190"
+                          : "View more \u2192"
+                      }
                       sectionRef={(element) => {
                         sectionRefs.current["news-mobile"] = element;
                       }}
@@ -1994,12 +2003,21 @@ const AiGlobalListingsList = () => {
                     <AiDestinationHighlightSection
                       mobile
                       title={`Latest ${selectedLocationLabel} Blogs`}
-                      items={popularLocationBlogs}
+                      items={displayedPopularLocationBlogs}
                       kind="blog"
                       onCardClick={(item) =>
                         handleHighlightCardClick(item, "blog")
                       }
-                      onViewMore={handleBlogsViewMore}
+                      onViewMore={
+                        showBlogsToggle
+                          ? () => handleShowMoreClick(BLOGS_CATEGORY)
+                          : undefined
+                      }
+                      viewMoreLabel={
+                        isBlogsExpanded
+                          ? "View less \u2190"
+                          : "View more \u2192"
+                      }
                       sectionRef={(element) => {
                         sectionRefs.current["blogs-mobile"] = element;
                       }}
