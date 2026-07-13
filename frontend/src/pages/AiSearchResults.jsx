@@ -891,7 +891,7 @@ const searchBarEndGoalLabelMap = {
     "Best Work Infrastructure": "Best Work Infrastructure Nomad Destinations",
   },
   "Increase Your Savings": {
-    "Maximum Savings": "Best Nomad Destinations to Maximize you Savings",
+    "Maximum Savings": "Best Nomad Destinations to Maximize your Savings",
     "Low Taxation": "Tax-Friendly Nomad Destinations",
     "Purchasing Power": "Nomad Destinations with Strong Purchasing Power",
     "Financial Stability(Low Risk)": "Financially Stable Nomad Destinations",
@@ -1133,7 +1133,9 @@ const AiSearchResults = () => {
   const hasHydratedSearchResultsPageRef = useRef(
     Boolean(initialSearchResultsPageState),
   );
-  const hasHydratedVisaRulesRef = useRef(Boolean(initialSearchResultsPageState));
+  const hasHydratedVisaRulesRef = useRef(
+    Boolean(initialSearchResultsPageState),
+  );
   const hasHydratedDestinationRevealRef = useRef(
     Boolean(initialSearchResultsPageState),
   );
@@ -2064,8 +2066,7 @@ const AiSearchResults = () => {
       const hasScrollFallback =
         Number.isFinite(targetScrollTop) && targetScrollTop >= 0;
       const hasClickedCardPosition =
-        clickedCardKey &&
-        Number.isFinite(clickedCardContainerTop);
+        clickedCardKey && Number.isFinite(clickedCardContainerTop);
 
       if (!hasClickedCardPosition && !hasScrollFallback) {
         return;
@@ -2384,7 +2385,8 @@ const AiSearchResults = () => {
 
                                 {formattedNarrative.additionalPriorityPointsText && (
                                   <span>
-                                    {formattedNarrative.priorityPoints.length > 0
+                                    {formattedNarrative.priorityPoints.length >
+                                    0
                                       ? ", "
                                       : " "}
                                     {

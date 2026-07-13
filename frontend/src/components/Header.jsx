@@ -75,9 +75,9 @@ const Header = () => {
 
   const goToHosts = () => {
     if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://hosts.localhost:5173";
+      window.location.href = "http://host.localhost:5173";
     } else {
-      window.location.href = "https://hosts.wono.co";
+      window.location.href = "https://host.wono.co";
     }
   };
   const goToHostssMain = () => {
@@ -184,8 +184,9 @@ const Header = () => {
                           className="group relative text-md text-black"
                         >
                           <span
-                            className={`relative z-10 mb-8 uppercase ${isActive ? "text-black" : "group-hover:font-bold"
-                              }`}
+                            className={`relative z-10 mb-8 uppercase ${
+                              isActive ? "text-black" : "group-hover:font-bold"
+                            }`}
                           >
                             {item.text}
                           </span>

@@ -87,7 +87,8 @@ const normalizeRestaurantReviews = (reviews) => {
     name: review.name || review.reviewerName || "Anonymous",
     reviewerName: review.reviewerName || review.name || "Anonymous",
     starCount: Number(review.starCount || review.rating || review.ratings || 0),
-    description: review.description || review.reviewText || review.message || "",
+    description:
+      review.description || review.reviewText || review.message || "",
   }));
 };
 
@@ -329,12 +330,15 @@ const AiRestaurantProduct = () => {
   const showMore = (companyDetails?.images?.length || 0) > 4;
   const selectedDestination = readSelectedDestination();
   const matchedSessionTitle =
-    selectedDestination?.country === companyDetails?.country?.trim().toLowerCase() &&
-      selectedDestination?.city === companyDetails?.state?.trim().toLowerCase()
+    selectedDestination?.country ===
+      companyDetails?.country?.trim().toLowerCase() &&
+    selectedDestination?.city === companyDetails?.state?.trim().toLowerCase()
       ? selectedDestination?.title
       : "";
   const displayStateLabel =
-    location.state?.selectedStateLabel || matchedSessionTitle || companyDetails?.state;
+    location.state?.selectedStateLabel ||
+    matchedSessionTitle ||
+    companyDetails?.state;
   const breadcrumbState = {
     continent: companyDetails?.continent || "Asia",
     country: companyDetails?.country,
@@ -364,7 +368,10 @@ const AiRestaurantProduct = () => {
 
   useEffect(() => {
     const trail = [
-      { label: breadcrumbState.continent, path: "/search/worldranking/results" },
+      {
+        label: breadcrumbState.continent,
+        path: "/search/worldranking/results",
+      },
       {
         label: breadcrumbState.country,
         path: `/search/worldranking/results`,
@@ -836,10 +843,9 @@ const AiRestaurantProduct = () => {
 
   const goToHostsContentCopyright = () => {
     if (window.location.hostname.includes("localhost")) {
-      window.location.href =
-        "http://hosts.localhost:5173/content-and-copyright";
+      window.location.href = "http://host.localhost:5173/content-and-copyright";
     } else {
-      window.location.href = "https://hosts.wono.co/content-and-copyright ";
+      window.location.href = "https://host.wono.co/content-and-copyright ";
     }
   };
 
