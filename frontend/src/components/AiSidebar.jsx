@@ -305,7 +305,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
   useEffect(() => {
     const normalizedPath = location.pathname.replace(/\/$/, "") || "/";
-    const isAiHomePage = normalizedPath === "/home";
+    const isAiHomePage = normalizedPath === "/";
 
     if (isAiHomePage) {
       setIsRecommendationsOpen(false);

@@ -54,10 +54,9 @@ const BlogDetails = () => {
 
   const goToHostsContentCopyright = () => {
     if (window.location.hostname.includes("localhost")) {
-      window.location.href =
-        "http://hosts.localhost:5173/content-and-copyright";
+      window.location.href = "http://host.localhost:5173/content-and-copyright";
     } else {
-      window.location.href = "https://hosts.wono.co/content-and-copyright";
+      window.location.href = "https://host.wono.co/content-and-copyright";
     }
   };
 
@@ -83,13 +82,15 @@ const BlogDetails = () => {
                 handleImageOpen(
                   content?.mainImage ||
                     content?.image ||
-                    "https://wallpapercave.com/wp/w8Lgiy5.jpg"
+                    "https://wallpapercave.com/wp/w8Lgiy5.jpg",
                 )
               }
             />
           </div>
           {renderContent(
-            content?.mainContent || content?.content || "Main Content goes here"
+            content?.mainContent ||
+              content?.content ||
+              "Main Content goes here",
           )}
         </section>
         <hr />
