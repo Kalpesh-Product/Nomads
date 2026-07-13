@@ -54,10 +54,9 @@ const AiBlogDetails = () => {
 
   const goToHostsContentCopyright = () => {
     if (window.location.hostname.includes("localhost")) {
-      window.location.href =
-        "http://hosts.localhost:5173/content-and-copyright";
+      window.location.href = "http://host.localhost:5173/content-and-copyright";
     } else {
-      window.location.href = "https://hosts.wono.co/content-and-copyright";
+      window.location.href = "https://host.wono.co/content-and-copyright";
     }
   };
 

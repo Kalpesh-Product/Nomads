@@ -351,28 +351,46 @@ if (tenant === "main") {
           children: [
             { path: "", element: <AiHostHome /> },
             { path: "ai-host-profile", element: <AiHostProfile /> },
-            { path: "ai-host-reset-password/:token", element: <AiHostResetPassword /> },
+            {
+              path: "ai-host-reset-password/:token",
+              element: <AiHostResetPassword />,
+            },
             { path: "ai-host-signup", element: <AiHostSignup /> },
             { path: "ai-host-product", element: <AiHostProduct /> },
             { path: "ai-host-modules", element: <AiHostModules /> },
             { path: "ai-host-themes", element: <AiHostThemes /> },
             { path: "ai-host-leads", element: <AiHostLeads /> },
             { path: "ai-host-career", element: <AiHostCareer /> },
-            { path: "ai-host-career/job/:title", element: <AiHostJobDetails /> },
+            {
+              path: "ai-host-career/job/:title",
+              element: <AiHostJobDetails />,
+            },
             { path: "ai-host-about", element: <AiHostAbout /> },
             { path: "ai-host-privacy", element: <AiHostPrivacy /> },
-            { path: "ai-host-terms-and-conditions", element: <AiHostTermsAndCondition /> },
+            {
+              path: "ai-host-terms-and-conditions",
+              element: <AiHostTermsAndCondition />,
+            },
             { path: "ai-host-faq", element: <AiHostFAQ /> },
             { path: "ai-host-contact", element: <AiHostContact /> },
-            { path: "ai-host-content-and-copyright", element: <AiHostContentAndCopyright /> },
-            { path: "ai-host-content-use-removal", element: <AiHostContentUseRemoval /> },
-            { path: "ai-host-model-showcase", element: <AiHostModelShowcase /> },
-          ]
+            {
+              path: "ai-host-content-and-copyright",
+              element: <AiHostContentAndCopyright />,
+            },
+            {
+              path: "ai-host-content-use-removal",
+              element: <AiHostContentUseRemoval />,
+            },
+            {
+              path: "ai-host-model-showcase",
+              element: <AiHostModelShowcase />,
+            },
+          ],
         },
       ],
     },
   ];
-} else if (tenant === "hosts") {
+} else if (tenant === "host") {
   // Hosts subdomain
   routerConfig = [
     {
@@ -414,8 +432,14 @@ if (tenant === "main") {
         { path: "page/products", element: <TemplateProductsPage /> },
         { path: "products/:slug", element: <TemplateProductDetailPage /> },
         { path: "page/products/:slug", element: <TemplateProductDetailPage /> },
-        { path: "products/:slug/:itemSlug", element: <TemplateProductDetailPage /> },
-        { path: "page/products/:slug/:itemSlug", element: <TemplateProductDetailPage /> },
+        {
+          path: "products/:slug/:itemSlug",
+          element: <TemplateProductDetailPage />,
+        },
+        {
+          path: "page/products/:slug/:itemSlug",
+          element: <TemplateProductDetailPage />,
+        },
         { path: "gallery", element: <TemplateGalleryPage /> },
         { path: "page/gallery", element: <TemplateGalleryPage /> },
         { path: "testimonials", element: <TemplateTestimonialsPage /> },
