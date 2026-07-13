@@ -345,48 +345,48 @@ if (tenant === "main") {
             { path: "favorites", element: <Favorites /> },
           ],
         },
-        {
-          element: <AiHostLayout />,
-          path: "/host",
-          children: [
-            { path: "", element: <AiHostHome /> },
-            { path: "ai-host-profile", element: <AiHostProfile /> },
-            {
-              path: "ai-host-reset-password/:token",
-              element: <AiHostResetPassword />,
-            },
-            { path: "ai-host-signup", element: <AiHostSignup /> },
-            { path: "ai-host-product", element: <AiHostProduct /> },
-            { path: "ai-host-modules", element: <AiHostModules /> },
-            { path: "ai-host-themes", element: <AiHostThemes /> },
-            { path: "ai-host-leads", element: <AiHostLeads /> },
-            { path: "ai-host-career", element: <AiHostCareer /> },
-            {
-              path: "ai-host-career/job/:title",
-              element: <AiHostJobDetails />,
-            },
-            { path: "ai-host-about", element: <AiHostAbout /> },
-            { path: "ai-host-privacy", element: <AiHostPrivacy /> },
-            {
-              path: "ai-host-terms-and-conditions",
-              element: <AiHostTermsAndCondition />,
-            },
-            { path: "ai-host-faq", element: <AiHostFAQ /> },
-            { path: "ai-host-contact", element: <AiHostContact /> },
-            {
-              path: "ai-host-content-and-copyright",
-              element: <AiHostContentAndCopyright />,
-            },
-            {
-              path: "ai-host-content-use-removal",
-              element: <AiHostContentUseRemoval />,
-            },
-            {
-              path: "ai-host-model-showcase",
-              element: <AiHostModelShowcase />,
-            },
-          ],
-        },
+        // {
+        //   element: <AiHostLayout />,
+        //   path: "/host",
+        //   children: [
+        //     { path: "", element: <AiHostHome /> },
+        //     { path: "ai-host-profile", element: <AiHostProfile /> },
+        //     {
+        //       path: "ai-host-reset-password/:token",
+        //       element: <AiHostResetPassword />,
+        //     },
+        //     { path: "ai-host-signup", element: <AiHostSignup /> },
+        //     { path: "ai-host-product", element: <AiHostProduct /> },
+        //     { path: "ai-host-modules", element: <AiHostModules /> },
+        //     { path: "ai-host-themes", element: <AiHostThemes /> },
+        //     { path: "ai-host-leads", element: <AiHostLeads /> },
+        //     { path: "ai-host-career", element: <AiHostCareer /> },
+        //     {
+        //       path: "ai-host-career/job/:title",
+        //       element: <AiHostJobDetails />,
+        //     },
+        //     { path: "ai-host-about", element: <AiHostAbout /> },
+        //     { path: "ai-host-privacy", element: <AiHostPrivacy /> },
+        //     {
+        //       path: "ai-host-terms-and-conditions",
+        //       element: <AiHostTermsAndCondition />,
+        //     },
+        //     { path: "ai-host-faq", element: <AiHostFAQ /> },
+        //     { path: "ai-host-contact", element: <AiHostContact /> },
+        //     {
+        //       path: "ai-host-content-and-copyright",
+        //       element: <AiHostContentAndCopyright />,
+        //     },
+        //     {
+        //       path: "ai-host-content-use-removal",
+        //       element: <AiHostContentUseRemoval />,
+        //     },
+        //     {
+        //       path: "ai-host-model-showcase",
+        //       element: <AiHostModelShowcase />,
+        //     },
+        //   ],
+        // },
       ],
     },
   ];
@@ -394,7 +394,49 @@ if (tenant === "main") {
   // Hosts subdomain
   routerConfig = [
     {
+      element: <AiHostLayout />,
       path: "/",
+      children: [
+        { path: "", element: <AiHostHome /> },
+        { path: "ai-host-profile", element: <AiHostProfile /> },
+        {
+          path: "ai-host-reset-password/:token",
+          element: <AiHostResetPassword />,
+        },
+        { path: "ai-host-signup", element: <AiHostSignup /> },
+        { path: "ai-host-product", element: <AiHostProduct /> },
+        { path: "ai-host-modules", element: <AiHostModules /> },
+        { path: "ai-host-themes", element: <AiHostThemes /> },
+        { path: "ai-host-leads", element: <AiHostLeads /> },
+        { path: "ai-host-career", element: <AiHostCareer /> },
+        {
+          path: "ai-host-career/job/:title",
+          element: <AiHostJobDetails />,
+        },
+        { path: "ai-host-about", element: <AiHostAbout /> },
+        { path: "ai-host-privacy", element: <AiHostPrivacy /> },
+        {
+          path: "ai-host-terms-and-conditions",
+          element: <AiHostTermsAndCondition />,
+        },
+        { path: "ai-host-faq", element: <AiHostFAQ /> },
+        { path: "ai-host-contact", element: <AiHostContact /> },
+        {
+          path: "ai-host-content-and-copyright",
+          element: <AiHostContentAndCopyright />,
+        },
+        {
+          path: "ai-host-content-use-removal",
+          element: <AiHostContentUseRemoval />,
+        },
+        {
+          path: "ai-host-model-showcase",
+          element: <AiHostModelShowcase />,
+        },
+      ],
+    },
+    {
+      path: "/hostold",
       element: <HostLayout />,
       children: [
         { path: "", element: <HostHome /> },
