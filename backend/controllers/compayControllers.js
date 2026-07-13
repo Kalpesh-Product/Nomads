@@ -1408,7 +1408,7 @@ export const addCompanyImage = async (req, res, next) => {
         console.log("📤 Syncing logo to Master Panel:", payload);
 
         const response = await axios.patch(
-          "https://wonomasterbe.vercel.app/api/hosts/upload-logo",
+          `${WONOMASTER_BE}/hosts/upload-logo`,
           payload,
           { headers: { "Content-Type": "application/json" } },
         );
@@ -1419,25 +1419,10 @@ export const addCompanyImage = async (req, res, next) => {
           response.data.message,
         );
       } catch (masterErr) {
-        console.error(
-          "❌ Master Panel sync failed:",
+        console.warn(
+          "Master Panel logo sync failed; keeping Nomads logo upload:",
           masterErr.response?.data || masterErr.message,
         );
-
-        // Rollback: delete file from S3 and remove logo from DB
-        try {
-          await deleteFileFromS3ByUrl(data.url);
-          company.logo = "";
-          await company.save({ validateBeforeSave: false });
-        } catch (rollbackErr) {
-          console.error("⚠️ Rollback failed:", rollbackErr.message);
-        }
-
-        return res.status(500).json({
-          message:
-            "Failed to sync logo with Master Panel. Changes reverted in Nomads.",
-          error: masterErr.message,
-        });
       }
     }
 
