@@ -49,11 +49,9 @@ const LogoCarousel = ({ logos, title }) => {
   return (
     <section className="bg-white px-4 py-10 md:px-6 md:py-12">
       <div className="mx-auto w-full max-w-7xl">
-        {title ? (
-          <div className="mb-8">
-            <LinedHeading title={title} />
-          </div>
-        ) : null}
+        <div className="mb-8">
+          <LinedHeading title={title || "Trusted By"} />
+        </div>
         <div className="overflow-hidden">
           <div className="flex items-center justify-center gap-6 transition-all duration-700 md:gap-16">
             {displayed.map((src, idx) => (

@@ -195,6 +195,7 @@ const TemplateSite = () => {
           pageNavItems={normalizedData?.pageNavItems}
           productDropdownPages={normalizedData?.productDropdownPages}
           pathname={location.pathname}
+          socials={normalizedData?.socials}
         />
       </footer>
     </div>
