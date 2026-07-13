@@ -361,7 +361,7 @@ const TemplateHome = () => {
       </section>
       ) : null}
 
-      {/* Logo Carousel - optional section after contact */}
+      {/* Trusted By - existing logo carousel section after contact */}
       {data?.logoCarousel?.enabled &&
       Array.isArray(data.logoCarousel.logos) &&
       data.logoCarousel.logos.length > 0 ? (
@@ -372,7 +372,7 @@ const TemplateHome = () => {
               return getMediaSrc(item);
             })
             .filter(Boolean)}
-          title={data?.logoCarousel?.title || undefined}
+          title={data?.logoCarousel?.title || "Trusted By"}
         />
       ) : null}
 
