@@ -44,7 +44,11 @@ const TemplateSite = () => {
           `https://wonomasterbe.vercel.app/api/editor/get-website/${encodeURIComponent(tenant)}`
         );
         if (fallback.ok) {
-          return fallback.json();
+          const raw = await fallback.json();
+          const template = raw?.template || raw;
+          // Prefer the frozen publish-time snapshot; the top-level fields
+          // change with every builder draft auto-save.
+          return template?.publishedData || template;
         }
       }
       return d;
