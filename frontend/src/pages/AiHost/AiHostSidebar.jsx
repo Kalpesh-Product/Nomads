@@ -75,7 +75,7 @@ const getSearchPathForGoal = (goalLabel) => {
   return goalSlug ? `/search/${goalSlug}/results` : "/search/results";
 };
 
-const hostSignupEntryPath = "/host/ai-host-signup?step=1";
+const hostSignupEntryPath = "/ai-host-signup?step=1";
 
 const recommendationItems = [
   {

@@ -42,7 +42,7 @@ const recommendationCards = [
             "Cloud Storage",
             "Up to 2 Users",
         ],
-        path: "/host/ai-host-signup",
+        path: "/ai-host-signup",
     },
     {
         title: "PROFESSIONAL",
@@ -65,7 +65,7 @@ const recommendationCards = [
             "Workspace Management",
             "Up to 5 Users",
         ],
-        path: "/host/ai-host-signup",
+        path: "/ai-host-signup",
     },
     {
         title: "CUSTOMISE",
@@ -89,7 +89,7 @@ const recommendationCards = [
             "Custom-Built Technology Stack",
             "Unlimited Users",
         ],
-        path: "/host/ai-host-signup",
+        path: "/ai-host-signup",
     },
 ];
 
