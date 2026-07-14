@@ -401,9 +401,9 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
   const handleBecomeHostClick = () => {
     if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://nomad.localhost:5173/host";
+      window.location.href = "http://host.localhost:5173/";
     } else {
-      window.location.href = "https://nomad.wono.co/host";
+      window.location.href = "https://host.wono.co/";
     }
   };
 

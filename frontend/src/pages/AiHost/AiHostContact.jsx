@@ -27,7 +27,7 @@ const AiHostContact = () => {
     const [showModal, setShowModal] = useState(false);
 
     const navigate = useNavigate();
-    const onBack = () => navigate("/host");
+    const onBack = () => navigate("/");
 
     const { control, handleSubmit, reset } = useForm({
         defaultValues: {

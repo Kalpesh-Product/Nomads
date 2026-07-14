@@ -108,7 +108,7 @@ const AiHostSignup = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { auth } = useAuth();
-  const onBack = () => navigate("/host");
+  const onBack = () => navigate("/");
   const hostRedirectUrl = "https://wonohostfe.vercel.app/";
 
   const initialStep = Math.max(
@@ -1738,7 +1738,7 @@ const AiHostSignup = () => {
                               <span className="text-sm text-gray-700">
                                 I agree to the{" "}
                                 <NavLink
-                                  to="/host/ai-host-terms-and-conditions"
+                                  to="/ai-host-terms-and-conditions"
                                   className="text-blue-600 underline"
                                   target="_blank"
                                   rel="noreferrer"

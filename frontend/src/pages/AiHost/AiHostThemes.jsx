@@ -123,7 +123,7 @@ const supportItems = [
 
 const Themes = () => {
   const navigate = useNavigate();
-  const onBack = () => navigate("/host");
+  const onBack = () => navigate("/");
   return (
     <div className="   text-secondary-dark justify-center items-center">
       <div className="sticky top-0 z-40 flex min-w-[11rem] items-center gap-3 bg-white/95 py-3 backdrop-blur-sm">
@@ -173,7 +173,7 @@ const Themes = () => {
                   data-aos="fade-up"
                   className="flex-shrink-0 w-[85vw] md:w-[45vw] h-full overflow-hidden rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.5)] snap-start lg:w-full"
                   onClick={() =>
-                    navigate("/host/ai-host-product", { state: { image } })
+                    navigate("/ai-host-product", { state: { image } })
                   }
                   key={index}
                 >

@@ -17,7 +17,7 @@ import { HiOutlineArrowLeft } from "react-icons/hi";
 
 const AiHostContentUseRemoval = () => {
     const navigate = useNavigate();
-    const onBack = () => navigate("/host");
+    const onBack = () => navigate("/");
 
     // -------------------------
     // 🔹 Form Logic

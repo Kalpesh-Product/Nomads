@@ -81,32 +81,32 @@ const recommendationItems = [
   {
     label: "Build & Manage Website",
     icon: CgWebsite,
-    path: "/host/ai-host-website-builder",
+    path: "/ai-host-website-builder",
   },
   {
     label: "Sales Management",
     icon: MdOutlineHandshake,
-    path: "/host/ai-host-modules",
+    path: "/ai-host-modules",
   },
   {
     label: "Finance Suite",
     icon: MdAccountBalance,
-    path: "/host/ai-host-themes",
+    path: "/ai-host-themes",
   },
   {
     label: "Operations Module",
     icon: IoSettingsOutline,
-    path: "/host/ai-host-leads",
+    path: "/ai-host-leads",
   },
   {
     label: "HR Management System",
     icon: BsPeopleFill,
-    path: "/host/ai-host-career",
+    path: "/ai-host-career",
   },
   {
     label: "IT Infrastructure Module",
     icon: FaDesktop,
-    path: "/host/ai-host-calendar",
+    path: "/ai-host-calendar",
   },
   {
     label: "Maintenance Module",
@@ -119,27 +119,27 @@ const valueAdditionItems = [
   {
     label: "AI Apps - Automation",
     icon: RiApps2AiLine,
-    path: "/host/extra-common-modules",
+    path: "/extra-common-modules",
   },
   {
     label: "Meeting Room System",
     icon: MdMeetingRoom,
-    path: "/host/extra-common-modules",
+    path: "/extra-common-modules",
   },
   {
     label: "Visitor Management",
     icon: BsPersonVcard,
-    path: "/host/assets",
+    path: "/assets",
   },
   {
     label: "Ticketing System",
     icon: MdOutlineSupportAgent,
-    path: "/host/inventory",
+    path: "/inventory",
   },
   {
     label: "Smart Calendar",
     icon: TbCalendarUser,
-    path: "/host/finance-management",
+    path: "/finance-management",
   },
   {
     label: "Chat Bot",
@@ -152,27 +152,27 @@ const commonFeatures = [
   {
     label: "Dashboard",
     icon: HiOutlineViewGrid,
-    path: "/host/extra-common-modules",
+    path: "/extra-common-modules",
   },
   {
     label: "Attendance",
     icon: MdOutlineFingerprint,
-    path: "/host/extra-common-modules",
+    path: "/extra-common-modules",
   },
   {
     label: "Tasks",
     icon: HiOutlineClipboardList,
-    path: "/host/assets",
+    path: "/assets",
   },
   {
     label: "Tickets",
     icon: MdOutlineSupportAgent,
-    path: "/host/inventory",
+    path: "/inventory",
   },
   {
     label: "My Calendar",
     icon: TbCalendarUser,
-    path: "/host/finance-management",
+    path: "/finance-management",
   },
   {
     label: "Leave Requests",
@@ -181,7 +181,7 @@ const commonFeatures = [
   {
     label: "Meeting Room Booking",
     icon: MdMeetingRoom,
-    path: "/host/finance-management",
+    path: "/finance-management",
   },
   {
     label: "Reports",
@@ -193,17 +193,17 @@ const extraCommonModules = [
   {
     label: "Assets",
     icon: HiOutlineArchive,
-    path: "/host/extra-common-modules",
+    path: "/extra-common-modules",
   },
   {
     label: "Inventory",
     icon: HiOutlineLibrary,
-    path: "/host/extra-common-modules",
+    path: "/extra-common-modules",
   },
   {
     label: "Finance Management",
     icon: HiOutlineCash,
-    path: "/host/assets",
+    path: "/assets",
   },
 ];
 
@@ -211,32 +211,32 @@ const coreModules = [
   {
     label: "Organization Management",
     icon: HiOutlineLibrary,
-    path: "/host/extra-common-modules",
+    path: "/extra-common-modules",
   },
   {
     label: "Module Management",
     icon: HiOutlineTemplate,
-    path: "/host/extra-common-modules",
+    path: "/extra-common-modules",
   },
   {
     label: "Access Grants",
     icon: HiOutlineKey,
-    path: "/host/assets",
+    path: "/assets",
   },
   {
     label: "Workspace Settings",
     icon: HiOutlineAdjustments,
-    path: "/host/extra-common-modules",
+    path: "/extra-common-modules",
   },
   {
     label: "Workspace Management",
     icon: HiOutlineCog,
-    path: "/host/extra-common-modules",
+    path: "/extra-common-modules",
   },
   {
     label: "Analytics",
     icon: HiOutlineChartBar,
-    path: "/host/assets",
+    path: "/assets",
   },
 ];
 
@@ -244,37 +244,37 @@ const departmentAccess = [
   {
     label: "Hr Department",
     icon: HiOutlineUsers,
-    path: "/host/extra-common-modules",
+    path: "/extra-common-modules",
   },
   {
     label: "Administration Department",
     icon: HiOutlineBriefcase,
-    path: "/host/extra-common-modules",
+    path: "/extra-common-modules",
   },
   {
     label: "Sales Department",
     icon: HiOutlineTrendingUp,
-    path: "/host/assets",
+    path: "/assets",
   },
   {
     label: "Finance Department",
     icon: HiOutlineCurrencyDollar,
-    path: "/host/extra-common-modules",
+    path: "/extra-common-modules",
   },
   {
     label: "Maintainence Department",
     icon: HiOutlineWrenchScrewdriver,
-    path: "/host/extra-common-modules",
+    path: "/extra-common-modules",
   },
   {
     label: "Tech Department",
     icon: HiOutlineChip,
-    path: "/host/assets",
+    path: "/assets",
   },
   {
     label: "IT Department",
     icon: HiOutlineDatabase,
-    path: "/host/assets",
+    path: "/assets",
   },
 ];
 
@@ -552,7 +552,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     params.set("tab", item.tab);
 
     navigate({
-      pathname: "/host/ai-host-profile",
+      pathname: "/ai-host-profile",
       search: params.toString() ? `?${params.toString()}` : "",
     });
   };
