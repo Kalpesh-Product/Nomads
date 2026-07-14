@@ -2320,7 +2320,7 @@ const AiSearchResults = () => {
               <div className="ml-auto flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => navigate("/home")}
+                  onClick={() => navigate("/")}
                   className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-black/70 transition-colors hover:bg-black/5 hover:text-black"
                   aria-label="Clear search and go back"
                 >
