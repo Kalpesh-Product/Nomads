@@ -123,6 +123,12 @@ const templateSchema = new mongoose.Schema(
     //footer
     registeredCompanyName: { type: String },
     copyrightText: { type: String, required: true },
+    // Frozen copy of the template captured by HostPanel at publish/submit time.
+    // Serve this to visitors instead of the top-level fields, which change with
+    // every builder draft auto-save.
+    isPublished: { type: Boolean, default: false },
+    publishedData: { type: mongoose.Schema.Types.Mixed, default: null },
+    publishedAt: { type: Date, default: null },
   },
   { timestamps: true }
 );
