@@ -135,7 +135,13 @@ const Product = () => {
       }
       const url = `company/get-single-company-data?${params.toString()}`;
       const response = await axios.get(url);
-      return response?.data;
+      const companyData = response?.data;
+      return {
+        ...companyData,
+        reviews: Array.isArray(companyData?.reviews)
+          ? companyData.reviews.filter((review) => review?.isEnabled !== false)
+          : [],
+      };
     },
     enabled: !!companyId || !!companyName,
     refetchOnMount: "always",
