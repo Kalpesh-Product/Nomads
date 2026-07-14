@@ -119,9 +119,9 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
 
   const goToHostssMain = () => {
     if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://host.localhost:5173/";
+      window.location.href = "http://localhost:5173";
     } else {
-      window.location.href = "https://host.wono.co/";
+      window.location.href = "https://wono.co";
     }
   };
 
