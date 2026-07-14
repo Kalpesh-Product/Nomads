@@ -13,28 +13,23 @@ import {
   HiOutlineMenu,
   HiX,
   HiOutlineViewGrid,
-  HiOutlineCog,
   HiOutlineHeart,
   HiOutlineUserCircle,
   HiOutlineKey,
   HiOutlineLogout,
 } from "react-icons/hi";
 import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
-import { FaGlobeAmericas } from "react-icons/fa";
+import { FaGlobeAmericas, FaHandsHelping } from "react-icons/fa";
 import { MdOutlineWorkHistory } from "react-icons/md";
 import { HiOutlineCurrencyDollar } from "react-icons/hi";
 import { RiUserCommunityLine } from "react-icons/ri";
 import { TbAward, TbWorldWww } from "react-icons/tb";
-import { IoMdPersonAdd } from "react-icons/io";
 import { CgWebsite } from "react-icons/cg";
-import { IoMdChatbubbles } from "react-icons/io";
 import { TbCalendarUser } from "react-icons/tb";
 import { MdOutlineSupportAgent } from "react-icons/md";
 import { MdMeetingRoom } from "react-icons/md";
-import { RiApps2AiLine } from "react-icons/ri";
 import { TiSpanner } from "react-icons/ti";
 import { FaDesktop } from "react-icons/fa";
-import { IoSettingsOutline } from "react-icons/io5";
 import { BsPeopleFill } from "react-icons/bs";
 import { MdAccountBalance } from "react-icons/md";
 import { MdOutlineHandshake } from "react-icons/md";
@@ -46,7 +41,6 @@ import { HiOutlineArchive } from "react-icons/hi";
 import { HiOutlineLibrary } from "react-icons/hi";
 import { HiOutlineCash } from "react-icons/hi";
 import { HiOutlineTemplate } from "react-icons/hi";
-import { HiOutlineAdjustments } from "react-icons/hi";
 import { HiOutlineChartBar } from "react-icons/hi";
 import { HiOutlineUsers } from "react-icons/hi";
 import { HiOutlineBriefcase } from "react-icons/hi";
@@ -84,22 +78,27 @@ const recommendationItems = [
     path: "/ai-host-website-builder",
   },
   {
-    label: "Sales Management",
+    label: "Nomad Listings",
+    icon: TbWorldWww,
+    path: "/ai-host-modules",
+  },
+  {
+    label: "Sales Management Module",
     icon: MdOutlineHandshake,
     path: "/ai-host-modules",
   },
   {
-    label: "Finance Suite",
+    label: "Finance Management Module",
     icon: MdAccountBalance,
     path: "/ai-host-themes",
   },
   {
-    label: "Operations Module",
-    icon: IoSettingsOutline,
+    label: "Administration Management Module",
+    icon: HiOutlineBriefcase,
     path: "/ai-host-leads",
   },
   {
-    label: "HR Management System",
+    label: "HR Management Module",
     icon: BsPeopleFill,
     path: "/ai-host-career",
   },
@@ -109,7 +108,7 @@ const recommendationItems = [
     path: "/ai-host-calendar",
   },
   {
-    label: "Maintenance Module",
+    label: "Maintenance Management Module",
     icon: TiSpanner,
     // suffixText: "...More",
   },
@@ -117,34 +116,28 @@ const recommendationItems = [
 
 const valueAdditionItems = [
   {
-    label: "AI Apps - Automation",
-    icon: RiApps2AiLine,
-    path: "/extra-common-modules",
-  },
-  {
-    label: "Meeting Room System",
-    icon: MdMeetingRoom,
-    path: "/extra-common-modules",
-  },
-  {
     label: "Visitor Management",
     icon: BsPersonVcard,
     path: "/assets",
   },
   {
-    label: "Ticketing System",
-    icon: MdOutlineSupportAgent,
-    path: "/inventory",
+    label: "Assets Management",
+    icon: HiOutlineArchive,
+    path: "/extra-common-modules",
   },
   {
-    label: "Smart Calendar",
-    icon: TbCalendarUser,
-    path: "/finance-management",
+    label: "Inventory Management",
+    icon: HiOutlineLibrary,
+    path: "/extra-common-modules",
   },
   {
-    label: "Chat Bot",
-    icon: IoMdChatbubbles,
-    // suffixText: "...More",
+    label: "Finance Management",
+    icon: HiOutlineCash,
+    path: "/assets",
+  },
+  {
+    label: "Reports Management",
+    icon: HiOutlineDocumentReport,
   },
 ];
 
@@ -155,8 +148,8 @@ const commonFeatures = [
     path: "/extra-common-modules",
   },
   {
-    label: "Attendance",
-    icon: MdOutlineFingerprint,
+    label: "Customer Support",
+    icon: MdOutlineSupportAgent,
     path: "/extra-common-modules",
   },
   {
@@ -165,45 +158,28 @@ const commonFeatures = [
     path: "/assets",
   },
   {
-    label: "Tickets",
+    label: "Ticketing System",
     icon: MdOutlineSupportAgent,
     path: "/inventory",
   },
   {
-    label: "My Calendar",
-    icon: TbCalendarUser,
+    label: "Meeting Room Booking System",
+    icon: MdMeetingRoom,
     path: "/finance-management",
+  },
+  {
+    label: "Attendance",
+    icon: MdOutlineFingerprint,
+    path: "/extra-common-modules",
   },
   {
     label: "Leave Requests",
     icon: HiOutlineLogout,
   },
   {
-    label: "Meeting Room Booking",
-    icon: MdMeetingRoom,
+    label: "Calendar",
+    icon: TbCalendarUser,
     path: "/finance-management",
-  },
-  {
-    label: "Reports",
-    icon: HiOutlineDocumentReport,
-  },
-];
-
-const extraCommonModules = [
-  {
-    label: "Assets",
-    icon: HiOutlineArchive,
-    path: "/extra-common-modules",
-  },
-  {
-    label: "Inventory",
-    icon: HiOutlineLibrary,
-    path: "/extra-common-modules",
-  },
-  {
-    label: "Finance Management",
-    icon: HiOutlineCash,
-    path: "/assets",
   },
 ];
 
@@ -224,13 +200,13 @@ const coreModules = [
     path: "/assets",
   },
   {
-    label: "Workspace Settings",
-    icon: HiOutlineAdjustments,
+    label: "Unit Selling",
+    icon: HiOutlineCash,
     path: "/extra-common-modules",
   },
   {
-    label: "Workspace Management",
-    icon: HiOutlineCog,
+    label: "Unit Management",
+    icon: HiOutlineTemplate,
     path: "/extra-common-modules",
   },
   {
@@ -296,17 +272,16 @@ const signOutItem = [{ label: "Sign Out", icon: HiOutlineLogout }];
 
 const becomeContributorLink = {
   label: "Become A Contributor",
-  icon: IoMdPersonAdd,
+  icon: FaHandsHelping,
   path: "/become-a-contributor",
 };
 
 const collapsedSectionLabels = {
   Modules: "MOD",
-  "Key Apps": "APP",
-  "Common Features": "COM",
-  "Extra Common Modules": "EXT",
+  "Common Modules": "COM",
   "Core Modules": "COR",
-  "Department Accesses": "DEP",
+  "Key Apps": "APP",
+  "Department Access": "DEP",
   Profile: "PRO",
 };
 
@@ -465,8 +440,6 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   const [isRecommendationsOpen, setIsRecommendationsOpen] = useState(true);
   const [isValueAdditionsOpen, setIsValueAdditionsOpen] = useState(false);
   const [isCommonFeaturesOpen, setIsCommonFeaturesOpen] = useState(false);
-  const [isExtraCommonModulesOpen, setIsExtraCommonModulesOpen] =
-    useState(false);
   const [isCoreModulesOpen, setIsCoreModulesOpen] = useState(false);
   const [isDepartmentAccessOpen, setIsDepartmentAccessOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -491,15 +464,6 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     });
 
     const isCommonFeaturePage = commonFeatures.some((item) => {
-      if (!item.path) return false;
-      const normalizedItemPath = item.path.replace(/\/$/, "");
-      return (
-        normalizedPath === normalizedItemPath ||
-        normalizedPath.startsWith(`${normalizedItemPath}/`)
-      );
-    });
-
-    const isExtraModulePage = extraCommonModules.some((item) => {
       if (!item.path) return false;
       const normalizedItemPath = item.path.replace(/\/$/, "");
       return (
@@ -535,7 +499,6 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     setIsRecommendationsOpen(true);
     if (isValueAddedPage) setIsValueAdditionsOpen(true);
     if (isCommonFeaturePage) setIsCommonFeaturesOpen(true);
-    if (isExtraModulePage) setIsExtraCommonModulesOpen(true);
     if (isCoreModulePage) setIsCoreModulesOpen(true);
     if (isDepartmentAccessPage) setIsDepartmentAccessOpen(true);
   }, [location.pathname]);
@@ -666,20 +629,6 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     };
   });
 
-  const extraCommonModulesWithActivePath = extraCommonModules.map((item) => {
-    if (!item.path) return item;
-
-    const normalizedItemPath = item.path.replace(/\/$/, "");
-    const isActivePath =
-      normalizedPath === normalizedItemPath ||
-      normalizedPath.startsWith(`${normalizedItemPath}/`);
-
-    return {
-      ...item,
-      active: isActivePath,
-    };
-  });
-
   const coreModulesWithActivePath = coreModules.map((item) => {
     if (!item.path) return item;
 
@@ -773,32 +722,12 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
       />
 
       <SidebarSection
-        title="Key Apps"
-        items={valueAdditionItemsWithActivePath}
-        collapsed={isCollapsed}
-        isExpandable
-        isOpen={isValueAdditionsOpen}
-        onToggle={() => setIsValueAdditionsOpen((prev) => !prev)}
-        onItemClick={handleSidebarItemClick}
-        onTooltipChange={setTooltip}
-      />
-      <SidebarSection
-        title="Common Features"
+        title="Common Modules"
         items={commonFeaturesWithActivePath}
         collapsed={isCollapsed}
         isExpandable
         isOpen={isCommonFeaturesOpen}
         onToggle={() => setIsCommonFeaturesOpen((prev) => !prev)}
-        onItemClick={handleSidebarItemClick}
-        onTooltipChange={setTooltip}
-      />
-      <SidebarSection
-        title="Extra Common Modules"
-        items={extraCommonModulesWithActivePath}
-        collapsed={isCollapsed}
-        isExpandable
-        isOpen={isExtraCommonModulesOpen}
-        onToggle={() => setIsExtraCommonModulesOpen((prev) => !prev)}
         onItemClick={handleSidebarItemClick}
         onTooltipChange={setTooltip}
       />
@@ -813,7 +742,17 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         onTooltipChange={setTooltip}
       />
       <SidebarSection
-        title="Department Accesses"
+        title="Key Apps"
+        items={valueAdditionItemsWithActivePath}
+        collapsed={isCollapsed}
+        isExpandable
+        isOpen={isValueAdditionsOpen}
+        onToggle={() => setIsValueAdditionsOpen((prev) => !prev)}
+        onItemClick={handleSidebarItemClick}
+        onTooltipChange={setTooltip}
+      />
+      <SidebarSection
+        title="Department Access"
         items={departmentAccessWithActivePath}
         collapsed={isCollapsed}
         isExpandable

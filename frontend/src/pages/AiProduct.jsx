@@ -71,6 +71,7 @@ const AiProduct = () => {
   const [selectedReview, setSelectedReview] = useState([]);
   const [showAmenities, setShowAmenities] = useState(false);
   const [open, setOpen] = useState(false);
+  const [isReviewCarouselPaused, setIsReviewCarouselPaused] = useState(false);
   const [isAddReviewOpen, setIsAddReviewOpen] = useState(false);
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
 
@@ -152,11 +153,16 @@ const AiProduct = () => {
     const setupAutoScroll = (containerRef) => {
       const container = containerRef.current;
       // We need at least one full set of reviews to loop
-      if (!container || (companyDetails?.reviews?.length || 0) <= 2)
+      if (
+        !container ||
+        isReviewCarouselPaused ||
+        open ||
+        (companyDetails?.reviews?.length || 0) <= 2
+      )
         return null;
 
       const interval = setInterval(() => {
-        const { scrollLeft, offsetWidth, scrollWidth } = container;
+        const { scrollLeft, scrollWidth } = container;
 
         // The width of a single review card + gap
         // Based on your CSS: min-w-[300px] md:min-w-[400px] + gap-6 (24px)
@@ -185,7 +191,7 @@ const AiProduct = () => {
       if (desktopInterval) clearInterval(desktopInterval);
       if (mobileInterval) clearInterval(mobileInterval);
     };
-  }, [companyDetails?.reviews]);
+  }, [companyDetails?.reviews, isReviewCarouselPaused, open]);
 
   useEffect(() => {
     const companyType = companyDetails?.companyType?.trim();
@@ -1391,8 +1397,12 @@ const AiProduct = () => {
                 <>
                   {infiniteReviews.map((review, index) => (
                     <div
-                      key={review._id || `${review._id}-${index}`} // Ensure unique keys for duplicates
+                      key={`${review._id || "review"}-${index}`} // Ensure unique keys for duplicates
                       className="w-full md:w-[calc((100%-3rem)/3)] flex-shrink-0 snap-center h-full"
+                      onPointerDown={() => setIsReviewCarouselPaused(true)}
+                      onPointerUp={() => setIsReviewCarouselPaused(false)}
+                      onPointerLeave={() => setIsReviewCarouselPaused(false)}
+                      onPointerCancel={() => setIsReviewCarouselPaused(false)}
                     >
                       <ReviewCard
                         handleClick={() => {
@@ -2337,8 +2347,12 @@ const AiProduct = () => {
                 <>
                   {infiniteReviews.map((review, index) => (
                     <div
-                      key={review._id || `${review._id}-${index}`}
+                      key={`${review._id || "review"}-${index}`}
                       className="w-full flex-shrink-0 snap-center h-full"
+                      onPointerDown={() => setIsReviewCarouselPaused(true)}
+                      onPointerUp={() => setIsReviewCarouselPaused(false)}
+                      onPointerLeave={() => setIsReviewCarouselPaused(false)}
+                      onPointerCancel={() => setIsReviewCarouselPaused(false)}
                     >
                       <ReviewCard
                         handleClick={() => {

@@ -109,7 +109,7 @@ const AiHostSignup = () => {
   const location = useLocation();
   const { auth } = useAuth();
   const onBack = () => navigate("/");
-  const hostRedirectUrl = "https://wonohostfe.vercel.app";
+  const hostRedirectUrl = `${window.location.origin}/`;
 
   const initialStep = Math.max(
     0,

@@ -21,12 +21,11 @@ import {
   HiOutlineLogin,
 } from "react-icons/hi";
 import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
-import { FaGlobeAmericas } from "react-icons/fa";
+import { FaGlobeAmericas, FaHandsHelping } from "react-icons/fa";
 import { MdOutlineWorkHistory } from "react-icons/md";
 import { HiOutlineCurrencyDollar } from "react-icons/hi";
 import { RiUserCommunityLine } from "react-icons/ri";
 import { TbAward, TbWorldWww } from "react-icons/tb";
-import { IoMdPersonAdd } from "react-icons/io";
 import { HiOutlineUserGroup } from "react-icons/hi";
 import { MdComputer } from "react-icons/md";
 import { IoBriefcaseSharp } from "react-icons/io5";
@@ -132,7 +131,7 @@ const signOutItem = [{ label: "Sign Out", icon: HiOutlineLogout }];
 
 const becomeContributorLink = {
   label: "Become A Contributor",
-  icon: IoMdPersonAdd,
+  icon: FaHandsHelping,
   path: "/become-a-contributor",
 };
 
