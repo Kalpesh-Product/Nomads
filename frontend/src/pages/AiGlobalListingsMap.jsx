@@ -943,6 +943,7 @@ const AiGlobalListingsMap = () => {
         <div className={isHeadingSequenceComplete ? "block" : "hidden"}>
           <Container padding={false}>
             <div className="">
+              <div className="border-t border-gray-300 mt-0 mb-6" />
               <div className="font-semibold text-md grid grid-cols-9 gap-4 pt-3">
                 <div className="custom-scrollbar-hide col-span-5">
                   {isLisitingLoading ? (
