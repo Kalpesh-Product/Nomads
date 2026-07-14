@@ -1495,7 +1495,9 @@ const AiHostSignup = () => {
             </Stepper> */}
       <div
         className={`max-w-5xl mx-auto w-full ${
-          activeStep === 1 ? "md:px-20 lg:px-20 flex flex-col gap-1" : ""
+          activeStep === 1
+            ? "md:px-20 lg:px-20 flex flex-col gap-1 lg:gap-16"
+            : ""
         }`}
       >
         {/* {activeStep !== 3 && (
