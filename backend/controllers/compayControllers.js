@@ -10,6 +10,17 @@ import axios from "axios";
 import TestListing from "../models/TestCompany.js";
 import NomadUser from "../models/NomadUser.js";
 
+const buildVisibleNomadReviewQuery = (criteria = {}) => ({
+  ...criteria,
+  status: "approved",
+  isEnabled: { $ne: false },
+  $or: [
+    { source: "nomad" },
+    { source: { $exists: false } },
+    { reviewSource: /^Nomads Website$/i },
+  ],
+});
+
 // Utility to calculate distance between two lat/lng points in meters
 function getDistanceFromLatLonInM(lat1, lon1, lat2, lon2) {
   const R = 6371e3; // Earth radius in meters
@@ -699,7 +710,9 @@ export const getCompaniesData = async (req, res, next) => {
     const ids = filtered.map((c) => c._id);
 
     const [reviews, pocs] = await Promise.all([
-      Review.find({ company: { $in: ids } }).lean(),
+      Review.find(
+        buildVisibleNomadReviewQuery({ company: { $in: ids } }),
+      ).lean(),
       PointOfContact.find({
         company: { $in: ids },
         isActive: true,
@@ -1107,7 +1120,11 @@ export const getCompanyData = async (req, res, next) => {
 
     // Fetch DB reviews & POC
     const [reviews, poc] = await Promise.all([
-      Review.find({ company: companyObjectId }).lean().exec(),
+      Review.find(
+        buildVisibleNomadReviewQuery({ company: companyObjectId }),
+      )
+        .lean()
+        .exec(),
       PointOfContact.findOne({ company: companyObjectId, isActive: true })
         .lean()
         .exec(),
@@ -1122,16 +1139,21 @@ export const getCompanyData = async (req, res, next) => {
 
     return res.status(200).json({
       ...updatedCompanyData,
+      // Reviews shown on Nomads must be controlled by approval/isEnabled in
+      // our database. Live Google reviews bypass those moderation controls.
       reviews: [
         ...reviews,
-        ...(closestGoogle?.reviews || []).map((r) => ({
-          company: companyObjectId,
-          name: r.author_name,
-          starCount: r.rating,
-          description: r.text,
-          reviewLink: r.author_url,
-          avatar: r.profile_photo_url,
-        })),
+        // Keep the Google review integration available for later use. It is
+        // disabled for now because live Google reviews do not have a database
+        // isEnabled value and therefore cannot follow HostPanel visibility.
+        // ...(closestGoogle?.reviews || []).map((r) => ({
+        //   company: companyObjectId,
+        //   name: r.author_name,
+        //   starCount: r.rating,
+        //   description: r.text,
+        //   reviewLink: r.author_url,
+        //   avatar: r.profile_photo_url,
+        // })),
       ],
       poc,
     });
@@ -1168,7 +1190,9 @@ export const getListings = async (req, res, next) => {
     }
 
     const listings = await Company.find(query).lean().exec();
-    const reviews = await Review.find({ companyId })
+    const reviews = await Review.find(
+      buildVisibleNomadReviewQuery({ companyId }),
+    )
       .populate({ path: "company", select: "companyType" })
       .lean()
       .exec();

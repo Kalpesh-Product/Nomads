@@ -292,35 +292,49 @@ export const addReview = async (req, res, next) => {
 export const updateReviewStatus = async (req, res, next) => {
   try {
     const { reviewId } = req.params;
-    const { status, userId, date, userType } = req.body;
-    let data = { status, userType };
-
-    if (!userType || !["MASTER", "HOST"].includes(userType)) {
-      return res.status(400).json({ message: "User type is invalid" });
-    }
+    const { status, userId, date, userType, isEnabled } = req.body;
 
     if (!reviewId) {
       return res.status(400).json({ message: "Review id is required" });
     }
 
-    const allowedStatuses = ["approved", "rejected"];
-    if (!allowedStatuses.includes(status)) {
-      return res.status(400).json({ message: "Invalid review status" });
+    if (status === undefined && isEnabled === undefined) {
+      return res
+        .status(400)
+        .json({ message: "Status or isEnabled is required" });
     }
 
-    if (status === "approved") {
-      data = {
-        ...data,
-        approvedBy: { userId, userType },
-        approvedDate: new Date(date),
-      };
-    } else {
-      data = {
-        ...data,
-        rejectedBy: { userId, userType },
-        rejectedDate: new Date(date),
-      };
+    const data = {};
+
+    if (status !== undefined) {
+      if (!userType || !["MASTER", "HOST"].includes(userType)) {
+        return res.status(400).json({ message: "User type is invalid" });
+      }
+
+      const allowedStatuses = ["approved", "rejected"];
+      if (!allowedStatuses.includes(status)) {
+        return res.status(400).json({ message: "Invalid review status" });
+      }
+
+      data.status = status;
+      if (status === "approved") {
+        data.approvedBy = { userId, userType };
+        data.approvedDate = new Date(date);
+      } else {
+        data.rejectedBy = { userId, userType };
+        data.rejectedDate = new Date(date);
+      }
     }
+
+    if (isEnabled !== undefined) {
+      if (typeof isEnabled !== "boolean") {
+        return res
+          .status(400)
+          .json({ message: "isEnabled must be true or false" });
+      }
+      data.isEnabled = isEnabled;
+    }
+
     const review = await Review.findByIdAndUpdate(reviewId, data, {
       new: true,
     });
@@ -330,7 +344,10 @@ export const updateReviewStatus = async (req, res, next) => {
     }
 
     return res.status(200).json({
-      message: `Review ${status} successfully`,
+      message:
+        status !== undefined
+          ? `Review ${status} successfully`
+          : `Review ${isEnabled ? "enabled" : "disabled"} successfully`,
       review,
     });
   } catch (error) {
@@ -340,7 +357,12 @@ export const updateReviewStatus = async (req, res, next) => {
 
 export const getReviewsByCompany = async (req, res, next) => {
   try {
-    const { companyId, companyType = "", workspaceId, status = "pending" } = req.query;
+    const {
+      companyId,
+      companyType = "",
+      workspaceId,
+      source,
+    } = req.query;
 
     let cmpQuery = {};
 
@@ -381,6 +403,24 @@ export const getReviewsByCompany = async (req, res, next) => {
 
     if (workspaceId) {
       query = { ...query, workspaceId };
+    }
+
+    if (source === "nomad") {
+      query = {
+        ...query,
+        $and: [
+          ...(Array.isArray(query.$and) ? query.$and : []),
+          {
+            $or: [
+              { source: "nomad" },
+              { source: { $exists: false } },
+              { reviewSource: /^Nomads Website$/i },
+            ],
+          },
+        ],
+      };
+    } else if (source) {
+      query = { ...query, source };
     }
 
     // 2️⃣ Fetch reviews using ObjectId (fast)
@@ -443,7 +483,6 @@ export const createWebsiteReview = async (req, res, next) => {
       name,
       starCount,
       description,
-      reviewSource,
       reviewLink,
       workspaceId,
     } = req.body;
@@ -495,7 +534,9 @@ export const createWebsiteReview = async (req, res, next) => {
       name: name.trim(),
       starCount: parsedStarCount,
       description: description?.trim(),
-      reviewSource: reviewSource?.trim() || "Website",
+      // This endpoint is exclusively used by hosted website review forms.
+      // Keep its visible source separate from reviews submitted through Nomads.
+      reviewSource: "Website Reviews",
       reviewLink: reviewLink?.trim() || "",
       status: "pending",
       workspaceId: workspaceId?.trim() || "",
@@ -519,7 +560,7 @@ export const getApprovedReviewsByCompany = async (req, res, next) => {
       return res.status(400).json({ message: "companyId or workspaceId is required" });
     }
 
-    let query = { status: "approved" };
+    let query = { status: "approved", isEnabled: { $ne: false } };
 
     if (source) {
       query.source = source;
@@ -532,7 +573,7 @@ export const getApprovedReviewsByCompany = async (req, res, next) => {
     }
 
     const reviews = await Review.find(query)
-      .select("name starCount description reviewSource reviewLink createdAt companyId workspaceId source")
+      .select("name starCount description reviewSource reviewLink createdAt companyId workspaceId source isEnabled")
       .sort({ createdAt: -1 })
       .lean()
       .exec();
@@ -549,29 +590,54 @@ export const getApprovedReviewsByCompany = async (req, res, next) => {
 export const updateWebsiteReviewStatus = async (req, res, next) => {
   try {
     const { reviewId } = req.params;
-    const { status } = req.body;
+    const { status, isEnabled } = req.body;
 
     if (!reviewId) {
       return res.status(400).json({ message: "Review ID is required" });
     }
 
-    const allowedStatuses = ["approved", "rejected", "pending"];
-    if (!status || !allowedStatuses.includes(status)) {
-      return res.status(400).json({ message: "Status must be approved, rejected or pending" });
+    if (status === undefined && isEnabled === undefined) {
+      return res
+        .status(400)
+        .json({ message: "Status or isEnabled is required" });
     }
 
-    const review = await Review.findByIdAndUpdate(
-      reviewId,
-      { status },
-      { new: true },
-    );
+    const updates = {};
+
+    if (status !== undefined) {
+      const allowedStatuses = ["approved", "rejected", "pending"];
+      if (!allowedStatuses.includes(status)) {
+        return res.status(400).json({ message: "Status must be approved, rejected or pending" });
+      }
+      updates.status = status;
+    }
+
+    if (isEnabled !== undefined) {
+      if (typeof isEnabled !== "boolean") {
+        return res
+          .status(400)
+          .json({ message: "isEnabled must be true or false" });
+      }
+      updates.isEnabled = isEnabled;
+    }
+
+    const review = await Review.findByIdAndUpdate(reviewId, updates, {
+      new: true,
+    });
 
     if (!review) {
       return res.status(404).json({ message: "Review not found" });
     }
 
+    const messageAction =
+      status !== undefined
+        ? status
+        : isEnabled
+          ? "enabled"
+          : "disabled";
+
     return res.status(200).json({
-      message: `Review ${status} successfully`,
+      message: `Review ${messageAction} successfully`,
       review,
     });
   } catch (error) {
