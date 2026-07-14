@@ -53,7 +53,7 @@ import { HiOutlineArrowLeft } from "react-icons/hi";
 export default function Modules() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const onBack = () => navigate("/host");
+  const onBack = () => navigate("/");
   return (
     <>
       <div className="sticky top-0 z-40 flex min-w-[11rem] items-center gap-3 bg-white/95 py-3 backdrop-blur-sm">

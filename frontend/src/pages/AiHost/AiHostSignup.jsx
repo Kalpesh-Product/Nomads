@@ -108,8 +108,8 @@ const AiHostSignup = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { auth } = useAuth();
-  const onBack = () => navigate("/host");
-  const hostRedirectUrl = "https://wonohostfe.vercel.app/";
+  const onBack = () => navigate("/");
+  const hostRedirectUrl = "https://wonohostfe.vercel.app";
 
   const initialStep = Math.max(
     0,
@@ -313,11 +313,10 @@ const AiHostSignup = () => {
           ? data.message
           : data.message?.message ||
               "Form submitted successfully, our team will get back to you soon",
-      );
+      ).then(() => {
+        window.location.href = hostRedirectUrl;
+      });
       reset();
-      // window.setTimeout(() => {
-      //     window.location.href = hostRedirectUrl;
-      // }, 1500);
     },
     // onError: (error) => {
     //   // toast.error(error.response?.data?.message || "Something went wrong");
@@ -1495,7 +1494,9 @@ const AiHostSignup = () => {
             </Stepper> */}
       <div
         className={`max-w-5xl mx-auto w-full ${
-          activeStep === 1 ? "md:px-20 lg:px-20 flex flex-col gap-1" : ""
+          activeStep === 1
+            ? "md:px-20 lg:px-20 flex flex-col gap-1 lg:gap-16"
+            : ""
         }`}
       >
         {/* {activeStep !== 3 && (
@@ -1736,7 +1737,7 @@ const AiHostSignup = () => {
                               <span className="text-sm text-gray-700">
                                 I agree to the{" "}
                                 <NavLink
-                                  to="/host/ai-host-terms-and-conditions"
+                                  to="/ai-host-terms-and-conditions"
                                   className="text-blue-600 underline"
                                   target="_blank"
                                   rel="noreferrer"

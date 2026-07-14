@@ -11,10 +11,11 @@ import AiHome from "../AiHome";
 import { HiOutlineArrowLeft } from "react-icons/hi";
 
 const Career = () => {
+    const navigate = useNavigate();
     const [openIndex, setOpenIndex] = useState(null);
     const { pathname } = useLocation();
     const isHost = pathname.includes("host");
-    const customLink = isHost ? `/host/ai-host-career/job` : `/career/job`;
+    const customLink = isHost ? `/ai-host-career/job` : `/career/job`;
     // const customRoute = isHost ? "job/get-job-posts" : "";
 
     const categoryOrder = [
@@ -50,7 +51,7 @@ const Career = () => {
 
     // const jobData = isHost ? jobRoles : jobRolesDummy;
 
-    const onBack = () => navigate("/host");
+    const onBack = () => navigate("/");
 
     return (
         <>

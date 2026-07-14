@@ -97,19 +97,19 @@ const HostHome = () => {
                 id: 1,
                 title: "MODULES",
                 icon: TbWorldWww,
-                route: "/host/ai-host-modules",
+                route: "/ai-host-modules",
               },
               {
                 id: 2,
                 title: "LEADS",
                 icon: TbFileDescription,
-                route: "/host/ai-host-leads",
+                route: "/ai-host-leads",
               },
               {
                 id: 3,
                 title: "THEMES",
                 icon: TbLayoutDashboard,
-                route: "/host/ai-host-themes",
+                route: "/ai-host-themes",
               },
             ].map((tab) => {
               const Icon = tab.icon;
@@ -230,7 +230,7 @@ const HostHome = () => {
             </div>
             <div className="text-center my-4">
               <NavLink
-                to={"/host/ai-host-themes"}
+                to={"/ai-host-themes"}
                 className={" hover:underline hover:text-primary-blue"}
               >
                 View more
