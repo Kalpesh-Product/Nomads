@@ -109,7 +109,7 @@ const AiHostSignup = () => {
   const location = useLocation();
   const { auth } = useAuth();
   const onBack = () => navigate("/");
-  const hostRedirectUrl = "https://wonohostfe.vercel.app/";
+  const hostRedirectUrl = "https://wonohostfe.vercel.app";
 
   const initialStep = Math.max(
     0,
@@ -313,11 +313,10 @@ const AiHostSignup = () => {
           ? data.message
           : data.message?.message ||
               "Form submitted successfully, our team will get back to you soon",
-      );
+      ).then(() => {
+        window.location.href = hostRedirectUrl;
+      });
       reset();
-      // window.setTimeout(() => {
-      //     window.location.href = hostRedirectUrl;
-      // }, 1500);
     },
     // onError: (error) => {
     //   // toast.error(error.response?.data?.message || "Something went wrong");
