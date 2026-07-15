@@ -22,6 +22,8 @@ const AiImageGallery = () => {
     continent = "Asia",
     country,
     state: companyState,
+    stateLabel,
+    selectedStateLabel,
     companyType,
   } = location.state || {};
   const imageRefs = useRef({});
@@ -29,11 +31,8 @@ const AiImageGallery = () => {
 
   const [photos, setPhotos] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
-
   const [sliderRef, instanceRef] = useKeenSlider({
     loop: true,
-    slideChanged: (s) => setCurrentIndex(s.track.details.rel),
   });
 
   useEffect(() => {
@@ -79,7 +78,6 @@ const AiImageGallery = () => {
   }, [photos, selectedImageId]);
 
   const openModal = (index) => {
-    setCurrentIndex(index);
     setIsModalOpen(true);
 
     // Wait for the modal and slider to render
@@ -101,6 +99,7 @@ const AiImageGallery = () => {
   };
 
   const resolvedCompanyName = companyName || companyParam || "Unknown";
+  const displayStateLabel = selectedStateLabel || stateLabel || companyState;
 
   const getCompanyTypeBreadcrumbLabel = (value) => {
     const companyTypeLabelMap = {
@@ -118,7 +117,7 @@ const AiImageGallery = () => {
   const breadcrumbItems = [
     { key: "continent", label: continent, isLink: true },
     { key: "country", label: country, isLink: true },
-    { key: "state", label: companyState, isLink: true },
+    { key: "state", label: displayStateLabel, isLink: true },
     {
       key: "companyType",
       label: getCompanyTypeBreadcrumbLabel(companyType),
@@ -131,7 +130,15 @@ const AiImageGallery = () => {
       onClick: () => {
         const target = companyParam || companyName;
         if (!target) return;
-        navigate(`/listings/${encodeURIComponent(target)}`);
+        const params = new URLSearchParams();
+        if (companyType) params.set("companyType", companyType);
+        navigate(
+          {
+            pathname: `/listings/${encodeURIComponent(target)}`,
+            search: params.toString() ? `?${params.toString()}` : "",
+          },
+          { state: location.state },
+        );
       },
     },
     { key: "gallery", label: "Gallery", isLink: false },
@@ -139,15 +146,16 @@ const AiImageGallery = () => {
 
   useEffect(() => {
     const trail = [
-      { label: continent, path: "/verticals" },
       {
-        label: country,
-        path: `/verticals?country=${encodeURIComponent(
-          country || "",
-        )}&state=${encodeURIComponent(companyState || "")}`,
+        label: continent,
+        path: "/search/worldranking/results",
       },
       {
-        label: companyState,
+        label: country,
+        path: "/search/worldranking/results",
+      },
+      {
+        label: displayStateLabel,
         path: `/verticals?country=${encodeURIComponent(
           country || "",
         )}&state=${encodeURIComponent(companyState || "")}`,
@@ -162,7 +170,11 @@ const AiImageGallery = () => {
       },
       {
         label: resolvedCompanyName,
-        path: `/listings/${encodeURIComponent(companyParam || companyName || "")}`,
+        path: `/listings/${encodeURIComponent(
+          companyParam || companyName || "",
+        )}${
+          companyType ? `?companyType=${encodeURIComponent(companyType)}` : ""
+        }`,
       },
       { label: "Gallery", truncate: true },
     ].filter((item) => item.label);
@@ -185,6 +197,7 @@ const AiImageGallery = () => {
     companyType,
     continent,
     country,
+    displayStateLabel,
     location.pathname,
     location.search,
     location.state,
@@ -218,6 +231,18 @@ const AiImageGallery = () => {
         `/listings-list?country=${normalizedCountry || ""}&location=${
           normalizedLocation || ""
         }&category=${normalizedCategory || ""}`,
+        {
+          state: {
+            ...location.state,
+            selectedStateLabel: displayStateLabel,
+            breadcrumbFilters: {
+              continent: normalizedContinent || "",
+              country: normalizedCountry || "",
+              location: normalizedLocation || "",
+              category: normalizedCategory || "",
+            },
+          },
+        },
       );
       return;
     }
@@ -226,6 +251,17 @@ const AiImageGallery = () => {
       `/verticals?country=${normalizedCountry || ""}&state=${
         normalizedLocation || ""
       }`,
+      {
+        state: {
+          ...location.state,
+          selectedStateLabel: displayStateLabel,
+          breadcrumbFilters: {
+            continent: normalizedContinent || "",
+            country: normalizedCountry || "",
+            location: normalizedLocation || "",
+          },
+        },
+      },
     );
   };
 
