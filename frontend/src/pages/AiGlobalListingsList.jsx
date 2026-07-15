@@ -178,12 +178,12 @@ const valueAddedServiceItems = [
   },
   // {
   //   label: "VIEW LOCATION BLOGS",
-  //   path: "/ai-blogs",
+  //   path: "/blog",
   //   usesSelectedLocation: true,
   // },
   // {
   //   label: "VIEW LOCATION NEWS",
-  //   path: "/ai-news",
+  //   path: "/news",
   //   usesSelectedLocation: true,
   // },
 ];
@@ -717,6 +717,14 @@ const AiGlobalListingsList = () => {
           return popularLocationRestaurants.length > 0;
         }
 
+        if (option.value === NEWS_CATEGORY) {
+          return popularLocationNews.length > 0;
+        }
+
+        if (option.value === BLOGS_CATEGORY) {
+          return popularLocationBlogs.length > 0;
+        }
+
         return true;
       });
 
@@ -774,7 +782,9 @@ const AiGlobalListingsList = () => {
   }, [
     isLisitingLoading,
     listingsData,
+    popularLocationBlogs.length,
     popularLocationEvents.length,
+    popularLocationNews.length,
     popularLocationRestaurants.length,
     popularLocationVenues.length,
   ]);
@@ -868,7 +878,7 @@ const AiGlobalListingsList = () => {
       );
     }
 
-    navigate(`/ai-listings/${encodeURIComponent(item.companyName)}`, {
+    navigate(`/listings/${encodeURIComponent(item.companyName)}`, {
       state: {
         breadcrumbLoading: true,
         companyId: item.companyId,
@@ -891,7 +901,7 @@ const AiGlobalListingsList = () => {
             "",
         },
         returnTo: {
-          pathname: "/ai-verticals",
+          pathname: "/verticals",
           search: location.search,
         },
       },
@@ -992,7 +1002,7 @@ const AiGlobalListingsList = () => {
       dispatch(setFormValues(data));
       setShowMobileSearch(false);
       navigate(
-        `/ai-verticals?country=${data.country}&location=${data.location}`,
+        `/verticals?country=${data.country}&location=${data.location}`,
       );
     },
     onSuccess: () => {
@@ -1037,7 +1047,7 @@ const AiGlobalListingsList = () => {
     };
 
     navigate(
-      `/ai-listings-list?country=${formData.country}&location=${formData.location}&category=${state.category}`,
+      `/listings-list?country=${formData.country}&location=${formData.location}&category=${state.category}`,
       {
         state: {
           country: formData.country,
@@ -1073,8 +1083,8 @@ const AiGlobalListingsList = () => {
       {
         pathname:
           type === "news"
-            ? "/ai-news/ai-news-details"
-            : "/ai-blogs/ai-blog-details",
+            ? "/news/news-details"
+            : "/blog/blog-details",
         search: location.search,
       },
       {
@@ -1154,7 +1164,7 @@ const AiGlobalListingsList = () => {
       return;
     }
 
-    const mapUrl = `/ai-verticals?country=${encodeURIComponent(formData.country)}&state=${encodeURIComponent(formData.location)}&view=map`;
+    const mapUrl = `/verticals?country=${encodeURIComponent(formData.country)}&state=${encodeURIComponent(formData.location)}&view=map`;
     console.log("Navigating to:", mapUrl);
     navigate(mapUrl, {
       state: {
@@ -1214,7 +1224,7 @@ const AiGlobalListingsList = () => {
         />
         <meta property="og:image" content="/images/homepage.jpeg" />
         <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://wono.co/ai-verticals" />
+        <link rel="canonical" href="https://wono.co/verticals" />
       </Helmet>
 
       {/* ==================== DESKTOP VIEW (lg and above) ==================== */}

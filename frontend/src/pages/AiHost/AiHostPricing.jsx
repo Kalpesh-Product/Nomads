@@ -43,7 +43,7 @@ const recommendationCards = [
       "Cloud Storage",
       "Up to 2 Users",
     ],
-    path: "/ai-host-signup",
+    path: "/signup",
   },
   {
     title: "PROFESSIONAL",
@@ -67,7 +67,7 @@ const recommendationCards = [
       "Unit Management",
       "Up to 5 Users",
     ],
-    path: "/ai-host-signup",
+    path: "/signup",
   },
   {
     title: "CUSTOMISE",
@@ -92,7 +92,7 @@ const recommendationCards = [
       "Custom-Built Technology Stack",
       "Unlimited Users",
     ],
-    path: "/ai-host-signup",
+    path: "/signup",
   },
 ];
 
@@ -250,7 +250,7 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
     const params = new URLSearchParams(location.search);
     params.delete("step");
     params.set("step", String(startStep));
-    if (card.path.includes("/ai-host-signup")) {
+    if (card.path.includes("/signup")) {
       params.set("plan", card.title);
     }
     const queryString = params.toString();

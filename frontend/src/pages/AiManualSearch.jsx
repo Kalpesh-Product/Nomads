@@ -316,7 +316,7 @@ const AiManualSearch = () => {
     });
 
     navigate(
-      `/ai-verticals?country=${encodeURIComponent(country)}&location=${encodeURIComponent(location)}`,
+      `/verticals?country=${encodeURIComponent(country)}&location=${encodeURIComponent(location)}`,
       {
         state: {
           selectedStateLabel: selectedLocationTitle,

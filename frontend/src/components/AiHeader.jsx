@@ -25,21 +25,20 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
   const view = searchParams.get("view");
   const formData = useSelector((state) => state.location.formValues);
 
-  const isAiListingsMapPage = location.pathname === "/ai-listings";
-  const isAiListingsListPage = location.pathname === "/ai-listings-list";
+  const isAiListingsMapPage = location.pathname === "/listings";
+  const isAiListingsListPage = location.pathname === "/listings-list";
   const isAiDestinationListingsPage =
-    location.pathname === "/ai-verticals" ||
+    location.pathname === "/verticals" ||
     isAiListingsMapPage ||
     isAiListingsListPage;
   const showToggle =
     location.pathname.includes("verticals") || isAiDestinationListingsPage;
   const isAiEditorialPage =
-    location.pathname.startsWith("/ai-blogs") ||
-    location.pathname.startsWith("/ai-news");
+    location.pathname.startsWith("/blog") ||
+    location.pathname.startsWith("/news");
   const shouldCheckNewsBlogLinks =
     showToggle ||
     isAiEditorialPage ||
-    location.pathname.startsWith("/ai-listings") ||
     location.pathname.startsWith("/listings");
 
   const countryParam = searchParams.get("country") || formData?.country || "";
@@ -58,11 +57,11 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
 
   const listingsQuery = buildListingsQuery();
   const mapViewLink = listingsQuery
-    ? `/ai-listings?${listingsQuery}`
-    : "/ai-listings";
+    ? `/listings?${listingsQuery}`
+    : "/listings";
   const listViewLink = listingsQuery
-    ? `/ai-listings-list?${listingsQuery}`
-    : "/ai-listings-list";
+    ? `/listings-list?${listingsQuery}`
+    : "/listings-list";
 
   const { auth } = useAuth();
   const logout = useLogout();
@@ -89,7 +88,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
 
       navigate(
         {
-          pathname: "/ai-login",
+          pathname: "/login",
           search: nextSearchParams.toString()
             ? `?${nextSearchParams.toString()}`
             : "",
@@ -109,9 +108,9 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
 
   const getNomadLoginRedirectPath = () => {
     const authPages = new Set([
-      "/ai-signup",
-      "/ai-login",
-      "/ai-forgot-password",
+      "/signup",
+      "/login",
+      "/forgot-password",
     ]);
 
     if (authPages.has(location.pathname)) {
@@ -215,14 +214,14 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
 
   const headerLinks = [
     // { id: 1, text: "Home", to: "/" },
-    { id: 2, type: "news", text: newsLabel, to: `/ai-news${currentSearch}` },
-    { id: 3, type: "blog", text: blogLabel, to: `/ai-blogs${currentSearch}` },
+    { id: 2, type: "news", text: newsLabel, to: `/news${currentSearch}` },
+    { id: 3, type: "blog", text: blogLabel, to: `/blog${currentSearch}` },
     // { id: 4, type: "offers", text: offersLabel },
   ];
 
   const shouldShowHeaderLinks =
     location.pathname.startsWith("/listings") &&
-    !location.pathname.startsWith("/ai-listings");
+    !location.pathname.startsWith("/listings");
 
   return (
     <div className="bg-white/80 backdrop-blur-md px-1 md:px-20">
@@ -354,7 +353,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                   <li className="flex items-center gap-6">
                     {hasNews && (
                       <Link
-                        to={`/ai-news${currentSearch}`}
+                        to={`/news${currentSearch}`}
                         className="group relative text-md text-black font-semibold whitespace-nowrap"
                       >
                         <span className="relative z-10 group-hover:font-bold mb-2 text-sm whitespace-nowrap">
@@ -366,7 +365,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
 
                     {hasBlogs && (
                       <Link
-                        to={`/ai-blogs${currentSearch}`}
+                        to={`/blog${currentSearch}`}
                         className="group relative text-md text-black font-semibold whitespace-nowrap"
                       >
                         <span className="relative z-10 group-hover:font-bold mb-2 text-sm whitespace-nowrap">
@@ -389,7 +388,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
               {!isLoggedIn && (
                 <div className="p-4 px-0 whitespace-nowrap">
                   <Link
-                    to={`/ai-login${location.search}`}
+                    to={`/login${location.search}`}
                     state={{
                       redirectTo: getNomadLoginRedirectPath(),
                     }}

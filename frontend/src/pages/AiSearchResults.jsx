@@ -1580,7 +1580,7 @@ const AiSearchResults = () => {
     }
 
     navigate(
-      `/ai-verticals?country=${encodeURIComponent(country)}&state=${encodeURIComponent(selectedLocationParam)}`,
+      `/verticals?country=${encodeURIComponent(country)}&state=${encodeURIComponent(selectedLocationParam)}`,
       {
         state: {
           selectedStateLabel: destinationTitle,
@@ -1604,7 +1604,7 @@ const AiSearchResults = () => {
       const destinationId = destination?._id;
 
       if (!userId) {
-        navigate("/ai-login", {
+        navigate("/login", {
           state: {
             redirectTo: `${location.pathname}${location.search}`,
             loginContext: {

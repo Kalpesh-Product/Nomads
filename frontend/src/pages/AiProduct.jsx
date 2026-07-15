@@ -274,13 +274,13 @@ const AiProduct = () => {
       },
       {
         label: breadcrumbState.stateLabel,
-        path: `/ai-verticals?country=${encodeURIComponent(
+        path: `/verticals?country=${encodeURIComponent(
           breadcrumbState.country || "",
         )}&state=${encodeURIComponent(breadcrumbState.state || "")}`,
       },
       {
         label: getCompanyTypeBreadcrumbLabel(breadcrumbState.companyType),
-        path: `/ai-listings-list?country=${encodeURIComponent(
+        path: `/listings-list?country=${encodeURIComponent(
           breadcrumbState.country || "",
         )}&location=${encodeURIComponent(
           breadcrumbState.state || "",
@@ -353,7 +353,7 @@ const AiProduct = () => {
 
     if (isCompanyTypeClick) {
       navigate(
-        `/ai-listings-list?country=${normalizedCountry || ""}&location=${
+        `/listings-list?country=${normalizedCountry || ""}&location=${
           normalizedLocation || ""
         }&category=${normalizedCategory || ""}`,
         {
@@ -373,7 +373,7 @@ const AiProduct = () => {
     }
 
     navigate(
-      `/ai-verticals?country=${normalizedCountry || ""}&state=${
+      `/verticals?country=${normalizedCountry || ""}&state=${
         normalizedLocation || ""
       }`,
       {
@@ -413,7 +413,7 @@ const AiProduct = () => {
 
     if (fallbackCountry && fallbackState) {
       navigate(
-        `/ai-verticals?country=${fallbackCountry}&state=${fallbackState}`,
+        `/verticals?country=${fallbackCountry}&state=${fallbackState}`,
         {
           state: location.state,
         },

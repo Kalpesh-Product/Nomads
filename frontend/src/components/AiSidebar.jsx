@@ -326,7 +326,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
     if (!isLoggedIn && gatedRecommendationLabels.has(item.label)) {
       const goalSlug = goalSlugByLabel[item.label];
-      const loginPath = goalSlug ? `/ai-login/${goalSlug}` : "/ai-login";
+      const loginPath = goalSlug ? `/login/${goalSlug}` : "/login";
 
       navigate(`${loginPath}${location.search}`, {
         state: {
@@ -371,16 +371,16 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     params.set("tab", item.tab);
 
     navigate({
-      pathname: "/ai-profile",
+      pathname: "/profile",
       search: params.toString() ? `?${params.toString()}` : "",
     });
   };
 
   const getNomadLoginRedirectPath = () => {
     const authPages = new Set([
-      "/ai-signup",
-      "/ai-login",
-      "/ai-forgot-password",
+      "/signup",
+      "/login",
+      "/forgot-password",
     ]);
 
     if (authPages.has(location.pathname)) {
@@ -391,7 +391,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   };
 
   const handleLogInClick = () => {
-    navigate(`/ai-login${location.search}`, {
+    navigate(`/login${location.search}`, {
       state: {
         redirectTo: getNomadLoginRedirectPath(),
       },
@@ -425,13 +425,13 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
     if (isMobileOverlay) {
       onClose?.();
-      navigate("/ai-login");
+      navigate("/login");
       return;
     }
 
     navigate(
       {
-        pathname: "/ai-login",
+        pathname: "/login",
         search: nextSearchParams.toString()
           ? `?${nextSearchParams.toString()}`
           : "",
@@ -449,7 +449,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   const normalizedPath = location.pathname.replace(/\/$/, "") || "/";
   const redirectGoal = location.pathname
     .replace(/\/$/, "")
-    .match(/^\/ai-login\/([^/]+)$/)?.[1];
+    .match(/^\/login\/([^/]+)$/)?.[1];
 
   // Active state logic for recommendations
   const recommendationItemsWithActivePath = recommendationItems.map((item) => {
@@ -460,7 +460,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     const isActivePath =
       normalizedPath === normalizedItemPath ||
       normalizedPath.startsWith(`${normalizedItemPath}/`) ||
-      (normalizedPath.startsWith("/ai-login/") &&
+      (normalizedPath.startsWith("/login/") &&
         Boolean(goalSlug) &&
         goalSlug === redirectGoal);
 

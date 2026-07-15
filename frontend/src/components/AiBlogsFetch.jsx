@@ -35,7 +35,7 @@ const BlogCard = ({ b, stateName }) => {
       onClick={() =>
         navigate(
           {
-            pathname: "ai-blog-details",
+            pathname: "blog-details",
             search: location.search,
           },
           {

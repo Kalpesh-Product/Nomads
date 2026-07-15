@@ -127,7 +127,7 @@ const AiTermsAndConditions = () => {
                     are governed by our{" "}
                     <span
                         className="text-primary-blue underline cursor-pointer"
-                        onClick={() => navigate("/ai-privacy")}
+                        onClick={() => navigate("/privacy")}
                     >
                         Privacy Policy
                     </span>
@@ -224,7 +224,7 @@ const AiTermsAndConditions = () => {
                             </a>
                             <span
                                 className="text-primary-blue cursor-pointer"
-                                onClick={() => navigate("/ai-contact")}
+                                onClick={() => navigate("/contact")}
                             >
                                 Contact us
                             </span>

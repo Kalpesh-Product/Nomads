@@ -1,32 +1,17 @@
 import React, { useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { HiOutlineArrowLeft } from "react-icons/hi";
+import { useLocation, useParams } from "react-router-dom";
 import Container from "../components/Container";
-import JobApplicationForm from "./JobApplicationForm";
 import HostJobApplicationForm from "./host/HostJobApplicationForm";
 
 const AiJobDetail = () => {
     const { title } = useParams();
-    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState("description");
-    const { pathname, state } = useLocation();
+    const { state } = useLocation();
     const { about, responsibilities, qualifications, jobName } = state;
-    const isHost = pathname.includes("host");
 
     return (
-        <>
-            <div className="sticky top-0 z-40 bg-white/95 py-3 backdrop-blur-sm md:px-10">
-                <button
-                    type="button"
-                    onClick={() => navigate("/home")}
-                    className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500"
-                    aria-label="Go back to AI career"
-                >
-                    <HiOutlineArrowLeft size={18} />
-                </button>
-            </div>
-            <Container>
-                <div className="lg:px-10 px-6">
+        <Container>
+            <div className="lg:px-10 px-6">
                     <h2 className="text-xl lg:text-3xl font-normal text-center mb-6">
                         {jobName?.split("-")?.length
                             ? jobName?.split("-")?.join(" ")?.toUpperCase()
@@ -110,9 +95,8 @@ const AiJobDetail = () => {
                     ) : (
                         <HostJobApplicationForm title={title} />
                     )}
-                </div>
-            </Container>
-        </>
+            </div>
+        </Container>
     );
 };
 

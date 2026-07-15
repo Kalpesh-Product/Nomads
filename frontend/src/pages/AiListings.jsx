@@ -109,12 +109,12 @@ const valueAddedServiceItems = [
   },
   // {
   //   label: "VIEW LOCATION BLOGS",
-  //   path: "/ai-blogs",
+  //   path: "/blog",
   //   usesSelectedLocation: true,
   // },
   // {
   //   label: "VIEW LOCATION NEWS",
-  //   path: "/ai-news",
+  //   path: "/news",
   //   usesSelectedLocation: true,
   // },
 ];
@@ -399,6 +399,13 @@ const AiListings = ({ forceListView = false }) => {
       searchParams.get("location") ||
       formData?.location,
   );
+  const destinationContentParams = React.useMemo(() => {
+    if (!destinationAvailability) return undefined;
+
+    return {
+      keyword: buildExactKeyword(destinationAvailability),
+    };
+  }, [destinationAvailability]);
   const { data: destinationEventsData = [] } = useQuery({
     queryKey: ["ai-events-availability", destinationAvailability],
     queryFn: async () => {
@@ -441,6 +448,30 @@ const AiListings = ({ forceListView = false }) => {
     enabled: !!destinationAvailability,
     refetchOnWindowFocus: false,
   });
+  const { data: destinationNewsData = [] } = useQuery({
+    queryKey: ["ai-news-availability", destinationAvailability],
+    queryFn: async () => {
+      const response = await axios.get("/news/get-news", {
+        params: destinationContentParams,
+      });
+
+      return Array.isArray(response.data) ? response.data : [];
+    },
+    enabled: !!destinationAvailability,
+    refetchOnWindowFocus: false,
+  });
+  const { data: destinationBlogsData = [] } = useQuery({
+    queryKey: ["ai-blogs-availability", destinationAvailability],
+    queryFn: async () => {
+      const response = await axios.get("/blogs/get-blogs", {
+        params: destinationContentParams,
+      });
+
+      return Array.isArray(response.data) ? response.data : [];
+    },
+    enabled: !!destinationAvailability,
+    refetchOnWindowFocus: false,
+  });
 
   const categoryOptions = React.useMemo(() => {
     if (isLisitingLoading) {
@@ -459,6 +490,14 @@ const AiListings = ({ forceListView = false }) => {
 
         if (option.value === RESTAURANTS_CATEGORY) {
           return destinationRestaurantsData.length > 0;
+        }
+
+        if (option.value === NEWS_CATEGORY) {
+          return destinationNewsData.length > 0;
+        }
+
+        if (option.value === BLOGS_CATEGORY) {
+          return destinationBlogsData.length > 0;
         }
 
         return true;
@@ -519,7 +558,9 @@ const AiListings = ({ forceListView = false }) => {
       { label: "Value Adds", value: VALUE_ADDED_SERVICES_CATEGORY },
     ];
   }, [
+    destinationBlogsData.length,
     destinationEventsData.length,
+    destinationNewsData.length,
     destinationRestaurantsData.length,
     destinationVenuesData.length,
     isLisitingLoading,
@@ -772,7 +813,7 @@ const AiListings = ({ forceListView = false }) => {
         location: formData.location,
         highlight: categoryValue,
       });
-      navigate(`/ai-verticals?${params.toString()}`, {
+      navigate(`/verticals?${params.toString()}`, {
         state: {
           selectedStateLabel,
           searchBarBadges,
@@ -883,9 +924,9 @@ const AiListings = ({ forceListView = false }) => {
   const showDesktopMap =
     !forceListView && mapOpen && !isFocusedContentSelected;
   const listingsBasePath =
-    location.pathname === "/ai-listings-list"
-      ? "/ai-listings-list"
-      : "/ai-listings";
+    location.pathname === "/listings-list"
+      ? "/listings-list"
+      : "/listings";
   const selectedStateFromParams =
     searchParams.get("state") || searchParams.get("location") || "";
   const backLabel = selectedStateFromParams || formData?.location || "";
@@ -1080,7 +1121,7 @@ const AiListings = ({ forceListView = false }) => {
   );
 
   const handleEventClick = (event) => {
-    navigate(`/ai-events/${event.id}`, {
+    navigate(`/events/${event.id}`, {
       state: {
         item: event,
         selectedStateLabel,
@@ -1096,7 +1137,7 @@ const AiListings = ({ forceListView = false }) => {
   };
 
   const handleVenueClick = (venue) => {
-    navigate(`/ai-venues/${venue.id}`, {
+    navigate(`/venues/${venue.id}`, {
       state: {
         item: venue,
         selectedStateLabel,
@@ -1112,7 +1153,7 @@ const AiListings = ({ forceListView = false }) => {
   };
 
   const handleRestaurantClick = (restaurant) => {
-    navigate(`/ai-restaurants/${restaurant.id}`, {
+    navigate(`/restaurants/${restaurant.id}`, {
       state: {
         item: restaurant,
         selectedStateLabel,
@@ -1129,7 +1170,7 @@ const AiListings = ({ forceListView = false }) => {
   const handleNewsClick = (newsItem) => {
     navigate(
       {
-        pathname: "/ai-news/ai-news-details",
+        pathname: "/news/news-details",
         search: location.search,
       },
       {
@@ -1144,7 +1185,7 @@ const AiListings = ({ forceListView = false }) => {
   const handleBlogClick = (blog) => {
     navigate(
       {
-        pathname: "/ai-blogs/ai-blog-details",
+        pathname: "/blog/blog-details",
         search: location.search,
       },
       {
@@ -1922,7 +1963,7 @@ const AiListings = ({ forceListView = false }) => {
                             showVertical={false}
                             handleNavigation={() => {
                               navigate(
-                                `/ai-listings/${encodeURIComponent(item.companyName)}`,
+                                `/listings/${encodeURIComponent(item.companyName)}`,
                                 {
                                   state: {
                                     companyId: item.companyId,
@@ -1972,7 +2013,7 @@ const AiListings = ({ forceListView = false }) => {
               <button
                 onClick={() =>
                   navigate(
-                    `/ai-verticals?country=${formData?.country}&location=${formData?.location}&view=map`,
+                    `/verticals?country=${formData?.country}&location=${formData?.location}&view=map`,
                     {
                       state: { searchBarBadges },
                     },
