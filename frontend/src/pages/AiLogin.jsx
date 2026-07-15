@@ -143,7 +143,7 @@ export default function AiLogin() {
           ? location.state.redirectTo
           : redirectGoal
             ? `/search/${redirectGoal}/results`
-            : "/home";
+            : "/";
 
       navigate(redirectPath, { replace: true });
     }
@@ -170,7 +170,7 @@ export default function AiLogin() {
       return `/search/${redirectGoal}/results`;
     }
 
-    return "/home";
+    return "/";
   };
 
   const { mutate: submitLogin, isPending: isLoginPending } = useMutation({

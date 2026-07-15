@@ -114,7 +114,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
     ]);
 
     if (authPages.has(location.pathname)) {
-      return "/home";
+      return "/";
     }
 
     return `${location.pathname}${location.search}`;

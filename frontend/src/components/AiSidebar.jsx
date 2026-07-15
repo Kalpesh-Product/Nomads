@@ -384,7 +384,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     ]);
 
     if (authPages.has(location.pathname)) {
-      return "/home";
+      return "/";
     }
 
     return `${location.pathname}${location.search}`;
