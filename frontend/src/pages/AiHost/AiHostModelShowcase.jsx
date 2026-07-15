@@ -38,7 +38,7 @@ const AiHostModelShowcase = () => {
                 <div className="justify-center pb-4 pt-4">
                     <GetStartedButton
                         title={"Get Started"}
-                        handleSubmit={() => navigate("/ai-host-signup?step=1")}
+                        handleSubmit={() => navigate("/signup?step=1")}
                     />
                 </div>
             </div>

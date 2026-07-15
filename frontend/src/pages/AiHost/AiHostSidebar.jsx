@@ -69,43 +69,43 @@ const getSearchPathForGoal = (goalLabel) => {
   return goalSlug ? `/search/${goalSlug}/results` : "/search/results";
 };
 
-const hostSignupEntryPath = "/ai-host-signup?step=1";
+const hostSignupEntryPath = "/signup?step=1";
 
 const recommendationItems = [
   {
     label: "Build & Manage Website",
     icon: CgWebsite,
-    path: "/ai-host-website-builder",
+    path: "/website-builder",
   },
   {
     label: "Nomad Listings",
     icon: TbWorldWww,
-    path: "/ai-host-modules",
+    path: "/modules",
   },
   {
     label: "Sales Management Module",
     icon: MdOutlineHandshake,
-    path: "/ai-host-modules",
+    path: "/modules",
   },
   {
     label: "Finance Management Module",
     icon: MdAccountBalance,
-    path: "/ai-host-themes",
+    path: "/themes",
   },
   {
     label: "Administration Management Module",
     icon: HiOutlineBriefcase,
-    path: "/ai-host-leads",
+    path: "/leads",
   },
   {
     label: "HR Management Module",
     icon: BsPeopleFill,
-    path: "/ai-host-career",
+    path: "/career",
   },
   {
     label: "IT Infrastructure Module",
     icon: FaDesktop,
-    path: "/ai-host-calendar",
+    path: "/calendar",
   },
   {
     label: "Maintenance Management Module",
@@ -515,7 +515,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     params.set("tab", item.tab);
 
     navigate({
-      pathname: "/ai-host-profile",
+      pathname: "/profile",
       search: params.toString() ? `?${params.toString()}` : "",
     });
   };

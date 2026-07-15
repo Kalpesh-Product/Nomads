@@ -179,7 +179,7 @@ const HostProduct = () => {
                     ))}
                   </ul>
                   <GetStartedButton
-                    handleSubmit={() => navigate("/ai-host-signup?step=1")}
+                    handleSubmit={() => navigate("/signup?step=1")}
                     externalStyles="bg-black text-white w-full max-w-[420px] py-4 text-xl font-semibold"
                   />
                 </div>
@@ -255,7 +255,7 @@ const HostProduct = () => {
                     ))}
                 </div>
                 <GetStartedButton
-                  handleSubmit={() => navigate("/ai-host-signup?step=1")}
+                  handleSubmit={() => navigate("/signup?step=1")}
                 />
               </div>
             </Container>

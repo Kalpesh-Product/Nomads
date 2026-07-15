@@ -149,7 +149,7 @@ const Themes = () => {
           </h1>
 
           <GetStartedButton
-            handleSubmit={() => navigate("/ai-host-signup?step=1")}
+            handleSubmit={() => navigate("/signup?step=1")}
           />
         </section>
       </Container>
@@ -173,7 +173,7 @@ const Themes = () => {
                   data-aos="fade-up"
                   className="flex-shrink-0 w-[85vw] md:w-[45vw] h-full overflow-hidden rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.5)] snap-start lg:w-full"
                   onClick={() =>
-                    navigate("/ai-host-product", { state: { image } })
+                    navigate("/product", { state: { image } })
                   }
                   key={index}
                 >
@@ -190,7 +190,7 @@ const Themes = () => {
             </div>
             <div className="flex justify-center items-center pt-4">
               <GetStartedButton
-                handleSubmit={() => navigate("/ai-host-signup?step=1")}
+                handleSubmit={() => navigate("/signup?step=1")}
               />
             </div>
           </div>
@@ -215,7 +215,7 @@ const Themes = () => {
               </ul>
               <div className="flex justify-center md:justify-start w-full pt-2">
                 <GetStartedButton
-                  handleSubmit={() => navigate("/ai-host-signup?step=1")}
+                  handleSubmit={() => navigate("/signup?step=1")}
                 />
               </div>
             </div>
@@ -250,7 +250,7 @@ const Themes = () => {
           </div>
           <div className="pt-2">
             <GetStartedButton
-              handleSubmit={() => navigate("/ai-host-signup?step=1")}
+              handleSubmit={() => navigate("/signup?step=1")}
             />
           </div>
         </div>

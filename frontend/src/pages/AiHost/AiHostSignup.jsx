@@ -1737,7 +1737,7 @@ const AiHostSignup = () => {
                               <span className="text-sm text-gray-700">
                                 I agree to the{" "}
                                 <NavLink
-                                  to="/ai-host-terms-and-conditions"
+                                  to="/terms-and-conditions"
                                   className="text-blue-600 underline"
                                   target="_blank"
                                   rel="noreferrer"

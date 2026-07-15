@@ -33,36 +33,36 @@ const AiFooter = () => {
 
   const goToHostsPrivacy = () => {
     if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://host.localhost:5173/ai-host-privacy";
+      window.location.href = "http://host.localhost:5173/privacy";
     } else {
-      window.location.href = "https://host.wono.co/ai-host-privacy";
+      window.location.href = "https://host.wono.co/privacy";
     }
   };
   const goToHostsTC = () => {
     if (window.location.hostname.includes("localhost")) {
       window.location.href =
-        "http://host.localhost:5173/ai-host-terms-and-conditions";
+        "http://host.localhost:5173/terms-and-conditions";
     } else {
       window.location.href =
-        "https://host.wono.co/ai-host-terms-and-conditions";
+        "https://host.wono.co/terms-and-conditions";
     }
   };
   const goToHostsContentCopyright = () => {
     if (window.location.hostname.includes("localhost")) {
       window.location.href =
-        "http://host.localhost:5173/ai-host-content-and-copyright";
+        "http://host.localhost:5173/content-and-copyright";
     } else {
       window.location.href =
-        "https://host.wono.co/ai-host-content-and-copyright";
+        "https://host.wono.co/content-and-copyright";
     }
   };
   const goToHostsContentUseRemoval = () => {
     if (window.location.hostname.includes("localhost")) {
       window.location.href =
-        "http://host.localhost:5173/ai-host-content-use-removal";
+        "http://host.localhost:5173/content-use-removal";
     } else {
       window.location.href =
-        "https://host.wono.co/ai-host-content-use-removal";
+        "https://host.wono.co/content-use-removal";
     }
   };
 
@@ -70,9 +70,9 @@ const AiFooter = () => {
     {
       heading: "Services",
       links: [
-        { name: "About", link: "/ai-host-about" },
-        { name: "Career", link: "/ai-host-career" },
-        { name: "FAQs", link: "/ai-host-faq" },
+        { name: "About", link: "/about" },
+        { name: "Career", link: "/career" },
+        { name: "FAQs", link: "/faq" },
         // {
         //   name: "Content and Copyright Policy",
         //   link: goToHostsContentCopyright,
@@ -84,7 +84,7 @@ const AiFooter = () => {
       links: [
         { name: "Privacy", link: goToHostsPrivacy },
         { name: "T&C", link: goToHostsTC },
-        { name: "Contact", link: "/ai-host-contact" },
+        { name: "Contact", link: "/contact" },
         // {
         //   name: "Content Use & Removal Policy",
         //   link: goToHostsContentUseRemoval,

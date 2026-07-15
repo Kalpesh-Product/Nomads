@@ -105,7 +105,7 @@ const Leads = () => {
         </div>
         <div className="flex flex-row lg:justify-end md:justify-end  sm:justify-center xs:justify-center items-center pb-8 pt-4">
           <GetStartedButton
-            handleSubmit={() => navigate("/ai-host-signup?step=1")}
+            handleSubmit={() => navigate("/signup?step=1")}
           />
         </div>
         {/* </div> */}
@@ -224,7 +224,7 @@ const Leads = () => {
           </div>
           <div className="flex lg:justify-end xs:justify-center items-center lg:px-8 pt-6">
             <GetStartedButton
-              handleSubmit={() => navigate("/ai-host-signup?step=1")}
+              handleSubmit={() => navigate("/signup?step=1")}
             />
           </div>
         </div>
