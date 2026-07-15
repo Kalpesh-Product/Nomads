@@ -139,7 +139,7 @@ const AiContentAndCopyright = () => {
             <div className="space-y-8">
                 {sections.map((section, i) => (
                     <div key={i}>
-                        <div className="flex flex-col gap-4 font-sans">
+                        <div className="flex flex-col gap-4 font-sans p-2">
                             <h4 className="font-sans text-lg md:text-xl lg:text-2xl font-semibold">
                                 {section.title}
                             </h4>
