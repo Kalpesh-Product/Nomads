@@ -200,7 +200,7 @@ const coreModules = [
     path: "/assets",
   },
   {
-    label: "Unit Selling",
+    label: "Unit Setting",
     icon: HiOutlineCash,
     path: "/extra-common-modules",
   },
