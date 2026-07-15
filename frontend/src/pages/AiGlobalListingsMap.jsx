@@ -54,6 +54,11 @@ const normalizeContentDestination = (label) =>
         .replace(/[\u2010-\u2015\u2212\u{FE63}\u{FF0D}]/gu, "-")
         .trim()
     : "";
+const buildExactContentKeyword = (label) => {
+  if (!label) return null;
+  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return `^${escaped}$`;
+};
 const getAiVerticalsPageStateKey = (country = "", location = "") => {
   const countryKey = country.trim().toLowerCase();
   const locationKey = location.trim().toLowerCase();
@@ -382,6 +387,13 @@ const AiGlobalListingsMap = () => {
       new URLSearchParams(location.search).get("location") ||
       formData?.location,
   );
+  const destinationContentParams = useMemo(() => {
+    if (!destinationAvailability) return undefined;
+
+    return {
+      keyword: buildExactContentKeyword(destinationAvailability),
+    };
+  }, [destinationAvailability]);
   const { data: destinationEventsData = [] } = useQuery({
     queryKey: ["ai-events-availability", destinationAvailability],
     queryFn: async () => {
@@ -424,6 +436,30 @@ const AiGlobalListingsMap = () => {
     enabled: !!destinationAvailability,
     refetchOnWindowFocus: false,
   });
+  const { data: destinationNewsData = [] } = useQuery({
+    queryKey: ["ai-news-availability", destinationAvailability],
+    queryFn: async () => {
+      const response = await axios.get("/news/get-news", {
+        params: destinationContentParams,
+      });
+
+      return Array.isArray(response.data) ? response.data : [];
+    },
+    enabled: !!destinationAvailability,
+    refetchOnWindowFocus: false,
+  });
+  const { data: destinationBlogsData = [] } = useQuery({
+    queryKey: ["ai-blogs-availability", destinationAvailability],
+    queryFn: async () => {
+      const response = await axios.get("/blogs/get-blogs", {
+        params: destinationContentParams,
+      });
+
+      return Array.isArray(response.data) ? response.data : [];
+    },
+    enabled: !!destinationAvailability,
+    refetchOnWindowFocus: false,
+  });
 
   const sortedListings = useMemo(() => {
     if (!listingsData || listingsData.length === 0) return [];
@@ -449,6 +485,14 @@ const AiGlobalListingsMap = () => {
 
         if (option.value === RESTAURANTS_CATEGORY) {
           return destinationRestaurantsData.length > 0;
+        }
+
+        if (option.value === NEWS_CATEGORY) {
+          return destinationNewsData.length > 0;
+        }
+
+        if (option.value === BLOGS_CATEGORY) {
+          return destinationBlogsData.length > 0;
         }
 
         return true;
@@ -511,7 +555,9 @@ const AiGlobalListingsMap = () => {
       },
     ];
   }, [
+    destinationBlogsData.length,
     destinationEventsData.length,
+    destinationNewsData.length,
     destinationRestaurantsData.length,
     destinationVenuesData.length,
     isLisitingLoading,

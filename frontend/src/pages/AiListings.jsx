@@ -399,6 +399,13 @@ const AiListings = ({ forceListView = false }) => {
       searchParams.get("location") ||
       formData?.location,
   );
+  const destinationContentParams = React.useMemo(() => {
+    if (!destinationAvailability) return undefined;
+
+    return {
+      keyword: buildExactKeyword(destinationAvailability),
+    };
+  }, [destinationAvailability]);
   const { data: destinationEventsData = [] } = useQuery({
     queryKey: ["ai-events-availability", destinationAvailability],
     queryFn: async () => {
@@ -441,6 +448,30 @@ const AiListings = ({ forceListView = false }) => {
     enabled: !!destinationAvailability,
     refetchOnWindowFocus: false,
   });
+  const { data: destinationNewsData = [] } = useQuery({
+    queryKey: ["ai-news-availability", destinationAvailability],
+    queryFn: async () => {
+      const response = await axios.get("/news/get-news", {
+        params: destinationContentParams,
+      });
+
+      return Array.isArray(response.data) ? response.data : [];
+    },
+    enabled: !!destinationAvailability,
+    refetchOnWindowFocus: false,
+  });
+  const { data: destinationBlogsData = [] } = useQuery({
+    queryKey: ["ai-blogs-availability", destinationAvailability],
+    queryFn: async () => {
+      const response = await axios.get("/blogs/get-blogs", {
+        params: destinationContentParams,
+      });
+
+      return Array.isArray(response.data) ? response.data : [];
+    },
+    enabled: !!destinationAvailability,
+    refetchOnWindowFocus: false,
+  });
 
   const categoryOptions = React.useMemo(() => {
     if (isLisitingLoading) {
@@ -459,6 +490,14 @@ const AiListings = ({ forceListView = false }) => {
 
         if (option.value === RESTAURANTS_CATEGORY) {
           return destinationRestaurantsData.length > 0;
+        }
+
+        if (option.value === NEWS_CATEGORY) {
+          return destinationNewsData.length > 0;
+        }
+
+        if (option.value === BLOGS_CATEGORY) {
+          return destinationBlogsData.length > 0;
         }
 
         return true;
@@ -519,7 +558,9 @@ const AiListings = ({ forceListView = false }) => {
       { label: "Value Adds", value: VALUE_ADDED_SERVICES_CATEGORY },
     ];
   }, [
+    destinationBlogsData.length,
     destinationEventsData.length,
+    destinationNewsData.length,
     destinationRestaurantsData.length,
     destinationVenuesData.length,
     isLisitingLoading,

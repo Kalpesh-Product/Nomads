@@ -717,6 +717,14 @@ const AiGlobalListingsList = () => {
           return popularLocationRestaurants.length > 0;
         }
 
+        if (option.value === NEWS_CATEGORY) {
+          return popularLocationNews.length > 0;
+        }
+
+        if (option.value === BLOGS_CATEGORY) {
+          return popularLocationBlogs.length > 0;
+        }
+
         return true;
       });
 
@@ -774,7 +782,9 @@ const AiGlobalListingsList = () => {
   }, [
     isLisitingLoading,
     listingsData,
+    popularLocationBlogs.length,
     popularLocationEvents.length,
+    popularLocationNews.length,
     popularLocationRestaurants.length,
     popularLocationVenues.length,
   ]);
