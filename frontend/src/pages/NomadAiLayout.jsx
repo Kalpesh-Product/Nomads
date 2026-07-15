@@ -231,6 +231,26 @@ const NomadAiLayout = () => {
   const isAiProductPage = location.pathname.startsWith("/listings/");
   const isBreadcrumbLoading =
     isAiProductPage && Boolean(location.state?.breadcrumbLoading);
+  const handleStickyBack = () => {
+    const returnTo = location.state?.returnTo;
+
+    if (returnTo?.pathname) {
+      navigate(
+        {
+          pathname: returnTo.pathname,
+          search: returnTo.search || "",
+        },
+        {
+          state: {
+            ...location.state,
+          },
+        },
+      );
+      return;
+    }
+
+    navigate(-1);
+  };
 
   return (
     <div className="flex h-screen bg-white">
@@ -261,7 +281,7 @@ const NomadAiLayout = () => {
           <div className="w-full bg-white/95">
             <div className="px-3 md:px-8 lg:px-10 xl:px-12 2xl:px-14">
               <AiStickyBackBreadcrumb
-                onBack={() => navigate(-1)}
+                onBack={handleStickyBack}
                 breadcrumbs={routeBreadcrumbs}
                 isLoading={isBreadcrumbLoading}
                 sticky={false}

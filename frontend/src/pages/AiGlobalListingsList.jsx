@@ -635,10 +635,14 @@ const AiGlobalListingsList = () => {
 
   const hasRestoredPageStateRef = React.useRef(false);
   const sectionRefs = React.useRef({});
-  const getDiscoverySectionRef = React.useCallback((categoryValue) => {
+  const getDiscoverySectionKey = React.useCallback((categoryValue) => {
     const viewport = window.innerWidth >= 1024 ? "desktop" : "mobile";
-    return sectionRefs.current[`${categoryValue}-${viewport}`];
+    return `${categoryValue}-${viewport}`;
   }, []);
+
+  const getDiscoverySectionRef = React.useCallback((categoryValue) => {
+    return sectionRefs.current[getDiscoverySectionKey(categoryValue)];
+  }, [getDiscoverySectionKey]);
 
   const getScrollContainer = () =>
     typeof document === "undefined"
@@ -830,7 +834,7 @@ const AiGlobalListingsList = () => {
         ? sectionRefs.current[targetCategory]
         : null;
 
-      window.requestAnimationFrame(() => {
+      const restorePageState = () => {
         if (targetSection) {
           targetSection.scrollIntoView({ block: "start", behavior: "auto" });
         }
@@ -845,7 +849,12 @@ const AiGlobalListingsList = () => {
             behavior: "auto",
           });
         }
-      });
+      };
+
+      window.requestAnimationFrame(restorePageState);
+      window.setTimeout(restorePageState, 150);
+      window.setTimeout(restorePageState, 500);
+      window.setTimeout(restorePageState, 700);
 
       hasRestoredPageStateRef.current = true;
       window.sessionStorage.removeItem(listingPageStateStorageKey);
@@ -865,18 +874,22 @@ const AiGlobalListingsList = () => {
     );
   };
 
-  const handleListingNavigation = (item) => {
+  const saveListingPageState = (category) => {
     const scrollContainer = getScrollContainer();
 
     if (listingPageStateStorageKey) {
       window.sessionStorage.setItem(
         listingPageStateStorageKey,
         JSON.stringify({
-          category: item.companyType || "",
+          category,
           scrollTop: scrollContainer?.scrollTop ?? 0,
         }),
       );
     }
+  };
+
+  const handleListingNavigation = (item) => {
+    saveListingPageState(item.companyType || "");
 
     navigate(`/listings/${encodeURIComponent(item.companyName)}`, {
       state: {
@@ -1060,17 +1073,34 @@ const AiGlobalListingsList = () => {
   };
 
   const handleHighlightCardClick = (item, type) => {
+    const sectionKeyByType = {
+      event: ANNUAL_EVENTS_CATEGORY,
+      venue: "venues",
+      restaurant: RESTAURANTS_CATEGORY,
+      news: NEWS_CATEGORY,
+      blog: BLOGS_CATEGORY,
+    };
+    const sectionKey = sectionKeyByType[type];
+
+    if (sectionKey) {
+      saveListingPageState(getDiscoverySectionKey(sectionKey));
+    }
+
     if (type === "event" || type === "venue" || type === "restaurant") {
       const detailType = type === "restaurant" ? "restaurants" : `${type}s`;
 
-      navigate(`/ai-${detailType}/${item.id}`, {
+      navigate(`/${detailType}/${item.id}`, {
         state: {
           item,
           selectedStateLabel: selectedLocationLabel,
+          returnTo: {
+            pathname: "/verticals",
+            search: location.search,
+          },
           stickyBreadcrumbs: [
             {
               label: selectedLocationLabel || "Destination",
-              path: location.pathname,
+              path: `${location.pathname}${location.search}`,
             },
             { label: item.title },
           ],
@@ -1099,6 +1129,10 @@ const AiGlobalListingsList = () => {
 
   const handleValueAddedServiceClick = (service) => {
     if (!service.path) return;
+
+    saveListingPageState(
+      getDiscoverySectionKey(VALUE_ADDED_SERVICES_CATEGORY),
+    );
 
     const params = new URLSearchParams(location.search);
     navigate({
