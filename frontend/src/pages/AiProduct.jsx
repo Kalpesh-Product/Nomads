@@ -914,6 +914,7 @@ const AiProduct = () => {
                   onClick={() =>
                     navigate("images", {
                       state: {
+                        ...location.state,
                         companyName: companyDetails?.companyName,
                         images: companyDetails?.images,
                         selectedImageId: selectedImage?._id,
@@ -937,6 +938,7 @@ const AiProduct = () => {
                     onClick={() =>
                       navigate("images", {
                         state: {
+                          ...location.state,
                           companyName: companyDetails?.companyName,
                           images: companyDetails?.images,
                           selectedImageId: item._id,
@@ -957,6 +959,7 @@ const AiProduct = () => {
                             e.stopPropagation();
                             navigate("images", {
                               state: {
+                                ...location.state,
                                 companyName: companyDetails?.companyName,
                                 images: companyDetails?.images,
                                 ...breadcrumbState,
@@ -1804,9 +1807,11 @@ const AiProduct = () => {
                     onClick={() =>
                       navigate("images", {
                         state: {
+                          ...location.state,
                           companyName: companyDetails?.companyName,
                           images: companyDetails?.images,
                           selectedImageId: selectedImage?._id,
+                          ...breadcrumbState,
                         },
                       })
                     }
@@ -1826,9 +1831,11 @@ const AiProduct = () => {
                       onClick={() =>
                         navigate("images", {
                           state: {
+                            ...location.state,
                             companyName: companyDetails?.companyName,
                             images: companyDetails?.images,
                             selectedImageId: item._id,
+                            ...breadcrumbState,
                           },
                         })
                       }
@@ -1845,8 +1852,10 @@ const AiProduct = () => {
                               e.stopPropagation();
                               navigate("images", {
                                 state: {
+                                  ...location.state,
                                   companyName: companyDetails?.companyName,
                                   images: companyDetails?.images,
+                                  ...breadcrumbState,
                                 },
                               });
                             }}
@@ -1878,9 +1887,11 @@ const AiProduct = () => {
                       onClick={() =>
                         navigate("images", {
                           state: {
+                            ...location.state,
                             companyName: companyDetails?.companyName,
                             images: companyDetails?.images,
                             selectedImageId: item._id,
+                            ...breadcrumbState,
                           },
                         })
                       }
