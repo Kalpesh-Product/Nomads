@@ -351,7 +351,7 @@ const AiGlobalListingsMap = () => {
     }
 
     navigate(
-      `/ai-listings?country=${formData.country}&location=${formData.location}&category=${type}`,
+      `/listings?country=${formData.country}&location=${formData.location}&category=${type}`,
       {
         state: updatedForm,
       },
@@ -629,7 +629,7 @@ const AiGlobalListingsMap = () => {
     mutationFn: async (data) => {
       dispatch(setFormValues(data));
       navigate(
-        `/ai-verticals?country=${data.country}&location=${data.location}`,
+        `/verticals?country=${data.country}&location=${data.location}`,
       );
       setShowMobileSearch(false);
     },
@@ -665,7 +665,7 @@ const AiGlobalListingsMap = () => {
         location: currentFormData.location,
         highlight: categoryValue,
       });
-      navigate(`/ai-verticals?${params.toString()}`, {
+      navigate(`/verticals?${params.toString()}`, {
         state: {
           ...location.state,
           selectedStateLabel: selectedLocationLabel,
@@ -707,8 +707,8 @@ const AiGlobalListingsMap = () => {
       categoryValue === RESTAURANTS_CATEGORY ||
       categoryValue === NEWS_CATEGORY ||
       categoryValue === BLOGS_CATEGORY
-        ? "/ai-listings-list"
-        : "/ai-listings";
+        ? "/listings-list"
+        : "/listings";
 
     navigate(
       `${listingsPath}?country=${currentFormData.country}&location=${currentFormData.location}&category=${state.category}`,
@@ -734,7 +734,7 @@ const AiGlobalListingsMap = () => {
       );
     }
 
-    navigate(`/ai-listings/${encodeURIComponent(item.companyName)}`, {
+    navigate(`/listings/${encodeURIComponent(item.companyName)}`, {
       state: {
         breadcrumbLoading: true,
         companyId: item.companyId,
@@ -757,7 +757,7 @@ const AiGlobalListingsMap = () => {
             "",
         },
         returnTo: {
-          pathname: "/ai-verticals",
+          pathname: "/verticals",
           search: location.search,
         },
       },
@@ -803,7 +803,7 @@ const AiGlobalListingsMap = () => {
         />
         <meta property="og:image" content="/images/map-preview.jpeg" />
         <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://nomad.wono.co/ai-verticals" />
+        <link rel="canonical" href="https://nomad.wono.co/verticals" />
       </Helmet>
 
       {/* ==================== DESKTOP VIEW (lg and above) ==================== */}
@@ -1407,7 +1407,7 @@ const AiGlobalListingsMap = () => {
         <button
           onClick={() =>
             navigate(
-              `/ai-verticals?country=${formData?.country}&location=${formData?.location}`,
+              `/verticals?country=${formData?.country}&location=${formData?.location}`,
               {
                 state: {
                   ...location.state,

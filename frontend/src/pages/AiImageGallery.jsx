@@ -131,7 +131,7 @@ const AiImageGallery = () => {
       onClick: () => {
         const target = companyParam || companyName;
         if (!target) return;
-        navigate(`/ai-listings/${encodeURIComponent(target)}`);
+        navigate(`/listings/${encodeURIComponent(target)}`);
       },
     },
     { key: "gallery", label: "Gallery", isLink: false },
@@ -139,22 +139,22 @@ const AiImageGallery = () => {
 
   useEffect(() => {
     const trail = [
-      { label: continent, path: "/ai-verticals" },
+      { label: continent, path: "/verticals" },
       {
         label: country,
-        path: `/ai-verticals?country=${encodeURIComponent(
+        path: `/verticals?country=${encodeURIComponent(
           country || "",
         )}&state=${encodeURIComponent(companyState || "")}`,
       },
       {
         label: companyState,
-        path: `/ai-verticals?country=${encodeURIComponent(
+        path: `/verticals?country=${encodeURIComponent(
           country || "",
         )}&state=${encodeURIComponent(companyState || "")}`,
       },
       {
         label: getCompanyTypeBreadcrumbLabel(companyType),
-        path: `/ai-listings-list?country=${encodeURIComponent(
+        path: `/listings-list?country=${encodeURIComponent(
           country || "",
         )}&location=${encodeURIComponent(
           companyState || "",
@@ -162,7 +162,7 @@ const AiImageGallery = () => {
       },
       {
         label: resolvedCompanyName,
-        path: `/ai-listings/${encodeURIComponent(companyParam || companyName || "")}`,
+        path: `/listings/${encodeURIComponent(companyParam || companyName || "")}`,
       },
       { label: "Gallery", truncate: true },
     ].filter((item) => item.label);
@@ -215,7 +215,7 @@ const AiImageGallery = () => {
 
     if (isCompanyTypeClick) {
       navigate(
-        `/ai-listings-list?country=${normalizedCountry || ""}&location=${
+        `/listings-list?country=${normalizedCountry || ""}&location=${
           normalizedLocation || ""
         }&category=${normalizedCategory || ""}`,
       );
@@ -223,7 +223,7 @@ const AiImageGallery = () => {
     }
 
     navigate(
-      `/ai-verticals?country=${normalizedCountry || ""}&state=${
+      `/verticals?country=${normalizedCountry || ""}&state=${
         normalizedLocation || ""
       }`,
     );

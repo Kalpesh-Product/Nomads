@@ -117,7 +117,7 @@ const AiCareerSearchResults = () => {
     const continent = destination.continent.toLowerCase();
 
     navigate(
-      `/ai-verticals?country=${encodeURIComponent(country)}&state=${encodeURIComponent(location)}`,
+      `/verticals?country=${encodeURIComponent(country)}&state=${encodeURIComponent(location)}`,
       {
         state: {
           breadcrumbFilters: {

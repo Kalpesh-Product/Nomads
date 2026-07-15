@@ -111,7 +111,7 @@ const AiContentAndCopyright = () => {
                         Please click here to read the{" "}
                         <span
                             className="text-primary-blue font-bold cursor-pointer"
-                            onClick={() => navigate("/ai-content-use-removal")}
+                            onClick={() => navigate("/content-use-removal")}
                         >
                             Content Use & Removal Policy.
                         </span>{" "}

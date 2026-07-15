@@ -636,7 +636,7 @@ const AiSearchResults = () => {
     const nextSearchBarBadges = [...searchBarBadges, selectedLocationLabel];
 
     navigate(
-      `/ai-verticals?country=${encodeURIComponent(country)}&state=${encodeURIComponent(selectedLocationParam)}`,
+      `/verticals?country=${encodeURIComponent(country)}&state=${encodeURIComponent(selectedLocationParam)}`,
       {
         state: {
           breadcrumbFilters: {
