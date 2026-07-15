@@ -156,13 +156,15 @@ const valueAddedServiceItems = [
     label: "OVERALL ACTIVATION SUPPORT",
     path: "/overall-activation-support",
     imageUrl:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbhxwe7kd7j-UFpFp7tS2Ka0_L2iZ_zI_07Q&s",
+      // "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbhxwe7kd7j-UFpFp7tS2Ka0_L2iZ_zI_07Q&s",
+      "https://www.google.com/search?q=location+map+setup+wallpaper&sca_esv=b95d1611b6ab2c1b&udm=2&biw=1396&bih=663&ei=UYZXavCiLJiZseMPucrWmAM&ved=0ahUKEwiwj7Kq4NSVAxWYTGwGHTmlFTMQ4dUDCBM&uact=5&oq=location+map+setup+wallpaper&gs_lp=Egtnd3Mtd2l6LWltZyIcbG9jYXRpb24gbWFwIHNldHVwIHdhbGxwYXBlckirNVCTBli5M3AIeACQAQCYAXCgAa0KqgEDNS44uAEDyAEA-AEBmAIJoAK8A8ICBhAAGAcYHsICCBAAGAgYBxgewgIKEAAYCBgHGB4YCpgDAIgGAZIHAzUuNKAH6hOyBwMwLjS4B6sDwgcFMC4yLjfIBx6ACAE&sclient=gws-wiz-img#sv=CAMSURoyKhBlLVpHcjQzbUx5WHNtaGpNMg5aR3I0M21MeVhzbWhqTToORTFoc0h0UGlCa0NyNU0gBCoXCgFzEhBlLVpHcjQzbUx5WHNtaGpNGAEwARgHIPGd3LEOSggQARgBIAEoAQ"
   },
   {
     label: "NEW COMPANY SUPPORT",
     path: "/new-company-setup",
     imageUrl:
-      "https://3.imimg.com/data3/KB/OY/MY-1439773/new-business-setup.jpg",
+      // "https://3.imimg.com/data3/KB/OY/MY-1439773/new-business-setup.jpg",
+      "https://www.google.com/search?q=Handshake+wallpaper&sca_esv=b95d1611b6ab2c1b&udm=2&biw=1396&bih=663&ei=kIVXaqSBB4SgseMPja3joAQ&ved=0ahUKEwikiYnO39SVAxUEUGwGHY3WGEQQ4dUDCBM&uact=5&oq=Handshake+wallpaper&gs_lp=Egtnd3Mtd2l6LWltZyITSGFuZHNoYWtlIHdhbGxwYXBlcjIFEAAYgAQyBhAAGAcYHjIGEAAYBxgeMgYQABgHGB4yBRAAGIAEMgQQABgeMgQQABgeMgQQABgeMgQQABgeMgYQABgFGB5I6RZQ-gVYpxRwAngAkAEAmAGrAaAB9QqqAQQwLjEwuAEDyAEA-AEBmAIJoAL-B8ICChAAGIAEGIoFGEOYAwCIBgGSBwMyLjegB_svsgcDMC43uAf3B8IHBTAuMS44yAclgAgB&sclient=gws-wiz-img#sv=CAMSURoyKhBlLU54bE5UQnFsaHgzbTdNMg5OeGxOVEJxbGh4M203TToOT1pXNTNldnphUWNEdk0gBCoXCgFzEhBlLU54bE5UQnFsaHgzbTdNGAEwARgHIKf5-YMPSggQARgBIAEoAQ",
   },
   {
     label: "ANY CONSULTATION SUPPORT",
@@ -174,7 +176,8 @@ const valueAddedServiceItems = [
     label: "APPLY FOR JOB",
     badge: "Coming soon",
     imageUrl:
-      "https://img.freepik.com/premium-vector/people-seeking-jobs-internet-job-search-recruitment_773186-499.jpg?semt=ais_hybrid&w=740&q=80",
+      // "https://img.freepik.com/premium-vector/people-seeking-jobs-internet-job-search-recruitment_773186-499.jpg?semt=ais_hybrid&w=740&q=80",
+      "https://static.vecteezy.com/system/resources/thumbnails/072/930/801/small/magnifying-glass-highlighting-the-word-vacancy-on-a-wooden-block-against-a-bright-yellow-background-symbolizing-job-search-career-opportunities-and-the-concept-of-finding-the-right-candidate-for-an-op-photo.jpg",
   },
   // {
   //   label: "VIEW LOCATION BLOGS",
