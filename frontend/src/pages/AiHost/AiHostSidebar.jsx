@@ -19,7 +19,7 @@ import {
   HiOutlineLogout,
 } from "react-icons/hi";
 import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
-import { FaGlobeAmericas, FaHandsHelping } from "react-icons/fa";
+import { FaGlobeAmericas } from "react-icons/fa";
 import { MdOutlineWorkHistory } from "react-icons/md";
 import { HiOutlineCurrencyDollar } from "react-icons/hi";
 import { RiUserCommunityLine } from "react-icons/ri";
@@ -200,7 +200,7 @@ const coreModules = [
     path: "/assets",
   },
   {
-    label: "Unit Selling",
+    label: "Unit Setting",
     icon: HiOutlineCash,
     path: "/extra-common-modules",
   },
@@ -269,12 +269,6 @@ const profileItems = [
 ];
 
 const signOutItem = [{ label: "Sign Out", icon: HiOutlineLogout }];
-
-const becomeContributorLink = {
-  label: "Become A Contributor",
-  icon: FaHandsHelping,
-  path: "/become-a-contributor",
-};
 
 const collapsedSectionLabels = {
   Modules: "MOD",
@@ -536,14 +530,6 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     }
   };
 
-  const handleBecomeContributorClick = (item) => {
-    const params = new URLSearchParams(location.search);
-    navigate({
-      pathname: item.path,
-      search: params.toString() ? `?${params.toString()}` : "",
-    });
-  };
-
   const handleSignOutClick = async () => {
     if (auth?.user) {
       await logout();
@@ -657,13 +643,6 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     };
   });
 
-  const becomeContributorItemWithActivePath = {
-    ...becomeContributorLink,
-    active:
-      normalizedPath === becomeContributorLink.path ||
-      normalizedPath.startsWith(`${becomeContributorLink.path}/`),
-  };
-
   return (
     <aside
       className={`flex h-full max-h-screen flex-col overflow-y-auto overscroll-contain border-r border-black/10 bg-[#efefef] transition-all duration-300 custom-scrollbar-hide ${
@@ -776,13 +755,6 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
           <div className="mx-4 mt-3 border-t border-black/10"></div>
           {/* Compact sections - minimal spacing */}
           {/* <SidebarSection
-                        items={[becomeContributorItemWithActivePath]}
-                        collapsed={isCollapsed}
-                        onItemClick={handleBecomeContributorClick}
-                        compact={true}
-                    /> */}
-          {/* <div className="mx-4 border-t border-black/10"></div>
-                    <SidebarSection
                         items={becomeHostItem}
                         collapsed={isCollapsed}
                         onItemClick={handleBecomeHostClick}
@@ -799,14 +771,6 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         </>
       ) : (
         <>
-          <div className="mx-4 mt-3 border-t border-black/10"></div>
-          <SidebarSection
-            items={[becomeContributorItemWithActivePath]}
-            collapsed={isCollapsed}
-            onItemClick={handleBecomeContributorClick}
-            compact={true}
-            onTooltipChange={setTooltip}
-          />
           {/* <div className="mx-4 border-t border-black/10"></div>
                     <SidebarSection
                         items={becomeHostItem}
