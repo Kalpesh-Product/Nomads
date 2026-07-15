@@ -9,9 +9,14 @@ const normalizeOriginalGoalLabel = (value = "") => {
   const normalizedValue = normalizeBadgeKey(value);
 
   const goalAliasMap = {
+    worldranking: "World Ranking",
+    "world ranking": "World Ranking",
     "worldwide nomad destinations ranking": "World Ranking",
+    "work from anywhere": "Work From Anywhere",
     "best nomad destinations for remote work": "Work From Anywhere",
+    "increase your savings": "Increase Your Savings",
     "budget friendly nomad destinations": "Increase Your Savings",
+    "find your community": "Find Your Community",
     "be with your community": "Find Your Community",
     "advance your career": "Advance Your Career",
   };
@@ -79,18 +84,52 @@ export const buildAiSearchBadgesWithLocation = ({
 
 export const buildAiVerticalsSearchBadges = ({
   locationState = null,
+  fallbackSelectedFilters = {},
+  querySearch = "",
   selectedStateValue = "",
   persistedBadges = [],
 }) => {
+  const queryParams = new URLSearchParams(querySearch);
   const selectedFilters = locationState?.selectedFilters || {};
+  const querySelectedFilters = {
+    continent: queryParams.get("continent") || "",
+    goal: queryParams.get("goal") || "",
+    goalOption: queryParams.get("goalOption") || "",
+  };
+  const hasExplicitSearchContext =
+    Boolean(selectedFilters?.goalOption) ||
+    Boolean(selectedFilters?.continent) ||
+    Boolean(querySelectedFilters.goalOption) ||
+    Boolean(querySelectedFilters.continent) ||
+    Boolean(querySelectedFilters.goal);
+  const shouldUseDirectLinkFallback =
+    !hasExplicitSearchContext &&
+    Boolean(queryParams.get("country")) &&
+    Boolean(queryParams.get("state") || queryParams.get("location")) &&
+    !queryParams.get("category") &&
+    !queryParams.get("highlight");
+  const fallbackFilters = shouldUseDirectLinkFallback
+    ? fallbackSelectedFilters
+    : {};
   const hasAiSearchFilters =
-    Boolean(selectedFilters?.goalOption) || Boolean(selectedFilters?.continent);
+    hasExplicitSearchContext ||
+    Boolean(fallbackFilters?.goalOption) ||
+    Boolean(fallbackFilters?.continent) ||
+    Boolean(fallbackFilters?.goal);
   const incomingBadges = Array.isArray(locationState?.searchBarBadges)
     ? locationState.searchBarBadges
     : [];
 
-  const selectedContinentBadge = formatAiSearchBadge(selectedFilters.continent);
-  const selectedGoalOptionBadge = formatAiSearchBadge(selectedFilters.goalOption);
+  const selectedContinentBadge = formatAiSearchBadge(
+    selectedFilters.continent ||
+      querySelectedFilters.continent ||
+      fallbackFilters.continent,
+  );
+  const selectedGoalOptionBadge = formatAiSearchBadge(
+    selectedFilters.goalOption ||
+      querySelectedFilters.goalOption ||
+      fallbackFilters.goalOption,
+  );
   const selectedStateLabel =
     locationState?.selectedStateLabel ||
     locationState?.stateLabel ||
@@ -115,7 +154,7 @@ export const buildAiVerticalsSearchBadges = ({
     ) || "";
   const broaderGoalBadge = broaderGoalBadgeRaw
     ? broaderGoalBadgeRaw.replace(/^\s*your broader goal\s*>\s*/i, "").trim()
-    : "";
+    : querySelectedFilters.goal || fallbackFilters.goal || "";
   const normalizedBroaderGoalBadge = normalizeOriginalGoalLabel(
     broaderGoalBadge,
   );

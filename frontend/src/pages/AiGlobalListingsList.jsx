@@ -156,13 +156,15 @@ const valueAddedServiceItems = [
     label: "OVERALL ACTIVATION SUPPORT",
     path: "/overall-activation-support",
     imageUrl:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbhxwe7kd7j-UFpFp7tS2Ka0_L2iZ_zI_07Q&s",
+      // "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbhxwe7kd7j-UFpFp7tS2Ka0_L2iZ_zI_07Q&s",
+      "https://www.google.com/search?q=location+map+setup+wallpaper&sca_esv=b95d1611b6ab2c1b&udm=2&biw=1396&bih=663&ei=UYZXavCiLJiZseMPucrWmAM&ved=0ahUKEwiwj7Kq4NSVAxWYTGwGHTmlFTMQ4dUDCBM&uact=5&oq=location+map+setup+wallpaper&gs_lp=Egtnd3Mtd2l6LWltZyIcbG9jYXRpb24gbWFwIHNldHVwIHdhbGxwYXBlckirNVCTBli5M3AIeACQAQCYAXCgAa0KqgEDNS44uAEDyAEA-AEBmAIJoAK8A8ICBhAAGAcYHsICCBAAGAgYBxgewgIKEAAYCBgHGB4YCpgDAIgGAZIHAzUuNKAH6hOyBwMwLjS4B6sDwgcFMC4yLjfIBx6ACAE&sclient=gws-wiz-img#sv=CAMSURoyKhBlLVpHcjQzbUx5WHNtaGpNMg5aR3I0M21MeVhzbWhqTToORTFoc0h0UGlCa0NyNU0gBCoXCgFzEhBlLVpHcjQzbUx5WHNtaGpNGAEwARgHIPGd3LEOSggQARgBIAEoAQ"
   },
   {
     label: "NEW COMPANY SUPPORT",
     path: "/new-company-setup",
     imageUrl:
-      "https://3.imimg.com/data3/KB/OY/MY-1439773/new-business-setup.jpg",
+      // "https://3.imimg.com/data3/KB/OY/MY-1439773/new-business-setup.jpg",
+      "https://www.google.com/search?q=Handshake+wallpaper&sca_esv=b95d1611b6ab2c1b&udm=2&biw=1396&bih=663&ei=kIVXaqSBB4SgseMPja3joAQ&ved=0ahUKEwikiYnO39SVAxUEUGwGHY3WGEQQ4dUDCBM&uact=5&oq=Handshake+wallpaper&gs_lp=Egtnd3Mtd2l6LWltZyITSGFuZHNoYWtlIHdhbGxwYXBlcjIFEAAYgAQyBhAAGAcYHjIGEAAYBxgeMgYQABgHGB4yBRAAGIAEMgQQABgeMgQQABgeMgQQABgeMgQQABgeMgYQABgFGB5I6RZQ-gVYpxRwAngAkAEAmAGrAaAB9QqqAQQwLjEwuAEDyAEA-AEBmAIJoAL-B8ICChAAGIAEGIoFGEOYAwCIBgGSBwMyLjegB_svsgcDMC43uAf3B8IHBTAuMS44yAclgAgB&sclient=gws-wiz-img#sv=CAMSURoyKhBlLU54bE5UQnFsaHgzbTdNMg5OeGxOVEJxbGh4M203TToOT1pXNTNldnphUWNEdk0gBCoXCgFzEhBlLU54bE5UQnFsaHgzbTdNGAEwARgHIKf5-YMPSggQARgBIAEoAQ",
   },
   {
     label: "ANY CONSULTATION SUPPORT",
@@ -174,7 +176,8 @@ const valueAddedServiceItems = [
     label: "APPLY FOR JOB",
     badge: "Coming soon",
     imageUrl:
-      "https://img.freepik.com/premium-vector/people-seeking-jobs-internet-job-search-recruitment_773186-499.jpg?semt=ais_hybrid&w=740&q=80",
+      // "https://img.freepik.com/premium-vector/people-seeking-jobs-internet-job-search-recruitment_773186-499.jpg?semt=ais_hybrid&w=740&q=80",
+      "https://static.vecteezy.com/system/resources/thumbnails/072/930/801/small/magnifying-glass-highlighting-the-word-vacancy-on-a-wooden-block-against-a-bright-yellow-background-symbolizing-job-search-career-opportunities-and-the-concept-of-finding-the-right-candidate-for-an-op-photo.jpg",
   },
   // {
   //   label: "VIEW LOCATION BLOGS",
@@ -236,10 +239,21 @@ const AiGlobalListingsList = () => {
       params.get("state") || params.get("location") || "";
     return buildAiVerticalsSearchBadges({
       locationState: location.state,
+      fallbackSelectedFilters: {
+        goal: "World Ranking",
+        continent: formData.continent,
+        goalOption: "Most Affordable",
+      },
+      querySearch: location.search,
       selectedStateValue: selectedStateFromQuery,
       persistedBadges: persistedSearchBarBadges,
     });
-  }, [location.search, location.state, persistedSearchBarBadges]);
+  }, [
+    formData.continent,
+    location.search,
+    location.state,
+    persistedSearchBarBadges,
+  ]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -640,9 +654,12 @@ const AiGlobalListingsList = () => {
     return `${categoryValue}-${viewport}`;
   }, []);
 
-  const getDiscoverySectionRef = React.useCallback((categoryValue) => {
-    return sectionRefs.current[getDiscoverySectionKey(categoryValue)];
-  }, [getDiscoverySectionKey]);
+  const getDiscoverySectionRef = React.useCallback(
+    (categoryValue) => {
+      return sectionRefs.current[getDiscoverySectionKey(categoryValue)];
+    },
+    [getDiscoverySectionKey],
+  );
 
   const getScrollContainer = () =>
     typeof document === "undefined"
@@ -989,13 +1006,20 @@ const AiGlobalListingsList = () => {
     const continent = normalizeValue(
       breadcrumbFilters?.continent || queryContinent,
     );
+    const resolvedContinent =
+      continent ||
+      normalizeValue(
+        locations.find((item) => normalizeValue(item.country) === country)
+          ?.continent,
+      );
 
     if (!country || !loc) return;
 
     if (
       country === normalizeValue(formData.country) &&
       loc === normalizeValue(formData.location) &&
-      (!continent || continent === normalizeValue(formData.continent))
+      (!resolvedContinent ||
+        resolvedContinent === normalizeValue(formData.continent))
     ) {
       return;
     }
@@ -1004,19 +1028,17 @@ const AiGlobalListingsList = () => {
       ...formData,
       country: country || "",
       location: loc || "",
-      continent: continent || formData.continent || "",
+      continent: resolvedContinent || formData.continent || "",
     };
 
     dispatch(setFormValues(nextFormValues));
-  }, [dispatch, formData, location.state, location.search]);
+  }, [dispatch, formData, location.state, location.search, locations]);
 
   const { mutate: locationData, isPending: isLocation } = useMutation({
     mutationFn: async (data) => {
       dispatch(setFormValues(data));
       setShowMobileSearch(false);
-      navigate(
-        `/verticals?country=${data.country}&location=${data.location}`,
-      );
+      navigate(`/verticals?country=${data.country}&location=${data.location}`);
     },
     onSuccess: () => {
       console.log("success");
@@ -1111,10 +1133,7 @@ const AiGlobalListingsList = () => {
 
     navigate(
       {
-        pathname:
-          type === "news"
-            ? "/news/news-details"
-            : "/blog/blog-details",
+        pathname: type === "news" ? "/news/news-details" : "/blog/blog-details",
         search: location.search,
       },
       {
@@ -1130,9 +1149,7 @@ const AiGlobalListingsList = () => {
   const handleValueAddedServiceClick = (service) => {
     if (!service.path) return;
 
-    saveListingPageState(
-      getDiscoverySectionKey(VALUE_ADDED_SERVICES_CATEGORY),
-    );
+    saveListingPageState(getDiscoverySectionKey(VALUE_ADDED_SERVICES_CATEGORY));
 
     const params = new URLSearchParams(location.search);
     navigate({
@@ -1198,7 +1215,12 @@ const AiGlobalListingsList = () => {
       return;
     }
 
-    const mapUrl = `/verticals?country=${encodeURIComponent(formData.country)}&state=${encodeURIComponent(formData.location)}&view=map`;
+    const mapParams = new URLSearchParams(location.search);
+    mapParams.set("country", formData.country);
+    mapParams.set("state", formData.location);
+    mapParams.delete("location");
+    mapParams.set("view", "map");
+    const mapUrl = `/verticals?${mapParams.toString()}`;
     console.log("Navigating to:", mapUrl);
     navigate(mapUrl, {
       state: {
@@ -2036,9 +2058,7 @@ const AiGlobalListingsList = () => {
                           : undefined
                       }
                       viewMoreLabel={
-                        isNewsExpanded
-                          ? "View less \u2190"
-                          : "View more \u2192"
+                        isNewsExpanded ? "View less \u2190" : "View more \u2192"
                       }
                       sectionRef={(element) => {
                         sectionRefs.current["news-mobile"] = element;
