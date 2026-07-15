@@ -1579,8 +1579,16 @@ const AiSearchResults = () => {
       );
     }
 
+    const verticalsParams = new URLSearchParams({
+      country,
+      state: selectedLocationParam,
+      goal: selectedGoal,
+      continent: selectedContinent,
+      goalOption: selectedGoalOption,
+    });
+
     navigate(
-      `/verticals?country=${encodeURIComponent(country)}&state=${encodeURIComponent(selectedLocationParam)}`,
+      `/verticals?${verticalsParams.toString()}`,
       {
         state: {
           selectedStateLabel: destinationTitle,

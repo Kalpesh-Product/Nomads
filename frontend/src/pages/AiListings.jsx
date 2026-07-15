@@ -478,8 +478,8 @@ const AiListings = ({ forceListView = false }) => {
       return [];
     }
 
-    const visibleDestinationHighlightFilters = DESTINATION_HIGHLIGHT_FILTERS.filter(
-      (option) => {
+    const visibleDestinationHighlightFilters =
+      DESTINATION_HIGHLIGHT_FILTERS.filter((option) => {
         if (option.value === ANNUAL_EVENTS_CATEGORY) {
           return destinationEventsData.length > 0;
         }
@@ -501,8 +501,7 @@ const AiListings = ({ forceListView = false }) => {
         }
 
         return true;
-      },
-    );
+      });
 
     if (!listingsData || listingsData.length === 0) {
       return [
@@ -908,8 +907,7 @@ const AiListings = ({ forceListView = false }) => {
   const isTablet = useMediaQuery("(max-width:1023px)");
   const isValueAddedServicesSelected =
     formData?.category === VALUE_ADDED_SERVICES_CATEGORY;
-  const isAnnualEventsSelected =
-    formData?.category === ANNUAL_EVENTS_CATEGORY;
+  const isAnnualEventsSelected = formData?.category === ANNUAL_EVENTS_CATEGORY;
   const isVenuesSelected = formData?.category === VENUES_CATEGORY;
   const isRestaurantsSelected = formData?.category === RESTAURANTS_CATEGORY;
   const isNewsSelected = formData?.category === NEWS_CATEGORY;
@@ -921,12 +919,9 @@ const AiListings = ({ forceListView = false }) => {
     isRestaurantsSelected ||
     isNewsSelected ||
     isBlogsSelected;
-  const showDesktopMap =
-    !forceListView && mapOpen && !isFocusedContentSelected;
+  const showDesktopMap = !forceListView && mapOpen && !isFocusedContentSelected;
   const listingsBasePath =
-    location.pathname === "/listings-list"
-      ? "/listings-list"
-      : "/listings";
+    location.pathname === "/listings-list" ? "/listings-list" : "/listings";
   const selectedStateFromParams =
     searchParams.get("state") || searchParams.get("location") || "";
   const backLabel = selectedStateFromParams || formData?.location || "";
@@ -1712,28 +1707,28 @@ const AiListings = ({ forceListView = false }) => {
               !isRestaurantsSelected &&
               !isNewsSelected &&
               !isBlogsSelected && (
-              <div className="mt-6 mb-2 px-1 border-t border-gray-300">
-                <h1 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight mt-6">
-                  Popular{" "}
-                  {{
-                    coworking: "Co-Working Spaces",
-                    coliving: "Co-Living Spaces",
-                    hostel: "Hostels",
-                    workation: "Workation",
-                    privatestay: "Private Stays",
-                    meetingroom: "Meeting Rooms",
-                    cafe: "Cafes",
-                    [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
-                    [ANNUAL_EVENTS_CATEGORY]: "Annual Events",
-                    [VENUES_CATEGORY]: "Places",
-                    [RESTAURANTS_CATEGORY]: "Restaurants",
-                    [NEWS_CATEGORY]: "News",
-                    [BLOGS_CATEGORY]: "Blogs",
-                  }[formData.category] || `${formData.category} Spaces`}{" "}
-                  in {selectedStateLabel || "Unknown"}
-                </h1>
-              </div>
-            )}
+                <div className="mt-6 mb-2 px-1 border-t border-gray-300">
+                  <h1 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight mt-6">
+                    Popular{" "}
+                    {{
+                      coworking: "Co-Working Spaces",
+                      coliving: "Co-Living Spaces",
+                      hostel: "Hostels",
+                      workation: "Workation",
+                      privatestay: "Private Stays",
+                      meetingroom: "Meeting Rooms",
+                      cafe: "Cafes",
+                      [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
+                      [ANNUAL_EVENTS_CATEGORY]: "Annual Events",
+                      [VENUES_CATEGORY]: "Places",
+                      [RESTAURANTS_CATEGORY]: "Restaurants",
+                      [NEWS_CATEGORY]: "News",
+                      [BLOGS_CATEGORY]: "Blogs",
+                    }[formData.category] || `${formData.category} Spaces`}{" "}
+                    in {selectedStateLabel || "Unknown"}
+                  </h1>
+                </div>
+              )}
 
             <div className="grid grid-cols-1 lg:grid-cols-9 gap-4">
               {/* LIST VIEW */}
@@ -1777,16 +1772,16 @@ const AiListings = ({ forceListView = false }) => {
                             </span>
                           )}
                           <div className="flex w-full flex-col items-center justify-end">
-                            {getValueAddedServiceCardLines(
-                              serviceLabel,
-                            ).map((line) => (
-                              <span
-                                key={`${serviceLabel}-${line}`}
-                                className="text-base font-normal uppercase text-white !leading-[1rem] tracking-wide pb-2"
-                              >
-                                {line}
-                              </span>
-                            ))}
+                            {getValueAddedServiceCardLines(serviceLabel).map(
+                              (line) => (
+                                <span
+                                  key={`${serviceLabel}-${line}`}
+                                  className="text-base font-normal uppercase text-white !leading-[1rem] tracking-wide pb-2"
+                                >
+                                  {line}
+                                </span>
+                              ),
+                            )}
                           </div>
                         </button>
                       );

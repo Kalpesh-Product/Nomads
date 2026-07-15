@@ -62,6 +62,29 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
   const listViewLink = listingsQuery
     ? `/listings-list?${listingsQuery}`
     : "/listings-list";
+  const buildVerticalsToggleLink = (nextView = "") => {
+    const params = new URLSearchParams(location.search);
+    const country = params.get("country") || formData?.country || "";
+    const state =
+      params.get("state") || params.get("location") || formData?.location || "";
+
+    if (country) params.set("country", country);
+    if (state) {
+      params.set("state", state);
+      params.delete("location");
+    }
+
+    if (nextView) {
+      params.set("view", nextView);
+    } else {
+      params.delete("view");
+    }
+
+    const query = params.toString();
+    return query ? `${location.pathname}?${query}` : location.pathname;
+  };
+  const verticalsMapViewLink = buildVerticalsToggleLink("map");
+  const verticalsListViewLink = buildVerticalsToggleLink();
 
   const { auth } = useAuth();
   const logout = useLogout();
@@ -258,7 +281,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                           to={
                             isAiListingsListPage
                               ? mapViewLink
-                              : `${location.pathname}?country=${formData?.country}&location=${formData?.location}&view=map`
+                              : verticalsMapViewLink
                           }
                           state={aiVerticalsToggleState}
                           className="group relative text-md text-black"
@@ -279,7 +302,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                           to={
                             isAiListingsMapPage
                               ? listViewLink
-                              : `${location.pathname}?country=${formData?.country}&location=${formData?.location}`
+                              : verticalsListViewLink
                           }
                           state={aiVerticalsToggleState}
                           className="group relative text-md text-black"

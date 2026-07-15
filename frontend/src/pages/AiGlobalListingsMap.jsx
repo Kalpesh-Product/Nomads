@@ -161,10 +161,21 @@ const AiGlobalListingsMap = () => {
       params.get("state") || params.get("location") || "";
     return buildAiVerticalsSearchBadges({
       locationState: location.state,
+      fallbackSelectedFilters: {
+        goal: "World Ranking",
+        continent: formData.continent,
+        goalOption: "Most Affordable",
+      },
+      querySearch: location.search,
       selectedStateValue: selectedStateFromQuery,
       persistedBadges: persistedSearchBarBadges,
     });
-  }, [location.search, location.state, persistedSearchBarBadges]);
+  }, [
+    formData.continent,
+    location.search,
+    location.state,
+    persistedSearchBarBadges,
+  ]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -653,8 +664,16 @@ const AiGlobalListingsMap = () => {
 
     if (!normalizedCountry || !normalizedLocation) return;
 
+    const resolvedContinent =
+      normalizedContinent ||
+      normalizeValue(
+        locations.find(
+          (item) => normalizeValue(item.country) === normalizedCountry,
+        )?.continent,
+      );
+
     if (
-      normalizedContinent === normalizeValue(formData.continent) &&
+      resolvedContinent === normalizeValue(formData.continent) &&
       normalizedCountry === normalizeValue(formData.country) &&
       normalizedLocation === normalizeValue(formData.location)
     ) {
@@ -663,13 +682,13 @@ const AiGlobalListingsMap = () => {
 
     const nextFormValues = {
       ...formData,
-      continent: normalizedContinent || "",
+      continent: resolvedContinent || "",
       country: normalizedCountry || "",
       location: normalizedLocation || "",
     };
 
     dispatch(setFormValues(nextFormValues));
-  }, [dispatch, formData, location.state, location.search]);
+  }, [dispatch, formData, location.state, location.search, locations]);
 
   const { mutate: locationData, isPending: isLocation } = useMutation({
     mutationFn: async (data) => {

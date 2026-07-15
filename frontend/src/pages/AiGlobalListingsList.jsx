@@ -236,10 +236,21 @@ const AiGlobalListingsList = () => {
       params.get("state") || params.get("location") || "";
     return buildAiVerticalsSearchBadges({
       locationState: location.state,
+      fallbackSelectedFilters: {
+        goal: "World Ranking",
+        continent: formData.continent,
+        goalOption: "Most Affordable",
+      },
+      querySearch: location.search,
       selectedStateValue: selectedStateFromQuery,
       persistedBadges: persistedSearchBarBadges,
     });
-  }, [location.search, location.state, persistedSearchBarBadges]);
+  }, [
+    formData.continent,
+    location.search,
+    location.state,
+    persistedSearchBarBadges,
+  ]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -640,9 +651,12 @@ const AiGlobalListingsList = () => {
     return `${categoryValue}-${viewport}`;
   }, []);
 
-  const getDiscoverySectionRef = React.useCallback((categoryValue) => {
-    return sectionRefs.current[getDiscoverySectionKey(categoryValue)];
-  }, [getDiscoverySectionKey]);
+  const getDiscoverySectionRef = React.useCallback(
+    (categoryValue) => {
+      return sectionRefs.current[getDiscoverySectionKey(categoryValue)];
+    },
+    [getDiscoverySectionKey],
+  );
 
   const getScrollContainer = () =>
     typeof document === "undefined"
@@ -989,13 +1003,20 @@ const AiGlobalListingsList = () => {
     const continent = normalizeValue(
       breadcrumbFilters?.continent || queryContinent,
     );
+    const resolvedContinent =
+      continent ||
+      normalizeValue(
+        locations.find((item) => normalizeValue(item.country) === country)
+          ?.continent,
+      );
 
     if (!country || !loc) return;
 
     if (
       country === normalizeValue(formData.country) &&
       loc === normalizeValue(formData.location) &&
-      (!continent || continent === normalizeValue(formData.continent))
+      (!resolvedContinent ||
+        resolvedContinent === normalizeValue(formData.continent))
     ) {
       return;
     }
@@ -1004,19 +1025,17 @@ const AiGlobalListingsList = () => {
       ...formData,
       country: country || "",
       location: loc || "",
-      continent: continent || formData.continent || "",
+      continent: resolvedContinent || formData.continent || "",
     };
 
     dispatch(setFormValues(nextFormValues));
-  }, [dispatch, formData, location.state, location.search]);
+  }, [dispatch, formData, location.state, location.search, locations]);
 
   const { mutate: locationData, isPending: isLocation } = useMutation({
     mutationFn: async (data) => {
       dispatch(setFormValues(data));
       setShowMobileSearch(false);
-      navigate(
-        `/verticals?country=${data.country}&location=${data.location}`,
-      );
+      navigate(`/verticals?country=${data.country}&location=${data.location}`);
     },
     onSuccess: () => {
       console.log("success");
@@ -1111,10 +1130,7 @@ const AiGlobalListingsList = () => {
 
     navigate(
       {
-        pathname:
-          type === "news"
-            ? "/news/news-details"
-            : "/blog/blog-details",
+        pathname: type === "news" ? "/news/news-details" : "/blog/blog-details",
         search: location.search,
       },
       {
@@ -1130,9 +1146,7 @@ const AiGlobalListingsList = () => {
   const handleValueAddedServiceClick = (service) => {
     if (!service.path) return;
 
-    saveListingPageState(
-      getDiscoverySectionKey(VALUE_ADDED_SERVICES_CATEGORY),
-    );
+    saveListingPageState(getDiscoverySectionKey(VALUE_ADDED_SERVICES_CATEGORY));
 
     const params = new URLSearchParams(location.search);
     navigate({
@@ -1198,7 +1212,12 @@ const AiGlobalListingsList = () => {
       return;
     }
 
-    const mapUrl = `/verticals?country=${encodeURIComponent(formData.country)}&state=${encodeURIComponent(formData.location)}&view=map`;
+    const mapParams = new URLSearchParams(location.search);
+    mapParams.set("country", formData.country);
+    mapParams.set("state", formData.location);
+    mapParams.delete("location");
+    mapParams.set("view", "map");
+    const mapUrl = `/verticals?${mapParams.toString()}`;
     console.log("Navigating to:", mapUrl);
     navigate(mapUrl, {
       state: {
@@ -2036,9 +2055,7 @@ const AiGlobalListingsList = () => {
                           : undefined
                       }
                       viewMoreLabel={
-                        isNewsExpanded
-                          ? "View less \u2190"
-                          : "View more \u2192"
+                        isNewsExpanded ? "View less \u2190" : "View more \u2192"
                       }
                       sectionRef={(element) => {
                         sectionRefs.current["news-mobile"] = element;
