@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Country, State, City } from "country-state-city";
+import { validatePhoneNumberLength, isValidPhoneNumber } from "libphonenumber-js";
 import { FiChevronDown } from "react-icons/fi";
 import axios from "axios";
 import { api } from "../../utils/axios";
@@ -113,6 +114,13 @@ const TemplateCareerPage = () => {
   const [applyStateList, setApplyStateList] = useState([]);
   const [applyCityList, setApplyCityList] = useState([]);
 
+  const applyDialCode = useMemo(() => {
+    if (!form.country) return "";
+    const code = String(Country.getCountryByCode(form.country)?.phonecode || "").trim();
+    if (!code) return "";
+    return code.startsWith("+") ? code : `+${code}`;
+  }, [form.country]);
+
   const { data: jobsData, isPending: jobsLoading } = useQuery({
     queryKey: ["career-jobs", workspaceId],
     queryFn: async () => {
@@ -198,6 +206,15 @@ const TemplateCareerPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedJob) return;
+
+    const phoneDigits = form.phone.replace(/\D/g, "");
+    if (form.country && !isValidPhoneNumber(phoneDigits, form.country)) {
+      setSubmitError(
+        `Please enter a valid mobile number for the selected country (${applyDialCode}).`,
+      );
+      return;
+    }
+
     setSubmitPending(true);
     setSubmitError("");
 
@@ -209,7 +226,10 @@ const TemplateCareerPage = () => {
       fd.append("fullName", form.fullName);
       fd.append("email", form.email);
       fd.append("dateOfBirth", form.dateOfBirth);
-      fd.append("phone", form.phone);
+      fd.append(
+        "phone",
+        applyDialCode && form.phone ? `${applyDialCode} ${form.phone.trim()}` : form.phone,
+      );
       fd.append("country", form.country);
       fd.append("state", form.state);
       fd.append("city", form.city);
@@ -262,13 +282,10 @@ const TemplateCareerPage = () => {
         className={FIELD_CLASS}
       />
       <input
-        type="date" required placeholder="Date of Birth *" value={form.dateOfBirth}
+        type="text" required placeholder="Date of Birth (DOB) *" value={form.dateOfBirth}
+        onFocus={(e) => { e.target.type = "date"; }}
+        onBlur={(e) => { if (!e.target.value) e.target.type = "text"; }}
         onChange={(e) => setForm((p) => ({ ...p, dateOfBirth: e.target.value }))}
-        className={FIELD_CLASS}
-      />
-      <input
-        type="tel" required placeholder="Mobile Number *" value={form.phone}
-        onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
         className={FIELD_CLASS}
       />
       <select
@@ -306,6 +323,29 @@ const TemplateCareerPage = () => {
           <option key={c.name} value={c.name}>{c.name}</option>
         ))}
       </select>
+      <div className="flex gap-2">
+        <span
+          className={`flex shrink-0 items-center rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-[13px] ${
+            applyDialCode ? "text-[#111827]" : "text-[#9ca3af]"
+          }`}
+          title={applyDialCode ? "" : "Select country for code"}
+        >
+          {applyDialCode || "+ --"}
+        </span>
+        <input
+          type="tel" required placeholder="Mobile Number *" value={form.phone}
+          onChange={(e) => {
+            const cleaned = e.target.value.replace(/[^\d\s-]/g, "");
+            const digits = cleaned.replace(/\D/g, "");
+            if (
+              form.country && digits &&
+              validatePhoneNumberLength(digits, form.country) === "TOO_LONG"
+            ) return;
+            setForm((p) => ({ ...p, phone: cleaned }));
+          }}
+          className={FIELD_CLASS}
+        />
+      </div>
       <div className="rounded-lg border border-dashed border-slate-300 bg-white px-3 py-2 text-[11px] sm:text-[13px]">
         <label className="flex cursor-pointer items-center justify-between gap-3">
           <span className="min-w-0 flex-1 truncate font-medium leading-tight text-[#111827]">
