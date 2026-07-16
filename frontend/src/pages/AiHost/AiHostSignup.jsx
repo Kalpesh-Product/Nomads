@@ -111,14 +111,17 @@ const AiHostSignup = () => {
   const onBack = () => navigate("/");
   const hostRedirectUrl = `${window.location.origin}/`;
 
-  const initialStep = Math.max(
-    0,
-    Math.min(1, Number(new URLSearchParams(location.search).get("step")) || 0),
-  );
+  const signupParams = new URLSearchParams(location.search);
+  const requestedStep = signupParams.has("step")
+    ? Number(signupParams.get("step"))
+    : 1;
+  const initialStep = Number.isFinite(requestedStep)
+    ? Math.max(0, Math.min(1, requestedStep))
+    : 1;
   const [activeStep, setActiveStep] = useState(initialStep);
   const [typedActivationTitle, setTypedActivationTitle] = useState("");
   const selectedPlanFromQuery = normalizePlanFromQuery(
-    new URLSearchParams(location.search).get("plan"),
+    signupParams.get("plan"),
   );
   const [selectedPlan, setSelectedPlan] = useState(selectedPlanFromQuery);
   const countries = useMemo(() => Country.getAllCountries(), []);
@@ -1737,7 +1740,7 @@ const AiHostSignup = () => {
                               <span className="text-sm text-gray-700">
                                 I agree to the{" "}
                                 <NavLink
-                                  to="/ai-host-terms-and-conditions"
+                                  to="/terms-and-conditions"
                                   className="text-blue-600 underline"
                                   target="_blank"
                                   rel="noreferrer"

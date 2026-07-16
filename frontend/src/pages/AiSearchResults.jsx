@@ -1579,8 +1579,16 @@ const AiSearchResults = () => {
       );
     }
 
+    const verticalsParams = new URLSearchParams({
+      country,
+      state: selectedLocationParam,
+      goal: selectedGoal,
+      continent: selectedContinent,
+      goalOption: selectedGoalOption,
+    });
+
     navigate(
-      `/ai-verticals?country=${encodeURIComponent(country)}&state=${encodeURIComponent(selectedLocationParam)}`,
+      `/verticals?${verticalsParams.toString()}`,
       {
         state: {
           selectedStateLabel: destinationTitle,
@@ -1604,7 +1612,7 @@ const AiSearchResults = () => {
       const destinationId = destination?._id;
 
       if (!userId) {
-        navigate("/ai-login", {
+        navigate("/login", {
           state: {
             redirectTo: `${location.pathname}${location.search}`,
             loginContext: {

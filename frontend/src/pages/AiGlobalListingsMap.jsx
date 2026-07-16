@@ -54,6 +54,11 @@ const normalizeContentDestination = (label) =>
         .replace(/[\u2010-\u2015\u2212\u{FE63}\u{FF0D}]/gu, "-")
         .trim()
     : "";
+const buildExactContentKeyword = (label) => {
+  if (!label) return null;
+  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return `^${escaped}$`;
+};
 const getAiVerticalsPageStateKey = (country = "", location = "") => {
   const countryKey = country.trim().toLowerCase();
   const locationKey = location.trim().toLowerCase();
@@ -156,10 +161,21 @@ const AiGlobalListingsMap = () => {
       params.get("state") || params.get("location") || "";
     return buildAiVerticalsSearchBadges({
       locationState: location.state,
+      fallbackSelectedFilters: {
+        goal: "World Ranking",
+        continent: formData.continent,
+        goalOption: "Most Affordable",
+      },
+      querySearch: location.search,
       selectedStateValue: selectedStateFromQuery,
       persistedBadges: persistedSearchBarBadges,
     });
-  }, [location.search, location.state, persistedSearchBarBadges]);
+  }, [
+    formData.continent,
+    location.search,
+    location.state,
+    persistedSearchBarBadges,
+  ]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -351,7 +367,7 @@ const AiGlobalListingsMap = () => {
     }
 
     navigate(
-      `/ai-listings?country=${formData.country}&location=${formData.location}&category=${type}`,
+      `/listings?country=${formData.country}&location=${formData.location}&category=${type}`,
       {
         state: updatedForm,
       },
@@ -382,6 +398,13 @@ const AiGlobalListingsMap = () => {
       new URLSearchParams(location.search).get("location") ||
       formData?.location,
   );
+  const destinationContentParams = useMemo(() => {
+    if (!destinationAvailability) return undefined;
+
+    return {
+      keyword: buildExactContentKeyword(destinationAvailability),
+    };
+  }, [destinationAvailability]);
   const { data: destinationEventsData = [] } = useQuery({
     queryKey: ["ai-events-availability", destinationAvailability],
     queryFn: async () => {
@@ -424,6 +447,30 @@ const AiGlobalListingsMap = () => {
     enabled: !!destinationAvailability,
     refetchOnWindowFocus: false,
   });
+  const { data: destinationNewsData = [] } = useQuery({
+    queryKey: ["ai-news-availability", destinationAvailability],
+    queryFn: async () => {
+      const response = await axios.get("/news/get-news", {
+        params: destinationContentParams,
+      });
+
+      return Array.isArray(response.data) ? response.data : [];
+    },
+    enabled: !!destinationAvailability,
+    refetchOnWindowFocus: false,
+  });
+  const { data: destinationBlogsData = [] } = useQuery({
+    queryKey: ["ai-blogs-availability", destinationAvailability],
+    queryFn: async () => {
+      const response = await axios.get("/blogs/get-blogs", {
+        params: destinationContentParams,
+      });
+
+      return Array.isArray(response.data) ? response.data : [];
+    },
+    enabled: !!destinationAvailability,
+    refetchOnWindowFocus: false,
+  });
 
   const sortedListings = useMemo(() => {
     if (!listingsData || listingsData.length === 0) return [];
@@ -449,6 +496,14 @@ const AiGlobalListingsMap = () => {
 
         if (option.value === RESTAURANTS_CATEGORY) {
           return destinationRestaurantsData.length > 0;
+        }
+
+        if (option.value === NEWS_CATEGORY) {
+          return destinationNewsData.length > 0;
+        }
+
+        if (option.value === BLOGS_CATEGORY) {
+          return destinationBlogsData.length > 0;
         }
 
         return true;
@@ -511,7 +566,9 @@ const AiGlobalListingsMap = () => {
       },
     ];
   }, [
+    destinationBlogsData.length,
     destinationEventsData.length,
+    destinationNewsData.length,
     destinationRestaurantsData.length,
     destinationVenuesData.length,
     isLisitingLoading,
@@ -607,8 +664,16 @@ const AiGlobalListingsMap = () => {
 
     if (!normalizedCountry || !normalizedLocation) return;
 
+    const resolvedContinent =
+      normalizedContinent ||
+      normalizeValue(
+        locations.find(
+          (item) => normalizeValue(item.country) === normalizedCountry,
+        )?.continent,
+      );
+
     if (
-      normalizedContinent === normalizeValue(formData.continent) &&
+      resolvedContinent === normalizeValue(formData.continent) &&
       normalizedCountry === normalizeValue(formData.country) &&
       normalizedLocation === normalizeValue(formData.location)
     ) {
@@ -617,19 +682,19 @@ const AiGlobalListingsMap = () => {
 
     const nextFormValues = {
       ...formData,
-      continent: normalizedContinent || "",
+      continent: resolvedContinent || "",
       country: normalizedCountry || "",
       location: normalizedLocation || "",
     };
 
     dispatch(setFormValues(nextFormValues));
-  }, [dispatch, formData, location.state, location.search]);
+  }, [dispatch, formData, location.state, location.search, locations]);
 
   const { mutate: locationData, isPending: isLocation } = useMutation({
     mutationFn: async (data) => {
       dispatch(setFormValues(data));
       navigate(
-        `/ai-verticals?country=${data.country}&location=${data.location}`,
+        `/verticals?country=${data.country}&location=${data.location}`,
       );
       setShowMobileSearch(false);
     },
@@ -665,7 +730,7 @@ const AiGlobalListingsMap = () => {
         location: currentFormData.location,
         highlight: categoryValue,
       });
-      navigate(`/ai-verticals?${params.toString()}`, {
+      navigate(`/verticals?${params.toString()}`, {
         state: {
           ...location.state,
           selectedStateLabel: selectedLocationLabel,
@@ -707,8 +772,8 @@ const AiGlobalListingsMap = () => {
       categoryValue === RESTAURANTS_CATEGORY ||
       categoryValue === NEWS_CATEGORY ||
       categoryValue === BLOGS_CATEGORY
-        ? "/ai-listings-list"
-        : "/ai-listings";
+        ? "/listings-list"
+        : "/listings";
 
     navigate(
       `${listingsPath}?country=${currentFormData.country}&location=${currentFormData.location}&category=${state.category}`,
@@ -734,7 +799,7 @@ const AiGlobalListingsMap = () => {
       );
     }
 
-    navigate(`/ai-listings/${encodeURIComponent(item.companyName)}`, {
+    navigate(`/listings/${encodeURIComponent(item.companyName)}`, {
       state: {
         breadcrumbLoading: true,
         companyId: item.companyId,
@@ -757,7 +822,7 @@ const AiGlobalListingsMap = () => {
             "",
         },
         returnTo: {
-          pathname: "/ai-verticals",
+          pathname: "/verticals",
           search: location.search,
         },
       },
@@ -803,7 +868,7 @@ const AiGlobalListingsMap = () => {
         />
         <meta property="og:image" content="/images/map-preview.jpeg" />
         <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://nomad.wono.co/ai-verticals" />
+        <link rel="canonical" href="https://nomad.wono.co/verticals" />
       </Helmet>
 
       {/* ==================== DESKTOP VIEW (lg and above) ==================== */}
@@ -1407,7 +1472,7 @@ const AiGlobalListingsMap = () => {
         <button
           onClick={() =>
             navigate(
-              `/ai-verticals?country=${formData?.country}&location=${formData?.location}`,
+              `/verticals?country=${formData?.country}&location=${formData?.location}`,
               {
                 state: {
                   ...location.state,

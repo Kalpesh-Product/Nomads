@@ -76,7 +76,7 @@ export default function AiSignup() {
         "Signup successful! Please check your email for confirmation.",
       );
       reset();
-      navigate("/ai-login");
+      navigate("/login");
     },
     onError: (error) => {
       showErrorAlert(error.response?.data?.message || "Something went wrong");
@@ -342,7 +342,7 @@ export default function AiSignup() {
             <p className="text-center">
               Already have an account?&nbsp;
               <span className="underline">
-                <Link to="/ai-login">Login</Link>
+                <Link to="/login">Login</Link>
               </span>
             </p>
           </div>

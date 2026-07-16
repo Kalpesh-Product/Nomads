@@ -97,19 +97,19 @@ const HostHome = () => {
                 id: 1,
                 title: "MODULES",
                 icon: TbWorldWww,
-                route: "/ai-host-modules",
+                route: "/modules",
               },
               {
                 id: 2,
                 title: "LEADS",
                 icon: TbFileDescription,
-                route: "/ai-host-leads",
+                route: "/leads",
               },
               {
                 id: 3,
                 title: "THEMES",
                 icon: TbLayoutDashboard,
-                route: "/ai-host-themes",
+                route: "/themes",
               },
             ].map((tab) => {
               const Icon = tab.icon;
@@ -191,7 +191,7 @@ const HostHome = () => {
             <div className="flex flex-row items-center justify-center pt-2 pb-0 lg:justify-end">
               <GetStartedButton
                 title={"GET STARTED"}
-                handleSubmit={() => navigate("/ai-host-signup?step=1")}
+                handleSubmit={() => navigate("/signup?step=1")}
               />
             </div>
           </div>
@@ -230,7 +230,7 @@ const HostHome = () => {
             </div>
             <div className="text-center my-4">
               <NavLink
-                to={"/ai-host-themes"}
+                to={"/themes"}
                 className={" hover:underline hover:text-primary-blue"}
               >
                 View more
@@ -247,7 +247,7 @@ const HostHome = () => {
         <div className="justify-center pb-4 pt-4">
           <GetStartedButton
             title={"Get Started"}
-            handleSubmit={() => navigate("/ai-host-signup?step=1")}
+            handleSubmit={() => navigate("/signup?step=1")}
           />
         </div>
       </div>

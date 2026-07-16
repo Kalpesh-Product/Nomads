@@ -16,7 +16,19 @@ const locationSlice = createSlice({
   initialState,
   reducers: {
     setFormValues: (state, action) => {
-      state.formValues = action.payload;
+      const nextFormValues = action.payload || initialState.formValues;
+      const previousFormValues = state.formValues || {};
+      const keys = new Set([
+        ...Object.keys(previousFormValues),
+        ...Object.keys(nextFormValues),
+      ]);
+      const hasChanged = Array.from(keys).some(
+        (key) => previousFormValues[key] !== nextFormValues[key],
+      );
+
+      if (!hasChanged) return;
+
+      state.formValues = nextFormValues;
     },
     clearFormValues: (state) => {
       state.formValues = initialState.formValues;

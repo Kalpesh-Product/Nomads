@@ -19,7 +19,7 @@ import {
   HiOutlineLogout,
 } from "react-icons/hi";
 import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
-import { FaGlobeAmericas, FaHandsHelping } from "react-icons/fa";
+import { FaGlobeAmericas } from "react-icons/fa";
 import { MdOutlineWorkHistory } from "react-icons/md";
 import { HiOutlineCurrencyDollar } from "react-icons/hi";
 import { RiUserCommunityLine } from "react-icons/ri";
@@ -69,43 +69,43 @@ const getSearchPathForGoal = (goalLabel) => {
   return goalSlug ? `/search/${goalSlug}/results` : "/search/results";
 };
 
-const hostSignupEntryPath = "/ai-host-signup?step=1";
+const hostSignupEntryPath = "/signup?step=1";
 
 const recommendationItems = [
   {
     label: "Build & Manage Website",
     icon: CgWebsite,
-    path: "/ai-host-website-builder",
+    path: "/website-builder",
   },
   {
     label: "Nomad Listings",
     icon: TbWorldWww,
-    path: "/ai-host-modules",
+    path: "/modules",
   },
   {
     label: "Sales Management Module",
     icon: MdOutlineHandshake,
-    path: "/ai-host-modules",
+    path: "/modules",
   },
   {
     label: "Finance Management Module",
     icon: MdAccountBalance,
-    path: "/ai-host-themes",
+    path: "/themes",
   },
   {
     label: "Administration Management Module",
     icon: HiOutlineBriefcase,
-    path: "/ai-host-leads",
+    path: "/leads",
   },
   {
     label: "HR Management Module",
     icon: BsPeopleFill,
-    path: "/ai-host-career",
+    path: "/career",
   },
   {
     label: "IT Infrastructure Module",
     icon: FaDesktop,
-    path: "/ai-host-calendar",
+    path: "/calendar",
   },
   {
     label: "Maintenance Management Module",
@@ -200,7 +200,7 @@ const coreModules = [
     path: "/assets",
   },
   {
-    label: "Unit Selling",
+    label: "Unit Setting",
     icon: HiOutlineCash,
     path: "/extra-common-modules",
   },
@@ -269,12 +269,6 @@ const profileItems = [
 ];
 
 const signOutItem = [{ label: "Sign Out", icon: HiOutlineLogout }];
-
-const becomeContributorLink = {
-  label: "Become A Contributor",
-  icon: FaHandsHelping,
-  path: "/become-a-contributor",
-};
 
 const collapsedSectionLabels = {
   Modules: "MOD",
@@ -515,7 +509,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     params.set("tab", item.tab);
 
     navigate({
-      pathname: "/ai-host-profile",
+      pathname: "/profile",
       search: params.toString() ? `?${params.toString()}` : "",
     });
   };
@@ -534,14 +528,6 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     } else {
       window.location.href = "https://nomad.wono.co/home";
     }
-  };
-
-  const handleBecomeContributorClick = (item) => {
-    const params = new URLSearchParams(location.search);
-    navigate({
-      pathname: item.path,
-      search: params.toString() ? `?${params.toString()}` : "",
-    });
   };
 
   const handleSignOutClick = async () => {
@@ -657,13 +643,6 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     };
   });
 
-  const becomeContributorItemWithActivePath = {
-    ...becomeContributorLink,
-    active:
-      normalizedPath === becomeContributorLink.path ||
-      normalizedPath.startsWith(`${becomeContributorLink.path}/`),
-  };
-
   return (
     <aside
       className={`flex h-full max-h-screen flex-col overflow-y-auto overscroll-contain border-r border-black/10 bg-[#efefef] transition-all duration-300 custom-scrollbar-hide ${
@@ -776,13 +755,6 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
           <div className="mx-4 mt-3 border-t border-black/10"></div>
           {/* Compact sections - minimal spacing */}
           {/* <SidebarSection
-                        items={[becomeContributorItemWithActivePath]}
-                        collapsed={isCollapsed}
-                        onItemClick={handleBecomeContributorClick}
-                        compact={true}
-                    /> */}
-          {/* <div className="mx-4 border-t border-black/10"></div>
-                    <SidebarSection
                         items={becomeHostItem}
                         collapsed={isCollapsed}
                         onItemClick={handleBecomeHostClick}
@@ -799,14 +771,6 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         </>
       ) : (
         <>
-          <div className="mx-4 mt-3 border-t border-black/10"></div>
-          <SidebarSection
-            items={[becomeContributorItemWithActivePath]}
-            collapsed={isCollapsed}
-            onItemClick={handleBecomeContributorClick}
-            compact={true}
-            onTooltipChange={setTooltip}
-          />
           {/* <div className="mx-4 border-t border-black/10"></div>
                     <SidebarSection
                         items={becomeHostItem}

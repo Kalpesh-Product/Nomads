@@ -60,7 +60,7 @@ const AiHostJobDetails = () => {
       <div className="sticky top-0 z-40 bg-white/95 py-3 backdrop-blur-sm">
         <button
           type="button"
-          onClick={() => navigate("/ai-host-career")}
+          onClick={() => navigate("/career")}
           className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500"
           aria-label="Go back to AI host career"
         >

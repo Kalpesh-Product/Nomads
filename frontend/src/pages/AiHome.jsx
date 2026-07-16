@@ -253,7 +253,7 @@ const AiHome = () => {
 
     if (!isLoggedIn && gatedRecommendationTitles.has(card.title)) {
       const goalSlug = goalSlugByTitle[card.title];
-      const loginPath = goalSlug ? `/ai-login/${goalSlug}` : "/ai-login";
+      const loginPath = goalSlug ? `/login/${goalSlug}` : "/login";
 
       navigate(`${loginPath}${location.search}`, {
         state: {

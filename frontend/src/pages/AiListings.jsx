@@ -87,13 +87,15 @@ const valueAddedServiceItems = [
     label: "OVERALL ACTIVATION SUPPORT",
     path: "/overall-activation-support",
     imageUrl:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbhxwe7kd7j-UFpFp7tS2Ka0_L2iZ_zI_07Q&s",
+      // "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbhxwe7kd7j-UFpFp7tS2Ka0_L2iZ_zI_07Q&s",
+      "https://www.google.com/search?q=location+map+setup+wallpaper&sca_esv=b95d1611b6ab2c1b&udm=2&biw=1396&bih=663&ei=UYZXavCiLJiZseMPucrWmAM&ved=0ahUKEwiwj7Kq4NSVAxWYTGwGHTmlFTMQ4dUDCBM&uact=5&oq=location+map+setup+wallpaper&gs_lp=Egtnd3Mtd2l6LWltZyIcbG9jYXRpb24gbWFwIHNldHVwIHdhbGxwYXBlckirNVCTBli5M3AIeACQAQCYAXCgAa0KqgEDNS44uAEDyAEA-AEBmAIJoAK8A8ICBhAAGAcYHsICCBAAGAgYBxgewgIKEAAYCBgHGB4YCpgDAIgGAZIHAzUuNKAH6hOyBwMwLjS4B6sDwgcFMC4yLjfIBx6ACAE&sclient=gws-wiz-img#sv=CAMSURoyKhBlLVpHcjQzbUx5WHNtaGpNMg5aR3I0M21MeVhzbWhqTToORTFoc0h0UGlCa0NyNU0gBCoXCgFzEhBlLVpHcjQzbUx5WHNtaGpNGAEwARgHIPGd3LEOSggQARgBIAEoAQ",
   },
   {
     label: "NEW COMPANY SUPPORT",
     path: "/new-company-setup",
     imageUrl:
-      "https://3.imimg.com/data3/KB/OY/MY-1439773/new-business-setup.jpg",
+      // "https://3.imimg.com/data3/KB/OY/MY-1439773/new-business-setup.jpg",
+      "https://www.google.com/search?q=Handshake+wallpaper&sca_esv=b95d1611b6ab2c1b&udm=2&biw=1396&bih=663&ei=kIVXaqSBB4SgseMPja3joAQ&ved=0ahUKEwikiYnO39SVAxUEUGwGHY3WGEQQ4dUDCBM&uact=5&oq=Handshake+wallpaper&gs_lp=Egtnd3Mtd2l6LWltZyITSGFuZHNoYWtlIHdhbGxwYXBlcjIFEAAYgAQyBhAAGAcYHjIGEAAYBxgeMgYQABgHGB4yBRAAGIAEMgQQABgeMgQQABgeMgQQABgeMgQQABgeMgYQABgFGB5I6RZQ-gVYpxRwAngAkAEAmAGrAaAB9QqqAQQwLjEwuAEDyAEA-AEBmAIJoAL-B8ICChAAGIAEGIoFGEOYAwCIBgGSBwMyLjegB_svsgcDMC43uAf3B8IHBTAuMS44yAclgAgB&sclient=gws-wiz-img#sv=CAMSURoyKhBlLU54bE5UQnFsaHgzbTdNMg5OeGxOVEJxbGh4M203TToOT1pXNTNldnphUWNEdk0gBCoXCgFzEhBlLU54bE5UQnFsaHgzbTdNGAEwARgHIKf5-YMPSggQARgBIAEoAQ",
   },
   {
     label: "ANY CONSULTATION SUPPORT",
@@ -105,16 +107,17 @@ const valueAddedServiceItems = [
     label: "APPLY FOR JOB",
     badge: "Coming soon",
     imageUrl:
-      "https://img.freepik.com/premium-vector/people-seeking-jobs-internet-job-search-recruitment_773186-499.jpg?semt=ais_hybrid&w=740&q=80",
+      // "https://img.freepik.com/premium-vector/people-seeking-jobs-internet-job-search-recruitment_773186-499.jpg?semt=ais_hybrid&w=740&q=80",
+      "https://static.vecteezy.com/system/resources/thumbnails/072/930/801/small/magnifying-glass-highlighting-the-word-vacancy-on-a-wooden-block-against-a-bright-yellow-background-symbolizing-job-search-career-opportunities-and-the-concept-of-finding-the-right-candidate-for-an-op-photo.jpg",
   },
   // {
   //   label: "VIEW LOCATION BLOGS",
-  //   path: "/ai-blogs",
+  //   path: "/blog",
   //   usesSelectedLocation: true,
   // },
   // {
   //   label: "VIEW LOCATION NEWS",
-  //   path: "/ai-news",
+  //   path: "/news",
   //   usesSelectedLocation: true,
   // },
 ];
@@ -399,6 +402,13 @@ const AiListings = ({ forceListView = false }) => {
       searchParams.get("location") ||
       formData?.location,
   );
+  const destinationContentParams = React.useMemo(() => {
+    if (!destinationAvailability) return undefined;
+
+    return {
+      keyword: buildExactKeyword(destinationAvailability),
+    };
+  }, [destinationAvailability]);
   const { data: destinationEventsData = [] } = useQuery({
     queryKey: ["ai-events-availability", destinationAvailability],
     queryFn: async () => {
@@ -441,14 +451,38 @@ const AiListings = ({ forceListView = false }) => {
     enabled: !!destinationAvailability,
     refetchOnWindowFocus: false,
   });
+  const { data: destinationNewsData = [] } = useQuery({
+    queryKey: ["ai-news-availability", destinationAvailability],
+    queryFn: async () => {
+      const response = await axios.get("/news/get-news", {
+        params: destinationContentParams,
+      });
+
+      return Array.isArray(response.data) ? response.data : [];
+    },
+    enabled: !!destinationAvailability,
+    refetchOnWindowFocus: false,
+  });
+  const { data: destinationBlogsData = [] } = useQuery({
+    queryKey: ["ai-blogs-availability", destinationAvailability],
+    queryFn: async () => {
+      const response = await axios.get("/blogs/get-blogs", {
+        params: destinationContentParams,
+      });
+
+      return Array.isArray(response.data) ? response.data : [];
+    },
+    enabled: !!destinationAvailability,
+    refetchOnWindowFocus: false,
+  });
 
   const categoryOptions = React.useMemo(() => {
     if (isLisitingLoading) {
       return [];
     }
 
-    const visibleDestinationHighlightFilters = DESTINATION_HIGHLIGHT_FILTERS.filter(
-      (option) => {
+    const visibleDestinationHighlightFilters =
+      DESTINATION_HIGHLIGHT_FILTERS.filter((option) => {
         if (option.value === ANNUAL_EVENTS_CATEGORY) {
           return destinationEventsData.length > 0;
         }
@@ -461,9 +495,16 @@ const AiListings = ({ forceListView = false }) => {
           return destinationRestaurantsData.length > 0;
         }
 
+        if (option.value === NEWS_CATEGORY) {
+          return destinationNewsData.length > 0;
+        }
+
+        if (option.value === BLOGS_CATEGORY) {
+          return destinationBlogsData.length > 0;
+        }
+
         return true;
-      },
-    );
+      });
 
     if (!listingsData || listingsData.length === 0) {
       return [
@@ -519,7 +560,9 @@ const AiListings = ({ forceListView = false }) => {
       { label: "Value Adds", value: VALUE_ADDED_SERVICES_CATEGORY },
     ];
   }, [
+    destinationBlogsData.length,
     destinationEventsData.length,
+    destinationNewsData.length,
     destinationRestaurantsData.length,
     destinationVenuesData.length,
     isLisitingLoading,
@@ -772,7 +815,7 @@ const AiListings = ({ forceListView = false }) => {
         location: formData.location,
         highlight: categoryValue,
       });
-      navigate(`/ai-verticals?${params.toString()}`, {
+      navigate(`/verticals?${params.toString()}`, {
         state: {
           selectedStateLabel,
           searchBarBadges,
@@ -867,8 +910,7 @@ const AiListings = ({ forceListView = false }) => {
   const isTablet = useMediaQuery("(max-width:1023px)");
   const isValueAddedServicesSelected =
     formData?.category === VALUE_ADDED_SERVICES_CATEGORY;
-  const isAnnualEventsSelected =
-    formData?.category === ANNUAL_EVENTS_CATEGORY;
+  const isAnnualEventsSelected = formData?.category === ANNUAL_EVENTS_CATEGORY;
   const isVenuesSelected = formData?.category === VENUES_CATEGORY;
   const isRestaurantsSelected = formData?.category === RESTAURANTS_CATEGORY;
   const isNewsSelected = formData?.category === NEWS_CATEGORY;
@@ -880,12 +922,9 @@ const AiListings = ({ forceListView = false }) => {
     isRestaurantsSelected ||
     isNewsSelected ||
     isBlogsSelected;
-  const showDesktopMap =
-    !forceListView && mapOpen && !isFocusedContentSelected;
+  const showDesktopMap = !forceListView && mapOpen && !isFocusedContentSelected;
   const listingsBasePath =
-    location.pathname === "/ai-listings-list"
-      ? "/ai-listings-list"
-      : "/ai-listings";
+    location.pathname === "/listings-list" ? "/listings-list" : "/listings";
   const selectedStateFromParams =
     searchParams.get("state") || searchParams.get("location") || "";
   const backLabel = selectedStateFromParams || formData?.location || "";
@@ -1080,7 +1119,7 @@ const AiListings = ({ forceListView = false }) => {
   );
 
   const handleEventClick = (event) => {
-    navigate(`/ai-events/${event.id}`, {
+    navigate(`/events/${event.id}`, {
       state: {
         item: event,
         selectedStateLabel,
@@ -1096,7 +1135,7 @@ const AiListings = ({ forceListView = false }) => {
   };
 
   const handleVenueClick = (venue) => {
-    navigate(`/ai-venues/${venue.id}`, {
+    navigate(`/venues/${venue.id}`, {
       state: {
         item: venue,
         selectedStateLabel,
@@ -1112,7 +1151,7 @@ const AiListings = ({ forceListView = false }) => {
   };
 
   const handleRestaurantClick = (restaurant) => {
-    navigate(`/ai-restaurants/${restaurant.id}`, {
+    navigate(`/restaurants/${restaurant.id}`, {
       state: {
         item: restaurant,
         selectedStateLabel,
@@ -1129,7 +1168,7 @@ const AiListings = ({ forceListView = false }) => {
   const handleNewsClick = (newsItem) => {
     navigate(
       {
-        pathname: "/ai-news/ai-news-details",
+        pathname: "/news/news-details",
         search: location.search,
       },
       {
@@ -1144,7 +1183,7 @@ const AiListings = ({ forceListView = false }) => {
   const handleBlogClick = (blog) => {
     navigate(
       {
-        pathname: "/ai-blogs/ai-blog-details",
+        pathname: "/blog/blog-details",
         search: location.search,
       },
       {
@@ -1671,28 +1710,28 @@ const AiListings = ({ forceListView = false }) => {
               !isRestaurantsSelected &&
               !isNewsSelected &&
               !isBlogsSelected && (
-              <div className="mt-6 mb-2 px-1 border-t border-gray-300">
-                <h1 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight mt-6">
-                  Popular{" "}
-                  {{
-                    coworking: "Co-Working Spaces",
-                    coliving: "Co-Living Spaces",
-                    hostel: "Hostels",
-                    workation: "Workation",
-                    privatestay: "Private Stays",
-                    meetingroom: "Meeting Rooms",
-                    cafe: "Cafes",
-                    [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
-                    [ANNUAL_EVENTS_CATEGORY]: "Annual Events",
-                    [VENUES_CATEGORY]: "Places",
-                    [RESTAURANTS_CATEGORY]: "Restaurants",
-                    [NEWS_CATEGORY]: "News",
-                    [BLOGS_CATEGORY]: "Blogs",
-                  }[formData.category] || `${formData.category} Spaces`}{" "}
-                  in {selectedStateLabel || "Unknown"}
-                </h1>
-              </div>
-            )}
+                <div className="mt-6 mb-2 px-1 border-t border-gray-300">
+                  <h1 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight mt-6">
+                    Popular{" "}
+                    {{
+                      coworking: "Co-Working Spaces",
+                      coliving: "Co-Living Spaces",
+                      hostel: "Hostels",
+                      workation: "Workation",
+                      privatestay: "Private Stays",
+                      meetingroom: "Meeting Rooms",
+                      cafe: "Cafes",
+                      [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
+                      [ANNUAL_EVENTS_CATEGORY]: "Annual Events",
+                      [VENUES_CATEGORY]: "Places",
+                      [RESTAURANTS_CATEGORY]: "Restaurants",
+                      [NEWS_CATEGORY]: "News",
+                      [BLOGS_CATEGORY]: "Blogs",
+                    }[formData.category] || `${formData.category} Spaces`}{" "}
+                    in {selectedStateLabel || "Unknown"}
+                  </h1>
+                </div>
+              )}
 
             <div className="grid grid-cols-1 lg:grid-cols-9 gap-4">
               {/* LIST VIEW */}
@@ -1736,16 +1775,16 @@ const AiListings = ({ forceListView = false }) => {
                             </span>
                           )}
                           <div className="flex w-full flex-col items-center justify-end">
-                            {getValueAddedServiceCardLines(
-                              serviceLabel,
-                            ).map((line) => (
-                              <span
-                                key={`${serviceLabel}-${line}`}
-                                className="text-base md:text-xl font-normal uppercase text-white !leading-[1.05rem] tracking-wide"
-                              >
-                                {line}
-                              </span>
-                            ))}
+                            {getValueAddedServiceCardLines(serviceLabel).map(
+                              (line) => (
+                                <span
+                                  key={`${serviceLabel}-${line}`}
+                                  className="text-base font-normal uppercase text-white !leading-[1rem] tracking-wide pb-2"
+                                >
+                                  {line}
+                                </span>
+                              ),
+                            )}
                           </div>
                         </button>
                       );
@@ -1922,7 +1961,7 @@ const AiListings = ({ forceListView = false }) => {
                             showVertical={false}
                             handleNavigation={() => {
                               navigate(
-                                `/ai-listings/${encodeURIComponent(item.companyName)}`,
+                                `/listings/${encodeURIComponent(item.companyName)}`,
                                 {
                                   state: {
                                     companyId: item.companyId,
@@ -1972,7 +2011,7 @@ const AiListings = ({ forceListView = false }) => {
               <button
                 onClick={() =>
                   navigate(
-                    `/ai-verticals?country=${formData?.country}&location=${formData?.location}&view=map`,
+                    `/verticals?country=${formData?.country}&location=${formData?.location}&view=map`,
                     {
                       state: { searchBarBadges },
                     },
