@@ -3,6 +3,7 @@ import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Country, State, City } from "country-state-city";
 import { FiChevronDown } from "react-icons/fi";
+import axios from "axios";
 import { api } from "../../utils/axios";
 import LinedHeading from "./components/LinedHeading";
 
@@ -215,9 +216,10 @@ const TemplateCareerPage = () => {
       fd.append("customFields", JSON.stringify(customValues));
       if (resumeFile) fd.append("resumeFile", resumeFile);
 
-      await api.post("/company/jobs/apply", fd, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      await axios.post(
+        "https://wonomasterbe.vercel.app/api/recruitment/jobs/apply",
+        fd,
+      );
 
       setSubmitSuccess(true);
       setTimeout(() => {
