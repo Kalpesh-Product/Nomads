@@ -1564,7 +1564,7 @@ const AiListings = ({ forceListView = false }) => {
             </span>
           </button>
           
-          <div className="flex overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 flex md:justify-center">
+          <div className=" overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 flex md:justify-center">
             {categoryOptions.map((cat) => {
               const iconSrc = newIcons[cat.value];
               const isActive = activeCategory === cat.value;
