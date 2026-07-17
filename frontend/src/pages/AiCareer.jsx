@@ -109,7 +109,7 @@ const AiCareer = () => {
                                                                             </p>
                                                                         )}
                                                                     </div>
-                                                                    <div className="flex flex-col md:flex-row items-center gap-4 md:gap-10 w-full md:w-auto justify-end">
+                                                                    <div className="flex flex-row md:flex-row items-center gap-2 md:gap-10 w-full md:w-auto justify-end">
                                                                         <p className="text-xs md:text-sm font-semibold text-gray-900">
                                                                             {job?.jobType} | {job?.jobMode} |{" "}
                                                                             {job?.location}
