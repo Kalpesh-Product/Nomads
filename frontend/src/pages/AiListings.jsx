@@ -84,7 +84,7 @@ const valueAddedServiceItems = [
   {
     label: "OVERALL ACTIVATION SUPPORT",
     path: "/overall-activation-support",
-    imageUrl: "/value-adds/overall-activation-support.png",
+    imageUrl: "/value-adds/overall-activation-support.jpg",
   },
   {
     label: "NEW COMPANY SUPPORT",
