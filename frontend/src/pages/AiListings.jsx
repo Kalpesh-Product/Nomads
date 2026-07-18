@@ -25,7 +25,6 @@ import { useSearchParams } from "react-router-dom";
 import ListingCard from "../components/ListingCard.jsx";
 import PaginatedGrid from "../components/PaginatedGrid.jsx";
 import AiDestinationHighlightSection from "../components/AiDestinationHighlightSection.jsx";
-import newIcons from "../assets/newIcons.js";
 import { DESTINATION_HIGHLIGHT_FILTERS } from "../data/aiDestinationHighlights.js";
 import SearchBarCombobox from "../components/SearchBarCombobox.jsx";
 import AiSelectedBadgesSearchBar from "../components/AiSelectedBadgesSearchBar.jsx";
@@ -37,6 +36,10 @@ import {
   persistSelectedDestination,
   readSelectedDestination,
 } from "../utils/selectedDestinationSession.js";
+import {
+  getCategoryShortcutIconSrc,
+  useCroppedDesktopShortcutIcons,
+} from "../utils/categoryShortcutIcons.js";
 
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
 const ANNUAL_EVENTS_CATEGORY = "annualevents";
@@ -49,15 +52,6 @@ const SECOND_HEADING_DELAY_MS = 250;
 const THINKING_HEADING_TEXT = "Curating the best results for you";
 const CURATED_RESULTS_HEADING_TEXT =
   "Please find below, the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
-const MOBILE_SHORTCUT_ICON_OVERRIDES = {
-  annualevents: "/icons-new/Events-cropped.png",
-  venues: "/icons-new/Venues-cropped.png",
-  restaurants: "/icons-new/Restaurants.png",
-  news: "/icons-new/News-cropped.png",
-  blogs: "/icons-new/Blogs-cropped.png",
-};
-const getMobileShortcutIconSrc = (value) =>
-  MOBILE_SHORTCUT_ICON_OVERRIDES[value] || newIcons[value];
 const normalizeContentDestination = (label) =>
   label
     ? label
@@ -154,6 +148,7 @@ const AiListings = ({ forceListView = false }) => {
   const [isSecondHeadingPhase, setIsSecondHeadingPhase] = useState(false);
   const [isHeadingSequenceComplete, setIsHeadingSequenceComplete] =
     useState(false);
+  const useCroppedDesktopShortcuts = useCroppedDesktopShortcutIcons();
 
   const searchBarBadges = useMemo(() => {
     const formatBadgeValue = (value) =>
@@ -1300,7 +1295,7 @@ const AiListings = ({ forceListView = false }) => {
 
             <div className="lg:hidden flex overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 md:justify-center">
               {categoryOptions.map((cat) => {
-                const iconSrc = getMobileShortcutIconSrc(cat.value);
+                const iconSrc = getCategoryShortcutIconSrc(cat.value, true);
                 const isActive = formData?.category === cat.value;
                 return (
                   <button
@@ -1425,7 +1420,10 @@ const AiListings = ({ forceListView = false }) => {
                   <div className="w-full pb-4">
                     <div className="flex justify-between items-center">
                       {categoryOptions.map((cat) => {
-                        const iconSrc = newIcons[cat.value];
+                        const iconSrc = getCategoryShortcutIconSrc(
+                          cat.value,
+                          useCroppedDesktopShortcuts,
+                        );
                         const isActive = activeCategory === cat.value;
 
                         return (
@@ -1566,7 +1564,10 @@ const AiListings = ({ forceListView = false }) => {
           
           <div className=" overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 flex md:justify-center">
             {categoryOptions.map((cat) => {
-              const iconSrc = newIcons[cat.value];
+              const iconSrc = getCategoryShortcutIconSrc(
+                cat.value,
+                useCroppedDesktopShortcuts,
+              );
               const isActive = activeCategory === cat.value;
               return (
                 <button

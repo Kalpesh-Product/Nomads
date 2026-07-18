@@ -17,7 +17,6 @@ import SkeletonMap from "../components/Skeletons/SkeletonMap.jsx";
 import Select from "react-dropdown-select";
 import { setFormValues } from "../features/locationSlice.js";
 import ListingCard from "../components/ListingCard.jsx";
-import newIcons from "../assets/newIcons.js";
 import { IoSearch } from "react-icons/io5";
 import SearchBarCombobox from "../components/SearchBarCombobox.jsx";
 import AiSelectedBadgesSearchBar from "../components/AiSelectedBadgesSearchBar.jsx";
@@ -33,6 +32,10 @@ import {
   dedupeAiSearchBadges,
   buildAiVerticalsSearchBadges,
 } from "../utils/aiSearchBarBadges.js";
+import {
+  getCategoryShortcutIconSrc,
+  useCroppedDesktopShortcutIcons,
+} from "../utils/categoryShortcutIcons.js";
 import AiDestinationHighlightSection from "../components/AiDestinationHighlightSection.jsx";
 import { DESTINATION_HIGHLIGHT_FILTERS } from "../data/aiDestinationHighlights.js";
 
@@ -56,15 +59,6 @@ const THINKING_HEADING_TEXT = "Curating the best results for you";
 const CURATED_RESULTS_HEADING_TEXT =
   "Please find below, the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
 const AI_SCROLL_CONTAINER_ID = "nomad-ai-scroll-container";
-const MOBILE_SHORTCUT_ICON_OVERRIDES = {
-  annualevents: "/icons-new/Events-cropped.png",
-  venues: "/icons-new/Venues-cropped.png",
-  restaurants: "/icons-new/Restaurants.png",
-  news: "/icons-new/News-cropped.png",
-  blogs: "/icons-new/Blogs-cropped.png",
-};
-const getMobileShortcutIconSrc = (value) =>
-  MOBILE_SHORTCUT_ICON_OVERRIDES[value] || newIcons[value];
 const extractImageFromContent = (content) => {
   const match = content?.match(/<img.*?src=["'](.*?)["']/);
   return match ? match[1] : null;
@@ -224,6 +218,7 @@ const AiGlobalListingsList = () => {
   const [isSecondHeadingPhase, setIsSecondHeadingPhase] = useState(false);
   const [isHeadingSequenceComplete, setIsHeadingSequenceComplete] =
     useState(false);
+  const useCroppedDesktopShortcuts = useCroppedDesktopShortcutIcons();
 
   const searchBarBadges = useMemo(() => {
     const params = new URLSearchParams(location.search);
@@ -1306,7 +1301,10 @@ const AiGlobalListingsList = () => {
               <div className="w-full pb-4">
                 <div className="flex justify-between items-center">
                   {categoryOptions.map((cat) => {
-                    const iconSrc = newIcons[cat.value];
+                    const iconSrc = getCategoryShortcutIconSrc(
+                      cat.value,
+                      useCroppedDesktopShortcuts,
+                    );
                     return (
                       <button
                         key={cat.value}
@@ -1749,7 +1747,7 @@ const AiGlobalListingsList = () => {
 
             <div className="lg:hidden flex overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 md:justify-center">
               {categoryOptions.map((cat) => {
-                const iconSrc = getMobileShortcutIconSrc(cat.value);
+                const iconSrc = getCategoryShortcutIconSrc(cat.value, true);
                 return (
                   <button
                     key={cat.value}
