@@ -18,15 +18,19 @@ import { setFormValues } from "../features/locationSlice.js";
 import { useSearchParams } from "react-router-dom";
 import ListingCard from "../components/ListingCard.jsx";
 import PaginatedGrid from "../components/PaginatedGrid.jsx";
-import newIcons from "../assets/newIcons.js";
 import SearchBarCombobox from "../components/SearchBarCombobox.jsx";
 import { IoSearch } from "react-icons/io5";
 import { AnimatePresence, motion } from "motion/react";
 import useAuth from "../hooks/useAuth.js";
+import {
+  getCategoryShortcutIconSrc,
+  useCroppedDesktopShortcutIcons,
+} from "../utils/categoryShortcutIcons.js";
 
 const Listings = () => {
   const [resetPageKey, setResetPageKey] = useState(0);
   const [favorites, setFavorites] = useState([]);
+  const useCroppedDesktopShortcuts = useCroppedDesktopShortcutIcons();
   const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
   const [showMobileSearch, setShowMobileSearch] = useState(false);
@@ -418,7 +422,7 @@ const Listings = () => {
 
         <div className="lg:hidden flex overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 md:justify-center">
           {categoryOptions.map((cat) => {
-            const iconSrc = newIcons[cat.value];
+            const iconSrc = getCategoryShortcutIconSrc(cat.value, true);
             const isActive = formData?.category === cat.value;
             return (
               <button
@@ -541,7 +545,10 @@ const Listings = () => {
               <div className=" w-3/4 pb-4">
                 <div className="flex justify-between items-center">
                   {categoryOptions.map((cat) => {
-                    const iconSrc = newIcons[cat.value];
+                    const iconSrc = getCategoryShortcutIconSrc(
+                      cat.value,
+                      useCroppedDesktopShortcuts,
+                    );
                     const isActive = activeCategory === cat.value;
 
                     return (
@@ -681,7 +688,10 @@ const Listings = () => {
           
           <div className="flex overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 flex md:justify-center">
             {categoryOptions.map((cat) => {
-              const iconSrc = newIcons[cat.value];
+              const iconSrc = getCategoryShortcutIconSrc(
+                cat.value,
+                useCroppedDesktopShortcuts,
+              );
               const isActive = activeCategory === cat.value;
               return (
                 <button
