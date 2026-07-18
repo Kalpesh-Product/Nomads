@@ -56,6 +56,8 @@ const writeAiScrollPosition = (location, scrollTop) => {
 const readAiScrollPosition = (location) =>
   readAiScrollPositions()[getAiScrollPositionKey(location)];
 
+const MANUAL_SEARCH_COMPACT_WIDTH = 820;
+
 const HIDE_STICKY_BAR_PREFIXES = [
   "/login",
   "/signup",
@@ -96,6 +98,12 @@ const NomadAiLayout = () => {
   const navigationType = useNavigationType();
   const contentRef = useRef(null);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isManualSearchCompact, setIsManualSearchCompact] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      location.pathname.startsWith("/manual-search") &&
+      window.innerWidth <= MANUAL_SEARCH_COMPACT_WIDTH,
+  );
 
   const formData = useSelector((state) => state.location.formValues);
   console.log("formData from layout : ", formData);
@@ -134,6 +142,21 @@ const NomadAiLayout = () => {
   useEffect(() => {
     setIsMobileSidebarOpen(false);
   }, [location.pathname, location.search]);
+
+  useEffect(() => {
+    const updateManualSearchCompactMode = () => {
+      setIsManualSearchCompact(
+        location.pathname.startsWith("/manual-search") &&
+          window.innerWidth <= MANUAL_SEARCH_COMPACT_WIDTH,
+      );
+    };
+
+    updateManualSearchCompactMode();
+    window.addEventListener("resize", updateManualSearchCompactMode);
+
+    return () =>
+      window.removeEventListener("resize", updateManualSearchCompactMode);
+  }, [location.pathname]);
 
   const shouldShowStickyBar = (() => {
     if (EXCLUDED_STICKY_BAR_PATHS.has(location.pathname)) return false;
@@ -254,13 +277,15 @@ const NomadAiLayout = () => {
 
   return (
     <div className="flex h-screen bg-white">
-      <div className="hidden sm:block">
+      <div className={isManualSearchCompact ? "hidden" : "hidden sm:block"}>
         <AiSidebar />
       </div>
 
       {isMobileSidebarOpen && (
         <div
-          className="fixed inset-0 z-[70] bg-black/35 sm:hidden"
+          className={`fixed inset-0 z-[70] bg-black/35 ${
+            isManualSearchCompact ? "" : "sm:hidden"
+          }`}
           onClick={() => setIsMobileSidebarOpen(false)}
           aria-hidden="true"
         >
@@ -275,6 +300,7 @@ const NomadAiLayout = () => {
         <div className="sticky top-0 z-50 w-full">
           <AiHeader
             onMobileSidebarToggle={() => setIsMobileSidebarOpen(true)}
+            forceMobileNavigation={isManualSearchCompact}
           />
         </div>
         {shouldShowStickyBar && (
