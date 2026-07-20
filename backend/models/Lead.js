@@ -78,7 +78,20 @@ const leadSchema = new mongoose.Schema(
     status: {
       type: String,
       default: "Pending",
-      enum: ["Pending", "Contacted", "In Progress", "Converted", "Lost"],
+      enum: ["Pending", "Contacted", "Closed", "In Progress", "Converted", "Lost"],
+    },
+    hostPanelStatus: {
+      type: String,
+      default: "Pending",
+      enum: ["Pending", "Closed"],
+    },
+    masterStatusUpdatedAt: {
+      type: Date,
+      default: null,
+    },
+    hostPanelStatusUpdatedAt: {
+      type: Date,
+      default: null,
     },
     isEscalated: {
       type: Boolean,
@@ -132,6 +145,30 @@ const leadSchema = new mongoose.Schema(
       trim: true,
     },
     timeSlot: {
+      type: String,
+      trim: true,
+    },
+    roomType: {
+      type: String,
+      trim: true,
+    },
+    dormType: {
+      type: String,
+      trim: true,
+    },
+    attendees: {
+      type: String,
+      trim: true,
+    },
+    budget: {
+      type: String,
+      trim: true,
+    },
+    location: {
+      type: String,
+      trim: true,
+    },
+    message: {
       type: String,
       trim: true,
     },
