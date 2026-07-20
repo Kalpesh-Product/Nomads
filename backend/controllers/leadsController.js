@@ -29,6 +29,10 @@ export const createWebsiteLead = async (req, res, next) => {
       stayDuration,
       timeSlot,
       vertical,
+      budget,
+      location,
+      message,
+      comment,
     } = req.body;
 
     // Resolve required fields with fallbacks across the many aliases the
@@ -96,6 +100,12 @@ export const createWebsiteLead = async (req, res, next) => {
       websiteUrl: websiteUrl || "",
       stayDuration: stayDuration || "",
       timeSlot: timeSlot || "",
+      roomType: roomType || "",
+      dormType: dormType || "",
+      attendees: attendees ? String(attendees) : "",
+      budget: budget ? String(budget) : "",
+      location: location ? String(location) : "",
+      message: (message || comment || "").trim(),
       status: "Pending",
       isEscalated: false,
     });

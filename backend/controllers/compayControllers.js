@@ -2070,6 +2070,16 @@ export const escalateLeadToHostPanel = async (req, res, next) => {
       return res.status(400).json({ message: "workspaceId is required" });
     }
 
+    const existingLead = await Lead.findById(normalizedLeadId).lean();
+    if (!existingLead) {
+      return res.status(404).json({ message: "Lead not found" });
+    }
+    if (existingLead.status !== "Closed") {
+      return res.status(409).json({
+        message: "Close the Master Panel lead before escalating it to HostPanel",
+      });
+    }
+
     const lead = await Lead.findByIdAndUpdate(
       normalizedLeadId,
       {
@@ -2079,6 +2089,7 @@ export const escalateLeadToHostPanel = async (req, res, next) => {
           escalatedHostCompanyId: String(hostCompanyId || "").trim(),
           escalatedAt: new Date(),
           escalatedBy: String(escalatedBy || "").trim(),
+          hostPanelStatus: existingLead.hostPanelStatus || "Pending",
         },
       },
       { new: true },
@@ -2099,29 +2110,58 @@ export const escalateLeadToHostPanel = async (req, res, next) => {
 
 export const updateLeads = async (req, res, next) => {
   try {
-    const { status, comment, leadId } = req.body;
+    const { status, hostPanelStatus, comment, leadId, workspaceId } = req.body || {};
+    const normalizedStatus = String(status || "").trim();
+    const normalizedHostStatus = String(hostPanelStatus || "").trim();
 
-    if ((!leadId && typeof status !== boolean) || (!leadId && !comment)) {
+    if (!mongoose.Types.ObjectId.isValid(String(leadId || "").trim())) {
       return res.status(400).json({
-        message: "Missing required fields",
+        message: "A valid leadId is required",
       });
+    }
+
+    if (!normalizedStatus && !normalizedHostStatus && typeof comment !== "string") {
+      return res.status(400).json({ message: "No lead changes were provided" });
+    }
+
+    if (normalizedStatus && !["Pending", "Contacted", "Closed"].includes(normalizedStatus)) {
+      return res.status(400).json({ message: "Invalid Master Panel lead status" });
+    }
+
+    if (normalizedHostStatus && !["Pending", "Closed"].includes(normalizedHostStatus)) {
+      return res.status(400).json({ message: "Invalid HostPanel lead status" });
+    }
+
+    const normalizedWorkspaceId = String(workspaceId || "").trim();
+    if (normalizedHostStatus && !normalizedWorkspaceId) {
+      return res.status(400).json({ message: "workspaceId is required for HostPanel status updates" });
     }
 
     const query = {};
 
-    if (comment) {
+    if (typeof comment === "string") {
       query.comment = comment;
     }
 
-    if (status) {
-      query.status = status;
+    if (normalizedStatus) {
+      query.status = normalizedStatus;
+      query.masterStatusUpdatedAt = new Date();
     }
 
-    const leads = await Lead.findByIdAndUpdate(
+    if (normalizedHostStatus) {
+      query.hostPanelStatus = normalizedHostStatus;
+      query.hostPanelStatusUpdatedAt = new Date();
+    }
+
+    const leads = await Lead.findOneAndUpdate(
       {
         _id: leadId,
+        ...(normalizedHostStatus
+          ? { isEscalated: true, escalatedWorkspaceId: normalizedWorkspaceId }
+          : {}),
       },
-      query,
+      { $set: query },
+      { new: true },
     );
 
     if (!leads) {
@@ -2131,7 +2171,8 @@ export const updateLeads = async (req, res, next) => {
     }
 
     return res.status(200).json({
-      message: `Lead ${comment ? "comment" : "status"} updated`,
+      message: `Lead ${typeof comment === "string" && !normalizedStatus && !normalizedHostStatus ? "comment" : "status"} updated`,
+      lead: leads,
     });
   } catch (error) {
     console.error("[getCompanyLeads] error:", error);
