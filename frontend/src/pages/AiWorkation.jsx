@@ -72,7 +72,7 @@ const formatWorkationCountry = (country, state) => {
 };
 
 const WORKATION_PROMPT =
-  "Share your workation requirements and we will connect you with the right expert support.";
+  "share your workation requirements and we will connect you with the right expert support.";
 const WORKATION_HEADING = "Workation";
 const WORKATION_TYPING_SEEN_KEY = "wono-workation-typing-seen";
 const getFlagIconUrl = (isoCode) =>

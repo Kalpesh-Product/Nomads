@@ -53,7 +53,7 @@ const VISA_TYPE_OPTIONS = [
 ];
 
 const VISA_SUPPORT_PROMPT =
-  "Tell us about your travel plans and we will help you navigate the visa process with confidence.";
+  "tell us about your travel plans and we will help you navigate the visa process with confidence.";
 const VISA_SUPPORT_HEADING = "Visa Support";
 const VISA_SUPPORT_TYPING_SEEN_KEY = "wono-visa-support-typing-seen";
 const getFlagIconUrl = (isoCode) =>

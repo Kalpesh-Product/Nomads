@@ -66,7 +66,7 @@ const defaultValues = {
 };
 
 const NEW_COMPANY_PROMPT =
-  "Planning to build your business abroad? Share your details and we will support your setup journey.";
+  "planning to build your business abroad? Share your details and we will support your setup journey.";
 const NEW_COMPANY_HEADING = "New Company Setup";
 const NEW_COMPANY_TYPING_SEEN_KEY = "wono-new-company-typing-seen";
 const getFlagIconUrl = (isoCode) =>
