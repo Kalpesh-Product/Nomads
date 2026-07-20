@@ -63,7 +63,7 @@ const defaultValues = {
 };
 
 const CONSULTATION_PROMPT =
-  "Share your consultation requirements and we will connect you with the right expert support.";
+  "share your consultation requirements and we will connect you with the right expert support.";
 const CONSULTATION_HEADING = "Consultation";
 const CONSULTATION_TYPING_SEEN_KEY = "wono-consultation-typing-seen";
 const getFlagIconUrl = (isoCode) =>

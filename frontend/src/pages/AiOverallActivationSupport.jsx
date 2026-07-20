@@ -62,7 +62,7 @@ const formatTravelCountry = (country, state) => {
 };
 
 const OVERALL_ACTIVATION_PROMPT =
-  "Tell us what kind of on-ground activation help you need, and our team will guide you end-to-end.";
+  "tell us what kind of on-ground activation help you need, and our team will guide you end-to-end.";
 const OVERALL_ACTIVATION_HEADING = "Overall Activation Support";
 const OVERALL_ACTIVATION_TYPING_SEEN_KEY =
   "wono-overall-activation-typing-seen";
