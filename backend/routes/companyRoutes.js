@@ -17,6 +17,7 @@ import {
   addTemplateLink,
   activateProduct,
   updateLeads,
+  escalateLeadToHostPanel,
   bulkUpdateCompanyInclusions,
   deactivateProduct,
   editCompanyImagesBulk,
@@ -66,6 +67,7 @@ router.patch(
 router.post("/create-company", upload.any(), createCompany);
 router.get("/all-leads", getAllLeads);
 router.get("/leads", getCompanyLeads);
+router.patch("/escalate-lead", escalateLeadToHostPanel);
 router.patch("/update-lead", updateLeads);
 
 router.post("/jobs/apply", proxyUpload.any(), applyToCompanyJob);

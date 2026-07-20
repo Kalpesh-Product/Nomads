@@ -80,6 +80,32 @@ const leadSchema = new mongoose.Schema(
       default: "Pending",
       enum: ["Pending", "Contacted", "In Progress", "Converted", "Lost"],
     },
+    isEscalated: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    escalatedWorkspaceId: {
+      type: String,
+      trim: true,
+      default: "",
+      index: true,
+    },
+    escalatedHostCompanyId: {
+      type: String,
+      trim: true,
+      default: "",
+      index: true,
+    },
+    escalatedAt: {
+      type: Date,
+      default: null,
+    },
+    escalatedBy: {
+      type: String,
+      trim: true,
+      default: "",
+    },
     // Website builder lead fields
     workspaceId: {
       type: String,
