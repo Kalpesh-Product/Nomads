@@ -97,6 +97,7 @@ export const createWebsiteLead = async (req, res, next) => {
       stayDuration: stayDuration || "",
       timeSlot: timeSlot || "",
       status: "Pending",
+      isEscalated: false,
     });
 
     return res.status(201).json({

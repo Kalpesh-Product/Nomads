@@ -1940,7 +1940,7 @@ export const addTemplateLink = async (req, res, next) => {
 
 export const getAllLeads = async (req, res, next) => {
   try {
-    const leads = await Lead.find();
+    const leads = await Lead.find().sort({ createdAt: -1 });
 
     if (!leads || !leads.length) {
       return res.status(200).json({
@@ -2020,14 +2020,28 @@ export const deactivateProduct = async (req, res, next) => {
 
 export const getCompanyLeads = async (req, res, next) => {
   try {
-    const { companyId } = req.query;
+    const { companyId, workspaceId, isEscalated } = req.query;
     let query = {};
 
     if (companyId) {
       query.companyId = companyId;
     }
 
-    const leads = await Lead.find(query);
+    if (String(isEscalated || "").toLowerCase() === "true") {
+      query.isEscalated = true;
+      if (companyId) {
+        delete query.companyId;
+        query.$or = [
+          { companyId },
+          { escalatedHostCompanyId: companyId },
+        ];
+      }
+      if (workspaceId) {
+        query.escalatedWorkspaceId = String(workspaceId).trim();
+      }
+    }
+
+    const leads = await Lead.find(query).sort({ createdAt: -1 });
 
     if (!leads || !leads.length) {
       return res.status(200).json({
@@ -2039,6 +2053,47 @@ export const getCompanyLeads = async (req, res, next) => {
   } catch (error) {
     console.error("[getCompanyLeads] error:", error);
     return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const escalateLeadToHostPanel = async (req, res, next) => {
+  try {
+    const { leadId, workspaceId, hostCompanyId, escalatedBy } = req.body || {};
+    const normalizedLeadId = String(leadId || "").trim();
+    const normalizedWorkspaceId = String(workspaceId || "").trim();
+
+    if (!mongoose.Types.ObjectId.isValid(normalizedLeadId)) {
+      return res.status(400).json({ message: "A valid leadId is required" });
+    }
+
+    if (!normalizedWorkspaceId) {
+      return res.status(400).json({ message: "workspaceId is required" });
+    }
+
+    const lead = await Lead.findByIdAndUpdate(
+      normalizedLeadId,
+      {
+        $set: {
+          isEscalated: true,
+          escalatedWorkspaceId: normalizedWorkspaceId,
+          escalatedHostCompanyId: String(hostCompanyId || "").trim(),
+          escalatedAt: new Date(),
+          escalatedBy: String(escalatedBy || "").trim(),
+        },
+      },
+      { new: true },
+    );
+
+    if (!lead) {
+      return res.status(404).json({ message: "Lead not found" });
+    }
+
+    return res.status(200).json({
+      message: "Lead escalated to HostPanel successfully",
+      lead,
+    });
+  } catch (error) {
+    next(error);
   }
 };
 
