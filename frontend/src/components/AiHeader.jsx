@@ -14,7 +14,7 @@ import { clearStoredLoginState } from "../hooks/useNomadLoginState";
 import useLocationContentAvailability from "../hooks/useLocationContentAvailability";
 import { readSelectedDestination } from "../utils/selectedDestinationSession";
 
-const AiHeader = ({ onMobileSidebarToggle }) => {
+const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
   const [open, setOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [isLogoutLoading, setIsLogoutLoading] = useState(false);
@@ -158,7 +158,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
 
   const goToHostssMain = () => {
     if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://nomad.localhost:5173/";
+      window.location.href = "http://localhost:5173";
     } else {
       window.location.href = "https://wono.co/";
     }
@@ -247,7 +247,11 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
     !location.pathname.startsWith("/listings");
 
   return (
-    <div className="bg-white/80 backdrop-blur-md px-1 md:px-20">
+    <div
+      className={`bg-white/80 backdrop-blur-md px-1 ${
+        forceMobileNavigation ? "" : "md:px-20"
+      }`}
+    >
       <AiContainer padding={false}>
         <div className="flex py-3 justify-between items-center lg:py-[0.625rem]">
           {/* Logo */}
@@ -255,7 +259,9 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
             <button
               type="button"
               onClick={() => onMobileSidebarToggle?.()}
-              className="mr-2 rounded p-1 text-black sm:hidden"
+              className={`mr-2 rounded p-1 text-black ${
+                forceMobileNavigation ? "" : "sm:hidden"
+              }`}
               aria-label="Open sidebar"
             >
               <HiOutlineMenu size={24} />

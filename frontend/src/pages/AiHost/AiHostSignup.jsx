@@ -1510,7 +1510,7 @@ const AiHostSignup = () => {
         {activeStep !== 3 && (
           <h1
             className={`text-title text-center ${
-              activeStep === 1 ? "min-h-[3rem] font-play" : ""
+              activeStep === 1 ? "min-h-[3rem] font-play mb-5 md:mb-0" : ""
             }`}
           >
             {activeStep === 0 && "Select Your Plan"}
@@ -1523,7 +1523,11 @@ const AiHostSignup = () => {
 
         <form
           key={activeStep}
-          className={`${activeStep === 0 ? "block" : "grid grid-cols-1 md:grid-cols-2 gap-4"}`}
+          className={`${
+            activeStep === 0
+              ? "block"
+              : "grid grid-cols-1 md:grid-cols-2 gap-4 px-4 md:px-0"
+          }`}
           // onSubmit={handleSubmit((data) => register(data))}
           // onSubmit={handleSubmit((data) =>
           //   register({ ...data, about: data.about.map((a) => a.text) })

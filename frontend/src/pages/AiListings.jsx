@@ -25,7 +25,6 @@ import { useSearchParams } from "react-router-dom";
 import ListingCard from "../components/ListingCard.jsx";
 import PaginatedGrid from "../components/PaginatedGrid.jsx";
 import AiDestinationHighlightSection from "../components/AiDestinationHighlightSection.jsx";
-import newIcons from "../assets/newIcons.js";
 import { DESTINATION_HIGHLIGHT_FILTERS } from "../data/aiDestinationHighlights.js";
 import SearchBarCombobox from "../components/SearchBarCombobox.jsx";
 import AiSelectedBadgesSearchBar from "../components/AiSelectedBadgesSearchBar.jsx";
@@ -37,6 +36,10 @@ import {
   persistSelectedDestination,
   readSelectedDestination,
 } from "../utils/selectedDestinationSession.js";
+import {
+  getCategoryShortcutIconSrc,
+  useCroppedDesktopShortcutIcons,
+} from "../utils/categoryShortcutIcons.js";
 
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
 const ANNUAL_EVENTS_CATEGORY = "annualevents";
@@ -49,15 +52,6 @@ const SECOND_HEADING_DELAY_MS = 250;
 const THINKING_HEADING_TEXT = "Curating the best results for you";
 const CURATED_RESULTS_HEADING_TEXT =
   "Please find below, the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
-const MOBILE_SHORTCUT_ICON_OVERRIDES = {
-  annualevents: "/icons-new/Events-cropped.png",
-  venues: "/icons-new/Venues-cropped.png",
-  restaurants: "/icons-new/Restaurants.png",
-  news: "/icons-new/News-cropped.png",
-  blogs: "/icons-new/Blogs-cropped.png",
-};
-const getMobileShortcutIconSrc = (value) =>
-  MOBILE_SHORTCUT_ICON_OVERRIDES[value] || newIcons[value];
 const normalizeContentDestination = (label) =>
   label
     ? label
@@ -79,36 +73,27 @@ const valueAddedServiceItems = [
   {
     label: "ANY VISA SUPPORT",
     path: "/visa-support",
-    imageUrl:
-      // "https://img.magnific.com/free-photo/american-visa-document_1101-820.jpg?semt=ais_hybrid&w=740&q=80",
-      "https://img.magnific.com/free-photo/american-visa-document_1101-820.jpg?semt=ais_hybrid&w=740&q=80",
+    imageUrl: "/value-adds/any-visa-support.jpg",
   },
   {
     label: "OVERALL ACTIVATION SUPPORT",
     path: "/overall-activation-support",
-    imageUrl:
-      // "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbhxwe7kd7j-UFpFp7tS2Ka0_L2iZ_zI_07Q&s",
-      "https://www.google.com/search?q=location+map+setup+wallpaper&sca_esv=b95d1611b6ab2c1b&udm=2&biw=1396&bih=663&ei=UYZXavCiLJiZseMPucrWmAM&ved=0ahUKEwiwj7Kq4NSVAxWYTGwGHTmlFTMQ4dUDCBM&uact=5&oq=location+map+setup+wallpaper&gs_lp=Egtnd3Mtd2l6LWltZyIcbG9jYXRpb24gbWFwIHNldHVwIHdhbGxwYXBlckirNVCTBli5M3AIeACQAQCYAXCgAa0KqgEDNS44uAEDyAEA-AEBmAIJoAK8A8ICBhAAGAcYHsICCBAAGAgYBxgewgIKEAAYCBgHGB4YCpgDAIgGAZIHAzUuNKAH6hOyBwMwLjS4B6sDwgcFMC4yLjfIBx6ACAE&sclient=gws-wiz-img#sv=CAMSURoyKhBlLVpHcjQzbUx5WHNtaGpNMg5aR3I0M21MeVhzbWhqTToORTFoc0h0UGlCa0NyNU0gBCoXCgFzEhBlLVpHcjQzbUx5WHNtaGpNGAEwARgHIPGd3LEOSggQARgBIAEoAQ",
+    imageUrl: "/value-adds/overall-activation-support.jpg",
   },
   {
     label: "NEW COMPANY SUPPORT",
     path: "/new-company-setup",
-    imageUrl:
-      // "https://3.imimg.com/data3/KB/OY/MY-1439773/new-business-setup.jpg",
-      "https://www.google.com/search?q=Handshake+wallpaper&sca_esv=b95d1611b6ab2c1b&udm=2&biw=1396&bih=663&ei=kIVXaqSBB4SgseMPja3joAQ&ved=0ahUKEwikiYnO39SVAxUEUGwGHY3WGEQQ4dUDCBM&uact=5&oq=Handshake+wallpaper&gs_lp=Egtnd3Mtd2l6LWltZyITSGFuZHNoYWtlIHdhbGxwYXBlcjIFEAAYgAQyBhAAGAcYHjIGEAAYBxgeMgYQABgHGB4yBRAAGIAEMgQQABgeMgQQABgeMgQQABgeMgQQABgeMgYQABgFGB5I6RZQ-gVYpxRwAngAkAEAmAGrAaAB9QqqAQQwLjEwuAEDyAEA-AEBmAIJoAL-B8ICChAAGIAEGIoFGEOYAwCIBgGSBwMyLjegB_svsgcDMC43uAf3B8IHBTAuMS44yAclgAgB&sclient=gws-wiz-img#sv=CAMSURoyKhBlLU54bE5UQnFsaHgzbTdNMg5OeGxOVEJxbGh4M203TToOT1pXNTNldnphUWNEdk0gBCoXCgFzEhBlLU54bE5UQnFsaHgzbTdNGAEwARgHIKf5-YMPSggQARgBIAEoAQ",
+    imageUrl: "/value-adds/new-company-support.jpg",
   },
   {
     label: "ANY CONSULTATION SUPPORT",
     path: "/consultation",
-    imageUrl:
-      "https://images.unsplash.com/photo-1553877522-43269d4ea984?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y29uc3VsdGF0aW9ufGVufDB8fDB8fHww",
+    imageUrl: "/value-adds/any-consultation-support.jpg",
   },
   {
     label: "APPLY FOR JOB",
     badge: "Coming soon",
-    imageUrl:
-      // "https://img.freepik.com/premium-vector/people-seeking-jobs-internet-job-search-recruitment_773186-499.jpg?semt=ais_hybrid&w=740&q=80",
-      "https://static.vecteezy.com/system/resources/thumbnails/072/930/801/small/magnifying-glass-highlighting-the-word-vacancy-on-a-wooden-block-against-a-bright-yellow-background-symbolizing-job-search-career-opportunities-and-the-concept-of-finding-the-right-candidate-for-an-op-photo.jpg",
+    imageUrl: "/value-adds/apply-for-job.jpg",
   },
   // {
   //   label: "VIEW LOCATION BLOGS",
@@ -163,6 +148,7 @@ const AiListings = ({ forceListView = false }) => {
   const [isSecondHeadingPhase, setIsSecondHeadingPhase] = useState(false);
   const [isHeadingSequenceComplete, setIsHeadingSequenceComplete] =
     useState(false);
+  const useCroppedDesktopShortcuts = useCroppedDesktopShortcutIcons();
 
   const searchBarBadges = useMemo(() => {
     const formatBadgeValue = (value) =>
@@ -1309,7 +1295,7 @@ const AiListings = ({ forceListView = false }) => {
 
             <div className="lg:hidden flex overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 md:justify-center">
               {categoryOptions.map((cat) => {
-                const iconSrc = getMobileShortcutIconSrc(cat.value);
+                const iconSrc = getCategoryShortcutIconSrc(cat.value, true);
                 const isActive = formData?.category === cat.value;
                 return (
                   <button
@@ -1434,7 +1420,10 @@ const AiListings = ({ forceListView = false }) => {
                   <div className="w-full pb-4">
                     <div className="flex justify-between items-center">
                       {categoryOptions.map((cat) => {
-                        const iconSrc = newIcons[cat.value];
+                        const iconSrc = getCategoryShortcutIconSrc(
+                          cat.value,
+                          useCroppedDesktopShortcuts,
+                        );
                         const isActive = activeCategory === cat.value;
 
                         return (
@@ -1573,9 +1562,12 @@ const AiListings = ({ forceListView = false }) => {
             </span>
           </button>
           
-          <div className="flex overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 flex md:justify-center">
+          <div className=" overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 flex md:justify-center">
             {categoryOptions.map((cat) => {
-              const iconSrc = newIcons[cat.value];
+              const iconSrc = getCategoryShortcutIconSrc(
+                cat.value,
+                useCroppedDesktopShortcuts,
+              );
               const isActive = activeCategory === cat.value;
               return (
                 <button

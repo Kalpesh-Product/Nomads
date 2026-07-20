@@ -17,12 +17,15 @@ import SkeletonMap from "../components/Skeletons/SkeletonMap.jsx";
 import Select from "react-dropdown-select";
 import { setFormValues } from "../features/locationSlice.js";
 import ListingCard from "../components/ListingCard.jsx";
-import newIcons from "../assets/newIcons.js";
 import { IoSearch } from "react-icons/io5";
 import SearchBarCombobox from "../components/SearchBarCombobox.jsx";
 import { AnimatePresence, motion } from "motion/react";
 import { Helmet } from "@dr.pogodin/react-helmet";
 import useAuth from "../hooks/useAuth.js";
+import {
+  getCategoryShortcutIconSrc,
+  useCroppedDesktopShortcutIcons,
+} from "../utils/categoryShortcutIcons.js";
 
 const HorizontalScrollWrapper = ({ children, title }) => {
   const scrollRef = React.useRef(null);
@@ -76,6 +79,7 @@ const HorizontalScrollWrapper = ({ children, title }) => {
 const GlobalListingsList = () => {
   const [favorites, setFavorites] = useState([]);
   const [expandedCategories, setExpandedCategories] = useState([]);
+  const useCroppedDesktopShortcuts = useCroppedDesktopShortcutIcons();
   const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -467,7 +471,10 @@ const GlobalListingsList = () => {
               <div className="w-3/4 pb-4">
                 <div className="flex justify-between items-center">
                   {categoryOptions.map((cat) => {
-                    const iconSrc = newIcons[cat.value];
+                    const iconSrc = getCategoryShortcutIconSrc(
+                      cat.value,
+                      useCroppedDesktopShortcuts,
+                    );
                     return (
                       <button
                         key={cat.value}
@@ -716,7 +723,7 @@ const GlobalListingsList = () => {
 
             <div className="lg:hidden flex overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 md:justify-center">
               {categoryOptions.map((cat) => {
-                const iconSrc = newIcons[cat.value];
+                const iconSrc = getCategoryShortcutIconSrc(cat.value, true);
                 return (
                   <button
                     key={cat.value}
