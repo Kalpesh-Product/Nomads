@@ -872,7 +872,7 @@ const AiGlobalListingsMap = () => {
         />
         <meta property="og:image" content="/images/map-preview.jpeg" />
         <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://nomad.wono.co/verticals" />
+        <link rel="canonical" href="https://wono.co/verticals" />
       </Helmet>
 
       {/* ==================== DESKTOP VIEW (lg and above) ==================== */}
