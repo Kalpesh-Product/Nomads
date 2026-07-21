@@ -24,6 +24,7 @@ import {
   getCompaniesDataNomads,
   getCompaniesDataMaster,
   applyToCompanyJob,
+  getCompanyCountries,
 } from "../controllers/compayControllers.js";
 
 const proxyUpload = multer({ storage: multer.memoryStorage() });
@@ -44,6 +45,7 @@ router.patch(
 router.get("/companies", getCompaniesData);
 router.get("/companiesn", getCompaniesDataNomads);
 router.get("/companiesma", getCompaniesDataMaster);
+router.get("/company-countries", getCompanyCountries);
 router.patch("/activate-product", activateProduct);
 router.patch("/deactivate-product", deactivateProduct);
 router.get("/get-single-company-data", getCompanyData);

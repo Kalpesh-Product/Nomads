@@ -1324,6 +1324,34 @@ export const getUniqueDataLocations = async (req, res, next) => {
   }
 };
 
+export const getCompanyCountries = async (req, res, next) => {
+  try {
+    const countries = await Company.aggregate([
+      {
+        $project: {
+          country: { $trim: { input: { $ifNull: ["$country", ""] } } },
+        },
+      },
+      { $match: { country: { $ne: "" } } },
+      {
+        $group: {
+          _id: { $toLower: "$country" },
+          country: { $first: "$country" },
+        },
+      },
+      { $sort: { country: 1 } },
+      { $project: { _id: 0, country: 1 } },
+    ]).collation({ locale: "en", strength: 2 });
+
+    return res.status(200).json({
+      message: "Company countries fetched successfully",
+      data: countries.map((item) => item.country),
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const addCompanyImage = async (req, res, next) => {
   try {
     const file = req.file;
