@@ -58,6 +58,25 @@ const VISA_SUPPORT_TYPING_SEEN_KEY = "wono-visa-support-typing-seen";
 const getFlagIconUrl = (isoCode) =>
   `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
 const normalizePrefillValue = (value) => value?.trim().toLowerCase() || "";
+const COUNTRY_FLAG_ALIASES = {
+  bahamas: "The Bahamas",
+  fiji: "Fiji Islands",
+  "north macedonia": "Macedonia",
+  usa: "United States",
+};
+
+const findCountryByName = (countries, countryName = "") => {
+  const normalizedCountryName = countryName.trim().toLowerCase();
+  const lookupName =
+    COUNTRY_FLAG_ALIASES[normalizedCountryName] || countryName.trim();
+
+  return (
+    countries.find(
+      (country) => country.name.toLowerCase() === lookupName.toLowerCase(),
+    ) || null
+  );
+};
+
 const getDestinationDisplayName = (destination = {}) =>
   destination.title?.trim() || destination.state?.trim() || "";
 
@@ -595,13 +614,14 @@ const AiVisaSupport = () => {
                           SELECT COUNTRY
                         </MenuItem>
                         {travellingCountryOptions.map((countryName) => {
-                          const country = countries.find(
-                            (c) => c.name === countryName,
+                          const country = findCountryByName(
+                            countries,
+                            countryName,
                           );
                           return (
                             <MenuItem
                               key={country?.isoCode || countryName}
-                              value={country?.name || countryName}
+                              value={countryName}
                               sx={tickMenuItemSx}
                             >
                               <Box className="flex w-full items-center gap-2">
@@ -611,7 +631,7 @@ const AiVisaSupport = () => {
                                     <Box
                                       component="img"
                                       src={getFlagIconUrl(country.isoCode)}
-                                      alt={`${country.name} flag`}
+                                      alt={`${countryName} flag`}
                                       sx={{
                                         width: 20,
                                         height: 15,
@@ -620,7 +640,7 @@ const AiVisaSupport = () => {
                                       loading="lazy"
                                     />
                                   )}
-                                  <span>{country?.name || countryName}</span>
+                                  <span>{countryName}</span>
                                 </Box>
                               </Box>
                             </MenuItem>
