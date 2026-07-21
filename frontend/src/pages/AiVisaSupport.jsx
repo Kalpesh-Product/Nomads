@@ -20,6 +20,7 @@ import {
   readSelectedDestination,
 } from "../utils/selectedDestinationSession";
 import { showErrorAlert } from "../utils/alerts";
+import { findCountryByName } from "../utils/countryFlags";
 import { HiCheck } from "react-icons/hi";
 
 const floatingLabelSx = {
@@ -58,25 +59,6 @@ const VISA_SUPPORT_TYPING_SEEN_KEY = "wono-visa-support-typing-seen";
 const getFlagIconUrl = (isoCode) =>
   `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
 const normalizePrefillValue = (value) => value?.trim().toLowerCase() || "";
-const COUNTRY_FLAG_ALIASES = {
-  bahamas: "The Bahamas",
-  fiji: "Fiji Islands",
-  "north macedonia": "Macedonia",
-  usa: "United States",
-};
-
-const findCountryByName = (countries, countryName = "") => {
-  const normalizedCountryName = countryName.trim().toLowerCase();
-  const lookupName =
-    COUNTRY_FLAG_ALIASES[normalizedCountryName] || countryName.trim();
-
-  return (
-    countries.find(
-      (country) => country.name.toLowerCase() === lookupName.toLowerCase(),
-    ) || null
-  );
-};
-
 const getDestinationDisplayName = (destination = {}) =>
   destination.title?.trim() || destination.state?.trim() || "";
 

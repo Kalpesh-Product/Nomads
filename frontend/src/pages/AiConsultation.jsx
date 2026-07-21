@@ -27,6 +27,7 @@ import {
   readSelectedDestination,
 } from "../utils/selectedDestinationSession";
 import { showErrorAlert } from "../utils/alerts";
+import { findCountryByName } from "../utils/countryFlags";
 import { HiCheck } from "react-icons/hi";
 import { aiDestinationCards } from "../constants/aiDestinationCards";
 
@@ -110,6 +111,18 @@ const AiConsultation = () => {
       }
     },
   });
+  const { data: companyCountries = [] } = useQuery({
+    queryKey: ["consultation-company-countries"],
+    queryFn: async () => {
+      try {
+        const response = await axios.get("company/company-countries");
+        return Array.isArray(response?.data?.data) ? response.data.data : [];
+      } catch (error) {
+        console.error(error?.response?.data?.message);
+        return [];
+      }
+    },
+  });
 
   const destinationOptions = useMemo(() => {
     const sourceDestinations = stateWiseDestinations.length
@@ -135,6 +148,19 @@ const AiConsultation = () => {
       ).sort(),
     [destinationOptions],
   );
+  const consultationCountryOptions = useMemo(() => {
+    const sourceCountries = companyCountries.length
+      ? companyCountries
+      : destinationCountries;
+
+    return Array.from(
+      new Set(
+        sourceCountries
+          .map((countryName) => countryName?.trim())
+          .filter(Boolean),
+      ),
+    ).sort((a, b) => a.localeCompare(b));
+  }, [companyCountries, destinationCountries]);
   const { handleSubmit, control, reset, setValue, watch } = useForm({
     defaultValues,
   });
@@ -223,7 +249,7 @@ const AiConsultation = () => {
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const queryCountry = normalizePrefillValue(queryParams.get("country"));
-    const prefilledCountryFromQuery = destinationCountries.find(
+    const prefilledCountryFromQuery = consultationCountryOptions.find(
       (countryName) => normalizePrefillValue(countryName) === queryCountry,
     );
     const destinationCountry =
@@ -232,7 +258,7 @@ const AiConsultation = () => {
 
     if (!destinationCountry || consultationCountry) return;
 
-    const hasDestination = destinationCountries.some(
+    const hasDestination = consultationCountryOptions.some(
       (country) => country === destinationCountry,
     );
     if (!hasDestination) return;
@@ -243,8 +269,8 @@ const AiConsultation = () => {
     });
   }, [
     consultationCountry,
+    consultationCountryOptions,
     countries,
-    destinationCountries,
     location.search,
     setValue,
   ]);
@@ -527,33 +553,35 @@ const AiConsultation = () => {
                         <MenuItem value="" sx={{ fontWeight: 700 }}>
                           SELECT COUNTRY
                         </MenuItem>
-                        {destinationCountries.map((countryName) => {
-                          const country = countries.find(
-                            (item) => item.name === countryName,
+                        {consultationCountryOptions.map((countryName) => {
+                          const country = findCountryByName(
+                            countries,
+                            countryName,
                           );
-                          if (!country) return null;
 
                           return (
                             <MenuItem
-                              key={country.isoCode}
-                              value={country.name}
+                              key={country?.isoCode || countryName}
+                              value={countryName}
                               sx={tickMenuItemSx}
                             >
                               <Box className="flex w-full items-center gap-2">
                                 <HiCheck className="tick-icon" size={16} />
                                 <Box className="flex items-center gap-1">
-                                  <Box
-                                    component="img"
-                                    src={getFlagIconUrl(country.isoCode)}
-                                    alt={`${country.name} flag`}
-                                    sx={{
-                                      width: 20,
-                                      height: 15,
-                                      flexShrink: 0,
-                                    }}
-                                    loading="lazy"
-                                  />
-                                  <span>{country.name}</span>
+                                  {country?.isoCode && (
+                                    <Box
+                                      component="img"
+                                      src={getFlagIconUrl(country.isoCode)}
+                                      alt={`${countryName} flag`}
+                                      sx={{
+                                        width: 20,
+                                        height: 15,
+                                        flexShrink: 0,
+                                      }}
+                                      loading="lazy"
+                                    />
+                                  )}
+                                  <span>{countryName}</span>
                                 </Box>
                               </Box>
                             </MenuItem>
