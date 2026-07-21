@@ -16,9 +16,7 @@ export const allowedOrigins = [
   "http://localhost:5000",
   "http://localhost:5006",
   "http://localhost:5007",
-  "https://nomad.wono.co",
   "https://host.wono.co",
-  "http://nomad.localhost:5173",
   "http://host.localhost:5173",
 ];
 

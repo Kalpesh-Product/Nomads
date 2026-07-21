@@ -30,9 +30,9 @@ const MainPage = () => {
   const intervalRef = useRef(null);
   const goToNomads = () => {
     if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://nomad.localhost:5173";
+      window.location.href = "http://localhost:5173";
     } else {
-      window.location.href = "https://nomad.wono.co";
+      window.location.href = "https://wono.co";
     }
   };
 

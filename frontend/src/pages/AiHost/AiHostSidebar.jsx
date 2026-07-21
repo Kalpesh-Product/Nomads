@@ -524,9 +524,9 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
   const handleBecomeHostClick = () => {
     if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://nomad.localhost:5173/home";
+      window.location.href = "http://localhost:5173/home";
     } else {
-      window.location.href = "https://nomad.wono.co/home";
+      window.location.href = "https://wono.co/home";
     }
   };
 

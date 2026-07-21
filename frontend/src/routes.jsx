@@ -128,7 +128,7 @@ import AiHostJobDetails from "./pages/AiHost/AiHostJobDetails";
 import AiHostModelShowcase from "./pages/AiHost/AiHostModelShowcase";
 
 function getTenantFromHost() {
-  const hostname = window.location.hostname; // e.g. "nomad.wono.co" or "nomad.localhost"
+  const hostname = window.location.hostname;
   const rootDomain = "wono.co";
 
   // Case 1: main site (no subdomain, localhost, or Vercel preview)
@@ -144,12 +144,16 @@ function getTenantFromHost() {
 
   // Case 2: production subdomains (*.wono.co)
   if (hostname.endsWith(`.${rootDomain}`)) {
-    return hostname.replace(`.${rootDomain}`, "");
+    const subdomain = hostname.replace(`.${rootDomain}`, "");
+    if (subdomain === "nomad") return "main";
+    return subdomain;
   }
 
   // Case 3: dev subdomains (*.localhost)
   if (hostname.endsWith(".localhost")) {
-    return hostname.replace(".localhost", "");
+    const subdomain = hostname.replace(".localhost", "");
+    if (subdomain === "nomad") return "main";
+    return subdomain;
   }
 
   return null;
@@ -160,21 +164,195 @@ const tenant = getTenantFromHost();
 let routerConfig = [];
 
 if (tenant === "main") {
-  // Marketing site
+  // Main site with former nomad routes
   routerConfig = [
     {
-      path: "/",
-      element: <App />,
+      element: <PersistLogin />,
       children: [
-        { path: "", index: true, element: <MainPage /> },
-        { path: "site-is-down", element: <SiteIsDown /> },
         {
-          path: "website-under-maintenance",
-          element: <WebsiteUnderMaintenance />,
+          element: <NomadAiLayout />,
+          path: "/",
+          children: [
+            { index: true, element: <AiHome /> },
+            { path: "login/:redirectGoal?", element: <AiLogin /> },
+            { path: "signup", element: <AiSignup /> },
+            { path: "forgot-password", element: <AiForgotPassword /> },
+            { path: "reset-password/:token", element: <AiResetPassword /> },
+            { path: "home-logged-in", element: <AiHomeLoggedIn /> },
+            { path: "search", element: <AiSearch /> },
+            { path: "world-rankings", element: <AiWorldRankings /> },
+            { path: "savings", element: <AiSavingsSearch /> },
+            { path: "savings/results", element: <AiSavingsSearchResults /> },
+            { path: "career-search", element: <AiCareerSearch /> },
+            { path: "compatible", element: <AiCompatibleSearch /> },
+            {
+              path: "compatible/results",
+              element: <AiCompatibleSearchResults />,
+            },
+            {
+              path: "career-search/results",
+              element: <AiCareerSearchResults />,
+            },
+            {
+              path: "search/results/:loc?/:attr?",
+              element: <AiSearchResults />,
+            },
+            {
+              path: "search/:goal/results/:loc?/:attr?",
+              element: <AiSearchResults />,
+            },
+            {
+              path: "manual-search/:continent?/:country?",
+              element: <AiManualSearch />,
+            },
+            { path: "verticals", element: <AiGlobalListings /> },
+            { path: "blog", element: <AiBlogsFetch /> },
+            { path: "blog/blog-details", element: <AiBlogDetails /> },
+            { path: "news", element: <AiNewsFetch /> },
+            { path: "news/news-details", element: <AiBlogDetails /> },
+            {
+              path: "events/:eventId",
+              element: <AiDestinationDetail type="event" />,
+            },
+            {
+              path: "venues/:venueId",
+              element: <AiDestinationDetail type="venue" />,
+            },
+            {
+              path: "restaurants/:restaurantId",
+              element: <AiRestaurantProduct />,
+            },
+            {
+              path: "restaurants/:restaurantId/images",
+              element: <AiImageGallery />,
+            },
+            { path: "listings", element: <AiListings /> },
+            { path: "listings-list", element: <AiListingsListView /> },
+            { path: "listings/:company", element: <AiProduct /> },
+            {
+              path: "listings/:company/images",
+              element: <AiImageGallery />,
+            },
+            { path: "visa-support", element: <AiVisaSupport /> },
+            {
+              path: "visa-support/thank-you",
+              element: <AiVisaSupportThankYou />,
+            },
+            {
+              path: "overall-activation-support",
+              element: <AiOverallActivationSupport />,
+            },
+            {
+              path: "new-company-setup",
+              element: <AiNewCompanySetup />,
+            },
+            { path: "consultation", element: <AiConsultation /> },
+            { path: "workation", element: <AiWorkation /> },
+            { path: "profile", element: <AiProfile /> },
+            {
+              path: "become-a-contributor",
+              element: <AiBecomeContributor />,
+            },
+            {
+              path: "about",
+              element: <AiAbout />,
+            },
+            {
+              path: "privacy",
+              element: <AiPrivacy />,
+            },
+            {
+              path: "contact",
+              element: <AiContact />,
+            },
+            {
+              path: "career",
+              element: <AiCareer />,
+            },
+            {
+              path: "career/job/:title",
+              element: <AiJobDetail />,
+            },
+            {
+              path: "faq",
+              element: <AiFAQ />,
+            },
+            {
+              path: "terms-and-conditions",
+              element: <AiTermsAndConditions />,
+            },
+            {
+              path: "content-and-copyright",
+              element: <AiContentAndCopyright />,
+            },
+            {
+              path: "content-use-removal",
+              element: <AiContentUseRemoval />,
+            },
+            { path: "site-is-down", element: <SiteIsDown /> },
+            {
+              path: "website-under-maintenance",
+              element: <WebsiteUnderMaintenance />,
+            },
+          ],
         },
+        {
+          element: <NomadLayout />,
+          path: "/old",
+          children: [
+            { path: "home", element: <Home /> },
+
+            { path: "verticals", element: <GlobalListings /> },
+            { path: "listings", element: <Listings /> },
+            { path: "listings/:company", element: <Product /> },
+            { path: "listings/:company/images", element: <ImageGallery /> },
+            { path: "components", element: <ReusableComponents /> },
+            { path: "contact", element: <Contact /> },
+            { path: "news", element: <DestinationNews /> },
+            { path: "news/news-details", element: <BlogDetails /> },
+            { path: "blog", element: <LocalBlog /> },
+            { path: "blog/blog-details", element: <BlogDetails /> },
+            { path: "career", element: <Career /> },
+            { path: "career/job/:title", element: <JobDetails /> },
+            { path: "login", element: <Login /> },
+            { path: "forgot-password", element: <ForgotPassword /> },
+            { path: "reset-password/:token", element: <ResetPassword /> },
+            { path: "signup", element: <Signup /> },
+            { path: "about", element: <NomadAbout /> },
+            {
+              path: "terms-and-conditions",
+              element: <NomadTermsAndConditions />,
+            },
+            {
+              path: "content-and-copyright",
+              element: <NomadContentAndCopyright />,
+            },
+            {
+              path: "content-use-removal",
+              element: <NomadContentUseRemoval />,
+            },
+            { path: "privacy", element: <NomadPrivacy /> },
+            { path: "faq", element: <NomadFAQ /> },
+            { path: "profile", element: <Profile /> },
+            { path: "favorites", element: <Favorites /> },
+          ],
+        },
+        // {
+        //   path: "/",
+        //   element: <App />,
+        //   children: [
+        //     { path: "", index: true, element: <MainPage /> },
+        //     { path: "site-is-down", element: <SiteIsDown /> },
+        //     {
+        //       path: "website-under-maintenance",
+        //       element: <WebsiteUnderMaintenance />,
+        //     },
+        //   ],
+        // },
       ],
     },
   ];
+/*
 } else if (tenant === "nomad") {
   console.log("nomad routes");
   // Nomads subdomain
@@ -390,6 +568,7 @@ if (tenant === "main") {
       ],
     },
   ];
+*/
 } else if (tenant === "host") {
   // Hosts subdomain
   routerConfig = [
