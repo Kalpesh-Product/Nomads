@@ -1,3 +1,11 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
+import dns from 'dns';
+if (process.env.FORCE_GOOGLE_DNS === 'true') {
+  dns.setServers(['8.8.8.8', '8.8.4.4']);
+  console.log('[dns-fix] Applied Google DNS servers for local dev');
+}
 import express from "express";
 import { config } from "dotenv";
 import { corsConfig } from "./config/corsConfig.js";
