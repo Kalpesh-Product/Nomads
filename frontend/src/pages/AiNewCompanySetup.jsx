@@ -18,7 +18,7 @@ import { Controller, useForm } from "react-hook-form";
 import { DatePicker } from "@mui/x-date-pickers";
 import { Country } from "country-state-city";
 import Swal from "sweetalert2";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
 import { FaCheck } from "react-icons/fa";
 import Container from "../components/Container";
@@ -29,6 +29,7 @@ import {
   readSelectedDestination,
 } from "../utils/selectedDestinationSession";
 import { showErrorAlert } from "../utils/alerts";
+import { findCountryByName } from "../utils/countryFlags";
 import { HiCheck } from "react-icons/hi";
 
 import { aiDestinationCards } from "../constants/aiDestinationCards";
@@ -72,6 +73,8 @@ const NEW_COMPANY_TYPING_SEEN_KEY = "wono-new-company-typing-seen";
 const getFlagIconUrl = (isoCode) =>
   `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
 const normalizePrefillValue = (value) => value?.trim().toLowerCase() || "";
+const getDestinationDisplayName = (destination = {}) =>
+  destination.title?.trim() || destination.state?.trim() || "";
 
 const tickMenuItemSx = {
   "& .tick-icon": { opacity: 0, color: "#1976d2" },
@@ -99,14 +102,48 @@ const AiNewCompanySetup = () => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const location = useLocation();
   const countries = useMemo(() => Country.getAllCountries(), []);
-  const destinationOptions = useMemo(
-    () =>
-      aiDestinationCards.map((destination) => ({
-        state: destination.city,
-        country: destination.country,
-      })),
-    [],
-  );
+  const { data: stateWiseDestinations = [] } = useQuery({
+    queryKey: ["new-company-state-wise-destinations"],
+    queryFn: async () => {
+      try {
+        const response = await axios.get("state-wise-weight");
+        return Array.isArray(response?.data?.data) ? response.data.data : [];
+      } catch (error) {
+        console.error(error?.response?.data?.message);
+        return [];
+      }
+    },
+  });
+  const { data: companyCountries = [] } = useQuery({
+    queryKey: ["new-company-company-countries"],
+    queryFn: async () => {
+      try {
+        const response = await axios.get("company/company-countries");
+        return Array.isArray(response?.data?.data) ? response.data.data : [];
+      } catch (error) {
+        console.error(error?.response?.data?.message);
+        return [];
+      }
+    },
+  });
+
+  const destinationOptions = useMemo(() => {
+    const sourceDestinations = stateWiseDestinations.length
+      ? stateWiseDestinations
+      : aiDestinationCards.map((destination) => ({
+          state: destination.city,
+          country: destination.country,
+          continent: destination.continent,
+        }));
+
+    return sourceDestinations
+      .map((destination) => ({
+        state: destination.state?.trim() || "",
+        title: getDestinationDisplayName(destination),
+        country: destination.country?.trim() || "",
+      }))
+      .filter((destination) => destination.state && destination.country);
+  }, [stateWiseDestinations]);
   const destinationCountries = useMemo(
     () =>
       Array.from(
@@ -114,6 +151,19 @@ const AiNewCompanySetup = () => {
       ).sort(),
     [destinationOptions],
   );
+  const newCompanyCountryOptions = useMemo(() => {
+    const sourceCountries = companyCountries.length
+      ? companyCountries
+      : destinationCountries;
+
+    return Array.from(
+      new Set(
+        sourceCountries
+          .map((countryName) => countryName?.trim())
+          .filter(Boolean),
+      ),
+    ).sort((a, b) => a.localeCompare(b));
+  }, [companyCountries, destinationCountries]);
   const { handleSubmit, control, reset, setValue, watch } = useForm({
     defaultValues,
   });
@@ -217,7 +267,7 @@ const AiNewCompanySetup = () => {
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const queryCountry = normalizePrefillValue(queryParams.get("country"));
-    const prefilledCountryFromQuery = destinationCountries.find(
+    const prefilledCountryFromQuery = newCompanyCountryOptions.find(
       (countryName) => normalizePrefillValue(countryName) === queryCountry,
     );
     const destinationCountry =
@@ -226,7 +276,7 @@ const AiNewCompanySetup = () => {
 
     if (!destinationCountry || newCompanyCountry) return;
 
-    const hasDestination = destinationCountries.some(
+    const hasDestination = newCompanyCountryOptions.some(
       (countryName) => countryName === destinationCountry,
     );
     if (!hasDestination) return;
@@ -237,9 +287,9 @@ const AiNewCompanySetup = () => {
     });
   }, [
     countries,
-    destinationCountries,
     location.search,
     newCompanyCountry,
+    newCompanyCountryOptions,
     setValue,
   ]);
 
@@ -508,33 +558,35 @@ const AiNewCompanySetup = () => {
                         <MenuItem value="" sx={{ fontWeight: 700 }}>
                           SELECT COUNTRY
                         </MenuItem>
-                        {destinationCountries.map((countryName) => {
-                          const country = countries.find(
-                            (item) => item.name === countryName,
+                        {newCompanyCountryOptions.map((countryName) => {
+                          const country = findCountryByName(
+                            countries,
+                            countryName,
                           );
-                          if (!country) return null;
 
                           return (
                             <MenuItem
-                              key={country.isoCode}
-                              value={country.name}
+                              key={country?.isoCode || countryName}
+                              value={countryName}
                               sx={tickMenuItemSx}
                             >
                               <Box className="flex w-full items-center gap-2">
                                 <HiCheck className="tick-icon" size={16} />
                                 <Box className="flex items-center gap-1">
-                                  <Box
-                                    component="img"
-                                    src={getFlagIconUrl(country.isoCode)}
-                                    alt={`${country.name} flag`}
-                                    sx={{
-                                      width: 20,
-                                      height: 15,
-                                      flexShrink: 0,
-                                    }}
-                                    loading="lazy"
-                                  />
-                                  <span>{country.name}</span>
+                                  {country?.isoCode && (
+                                    <Box
+                                      component="img"
+                                      src={getFlagIconUrl(country.isoCode)}
+                                      alt={`${countryName} flag`}
+                                      sx={{
+                                        width: 20,
+                                        height: 15,
+                                        flexShrink: 0,
+                                      }}
+                                      loading="lazy"
+                                    />
+                                  )}
+                                  <span>{countryName}</span>
                                 </Box>
                               </Box>
                             </MenuItem>
@@ -577,7 +629,9 @@ const AiNewCompanySetup = () => {
                             >
                               <Box className="flex w-full items-center gap-2">
                                 <HiCheck className="tick-icon" size={16} />
-                                <span>{stateOption.state}</span>
+                                <span>
+                                  {stateOption.title || stateOption.state}
+                                </span>
                               </Box>
                             </MenuItem>
                           ))}
