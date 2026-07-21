@@ -18,7 +18,7 @@ import { Controller, useForm } from "react-hook-form";
 import { DatePicker } from "@mui/x-date-pickers";
 import { Country } from "country-state-city";
 import Swal from "sweetalert2";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
 import { FaCheck } from "react-icons/fa";
 import Container from "../components/Container";
@@ -72,6 +72,8 @@ const NEW_COMPANY_TYPING_SEEN_KEY = "wono-new-company-typing-seen";
 const getFlagIconUrl = (isoCode) =>
   `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
 const normalizePrefillValue = (value) => value?.trim().toLowerCase() || "";
+const getDestinationDisplayName = (destination = {}) =>
+  destination.title?.trim() || destination.state?.trim() || "";
 
 const tickMenuItemSx = {
   "& .tick-icon": { opacity: 0, color: "#1976d2" },
@@ -99,14 +101,36 @@ const AiNewCompanySetup = () => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const location = useLocation();
   const countries = useMemo(() => Country.getAllCountries(), []);
-  const destinationOptions = useMemo(
-    () =>
-      aiDestinationCards.map((destination) => ({
-        state: destination.city,
-        country: destination.country,
-      })),
-    [],
-  );
+  const { data: stateWiseDestinations = [] } = useQuery({
+    queryKey: ["new-company-state-wise-destinations"],
+    queryFn: async () => {
+      try {
+        const response = await axios.get("state-wise-weight");
+        return Array.isArray(response?.data?.data) ? response.data.data : [];
+      } catch (error) {
+        console.error(error?.response?.data?.message);
+        return [];
+      }
+    },
+  });
+
+  const destinationOptions = useMemo(() => {
+    const sourceDestinations = stateWiseDestinations.length
+      ? stateWiseDestinations
+      : aiDestinationCards.map((destination) => ({
+          state: destination.city,
+          country: destination.country,
+          continent: destination.continent,
+        }));
+
+    return sourceDestinations
+      .map((destination) => ({
+        state: destination.state?.trim() || "",
+        title: getDestinationDisplayName(destination),
+        country: destination.country?.trim() || "",
+      }))
+      .filter((destination) => destination.state && destination.country);
+  }, [stateWiseDestinations]);
   const destinationCountries = useMemo(
     () =>
       Array.from(
@@ -577,7 +601,9 @@ const AiNewCompanySetup = () => {
                             >
                               <Box className="flex w-full items-center gap-2">
                                 <HiCheck className="tick-icon" size={16} />
-                                <span>{stateOption.state}</span>
+                                <span>
+                                  {stateOption.title || stateOption.state}
+                                </span>
                               </Box>
                             </MenuItem>
                           ))}
