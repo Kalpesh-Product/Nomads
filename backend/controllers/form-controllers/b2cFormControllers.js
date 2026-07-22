@@ -760,13 +760,13 @@ export const addB2CformSubmission = async (req, res, next) => {
           submittedAt: new Date(),
         }),
         successMsg:
-          "Your overall activation support request has been submitted successfully.",
+          "Your Activation Support request has been submitted successfully.",
         emailTemplate: (data) => ({
           to: data.email,
-          subject: "Overall Activation Support Request Received",
+          subject: "Activation Support Request Received",
           text: `Hi ${data.fullName}, we have received your activation support request for ${data.travelCountry}.`,
           html: `
-      <h2>Overall Activation Support Request Received</h2>
+      <h2>Activation Support Request Received</h2>
       <p>Hi ${data.fullName},</p>
       <p>Thank you for your request for <b>${data.travelCountry}</b>.</p>
       <p>Our team has received your details and will get back to you shortly.</p>
@@ -792,10 +792,10 @@ export const addB2CformSubmission = async (req, res, next) => {
           "Your new company setup request has been submitted successfully.",
         emailTemplate: (data) => ({
           to: data.email,
-          subject: "New Company Setup Request Received",
+          subject: "Company Setup Request Received",
           text: `Hi ${data.fullName}, we have received your new company setup request for ${data.newCompanyCountry}.`,
           html: `
-      <h2>New Company Setup Request Received</h2>
+      <h2>Company Setup Request Received</h2>
       <p>Hi ${data.fullName},</p>
       <p>Thank you for your request to setup in <b>${data.newCompanyCountry}</b>.</p>
       <p>Our team has received your details and will get back to you shortly.</p>

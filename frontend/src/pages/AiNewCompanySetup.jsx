@@ -43,7 +43,7 @@ const floatingLabelSx = {
 const supportOptions = [
   "Private / Co-Working Setup for Registration",
   "Virtual Office Setup for Registration",
-  "Fresh New Company Setup",
+  "Fresh Company Setup",
   "Subsidiary / Foreign Company Setup",
   "Branch / Liaison Office Setup",
   "LLP / Partnership Firm Registration",
@@ -68,7 +68,7 @@ const defaultValues = {
 
 const NEW_COMPANY_PROMPT =
   "planning to build your business abroad? Share your details and we will support your setup journey.";
-const NEW_COMPANY_HEADING = "New Company Setup";
+const NEW_COMPANY_HEADING = "Company Setup";
 const NEW_COMPANY_TYPING_SEEN_KEY = "wono-new-company-typing-seen";
 const getFlagIconUrl = (isoCode) =>
   `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;

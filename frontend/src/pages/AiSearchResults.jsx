@@ -755,7 +755,7 @@ const goalNarrativeTopHeadingMap = {
     "Please find below, the best curated results from the options you suggested to me to help you advance your career.",
   "Find Your Community":
     "Please find below, the best curated results from the options you suggested to me to help you discover your preferred community in nomad destinations.",
-  "Search Old School":
+  "Classic Search":
     "Please find below, the best curated results from the options you suggested to me to help you discover your preferred nomad destinations.",
 };
 
@@ -1365,9 +1365,9 @@ const AiSearchResults = () => {
         setLikedDestinations(favoriteIds);
       } catch (error) {
         if (isMounted) {
-          showErrorAlert(
-            error?.response?.data?.message ||
-              "Failed to load favorite destinations.",
+          console.warn(
+            "Failed to load favorite destinations.",
+            error?.response?.data?.message || error,
           );
         }
       }
@@ -1587,24 +1587,21 @@ const AiSearchResults = () => {
       goalOption: selectedGoalOption,
     });
 
-    navigate(
-      `/verticals?${verticalsParams.toString()}`,
-      {
-        state: {
-          selectedStateLabel: destinationTitle,
-          breadcrumbFilters: {
-            continent,
-            country,
-            location: selectedLocationParam,
-          },
-          selectedFilters: {
-            continent: selectedContinent,
-            goalOption: selectedGoalOption,
-          },
-          searchBarBadges: nextSearchBarBadges,
+    navigate(`/verticals?${verticalsParams.toString()}`, {
+      state: {
+        selectedStateLabel: destinationTitle,
+        breadcrumbFilters: {
+          continent,
+          country,
+          location: selectedLocationParam,
         },
+        selectedFilters: {
+          continent: selectedContinent,
+          goalOption: selectedGoalOption,
+        },
+        searchBarBadges: nextSearchBarBadges,
       },
-    );
+    });
   };
   const toggleDestinationLike = useCallback(
     (destination) => {

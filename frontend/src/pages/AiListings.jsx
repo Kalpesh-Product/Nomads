@@ -76,7 +76,7 @@ const valueAddedServiceItems = [
     imageUrl: "/value-adds/any-visa-support.jpg",
   },
   {
-    label: "OVERALL ACTIVATION SUPPORT",
+    label: "Activation Support",
     path: "/overall-activation-support",
     imageUrl: "/value-adds/overall-activation-support.jpg",
   },
@@ -571,7 +571,7 @@ const AiListings = ({ forceListView = false }) => {
       workation: "Workation",
       meetingroom: "Meetings",
       cafe: "Cafes",
-      [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
+      [VALUE_ADDED_SERVICES_CATEGORY]: "Value-Added Services",
       [ANNUAL_EVENTS_CATEGORY]: "Events",
       [VENUES_CATEGORY]: "Places",
       [RESTAURANTS_CATEGORY]: "Restaurants",
@@ -863,7 +863,7 @@ const AiListings = ({ forceListView = false }) => {
     const locationLabel = (selectedStateLabel || "LOCATION").toUpperCase();
     const valueAddedServiceLabelMap = {
       "ANY VISA SUPPORT": `${locationLabel} VISA`,
-      "OVERALL ACTIVATION SUPPORT": `${locationLabel} ACTIVATION`,
+      "Activation Support": `${locationLabel} ACTIVATION`,
       "NEW COMPANY SUPPORT": `${locationLabel} COMPANY SETUP`,
       "ANY CONSULTATION SUPPORT": `${locationLabel} CONSULTATION`,
       "APPLY FOR JOB": `${locationLabel} JOBS`,
@@ -1713,7 +1713,7 @@ const AiListings = ({ forceListView = false }) => {
                       privatestay: "Private Stays",
                       meetingroom: "Meeting Rooms",
                       cafe: "Cafes",
-                      [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
+                      [VALUE_ADDED_SERVICES_CATEGORY]: "Value-Added Services",
                       [ANNUAL_EVENTS_CATEGORY]: "Annual Events",
                       [VENUES_CATEGORY]: "Places",
                       [RESTAURANTS_CATEGORY]: "Restaurants",
