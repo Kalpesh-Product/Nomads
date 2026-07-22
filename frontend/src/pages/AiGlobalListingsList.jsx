@@ -761,7 +761,7 @@ const AiGlobalListingsList = () => {
       workation: "Workation",
       meetingroom: "Meetings",
       cafe: "Cafes",
-      [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
+      [VALUE_ADDED_SERVICES_CATEGORY]: "Value-Added Services",
     };
 
     const typeOrder = [
@@ -1627,7 +1627,7 @@ const AiGlobalListingsList = () => {
                         className="col-span-full border-t border-gray-300 mt-6 pt-6 mb-6 scroll-mt-24"
                       >
                         <h2 className="text-subtitle font-semibold mb-5 text-secondary-dark">
-                          Value Added Services in {selectedLocationLabel}
+                          Value-Added Services in {selectedLocationLabel}
                         </h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                           {visibleValueAddedServiceItems.map((service) => {
@@ -2084,7 +2084,7 @@ const AiGlobalListingsList = () => {
                       className="mb-6 scroll-mt-24"
                     >
                       <h2 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold leading-tight mb-4">
-                        Value Added Services in {selectedLocationLabel}
+                        Value-Added Services in {selectedLocationLabel}
                       </h2>
                       <div className="flex md:hidden flex-nowrap overflow-x-auto snap-x snap-mandatory gap-4 pb-2 custom-scrollbar-hide">
                         {mobileValueAddedServiceItems.map((service) => {

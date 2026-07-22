@@ -137,7 +137,7 @@ const becomeContributorLink = {
 
 const collapsedSectionLabels = {
   "WoNo Intelligence": "WOI",
-  "Value Added Services": "VAS",
+  "Value-Added Services": "VAS",
   Profile: "PRO",
 };
 
@@ -559,7 +559,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         />
 
         <SidebarSection
-          title="Value Added Services"
+          title="Value-Added Services"
           items={valueAdditionItemsWithActivePath}
           collapsed={isCollapsed}
           isExpandable
