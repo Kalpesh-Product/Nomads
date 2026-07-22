@@ -259,11 +259,16 @@ const AiGlobalListingsList = () => {
     valueAddedServiceItems.length > VALUE_ADDED_SERVICES_DEFAULT_VISIBLE_COUNT;
 
   const mobileValueAddedServiceItems = valueAddedServiceItems;
+  const shouldSkipHeadingIntro = Boolean(location.state?.skipHeadingIntro);
 
-  const [typedHeading, setTypedHeading] = useState("");
-  const [isSecondHeadingPhase, setIsSecondHeadingPhase] = useState(false);
+  const [typedHeading, setTypedHeading] = useState(() =>
+    shouldSkipHeadingIntro ? CURATED_RESULTS_HEADING_TEXT : "",
+  );
+  const [isSecondHeadingPhase, setIsSecondHeadingPhase] = useState(
+    shouldSkipHeadingIntro,
+  );
   const [isHeadingSequenceComplete, setIsHeadingSequenceComplete] =
-    useState(false);
+    useState(shouldSkipHeadingIntro);
   const useCroppedDesktopShortcuts = useCroppedDesktopShortcutIcons();
 
   const searchBarBadges = useMemo(() => {
@@ -288,16 +293,30 @@ const AiGlobalListingsList = () => {
     persistedSearchBarBadges,
   ]);
 
-  useEffect(() => {
+  const headingSequenceKey = useMemo(() => {
     const params = new URLSearchParams(location.search);
-    const currentCountry = (params.get("country") || "").trim().toLowerCase();
-    const currentLocation = (
+    const country = (params.get("country") || "").trim().toLowerCase();
+    const selectedLocation = (
       params.get("state") ||
       params.get("location") ||
       ""
     )
       .trim()
       .toLowerCase();
+
+    return JSON.stringify([country, selectedLocation]);
+  }, [location.search]);
+
+  useEffect(() => {
+    const [currentCountry = "", currentLocation = ""] =
+      JSON.parse(headingSequenceKey);
+
+    if (shouldSkipHeadingIntro) {
+      setTypedHeading(CURATED_RESULTS_HEADING_TEXT);
+      setIsSecondHeadingPhase(true);
+      setIsHeadingSequenceComplete(true);
+      return undefined;
+    }
 
     if (typeof window !== "undefined" && currentCountry && currentLocation) {
       const restoreKey = getAiVerticalsPageStateKey(
@@ -346,7 +365,7 @@ const AiGlobalListingsList = () => {
       clearTimeout(timeoutId);
       clearInterval(intervalId);
     };
-  }, [location.search]);
+  }, [headingSequenceKey, shouldSkipHeadingIntro]);
 
   // Special users who can see all locations
   const specialUserEmails = [
@@ -1121,6 +1140,7 @@ const AiGlobalListingsList = () => {
           country: formData.country,
           location: formData.location,
           category: categoryValue,
+          skipHeadingIntro: true,
           searchBarBadges,
         },
       },
