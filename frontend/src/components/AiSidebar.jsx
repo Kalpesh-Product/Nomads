@@ -111,7 +111,7 @@ const valueAdditionItems = [
   },
 ];
 
-const becomeHostItem = [{ label: "Become A Host", icon: HiOutlineViewGrid }];
+const becomeHostItem = [{ label: "Become a Host", icon: HiOutlineViewGrid }];
 
 const loggedOutPrompt = {
   title: "Get responses tailored to you",
@@ -130,7 +130,7 @@ const profileItems = [
 const signOutItem = [{ label: "Sign Out", icon: HiOutlineLogout }];
 
 const becomeContributorLink = {
-  label: "Become A Contributor",
+  label: "Become a Contributor",
   icon: FaHandsHelping,
   path: "/become-a-contributor",
 };
