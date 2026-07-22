@@ -87,7 +87,7 @@ const recommendationItems = [
     icon: RiUserCommunityLine,
     path: getSearchPathForGoal("Find Your Community"),
   },
-  { label: "Search Old School", icon: TbWorldWww, path: "/manual-search" },
+  { label: "Classic Search", icon: TbWorldWww, path: "/manual-search" },
 ];
 
 const valueAdditionItems = [
@@ -386,11 +386,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   };
 
   const getNomadLoginRedirectPath = () => {
-    const authPages = new Set([
-      "/signup",
-      "/login",
-      "/forgot-password",
-    ]);
+    const authPages = new Set(["/signup", "/login", "/forgot-password"]);
 
     if (authPages.has(location.pathname)) {
       return "/";

@@ -19,10 +19,7 @@ const gatedRecommendationTitles = new Set([
   "Find Your Community",
 ]);
 
-const freeRecommendationTitles = new Set([
-  "World Ranking",
-  "Search Old School",
-]);
+const freeRecommendationTitles = new Set(["World Ranking", "Classic Search"]);
 
 const goalSlugByTitle = {
   "World Ranking": "worldranking",
@@ -74,7 +71,7 @@ const recommendationCards = [
     path: getSearchPathForGoal("Find Your Community"),
   },
   {
-    title: "Search Old School",
+    title: "Classic Search",
     description:
       "Self search & find ideal nomad destinations as per your preference like old times.",
     icon: TbWorldWww,
@@ -318,7 +315,7 @@ const AiHome = () => {
 
                 const isFreeCard = freeRecommendationTitles.has(card.title);
                 const loggedOutCardText = isFreeCard
-                  ? "Login not required"
+                  ? "No login required"
                   : "Login required";
 
                 return (
