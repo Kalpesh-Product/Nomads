@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 import Container from "../components/Container";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import axios from "../utils/axios";
 import romans from "romans";
@@ -10,10 +10,7 @@ import { CircularProgress } from "@mui/material";
 
 const AiCareer = () => {
     const [openIndex, setOpenIndex] = useState(null);
-    const { pathname } = useLocation();
-    const isHost = pathname.includes("host");
-    const customLink = isHost ? `/career/job` : `/ai-career/job`;
-    // const customRoute = isHost ? "job/get-job-posts" : "";
+    const customLink = `/career/job`;
 
     const categoryOrder = [
         "Product Management",
@@ -112,7 +109,7 @@ const AiCareer = () => {
                                                                             </p>
                                                                         )}
                                                                     </div>
-                                                                    <div className="flex flex-col md:flex-row items-center gap-4 md:gap-10 w-full md:w-auto justify-end">
+                                                                    <div className="flex flex-row md:flex-row items-center gap-2 md:gap-10 w-full md:w-auto justify-end">
                                                                         <p className="text-xs md:text-sm font-semibold text-gray-900">
                                                                             {job?.jobType} | {job?.jobMode} |{" "}
                                                                             {job?.location}

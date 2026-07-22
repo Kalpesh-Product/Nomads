@@ -27,7 +27,7 @@ const AiVisaSupportThankYou = () => {
       params.set("continent", selectedContinent);
     }
 
-    return `/ai-verticals?${params.toString()}`;
+    return `/verticals?${params.toString()}`;
   }, [selectedContinent, selectedCountry, selectedState]);
 
   const formattedCountry = useMemo(() => {

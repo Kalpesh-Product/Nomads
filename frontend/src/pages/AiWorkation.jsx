@@ -18,7 +18,7 @@ import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import { Country } from "country-state-city";
 import Swal from "sweetalert2";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
 import Container from "../components/Container";
 import useAuth from "../hooks/useAuth";
@@ -72,12 +72,14 @@ const formatWorkationCountry = (country, state) => {
 };
 
 const WORKATION_PROMPT =
-  "Share your workation requirements and we will connect you with the right expert support.";
+  "share your workation requirements and we will connect you with the right expert support.";
 const WORKATION_HEADING = "Workation";
 const WORKATION_TYPING_SEEN_KEY = "wono-workation-typing-seen";
 const getFlagIconUrl = (isoCode) =>
   `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
 const normalizePrefillValue = (value) => value?.trim().toLowerCase() || "";
+const getDestinationDisplayName = (destination = {}) =>
+  destination.title?.trim() || destination.state?.trim() || "";
 
 const tickMenuItemSx = {
   "& .tick-icon": { opacity: 0, color: "#1976d2" },
@@ -109,14 +111,36 @@ const AiWorkation = () => {
     ? (auth?.user?.fullName?.split(" ")[0] || "User") + ", "
     : "User, ";
   const workationPrompt = `${messagePrefix}${WORKATION_PROMPT}`;
-  const destinationOptions = useMemo(
-    () =>
-      aiDestinationCards.map((destination) => ({
-        state: destination.city,
-        country: destination.country,
-      })),
-    [],
-  );
+  const { data: stateWiseDestinations = [] } = useQuery({
+    queryKey: ["workation-state-wise-destinations"],
+    queryFn: async () => {
+      try {
+        const response = await axios.get("state-wise-weight");
+        return Array.isArray(response?.data?.data) ? response.data.data : [];
+      } catch (error) {
+        console.error(error?.response?.data?.message);
+        return [];
+      }
+    },
+  });
+
+  const destinationOptions = useMemo(() => {
+    const sourceDestinations = stateWiseDestinations.length
+      ? stateWiseDestinations
+      : aiDestinationCards.map((destination) => ({
+          state: destination.city,
+          country: destination.country,
+          continent: destination.continent,
+        }));
+
+    return sourceDestinations
+      .map((destination) => ({
+        state: destination.state?.trim() || "",
+        title: getDestinationDisplayName(destination),
+        country: destination.country?.trim() || "",
+      }))
+      .filter((destination) => destination.state && destination.country);
+  }, [stateWiseDestinations]);
   const destinationCountries = useMemo(
     () =>
       Array.from(
@@ -322,9 +346,9 @@ const AiWorkation = () => {
   return (
     <div className="bg-white text-black font-sans">
       <Container padding={false}>
-        <section className="min-h-[85vh] flex items-center justify-center py-2">
+        <section className="min-h-[60vh] flex items-center justify-center py-0">
           <div className="w-full max-w-5xl md:px-20 lg:px-20">
-            <div className="mx-auto mb-0 flex w-full max-w-4xl flex-col items-center gap-2 ">
+            <div className="mx-auto mb-0 flex w-full max-w-4xl flex-col items-center gap-1 ">
               <p className="min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1rem]">
                 {messagePrefix ? (
                   <>
@@ -599,7 +623,10 @@ const AiWorkation = () => {
                             >
                               <Box className="flex w-full items-center gap-2">
                                 <HiCheck className="tick-icon" size={16} />
-                                <span>{destinationOption.state}</span>
+                                <span>
+                                  {destinationOption.title ||
+                                    destinationOption.state}
+                                </span>
                               </Box>
                             </MenuItem>
                           ))}
@@ -751,8 +778,8 @@ const AiWorkation = () => {
                       <TextField
                         {...field}
                         fullWidth
-                        multiline
-                        minRows={3}
+                        // multiline
+                        // minRows={3}
                         label="Additional Comments"
                         variant="standard"
                         InputLabelProps={{ sx: floatingLabelSx }}

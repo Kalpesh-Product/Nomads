@@ -34,17 +34,17 @@ const WebsiteUnderMaintenance = () => {
   const intervalRef = useRef(null);
   const goToNomads = () => {
     if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://nomad.localhost:5173";
+      window.location.href = "http://localhost:5173";
     } else {
-      window.location.href = "https://nomad.wono.co";
+      window.location.href = "https://wono.co";
     }
   };
 
   const goToHosts = () => {
     if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://hosts.localhost:5173";
+      window.location.href = "http://host.localhost:5173";
     } else {
-      window.location.href = "https://hosts.wono.co";
+      window.location.href = "https://host.wono.co";
     }
   };
 

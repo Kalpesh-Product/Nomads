@@ -75,9 +75,9 @@ const Header = () => {
 
   const goToHosts = () => {
     if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://hosts.localhost:5173";
+      window.location.href = "http://host.localhost:5173";
     } else {
-      window.location.href = "https://hosts.wono.co";
+      window.location.href = "https://host.wono.co";
     }
   };
   const goToHostssMain = () => {
@@ -184,8 +184,9 @@ const Header = () => {
                           className="group relative text-md text-black"
                         >
                           <span
-                            className={`relative z-10 mb-8 uppercase ${isActive ? "text-black" : "group-hover:font-bold"
-                              }`}
+                            className={`relative z-10 mb-8 uppercase ${
+                              isActive ? "text-black" : "group-hover:font-bold"
+                            }`}
                           >
                             {item.text}
                           </span>
@@ -210,7 +211,7 @@ const Header = () => {
                   onClick={goToHosts}
                   className="relative pb-1 transition-all cursor-pointer duration-300 group font-bold bg-transparent uppercase border-none"
                 >
-                  Become a host
+                  Become a Host
                   <span className="absolute left-0 w-0 bottom-0 block h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
                 </button>
               </div>
@@ -378,7 +379,7 @@ const Header = () => {
                     </li>
                   ))}
 
-                {/* ✅ NEW: Become a host visible in mobile drawer */}
+                {/* ✅ NEW: Become a Host visible in mobile drawer */}
                 <li className="items-center text-center">
                   <div
                     onClick={() => {
@@ -388,7 +389,7 @@ const Header = () => {
                     className="py-4 cursor-pointer"
                   >
                     <p className="text-secondary-dark text-lg font-semibold">
-                      Become A Host
+                      Become a Host
                     </p>
                   </div>
                   <div className="h-[0.2px] bg-gray-300"></div>

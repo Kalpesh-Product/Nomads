@@ -913,7 +913,12 @@ export const addB2CformSubmission = async (req, res, next) => {
         return res.status(400).json({ message: "Invalid company id provided" });
       }
 
-      const leads = new Lead({ ...payload, company, companyId });
+      const leads = new Lead({
+        ...payload,
+        company,
+        companyId,
+        isEscalated: false,
+      });
 
       await leads.save();
     }

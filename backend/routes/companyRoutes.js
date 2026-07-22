@@ -17,12 +17,14 @@ import {
   addTemplateLink,
   activateProduct,
   updateLeads,
+  escalateLeadToHostPanel,
   bulkUpdateCompanyInclusions,
   deactivateProduct,
   editCompanyImagesBulk,
   getCompaniesDataNomads,
   getCompaniesDataMaster,
   applyToCompanyJob,
+  getCompanyCountries,
 } from "../controllers/compayControllers.js";
 
 const proxyUpload = multer({ storage: multer.memoryStorage() });
@@ -43,6 +45,7 @@ router.patch(
 router.get("/companies", getCompaniesData);
 router.get("/companiesn", getCompaniesDataNomads);
 router.get("/companiesma", getCompaniesDataMaster);
+router.get("/company-countries", getCompanyCountries);
 router.patch("/activate-product", activateProduct);
 router.patch("/deactivate-product", deactivateProduct);
 router.get("/get-single-company-data", getCompanyData);
@@ -66,6 +69,7 @@ router.patch(
 router.post("/create-company", upload.any(), createCompany);
 router.get("/all-leads", getAllLeads);
 router.get("/leads", getCompanyLeads);
+router.patch("/escalate-lead", escalateLeadToHostPanel);
 router.patch("/update-lead", updateLeads);
 
 router.post("/jobs/apply", proxyUpload.any(), applyToCompanyJob);

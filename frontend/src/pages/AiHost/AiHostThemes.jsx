@@ -123,7 +123,7 @@ const supportItems = [
 
 const Themes = () => {
   const navigate = useNavigate();
-  const onBack = () => navigate("/host");
+  const onBack = () => navigate("/");
   return (
     <div className="   text-secondary-dark justify-center items-center">
       <div className="sticky top-0 z-40 flex min-w-[11rem] items-center gap-3 bg-white/95 py-3 backdrop-blur-sm">
@@ -143,13 +143,13 @@ const Themes = () => {
                     )} */}
       </div>
       <Container padding={false}>
-        <section className="flex flex-col items-end justify-center gap-4 leading-[1.3] text-secondary-dark lg:pt-16 pt-10 pb-10">
+        <section className="flex flex-col items-end justify-center gap-4 leading-[1.3] text-secondary-dark lg:pt-0 pt-10 pb-10">
           <h1 className="text-[clamp(1.62rem,4.0vw,4.5rem)] font-medium">
             Choose the best Responsive Website Theme for your business
           </h1>
 
           <GetStartedButton
-            handleSubmit={() => navigate("/host/ai-host-signup?step=1")}
+            handleSubmit={() => navigate("/signup?step=1")}
           />
         </section>
       </Container>
@@ -173,7 +173,7 @@ const Themes = () => {
                   data-aos="fade-up"
                   className="flex-shrink-0 w-[85vw] md:w-[45vw] h-full overflow-hidden rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.5)] snap-start lg:w-full"
                   onClick={() =>
-                    navigate("/host/ai-host-product", { state: { image } })
+                    navigate("/product", { state: { image } })
                   }
                   key={index}
                 >
@@ -190,7 +190,7 @@ const Themes = () => {
             </div>
             <div className="flex justify-center items-center pt-4">
               <GetStartedButton
-                handleSubmit={() => navigate("/host/ai-host-signup?step=1")}
+                handleSubmit={() => navigate("/signup?step=1")}
               />
             </div>
           </div>
@@ -215,7 +215,7 @@ const Themes = () => {
               </ul>
               <div className="flex justify-center md:justify-start w-full pt-2">
                 <GetStartedButton
-                  handleSubmit={() => navigate("/host/ai-host-signup?step=1")}
+                  handleSubmit={() => navigate("/signup?step=1")}
                 />
               </div>
             </div>
@@ -250,7 +250,7 @@ const Themes = () => {
           </div>
           <div className="pt-2">
             <GetStartedButton
-              handleSubmit={() => navigate("/host/ai-host-signup?step=1")}
+              handleSubmit={() => navigate("/signup?step=1")}
             />
           </div>
         </div>
@@ -266,11 +266,9 @@ const Themes = () => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             {supportItems.map((item, index) => (
-              <div
-                className="flex flex-col gap-8 border-t-2 border-black pt-10"
-                key={index}
-              >
+              <div className="flex flex-col gap-8" key={index}>
                 <h2 className="font-medium text-content">{item.title}</h2>
+                <div className="border-t-2 border-black" />
                 <p>{item.description}</p>
                 <span
                   className="cursor-pointer font-semibold underline hover:no-underline underline-offset-8 transition-hover duration-500 ease max-w-fit"

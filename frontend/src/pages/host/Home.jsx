@@ -201,7 +201,7 @@ const HostHome = () => {
       </Container>
       {/* Key Modules */}
       <Container padding={false}>
-        <hr className="border-t-2 border-gray-300" />
+        <hr className="border-t-4 border-gray-300" />
       </Container>
       <section>
         <Container>

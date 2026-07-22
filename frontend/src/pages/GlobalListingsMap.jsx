@@ -19,13 +19,16 @@ import SkeletonMap from "../components/Skeletons/SkeletonMap.jsx";
 import Select from "react-dropdown-select";
 import { setFormValues } from "../features/locationSlice.js";
 import ListingCard from "../components/ListingCard.jsx";
-import newIcons from "../assets/newIcons.js";
 import { IoSearch } from "react-icons/io5";
 import SearchBarCombobox from "../components/SearchBarCombobox.jsx";
 import { AnimatePresence, motion } from "motion/react";
 import PaginatedGrid from "../components/PaginatedGrid.jsx";
 import { Helmet } from "@dr.pogodin/react-helmet";
 import useAuth from "../hooks/useAuth.js";
+import {
+  getCategoryShortcutIconSrc,
+  useCroppedDesktopShortcutIcons,
+} from "../utils/categoryShortcutIcons.js";
 
 const HorizontalScrollWrapper = ({ children, title }) => {
   const scrollRef = React.useRef(null);
@@ -79,6 +82,7 @@ const HorizontalScrollWrapper = ({ children, title }) => {
 const GlobalListingsMap = () => {
   const [favorites, setFavorites] = useState([]);
   const [expandedCategories, setExpandedCategories] = useState([]);
+  const useCroppedDesktopShortcuts = useCroppedDesktopShortcutIcons();
   const location = useLocation();
   const dispatch = useDispatch();
   const formData = useSelector((state) => state.location.formValues);
@@ -432,7 +436,7 @@ const GlobalListingsMap = () => {
         />
         <meta property="og:image" content="/images/map-preview.jpeg" />
         <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://nomad.wono.co/verticals" />
+        <link rel="canonical" href="https://wono.co/verticals" />
       </Helmet>
 
       {/* ==================== DESKTOP VIEW (lg and above) ==================== */}
@@ -443,7 +447,10 @@ const GlobalListingsMap = () => {
               <div className="w-3/4 pb-4">
                 <div className="flex justify-between items-center">
                   {categoryOptions.map((cat) => {
-                    const iconSrc = newIcons[cat.value];
+                    const iconSrc = getCategoryShortcutIconSrc(
+                      cat.value,
+                      useCroppedDesktopShortcuts,
+                    );
                     return (
                       <button
                         key={cat.value}

@@ -891,7 +891,7 @@ const searchBarEndGoalLabelMap = {
     "Best Work Infrastructure": "Best Work Infrastructure Nomad Destinations",
   },
   "Increase Your Savings": {
-    "Maximum Savings": "Best Nomad Destinations to Maximize you Savings",
+    "Maximum Savings": "Best Nomad Destinations to Maximize your Savings",
     "Low Taxation": "Tax-Friendly Nomad Destinations",
     "Purchasing Power": "Nomad Destinations with Strong Purchasing Power",
     "Financial Stability(Low Risk)": "Financially Stable Nomad Destinations",
@@ -1133,7 +1133,9 @@ const AiSearchResults = () => {
   const hasHydratedSearchResultsPageRef = useRef(
     Boolean(initialSearchResultsPageState),
   );
-  const hasHydratedVisaRulesRef = useRef(Boolean(initialSearchResultsPageState));
+  const hasHydratedVisaRulesRef = useRef(
+    Boolean(initialSearchResultsPageState),
+  );
   const hasHydratedDestinationRevealRef = useRef(
     Boolean(initialSearchResultsPageState),
   );
@@ -1577,8 +1579,16 @@ const AiSearchResults = () => {
       );
     }
 
+    const verticalsParams = new URLSearchParams({
+      country,
+      state: selectedLocationParam,
+      goal: selectedGoal,
+      continent: selectedContinent,
+      goalOption: selectedGoalOption,
+    });
+
     navigate(
-      `/ai-verticals?country=${encodeURIComponent(country)}&state=${encodeURIComponent(selectedLocationParam)}`,
+      `/verticals?${verticalsParams.toString()}`,
       {
         state: {
           selectedStateLabel: destinationTitle,
@@ -1602,7 +1612,7 @@ const AiSearchResults = () => {
       const destinationId = destination?._id;
 
       if (!userId) {
-        navigate("/ai-login", {
+        navigate("/login", {
           state: {
             redirectTo: `${location.pathname}${location.search}`,
             loginContext: {
@@ -2064,8 +2074,7 @@ const AiSearchResults = () => {
       const hasScrollFallback =
         Number.isFinite(targetScrollTop) && targetScrollTop >= 0;
       const hasClickedCardPosition =
-        clickedCardKey &&
-        Number.isFinite(clickedCardContainerTop);
+        clickedCardKey && Number.isFinite(clickedCardContainerTop);
 
       if (!hasClickedCardPosition && !hasScrollFallback) {
         return;
@@ -2319,7 +2328,7 @@ const AiSearchResults = () => {
               <div className="ml-auto flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => navigate("/home")}
+                  onClick={() => navigate("/")}
                   className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-black/70 transition-colors hover:bg-black/5 hover:text-black"
                   aria-label="Clear search and go back"
                 >
@@ -2384,7 +2393,8 @@ const AiSearchResults = () => {
 
                                 {formattedNarrative.additionalPriorityPointsText && (
                                   <span>
-                                    {formattedNarrative.priorityPoints.length > 0
+                                    {formattedNarrative.priorityPoints.length >
+                                    0
                                       ? ", "
                                       : " "}
                                     {

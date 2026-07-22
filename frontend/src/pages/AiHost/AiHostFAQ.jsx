@@ -124,7 +124,7 @@ const faqs = [
 const AiHostFAQ = () => {
     const navigate = useNavigate();
 
-    const onBack = () => navigate("/host");
+    const onBack = () => navigate("/");
 
     return (
         <>
@@ -165,7 +165,7 @@ const AiHostFAQ = () => {
                         Can’t find the answer to your question? Connect with us via our{" "}
                         <Link
                             className="text-primary-blue text-decoration-none"
-                            to="/host/ai-host-contact"
+                            to="/contact"
                         >
                             Contact us
                         </Link>{" "}

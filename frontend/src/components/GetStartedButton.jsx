@@ -13,6 +13,7 @@ const GetStartedButton = ({
 }) => {
   console.log("isLoading", isLoading);
   const baseBgColor = disabled || isLoading ? "bg-gray-400" : "bg-black";
+  const hoverBgColor = disabled || isLoading ? "" : "hover:bg-[#333]";
   const resolvedPadding = padding || "px-10 py-3";
   const resolvedFontSize = fontSize || "text-base";
   const resolvedClassName = className || "";
@@ -22,7 +23,7 @@ const GetStartedButton = ({
     <button
       disabled={disabled || isLoading}
       type={type}
-      className={`inline-flex items-center justify-center gap-2 rounded-full ${baseBgColor} ${resolvedPadding} ${resolvedFontSize} text-white ${resolvedClassName} ${resolvedExternalStyles}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-full ${baseBgColor} ${hoverBgColor} ${resolvedPadding} ${resolvedFontSize} text-white transition-colors ${resolvedClassName} ${resolvedExternalStyles}`}
       onClick={handleSubmit}
     >
       {isLoading && <CircularProgress size={16} sx={{ color: "#ffffff" }} />}

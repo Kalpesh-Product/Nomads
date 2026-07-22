@@ -273,7 +273,7 @@ const AiHostPrivacy = () => {
                         </a>
                         <span
                             className="text-primary-blue cursor-pointer max-w-fit"
-                            onClick={() => navigate("/host/ai-host-contact")}
+                            onClick={() => navigate("/contact")}
                         >
                             Contact us
                         </span>
@@ -283,7 +283,7 @@ const AiHostPrivacy = () => {
         },
     ];
 
-    const onBack = () => navigate("/host");
+    const onBack = () => navigate("/");
 
     return (
         <>

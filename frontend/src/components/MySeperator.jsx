@@ -6,7 +6,7 @@ const MySeperator = () => {
   return (
     <div>
       <Container padding={false}>
-        <hr className="border-t-2 border-gray-300 " />
+        <hr className="border-t-4 border-gray-300 " />
       </Container>
     </div>
   );

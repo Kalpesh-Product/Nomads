@@ -167,7 +167,7 @@ const AiProfile = () => {
   });
 
   useEffect(() => {
-    if (!auth?.user) navigate("/ai-login", { replace: true });
+    if (!auth?.user) navigate("/login", { replace: true });
   }, [auth, navigate]);
 
   useEffect(() => {
@@ -285,7 +285,7 @@ const AiProfile = () => {
         confirmPassword: "",
       });
       await logout();
-      navigate("/ai-login", { replace: true });
+      navigate("/login", { replace: true });
     },
     onError: (error) => {
       showErrorAlert(

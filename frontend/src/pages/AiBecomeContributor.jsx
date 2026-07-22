@@ -41,7 +41,7 @@ const defaultValues = {
 };
 
 const CONTRIBUTOR_PROMPT =
-  "We are constantly looking out for individuals who can support our cause to make WoNo the largest Nomad Community & Platform in the world. We know we will not be able to do this alone.";
+  "we are constantly looking out for individuals who can support our cause to make WoNo the largest Nomad Community & Platform in the world. We know we will not be able to do this alone.";
 const CONTRIBUTOR_HEADING = "Become a Wono Contributor";
 const CONTRIBUTOR_TYPING_SEEN_KEY = "wono-contributor-typing-seen";
 const getFlagIconUrl = (isoCode) =>

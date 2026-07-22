@@ -14,7 +14,7 @@ import { clearStoredLoginState } from "../hooks/useNomadLoginState";
 import useLocationContentAvailability from "../hooks/useLocationContentAvailability";
 import { readSelectedDestination } from "../utils/selectedDestinationSession";
 
-const AiHeader = ({ onMobileSidebarToggle }) => {
+const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
   const [open, setOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [isLogoutLoading, setIsLogoutLoading] = useState(false);
@@ -25,19 +25,20 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
   const view = searchParams.get("view");
   const formData = useSelector((state) => state.location.formValues);
 
-  const isAiListingsMapPage = location.pathname === "/ai-listings";
-  const isAiListingsListPage = location.pathname === "/ai-listings-list";
-  const showToggle =
-    location.pathname.includes("verticals") ||
+  const isAiListingsMapPage = location.pathname === "/listings";
+  const isAiListingsListPage = location.pathname === "/listings-list";
+  const isAiDestinationListingsPage =
+    location.pathname === "/verticals" ||
     isAiListingsMapPage ||
     isAiListingsListPage;
+  const showToggle =
+    location.pathname.includes("verticals") || isAiDestinationListingsPage;
   const isAiEditorialPage =
-    location.pathname.startsWith("/ai-blogs") ||
-    location.pathname.startsWith("/ai-news");
+    location.pathname.startsWith("/blog") ||
+    location.pathname.startsWith("/news");
   const shouldCheckNewsBlogLinks =
     showToggle ||
     isAiEditorialPage ||
-    location.pathname.startsWith("/ai-listings") ||
     location.pathname.startsWith("/listings");
 
   const countryParam = searchParams.get("country") || formData?.country || "";
@@ -56,11 +57,34 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
 
   const listingsQuery = buildListingsQuery();
   const mapViewLink = listingsQuery
-    ? `/ai-listings?${listingsQuery}`
-    : "/ai-listings";
+    ? `/listings?${listingsQuery}`
+    : "/listings";
   const listViewLink = listingsQuery
-    ? `/ai-listings-list?${listingsQuery}`
-    : "/ai-listings-list";
+    ? `/listings-list?${listingsQuery}`
+    : "/listings-list";
+  const buildVerticalsToggleLink = (nextView = "") => {
+    const params = new URLSearchParams(location.search);
+    const country = params.get("country") || formData?.country || "";
+    const state =
+      params.get("state") || params.get("location") || formData?.location || "";
+
+    if (country) params.set("country", country);
+    if (state) {
+      params.set("state", state);
+      params.delete("location");
+    }
+
+    if (nextView) {
+      params.set("view", nextView);
+    } else {
+      params.delete("view");
+    }
+
+    const query = params.toString();
+    return query ? `${location.pathname}?${query}` : location.pathname;
+  };
+  const verticalsMapViewLink = buildVerticalsToggleLink("map");
+  const verticalsListViewLink = buildVerticalsToggleLink();
 
   const { auth } = useAuth();
   const logout = useLogout();
@@ -87,7 +111,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
 
       navigate(
         {
-          pathname: "/ai-login",
+          pathname: "/login",
           search: nextSearchParams.toString()
             ? `?${nextSearchParams.toString()}`
             : "",
@@ -107,13 +131,13 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
 
   const getNomadLoginRedirectPath = () => {
     const authPages = new Set([
-      "/ai-signup",
-      "/ai-login",
-      "/ai-forgot-password",
+      "/signup",
+      "/login",
+      "/forgot-password",
     ]);
 
     if (authPages.has(location.pathname)) {
-      return "/home";
+      return "/";
     }
 
     return `${location.pathname}${location.search}`;
@@ -126,17 +150,17 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
 
   const goToHosts = () => {
     if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://nomad.localhost:5173/host";
+      window.location.href = "http://host.localhost:5173";
     } else {
-      window.location.href = "https://nomad.wono.co/host";
+      window.location.href = "https://host.wono.co";
     }
   };
 
   const goToHostssMain = () => {
     if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://nomad.localhost:5173/home";
+      window.location.href = "http://localhost:5173";
     } else {
-      window.location.href = "https://nomad.wono.co/home";
+      window.location.href = "https://wono.co/";
     }
   };
 
@@ -174,7 +198,8 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
     enabled: shouldCheckNewsBlogLinks,
     keyword: stateParam,
   });
-  const showNewsBlogLinks = shouldCheckNewsBlogLinks && hasNewsOrBlogs;
+  const showNewsBlogLinks =
+    shouldCheckNewsBlogLinks && hasNewsOrBlogs && !isAiDestinationListingsPage;
 
   const currentSearch = location.search || location.state?.sourceSearch || "";
   const aiVerticalsToggleState = (() => {
@@ -212,17 +237,21 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
 
   const headerLinks = [
     // { id: 1, text: "Home", to: "/" },
-    { id: 2, type: "news", text: newsLabel, to: `/ai-news${currentSearch}` },
-    { id: 3, type: "blog", text: blogLabel, to: `/ai-blogs${currentSearch}` },
+    { id: 2, type: "news", text: newsLabel, to: `/news${currentSearch}` },
+    { id: 3, type: "blog", text: blogLabel, to: `/blog${currentSearch}` },
     // { id: 4, type: "offers", text: offersLabel },
   ];
 
   const shouldShowHeaderLinks =
     location.pathname.startsWith("/listings") &&
-    !location.pathname.startsWith("/ai-listings");
+    !location.pathname.startsWith("/listings");
 
   return (
-    <div className="bg-white/80 backdrop-blur-md px-1 md:px-20">
+    <div
+      className={`bg-white/80 backdrop-blur-md px-1 ${
+        forceMobileNavigation ? "" : "md:px-20"
+      }`}
+    >
       <AiContainer padding={false}>
         <div className="flex py-3 justify-between items-center lg:py-[0.625rem]">
           {/* Logo */}
@@ -230,7 +259,9 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
             <button
               type="button"
               onClick={() => onMobileSidebarToggle?.()}
-              className="mr-2 rounded p-1 text-black sm:hidden"
+              className={`mr-2 rounded p-1 text-black ${
+                forceMobileNavigation ? "" : "sm:hidden"
+              }`}
               aria-label="Open sidebar"
             >
               <HiOutlineMenu size={24} />
@@ -256,7 +287,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                           to={
                             isAiListingsListPage
                               ? mapViewLink
-                              : `${location.pathname}?country=${formData?.country}&location=${formData?.location}&view=map`
+                              : verticalsMapViewLink
                           }
                           state={aiVerticalsToggleState}
                           className="group relative text-md text-black"
@@ -277,7 +308,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                           to={
                             isAiListingsMapPage
                               ? listViewLink
-                              : `${location.pathname}?country=${formData?.country}&location=${formData?.location}`
+                              : verticalsListViewLink
                           }
                           state={aiVerticalsToggleState}
                           className="group relative text-md text-black"
@@ -337,7 +368,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
             <div className="flex items-center gap-3">
               {/* <button
                 type="button"
-                onClick={() => navigate(`/host/ai-host-signup?step=1`)}
+                onClick={() => navigate(`/ai-host-signup?step=1`)}
                 className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm  text-black transition hover:border-black/20 hover:bg-black/5 min-w-48"
               >
                 Sign up as Business
@@ -351,7 +382,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                   <li className="flex items-center gap-6">
                     {hasNews && (
                       <Link
-                        to={`/ai-news${currentSearch}`}
+                        to={`/news${currentSearch}`}
                         className="group relative text-md text-black font-semibold whitespace-nowrap"
                       >
                         <span className="relative z-10 group-hover:font-bold mb-2 text-sm whitespace-nowrap">
@@ -363,7 +394,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
 
                     {hasBlogs && (
                       <Link
-                        to={`/ai-blogs${currentSearch}`}
+                        to={`/blog${currentSearch}`}
                         className="group relative text-md text-black font-semibold whitespace-nowrap"
                       >
                         <span className="relative z-10 group-hover:font-bold mb-2 text-sm whitespace-nowrap">
@@ -386,7 +417,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
               {!isLoggedIn && (
                 <div className="p-4 px-0 whitespace-nowrap">
                   <Link
-                    to={`/ai-login${location.search}`}
+                    to={`/login${location.search}`}
                     state={{
                       redirectTo: getNomadLoginRedirectPath(),
                     }}
@@ -402,7 +433,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                   onClick={goToHosts}
                   className="relative pb-1 transition-all cursor-pointer duration-300 group bg-transparent border-none text-sm text-primary-blue"
                 >
-                  Become A Host
+                  Become a Host
                   <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-primary-blue transition-all duration-300 group-hover:w-full"></span>
                 </button>
               </div>
@@ -551,7 +582,7 @@ const AiHeader = ({ onMobileSidebarToggle }) => {
                     className="py-4 cursor-pointer"
                   >
                     <p className="text-secondary-dark text-lg ">
-                      Become A Host
+                      Become a Host
                     </p>
                   </div>
                   <div className="h-[0.2px] bg-gray-300"></div>

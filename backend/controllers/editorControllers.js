@@ -229,7 +229,17 @@ export const getWebsiteByTenant = async (req, res, next) => {
         .exec());
 
     if (publishedTemplate) {
-      return res.status(200).json(normalizeTemplatePayload(publishedTemplate));
+      // publishedData is the frozen copy taken at publish/submit time. The
+      // top-level fields keep changing with every builder draft auto-save, so
+      // they must not be served here. Older published sites (pre-snapshot)
+      // have no publishedData and fall back to the live fields.
+      return res
+        .status(200)
+        .json(
+          normalizeTemplatePayload(
+            publishedTemplate.publishedData || publishedTemplate,
+          ),
+        );
     }
 
     const localTemplate =
@@ -245,7 +255,14 @@ export const getWebsiteByTenant = async (req, res, next) => {
         .exec());
 
     if (localTemplate) {
-      return res.status(200).json(normalizeTemplatePayload(localTemplate));
+      // Same rule as above: prefer the frozen submit-time snapshot so builder
+      // draft auto-saves never leak to visitors. Templates that predate the
+      // snapshot fall back to the live fields.
+      return res
+        .status(200)
+        .json(
+          normalizeTemplatePayload(localTemplate.publishedData || localTemplate),
+        );
     }
 
     const company = await Company.findOne({
@@ -264,18 +281,30 @@ export const getWebsiteByTenant = async (req, res, next) => {
         )}`,
       );
 
+      // Upstream may return the raw doc whose top-level fields are the live
+      // draft; prefer the frozen publish-time snapshot when it exists.
+      const upstreamTemplate = upstream.data?.template || upstream.data;
       return res
         .status(upstream.status)
-        .json(normalizeTemplatePayload(upstream.data?.template || upstream.data));
+        .json(
+          normalizeTemplatePayload(
+            upstreamTemplate?.publishedData || upstreamTemplate,
+          ),
+        );
     }
 
     const upstream = await axios.get(
       `https://wonomasterbe.vercel.app/api/editor/get-website/${encodeURIComponent(tenant)}`,
     );
 
+    const upstreamTemplate = upstream.data?.template || upstream.data;
     return res
       .status(upstream.status)
-      .json(normalizeTemplatePayload(upstream.data?.template || upstream.data));
+      .json(
+        normalizeTemplatePayload(
+          upstreamTemplate?.publishedData || upstreamTemplate,
+        ),
+      );
   } catch (error) {
     const status = error?.response?.status || 500;
     const message =

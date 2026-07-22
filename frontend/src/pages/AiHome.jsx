@@ -100,7 +100,7 @@ const AiHome = () => {
 
   const userFirstName = auth?.user?.fullName?.split(" ")?.[0] || "Abrar";
 
-  const greetingText = isLoggedIn ? `Hi ${userFirstName}!` : "Meet wono";
+  const greetingText = isLoggedIn ? `Hi ${userFirstName}!` : "Meet Wono";
   const subheadingText = isLoggedIn
     ? ""
     : "An intelligent platform for modern nomads … Early adoption of our future lifestyle!";
@@ -253,7 +253,7 @@ const AiHome = () => {
 
     if (!isLoggedIn && gatedRecommendationTitles.has(card.title)) {
       const goalSlug = goalSlugByTitle[card.title];
-      const loginPath = goalSlug ? `/ai-login/${goalSlug}` : "/ai-login";
+      const loginPath = goalSlug ? `/login/${goalSlug}` : "/login";
 
       navigate(`${loginPath}${location.search}`, {
         state: {
@@ -291,7 +291,7 @@ const AiHome = () => {
           {!isLoggedIn ? (
             <h2 className="mt-1 text-ls font-medium font-play">
               <span className="text-black/90">(</span>
-              {renderBracketBrand("world of nomads")}
+              {renderBracketBrand("World of Nomads")}
               <span className="text-black/90">)</span>
             </h2>
           ) : null}

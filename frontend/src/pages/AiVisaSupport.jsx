@@ -10,17 +10,17 @@ import { Controller, useForm } from "react-hook-form";
 import { Country } from "country-state-city";
 import Swal from "sweetalert2";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "../utils/axios";
 import Container from "../components/Container";
 import { aiDestinationCards } from "../constants/aiDestinationCards";
-import useNomadLoginState from "../hooks/useNomadLoginState";
 import useAuth from "../hooks/useAuth";
 import {
   getCountryNameFromSelectedDestination,
   readSelectedDestination,
 } from "../utils/selectedDestinationSession";
 import { showErrorAlert } from "../utils/alerts";
+import { findCountryByName } from "../utils/countryFlags";
 import { HiCheck } from "react-icons/hi";
 
 const floatingLabelSx = {
@@ -53,12 +53,14 @@ const VISA_TYPE_OPTIONS = [
 ];
 
 const VISA_SUPPORT_PROMPT =
-  "Tell us about your travel plans and we will help you navigate the visa process with confidence.";
+  "tell us about your travel plans and we will help you navigate the visa process with confidence.";
 const VISA_SUPPORT_HEADING = "Visa Support";
 const VISA_SUPPORT_TYPING_SEEN_KEY = "wono-visa-support-typing-seen";
 const getFlagIconUrl = (isoCode) =>
   `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
 const normalizePrefillValue = (value) => value?.trim().toLowerCase() || "";
+const getDestinationDisplayName = (destination = {}) =>
+  destination.title?.trim() || destination.state?.trim() || "";
 
 const tickMenuItemSx = {
   "& .tick-icon": { opacity: 0, color: "#1976d2" },
@@ -93,15 +95,49 @@ const AiVisaSupport = () => {
     : "User, ";
   const visaSupportPrompt = `${messagePrefix}${VISA_SUPPORT_PROMPT}`;
   const countries = useMemo(() => Country.getAllCountries(), []);
-  const destinationOptions = useMemo(
-    () =>
-      aiDestinationCards.map((destination) => ({
-        state: destination.city,
-        country: destination.country,
-        continent: destination.continent,
-      })),
-    [],
-  );
+  const { data: stateWiseDestinations = [] } = useQuery({
+    queryKey: ["visa-support-state-wise-destinations"],
+    queryFn: async () => {
+      try {
+        const response = await axios.get("state-wise-weight");
+        return Array.isArray(response?.data?.data) ? response.data.data : [];
+      } catch (error) {
+        console.error(error?.response?.data?.message);
+        return [];
+      }
+    },
+  });
+  const { data: companyCountries = [] } = useQuery({
+    queryKey: ["visa-support-company-countries"],
+    queryFn: async () => {
+      try {
+        const response = await axios.get("company/company-countries");
+        return Array.isArray(response?.data?.data) ? response.data.data : [];
+      } catch (error) {
+        console.error(error?.response?.data?.message);
+        return [];
+      }
+    },
+  });
+
+  const destinationOptions = useMemo(() => {
+    const sourceDestinations = stateWiseDestinations.length
+      ? stateWiseDestinations
+      : aiDestinationCards.map((destination) => ({
+          state: destination.city,
+          country: destination.country,
+          continent: destination.continent,
+        }));
+
+    return sourceDestinations
+      .map((destination) => ({
+        state: destination.state?.trim() || "",
+        title: getDestinationDisplayName(destination),
+        country: destination.country?.trim() || "",
+        continent: destination.continent?.trim() || "",
+      }))
+      .filter((destination) => destination.state && destination.country);
+  }, [stateWiseDestinations]);
 
   const destinationCountries = useMemo(
     () =>
@@ -110,6 +146,19 @@ const AiVisaSupport = () => {
       ).sort(),
     [destinationOptions],
   );
+  const travellingCountryOptions = useMemo(() => {
+    const sourceCountries = companyCountries.length
+      ? companyCountries
+      : destinationCountries;
+
+    return Array.from(
+      new Set(
+        sourceCountries
+          .map((countryName) => countryName?.trim())
+          .filter(Boolean),
+      ),
+    ).sort((a, b) => a.localeCompare(b));
+  }, [companyCountries, destinationCountries]);
   const selectedNationality = watch("nationality");
   const selectedTravellingCountry = watch("travellingCountry");
   const selectedTravellingState = watch("travellingState");
@@ -251,7 +300,7 @@ const AiVisaSupport = () => {
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const queryCountry = normalizePrefillValue(queryParams.get("country"));
-    const prefilledCountryFromQuery = destinationCountries.find(
+    const prefilledCountryFromQuery = travellingCountryOptions.find(
       (countryName) => normalizePrefillValue(countryName) === queryCountry,
     );
     const destinationCountry =
@@ -260,7 +309,7 @@ const AiVisaSupport = () => {
 
     if (!destinationCountry || selectedTravellingCountry) return;
 
-    const hasDestination = destinationCountries.some(
+    const hasDestination = travellingCountryOptions.some(
       (countryName) => countryName === destinationCountry,
     );
     if (!hasDestination) return;
@@ -271,10 +320,10 @@ const AiVisaSupport = () => {
     });
   }, [
     countries,
-    destinationCountries,
     location.search,
     selectedTravellingCountry,
     setValue,
+    travellingCountryOptions,
   ]);
 
   useEffect(() => {
@@ -535,37 +584,45 @@ const AiVisaSupport = () => {
                         helperText={fieldState.error?.message}
                         select
                         InputLabelProps={{ sx: floatingLabelSx }}
-                        onChange={(event) => field.onChange(event.target.value)}
+                        onChange={(event) => {
+                          field.onChange(event.target.value);
+                          setValue("travellingState", "", {
+                            shouldDirty: true,
+                            shouldTouch: true,
+                          });
+                        }}
                       >
                         <MenuItem value="" sx={{ fontWeight: 700 }}>
                           SELECT COUNTRY
                         </MenuItem>
-                        {destinationCountries.map((countryName) => {
-                          const country = countries.find(
-                            (c) => c.name === countryName,
+                        {travellingCountryOptions.map((countryName) => {
+                          const country = findCountryByName(
+                            countries,
+                            countryName,
                           );
-                          if (!country) return null;
                           return (
                             <MenuItem
-                              key={country.isoCode}
-                              value={country.name}
+                              key={country?.isoCode || countryName}
+                              value={countryName}
                               sx={tickMenuItemSx}
                             >
                               <Box className="flex w-full items-center gap-2">
                                 <HiCheck className="tick-icon" size={16} />
                                 <Box className="flex items-center gap-1">
-                                  <Box
-                                    component="img"
-                                    src={getFlagIconUrl(country.isoCode)}
-                                    alt={`${country.name} flag`}
-                                    sx={{
-                                      width: 20,
-                                      height: 15,
-                                      flexShrink: 0,
-                                    }}
-                                    loading="lazy"
-                                  />
-                                  <span>{country.name}</span>
+                                  {country?.isoCode && (
+                                    <Box
+                                      component="img"
+                                      src={getFlagIconUrl(country.isoCode)}
+                                      alt={`${countryName} flag`}
+                                      sx={{
+                                        width: 20,
+                                        height: 15,
+                                        flexShrink: 0,
+                                      }}
+                                      loading="lazy"
+                                    />
+                                  )}
+                                  <span>{countryName}</span>
                                 </Box>
                               </Box>
                             </MenuItem>
@@ -608,7 +665,10 @@ const AiVisaSupport = () => {
                             >
                               <Box className="flex w-full items-center gap-2">
                                 <HiCheck className="tick-icon" size={16} />
-                                <span>{destinationOption.state}</span>
+                                <span>
+                                  {destinationOption.title ||
+                                    destinationOption.state}
+                                </span>
                               </Box>
                             </MenuItem>
                           ))}

@@ -54,10 +54,9 @@ const AiBlogDetails = () => {
 
   const goToHostsContentCopyright = () => {
     if (window.location.hostname.includes("localhost")) {
-      window.location.href =
-        "http://hosts.localhost:5173/content-and-copyright";
+      window.location.href = "http://host.localhost:5173/content-and-copyright";
     } else {
-      window.location.href = "https://hosts.wono.co/content-and-copyright";
+      window.location.href = "https://host.wono.co/content-and-copyright";
     }
   };
 
@@ -107,7 +106,9 @@ const AiBlogDetails = () => {
           {newsContent &&
             newsContent.map((item) => (
               <article key={item.id} className="space-y-4">
-                <h1 className="text-card-title font-bold">{item.title}</h1>
+                <h1 className="text-card-title font-bold leading-[1.2] md:leading-[1rem]">
+                  {item.title}
+                </h1>
                 {item.image && (
                   <div className="h-96 rounded-xl w-full overflow-hidden">
                     <img

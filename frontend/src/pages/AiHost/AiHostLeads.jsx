@@ -15,7 +15,6 @@ import CompanyLogosMobile from "/hosts/leads-page/leads-companies-image-phone.pn
 import { PiCheckFatFill } from "react-icons/pi";
 import { ReactFitty } from "react-fitty";
 import { useNavigate } from "react-router-dom";
-import MySeperator from "../../components/MySeperator";
 import { HiOutlineArrowLeft } from "react-icons/hi";
 import GetStartedButton from "../../components/GetStartedButton";
 
@@ -75,7 +74,7 @@ const contentItems = [
 
 const Leads = () => {
   const navigate = useNavigate();
-  const onBack = () => navigate("/host");
+  const onBack = () => navigate("/");
   return (
     <div>
       <div className="sticky top-0 z-40 flex min-w-[11rem] items-center gap-3 bg-white/95 py-3 backdrop-blur-sm">
@@ -96,20 +95,20 @@ const Leads = () => {
       </div>
       {/* Top Text section */}
       <Container padding={false}>
-        <div className="lg:pt-16 pt-10">
-          <div>
-            <h2 className="lg:text-[1.67rem] md:text-[1.75rem] sm:text-[1.75rem] xs:text-[1.75rem] leading-[1.4] font-semibold text-host">
-              Generate continuous structured leads for your business with the
-              support of our automated platform and trained and experienced
-              resources.
-            </h2>
-          </div>
-          <div className="flex flex-row lg:justify-end md:justify-end  sm:justify-center xs:justify-center items-center pb-8 pt-4">
-            <GetStartedButton
-              handleSubmit={() => navigate("/host/ai-host-signup?step=1")}
-            />
-          </div>
+        {/* <div className="lg:pt-16 pt-10"> */}
+        <div>
+          <h2 className="lg:text-[1.67rem] md:text-[1.75rem] sm:text-[1.75rem] xs:text-[1.75rem] leading-[1.4] font-semibold text-host">
+            Generate continuous structured leads for your business with the
+            support of our automated platform and trained and experienced
+            resources.
+          </h2>
         </div>
+        <div className="flex flex-row lg:justify-end md:justify-end  sm:justify-center xs:justify-center items-center pb-8 pt-4">
+          <GetStartedButton
+            handleSubmit={() => navigate("/signup?step=1")}
+          />
+        </div>
+        {/* </div> */}
       </Container>
 
       {/* Social media icons banner */}
@@ -174,7 +173,7 @@ const Leads = () => {
       </Container>
 
       <div className="flex items-center justify-center h-0">
-        <hr className="w-full h-0 m-0 border-t  border-gray-400" />
+        <hr className="w-full h-0 m-0 border-t-4" />
       </div>
       {/* Automated Google Leads Section */}
       <Container padding={false}>
@@ -198,7 +197,7 @@ const Leads = () => {
       </Container>
 
       <div className="flex items-center justify-center h-0">
-        <hr className="w-full h-0 m-0 border-t  border-gray-400" />
+        <hr className="w-full h-0 m-0 border-t-4" />
       </div>
 
       {/* Run & Scale Grid Section */}
@@ -225,14 +224,14 @@ const Leads = () => {
           </div>
           <div className="flex lg:justify-end xs:justify-center items-center lg:px-8 pt-6">
             <GetStartedButton
-              handleSubmit={() => navigate("/host/ai-host-signup?step=1")}
+              handleSubmit={() => navigate("/signup?step=1")}
             />
           </div>
         </div>
       </Container>
 
       <div className="flex items-center justify-center h-0">
-        <hr className="w-full h-0 m-0 border-t  border-gray-400" />
+        <hr className="w-full h-0 m-0 border-t-4" />
       </div>
 
       {/* Get better ROI Section */}
@@ -257,7 +256,7 @@ const Leads = () => {
       </Container>
 
       <div className="flex items-center justify-center h-0">
-        <hr className="w-full h-0 m-0 border-t  border-gray-400" />
+        <hr className="w-full h-0 m-0 border-t-4" />
       </div>
 
       {/* Get a Complete View Section */}
@@ -281,7 +280,7 @@ const Leads = () => {
       </Container>
 
       <div className="flex items-center justify-center h-0">
-        <hr className="w-full h-0 m-0 border-t  border-gray-400" />
+        <hr className="w-full h-0 m-0 border-t-4" />
       </div>
 
       {/* The finer points Section */}

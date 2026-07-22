@@ -9,13 +9,10 @@ import {
 } from "react-icons/fa";
 import sliderImageOne from "../assets/main-slider-images/slider-image-1.png";
 import sliderImageTwo from "../assets/main-slider-images/slider-image-2.png";
-import logo from "../assets/wono-logo-white.png";
 
 import "keen-slider/keen-slider.min.css";
 import { useKeenSlider } from "keen-slider/react";
-import { useNavigate } from "react-router-dom";
 import { useEffect, useRef } from "react";
-import PrimaryButton from "../components/PrimaryButton";
 import { FaXTwitter } from "react-icons/fa6";
 
 const slides = [
@@ -30,21 +27,20 @@ const slides = [
 ];
 
 const MainPage = () => {
-  const navigate = useNavigate();
   const intervalRef = useRef(null);
   const goToNomads = () => {
     if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://nomad.localhost:5173";
+      window.location.href = "http://localhost:5173";
     } else {
-      window.location.href = "https://nomad.wono.co";
+      window.location.href = "https://wono.co";
     }
   };
 
   const goToHosts = () => {
     if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://hosts.localhost:5173";
+      window.location.href = "http://host.localhost:5173";
     } else {
-      window.location.href = "https://hosts.wono.co";
+      window.location.href = "https://host.wono.co";
     }
   };
 
@@ -101,16 +97,20 @@ const MainPage = () => {
             ))}
           </div>
           <div className="flex gap-8 w-full justify-center items-center pt-4">
-            <PrimaryButton
-              title="For Nomads"
-              handleSubmit={goToNomads}
-              externalStyles="bg-[#FF5757] text-[0.8rem] xs:text-[0.9rem] sm:text-[1rem] md:text-[1rem] lg:text-[1rem] flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[12rem] px-6"
-            />
-            <PrimaryButton
-              title="For Hosts"
-              handleSubmit={goToHosts}
-              externalStyles="bg-[#FF5757] text-[0.8rem] xs:text-[0.9rem] sm:text-[1rem] md:text-[1rem] lg:text-[1rem] flex text-white font-[500] capatilize hover:bg-[#E14C4C] w-[12rem] px-6"
-            />
+            <button
+              type="button"
+              onClick={goToNomads}
+              className="flex rounded-full items-center cursor-pointer justify-center gap-2 bg-primary-blue hover:bg-secondary-light text-primary text-[0.8rem] xs:text-[0.9rem] sm:text-[1rem] md:text-[1rem] lg:text-[1rem] leading-5 font-[500] capatilize w-[12rem] px-6 py-3"
+            >
+              For Nomads
+            </button>
+            <button
+              type="button"
+              onClick={goToHosts}
+              className="flex rounded-full items-center cursor-pointer justify-center gap-2 bg-primary-blue hover:bg-secondary-light text-primary text-[0.8rem] xs:text-[0.9rem] sm:text-[1rem] md:text-[1rem] lg:text-[1rem] leading-5 font-[500] capatilize w-[12rem] px-6 py-3"
+            >
+              For Hosts
+            </button>
           </div>
         </article>
       </div>

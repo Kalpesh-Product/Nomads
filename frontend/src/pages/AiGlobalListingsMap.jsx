@@ -19,7 +19,6 @@ import SkeletonMap from "../components/Skeletons/SkeletonMap.jsx";
 import Select from "react-dropdown-select";
 import { setFormValues } from "../features/locationSlice.js";
 import ListingCard from "../components/ListingCard.jsx";
-import newIcons from "../assets/newIcons.js";
 import { IoSearch } from "react-icons/io5";
 import SearchBarCombobox from "../components/SearchBarCombobox.jsx";
 import AiSelectedBadgesSearchBar from "../components/AiSelectedBadgesSearchBar.jsx";
@@ -35,6 +34,10 @@ import {
   dedupeAiSearchBadges,
   buildAiVerticalsSearchBadges,
 } from "../utils/aiSearchBarBadges.js";
+import {
+  getCategoryShortcutIconSrc,
+  useCroppedDesktopShortcutIcons,
+} from "../utils/categoryShortcutIcons.js";
 import { DESTINATION_HIGHLIGHT_FILTERS } from "../data/aiDestinationHighlights.js";
 
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
@@ -54,6 +57,11 @@ const normalizeContentDestination = (label) =>
         .replace(/[\u2010-\u2015\u2212\u{FE63}\u{FF0D}]/gu, "-")
         .trim()
     : "";
+const buildExactContentKeyword = (label) => {
+  if (!label) return null;
+  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return `^${escaped}$`;
+};
 const getAiVerticalsPageStateKey = (country = "", location = "") => {
   const countryKey = country.trim().toLowerCase();
   const locationKey = location.trim().toLowerCase();
@@ -141,6 +149,7 @@ const AiGlobalListingsMap = () => {
   const [isSecondHeadingPhase, setIsSecondHeadingPhase] = useState(false);
   const [isHeadingSequenceComplete, setIsHeadingSequenceComplete] =
     useState(false);
+  const useCroppedDesktopShortcuts = useCroppedDesktopShortcutIcons();
   const listingPageStateStorageKey = useMemo(
     () =>
       getAiVerticalsPageStateKey(
@@ -156,10 +165,21 @@ const AiGlobalListingsMap = () => {
       params.get("state") || params.get("location") || "";
     return buildAiVerticalsSearchBadges({
       locationState: location.state,
+      fallbackSelectedFilters: {
+        goal: "World Ranking",
+        continent: formData.continent,
+        goalOption: "Most Affordable",
+      },
+      querySearch: location.search,
       selectedStateValue: selectedStateFromQuery,
       persistedBadges: persistedSearchBarBadges,
     });
-  }, [location.search, location.state, persistedSearchBarBadges]);
+  }, [
+    formData.continent,
+    location.search,
+    location.state,
+    persistedSearchBarBadges,
+  ]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -351,7 +371,7 @@ const AiGlobalListingsMap = () => {
     }
 
     navigate(
-      `/ai-listings?country=${formData.country}&location=${formData.location}&category=${type}`,
+      `/listings?country=${formData.country}&location=${formData.location}&category=${type}`,
       {
         state: updatedForm,
       },
@@ -382,6 +402,13 @@ const AiGlobalListingsMap = () => {
       new URLSearchParams(location.search).get("location") ||
       formData?.location,
   );
+  const destinationContentParams = useMemo(() => {
+    if (!destinationAvailability) return undefined;
+
+    return {
+      keyword: buildExactContentKeyword(destinationAvailability),
+    };
+  }, [destinationAvailability]);
   const { data: destinationEventsData = [] } = useQuery({
     queryKey: ["ai-events-availability", destinationAvailability],
     queryFn: async () => {
@@ -424,6 +451,30 @@ const AiGlobalListingsMap = () => {
     enabled: !!destinationAvailability,
     refetchOnWindowFocus: false,
   });
+  const { data: destinationNewsData = [] } = useQuery({
+    queryKey: ["ai-news-availability", destinationAvailability],
+    queryFn: async () => {
+      const response = await axios.get("/news/get-news", {
+        params: destinationContentParams,
+      });
+
+      return Array.isArray(response.data) ? response.data : [];
+    },
+    enabled: !!destinationAvailability,
+    refetchOnWindowFocus: false,
+  });
+  const { data: destinationBlogsData = [] } = useQuery({
+    queryKey: ["ai-blogs-availability", destinationAvailability],
+    queryFn: async () => {
+      const response = await axios.get("/blogs/get-blogs", {
+        params: destinationContentParams,
+      });
+
+      return Array.isArray(response.data) ? response.data : [];
+    },
+    enabled: !!destinationAvailability,
+    refetchOnWindowFocus: false,
+  });
 
   const sortedListings = useMemo(() => {
     if (!listingsData || listingsData.length === 0) return [];
@@ -449,6 +500,14 @@ const AiGlobalListingsMap = () => {
 
         if (option.value === RESTAURANTS_CATEGORY) {
           return destinationRestaurantsData.length > 0;
+        }
+
+        if (option.value === NEWS_CATEGORY) {
+          return destinationNewsData.length > 0;
+        }
+
+        if (option.value === BLOGS_CATEGORY) {
+          return destinationBlogsData.length > 0;
         }
 
         return true;
@@ -511,7 +570,9 @@ const AiGlobalListingsMap = () => {
       },
     ];
   }, [
+    destinationBlogsData.length,
     destinationEventsData.length,
+    destinationNewsData.length,
     destinationRestaurantsData.length,
     destinationVenuesData.length,
     isLisitingLoading,
@@ -607,8 +668,16 @@ const AiGlobalListingsMap = () => {
 
     if (!normalizedCountry || !normalizedLocation) return;
 
+    const resolvedContinent =
+      normalizedContinent ||
+      normalizeValue(
+        locations.find(
+          (item) => normalizeValue(item.country) === normalizedCountry,
+        )?.continent,
+      );
+
     if (
-      normalizedContinent === normalizeValue(formData.continent) &&
+      resolvedContinent === normalizeValue(formData.continent) &&
       normalizedCountry === normalizeValue(formData.country) &&
       normalizedLocation === normalizeValue(formData.location)
     ) {
@@ -617,19 +686,19 @@ const AiGlobalListingsMap = () => {
 
     const nextFormValues = {
       ...formData,
-      continent: normalizedContinent || "",
+      continent: resolvedContinent || "",
       country: normalizedCountry || "",
       location: normalizedLocation || "",
     };
 
     dispatch(setFormValues(nextFormValues));
-  }, [dispatch, formData, location.state, location.search]);
+  }, [dispatch, formData, location.state, location.search, locations]);
 
   const { mutate: locationData, isPending: isLocation } = useMutation({
     mutationFn: async (data) => {
       dispatch(setFormValues(data));
       navigate(
-        `/ai-verticals?country=${data.country}&location=${data.location}`,
+        `/verticals?country=${data.country}&location=${data.location}`,
       );
       setShowMobileSearch(false);
     },
@@ -665,7 +734,7 @@ const AiGlobalListingsMap = () => {
         location: currentFormData.location,
         highlight: categoryValue,
       });
-      navigate(`/ai-verticals?${params.toString()}`, {
+      navigate(`/verticals?${params.toString()}`, {
         state: {
           ...location.state,
           selectedStateLabel: selectedLocationLabel,
@@ -707,8 +776,8 @@ const AiGlobalListingsMap = () => {
       categoryValue === RESTAURANTS_CATEGORY ||
       categoryValue === NEWS_CATEGORY ||
       categoryValue === BLOGS_CATEGORY
-        ? "/ai-listings-list"
-        : "/ai-listings";
+        ? "/listings-list"
+        : "/listings";
 
     navigate(
       `${listingsPath}?country=${currentFormData.country}&location=${currentFormData.location}&category=${state.category}`,
@@ -734,7 +803,7 @@ const AiGlobalListingsMap = () => {
       );
     }
 
-    navigate(`/ai-listings/${encodeURIComponent(item.companyName)}`, {
+    navigate(`/listings/${encodeURIComponent(item.companyName)}`, {
       state: {
         breadcrumbLoading: true,
         companyId: item.companyId,
@@ -757,7 +826,7 @@ const AiGlobalListingsMap = () => {
             "",
         },
         returnTo: {
-          pathname: "/ai-verticals",
+          pathname: "/verticals",
           search: location.search,
         },
       },
@@ -803,7 +872,7 @@ const AiGlobalListingsMap = () => {
         />
         <meta property="og:image" content="/images/map-preview.jpeg" />
         <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://nomad.wono.co/ai-verticals" />
+        <link rel="canonical" href="https://wono.co/verticals" />
       </Helmet>
 
       {/* ==================== DESKTOP VIEW (lg and above) ==================== */}
@@ -815,7 +884,7 @@ const AiGlobalListingsMap = () => {
             onBack={() => navigate(-1)}
             onClear={() => navigate("/search/results")}
             heading={
-              <p className="mt-6 mb-6 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.8rem] font-play">
+              <p className="mt-0 mb-5 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.8rem] font-play">
                 {!isSecondHeadingPhase && (
                   <span
                     className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-b-transparent"
@@ -837,7 +906,10 @@ const AiGlobalListingsMap = () => {
               <div className="w-full pb-4">
                 <div className="flex justify-between items-center">
                   {categoryOptions.map((cat) => {
-                    const iconSrc = newIcons[cat.value];
+                    const iconSrc = getCategoryShortcutIconSrc(
+                      cat.value,
+                      useCroppedDesktopShortcuts,
+                    );
                     return (
                       <button
                         key={cat.value}
@@ -943,6 +1015,7 @@ const AiGlobalListingsMap = () => {
         <div className={isHeadingSequenceComplete ? "block" : "hidden"}>
           <Container padding={false}>
             <div className="">
+              <div className="border-t border-gray-300 mt-0 mb-6" />
               <div className="font-semibold text-md grid grid-cols-9 gap-4 pt-3">
                 <div className="custom-scrollbar-hide col-span-5">
                   {isLisitingLoading ? (
@@ -1406,7 +1479,7 @@ const AiGlobalListingsMap = () => {
         <button
           onClick={() =>
             navigate(
-              `/ai-verticals?country=${formData?.country}&location=${formData?.location}`,
+              `/verticals?country=${formData?.country}&location=${formData?.location}`,
               {
                 state: {
                   ...location.state,

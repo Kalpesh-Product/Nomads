@@ -16,7 +16,7 @@ import { persistSelectedDestination } from "../utils/selectedDestinationSession"
 
 const searchBarBadgeClassName =
   "inline-flex min-h-[40px] min-w-[5rem] items-center rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85";
-const contentAlignClassName = "md:px-10";
+const contentAlignClassName = "max-[820px]:!px-0 md:px-10";
 
 // const countOptions = [
 //   { label: "1 - 5", value: "1-5" },
@@ -316,7 +316,7 @@ const AiManualSearch = () => {
     });
 
     navigate(
-      `/ai-verticals?country=${encodeURIComponent(country)}&location=${encodeURIComponent(location)}`,
+      `/verticals?country=${encodeURIComponent(country)}&location=${encodeURIComponent(location)}`,
       {
         state: {
           selectedStateLabel: selectedLocationTitle,
@@ -417,7 +417,7 @@ const AiManualSearch = () => {
   return (
     <div className="min-h-full bg-white">
       <main className="pb-8">
-        <div className="mx-0 w-full max-w-none px-3 sm:max-w-[20rem] sm:px-6 lg:mx-auto lg:max-w-[85rem] lg:px-0 lg:min-w-[75%]">
+        <div className="mx-0 w-full max-w-none px-3 sm:max-w-[20rem] sm:px-6 max-[820px]:!max-w-none max-[820px]:!px-3 lg:mx-auto lg:max-w-[85rem] lg:px-0 lg:min-w-[75%]">
           <div className="rounded-[10px] bg-white px-0 pb-6">
             <div className={`mt-6 mb-6 ${contentAlignClassName}`}>
               <p className="text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
@@ -426,7 +426,7 @@ const AiManualSearch = () => {
             </div>
 
             <div className={contentAlignClassName}>
-              <div className="mt-4 hidden max-w-full items-center rounded-[30px] border bg-white px-4 py-2 shadow-[0_5px_14px_rgba(0,0,0,0.12)] sm:flex">
+              <div className="mt-4 hidden max-w-full items-center rounded-[30px] border bg-white px-4 py-2 shadow-[0_5px_14px_rgba(0,0,0,0.12)] sm:flex max-[820px]:!hidden">
                 <div className="flex flex-wrap items-center gap-2">
                   {searchBarBadges.map((badgeLabel, index) => (
                     <div
@@ -440,7 +440,7 @@ const AiManualSearch = () => {
                 <div className="ml-auto flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => navigate("/home")}
+                    onClick={() => navigate("/")}
                     className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-black/70 transition-colors hover:bg-black/5 hover:text-black"
                     aria-label="Clear search and go back"
                   >
@@ -467,7 +467,7 @@ const AiManualSearch = () => {
               className={`relative mt-6 ${contentAlignClassName}`}
               ref={dropdownContainerRef}
             >
-              <div className="relative z-30 grid w-full grid-cols-1 gap-4 sm:grid-cols-2 sm:items-stretch lg:grid-cols-3">
+              <div className="relative z-30 grid w-full grid-cols-1 gap-4 sm:grid-cols-2 sm:items-stretch max-[820px]:!grid-cols-1 lg:grid-cols-3">
                 <DropdownBadge
                   label="Continent"
                   options={continentOptions}

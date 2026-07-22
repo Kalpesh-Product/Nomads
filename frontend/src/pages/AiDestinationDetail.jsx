@@ -89,7 +89,7 @@ const AiDestinationDetail = ({ type }) => {
 
   const handleWriteReviewClick = () => {
     if (!userId) {
-      navigate("/ai-login");
+      navigate("/login");
       return;
     }
 

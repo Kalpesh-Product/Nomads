@@ -135,7 +135,13 @@ const Product = () => {
       }
       const url = `company/get-single-company-data?${params.toString()}`;
       const response = await axios.get(url);
-      return response?.data;
+      const companyData = response?.data;
+      return {
+        ...companyData,
+        reviews: Array.isArray(companyData?.reviews)
+          ? companyData.reviews.filter((review) => review?.isEnabled !== false)
+          : [],
+      };
     },
     enabled: !!companyId || !!companyName,
     refetchOnMount: "always",
@@ -591,10 +597,9 @@ const Product = () => {
 
   const goToHostsContentCopyright = () => {
     if (window.location.hostname.includes("localhost")) {
-      window.location.href =
-        "http://hosts.localhost:5173/content-and-copyright";
+      window.location.href = "http://host.localhost:5173/content-and-copyright";
     } else {
-      window.location.href = "https://hosts.wono.co/content-and-copyright ";
+      window.location.href = "https://host.wono.co/content-and-copyright ";
     }
   };
 

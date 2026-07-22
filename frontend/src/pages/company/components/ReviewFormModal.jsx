@@ -40,7 +40,7 @@ const ReviewFormModal = ({
         starCount: Number(starCount),
         description: description.trim(),
         workspaceId,
-        reviewSource: "Nomads Website",
+        reviewSource: "Website Reviews",
         reviewLink:
           typeof window !== "undefined" ? window.location.href : "",
       };

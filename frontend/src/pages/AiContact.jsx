@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import axios from "../utils/axios";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
@@ -20,24 +20,31 @@ import { useMutation } from "@tanstack/react-query";
 // import toast from "react-hot-toast";
 import { isValidInternationalPhone } from "../utils/validators";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
+import { Country } from "country-state-city";
+import { HiCheck } from "react-icons/hi";
+
+const getFlagIconUrl = (isoCode) =>
+    `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
+
+const tickMenuItemSx = {
+    "& .tick-icon": { opacity: 0, color: "#1976d2" },
+    "&:hover .tick-icon": { opacity: 1 },
+    "&.Mui-selected .tick-icon": { opacity: 1 },
+    "&.Mui-selected:hover .tick-icon": { opacity: 1 },
+};
 
 const AiContact = () => {
-    const [loading, setLoading] = useState(false);
+    const [loading] = useState(false);
     const [showModal, setShowModal] = useState(false);
+    const countries = useMemo(() => Country.getAllCountries(), []);
 
-    const [formData, setFormData] = useState({
-        name: "",
-        email: "",
-        mobile: "",
-        typeOfPartnerShip: "",
-        message: "",
-    });
-
-    const { control, handleSubmit, reset } = useForm({
+    const { control, handleSubmit, reset, getValues } = useForm({
         defaultValues: {
             name: "",
             email: "",
             mobile: "",
+            contactCode: "+91",
+            contactNumber: "",
             typeOfPartnerShip: "",
             message: "",
         },
@@ -54,7 +61,7 @@ const AiContact = () => {
                 });
                 return response.data;
             },
-            onSuccess: (data) => {
+            onSuccess: () => {
                 showSuccessAlert("Form submitted successfully");
                 reset();
             },
@@ -62,6 +69,13 @@ const AiContact = () => {
                 showErrorAlert(error.response.data.message);
             },
         });
+
+    const handleContactSubmit = ({ contactCode, contactNumber, ...data }) => {
+        submitContactForm({
+            ...data,
+            mobile: `${contactCode}${contactNumber}`,
+        });
+    };
 
     const floatingLabelSx = {
         color: "black",
@@ -172,7 +186,7 @@ const AiContact = () => {
                         <div className="md:px-20 lg:px-40">
                             <Box
                                 component="form"
-                                onSubmit={handleSubmit((data) => submitContactForm(data))}
+                                onSubmit={handleSubmit(handleContactSubmit)}
                                 sx={{ mt: 0 }}
                                 className="bg-gray-50/50 p-6 md:p-10 rounded-2xl border border-gray-100 shadow-sm"
                             >
@@ -225,27 +239,95 @@ const AiContact = () => {
                                         )}
                                     />
 
-                                    {/* Mobile */}
-                                    <Controller
-                                        name="mobile"
-                                        control={control}
-                                        rules={{
-                                            required: "Mobile number is required",
-                                            validate: isValidInternationalPhone,
-                                        }}
-                                        render={({ field, fieldState }) => (
-                                            <TextField
-                                                {...field}
-                                                fullWidth
-                                                label="Mobile Number"
-                                                variant="standard"
-                                                required
-                                                error={!!fieldState.error}
-                                                helperText={fieldState.error?.message}
-                                                InputLabelProps={{ sx: floatingLabelSx }}
-                                            />
-                                        )}
-                                    />
+                                    {/* Contact Number */}
+                                    <Box sx={{ display: "flex", gap: 2, width: "100%" }}>
+                                        <Controller
+                                            name="contactCode"
+                                            control={control}
+                                            rules={{ required: "Code is required" }}
+                                            render={({ field, fieldState }) => {
+                                                return (
+                                                    <TextField
+                                                        {...field}
+                                                        select
+                                                        label="Code"
+                                                        variant="standard"
+                                                        required
+                                                        error={!!fieldState.error}
+                                                        helperText={fieldState.error?.message}
+                                                        InputLabelProps={{ sx: floatingLabelSx }}
+                                                        sx={{ width: "35%" }}
+                                                    >
+                                                        {countries.map((country) => {
+                                                            const phoneCode = `+${country.phonecode}`;
+
+                                                            return (
+                                                                <MenuItem
+                                                                    key={`${country.isoCode}-${phoneCode}`}
+                                                                    value={phoneCode}
+                                                                    sx={tickMenuItemSx}
+                                                                >
+                                                                    <Box className="flex w-full items-center gap-2">
+                                                                        <HiCheck className="tick-icon" size={16} />
+                                                                        <Box className="flex items-center gap-1">
+                                                                            <Box
+                                                                                component="img"
+                                                                                src={getFlagIconUrl(country.isoCode)}
+                                                                                alt={`${country.name} flag`}
+                                                                                sx={{
+                                                                                    width: 20,
+                                                                                    height: 15,
+                                                                                    flexShrink: 0,
+                                                                                }}
+                                                                                loading="lazy"
+                                                                            />
+                                                                            <span>{phoneCode}</span>
+                                                                        </Box>
+                                                                    </Box>
+                                                                </MenuItem>
+                                                            );
+                                                        })}
+                                                    </TextField>
+                                                );
+                                            }}
+                                        />
+                                        <Box
+                                            sx={{
+                                                width: "1px",
+                                                height: "100%",
+                                                backgroundColor: "#ccc",
+                                            }}
+                                        />
+                                        <Controller
+                                            name="contactNumber"
+                                            control={control}
+                                            rules={{
+                                                required: "Contact number is required",
+                                                pattern: {
+                                                    value: /^[0-9]{7,15}$/,
+                                                    message: "Please enter a valid phone number",
+                                                },
+                                                validate: (value) =>
+                                                    isValidInternationalPhone(
+                                                        `${getValues("contactCode")}${value}`,
+                                                    ),
+                                            }}
+                                            render={({ field, fieldState }) => (
+                                                <TextField
+                                                    {...field}
+                                                    fullWidth
+                                                    label="Contact Number"
+                                                    variant="standard"
+                                                    type="tel"
+                                                    required
+                                                    error={!!fieldState.error}
+                                                    helperText={fieldState.error?.message}
+                                                    InputLabelProps={{ sx: floatingLabelSx }}
+                                                    sx={{ flex: 1 }}
+                                                />
+                                            )}
+                                        />
+                                    </Box>
 
                                     {/* Reason to Connect */}
                                     <Controller

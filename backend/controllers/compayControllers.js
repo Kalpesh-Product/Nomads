@@ -10,6 +10,17 @@ import axios from "axios";
 import TestListing from "../models/TestCompany.js";
 import NomadUser from "../models/NomadUser.js";
 
+const buildVisibleNomadReviewQuery = (criteria = {}) => ({
+  ...criteria,
+  status: "approved",
+  isEnabled: { $ne: false },
+  $or: [
+    { source: "nomad" },
+    { source: { $exists: false } },
+    { reviewSource: /^Nomads Website$/i },
+  ],
+});
+
 // Utility to calculate distance between two lat/lng points in meters
 function getDistanceFromLatLonInM(lat1, lon1, lat2, lon2) {
   const R = 6371e3; // Earth radius in meters
@@ -699,7 +710,9 @@ export const getCompaniesData = async (req, res, next) => {
     const ids = filtered.map((c) => c._id);
 
     const [reviews, pocs] = await Promise.all([
-      Review.find({ company: { $in: ids } }).lean(),
+      Review.find(
+        buildVisibleNomadReviewQuery({ company: { $in: ids } }),
+      ).lean(),
       PointOfContact.find({
         company: { $in: ids },
         isActive: true,
@@ -1107,7 +1120,11 @@ export const getCompanyData = async (req, res, next) => {
 
     // Fetch DB reviews & POC
     const [reviews, poc] = await Promise.all([
-      Review.find({ company: companyObjectId }).lean().exec(),
+      Review.find(
+        buildVisibleNomadReviewQuery({ company: companyObjectId }),
+      )
+        .lean()
+        .exec(),
       PointOfContact.findOne({ company: companyObjectId, isActive: true })
         .lean()
         .exec(),
@@ -1122,16 +1139,21 @@ export const getCompanyData = async (req, res, next) => {
 
     return res.status(200).json({
       ...updatedCompanyData,
+      // Reviews shown on Nomads must be controlled by approval/isEnabled in
+      // our database. Live Google reviews bypass those moderation controls.
       reviews: [
         ...reviews,
-        ...(closestGoogle?.reviews || []).map((r) => ({
-          company: companyObjectId,
-          name: r.author_name,
-          starCount: r.rating,
-          description: r.text,
-          reviewLink: r.author_url,
-          avatar: r.profile_photo_url,
-        })),
+        // Keep the Google review integration available for later use. It is
+        // disabled for now because live Google reviews do not have a database
+        // isEnabled value and therefore cannot follow HostPanel visibility.
+        // ...(closestGoogle?.reviews || []).map((r) => ({
+        //   company: companyObjectId,
+        //   name: r.author_name,
+        //   starCount: r.rating,
+        //   description: r.text,
+        //   reviewLink: r.author_url,
+        //   avatar: r.profile_photo_url,
+        // })),
       ],
       poc,
     });
@@ -1168,7 +1190,9 @@ export const getListings = async (req, res, next) => {
     }
 
     const listings = await Company.find(query).lean().exec();
-    const reviews = await Review.find({ companyId })
+    const reviews = await Review.find(
+      buildVisibleNomadReviewQuery({ companyId }),
+    )
       .populate({ path: "company", select: "companyType" })
       .lean()
       .exec();
@@ -1300,6 +1324,34 @@ export const getUniqueDataLocations = async (req, res, next) => {
   }
 };
 
+export const getCompanyCountries = async (req, res, next) => {
+  try {
+    const countries = await Company.aggregate([
+      {
+        $project: {
+          country: { $trim: { input: { $ifNull: ["$country", ""] } } },
+        },
+      },
+      { $match: { country: { $ne: "" } } },
+      {
+        $group: {
+          _id: { $toLower: "$country" },
+          country: { $first: "$country" },
+        },
+      },
+      { $sort: { country: 1 } },
+      { $project: { _id: 0, country: 1 } },
+    ]).collation({ locale: "en", strength: 2 });
+
+    return res.status(200).json({
+      message: "Company countries fetched successfully",
+      data: countries.map((item) => item.country),
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const addCompanyImage = async (req, res, next) => {
   try {
     const file = req.file;
@@ -1408,7 +1460,7 @@ export const addCompanyImage = async (req, res, next) => {
         console.log("📤 Syncing logo to Master Panel:", payload);
 
         const response = await axios.patch(
-          "https://wonomasterbe.vercel.app/api/hosts/upload-logo",
+          `${WONOMASTER_BE}/hosts/upload-logo`,
           payload,
           { headers: { "Content-Type": "application/json" } },
         );
@@ -1419,25 +1471,10 @@ export const addCompanyImage = async (req, res, next) => {
           response.data.message,
         );
       } catch (masterErr) {
-        console.error(
-          "❌ Master Panel sync failed:",
+        console.warn(
+          "Master Panel logo sync failed; keeping Nomads logo upload:",
           masterErr.response?.data || masterErr.message,
         );
-
-        // Rollback: delete file from S3 and remove logo from DB
-        try {
-          await deleteFileFromS3ByUrl(data.url);
-          company.logo = "";
-          await company.save({ validateBeforeSave: false });
-        } catch (rollbackErr) {
-          console.error("⚠️ Rollback failed:", rollbackErr.message);
-        }
-
-        return res.status(500).json({
-          message:
-            "Failed to sync logo with Master Panel. Changes reverted in Nomads.",
-          error: masterErr.message,
-        });
       }
     }
 
@@ -1931,7 +1968,7 @@ export const addTemplateLink = async (req, res, next) => {
 
 export const getAllLeads = async (req, res, next) => {
   try {
-    const leads = await Lead.find();
+    const leads = await Lead.find().sort({ createdAt: -1 });
 
     if (!leads || !leads.length) {
       return res.status(200).json({
@@ -2011,14 +2048,28 @@ export const deactivateProduct = async (req, res, next) => {
 
 export const getCompanyLeads = async (req, res, next) => {
   try {
-    const { companyId } = req.query;
+    const { companyId, workspaceId, isEscalated } = req.query;
     let query = {};
 
     if (companyId) {
       query.companyId = companyId;
     }
 
-    const leads = await Lead.find(query);
+    if (String(isEscalated || "").toLowerCase() === "true") {
+      query.isEscalated = true;
+      if (companyId) {
+        delete query.companyId;
+        query.$or = [
+          { companyId },
+          { escalatedHostCompanyId: companyId },
+        ];
+      }
+      if (workspaceId) {
+        query.escalatedWorkspaceId = String(workspaceId).trim();
+      }
+    }
+
+    const leads = await Lead.find(query).sort({ createdAt: -1 });
 
     if (!leads || !leads.length) {
       return res.status(200).json({
@@ -2033,31 +2084,112 @@ export const getCompanyLeads = async (req, res, next) => {
   }
 };
 
+export const escalateLeadToHostPanel = async (req, res, next) => {
+  try {
+    const { leadId, workspaceId, hostCompanyId, escalatedBy } = req.body || {};
+    const normalizedLeadId = String(leadId || "").trim();
+    const normalizedWorkspaceId = String(workspaceId || "").trim();
+
+    if (!mongoose.Types.ObjectId.isValid(normalizedLeadId)) {
+      return res.status(400).json({ message: "A valid leadId is required" });
+    }
+
+    if (!normalizedWorkspaceId) {
+      return res.status(400).json({ message: "workspaceId is required" });
+    }
+
+    const existingLead = await Lead.findById(normalizedLeadId).lean();
+    if (!existingLead) {
+      return res.status(404).json({ message: "Lead not found" });
+    }
+    if (existingLead.status !== "Closed") {
+      return res.status(409).json({
+        message: "Close the Master Panel lead before escalating it to HostPanel",
+      });
+    }
+
+    const lead = await Lead.findByIdAndUpdate(
+      normalizedLeadId,
+      {
+        $set: {
+          isEscalated: true,
+          escalatedWorkspaceId: normalizedWorkspaceId,
+          escalatedHostCompanyId: String(hostCompanyId || "").trim(),
+          escalatedAt: new Date(),
+          escalatedBy: String(escalatedBy || "").trim(),
+          hostPanelStatus: existingLead.hostPanelStatus || "Pending",
+        },
+      },
+      { new: true },
+    );
+
+    if (!lead) {
+      return res.status(404).json({ message: "Lead not found" });
+    }
+
+    return res.status(200).json({
+      message: "Lead escalated to HostPanel successfully",
+      lead,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const updateLeads = async (req, res, next) => {
   try {
-    const { status, comment, leadId } = req.body;
+    const { status, hostPanelStatus, comment, leadId, workspaceId } = req.body || {};
+    const normalizedStatus = String(status || "").trim();
+    const normalizedHostStatus = String(hostPanelStatus || "").trim();
 
-    if ((!leadId && typeof status !== boolean) || (!leadId && !comment)) {
+    if (!mongoose.Types.ObjectId.isValid(String(leadId || "").trim())) {
       return res.status(400).json({
-        message: "Missing required fields",
+        message: "A valid leadId is required",
       });
+    }
+
+    if (!normalizedStatus && !normalizedHostStatus && typeof comment !== "string") {
+      return res.status(400).json({ message: "No lead changes were provided" });
+    }
+
+    if (normalizedStatus && !["Pending", "Contacted", "Closed"].includes(normalizedStatus)) {
+      return res.status(400).json({ message: "Invalid Master Panel lead status" });
+    }
+
+    if (normalizedHostStatus && !["Pending", "Closed"].includes(normalizedHostStatus)) {
+      return res.status(400).json({ message: "Invalid HostPanel lead status" });
+    }
+
+    const normalizedWorkspaceId = String(workspaceId || "").trim();
+    if (normalizedHostStatus && !normalizedWorkspaceId) {
+      return res.status(400).json({ message: "workspaceId is required for HostPanel status updates" });
     }
 
     const query = {};
 
-    if (comment) {
+    if (typeof comment === "string") {
       query.comment = comment;
     }
 
-    if (status) {
-      query.status = status;
+    if (normalizedStatus) {
+      query.status = normalizedStatus;
+      query.masterStatusUpdatedAt = new Date();
     }
 
-    const leads = await Lead.findByIdAndUpdate(
+    if (normalizedHostStatus) {
+      query.hostPanelStatus = normalizedHostStatus;
+      query.hostPanelStatusUpdatedAt = new Date();
+    }
+
+    const leads = await Lead.findOneAndUpdate(
       {
         _id: leadId,
+        ...(normalizedHostStatus
+          ? { isEscalated: true, escalatedWorkspaceId: normalizedWorkspaceId }
+          : {}),
       },
-      query,
+      { $set: query },
+      { new: true },
     );
 
     if (!leads) {
@@ -2067,7 +2199,8 @@ export const updateLeads = async (req, res, next) => {
     }
 
     return res.status(200).json({
-      message: `Lead ${comment ? "comment" : "status"} updated`,
+      message: `Lead ${typeof comment === "string" && !normalizedStatus && !normalizedHostStatus ? "comment" : "status"} updated`,
+      lead: leads,
     });
   } catch (error) {
     console.error("[getCompanyLeads] error:", error);

@@ -210,7 +210,7 @@ const Favorites = ({
                         className="overflow-hidden rounded-2xl bg-white text-left transition-all hover:-translate-y-1"
                         onClick={() =>
                           navigate(
-                            `/ai-verticals?country=${encodeURIComponent(
+                            `/verticals?country=${encodeURIComponent(
                               (destination.country || "").toLowerCase(),
                             )}&state=${encodeURIComponent(
                               (destination.state || "").toLowerCase(),
@@ -221,7 +221,7 @@ const Favorites = ({
                           if (event.key === "Enter" || event.key === " ") {
                             event.preventDefault();
                             navigate(
-                              `/ai-verticals?country=${encodeURIComponent(
+                              `/verticals?country=${encodeURIComponent(
                                 (destination.country || "").toLowerCase(),
                               )}&state=${encodeURIComponent(
                                 (destination.state || "").toLowerCase(),
@@ -322,7 +322,7 @@ const Favorites = ({
                   handleNavigation={() =>
                     navigate(
                       `${
-                        useAiListingsRoute ? "/ai-listings" : "/listings"
+                        useAiListingsRoute ? "/listings" : "/listings"
                       }/${encodeURIComponent(item.companyName)}`,
                       {
                         state: {

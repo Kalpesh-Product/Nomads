@@ -36,7 +36,7 @@ const NewsCard = ({ a, stateName }) => {
       onClick={() =>
         navigate(
           {
-            pathname: "ai-news-details",
+            pathname: "news-details",
             search: location.search,
           },
           {

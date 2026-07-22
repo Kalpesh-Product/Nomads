@@ -21,12 +21,11 @@ import {
   HiOutlineLogin,
 } from "react-icons/hi";
 import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
-import { FaGlobeAmericas } from "react-icons/fa";
+import { FaGlobeAmericas, FaHandsHelping } from "react-icons/fa";
 import { MdOutlineWorkHistory } from "react-icons/md";
 import { HiOutlineCurrencyDollar } from "react-icons/hi";
 import { RiUserCommunityLine } from "react-icons/ri";
 import { TbAward, TbWorldWww } from "react-icons/tb";
-import { IoMdPersonAdd } from "react-icons/io";
 import { HiOutlineUserGroup } from "react-icons/hi";
 import { MdComputer } from "react-icons/md";
 import { IoBriefcaseSharp } from "react-icons/io5";
@@ -132,7 +131,7 @@ const signOutItem = [{ label: "Sign Out", icon: HiOutlineLogout }];
 
 const becomeContributorLink = {
   label: "Become A Contributor",
-  icon: IoMdPersonAdd,
+  icon: FaHandsHelping,
   path: "/become-a-contributor",
 };
 
@@ -305,7 +304,16 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
   useEffect(() => {
     const normalizedPath = location.pathname.replace(/\/$/, "") || "/";
-    const isAiHomePage = normalizedPath === "/home";
+    const isAiHomePage = normalizedPath === "/";
+    const isValueAdditionPage = valueAdditionItems.some((item) => {
+      if (!item.path) return false;
+
+      const normalizedItemPath = item.path.replace(/\/$/, "");
+      return (
+        normalizedPath === normalizedItemPath ||
+        normalizedPath.startsWith(`${normalizedItemPath}/`)
+      );
+    });
 
     if (isAiHomePage) {
       setIsRecommendationsOpen(false);
@@ -314,7 +322,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     }
 
     setIsRecommendationsOpen(true);
-    setIsValueAdditionsOpen(false);
+    setIsValueAdditionsOpen(isValueAdditionPage);
   }, [location.pathname]);
 
   const isLoggedIn = Boolean(auth?.user) || readStoredLoginState();
@@ -327,7 +335,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
     if (!isLoggedIn && gatedRecommendationLabels.has(item.label)) {
       const goalSlug = goalSlugByLabel[item.label];
-      const loginPath = goalSlug ? `/ai-login/${goalSlug}` : "/ai-login";
+      const loginPath = goalSlug ? `/login/${goalSlug}` : "/login";
 
       navigate(`${loginPath}${location.search}`, {
         state: {
@@ -372,27 +380,27 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     params.set("tab", item.tab);
 
     navigate({
-      pathname: "/ai-profile",
+      pathname: "/profile",
       search: params.toString() ? `?${params.toString()}` : "",
     });
   };
 
   const getNomadLoginRedirectPath = () => {
     const authPages = new Set([
-      "/ai-signup",
-      "/ai-login",
-      "/ai-forgot-password",
+      "/signup",
+      "/login",
+      "/forgot-password",
     ]);
 
     if (authPages.has(location.pathname)) {
-      return "/home";
+      return "/";
     }
 
     return `${location.pathname}${location.search}`;
   };
 
   const handleLogInClick = () => {
-    navigate(`/ai-login${location.search}`, {
+    navigate(`/login${location.search}`, {
       state: {
         redirectTo: getNomadLoginRedirectPath(),
       },
@@ -401,9 +409,9 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
   const handleBecomeHostClick = () => {
     if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://nomad.localhost:5173/host";
+      window.location.href = "http://host.localhost:5173/";
     } else {
-      window.location.href = "https://nomad.wono.co/host";
+      window.location.href = "https://host.wono.co/";
     }
   };
 
@@ -426,13 +434,13 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
     if (isMobileOverlay) {
       onClose?.();
-      navigate("/ai-login");
+      navigate("/login");
       return;
     }
 
     navigate(
       {
-        pathname: "/ai-login",
+        pathname: "/login",
         search: nextSearchParams.toString()
           ? `?${nextSearchParams.toString()}`
           : "",
@@ -450,7 +458,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   const normalizedPath = location.pathname.replace(/\/$/, "") || "/";
   const redirectGoal = location.pathname
     .replace(/\/$/, "")
-    .match(/^\/ai-login\/([^/]+)$/)?.[1];
+    .match(/^\/login\/([^/]+)$/)?.[1];
 
   // Active state logic for recommendations
   const recommendationItemsWithActivePath = recommendationItems.map((item) => {
@@ -461,7 +469,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     const isActivePath =
       normalizedPath === normalizedItemPath ||
       normalizedPath.startsWith(`${normalizedItemPath}/`) ||
-      (normalizedPath.startsWith("/ai-login/") &&
+      (normalizedPath.startsWith("/login/") &&
         Boolean(goalSlug) &&
         goalSlug === redirectGoal);
 

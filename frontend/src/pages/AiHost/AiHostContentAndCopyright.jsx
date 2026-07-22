@@ -6,7 +6,7 @@ import { HiOutlineArrowLeft } from "react-icons/hi";
 const AiHostContentAndCopyright = () => {
     const navigate = useNavigate();
 
-    const onBack = () => navigate("/host");
+    const onBack = () => navigate("/");
 
     const sections = [
         {

@@ -20,8 +20,10 @@ import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import blueUnderline from "../../assets/blue_underline.png";
 import { HiOutlineArrowLeft } from "react-icons/hi";
+import { useNavigate } from "react-router-dom";
 
 const HostAbout = () => {
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
 
@@ -61,7 +63,7 @@ const HostAbout = () => {
         "&.MuiInputLabel-shrink": { color: "#1976d2" },
     };
 
-    const onBack = () => navigate("/host");
+    const onBack = () => navigate("/");
 
     return (
         <>

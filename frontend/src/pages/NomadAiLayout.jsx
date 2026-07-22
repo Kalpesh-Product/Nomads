@@ -56,11 +56,13 @@ const writeAiScrollPosition = (location, scrollTop) => {
 const readAiScrollPosition = (location) =>
   readAiScrollPositions()[getAiScrollPositionKey(location)];
 
+const MANUAL_SEARCH_COMPACT_WIDTH = 820;
+
 const HIDE_STICKY_BAR_PREFIXES = [
-  "/ai-login",
-  "/ai-signup",
-  "/ai-forgot-password",
-  "/ai-reset-password",
+  "/login",
+  "/signup",
+  "/forgot-password",
+  "/reset-password",
 ];
 
 const toTitle = (value) =>
@@ -73,19 +75,19 @@ const toTitle = (value) =>
 
 const normalizeBreadcrumbLabel = (segment) => {
   const normalized = (segment || "").toLowerCase();
-  if (normalized === "ai-blogs") return "Blogs";
-  if (normalized === "ai-news") return "News";
-  if (normalized === "ai-events") return "Events";
-  if (normalized === "ai-venues") return "Places";
-  if (normalized === "ai-about") return "About";
-  if (normalized === "ai-career") return "Career";
-  if (normalized === "ai-faq") return "FAQs";
-  if (normalized === "ai-privacy") return "Privacy";
-  if (normalized === "ai-terms-and-conditions") return "T&C";
-  if (normalized === "ai-contact") return "Contact";
-  if (normalized === "ai-content-and-copyright")
+  if (normalized === "blog") return "Blogs";
+  if (normalized === "news") return "News";
+  if (normalized === "events") return "Events";
+  if (normalized === "venues") return "Places";
+  if (normalized === "about") return "About";
+  if (normalized === "career") return "Career";
+  if (normalized === "faq") return "FAQs";
+  if (normalized === "privacy") return "Privacy";
+  if (normalized === "terms-and-conditions") return "T&C";
+  if (normalized === "contact") return "Contact";
+  if (normalized === "content-and-copyright")
     return "Content and Copyright Policy";
-  if (normalized === "ai-content-use-removal")
+  if (normalized === "content-use-removal")
     return "Content Use & Removal Policy";
   return toTitle(segment);
 };
@@ -96,6 +98,12 @@ const NomadAiLayout = () => {
   const navigationType = useNavigationType();
   const contentRef = useRef(null);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isManualSearchCompact, setIsManualSearchCompact] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      location.pathname.startsWith("/manual-search") &&
+      window.innerWidth <= MANUAL_SEARCH_COMPACT_WIDTH,
+  );
 
   const formData = useSelector((state) => state.location.formValues);
   console.log("formData from layout : ", formData);
@@ -135,6 +143,21 @@ const NomadAiLayout = () => {
     setIsMobileSidebarOpen(false);
   }, [location.pathname, location.search]);
 
+  useEffect(() => {
+    const updateManualSearchCompactMode = () => {
+      setIsManualSearchCompact(
+        location.pathname.startsWith("/manual-search") &&
+          window.innerWidth <= MANUAL_SEARCH_COMPACT_WIDTH,
+      );
+    };
+
+    updateManualSearchCompactMode();
+    window.addEventListener("resize", updateManualSearchCompactMode);
+
+    return () =>
+      window.removeEventListener("resize", updateManualSearchCompactMode);
+  }, [location.pathname]);
+
   const shouldShowStickyBar = (() => {
     if (EXCLUDED_STICKY_BAR_PATHS.has(location.pathname)) return false;
     if (HIDE_STICKY_BAR_EXACT_PATHS.has(location.pathname)) return false;
@@ -151,32 +174,32 @@ const NomadAiLayout = () => {
   const routeBreadcrumbs = (() => {
     if (
       location.pathname === "/world-rankings" ||
-      location.pathname === "/ai-verticals" ||
-      location.pathname === "/ai-profile" ||
-      location.pathname === "/ai-listings" ||
+      location.pathname === "/verticals" ||
+      location.pathname === "/profile" ||
+      location.pathname === "/listings" ||
       location.pathname.startsWith("/manual-search") ||
       location.pathname.startsWith("/search/worldranking/results") ||
       location.pathname.startsWith("/search/workfromanywhere/results") ||
       location.pathname.startsWith("/search/increaseyoursavings/results") ||
       location.pathname.startsWith("/search/advanceyourcareer/results") ||
       location.pathname.startsWith("/search/findyourcommunity/results") ||
-      location.pathname.startsWith("/ai-listings-list") ||
+      location.pathname.startsWith("/listings-list") ||
       location.pathname.startsWith("/visa-support") ||
       location.pathname.startsWith("/overall-activation-support") ||
       location.pathname.startsWith("/new-company-setup") ||
       location.pathname.startsWith("/consultation") ||
       location.pathname.startsWith("/workation") ||
       location.pathname.startsWith("/become-a-contributor") ||
-      location.pathname.startsWith("/ai-about") ||
-      location.pathname.startsWith("/ai-privacy") ||
-      location.pathname.startsWith("/ai-career") ||
-      location.pathname.startsWith("/ai-terms-and-conditions") ||
-      location.pathname.startsWith("/ai-faq") ||
-      location.pathname.startsWith("/ai-contact") ||
-      location.pathname.startsWith("/ai-career") ||
-      location.pathname.startsWith("/ai-content-and-copyright") ||
-      location.pathname.startsWith("/ai-content-use-removal") ||
-      location.pathname.startsWith("/ai-contact")
+      location.pathname.startsWith("/about") ||
+      location.pathname.startsWith("/privacy") ||
+      location.pathname.startsWith("/career") ||
+      location.pathname.startsWith("/terms-and-conditions") ||
+      location.pathname.startsWith("/faq") ||
+      location.pathname.startsWith("/contact") ||
+      location.pathname.startsWith("/career") ||
+      location.pathname.startsWith("/content-and-copyright") ||
+      location.pathname.startsWith("/content-use-removal") ||
+      location.pathname.startsWith("/contact")
     ) {
       return [];
     }
@@ -207,8 +230,8 @@ const NomadAiLayout = () => {
     if (segments.length === 0) return [];
 
     const isContentDetailPage =
-      location.pathname === "/ai-blogs/ai-blog-details" ||
-      location.pathname === "/ai-news/ai-news-details";
+      location.pathname === "/blog/blog-details" ||
+      location.pathname === "/news/news-details";
     const detailStateName = location.state?.selectedStateLabel;
 
     return segments
@@ -228,19 +251,41 @@ const NomadAiLayout = () => {
       .filter((item) => item.label);
   })();
 
-  const isAiProductPage = location.pathname.startsWith("/ai-listings/");
+  const isAiProductPage = location.pathname.startsWith("/listings/");
   const isBreadcrumbLoading =
     isAiProductPage && Boolean(location.state?.breadcrumbLoading);
+  const handleStickyBack = () => {
+    const returnTo = location.state?.returnTo;
+
+    if (returnTo?.pathname) {
+      navigate(
+        {
+          pathname: returnTo.pathname,
+          search: returnTo.search || "",
+        },
+        {
+          state: {
+            ...location.state,
+          },
+        },
+      );
+      return;
+    }
+
+    navigate(-1);
+  };
 
   return (
     <div className="flex h-screen bg-white">
-      <div className="hidden sm:block">
+      <div className={isManualSearchCompact ? "hidden" : "hidden sm:block"}>
         <AiSidebar />
       </div>
 
       {isMobileSidebarOpen && (
         <div
-          className="fixed inset-0 z-[70] bg-black/35 sm:hidden"
+          className={`fixed inset-0 z-[70] bg-black/35 ${
+            isManualSearchCompact ? "" : "sm:hidden"
+          }`}
           onClick={() => setIsMobileSidebarOpen(false)}
           aria-hidden="true"
         >
@@ -255,13 +300,14 @@ const NomadAiLayout = () => {
         <div className="sticky top-0 z-50 w-full">
           <AiHeader
             onMobileSidebarToggle={() => setIsMobileSidebarOpen(true)}
+            forceMobileNavigation={isManualSearchCompact}
           />
         </div>
         {shouldShowStickyBar && (
           <div className="w-full bg-white/95">
             <div className="px-3 md:px-8 lg:px-10 xl:px-12 2xl:px-14">
               <AiStickyBackBreadcrumb
-                onBack={() => navigate(-1)}
+                onBack={handleStickyBack}
                 breadcrumbs={routeBreadcrumbs}
                 isLoading={isBreadcrumbLoading}
                 sticky={false}

@@ -7,7 +7,7 @@ import { HiOutlineArrowLeft } from "react-icons/hi";
 const AiHostTermsAndCondition = () => {
     const navigate = useNavigate();
 
-    const onBack = () => navigate("/host");
+    const onBack = () => navigate("/");
 
     const sections = [
         {
@@ -227,7 +227,7 @@ const AiHostTermsAndCondition = () => {
                             </a>
                             <span
                                 className="text-primary-blue cursor-pointer"
-                                onClick={() => navigate("/host/ai-host-contact")}
+                                onClick={() => navigate("/contact")}
                             >
                                 Contact us
                             </span>

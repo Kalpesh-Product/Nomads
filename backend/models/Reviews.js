@@ -72,6 +72,10 @@ const reviewSchema = new mongoose.Schema(
       type: Date,
     },
     // Website builder review fields
+    isEnabled: {
+      type: Boolean,
+      default: true,
+    },
     workspaceId: {
       type: String,
       trim: true,

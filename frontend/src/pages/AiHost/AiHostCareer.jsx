@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 import Container from "../../components/Container";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import axios from "../../utils/axios";
 import romans from "romans";
@@ -11,11 +11,9 @@ import AiHome from "../AiHome";
 import { HiOutlineArrowLeft } from "react-icons/hi";
 
 const Career = () => {
+    const navigate = useNavigate();
     const [openIndex, setOpenIndex] = useState(null);
-    const { pathname } = useLocation();
-    const isHost = pathname.includes("host");
-    const customLink = isHost ? `/host/ai-host-career/job` : `/career/job`;
-    // const customRoute = isHost ? "job/get-job-posts" : "";
+    const customLink = `/career/job`;
 
     const categoryOrder = [
         "Product Management",
@@ -50,7 +48,7 @@ const Career = () => {
 
     // const jobData = isHost ? jobRoles : jobRolesDummy;
 
-    const onBack = () => navigate("/host");
+    const onBack = () => navigate("/");
 
     return (
         <>
