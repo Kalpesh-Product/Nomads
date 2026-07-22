@@ -1716,7 +1716,7 @@ const AiListings = ({ forceListView = false }) => {
               !isRestaurantsSelected &&
               !isNewsSelected &&
               !isBlogsSelected && (
-                <div className="mt-6 mb-2 px-1 border-t border-gray-300">
+                <div className="mt-6 mb-5 px-1 border-t border-gray-300">
                   <h1 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight mt-6">
                     Popular{" "}
                     {{

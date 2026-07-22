@@ -43,7 +43,10 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
 
   const countryParam = searchParams.get("country") || formData?.country || "";
   const locationParam =
-    searchParams.get("location") || formData?.location || "";
+    searchParams.get("location") ||
+    searchParams.get("state") ||
+    formData?.location ||
+    "";
   const categoryParam =
     searchParams.get("category") || formData?.category || "";
 
@@ -202,6 +205,21 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
     shouldCheckNewsBlogLinks && hasNewsOrBlogs && !isAiDestinationListingsPage;
 
   const currentSearch = location.search || location.state?.sourceSearch || "";
+  const buildEditorialListingsLink = (category) => {
+    const params = new URLSearchParams(currentSearch);
+    const country = params.get("country") || countryParam;
+    const selectedLocation =
+      params.get("location") || params.get("state") || locationParam;
+
+    if (country) params.set("country", country);
+    if (selectedLocation) params.set("location", selectedLocation);
+    params.delete("state");
+    params.set("category", category);
+
+    return `/listings-list?${params.toString()}`;
+  };
+  const newsListingsLink = buildEditorialListingsLink("news");
+  const blogsListingsLink = buildEditorialListingsLink("blogs");
   const aiVerticalsToggleState = (() => {
     const stateFromRoute = location.state || {};
     let fallbackBadges = [];
@@ -237,8 +255,8 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
 
   const headerLinks = [
     // { id: 1, text: "Home", to: "/" },
-    { id: 2, type: "news", text: newsLabel, to: `/news${currentSearch}` },
-    { id: 3, type: "blog", text: blogLabel, to: `/blog${currentSearch}` },
+    { id: 2, type: "news", text: newsLabel, to: newsListingsLink },
+    { id: 3, type: "blog", text: blogLabel, to: blogsListingsLink },
     // { id: 4, type: "offers", text: offersLabel },
   ];
 
@@ -382,7 +400,7 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
                   <li className="flex items-center gap-6">
                     {hasNews && (
                       <Link
-                        to={`/news${currentSearch}`}
+                        to={newsListingsLink}
                         className="group relative text-md text-black font-semibold whitespace-nowrap"
                       >
                         <span className="relative z-10 group-hover:font-bold mb-2 text-sm whitespace-nowrap">
@@ -394,7 +412,7 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
 
                     {hasBlogs && (
                       <Link
-                        to={`/blog${currentSearch}`}
+                        to={blogsListingsLink}
                         className="group relative text-md text-black font-semibold whitespace-nowrap"
                       >
                         <span className="relative z-10 group-hover:font-bold mb-2 text-sm whitespace-nowrap">
