@@ -22,6 +22,8 @@ const getInitials = (name = "") =>
     .join("")
     .slice(0, 2);
 
+const emptyReviewPromptBottomSpacing = "1.5rem";
+
 const AiDestinationDetail = ({ type }) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -131,6 +133,9 @@ const AiDestinationDetail = ({ type }) => {
     },
   });
 
+  const hasCompactEmptyReviewPrompt =
+    isReviewEnabled && !isReviewsLoading && reviews.length === 0;
+
   return (
     <main className="mx-auto w-full max-w-[75rem] px-4 pb-8 lg:px-0">
       <header className="mb-5">
@@ -194,7 +199,13 @@ const AiDestinationDetail = ({ type }) => {
       </section>
 
       {isReviewEnabled && (
-        <section className="py-8">
+        <section
+          className={`pt-8 ${hasCompactEmptyReviewPrompt ? "" : "pb-8"}`}
+          style={{
+            "--empty-review-prompt-bottom-spacing":
+              emptyReviewPromptBottomSpacing,
+          }}
+        >
           <div className="mb-8 text-center">
             <button
               type="button"
@@ -210,7 +221,7 @@ const AiDestinationDetail = ({ type }) => {
                 Loading reviews...
               </p>
             ) : reviews.length === 0 ? (
-              <p className="text-sm text-gray-500 text-center h-20">
+              <p className="mb-[var(--empty-review-prompt-bottom-spacing)] text-center text-sm text-gray-500">
                 Share your experience and leave a review.
               </p>
             ) : (
