@@ -1365,9 +1365,9 @@ const AiSearchResults = () => {
         setLikedDestinations(favoriteIds);
       } catch (error) {
         if (isMounted) {
-          showErrorAlert(
-            error?.response?.data?.message ||
-              "Failed to load favorite destinations.",
+          console.warn(
+            "Failed to load favorite destinations.",
+            error?.response?.data?.message || error,
           );
         }
       }
