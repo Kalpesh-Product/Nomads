@@ -93,7 +93,7 @@ const recommendationItems = [
 const valueAdditionItems = [
   { label: "VISA Support", icon: LuMapPinned, path: "/visa-support" },
   {
-    label: "Overall Activation Support",
+    label: "Activation Support",
     icon: HiOutlineKey,
     path: "/overall-activation-support",
   },
