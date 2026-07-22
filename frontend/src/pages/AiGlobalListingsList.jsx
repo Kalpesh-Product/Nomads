@@ -59,6 +59,52 @@ const THINKING_HEADING_TEXT = "Curating the best results for you";
 const CURATED_RESULTS_HEADING_TEXT =
   "Please find below, the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
 const AI_SCROLL_CONTAINER_ID = "nomad-ai-scroll-container";
+
+const CategoryShortcutButton = ({
+  label,
+  iconSrc,
+  onClick,
+  buttonClassName,
+  iconBoxClassName,
+  imageClassName,
+  labelClassName,
+}) => {
+  const [isIconLoaded, setIsIconLoaded] = useState(false);
+
+  useEffect(() => {
+    setIsIconLoaded(false);
+  }, [iconSrc]);
+
+  return (
+    <button type="button" onClick={onClick} className={buttonClassName}>
+      <div className="flex min-h-[3.5rem] w-full flex-col items-center justify-start gap-1">
+        {iconSrc ? (
+          <div className={`relative overflow-hidden ${iconBoxClassName}`}>
+            {!isIconLoaded && (
+              <div
+                className="absolute inset-0 rounded-md bg-gray-200/80 animate-pulse"
+                aria-hidden="true"
+              />
+            )}
+            <img
+              src={iconSrc}
+              alt={label}
+              loading="eager"
+              decoding="async"
+              onLoad={() => setIsIconLoaded(true)}
+              onError={() => setIsIconLoaded(true)}
+              className={`${imageClassName} transition-opacity duration-200 ${
+                isIconLoaded ? "opacity-100" : "opacity-0"
+              }`}
+            />
+          </div>
+        ) : null}
+        <span className={labelClassName}>{label}</span>
+      </div>
+    </button>
+  );
+};
+
 const extractImageFromContent = (content) => {
   const match = content?.match(/<img.*?src=["'](.*?)["']/);
   return match ? match[1] : null;
@@ -1306,25 +1352,16 @@ const AiGlobalListingsList = () => {
                       useCroppedDesktopShortcuts,
                     );
                     return (
-                      <button
+                      <CategoryShortcutButton
                         key={cat.value}
-                        type="button"
+                        label={cat.label}
+                        iconSrc={iconSrc}
                         onClick={() => handleCategoryClick(cat.value)}
-                        className="text-black px-1 py-2 hover:text-black transition flex items-center justify-center w-full"
-                      >
-                        {iconSrc ? (
-                          <div className="h-10 w-full flex flex-col gap-0">
-                            <img
-                              src={iconSrc}
-                              alt={cat.label}
-                              className="h-full w-full object-contain"
-                            />
-                            <span className="text-tiny">{cat.label}</span>
-                          </div>
-                        ) : (
-                          cat.label
-                        )}
-                      </button>
+                        buttonClassName="text-black px-1 py-2 hover:text-black transition flex items-center justify-center w-full"
+                        iconBoxClassName="h-10 w-full"
+                        imageClassName="h-full w-full object-contain"
+                        labelClassName="text-tiny"
+                      />
                     );
                   })}
                 </div>
@@ -1749,23 +1786,16 @@ const AiGlobalListingsList = () => {
               {categoryOptions.map((cat) => {
                 const iconSrc = getCategoryShortcutIconSrc(cat.value, true);
                 return (
-                  <button
+                  <CategoryShortcutButton
                     key={cat.value}
-                    type="button"
+                    label={cat.label}
+                    iconSrc={iconSrc}
                     onClick={() => handleCategoryClick(cat.value)}
-                    className="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] lg:w-[10%]"
-                  >
-                    <div className="h-10 w-full flex flex-col items-center gap-1">
-                      <img
-                        src={iconSrc}
-                        alt={cat.label}
-                        className="h-full w-[90%] object-contain"
-                      />
-                      <span className="text-[10px] font-medium whitespace-nowrap">
-                        {cat.label}
-                      </span>
-                    </div>
-                  </button>
+                    buttonClassName="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] lg:w-[10%]"
+                    iconBoxClassName="h-10 w-full"
+                    imageClassName="h-full w-[90%] object-contain mx-auto"
+                    labelClassName="text-[10px] font-medium whitespace-nowrap"
+                  />
                 );
               })}
             </div>
