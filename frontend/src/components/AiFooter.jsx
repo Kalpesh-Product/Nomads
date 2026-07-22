@@ -47,8 +47,7 @@ const AiFooter = () => {
   };
   const goToHostsContentCopyright = () => {
     if (window.location.hostname.includes("localhost")) {
-      window.location.href =
-        "http://localhost:5173/content-and-copyright";
+      window.location.href = "http://localhost:5173/content-and-copyright";
     } else {
       window.location.href = "https://wono.co/content-and-copyright";
     }
@@ -93,8 +92,9 @@ const AiFooter = () => {
       <div className="sticky bottom-0 z-10 bg-white/95 py-6 text-nano text-gray-600 backdrop-blur supports-[backdrop-filter]:bg-white/80">
         <div className="flex flex-col items-center gap-2 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center">
           <span className="text-center sm:col-start-2">
-            WoNo is in Beta and can make mistakes. Building the future of global
-            nomad living, one update at a time. See Cookie Preferences.
+            WONO is currently in beta. We're continuously improving the platform
+            based on your feedback. Building the future of global nomad living,
+            one update at a time. See Cookie Preferences.
           </span>
           <span className="text-center sm:col-start-3 sm:justify-self-end sm:pr-8">
             Version 2.7.3
@@ -243,10 +243,11 @@ const AiFooter = () => {
                         setShowLangModal(false);
                       }}
                       className={`border rounded-md px-3 py-2 
-        ${isDisabled
-                          ? "opacity-40 cursor-not-allowed"
-                          : "cursor-pointer hover:border-black"
-                        } 
+        ${
+          isDisabled
+            ? "opacity-40 cursor-not-allowed"
+            : "cursor-pointer hover:border-black"
+        } 
         ${selectedLang.code === lang.code ? "border-black" : "border-gray-300"}
       `}
                     >
@@ -283,14 +284,16 @@ const AiFooter = () => {
                         setShowCurrencyModal(false);
                       }}
                       className={`border rounded-md px-3 py-2 
-        ${isDisabled
-                          ? "opacity-40 cursor-not-allowed"
-                          : "cursor-pointer hover:border-black"
-                        } 
-        ${selectedCurrency.code === cur.code
-                          ? "border-black"
-                          : "border-gray-300"
-                        }
+        ${
+          isDisabled
+            ? "opacity-40 cursor-not-allowed"
+            : "cursor-pointer hover:border-black"
+        } 
+        ${
+          selectedCurrency.code === cur.code
+            ? "border-black"
+            : "border-gray-300"
+        }
       `}
                     >
                       <div className="font-medium">{cur.name}</div>
