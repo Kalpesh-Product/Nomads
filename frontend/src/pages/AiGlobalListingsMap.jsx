@@ -39,11 +39,21 @@ import { DESTINATION_HIGHLIGHT_FILTERS } from "../data/aiDestinationHighlights.j
 
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
 const ANNUAL_EVENTS_CATEGORY = "annualevents";
+const RESTAURANTS_CATEGORY = "restaurants";
+const NEWS_CATEGORY = "news";
+const BLOGS_CATEGORY = "blogs";
 const TYPING_INTERVAL_MS = 7;
 const SECOND_HEADING_DELAY_MS = 250;
 const THINKING_HEADING_TEXT = "Curating the best results for you";
 const CURATED_RESULTS_HEADING_TEXT =
   "Please find below, the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
+const normalizeContentDestination = (label) =>
+  label
+    ? label
+        .replace(/\+/g, " ")
+        .replace(/[\u2010-\u2015\u2212\u{FE63}\u{FF0D}]/gu, "-")
+        .trim()
+    : "";
 const getAiVerticalsPageStateKey = (country = "", location = "") => {
   const countryKey = country.trim().toLowerCase();
   const locationKey = location.trim().toLowerCase();
@@ -367,7 +377,11 @@ const AiGlobalListingsMap = () => {
     refetchOnMount: "always",
   });
 
-  const destinationAvailability = formData?.location || "";
+  const destinationAvailability = normalizeContentDestination(
+    new URLSearchParams(location.search).get("state") ||
+      new URLSearchParams(location.search).get("location") ||
+      formData?.location,
+  );
   const { data: destinationEventsData = [] } = useQuery({
     queryKey: ["ai-events-availability", destinationAvailability],
     queryFn: async () => {
@@ -386,6 +400,20 @@ const AiGlobalListingsMap = () => {
     queryKey: ["ai-places-availability", destinationAvailability],
     queryFn: async () => {
       const response = await axios.get("/places", {
+        params: {
+          destination: destinationAvailability,
+        },
+      });
+
+      return Array.isArray(response.data) ? response.data : [];
+    },
+    enabled: !!destinationAvailability,
+    refetchOnWindowFocus: false,
+  });
+  const { data: destinationRestaurantsData = [] } = useQuery({
+    queryKey: ["ai-restaurants-availability", destinationAvailability],
+    queryFn: async () => {
+      const response = await axios.get("/restaurants", {
         params: {
           destination: destinationAvailability,
         },
@@ -417,6 +445,10 @@ const AiGlobalListingsMap = () => {
 
         if (option.value === "venues") {
           return destinationVenuesData.length > 0;
+        }
+
+        if (option.value === RESTAURANTS_CATEGORY) {
+          return destinationRestaurantsData.length > 0;
         }
 
         return true;
@@ -480,6 +512,7 @@ const AiGlobalListingsMap = () => {
     ];
   }, [
     destinationEventsData.length,
+    destinationRestaurantsData.length,
     destinationVenuesData.length,
     isLisitingLoading,
     listingsData,
@@ -552,15 +585,27 @@ const AiGlobalListingsMap = () => {
   ]);
 
   useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const queryCountry = params.get("country");
+    const queryLocation = params.get("state") || params.get("location");
+    const queryContinent = params.get("continent");
+
     const breadcrumbFilters = location.state?.breadcrumbFilters;
-    if (!breadcrumbFilters) return;
 
     const normalizeValue = (value) =>
       typeof value === "string" ? value.trim().toLowerCase() : value;
 
-    const normalizedContinent = normalizeValue(breadcrumbFilters.continent);
-    const normalizedCountry = normalizeValue(breadcrumbFilters.country);
-    const normalizedLocation = normalizeValue(breadcrumbFilters.location);
+    const normalizedContinent = normalizeValue(
+      breadcrumbFilters?.continent || queryContinent,
+    );
+    const normalizedCountry = normalizeValue(
+      breadcrumbFilters?.country || queryCountry,
+    );
+    const normalizedLocation = normalizeValue(
+      breadcrumbFilters?.location || queryLocation,
+    );
+
+    if (!normalizedCountry || !normalizedLocation) return;
 
     if (
       normalizedContinent === normalizeValue(formData.continent) &&
@@ -578,7 +623,7 @@ const AiGlobalListingsMap = () => {
     };
 
     dispatch(setFormValues(nextFormValues));
-  }, [dispatch, formData, location.state]);
+  }, [dispatch, formData, location.state, location.search]);
 
   const { mutate: locationData, isPending: isLocation } = useMutation({
     mutationFn: async (data) => {
@@ -604,20 +649,15 @@ const AiGlobalListingsMap = () => {
       return;
     }
 
-    if (categoryValue === "news" || categoryValue === "blogs") {
-      navigate({
-        pathname: categoryValue === "news" ? "/ai-news" : "/ai-blogs",
-        search: location.search,
-      });
-      return;
-    }
-
     if (
       DESTINATION_HIGHLIGHT_FILTERS.some(
         (filter) =>
           filter.value === categoryValue &&
           categoryValue !== ANNUAL_EVENTS_CATEGORY &&
-          categoryValue !== "venues",
+          categoryValue !== "venues" &&
+          categoryValue !== RESTAURANTS_CATEGORY &&
+          categoryValue !== NEWS_CATEGORY &&
+          categoryValue !== BLOGS_CATEGORY,
       )
     ) {
       const params = new URLSearchParams({
@@ -641,7 +681,10 @@ const AiGlobalListingsMap = () => {
       isMobileOrTablet &&
       categoryValue !== VALUE_ADDED_SERVICES_CATEGORY &&
       categoryValue !== ANNUAL_EVENTS_CATEGORY &&
-      categoryValue !== "venues"
+      categoryValue !== "venues" &&
+      categoryValue !== RESTAURANTS_CATEGORY &&
+      categoryValue !== NEWS_CATEGORY &&
+      categoryValue !== BLOGS_CATEGORY
     ) {
       setShowListings(true);
       // Optional: Clear mobile search if open
@@ -660,7 +703,10 @@ const AiGlobalListingsMap = () => {
     const listingsPath =
       categoryValue === VALUE_ADDED_SERVICES_CATEGORY ||
       categoryValue === ANNUAL_EVENTS_CATEGORY ||
-      categoryValue === "venues"
+      categoryValue === "venues" ||
+      categoryValue === RESTAURANTS_CATEGORY ||
+      categoryValue === NEWS_CATEGORY ||
+      categoryValue === BLOGS_CATEGORY
         ? "/ai-listings-list"
         : "/ai-listings";
 
