@@ -105,7 +105,7 @@ const valueAdditionItems = [
   { label: "Consultation", icon: HiOutlineUserGroup, path: "/consultation" },
   { label: "Workation", icon: MdComputer, path: "/workation" },
   {
-    label: "Apply for Job",
+    label: "Apply for Jobs",
     icon: IoBriefcaseSharp,
     badge: "Coming soon",
   },
