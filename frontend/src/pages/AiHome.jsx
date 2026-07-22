@@ -108,8 +108,8 @@ const AiHome = () => {
     ? "A global community of nomads & remote workers, who are redefining how the world lives and works. Early adoption of our future lifestyle!"
     : "A global community of nomads & remote workers, who are redefining how the world lives and works. Early adoption of our future lifestyle!";
   const fourthLineText = isLoggedIn
-    ? "Choose your goals from below so that we can help you design your nomad lifestyle."
-    : "Choose your goals from below so that we can help you design your nomad lifestyle.";
+    ? "Choose your goals below, and we'll help you design your ideal nomad lifestyle."
+    : "Choose your goals below, and we'll help you design your ideal nomad lifestyle.";
 
   const renderBracketBrand = (text) =>
     text.split("").map((char, index) => {
