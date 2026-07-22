@@ -792,10 +792,10 @@ export const addB2CformSubmission = async (req, res, next) => {
           "Your new company setup request has been submitted successfully.",
         emailTemplate: (data) => ({
           to: data.email,
-          subject: "New Company Setup Request Received",
+          subject: "Company Setup Request Received",
           text: `Hi ${data.fullName}, we have received your new company setup request for ${data.newCompanyCountry}.`,
           html: `
-      <h2>New Company Setup Request Received</h2>
+      <h2>Company Setup Request Received</h2>
       <p>Hi ${data.fullName},</p>
       <p>Thank you for your request to setup in <b>${data.newCompanyCountry}</b>.</p>
       <p>Our team has received your details and will get back to you shortly.</p>

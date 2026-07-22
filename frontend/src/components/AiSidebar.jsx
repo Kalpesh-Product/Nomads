@@ -98,7 +98,7 @@ const valueAdditionItems = [
     path: "/overall-activation-support",
   },
   {
-    label: "New Company Setup",
+    label: "Company Setup",
     icon: HiOutlineCog,
     path: "/new-company-setup",
   },
