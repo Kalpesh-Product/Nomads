@@ -291,7 +291,7 @@ const AiHome = () => {
           {!isLoggedIn ? (
             <h2 className="mt-1 text-ls font-medium font-play">
               <span className="text-black/90">(</span>
-              {renderBracketBrand("world of nomads")}
+              {renderBracketBrand("World of Nomads")}
               <span className="text-black/90">)</span>
             </h2>
           ) : null}
