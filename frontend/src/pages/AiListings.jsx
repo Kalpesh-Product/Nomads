@@ -76,7 +76,7 @@ const valueAddedServiceItems = [
     imageUrl: "/value-adds/any-visa-support.jpg",
   },
   {
-    label: "OVERALL ACTIVATION SUPPORT",
+    label: "Activation Support",
     path: "/overall-activation-support",
     imageUrl: "/value-adds/overall-activation-support.jpg",
   },
@@ -143,11 +143,16 @@ const AiListings = ({ forceListView = false }) => {
   const selectedState = watch("location");
 
   const [persistedSearchBarBadges, setPersistedSearchBarBadges] = useState([]);
+  const shouldSkipHeadingIntro = Boolean(location.state?.skipHeadingIntro);
 
-  const [typedHeading, setTypedHeading] = useState("");
-  const [isSecondHeadingPhase, setIsSecondHeadingPhase] = useState(false);
+  const [typedHeading, setTypedHeading] = useState(() =>
+    shouldSkipHeadingIntro ? CURATED_RESULTS_HEADING_TEXT : "",
+  );
+  const [isSecondHeadingPhase, setIsSecondHeadingPhase] = useState(
+    shouldSkipHeadingIntro,
+  );
   const [isHeadingSequenceComplete, setIsHeadingSequenceComplete] =
-    useState(false);
+    useState(shouldSkipHeadingIntro);
   const useCroppedDesktopShortcuts = useCroppedDesktopShortcutIcons();
 
   const searchBarBadges = useMemo(() => {
@@ -203,6 +208,13 @@ const AiListings = ({ forceListView = false }) => {
   }, [location.search, location.state, persistedSearchBarBadges]);
 
   useEffect(() => {
+    if (shouldSkipHeadingIntro) {
+      setTypedHeading(CURATED_RESULTS_HEADING_TEXT);
+      setIsSecondHeadingPhase(true);
+      setIsHeadingSequenceComplete(true);
+      return undefined;
+    }
+
     let timeoutId;
     let intervalId;
     const typeText = (text, onComplete) => {
@@ -231,7 +243,7 @@ const AiListings = ({ forceListView = false }) => {
       clearTimeout(timeoutId);
       clearInterval(intervalId);
     };
-  }, []);
+  }, [shouldSkipHeadingIntro]);
   const { data: locations = [], isLoading: isLocations } = useQuery({
     queryKey: ["locations", user?.email],
     queryFn: async () => {
@@ -571,7 +583,7 @@ const AiListings = ({ forceListView = false }) => {
       workation: "Workation",
       meetingroom: "Meetings",
       cafe: "Cafes",
-      [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
+      [VALUE_ADDED_SERVICES_CATEGORY]: "Value-Added Services",
       [ANNUAL_EVENTS_CATEGORY]: "Events",
       [VENUES_CATEGORY]: "Places",
       [RESTAURANTS_CATEGORY]: "Restaurants",
@@ -804,6 +816,7 @@ const AiListings = ({ forceListView = false }) => {
       navigate(`/verticals?${params.toString()}`, {
         state: {
           selectedStateLabel,
+          skipHeadingIntro: true,
           searchBarBadges,
         },
       });
@@ -843,6 +856,7 @@ const AiListings = ({ forceListView = false }) => {
           location: formData.location,
           category: categoryValue,
           selectedStateLabel,
+          skipHeadingIntro: true,
           searchBarBadges,
         },
       },
@@ -863,7 +877,7 @@ const AiListings = ({ forceListView = false }) => {
     const locationLabel = (selectedStateLabel || "LOCATION").toUpperCase();
     const valueAddedServiceLabelMap = {
       "ANY VISA SUPPORT": `${locationLabel} VISA`,
-      "OVERALL ACTIVATION SUPPORT": `${locationLabel} ACTIVATION`,
+      "Activation Support": `${locationLabel} ACTIVATION`,
       "NEW COMPANY SUPPORT": `${locationLabel} COMPANY SETUP`,
       "ANY CONSULTATION SUPPORT": `${locationLabel} CONSULTATION`,
       "APPLY FOR JOB": `${locationLabel} JOBS`,
@@ -1702,7 +1716,7 @@ const AiListings = ({ forceListView = false }) => {
               !isRestaurantsSelected &&
               !isNewsSelected &&
               !isBlogsSelected && (
-                <div className="mt-6 mb-2 px-1 border-t border-gray-300">
+                <div className="mt-6 mb-5 px-1 border-t border-gray-300">
                   <h1 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight mt-6">
                     Popular{" "}
                     {{
@@ -1713,7 +1727,7 @@ const AiListings = ({ forceListView = false }) => {
                       privatestay: "Private Stays",
                       meetingroom: "Meeting Rooms",
                       cafe: "Cafes",
-                      [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
+                      [VALUE_ADDED_SERVICES_CATEGORY]: "Value-Added Services",
                       [ANNUAL_EVENTS_CATEGORY]: "Annual Events",
                       [VENUES_CATEGORY]: "Places",
                       [RESTAURANTS_CATEGORY]: "Restaurants",

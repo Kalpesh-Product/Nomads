@@ -22,6 +22,8 @@ const getInitials = (name = "") =>
     .join("")
     .slice(0, 2);
 
+const emptyReviewPromptBottomSpacing = "1.5rem";
+
 const AiDestinationDetail = ({ type }) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -56,6 +58,14 @@ const AiDestinationDetail = ({ type }) => {
 
   const handleImageClose = () => {
     setActiveImage(null);
+  };
+
+  const goToHostsContentCopyright = () => {
+    if (window.location.hostname.includes("localhost")) {
+      window.location.href = "http://host.localhost:5173/content-and-copyright";
+    } else {
+      window.location.href = "https://host.wono.co/content-and-copyright";
+    }
   };
 
   const { data: reviews = [], isPending: isReviewsLoading } = useQuery({
@@ -123,6 +133,9 @@ const AiDestinationDetail = ({ type }) => {
     },
   });
 
+  const hasCompactEmptyReviewPrompt =
+    isReviewEnabled && !isReviewsLoading && reviews.length === 0;
+
   return (
     <main className="mx-auto w-full max-w-[75rem] px-4 pb-8 lg:px-0">
       <header className="mb-5">
@@ -186,7 +199,13 @@ const AiDestinationDetail = ({ type }) => {
       </section>
 
       {isReviewEnabled && (
-        <section className="py-8">
+        <section
+          className={`pt-8 ${hasCompactEmptyReviewPrompt ? "" : "pb-8"}`}
+          style={{
+            "--empty-review-prompt-bottom-spacing":
+              emptyReviewPromptBottomSpacing,
+          }}
+        >
           <div className="mb-8 text-center">
             <button
               type="button"
@@ -202,7 +221,7 @@ const AiDestinationDetail = ({ type }) => {
                 Loading reviews...
               </p>
             ) : reviews.length === 0 ? (
-              <p className="text-sm text-gray-500 text-center h-20">
+              <p className="mb-[var(--empty-review-prompt-bottom-spacing)] text-center text-sm text-gray-500">
                 Share your experience and leave a review.
               </p>
             ) : (
@@ -239,10 +258,48 @@ const AiDestinationDetail = ({ type }) => {
       )}
 
       <div className="mt-5 text-[0.5rem] leading-relaxed text-gray-500">
-        <p>
+        <p className="mb-2">
           <b>Source:</b> All above content, images and details are placeholder
           content for the supplied mockup and will be replaced with verified
           publicly available information.
+        </p>
+        <p className="mb-2">
+          <b>Content and Copyright Disclaimer:</b> WoNo is a nomad services and
+          informational platform that aggregates and presents publicly available
+          information about co-working spaces, co-living spaces, serviced
+          apartments, hostels, workation spaces, meeting rooms, working cafes
+          and related lifestyle or travel services. All such information
+          displayed on its platform, including images, brand names, or
+          descriptions is shared solely for informational and reference purposes
+          to help nomads/users discover and compare global nomad-friendly
+          information and services on its central platform.
+        </p>
+        <p className="mb-2">
+          WoNo does not claim ownership of any third-party logos, images,
+          descriptions, or business information displayed on the platform. All
+          trademarks, brand names, and intellectual property remain the
+          exclusive property of their respective owners and platforms. The
+          inclusion of third-party information does not imply endorsement,
+          partnership, or affiliation unless explicitly stated.
+        </p>
+        <p className="mb-2">
+          The content featured from other websites and platforms on WoNo is not
+          used for direct monetization, resale, or advertising gain. WoNo's
+          purpose is to inform and connect digital nomads and remote working
+          professionals by curating publicly available data in a transparent,
+          good-faith manner for the ease of its users and to support and grow
+          the businesses who are providing these services with intent to grow
+          them and the ecosystem.
+        </p>
+        <p className="mt-2">
+          Read the entire{" "}
+          <span
+            className="underline text-primary-blue cursor-pointer"
+            onClick={goToHostsContentCopyright}
+          >
+            Content and Copyright
+          </span>{" "}
+          by clicking the link in our website footer.
         </p>
       </div>
 

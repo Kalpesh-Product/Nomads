@@ -29,7 +29,7 @@ export const createOverallActivationSupport = async (req, res, next) => {
       await OverallActivationSupport.create(payload);
 
     return res.status(201).json({
-      message: "Overall activation support request submitted successfully",
+      message: "Activation Support request submitted successfully",
       data: overallActivationSupport,
     });
   } catch (error) {
@@ -48,7 +48,7 @@ export const getOverallActivationSupportRequests = async (req, res, next) => {
     });
 
     return res.status(200).json({
-      message: "Overall activation support requests fetched successfully",
+      message: "Activation Support requests fetched successfully",
       data: requests,
     });
   } catch (error) {

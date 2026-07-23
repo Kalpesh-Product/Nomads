@@ -14,6 +14,7 @@ import {
   InputLabel,
   Select,
   ListItemText,
+  ListSubheader,
 } from "@mui/material";
 import Container from "../../components/Container";
 import GetStartedButton from "../../components/GetStartedButton";
@@ -119,6 +120,7 @@ const AiHostSignup = () => {
     ? Math.max(0, Math.min(1, requestedStep))
     : 1;
   const [activeStep, setActiveStep] = useState(initialStep);
+  const [verticalTypeOpen, setVerticalTypeOpen] = useState(false);
   const [typedActivationTitle, setTypedActivationTitle] = useState("");
   const selectedPlanFromQuery = normalizePlanFromQuery(
     signupParams.get("plan"),
@@ -695,11 +697,21 @@ const AiHostSignup = () => {
                   <Select
                     multiple
                     name={field.name}
+                    open={verticalTypeOpen}
+                    onOpen={() => setVerticalTypeOpen(true)}
+                    onClose={() => setVerticalTypeOpen(false)}
                     value={field.value || []}
                     onChange={(e) => field.onChange(e.target.value)}
                     onBlur={field.onBlur}
                     inputRef={field.ref}
                     renderValue={(selected) => selected.join(", ")}
+                    MenuProps={{
+                      PaperProps: {
+                        sx: {
+                          pb: 0,
+                        },
+                      },
+                    }}
                   >
                     {verticalTypeOptions.map((option) => (
                       <MenuItem key={option} value={option}>
@@ -709,6 +721,39 @@ const AiHostSignup = () => {
                         <ListItemText primary={option} />
                       </MenuItem>
                     ))}
+                    <ListSubheader
+                      disableSticky
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        px: 1.5,
+                        pt: 1,
+                        pb: 0,
+                        lineHeight: "normal",
+                        borderTop: "1px solid",
+                        borderColor: "divider",
+                        bgcolor: "background.paper",
+                      }}
+                    >
+                      <Button
+                        size="small"
+                        variant="contained"
+                        sx={{
+                          minWidth: 72,
+                          borderRadius: 999,
+                          bgcolor: "#0BA9EF",
+                          textTransform: "none",
+                          "&:hover": { bgcolor: "#0BA9EF" },
+                        }}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setVerticalTypeOpen(false);
+                        }}
+                      >
+                        Done
+                      </Button>
+                    </ListSubheader>
                   </Select>
                   <FormHelperText>{fieldState.error?.message}</FormHelperText>
                 </FormControl>

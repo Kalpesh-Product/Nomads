@@ -59,6 +59,52 @@ const THINKING_HEADING_TEXT = "Curating the best results for you";
 const CURATED_RESULTS_HEADING_TEXT =
   "Please find below, the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
 const AI_SCROLL_CONTAINER_ID = "nomad-ai-scroll-container";
+
+const CategoryShortcutButton = ({
+  label,
+  iconSrc,
+  onClick,
+  buttonClassName,
+  iconBoxClassName,
+  imageClassName,
+  labelClassName,
+}) => {
+  const [isIconLoaded, setIsIconLoaded] = useState(false);
+
+  useEffect(() => {
+    setIsIconLoaded(false);
+  }, [iconSrc]);
+
+  return (
+    <button type="button" onClick={onClick} className={buttonClassName}>
+      <div className="flex min-h-[3.5rem] w-full flex-col items-center justify-start gap-1">
+        {iconSrc ? (
+          <div className={`relative overflow-hidden ${iconBoxClassName}`}>
+            {!isIconLoaded && (
+              <div
+                className="absolute inset-0 rounded-md bg-gray-200/80 animate-pulse"
+                aria-hidden="true"
+              />
+            )}
+            <img
+              src={iconSrc}
+              alt={label}
+              loading="eager"
+              decoding="async"
+              onLoad={() => setIsIconLoaded(true)}
+              onError={() => setIsIconLoaded(true)}
+              className={`${imageClassName} transition-opacity duration-200 ${
+                isIconLoaded ? "opacity-100" : "opacity-0"
+              }`}
+            />
+          </div>
+        ) : null}
+        <span className={labelClassName}>{label}</span>
+      </div>
+    </button>
+  );
+};
+
 const extractImageFromContent = (content) => {
   const match = content?.match(/<img.*?src=["'](.*?)["']/);
   return match ? match[1] : null;
@@ -146,7 +192,7 @@ const valueAddedServiceItems = [
     imageUrl: "/value-adds/any-visa-support.jpg",
   },
   {
-    label: "OVERALL ACTIVATION SUPPORT",
+    label: "Activation Support",
     path: "/overall-activation-support",
     imageUrl: "/value-adds/overall-activation-support.jpg",
   },
@@ -213,11 +259,16 @@ const AiGlobalListingsList = () => {
     valueAddedServiceItems.length > VALUE_ADDED_SERVICES_DEFAULT_VISIBLE_COUNT;
 
   const mobileValueAddedServiceItems = valueAddedServiceItems;
+  const shouldSkipHeadingIntro = Boolean(location.state?.skipHeadingIntro);
 
-  const [typedHeading, setTypedHeading] = useState("");
-  const [isSecondHeadingPhase, setIsSecondHeadingPhase] = useState(false);
+  const [typedHeading, setTypedHeading] = useState(() =>
+    shouldSkipHeadingIntro ? CURATED_RESULTS_HEADING_TEXT : "",
+  );
+  const [isSecondHeadingPhase, setIsSecondHeadingPhase] = useState(
+    shouldSkipHeadingIntro,
+  );
   const [isHeadingSequenceComplete, setIsHeadingSequenceComplete] =
-    useState(false);
+    useState(shouldSkipHeadingIntro);
   const useCroppedDesktopShortcuts = useCroppedDesktopShortcutIcons();
 
   const searchBarBadges = useMemo(() => {
@@ -242,16 +293,30 @@ const AiGlobalListingsList = () => {
     persistedSearchBarBadges,
   ]);
 
-  useEffect(() => {
+  const headingSequenceKey = useMemo(() => {
     const params = new URLSearchParams(location.search);
-    const currentCountry = (params.get("country") || "").trim().toLowerCase();
-    const currentLocation = (
+    const country = (params.get("country") || "").trim().toLowerCase();
+    const selectedLocation = (
       params.get("state") ||
       params.get("location") ||
       ""
     )
       .trim()
       .toLowerCase();
+
+    return JSON.stringify([country, selectedLocation]);
+  }, [location.search]);
+
+  useEffect(() => {
+    const [currentCountry = "", currentLocation = ""] =
+      JSON.parse(headingSequenceKey);
+
+    if (shouldSkipHeadingIntro) {
+      setTypedHeading(CURATED_RESULTS_HEADING_TEXT);
+      setIsSecondHeadingPhase(true);
+      setIsHeadingSequenceComplete(true);
+      return undefined;
+    }
 
     if (typeof window !== "undefined" && currentCountry && currentLocation) {
       const restoreKey = getAiVerticalsPageStateKey(
@@ -300,7 +365,7 @@ const AiGlobalListingsList = () => {
       clearTimeout(timeoutId);
       clearInterval(intervalId);
     };
-  }, [location.search]);
+  }, [headingSequenceKey, shouldSkipHeadingIntro]);
 
   // Special users who can see all locations
   const specialUserEmails = [
@@ -761,7 +826,7 @@ const AiGlobalListingsList = () => {
       workation: "Workation",
       meetingroom: "Meetings",
       cafe: "Cafes",
-      [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
+      [VALUE_ADDED_SERVICES_CATEGORY]: "Value-Added Services",
     };
 
     const typeOrder = [
@@ -1075,6 +1140,7 @@ const AiGlobalListingsList = () => {
           country: formData.country,
           location: formData.location,
           category: categoryValue,
+          skipHeadingIntro: true,
           searchBarBadges,
         },
       },
@@ -1149,7 +1215,7 @@ const AiGlobalListingsList = () => {
     const locationLabel = (selectedLocationLabel || "LOCATION").toUpperCase();
     const valueAddedServiceLabelMap = {
       "ANY VISA SUPPORT": `${locationLabel} VISA`,
-      "OVERALL ACTIVATION SUPPORT": `${locationLabel} ACTIVATION`,
+      "Activation Support": `${locationLabel} ACTIVATION`,
       "NEW COMPANY SUPPORT": `${locationLabel} COMPANY SETUP`,
       "ANY CONSULTATION SUPPORT": `${locationLabel} CONSULTATION`,
       "APPLY FOR JOB": `${locationLabel} JOBS`,
@@ -1306,25 +1372,16 @@ const AiGlobalListingsList = () => {
                       useCroppedDesktopShortcuts,
                     );
                     return (
-                      <button
+                      <CategoryShortcutButton
                         key={cat.value}
-                        type="button"
+                        label={cat.label}
+                        iconSrc={iconSrc}
                         onClick={() => handleCategoryClick(cat.value)}
-                        className="text-black px-1 py-2 hover:text-black transition flex items-center justify-center w-full"
-                      >
-                        {iconSrc ? (
-                          <div className="h-10 w-full flex flex-col gap-0">
-                            <img
-                              src={iconSrc}
-                              alt={cat.label}
-                              className="h-full w-full object-contain"
-                            />
-                            <span className="text-tiny">{cat.label}</span>
-                          </div>
-                        ) : (
-                          cat.label
-                        )}
-                      </button>
+                        buttonClassName="text-black px-1 py-2 hover:text-black transition flex items-center justify-center w-full"
+                        iconBoxClassName="h-10 w-full"
+                        imageClassName="h-full w-full object-contain"
+                        labelClassName="text-tiny"
+                      />
                     );
                   })}
                 </div>
@@ -1627,7 +1684,7 @@ const AiGlobalListingsList = () => {
                         className="col-span-full border-t border-gray-300 mt-6 pt-6 mb-6 scroll-mt-24"
                       >
                         <h2 className="text-subtitle font-semibold mb-5 text-secondary-dark">
-                          Value Added Services in {selectedLocationLabel}
+                          Value-Added Services in {selectedLocationLabel}
                         </h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                           {visibleValueAddedServiceItems.map((service) => {
@@ -1749,23 +1806,16 @@ const AiGlobalListingsList = () => {
               {categoryOptions.map((cat) => {
                 const iconSrc = getCategoryShortcutIconSrc(cat.value, true);
                 return (
-                  <button
+                  <CategoryShortcutButton
                     key={cat.value}
-                    type="button"
+                    label={cat.label}
+                    iconSrc={iconSrc}
                     onClick={() => handleCategoryClick(cat.value)}
-                    className="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] lg:w-[10%]"
-                  >
-                    <div className="h-10 w-full flex flex-col items-center gap-1">
-                      <img
-                        src={iconSrc}
-                        alt={cat.label}
-                        className="h-full w-[90%] object-contain"
-                      />
-                      <span className="text-[10px] font-medium whitespace-nowrap">
-                        {cat.label}
-                      </span>
-                    </div>
-                  </button>
+                    buttonClassName="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] lg:w-[10%]"
+                    iconBoxClassName="h-10 w-full"
+                    imageClassName="h-full w-[90%] object-contain mx-auto"
+                    labelClassName="text-[10px] font-medium whitespace-nowrap"
+                  />
                 );
               })}
             </div>
@@ -2084,7 +2134,7 @@ const AiGlobalListingsList = () => {
                       className="mb-6 scroll-mt-24"
                     >
                       <h2 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold leading-tight mb-4">
-                        Value Added Services in {selectedLocationLabel}
+                        Value-Added Services in {selectedLocationLabel}
                       </h2>
                       <div className="flex md:hidden flex-nowrap overflow-x-auto snap-x snap-mandatory gap-4 pb-2 custom-scrollbar-hide">
                         {mobileValueAddedServiceItems.map((service) => {
