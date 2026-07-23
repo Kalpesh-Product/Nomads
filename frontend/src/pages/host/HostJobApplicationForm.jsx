@@ -161,8 +161,13 @@ const HostJobApplicationForm = () => {
       });
       return response.data;
     },
-    onSuccess: (data) => {
-      showSuccessAlert(data?.message || "Application submitted");
+    onSuccess: () => {
+      showSuccessAlert(
+        "Thank you for applying! We’ll review your application and get back to you soon",
+        {
+          title: "Application Submitted!",
+        },
+      );
       resetForm();
     },
     onError: (error) => {
