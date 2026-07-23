@@ -43,7 +43,12 @@ const AiHostContentUseRemoval = () => {
             return response.data;
         },
         onSuccess: () => {
-            showSuccessAlert("Your request has been submitted successfully!");
+            showSuccessAlert(
+                "We’ll review your request and get back to you within 3–5 business days.",
+                {
+                    title: "Request Submitted!",
+                },
+            );
             reset();
         },
         onError: (error) => {

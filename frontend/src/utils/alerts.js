@@ -7,18 +7,20 @@ const baseOptions = {
   heightAuto: false,
 };
 
-export const showSuccessAlert = (message) =>
+export const showSuccessAlert = (message, options = {}) =>
   Swal.fire({
     ...baseOptions,
     icon: "success",
-    title: "Success",
+    title: options.title || "Success",
     text: message,
     showConfirmButton: false,
     timer: 2500,
     timerProgressBar: true,
     customClass: {
       popup: "swal2-popup--rounded",
-      title: "swal2-title--serif",
+      title: ["swal2-title--serif", options.titleClassName]
+        .filter(Boolean)
+        .join(" "),
     },
   });
 

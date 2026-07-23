@@ -1,7 +1,13 @@
 import mongoose from "mongoose";
+import { randomUUID } from "crypto";
 
 const workationSchema = new mongoose.Schema(
     {
+        businessId: {
+            type: String,
+            trim: true,
+            default: () => `WORKATION-${randomUUID()}`,
+        },
         noOfPeople: { type: String, trim: true, default: "" },
         fullName: { type: String, trim: true, required: true },
         companyName: { type: String, trim: true, default: "" },

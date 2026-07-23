@@ -101,12 +101,14 @@ const AiBecomeContributor = () => {
         return;
       }
       await Swal.fire({
-        title: "Request Submitted!",
-        text: "Your form has been submitted. We will get back to you shortly.",
+        title: "Thank You for Your Interest!",
+        text: "We’ll review your details and get back to you soon.",
         icon: "success",
         confirmButtonText: "OK",
         confirmButtonColor: "#0BA9EF",
         customClass: {
+          popup: "swal2-popup--rounded",
+          title: "swal2-title--serif",
           confirmButton: "swal2-button--pill",
         },
       });

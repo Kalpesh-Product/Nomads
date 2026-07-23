@@ -45,8 +45,10 @@ export default function LoginPage() {
 
       return response.data;
     },
-    onSuccess: (data) => {
-      showSuccessAlert(data?.message || "Login successful");
+    onSuccess: () => {
+      showSuccessAlert("You’ve logged in successfully. Let’s get started!", {
+        title: "Welcome Back!",
+      });
       reset();
 
       // ✅ Redirect to profile page after login

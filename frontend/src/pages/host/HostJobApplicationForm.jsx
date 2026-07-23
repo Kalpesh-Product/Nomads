@@ -161,14 +161,18 @@ const HostJobApplicationForm = () => {
       });
       return response.data;
     },
-    onSuccess: (data) => {
-      showSuccessAlert(data?.message || "Application submitted");
+    onSuccess: () => {
+      showSuccessAlert(
+        "Thank you for applying! We’ll review your application and get back to you soon",
+        {
+          title: "Application Submitted!",
+        },
+      );
       resetForm();
     },
     onError: (error) => {
       const msg =
-        error?.response?.data?.message ||
-        "Submission failed. Try not angering the server next time.";
+        error?.response?.data?.message || "Submission failed. Server error.";
       showErrorAlert(msg);
     },
   });

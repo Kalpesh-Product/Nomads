@@ -63,7 +63,12 @@ const AiHostContact = () => {
                 return response.data;
             },
             onSuccess: () => {
-                showSuccessAlert("Form submitted successfully");
+                showSuccessAlert(
+                    "Your message has been received. We’ll get back to you soon.",
+                    {
+                        title: "Thanks for Reaching Out!",
+                    },
+                );
                 reset();
             },
             onError: (error) => {
