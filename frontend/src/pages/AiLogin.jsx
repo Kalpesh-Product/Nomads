@@ -190,8 +190,10 @@ export default function AiLogin() {
 
       return response.data;
     },
-    onSuccess: (data) => {
-      showSuccessAlert(data?.message || "Login successful");
+    onSuccess: () => {
+      showSuccessAlert("You’ve logged in successfully. Let’s get started!", {
+        title: "Welcome Back!",
+      });
       reset();
 
       const redirectPath = resolveRedirectPath();
