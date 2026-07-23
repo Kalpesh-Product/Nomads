@@ -1802,7 +1802,7 @@ const AiGlobalListingsList = () => {
               </div>
             </div>
 
-            <div className="lg:hidden flex overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 md:justify-center">
+            <div className="lg:hidden flex justify-start overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4">
               {categoryOptions.map((cat) => {
                 const iconSrc = getCategoryShortcutIconSrc(cat.value, true);
                 return (
@@ -1811,7 +1811,7 @@ const AiGlobalListingsList = () => {
                     label={cat.label}
                     iconSrc={iconSrc}
                     onClick={() => handleCategoryClick(cat.value)}
-                    buttonClassName="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] lg:w-[10%]"
+                    buttonClassName="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] min-w-[5rem] md:min-w-[5.75rem]"
                     iconBoxClassName="h-10 w-full"
                     imageClassName="h-full w-[90%] object-contain mx-auto"
                     labelClassName="text-[10px] font-medium whitespace-nowrap"

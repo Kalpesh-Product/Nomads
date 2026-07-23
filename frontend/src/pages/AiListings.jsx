@@ -1221,7 +1221,7 @@ const AiListings = ({ forceListView = false }) => {
   return (
     <div className="flex flex-col gap:2 lg:gap-6 ">
       <div
-        className={`${forceListView ? "flex" : "hidden lg:flex"} flex-col gap-6 md:px-10`}
+        className={`${forceListView ? "flex" : "hidden lg:flex"} flex-col gap-6 lg:px-10`}
       >
         <div
           className={`w-full lg:min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto ${
@@ -1307,7 +1307,7 @@ const AiListings = ({ forceListView = false }) => {
               </div>
             </div>
 
-            <div className="lg:hidden flex overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 md:justify-center">
+            <div className="lg:hidden flex justify-start overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4">
               {categoryOptions.map((cat) => {
                 const iconSrc = getCategoryShortcutIconSrc(cat.value, true);
                 const isActive = formData?.category === cat.value;
@@ -1316,7 +1316,7 @@ const AiListings = ({ forceListView = false }) => {
                     key={cat.value}
                     type="button"
                     onClick={() => handleCategoryClick(cat.value)}
-                    className="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] lg:w-[10%]"
+                    className="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] min-w-[5rem] md:min-w-[5.75rem]"
                   >
                     <div className="h-10 w-full flex flex-col items-center gap-1">
                       <img
