@@ -167,8 +167,7 @@ const HostJobApplicationForm = () => {
     },
     onError: (error) => {
       const msg =
-        error?.response?.data?.message ||
-        "Submission failed. Try not angering the server next time.";
+        error?.response?.data?.message || "Submission failed. Server error.";
       showErrorAlert(msg);
     },
   });
