@@ -710,15 +710,25 @@ export const addB2CformSubmission = async (req, res, next) => {
         successMsg: "Sign-up saved successfully.",
         emailTemplate: (data) => ({
           to: data.email,
-          subject: "Welcome to WoNo",
-          text: `Hi ${data.fullName}, welcome to WoNo! Your signup was successful.`,
-          html: `
-      <h2>Welcome to WoNo!</h2>
-      <p>Hi ${data.fullName},</p>
-      <p>Thank you for signing up with <b>WoNo</b>.</p>
-      <p>We’re excited to have you onboard! Our team will review your profile and connect with you shortly to complete the onboarding process.</p>
-      <p>Cheers,<br/>The WoNo Team</p>
-    `,
+          subject: "Welcome to WONO!",
+          text: `Hi ${data.fullName}, welcome to WONO! Your Nomad signup is successful.`,
+          html: renderNotificationEmail({
+            heroTitle: "Welcome to WONO!",
+            heroSubtitle: "Your Nomad signup is successful.",
+            greetingHtml: `
+              <p style="margin:0 0 4px;">Hello ${data.fullName},</p>
+              <p class="email-text" style="margin:0;">Thank you for signing up with WONO.</p>
+              <p class="email-text" style="margin:8px 0 0;">We're excited to welcome you to the WONO Nomad community.</p>
+            `,
+            bodyHtml: `
+              <tr>
+                <td style="padding:28px 32px 4px;text-align:center;">
+                  <p style="margin:0 0 12px;font-size:12px;font-weight:600;letter-spacing:0.5px;color:#0BA9EF;text-transform:uppercase;">Start Your Journey</p>
+                  <a href="https://www.wono.co" style="display:inline-block;background:#0BA9EF;color:#ffffff;font-weight:600;font-size:14px;text-decoration:none;padding:13px 32px;border-radius:8px;">Explore WONO &#8594;</a>
+                </td>
+              </tr>
+            `,
+          }),
         }),
       },
       Content_Removal_Requests: {
