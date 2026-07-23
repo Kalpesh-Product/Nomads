@@ -13,6 +13,11 @@
   font-weight: 600;
 }
 
+.swal2-title--activation-request {
+  font-size: 1.35rem;
+  white-space: nowrap;
+}
+
 .swal2-html-container {
   font-family: "Poppins", "Times New Roman", serif;
   font-size: 1rem;
