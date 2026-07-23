@@ -10,11 +10,12 @@
 
 .swal2-title--serif {
   font-family: "Poppins", "Times New Roman", serif;
+  font-size: 1.35rem;
   font-weight: 600;
+  line-height: 1.3;
 }
 
 .swal2-title--activation-request {
-  font-size: 1.35rem;
   white-space: nowrap;
 }
 

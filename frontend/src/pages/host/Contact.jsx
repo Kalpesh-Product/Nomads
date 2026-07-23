@@ -43,8 +43,13 @@ const HostContact = () => {
         });
         return response.data;
       },
-      onSuccess: (data) => {
-        showSuccessAlert("Form submitted successfully");
+      onSuccess: () => {
+        showSuccessAlert(
+          "Your message has been received. We’ll get back to you soon.",
+          {
+            title: "Thanks for Reaching Out!",
+          },
+        );
         reset();
       },
       onError: (error) => {
