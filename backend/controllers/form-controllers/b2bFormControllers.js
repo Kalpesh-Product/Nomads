@@ -7,6 +7,22 @@ import HostUser from "../../models/HostUser.js";
 import sharp from "sharp";
 import { sendMail, sendAdminFormNotification } from "../../config/mailer.js";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
+import {
+  referenceDateStamp,
+  formatSubmittedOn,
+  renderNotificationEmail,
+} from "../../utils/emailTemplates.js";
+
+const PLAN_DISPLAY_NAMES = {
+  BASIC: "Basic - Free",
+  PROFESSIONAL: "Professional - $199",
+  CUSTOMISE: "Customise - Personalised",
+};
+
+function planDisplayName(goals) {
+  const key = (goals || "").trim().toUpperCase();
+  return PLAN_DISPLAY_NAMES[key] || goals || "-";
+}
 
 const istNowPieces = () => {
   const tz = "Asia/Kolkata";
@@ -564,7 +580,7 @@ export const registerFormSubmission = async (req, res) => {
     const sheetResult = await postToAppsScript(apsBody);
 
     // STEP 1.5: also persist host signup user in MongoDB
-    await HostUser.create({
+    const hostUser = await HostUser.create({
       name: payload.name,
       email: payload.email,
       mobile: payload.mobile,
@@ -816,18 +832,46 @@ export const registerFormSubmission = async (req, res) => {
       // STEP 5: send confirmation email to user
       if (payload.email) {
         try {
+          const registeredAt = hostUser.createdAt || new Date();
+          const totalHostUsers = await HostUser.countDocuments({});
+          const registrationId = `WN-REG-${referenceDateStamp(
+            registeredAt,
+          )}-${String(totalHostUsers).padStart(5, "0")}`;
+          const { submittedDate, submittedTime } =
+            formatSubmittedOn(registeredAt);
+
           await sendMail({
             to: payload.email,
-            subject: "Welcome to WONO 🎉",
-            text: `Hi ${payload.name || "User"
-              }, thanks for registering with WONO!`,
-            html: `
-            <h2>Welcome to WONO</h2>
-            <p>Hi ${payload.name || "User"},</p>
-            <p>Thanks for registering with us. Our team will contact you shortly ${searchKey && "and will inform you once your website is created"
-              }.</p>
-            <p>Cheers,<br/>The WONO Team</p>
-          `,
+            subject: "Welcome to WONO!",
+            text: `Hi ${payload.name || "User"}, thanks for registering with WONO! Registration ID: ${registrationId}. Our team will contact you shortly.`,
+            html: renderNotificationEmail({
+              heroTitle: "Welcome to WONO!",
+              heroSubtitle: "Thank you for registering with WONO.",
+              greetingHtml: `
+                <p style="margin:0 0 4px;">Hello ${payload.name || "User"},</p>
+                <p class="email-text" style="margin:0;">We're excited to have you onboard. Our team will contact you shortly${
+                  searchKey
+                    ? " and will inform you once your website is created"
+                    : ""
+                }.</p>
+              `,
+              referenceLabel: "Registration ID",
+              referenceValue: registrationId,
+              detailsTitle: "Registration Details",
+              detailRows: [
+                ["Name", payload.name || "-"],
+                ["Email", payload.email],
+                ["Selected Plan", planDisplayName(payload.Goals)],
+                ["Company", payload.companyName || "-"],
+                ["Registration Date", `${submittedDate}<br/>${submittedTime}`],
+              ],
+              whatNextTitle: "What Happens Next?",
+              whatNextItems: [
+                "Registration completed successfully",
+                "Our team will review your information",
+                "We will contact you shortly",
+              ],
+            }),
           });
           console.log("✅ Registration email sent to", payload.email);
         } catch (err) {
