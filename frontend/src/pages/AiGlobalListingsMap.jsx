@@ -488,8 +488,8 @@ const AiGlobalListingsMap = () => {
       return [];
     }
 
-    const visibleDestinationHighlightFilters = DESTINATION_HIGHLIGHT_FILTERS.filter(
-      (option) => {
+    const visibleDestinationHighlightFilters =
+      DESTINATION_HIGHLIGHT_FILTERS.filter((option) => {
         if (option.value === ANNUAL_EVENTS_CATEGORY) {
           return destinationEventsData.length > 0;
         }
@@ -511,8 +511,7 @@ const AiGlobalListingsMap = () => {
         }
 
         return true;
-      },
-    );
+      });
 
     if (!listingsData || listingsData.length === 0) {
       return [
@@ -542,7 +541,7 @@ const AiGlobalListingsMap = () => {
       workation: "Workation",
       meetingroom: "Meetings",
       cafe: "Cafes",
-      [VALUE_ADDED_SERVICES_CATEGORY]: "Value Added Services",
+      [VALUE_ADDED_SERVICES_CATEGORY]: "Value-Added Services",
     };
 
     const typeOrder = [
@@ -697,9 +696,7 @@ const AiGlobalListingsMap = () => {
   const { mutate: locationData, isPending: isLocation } = useMutation({
     mutationFn: async (data) => {
       dispatch(setFormValues(data));
-      navigate(
-        `/verticals?country=${data.country}&location=${data.location}`,
-      );
+      navigate(`/verticals?country=${data.country}&location=${data.location}`);
       setShowMobileSearch(false);
     },
     onSuccess: () => {

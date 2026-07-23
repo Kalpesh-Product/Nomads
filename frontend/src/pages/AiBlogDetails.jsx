@@ -124,10 +124,14 @@ const AiBlogDetails = () => {
             ))}
         </section>
         <hr />
-        <footer className="flex w-full justify-between items-center">
-          <p>{content?.author || ""}</p>
-          <p>{humanDate(content?.date) || new Date().toLocaleString()}</p>
-          <p>
+        <footer className="flex w-full flex-col items-center gap-2 text-center text-sm md:flex-row md:items-center md:justify-between md:gap-4 md:text-left md:text-base">
+          <p className="w-full break-words md:w-auto">
+            {content?.author || ""}
+          </p>
+          <p className="w-full break-words md:w-auto">
+            {humanDate(content?.date) || new Date().toLocaleString()}
+          </p>
+          <p className="w-full break-words md:w-auto md:text-right">
             {typeof content?.source === "object"
               ? content?.source?.name || "Source"
               : content?.source || "Source"}

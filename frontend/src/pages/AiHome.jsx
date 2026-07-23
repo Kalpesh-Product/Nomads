@@ -19,10 +19,7 @@ const gatedRecommendationTitles = new Set([
   "Find Your Community",
 ]);
 
-const freeRecommendationTitles = new Set([
-  "World Ranking",
-  "Search Old School",
-]);
+const freeRecommendationTitles = new Set(["World Ranking", "Classic Search"]);
 
 const goalSlugByTitle = {
   "World Ranking": "worldranking",
@@ -74,7 +71,7 @@ const recommendationCards = [
     path: getSearchPathForGoal("Find Your Community"),
   },
   {
-    title: "Search Old School",
+    title: "Classic Search",
     description:
       "Self search & find ideal nomad destinations as per your preference like old times.",
     icon: TbWorldWww,
@@ -103,13 +100,13 @@ const AiHome = () => {
   const greetingText = isLoggedIn ? `Hi ${userFirstName}!` : "Meet Wono";
   const subheadingText = isLoggedIn
     ? ""
-    : "An intelligent platform for modern nomads … Early adoption of our future lifestyle!";
+    : "An intelligent platform for modern nomads. Join the early adoption of our future lifestyle.";
   const thirdLineText = isLoggedIn
     ? "A global community of nomads & remote workers, who are redefining how the world lives and works. Early adoption of our future lifestyle!"
     : "A global community of nomads & remote workers, who are redefining how the world lives and works. Early adoption of our future lifestyle!";
   const fourthLineText = isLoggedIn
-    ? "Choose your goals from below so that we can help you design your nomad lifestyle."
-    : "Choose your goals from below so that we can help you design your nomad lifestyle.";
+    ? "Choose your goals below, and we'll help you design your ideal nomad lifestyle."
+    : "Choose your goals below, and we'll help you design your ideal nomad lifestyle.";
 
   const renderBracketBrand = (text) =>
     text.split("").map((char, index) => {
@@ -152,9 +149,9 @@ const AiHome = () => {
     let subheadingIndex = 0;
     let thirdLineIndex = 0;
     let fourthLineIndex = 0;
-    let cleanupSubheading = () => { };
-    let cleanupThirdLine = () => { };
-    let cleanupFourthLine = () => { };
+    let cleanupSubheading = () => {};
+    let cleanupThirdLine = () => {};
+    let cleanupFourthLine = () => {};
 
     const greetingInterval = setInterval(() => {
       greetingIndex += 1;
@@ -308,8 +305,9 @@ const AiHome = () => {
           </p>
 
           <div
-            className={`mt-8 rounded-[40px] px-0 py-4 md:px-6 md:py-8 ${areCardsVisible ? "visible" : "invisible"
-              }`}
+            className={`mt-8 rounded-[40px] px-0 py-4 md:px-6 md:py-8 ${
+              areCardsVisible ? "visible" : "invisible"
+            }`}
           >
             <div className="grid grid-cols-2 gap-4 md:grid-cols-2 md:gap-10 xl:grid-cols-3">
               {recommendationCards.map((card, index) => {
@@ -317,16 +315,17 @@ const AiHome = () => {
 
                 const isFreeCard = freeRecommendationTitles.has(card.title);
                 const loggedOutCardText = isFreeCard
-                  ? "Login not required"
+                  ? "No login required"
                   : "Login required";
 
                 return (
                   <div
                     key={card.title}
-                    className={`transition-all duration-300 ${index < visibleCardCount
-                      ? "translate-y-0 opacity-100"
-                      : "pointer-events-none translate-y-2 opacity-0"
-                      }`}
+                    className={`transition-all duration-300 ${
+                      index < visibleCardCount
+                        ? "translate-y-0 opacity-100"
+                        : "pointer-events-none translate-y-2 opacity-0"
+                    }`}
                   >
                     <article
                       onClick={() => handleCardClick(card)}
@@ -355,8 +354,9 @@ const AiHome = () => {
                     </article>
                     {!isLoggedIn ? (
                       <p
-                        className={`mt-2 text-[10px] font-semibold tracking-wide md:text-xs ${isFreeCard ? "text-primary-blue" : "text-black/70"
-                          }`}
+                        className={`mt-2 text-[10px] font-semibold tracking-wide md:text-xs ${
+                          isFreeCard ? "text-primary-blue" : "text-black/70"
+                        }`}
                       >
                         {loggedOutCardText}
                       </p>
@@ -370,7 +370,7 @@ const AiHome = () => {
       </main>
 
       {/* <div className="sticky bottom-0 z-10  bg-white/95 py-6 text-center text-nano text-gray-600 backdrop-blur supports-[backdrop-filter]:bg-white/80">
-        WoNo is in Beta and can make mistakes. Building the future of global
+        WONO is currently in beta. We're continuously improving the platform based on your feedback. Building the future of global
         nomad living, one update at a time. See Cookie Preferences.
       </div> */}
     </div>

@@ -79,7 +79,8 @@ const DropdownBadge = ({
           >
             {options.map((option) => {
               const isSelected =
-                option.value === selectedValue || option.label === selectedValue;
+                option.value === selectedValue ||
+                option.label === selectedValue;
 
               return (
                 <li key={option.value}>
@@ -263,7 +264,7 @@ const AiManualSearch = () => {
   const selectedTopHeadingText =
     "Curating the best results for you. Click on Search to continue.";
   const searchBarBadges = [
-    "Search Old School",
+    "Classic Search",
     selectedContinent && continentLabel,
     selectedCountry && countryLabel,
     selectedLocation && locationLabel,
@@ -302,7 +303,7 @@ const AiManualSearch = () => {
       locationOptions.find((option) => option.value === location)?.label ||
       location;
     const badges = [
-      "Search Old School",
+      "Classic Search",
       continentOptions.find((option) => option.value === continent)?.label,
       countryOptions.find((option) => option.value === country)?.label,
       selectedLocationTitle,

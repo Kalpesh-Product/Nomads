@@ -87,31 +87,31 @@ const recommendationItems = [
     icon: RiUserCommunityLine,
     path: getSearchPathForGoal("Find Your Community"),
   },
-  { label: "Search Old School", icon: TbWorldWww, path: "/manual-search" },
+  { label: "Classic Search", icon: TbWorldWww, path: "/manual-search" },
 ];
 
 const valueAdditionItems = [
   { label: "VISA Support", icon: LuMapPinned, path: "/visa-support" },
   {
-    label: "Overall Activation Support",
+    label: "Activation Support",
     icon: HiOutlineKey,
     path: "/overall-activation-support",
   },
   {
-    label: "New Company Setup",
+    label: "Company Setup",
     icon: HiOutlineCog,
     path: "/new-company-setup",
   },
   { label: "Consultation", icon: HiOutlineUserGroup, path: "/consultation" },
   { label: "Workation", icon: MdComputer, path: "/workation" },
   {
-    label: "Apply for Job",
+    label: "Apply for Jobs",
     icon: IoBriefcaseSharp,
     badge: "Coming soon",
   },
 ];
 
-const becomeHostItem = [{ label: "Become A Host", icon: HiOutlineViewGrid }];
+const becomeHostItem = [{ label: "Become a Host", icon: HiOutlineViewGrid }];
 
 const loggedOutPrompt = {
   title: "Get responses tailored to you",
@@ -130,14 +130,14 @@ const profileItems = [
 const signOutItem = [{ label: "Sign Out", icon: HiOutlineLogout }];
 
 const becomeContributorLink = {
-  label: "Become A Contributor",
+  label: "Become a Contributor",
   icon: FaHandsHelping,
   path: "/become-a-contributor",
 };
 
 const collapsedSectionLabels = {
   "WoNo Intelligence": "WOI",
-  "Value Added Services": "VAS",
+  "Value-Added Services": "VAS",
   Profile: "PRO",
 };
 
@@ -386,11 +386,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   };
 
   const getNomadLoginRedirectPath = () => {
-    const authPages = new Set([
-      "/signup",
-      "/login",
-      "/forgot-password",
-    ]);
+    const authPages = new Set(["/signup", "/login", "/forgot-password"]);
 
     if (authPages.has(location.pathname)) {
       return "/";
@@ -563,7 +559,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         />
 
         <SidebarSection
-          title="Value Added Services"
+          title="Value-Added Services"
           items={valueAdditionItemsWithActivePath}
           collapsed={isCollapsed}
           isExpandable
