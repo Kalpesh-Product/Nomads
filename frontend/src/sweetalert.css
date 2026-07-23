@@ -56,3 +56,22 @@
   padding: 0.65rem 1.35rem !important;
   font-weight: 600;
 }
+
+.swal2-popup--visa-support {
+  width: min(34rem, calc(100vw - 2rem));
+}
+
+.swal2-actions--visa-support {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.swal2-actions--visa-support .swal2-styled {
+  margin: 0 !important;
+  min-width: 13rem;
+  white-space: nowrap;
+}

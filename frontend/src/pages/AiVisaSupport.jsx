@@ -234,8 +234,9 @@ const AiVisaSupport = () => {
         cancelButtonColor: "#000000",
         confirmButtonColor: "#0BA9EF",
         customClass: {
-          popup: "swal2-popup--rounded",
+          popup: "swal2-popup--rounded swal2-popup--visa-support",
           title: "swal2-title--serif",
+          actions: "swal2-actions--visa-support",
           confirmButton: "swal2-button--pill",
           cancelButton: "swal2-button--pill",
         },
