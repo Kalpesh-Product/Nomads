@@ -14,6 +14,12 @@ import { randomUUID } from "crypto";
 import bcrypt from "bcrypt";
 import { uploadFileToS3 } from "../../config/s3Config.js";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
+import {
+  toDMY,
+  referenceDateStamp,
+  formatSubmittedOn,
+  renderNotificationEmail,
+} from "../../utils/emailTemplates.js";
 
 function istNowPieces() {
   const tz = "Asia/Kolkata";
@@ -589,17 +595,45 @@ export const addB2CformSubmission = async (req, res, next) => {
           sheetName: d.sheetName,
         }),
         successMsg: "Your enquiry has been sent.",
-        emailTemplate: (data) => ({
-          to: data.email,
-          subject: "Your enquiry has been received",
-          text: `Hi ${data.fullName}, your enquiry has been sent to the company successfully.`,
-          html: `
-        <h2>Thank you for your enquiry</h2>
-        <p>Hi ${data.fullName},</p>
-        <p>Your enquiry for <b>${data.companyName}</b> has been successfully submitted. Our team will reach out shortly.</p>
-        <p>Cheers,<br/>The WONO Team</p>
-      `,
-        }),
+        emailTemplate: (data) => {
+          const { submittedDate, submittedTime } = formatSubmittedOn(
+            data.submittedAt ? new Date(data.submittedAt) : new Date(),
+          );
+          const referenceId = data.referenceId || "-";
+
+          return {
+            to: data.email,
+            subject: "Your enquiry has been received",
+            text: `Hi ${data.fullName}, your enquiry for ${data.companyName} has been successfully submitted. Reference ID: ${referenceId}. Our team will reach out shortly.`,
+            html: renderNotificationEmail({
+              heroTitle: "Thank You!",
+              heroSubtitle: "We've successfully received your enquiry.",
+              greetingHtml: `
+                <p style="margin:0 0 4px;">Hello ${data.fullName},</p>
+                <p class="email-text" style="margin:0;">Thank you for your interest in <b class="email-heading">${data.companyName}</b>.</p>
+              `,
+              referenceLabel: "Reference ID",
+              referenceValue: referenceId,
+              detailsTitle: "Your Details",
+              detailRows: [
+                ["Full Name", data.fullName],
+                ["No. Of People", data.noOfPeople],
+                ["Phone", data.mobileNumber],
+                ["Email", data.email],
+                ["Product", data.companyName],
+                ["Start Date", toDMY(data.startDate)],
+                ["End Date", toDMY(data.endDate)],
+                ["Submitted On", `${submittedDate}<br/>${submittedTime}`],
+              ],
+              whatNextTitle: "What Happens Next?",
+              whatNextItems: [
+                "Our team will review your enquiry.",
+                "We will contact you within 24 business hours.",
+                "If additional information is required, we will get in touch.",
+              ],
+            }),
+          };
+        },
       },
       All_POC_Contact: {
         schema: pocSchema,
@@ -676,15 +710,25 @@ export const addB2CformSubmission = async (req, res, next) => {
         successMsg: "Sign-up saved successfully.",
         emailTemplate: (data) => ({
           to: data.email,
-          subject: "Welcome to WoNo",
-          text: `Hi ${data.fullName}, welcome to WoNo! Your signup was successful.`,
-          html: `
-      <h2>Welcome to WoNo!</h2>
-      <p>Hi ${data.fullName},</p>
-      <p>Thank you for signing up with <b>WoNo</b>.</p>
-      <p>We’re excited to have you onboard! Our team will review your profile and connect with you shortly to complete the onboarding process.</p>
-      <p>Cheers,<br/>The WoNo Team</p>
-    `,
+          subject: "Welcome to WONO!",
+          text: `Hi ${data.fullName}, welcome to WONO! Your Nomad signup is successful.`,
+          html: renderNotificationEmail({
+            heroTitle: "Welcome to WONO!",
+            heroSubtitle: "Your Nomad signup is successful.",
+            greetingHtml: `
+              <p style="margin:0 0 4px;">Hello ${data.fullName},</p>
+              <p class="email-text" style="margin:0;">Thank you for signing up with WONO.</p>
+              <p class="email-text" style="margin:8px 0 0;">We're excited to welcome you to the WONO Nomad community.</p>
+            `,
+            bodyHtml: `
+              <tr>
+                <td style="padding:28px 32px 4px;text-align:center;">
+                  <p style="margin:0 0 12px;font-size:12px;font-weight:600;letter-spacing:0.5px;color:#0BA9EF;text-transform:uppercase;">Start Your Journey</p>
+                  <a href="https://www.wono.co" style="display:inline-block;background:#0BA9EF;color:#ffffff;font-weight:600;font-size:14px;text-decoration:none;padding:13px 32px;border-radius:8px;">Explore WONO &#8594;</a>
+                </td>
+              </tr>
+            `,
+          }),
         }),
       },
       Content_Removal_Requests: {
@@ -921,6 +965,12 @@ export const addB2CformSubmission = async (req, res, next) => {
       });
 
       await leads.save();
+
+      const totalLeads = await Lead.countDocuments({});
+      payload.referenceId = `WN-${referenceDateStamp(leads.createdAt)}-${String(
+        totalLeads,
+      ).padStart(5, "0")}`;
+      payload.submittedAt = leads.createdAt || new Date();
     }
 
     if (sheetName === "Sign_up") {
