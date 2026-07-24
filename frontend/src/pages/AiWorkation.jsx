@@ -645,6 +645,7 @@ const AiWorkation = () => {
                     <DatePicker
                       {...field}
                       label="Start Date (Date calender)"
+                      disablePast
                       value={field.value ? dayjs(field.value) : null}
                       onChange={(date) => field.onChange(date)}
                       slotProps={{
@@ -668,6 +669,7 @@ const AiWorkation = () => {
                     <DatePicker
                       {...field}
                       label="End Date (Date calender)"
+                      disablePast
                       value={field.value ? dayjs(field.value) : null}
                       onChange={(date) => field.onChange(date)}
                       slotProps={{
