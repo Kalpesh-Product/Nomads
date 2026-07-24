@@ -1171,57 +1171,62 @@ const AiProduct = () => {
                         helperText={errors?.fullName?.message}
                         sx={{ marginTop: 3 }}
                         error={!!errors.fullName}
+                        disabled={!!auth?.user}
                       />
                     )}
                   />
                   <Controller
-                    name="noOfPeople"
-                    control={control}
-                    rules={{
-                      required: "No. of people is required",
-                      validate: (value) =>
-                        value > 0 || "At least one person is required",
-                    }}
-                    render={({ field }) => (
-                      <div className="flex flex-col gap-1">
-                        <label className="text-sm text-gray-600 font-medium">
-                          No. Of People
-                        </label>
-                        <div className="flex items-center border-b border-gray-300 py-1 w-full max-w-xs">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              field.onChange(
-                                Math.max(0, Number(field.value || 0) - 1),
-                              )
-                            }
-                            className="px-3 py-1 text-lg font-semibold text-gray-600 hover:text-primary-blue"
-                          >
-                            −
-                          </button>
-                          <input
-                            {...field}
-                            readOnly
-                            className="w-full text-center outline-none bg-transparent text-gray-800 text-sm font-medium"
-                            value={field.value || 0}
-                          />
-                          <button
-                            type="button"
-                            onClick={() =>
-                              field.onChange(Number(field.value || 0) + 1)
-                            }
-                            className="px-3 py-1 text-lg font-semibold text-gray-600 hover:text-primary-blue"
-                          >
-                            +
-                          </button>
-                        </div>
-                        {errors?.noOfPeople && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.noOfPeople.message}
-                          </p>
-                        )}
-                      </div>
-                    )}
+  name="noOfPeople"
+  control={control}
+  rules={{
+    required: "No. of people is required",
+    validate: (value) =>
+      Number(value) > 0 || "At least one person is required",
+  }}
+render={({ field }) => (
+  <div className="relative w-full mt-7">
+    <label className="absolute left-0 top-0 text-xs text-gray-600">
+      No. Of People
+    </label>
+
+    <div className="flex items-center w-full border-b border-gray-400 pt-[14px] h-[40px]">
+      <button
+        type="button"
+        onClick={() =>
+          field.onChange(
+            Math.max(0, Number(field.value || 0) - 1),
+          )
+        }
+        className="px-3 text-lg leading-none font-semibold text-gray-600 hover:text-primary-blue"
+      >
+        −
+      </button>
+
+      <input
+        {...field}
+        readOnly
+        value={field.value || 0}
+        className="w-full text-center outline-none bg-transparent text-sm font-medium text-gray-800"
+      />
+
+      <button
+        type="button"
+        onClick={() =>
+          field.onChange(Number(field.value || 0) + 1)
+        }
+        className="px-3 text-lg leading-none font-semibold text-gray-600 hover:text-primary-blue"
+      >
+        +
+      </button>
+    </div>
+
+    {errors?.noOfPeople && (
+      <p className="mt-1 text-xs text-red-500">
+        {errors.noOfPeople.message}
+      </p>
+    )}
+  </div>
+)}
                   />
 
                   <Controller
@@ -1238,7 +1243,6 @@ const AiProduct = () => {
                         {...field}
                         label="Mobile Number"
                         fullWidth
-                        defaultCountry="IN"
                         variant="standard"
                         size="small"
                         value={field.value || ""}
@@ -1251,6 +1255,7 @@ const AiProduct = () => {
                         }}
                         helperText={errors?.mobileNumber?.message}
                         error={!!errors.mobileNumber}
+                        disabled={!!auth?.user}
                       />
                     )}
                   />
@@ -1273,6 +1278,7 @@ const AiProduct = () => {
                         size="small"
                         helperText={errors?.email?.message}
                         error={!!errors.email}
+                        disabled={!!auth?.user}
                       />
                     )}
                   />
@@ -2126,6 +2132,7 @@ const AiProduct = () => {
                           size="small"
                           helperText={errors?.fullName?.message}
                           error={!!errors.fullName}
+                          disabled={!!auth?.user}
                         />
                       )}
                     />
@@ -2193,7 +2200,6 @@ const AiProduct = () => {
                           {...field}
                           label="Mobile Number"
                           fullWidth
-                          defaultCountry="IN"
                           variant="standard"
                           size="small"
                           value={field.value || ""}
@@ -2206,6 +2212,7 @@ const AiProduct = () => {
                           }}
                           helperText={errors?.mobileNumber?.message}
                           error={!!errors.mobileNumber}
+                          disabled={!!auth?.user}
                         />
                       )}
                     />
@@ -2228,6 +2235,7 @@ const AiProduct = () => {
                           size="small"
                           helperText={errors?.email?.message}
                           error={!!errors.email}
+                          disabled={!!auth?.user}
                         />
                       )}
                     />
