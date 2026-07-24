@@ -21,6 +21,58 @@ const buildVisibleNomadReviewQuery = (criteria = {}) => ({
   ],
 });
 
+const COMPANY_LOCATIONS_CACHE_TTL_MS = 5 * 60 * 1000;
+let companyLocationsCache = {
+  data: null,
+  expiresAt: 0,
+  pendingRequest: null,
+};
+
+const loadCompanyLocations = async () => {
+  const companies = await Company.find()
+    .select("country state continent isPublic -_id")
+    .lean()
+    .exec();
+
+  const countryMap = new Map();
+
+  for (const company of companies) {
+    const country = company.country?.trim();
+    const state = company.state?.trim();
+    const continent = company.continent?.trim() || "Unknown";
+    const isPublic = !!company.isPublic;
+
+    if (!country || !state) continue;
+
+    if (!countryMap.has(country)) {
+      countryMap.set(country, {
+        states: new Map(),
+        continent,
+      });
+    }
+
+    const existing = countryMap.get(country);
+
+    if (continent !== "Unknown" && existing.continent === "Unknown") {
+      existing.continent = continent;
+    }
+
+    if (!existing.states.has(state)) {
+      existing.states.set(state, { name: state, isPublic });
+    } else if (isPublic) {
+      existing.states.get(state).isPublic = true;
+    }
+  }
+
+  return Array.from(countryMap.entries()).map(
+    ([country, { states, continent }]) => ({
+      country,
+      states: Array.from(states.values()),
+      continent,
+    }),
+  );
+};
+
 // Utility to calculate distance between two lat/lng points in meters
 function getDistanceFromLatLonInM(lat1, lon1, lat2, lon2) {
   const R = 6371e3; // Earth radius in meters
@@ -1219,105 +1271,36 @@ export const getListings = async (req, res, next) => {
   }
 };
 
-// export const getUniqueDataLocations = async (req, res, next) => {
-//   try {
-//     const companies = await Company.find()
-//       .select("country state continent")
-//       .lean()
-//       .exec();
-
-//     const countryMap = new Map();
-
-//     for (const company of companies) {
-//       const country = company.country?.trim();
-//       const state = company.state?.trim();
-//       const continent = company.continent?.trim() || "Unknown";
-
-//       if (!country) continue;
-
-//       if (!countryMap.has(country)) {
-//         countryMap.set(country, {
-//           states: new Set(),
-//           continent,
-//         });
-//       }
-
-//       // if continent differs across records, prefer non-"Unknown"
-//       const existing = countryMap.get(country);
-//       if (continent !== "Unknown" && existing.continent === "Unknown") {
-//         existing.continent = continent;
-//       }
-
-//       if (state) {
-//         existing.states.add(state);
-//       }
-//     }
-
-//     const finalizedLocations = Array.from(countryMap.entries()).map(
-//       ([country, { states, continent }]) => ({
-//         country,
-//         states: Array.from(states),
-//         continent,
-//       })
-//     );
-
-//     return res.status(200).json(finalizedLocations);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
 export const getUniqueDataLocations = async (req, res, next) => {
   try {
-    const companies = await Company.find()
-      .select("country state continent isPublic")
-      .lean()
-      .exec();
+    res.set({
+      "Cache-Control": "public, max-age=300, stale-while-revalidate=3600",
+      "Vercel-CDN-Cache-Control":
+        "public, s-maxage=600, stale-while-revalidate=86400",
+    });
 
-    const countryMap = new Map();
-
-    for (const company of companies) {
-      const country = company.country?.trim();
-      const state = company.state?.trim();
-      const continent = company.continent?.trim() || "Unknown";
-      const isPublic = !!company.isPublic;
-
-      if (!country || !state) continue;
-
-      // initialize country entry if missing
-      if (!countryMap.has(country)) {
-        countryMap.set(country, {
-          states: new Map(),
-          continent,
-        });
-      }
-
-      const existing = countryMap.get(country);
-
-      // prefer non-"Unknown" continent if previously unknown
-      if (continent !== "Unknown" && existing.continent === "Unknown") {
-        existing.continent = continent;
-      }
-
-      // initialize state entry if missing
-      if (!existing.states.has(state)) {
-        existing.states.set(state, { name: state, isPublic });
-      } else {
-        // if any company for this state is public, mark it true
-        const stateObj = existing.states.get(state);
-        if (isPublic) stateObj.isPublic = true;
-      }
+    const now = Date.now();
+    if (
+      companyLocationsCache.data &&
+      companyLocationsCache.expiresAt > now
+    ) {
+      return res.status(200).json(companyLocationsCache.data);
     }
 
-    // convert map structure into array form
-    const finalizedLocations = Array.from(countryMap.entries()).map(
-      ([country, { states, continent }]) => ({
-        country,
-        states: Array.from(states.values()),
-        continent,
-      }),
-    );
+    if (!companyLocationsCache.pendingRequest) {
+      companyLocationsCache.pendingRequest = loadCompanyLocations()
+        .then((locations) => {
+          companyLocationsCache.data = locations;
+          companyLocationsCache.expiresAt =
+            Date.now() + COMPANY_LOCATIONS_CACHE_TTL_MS;
+          return locations;
+        })
+        .finally(() => {
+          companyLocationsCache.pendingRequest = null;
+        });
+    }
 
+    const finalizedLocations = await companyLocationsCache.pendingRequest;
     return res.status(200).json(finalizedLocations);
   } catch (error) {
     next(error);
