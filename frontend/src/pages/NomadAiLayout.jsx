@@ -59,7 +59,6 @@ const readAiScrollPosition = (location) =>
 const MANUAL_SEARCH_COMPACT_WIDTH = 820;
 
 const HIDE_STICKY_BAR_PREFIXES = [
-  "/login",
   "/signup",
   "/forgot-password",
   "/reset-password",
@@ -97,7 +96,10 @@ const NomadAiLayout = () => {
   const navigate = useNavigate();
   const navigationType = useNavigationType();
   const contentRef = useRef(null);
+  const previousPathRef = useRef(location.pathname);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [hasInternalHomeBackTarget, setHasInternalHomeBackTarget] =
+    useState(false);
   const [isManualSearchCompact, setIsManualSearchCompact] = useState(
     () =>
       typeof window !== "undefined" &&
@@ -107,6 +109,15 @@ const NomadAiLayout = () => {
 
   const formData = useSelector((state) => state.location.formValues);
   console.log("formData from layout : ", formData);
+
+  useEffect(() => {
+    if (location.pathname === "/" && previousPathRef.current !== "/") {
+      setHasInternalHomeBackTarget(true);
+    }
+
+    previousPathRef.current = location.pathname;
+  }, [location.pathname]);
+
   useEffect(() => {
     const scrollContainer = contentRef.current;
     if (!scrollContainer) return undefined;
@@ -159,6 +170,7 @@ const NomadAiLayout = () => {
   }, [location.pathname]);
 
   const shouldShowStickyBar = (() => {
+    if (location.pathname === "/" && !hasInternalHomeBackTarget) return false;
     if (EXCLUDED_STICKY_BAR_PATHS.has(location.pathname)) return false;
     if (HIDE_STICKY_BAR_EXACT_PATHS.has(location.pathname)) return false;
     if (
@@ -189,6 +201,7 @@ const NomadAiLayout = () => {
       location.pathname.startsWith("/new-company-setup") ||
       location.pathname.startsWith("/consultation") ||
       location.pathname.startsWith("/workation") ||
+      location.pathname.startsWith("/login") ||
       location.pathname.startsWith("/become-a-contributor") ||
       location.pathname.startsWith("/about") ||
       location.pathname.startsWith("/privacy") ||

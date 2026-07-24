@@ -105,8 +105,13 @@ const JobApplicationForm = ({ title }) => {
 
       return response.data;
     },
-    onSuccess: (data) => {
-      showSuccessAlert(data.message);
+    onSuccess: () => {
+      showSuccessAlert(
+        "Thank you for applying! We’ll review your application and get back to you soon",
+        {
+          title: "Application Submitted!",
+        },
+      );
       reset();
     },
     onError: (error) => {

@@ -224,8 +224,8 @@ const AiVisaSupport = () => {
     },
     onSuccess: async (_, formValues) => {
       await Swal.fire({
-        title: "Request Submitted!",
-        text: "Please suggest and select below options.",
+        title: "Visa Support Request Submitted!",
+        text: "Choose how you’d like to continue with your visa support.",
         icon: "success",
         showCancelButton: true,
         confirmButtonText: "Need Custom Solution",
@@ -234,6 +234,8 @@ const AiVisaSupport = () => {
         cancelButtonColor: "#000000",
         confirmButtonColor: "#0BA9EF",
         customClass: {
+          popup: "swal2-popup--rounded",
+          title: "swal2-title--serif",
           confirmButton: "swal2-button--pill",
           cancelButton: "swal2-button--pill",
         },

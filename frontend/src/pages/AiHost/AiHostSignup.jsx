@@ -314,10 +314,11 @@ const AiHostSignup = () => {
     },
     onSuccess: (data) => {
       showSuccessAlert(
-        typeof data.message === "string"
-          ? data.message
-          : data.message?.message ||
-              "Form submitted successfully, our team will get back to you soon",
+        "We’ll email you once your account is activated.",
+        {
+          title: "Activation Request Submitted!",
+          titleClassName: "swal2-title--activation-request",
+        },
       ).then(() => {
         window.location.href = hostRedirectUrl;
       });

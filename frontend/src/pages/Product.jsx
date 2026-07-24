@@ -391,8 +391,13 @@ const Product = () => {
       });
       return response.data;
     },
-    onSuccess: (data) => {
-      showSuccessAlert(data.message);
+    onSuccess: () => {
+      showSuccessAlert(
+        "Your enquiry has been shared. You’ll receive an update soon.",
+        {
+          title: "Enquiry Sent Successfully!",
+        },
+      );
       reset();
     },
     onError: (error) => {
@@ -422,7 +427,9 @@ const Product = () => {
       return response?.data;
     },
     onSuccess: () => {
-      showSuccessAlert("Review submitted successfully.");
+      showSuccessAlert("Your review has been submitted successfully.", {
+        title: "Thank You for Your Review!",
+      });
       resetReview();
       setIsAddReviewOpen(false);
       queryClient.invalidateQueries({ queryKey: ["companyDetails"] });
@@ -447,8 +454,13 @@ const Product = () => {
       });
       return response.data;
     },
-    onSuccess: (data) => {
-      showSuccessAlert(data.message);
+    onSuccess: () => {
+      showSuccessAlert(
+        "Your message has been shared with the host. They’ll get back to you soon.",
+        {
+          title: "Message Sent Successfully!",
+        },
+      );
       salesReset();
     },
     onError: (error) => {

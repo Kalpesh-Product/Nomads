@@ -13,7 +13,9 @@ export default function useLogout() {
       await api.get("auth/logout", {
         withCredentials: true,
       });
-      showSuccessAlert("Logged out");
+      showSuccessAlert("You’ve been safely logged out. See you again soon!", {
+        title: "Logged Out Successfully!",
+      });
       setAuth((prevState) => {
         return {
           ...prevState,
