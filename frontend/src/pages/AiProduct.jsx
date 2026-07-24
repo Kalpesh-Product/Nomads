@@ -1514,9 +1514,10 @@ render={({ field }) => (
 
             {/* Desktop Map */}
             <div className="w-full h-[500px] flex flex-col gap-8 rounded-xl overflow-hidden">
-              <h1 className="text-title font-medium text-gray-700 uppercase">
+             
+            <div class="mt-2 flex flex-wrap items-center justify-between gap-2 text-sm md:text-base"> <h1 className="text-title font-medium text-gray-700 uppercase">
                 Where you'll be
-              </h1>
+              </h1> <a href={companyDetails?.googleMap} target="_blank" rel="noreferrer" class="font-medium text-blue-600 underline">Get Direction</a></div>
               <Map
                 locations={mapsData}
                 disableNavigation
