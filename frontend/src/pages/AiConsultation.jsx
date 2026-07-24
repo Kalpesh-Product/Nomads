@@ -65,7 +65,7 @@ const defaultValues = {
 
 const CONSULTATION_PROMPT =
   "share your consultation requirements and we will connect you with the right expert support.";
-const CONSULTATION_HEADING = "Consultation";
+const CONSULTATION_HEADING = "Consultation Support";
 const CONSULTATION_TYPING_SEEN_KEY = "wono-consultation-typing-seen";
 const getFlagIconUrl = (isoCode) =>
   `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
@@ -173,7 +173,7 @@ const AiConsultation = () => {
   );
   const messagePrefix = isLoggedIn
     ? (auth?.user?.fullName?.split(" ")[0] || "User") + ", "
-    : "User, ";
+    : "Hey, ";
   const consultationPrompt = `${messagePrefix}${CONSULTATION_PROMPT}`;
 
   const { mutate: submitConsultation } = useMutation({

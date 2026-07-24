@@ -68,7 +68,7 @@ const defaultValues = {
 
 const NEW_COMPANY_PROMPT =
   "planning to build your business abroad? Share your details and we will support your setup journey.";
-const NEW_COMPANY_HEADING = "Company Setup";
+const NEW_COMPANY_HEADING = "Company Setup Support";
 const NEW_COMPANY_TYPING_SEEN_KEY = "wono-new-company-typing-seen";
 const getFlagIconUrl = (isoCode) =>
   `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
@@ -176,7 +176,7 @@ const AiNewCompanySetup = () => {
   );
   const messagePrefix = isLoggedIn
     ? (auth?.user?.fullName?.split(" ")[0] || "User") + ", "
-    : "User, ";
+    : "Hey, ";
   const newCompanyPrompt = `${messagePrefix}${NEW_COMPANY_PROMPT}`;
 
   const { mutate: submitNewCompanySetup } = useMutation({
