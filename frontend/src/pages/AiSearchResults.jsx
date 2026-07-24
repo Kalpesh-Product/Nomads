@@ -2654,8 +2654,29 @@ const AiSearchResults = () => {
                         </div>
                       ) : (
                         <div className="mt-10 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-500">
-                          No destinations are available for{" "}
-                          {selectedContinentDisplay} right now.
+                          {isVisaRequirementFilterActive(
+                            selectedVisaRequirement,
+                          ) ? (
+                            <span className="font-play font-bold text-black/85">
+                              There is no{" "}
+                              <span className="text-primary-blue">
+                                {selectedVisaRequirement}
+                              </span>{" "}
+                              support destination in{" "}
+                              <span className="text-primary-blue">
+                                {selectedContinentDisplay}
+                              </span>{" "}
+                              right now.
+                            </span>
+                          ) : (
+                            <span className="font-play font-bold text-black/85">
+                              No destinations are available for{" "}
+                              <span className="text-primary-blue">
+                                {selectedContinentDisplay}
+                              </span>{" "}
+                              right now.
+                            </span>
+                          )}
                         </div>
                       )}
                     </>

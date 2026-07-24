@@ -15,6 +15,7 @@ export default function useLogout() {
       });
       showSuccessAlert("You’ve been safely logged out. See you again soon!", {
         title: "Logged Out Successfully!",
+        textClassName: "swal2-logout-message",
       });
       setAuth((prevState) => {
         return {

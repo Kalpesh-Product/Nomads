@@ -21,6 +21,7 @@ export const showSuccessAlert = (message, options = {}) =>
       title: ["swal2-title--serif", options.titleClassName]
         .filter(Boolean)
         .join(" "),
+      htmlContainer: options.textClassName,
     },
   });
 

@@ -332,7 +332,7 @@ const AiOverallActivationSupport = () => {
     const typeHeading = () => {
       const headingInterval = setInterval(() => {
         headingIndex += 1;
-        setTypedPageHeading(overallActivationPrompt.slice(0, headingIndex));
+        setTypedPageHeading(OVERALL_ACTIVATION_HEADING.slice(0, headingIndex));
 
         if (headingIndex >= OVERALL_ACTIVATION_HEADING.length) {
           clearInterval(headingInterval);
