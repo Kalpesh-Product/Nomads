@@ -143,6 +143,16 @@ export const buildAiVerticalsSearchBadges = ({
     (badge) => !badge.toLowerCase().startsWith("your broader goal >"),
   );
 
+  const hasClassicSearchContext =
+    locationState?.searchContext === "classic" ||
+    cleanIncomingBadges.some(
+      (badge) => normalizeBadgeKey(badge) === "classic search",
+    );
+
+  if (hasClassicSearchContext && cleanIncomingBadges.length > 0) {
+    return cleanIncomingBadges;
+  }
+
   // Manual/old-school search should keep its original badge order.
   if (!hasAiSearchFilters && cleanIncomingBadges.length > 0) {
     return cleanIncomingBadges;
