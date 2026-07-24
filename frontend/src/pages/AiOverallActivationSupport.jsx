@@ -94,7 +94,7 @@ const AiOverallActivationSupport = () => {
   });
   const messagePrefix = isLoggedIn
     ? (auth?.user?.fullName?.split(" ")[0] || "User") + ", "
-    : "User, ";
+    : "Hey, ";
   const overallActivationPrompt = `${messagePrefix}${OVERALL_ACTIVATION_PROMPT}`;
   const { data: stateWiseDestinations = [] } = useQuery({
     queryKey: ["overall-activation-state-wise-destinations"],
