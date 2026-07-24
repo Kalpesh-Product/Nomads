@@ -192,7 +192,7 @@ export default function AiLogin() {
     },
     onSuccess: () => {
       showSuccessAlert("You’ve logged in successfully. Let’s get started!", {
-        title: "Welcome Back!",
+        title: "Hello Nomad, Welcome Back!",
       });
       reset();
 

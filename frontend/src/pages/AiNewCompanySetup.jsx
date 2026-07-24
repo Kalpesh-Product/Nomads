@@ -94,7 +94,6 @@ const formatCountryWithState = (country, state) => {
 
 const AiNewCompanySetup = () => {
   const [typedMessage, setTypedMessage] = useState("");
-  const [typedPageHeading, setTypedPageHeading] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { auth } = useAuth();
@@ -178,7 +177,6 @@ const AiNewCompanySetup = () => {
     ? (auth?.user?.fullName?.split(" ")[0] || "User") + ", "
     : "User, ";
   const newCompanyPrompt = `${messagePrefix}${NEW_COMPANY_PROMPT}`;
-
   const { mutate: submitNewCompanySetup } = useMutation({
     mutationFn: async (formValues) => {
       const payload = {
@@ -331,49 +329,28 @@ const AiNewCompanySetup = () => {
 
     if (hasSeenTypingEffect) {
       setTypedMessage(newCompanyPrompt);
-      setTypedPageHeading(NEW_COMPANY_HEADING);
       setIsFormVisible(true);
       return;
     }
+
     setTypedMessage("");
-    setTypedPageHeading("");
     setIsFormVisible(false);
 
     let messageIndex = 0;
-    let headingIndex = 0;
-    let cleanupHeading = () => {};
-
-    const typeHeading = () => {
-      const headingInterval = setInterval(() => {
-        headingIndex += 1;
-        setTypedPageHeading(newCompanyPrompt.slice(0, headingIndex));
-
-        if (headingIndex >= newCompanyPrompt.length) {
-          clearInterval(headingInterval);
-          setIsFormVisible(true);
-          if (typeof window !== "undefined") {
-            window.localStorage.setItem(NEW_COMPANY_TYPING_SEEN_KEY, "true");
-          }
-        }
-      }, 1);
-
-      cleanupHeading = () => clearInterval(headingInterval);
-    };
-
     const messageInterval = setInterval(() => {
       messageIndex += 1;
       setTypedMessage(newCompanyPrompt.slice(0, messageIndex));
 
       if (messageIndex >= newCompanyPrompt.length) {
         clearInterval(messageInterval);
-        typeHeading();
+        setIsFormVisible(true);
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem(NEW_COMPANY_TYPING_SEEN_KEY, "true");
+        }
       }
     }, 1);
 
-    return () => {
-      clearInterval(messageInterval);
-      cleanupHeading();
-    };
+    return () => clearInterval(messageInterval);
   }, [newCompanyPrompt]);
 
   const namePortion = typedMessage.slice(0, messagePrefix.length);
@@ -386,17 +363,11 @@ const AiNewCompanySetup = () => {
           <div className="w-full max-w-5xl md:px-20 lg:px-20">
             <div className="mx-auto mb-0 flex w-full max-w-4xl flex-col items-center gap-2 px-0">
               <p className="min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1rem]">
-                {messagePrefix ? (
-                  <>
-                    <span className="text-blue-600">{namePortion}</span>
-                    {messagePortion}
-                  </>
-                ) : (
-                  typedMessage
-                )}
+                <span className="text-blue-600">{namePortion}</span>
+                {messagePortion}
               </p>
               <h1 className="text-hero min-h-[3rem] text-center font-play">
-                {typedPageHeading}
+                {NEW_COMPANY_HEADING}
               </h1>
             </div>
             <Box
