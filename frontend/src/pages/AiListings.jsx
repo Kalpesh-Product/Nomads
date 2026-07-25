@@ -41,6 +41,7 @@ import {
   useCroppedDesktopShortcutIcons,
 } from "../utils/categoryShortcutIcons.js";
 
+const ALL_LISTINGS_CATEGORY = "alllistings";
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
 const ANNUAL_EVENTS_CATEGORY = "annualevents";
 const VENUES_CATEGORY = "venues";
@@ -506,6 +507,7 @@ const AiListings = ({ forceListView = false }) => {
 
     if (!listingsData || listingsData.length === 0) {
       return [
+        { label: "All Listing", value: ALL_LISTINGS_CATEGORY },
         ...visibleDestinationHighlightFilters,
         {
           label: "Value Adds",
@@ -551,6 +553,7 @@ const AiListings = ({ forceListView = false }) => {
       .sort((a, b) => typeOrder.indexOf(a.value) - typeOrder.indexOf(b.value));
 
     return [
+      { label: "All Listing", value: ALL_LISTINGS_CATEGORY },
       ...options.filter(
         (option) => option.value !== VALUE_ADDED_SERVICES_CATEGORY,
       ),
@@ -794,6 +797,27 @@ const AiListings = ({ forceListView = false }) => {
 
     if (!formData.country || !formData.location) {
       alert("Please select Country and Location first.");
+      return;
+    }
+
+    if (categoryValue === ALL_LISTINGS_CATEGORY) {
+      dispatch(setFormValues({ ...formData, category: "" }));
+
+      const verticalsViewParam = forceListView ? "" : "view=map&";
+
+      navigate(
+        `/verticals?${verticalsViewParam}country=${formData.country}&location=${formData.location}`,
+        {
+          state: {
+            country: formData.country,
+            location: formData.location,
+            category: "",
+            selectedStateLabel,
+            skipHeadingIntro: true,
+            searchBarBadges,
+          },
+        },
+      );
       return;
     }
 

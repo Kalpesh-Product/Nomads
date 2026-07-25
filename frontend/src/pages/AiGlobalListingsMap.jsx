@@ -40,6 +40,7 @@ import {
 } from "../utils/categoryShortcutIcons.js";
 import { DESTINATION_HIGHLIGHT_FILTERS } from "../data/aiDestinationHighlights.js";
 
+const ALL_LISTINGS_CATEGORY = "alllistings";
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
 const ANNUAL_EVENTS_CATEGORY = "annualevents";
 const RESTAURANTS_CATEGORY = "restaurants";
@@ -515,6 +516,7 @@ const AiGlobalListingsMap = () => {
 
     if (!listingsData || listingsData.length === 0) {
       return [
+        { label: "All Listing", value: ALL_LISTINGS_CATEGORY },
         ...visibleDestinationHighlightFilters,
         {
           label: "Value Adds",
@@ -559,6 +561,7 @@ const AiGlobalListingsMap = () => {
       .sort((a, b) => typeOrder.indexOf(a.value) - typeOrder.indexOf(b.value));
 
     return [
+      { label: "All Listing", value: ALL_LISTINGS_CATEGORY },
       ...result.filter(
         (option) => option.value !== VALUE_ADDED_SERVICES_CATEGORY,
       ),
@@ -712,6 +715,26 @@ const AiGlobalListingsMap = () => {
 
     if (!currentFormData.country || !currentFormData.location) {
       alert("Please select Country and Location first.");
+      return;
+    }
+
+    if (categoryValue === ALL_LISTINGS_CATEGORY) {
+      dispatch(setFormValues({ ...currentFormData, category: "" }));
+      setShowListings(false);
+      setShowMobileSearch(false);
+
+      navigate(
+        `/verticals?view=map&country=${currentFormData.country}&location=${currentFormData.location}`,
+        {
+          state: {
+            ...location.state,
+            selectedStateLabel: selectedLocationLabel,
+            category: "",
+            skipHeadingIntro: true,
+            searchBarBadges,
+          },
+        },
+      );
       return;
     }
 
@@ -1131,7 +1154,12 @@ const AiGlobalListingsMap = () => {
 
             {/* Collection/Category Chips */}
             <div className="pointer-events-auto w-full max-w-[450px] flex overflow-x-auto gap-2 pb-2 scrollbar-hide scroll-smooth snap-x">
-              {[{ label: "All", value: "" }, ...categoryOptions].map((cat) => {
+              {[
+                { label: "All", value: "" },
+                ...categoryOptions.filter(
+                  (cat) => cat.value !== ALL_LISTINGS_CATEGORY,
+                ),
+              ].map((cat) => {
                 const isActive = cat.value === formData?.category;
                 return (
                   <button
