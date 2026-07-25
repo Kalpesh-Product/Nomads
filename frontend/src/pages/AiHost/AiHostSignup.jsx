@@ -257,6 +257,15 @@ const AiHostSignup = () => {
     setValue("city", "");
   };
 
+  const handleMobileChange = (event, onChange) => {
+    const digits = event.target.value.replace(/\D/g, "");
+
+    if (selectedCountry?.isoCode === "IN" && digits.length > 10) return;
+    if (digits.length > 15) return;
+
+    onChange(digits);
+  };
+
   // inside your HostSignup or CreateWebsite component:
   const {
     fields: aboutFields,
@@ -643,6 +652,10 @@ const AiHostSignup = () => {
                     value: /^[0-9]{7,15}$/,
                     message: "Please enter a valid phone number",
                   },
+                  validate: (value) =>
+                    selectedCountry?.isoCode !== "IN" ||
+                    value.length <= 10 ||
+                    "Indian phone numbers cannot exceed 10 digits",
                 }}
                 render={({ field, fieldState }) => (
                   <TextField
@@ -655,6 +668,13 @@ const AiHostSignup = () => {
                     error={!!fieldState.error}
                     helperText={fieldState.error?.message}
                     InputLabelProps={{ sx: floatingLabelSx }}
+                    inputProps={{
+                      inputMode: "numeric",
+                      maxLength: selectedCountry?.isoCode === "IN" ? 10 : 15,
+                    }}
+                    onChange={(event) =>
+                      handleMobileChange(event, field.onChange)
+                    }
                   />
                 )}
               />
