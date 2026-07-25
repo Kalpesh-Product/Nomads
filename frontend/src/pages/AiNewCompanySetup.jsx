@@ -17,7 +17,6 @@ import {
 import { Controller, useForm } from "react-hook-form";
 import { DatePicker } from "@mui/x-date-pickers";
 import { Country } from "country-state-city";
-import Swal from "sweetalert2";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
 import { FaCheck } from "react-icons/fa";
@@ -28,7 +27,7 @@ import {
   getCountryNameFromSelectedDestination,
   readSelectedDestination,
 } from "../utils/selectedDestinationSession";
-import { showErrorAlert } from "../utils/alerts";
+import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 import { findCountryByName } from "../utils/countryFlags";
 import { HiCheck } from "react-icons/hi";
 
@@ -198,18 +197,12 @@ const AiNewCompanySetup = () => {
         showErrorAlert(data.warning);
         return;
       }
-      await Swal.fire({
-        title: "Support Request Submitted!",
-        text: "Our team will review your request and get back to you soon.",
-        icon: "success",
-        confirmButtonText: "OK",
-        confirmButtonColor: "#0BA9EF",
-        customClass: {
-          popup: "swal2-popup--rounded",
-          title: "swal2-title--serif",
-          confirmButton: "swal2-button--pill",
+      await showSuccessAlert(
+        "Our team will review your request and get back to you soon.",
+        {
+          title: "Support Request Submitted!",
         },
-      });
+      );
       reset(defaultValues);
     },
     onError: (error) => {
@@ -359,10 +352,10 @@ const AiNewCompanySetup = () => {
   return (
     <div className="bg-white text-black font-sans">
       <Container padding={false}>
-        <section className="min-h-[85vh] flex items-center justify-center py-2">
+        <section className="min-h-[60vh] flex items-center justify-center py-0">
           <div className="w-full max-w-5xl md:px-20 lg:px-20">
-            <div className="mx-auto mb-0 flex w-full max-w-4xl flex-col items-center gap-2 px-0">
-              <p className="min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1rem]">
+            <div className="mx-auto mb-0 flex w-full max-w-4xl flex-col items-center gap-0 px-0">
+              <p className="min-h-[2.75rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.25rem] sm:text-[1rem]">
                 <span className="text-blue-600">{namePortion}</span>
                 {messagePortion}
               </p>
@@ -377,7 +370,7 @@ const AiNewCompanySetup = () => {
                 isFormVisible ? "visible" : "invisible"
               }`}
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-4">
+              <div className="mt-1 grid grid-cols-1 gap-4 md:mt-2 md:grid-cols-2 md:gap-4">
                 <Controller
                   name="supportRequired"
                   control={control}

@@ -17,7 +17,6 @@ import { Controller, useForm } from "react-hook-form";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import { Country } from "country-state-city";
-import Swal from "sweetalert2";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
 import Container from "../components/Container";
@@ -27,7 +26,7 @@ import {
   getCountryNameFromSelectedDestination,
   readSelectedDestination,
 } from "../utils/selectedDestinationSession";
-import { showErrorAlert } from "../utils/alerts";
+import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 import { HiCheck } from "react-icons/hi";
 
 import { aiDestinationCards } from "../constants/aiDestinationCards";
@@ -166,18 +165,12 @@ const AiWorkation = () => {
         showErrorAlert(data.warning);
         return;
       }
-      await Swal.fire({
-        title: "Workation Request Submitted!",
-        text: "We’ll review your requirements and connect you with the right support soon.",
-        icon: "success",
-        confirmButtonText: "OK",
-        confirmButtonColor: "#0BA9EF",
-        customClass: {
-          popup: "swal2-popup--rounded",
-          title: "swal2-title--serif",
-          confirmButton: "swal2-button--pill",
+      await showSuccessAlert(
+        "We’ll review your requirements and connect you with the right support soon.",
+        {
+          title: "Workation Request Submitted!",
         },
-      });
+      );
       reset(defaultValues);
     },
     onError: (error) => {
@@ -350,8 +343,8 @@ const AiWorkation = () => {
       <Container padding={false}>
         <section className="min-h-[60vh] flex items-center justify-center py-0">
           <div className="w-full max-w-5xl md:px-20 lg:px-20">
-            <div className="mx-auto mb-0 flex w-full max-w-4xl flex-col items-center gap-1 ">
-              <p className="min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1rem]">
+            <div className="mx-auto mb-0 flex w-full max-w-4xl flex-col items-center gap-0 ">
+              <p className="min-h-[2.75rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.25rem] sm:text-[1rem]">
                 {messagePrefix ? (
                   <>
                     <span className="text-blue-600">{namePortion}</span>
@@ -370,7 +363,7 @@ const AiWorkation = () => {
               onSubmit={handleSubmit(handleFormSubmit)}
               className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"}`}
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-4">
+              <div className="mt-1 grid grid-cols-1 gap-4 md:mt-2 md:grid-cols-2 md:gap-4">
                 <Controller
                   name="noOfPeople"
                   control={control}

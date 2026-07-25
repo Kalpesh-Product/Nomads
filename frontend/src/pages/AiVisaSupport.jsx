@@ -234,8 +234,9 @@ const AiVisaSupport = () => {
         cancelButtonColor: "#000000",
         confirmButtonColor: "#0BA9EF",
         customClass: {
-          popup: "swal2-popup--rounded",
+          popup: "swal2-popup--rounded swal2-popup--visa-support",
           title: "swal2-title--serif",
+          actions: "swal2-actions--visa-support",
           confirmButton: "swal2-button--pill",
           cancelButton: "swal2-button--pill",
         },
@@ -416,22 +417,24 @@ const AiVisaSupport = () => {
   return (
     <div className="bg-white text-black font-sans">
       <Container padding={false}>
-        <section className="min-h-[85vh] flex items-center justify-center py-2">
-          <div className="w-full max-w-5xl md:px-20 lg:px-20 flex flex-col gap-1">
-            <p className="mx-auto min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1rem]">
-              {messagePrefix ? (
-                <>
-                  <span className="text-blue-600">{namePortion}</span>
-                  {messagePortion}
-                </>
-              ) : (
-                typedMessage
-              )}
-            </p>
+        <section className="min-h-[60vh] flex items-center justify-center py-0">
+          <div className="w-full max-w-5xl md:px-20 lg:px-20">
+            <div className="mx-auto mb-0 flex w-full max-w-4xl flex-col items-center gap-0">
+              <p className="min-h-[2.75rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.25rem] sm:text-[1rem]">
+                {messagePrefix ? (
+                  <>
+                    <span className="text-blue-600">{namePortion}</span>
+                    {messagePortion}
+                  </>
+                ) : (
+                  typedMessage
+                )}
+              </p>
 
-            <h1 className="text-hero min-h-[3rem] text-center font-play">
-              {typedVisaHeading}
-            </h1>
+              <h1 className="text-hero min-h-[3rem] text-center font-play">
+                {typedVisaHeading}
+              </h1>
+            </div>
 
             <Box
               component="form"
@@ -440,7 +443,7 @@ const AiVisaSupport = () => {
                 isFormVisible ? "visible" : "invisible"
               }`}
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
+              <div className="mt-1 grid grid-cols-1 gap-4 md:mt-2 md:grid-cols-2">
                 <Controller
                   name="visaType"
                   control={control}

@@ -16,12 +16,11 @@ import {
 } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { Country } from "country-state-city";
-import Swal from "sweetalert2";
 import { useMutation } from "@tanstack/react-query";
 import Container from "../components/Container";
 import axios from "../utils/axios";
 import useAuth from "../hooks/useAuth";
-import { showErrorAlert } from "../utils/alerts";
+import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 import { HiCheck } from "react-icons/hi";
 
 const floatingLabelSx = {
@@ -100,18 +99,12 @@ const AiBecomeContributor = () => {
         showErrorAlert(data.warning);
         return;
       }
-      await Swal.fire({
-        title: "Thank You for Your Interest!",
-        text: "We’ll review your details and get back to you soon.",
-        icon: "success",
-        confirmButtonText: "OK",
-        confirmButtonColor: "#0BA9EF",
-        customClass: {
-          popup: "swal2-popup--rounded",
-          title: "swal2-title--serif",
-          confirmButton: "swal2-button--pill",
+      await showSuccessAlert(
+        "We’ll review your details and get back to you soon.",
+        {
+          title: "Thank You for Your Interest!",
         },
-      });
+      );
       reset(defaultValues);
     },
     onError: (error) => {
@@ -224,20 +217,13 @@ const AiBecomeContributor = () => {
   return (
     <div className="bg-white text-black font-sans">
       <Container padding={false}>
-        <section className="min-h-[85vh] flex items-center justify-center py-0">
+        <section className="min-h-[60vh] flex items-center justify-center py-0">
           <div className="w-full max-w-5xl md:px-20 lg:px-20">
-            <div className="mx-auto mb-0 flex w-full max-w-4xl flex-col items-center gap-8 px-0">
-              <p className="mx-auto min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1rem]">
-              {messagePrefix ? (
-                <>
-                  <span className="text-blue-600">{namePortion}</span>
-                  {messagePortion}
-                </>
-              ) : (
-                typedMessage
-              )}
-            </p>
-              <h1 className="text-hero min-h-[3rem] text-center font-play">
+            <div className="mx-auto mb-0 flex w-full max-w-4xl flex-col items-center gap-0 px-0">
+              <p className="min-h-[2.75rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.25rem] sm:text-[1rem]">
+                {typedMessage}
+              </p>
+              <h1 className="text-hero mt-5 min-h-[3rem] text-center font-play md:mt-8">
                 {typedPageHeading}
               </h1>
             </div>
@@ -248,7 +234,7 @@ const AiBecomeContributor = () => {
                 isFormVisible ? "visible" : "invisible"
               }`}
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+              <div className="mt-1 grid grid-cols-1 gap-4 md:mt-2 md:grid-cols-2 md:gap-4">
                 <Controller
                   name="contributionType"
                   control={control}
@@ -496,7 +482,7 @@ const AiBecomeContributor = () => {
                   />
                 </div>
 
-                <div className="pt-0 md:col-span-2 text-center">
+                <div className="pt-2 md:col-span-2 text-center">
                   <Button
                     type="submit"
                     variant="contained"
