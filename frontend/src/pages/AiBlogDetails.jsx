@@ -106,7 +106,7 @@ const AiBlogDetails = () => {
           {newsContent &&
             newsContent.map((item) => (
               <article key={item.id} className="space-y-4">
-                <h1 className="text-card-title font-bold leading-[1.2] md:leading-[1rem]">
+                <h1 className="text-card-title font-bold leading-[1.2] md:leading-[1.35] lg:leading-[1rem]">
                   {item.title}
                 </h1>
                 {item.image && (

@@ -41,6 +41,7 @@ import {
   useCroppedDesktopShortcutIcons,
 } from "../utils/categoryShortcutIcons.js";
 
+const ALL_LISTINGS_CATEGORY = "alllistings";
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
 const ANNUAL_EVENTS_CATEGORY = "annualevents";
 const VENUES_CATEGORY = "venues";
@@ -378,7 +379,7 @@ const AiListings = ({ forceListView = false }) => {
   const skeletonArray = Array.from({ length: 6 });
 
   const { data: listingsData = [], isPending: isLisitingLoading } = useQuery({
-    queryKey: ["listings", formData],
+    queryKey: ["listings", formData?.country, formData?.location, userId],
     queryFn: async () => {
       const { country, location } = formData || {};
       const response = await axios.get(
@@ -506,6 +507,7 @@ const AiListings = ({ forceListView = false }) => {
 
     if (!listingsData || listingsData.length === 0) {
       return [
+        { label: "All Listing", value: ALL_LISTINGS_CATEGORY },
         ...visibleDestinationHighlightFilters,
         {
           label: "Value Adds",
@@ -551,6 +553,7 @@ const AiListings = ({ forceListView = false }) => {
       .sort((a, b) => typeOrder.indexOf(a.value) - typeOrder.indexOf(b.value));
 
     return [
+      { label: "All Listing", value: ALL_LISTINGS_CATEGORY },
       ...options.filter(
         (option) => option.value !== VALUE_ADDED_SERVICES_CATEGORY,
       ),
@@ -794,6 +797,27 @@ const AiListings = ({ forceListView = false }) => {
 
     if (!formData.country || !formData.location) {
       alert("Please select Country and Location first.");
+      return;
+    }
+
+    if (categoryValue === ALL_LISTINGS_CATEGORY) {
+      dispatch(setFormValues({ ...formData, category: "" }));
+
+      const verticalsViewParam = forceListView ? "" : "view=map&";
+
+      navigate(
+        `/verticals?${verticalsViewParam}country=${formData.country}&location=${formData.location}`,
+        {
+          state: {
+            country: formData.country,
+            location: formData.location,
+            category: "",
+            selectedStateLabel,
+            skipHeadingIntro: true,
+            searchBarBadges,
+          },
+        },
+      );
       return;
     }
 
@@ -1221,11 +1245,13 @@ const AiListings = ({ forceListView = false }) => {
   return (
     <div className="flex flex-col gap:2 lg:gap-6 ">
       <div
-        className={`${forceListView ? "flex" : "hidden lg:flex"} flex-col gap-6 md:px-10`}
+        className={`${forceListView ? "flex" : "hidden lg:flex"} flex-col gap-6 lg:px-10`}
       >
         <div
           className={`w-full lg:min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto ${
-            forceListView ? "px-2 sm:px-6 lg:px-0" : "px-4 sm:px-6 lg:px-0"
+            forceListView
+              ? "px-2 sm:px-6 max-[820px]:!px-0 lg:px-0"
+              : "px-4 sm:px-6 lg:px-0"
           }`}
         >
           {!forceListView && (
@@ -1270,7 +1296,7 @@ const AiListings = ({ forceListView = false }) => {
                 {typedHeading}
               </p>
             }
-            className="mb-4"
+            className="mb-4 pb-4"
             fullWidth
           />
           <div className={isHeadingSequenceComplete ? "block" : "hidden"}>
@@ -1307,7 +1333,7 @@ const AiListings = ({ forceListView = false }) => {
               </div>
             </div>
 
-            <div className="lg:hidden flex overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 md:justify-center">
+            <div className="lg:hidden flex justify-start overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4">
               {categoryOptions.map((cat) => {
                 const iconSrc = getCategoryShortcutIconSrc(cat.value, true);
                 const isActive = formData?.category === cat.value;
@@ -1316,7 +1342,7 @@ const AiListings = ({ forceListView = false }) => {
                     key={cat.value}
                     type="button"
                     onClick={() => handleCategoryClick(cat.value)}
-                    className="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] lg:w-[10%]"
+                    className="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] min-w-[5rem] md:min-w-[5.75rem]"
                   >
                     <div className="h-10 w-full flex flex-col items-center gap-1">
                       <img
@@ -1455,7 +1481,7 @@ const AiListings = ({ forceListView = false }) => {
                                   className="h-full w-full object-contain"
                                 />
                                 <span
-                                  className={`text-tiny border-b-2 pb-1 ${
+                                  className={`text-tiny border-b-2 pb-1 pt-1 ${
                                     isActive
                                       ? "border-primary-blue"
                                       : "border-transparent"
@@ -1706,7 +1732,11 @@ const AiListings = ({ forceListView = false }) => {
           </AnimatePresence>
           <Container
             padding={false}
-            className={forceListView ? "!px-0 sm:!px-6 lg:!px-0" : ""}
+            className={
+              forceListView
+                ? "!px-0 sm:!px-6 max-[820px]:!px-0 lg:!px-0"
+                : ""
+            }
           >
             {/* Dynamic Header */}
             {formData?.category &&
@@ -1716,7 +1746,7 @@ const AiListings = ({ forceListView = false }) => {
               !isRestaurantsSelected &&
               !isNewsSelected &&
               !isBlogsSelected && (
-                <div className="mt-6 mb-5 px-1 border-t border-gray-300">
+                <div className="mt-10 mb-5 px-1 border-t border-gray-300">
                   <h1 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight mt-6">
                     Popular{" "}
                     {{

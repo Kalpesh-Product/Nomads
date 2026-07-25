@@ -46,6 +46,7 @@ import { DESTINATION_HIGHLIGHT_FILTERS } from "../data/aiDestinationHighlights.j
 //   HiOutlineUserCircle,
 // } from "react-icons/hi";
 
+const ALL_LISTINGS_CATEGORY = "alllistings";
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
 const ANNUAL_EVENTS_CATEGORY = "annualevents";
 const RESTAURANTS_CATEGORY = "restaurants";
@@ -757,9 +758,9 @@ const AiGlobalListingsList = () => {
   }, [expandedCategories, expandedCategoriesStorageKey]);
 
   const { data: listingsData, isPending: isLisitingLoading } = useQuery({
-    queryKey: ["globallistings", formData],
+    queryKey: ["globallistings", formData?.country, formData?.location, userId],
     queryFn: async () => {
-      const { country, location, category } = formData || {};
+      const { country, location } = formData || {};
 
       const response = await axios.get(
         `company/companiesn?country=${country}&state=${location}&userId=${userId || ""}`,
@@ -803,6 +804,7 @@ const AiGlobalListingsList = () => {
 
     if (!listingsData || listingsData.length === 0) {
       return [
+        { label: "All Listing", value: ALL_LISTINGS_CATEGORY },
         ...visibleDestinationHighlightFilters,
         { label: "Value Adds", value: VALUE_ADDED_SERVICES_CATEGORY },
       ];
@@ -848,6 +850,7 @@ const AiGlobalListingsList = () => {
     );
 
     return [
+      { label: "All Listing", value: ALL_LISTINGS_CATEGORY },
       ...optionsWithoutValueAdds,
       ...visibleDestinationHighlightFilters,
       { label: "Value Adds", value: VALUE_ADDED_SERVICES_CATEGORY },
@@ -1105,6 +1108,24 @@ const AiGlobalListingsList = () => {
 
     if (!formData.country || !formData.location) {
       alert("Please select Country and Location first.");
+      return;
+    }
+
+    if (categoryValue === ALL_LISTINGS_CATEGORY) {
+      dispatch(setFormValues({ ...formData, category: "" }));
+
+      navigate(
+        `/verticals?country=${formData.country}&location=${formData.location}`,
+        {
+          state: {
+            country: formData.country,
+            location: formData.location,
+            category: "",
+            skipHeadingIntro: true,
+            searchBarBadges,
+          },
+        },
+      );
       return;
     }
 
@@ -1802,7 +1823,7 @@ const AiGlobalListingsList = () => {
               </div>
             </div>
 
-            <div className="lg:hidden flex overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 md:justify-center">
+            <div className="lg:hidden flex justify-start overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4">
               {categoryOptions.map((cat) => {
                 const iconSrc = getCategoryShortcutIconSrc(cat.value, true);
                 return (
@@ -1811,7 +1832,7 @@ const AiGlobalListingsList = () => {
                     label={cat.label}
                     iconSrc={iconSrc}
                     onClick={() => handleCategoryClick(cat.value)}
-                    buttonClassName="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] lg:w-[10%]"
+                    buttonClassName="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] min-w-[5rem] md:min-w-[5.75rem]"
                     iconBoxClassName="h-10 w-full"
                     imageClassName="h-full w-[90%] object-contain mx-auto"
                     labelClassName="text-[10px] font-medium whitespace-nowrap"

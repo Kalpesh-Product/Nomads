@@ -566,10 +566,14 @@ const AiRestaurantProduct = () => {
   useEffect(() => {
     if (auth?.user) {
       const fullName = auth.user.fullName || "";
+      const mobileNumber =
+        auth.user.contactCode && auth.user.contactNumber
+          ? `${auth.user.contactCode}${auth.user.contactNumber}`
+          : "";
 
       reset({
         fullName,
-        mobileNumber: auth.user.mobile || "",
+        mobileNumber,
         email: auth.user.email || "",
         noOfPeople: 0,
         startDate: null,
