@@ -438,6 +438,7 @@ const AiProfile = () => {
                 onChange={handleProfileChange}
                 error={!!profileErrors.fullName}
                 helperText={profileErrors.fullName}
+                disabled={!editMode}
                 InputProps={{ readOnly: !editMode }}
                 InputLabelProps={{ sx: floatingLabelSx }}
               />
@@ -450,6 +451,7 @@ const AiProfile = () => {
                 onChange={handleProfileChange}
                 error={!!profileErrors.email}
                 helperText={profileErrors.email}
+                disabled={!editMode}
                 InputProps={{ readOnly: true }}
                 InputLabelProps={{ sx: floatingLabelSx }}
               />
@@ -529,6 +531,7 @@ const AiProfile = () => {
                   value={profileForm.contactCode}
                   error={!!profileErrors.contactCode}
                   helperText={profileErrors.contactCode}
+                  disabled={!editMode}
                   InputLabelProps={{ sx: floatingLabelSx }}
                   InputProps={{
                     readOnly: true,
@@ -555,6 +558,7 @@ const AiProfile = () => {
                   onChange={handleProfileChange}
                   error={!!profileErrors.contactNumber}
                   helperText={profileErrors.contactNumber}
+                  disabled={!editMode}
                   InputProps={{ readOnly: !editMode }}
                   InputLabelProps={{ sx: floatingLabelSx }}
                   sx={{ flex: 1 }}
@@ -567,6 +571,7 @@ const AiProfile = () => {
                 name="salary"
                 value={profileForm.salary}
                 onChange={handleProfileChange}
+                disabled={!editMode}
                 InputProps={{ readOnly: !editMode }}
                 InputLabelProps={{ sx: floatingLabelSx }}
               />
@@ -577,6 +582,7 @@ const AiProfile = () => {
                 name="designation"
                 value={profileForm.designation}
                 onChange={handleProfileChange}
+                disabled={!editMode}
                 InputProps={{ readOnly: !editMode }}
                 InputLabelProps={{ sx: floatingLabelSx }}
               />
