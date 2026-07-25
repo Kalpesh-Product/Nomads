@@ -94,6 +94,7 @@ import AiBlogsFetch from "./components/AiBlogsFetch";
 import AiNewsFetch from "./components/AiNewsFetch";
 import AiBlogDetails from "./pages/AiBlogDetails";
 import AiForgotPassword from "./pages/AiForgotPassword";
+import AiVerifyForgotPasswordOtp from "./pages/AiVerifyForgotPasswordOtp";
 import AiResetPassword from "./pages/AiResetPassword";
 import AiAbout from "./pages/AiAbout";
 import AiPrivacy from "./pages/AiPrivacy";
@@ -177,6 +178,8 @@ if (tenant === "main") {
             { path: "login/:redirectGoal?", element: <AiLogin /> },
             { path: "signup", element: <AiSignup /> },
             { path: "forgot-password", element: <AiForgotPassword /> },
+            { path: "forgot-password/verify", element: <AiVerifyForgotPasswordOtp /> },
+            { path: "forgot-password/reset", element: <AiResetPassword /> },
             { path: "reset-password/:token", element: <AiResetPassword /> },
             { path: "home-logged-in", element: <AiHomeLoggedIn /> },
             { path: "search", element: <AiSearch /> },
@@ -368,6 +371,8 @@ if (tenant === "main") {
             { path: "login/:redirectGoal?", element: <AiLogin /> },
             { path: "signup", element: <AiSignup /> },
             { path: "forgot-password", element: <AiForgotPassword /> },
+            { path: "forgot-password/verify", element: <AiVerifyForgotPasswordOtp /> },
+            { path: "forgot-password/reset", element: <AiResetPassword /> },
             { path: "reset-password/:token", element: <AiResetPassword /> },
             { path: "home-logged-in", element: <AiHomeLoggedIn /> },
             { path: "search", element: <AiSearch /> },

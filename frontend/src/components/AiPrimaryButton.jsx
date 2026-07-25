@@ -11,9 +11,13 @@ const AiPrimaryButton = ({
   className,
   uppercase = false,
   isLoading, // New prop for showing the spinner
+  bgColor, // Optional override for the default blue background
+  hoverColor, // Optional override for the default hover background
 }) => {
-  const baseBgColor = disabled || isLoading ? "bg-gray-400" : "bg-primary-blue";
-  const hoverBgColor = disabled || isLoading ? "" : "hover:bg-black"; // Add hover color here
+  const baseBgColor =
+    disabled || isLoading ? "bg-gray-400" : bgColor || "bg-primary-blue";
+  const hoverBgColor =
+    disabled || isLoading ? "" : hoverColor || "hover:bg-black"; // Add hover color here
 
   return (
     <button

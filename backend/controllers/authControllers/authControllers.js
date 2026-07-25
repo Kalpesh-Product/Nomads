@@ -2,8 +2,39 @@ import bcrypt from "bcrypt";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import NomadUser from "../../models/NomadUser.js";
+import Otp from "../../models/Otp.js";
 import { sendMail } from "../../config/mailer.js";
 import { renderNotificationEmail } from "../../utils/emailTemplates.js";
+
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\d\W]).+$/;
+
+const validateStrongPassword = (password) => {
+  if (!password || password.length < 8) return "Must be at least 8 characters long.";
+  if (password.length > 72) return "Password cannot exceed 72 characters.";
+  if (!PASSWORD_REGEX.test(password)) {
+    return "Should include both uppercase and lowercase letters and at least one number or special character.";
+  }
+  return "";
+};
+
+const getPasswordResetSessionSecret = () =>
+  process.env.PASSWORD_RESET_OTP_SECRET || process.env.ACCESS_TOKEN_SECRET;
+
+const signPasswordResetSession = (email) => {
+  const secret = getPasswordResetSessionSecret();
+  if (!secret) throw new Error("Password reset secret not configured");
+  return jwt.sign(
+    { purpose: "password_reset_session", email: String(email || "").trim().toLowerCase() },
+    secret,
+    { expiresIn: "15m" },
+  );
+};
+
+const verifyPasswordResetSession = (token) => {
+  const secret = getPasswordResetSessionSecret();
+  if (!secret) throw new Error("Password reset secret not configured");
+  return jwt.verify(token, secret);
+};
 
 export const login = async (req, res) => {
   try {
@@ -214,6 +245,176 @@ export const aiForgotPassword = async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+export const startForgotPasswordWithOtp = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const normalizedEmail = String(email || "").trim().toLowerCase();
+    if (!normalizedEmail) return res.status(400).json({ message: "Email is required." });
+
+    const user = await NomadUser.findOne({ email: normalizedEmail }).lean().exec();
+    if (!user) return res.status(404).json({ message: "Email doesn't exist." });
+
+    const otp = `${Math.floor(100000 + Math.random() * 900000)}`;
+    await Otp.updateMany(
+      { email: normalizedEmail, purpose: "password_reset", isUsed: false },
+      { $set: { isUsed: true } },
+    );
+    await Otp.create({
+      email: normalizedEmail,
+      code: otp,
+      purpose: "password_reset",
+      expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+      payload: {},
+    });
+
+    await sendMail({
+      to: normalizedEmail,
+      subject: "Reset Your WONO Password",
+      html: renderNotificationEmail({
+        heroTitle: "Reset Your Password",
+        heroSubtitle: "Use the verification code below to continue.",
+        greetingHtml: `
+          <p style="margin:0 0 4px;">Hello ${user?.fullName || "there"},</p>
+          <p class="email-text" style="margin:0;">Use the verification code below to verify your identity and reset your WONO password.</p>
+        `,
+        otpCode: { code: otp, expiryMinutes: 10 },
+        noteHtml:
+          "For your security, never share this verification code with anyone.<br/><br/><b>Didn't request this?</b> You can safely ignore this email.",
+      }),
+    });
+
+    return res.status(200).json({ message: "OTP sent successfully.", email: normalizedEmail });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const verifyForgotPasswordOtp = async (req, res, next) => {
+  try {
+    const { email, otp } = req.body;
+    const normalizedEmail = String(email || "").trim().toLowerCase();
+    if (!normalizedEmail || !otp) {
+      return res.status(400).json({ message: "Email and OTP are required." });
+    }
+
+    const otpRecord = await Otp.findOne({
+      email: normalizedEmail,
+      purpose: "password_reset",
+      isUsed: false,
+    })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    if (!otpRecord) return res.status(400).json({ message: "Please request OTP first." });
+    if (new Date(otpRecord.expiresAt).getTime() < Date.now()) {
+      await Otp.updateOne({ _id: otpRecord._id }, { $set: { isUsed: true } });
+      return res.status(400).json({ message: "OTP expired. Please request a new OTP." });
+    }
+    if (otpRecord.attempts >= 5) {
+      await Otp.updateOne({ _id: otpRecord._id }, { $set: { isUsed: true } });
+      return res.status(429).json({ message: "OTP attempts exceeded. Request a new OTP." });
+    }
+    if (String(otpRecord.code) !== String(otp)) {
+      await Otp.updateOne({ _id: otpRecord._id }, { $inc: { attempts: 1 } });
+      return res.status(400).json({ message: "Invalid OTP." });
+    }
+
+    const user = await NomadUser.findOne({ email: normalizedEmail }).lean().exec();
+    if (!user) {
+      await Otp.updateOne({ _id: otpRecord._id }, { $set: { isUsed: true } });
+      return res.status(404).json({ message: "Email doesn't exist." });
+    }
+
+    await Otp.updateOne({ _id: otpRecord._id }, { $set: { isUsed: true } });
+    const resetSessionToken = signPasswordResetSession(normalizedEmail);
+    return res.status(200).json({
+      message: "OTP verified successfully.",
+      resetSessionToken,
+      email: normalizedEmail,
+    });
+  } catch (error) {
+    if (error?.name === "TokenExpiredError") {
+      return res.status(400).json({ message: "Reset session expired. Verify OTP again." });
+    }
+    if (error?.name === "JsonWebTokenError") {
+      return res.status(400).json({ message: "Invalid reset session." });
+    }
+    next(error);
+  }
+};
+
+export const resetPasswordWithOtpSession = async (req, res, next) => {
+  try {
+    const { resetSessionToken, password, confirmPassword } = req.body;
+    if (!resetSessionToken) {
+      return res.status(400).json({ message: "Reset session token is required." });
+    }
+    if (!password || !confirmPassword) {
+      return res.status(400).json({ message: "Password and confirm password are required." });
+    }
+    if (password !== confirmPassword) {
+      return res.status(400).json({ message: "Passwords do not match." });
+    }
+    const strengthMessage = validateStrongPassword(password);
+    if (strengthMessage) return res.status(400).json({ message: strengthMessage });
+
+    const decoded = verifyPasswordResetSession(resetSessionToken);
+    const normalizedEmail = String(decoded?.email || "").trim().toLowerCase();
+    if (!normalizedEmail) return res.status(400).json({ message: "Invalid reset session." });
+
+    const user = await NomadUser.findOne({ email: normalizedEmail }).select("+password").exec();
+    if (!user) return res.status(404).json({ message: "Email doesn't exist." });
+
+    const isSamePassword = await bcrypt.compare(password, user.password);
+    if (isSamePassword) {
+      return res
+        .status(400)
+        .json({ message: "New password cannot be the same as the old password." });
+    }
+
+    user.password = password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    await user.save();
+
+    try {
+      const firstName = (user.fullName || "").split(" ")[0] || "there";
+      const loginUrl = `${process.env.FRONTEND_DEV_LINK}login`;
+      await sendMail({
+        to: user.email,
+        subject: "Password Reset Successful",
+        html: renderNotificationEmail({
+          heroTitle: "Password Reset Successful",
+          heroSubtitle: "Your WONO password has been updated.",
+          greetingHtml: `
+            <p style="margin:0 0 4px;">Hello ${firstName},</p>
+            <p class="email-text" style="margin:0;">Your password has been successfully reset. You can now log in with your new password.</p>
+          `,
+          ctaButton: {
+            label: "Login to WONO",
+            href: loginUrl,
+            caption: "Log in with your new password.",
+          },
+          noteHtml:
+            "If you did not perform this action, please contact our support team immediately.",
+        }),
+      });
+    } catch (error) {
+      console.error("Password reset confirmation email failed:", error.message);
+    }
+
+    return res.status(200).json({ success: true, message: "Password reset successful." });
+  } catch (error) {
+    if (error?.name === "TokenExpiredError") {
+      return res.status(400).json({ message: "Reset session expired. Verify OTP again." });
+    }
+    if (error?.name === "JsonWebTokenError") {
+      return res.status(400).json({ message: "Invalid reset session." });
+    }
+    next(error);
   }
 };
 

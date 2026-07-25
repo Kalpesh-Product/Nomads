@@ -58,11 +58,7 @@ const readAiScrollPosition = (location) =>
 
 const MANUAL_SEARCH_COMPACT_WIDTH = 820;
 
-const HIDE_STICKY_BAR_PREFIXES = [
-  "/signup",
-  "/forgot-password",
-  "/reset-password",
-];
+const HIDE_STICKY_BAR_PREFIXES = [];
 
 const toTitle = (value) =>
   decodeURIComponent(value || "")
@@ -202,6 +198,9 @@ const NomadAiLayout = () => {
       location.pathname.startsWith("/consultation") ||
       location.pathname.startsWith("/workation") ||
       location.pathname.startsWith("/login") ||
+      location.pathname.startsWith("/signup") ||
+      location.pathname.startsWith("/forgot-password") ||
+      location.pathname.startsWith("/reset-password") ||
       location.pathname.startsWith("/become-a-contributor") ||
       location.pathname.startsWith("/about") ||
       location.pathname.startsWith("/privacy") ||
