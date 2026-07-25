@@ -231,7 +231,7 @@ const AiBecomeContributor = () => {
                 isFormVisible ? "visible" : "invisible"
               }`}
             >
-              <div className="mt-1 grid grid-cols-1 gap-6 md:mt-2 md:grid-cols-2 md:gap-8">
+              <div className="mt-1 grid grid-cols-1 gap-4 md:mt-2 md:grid-cols-2 md:gap-4">
                 <Controller
                   name="contributionType"
                   control={control}
@@ -479,7 +479,7 @@ const AiBecomeContributor = () => {
                   />
                 </div>
 
-                <div className="pt-0 md:col-span-2 text-center">
+                <div className="pt-2 md:col-span-2 text-center">
                   <Button
                     type="submit"
                     variant="contained"
