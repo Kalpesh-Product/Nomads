@@ -46,6 +46,7 @@ import { DESTINATION_HIGHLIGHT_FILTERS } from "../data/aiDestinationHighlights.j
 //   HiOutlineUserCircle,
 // } from "react-icons/hi";
 
+const ALL_LISTINGS_CATEGORY = "alllistings";
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
 const ANNUAL_EVENTS_CATEGORY = "annualevents";
 const RESTAURANTS_CATEGORY = "restaurants";
@@ -757,9 +758,9 @@ const AiGlobalListingsList = () => {
   }, [expandedCategories, expandedCategoriesStorageKey]);
 
   const { data: listingsData, isPending: isLisitingLoading } = useQuery({
-    queryKey: ["globallistings", formData],
+    queryKey: ["globallistings", formData?.country, formData?.location, userId],
     queryFn: async () => {
-      const { country, location, category } = formData || {};
+      const { country, location } = formData || {};
 
       const response = await axios.get(
         `company/companiesn?country=${country}&state=${location}&userId=${userId || ""}`,
@@ -803,6 +804,7 @@ const AiGlobalListingsList = () => {
 
     if (!listingsData || listingsData.length === 0) {
       return [
+        { label: "All Listing", value: ALL_LISTINGS_CATEGORY },
         ...visibleDestinationHighlightFilters,
         { label: "Value Adds", value: VALUE_ADDED_SERVICES_CATEGORY },
       ];
@@ -848,6 +850,7 @@ const AiGlobalListingsList = () => {
     );
 
     return [
+      { label: "All Listing", value: ALL_LISTINGS_CATEGORY },
       ...optionsWithoutValueAdds,
       ...visibleDestinationHighlightFilters,
       { label: "Value Adds", value: VALUE_ADDED_SERVICES_CATEGORY },
@@ -1105,6 +1108,24 @@ const AiGlobalListingsList = () => {
 
     if (!formData.country || !formData.location) {
       alert("Please select Country and Location first.");
+      return;
+    }
+
+    if (categoryValue === ALL_LISTINGS_CATEGORY) {
+      dispatch(setFormValues({ ...formData, category: "" }));
+
+      navigate(
+        `/verticals?country=${formData.country}&location=${formData.location}`,
+        {
+          state: {
+            country: formData.country,
+            location: formData.location,
+            category: "",
+            skipHeadingIntro: true,
+            searchBarBadges,
+          },
+        },
+      );
       return;
     }
 

@@ -102,8 +102,17 @@ export const buildAiVerticalsSearchBadges = ({
     Boolean(querySelectedFilters.goalOption) ||
     Boolean(querySelectedFilters.continent) ||
     Boolean(querySelectedFilters.goal);
+  const incomingBadges = Array.isArray(locationState?.searchBarBadges)
+    ? locationState.searchBarBadges
+    : [];
+  // A true "direct link" (pasted/bookmarked URL) arrives with no router
+  // state at all, so it can never carry incoming badges. If badges were
+  // already handed down via navigate() state, this is an internal
+  // navigation (e.g. the "All Listing" shortcut) that should keep the
+  // existing badge trail as-is rather than fabricating a fallback one.
   const shouldUseDirectLinkFallback =
     !hasExplicitSearchContext &&
+    incomingBadges.length === 0 &&
     Boolean(queryParams.get("country")) &&
     Boolean(queryParams.get("state") || queryParams.get("location")) &&
     !queryParams.get("category") &&
@@ -116,9 +125,6 @@ export const buildAiVerticalsSearchBadges = ({
     Boolean(fallbackFilters?.goalOption) ||
     Boolean(fallbackFilters?.continent) ||
     Boolean(fallbackFilters?.goal);
-  const incomingBadges = Array.isArray(locationState?.searchBarBadges)
-    ? locationState.searchBarBadges
-    : [];
 
   const selectedContinentBadge = formatAiSearchBadge(
     selectedFilters.continent ||

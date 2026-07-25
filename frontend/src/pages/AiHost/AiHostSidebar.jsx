@@ -83,32 +83,32 @@ const recommendationItems = [
     path: "/modules",
   },
   {
-    label: "Sales Management Module",
+    label: "Sales Management",
     icon: MdOutlineHandshake,
     path: "/modules",
   },
   {
-    label: "Finance Management Module",
+    label: "Finance Management",
     icon: MdAccountBalance,
     path: "/themes",
   },
   {
-    label: "Administration Management Module",
+    label: "Administration Management",
     icon: HiOutlineBriefcase,
     path: "/leads",
   },
   {
-    label: "HR Management Module",
+    label: "HR Management",
     icon: BsPeopleFill,
     path: "/career",
   },
   {
-    label: "IT Infrastructure Module",
+    label: "IT Infrastructure",
     icon: FaDesktop,
     path: "/calendar",
   },
   {
-    label: "Maintenance Management Module",
+    label: "Maintenance Management",
     icon: TiSpanner,
     // suffixText: "...More",
   },
@@ -752,7 +752,9 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                         onToggle={() => setIsProfileOpen((prev) => !prev)}
                         onItemClick={handleProfileClick}
                     /> */}
-          <div className="mx-4 mt-3 border-t border-black/10"></div>
+          <div className="px-4 pt-3">
+            <div className="border-t border-black/10"></div>
+          </div>
           {/* Compact sections - minimal spacing */}
           {/* <SidebarSection
                         items={becomeHostItem}
@@ -760,18 +762,22 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                         onItemClick={handleBecomeHostClick}
                         compact={true}
                     /> */}
-          <div className="mx-4 border-t border-black/10"></div>
+          <div className="px-4 pt-3">
+            <div className="border-t border-black/10"></div>
+          </div>
           {/* <SidebarSection
                         items={signOutItem}
                         collapsed={isCollapsed}
                         onItemClick={handleSignOutClick}
                         compact={true}
                     /> */}
-          <div className="mx-4 border-t border-black/10"></div>
+          <div className="px-4 pt-3">
+            <div className="border-t border-black/10"></div>
+          </div>
         </>
       ) : (
         <>
-          {/* <div className="mx-4 border-t border-black/10"></div>
+          {/* <div className="border-t border-black/10 mt-4 mx-4"></div>
                     <SidebarSection
                         items={becomeHostItem}
                         collapsed={isCollapsed}
@@ -779,7 +785,9 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                         compact={true}
                     /> */}
           {/* <div className="border-t border-black/10 mt-4 mx-4"></div> */}
-          <div className="border-t border-black/10 mx-4"></div>
+          <div className="px-4 pt-3">
+            <div className="border-t border-black/10"></div>
+          </div>
           {/* {!isCollapsed && (
                         <div className="mt-auto px-4 pb-4 pt-10">
                             <div className="rounded-[28px] p-4 shadow-sm">

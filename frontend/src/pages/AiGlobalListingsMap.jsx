@@ -40,6 +40,7 @@ import {
 } from "../utils/categoryShortcutIcons.js";
 import { DESTINATION_HIGHLIGHT_FILTERS } from "../data/aiDestinationHighlights.js";
 
+const ALL_LISTINGS_CATEGORY = "alllistings";
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
 const ANNUAL_EVENTS_CATEGORY = "annualevents";
 const RESTAURANTS_CATEGORY = "restaurants";
@@ -379,9 +380,9 @@ const AiGlobalListingsMap = () => {
   };
 
   const { data: listingsData, isPending: isLisitingLoading } = useQuery({
-    queryKey: ["globallistings", formData],
+    queryKey: ["globallistings", formData?.country, formData?.location, userId],
     queryFn: async () => {
-      const { country, location, category } = formData || {};
+      const { country, location } = formData || {};
 
       const response = await axios.get(
         `company/companiesn?country=${country}&state=${location}&userId=${
@@ -515,6 +516,7 @@ const AiGlobalListingsMap = () => {
 
     if (!listingsData || listingsData.length === 0) {
       return [
+        { label: "All Listing", value: ALL_LISTINGS_CATEGORY },
         ...visibleDestinationHighlightFilters,
         {
           label: "Value Adds",
@@ -559,6 +561,7 @@ const AiGlobalListingsMap = () => {
       .sort((a, b) => typeOrder.indexOf(a.value) - typeOrder.indexOf(b.value));
 
     return [
+      { label: "All Listing", value: ALL_LISTINGS_CATEGORY },
       ...result.filter(
         (option) => option.value !== VALUE_ADDED_SERVICES_CATEGORY,
       ),
@@ -712,6 +715,26 @@ const AiGlobalListingsMap = () => {
 
     if (!currentFormData.country || !currentFormData.location) {
       alert("Please select Country and Location first.");
+      return;
+    }
+
+    if (categoryValue === ALL_LISTINGS_CATEGORY) {
+      dispatch(setFormValues({ ...currentFormData, category: "" }));
+      setShowListings(false);
+      setShowMobileSearch(false);
+
+      navigate(
+        `/verticals?view=map&country=${currentFormData.country}&location=${currentFormData.location}`,
+        {
+          state: {
+            ...location.state,
+            selectedStateLabel: selectedLocationLabel,
+            category: "",
+            skipHeadingIntro: true,
+            searchBarBadges,
+          },
+        },
+      );
       return;
     }
 
@@ -914,18 +937,18 @@ const AiGlobalListingsMap = () => {
                         onClick={() => handleCategoryClick(cat.value)}
                         className="text-black px-1 py-2 hover:text-black transition flex items-center justify-center w-full"
                       >
-                        {iconSrc ? (
-                          <div className="h-10 w-full flex flex-col gap-0">
-                            <img
-                              src={iconSrc}
-                              alt={cat.label}
-                              className="h-full w-full object-contain"
-                            />
-                            <span className="text-tiny">{cat.label}</span>
-                          </div>
-                        ) : (
-                          cat.label
-                        )}
+                        <div className="flex min-h-[3.5rem] w-full flex-col items-center justify-start gap-1">
+                          {iconSrc ? (
+                            <div className="h-10 w-full">
+                              <img
+                                src={iconSrc}
+                                alt={cat.label}
+                                className="h-full w-full object-contain"
+                              />
+                            </div>
+                          ) : null}
+                          <span className="text-tiny">{cat.label}</span>
+                        </div>
                       </button>
                     );
                   })}
@@ -1013,6 +1036,9 @@ const AiGlobalListingsMap = () => {
           <Container padding={false}>
             <div className="">
               <div className="border-t border-gray-300 mt-0 mb-6" />
+              <h1 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight mt-6 mb-2">
+                All listings in {selectedLocationLabel || "Unknown"}
+              </h1>
               <div className="font-semibold text-md grid grid-cols-9 gap-4 pt-3">
                 <div className="custom-scrollbar-hide col-span-5">
                   {isLisitingLoading ? (
@@ -1131,7 +1157,12 @@ const AiGlobalListingsMap = () => {
 
             {/* Collection/Category Chips */}
             <div className="pointer-events-auto w-full max-w-[450px] flex overflow-x-auto gap-2 pb-2 scrollbar-hide scroll-smooth snap-x">
-              {[{ label: "All", value: "" }, ...categoryOptions].map((cat) => {
+              {[
+                { label: "All", value: "" },
+                ...categoryOptions.filter(
+                  (cat) => cat.value !== ALL_LISTINGS_CATEGORY,
+                ),
+              ].map((cat) => {
                 const isActive = cat.value === formData?.category;
                 return (
                   <button
