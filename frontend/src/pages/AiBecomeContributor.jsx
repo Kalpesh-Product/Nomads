@@ -221,8 +221,15 @@ const AiBecomeContributor = () => {
           <div className="w-full max-w-5xl md:px-20 lg:px-20">
             <div className="mx-auto mb-0 flex w-full max-w-4xl flex-col items-center gap-0 px-0">
               <p className="min-h-[2.75rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.25rem] sm:text-[1rem]">
-                {typedMessage}
-              </p>
+                {messagePrefix ? (
+                <>
+                  <span className="text-blue-600">{namePortion}</span>
+                  {messagePortion}
+                </>
+              ) : (
+                typedMessage
+              )}
+            </p>
               <h1 className="text-hero mt-5 min-h-[3rem] text-center font-play md:mt-8">
                 {typedPageHeading}
               </h1>
