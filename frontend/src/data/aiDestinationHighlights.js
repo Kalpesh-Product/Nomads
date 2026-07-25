@@ -1,6 +1,6 @@
 export const DESTINATION_HIGHLIGHT_FILTERS = [
   { label: "Events", value: "annualevents" },
-  { label: "Places", value: "venues" },
+  { label: "Places", value: "places" },
   { label: "Restaurants", value: "restaurants" },
   { label: "News", value: "news" },
   { label: "Blogs", value: "blogs" },
@@ -66,7 +66,7 @@ export const annualEvents = [
   },
 ];
 
-export const popularVenues = [
+export const popularPlaces = [
   {
     id: "palolem-beach",
     title: "Palolem Beach",

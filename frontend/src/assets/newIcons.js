@@ -8,7 +8,7 @@ const newIcons = {
   workation: "/icons-new/companyWorkation.png",
   meetingroom: "/icons-new/meeting-room.png",
   annualevents: "/icons-new/Events.png",
-  venues: "/icons-new/Venues.png",
+  places: "/icons-new/Places.png",
   restaurants: "/icons-new/Restaurants.png",
   news: "/icons-new/News.png",
   blogs: "/icons-new/Blogs.png",

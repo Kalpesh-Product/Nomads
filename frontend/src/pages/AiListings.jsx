@@ -44,7 +44,7 @@ import {
 const ALL_LISTINGS_CATEGORY = "alllistings";
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
 const ANNUAL_EVENTS_CATEGORY = "annualevents";
-const VENUES_CATEGORY = "venues";
+const PLACES_CATEGORY = "places";
 const RESTAURANTS_CATEGORY = "restaurants";
 const NEWS_CATEGORY = "news";
 const BLOGS_CATEGORY = "blogs";
@@ -69,7 +69,6 @@ const extractImageFromContent = (content) => {
   const match = content?.match(/<img.*?src=["'](.*?)["']/);
   return match ? match[1] : null;
 };
-
 const valueAddedServiceItems = [
   {
     label: "ANY VISA SUPPORT",
@@ -422,7 +421,7 @@ const AiListings = ({ forceListView = false }) => {
     enabled: !!destinationAvailability,
     refetchOnWindowFocus: false,
   });
-  const { data: destinationVenuesData = [] } = useQuery({
+  const { data: destinationPlacesData = [] } = useQuery({
     queryKey: ["ai-places-availability", destinationAvailability],
     queryFn: async () => {
       const response = await axios.get("/places", {
@@ -486,8 +485,8 @@ const AiListings = ({ forceListView = false }) => {
           return destinationEventsData.length > 0;
         }
 
-        if (option.value === VENUES_CATEGORY) {
-          return destinationVenuesData.length > 0;
+        if (option.value === PLACES_CATEGORY) {
+          return destinationPlacesData.length > 0;
         }
 
         if (option.value === RESTAURANTS_CATEGORY) {
@@ -565,7 +564,7 @@ const AiListings = ({ forceListView = false }) => {
     destinationEventsData.length,
     destinationNewsData.length,
     destinationRestaurantsData.length,
-    destinationVenuesData.length,
+    destinationPlacesData.length,
     isLisitingLoading,
     listingsData,
   ]);
@@ -588,7 +587,7 @@ const AiListings = ({ forceListView = false }) => {
       cafe: "Cafes",
       [VALUE_ADDED_SERVICES_CATEGORY]: "Value-Added Services",
       [ANNUAL_EVENTS_CATEGORY]: "Events",
-      [VENUES_CATEGORY]: "Places",
+      [PLACES_CATEGORY]: "Places",
       [RESTAURANTS_CATEGORY]: "Restaurants",
       [NEWS_CATEGORY]: "News",
       [BLOGS_CATEGORY]: "Blogs",
@@ -612,7 +611,7 @@ const AiListings = ({ forceListView = false }) => {
     if (
       formData?.category === VALUE_ADDED_SERVICES_CATEGORY ||
       formData?.category === ANNUAL_EVENTS_CATEGORY ||
-      formData?.category === VENUES_CATEGORY ||
+      formData?.category === PLACES_CATEGORY ||
       formData?.category === RESTAURANTS_CATEGORY ||
       formData?.category === NEWS_CATEGORY ||
       formData?.category === BLOGS_CATEGORY
@@ -735,7 +734,7 @@ const AiListings = ({ forceListView = false }) => {
       if (
         formData.category === VALUE_ADDED_SERVICES_CATEGORY ||
         formData.category === ANNUAL_EVENTS_CATEGORY ||
-        formData.category === VENUES_CATEGORY ||
+        formData.category === PLACES_CATEGORY ||
         formData.category === RESTAURANTS_CATEGORY ||
         formData.category === NEWS_CATEGORY ||
         formData.category === BLOGS_CATEGORY
@@ -826,7 +825,7 @@ const AiListings = ({ forceListView = false }) => {
         (filter) =>
           filter.value === categoryValue &&
           categoryValue !== ANNUAL_EVENTS_CATEGORY &&
-          categoryValue !== VENUES_CATEGORY &&
+          categoryValue !== PLACES_CATEGORY &&
           categoryValue !== RESTAURANTS_CATEGORY &&
           categoryValue !== NEWS_CATEGORY &&
           categoryValue !== BLOGS_CATEGORY,
@@ -935,14 +934,14 @@ const AiListings = ({ forceListView = false }) => {
   const isValueAddedServicesSelected =
     formData?.category === VALUE_ADDED_SERVICES_CATEGORY;
   const isAnnualEventsSelected = formData?.category === ANNUAL_EVENTS_CATEGORY;
-  const isVenuesSelected = formData?.category === VENUES_CATEGORY;
+  const isPlacesSelected = formData?.category === PLACES_CATEGORY;
   const isRestaurantsSelected = formData?.category === RESTAURANTS_CATEGORY;
   const isNewsSelected = formData?.category === NEWS_CATEGORY;
   const isBlogsSelected = formData?.category === BLOGS_CATEGORY;
   const isFocusedContentSelected =
     isValueAddedServicesSelected ||
     isAnnualEventsSelected ||
-    isVenuesSelected ||
+    isPlacesSelected ||
     isRestaurantsSelected ||
     isNewsSelected ||
     isBlogsSelected;
@@ -985,7 +984,7 @@ const AiListings = ({ forceListView = false }) => {
     enabled: isAnnualEventsSelected && !!eventDestination,
     refetchOnWindowFocus: false,
   });
-  const { data: venuesData = [], isPending: isVenuesLoading } = useQuery({
+  const { data: placesData = [], isPending: isPlacesLoading } = useQuery({
     queryKey: ["ai-places", eventDestination],
     queryFn: async () => {
       const response = await axios.get("/places", {
@@ -996,7 +995,7 @@ const AiListings = ({ forceListView = false }) => {
 
       return Array.isArray(response.data) ? response.data : [];
     },
-    enabled: isVenuesSelected && !!eventDestination,
+    enabled: isPlacesSelected && !!eventDestination,
     refetchOnWindowFocus: false,
   });
   const { data: restaurantsData = [], isPending: isRestaurantsLoading } =
@@ -1059,9 +1058,9 @@ const AiListings = ({ forceListView = false }) => {
       })),
     [eventsData],
   );
-  const venues = useMemo(
+  const places = useMemo(
     () =>
-      venuesData
+      placesData
         .map((place) => ({
           ...place,
           id: place._id || place.serialNumber || place.placeName,
@@ -1078,7 +1077,7 @@ const AiListings = ({ forceListView = false }) => {
           const bRating = Number.parseFloat(b.rating) || 0;
           return bRating - aRating;
         }),
-    [venuesData],
+    [placesData],
   );
   const restaurants = useMemo(
     () =>
@@ -1158,17 +1157,17 @@ const AiListings = ({ forceListView = false }) => {
     });
   };
 
-  const handleVenueClick = (venue) => {
-    navigate(`/venues/${venue.id}`, {
+  const handlePlaceClick = (place) => {
+    navigate(`/places/${place.id}`, {
       state: {
-        item: venue,
+        item: place,
         selectedStateLabel,
         stickyBreadcrumbs: [
           {
             label: selectedStateLabel || "Destination",
             path: location.pathname,
           },
-          { label: venue.title },
+          { label: place.title },
         ],
       },
     });
@@ -1742,7 +1741,7 @@ const AiListings = ({ forceListView = false }) => {
             {formData?.category &&
               formData?.location &&
               !isAnnualEventsSelected &&
-              !isVenuesSelected &&
+              !isPlacesSelected &&
               !isRestaurantsSelected &&
               !isNewsSelected &&
               !isBlogsSelected && (
@@ -1759,7 +1758,7 @@ const AiListings = ({ forceListView = false }) => {
                       cafe: "Cafes",
                       [VALUE_ADDED_SERVICES_CATEGORY]: "Value-Added Services",
                       [ANNUAL_EVENTS_CATEGORY]: "Annual Events",
-                      [VENUES_CATEGORY]: "Places",
+                      [PLACES_CATEGORY]: "Places",
                       [RESTAURANTS_CATEGORY]: "Restaurants",
                       [NEWS_CATEGORY]: "News",
                       [BLOGS_CATEGORY]: "Blogs",
@@ -1852,8 +1851,8 @@ const AiListings = ({ forceListView = false }) => {
                       onCardClick={handleEventClick}
                     />
                   )
-                ) : isVenuesSelected ? (
-                  isVenuesLoading ? (
+                ) : isPlacesSelected ? (
+                  isPlacesLoading ? (
                     <PaginatedGrid
                       data={skeletonArray}
                       entriesPerPage={isMobile ? 10 : isTablet ? 9 : 100}
@@ -1873,9 +1872,9 @@ const AiListings = ({ forceListView = false }) => {
                   ) : (
                     <AiDestinationHighlightSection
                       title={`Popular Places to visit in ${selectedStateLabel || "Unknown"}`}
-                      items={venues}
-                      kind="venue"
-                      onCardClick={handleVenueClick}
+                      items={places}
+                      kind="place"
+                      onCardClick={handlePlaceClick}
                     />
                   )
                 ) : isRestaurantsSelected ? (

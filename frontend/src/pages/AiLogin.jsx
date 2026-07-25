@@ -308,24 +308,28 @@ export default function AiLogin() {
               )}
             />
 
-            <div className="col-span-1 md:col-span-2 flex justify-center items-center mt-2 py-2 w-full">
+            <div className="col-span-1 md:col-span-2 text-end">
+              <Link to="/forgot-password" className="hover:underline text-black">
+                Forgot Password?
+              </Link>
+            </div>
+
+            <div className="col-span-1 md:col-span-2 flex justify-center items-center w-full">
               <AiPrimaryButton
                 title="Login"
                 type="submit"
                 isLoading={isLoginPending}
                 disabled={isLoginPending}
-                className="bg-primary-blue flex text-white font-[500] capitalize hover:bg-black w-full sm:w-[7rem] px-6"
+                bgColor="bg-black"
+                hoverColor="hover:bg-gray-800"
+                fontSize="text-lg"
+                padding="px-8 py-2"
+                className="flex text-white font-[500] capitalize w-40"
               />
             </div>
 
-            <div className="col-span-1 md:col-span-2 flex flex-col md:flex-row justify-center items-center md:gap-2 text-center">
-              <p className="text-gray-600 hover:text-black underline mb-1 md:mb-0">
-                <Link to="/forgot-password">Forgot password?</Link>
-              </p>
-
-              <p className="hidden md:block">|</p>
-
-              <p className="text-gray-600 hover:text-black ">
+            <div className="col-span-1 md:col-span-2 flex justify-center items-center text-center">
+              <p className="text-gray-600 hover:text-black">
                 <span>New to WoNo? </span>
                 <span className="underline">
                   <Link to="/signup">Sign Up</Link>

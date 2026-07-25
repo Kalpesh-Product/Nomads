@@ -3,7 +3,7 @@ import newIcons from "../assets/newIcons.js";
 
 const CROPPED_SHORTCUT_ICON_OVERRIDES = {
   annualevents: "/icons-new/Events-cropped.png",
-  venues: "/icons-new/Venues-cropped.png",
+  places: "/icons-new/Places-cropped.png",
   news: "/icons-new/News-cropped.png",
   blogs: "/icons-new/Blogs-cropped.png",
 };

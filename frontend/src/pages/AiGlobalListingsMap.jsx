@@ -43,6 +43,7 @@ import { DESTINATION_HIGHLIGHT_FILTERS } from "../data/aiDestinationHighlights.j
 const ALL_LISTINGS_CATEGORY = "alllistings";
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
 const ANNUAL_EVENTS_CATEGORY = "annualevents";
+const PLACES_CATEGORY = "places";
 const RESTAURANTS_CATEGORY = "restaurants";
 const NEWS_CATEGORY = "news";
 const BLOGS_CATEGORY = "blogs";
@@ -424,7 +425,7 @@ const AiGlobalListingsMap = () => {
     enabled: !!destinationAvailability,
     refetchOnWindowFocus: false,
   });
-  const { data: destinationVenuesData = [] } = useQuery({
+  const { data: destinationPlacesData = [] } = useQuery({
     queryKey: ["ai-places-availability", destinationAvailability],
     queryFn: async () => {
       const response = await axios.get("/places", {
@@ -495,8 +496,8 @@ const AiGlobalListingsMap = () => {
           return destinationEventsData.length > 0;
         }
 
-        if (option.value === "venues") {
-          return destinationVenuesData.length > 0;
+        if (option.value === PLACES_CATEGORY) {
+          return destinationPlacesData.length > 0;
         }
 
         if (option.value === RESTAURANTS_CATEGORY) {
@@ -576,7 +577,7 @@ const AiGlobalListingsMap = () => {
     destinationEventsData.length,
     destinationNewsData.length,
     destinationRestaurantsData.length,
-    destinationVenuesData.length,
+    destinationPlacesData.length,
     isLisitingLoading,
     listingsData,
   ]);
@@ -743,7 +744,7 @@ const AiGlobalListingsMap = () => {
         (filter) =>
           filter.value === categoryValue &&
           categoryValue !== ANNUAL_EVENTS_CATEGORY &&
-          categoryValue !== "venues" &&
+          categoryValue !== PLACES_CATEGORY &&
           categoryValue !== RESTAURANTS_CATEGORY &&
           categoryValue !== NEWS_CATEGORY &&
           categoryValue !== BLOGS_CATEGORY,
@@ -764,13 +765,17 @@ const AiGlobalListingsMap = () => {
       return;
     }
 
-    dispatch(setFormValues({ ...currentFormData, category: categoryValue }));
+    const normalizedCategoryValue = categoryValue;
+
+    dispatch(
+      setFormValues({ ...currentFormData, category: normalizedCategoryValue }),
+    );
 
     if (
       isMobileOrTablet &&
       categoryValue !== VALUE_ADDED_SERVICES_CATEGORY &&
       categoryValue !== ANNUAL_EVENTS_CATEGORY &&
-      categoryValue !== "venues" &&
+      normalizedCategoryValue !== PLACES_CATEGORY &&
       categoryValue !== RESTAURANTS_CATEGORY &&
       categoryValue !== NEWS_CATEGORY &&
       categoryValue !== BLOGS_CATEGORY
@@ -783,7 +788,7 @@ const AiGlobalListingsMap = () => {
 
     const state = {
       ...currentFormData,
-      category: categoryValue,
+      category: normalizedCategoryValue,
     };
 
     setShowMobileSearch(false);
@@ -792,7 +797,7 @@ const AiGlobalListingsMap = () => {
     const listingsPath =
       categoryValue === VALUE_ADDED_SERVICES_CATEGORY ||
       categoryValue === ANNUAL_EVENTS_CATEGORY ||
-      categoryValue === "venues" ||
+      normalizedCategoryValue === PLACES_CATEGORY ||
       categoryValue === RESTAURANTS_CATEGORY ||
       categoryValue === NEWS_CATEGORY ||
       categoryValue === BLOGS_CATEGORY
@@ -805,7 +810,7 @@ const AiGlobalListingsMap = () => {
         state: {
           country: currentFormData.country,
           location: currentFormData.location,
-          category: categoryValue,
+          category: normalizedCategoryValue,
           searchBarBadges,
         },
       },

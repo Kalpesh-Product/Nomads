@@ -47,8 +47,7 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
     searchParams.get("state") ||
     formData?.location ||
     "";
-  const categoryParam =
-    searchParams.get("category") || formData?.category || "";
+  const categoryParam = searchParams.get("category") || formData?.category || "";
 
   const buildListingsQuery = () => {
     const params = new URLSearchParams();

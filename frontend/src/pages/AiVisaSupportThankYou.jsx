@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Container from "../components/Container";
+import { formatAiSearchBadge } from "../utils/aiSearchBarBadges";
+import { persistSelectedDestination } from "../utils/selectedDestinationSession";
 
 const AiVisaSupportThankYou = () => {
   const navigate = useNavigate();
@@ -9,6 +11,17 @@ const AiVisaSupportThankYou = () => {
   const selectedState = searchParams.get("state");
   const selectedCountry = searchParams.get("country");
   const selectedContinent = searchParams.get("continent");
+
+  const searchBarBadges = useMemo(
+    () =>
+      [
+        "Classic Search",
+        formatAiSearchBadge(selectedContinent || ""),
+        formatAiSearchBadge(selectedCountry || ""),
+        formatAiSearchBadge(selectedState || ""),
+      ].filter(Boolean),
+    [selectedContinent, selectedCountry, selectedState],
+  );
 
   const destinationPath = useMemo(() => {
     if (!selectedCountry) {
@@ -67,15 +80,44 @@ const AiVisaSupportThankYou = () => {
 
     const redirectTimeout = setTimeout(() => {
       if (typeof window !== "undefined") {
-        window.sessionStorage.removeItem("aiSearchBarBadges");
+        window.sessionStorage.setItem(
+          "aiSearchBarBadges",
+          JSON.stringify(searchBarBadges),
+        );
       }
-      navigate(destinationPath);
+
+      persistSelectedDestination({
+        continent: selectedContinent,
+        country: selectedCountry,
+        city: selectedState,
+        title: formatAiSearchBadge(selectedState || ""),
+      });
+
+      navigate(destinationPath, {
+        state: {
+          searchContext: "classic",
+          selectedStateLabel: formatAiSearchBadge(selectedState || ""),
+          breadcrumbFilters: {
+            continent: selectedContinent || "",
+            country: selectedCountry || "",
+            location: selectedState || "",
+          },
+          searchBarBadges,
+        },
+      });
     }, 7000);
 
     return () => {
       clearTimeout(redirectTimeout);
     };
-  }, [destinationPath, navigate]);
+  }, [
+    destinationPath,
+    navigate,
+    searchBarBadges,
+    selectedContinent,
+    selectedCountry,
+    selectedState,
+  ]);
 
   return (
     <div className="bg-white text-black font-sans">
