@@ -1225,7 +1225,9 @@ const AiListings = ({ forceListView = false }) => {
       >
         <div
           className={`w-full lg:min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto ${
-            forceListView ? "px-2 sm:px-6 lg:px-0" : "px-4 sm:px-6 lg:px-0"
+            forceListView
+              ? "px-2 sm:px-6 max-[820px]:!px-0 lg:px-0"
+              : "px-4 sm:px-6 lg:px-0"
           }`}
         >
           {!forceListView && (
@@ -1706,7 +1708,11 @@ const AiListings = ({ forceListView = false }) => {
           </AnimatePresence>
           <Container
             padding={false}
-            className={forceListView ? "!px-0 sm:!px-6 lg:!px-0" : ""}
+            className={
+              forceListView
+                ? "!px-0 sm:!px-6 max-[820px]:!px-0 lg:!px-0"
+                : ""
+            }
           >
             {/* Dynamic Header */}
             {formData?.category &&
