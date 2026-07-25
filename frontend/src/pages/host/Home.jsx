@@ -275,8 +275,9 @@ const HostHome = () => {
             <div className="text-center my-4">
               <NavLink
                 to={"themes"}
-                className={" hover:underline hover:text-primary-blue"}>
+                className="relative inline-block pb-1 transition-all duration-300 group text-black">
                 View More
+                <span className="absolute left-0 bottom-0 block h-[2px] w-0 bg-primary-blue transition-all duration-300 group-hover:w-full"></span>
               </NavLink>
             </div>
           </div>

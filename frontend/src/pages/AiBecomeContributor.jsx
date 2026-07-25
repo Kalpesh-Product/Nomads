@@ -16,12 +16,11 @@ import {
 } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { Country } from "country-state-city";
-import Swal from "sweetalert2";
 import { useMutation } from "@tanstack/react-query";
 import Container from "../components/Container";
 import axios from "../utils/axios";
 import useAuth from "../hooks/useAuth";
-import { showErrorAlert } from "../utils/alerts";
+import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 import { HiCheck } from "react-icons/hi";
 
 const floatingLabelSx = {
@@ -100,18 +99,12 @@ const AiBecomeContributor = () => {
         showErrorAlert(data.warning);
         return;
       }
-      await Swal.fire({
-        title: "Thank You for Your Interest!",
-        text: "We’ll review your details and get back to you soon.",
-        icon: "success",
-        confirmButtonText: "OK",
-        confirmButtonColor: "#0BA9EF",
-        customClass: {
-          popup: "swal2-popup--rounded",
-          title: "swal2-title--serif",
-          confirmButton: "swal2-button--pill",
+      await showSuccessAlert(
+        "We’ll review your details and get back to you soon.",
+        {
+          title: "Thank You for Your Interest!",
         },
-      });
+      );
       reset(defaultValues);
     },
     onError: (error) => {

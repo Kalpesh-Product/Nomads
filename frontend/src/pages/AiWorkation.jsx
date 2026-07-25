@@ -17,7 +17,6 @@ import { Controller, useForm } from "react-hook-form";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import { Country } from "country-state-city";
-import Swal from "sweetalert2";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
 import Container from "../components/Container";
@@ -27,7 +26,7 @@ import {
   getCountryNameFromSelectedDestination,
   readSelectedDestination,
 } from "../utils/selectedDestinationSession";
-import { showErrorAlert } from "../utils/alerts";
+import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 import { HiCheck } from "react-icons/hi";
 
 import { aiDestinationCards } from "../constants/aiDestinationCards";
@@ -166,18 +165,12 @@ const AiWorkation = () => {
         showErrorAlert(data.warning);
         return;
       }
-      await Swal.fire({
-        title: "Workation Request Submitted!",
-        text: "We’ll review your requirements and connect you with the right support soon.",
-        icon: "success",
-        confirmButtonText: "OK",
-        confirmButtonColor: "#0BA9EF",
-        customClass: {
-          popup: "swal2-popup--rounded",
-          title: "swal2-title--serif",
-          confirmButton: "swal2-button--pill",
+      await showSuccessAlert(
+        "We’ll review your requirements and connect you with the right support soon.",
+        {
+          title: "Workation Request Submitted!",
         },
-      });
+      );
       reset(defaultValues);
     },
     onError: (error) => {

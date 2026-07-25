@@ -17,7 +17,6 @@ import {
 import { Controller, useForm } from "react-hook-form";
 import { DatePicker } from "@mui/x-date-pickers";
 import { Country } from "country-state-city";
-import Swal from "sweetalert2";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
 import { FaCheck } from "react-icons/fa";
@@ -28,7 +27,7 @@ import {
   getCountryNameFromSelectedDestination,
   readSelectedDestination,
 } from "../utils/selectedDestinationSession";
-import { showErrorAlert } from "../utils/alerts";
+import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 import { findCountryByName } from "../utils/countryFlags";
 import { HiCheck } from "react-icons/hi";
 
@@ -198,18 +197,12 @@ const AiNewCompanySetup = () => {
         showErrorAlert(data.warning);
         return;
       }
-      await Swal.fire({
-        title: "Support Request Submitted!",
-        text: "Our team will review your request and get back to you soon.",
-        icon: "success",
-        confirmButtonText: "OK",
-        confirmButtonColor: "#0BA9EF",
-        customClass: {
-          popup: "swal2-popup--rounded",
-          title: "swal2-title--serif",
-          confirmButton: "swal2-button--pill",
+      await showSuccessAlert(
+        "Our team will review your request and get back to you soon.",
+        {
+          title: "Support Request Submitted!",
         },
-      });
+      );
       reset(defaultValues);
     },
     onError: (error) => {
