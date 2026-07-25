@@ -404,25 +404,32 @@ const Reviews = () => {
         onClose={closeReviewModal}
         title={modalTitle}
       >
-        <form className="flex flex-col gap-6" onSubmit={handleSubmitEdit}>
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex items-center gap-4 min-w-0">
-              <div className="w-16 h-16 shrink-0 rounded-full bg-[#ff5757] flex items-center justify-center text-white text-3xl font-medium uppercase">
-                {(selectedReview?.name || "A").charAt(0)}
+        <form
+          className="flex flex-col gap-7 pb-1"
+          onSubmit={handleSubmitEdit}
+        >
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex min-w-0 items-center gap-4">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-primary-blue text-2xl font-semibold uppercase text-white sm:h-20 sm:w-20 sm:text-3xl">
+                {(selectedReview?.name || "A")
+                  .split(" ")
+                  .map((namePart) => namePart[0])
+                  .join("")
+                  .slice(0, 2)}
               </div>
               <div className="min-w-0">
-                <p className="text-2xl font-semibold text-secondary-dark truncate">
+                <p className="truncate text-xl font-semibold text-gray-900 sm:text-2xl">
                   {selectedReview?.name || "Anonymous"}
                 </p>
                 {formattedReviewDate && (
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="mt-1 text-sm text-gray-500">
                     {formattedReviewDate}
                   </p>
                 )}
               </div>
             </div>
 
-            <div className="flex shrink-0 items-center gap-2">
+            <div className="flex shrink-0 items-center gap-2 self-start sm:self-center">
               {isSelectedDestinationReview && (
                 <button
                   type="button"
@@ -448,12 +455,12 @@ const Reviews = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 text-4xl">
+          <div className="flex items-center gap-2 sm:gap-3">
             {Array.from({ length: 5 }).map((_, index) => (
               <button
                 key={index}
                 type="button"
-                className={`leading-none ${
+                className={`leading-none transition-transform ${
                   isEditingReview ? "cursor-pointer" : "cursor-default"
                 }`}
                 onClick={() => {
@@ -465,6 +472,7 @@ const Reviews = () => {
                 aria-label={`Set ${index + 1} star rating`}
               >
                 <AiFillStar
+                  size={48}
                   className={
                     index <
                     (isEditingReview
@@ -478,16 +486,17 @@ const Reviews = () => {
             ))}
           </div>
 
-          <div className="pt-5 border-t border-borderGray">
+          <div className="border-t border-borderGray pt-6">
             {isEditingReview ? (
               <textarea
-                className="min-h-28 w-full rounded-lg border border-borderGray px-3 py-2 text-sm text-gray-800 outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                className="min-h-32 w-full rounded-lg border border-borderGray px-4 py-3 text-sm leading-relaxed text-gray-800 outline-none focus:border-primary-blue focus:ring-1 focus:ring-primary-blue"
+                placeholder="Share details of your own experience at this place"
                 value={editDescription}
                 onChange={(event) => setEditDescription(event.target.value)}
                 disabled={updateReviewMutation.isPending}
               />
             ) : (
-              <p className="text-sm text-gray-800 whitespace-pre-line leading-relaxed">
+              <p className="min-h-24 whitespace-pre-line break-words text-sm leading-7 text-gray-700">
                 {selectedReview?.description || "No review details available."}
               </p>
             )}
@@ -496,10 +505,10 @@ const Reviews = () => {
           {editError && <p className="text-sm text-red-500">{editError}</p>}
 
           {isEditingReview && (
-            <div className="flex justify-end gap-3">
+            <div className="flex flex-col-reverse gap-3 border-t border-gray-200 pt-6 sm:flex-row sm:justify-end">
               <button
                 type="button"
-                className="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700"
+                className="rounded-full border border-gray-300 px-5 py-2 text-sm font-medium text-gray-700"
                 onClick={handleCancelEdit}
                 disabled={updateReviewMutation.isPending}
               >
@@ -507,7 +516,7 @@ const Reviews = () => {
               </button>
               <button
                 type="submit"
-                className="rounded-full bg-primary-blue hover:bg-primary-light px-5 py-2 text-sm font-semibold text-white disabled:opacity-60"
+                className="rounded-full bg-primary-blue px-6 py-2 text-sm font-semibold text-white hover:bg-primary-light disabled:opacity-60"
                 disabled={updateReviewMutation.isPending}
               >
                 {updateReviewMutation.isPending ? "Submitting..." : "Submit"}
