@@ -1159,7 +1159,7 @@ const AiListings = ({ forceListView = false }) => {
   };
 
   const handleVenueClick = (venue) => {
-    navigate(`/venues/${venue.id}`, {
+    navigate(`/places/${venue.id}`, {
       state: {
         item: venue,
         selectedStateLabel,

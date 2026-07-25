@@ -1183,7 +1183,12 @@ const AiGlobalListingsList = () => {
     }
 
     if (type === "event" || type === "venue" || type === "restaurant") {
-      const detailType = type === "restaurant" ? "restaurants" : `${type}s`;
+      const detailTypeByType = {
+        event: "events",
+        venue: "places",
+        restaurant: "restaurants",
+      };
+      const detailType = detailTypeByType[type];
 
       navigate(`/${detailType}/${item.id}`, {
         state: {
