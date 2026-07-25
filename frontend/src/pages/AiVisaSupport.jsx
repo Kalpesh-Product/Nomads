@@ -441,7 +441,7 @@ const AiVisaSupport = () => {
                 isFormVisible ? "visible" : "invisible"
               }`}
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
+              <div className="mt-1 grid grid-cols-1 gap-4 md:mt-2 md:grid-cols-2">
                 <Controller
                   name="visaType"
                   control={control}

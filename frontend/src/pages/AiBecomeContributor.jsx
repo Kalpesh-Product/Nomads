@@ -231,7 +231,7 @@ const AiBecomeContributor = () => {
                 isFormVisible ? "visible" : "invisible"
               }`}
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+              <div className="mt-1 grid grid-cols-1 gap-6 md:mt-2 md:grid-cols-2 md:gap-8">
                 <Controller
                   name="contributionType"
                   control={control}

@@ -394,7 +394,7 @@ const AiConsultation = () => {
               onSubmit={handleSubmit(handleFormSubmit)}
               className={`bg-white p-0 md:p-0 rounded-2xl ${isFormVisible ? "visible" : "invisible"}`}
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-4">
+              <div className="mt-1 grid grid-cols-1 gap-4 md:mt-2 md:grid-cols-2 md:gap-4">
                 <Controller
                   name="supportRequired"
                   control={control}
