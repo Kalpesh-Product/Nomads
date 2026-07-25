@@ -35,7 +35,8 @@ const companySchema = new mongoose.Schema({
     trim: true,
   },
   logo: {
-    type: { url: String, id: String },
+    url: { type: String },
+    id: { type: String },
   },
   images: {
     type: [{ url: String, id: String, index: Number }],
