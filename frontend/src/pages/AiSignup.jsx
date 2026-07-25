@@ -334,7 +334,11 @@ export default function AiSignup() {
               isLoading={isPending}
               title="Signup"
               disabled={isPending}
-              className="bg-primary-blue flex text-white font-[500] capitalize hover:bg-primary-light w-full sm:w-[7rem] px-6"
+              bgColor="bg-black"
+              hoverColor="hover:bg-gray-800"
+              fontSize="text-lg"
+              padding="px-8 py-2"
+              className="flex text-white font-[500] capitalize w-40"
             />
           </div>
 
