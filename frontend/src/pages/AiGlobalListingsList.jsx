@@ -758,9 +758,9 @@ const AiGlobalListingsList = () => {
   }, [expandedCategories, expandedCategoriesStorageKey]);
 
   const { data: listingsData, isPending: isLisitingLoading } = useQuery({
-    queryKey: ["globallistings", formData],
+    queryKey: ["globallistings", formData?.country, formData?.location, userId],
     queryFn: async () => {
-      const { country, location, category } = formData || {};
+      const { country, location } = formData || {};
 
       const response = await axios.get(
         `company/companiesn?country=${country}&state=${location}&userId=${userId || ""}`,

@@ -379,7 +379,7 @@ const AiListings = ({ forceListView = false }) => {
   const skeletonArray = Array.from({ length: 6 });
 
   const { data: listingsData = [], isPending: isLisitingLoading } = useQuery({
-    queryKey: ["listings", formData],
+    queryKey: ["listings", formData?.country, formData?.location, userId],
     queryFn: async () => {
       const { country, location } = formData || {};
       const response = await axios.get(
@@ -1294,7 +1294,7 @@ const AiListings = ({ forceListView = false }) => {
                 {typedHeading}
               </p>
             }
-            className="mb-4"
+            className="mb-4 pb-4"
             fullWidth
           />
           <div className={isHeadingSequenceComplete ? "block" : "hidden"}>
@@ -1479,7 +1479,7 @@ const AiListings = ({ forceListView = false }) => {
                                   className="h-full w-full object-contain"
                                 />
                                 <span
-                                  className={`text-tiny border-b-2 pb-1 ${
+                                  className={`text-tiny border-b-2 pb-1 pt-1 ${
                                     isActive
                                       ? "border-primary-blue"
                                       : "border-transparent"
@@ -1740,7 +1740,7 @@ const AiListings = ({ forceListView = false }) => {
               !isRestaurantsSelected &&
               !isNewsSelected &&
               !isBlogsSelected && (
-                <div className="mt-6 mb-5 px-1 border-t border-gray-300">
+                <div className="mt-10 mb-5 px-1 border-t border-gray-300">
                   <h1 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight mt-6">
                     Popular{" "}
                     {{

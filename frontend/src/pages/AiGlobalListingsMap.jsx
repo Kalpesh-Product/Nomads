@@ -380,9 +380,9 @@ const AiGlobalListingsMap = () => {
   };
 
   const { data: listingsData, isPending: isLisitingLoading } = useQuery({
-    queryKey: ["globallistings", formData],
+    queryKey: ["globallistings", formData?.country, formData?.location, userId],
     queryFn: async () => {
-      const { country, location, category } = formData || {};
+      const { country, location } = formData || {};
 
       const response = await axios.get(
         `company/companiesn?country=${country}&state=${location}&userId=${
@@ -937,18 +937,18 @@ const AiGlobalListingsMap = () => {
                         onClick={() => handleCategoryClick(cat.value)}
                         className="text-black px-1 py-2 hover:text-black transition flex items-center justify-center w-full"
                       >
-                        {iconSrc ? (
-                          <div className="h-10 w-full flex flex-col gap-0">
-                            <img
-                              src={iconSrc}
-                              alt={cat.label}
-                              className="h-full w-full object-contain"
-                            />
-                            <span className="text-tiny">{cat.label}</span>
-                          </div>
-                        ) : (
-                          cat.label
-                        )}
+                        <div className="flex min-h-[3.5rem] w-full flex-col items-center justify-start gap-1">
+                          {iconSrc ? (
+                            <div className="h-10 w-full">
+                              <img
+                                src={iconSrc}
+                                alt={cat.label}
+                                className="h-full w-full object-contain"
+                              />
+                            </div>
+                          ) : null}
+                          <span className="text-tiny">{cat.label}</span>
+                        </div>
                       </button>
                     );
                   })}
