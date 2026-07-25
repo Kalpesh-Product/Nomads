@@ -1036,6 +1036,9 @@ const AiGlobalListingsMap = () => {
           <Container padding={false}>
             <div className="">
               <div className="border-t border-gray-300 mt-0 mb-6" />
+              <h1 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight mt-6 mb-2">
+                All listings in {selectedLocationLabel || "Unknown"}
+              </h1>
               <div className="font-semibold text-md grid grid-cols-9 gap-4 pt-3">
                 <div className="custom-scrollbar-hide col-span-5">
                   {isLisitingLoading ? (
