@@ -191,7 +191,7 @@ const quickStatsConfigByGoalOption = {
     { label: "Affordability", weightKey: "costOfLiving" },
     { label: "Purchasing Power", weightKey: "purchasingPower" },
     { label: "Heathcare Cost", weightKey: "healthcareCostIndex" },
-    { label: "Visa Cost", weightKey: "inflationStability" },
+    { label: "Visa Cost", weightKey: "visaCost" },
   ],
   "Safest Cities": [
     { label: "Safety", weightKey: "safety" },
@@ -263,22 +263,22 @@ const quickStatsConfigByGoalOption = {
     { label: "Affordability", weightKey: "costOfLiving" },
     { label: "Tax Friendly", weightKey: "taxFriendly" },
     { label: "Purchasing Power", weightKey: "purchasingPower" },
-    { label: "Visa Cost", weightKey: "inflationStability" },
+    { label: "Visa Cost", weightKey: "visaCost" },
   ],
   "Low Taxation": [
     { label: "Tax Friendly", weightKey: "taxFriendly" },
     { label: "Affordability", weightKey: "costOfLiving" },
     { label: "Purchasing Power", weightKey: "purchasingPower" },
-    { label: "Visa Cost", weightKey: "inflationStability" },
+    { label: "Visa Cost", weightKey: "visaCost" },
   ],
   "Purchasing Power": [
     { label: "Purchasing Power", weightKey: "purchasingPower" },
     { label: "Affordability", weightKey: "costOfLiving" },
     { label: "Tax Friendly", weightKey: "taxFriendly" },
-    { label: "Visa Cost", weightKey: "inflationStability" },
+    { label: "Visa Cost", weightKey: "visaCost" },
   ],
   "Financial Stability(Low Risk)": [
-    { label: "Visa Cost", weightKey: "inflationStability" },
+    { label: "Visa Cost", weightKey: "visaCost" },
     { label: "Heathcare Cost", weightKey: "healthcareCostIndex" },
     { label: "Affordability", weightKey: "costOfLiving" },
     { label: "Tax Friendly", weightKey: "taxFriendly" },
@@ -2654,8 +2654,29 @@ const AiSearchResults = () => {
                         </div>
                       ) : (
                         <div className="mt-10 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-500">
-                          No destinations are available for{" "}
-                          {selectedContinentDisplay} right now.
+                          {isVisaRequirementFilterActive(
+                            selectedVisaRequirement,
+                          ) ? (
+                            <span className="font-play font-bold text-black/85">
+                              There is no{" "}
+                              <span className="text-primary-blue">
+                                {selectedVisaRequirement}
+                              </span>{" "}
+                              support destination in{" "}
+                              <span className="text-primary-blue">
+                                {selectedContinentDisplay}
+                              </span>{" "}
+                              right now.
+                            </span>
+                          ) : (
+                            <span className="font-play font-bold text-black/85">
+                              No destinations are available for{" "}
+                              <span className="text-primary-blue">
+                                {selectedContinentDisplay}
+                              </span>{" "}
+                              right now.
+                            </span>
+                          )}
                         </div>
                       )}
                     </>

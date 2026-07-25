@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   clearStoredLoginState,
@@ -30,6 +31,7 @@ import { HiOutlineUserGroup } from "react-icons/hi";
 import { MdComputer } from "react-icons/md";
 import { IoBriefcaseSharp } from "react-icons/io5";
 import { MdRateReview } from "react-icons/md";
+import { companyLocationsQueryOptions } from "../utils/classicSearchLocations";
 
 const gatedRecommendationLabels = new Set([
   "Work From Anywhere",
@@ -293,6 +295,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
   const location = useLocation();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const { auth } = useAuth();
   const logout = useLogout();
@@ -301,6 +304,10 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   const profileItemsWithUserName = profileItems.map((item) =>
     item.label === "userFullName" ? { ...item, label: userFullName } : item,
   );
+
+  useEffect(() => {
+    queryClient.prefetchQuery(companyLocationsQueryOptions);
+  }, [queryClient]);
 
   useEffect(() => {
     const normalizedPath = location.pathname.replace(/\/$/, "") || "/";

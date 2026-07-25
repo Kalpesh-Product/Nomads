@@ -13,6 +13,7 @@ import useAuth from "../hooks/useAuth";
 import axios from "../utils/axios";
 
 import { persistSelectedDestination } from "../utils/selectedDestinationSession";
+import { companyLocationsQueryOptions } from "../utils/classicSearchLocations";
 
 const searchBarBadgeClassName =
   "inline-flex min-h-[40px] min-w-[5rem] items-center rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85";
@@ -149,30 +150,20 @@ const AiManualSearch = () => {
     "vishal.wono@gmail.com",
   ];
 
-  const { data: locations = [] } = useQuery({
-    queryKey: ["locations", user?.email],
-    queryFn: async () => {
-      try {
-        const response = await axios.get("company/company-locations");
-        const rawData = Array.isArray(response.data) ? response.data : [];
+  const { data: rawLocations = [] } = useQuery(companyLocationsQueryOptions);
+  const locations = useMemo(() => {
+    const userEmail = user?.email?.toLowerCase();
+    const isSpecialUser = specialUserEmails.includes(userEmail);
 
-        const userEmail = user?.email?.toLowerCase();
-        const isSpecialUser = specialUserEmails.includes(userEmail);
+    if (isSpecialUser) return rawLocations;
 
-        if (isSpecialUser) return rawData;
-
-        return rawData
-          .map((country) => ({
-            ...country,
-            states: (country.states || []).filter((state) => state?.isPublic),
-          }))
-          .filter((country) => (country.states?.length || 0) > 0);
-      } catch (error) {
-        console.error(error?.response?.data?.message);
-        return [];
-      }
-    },
-  });
+    return rawLocations
+      .map((country) => ({
+        ...country,
+        states: (country.states || []).filter((state) => state?.isPublic),
+      }))
+      .filter((country) => (country.states?.length || 0) > 0);
+  }, [rawLocations, user?.email]);
 
   const { data: destinationTitleLookup = new Map() } = useQuery({
     queryKey: ["state-wise-destination-titles"],
@@ -194,6 +185,10 @@ const AiManualSearch = () => {
         return new Map();
       }
     },
+    enabled: Boolean(selectedCountry),
+    staleTime: 30 * 60 * 1000,
+    gcTime: 2 * 60 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 
   const continentOptions = useMemo(() => {
@@ -320,6 +315,7 @@ const AiManualSearch = () => {
       `/verticals?country=${encodeURIComponent(country)}&location=${encodeURIComponent(location)}`,
       {
         state: {
+          searchContext: "classic",
           selectedStateLabel: selectedLocationTitle,
           breadcrumbFilters: {
             continent,

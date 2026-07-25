@@ -3,6 +3,7 @@ import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import NomadUser from "../../models/NomadUser.js";
 import { sendMail } from "../../config/mailer.js";
+import { renderNotificationEmail } from "../../utils/emailTemplates.js";
 
 export const login = async (req, res) => {
   try {
@@ -124,19 +125,25 @@ export const forgotPassword = async (req, res) => {
     // const resetUrl = `${process.env.FRONTEND_PROD_LINK}/reset-password/${resetToken}`;
     const resetUrl = `${process.env.FRONTEND_PROD_LINK}reset-password/${resetToken}`;
 
-    const message = `
-      <p>Hi ${user.name || ""},</p> 
-      <p>You requested a password reset. Click below to reset your password:</p>
-      <a href="${resetUrl}" target="_blank">Reset Password</a>
-      <p>This link will expire in 15 minutes.</p>
-      <p>If you didn’t request this, please ignore this email.</p>
-    `;
-
     try {
       await sendMail({
         to: user.email,
-        subject: "Password Reset Request",
-        html: message,
+        subject: "Reset Your WONO Password",
+        html: renderNotificationEmail({
+          heroTitle: "Reset Your Password",
+          heroSubtitle: "We received a request to reset your WONO password.",
+          greetingHtml: `
+            <p style="margin:0 0 4px;">Hello ${user.name || "there"},</p>
+            <p class="email-text" style="margin:0;">Click the button below to set a new password for your WONO account.</p>
+          `,
+          ctaButton: {
+            label: "Reset Password",
+            href: resetUrl,
+            caption: "This link expires in 15 minutes.",
+          },
+          noteHtml:
+            "If you didn't request this, you can safely ignore this email — your password will remain unchanged.",
+        }),
       });
 
       res.status(200).json({
@@ -174,19 +181,25 @@ export const aiForgotPassword = async (req, res) => {
     // const resetUrl = `${process.env.FRONTEND_PROD_LINK}/reset-password/${resetToken}`;
     const resetUrl = `${process.env.FRONTEND_PROD_LINK}ai-reset-password/${resetToken}`;
 
-    const message = `
-      <p>Hi ${user.name || ""},</p> 
-      <p>You requested a password reset. Click below to reset your password:</p>
-      <a href="${resetUrl}" target="_blank">Reset Password</a>
-      <p>This link will expire in 15 minutes.</p>
-      <p>If you didn’t request this, please ignore this email.</p>
-    `;
-
     try {
       await sendMail({
         to: user.email,
-        subject: "Password Reset Request",
-        html: message,
+        subject: "Reset Your WONO Password",
+        html: renderNotificationEmail({
+          heroTitle: "Reset Your Password",
+          heroSubtitle: "We received a request to reset your WONO password.",
+          greetingHtml: `
+            <p style="margin:0 0 4px;">Hello ${user.name || "there"},</p>
+            <p class="email-text" style="margin:0;">Click the button below to set a new password for your WONO account.</p>
+          `,
+          ctaButton: {
+            label: "Reset Password",
+            href: resetUrl,
+            caption: "This link expires in 15 minutes.",
+          },
+          noteHtml:
+            "If you didn't request this, you can safely ignore this email — your password will remain unchanged.",
+        }),
       });
 
       res.status(200).json({
@@ -258,22 +271,28 @@ export const resetPassword = async (req, res) => {
     await user.save();
 
     // ✅ Send confirmation email
-    const successMessage = `
-      <p>Hi ${(user.fullName || user.name || "").split(" ")[0] || ""},</p>
-      <p>Your password has been successfully reset.</p>
-      <p>You can now <a href="${
-        process.env.FRONTEND_DEV_LINK
-      }login" target="_blank">Login</a> with your new password.</p>
-      <p>If you did not perform this action, please contact us immediately.</p>
-      <br/>
-      <p>Best,<br/>The Wono Team</p>
-    `;
+    const firstName = (user.fullName || user.name || "").split(" ")[0] || "there";
+    const loginUrl = `${process.env.FRONTEND_DEV_LINK}login`;
 
     try {
       await sendMail({
         to: user.email,
-        subject: "Your Password Has Been Reset Successfully",
-        html: successMessage,
+        subject: "Password Reset Successful",
+        html: renderNotificationEmail({
+          heroTitle: "Password Reset Successful",
+          heroSubtitle: "Your WONO password has been updated.",
+          greetingHtml: `
+            <p style="margin:0 0 4px;">Hello ${firstName},</p>
+            <p class="email-text" style="margin:0;">Your password has been successfully reset. You can now log in with your new password.</p>
+          `,
+          ctaButton: {
+            label: "Login to WONO",
+            href: loginUrl,
+            caption: "Log in with your new password.",
+          },
+          noteHtml:
+            "If you did not perform this action, please contact our support team immediately.",
+        }),
       });
     } catch (error) {
       console.error(

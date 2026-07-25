@@ -14,6 +14,13 @@ import { randomUUID } from "crypto";
 import bcrypt from "bcrypt";
 import { uploadFileToS3 } from "../../config/s3Config.js";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
+import {
+  toDMY,
+  referenceDateStamp,
+  formatSubmittedOn,
+  formatLongDate,
+  renderNotificationEmail,
+} from "../../utils/emailTemplates.js";
 
 function istNowPieces() {
   const tz = "Asia/Kolkata";
@@ -589,17 +596,45 @@ export const addB2CformSubmission = async (req, res, next) => {
           sheetName: d.sheetName,
         }),
         successMsg: "Your enquiry has been sent.",
-        emailTemplate: (data) => ({
-          to: data.email,
-          subject: "Your enquiry has been received",
-          text: `Hi ${data.fullName}, your enquiry has been sent to the company successfully.`,
-          html: `
-        <h2>Thank you for your enquiry</h2>
-        <p>Hi ${data.fullName},</p>
-        <p>Your enquiry for <b>${data.companyName}</b> has been successfully submitted. Our team will reach out shortly.</p>
-        <p>Cheers,<br/>The WONO Team</p>
-      `,
-        }),
+        emailTemplate: (data) => {
+          const { submittedDate, submittedTime } = formatSubmittedOn(
+            data.submittedAt ? new Date(data.submittedAt) : new Date(),
+          );
+          const referenceId = data.referenceId || "-";
+
+          return {
+            to: data.email,
+            subject: "Your enquiry has been received",
+            text: `Hi ${data.fullName}, your enquiry for ${data.companyName} has been successfully submitted. Reference ID: ${referenceId}. Our team will reach out shortly.`,
+            html: renderNotificationEmail({
+              heroTitle: "Thank You!",
+              heroSubtitle: "We've successfully received your enquiry.",
+              greetingHtml: `
+                <p style="margin:0 0 4px;">Hello ${data.fullName},</p>
+                <p class="email-text" style="margin:0;">Thank you for your interest in <b class="email-heading">${data.companyName}</b>.</p>
+              `,
+              referenceLabel: "Reference ID",
+              referenceValue: referenceId,
+              detailsTitle: "Your Details",
+              detailRows: [
+                ["Full Name", data.fullName],
+                ["No. Of People", data.noOfPeople],
+                ["Phone", data.mobileNumber],
+                ["Email", data.email],
+                ["Product", data.companyName],
+                ["Start Date", toDMY(data.startDate)],
+                ["End Date", toDMY(data.endDate)],
+                ["Submitted On", `${submittedDate}<br/>${submittedTime}`],
+              ],
+              whatNextTitle: "What Happens Next?",
+              whatNextItems: [
+                "Our team will review your enquiry.",
+                "We will contact you within 24 business hours.",
+                "If additional information is required, we will get in touch.",
+              ],
+            }),
+          };
+        },
       },
       All_POC_Contact: {
         schema: pocSchema,
@@ -615,15 +650,28 @@ export const addB2CformSubmission = async (req, res, next) => {
         successMsg: "Message sent successfully",
         emailTemplate: (data) => ({
           to: data.email,
-          subject: "Your POC request has been sent",
-          text: `Hi ${data.fullName}, your POC contact request has been shared.`,
-          html: `
-        <h2>POC Contacted</h2>
-        <p>Hi ${data.fullName},</p>
-        <p>Your request to connect with <b>${data.pocName}</b> (${data.pocDesignation} at ${data.pocCompany}) has been submitted successfully.</p>
-        <p>They will reach out to you soon.</p>
-        <p>Cheers,<br/>The WONO Team</p>
-      `,
+          subject: "Your POC Request Has Been Sent",
+          text: `Hi ${data.fullName}, your request to connect with ${data.pocName} has been submitted successfully.`,
+          html: renderNotificationEmail({
+            heroTitle: "Request Sent!",
+            heroSubtitle: "Your POC request has been shared.",
+            greetingHtml: `
+              <p style="margin:0 0 4px;">Hello ${data.fullName},</p>
+              <p class="email-text" style="margin:0;">Your request to connect with <b class="email-heading">${data.pocName}</b> has been submitted successfully. They will reach out to you soon.</p>
+            `,
+            detailsTitle: "Contact Details",
+            detailRows: [
+              ["Contact Person", data.pocName],
+              ["Designation", data.pocDesignation],
+              ["Company", data.pocCompany],
+            ],
+            whatNextTitle: "What Happens Next?",
+            whatNextItems: [
+              "Your request has been shared with the contact.",
+              "They will review your details.",
+              "You can expect a response soon.",
+            ],
+          }),
         }),
       },
       Connect_with_us: {
@@ -640,13 +688,22 @@ export const addB2CformSubmission = async (req, res, next) => {
         emailTemplate: (d) => ({
           to: d.email,
           subject: "We Received Your Message",
-          html: `
-        <h2>Thank You For Connecting</h2>
-        <p>Hi ${d.name},</p>
-        <p>We’ve received your message regarding <b>${d.typeOfPartnerShip}</b>.</p>
-        <p>Our team will respond shortly.</p>
-        <p>Cheers,<br/>The WONO Team</p>
-      `,
+          text: `Hi ${d.name}, we've received your message regarding ${d.typeOfPartnerShip}.`,
+          html: renderNotificationEmail({
+            heroTitle: "Message Received!",
+            heroSubtitle: "Thank you for connecting with WONO.",
+            greetingHtml: `
+              <p style="margin:0 0 4px;">Hello ${d.name},</p>
+              <p class="email-text" style="margin:0;">We've received your message regarding <b class="email-heading">${d.typeOfPartnerShip}</b>. Our team will respond shortly.</p>
+            `,
+            detailsTitle: "Enquiry Details",
+            detailRows: [["Type of Partnership", d.typeOfPartnerShip]],
+            whatNextTitle: "What Happens Next?",
+            whatNextItems: [
+              "Our team will review your message.",
+              "We'll get back to you shortly.",
+            ],
+          }),
         }),
       },
       Sign_up: {
@@ -676,15 +733,25 @@ export const addB2CformSubmission = async (req, res, next) => {
         successMsg: "Sign-up saved successfully.",
         emailTemplate: (data) => ({
           to: data.email,
-          subject: "Welcome to WoNo",
-          text: `Hi ${data.fullName}, welcome to WoNo! Your signup was successful.`,
-          html: `
-      <h2>Welcome to WoNo!</h2>
-      <p>Hi ${data.fullName},</p>
-      <p>Thank you for signing up with <b>WoNo</b>.</p>
-      <p>We’re excited to have you onboard! Our team will review your profile and connect with you shortly to complete the onboarding process.</p>
-      <p>Cheers,<br/>The WoNo Team</p>
-    `,
+          subject: "Welcome to WONO!",
+          text: `Hi ${data.fullName}, welcome to WONO! Your Nomad signup is successful.`,
+          html: renderNotificationEmail({
+            heroTitle: "Welcome to WONO!",
+            heroSubtitle: "Your Nomad signup is successful.",
+            greetingHtml: `
+              <p style="margin:0 0 4px;">Hello ${data.fullName},</p>
+              <p class="email-text" style="margin:0;">Thank you for signing up with WONO.</p>
+              <p class="email-text" style="margin:8px 0 0;">We're excited to welcome you to the WONO Nomad community.</p>
+            `,
+            bodyHtml: `
+              <tr>
+                <td style="padding:28px 32px 4px;text-align:center;">
+                  <p style="margin:0 0 12px;font-size:12px;font-weight:600;letter-spacing:0.5px;color:#0BA9EF;text-transform:uppercase;">Start Your Journey</p>
+                  <a href="https://www.wono.co" style="display:inline-block;background:#0BA9EF;color:#ffffff;font-weight:600;font-size:14px;text-decoration:none;padding:13px 32px;border-radius:8px;">Explore WONO &#8594;</a>
+                </td>
+              </tr>
+            `,
+          }),
         }),
       },
       Content_Removal_Requests: {
@@ -705,15 +772,22 @@ export const addB2CformSubmission = async (req, res, next) => {
         emailTemplate: (data) => ({
           to: data.email,
           subject: "Content Removal Request Received",
-          text: `Hi ${data.fullName}, we’ve received your content removal request for ${data.companyName}. Our moderation team will review it shortly.`,
-          html: `
-      <h2>Content Removal Request Received</h2>
-      <p>Hi ${data.fullName},</p>
-      <p>We’ve received your content removal request for <b>${data.companyName}</b>.</p>
-      <p>Our team will review the provided URLs and take the necessary action.</p>
-      <p>We’ll get back to you via email if we need additional details.</p>
-      <p>Cheers,<br/>The WONO Team</p>
-   `,
+          text: `Hi ${data.fullName}, we've received your content removal request for ${data.companyName}. Our moderation team will review it shortly.`,
+          html: renderNotificationEmail({
+            heroTitle: "Request Received!",
+            heroSubtitle: "Your content removal request is being reviewed.",
+            greetingHtml: `
+              <p style="margin:0 0 4px;">Hello ${data.fullName},</p>
+              <p class="email-text" style="margin:0;">We've received your content removal request for <b class="email-heading">${data.companyName}</b>. Our team will review the provided URLs and take the necessary action.</p>
+            `,
+            detailsTitle: "Request Details",
+            detailRows: [
+              ["Company", data.companyName],
+              ["Designation", data.designation],
+            ],
+            noteHtml:
+              "We'll get back to you via email if we need additional details.",
+          }),
         }),
       },
       AI_Visa_Support: {
@@ -736,13 +810,21 @@ export const addB2CformSubmission = async (req, res, next) => {
           to: data.email,
           subject: "Visa Support Request Received",
           text: `Hi ${data.fullName}, we have received your visa support request for ${data.travellingCountry}.`,
-          html: `
-      <h2>Visa Support Request Received</h2>
-      <p>Hi ${data.fullName},</p>
-      <p>Thank you for your request for <b>${data.travellingCountry}</b>.</p>
-      <p>Our team has received your details and will get back to you shortly with the next steps.</p>
-      <p>Cheers,<br/>The WONO Team</p>
-          `,
+          html: renderNotificationEmail({
+            heroTitle: "Request Received!",
+            heroSubtitle: "Your visa support request is being reviewed.",
+            greetingHtml: `
+              <p style="margin:0 0 4px;">Hello ${data.fullName},</p>
+              <p class="email-text" style="margin:0;">Thank you for your request for <b class="email-heading">${data.travellingCountry}</b>. Our team has received your details and will get back to you shortly with the next steps.</p>
+            `,
+            detailsTitle: "Request Details",
+            detailRows: [
+              ["Visa Type", data.visaType],
+              ["Nationality", data.nationality],
+              ["Travelling To", data.travellingCountry],
+              ["Contact Number", `${data.contactCode || ""} ${data.contactNumber || ""}`.trim()],
+            ],
+          }),
         }),
       },
       AI_Overall_Activation_Support: {
@@ -765,13 +847,21 @@ export const addB2CformSubmission = async (req, res, next) => {
           to: data.email,
           subject: "Activation Support Request Received",
           text: `Hi ${data.fullName}, we have received your activation support request for ${data.travelCountry}.`,
-          html: `
-      <h2>Activation Support Request Received</h2>
-      <p>Hi ${data.fullName},</p>
-      <p>Thank you for your request for <b>${data.travelCountry}</b>.</p>
-      <p>Our team has received your details and will get back to you shortly.</p>
-      <p>Cheers,<br/>The WONO Team</p>
-    `,
+          html: renderNotificationEmail({
+            heroTitle: "Request Received!",
+            heroSubtitle: "Your activation support request is being reviewed.",
+            greetingHtml: `
+              <p style="margin:0 0 4px;">Hello ${data.fullName},</p>
+              <p class="email-text" style="margin:0;">Thank you for your request for <b class="email-heading">${data.travelCountry}</b>. Our team has received your details and will get back to you shortly.</p>
+            `,
+            detailsTitle: "Request Details",
+            detailRows: [
+              ["Support Required", data.supportRequired],
+              ["Nationality (Passport)", data.nationalityOnPassport],
+              ["Travel Country", data.travelCountry],
+              ["Contact Number", `${data.contactCode || ""} ${data.contactNumber || ""}`.trim()],
+            ],
+          }),
         }),
       },
       AI_New_Company_Setup: {
@@ -794,13 +884,21 @@ export const addB2CformSubmission = async (req, res, next) => {
           to: data.email,
           subject: "Company Setup Request Received",
           text: `Hi ${data.fullName}, we have received your new company setup request for ${data.newCompanyCountry}.`,
-          html: `
-      <h2>Company Setup Request Received</h2>
-      <p>Hi ${data.fullName},</p>
-      <p>Thank you for your request to setup in <b>${data.newCompanyCountry}</b>.</p>
-      <p>Our team has received your details and will get back to you shortly.</p>
-      <p>Cheers,<br/>The WONO Team</p>
-    `,
+          html: renderNotificationEmail({
+            heroTitle: "Request Received!",
+            heroSubtitle: "Your company setup request is being reviewed.",
+            greetingHtml: `
+              <p style="margin:0 0 4px;">Hello ${data.fullName},</p>
+              <p class="email-text" style="margin:0;">Thank you for your request to set up in <b class="email-heading">${data.newCompanyCountry}</b>. Our team has received your details and will get back to you shortly.</p>
+            `,
+            detailsTitle: "Request Details",
+            detailRows: [
+              ["Support Required", data.supportRequired],
+              ["Current Country", data.currentCompanyCountry],
+              ["New Company Country", data.newCompanyCountry],
+              ["Contact Number", `${data.contactCode || ""} ${data.contactNumber || ""}`.trim()],
+            ],
+          }),
         }),
       },
       AI_Consultation: {
@@ -823,13 +921,21 @@ export const addB2CformSubmission = async (req, res, next) => {
           to: data.email,
           subject: "Consultation Request Received",
           text: `Hi ${data.fullName}, we have received your consultation request for ${data.consultationCountry}.`,
-          html: `
-      <h2>Consultation Request Received</h2>
-      <p>Hi ${data.fullName},</p>
-      <p>Thank you for your consultation request for <b>${data.consultationCountry}</b>.</p>
-      <p>Our team has received your details and will get back to you shortly.</p>
-      <p>Cheers,<br/>The WONO Team</p>
-    `,
+          html: renderNotificationEmail({
+            heroTitle: "Request Received!",
+            heroSubtitle: "Your consultation request is being reviewed.",
+            greetingHtml: `
+              <p style="margin:0 0 4px;">Hello ${data.fullName},</p>
+              <p class="email-text" style="margin:0;">Thank you for your consultation request for <b class="email-heading">${data.consultationCountry}</b>. Our team has received your details and will get back to you shortly.</p>
+            `,
+            detailsTitle: "Request Details",
+            detailRows: [
+              ["Support Required", data.supportRequired],
+              ["Current Country", data.currentCountry],
+              ["Consultation Country", data.consultationCountry],
+              ["Contact Number", `${data.contactCode || ""} ${data.contactNumber || ""}`.trim()],
+            ],
+          }),
         }),
       },
       AI_Workation: {
@@ -855,13 +961,24 @@ export const addB2CformSubmission = async (req, res, next) => {
           to: data.email,
           subject: "Workation Request Received",
           text: `Hi ${data.fullName}, we have received your workation request for ${data.workationCountry}.`,
-          html: `
-      <h2>Workation Request Received</h2>
-      <p>Hi ${data.fullName},</p>
-      <p>Thank you for your workation request for <b>${data.workationCountry}</b>.</p>
-      <p>Our team has received your details and will get back to you shortly.</p>
-      <p>Cheers,<br/>The WONO Team</p>
-    `,
+          html: renderNotificationEmail({
+            heroTitle: "Request Received!",
+            heroSubtitle: "Your workation request is being reviewed.",
+            greetingHtml: `
+              <p style="margin:0 0 4px;">Hello ${data.fullName},</p>
+              <p class="email-text" style="margin:0;">Thank you for your workation request for <b class="email-heading">${data.workationCountry}</b>. Our team has received your details and will get back to you shortly.</p>
+            `,
+            detailsTitle: "Request Details",
+            detailRows: [
+              ["Company", data.companyName],
+              ["Current Country", data.currentCountry],
+              ["Workation Country", data.workationCountry],
+              ["No. Of People", data.noOfPeople],
+              ["Start Date", formatLongDate(data.startDate)],
+              ["End Date", formatLongDate(data.endDate)],
+              ["Contact Number", `${data.contactCode || ""} ${data.contactNumber || ""}`.trim()],
+            ],
+          }),
         }),
       },
       AI_Become_Contributor: {
@@ -883,13 +1000,21 @@ export const addB2CformSubmission = async (req, res, next) => {
           to: data.email,
           subject: "Contributor Request Received",
           text: `Hi ${data.fullName}, we have received your contributor request.`,
-          html: `
-      <h2>Contributor Request Received</h2>
-      <p>Hi ${data.fullName},</p>
-      <p>Thank you for your interest in contributing to WoNo.</p>
-      <p>Our team has received your details and will get back to you shortly.</p>
-      <p>Cheers,<br/>The WONO Team</p>
-    `,
+          html: renderNotificationEmail({
+            heroTitle: "Request Received!",
+            heroSubtitle: "Thank you for your interest in contributing to WONO.",
+            greetingHtml: `
+              <p style="margin:0 0 4px;">Hello ${data.fullName},</p>
+              <p class="email-text" style="margin:0;">Thank you for your interest in contributing to WONO. Our team has received your details and will get back to you shortly.</p>
+            `,
+            detailsTitle: "Request Details",
+            detailRows: [
+              ["Contribution Type", data.contributionType],
+              ["Current Country", data.currentCountry],
+              ["LinkedIn", data.linkedinProfile],
+              ["Contact Number", `${data.contactCode || ""} ${data.contactNumber || ""}`.trim()],
+            ],
+          }),
         }),
       },
     };
@@ -921,6 +1046,12 @@ export const addB2CformSubmission = async (req, res, next) => {
       });
 
       await leads.save();
+
+      const totalLeads = await Lead.countDocuments({});
+      payload.referenceId = `WN-${referenceDateStamp(leads.createdAt)}-${String(
+        totalLeads,
+      ).padStart(5, "0")}`;
+      payload.submittedAt = leads.createdAt || new Date();
     }
 
     if (sheetName === "Sign_up") {

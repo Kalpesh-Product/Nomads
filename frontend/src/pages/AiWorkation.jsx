@@ -73,7 +73,7 @@ const formatWorkationCountry = (country, state) => {
 
 const WORKATION_PROMPT =
   "share your workation requirements and we will connect you with the right expert support.";
-const WORKATION_HEADING = "Workation";
+const WORKATION_HEADING = "Workation Support";
 const WORKATION_TYPING_SEEN_KEY = "wono-workation-typing-seen";
 const getFlagIconUrl = (isoCode) =>
   `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
@@ -109,7 +109,7 @@ const AiWorkation = () => {
   );
   const messagePrefix = isLoggedIn
     ? (auth?.user?.fullName?.split(" ")[0] || "User") + ", "
-    : "User, ";
+    : "Hey, ";
   const workationPrompt = `${messagePrefix}${WORKATION_PROMPT}`;
   const { data: stateWiseDestinations = [] } = useQuery({
     queryKey: ["workation-state-wise-destinations"],
@@ -645,6 +645,7 @@ const AiWorkation = () => {
                     <DatePicker
                       {...field}
                       label="Start Date (Date calender)"
+                      disablePast
                       value={field.value ? dayjs(field.value) : null}
                       onChange={(date) => field.onChange(date)}
                       slotProps={{
@@ -668,6 +669,7 @@ const AiWorkation = () => {
                     <DatePicker
                       {...field}
                       label="End Date (Date calender)"
+                      disablePast
                       value={field.value ? dayjs(field.value) : null}
                       onChange={(date) => field.onChange(date)}
                       slotProps={{
