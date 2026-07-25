@@ -7,7 +7,7 @@ import { CalendarDays, MapPin, Star } from "lucide-react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import MuiModal from "../components/Modal";
 import SecondaryButton from "../components/SecondaryButton";
-import { annualEvents, popularVenues } from "../data/aiDestinationHighlights";
+import { annualEvents, popularPlaces } from "../data/aiDestinationHighlights";
 import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
@@ -27,24 +27,24 @@ const emptyReviewPromptBottomSpacing = "1.5rem";
 const AiDestinationDetail = ({ type }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { eventId, venueId, restaurantId } = useParams();
+  const { eventId, placeId, restaurantId } = useParams();
   const { auth } = useAuth();
   const axiosPrivate = useAxiosPrivate();
   const [isAddReviewOpen, setIsAddReviewOpen] = useState(false);
   const [activeImage, setActiveImage] = useState(null);
-  const fallback = type === "event" ? annualEvents[0] : popularVenues[0];
+  const fallback = type === "event" ? annualEvents[0] : popularPlaces[0];
   const item = location.state?.item || fallback;
   const isEvent = type === "event";
   const isRestaurant = type === "restaurant";
   const isReviewEnabled = !isRestaurant;
-  const venueMapsLink =
+  const placeMapsLink =
     typeof item.googleMapsLink === "string" ? item.googleMapsLink.trim() : "";
-  const venueDirectionHref =
-    venueMapsLink ||
+  const placeDirectionHref =
+    placeMapsLink ||
     `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
       item.address || item.title,
     )}`;
-  const reviewTargetId = isEvent ? eventId : venueId || restaurantId;
+  const reviewTargetId = isEvent ? eventId : placeId || restaurantId;
   const reviewEndpoint = isEvent ? "/event-reviews" : "/place-reviews";
   const reviewIdParam = isEvent ? "eventId" : "placeId";
   const userId = auth?.user?._id || auth?.user?.id;
@@ -149,7 +149,7 @@ const AiDestinationDetail = ({ type }) => {
           </p>
           {!isEvent && (
             <a
-              href={venueDirectionHref}
+              href={placeDirectionHref}
               target="_blank"
               rel="noreferrer"
               className="font-medium text-blue-600 underline"

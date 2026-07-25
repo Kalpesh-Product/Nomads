@@ -77,7 +77,7 @@ const normalizeBreadcrumbLabel = (segment) => {
   if (normalized === "blog") return "Blogs";
   if (normalized === "news") return "News";
   if (normalized === "events") return "Events";
-  if (normalized === "venues") return "Places";
+  if (normalized === "places") return "Places";
   if (normalized === "about") return "About";
   if (normalized === "career") return "Career";
   if (normalized === "faq") return "FAQs";

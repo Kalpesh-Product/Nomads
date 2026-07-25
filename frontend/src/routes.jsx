@@ -126,7 +126,6 @@ import AiHostContentAndCopyright from "./pages/AiHost/AiHostContentAndCopyright"
 import AiHostContentUseRemoval from "./pages/AiHost/AiHostContentUseRemoval";
 import AiHostJobDetails from "./pages/AiHost/AiHostJobDetails";
 import AiHostModelShowcase from "./pages/AiHost/AiHostModelShowcase";
-import LegacyVenueRedirect from "./components/LegacyVenueRedirect";
 
 function getTenantFromHost() {
   const hostname = window.location.hostname;
@@ -216,12 +215,8 @@ if (tenant === "main") {
               element: <AiDestinationDetail type="event" />,
             },
             {
-              path: "places/:venueId",
-              element: <AiDestinationDetail type="venue" />,
-            },
-            {
-              path: "venues/:venueId",
-              element: <LegacyVenueRedirect />,
+              path: "places/:placeId",
+              element: <AiDestinationDetail type="place" />,
             },
             {
               path: "restaurants/:restaurantId",
@@ -411,12 +406,8 @@ if (tenant === "main") {
               element: <AiDestinationDetail type="event" />,
             },
             {
-              path: "places/:venueId",
-              element: <AiDestinationDetail type="venue" />,
-            },
-            {
-              path: "venues/:venueId",
-              element: <LegacyVenueRedirect />,
+              path: "places/:placeId",
+              element: <AiDestinationDetail type="place" />,
             },
             {
               path: "restaurants/:restaurantId",

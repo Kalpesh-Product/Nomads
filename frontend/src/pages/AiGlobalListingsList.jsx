@@ -49,6 +49,7 @@ import { DESTINATION_HIGHLIGHT_FILTERS } from "../data/aiDestinationHighlights.j
 const ALL_LISTINGS_CATEGORY = "alllistings";
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
 const ANNUAL_EVENTS_CATEGORY = "annualevents";
+const PLACES_CATEGORY = "places";
 const RESTAURANTS_CATEGORY = "restaurants";
 const NEWS_CATEGORY = "news";
 const BLOGS_CATEGORY = "blogs";
@@ -586,7 +587,7 @@ const AiGlobalListingsList = () => {
       })),
     [eventsData],
   );
-  const popularLocationVenues = useMemo(
+  const popularLocationPlaces = useMemo(
     () =>
       (Array.isArray(placesData) ? placesData : [])
         .map((place) => ({
@@ -645,11 +646,11 @@ const AiGlobalListingsList = () => {
     ? popularLocationEvents
     : popularLocationEvents.slice(0, 5);
   const showAnnualEventsToggle = popularLocationEvents.length > 5;
-  const isPopularVenuesExpanded = expandedCategories.includes("venues");
-  const displayedPopularLocationVenues = isPopularVenuesExpanded
-    ? popularLocationVenues
-    : popularLocationVenues.slice(0, 5);
-  const showPopularVenuesToggle = popularLocationVenues.length > 5;
+  const isPopularPlacesExpanded = expandedCategories.includes(PLACES_CATEGORY);
+  const displayedPopularLocationPlaces = isPopularPlacesExpanded
+    ? popularLocationPlaces
+    : popularLocationPlaces.slice(0, 5);
+  const showPopularPlacesToggle = popularLocationPlaces.length > 5;
   const isPopularRestaurantsExpanded =
     expandedCategories.includes(RESTAURANTS_CATEGORY);
   const displayedPopularLocationRestaurants = isPopularRestaurantsExpanded
@@ -783,8 +784,8 @@ const AiGlobalListingsList = () => {
           return popularLocationEvents.length > 0;
         }
 
-        if (option.value === "venues") {
-          return popularLocationVenues.length > 0;
+        if (option.value === PLACES_CATEGORY) {
+          return popularLocationPlaces.length > 0;
         }
 
         if (option.value === RESTAURANTS_CATEGORY) {
@@ -862,7 +863,7 @@ const AiGlobalListingsList = () => {
     popularLocationEvents.length,
     popularLocationNews.length,
     popularLocationRestaurants.length,
-    popularLocationVenues.length,
+    popularLocationPlaces.length,
   ]);
 
   const groupedListings = listingsData?.reduce((acc, item) => {
@@ -1134,7 +1135,7 @@ const AiGlobalListingsList = () => {
         (filter) =>
           filter.value === categoryValue &&
           categoryValue !== ANNUAL_EVENTS_CATEGORY &&
-          categoryValue !== "venues" &&
+          categoryValue !== PLACES_CATEGORY &&
           categoryValue !== RESTAURANTS_CATEGORY &&
           categoryValue !== NEWS_CATEGORY &&
           categoryValue !== BLOGS_CATEGORY,
@@ -1147,11 +1148,13 @@ const AiGlobalListingsList = () => {
       return;
     }
 
-    dispatch(setFormValues({ ...formData, category: categoryValue }));
+    const normalizedCategoryValue = categoryValue;
+
+    dispatch(setFormValues({ ...formData, category: normalizedCategoryValue }));
 
     const state = {
       ...formData,
-      category: categoryValue,
+      category: normalizedCategoryValue,
     };
 
     navigate(
@@ -1160,7 +1163,7 @@ const AiGlobalListingsList = () => {
         state: {
           country: formData.country,
           location: formData.location,
-          category: categoryValue,
+          category: normalizedCategoryValue,
           skipHeadingIntro: true,
           searchBarBadges,
         },
@@ -1171,7 +1174,7 @@ const AiGlobalListingsList = () => {
   const handleHighlightCardClick = (item, type) => {
     const sectionKeyByType = {
       event: ANNUAL_EVENTS_CATEGORY,
-      venue: "venues",
+      place: PLACES_CATEGORY,
       restaurant: RESTAURANTS_CATEGORY,
       news: NEWS_CATEGORY,
       blog: BLOGS_CATEGORY,
@@ -1182,10 +1185,10 @@ const AiGlobalListingsList = () => {
       saveListingPageState(getDiscoverySectionKey(sectionKey));
     }
 
-    if (type === "event" || type === "venue" || type === "restaurant") {
+    if (type === "event" || type === "place" || type === "restaurant") {
       const detailTypeByType = {
         event: "events",
-        venue: "places",
+        place: "places",
         restaurant: "restaurants",
       };
       const detailType = detailTypeByType[type];
@@ -1620,23 +1623,24 @@ const AiGlobalListingsList = () => {
                       />
                       <AiDestinationHighlightSection
                         title={`Popular Places to visit in ${selectedLocationLabel}`}
-                        items={displayedPopularLocationVenues}
-                        kind="venue"
+                        items={displayedPopularLocationPlaces}
+                        kind="place"
                         onCardClick={(item) =>
-                          handleHighlightCardClick(item, "venue")
+                          handleHighlightCardClick(item, "place")
                         }
                         onViewMore={
-                          showPopularVenuesToggle
-                            ? () => handleShowMoreClick("venues")
+                          showPopularPlacesToggle
+                            ? () => handleShowMoreClick(PLACES_CATEGORY)
                             : undefined
                         }
                         viewMoreLabel={
-                          isPopularVenuesExpanded
+                          isPopularPlacesExpanded
                             ? "View less \u2190"
                             : "View more \u2192"
                         }
                         sectionRef={(element) => {
-                          sectionRefs.current["venues-desktop"] = element;
+                          sectionRefs.current[`${PLACES_CATEGORY}-desktop`] =
+                            element;
                         }}
                       />
                       <AiDestinationHighlightSection
@@ -2069,23 +2073,24 @@ const AiGlobalListingsList = () => {
                     <AiDestinationHighlightSection
                       mobile
                       title={`Popular Places to visit in ${selectedLocationLabel}`}
-                      items={displayedPopularLocationVenues}
-                      kind="venue"
+                      items={displayedPopularLocationPlaces}
+                      kind="place"
                       onCardClick={(item) =>
-                        handleHighlightCardClick(item, "venue")
+                        handleHighlightCardClick(item, "place")
                       }
                       onViewMore={
-                        showPopularVenuesToggle
-                          ? () => handleShowMoreClick("venues")
+                        showPopularPlacesToggle
+                          ? () => handleShowMoreClick(PLACES_CATEGORY)
                           : undefined
                       }
                       viewMoreLabel={
-                        isPopularVenuesExpanded
+                        isPopularPlacesExpanded
                           ? "View less \u2190"
                           : "View more \u2192"
                       }
                       sectionRef={(element) => {
-                        sectionRefs.current["venues-mobile"] = element;
+                        sectionRefs.current[`${PLACES_CATEGORY}-mobile`] =
+                          element;
                       }}
                     />
                     <AiDestinationHighlightSection
