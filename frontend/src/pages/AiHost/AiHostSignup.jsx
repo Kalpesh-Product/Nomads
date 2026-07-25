@@ -109,7 +109,7 @@ const AiHostSignup = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { auth } = useAuth();
-  const onBack = () => navigate("/");
+  const onBack = () => navigate(-1);
   const hostRedirectUrl = `${window.location.origin}/`;
 
   const signupParams = new URLSearchParams(location.search);
