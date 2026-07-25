@@ -84,7 +84,7 @@ const AiBecomeContributor = () => {
   );
   const messagePrefix = isLoggedIn
     ? (auth?.user?.fullName?.split(" ")[0] || "User") + ", "
-    : "User, ";
+    : "Hey, ";
   const contributorPrompt = `${messagePrefix}${CONTRIBUTOR_PROMPT}`;
 
   const { mutate: submitContributor } = useMutation({
@@ -218,15 +218,25 @@ const AiBecomeContributor = () => {
     };
   }, []);
 
+    const namePortion = typedMessage.slice(0, messagePrefix.length);
+  const messagePortion = typedMessage.slice(messagePrefix.length);
+
   return (
     <div className="bg-white text-black font-sans">
       <Container padding={false}>
         <section className="min-h-[85vh] flex items-center justify-center py-0">
           <div className="w-full max-w-5xl md:px-20 lg:px-20">
             <div className="mx-auto mb-0 flex w-full max-w-4xl flex-col items-center gap-8 px-0">
-              <p className="min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1rem]">
-                {typedMessage}
-              </p>
+              <p className="mx-auto min-h-[3rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.5rem] sm:text-[1rem]">
+              {messagePrefix ? (
+                <>
+                  <span className="text-blue-600">{namePortion}</span>
+                  {messagePortion}
+                </>
+              ) : (
+                typedMessage
+              )}
+            </p>
               <h1 className="text-hero min-h-[3rem] text-center font-play">
                 {typedPageHeading}
               </h1>
