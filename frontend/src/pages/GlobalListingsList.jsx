@@ -14,6 +14,7 @@ import axios from "../utils/axios.js";
 import renderStars from "../utils/renderStarts.jsx";
 import SkeletonCard from "../components/Skeletons/SkeletonCard.jsx";
 import SkeletonMap from "../components/Skeletons/SkeletonMap.jsx";
+import CategoryShortcutSkeletons from "../components/Skeletons/CategoryShortcutSkeletons.jsx";
 import Select from "react-dropdown-select";
 import { setFormValues } from "../features/locationSlice.js";
 import ListingCard from "../components/ListingCard.jsx";
@@ -470,33 +471,41 @@ const GlobalListingsList = () => {
             <div className="flex flex-col gap-4 justify-between items-center w-full h-full">
               <div className="w-3/4 pb-4">
                 <div className="flex justify-between items-center">
-                  {categoryOptions.map((cat) => {
-                    const iconSrc = getCategoryShortcutIconSrc(
-                      cat.value,
-                      useCroppedDesktopShortcuts,
-                    );
-                    return (
-                      <button
-                        key={cat.value}
-                        type="button"
-                        onClick={() => handleCategoryClick(cat.value)}
-                        className="text-black px-4 py-2 hover:text-black transition flex items-center justify-center w-full"
-                      >
-                        {iconSrc ? (
-                          <div className="h-10 w-full flex flex-col gap-0">
-                            <img
-                              src={iconSrc}
-                              alt={cat.label}
-                              className="h-full w-full object-contain"
-                            />
-                            <span className="text-sm">{cat.label}</span>
-                          </div>
-                        ) : (
-                          cat.label
-                        )}
-                      </button>
-                    );
-                  })}
+                  {isLisitingLoading ? (
+                    <CategoryShortcutSkeletons
+                      itemClassName="px-4 py-2 flex items-center justify-center w-full"
+                      iconBoxClassName="h-10 w-full"
+                      labelClassName="w-14"
+                    />
+                  ) : (
+                    categoryOptions.map((cat) => {
+                      const iconSrc = getCategoryShortcutIconSrc(
+                        cat.value,
+                        useCroppedDesktopShortcuts,
+                      );
+                      return (
+                        <button
+                          key={cat.value}
+                          type="button"
+                          onClick={() => handleCategoryClick(cat.value)}
+                          className="text-black px-4 py-2 hover:text-black transition flex items-center justify-center w-full"
+                        >
+                          {iconSrc ? (
+                            <div className="h-10 w-full flex flex-col gap-0">
+                              <img
+                                src={iconSrc}
+                                alt={cat.label}
+                                className="h-full w-full object-contain"
+                              />
+                              <span className="text-sm">{cat.label}</span>
+                            </div>
+                          ) : (
+                            cat.label
+                          )}
+                        </button>
+                      );
+                    })
+                  )}
                 </div>
               </div>
 
@@ -722,28 +731,36 @@ const GlobalListingsList = () => {
             </div>
 
             <div className="lg:hidden flex overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 md:justify-center">
-              {categoryOptions.map((cat) => {
-                const iconSrc = getCategoryShortcutIconSrc(cat.value, true);
-                return (
-                  <button
-                    key={cat.value}
-                    type="button"
-                    onClick={() => handleCategoryClick(cat.value)}
-                    className="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] lg:w-[10%]"
-                  >
-                    <div className="h-10 w-full flex flex-col items-center gap-1">
-                      <img
-                        src={iconSrc}
-                        alt={cat.label}
-                        className="h-full w-[90%] object-contain"
-                      />
-                      <span className="text-[10px] font-medium whitespace-nowrap">
-                        {cat.label}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
+              {isLisitingLoading ? (
+                <CategoryShortcutSkeletons
+                  itemClassName="flex-shrink-0 snap-start px-2 py-2 flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] lg:w-[10%]"
+                  iconBoxClassName="h-10 w-full"
+                  labelClassName="w-12"
+                />
+              ) : (
+                categoryOptions.map((cat) => {
+                  const iconSrc = getCategoryShortcutIconSrc(cat.value, true);
+                  return (
+                    <button
+                      key={cat.value}
+                      type="button"
+                      onClick={() => handleCategoryClick(cat.value)}
+                      className="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] lg:w-[10%]"
+                    >
+                      <div className="h-10 w-full flex flex-col items-center gap-1">
+                        <img
+                          src={iconSrc}
+                          alt={cat.label}
+                          className="h-full w-[90%] object-contain"
+                        />
+                        <span className="text-[10px] font-medium whitespace-nowrap">
+                          {cat.label}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })
+              )}
             </div>
           </div>
 

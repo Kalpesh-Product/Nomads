@@ -19,6 +19,7 @@ import axios from "../utils/axios.js";
 import renderStars from "../utils/renderStarts.jsx";
 import SkeletonCard from "../components/Skeletons/SkeletonCard.jsx";
 import SkeletonMap from "../components/Skeletons/SkeletonMap.jsx";
+import CategoryShortcutSkeletons from "../components/Skeletons/CategoryShortcutSkeletons.jsx";
 import Select from "react-dropdown-select";
 import { setFormValues } from "../features/locationSlice.js";
 import { useSearchParams } from "react-router-dom";
@@ -1333,31 +1334,39 @@ const AiListings = ({ forceListView = false }) => {
             </div>
 
             <div className="lg:hidden flex justify-start overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4">
-              {categoryOptions.map((cat) => {
-                const iconSrc = getCategoryShortcutIconSrc(cat.value, true);
-                const isActive = formData?.category === cat.value;
-                return (
-                  <button
-                    key={cat.value}
-                    type="button"
-                    onClick={() => handleCategoryClick(cat.value)}
-                    className="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] min-w-[5rem] md:min-w-[5.75rem]"
-                  >
-                    <div className="h-10 w-full flex flex-col items-center gap-1">
-                      <img
-                        src={iconSrc}
-                        alt={cat.label}
-                        className="h-full w-[90%] object-contain"
-                      />
-                      <span
-                        className={`text-[10px] font-medium whitespace-nowrap border-b-2 ${isActive ? "border-primary-blue text-primary-blue" : "border-transparent text-black"}`}
-                      >
-                        {cat.label}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
+              {isLisitingLoading ? (
+                <CategoryShortcutSkeletons
+                  itemClassName="flex-shrink-0 snap-start px-2 py-2 flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] min-w-[5rem] md:min-w-[5.75rem]"
+                  iconBoxClassName="h-10 w-full"
+                  labelClassName="w-12"
+                />
+              ) : (
+                categoryOptions.map((cat) => {
+                  const iconSrc = getCategoryShortcutIconSrc(cat.value, true);
+                  const isActive = formData?.category === cat.value;
+                  return (
+                    <button
+                      key={cat.value}
+                      type="button"
+                      onClick={() => handleCategoryClick(cat.value)}
+                      className="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] min-w-[5rem] md:min-w-[5.75rem]"
+                    >
+                      <div className="h-10 w-full flex flex-col items-center gap-1">
+                        <img
+                          src={iconSrc}
+                          alt={cat.label}
+                          className="h-full w-[90%] object-contain"
+                        />
+                        <span
+                          className={`text-[10px] font-medium whitespace-nowrap border-b-2 ${isActive ? "border-primary-blue text-primary-blue" : "border-transparent text-black"}`}
+                        >
+                          {cat.label}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })
+              )}
             </div>
           </div>
 
@@ -1458,43 +1467,51 @@ const AiListings = ({ forceListView = false }) => {
 
                   <div className="w-full pb-4">
                     <div className="flex justify-between items-center">
-                      {categoryOptions.map((cat) => {
-                        const iconSrc = getCategoryShortcutIconSrc(
-                          cat.value,
-                          useCroppedDesktopShortcuts,
-                        );
-                        const isActive = activeCategory === cat.value;
+                      {isLisitingLoading ? (
+                        <CategoryShortcutSkeletons
+                          itemClassName="px-1 py-2 flex items-center justify-center w-full"
+                          iconBoxClassName="h-10 w-full"
+                          labelClassName="w-14"
+                        />
+                      ) : (
+                        categoryOptions.map((cat) => {
+                          const iconSrc = getCategoryShortcutIconSrc(
+                            cat.value,
+                            useCroppedDesktopShortcuts,
+                          );
+                          const isActive = activeCategory === cat.value;
 
-                        return (
-                          <button
-                            key={cat.value}
-                            type="button"
-                            onClick={() => handleCategoryClick(cat.value)}
-                            className="text-black px-1 py-2 hover:text-black transition flex items-center justify-center w-full"
-                          >
-                            {iconSrc ? (
-                              <div className="h-10 w-full flex flex-col gap-0 items-center">
-                                <img
-                                  src={iconSrc}
-                                  alt={cat.label}
-                                  className="h-full w-full object-contain"
-                                />
-                                <span
-                                  className={`text-tiny border-b-2 pb-1 pt-1 ${
-                                    isActive
-                                      ? "border-primary-blue"
-                                      : "border-transparent"
-                                  }`}
-                                >
-                                  {cat.label}
-                                </span>
-                              </div>
-                            ) : (
-                              cat.label
-                            )}
-                          </button>
-                        );
-                      })}
+                          return (
+                            <button
+                              key={cat.value}
+                              type="button"
+                              onClick={() => handleCategoryClick(cat.value)}
+                              className="text-black px-1 py-2 hover:text-black transition flex items-center justify-center w-full"
+                            >
+                              {iconSrc ? (
+                                <div className="h-10 w-full flex flex-col gap-0 items-center">
+                                  <img
+                                    src={iconSrc}
+                                    alt={cat.label}
+                                    className="h-full w-full object-contain"
+                                  />
+                                  <span
+                                    className={`text-tiny border-b-2 pb-1 pt-1 ${
+                                      isActive
+                                        ? "border-primary-blue"
+                                        : "border-transparent"
+                                    }`}
+                                  >
+                                    {cat.label}
+                                  </span>
+                                </div>
+                              ) : (
+                                cat.label
+                              )}
+                            </button>
+                          );
+                        })
+                      )}
                     </div>
                   </div>
 

@@ -14,6 +14,7 @@ import axios from "../utils/axios.js";
 import renderStars from "../utils/renderStarts.jsx";
 import SkeletonCard from "../components/Skeletons/SkeletonCard.jsx";
 import SkeletonMap from "../components/Skeletons/SkeletonMap.jsx";
+import CategoryShortcutSkeletons from "../components/Skeletons/CategoryShortcutSkeletons.jsx";
 import Select from "react-dropdown-select";
 import { setFormValues } from "../features/locationSlice.js";
 import ListingCard from "../components/ListingCard.jsx";
@@ -1395,24 +1396,32 @@ const AiGlobalListingsList = () => {
             <div className="flex flex-col gap-4 justify-between items-center w-full h-full">
               <div className="w-full pb-4">
                 <div className="flex justify-between items-center">
-                  {categoryOptions.map((cat) => {
-                    const iconSrc = getCategoryShortcutIconSrc(
-                      cat.value,
-                      useCroppedDesktopShortcuts,
-                    );
-                    return (
-                      <CategoryShortcutButton
-                        key={cat.value}
-                        label={cat.label}
-                        iconSrc={iconSrc}
-                        onClick={() => handleCategoryClick(cat.value)}
-                        buttonClassName="text-black px-1 py-2 hover:text-black transition flex items-center justify-center w-full"
-                        iconBoxClassName="h-10 w-full"
-                        imageClassName="h-full w-full object-contain"
-                        labelClassName="text-tiny"
-                      />
-                    );
-                  })}
+                  {isLisitingLoading ? (
+                    <CategoryShortcutSkeletons
+                      itemClassName="px-1 py-2 flex items-center justify-center w-full"
+                      iconBoxClassName="h-10 w-full"
+                      labelClassName="w-14"
+                    />
+                  ) : (
+                    categoryOptions.map((cat) => {
+                      const iconSrc = getCategoryShortcutIconSrc(
+                        cat.value,
+                        useCroppedDesktopShortcuts,
+                      );
+                      return (
+                        <CategoryShortcutButton
+                          key={cat.value}
+                          label={cat.label}
+                          iconSrc={iconSrc}
+                          onClick={() => handleCategoryClick(cat.value)}
+                          buttonClassName="text-black px-1 py-2 hover:text-black transition flex items-center justify-center w-full"
+                          iconBoxClassName="h-10 w-full"
+                          imageClassName="h-full w-full object-contain"
+                          labelClassName="text-tiny"
+                        />
+                      );
+                    })
+                  )}
                 </div>
               </div>
 
@@ -1833,21 +1842,29 @@ const AiGlobalListingsList = () => {
             </div>
 
             <div className="lg:hidden flex justify-start overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4">
-              {categoryOptions.map((cat) => {
-                const iconSrc = getCategoryShortcutIconSrc(cat.value, true);
-                return (
-                  <CategoryShortcutButton
-                    key={cat.value}
-                    label={cat.label}
-                    iconSrc={iconSrc}
-                    onClick={() => handleCategoryClick(cat.value)}
-                    buttonClassName="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] min-w-[5rem] md:min-w-[5.75rem]"
-                    iconBoxClassName="h-10 w-full"
-                    imageClassName="h-full w-[90%] object-contain mx-auto"
-                    labelClassName="text-[10px] font-medium whitespace-nowrap"
-                  />
-                );
-              })}
+              {isLisitingLoading ? (
+                <CategoryShortcutSkeletons
+                  itemClassName="flex-shrink-0 snap-start px-2 py-2 flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] min-w-[5rem] md:min-w-[5.75rem]"
+                  iconBoxClassName="h-10 w-full"
+                  labelClassName="w-12"
+                />
+              ) : (
+                categoryOptions.map((cat) => {
+                  const iconSrc = getCategoryShortcutIconSrc(cat.value, true);
+                  return (
+                    <CategoryShortcutButton
+                      key={cat.value}
+                      label={cat.label}
+                      iconSrc={iconSrc}
+                      onClick={() => handleCategoryClick(cat.value)}
+                      buttonClassName="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] min-w-[5rem] md:min-w-[5.75rem]"
+                      iconBoxClassName="h-10 w-full"
+                      imageClassName="h-full w-[90%] object-contain mx-auto"
+                      labelClassName="text-[10px] font-medium whitespace-nowrap"
+                    />
+                  );
+                })
+              )}
             </div>
           </div>
 
