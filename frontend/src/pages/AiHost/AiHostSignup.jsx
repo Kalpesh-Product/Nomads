@@ -1521,7 +1521,7 @@ const AiHostSignup = () => {
 
   return (
     <div className="h-full flex flex-col justify-start items-center w-full">
-      <div className="w-[calc(100%+0.5rem)] -mx-1 bg-white/95 md:w-[calc(100%+3rem)] md:-mx-6 lg:w-[calc(100%+5rem)] lg:-mx-10 xl:w-[calc(100%+12rem)] xl:-mx-24">
+      <div className="w-[calc(100%+0.5rem)] -mx-1 bg-white md:w-[calc(100%+3rem)] md:-mx-6 lg:w-[calc(100%+5rem)] lg:-mx-10 xl:w-[calc(100%+12rem)] xl:-mx-24">
         <div className="px-3 md:px-8 lg:px-10 xl:px-12 2xl:px-14">
           <AiStickyBackBreadcrumb
             onBack={onBack}
