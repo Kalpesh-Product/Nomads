@@ -312,7 +312,12 @@ const TemplateCareerPage = () => {
       fd.append("customFields", JSON.stringify(customValues));
       if (resumeFile) fd.append("resumeFile", resumeFile);
 
-      await axios.post("http://localhost:5007/api/recruitment/jobs/apply", fd);
+      const masterPanelBaseUrl =
+        import.meta.env.VITE_MASTER_PANEL_BE_URL || "http://localhost:5007";
+      await axios.post(
+        `${masterPanelBaseUrl}/api/recruitment/jobs/apply`,
+        fd,
+      );
 
       setSubmitSuccess(true);
       setTimeout(() => {

@@ -46,8 +46,10 @@ const TemplateSite = () => {
       // If the local backend returned empty data (no companyName, no heroImages),
       // fall back directly to the master backend which has the correct data.
       if (!d?.companyName && !d?.heroImages?.length) {
+        const masterPanelBaseUrl =
+          import.meta.env.VITE_MASTER_PANEL_BE_URL || "http://localhost:5007";
         const fallback = await fetch(
-          `http://localhost:5007/api/editor/get-website/${encodeURIComponent(tenant)}`,
+          `${masterPanelBaseUrl}/api/editor/get-website/${encodeURIComponent(tenant)}`,
         );
         if (fallback.ok) {
           const raw = await fallback.json();
