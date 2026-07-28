@@ -184,9 +184,9 @@ export const bulkInsertPoc = async (req, res, next) => {
 
       // Sync with master panel
       try {
-        // https://wonomasterbe.vercel.app
+        // http://localhost:5007
         const response = await axios.post(
-          "https://wonomasterbe.vercel.app/api/host-user/bulk-insert-poc",
+          "http://localhost:5007/api/host-user/bulk-insert-poc",
           { pocs: masterPanelPocs },
           { headers: { "Content-Type": "application/json" } },
         );

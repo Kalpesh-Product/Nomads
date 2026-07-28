@@ -553,7 +553,7 @@ export const registerFormSubmission = async (req, res) => {
     try {
       const num = parsePhoneNumberFromString(payload.mobile);
       if (num?.isValid()) payload.mobile = num.number; // normalize
-    } catch { }
+    } catch {}
 
     // STEP 1: send registration data to Google Sheet
     const apsBody = {
@@ -719,8 +719,9 @@ export const registerFormSubmission = async (req, res) => {
         const buffer = await sharp(logoFile.buffer)
           .webp({ quality: 80 })
           .toBuffer();
-        const route = `${baseFolder}/companyLogo/${Date.now()}_${logoFile.originalname
-          }`;
+        const route = `${baseFolder}/companyLogo/${Date.now()}_${
+          logoFile.originalname
+        }`;
         const data = await uploadFileToS3(route, {
           buffer,
           mimetype: "image/webp",
@@ -798,7 +799,7 @@ export const registerFormSubmission = async (req, res) => {
       if (searchKey) {
         try {
           const submit = await fetch(
-            `https://wonomasterbe.vercel.app/api/editor/create-website`,
+            `http://localhost:5007/api/editor/create-website`,
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
