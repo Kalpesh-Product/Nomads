@@ -1228,6 +1228,52 @@ export const getCompany = async (req, res, next) => {
   }
 };
 
+export const getCompanyOgData = async (req, res, next) => {
+  try {
+    const { companyName, companyType } = req.query;
+
+    const normalizedCompanyName =
+      typeof companyName === "string" ? companyName.trim() : "";
+
+    if (!normalizedCompanyName) {
+      return res.status(400).json({ error: "companyName is required" });
+    }
+
+    const escapedCompanyName = normalizedCompanyName.replace(
+      /[.*+?^${}()|[\]\\]/g,
+      "\\$&",
+    );
+
+    const companyQuery = {
+      companyName: { $regex: new RegExp(`^${escapedCompanyName}$`, "i") },
+    };
+    if (companyType) {
+      companyQuery.companyType = companyType;
+    }
+
+    const company = await Company.findOne(companyQuery)
+      .select("companyTitle companyName about logo images companyType city")
+      .lean()
+      .exec();
+
+    if (!company) {
+      return res.status(404).json({ message: "Company not found" });
+    }
+
+    return res.status(200).json({
+      companyTitle: company.companyTitle || company.companyName,
+      about: company.about || "",
+      image:
+        (Array.isArray(company.images) && company.images[0]?.url) ||
+        company.logo?.url ||
+        "",
+      city: company.city || "",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getListings = async (req, res, next) => {
   try {
     const { companyId } = req.params;

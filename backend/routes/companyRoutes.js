@@ -25,6 +25,7 @@ import {
   getCompaniesDataMaster,
   applyToCompanyJob,
   getCompanyCountries,
+  getCompanyOgData,
 } from "../controllers/compayControllers.js";
 
 const proxyUpload = multer({ storage: multer.memoryStorage() });
@@ -51,6 +52,7 @@ router.patch("/deactivate-product", deactivateProduct);
 router.get("/get-single-company-data", getCompanyData);
 router.get("/get-listings/:companyId", getListings);
 router.get("/get-company-data/:companyName", getCompany); //check company from admin panel before adding website link after creating website.
+router.get("/og-data", getCompanyOgData);
 router.get("/company-locations", getUniqueDataLocations);
 router.patch("/update-company", upload.any(), editCompany);
 router.patch("/add-template-link", addTemplateLink);
