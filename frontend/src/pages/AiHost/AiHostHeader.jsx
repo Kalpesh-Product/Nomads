@@ -106,7 +106,7 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
   };
 
   const goToBusinessLogin = () => {
-    window.location.href = "https://wonohostfe.vercel.app";
+    window.location.href = "https://hostpanel.wono.co";
   };
 
   const goToHosts = () => {

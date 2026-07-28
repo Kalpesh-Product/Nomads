@@ -133,10 +133,15 @@ const normalizeTemplatePayload = (template) => {
     template?.pageNavItems || template?.navItems || [],
   );
   const productDropdownPages = normalizeProductDropdownPages(
-    template?.productDropdownPages || template?.productPages || template?.products || [],
+    template?.productDropdownPages ||
+      template?.productPages ||
+      template?.products ||
+      [],
   );
   const productPages = serializeProductPagesForClient(productDropdownPages);
-  const companyLogoUrl = getMediaSrc(template?.companyLogoUrl || template?.companyLogo);
+  const companyLogoUrl = getMediaSrc(
+    template?.companyLogoUrl || template?.companyLogo,
+  );
 
   return {
     ...template,
@@ -148,22 +153,29 @@ const normalizeTemplatePayload = (template) => {
     websiteEmail: normalizeString(template?.websiteEmail || template?.email),
     contactTitle: normalizeString(template?.contactTitle || "Contact"),
     contactPageHeading:
-      normalizeString(template?.contactPageHeading || template?.contactTitle) || "Contact",
+      normalizeString(template?.contactPageHeading || template?.contactTitle) ||
+      "Contact",
     contactPageIntro: normalizeString(template?.contactPageIntro),
     galleryPageHeading:
-      normalizeString(template?.galleryPageHeading || template?.galleryTitle) || "Gallery",
+      normalizeString(template?.galleryPageHeading || template?.galleryTitle) ||
+      "Gallery",
     testimonialsPageHeading:
-      normalizeString(template?.testimonialsPageHeading || template?.testimonialTitle) ||
-      "Testimonials",
+      normalizeString(
+        template?.testimonialsPageHeading || template?.testimonialTitle,
+      ) || "Testimonials",
     testimonialsPageIntro: normalizeString(template?.testimonialsPageIntro),
-    aboutPageIntro: normalizeString(template?.aboutPageIntro || "About Our Vision"),
+    aboutPageIntro: normalizeString(
+      template?.aboutPageIntro || "About Our Vision",
+    ),
     pageNavItems,
     navItems: pageNavItems,
     productDropdownPages,
     productPages,
     products: Array.isArray(template?.products) ? template.products : [],
     gallery: Array.isArray(template?.gallery) ? template.gallery : [],
-    testimonials: Array.isArray(template?.testimonials) ? template.testimonials : [],
+    testimonials: Array.isArray(template?.testimonials)
+      ? template.testimonials
+      : [],
     about: Array.isArray(template?.about) ? template.about : [],
     aboutPageImageCards: Array.isArray(template?.aboutPageImageCards)
       ? template.aboutPageImageCards
@@ -171,8 +183,12 @@ const normalizeTemplatePayload = (template) => {
     heroImages: Array.isArray(template?.heroImages) ? template.heroImages : [],
     heroVariant: normalizeString(template?.heroVariant || "text-image"),
     themeVariant: normalizeString(template?.themeVariant || "default"),
-    activeSections: Array.isArray(template?.activeSections) ? template.activeSections : [],
-    enabledSections: Array.isArray(template?.enabledSections) ? template.enabledSections : [],
+    activeSections: Array.isArray(template?.activeSections)
+      ? template.activeSections
+      : [],
+    enabledSections: Array.isArray(template?.enabledSections)
+      ? template.enabledSections
+      : [],
     sectionOverrides: template?.sectionOverrides || {},
     styleConfig: template?.styleConfig || {},
     mapUrl: normalizeString(template?.mapUrl),
@@ -190,14 +206,15 @@ export const getRecruitmentJobs = async (req, res, next) => {
     }
 
     const upstream = await axios.get(
-      `${process.env.WONOMASTER_BE || "https://wonomasterbe.vercel.app"}/api/recruitment/jobs/public`,
+      `${process.env.WONOMASTER_BE || "http://localhost:5007"}/api/recruitment/jobs/public`,
       { params: { workspaceId } },
     );
 
     return res.json(upstream.data?.data || upstream.data);
   } catch (error) {
     const status = error?.response?.status || 500;
-    const message = error?.response?.data?.message || error?.message || "Failed to load jobs";
+    const message =
+      error?.response?.data?.message || error?.message || "Failed to load jobs";
     return res.status(status).json({ message });
   }
 };
@@ -261,7 +278,9 @@ export const getWebsiteByTenant = async (req, res, next) => {
       return res
         .status(200)
         .json(
-          normalizeTemplatePayload(localTemplate.publishedData || localTemplate),
+          normalizeTemplatePayload(
+            localTemplate.publishedData || localTemplate,
+          ),
         );
     }
 
@@ -276,7 +295,7 @@ export const getWebsiteByTenant = async (req, res, next) => {
 
     if (company?.websiteTemplateLink) {
       const upstream = await axios.get(
-        `https://wonomasterbe.vercel.app/api/editor/get-website/${encodeURIComponent(
+        `http://localhost:5007/api/editor/get-website/${encodeURIComponent(
           company.websiteTemplateLink,
         )}`,
       );
@@ -294,7 +313,7 @@ export const getWebsiteByTenant = async (req, res, next) => {
     }
 
     const upstream = await axios.get(
-      `https://wonomasterbe.vercel.app/api/editor/get-website/${encodeURIComponent(tenant)}`,
+      `http://localhost:5007/api/editor/get-website/${encodeURIComponent(tenant)}`,
     );
 
     const upstreamTemplate = upstream.data?.template || upstream.data;
@@ -308,7 +327,9 @@ export const getWebsiteByTenant = async (req, res, next) => {
   } catch (error) {
     const status = error?.response?.status || 500;
     const message =
-      error?.response?.data?.message || error?.message || "Failed to load website";
+      error?.response?.data?.message ||
+      error?.message ||
+      "Failed to load website";
 
     return res.status(status).json({ message });
   }

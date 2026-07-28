@@ -84,9 +84,9 @@ function getDistanceFromLatLonInM(lat1, lon1, lat2, lon2) {
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(toRad(lat1)) *
-    Math.cos(toRad(lat2)) *
-    Math.sin(dLon / 2) *
-    Math.sin(dLon / 2);
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c; // distance in meters
@@ -105,7 +105,7 @@ export const bulkInsertCompanies = async (req, res, next) => {
 
     //fetch companies from master panel
     const hostCompanies = await axios.get(
-      "https://wonomasterbe.vercel.app/api/hosts/companies",
+      "http://localhost:5007/api/hosts/companies",
     );
 
     const companyMap = new Map();
@@ -113,10 +113,10 @@ export const bulkInsertCompanies = async (req, res, next) => {
       const key = `${company.companyName
         ?.trim()
         .toLowerCase()}|${company.companyCity
-          ?.trim()
-          .toLowerCase()}|${company.companyState
-            ?.trim()
-            .toLowerCase()}|${company.companyCountry?.trim().toLowerCase()}`;
+        ?.trim()
+        .toLowerCase()}|${company.companyState
+        ?.trim()
+        .toLowerCase()}|${company.companyCountry?.trim().toLowerCase()}`;
       companyMap.set(key, company.companyId);
     });
 
@@ -135,10 +135,10 @@ export const bulkInsertCompanies = async (req, res, next) => {
         ]
           ?.trim()
           ?.toLowerCase()}|${row["State"]?.trim()?.toLowerCase()}|${row[
-            "Country"
-          ]
-            ?.trim()
-            ?.toLowerCase()}`;
+          "Country"
+        ]
+          ?.trim()
+          ?.toLowerCase()}`;
 
         const company = {
           businessId: row["Business ID"]?.trim(),
@@ -881,7 +881,7 @@ export const getCompaniesDataNomads = async (req, res, next) => {
       { $limit: 200 },
     ];
 
-    console.log("pipe", pipeline)
+    console.log("pipe", pipeline);
     let companyData = await Company.aggregate(pipeline).collation({
       locale: "en",
       strength: 2,
@@ -1172,9 +1172,7 @@ export const getCompanyData = async (req, res, next) => {
 
     // Fetch DB reviews & POC
     const [reviews, poc] = await Promise.all([
-      Review.find(
-        buildVisibleNomadReviewQuery({ company: companyObjectId }),
-      )
+      Review.find(buildVisibleNomadReviewQuery({ company: companyObjectId }))
         .lean()
         .exec(),
       PointOfContact.findOne({ company: companyObjectId, isActive: true })
@@ -1280,10 +1278,7 @@ export const getUniqueDataLocations = async (req, res, next) => {
     });
 
     const now = Date.now();
-    if (
-      companyLocationsCache.data &&
-      companyLocationsCache.expiresAt > now
-    ) {
+    if (companyLocationsCache.data && companyLocationsCache.expiresAt > now) {
       return res.status(200).json(companyLocationsCache.data);
     }
 
@@ -2042,10 +2037,7 @@ export const getCompanyLeads = async (req, res, next) => {
       query.isEscalated = true;
       if (companyId) {
         delete query.companyId;
-        query.$or = [
-          { companyId },
-          { escalatedHostCompanyId: companyId },
-        ];
+        query.$or = [{ companyId }, { escalatedHostCompanyId: companyId }];
       }
       if (workspaceId) {
         query.escalatedWorkspaceId = String(workspaceId).trim();
@@ -2087,7 +2079,8 @@ export const escalateLeadToHostPanel = async (req, res, next) => {
     }
     if (existingLead.status !== "Closed") {
       return res.status(409).json({
-        message: "Close the Master Panel lead before escalating it to HostPanel",
+        message:
+          "Close the Master Panel lead before escalating it to HostPanel",
       });
     }
 
@@ -2121,7 +2114,8 @@ export const escalateLeadToHostPanel = async (req, res, next) => {
 
 export const updateLeads = async (req, res, next) => {
   try {
-    const { status, hostPanelStatus, comment, leadId, workspaceId } = req.body || {};
+    const { status, hostPanelStatus, comment, leadId, workspaceId } =
+      req.body || {};
     const normalizedStatus = String(status || "").trim();
     const normalizedHostStatus = String(hostPanelStatus || "").trim();
 
@@ -2131,21 +2125,37 @@ export const updateLeads = async (req, res, next) => {
       });
     }
 
-    if (!normalizedStatus && !normalizedHostStatus && typeof comment !== "string") {
+    if (
+      !normalizedStatus &&
+      !normalizedHostStatus &&
+      typeof comment !== "string"
+    ) {
       return res.status(400).json({ message: "No lead changes were provided" });
     }
 
-    if (normalizedStatus && !["Pending", "Contacted", "Closed"].includes(normalizedStatus)) {
-      return res.status(400).json({ message: "Invalid Master Panel lead status" });
+    if (
+      normalizedStatus &&
+      !["Pending", "Contacted", "Closed"].includes(normalizedStatus)
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Invalid Master Panel lead status" });
     }
 
-    if (normalizedHostStatus && !["Pending", "Closed"].includes(normalizedHostStatus)) {
+    if (
+      normalizedHostStatus &&
+      !["Pending", "Closed"].includes(normalizedHostStatus)
+    ) {
       return res.status(400).json({ message: "Invalid HostPanel lead status" });
     }
 
     const normalizedWorkspaceId = String(workspaceId || "").trim();
     if (normalizedHostStatus && !normalizedWorkspaceId) {
-      return res.status(400).json({ message: "workspaceId is required for HostPanel status updates" });
+      return res
+        .status(400)
+        .json({
+          message: "workspaceId is required for HostPanel status updates",
+        });
     }
 
     const query = {};
@@ -2191,7 +2201,7 @@ export const updateLeads = async (req, res, next) => {
   }
 };
 
-const WONOMASTER_BE = `${process.env.WONOMASTER_BE || "https://wonomasterbe.vercel.app"}/api`;
+const WONOMASTER_BE = `${process.env.WONOMASTER_BE || "http://localhost:5007"}/api`;
 
 export const applyToCompanyJob = async (req, res, next) => {
   try {
@@ -2202,7 +2212,10 @@ export const applyToCompanyJob = async (req, res, next) => {
     }
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
-        fd.append(file.fieldname, file.buffer, { filename: file.originalname, contentType: file.mimetype });
+        fd.append(file.fieldname, file.buffer, {
+          filename: file.originalname,
+          contentType: file.mimetype,
+        });
       }
     }
     const upstream = await axios.post(
@@ -2213,7 +2226,10 @@ export const applyToCompanyJob = async (req, res, next) => {
     return res.status(upstream.status).json(upstream.data);
   } catch (error) {
     const status = error?.response?.status || 500;
-    const message = error?.response?.data?.message || error?.message || "Failed to submit application";
+    const message =
+      error?.response?.data?.message ||
+      error?.message ||
+      "Failed to submit application";
     return res.status(status).json({ message });
   }
 };
