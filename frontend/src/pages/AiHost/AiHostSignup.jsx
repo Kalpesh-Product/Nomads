@@ -34,6 +34,8 @@ import AiStickyBackBreadcrumb from "../../components/AiStickyBackBreadcrumb";
 const steps = ["GOAL", "BASIC DETAILS"];
 const ACTIVATION_TITLE = "Your goal is set... let's get you activated";
 const ACTIVATION_TITLE_TYPING_INTERVAL_MS = 7;
+const COUNTRIES_NOW_ENDPOINT = "https://countriesnow.space/api/v0.1/countries";
+const STATE_CITY_FALLBACK_RADIUS_KM = 25;
 
 const serviceOptions = [
   {
@@ -90,6 +92,62 @@ const compactStepFieldSx = {
 const getFlagIconUrl = (isoCode) =>
   `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
 
+const normalizeLocationName = (value = "") =>
+  value
+    .toString()
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+
+const sortLocationNames = (locations = []) =>
+  Array.from(new Set(locations.filter(Boolean).map((item) => item.trim()))).sort(
+    (locationA, locationB) => locationA.localeCompare(locationB),
+  );
+
+const toNumber = (value) => {
+  const parsedValue = Number(value);
+  return Number.isFinite(parsedValue) ? parsedValue : null;
+};
+
+const getDistanceInKm = (from, to) => {
+  const fromLat = toNumber(from?.latitude);
+  const fromLng = toNumber(from?.longitude);
+  const toLat = toNumber(to?.latitude);
+  const toLng = toNumber(to?.longitude);
+
+  if ([fromLat, fromLng, toLat, toLng].some((value) => value === null)) {
+    return null;
+  }
+
+  const earthRadiusKm = 6371;
+  const degreesToRadians = (degrees) => (degrees * Math.PI) / 180;
+  const latDistance = degreesToRadians(toLat - fromLat);
+  const lngDistance = degreesToRadians(toLng - fromLng);
+  const a =
+    Math.sin(latDistance / 2) ** 2 +
+    Math.cos(degreesToRadians(fromLat)) *
+      Math.cos(degreesToRadians(toLat)) *
+      Math.sin(lngDistance / 2) ** 2;
+
+  return earthRadiusKm * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+};
+
+const getStateCityNameCandidates = (stateName = "") => {
+  const cleanedStateName = stateName.trim();
+  if (!cleanedStateName) return [];
+
+  return sortLocationNames([
+    cleanedStateName,
+    cleanedStateName.replace(/^City of\s+/i, ""),
+    cleanedStateName.replace(/^County of\s+/i, ""),
+    cleanedStateName.replace(/\s+County Borough$/i, ""),
+    cleanedStateName.replace(/\s+Borough Council$/i, ""),
+    cleanedStateName.replace(/\s+District Council$/i, ""),
+    cleanedStateName.replace(/\s+District$/i, ""),
+    cleanedStateName.replace(/\s+County$/i, ""),
+  ]);
+};
+
 const normalizePlanFromQuery = (plan) => {
   if (!plan || typeof plan !== "string") return "BASIC";
 
@@ -122,6 +180,9 @@ const AiHostSignup = () => {
   const [activeStep, setActiveStep] = useState(initialStep);
   const [verticalTypeOpen, setVerticalTypeOpen] = useState(false);
   const [typedActivationTitle, setTypedActivationTitle] = useState("");
+  const [countriesNowData, setCountriesNowData] = useState([]);
+  const [isCountriesNowLoading, setIsCountriesNowLoading] = useState(false);
+  const [countriesNowError, setCountriesNowError] = useState("");
   const selectedPlanFromQuery = normalizePlanFromQuery(
     signupParams.get("plan"),
   );
@@ -179,6 +240,41 @@ const AiHostSignup = () => {
   }, [selectedPlan, setValue]);
 
   useEffect(() => {
+    const controller = new AbortController();
+
+    const fetchCountriesNowData = async () => {
+      setIsCountriesNowLoading(true);
+      setCountriesNowError("");
+
+      try {
+        const response = await fetch(COUNTRIES_NOW_ENDPOINT, {
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error("Unable to load city options");
+        }
+
+        const payload = await response.json();
+        setCountriesNowData(Array.isArray(payload?.data) ? payload.data : []);
+      } catch (error) {
+        if (error?.name !== "AbortError") {
+          setCountriesNowError("City options could not be loaded");
+          setCountriesNowData([]);
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsCountriesNowLoading(false);
+        }
+      }
+    };
+
+    fetchCountriesNowData();
+
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
     if (activeStep !== 1) {
       setTypedActivationTitle("");
       return undefined;
@@ -234,11 +330,85 @@ const AiHostSignup = () => {
   }, [auth, setValue]);
 
   const selectedCountryName = watch("country");
+  const selectedStateName = watch("state");
   const selectedCountry = useMemo(
     () =>
       countries.find((country) => country.name === selectedCountryName) || null,
     [countries, selectedCountryName],
   );
+  const selectedState = useMemo(() => {
+    if (!selectedCountry || !selectedStateName) return null;
+
+    return (
+      State.getStatesOfCountry(selectedCountry.isoCode).find(
+        (state) => state.name === selectedStateName,
+      ) || null
+    );
+  }, [selectedCountry, selectedStateName]);
+  const countriesNowCountryCities = useMemo(() => {
+    if (!selectedCountry) return [];
+
+    const matchedCountry = countriesNowData.find((country) => {
+      const matchesIsoCode =
+        country.iso2?.toUpperCase() === selectedCountry.isoCode;
+      const matchesCountryName =
+        normalizeLocationName(country.country) ===
+        normalizeLocationName(selectedCountry.name);
+
+      return matchesIsoCode || matchesCountryName;
+    });
+
+    if (!Array.isArray(matchedCountry?.cities)) return [];
+
+    return sortLocationNames(matchedCountry.cities);
+  }, [countriesNowData, selectedCountry]);
+  const selectedStateCities = useMemo(() => {
+    if (!selectedCountry || !selectedState) return [];
+
+    const stateCities = City.getCitiesOfState(
+      selectedCountry.isoCode,
+      selectedState.isoCode,
+    );
+
+    if (stateCities.length) {
+      return sortLocationNames(stateCities.map((city) => city.name));
+    }
+
+    const countryCities = City.getCitiesOfCountry(selectedCountry.isoCode) || [];
+    const countriesNowCityNames = new Set(
+      countriesNowCountryCities.map((city) => normalizeLocationName(city)),
+    );
+    const nearbyCities = countryCities
+      .map((city) => ({
+        name: city.name,
+        distance: getDistanceInKm(selectedState, city),
+      }))
+      .filter(({ name, distance }) => {
+        if (distance === null || distance > STATE_CITY_FALLBACK_RADIUS_KM) {
+          return false;
+        }
+
+        return (
+          countriesNowCityNames.size === 0 ||
+          countriesNowCityNames.has(normalizeLocationName(name))
+        );
+      })
+      .sort((cityA, cityB) => cityA.distance - cityB.distance)
+      .map((city) => city.name);
+
+    if (nearbyCities.length) {
+      return sortLocationNames(nearbyCities);
+    }
+
+    const stateNameCandidates = getStateCityNameCandidates(selectedState.name);
+    const countriesNowStateMatches = stateNameCandidates.filter((city) =>
+      countriesNowCityNames.has(normalizeLocationName(city)),
+    );
+
+    return countriesNowStateMatches.length
+      ? countriesNowStateMatches
+      : stateNameCandidates;
+  }, [countriesNowCountryCities, selectedCountry, selectedState]);
 
   const handleCountryChange = (countryName, onChange) => {
     const country = countries.find((item) => item.name === countryName);
@@ -833,19 +1003,11 @@ const AiHostSignup = () => {
                 const countryObj = countries.find(
                   (c) => c.name === countryName,
                 );
-                const stateObj =
-                  countryObj &&
-                  State.getStatesOfCountry(countryObj.isoCode).find(
-                    (s) => s.name === stateName,
-                  );
-
                 const cities =
-                  countryObj && stateObj
-                    ? City.getCitiesOfState(
-                        countryObj.isoCode,
-                        stateObj.isoCode,
-                      )
-                    : [];
+                  countryObj && stateName ? selectedStateCities : [];
+                const cityHelperText =
+                  fieldState.error?.message ||
+                  (!cities.length ? countriesNowError : "");
 
                 return (
                   <TextField
@@ -857,13 +1019,18 @@ const AiHostSignup = () => {
                     sx={compactStepFieldSx}
                     variant="standard"
                     error={!!fieldState.error}
-                    helperText={fieldState.error?.message}
-                    disabled={!stateObj}
+                    helperText={cityHelperText}
+                    disabled={!countryObj || !stateName}
                     InputLabelProps={{ sx: floatingLabelSx }}
                   >
+                    {isCountriesNowLoading && !cities.length && (
+                      <MenuItem disabled value="">
+                        Loading cities...
+                      </MenuItem>
+                    )}
                     {cities.map((city) => (
-                      <MenuItem key={city.name} value={city.name}>
-                        {city.name}
+                      <MenuItem key={city} value={city}>
+                        {city}
                       </MenuItem>
                     ))}
                   </TextField>
@@ -1521,7 +1688,7 @@ const AiHostSignup = () => {
 
   return (
     <div className="h-full flex flex-col justify-start items-center w-full">
-      <div className="w-[calc(100%+0.5rem)] -mx-1 bg-white/95 md:w-[calc(100%+3rem)] md:-mx-6 lg:w-[calc(100%+5rem)] lg:-mx-10 xl:w-[calc(100%+12rem)] xl:-mx-24">
+      <div className="w-[calc(100%+0.5rem)] -mx-1 bg-white md:w-[calc(100%+3rem)] md:-mx-6 lg:w-[calc(100%+5rem)] lg:-mx-10 xl:w-[calc(100%+12rem)] xl:-mx-24">
         <div className="px-3 md:px-8 lg:px-10 xl:px-12 2xl:px-14">
           <AiStickyBackBreadcrumb
             onBack={onBack}

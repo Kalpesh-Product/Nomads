@@ -9,9 +9,9 @@ const TransparentModal = ({
   title,
   children,
   headerBackground,
-  bgColor="bg-black",
-  width="100vw",
-  height="100vh",
+  bgColor = "bg-black",
+  width = "100vw",
+  height = "100vh",
 }) => {
   const modalRef = useRef(null);
 
@@ -32,7 +32,21 @@ const TransparentModal = ({
               className={`${bgColor}  shadow-xl outline-none ${width} ${height} overflow-y-auto rounded-xl`}
             >
               {/* Header */}
-              <div className="flex justify-end items-center px-4 py-2 rounded-t-md">
+              <div
+                className={`flex items-center px-4 rounded-t-md ${
+                  title ? "justify-between" : "justify-end"
+                } ${title ? "pb-0 pt-4" : "py-2"}`}
+              >
+                {title ? (
+                  <h2
+                    className="text-base font-semibold text-gray-800"
+                    style={{
+                      color: headerBackground ? "white" : undefined,
+                    }}
+                  >
+                    {title}
+                  </h2>
+                ) : null}
                 <IconButton sx={{ p: 0 }} onClick={onClose}>
                   <IoMdClose
                     className="text-white"
@@ -44,7 +58,9 @@ const TransparentModal = ({
               </div>
 
               {/* Content */}
-              <div className="p-4">{children}</div>
+              <div className={title ? "px-4 pb-4 pt-1" : "p-4"}>
+                {children}
+              </div>
             </motion.div>
           </div>
         </Modal>

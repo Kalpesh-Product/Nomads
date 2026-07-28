@@ -316,7 +316,7 @@ const NomadAiLayout = () => {
           />
         </div>
         {shouldShowStickyBar && (
-          <div className="w-full bg-white/95">
+          <div className="w-full bg-white">
             <div className="px-3 md:px-8 lg:px-10 xl:px-12 2xl:px-14">
               <AiStickyBackBreadcrumb
                 onBack={handleStickyBack}

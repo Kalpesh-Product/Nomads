@@ -1,5 +1,11 @@
 import React, { useEffect, useMemo, useRef } from "react";
-import { Outlet, useLocation, useNavigate, useNavigation, useParams } from "react-router-dom";
+import {
+  Outlet,
+  useLocation,
+  useNavigate,
+  useNavigation,
+  useParams,
+} from "react-router-dom";
 import TempHeader from "./components/TempHeader";
 import TempFooter from "./components/TempFooter";
 import TemplateBreadcrumbs from "./components/TemplateBreadcrumbs";
@@ -41,7 +47,7 @@ const TemplateSite = () => {
       // fall back directly to the master backend which has the correct data.
       if (!d?.companyName && !d?.heroImages?.length) {
         const fallback = await fetch(
-          `https://wonomasterbe.vercel.app/api/editor/get-website/${encodeURIComponent(tenant)}`
+          `http://localhost:5007/api/editor/get-website/${encodeURIComponent(tenant)}`,
         );
         if (fallback.ok) {
           const raw = await fallback.json();
@@ -61,29 +67,43 @@ const TemplateSite = () => {
   const isPageChanging = navigation.state === "loading";
   const isLoading = isPending || isPageChanging;
   const routeContext = getTemplateRouteContext(location.pathname);
-  
+
   // Get item name for breadcrumb if we're on an item detail page
   let itemName = "";
   if (slug && itemSlug && normalizedData) {
-    const productPages = Array.isArray(normalizedData?.productPages) ? normalizedData.productPages : [];
-    const productDropdownPages = Array.isArray(normalizedData?.productDropdownPages) ? normalizedData.productDropdownPages : [];
+    const productPages = Array.isArray(normalizedData?.productPages)
+      ? normalizedData.productPages
+      : [];
+    const productDropdownPages = Array.isArray(
+      normalizedData?.productDropdownPages,
+    )
+      ? normalizedData.productDropdownPages
+      : [];
     const allPages = [...productPages, ...productDropdownPages];
-    
-    const page = allPages.find((item) => 
-      normalizeSlug(item?.slug || item?.name || "") === normalizeSlug(slug)
+
+    const page = allPages.find(
+      (item) =>
+        normalizeSlug(item?.slug || item?.name || "") === normalizeSlug(slug),
     );
-    
+
     if (page) {
       // Get catalog items for this page
-      const catalog = Array.isArray(page?.catalog) ? page.catalog : 
-                     Array.isArray(page?.menuItems) ? page.menuItems :
-                     Array.isArray(normalizedData?.products) ? normalizedData.products :
-                     Array.isArray(normalizedData?.menuItems) ? normalizedData.menuItems : [];
-      
-      const item = catalog.find((catalogItem) => 
-        normalizeSlug(catalogItem?.name || catalogItem?.title || "") === normalizeSlug(itemSlug)
+      const catalog = Array.isArray(page?.catalog)
+        ? page.catalog
+        : Array.isArray(page?.menuItems)
+          ? page.menuItems
+          : Array.isArray(normalizedData?.products)
+            ? normalizedData.products
+            : Array.isArray(normalizedData?.menuItems)
+              ? normalizedData.menuItems
+              : [];
+
+      const item = catalog.find(
+        (catalogItem) =>
+          normalizeSlug(catalogItem?.name || catalogItem?.title || "") ===
+          normalizeSlug(itemSlug),
       );
-      
+
       if (item) {
         itemName = item?.name || item?.title || "";
       }
@@ -91,19 +111,28 @@ const TemplateSite = () => {
   }
 
   const jobTitleFromState = location.state?.jobTitle || "";
-  
+
   const breadcrumbItems = useMemo(
     () =>
       getTemplateBreadcrumbItems({
         data: normalizedData,
         pathname: location.pathname,
         routeContext,
-        itemName: routeContext.currentCareerJobCode ? (jobTitleFromState || routeContext.currentCareerJobCode) : itemName,
+        itemName: routeContext.currentCareerJobCode
+          ? jobTitleFromState || routeContext.currentCareerJobCode
+          : itemName,
       }).map((item) => ({
         label: item.label,
         onClick: item.path ? () => navigate(item.path) : undefined,
       })),
-    [location.pathname, navigate, normalizedData, routeContext, itemName, jobTitleFromState],
+    [
+      location.pathname,
+      navigate,
+      normalizedData,
+      routeContext,
+      itemName,
+      jobTitleFromState,
+    ],
   );
   const companyId = normalizedData?.companyId || "";
   const workspaceId = normalizedData?.workspaceId || "";
@@ -131,10 +160,20 @@ const TemplateSite = () => {
   // testimonials and home are always accessible (no dedicated page to disable)
   // Only run guard after data is loaded to prevent redirect during initial load
   const pageNavItems = normalizedData?.pageNavItems || [];
-  const guardedSections = ["about", "products", "gallery", "partner", "careers", "contact"];
-  const isCurrentSectionEnabled = guardedSections.includes(routeContext.currentSection)
+  const guardedSections = [
+    "about",
+    "products",
+    "gallery",
+    "partner",
+    "careers",
+    "contact",
+  ];
+  const isCurrentSectionEnabled = guardedSections.includes(
+    routeContext.currentSection,
+  )
     ? pageNavItems.some(
-        (item) => resolveSectionFromSlug(item.slug) === routeContext.currentSection,
+        (item) =>
+          resolveSectionFromSlug(item.slug) === routeContext.currentSection,
       )
     : true;
 
@@ -178,7 +217,9 @@ const TemplateSite = () => {
         <Outlet
           context={{
             data: normalizedData,
-            rawProductDropdownPages: Array.isArray(data?.productDropdownPages) ? data.productDropdownPages : [],
+            rawProductDropdownPages: Array.isArray(data?.productDropdownPages)
+              ? data.productDropdownPages
+              : [],
             isPending,
             error,
             routeContext,

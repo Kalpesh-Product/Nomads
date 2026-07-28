@@ -33,36 +33,35 @@ const TempHeader = forwardRef(
       [location.pathname],
     );
 
-    const headerLinks = useMemo(
-      () => {
-        const orderedSlugs = [
-          "home",
-          "about",
-          "products",
-          "gallery",
-          "partner",
-          "careers",
-          "testimonials",
-          "contact",
-        ];
-        const normalizedItems = normalizePageNavItems(pageNavItems, navItems);
+    const headerLinks = useMemo(() => {
+      const orderedSlugs = [
+        "home",
+        "about",
+        "products",
+        "gallery",
+        "partner",
+        "careers",
+        "testimonials",
+        "contact",
+      ];
+      const normalizedItems = normalizePageNavItems(pageNavItems, navItems);
 
-        // Build links from normalized items, keeping order
-        return orderedSlugs
-          .map((slug) => {
-            const item = normalizedItems.find((item) => resolveSectionFromSlug(item.slug) === slug);
-            return item;
-          })
-          .filter(Boolean)
-          .map((item, index) => ({
-            ...item,
-            id: index + 1,
-            text: item.name,
-            to: getSectionPath(item.slug, location.pathname),
-          }));
-      },
-      [location.pathname, navItems, pageNavItems],
-    );
+      // Build links from normalized items, keeping order
+      return orderedSlugs
+        .map((slug) => {
+          const item = normalizedItems.find(
+            (item) => resolveSectionFromSlug(item.slug) === slug,
+          );
+          return item;
+        })
+        .filter(Boolean)
+        .map((item, index) => ({
+          ...item,
+          id: index + 1,
+          text: item.name,
+          to: getSectionPath(item.slug, location.pathname),
+        }));
+    }, [location.pathname, navItems, pageNavItems]);
 
     const normalizedProductPages = useMemo(
       () =>
@@ -85,7 +84,8 @@ const TempHeader = forwardRef(
 
       const handlePointerDown = (event) => {
         if (open) return;
-        const headerElement = ref && typeof ref === "object" ? ref.current : null;
+        const headerElement =
+          ref && typeof ref === "object" ? ref.current : null;
         if (headerElement && !headerElement.contains(event.target)) {
           setProductsOpen(false);
         }
@@ -140,7 +140,9 @@ const TempHeader = forwardRef(
                 <button
                   type="button"
                   onClick={() =>
-                    handleNavigate(getSectionPath("products", location.pathname))
+                    handleNavigate(
+                      getSectionPath("products", location.pathname),
+                    )
                   }
                   className={`block w-full px-4 py-2 text-left text-sm transition hover:bg-gray-100 ${
                     currentSection === "products" && !currentProductSlug
@@ -198,11 +200,17 @@ const TempHeader = forwardRef(
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-3 md:px-0 md:py-3">
           <button
             type="button"
-            onClick={() => handleNavigate(getSectionPath("home", location.pathname))}
+            onClick={() =>
+              handleNavigate(getSectionPath("home", location.pathname))
+            }
             className="flex h-16 w-24 items-center justify-start overflow-hidden lg:w-36"
             aria-label="Go to home"
           >
-            <img src={logo} alt="logo" className="h-full w-full object-contain object-left" />
+            <img
+              src={logo}
+              alt="logo"
+              className="h-full w-full object-contain object-left"
+            />
           </button>
 
           <nav className="ml-auto hidden items-center gap-6 xl:flex">
@@ -211,7 +219,9 @@ const TempHeader = forwardRef(
               <li>
                 <button
                   type="button"
-                  onClick={() => window.location.href = "https://wonohostfe.vercel.app/"}
+                  onClick={() =>
+                    (window.location.href = "http://localhost:3006/")
+                  }
                   className={navButtonClass(false)}
                 >
                   Login
@@ -262,7 +272,10 @@ const TempHeader = forwardRef(
 
                 if (section === "products") {
                   return (
-                    <li key={item.id || item.slug || item.text} className="items-center py-2 text-center">
+                    <li
+                      key={item.id || item.slug || item.text}
+                      className="items-center py-2 text-center"
+                    >
                       <button
                         type="button"
                         onClick={() => setProductsOpen((prev) => !prev)}
@@ -280,14 +293,21 @@ const TempHeader = forwardRef(
 
                       {productsOpen
                         ? normalizedProductPages.map((product, index) => {
-                            const isActiveProduct = currentProductSlug === product.slug;
+                            const isActiveProduct =
+                              currentProductSlug === product.slug;
 
                             return (
-                              <li key={product.slug || index} className="items-center text-center">
+                              <li
+                                key={product.slug || index}
+                                className="items-center text-center"
+                              >
                                 <div
                                   onClick={() =>
                                     handleNavigate(
-                                      getProductPath(product.slug, location.pathname),
+                                      getProductPath(
+                                        product.slug,
+                                        location.pathname,
+                                      ),
                                     )
                                   }
                                   className="cursor-pointer py-3"
@@ -312,9 +332,17 @@ const TempHeader = forwardRef(
                 }
 
                 return (
-                  <li key={item.id || item.slug || item.text} className="items-center text-center">
-                    <div onClick={() => handleNavigate(item.to)} className="cursor-pointer py-4">
-                      <p className={`text-lg ${isActive ? "font-semibold text-black" : "text-secondary-dark"}`}>
+                  <li
+                    key={item.id || item.slug || item.text}
+                    className="items-center text-center"
+                  >
+                    <div
+                      onClick={() => handleNavigate(item.to)}
+                      className="cursor-pointer py-4"
+                    >
+                      <p
+                        className={`text-lg ${isActive ? "font-semibold text-black" : "text-secondary-dark"}`}
+                      >
                         {item.text}
                       </p>
                     </div>

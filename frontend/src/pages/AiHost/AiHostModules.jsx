@@ -56,7 +56,7 @@ export default function Modules() {
   const onBack = () => navigate("/");
   return (
     <>
-      <div className="sticky top-0 z-40 flex min-w-[11rem] items-center gap-3 bg-white/95 py-3 backdrop-blur-sm">
+      <div className="sticky top-0 z-[100] -mx-1 flex min-w-[11rem] items-center gap-3 bg-white px-1 py-3 shadow-none md:-mx-6 md:px-6 lg:-mx-10 lg:px-10 xl:-mx-24 xl:px-24">
         <button
           type="button"
           onClick={onBack}

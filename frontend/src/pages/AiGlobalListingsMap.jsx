@@ -16,6 +16,7 @@ import axios from "../utils/axios.js";
 import renderStars from "../utils/renderStarts.jsx";
 import SkeletonCard from "../components/Skeletons/SkeletonCard.jsx";
 import SkeletonMap from "../components/Skeletons/SkeletonMap.jsx";
+import CategoryShortcutSkeletons from "../components/Skeletons/CategoryShortcutSkeletons.jsx";
 import Select from "react-dropdown-select";
 import { setFormValues } from "../features/locationSlice.js";
 import ListingCard from "../components/ListingCard.jsx";
@@ -930,33 +931,41 @@ const AiGlobalListingsMap = () => {
             <div className="flex flex-col gap-4 justify-between items-center">
               <div className="w-full pb-4">
                 <div className="flex justify-between items-center">
-                  {categoryOptions.map((cat) => {
-                    const iconSrc = getCategoryShortcutIconSrc(
-                      cat.value,
-                      useCroppedDesktopShortcuts,
-                    );
-                    return (
-                      <button
-                        key={cat.value}
-                        type="button"
-                        onClick={() => handleCategoryClick(cat.value)}
-                        className="text-black px-1 py-2 hover:text-black transition flex items-center justify-center w-full"
-                      >
-                        <div className="flex min-h-[3.5rem] w-full flex-col items-center justify-start gap-1">
-                          {iconSrc ? (
-                            <div className="h-10 w-full">
-                              <img
-                                src={iconSrc}
-                                alt={cat.label}
-                                className="h-full w-full object-contain"
-                              />
-                            </div>
-                          ) : null}
-                          <span className="text-tiny">{cat.label}</span>
-                        </div>
-                      </button>
-                    );
-                  })}
+                  {isLisitingLoading ? (
+                    <CategoryShortcutSkeletons
+                      itemClassName="px-1 py-2 flex items-center justify-center w-full"
+                      iconBoxClassName="h-10 w-full"
+                      labelClassName="w-14"
+                    />
+                  ) : (
+                    categoryOptions.map((cat) => {
+                      const iconSrc = getCategoryShortcutIconSrc(
+                        cat.value,
+                        useCroppedDesktopShortcuts,
+                      );
+                      return (
+                        <button
+                          key={cat.value}
+                          type="button"
+                          onClick={() => handleCategoryClick(cat.value)}
+                          className="text-black px-1 py-2 hover:text-black transition flex items-center justify-center w-full"
+                        >
+                          <div className="flex min-h-[3.5rem] w-full flex-col items-center justify-start gap-1">
+                            {iconSrc ? (
+                              <div className="h-10 w-full">
+                                <img
+                                  src={iconSrc}
+                                  alt={cat.label}
+                                  className="h-full w-full object-contain"
+                                />
+                              </div>
+                            ) : null}
+                            <span className="text-tiny">{cat.label}</span>
+                          </div>
+                        </button>
+                      );
+                    })
+                  )}
                 </div>
               </div>
 

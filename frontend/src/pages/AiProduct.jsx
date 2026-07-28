@@ -774,15 +774,13 @@ const AiProduct = () => {
       <TransparentModal
         open={shareMenuOpen}
         onClose={() => setShareMenuOpen(false)}
+        title="Share this listing"
         bgColor="bg-white"
         width="w-full max-w-md"
         height="h-auto max-h-[90vh]"
       >
         <div className="space-y-4">
           <div>
-            <p className="text-base font-semibold text-gray-800">
-              Share this listing
-            </p>
             <p className="text-xs text-gray-500">
               Choose a platform to share the listing link.
             </p>

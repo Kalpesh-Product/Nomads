@@ -16,7 +16,7 @@ const AiStickyBackBreadcrumb = ({
 
   return (
     <div
-      className={`${stickyClassName} z-40 bg-white/95 pt-0 pb-4 backdrop-blur-sm md:px-10 ${className}`}
+      className={`${stickyClassName} z-[100] bg-white pt-0 pb-4 shadow-none md:px-10 ${className}`}
     >
       <div className={`flex min-w-0 items-center gap-2 ${rowClassName}`}>
         <button

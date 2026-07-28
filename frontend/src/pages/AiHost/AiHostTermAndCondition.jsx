@@ -240,7 +240,7 @@ const AiHostTermsAndCondition = () => {
 
     return (
         <>
-            <div className="sticky top-0 z-40 bg-white/95 py-3 backdrop-blur-sm md:px-28">
+            <div className="sticky top-0 z-[100] -mx-1 bg-white px-1 py-3 shadow-none md:-mx-6 md:px-[calc(7rem+1.5rem)] lg:-mx-10 lg:px-[calc(7rem+2.5rem)] xl:-mx-24 xl:px-[calc(7rem+6rem)]">
                 <button
                     type="button"
                     onClick={onBack}

@@ -57,7 +57,7 @@ const AiHostJobDetails = () => {
 
   return (
     <>
-      <div className="sticky top-0 z-40 bg-white/95 py-3 backdrop-blur-sm">
+      <div className="sticky top-0 z-[100] -mx-1 bg-white px-1 py-3 shadow-none md:-mx-6 md:px-6 lg:-mx-10 lg:px-10 xl:-mx-24 xl:px-24">
         <button
           type="button"
           onClick={() => navigate("/career")}
