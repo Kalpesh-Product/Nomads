@@ -162,8 +162,7 @@ const AiWorkation = () => {
     },
     onSuccess: async (data) => {
       if (data?.warning) {
-        showErrorAlert(data.warning);
-        return;
+        console.warn(data.warning);
       }
       await showSuccessAlert(
         "We’ll review your requirements and connect you with the right support soon.",

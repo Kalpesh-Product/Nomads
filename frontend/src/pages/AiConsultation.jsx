@@ -193,8 +193,7 @@ const AiConsultation = () => {
     },
     onSuccess: async (data) => {
       if (data?.warning) {
-        showErrorAlert(data.warning);
-        return;
+        console.warn(data.warning);
       }
       await showSuccessAlert(
         "Our team will review your request and get back to you soon.",

@@ -96,8 +96,7 @@ const AiBecomeContributor = () => {
     },
     onSuccess: async (data) => {
       if (data?.warning) {
-        showErrorAlert(data.warning);
-        return;
+        console.warn(data.warning);
       }
       await showSuccessAlert(
         "We’ll review your details and get back to you soon.",
