@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 // import logo from "../assets/wono-logo-white.png";
-import logo from "../assets/WONO_LOGO_Black_TP.png";
+import logo from "../assets/WONO_LOGO_Black_TP.svg";
 import PrimaryButton from "./PrimaryButton";
 import Container from "./Container";
 import { Drawer } from "@mui/material";

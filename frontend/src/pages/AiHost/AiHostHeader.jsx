@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
-import logo from "../../assets/WONO_LOGO_Black_TP.png";
+import logo from "../../assets/WONO_LOGO_Black_TP.svg";
 import { useSelector } from "react-redux";
 import { Drawer, Avatar, Popover, CircularProgress } from "@mui/material";
 import { IoCloseSharp } from "react-icons/io5";

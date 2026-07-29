@@ -7,7 +7,7 @@ import {
 } from "../hooks/useNomadLoginState";
 import useAuth from "../hooks/useAuth";
 import useLogout from "../hooks/useLogout";
-import logo from "../assets/WONO_LOGO_Black_TP.png";
+import logo from "../assets/WONO_LOGO_Black_TP.svg";
 import {
   HiChevronDown,
   HiChevronUp,
