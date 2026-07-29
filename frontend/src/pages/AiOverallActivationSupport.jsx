@@ -180,8 +180,7 @@ const AiOverallActivationSupport = () => {
     },
     onSuccess: async (data) => {
       if (data?.warning) {
-        showErrorAlert(data.warning);
-        return;
+        console.warn(data.warning);
       }
 
       await showSuccessAlert(
