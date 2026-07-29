@@ -347,7 +347,7 @@ const AiWorkation = () => {
               <p className="min-h-[2.75rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.25rem] sm:text-[1rem]">
                 {messagePrefix ? (
                   <>
-                    <span className="text-blue-600">{namePortion}</span>
+                    <span className="text-primary-blue">{namePortion}</span>
                     {messagePortion}
                   </>
                 ) : (
