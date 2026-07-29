@@ -230,7 +230,7 @@ const AiBecomeContributor = () => {
                 typedMessage
               )}
             </p>
-              <h1 className="text-hero mt-5 min-h-[3rem] text-center font-play md:mt-8">
+              <h1 className="ai-phone-form-title text-hero mt-5 min-h-[3rem] text-center font-play md:mt-8">
                 {typedPageHeading}
               </h1>
             </div>

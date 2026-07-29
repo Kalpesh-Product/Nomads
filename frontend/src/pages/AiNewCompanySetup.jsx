@@ -359,7 +359,7 @@ const AiNewCompanySetup = () => {
                 <span className="text-blue-600">{namePortion}</span>
                 {messagePortion}
               </p>
-              <h1 className="text-hero min-h-[3rem] text-center font-play">
+              <h1 className="ai-phone-form-title text-hero min-h-[3rem] text-center font-play">
                 {NEW_COMPANY_HEADING}
               </h1>
             </div>

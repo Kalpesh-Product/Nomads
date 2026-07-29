@@ -431,7 +431,7 @@ const AiVisaSupport = () => {
                 )}
               </p>
 
-              <h1 className="text-hero min-h-[3rem] text-center font-play">
+              <h1 className="ai-phone-form-title text-hero min-h-[3rem] text-center font-play">
                 {typedVisaHeading}
               </h1>
             </div>

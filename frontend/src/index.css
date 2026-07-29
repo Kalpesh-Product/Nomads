@@ -18,6 +18,13 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  @media (max-width: 639px) {
+    .ai-phone-form-title {
+      margin-top: 1.25rem !important;
+      line-height: 1.55 !important;
+    }
+  }
 }
 
 @font-face {
