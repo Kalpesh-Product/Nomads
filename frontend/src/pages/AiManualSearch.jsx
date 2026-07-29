@@ -10,6 +10,7 @@ import { useDispatch } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { setFormValues } from "../features/locationSlice";
 import useAuth from "../hooks/useAuth";
+import useSpecialUserEmails from "../hooks/useSpecialUserEmails";
 import axios from "../utils/axios";
 
 import { persistSelectedDestination } from "../utils/selectedDestinationSession";
@@ -139,16 +140,9 @@ const AiManualSearch = () => {
 
   const user = auth?.user || {};
 
-  const specialUserEmails = [
-    "allan.wono@gmail.com",
-    "muskan.wono@gmail.com",
-    "shawnsilveira.wono@gmail.com",
-    "mehak.wono@gmail.com",
-    "savita.wono@gmail.com",
-    "k@k.k",
-    "gourish.wono@gmail.com",
-    "vishal.wono@gmail.com",
-  ];
+  // Special users who can see all locations, managed dynamically via the
+  // Wono Master Panel's User Access module.
+  const specialUserEmails = useSpecialUserEmails();
 
   const { data: rawLocations = [] } = useQuery(companyLocationsQueryOptions);
   const locations = useMemo(() => {
@@ -163,7 +157,7 @@ const AiManualSearch = () => {
         states: (country.states || []).filter((state) => state?.isPublic),
       }))
       .filter((country) => (country.states?.length || 0) > 0);
-  }, [rawLocations, user?.email]);
+  }, [rawLocations, user?.email, specialUserEmails]);
 
   const { data: destinationTitleLookup = new Map() } = useQuery({
     queryKey: ["state-wise-destination-titles"],
