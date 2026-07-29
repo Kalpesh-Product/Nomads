@@ -24,6 +24,7 @@ import AiSelectedBadgesSearchBar from "../components/AiSelectedBadgesSearchBar.j
 import { AnimatePresence, motion } from "motion/react";
 import { Helmet } from "@dr.pogodin/react-helmet";
 import useAuth from "../hooks/useAuth.js";
+import useSpecialUserEmails from "../hooks/useSpecialUserEmails.js";
 import { HiOutlineX } from "react-icons/hi";
 import {
   persistSelectedDestination,
@@ -370,20 +371,12 @@ const AiGlobalListingsList = () => {
     };
   }, [headingSequenceKey, shouldSkipHeadingIntro]);
 
-  // Special users who can see all locations
-  const specialUserEmails = [
-    "allan.wono@gmail.com",
-    "muskan.wono@gmail.com",
-    "shawnsilveira.wono@gmail.com",
-    "mehak.wono@gmail.com",
-    "savita.wono@gmail.com",
-    "k@k.k",
-    "gourish.wono@gmail.com",
-    "vishal.wono@gmail.com",
-  ];
+  // Special users who can see all locations, managed dynamically via the
+  // Wono Master Panel's User Access module.
+  const specialUserEmails = useSpecialUserEmails();
 
   const { data: locations = [], isLoading: isLocations } = useQuery({
-    queryKey: ["locations", user?.email],
+    queryKey: ["locations", user?.email, specialUserEmails],
     queryFn: async () => {
       try {
         const response = await axios.get("company/company-locations");

@@ -26,6 +26,7 @@ import { AnimatePresence, motion } from "motion/react";
 import PaginatedGrid from "../components/PaginatedGrid.jsx";
 import { Helmet } from "@dr.pogodin/react-helmet";
 import useAuth from "../hooks/useAuth.js";
+import useSpecialUserEmails from "../hooks/useSpecialUserEmails.js";
 import {
   getCategoryShortcutIconSrc,
   useCroppedDesktopShortcutIcons,
@@ -105,19 +106,12 @@ const GlobalListingsMap = () => {
   const selectedCountry = watch("country");
   const selectedState = watch("location");
 
-  const specialUserEmails = [
-    "allan.wono@gmail.com",
-    "muskan.wono@gmail.com",
-    "shawnsilveira.wono@gmail.com",
-    "mehak.wono@gmail.com",
-    "savita.wono@gmail.com",
-    "k@k.k",
-    "gourish.wono@gmail.com",
-    "vishal.wono@gmail.com",
-  ];
+  // Special users who can see all locations, managed dynamically via the
+  // Wono Master Panel's User Access module.
+  const specialUserEmails = useSpecialUserEmails();
 
   const { data: locations = [], isLoading: isLocations } = useQuery({
-    queryKey: ["locations", user?.email],
+    queryKey: ["locations", user?.email, specialUserEmails],
     queryFn: async () => {
       try {
         const response = await axios.get("company/company-locations");
