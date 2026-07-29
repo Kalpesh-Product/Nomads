@@ -454,14 +454,9 @@ export const createCompany = async (req, res, next) => {
       return res.status(400).json({ message: "Company Name are required" });
     }
 
-    const companyExists = await Company.findOne({ companyId, companyType });
-
-    if (companyExists) {
-      console.log("companyType", companyExists);
-      return res
-        .status(400)
-        .json({ message: `${companyType} product already exists` });
-    }
+    // Hosts can list multiple locations under the same product type (e.g.
+    // several Coworking listings), gated by plan quota upstream in
+    // HostPanel/WoNoMasterPanel — so no per-companyType uniqueness here.
 
     // Create company
     const company = new Company({
@@ -1842,6 +1837,10 @@ export const editCompany = async (req, res, next) => {
     const {
       businessId,
       address,
+      city,
+      state,
+      country,
+      continent,
       about,
       totalSeats,
       latitude,
@@ -1876,6 +1875,10 @@ export const editCompany = async (req, res, next) => {
 
     // Update scalar fields
     company.address = address?.trim() || company.address;
+    company.city = city?.trim() || company.city;
+    company.state = state?.trim() || company.state;
+    company.country = country?.trim() || company.country;
+    company.continent = continent?.trim() || company.continent;
     company.companyName = companyName?.trim() || company.companyName;
     company.companyTitle = companyTitle?.trim() || company.companyTitle;
     company.about = about?.trim() || company.about;
