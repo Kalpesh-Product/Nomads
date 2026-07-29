@@ -9,6 +9,10 @@ import Lead from "../models/Lead.js";
 import axios from "axios";
 import TestListing from "../models/TestCompany.js";
 import NomadUser from "../models/NomadUser.js";
+import {
+  buildListingShareData,
+  renderListingSharePage,
+} from "../utils/listingSharePage.js";
 
 const buildVisibleNomadReviewQuery = (criteria = {}) => ({
   ...criteria,
@@ -1269,6 +1273,53 @@ export const getCompanyOgData = async (req, res, next) => {
         "",
       city: company.city || "",
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getCompanySharePage = async (req, res, next) => {
+  try {
+    const { companyName, companyType } = req.query;
+    const normalizedCompanyName =
+      typeof companyName === "string" ? companyName.trim() : "";
+
+    if (!normalizedCompanyName) {
+      return res.status(400).type("text").send("companyName is required");
+    }
+
+    const escapedCompanyName = normalizedCompanyName.replace(
+      /[.*+?^${}()|[\]\\]/g,
+      "\\$&",
+    );
+    const companyQuery = {
+      companyName: { $regex: new RegExp(`^${escapedCompanyName}$`, "i") },
+    };
+    if (companyType) {
+      companyQuery.companyType = companyType;
+    }
+
+    const company = await Company.findOne(companyQuery)
+      .select(
+        "companyTitle companyName about logo images companyType city country",
+      )
+      .lean()
+      .exec();
+
+    if (!company) {
+      return res.status(404).type("text").send("Listing not found");
+    }
+
+    const shareData = buildListingShareData(company);
+    const html = renderListingSharePage(shareData);
+
+    return res
+      .status(200)
+      .set({
+        "Content-Type": "text/html; charset=utf-8",
+        "Cache-Control": "public, max-age=300, s-maxage=3600",
+      })
+      .send(html);
   } catch (error) {
     next(error);
   }

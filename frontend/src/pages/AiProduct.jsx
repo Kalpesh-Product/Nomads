@@ -47,6 +47,10 @@ import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 import { setFormValues } from "../features/locationSlice.js";
 import { readSelectedDestination } from "../utils/selectedDestinationSession";
+import {
+  buildCanonicalListingUrl,
+  buildListingShareUrl,
+} from "../utils/listingShareUrl.js";
 
 dayjs.extend(relativeTime);
 
@@ -657,20 +661,25 @@ const AiProduct = () => {
       "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp  ",
   };
 
-  const shareUrl = (() => {
-    if (typeof window !== "undefined") {
-      const url = new URL(window.location.href);
-      if (companyDetails?.companyType) {
-        url.searchParams.set("companyType", companyDetails.companyType);
-      }
-      return url.toString();
-    }
-    return companyDetails?.websiteTemplateLink || "";
-  })();
+  const canonicalListingUrl = buildCanonicalListingUrl({
+    currentUrl:
+      typeof window !== "undefined" ? window.location.href : "",
+    companyType: companyDetails?.companyType,
+    fallbackUrl: companyDetails?.websiteTemplateLink || "",
+  });
+  const shareUrl = buildListingShareUrl({
+    apiBaseUrl: axios.defaults.baseURL,
+    companyName: companyDetails?.companyName || companyName,
+    companyType: companyDetails?.companyType || type,
+    canonicalUrl: canonicalListingUrl,
+  });
 
-  const shareTitle = companyDetails?.companyName
-    ? `Check out ${companyDetails.companyName}`
-    : "Check out this listing";
+  const shareTitle =
+    companyDetails?.companyTitle || companyDetails?.companyName
+      ? `View ${
+          companyDetails?.companyTitle || companyDetails?.companyName
+        } on Nomads by WONO`
+      : "View this listing on Nomads by WONO";
   const [hasCopiedLink, setHasCopiedLink] = useState(false);
 
   const shareLinks = [

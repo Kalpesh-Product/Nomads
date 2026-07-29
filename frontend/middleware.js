@@ -57,14 +57,16 @@ export default async function middleware(request) {
     // fall through to defaults below on any network/API failure
   }
 
-  const title = escapeHtml(ogData?.companyTitle || companyName || "Nomad");
+  const listingName = ogData?.companyTitle || companyName || "Nomad listing";
+  const title = escapeHtml(`${listingName} | Nomads by WONO`);
   const description = escapeHtml(
-    truncate(
+    `${truncate(
       ogData?.about ||
-        "Discover coworking and coliving spaces for digital nomads on Nomad.",
-    ),
+        "Discover spaces and experiences built for digital nomads.",
+      112,
+    ).replace(/[.!?]+$/, "")}. Explore on Nomads by WONO - wono.co.`,
   );
-  const image = ogData?.image || "https://wono.co/logo-transparent.png";
+  const image = ogData?.image || "https://www.wono.co/email-logo-wono.png";
   const pageUrl = url.toString();
 
   const html = `<!doctype html>
@@ -77,7 +79,9 @@ export default async function middleware(request) {
 <meta property="og:image" content="${escapeHtml(image)}" />
 <meta property="og:url" content="${escapeHtml(pageUrl)}" />
 <meta property="og:type" content="website" />
-<meta property="og:site_name" content="Nomad" />
+<meta property="og:site_name" content="Nomads by WONO" />
+<meta property="og:image:secure_url" content="${escapeHtml(image)}" />
+<meta property="og:image:alt" content="${escapeHtml(listingName)} hero image" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="${title}" />
 <meta name="twitter:description" content="${description}" />
