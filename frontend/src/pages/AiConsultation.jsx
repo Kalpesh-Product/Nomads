@@ -193,8 +193,7 @@ const AiConsultation = () => {
     },
     onSuccess: async (data) => {
       if (data?.warning) {
-        showErrorAlert(data.warning);
-        return;
+        console.warn(data.warning);
       }
       await showSuccessAlert(
         "Our team will review your request and get back to you soon.",
@@ -378,14 +377,14 @@ const AiConsultation = () => {
               <p className="min-h-[2.75rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.25rem] sm:text-[1rem]">
                 {messagePrefix ? (
                   <>
-                    <span className="text-blue-600">{namePortion}</span>
+                    <span className="text-primary-blue">{namePortion}</span>
                     {messagePortion}
                   </>
                 ) : (
                   typedMessage
                 )}
               </p>
-              <h1 className="text-hero min-h-[3rem] text-center font-play">
+              <h1 className="ai-phone-form-title text-hero min-h-[3rem] text-center font-play">
                 {typedPageHeading}
               </h1>
             </div>
