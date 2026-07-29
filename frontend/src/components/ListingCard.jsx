@@ -134,6 +134,12 @@ const ListingCard = ({
 
   const displayType =
     typeMap[item.companyType?.toLowerCase()] || item.companyType;
+  const companyTitle = item?.companyTitle?.trim();
+  const hasPlaceholderTitle = companyTitle?.toLowerCase() === "title";
+  const listingName =
+    companyTitle && !hasPlaceholderTitle
+      ? companyTitle
+      : item?.companyName || "Title";
 
   return (
     <div
@@ -204,9 +210,9 @@ const ListingCard = ({
           <div className="w-full">
             <p
               className="text-xs md:text-sm font-semibold truncate"
-              title={item.companyTitle || "Title"}
+              title={listingName}
             >
-              {item.companyTitle || "title"}
+              {listingName}
             </p>
           </div>
         </div>
