@@ -54,11 +54,11 @@ const AiDestinationHighlightSection = ({
 
   if (mobile) {
     return (
-      <div ref={sectionRef} className="mb-6 scroll-mt-24">
-        <h2 className="mb-4 text-sm font-semibold leading-tight text-secondary-dark sm:text-base md:text-subtitle">
+      <div ref={sectionRef} className="mb-6 scroll-mt-24 max-sm:mb-4">
+        <h2 className="mb-4 text-sm font-semibold leading-tight text-secondary-dark sm:text-base md:text-subtitle max-sm:mb-2">
           {title}
         </h2>
-        <div className="custom-scrollbar-hide flex snap-x snap-mandatory flex-nowrap gap-4 overflow-x-auto pb-2">
+        <div className="custom-scrollbar-hide flex snap-x snap-mandatory flex-nowrap gap-4 overflow-x-auto pb-2 max-sm:gap-3 max-sm:pb-1">
           {items.map((item) => (
             <div
               key={item.id}
