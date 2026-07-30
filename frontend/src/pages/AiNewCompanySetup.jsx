@@ -194,8 +194,7 @@ const AiNewCompanySetup = () => {
     },
     onSuccess: async (data) => {
       if (data?.warning) {
-        showErrorAlert(data.warning);
-        return;
+        console.warn(data.warning);
       }
       await showSuccessAlert(
         "Our team will review your request and get back to you soon.",
@@ -356,10 +355,10 @@ const AiNewCompanySetup = () => {
           <div className="w-full max-w-5xl md:px-20 lg:px-20">
             <div className="mx-auto mb-0 flex w-full max-w-4xl flex-col items-center gap-0 px-0">
               <p className="min-h-[2.75rem] w-full text-left font-play text-[0.95rem] leading-relaxed text-gray-800 sm:min-h-[3.25rem] sm:text-[1rem]">
-                <span className="text-blue-600">{namePortion}</span>
+                <span className="text-primary-blue">{namePortion}</span>
                 {messagePortion}
               </p>
-              <h1 className="text-hero min-h-[3rem] text-center font-play">
+              <h1 className="ai-phone-form-title text-hero min-h-[3rem] text-center font-play">
                 {NEW_COMPANY_HEADING}
               </h1>
             </div>

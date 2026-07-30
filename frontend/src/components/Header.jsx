@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import PrimaryButton from "./PrimaryButton";
-import logo from "../assets/WONO_LOGO_Black_TP.png";
+import logo from "../assets/WONO_LOGO_Black_TP.svg";
 import { useSelector } from "react-redux";
 import {
   Drawer,
