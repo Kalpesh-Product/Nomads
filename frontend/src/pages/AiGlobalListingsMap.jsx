@@ -28,6 +28,7 @@ import PaginatedGrid from "../components/PaginatedGrid.jsx";
 import { Helmet } from "@dr.pogodin/react-helmet";
 import useAuth from "../hooks/useAuth.js";
 import useSpecialUserEmails from "../hooks/useSpecialUserEmails.js";
+import { HiOutlineX } from "react-icons/hi";
 import {
   persistSelectedDestination,
   readSelectedDestination,
@@ -1129,39 +1130,39 @@ const AiGlobalListingsMap = () => {
         {!showMobileSearch && (
           <div className="fixed top-[70px] left-0 right-0 z-[1001] flex flex-col items-center gap-2 px-4 pointer-events-none">
             {/* Floating Search Bar */}
-            <button
-              onClick={() => setShowMobileSearch(true)}
-              className="pointer-events-auto w-full max-w-[320px] bg-white shadow-2xl rounded-full py-2 px-4 flex items-center justify-between border border-gray-100 hover:scale-[1.02] transition-transform active:scale-95"
-              style={{ boxShadow: "0 8px 16px rgba(0,0,0,0.15)" }}
-            >
-              <div className="flex flex-col items-start overflow-hidden flex-1">
-                <span className="text-[11px] font-bold text-gray-900 truncate w-full text-left">
-                  {`${(formData?.country || "Country").charAt(0).toUpperCase() + (formData?.country || "Country").slice(1)} . ${
-                    formData?.location
-                      ? formData.location
-                          .split(" ")
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() +
-                              word.slice(1).toLowerCase(),
-                          )
-                          .join(" ")
-                      : "Unknown"
-                  } . ${
-                    formData?.category
-                      ? categoryOptions.find(
-                          (c) => c.value === formData.category,
-                        )?.label ||
-                        formData.category.charAt(0).toUpperCase() +
-                          formData.category.slice(1)
-                      : "All"
-                  }`}
-                </span>
+            <div className="pointer-events-auto mx-auto flex min-h-[46px] w-full max-w-[366px] items-center rounded-full border bg-white px-3 py-2 shadow-[0_5px_14px_rgba(0,0,0,0.12)]">
+              <div className="flex flex-1 items-center gap-1 overflow-x-auto pr-2 custom-scrollbar-hide">
+                {dedupeAiSearchBadges(searchBarBadges).map(
+                  (badgeLabel, index) => (
+                    <span
+                      key={`${badgeLabel}-${index}`}
+                      className="inline-flex min-h-[26px] max-w-[5.75rem] shrink-0 items-center justify-center rounded-full border border-black/25 px-2.5 py-1 text-center text-[9px] font-medium leading-tight text-black/85"
+                    >
+                      <span className="truncate">{badgeLabel}</span>
+                    </span>
+                  ),
+                )}
               </div>
-              <div className="bg-[#FF5757] p-1.5 rounded-full text-white ml-2 flex-shrink-0 shadow-sm">
-                <IoSearch size={16} />
+
+              <div className="flex shrink-0 items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => navigate("/search/results")}
+                  aria-label="Clear search"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-black/70 transition-colors hover:bg-black/5 hover:text-black"
+                >
+                  <HiOutlineX size={20} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowMobileSearch(true)}
+                  aria-label="Open search"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full text-black/90 transition-colors hover:bg-black/5"
+                >
+                  <IoSearch size={26} />
+                </button>
               </div>
-            </button>
+            </div>
 
             {/* Collection/Category Chips */}
             <div className="pointer-events-auto w-full max-w-[450px] flex overflow-x-auto gap-2 pb-2 scrollbar-hide scroll-smooth snap-x">
