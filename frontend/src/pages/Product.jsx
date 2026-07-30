@@ -227,12 +227,14 @@ const Product = () => {
 
   const companyImages = companyDetails?.images?.slice(0, 4) || [];
   const showMore = (companyDetails?.images?.length || 0) > 4;
+  const listingTitle =
+    companyDetails?.companyTitle || companyDetails?.companyName || companyName;
   const breadcrumbState = {
     continent: companyDetails?.continent || "Asia",
     country: companyDetails?.country,
     state: companyDetails?.state,
     companyType: companyDetails?.companyType,
-    companyTitle: companyDetails?.companyTitle,
+    companyTitle: listingTitle,
   };
 
   const getCompanyTypeBreadcrumbLabel = (companyType) => {
@@ -498,7 +500,7 @@ const Product = () => {
     lat: companyDetails?.latitude,
     lng: companyDetails?.longitude,
     name: companyDetails?.companyName,
-    companyTitle: companyDetails?.companyTitle,
+    companyTitle: listingTitle,
     googleMap: companyDetails?.googleMap,
     location: companyDetails?.city,
     reviews: companyDetails?.totalReviews,
@@ -706,7 +708,7 @@ const Product = () => {
               },
               {
                 key: "companyName",
-                label: companyDetails?.companyTitle || companyName,
+                label: listingTitle,
                 isLink: false,
               },
             ]
@@ -731,7 +733,7 @@ const Product = () => {
               ))}
           </nav>
           <h1 className="text-title font-semibold text-secondary-dark">
-            {companyDetails?.companyTitle || "Loading Title..."}
+            {listingTitle || "Loading Title..."}
           </h1>
         </div>
 
@@ -1581,7 +1583,7 @@ const Product = () => {
               },
               {
                 key: "companyName",
-                label: companyDetails?.companyTitle || companyName,
+                label: listingTitle,
                 isLink: false,
               },
             ]
@@ -1608,7 +1610,7 @@ const Product = () => {
               ))}
           </nav>
           <h1 className="text-title font-semibold text-secondary-dark">
-            {companyDetails?.companyTitle || "Loading Title..."}
+            {listingTitle || "Loading Title..."}
           </h1>
         </div>
 

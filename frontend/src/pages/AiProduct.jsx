@@ -235,6 +235,8 @@ const AiProduct = () => {
 
   const companyImages = companyDetails?.images?.slice(0, 4) || [];
   const showMore = (companyDetails?.images?.length || 0) > 4;
+  const listingTitle =
+    companyDetails?.companyTitle || companyDetails?.companyName || companyName;
   const selectedDestination = readSelectedDestination();
   const matchedSessionTitle =
     selectedDestination?.country ===
@@ -300,7 +302,7 @@ const AiProduct = () => {
         )}&category=${encodeURIComponent(breadcrumbState.companyType || "")}`,
       },
       {
-        label: companyDetails?.companyName || companyName,
+        label: listingTitle,
         truncate: true,
       },
     ].filter((item) => item.label);
@@ -660,7 +662,7 @@ const AiProduct = () => {
     lat: companyDetails?.latitude,
     lng: companyDetails?.longitude,
     name: companyDetails?.companyName,
-    companyTitle: companyDetails?.companyTitle,
+    companyTitle: listingTitle,
     googleMap: companyDetails?.googleMap,
     location: companyDetails?.city,
     reviews: companyDetails?.totalReviews,
@@ -905,7 +907,7 @@ const AiProduct = () => {
               ))}
           </nav>
           <h1 className="text-title font-semibold text-secondary-dark">
-            {companyDetails?.companyTitle || "Loading Title..."}
+            {listingTitle || "Loading Title..."}
           </h1>
         </div>
 

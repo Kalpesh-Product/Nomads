@@ -172,8 +172,8 @@ const HorizontalScrollWrapper = ({ children, title }) => {
   }, []);
 
   return (
-    <div className="relative group/scroll mb-6">
-      <div className="flex items-center justify-between mb-4 gap-2">
+    <div className="relative group/scroll mb-6 max-sm:mb-4">
+      <div className="flex items-center justify-between mb-4 gap-2 max-sm:mb-2">
         <h2 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight">
           {title}
         </h2>
@@ -181,7 +181,7 @@ const HorizontalScrollWrapper = ({ children, title }) => {
       <div
         ref={scrollRef}
         onScroll={handleScroll}
-        className="flex flex-nowrap overflow-x-auto snap-x snap-mandatory gap-4 md:gap-5 pb-2 custom-scrollbar-hide"
+        className="flex flex-nowrap overflow-x-auto snap-x snap-mandatory gap-4 md:gap-5 pb-2 custom-scrollbar-hide max-sm:gap-3 max-sm:pb-1"
       >
         {children}
       </div>
@@ -264,6 +264,14 @@ const AiGlobalListingsList = () => {
 
   const mobileValueAddedServiceItems = valueAddedServiceItems;
   const shouldSkipHeadingIntro = Boolean(location.state?.skipHeadingIntro);
+  const activeCategoryValue = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return (
+      params.get("category") ||
+      location.state?.category ||
+      ALL_LISTINGS_CATEGORY
+    );
+  }, [location.search, location.state]);
 
   const [typedHeading, setTypedHeading] = useState(() =>
     shouldSkipHeadingIntro ? CURATED_RESULTS_HEADING_TEXT : "",
@@ -1402,6 +1410,7 @@ const AiGlobalListingsList = () => {
                         cat.value,
                         useCroppedDesktopShortcuts,
                       );
+                      const isActive = activeCategoryValue === cat.value;
                       return (
                         <CategoryShortcutButton
                           key={cat.value}
@@ -1411,7 +1420,11 @@ const AiGlobalListingsList = () => {
                           buttonClassName="text-black px-1 py-2 hover:text-black transition flex items-center justify-center w-full"
                           iconBoxClassName="h-10 w-full"
                           imageClassName="h-full w-full object-contain"
-                          labelClassName="text-tiny"
+                          labelClassName={`text-tiny border-b-2 pb-1 pt-1 ${
+                            isActive
+                              ? "border-primary-blue text-primary-blue"
+                              : "border-transparent text-black"
+                          }`}
                         />
                       );
                     })
@@ -1798,11 +1811,11 @@ const AiGlobalListingsList = () => {
       </div>
 
       {/* ==================== MOBILE/TABLET VIEW (below lg) ==================== */}
-      <div className="lg:hidden flex flex-col gap-2">
-        <div className="flex flex-col gap-4 justify-center items-center w-full lg:mt-0">
-          <div className="w-full lg:min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-4 sm:px-6 lg:px-0">
-            <div className="lg:hidden w-full flex flex-col gap-4 mb-4">
-              <div className="w-[92%] mx-auto bg-white shadow-md border-2 rounded-full pl-16 pr-4 py-2 flex items-center gap-2">
+      <div className="lg:hidden flex flex-col gap-2 max-sm:gap-1">
+        <div className="flex flex-col gap-4 justify-center items-center w-full lg:mt-0 max-sm:gap-2">
+          <div className="w-full lg:min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-2 sm:px-6 lg:px-0">
+            <div className="lg:hidden w-full flex flex-col gap-4 mb-4 max-sm:gap-2 max-sm:mb-2">
+              <div className="w-[92%] mx-auto bg-white shadow-md border-2 rounded-full pl-16 pr-4 py-2 flex items-center gap-2 max-sm:w-full max-sm:pl-12 max-sm:pr-3 max-sm:py-1.5">
                 <div className="flex items-center flex-1 text-center justify-center font-medium text-secondary-dark flex-col gap-1 min-w-0">
                   <div className="flex items-center gap-2 w-full">
                     <IoSearch className="text-primary-red" />
@@ -1835,26 +1848,31 @@ const AiGlobalListingsList = () => {
               </div>
             </div>
 
-            <div className="lg:hidden flex justify-start overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4">
+            <div className="lg:hidden flex justify-start overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 max-sm:pb-2">
               {isLisitingLoading ? (
                 <CategoryShortcutSkeletons
-                  itemClassName="flex-shrink-0 snap-start px-2 py-2 flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] min-w-[5rem] md:min-w-[5.75rem]"
+                  itemClassName="flex-shrink-0 snap-start px-2 py-2 flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] min-w-[5rem] md:min-w-[5.75rem] max-sm:py-1"
                   iconBoxClassName="h-10 w-full"
                   labelClassName="w-12"
                 />
               ) : (
                 categoryOptions.map((cat) => {
                   const iconSrc = getCategoryShortcutIconSrc(cat.value, true);
+                  const isActive = activeCategoryValue === cat.value;
                   return (
                     <CategoryShortcutButton
                       key={cat.value}
                       label={cat.label}
                       iconSrc={iconSrc}
                       onClick={() => handleCategoryClick(cat.value)}
-                      buttonClassName="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] min-w-[5rem] md:min-w-[5.75rem]"
+                      buttonClassName="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] min-w-[5rem] md:min-w-[5.75rem] max-sm:py-1"
                       iconBoxClassName="h-10 w-full"
                       imageClassName="h-full w-[90%] object-contain mx-auto"
-                      labelClassName="text-[10px] font-medium whitespace-nowrap"
+                      labelClassName={`text-[10px] font-medium whitespace-nowrap border-b-2 ${
+                        isActive
+                          ? "border-primary-blue text-primary-blue"
+                          : "border-transparent text-black"
+                      }`}
                     />
                   );
                 })
@@ -1953,7 +1971,7 @@ const AiGlobalListingsList = () => {
           </AnimatePresence>
         </div>
 
-        <Container padding={false}>
+        <Container padding={false} className="max-sm:px-2">
           <div className="">
             <div className="font-semibold text-md">
               <div className="custom-scrollbar-hide">
@@ -2173,12 +2191,12 @@ const AiGlobalListingsList = () => {
                         sectionRefs.current["valueaddedservices-mobile"] =
                           element;
                       }}
-                      className="mb-6 scroll-mt-24"
+                      className="mb-6 scroll-mt-24 max-sm:mb-4"
                     >
-                      <h2 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold leading-tight mb-4">
+                      <h2 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold leading-tight mb-4 max-sm:mb-2">
                         Value-Added Services in {selectedLocationLabel}
                       </h2>
-                      <div className="flex md:hidden flex-nowrap overflow-x-auto snap-x snap-mandatory gap-4 pb-2 custom-scrollbar-hide">
+                      <div className="flex md:hidden flex-nowrap overflow-x-auto snap-x snap-mandatory gap-4 pb-2 custom-scrollbar-hide max-sm:gap-3 max-sm:pb-1">
                         {mobileValueAddedServiceItems.map((service) => {
                           const isDisabled = !service.path;
 
