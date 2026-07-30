@@ -827,6 +827,7 @@ const AiGlobalListingsMap = () => {
       state: {
         breadcrumbLoading: true,
         companyId: item.companyId,
+        businessId: item.businessId,
         type: item.companyType || "ss",
         selectedStateLabel: selectedLocationLabel,
         selectedFilters: location.state?.selectedFilters,

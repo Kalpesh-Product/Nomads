@@ -33,7 +33,7 @@ let companyLocationsCache = {
 };
 
 const loadCompanyLocations = async () => {
-  const companies = await Company.find()
+  const companies = await Company.find({ isActive: true })
     .select("country state continent isPublic -_id")
     .lean()
     .exec();
@@ -862,6 +862,7 @@ export const getCompaniesDataNomads = async (req, res, next) => {
           companyName: 1,
           companyTitle: 1,
           companyId: 1,
+          businessId: 1,
           companyType: 1,
           country: 1,
           state: 1,
@@ -972,16 +973,21 @@ export const getCompanyData = async (req, res, next) => {
   };
 
   try {
-    const { companyId, companyType, userId, companyName } = req.query;
+    const { companyId, companyType, userId, companyName, businessId } = req.query;
 
     let companyQuery = {};
 
-    if (companyId) {
+    // A companyId can now have several listings of the same companyType
+    // (multiple locations) — businessId is the only field unique to a single
+    // listing, so it takes priority whenever the caller has it.
+    if (businessId) {
+      companyQuery.businessId = businessId;
+    } else if (companyId) {
       companyQuery.companyId = companyId;
     }
     const normalizedCompanyName =
       typeof companyName === "string" ? companyName.trim() : "";
-    if (!companyId && normalizedCompanyName) {
+    if (!businessId && !companyId && normalizedCompanyName) {
       const escapedCompanyName = normalizedCompanyName.replace(
         /[.*+?^${}()|[\]\\]/g,
         "\\$&",
@@ -990,7 +996,7 @@ export const getCompanyData = async (req, res, next) => {
         $regex: new RegExp(`^${escapedCompanyName}$`, "i"),
       };
     }
-    if (companyType) {
+    if (!businessId && companyType) {
       companyQuery.companyType = companyType;
     }
 
@@ -2075,16 +2081,23 @@ export const activateProduct = async (req, res, next) => {
       });
     }
 
-    const product = await Company.findOneAndUpdate(
-      { businessId },
-      { isActive: status },
-    );
+    // A listing can only be public while it's active — deactivating one
+    // that was public must also pull it out of public visibility, otherwise
+    // it'd sit as isPublic:true/isActive:false, an inconsistent state the
+    // "public" toggle's own disabled-when-inactive rule assumes can't happen.
+    const update = status ? { isActive: true } : { isActive: false, isPublic: false };
+
+    const product = await Company.findOneAndUpdate({ businessId }, update);
 
     if (!product) {
       return res.status(400).json({
         message: "Failed to update product",
       });
     }
+
+    // A toggle here can add/remove the last active listing at a location —
+    // don't leave the cached dropdown data stale for up to 5 minutes.
+    companyLocationsCache = { data: null, expiresAt: 0, pendingRequest: null };
 
     const activeStatus = status ? "activated" : "deactivated";
     return res
@@ -2107,7 +2120,7 @@ export const deactivateProduct = async (req, res, next) => {
 
     const product = await Company.findOneAndUpdate(
       { businessId },
-      { isActive: false },
+      { isActive: false, isPublic: false },
     );
 
     if (!product) {
@@ -2116,9 +2129,47 @@ export const deactivateProduct = async (req, res, next) => {
       });
     }
 
+    companyLocationsCache = { data: null, expiresAt: 0, pendingRequest: null };
+
     return res
       .status(200)
       .json({ message: "Product has been deactivated successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Staff-only visibility toggle — separate from isActive. A listing must
+// already be active to be made public; the client also enforces this by
+// disabling the control, but this is the authoritative check.
+export const setListingPublicStatus = async (req, res, next) => {
+  try {
+    const { businessId, isPublic } = req.body;
+
+    if (!businessId) {
+      return res.status(400).json({ message: "Business Id missing" });
+    }
+    if (typeof isPublic !== "boolean") {
+      return res.status(400).json({ message: "isPublic must be true/false" });
+    }
+
+    const existing = await Company.findOne({ businessId }).select("isActive");
+    if (!existing) {
+      return res.status(404).json({ message: "Listing not found" });
+    }
+    if (isPublic && !existing.isActive) {
+      return res.status(400).json({
+        message: "Only active listings can be made public.",
+      });
+    }
+
+    await Company.findOneAndUpdate({ businessId }, { isPublic });
+
+    companyLocationsCache = { data: null, expiresAt: 0, pendingRequest: null };
+
+    return res.status(200).json({
+      message: `Listing made ${isPublic ? "public" : "private"} successfully`,
+    });
   } catch (error) {
     next(error);
   }

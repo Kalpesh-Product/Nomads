@@ -163,7 +163,11 @@ export default function Map({
       }
       if (!disableNavigation) {
         navigate(`/listings/${encodeURIComponent(loc.name)}`, {
-          state: { companyId: loc?.companyId, type: loc?.companyType },
+          state: {
+            companyId: loc?.companyId,
+            businessId: loc?.businessId,
+            type: loc?.companyType,
+          },
         });
       }
     },

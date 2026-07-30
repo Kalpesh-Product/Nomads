@@ -60,10 +60,12 @@ const AiProduct = () => {
   const { company } = useParams();
   const [searchParams] = useSearchParams();
   const locationState = location.state || {};
-  const { companyId: stateCompanyId, type: stateType } = locationState;
+  const { companyId: stateCompanyId, businessId: stateBusinessId, type: stateType } = locationState;
   const typeFromQuery = searchParams.get("companyType")?.trim() || null;
+  const businessIdFromQuery = searchParams.get("businessId")?.trim() || null;
   const companyName = company ? company.trim() : "";
   const companyId = stateCompanyId || null;
+  const businessId = stateBusinessId || businessIdFromQuery || null;
   const type = stateType || typeFromQuery || null;
   const queryClient = useQueryClient();
   const { auth } = useAuth();
@@ -122,13 +124,18 @@ const AiProduct = () => {
   const { data: companyDetails, isPending: isCompanyDetails } = useQuery({
     queryKey: [
       "companyDetails",
-      companyId,
+      businessId || companyId,
       companyName || "unknown",
       userId || "guest",
     ],
     queryFn: async () => {
       const params = new URLSearchParams();
-      if (companyId) {
+      // A companyId can have several listings of the same type in
+      // different locations — businessId is the only identifier unique to
+      // this one, so it must win whenever we have it.
+      if (businessId) {
+        params.set("businessId", businessId);
+      } else if (companyId) {
         params.set("companyId", companyId);
       } else if (companyName) {
         params.set("companyName", companyName);
@@ -143,7 +150,7 @@ const AiProduct = () => {
       const response = await axios.get(url);
       return response?.data;
     },
-    enabled: !!companyId || !!companyName,
+    enabled: !!businessId || !!companyId || !!companyName,
     refetchOnMount: "always",
   });
 
@@ -235,10 +242,12 @@ const AiProduct = () => {
     selectedDestination?.city === companyDetails?.state?.trim().toLowerCase()
       ? selectedDestination?.title
       : "";
-  const displayStateLabel =
-    location.state?.selectedStateLabel ||
-    matchedSessionTitle ||
-    companyDetails?.state;
+  // The breadcrumb must describe whichever listing actually came back from
+  // companyDetails — location.state?.selectedStateLabel is whatever the user
+  // searched with on the previous page and can point at a different
+  // location entirely once a company has multiple listings of the same
+  // type, so it's deliberately not used here.
+  const displayStateLabel = matchedSessionTitle || companyDetails?.state;
   const breadcrumbState = {
     continent: companyDetails?.continent || "Asia",
     country: companyDetails?.country,

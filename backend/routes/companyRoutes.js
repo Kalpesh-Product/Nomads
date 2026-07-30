@@ -20,6 +20,7 @@ import {
   escalateLeadToHostPanel,
   bulkUpdateCompanyInclusions,
   deactivateProduct,
+  setListingPublicStatus,
   editCompanyImagesBulk,
   getCompaniesDataNomads,
   getCompaniesDataMaster,
@@ -50,6 +51,7 @@ router.get("/companiesma", getCompaniesDataMaster);
 router.get("/company-countries", getCompanyCountries);
 router.patch("/activate-product", activateProduct);
 router.patch("/deactivate-product", deactivateProduct);
+router.patch("/set-public-status", setListingPublicStatus);
 router.get("/get-single-company-data", getCompanyData);
 router.get("/get-listings/:companyId", getListings);
 router.get("/get-company-data/:companyName", getCompany); //check company from admin panel before adding website link after creating website.

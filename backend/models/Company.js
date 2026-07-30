@@ -132,7 +132,7 @@ const companySchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-});
+}, { timestamps: true });
 
 companySchema.index({ companyType: 1 });
 

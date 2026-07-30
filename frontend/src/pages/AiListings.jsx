@@ -2010,6 +2010,7 @@ const AiListings = ({ forceListView = false }) => {
                                 {
                                   state: {
                                     companyId: item.companyId,
+                                    businessId: item.businessId,
                                     type: item.companyType,
                                     selectedStateLabel,
                                     searchBarBadges,
