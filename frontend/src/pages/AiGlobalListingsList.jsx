@@ -264,6 +264,14 @@ const AiGlobalListingsList = () => {
 
   const mobileValueAddedServiceItems = valueAddedServiceItems;
   const shouldSkipHeadingIntro = Boolean(location.state?.skipHeadingIntro);
+  const activeCategoryValue = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return (
+      params.get("category") ||
+      location.state?.category ||
+      ALL_LISTINGS_CATEGORY
+    );
+  }, [location.search, location.state]);
 
   const [typedHeading, setTypedHeading] = useState(() =>
     shouldSkipHeadingIntro ? CURATED_RESULTS_HEADING_TEXT : "",
@@ -1401,6 +1409,7 @@ const AiGlobalListingsList = () => {
                         cat.value,
                         useCroppedDesktopShortcuts,
                       );
+                      const isActive = activeCategoryValue === cat.value;
                       return (
                         <CategoryShortcutButton
                           key={cat.value}
@@ -1410,7 +1419,11 @@ const AiGlobalListingsList = () => {
                           buttonClassName="text-black px-1 py-2 hover:text-black transition flex items-center justify-center w-full"
                           iconBoxClassName="h-10 w-full"
                           imageClassName="h-full w-full object-contain"
-                          labelClassName="text-tiny"
+                          labelClassName={`text-tiny border-b-2 pb-1 pt-1 ${
+                            isActive
+                              ? "border-primary-blue text-primary-blue"
+                              : "border-transparent text-black"
+                          }`}
                         />
                       );
                     })
@@ -1844,6 +1857,7 @@ const AiGlobalListingsList = () => {
               ) : (
                 categoryOptions.map((cat) => {
                   const iconSrc = getCategoryShortcutIconSrc(cat.value, true);
+                  const isActive = activeCategoryValue === cat.value;
                   return (
                     <CategoryShortcutButton
                       key={cat.value}
@@ -1853,7 +1867,11 @@ const AiGlobalListingsList = () => {
                       buttonClassName="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] min-w-[5rem] md:min-w-[5.75rem] max-sm:py-1"
                       iconBoxClassName="h-10 w-full"
                       imageClassName="h-full w-[90%] object-contain mx-auto"
-                      labelClassName="text-[10px] font-medium whitespace-nowrap"
+                      labelClassName={`text-[10px] font-medium whitespace-nowrap border-b-2 ${
+                        isActive
+                          ? "border-primary-blue text-primary-blue"
+                          : "border-transparent text-black"
+                      }`}
                     />
                   );
                 })
