@@ -295,7 +295,7 @@ const NomadAiLayout = () => {
 
       {isMobileSidebarOpen && (
         <div
-          className={`fixed inset-0 z-[70] bg-black/35 ${
+          className={`fixed inset-0 z-[2100] bg-black/35 ${
             isManualSearchCompact ? "" : "sm:hidden"
           }`}
           onClick={() => setIsMobileSidebarOpen(false)}
