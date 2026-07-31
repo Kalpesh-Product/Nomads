@@ -118,6 +118,11 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
   };
 
   const goToHostssMain = () => {
+    if (window.location.hostname.startsWith("host.")) {
+      window.location.href = window.location.origin;
+      return;
+    }
+
     if (window.location.hostname.includes("localhost")) {
       window.location.href = "http://localhost:5173";
     } else {
