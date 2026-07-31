@@ -1815,36 +1815,31 @@ const AiGlobalListingsList = () => {
         <div className="flex flex-col gap-4 justify-center items-center w-full lg:mt-0 max-sm:gap-2">
           <div className="w-full lg:min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-2 sm:px-6 lg:px-0">
             <div className="lg:hidden w-full flex flex-col gap-4 mb-4 max-sm:gap-2 max-sm:mb-2">
-              <div className="w-[92%] mx-auto bg-white shadow-md border-2 rounded-full pl-16 pr-4 py-2 flex items-center gap-2 max-sm:w-full max-sm:pl-12 max-sm:pr-3 max-sm:py-1.5">
-                <div className="flex items-center flex-1 text-center justify-center font-medium text-secondary-dark flex-col gap-1 min-w-0">
-                  <div className="flex items-center gap-2 w-full">
-                    <IoSearch className="text-primary-red" />
-                    <span className="text-[11px] font-bold text-gray-900 truncate w-full text-left">
-                      {`${(formData?.country || "Country").charAt(0).toUpperCase() + (formData?.country || "Country").slice(1)} . ${
-                        selectedLocationLabel || "Unknown"
-                      } . ${
-                        formData?.category
-                          ? categoryOptions.find(
-                              (c) => c.value === formData.category,
-                            )?.label ||
-                            formData.category.charAt(0).toUpperCase() +
-                              formData.category.slice(1)
-                          : "All"
-                      }`}
-                    </span>
-                  </div>
-                  <span className="text-[10px] text-gray-500">
-                    {formData?.count || "1-5"} Nomads
-                  </span>
+              <div className="mx-auto flex min-h-[46px] w-[92%] items-center rounded-full border bg-white px-3 py-2 shadow-[0_5px_14px_rgba(0,0,0,0.12)] max-sm:w-full max-sm:px-2">
+                <div className="flex flex-1 items-center gap-1 overflow-x-auto pr-2 custom-scrollbar-hide">
+                  {dedupeAiSearchBadges(searchBarBadges).map(
+                    (badgeLabel, index) => (
+                      <span
+                        key={`${badgeLabel}-${index}`}
+                        className="inline-flex min-h-[26px] max-w-[5.75rem] shrink-0 items-center justify-center rounded-full border border-black/25 px-2.5 py-1 text-center text-[9px] font-medium leading-tight text-black/85"
+                      >
+                        <span className="truncate">{badgeLabel}</span>
+                      </span>
+                    ),
+                  )}
                 </div>
-                <button
-                  type="button"
-                  onClick={() => navigate(-1)}
-                  aria-label="Go back to previous page"
-                  className="h-8 w-8 shrink-0 rounded-full bg-gray-200 text-black/60 flex items-center justify-center"
-                >
-                  <HiOutlineX size={18} />
-                </button>
+
+                <div className="flex shrink-0 items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => navigate(-1)}
+                    aria-label="Clear search and go back"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-black/70 transition-colors hover:bg-black/5 hover:text-black"
+                  >
+                    <HiOutlineX size={20} />
+                  </button>
+                  <IoSearch size={26} className="text-black/90" />
+                </div>
               </div>
             </div>
 

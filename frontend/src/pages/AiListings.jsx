@@ -30,7 +30,7 @@ import { DESTINATION_HIGHLIGHT_FILTERS } from "../data/aiDestinationHighlights.j
 import SearchBarCombobox from "../components/SearchBarCombobox.jsx";
 import AiSelectedBadgesSearchBar from "../components/AiSelectedBadgesSearchBar.jsx";
 import { IoSearch } from "react-icons/io5";
-import { HiOutlineArrowLeft } from "react-icons/hi";
+import { HiOutlineArrowLeft, HiOutlineX } from "react-icons/hi";
 import { AnimatePresence, motion } from "motion/react";
 import useAuth from "../hooks/useAuth.js";
 import useSpecialUserEmails from "../hooks/useSpecialUserEmails.js";
@@ -1294,35 +1294,36 @@ const AiListings = ({ forceListView = false }) => {
           />
           <div className={isHeadingSequenceComplete ? "block" : "hidden"}>
             <div className="lg:hidden w-full flex flex-col gap-4 mb-4">
-              <div className="bg-white shadow-md flex items-center w-[92%] mx-auto text-center justify-center font-medium text-secondary-dark border-2 px-6 py-2 rounded-full flex-col gap-1">
-                <div className="flex items-center gap-2">
-                  <IoSearch className="text-primary-red" />
-                  <span className="text-[11px] font-bold text-gray-900 truncate w-full text-left">
-                    {`${(formData?.country || "Country").charAt(0).toUpperCase() + (formData?.country || "Country").slice(1)} . ${
-                      formData?.location
-                        ? formData.location
-                            .split(" ")
-                            .map(
-                              (word) =>
-                                word.charAt(0).toUpperCase() +
-                                word.slice(1).toLowerCase(),
-                            )
-                            .join(" ")
-                        : "Unknown"
-                    } . ${
-                      formData?.category
-                        ? categoryOptions.find(
-                            (c) => c.value === formData.category,
-                          )?.label ||
-                          formData.category.charAt(0).toUpperCase() +
-                            formData.category.slice(1)
-                        : "All"
-                    }`}
-                  </span>
+              <div className="mx-auto flex min-h-[46px] w-[92%] items-center rounded-full border bg-white px-3 py-2 shadow-[0_5px_14px_rgba(0,0,0,0.12)] max-sm:w-full max-sm:px-2">
+                <div className="flex flex-1 items-center gap-1 overflow-x-auto pr-2 custom-scrollbar-hide">
+                  {badgesWithCategory.map((badgeLabel, index) => (
+                    <span
+                      key={`${badgeLabel}-${index}`}
+                      className="inline-flex min-h-[26px] max-w-[5.75rem] shrink-0 items-center justify-center rounded-full border border-black/25 px-2.5 py-1 text-center text-[9px] font-medium leading-tight text-black/85"
+                    >
+                      <span className="truncate">{badgeLabel}</span>
+                    </span>
+                  ))}
                 </div>
-                <span className="text-[10px] text-gray-500">
-                  {formData?.count || "1-5"} Nomads
-                </span>
+
+                <div className="flex shrink-0 items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => navigate("/search/results")}
+                    aria-label="Clear search"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-black/70 transition-colors hover:bg-black/5 hover:text-black"
+                  >
+                    <HiOutlineX size={20} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowMobileSearch(true)}
+                    aria-label="Open search"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full text-black/90 transition-colors hover:bg-black/5"
+                  >
+                    <IoSearch size={26} />
+                  </button>
+                </div>
               </div>
             </div>
 
