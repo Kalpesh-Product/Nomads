@@ -3,22 +3,59 @@ import { useLocation } from "react-router-dom";
 
 const STORAGE_KEY = "nomad-login-query";
 
-const canUseSessionStorage = () => typeof window !== "undefined";
+const canUseStorage = () => typeof window !== "undefined";
+
+const storageValueIsTrue = (storage) => {
+  try {
+    return storage.getItem(STORAGE_KEY) === "true";
+  } catch {
+    return false;
+  }
+};
+
+const setStorageLoginState = (storage) => {
+  try {
+    storage.setItem(STORAGE_KEY, "true");
+  } catch {
+    // Storage can be unavailable in restricted browser modes.
+  }
+};
+
+const removeStorageLoginState = (storage) => {
+  try {
+    storage.removeItem(STORAGE_KEY);
+  } catch {
+    // Storage can be unavailable in restricted browser modes.
+  }
+};
 
 export const readStoredLoginState = () => {
-  if (!canUseSessionStorage()) {
+  if (!canUseStorage()) {
     return false;
   }
 
-  return window.sessionStorage.getItem(STORAGE_KEY) === "true";
+  return (
+    storageValueIsTrue(window.localStorage) ||
+    storageValueIsTrue(window.sessionStorage)
+  );
 };
 
-export const clearStoredLoginState = () => {
-  if (!canUseSessionStorage()) {
+export const storeLoginState = () => {
+  if (!canUseStorage()) {
     return;
   }
 
-  window.sessionStorage.removeItem(STORAGE_KEY);
+  setStorageLoginState(window.localStorage);
+  setStorageLoginState(window.sessionStorage);
+};
+
+export const clearStoredLoginState = () => {
+  if (!canUseStorage()) {
+    return;
+  }
+
+  removeStorageLoginState(window.localStorage);
+  removeStorageLoginState(window.sessionStorage);
 };
 
 export default function useNomadLoginState() {
@@ -30,12 +67,12 @@ export default function useNomadLoginState() {
   }, [location.search]);
 
   useEffect(() => {
-    if (!canUseSessionStorage()) {
+    if (!canUseStorage()) {
       return;
     }
 
     if (hasLoginQuery) {
-      window.sessionStorage.setItem(STORAGE_KEY, "true");
+      storeLoginState();
     }
   }, [hasLoginQuery]);
 
