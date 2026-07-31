@@ -83,3 +83,15 @@
   min-width: 13rem;
   white-space: nowrap;
 }
+
+@media (max-width: 480px) {
+  .swal2-actions--visa-support {
+    flex-direction: column-reverse !important;
+    align-items: stretch;
+  }
+
+  .swal2-actions--visa-support .swal2-styled {
+    width: 100%;
+    min-width: 0;
+  }
+}
