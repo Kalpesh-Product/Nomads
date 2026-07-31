@@ -65,10 +65,10 @@ const Career = () => {
             <Container>
 
                 <div className="py-0 sm:py-12">
-                    <h3 className="text-3xl md:text-5xl lg:text-6xl font-semibold text-host mb-2">
+                    <h3 className="font-comic text-3xl md:text-5xl lg:text-6xl font-semibold text-host mb-2">
                         JOIN OUR TEAM
                     </h3>
-                    <h2 className="text-lg md:text-2xl lg:text-3xl font-semibold mb-4 text-host">
+                    <h2 className="font-comic text-lg md:text-2xl lg:text-3xl font-semibold mb-4 text-host">
                         OPEN POSITION
                     </h2>
                     <div className="border-b-2 border-gray-300 w-12 mb-8"></div>
