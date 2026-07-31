@@ -2175,6 +2175,100 @@ export const setListingPublicStatus = async (req, res, next) => {
   }
 };
 
+const escapeRegExp = (value = "") =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+// Case-insensitive exact match, so "usa"/"USA"/"Usa" all hit the same
+// location bucket regardless of how a given listing's data was entered.
+const exactCaseInsensitive = (value) =>
+  new RegExp(`^${escapeRegExp(value.trim())}$`, "i");
+
+// Country > state > city tree with listing counts, used by the Master
+// Panel's bulk-publish UI to build cascading location selects and preview
+// how many listings a bulk isPublic change would affect.
+export const getLocationTree = async (req, res, next) => {
+  try {
+    const companies = await Company.find({})
+      .select("country state city isActive isPublic -_id")
+      .lean()
+      .exec();
+
+    const countryMap = new Map();
+
+    for (const company of companies) {
+      const country = company.country?.trim();
+      const state = company.state?.trim();
+      const city = company.city?.trim();
+      if (!country || !state || !city) continue;
+
+      if (!countryMap.has(country)) countryMap.set(country, new Map());
+      const stateMap = countryMap.get(country);
+
+      if (!stateMap.has(state)) stateMap.set(state, new Map());
+      const cityMap = stateMap.get(state);
+
+      if (!cityMap.has(city)) {
+        cityMap.set(city, { total: 0, active: 0, public: 0 });
+      }
+      const counts = cityMap.get(city);
+      counts.total += 1;
+      if (company.isActive) counts.active += 1;
+      if (company.isPublic) counts.public += 1;
+    }
+
+    const tree = Array.from(countryMap.entries()).map(([country, stateMap]) => ({
+      country,
+      states: Array.from(stateMap.entries()).map(([state, cityMap]) => ({
+        state,
+        cities: Array.from(cityMap.entries()).map(([city, counts]) => ({
+          city,
+          ...counts,
+        })),
+      })),
+    }));
+
+    return res.status(200).json(tree);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Bulk sibling of setListingPublicStatus: flips isPublic for every listing
+// matching a country (+ optional state/city), instead of one businessId at
+// a time. Same safety rule — only currently-active listings can be made
+// public — applies per-listing here too.
+export const setBulkListingPublicStatus = async (req, res, next) => {
+  try {
+    const { country, state, city, isPublic } = req.body;
+
+    if (!country || !state) {
+      return res.status(400).json({ message: "Country and state are required" });
+    }
+    if (typeof isPublic !== "boolean") {
+      return res.status(400).json({ message: "isPublic must be true/false" });
+    }
+
+    const filter = {
+      country: exactCaseInsensitive(country),
+      state: exactCaseInsensitive(state),
+    };
+    if (city) filter.city = exactCaseInsensitive(city);
+    if (isPublic) filter.isActive = true;
+
+    const result = await Company.updateMany(filter, { isPublic });
+
+    companyLocationsCache = { data: null, expiresAt: 0, pendingRequest: null };
+
+    return res.status(200).json({
+      message: `${result.modifiedCount} listing(s) made ${isPublic ? "public" : "private"}.`,
+      matched: result.matchedCount,
+      modified: result.modifiedCount,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getCompanyLeads = async (req, res, next) => {
   try {
     const { companyId, workspaceId, isEscalated } = req.query;
