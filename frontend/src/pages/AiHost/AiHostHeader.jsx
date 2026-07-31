@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { Drawer, Avatar, Popover, CircularProgress } from "@mui/material";
 import { IoCloseSharp } from "react-icons/io5";
 import { HiOutlineMenu } from "react-icons/hi";
-import { FiLogOut } from "react-icons/fi";
+import { FiLogOut, FiUser } from "react-icons/fi";
 import useAuth from "../../hooks/useAuth";
 import useNomadLoginState from "../../hooks/useNomadLoginState";
 import AiContainer from "../../components/AiContainer";
@@ -66,6 +66,11 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
 
   const handleAvatarClick = (event) => setAnchorEl(event.currentTarget);
   const handlePopoverClose = () => setAnchorEl(null);
+
+  const handleProfileMenuClick = () => {
+    navigate("/profile?tab=profile");
+    handlePopoverClose();
+  };
 
   const handleSignOut = async () => {
     if (isLogoutLoading) return;
@@ -390,7 +395,17 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
                 },
               }}
             >
-              <div className="p-[0.3rem]">
+              <div className="p-[0.3rem] flex flex-col gap-1">
+                <button
+                  type="button"
+                  onClick={handleProfileMenuClick}
+                  className="w-full min-w-[140px] h-10 px-5 rounded-2xl bg-white shadow-sm border border-gray-200 flex items-center gap-3 text-[#2f2f2f] text-[15px] font-medium hover:shadow-md active:bg-gray-50 transition-all"
+                >
+                  <span className="w-5 h-5 flex items-center justify-center text-gray-500">
+                    <FiUser />
+                  </span>
+                  <span>Profile</span>
+                </button>
                 <button
                   type="button"
                   onClick={handleSignOut}
