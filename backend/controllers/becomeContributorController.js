@@ -1,6 +1,8 @@
 import * as yup from "yup";
 import BecomeContributor from "../models/BecomeContributor.js";
 
+const MESSAGE_CHARACTER_LIMIT = 1000;
+
 const becomeContributorSchema = yup.object({
   contributionType: yup.string().required("Contribution type is required"),
   fullName: yup.string().required("Full name is required"),
@@ -13,7 +15,14 @@ const becomeContributorSchema = yup.object({
     .required("Email is required"),
   contactCode: yup.string().required("Contact code is required"),
   contactNumber: yup.string().required("Contact number is required"),
-  message: yup.string().trim().default(""),
+  message: yup
+    .string()
+    .trim()
+    .max(
+      MESSAGE_CHARACTER_LIMIT,
+      `Message cannot exceed ${MESSAGE_CHARACTER_LIMIT} characters`,
+    )
+    .default(""),
 });
 
 export const createBecomeContributor = async (req, res, next) => {

@@ -22,6 +22,8 @@ import {
   renderNotificationEmail,
 } from "../../utils/emailTemplates.js";
 
+const AI_CONTRIBUTOR_MESSAGE_CHARACTER_LIMIT = 1000;
+
 function istNowPieces() {
   const tz = "Asia/Kolkata";
   const now = new Date();
@@ -462,7 +464,14 @@ const aiBecomeContributorSchema = yup.object({
     .required("Please provide your email address"),
   contactCode: yup.string().trim().required("Contact code is required"),
   contactNumber: yup.string().trim().required("Contact number is required"),
-  message: yup.string().trim().nullable(),
+  message: yup
+    .string()
+    .trim()
+    .max(
+      AI_CONTRIBUTOR_MESSAGE_CHARACTER_LIMIT,
+      `Message cannot exceed ${AI_CONTRIBUTOR_MESSAGE_CHARACTER_LIMIT} characters`,
+    )
+    .nullable(),
   sheetName: yup.string().required("Please provide a sheet name"),
 });
 

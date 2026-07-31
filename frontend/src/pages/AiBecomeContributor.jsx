@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Box,
   Button,
@@ -39,6 +39,8 @@ const defaultValues = {
   message: "",
 };
 
+const MESSAGE_CHARACTER_LIMIT = 1000;
+
 const CONTRIBUTOR_PROMPT =
   "we are constantly looking out for individuals who can support our cause to make WoNo the largest Nomad Community & Platform in the world. We know we will not be able to do this alone.";
 const CONTRIBUTOR_HEADING = "Become a Wono Contributor";
@@ -70,6 +72,7 @@ const AiBecomeContributor = () => {
   const [typedPageHeading, setTypedPageHeading] = useState("");
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const messageLimitAlertedRef = useRef(false);
   const { auth } = useAuth();
   const isLoggedIn = Boolean(auth?.user);
   const countries = useMemo(() => Country.getAllCountries(), []);
@@ -120,6 +123,26 @@ const AiBecomeContributor = () => {
   const handleFormSubmit = (formValues) => {
     setIsSubmitting(true);
     submitContributor(formValues);
+  };
+
+  const handleMessageChange = (event, onChange) => {
+    const nextValue = event.target.value;
+
+    if (nextValue.length > MESSAGE_CHARACTER_LIMIT) {
+      if (!messageLimitAlertedRef.current) {
+        messageLimitAlertedRef.current = true;
+        showErrorAlert(
+          `Message cannot exceed ${MESSAGE_CHARACTER_LIMIT} characters.`,
+        );
+      }
+      onChange(nextValue.slice(0, MESSAGE_CHARACTER_LIMIT));
+      return;
+    }
+
+    if (nextValue.length < MESSAGE_CHARACTER_LIMIT) {
+      messageLimitAlertedRef.current = false;
+    }
+    onChange(nextValue);
   };
 
   const handleCountryChange = (countryName, onChange) => {
@@ -472,19 +495,48 @@ const AiBecomeContributor = () => {
                   <Controller
                     name="message"
                     control={control}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        fullWidth
-                        multiline
-                        minRows={3}
-                        label="Message"
-                        variant="standard"
-                        InputLabelProps={{
-                          sx: floatingLabelSx,
-                        }}
-                      />
-                    )}
+                    rules={{
+                      maxLength: {
+                        value: MESSAGE_CHARACTER_LIMIT,
+                        message: `Message cannot exceed ${MESSAGE_CHARACTER_LIMIT} characters`,
+                      },
+                    }}
+                    render={({ field, fieldState }) => {
+                      const messageLength = field.value?.length || 0;
+
+                      return (
+                        <TextField
+                          {...field}
+                          fullWidth
+                          multiline
+                          minRows={3}
+                          label="Message"
+                          variant="standard"
+                          onChange={(event) =>
+                            handleMessageChange(event, field.onChange)
+                          }
+                          error={!!fieldState.error}
+                          helperText={
+                            <Box
+                              component="span"
+                              sx={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                gap: 2,
+                              }}
+                            >
+                              <span>{fieldState.error?.message || " "}</span>
+                              <span>
+                                {messageLength}/{MESSAGE_CHARACTER_LIMIT}
+                              </span>
+                            </Box>
+                          }
+                          InputLabelProps={{
+                            sx: floatingLabelSx,
+                          }}
+                        />
+                      );
+                    }}
                   />
                 </div>
 
