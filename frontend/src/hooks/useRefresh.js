@@ -1,4 +1,8 @@
 import { api } from "../utils/axios";
+import {
+  clearStoredLoginState,
+  storeLoginState,
+} from "./useNomadLoginState";
 import useAuth from "./useAuth";
 
 export default function useRefresh() {
@@ -15,6 +19,7 @@ export default function useRefresh() {
           user: response.data.user,
         };
       });
+      storeLoginState();
       return response.data;
     } catch (error) {
       setAuth((prevState) => {
@@ -24,6 +29,7 @@ export default function useRefresh() {
           user: null,
         };
       });
+      clearStoredLoginState();
     }
   };
   return refresh;
