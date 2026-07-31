@@ -2081,11 +2081,12 @@ export const activateProduct = async (req, res, next) => {
       });
     }
 
-    // A listing can only be public while it's active — deactivating one
-    // that was public must also pull it out of public visibility, otherwise
-    // it'd sit as isPublic:true/isActive:false, an inconsistent state the
-    // "public" toggle's own disabled-when-inactive rule assumes can't happen.
-    const update = status ? { isActive: true } : { isActive: false, isPublic: false };
+    // A listing can only be public while it's inactive (active = internal
+    // Wono-team review, not yet live) — reactivating one that was public
+    // must pull it out of public visibility first, otherwise it'd sit as
+    // isPublic:true/isActive:true, a state the "public" toggle's own
+    // disabled-while-active rule assumes can't happen.
+    const update = status ? { isActive: true, isPublic: false } : { isActive: false };
 
     const product = await Company.findOneAndUpdate({ businessId }, update);
 
@@ -2139,9 +2140,11 @@ export const deactivateProduct = async (req, res, next) => {
   }
 };
 
-// Staff-only visibility toggle — separate from isActive. A listing must
-// already be active to be made public; the client also enforces this by
-// disabling the control, but this is the authoritative check.
+// Staff-only visibility toggle — separate from isActive. "Active" is the
+// internal Wono-team review/testing state; a listing must be switched to
+// inactive (review complete) before it can be made public. The client also
+// enforces this by disabling the control, but this is the authoritative
+// check.
 export const setListingPublicStatus = async (req, res, next) => {
   try {
     const { businessId, isPublic } = req.body;
@@ -2157,9 +2160,9 @@ export const setListingPublicStatus = async (req, res, next) => {
     if (!existing) {
       return res.status(404).json({ message: "Listing not found" });
     }
-    if (isPublic && !existing.isActive) {
+    if (isPublic && existing.isActive) {
       return res.status(400).json({
-        message: "Only active listings can be made public.",
+        message: "Only inactive listings can be made public — mark it inactive once internal review is done.",
       });
     }
 
@@ -2235,8 +2238,8 @@ export const getLocationTree = async (req, res, next) => {
 
 // Bulk sibling of setListingPublicStatus: flips isPublic for every listing
 // matching a country (+ optional state/city), instead of one businessId at
-// a time. Same safety rule — only currently-active listings can be made
-// public — applies per-listing here too.
+// a time. Same safety rule as setListingPublicStatus — only currently
+// inactive listings can be made public — applies per-listing here too.
 export const setBulkListingPublicStatus = async (req, res, next) => {
   try {
     const { country, state, city, isPublic } = req.body;
@@ -2253,7 +2256,7 @@ export const setBulkListingPublicStatus = async (req, res, next) => {
       state: exactCaseInsensitive(state),
     };
     if (city) filter.city = exactCaseInsensitive(city);
-    if (isPublic) filter.isActive = true;
+    if (isPublic) filter.isActive = false;
 
     const result = await Company.updateMany(filter, { isPublic });
 

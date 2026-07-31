@@ -135,6 +135,7 @@ const companySchema = new mongoose.Schema({
 }, { timestamps: true });
 
 companySchema.index({ companyType: 1 });
+companySchema.index({ companyId: 1 });
 
 const Company = mongoose.model("Company", companySchema);
 export default Company;
