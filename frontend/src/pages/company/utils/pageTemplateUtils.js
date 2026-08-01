@@ -111,6 +111,17 @@ export const getCatalogItemsForProductPage = (data, page) => {
       : [];
   }
 
+  // Custom pages: use this page's own products first — each page has its
+  // own list now. Falls back to the shared global products list only for
+  // pages that predate per-page products (this is the same fallback chain
+  // used in HostPanel's own builder preview, kept in sync here since this
+  // is the renderer that actually serves the live hosted site).
+  if (Array.isArray(page?.subProducts) && page.subProducts.length) {
+    return page.subProducts
+      .filter((item) => item?.enabled !== false)
+      .map((item) => normalizeCatalogItem(item, "Product"));
+  }
+
   return Array.isArray(data?.products)
     ? data.products.map((item) => normalizeCatalogItem(item, "Product"))
     : [];

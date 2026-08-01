@@ -103,6 +103,20 @@ const normalizeProductDropdownPages = (items = []) => {
         leadFormLabel: normalizeString(item?.leadFormLabel),
         inclusions: Array.isArray(item?.inclusions) ? item.inclusions : [],
         faqs: Array.isArray(item?.faqs) ? item.faqs : [],
+        subProducts: Array.isArray(item?.subProducts)
+          ? item.subProducts.map((sp) => ({
+              name: normalizeString(sp?.name),
+              description: normalizeString(sp?.description),
+              cost: normalizeString(sp?.cost),
+              enabled: sp?.enabled !== false,
+              images: Array.isArray(sp?.images)
+                ? sp.images.map((img) => ({
+                    id: normalizeString(img?.id),
+                    url: normalizeString(img?.url),
+                  }))
+                : [],
+            }))
+          : [],
       };
 
       return normalized;
