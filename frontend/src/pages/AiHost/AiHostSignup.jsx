@@ -25,6 +25,7 @@ import { showErrorAlert, showSuccessAlert } from "../../utils/alerts";
 import { useFieldArray } from "react-hook-form";
 import { Country, State, City } from "country-state-city";
 import { MenuItem } from "@mui/material";
+import { FaCheck } from "react-icons/fa";
 import UploadFileInput from "../../components/UploadFileInput";
 import UploadMultipleFilesInput from "../../components/UploadMultipleFilesInput";
 import AiHostPricing from "./AiHostPricing";
@@ -80,6 +81,8 @@ const verticalTypeOptions = [
   "Cafe",
 ];
 
+const roleOptions = ["Founder", "Manager", "Other"];
+
 const floatingLabelSx = {
   color: "black",
   "&.Mui-focused": { color: "#1976d2" },
@@ -88,6 +91,30 @@ const floatingLabelSx = {
 
 const compactStepFieldSx = {
   my: 0,
+};
+
+const checkedMenuItemSx = {
+  gap: 1,
+  px: 2,
+  "& .select-option-check": {
+    opacity: 0,
+    color: "#0BA9EF",
+    transition: "opacity 150ms ease",
+  },
+  "&:hover": {
+    bgcolor: "rgba(15, 23, 42, 0.04)",
+  },
+  "&:hover .select-option-check, &.Mui-selected .select-option-check": {
+    opacity: 1,
+  },
+  "&.Mui-selected": {
+    bgcolor: "rgba(14, 165, 233, 0.08)",
+    color: "#0284c7",
+    fontWeight: 500,
+  },
+  "&.Mui-selected:hover": {
+    bgcolor: "rgba(14, 165, 233, 0.12)",
+  },
 };
 
 const getFlagIconUrl = (isoCode) =>
@@ -714,10 +741,30 @@ const AiHostSignup = () => {
                   helperText={fieldState.error?.message}
                   value={field.value}
                   InputLabelProps={{ sx: floatingLabelSx }}
+                  SelectProps={{
+                    renderValue: (value) => value,
+                  }}
                 >
-                  <MenuItem value="Founder">Founder</MenuItem>
-                  <MenuItem value="Manager">Manager</MenuItem>
-                  <MenuItem value="Other">Other</MenuItem>
+                  {roleOptions.map((option) => (
+                    <MenuItem key={option} value={option} sx={checkedMenuItemSx}>
+                      <Box
+                        component="span"
+                        sx={{
+                          width: 16,
+                          display: "inline-flex",
+                          justifyContent: "center",
+                          flexShrink: 0,
+                        }}
+                      >
+                        <FaCheck
+                          size={13}
+                          className="select-option-check"
+                          aria-hidden="true"
+                        />
+                      </Box>
+                      <Box component="span">{option}</Box>
+                    </MenuItem>
+                  ))}
                 </TextField>
               )}
             />
