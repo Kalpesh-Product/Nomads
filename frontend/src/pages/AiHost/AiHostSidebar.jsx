@@ -657,7 +657,11 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
       }}
     >
       {/* Logo / Collapse Button */}
-      <div className="px-4 py-4">
+      <div
+        className={`py-4 ${
+          !isMobileOverlay && isCollapsed ? "flex justify-center px-0" : "px-4"
+        }`}
+      >
         {isMobileOverlay ? (
           <div className="flex items-center justify-between gap-3">
             <div className="h-10 w-24 overflow-x-hidden rounded-lg">
@@ -680,7 +684,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
           <button
             type="button"
             onClick={() => setCollapsed((prev) => !prev)}
-            className="rounded p-1 text-black/80"
+            className="flex items-center justify-center rounded p-1 text-black/80"
             aria-label="Toggle sidebar"
           >
             <HiOutlineMenu size={24} />
