@@ -1592,15 +1592,25 @@ const AiGlobalListingsList = () => {
                                 {sectionTitle}
                               </h2>
                               <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-x-5 gap-y-0">
-                                {displayItems.map((item) => (
-                                  <ListingCard
+                                {displayItems.map((item, itemIndex) => (
+                                  <motion.div
                                     key={item._id}
-                                    item={item}
-                                    showVertical={false}
-                                    handleNavigation={() =>
-                                      handleListingNavigation(item)
-                                    }
-                                  />
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{
+                                      duration: 0.4,
+                                      delay: itemIndex * 0.1,
+                                      ease: "easeOut",
+                                    }}
+                                  >
+                                    <ListingCard
+                                      item={item}
+                                      showVertical={false}
+                                      handleNavigation={() =>
+                                        handleListingNavigation(item)
+                                      }
+                                    />
+                                  </motion.div>
                                 ))}
                               </div>
                               {showViewMore && (
