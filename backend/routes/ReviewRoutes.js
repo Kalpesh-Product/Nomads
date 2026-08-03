@@ -6,6 +6,7 @@ import {
   bulkInsertReviews,
   getReviewsByCompany,
   getReviewsByUser,
+  updateReview,
   updateReviewStatus,
   createWebsiteReview,
   getApprovedReviewsByCompany,
@@ -28,6 +29,7 @@ router.patch("/website-review/:reviewId", updateWebsiteReviewStatus);
 // PROTECTED
 router.post("/", verifyJwt, addReview);
 router.get("/reviews", verifyJwt, getReviewsByUser);
+router.patch("/:reviewId/edit", verifyJwt, updateReview);
 
 // PROTECTED (if required)
 router.patch("/:reviewId", updateReviewStatus);

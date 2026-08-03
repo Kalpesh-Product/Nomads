@@ -1,4 +1,5 @@
 import Review from "../models/Reviews.js";
+import mongoose from "mongoose";
 import { Readable } from "stream";
 import csvParser from "csv-parser";
 import Company from "../models/Company.js";
@@ -351,6 +352,85 @@ export const updateReviewStatus = async (req, res, next) => {
         status !== undefined
           ? `Review ${status} successfully`
           : `Review ${isEnabled ? "enabled" : "disabled"} successfully`,
+      review,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateReview = async (req, res, next) => {
+  try {
+    const { reviewId } = req.params;
+    const { starCount, description } = req.body;
+    const user = req.userData._id;
+
+    if (!mongoose.isValidObjectId(reviewId)) {
+      return res
+        .status(400)
+        .json({ message: "Valid review identifier is required" });
+    }
+
+    const parsedStarCount = Number(starCount);
+    if (
+      Number.isNaN(parsedStarCount) ||
+      parsedStarCount < 1 ||
+      parsedStarCount > 5
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Star count must be between 1 and 5" });
+    }
+
+    if (!description?.trim()) {
+      return res
+        .status(400)
+        .json({ message: "Review details are required" });
+    }
+
+    const userExists = await NomadUser.findOne({ _id: user })
+      .select("_id fullName")
+      .lean();
+
+    if (!userExists) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const existingReview = await Review.findById(reviewId)
+      .populate("reviewer", "fullName email mobile")
+      .lean();
+
+    const userName = userExists.fullName?.trim();
+    const isDirectUserReview =
+      existingReview?.reviewer?._id?.toString() === user.toString();
+    const isExactNameOrphanedReview = Boolean(
+      userName &&
+        existingReview?.name?.trim().toLowerCase() ===
+          userName.toLowerCase() &&
+        !existingReview?.reviewer,
+    );
+
+    if (!existingReview || (!isDirectUserReview && !isExactNameOrphanedReview)) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    const review = await Review.findByIdAndUpdate(
+      reviewId,
+      {
+        starCount: parsedStarCount,
+        description: description.trim(),
+        status: "pending",
+        reviewer: user,
+      },
+      { new: true, runValidators: true },
+    ).populate("company");
+
+    if (!review) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    return res.status(200).json({
+      message: "Review updated successfully",
       review,
     });
   } catch (error) {

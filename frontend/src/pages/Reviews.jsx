@@ -94,7 +94,10 @@ const Reviews = () => {
 
     acc.push({
       ...company,
-      review,
+      review: {
+        ...review,
+        reviewType: "listing",
+      },
     });
     return acc;
   }, []);
@@ -148,8 +151,14 @@ const Reviews = () => {
   const updateReviewMutation = useMutation({
     mutationFn: async ({ reviewId, reviewType, starCount, description }) => {
       const endpoint =
-        reviewType === "place" ? "/place-reviews" : "/event-reviews";
-      const res = await axiosPrivate.patch(`${endpoint}/${reviewId}`, {
+        reviewType === "listing"
+          ? "/review"
+          : reviewType === "place"
+            ? "/place-reviews"
+            : "/event-reviews";
+      const reviewPath =
+        reviewType === "listing" ? `${reviewId}/edit` : reviewId;
+      const res = await axiosPrivate.patch(`${endpoint}/${reviewPath}`, {
         starCount,
         description,
       });
@@ -162,6 +171,7 @@ const Reviews = () => {
         ...updatedReview,
         event: selectedReview?.event,
         place: selectedReview?.place,
+        company: updatedReview?.company || selectedReview?.company,
         reviewType: selectedReview?.reviewType,
         status: "pending",
       };
@@ -172,9 +182,11 @@ const Reviews = () => {
       showSuccessAlert(response?.message || "Review updated successfully");
       queryClient.invalidateQueries({
         queryKey:
-          variables.reviewType === "place"
-            ? ["userPlaceReviews", userId]
-            : ["userEventReviews", userId],
+          variables.reviewType === "listing"
+            ? ["userReviews", userId]
+            : variables.reviewType === "place"
+              ? ["userPlaceReviews", userId]
+              : ["userEventReviews", userId],
       });
     },
     onError: (mutationError) => {
@@ -201,14 +213,9 @@ const Reviews = () => {
     setEditError("");
   };
   const reviewStatus = (selectedReview?.status || "pending").toLowerCase();
-  const isSelectedDestinationReview = Boolean(
+  const isSelectedReviewEditable = Boolean(
     selectedReview?._id &&
-      (selectedReview?.event ||
-      selectedReview?.eventId ||
-      selectedReview?.eventName ||
-      selectedReview?.place ||
-      selectedReview?.placeId ||
-      selectedReview?.placeName),
+      ["event", "place", "listing"].includes(selectedReview?.reviewType),
   );
   const modalTitle =
     selectedReview?.eventName ||
@@ -430,7 +437,7 @@ const Reviews = () => {
             </div>
 
             <div className="flex shrink-0 items-center gap-2 self-start sm:self-center">
-              {isSelectedDestinationReview && (
+              {isSelectedReviewEditable && (
                 <button
                   type="button"
                   className={`flex items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
