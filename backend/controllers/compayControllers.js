@@ -25,6 +25,23 @@ const buildVisibleNomadReviewQuery = (criteria = {}) => ({
   ],
 });
 
+const normalizeLogo = (logo) => {
+  if (!logo) return undefined;
+
+  if (typeof logo === "string") {
+    const url = logo.trim();
+    return url ? { url, id: "" } : undefined;
+  }
+
+  if (typeof logo === "object") {
+    const url = typeof logo.url === "string" ? logo.url.trim() : "";
+    const id = typeof logo.id === "string" ? logo.id : "";
+    return url ? { url, id } : undefined;
+  }
+
+  return undefined;
+};
+
 const COMPANY_LOCATIONS_CACHE_TTL_MS = 5 * 60 * 1000;
 let companyLocationsCache = {
   data: null,
@@ -464,7 +481,7 @@ export const createCompany = async (req, res, next) => {
       companyName: companyName.trim(),
       companyTitle: companyTitle.trim(),
       companyId,
-      logo,
+      logo: normalizeLogo(logo),
       registeredEntityName: registeredEntityName?.trim(),
       website: website?.trim() || null,
       address: address?.trim(),
@@ -1177,7 +1194,9 @@ export const getCompanyData = async (req, res, next) => {
 
     // Fetch DB reviews & POC
     const [reviews, poc] = await Promise.all([
-      Review.find(buildVisibleNomadReviewQuery({ company: companyObjectId }))
+      Review.find(
+        buildVisibleNomadReviewQuery({ companyId: companyData.companyId }),
+      )
         .lean()
         .exec(),
       PointOfContact.findOne({ company: companyObjectId, isActive: true })
@@ -1869,6 +1888,8 @@ export const editCompany = async (req, res, next) => {
       return res.status(404).json({ message: "Company not found" });
     }
 
+    company.logo = normalizeLogo(company.logo);
+
     const newCompanyType = companyType
       ?.trim()
       ?.split(" ")
@@ -1891,7 +1912,8 @@ export const editCompany = async (req, res, next) => {
     company.totalSeats = totalSeats ? parseInt(totalSeats) : company.totalSeats;
     company.latitude = latitude ? parseFloat(latitude) : company.latitude;
     company.longitude = longitude ? parseFloat(longitude) : company.longitude;
-    company.googleMap = googleMap?.trim() || company.googleMap;
+    company.googleMap =
+      typeof googleMap !== "undefined" ? googleMap.trim() : company.googleMap;
     company.ratings = ratings ? parseFloat(ratings) : company.ratings;
     company.totalReviews = totalReviews
       ? parseInt(totalReviews)
