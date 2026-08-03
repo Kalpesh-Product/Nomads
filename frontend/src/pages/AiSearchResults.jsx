@@ -56,18 +56,6 @@ const visaRequirementApiValueMap = {
 const getVisaRequirementApiValue = (value) =>
   visaRequirementApiValueMap[value] || value;
 
-const formatVisaRequirementLabel = (value) => {
-  if (!value) return "Visa";
-
-  const normalizedValue = value.trim().toLowerCase();
-
-  if (normalizedValue === "e-visa") {
-    return "e-Visa";
-  }
-
-  return `${normalizedValue.charAt(0).toUpperCase()}${normalizedValue.slice(1)}`;
-};
-
 const DEFAULT_PASSPORT_COUNTRY = "India";
 
 const destinationCards = aiDestinationCards;
@@ -2451,11 +2439,7 @@ const AiSearchResults = () => {
                         const visaDurationLabel =
                           visaDurationDays !== null &&
                           visaDurationDays !== undefined
-                            ? `${formatVisaRequirementLabel(
-                                getVisaRequirementApiValue(
-                                  selectedVisaRequirement,
-                                ),
-                              )}: ${visaDurationDays} days`
+                            ? `Visa Duration: ${visaDurationDays} days`
                             : null;
 
                         const isDestinationLiked = likedDestinations.includes(
