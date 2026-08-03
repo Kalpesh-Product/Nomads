@@ -438,6 +438,53 @@ export const updateReview = async (req, res, next) => {
   }
 };
 
+export const deleteReview = async (req, res, next) => {
+  try {
+    const { reviewId } = req.params;
+    const user = req.userData._id;
+
+    if (!mongoose.isValidObjectId(reviewId)) {
+      return res
+        .status(400)
+        .json({ message: "Valid review identifier is required" });
+    }
+
+    const userExists = await NomadUser.findOne({ _id: user })
+      .select("_id fullName")
+      .lean();
+
+    if (!userExists) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const existingReview = await Review.findById(reviewId)
+      .populate("reviewer", "fullName email mobile")
+      .lean();
+
+    const userName = userExists.fullName?.trim();
+    const isDirectUserReview =
+      existingReview?.reviewer?._id?.toString() === user.toString();
+    const isExactNameOrphanedReview = Boolean(
+      userName &&
+        existingReview?.name?.trim().toLowerCase() ===
+          userName.toLowerCase() &&
+        !existingReview?.reviewer,
+    );
+
+    if (!existingReview || (!isDirectUserReview && !isExactNameOrphanedReview)) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    await Review.findByIdAndDelete(reviewId);
+
+    return res.status(200).json({
+      message: "Review deleted successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getReviewsByCompany = async (req, res, next) => {
   try {
     const {
