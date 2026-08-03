@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   addPlaceReview,
+  deletePlaceReview,
   getAllPlaceReviews,
   getApprovedPlaceReviews,
   getPlaceReviewsByUser,
@@ -17,5 +18,6 @@ router.get("/", getApprovedPlaceReviews);
 router.post("/", verifyJwt, addPlaceReview);
 router.patch("/:reviewId/status", updatePlaceReviewStatus);
 router.patch("/:reviewId", verifyJwt, updatePlaceReview);
+router.delete("/:reviewId", verifyJwt, deletePlaceReview);
 
 export default router;

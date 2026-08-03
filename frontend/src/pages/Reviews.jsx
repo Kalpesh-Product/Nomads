@@ -218,7 +218,6 @@ const Reviews = () => {
     selectedReview?._id &&
       ["event", "place", "listing"].includes(selectedReview?.reviewType),
   );
-  const isSelectedListingReview = selectedReview?.reviewType === "listing";
   const modalTitle =
     selectedReview?.eventName ||
     selectedReview?.placeName ||
@@ -265,14 +264,27 @@ const Reviews = () => {
   };
 
   const deleteReviewMutation = useMutation({
-    mutationFn: async (reviewId) => {
-      const res = await axiosPrivate.delete(`/review/${reviewId}`);
+    mutationFn: async ({ reviewId, reviewType }) => {
+      const endpoint =
+        reviewType === "listing"
+          ? "/review"
+          : reviewType === "place"
+            ? "/place-reviews"
+            : "/event-reviews";
+      const res = await axiosPrivate.delete(`${endpoint}/${reviewId}`);
       return res.data;
     },
-    onSuccess: (response) => {
+    onSuccess: (response, variables) => {
       closeReviewModal();
       showSuccessAlert(response?.message || "Review deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["userReviews", userId] });
+      queryClient.invalidateQueries({
+        queryKey:
+          variables.reviewType === "listing"
+            ? ["userReviews", userId]
+            : variables.reviewType === "place"
+              ? ["userPlaceReviews", userId]
+              : ["userEventReviews", userId],
+      });
     },
     onError: (mutationError) => {
       setEditError(
@@ -283,7 +295,7 @@ const Reviews = () => {
   });
 
   const handleDeleteReview = async () => {
-    if (!selectedReview?._id || !isSelectedListingReview) return;
+    if (!selectedReview?._id || !isSelectedReviewEditable) return;
 
     const result = await Swal.fire({
       title: "Delete review?",
@@ -300,7 +312,10 @@ const Reviews = () => {
     });
 
     if (result.isConfirmed) {
-      deleteReviewMutation.mutate(selectedReview._id);
+      deleteReviewMutation.mutate({
+        reviewId: selectedReview._id,
+        reviewType: selectedReview.reviewType,
+      });
     }
   };
 
@@ -497,7 +512,7 @@ const Reviews = () => {
                   Edit
                 </button>
               )}
-              {isSelectedListingReview && (
+              {isSelectedReviewEditable && (
                 <button
                   type="button"
                   className="flex items-center gap-1 rounded-full border border-red-100 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-100 disabled:opacity-60"

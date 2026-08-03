@@ -238,3 +238,30 @@ export const updateEventReview = async (req, res, next) => {
     next(error);
   }
 };
+
+export const deleteEventReview = async (req, res, next) => {
+  try {
+    const { reviewId } = req.params;
+
+    if (!mongoose.isValidObjectId(reviewId)) {
+      return res
+        .status(400)
+        .json({ message: "Valid review identifier is required" });
+    }
+
+    const review = await EventReview.findOneAndDelete({
+      _id: reviewId,
+      reviewer: req.userData._id,
+    });
+
+    if (!review) {
+      return res.status(404).json({ message: "Event review not found" });
+    }
+
+    return res.status(200).json({
+      message: "Review deleted successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
