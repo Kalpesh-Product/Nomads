@@ -862,8 +862,12 @@ export const getCompaniesDataNomads = async (req, res, next) => {
   try {
     const { country, state, type, userId } = req.query;
 
+    // Public listing/map feed — isActive alone isn't visibility, isPublic
+    // is. Without this, any active-but-not-yet-published listing (still in
+    // internal Wono review) would leak onto the live public site.
     const match = {
       isActive: true,
+      isPublic: true,
       companyType: { $ne: "privatestay" },
     };
 
@@ -1020,6 +1024,11 @@ export const getCompanyData = async (req, res, next) => {
     if (Object.keys(companyQuery).length === 0) {
       return res.status(400).json({ error: "Company identifier is required" });
     }
+
+    // Public listing detail page — never serve a listing that hasn't been
+    // made public, even if someone has/guesses its businessId directly.
+    // Added after the identifier check above so "no identifier" still 400s.
+    companyQuery.isPublic = true;
 
     // if (mongoose.Types.ObjectId.isValid(companyId)) {
     //   // Search by ObjectId
@@ -1268,8 +1277,11 @@ export const getCompanyOgData = async (req, res, next) => {
       "\\$&",
     );
 
+    // Social preview metadata for a public share link — must not reveal a
+    // listing that was never made public.
     const companyQuery = {
       companyName: { $regex: new RegExp(`^${escapedCompanyName}$`, "i") },
+      isPublic: true,
     };
     if (companyType) {
       companyQuery.companyType = companyType;
@@ -1312,8 +1324,11 @@ export const getCompanySharePage = async (req, res, next) => {
       /[.*+?^${}()|[\]\\]/g,
       "\\$&",
     );
+    // Public share page HTML — must not reveal a listing that was never
+    // made public.
     const companyQuery = {
       companyName: { $regex: new RegExp(`^${escapedCompanyName}$`, "i") },
+      isPublic: true,
     };
     if (companyType) {
       companyQuery.companyType = companyType;
