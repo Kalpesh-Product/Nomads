@@ -190,13 +190,13 @@ const quickStatsConfigByGoalOption = {
   "Most Affordable": [
     { label: "Affordability", weightKey: "costOfLiving" },
     { label: "Purchasing Power", weightKey: "purchasingPower" },
-    { label: "Heathcare Cost", weightKey: "healthcareCostIndex" },
+    { label: "Healthcare Cost", weightKey: "healthcareCostIndex" },
     { label: "Visa Cost", weightKey: "visaCost" },
   ],
   "Safest Cities": [
     { label: "Safety", weightKey: "safety" },
     { label: "Livability", weightKey: "qualityOfLife" },
-    { label: "Heathcare Cost", weightKey: "healthcareCostIndex" },
+    { label: "Healthcare Cost", weightKey: "healthcareCostIndex" },
     { label: "Air Quality", weightKey: "airQualityIndex" },
   ],
   "Easy Visa / Long Stay": [
@@ -226,7 +226,7 @@ const quickStatsConfigByGoalOption = {
   "Clean Air / Environment": [
     { label: "Safety", weightKey: "safety" },
     { label: "Livability", weightKey: "qualityOfLife" },
-    { label: "Heathcare Cost", weightKey: "healthcareCostIndex" },
+    { label: "Healthcare Cost", weightKey: "healthcareCostIndex" },
     { label: "Air Quality", weightKey: "airQualityIndex" },
   ],
   "Best Work Infrastructure": [
@@ -279,7 +279,7 @@ const quickStatsConfigByGoalOption = {
   ],
   "Financial Stability(Low Risk)": [
     { label: "Visa Cost", weightKey: "visaCost" },
-    { label: "Heathcare Cost", weightKey: "healthcareCostIndex" },
+    { label: "Healthcare Cost", weightKey: "healthcareCostIndex" },
     { label: "Affordability", weightKey: "costOfLiving" },
     { label: "Tax Friendly", weightKey: "taxFriendly" },
   ],
