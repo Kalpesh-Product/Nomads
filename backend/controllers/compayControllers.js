@@ -9,10 +9,25 @@ import Lead from "../models/Lead.js";
 import axios from "axios";
 import TestListing from "../models/TestCompany.js";
 import NomadUser from "../models/NomadUser.js";
+import SpecialAccessUser from "../models/SpecialAccessUser.js";
 import {
   buildListingShareData,
   renderListingSharePage,
 } from "../utils/listingSharePage.js";
+
+// Emails granted special access (managed from the Wono Master Panel's User
+// Access module) can browse non-public listings on the public site too, not
+// just the extra countries/states getUniqueDataLocations already gives them.
+// Resolved from userId (not a client-supplied email) so this can't be spoofed
+// by just claiming to be special in the request.
+const isSpecialAccessUser = async (userId) => {
+  if (!userId || !mongoose.Types.ObjectId.isValid(userId)) return false;
+  const user = await NomadUser.findById(userId).select("email").lean();
+  const email = String(user?.email || "").toLowerCase().trim();
+  if (!email) return false;
+  const specialUser = await SpecialAccessUser.findOne({ email }).lean();
+  return Boolean(specialUser);
+};
 
 const buildVisibleNomadReviewQuery = (criteria = {}) => ({
   ...criteria,
@@ -845,13 +860,15 @@ export const getCompaniesDataNomads = async (req, res, next) => {
   try {
     const { country, state, type, userId } = req.query;
 
-    // Public listing/map feed — isActive alone isn't visibility, isPublic
-    // is. Without this, any active-but-not-yet-published listing (still in
-    // internal Wono review) would leak onto the live public site.
+    // Visibility rule: isPublic:true is visible to everyone, logged in or
+    // not, regardless of isActive. isActive:true alone (isPublic:false) is
+    // visible only to Wono staff with special access, for internal review
+    // before a listing goes live — isActive by itself never matters to a
+    // regular visitor.
+    const canSeeNonPublic = await isSpecialAccessUser(userId);
     const match = {
-      isActive: true,
-      isPublic: true,
       companyType: { $ne: "privatestay" },
+      ...(canSeeNonPublic ? { $or: [{ isActive: true }, { isPublic: true }] } : { isPublic: true }),
     };
 
     if (type) match.companyType = type;
@@ -1008,10 +1025,16 @@ export const getCompanyData = async (req, res, next) => {
       return res.status(400).json({ error: "Company identifier is required" });
     }
 
-    // Public listing detail page — never serve a listing that hasn't been
-    // made public, even if someone has/guesses its businessId directly.
-    // Added after the identifier check above so "no identifier" still 400s.
-    companyQuery.isPublic = true;
+    // Public listing detail page. isPublic:true is visible to anyone,
+    // regardless of isActive. isActive:true alone (isPublic:false) is only
+    // visible to Wono staff with special access, for internal review before
+    // a listing goes live. Added after the identifier check above so "no
+    // identifier" still 400s.
+    if (await isSpecialAccessUser(userId)) {
+      companyQuery.$or = [{ isActive: true }, { isPublic: true }];
+    } else {
+      companyQuery.isPublic = true;
+    }
 
     // if (mongoose.Types.ObjectId.isValid(companyId)) {
     //   // Search by ObjectId
@@ -2096,13 +2119,9 @@ export const activateProduct = async (req, res, next) => {
       });
     }
 
-    // A listing can only be public while it's active — deactivating one
-    // that was public must also pull it out of public visibility, otherwise
-    // it'd sit as isPublic:true/isActive:false, an inconsistent state the
-    // "public" toggle's own disabled-when-inactive rule assumes can't happen.
-    const update = status ? { isActive: true } : { isActive: false, isPublic: false };
-
-    const product = await Company.findOneAndUpdate({ businessId }, update);
+    // isActive and isPublic are independent — activating/deactivating a
+    // listing doesn't touch its public/private status.
+    const product = await Company.findOneAndUpdate({ businessId }, { isActive: status });
 
     if (!product) {
       return res.status(400).json({
@@ -2154,9 +2173,7 @@ export const deactivateProduct = async (req, res, next) => {
   }
 };
 
-// Staff-only visibility toggle — separate from isActive. A listing must
-// already be active to be made public; the client also enforces this by
-// disabling the control, but this is the authoritative check.
+// Staff-only visibility toggle — independent of isActive.
 export const setListingPublicStatus = async (req, res, next) => {
   try {
     const { businessId, isPublic } = req.body;
@@ -2168,17 +2185,10 @@ export const setListingPublicStatus = async (req, res, next) => {
       return res.status(400).json({ message: "isPublic must be true/false" });
     }
 
-    const existing = await Company.findOne({ businessId }).select("isActive");
+    const existing = await Company.findOneAndUpdate({ businessId }, { isPublic });
     if (!existing) {
       return res.status(404).json({ message: "Listing not found" });
     }
-    if (isPublic && !existing.isActive) {
-      return res.status(400).json({
-        message: "Only active listings can be made public.",
-      });
-    }
-
-    await Company.findOneAndUpdate({ businessId }, { isPublic });
 
     companyLocationsCache = { data: null, expiresAt: 0, pendingRequest: null };
 
@@ -2250,8 +2260,7 @@ export const getLocationTree = async (req, res, next) => {
 
 // Bulk sibling of setListingPublicStatus: flips isPublic for every listing
 // matching a country (+ optional state/city), instead of one businessId at
-// a time. Same safety rule — only currently-active listings can be made
-// public — applies per-listing here too.
+// a time. Independent of isActive, same as the single-listing version.
 export const setBulkListingPublicStatus = async (req, res, next) => {
   try {
     const { country, state, city, isPublic } = req.body;
@@ -2268,7 +2277,6 @@ export const setBulkListingPublicStatus = async (req, res, next) => {
       state: exactCaseInsensitive(state),
     };
     if (city) filter.city = exactCaseInsensitive(city);
-    if (isPublic) filter.isActive = true;
 
     const result = await Company.updateMany(filter, { isPublic });
 
