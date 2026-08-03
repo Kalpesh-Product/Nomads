@@ -17,19 +17,19 @@ export const refreshTokenController = async (req, res, next) => {
     jwt.verify(
       refreshToken,
       process.env.REFRESH_TOKEN_SECRET,
-      (err, decoded) => {
+      (err) => {
         if (err) {
           return res.sendStatus(403);
         }
-        const accessToken = jwt.sign(
-          { userInfo: { ...decoded.userInfo } },
-          process.env.ACCESS_TOKEN_SECRET,
-          { expiresIn: "15m" }
-        );
         delete user.password;
         delete user.refreshToken;
+        const accessToken = jwt.sign(
+          { userInfo: { ...user } },
+          process.env.ACCESS_TOKEN_SECRET,
+          { expiresIn: "15m" },
+        );
         res.status(200).json({ user, accessToken });
-      }
+      },
     );
   } catch (error) {
     next(error);
