@@ -5,6 +5,9 @@ import Company from "../models/Company.js";
 import TestReview from "../models/TestReview.js";
 import NomadUser from "../models/NomadUser.js";
 
+const escapeRegExp = (value = "") =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 export const bulkInsertReviews = async (req, res, next) => {
   try {
     const file = req.file;
@@ -452,8 +455,23 @@ export const getReviewsByUser = async (req, res, next) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // 2️⃣ Fetch reviews using ObjectId (fast)
-    const reviews = await Review.find({ reviewer: user })
+    const userName = userExists.fullName?.trim();
+    const reviewQuery = userName
+      ? {
+          $or: [
+            { reviewer: user },
+            {
+              name: {
+                $regex: new RegExp(`^${escapeRegExp(userName)}$`, "i"),
+              },
+            },
+          ],
+        }
+      : { reviewer: user };
+
+    // 2️⃣ Fetch direct user reviews plus exact-name orphaned reviews from
+    // older imports whose reviewer ObjectId no longer resolves to a user.
+    const fetchedReviews = await Review.find(reviewQuery)
       .populate([
         { path: "reviewer", select: "fullName email mobile" },
         {
@@ -464,6 +482,18 @@ export const getReviewsByUser = async (req, res, next) => {
       ])
       .lean()
       .exec();
+
+    const reviews = fetchedReviews.filter((review) => {
+      if (review.reviewer?._id?.toString() === user.toString()) {
+        return true;
+      }
+
+      return (
+        userName &&
+        review.name?.trim().toLowerCase() === userName.toLowerCase() &&
+        !review.reviewer
+      );
+    });
 
     return res.status(200).json({
       count: reviews.length,
