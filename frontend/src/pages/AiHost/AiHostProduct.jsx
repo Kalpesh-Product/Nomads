@@ -12,6 +12,7 @@ import GetStartedButton from "../../components/GetStartedButton";
 import { ReactFitty } from "react-fitty";
 import Container from "../../components/Container";
 import { HiOutlineArrowLeft } from "react-icons/hi";
+import { navigateBackWithinApp } from "../../utils/navigationHistory";
 
 const features = [
   "No Code Website",
@@ -134,7 +135,7 @@ const HostProduct = () => {
   const [selectedImage, setSelectedImage] = useState(initialImage);
 
   const onBack = () => {
-    navigate(-1);
+    navigateBackWithinApp(navigate);
   };
 
   useEffect(() => {

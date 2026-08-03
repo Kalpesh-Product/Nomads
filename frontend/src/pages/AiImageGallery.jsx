@@ -9,6 +9,7 @@ import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { useDispatch } from "react-redux";
 import { setFormValues } from "../features/locationSlice.js";
 import { ArrowLeft } from "lucide-react";
+import { navigateBackWithinApp } from "../utils/navigationHistory.js";
 
 const AiImageGallery = () => {
   const location = useLocation();
@@ -266,7 +267,7 @@ const AiImageGallery = () => {
   };
 
   const handleBackButtonClick = () => {
-    navigate(-1);
+    navigateBackWithinApp(navigate);
   };
 
   return (

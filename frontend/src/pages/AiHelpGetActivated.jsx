@@ -10,7 +10,7 @@ const helpGetActivatedOptions = [
   "Meeting Rooms",
   "Cafes",
   "Car & Bike renting",
-  "Yatch Renting",
+  "Yacht Renting",
   "Airport Pickup / Drop",
   "Company Registration Support",
   "Personalised",

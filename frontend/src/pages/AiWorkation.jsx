@@ -636,7 +636,7 @@ const AiWorkation = () => {
                   render={({ field, fieldState }) => (
                     <DatePicker
                       {...field}
-                      label="Start Date (Date calender)"
+                      label="Start Date (Date Calendar)"
                       disablePast
                       value={field.value ? dayjs(field.value) : null}
                       onChange={(date) => field.onChange(date)}
@@ -660,7 +660,7 @@ const AiWorkation = () => {
                   render={({ field, fieldState }) => (
                     <DatePicker
                       {...field}
-                      label="End Date (Date calender)"
+                      label="End Date (Date Calendar)"
                       disablePast
                       value={field.value ? dayjs(field.value) : null}
                       onChange={(date) => field.onChange(date)}

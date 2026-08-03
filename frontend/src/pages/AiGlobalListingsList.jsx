@@ -40,6 +40,7 @@ import {
 } from "../utils/categoryShortcutIcons.js";
 import AiDestinationHighlightSection from "../components/AiDestinationHighlightSection.jsx";
 import { DESTINATION_HIGHLIGHT_FILTERS } from "../data/aiDestinationHighlights.js";
+import { navigateBackWithinApp } from "../utils/navigationHistory.js";
 
 // import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
 // import {
@@ -68,6 +69,7 @@ const CategoryShortcutButton = ({
   label,
   iconSrc,
   onClick,
+  contentClassName = "flex min-h-[3.5rem] w-full flex-col items-center justify-start gap-1",
   buttonClassName,
   iconBoxClassName,
   imageClassName,
@@ -81,7 +83,7 @@ const CategoryShortcutButton = ({
 
   return (
     <button type="button" onClick={onClick} className={buttonClassName}>
-      <div className="flex min-h-[3.5rem] w-full flex-col items-center justify-start gap-1">
+      <div className={contentClassName}>
         {iconSrc ? (
           <div className={`relative overflow-hidden ${iconBoxClassName}`}>
             {!isIconLoaded && (
@@ -1374,8 +1376,8 @@ const AiGlobalListingsList = () => {
           <AiSelectedBadgesSearchBar
             badges={searchBarBadges}
             stateLabel={selectedLocationLabel}
-            onBack={() => navigate(-1)}
-            onClear={() => navigate(-1)}
+            onBack={() => navigateBackWithinApp(navigate)}
+            onClear={() => navigateBackWithinApp(navigate)}
             heading={
               <p className=" mt-0 mb-5 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
                 {!isSecondHeadingPhase && (
@@ -1417,8 +1419,9 @@ const AiGlobalListingsList = () => {
                           label={cat.label}
                           iconSrc={iconSrc}
                           onClick={() => handleCategoryClick(cat.value)}
+                          contentClassName="h-10 w-full flex flex-col gap-0 items-center"
                           buttonClassName="text-black px-1 py-2 hover:text-black transition flex items-center justify-center w-full"
-                          iconBoxClassName="h-10 w-full"
+                          iconBoxClassName="h-10 w-full shrink-0"
                           imageClassName="h-full w-full object-contain"
                           labelClassName={`text-tiny border-b-2 pb-1 pt-1 ${
                             isActive
@@ -1589,15 +1592,25 @@ const AiGlobalListingsList = () => {
                                 {sectionTitle}
                               </h2>
                               <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-x-5 gap-y-0">
-                                {displayItems.map((item) => (
-                                  <ListingCard
+                                {displayItems.map((item, itemIndex) => (
+                                  <motion.div
                                     key={item._id}
-                                    item={item}
-                                    showVertical={false}
-                                    handleNavigation={() =>
-                                      handleListingNavigation(item)
-                                    }
-                                  />
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{
+                                      duration: 0.4,
+                                      delay: itemIndex * 0.1,
+                                      ease: "easeOut",
+                                    }}
+                                  >
+                                    <ListingCard
+                                      item={item}
+                                      showVertical={false}
+                                      handleNavigation={() =>
+                                        handleListingNavigation(item)
+                                      }
+                                    />
+                                  </motion.div>
                                 ))}
                               </div>
                               {showViewMore && (
@@ -1832,7 +1845,7 @@ const AiGlobalListingsList = () => {
                 <div className="flex shrink-0 items-center gap-1.5">
                   <button
                     type="button"
-                    onClick={() => navigate(-1)}
+                    onClick={() => navigateBackWithinApp(navigate)}
                     aria-label="Clear search and go back"
                     className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-black/70 transition-colors hover:bg-black/5 hover:text-black"
                   >

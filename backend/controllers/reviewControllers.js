@@ -1,4 +1,5 @@
 import Review from "../models/Reviews.js";
+import mongoose from "mongoose";
 import { Readable } from "stream";
 import csvParser from "csv-parser";
 import Company from "../models/Company.js";
@@ -355,14 +356,137 @@ export const updateReviewStatus = async (req, res, next) => {
   }
 };
 
+export const updateReview = async (req, res, next) => {
+  try {
+    const { reviewId } = req.params;
+    const { starCount, description } = req.body;
+    const user = req.userData._id;
+
+    if (!mongoose.isValidObjectId(reviewId)) {
+      return res
+        .status(400)
+        .json({ message: "Valid review identifier is required" });
+    }
+
+    const parsedStarCount = Number(starCount);
+    if (
+      Number.isNaN(parsedStarCount) ||
+      parsedStarCount < 1 ||
+      parsedStarCount > 5
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Star count must be between 1 and 5" });
+    }
+
+    if (!description?.trim()) {
+      return res.status(400).json({ message: "Review details are required" });
+    }
+
+    const userExists = await NomadUser.findOne({ _id: user })
+      .select("_id fullName")
+      .lean();
+
+    if (!userExists) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const existingReview = await Review.findById(reviewId)
+      .populate("reviewer", "fullName email mobile")
+      .lean();
+
+    const userName = userExists.fullName?.trim();
+    const isDirectUserReview =
+      existingReview?.reviewer?._id?.toString() === user.toString();
+    const isExactNameOrphanedReview = Boolean(
+      userName &&
+      existingReview?.name?.trim().toLowerCase() === userName.toLowerCase() &&
+      !existingReview?.reviewer,
+    );
+
+    if (
+      !existingReview ||
+      (!isDirectUserReview && !isExactNameOrphanedReview)
+    ) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    const review = await Review.findByIdAndUpdate(
+      reviewId,
+      {
+        starCount: parsedStarCount,
+        description: description.trim(),
+        status: "pending",
+        reviewer: user,
+      },
+      { new: true, runValidators: true },
+    ).populate("company");
+
+    if (!review) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    return res.status(200).json({
+      message: "Review updated successfully",
+      review,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteReview = async (req, res, next) => {
+  try {
+    const { reviewId } = req.params;
+    const user = req.userData._id;
+
+    if (!mongoose.isValidObjectId(reviewId)) {
+      return res
+        .status(400)
+        .json({ message: "Valid review identifier is required" });
+    }
+
+    const userExists = await NomadUser.findOne({ _id: user })
+      .select("_id fullName")
+      .lean();
+
+    if (!userExists) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const existingReview = await Review.findById(reviewId)
+      .populate("reviewer", "fullName email mobile")
+      .lean();
+
+    const userName = userExists.fullName?.trim();
+    const isDirectUserReview =
+      existingReview?.reviewer?._id?.toString() === user.toString();
+    const isExactNameOrphanedReview = Boolean(
+      userName &&
+      existingReview?.name?.trim().toLowerCase() === userName.toLowerCase() &&
+      !existingReview?.reviewer,
+    );
+
+    if (
+      !existingReview ||
+      (!isDirectUserReview && !isExactNameOrphanedReview)
+    ) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    await Review.findByIdAndDelete(reviewId);
+
+    return res.status(200).json({
+      message: "Review deleted successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getReviewsByCompany = async (req, res, next) => {
   try {
-    const {
-      companyId,
-      companyType = "",
-      workspaceId,
-      source,
-    } = req.query;
+    const { companyId, companyType = "", workspaceId, source } = req.query;
 
     let cmpQuery = {};
 
@@ -491,7 +615,9 @@ export const createWebsiteReview = async (req, res, next) => {
     const resolvedBusinessId = (businessId || companyId || "").trim();
 
     if (!resolvedBusinessId) {
-      return res.status(400).json({ message: "Company identifier is required" });
+      return res
+        .status(400)
+        .json({ message: "Company identifier is required" });
     }
 
     if (!name?.trim()) {
@@ -501,9 +627,13 @@ export const createWebsiteReview = async (req, res, next) => {
     const parsedStarCount = starCount ? Number(starCount) : undefined;
     if (
       parsedStarCount !== undefined &&
-      (Number.isNaN(parsedStarCount) || parsedStarCount < 1 || parsedStarCount > 5)
+      (Number.isNaN(parsedStarCount) ||
+        parsedStarCount < 1 ||
+        parsedStarCount > 5)
     ) {
-      return res.status(400).json({ message: "Star count must be between 1 and 5" });
+      return res
+        .status(400)
+        .json({ message: "Star count must be between 1 and 5" });
     }
 
     // Look up company by businessId first, then fall back to companyId
@@ -525,7 +655,9 @@ export const createWebsiteReview = async (req, res, next) => {
     });
 
     if (reviewExists) {
-      return res.status(400).json({ message: "A review from this person already exists for this company" });
+      return res.status(400).json({
+        message: "A review from this person already exists for this company",
+      });
     }
 
     const review = await Review.create({
@@ -557,7 +689,9 @@ export const getApprovedReviewsByCompany = async (req, res, next) => {
     const { companyId, workspaceId, source } = req.query;
 
     if (!companyId && !workspaceId) {
-      return res.status(400).json({ message: "companyId or workspaceId is required" });
+      return res
+        .status(400)
+        .json({ message: "companyId or workspaceId is required" });
     }
 
     let query = { status: "approved", isEnabled: { $ne: false } };
@@ -573,7 +707,9 @@ export const getApprovedReviewsByCompany = async (req, res, next) => {
     }
 
     const reviews = await Review.find(query)
-      .select("name starCount description reviewSource reviewLink createdAt companyId workspaceId source isEnabled")
+      .select(
+        "name starCount description reviewSource reviewLink createdAt companyId workspaceId source isEnabled",
+      )
       .sort({ createdAt: -1 })
       .lean()
       .exec();
@@ -607,7 +743,9 @@ export const updateWebsiteReviewStatus = async (req, res, next) => {
     if (status !== undefined) {
       const allowedStatuses = ["approved", "rejected", "pending"];
       if (!allowedStatuses.includes(status)) {
-        return res.status(400).json({ message: "Status must be approved, rejected or pending" });
+        return res
+          .status(400)
+          .json({ message: "Status must be approved, rejected or pending" });
       }
       updates.status = status;
     }
@@ -630,11 +768,7 @@ export const updateWebsiteReviewStatus = async (req, res, next) => {
     }
 
     const messageAction =
-      status !== undefined
-        ? status
-        : isEnabled
-          ? "enabled"
-          : "disabled";
+      status !== undefined ? status : isEnabled ? "enabled" : "disabled";
 
     return res.status(200).json({
       message: `Review ${messageAction} successfully`,

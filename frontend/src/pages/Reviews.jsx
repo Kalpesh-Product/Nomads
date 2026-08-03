@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AiFillStar } from "react-icons/ai";
-import { FiEdit2 } from "react-icons/fi";
+import { FiEdit2, FiTrash2 } from "react-icons/fi";
+import Swal from "sweetalert2";
 import Container from "../components/Container";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useAuth from "../hooks/useAuth";
@@ -94,7 +95,10 @@ const Reviews = () => {
 
     acc.push({
       ...company,
-      review,
+      review: {
+        ...review,
+        reviewType: "listing",
+      },
     });
     return acc;
   }, []);
@@ -148,8 +152,14 @@ const Reviews = () => {
   const updateReviewMutation = useMutation({
     mutationFn: async ({ reviewId, reviewType, starCount, description }) => {
       const endpoint =
-        reviewType === "place" ? "/place-reviews" : "/event-reviews";
-      const res = await axiosPrivate.patch(`${endpoint}/${reviewId}`, {
+        reviewType === "listing"
+          ? "/review"
+          : reviewType === "place"
+            ? "/place-reviews"
+            : "/event-reviews";
+      const reviewPath =
+        reviewType === "listing" ? `${reviewId}/edit` : reviewId;
+      const res = await axiosPrivate.patch(`${endpoint}/${reviewPath}`, {
         starCount,
         description,
       });
@@ -162,6 +172,7 @@ const Reviews = () => {
         ...updatedReview,
         event: selectedReview?.event,
         place: selectedReview?.place,
+        company: updatedReview?.company || selectedReview?.company,
         reviewType: selectedReview?.reviewType,
         status: "pending",
       };
@@ -172,9 +183,11 @@ const Reviews = () => {
       showSuccessAlert(response?.message || "Review updated successfully");
       queryClient.invalidateQueries({
         queryKey:
-          variables.reviewType === "place"
-            ? ["userPlaceReviews", userId]
-            : ["userEventReviews", userId],
+          variables.reviewType === "listing"
+            ? ["userReviews", userId]
+            : variables.reviewType === "place"
+              ? ["userPlaceReviews", userId]
+              : ["userEventReviews", userId],
       });
     },
     onError: (mutationError) => {
@@ -201,14 +214,9 @@ const Reviews = () => {
     setEditError("");
   };
   const reviewStatus = (selectedReview?.status || "pending").toLowerCase();
-  const isSelectedDestinationReview = Boolean(
+  const isSelectedReviewEditable = Boolean(
     selectedReview?._id &&
-      (selectedReview?.event ||
-      selectedReview?.eventId ||
-      selectedReview?.eventName ||
-      selectedReview?.place ||
-      selectedReview?.placeId ||
-      selectedReview?.placeName),
+      ["event", "place", "listing"].includes(selectedReview?.reviewType),
   );
   const modalTitle =
     selectedReview?.eventName ||
@@ -253,6 +261,62 @@ const Reviews = () => {
       starCount: editStarCount,
       description: editDescription,
     });
+  };
+
+  const deleteReviewMutation = useMutation({
+    mutationFn: async ({ reviewId, reviewType }) => {
+      const endpoint =
+        reviewType === "listing"
+          ? "/review"
+          : reviewType === "place"
+            ? "/place-reviews"
+            : "/event-reviews";
+      const res = await axiosPrivate.delete(`${endpoint}/${reviewId}`);
+      return res.data;
+    },
+    onSuccess: (response, variables) => {
+      closeReviewModal();
+      showSuccessAlert(response?.message || "Review deleted successfully");
+      queryClient.invalidateQueries({
+        queryKey:
+          variables.reviewType === "listing"
+            ? ["userReviews", userId]
+            : variables.reviewType === "place"
+              ? ["userPlaceReviews", userId]
+              : ["userEventReviews", userId],
+      });
+    },
+    onError: (mutationError) => {
+      setEditError(
+        mutationError?.response?.data?.message ||
+          "Failed to delete this review.",
+      );
+    },
+  });
+
+  const handleDeleteReview = async () => {
+    if (!selectedReview?._id || !isSelectedReviewEditable) return;
+
+    const result = await Swal.fire({
+      title: "Delete review?",
+      text: "Are you sure you want to delete this review?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#0BA9EF",
+      customClass: {
+        confirmButton: "swal2-button--pill",
+        cancelButton: "swal2-button--pill",
+      },
+    });
+
+    if (result.isConfirmed) {
+      deleteReviewMutation.mutate({
+        reviewId: selectedReview._id,
+        reviewType: selectedReview.reviewType,
+      });
+    }
   };
 
   const renderDestinationReviewCards = (
@@ -430,7 +494,7 @@ const Reviews = () => {
             </div>
 
             <div className="flex shrink-0 items-center gap-2 self-start sm:self-center">
-              {isSelectedDestinationReview && (
+              {isSelectedReviewEditable && (
                 <button
                   type="button"
                   className={`flex items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
@@ -439,10 +503,27 @@ const Reviews = () => {
                       : "border-gray-200 bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
                   onClick={handleStartEdit}
-                  disabled={updateReviewMutation.isPending}
+                  disabled={
+                    updateReviewMutation.isPending ||
+                    deleteReviewMutation.isPending
+                  }
                 >
                   <FiEdit2 size={13} />
                   Edit
+                </button>
+              )}
+              {isSelectedReviewEditable && (
+                <button
+                  type="button"
+                  className="flex items-center gap-1 rounded-full border border-red-100 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-100 disabled:opacity-60"
+                  onClick={handleDeleteReview}
+                  disabled={
+                    updateReviewMutation.isPending ||
+                    deleteReviewMutation.isPending
+                  }
+                >
+                  <FiTrash2 size={13} />
+                  {deleteReviewMutation.isPending ? "Deleting..." : "Delete"}
                 </button>
               )}
               <span
@@ -467,7 +548,9 @@ const Reviews = () => {
                   if (isEditingReview) setEditStarCount(index + 1);
                 }}
                 disabled={
-                  !isEditingReview || updateReviewMutation.isPending
+                  !isEditingReview ||
+                  updateReviewMutation.isPending ||
+                  deleteReviewMutation.isPending
                 }
                 aria-label={`Set ${index + 1} star rating`}
               >
@@ -493,7 +576,10 @@ const Reviews = () => {
                 placeholder="Share details of your own experience at this place"
                 value={editDescription}
                 onChange={(event) => setEditDescription(event.target.value)}
-                disabled={updateReviewMutation.isPending}
+                disabled={
+                  updateReviewMutation.isPending ||
+                  deleteReviewMutation.isPending
+                }
               />
             ) : (
               <p className="min-h-24 whitespace-pre-line break-words text-sm leading-7 text-gray-700">
@@ -510,14 +596,20 @@ const Reviews = () => {
                 type="button"
                 className="rounded-full border border-gray-300 px-5 py-2 text-sm font-medium text-gray-700"
                 onClick={handleCancelEdit}
-                disabled={updateReviewMutation.isPending}
+                disabled={
+                  updateReviewMutation.isPending ||
+                  deleteReviewMutation.isPending
+                }
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 className="rounded-full bg-primary-blue px-6 py-2 text-sm font-semibold text-white hover:bg-primary-light disabled:opacity-60"
-                disabled={updateReviewMutation.isPending}
+                disabled={
+                  updateReviewMutation.isPending ||
+                  deleteReviewMutation.isPending
+                }
               >
                 {updateReviewMutation.isPending ? "Submitting..." : "Submit"}
               </button>

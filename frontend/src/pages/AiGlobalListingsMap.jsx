@@ -42,6 +42,7 @@ import {
   useCroppedDesktopShortcutIcons,
 } from "../utils/categoryShortcutIcons.js";
 import { DESTINATION_HIGHLIGHT_FILTERS } from "../data/aiDestinationHighlights.js";
+import { navigateBackWithinApp } from "../utils/navigationHistory.js";
 
 const ALL_LISTINGS_CATEGORY = "alllistings";
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
@@ -903,7 +904,7 @@ const AiGlobalListingsMap = () => {
           <AiSelectedBadgesSearchBar
             badges={searchBarBadges}
             stateLabel={selectedLocationLabel}
-            onBack={() => navigate(-1)}
+            onBack={() => navigateBackWithinApp(navigate)}
             onClear={() => navigate("/search/results")}
             heading={
               <p className="mt-0 mb-5 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.8rem] font-play">
@@ -946,9 +947,9 @@ const AiGlobalListingsMap = () => {
                           onClick={() => handleCategoryClick(cat.value)}
                           className="text-black px-1 py-2 hover:text-black transition flex items-center justify-center w-full"
                         >
-                          <div className="flex min-h-[3.5rem] w-full flex-col items-center justify-start gap-1">
+                          <div className="h-10 w-full flex flex-col gap-0 items-center">
                             {iconSrc ? (
-                              <div className="h-10 w-full">
+                              <div className="h-10 w-full shrink-0">
                                 <img
                                   src={iconSrc}
                                   alt={cat.label}

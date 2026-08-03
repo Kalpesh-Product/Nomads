@@ -14,6 +14,7 @@ import AiSidebar from "../components/AiSidebar";
 import AiFooter from "../components/AiFooter";
 import BackToTopButton from "../components/BackToTopButton";
 import AiStickyBackBreadcrumb from "../components/AiStickyBackBreadcrumb";
+import { navigateBackWithinApp } from "../utils/navigationHistory";
 
 const EXCLUDED_STICKY_BAR_PATHS = new Set([]);
 
@@ -284,7 +285,7 @@ const NomadAiLayout = () => {
       return;
     }
 
-    navigate(-1);
+    navigateBackWithinApp(navigate);
   };
 
   return (
