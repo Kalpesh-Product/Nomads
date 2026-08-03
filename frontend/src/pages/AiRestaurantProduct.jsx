@@ -46,6 +46,7 @@ import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 import { setFormValues } from "../features/locationSlice.js";
 import { readSelectedDestination } from "../utils/selectedDestinationSession";
+import { navigateBackWithinApp } from "../utils/navigationHistory.js";
 
 dayjs.extend(relativeTime);
 
@@ -527,7 +528,7 @@ const AiRestaurantProduct = () => {
       return;
     }
 
-    navigate(-1);
+    navigateBackWithinApp(navigate);
   };
 
   const handleWriteReviewClick = () => {

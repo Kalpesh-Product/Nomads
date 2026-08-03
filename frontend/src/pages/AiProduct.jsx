@@ -51,6 +51,7 @@ import {
   buildCanonicalListingUrl,
   buildListingShareUrl,
 } from "../utils/listingShareUrl.js";
+import { navigateBackWithinApp } from "../utils/navigationHistory.js";
 
 dayjs.extend(relativeTime);
 
@@ -436,7 +437,7 @@ const AiProduct = () => {
       return;
     }
 
-    navigate(-1);
+    navigateBackWithinApp(navigate);
   };
 
   const handleWriteReviewClick = () => {

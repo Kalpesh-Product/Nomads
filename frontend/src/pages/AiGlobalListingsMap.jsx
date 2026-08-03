@@ -42,6 +42,7 @@ import {
   useCroppedDesktopShortcutIcons,
 } from "../utils/categoryShortcutIcons.js";
 import { DESTINATION_HIGHLIGHT_FILTERS } from "../data/aiDestinationHighlights.js";
+import { navigateBackWithinApp } from "../utils/navigationHistory.js";
 
 const ALL_LISTINGS_CATEGORY = "alllistings";
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
@@ -903,7 +904,7 @@ const AiGlobalListingsMap = () => {
           <AiSelectedBadgesSearchBar
             badges={searchBarBadges}
             stateLabel={selectedLocationLabel}
-            onBack={() => navigate(-1)}
+            onBack={() => navigateBackWithinApp(navigate)}
             onClear={() => navigate("/search/results")}
             heading={
               <p className="mt-0 mb-5 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.8rem] font-play">

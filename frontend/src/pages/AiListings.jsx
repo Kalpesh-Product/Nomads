@@ -42,6 +42,7 @@ import {
   getCategoryShortcutIconSrc,
   useCroppedDesktopShortcutIcons,
 } from "../utils/categoryShortcutIcons.js";
+import { navigateBackWithinApp } from "../utils/navigationHistory.js";
 
 const ALL_LISTINGS_CATEGORY = "alllistings";
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
@@ -1276,7 +1277,7 @@ const AiListings = ({ forceListView = false }) => {
           <AiSelectedBadgesSearchBar
             badges={badgesWithCategory}
             stateLabel={selectedStateLabel}
-            onBack={() => navigate(-1)}
+            onBack={() => navigateBackWithinApp(navigate)}
             onClear={() => navigate("/search/results")}
             heading={
               <p className="mt-0 mb-5 hidden items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:flex lg:text-[0.9rem] font-play">

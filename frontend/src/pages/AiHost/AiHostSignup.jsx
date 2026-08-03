@@ -30,6 +30,7 @@ import UploadMultipleFilesInput from "../../components/UploadMultipleFilesInput"
 import AiHostPricing from "./AiHostPricing";
 import useAuth from "../../hooks/useAuth";
 import AiStickyBackBreadcrumb from "../../components/AiStickyBackBreadcrumb";
+import { navigateBackWithinApp } from "../../utils/navigationHistory";
 
 const steps = ["GOAL", "BASIC DETAILS"];
 const ACTIVATION_TITLE = "Your goal is set... let's get you activated";
@@ -167,7 +168,7 @@ const AiHostSignup = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { auth } = useAuth();
-  const onBack = () => navigate(-1);
+  const onBack = () => navigateBackWithinApp(navigate);
   const hostRedirectUrl = `${window.location.origin}/`;
 
   const signupParams = new URLSearchParams(location.search);

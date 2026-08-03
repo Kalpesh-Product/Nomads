@@ -40,6 +40,7 @@ import {
 } from "../utils/categoryShortcutIcons.js";
 import AiDestinationHighlightSection from "../components/AiDestinationHighlightSection.jsx";
 import { DESTINATION_HIGHLIGHT_FILTERS } from "../data/aiDestinationHighlights.js";
+import { navigateBackWithinApp } from "../utils/navigationHistory.js";
 
 // import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
 // import {
@@ -1374,8 +1375,8 @@ const AiGlobalListingsList = () => {
           <AiSelectedBadgesSearchBar
             badges={searchBarBadges}
             stateLabel={selectedLocationLabel}
-            onBack={() => navigate(-1)}
-            onClear={() => navigate(-1)}
+            onBack={() => navigateBackWithinApp(navigate)}
+            onClear={() => navigateBackWithinApp(navigate)}
             heading={
               <p className=" mt-0 mb-5 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
                 {!isSecondHeadingPhase && (
@@ -1832,7 +1833,7 @@ const AiGlobalListingsList = () => {
                 <div className="flex shrink-0 items-center gap-1.5">
                   <button
                     type="button"
-                    onClick={() => navigate(-1)}
+                    onClick={() => navigateBackWithinApp(navigate)}
                     aria-label="Clear search and go back"
                     className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-black/70 transition-colors hover:bg-black/5 hover:text-black"
                   >

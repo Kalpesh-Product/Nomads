@@ -164,11 +164,16 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
   };
 
   const goToHostssMain = () => {
-    if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://localhost:5173";
-    } else {
-      window.location.href = "https://wono.co/";
+    if (
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "wono.co" ||
+      window.location.hostname === "www.wono.co"
+    ) {
+      navigate("/");
+      return;
     }
+
+    window.location.href = "https://wono.co/";
   };
 
   const stateParam =
