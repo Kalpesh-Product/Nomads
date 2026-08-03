@@ -69,6 +69,7 @@ const CategoryShortcutButton = ({
   label,
   iconSrc,
   onClick,
+  contentClassName = "flex min-h-[3.5rem] w-full flex-col items-center justify-start gap-1",
   buttonClassName,
   iconBoxClassName,
   imageClassName,
@@ -82,7 +83,7 @@ const CategoryShortcutButton = ({
 
   return (
     <button type="button" onClick={onClick} className={buttonClassName}>
-      <div className="flex min-h-[3.5rem] w-full flex-col items-center justify-start gap-1">
+      <div className={contentClassName}>
         {iconSrc ? (
           <div className={`relative overflow-hidden ${iconBoxClassName}`}>
             {!isIconLoaded && (
@@ -1418,8 +1419,9 @@ const AiGlobalListingsList = () => {
                           label={cat.label}
                           iconSrc={iconSrc}
                           onClick={() => handleCategoryClick(cat.value)}
+                          contentClassName="h-10 w-full flex flex-col gap-0 items-center"
                           buttonClassName="text-black px-1 py-2 hover:text-black transition flex items-center justify-center w-full"
-                          iconBoxClassName="h-10 w-full"
+                          iconBoxClassName="h-10 w-full shrink-0"
                           imageClassName="h-full w-full object-contain"
                           labelClassName={`text-tiny border-b-2 pb-1 pt-1 ${
                             isActive
