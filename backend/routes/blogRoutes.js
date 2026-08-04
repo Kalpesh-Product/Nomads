@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   getBlogs,
+  getBlogDestinationCounts,
   bulkInsertBlogs,
   createBlog,
   updateBlog,
@@ -12,6 +13,7 @@ const router = Router();
 
 router.get("/blogs", getBlogs);
 router.get("/get-blogs", getBlogs);
+router.get("/destination-counts", getBlogDestinationCounts);
 router.post("/blogs", createBlog);
 router.put("/blogs/:id", updateBlog);
 router.delete("/blogs/:id", deleteBlog);

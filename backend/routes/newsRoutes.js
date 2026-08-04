@@ -2,6 +2,7 @@
 import { Router } from "express";
 import {
   getNews,
+  getNewsDestinationCounts,
   bulkInsertnews,
   createNews,
   updateNews,
@@ -12,6 +13,7 @@ import upload from "../config/multerConfig.js";
 const router = Router();
 router.get("/news", getNews);
 router.get("/get-news", getNews);
+router.get("/destination-counts", getNewsDestinationCounts);
 router.post("/news", createNews);
 router.put("/news/:id", updateNews);
 router.delete("/news/:id", deleteNews);

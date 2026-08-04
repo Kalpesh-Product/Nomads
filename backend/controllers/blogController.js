@@ -71,6 +71,24 @@ export const getBlogs = async (req, res, next) => {
         next(error);
     }
 };
+
+// Callers that only need per-destination totals (e.g. the master panel's
+// Destinations Data page) shouldn't have to pull every full document across
+// the wire just to count them — group server-side and send back a tiny
+// summary instead.
+export const getBlogDestinationCounts = async (req, res, next) => {
+    try {
+        const counts = await Blog.aggregate([
+            { $match: { isActive: { $ne: false } } },
+            { $group: { _id: "$destination", count: { $sum: 1 } } },
+        ]);
+        return res.status(200).json(
+            counts.map((row) => ({ destination: row._id, count: row.count })),
+        );
+    } catch (error) {
+        next(error);
+    }
+};
 // export const bulkInsertBlogs = async (req, res, next) => {
 //   try {
 //     const results = [];
