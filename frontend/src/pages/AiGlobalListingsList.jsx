@@ -1394,7 +1394,7 @@ const AiGlobalListingsList = () => {
           />
         </div>
         <div
-          className={`${isHeadingSequenceComplete ? "flex" : "hidden"} flex-col gap-4 justify-center items-center w-full`}
+          className={`${isHeadingSequenceComplete ? "flex" : "hidden"} mx-auto w-full max-w-[80rem] flex-col gap-4 px-1 sm:px-6 lg:px-0`}
         >
           <div className="w-full px-0">
             <div className="flex flex-col gap-4 justify-between items-center w-full h-full">
