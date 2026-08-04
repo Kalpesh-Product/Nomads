@@ -187,6 +187,19 @@ const AiGlobalListingsMap = () => {
     persistedSearchBarBadges,
   ]);
 
+  const activeCategoryValue = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    const queryCategory = params.get("category");
+    const queryHighlight = params.get("highlight");
+
+    return (
+      queryCategory ||
+      queryHighlight ||
+      formData?.category ||
+      ALL_LISTINGS_CATEGORY
+    );
+  }, [formData?.category, location.search]);
+
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const restoreKey = getAiVerticalsPageStateKey(
@@ -650,6 +663,8 @@ const AiGlobalListingsMap = () => {
     const queryCountry = params.get("country");
     const queryLocation = params.get("state") || params.get("location");
     const queryContinent = params.get("continent");
+    const queryCategory =
+      params.get("category") || params.get("highlight") || "";
 
     const breadcrumbFilters = location.state?.breadcrumbFilters;
 
@@ -679,7 +694,8 @@ const AiGlobalListingsMap = () => {
     if (
       resolvedContinent === normalizeValue(formData.continent) &&
       normalizedCountry === normalizeValue(formData.country) &&
-      normalizedLocation === normalizeValue(formData.location)
+      normalizedLocation === normalizeValue(formData.location) &&
+      queryCategory === (formData.category || "")
     ) {
       return;
     }
@@ -689,6 +705,7 @@ const AiGlobalListingsMap = () => {
       continent: resolvedContinent || "",
       country: normalizedCountry || "",
       location: normalizedLocation || "",
+      category: queryCategory,
     };
 
     dispatch(setFormValues(nextFormValues));
@@ -940,7 +957,7 @@ const AiGlobalListingsMap = () => {
                         cat.value,
                         useCroppedDesktopShortcuts,
                       );
-                      const isActive = formData?.category === cat.value;
+                      const isActive = activeCategoryValue === cat.value;
                       return (
                         <button
                           key={cat.value}
@@ -1178,12 +1195,12 @@ const AiGlobalListingsMap = () => {
             {/* Collection/Category Chips */}
             <div className="pointer-events-auto w-full max-w-[450px] flex overflow-x-auto gap-2 pb-2 scrollbar-hide scroll-smooth snap-x">
               {[
-                { label: "All", value: "" },
+                { label: "All", value: ALL_LISTINGS_CATEGORY },
                 ...categoryOptions.filter(
                   (cat) => cat.value !== ALL_LISTINGS_CATEGORY,
                 ),
               ].map((cat) => {
-                const isActive = cat.value === formData?.category;
+                const isActive = cat.value === activeCategoryValue;
                 return (
                   <button
                     key={cat.value}
