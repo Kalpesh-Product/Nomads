@@ -160,6 +160,33 @@ const AiProduct = () => {
       ? [...companyDetails.reviews, ...companyDetails.reviews]
       : companyDetails?.reviews || [];
 
+  // Best-effort: records that this signed-in user opened this specific
+  // listing. Fires once per listing load; failures (incl. logged-out users)
+  // are swallowed since this should never affect the page.
+  useEffect(() => {
+    if (!companyDetails?.companyName) return;
+    axiosPrivate
+      .post("user/listing-view", {
+        companyId: companyDetails.companyId,
+        businessId: companyDetails.businessId,
+        companyName: companyDetails.companyName,
+        city: companyDetails.city,
+        state: companyDetails.state,
+        country: companyDetails.country,
+        continent: companyDetails.continent,
+      })
+      .catch(() => {});
+  }, [
+    axiosPrivate,
+    companyDetails?.businessId,
+    companyDetails?.companyId,
+    companyDetails?.companyName,
+    companyDetails?.city,
+    companyDetails?.state,
+    companyDetails?.country,
+    companyDetails?.continent,
+  ]);
+
   useEffect(() => {
     // Helper function for the scrolling logic
     const setupAutoScroll = (containerRef) => {

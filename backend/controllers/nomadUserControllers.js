@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import NomadUser from "../models/NomadUser.js";
 import StateWiseWeight from "../models/StateWiseWeight.js";
+import NomadDestinationView from "../models/NomadDestinationView.js";
+import NomadListingView from "../models/NomadListingView.js";
 import bcrypt from "bcrypt";
 
 const normalizeFavoriteDestinationImages = (destination = {}) => {
@@ -431,6 +433,67 @@ export const likeListings = async (req, res, next) => {
       message: isLiked ? "You liked" : "You unliked",
       likes: updatedUser.likes,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Best-effort: records which destination a signed-in user viewed (continent
+// / country / state — this app has no separate city level). Fire-and-forget
+// from the frontend, so failures here should never surface to the caller.
+export const trackDestinationView = async (req, res, next) => {
+  try {
+    const userId = req.userData?._id;
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    const { continent, country, state, title } = req.body || {};
+    const trimmedCountry = String(country || "").trim();
+    const trimmedState = String(state || "").trim();
+    if (!trimmedCountry || !trimmedState) {
+      return res.status(400).json({ message: "country and state are required" });
+    }
+
+    await NomadDestinationView.create({
+      userId,
+      continent: String(continent || "").trim(),
+      country: trimmedCountry,
+      state: trimmedState,
+      title: String(title || "").trim(),
+    });
+
+    return res.status(201).json({ message: "Destination view recorded" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Best-effort: records which specific listing/company a signed-in user
+// opened. Fire-and-forget from the frontend, so failures here should never
+// surface to the caller.
+export const trackListingView = async (req, res, next) => {
+  try {
+    const userId = req.userData?._id;
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    const { companyId, businessId, companyName, city, state, country, continent } =
+      req.body || {};
+    const trimmedCompanyName = String(companyName || "").trim();
+    if (!trimmedCompanyName) {
+      return res.status(400).json({ message: "companyName is required" });
+    }
+
+    await NomadListingView.create({
+      userId,
+      companyId: String(companyId || "").trim(),
+      businessId: String(businessId || "").trim(),
+      companyName: trimmedCompanyName,
+      city: String(city || "").trim(),
+      state: String(state || "").trim(),
+      country: String(country || "").trim(),
+      continent: String(continent || "").trim(),
+    });
+
+    return res.status(201).json({ message: "Listing view recorded" });
   } catch (error) {
     next(error);
   }

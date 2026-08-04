@@ -11,6 +11,8 @@ import {
   getUserSaves,
   likeListings,
   saveListings,
+  trackDestinationView,
+  trackListingView,
   updateProfile,
 } from "../controllers/nomadUserControllers.js";
 
@@ -24,5 +26,7 @@ router.get("/favorite-destination/:userId", getUserFavoriteDestinations);
 router.patch("/like", likeListings);
 router.get("/likes/:userId", getUserLikes);
 router.get("/likes", getLikes);
+router.post("/destination-view", trackDestinationView);
+router.post("/listing-view", trackListingView);
 
 export default router;
