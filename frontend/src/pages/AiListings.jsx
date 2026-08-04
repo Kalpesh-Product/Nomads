@@ -146,8 +146,9 @@ const AiListings = ({ forceListView = false }) => {
   const [isSecondHeadingPhase, setIsSecondHeadingPhase] = useState(
     shouldSkipHeadingIntro,
   );
-  const [isHeadingSequenceComplete, setIsHeadingSequenceComplete] =
-    useState(shouldSkipHeadingIntro);
+  const [isHeadingSequenceComplete, setIsHeadingSequenceComplete] = useState(
+    shouldSkipHeadingIntro,
+  );
   const useCroppedDesktopShortcuts = useCroppedDesktopShortcutIcons();
 
   const searchBarBadges = useMemo(() => {
@@ -1744,9 +1745,7 @@ const AiListings = ({ forceListView = false }) => {
           <Container
             padding={false}
             className={
-              forceListView
-                ? "!px-0 sm:!px-6 max-[820px]:!px-0 lg:!px-0"
-                : ""
+              forceListView ? "!px-0 sm:!px-6 max-[820px]:!px-0 lg:!px-0" : ""
             }
           >
             {/* Dynamic Header */}
@@ -1757,7 +1756,7 @@ const AiListings = ({ forceListView = false }) => {
               !isRestaurantsSelected &&
               !isNewsSelected &&
               !isBlogsSelected && (
-                <div className="mt-6 mb-6 px-1 border-t border-gray-300">
+                <div className="mt-6 mb-6 px-0 border-t border-gray-300">
                   <h1 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight mt-6 mb-2">
                     Popular{" "}
                     {{
