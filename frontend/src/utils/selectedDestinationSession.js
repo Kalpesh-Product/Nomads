@@ -1,3 +1,5 @@
+import axiosPrivate from "./axios";
+
 export const SELECTED_DESTINATION_SESSION_KEY = "wonoSelectedDestination";
 
 const normalizeValue = (value) =>
@@ -25,6 +27,17 @@ export const persistSelectedDestination = ({ continent, country, city, title }) 
             updatedAt: Date.now(),
         }),
     );
+
+    // Best-effort activity tracking — only recorded when the request carries
+    // a valid session; failures (incl. logged-out users) are swallowed.
+    axiosPrivate
+        .post("user/destination-view", {
+            continent,
+            country,
+            state: city,
+            title: normalizedTitle,
+        })
+        .catch(() => {});
 };
 
 export const readSelectedDestination = () => {

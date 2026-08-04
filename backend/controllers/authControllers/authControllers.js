@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import NomadUser from "../../models/NomadUser.js";
+import NomadUserSessionLog from "../../models/NomadUserSessionLog.js";
 import Otp from "../../models/Otp.js";
 import { sendMail } from "../../config/mailer.js";
 import { renderNotificationEmail } from "../../utils/emailTemplates.js";
@@ -74,6 +75,10 @@ export const login = async (req, res) => {
 
     await NomadUser.findOneAndUpdate({ email }, { refreshToken }).lean().exec();
 
+    NomadUserSessionLog.create({ userId: user._id, event: "login" }).catch((error) => {
+      console.error("[authControllers] failed to log login event:", error.message);
+    });
+
     res.cookie("nomadCookie", refreshToken, {
       httpOnly: true,
       sameSite: "None",
@@ -125,6 +130,11 @@ export const logout = async (req, res, next) => {
     await NomadUser.findOneAndUpdate({ refreshToken }, { refreshToken: "" })
       .lean()
       .exec();
+
+    NomadUserSessionLog.create({ userId: user._id, event: "logout" }).catch((error) => {
+      console.error("[authControllers] failed to log logout event:", error.message);
+    });
+
     res.clearCookie("nomadCookie", {
       httpOnly: true,
       sameSite: "None",
