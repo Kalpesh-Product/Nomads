@@ -452,7 +452,7 @@ const AiProfile = () => {
                 error={!!profileErrors.email}
                 helperText={profileErrors.email}
                 disabled={!editMode}
-                InputProps={{ readOnly: true }}
+                InputProps={{ readOnly: !editMode }}
                 InputLabelProps={{ sx: floatingLabelSx }}
               />
               <TextField

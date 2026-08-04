@@ -88,6 +88,7 @@ export const updateProfile = async (req, res) => {
     const { userId } = req.params;
     const {
       fullName,
+      email,
       country,
       state,
       salary,
@@ -103,6 +104,33 @@ export const updateProfile = async (req, res) => {
     const user = await NomadUser.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
+    }
+
+    if (email !== undefined) {
+      const normalizedEmail = String(email).trim().toLowerCase();
+
+      if (!normalizedEmail) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+
+      if (!/^\S+@\S+\.\S+$/.test(normalizedEmail)) {
+        return res
+          .status(400)
+          .json({ message: "Please use a valid email address" });
+      }
+
+      if (normalizedEmail !== user.email) {
+        const existingUser = await NomadUser.findOne({
+          email: normalizedEmail,
+          _id: { $ne: user._id },
+        }).lean();
+
+        if (existingUser) {
+          return res.status(409).json({ message: "Email is already in use" });
+        }
+      }
+
+      user.email = normalizedEmail;
     }
 
     if (fullName) user.fullName = fullName.trim();
