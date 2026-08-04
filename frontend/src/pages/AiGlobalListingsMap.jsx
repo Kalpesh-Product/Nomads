@@ -940,6 +940,7 @@ const AiGlobalListingsMap = () => {
                         cat.value,
                         useCroppedDesktopShortcuts,
                       );
+                      const isActive = formData?.category === cat.value;
                       return (
                         <button
                           key={cat.value}
@@ -957,7 +958,15 @@ const AiGlobalListingsMap = () => {
                                 />
                               </div>
                             ) : null}
-                            <span className="text-tiny">{cat.label}</span>
+                            <span
+                              className={`text-tiny border-b-2 pb-1 pt-1 ${
+                                isActive
+                                  ? "border-primary-blue text-primary-blue"
+                                  : "border-transparent text-black"
+                              }`}
+                            >
+                              {cat.label}
+                            </span>
                           </div>
                         </button>
                       );
