@@ -2,6 +2,7 @@ import { Readable } from "stream";
 import csvParser from "csv-parser";
 import mongoose from "mongoose";
 import Restaurant from "../models/Restaurant.js";
+import { uploadFileToS3 } from "../config/s3Config.js";
 
 const REQUIRED_COLUMNS = [
   "Business ID",
@@ -200,8 +201,8 @@ const buildRestaurant = (row) => ({
   registeredEntityName: row["Registered Entity name"] || "",
   website: row["Website"] || "",
   logo: row["Logo"] || "",
-  images: row["Images"] || "",
-  mainImage: row["Images"] || row["Logo"] || "",
+  images: [],
+  mainImage: row["Logo"] || "",
   shortDescription: row["About"] || "",
   address: row["Address"] || "",
   continent: row["Continent"],
@@ -225,6 +226,116 @@ const buildRestaurant = (row) => ({
   destination: row["Destination"] || row["State"] || row["City"],
   restaurantType: row["Type"] || "",
 });
+
+const sanitizeFileName = (name) =>
+  String(name || "file")
+    .replace(/[/\\?%*:|"<>]/g, "_")
+    .replace(/\s+/g, "_");
+
+const sanitizeFolderName = (name) =>
+  String(name || "unnamed")
+    .replace(/[^\w\- ]+/g, "")
+    .trim() || "unnamed";
+
+const getExistingRestaurantImages = (images) =>
+  Array.isArray(images)
+    ? images.filter((image) => image && typeof image === "object")
+    : [];
+
+export const addRestaurantImagesBulk = async (req, res, next) => {
+  try {
+    const files = req.files;
+    const { restaurantId, businessId } = req.body || {};
+
+    if (!files || !files.length) {
+      return res.status(400).json({ message: "No files provided" });
+    }
+
+    let restaurant;
+    if (restaurantId) {
+      if (!mongoose.isValidObjectId(restaurantId)) {
+        return res.status(400).json({
+          message: "Valid restaurant identifier is required",
+        });
+      }
+      restaurant = await Restaurant.findById(restaurantId).exec();
+    } else if (businessId) {
+      restaurant = await Restaurant.findOne({ businessId }).exec();
+    } else {
+      return res
+        .status(400)
+        .json({ message: "Provide restaurantId or businessId" });
+    }
+
+    if (!restaurant) {
+      return res.status(404).json({ message: "Restaurant not found" });
+    }
+
+    const existingImages = getExistingRestaurantImages(restaurant.images);
+    if (existingImages.length) {
+      return res.status(409).json({
+        message:
+          "Images already exist. Please use a restaurant reupload flow to replace them.",
+      });
+    }
+
+    const folderPath = `nomads/restaurants/${restaurant.country}/${sanitizeFolderName(
+      restaurant.restaurantName || restaurant.businessName,
+    )}`;
+    const startIndex = existingImages.length;
+
+    const uploadResults = await Promise.allSettled(
+      files.map(async (file, index) => {
+        const key = `${folderPath}/images/${sanitizeFileName(
+          file.originalname,
+        )}`;
+        const data = await uploadFileToS3(key, file);
+        return {
+          url: data.url,
+          id: data.id,
+          index: startIndex + index + 1,
+          originalName: file.originalname,
+          key,
+        };
+      }),
+    );
+
+    const successes = [];
+    const failures = [];
+
+    for (const result of uploadResults) {
+      if (result.status === "fulfilled") successes.push(result.value);
+      else failures.push({ reason: result.reason?.message || "Unknown error" });
+    }
+
+    if (successes.length) {
+      restaurant.images = successes.map((image) => ({
+        url: image.url,
+        id: image.id,
+        index: image.index,
+      }));
+      restaurant.mainImage = successes[0].url;
+      await restaurant.save({ validateBeforeSave: false });
+    }
+
+    return res.status(failures.length ? 207 : 200).json({
+      message:
+        failures.length && successes.length
+          ? `Uploaded ${successes.length} restaurant images; ${failures.length} failed`
+          : failures.length
+            ? "All restaurant image uploads failed"
+            : `Successfully uploaded ${successes.length} restaurant images`,
+      data: {
+        restaurantId: restaurant._id,
+        businessId: restaurant.businessId,
+        uploaded: successes,
+        failed: failures,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const getRestaurants = async (req, res, next) => {
   try {
