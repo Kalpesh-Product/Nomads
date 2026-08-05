@@ -1,5 +1,6 @@
 import { Readable } from "stream";
 import csvParser from "csv-parser";
+import mongoose from "mongoose";
 import Restaurant from "../models/Restaurant.js";
 import RestaurantReview from "../models/RestaurantReview.js";
 
@@ -171,6 +172,90 @@ export const getRestaurantReviews = async (req, res, next) => {
       .lean();
 
     return res.status(200).json({ count: reviews.length, data: reviews });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const addRestaurantReview = async (req, res, next) => {
+  try {
+    const {
+      restaurantId,
+      businessId,
+      name,
+      starCount,
+      description,
+      reviewSource,
+      reviewLink,
+    } = req.body || {};
+
+    if (!restaurantId && !businessId) {
+      return res
+        .status(400)
+        .json({ message: "Restaurant identifier is required" });
+    }
+
+    const parsedStarCount = Number(starCount);
+    if (
+      Number.isNaN(parsedStarCount) ||
+      parsedStarCount < 1 ||
+      parsedStarCount > 5
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Star count must be between 1 and 5" });
+    }
+
+    if (!name?.trim() || !description?.trim()) {
+      return res
+        .status(400)
+        .json({ message: "Reviewer name and review details are required" });
+    }
+
+    const restaurantQuery =
+      restaurantId && mongoose.isValidObjectId(restaurantId)
+        ? { _id: restaurantId }
+        : { businessId };
+
+    const restaurant = await Restaurant.findOne(restaurantQuery)
+      .select("_id restaurantId businessId businessName restaurantName")
+      .lean();
+
+    if (!restaurant) {
+      return res.status(404).json({ message: "Restaurant not found" });
+    }
+
+    const existingReview = await RestaurantReview.findOne({
+      restaurant: restaurant._id,
+      reviewer: req.userData._id,
+    }).lean();
+
+    if (existingReview) {
+      return res.status(400).json({
+        message: "You can add a review for the same restaurant only once",
+      });
+    }
+
+    const reviewerName = name.trim();
+    const review = await RestaurantReview.create({
+      restaurant: restaurant._id,
+      restaurantId: restaurant.restaurantId || restaurant._id.toString(),
+      businessId: restaurant.businessId,
+      businessName: restaurant.businessName || restaurant.restaurantName || "",
+      name: reviewerName,
+      reviewerName,
+      starCount: parsedStarCount,
+      description: description.trim(),
+      reviewSource: reviewSource?.trim() || "Nomads Website",
+      reviewLink: reviewLink?.trim() || "",
+      status: "pending",
+      reviewer: req.userData._id,
+    });
+
+    return res.status(201).json({
+      message: "Review submitted successfully",
+      review,
+    });
   } catch (error) {
     next(error);
   }

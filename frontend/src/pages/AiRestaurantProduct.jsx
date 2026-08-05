@@ -687,9 +687,10 @@ const AiRestaurantProduct = () => {
   });
 
   const { mutate: submitReview, isPending: isSubmittingReview } = useMutation({
-    mutationKey: ["submitReview", companyDetails?.companyId],
+    mutationKey: ["submitRestaurantReview", companyDetails?._id],
     mutationFn: async (data) => {
       const payload = {
+        restaurantId: companyDetails?._id,
         businessId: companyDetails?.businessId,
         name: data.name?.trim() || reviewerName || "Anonymous",
         starCount: Number(data.starCount),
@@ -697,7 +698,7 @@ const AiRestaurantProduct = () => {
         reviewSource: "Nomads Website",
         reviewLink: "",
       };
-      const response = await axios.post("/review", {
+      const response = await axios.post("/restaurant-reviews", {
         ...payload,
       });
       return response?.data;
@@ -706,7 +707,7 @@ const AiRestaurantProduct = () => {
       showSuccessAlert("Review submitted successfully.");
       resetReview();
       setIsAddReviewOpen(false);
-      queryClient.invalidateQueries({ queryKey: ["companyDetails"] });
+      queryClient.invalidateQueries({ queryKey: ["restaurantDetails"] });
     },
     onError: (error) => {
       showErrorAlert(
