@@ -254,7 +254,13 @@ const departmentAccess = [
   },
 ];
 
-const becomeHostItem = [{ label: "Become A Nomad", icon: HiOutlineViewGrid }];
+const becomeNomadItem = [{ label: "Become a Nomad", icon: HiOutlineViewGrid }];
+
+const hostLoginPrompt = {
+  description:
+    "Login to manage your host tools, listings, operations, and business setup.",
+  actionLabel: "Login as Host",
+};
 
 const loggedOutPrompt = {
   title: "Get responses tailored to you",
@@ -522,12 +528,16 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     });
   };
 
-  const handleBecomeHostClick = () => {
+  const handleBecomeNomadClick = () => {
     if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://localhost:5173/home";
+      window.location.href = "http://localhost:5173/";
     } else {
-      window.location.href = "https://wono.co/home";
+      window.location.href = "https://wono.co/";
     }
+  };
+
+  const handleHostLoginClick = () => {
+    window.location.href = "https://hostpanel.wono.co";
   };
 
   const handleSignOutClick = async () => {
@@ -745,7 +755,42 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         onTooltipChange={setTooltip}
       />
 
-      {isLoggedIn ? (
+      {isMobileOverlay && (
+        <>
+          <div className="mx-4 mt-3 border-t border-black/10"></div>
+          <SidebarSection
+            items={becomeNomadItem}
+            collapsed={isCollapsed}
+            onItemClick={handleBecomeNomadClick}
+            compact={true}
+            onTooltipChange={setTooltip}
+          />
+          <div className="mx-4 border-t border-black/10"></div>
+
+          <div className="mt-auto px-4 pb-4 pt-10">
+            <div className="rounded-[28px] p-4">
+              <p className="mt-2 text-nano leading-[0.9rem] text-black/55">
+                {hostLoginPrompt.description}
+              </p>
+              <p className="text-nano font-semibold leading-5 text-black/55">
+                Built for your host workflow.
+              </p>
+
+              <div className="flex justify-center">
+                <button
+                  type="button"
+                  onClick={handleHostLoginClick}
+                  className="mt-6 w-[70%] rounded-full border border-black/30 bg-[#efefef] px-0 py-2 text-nano text-black/80 hover:bg-[#e0e0e0]"
+                >
+                  {hostLoginPrompt.actionLabel}
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {!isMobileOverlay && isLoggedIn ? (
         <>
           {/* <SidebarSection
                         title="Profile"
@@ -761,9 +806,9 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
           </div>
           {/* Compact sections - minimal spacing */}
           {/* <SidebarSection
-                        items={becomeHostItem}
+                        items={becomeNomadItem}
                         collapsed={isCollapsed}
-                        onItemClick={handleBecomeHostClick}
+                        onItemClick={handleBecomeNomadClick}
                         compact={true}
                     /> */}
           <div className="px-4 pt-3">
@@ -780,12 +825,13 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
           </div>
         </>
       ) : (
+        !isMobileOverlay && (
         <>
           {/* <div className="border-t border-black/10 mt-4 mx-4"></div>
                     <SidebarSection
-                        items={becomeHostItem}
+                        items={becomeNomadItem}
                         collapsed={isCollapsed}
-                        onItemClick={handleBecomeHostClick}
+                        onItemClick={handleBecomeNomadClick}
                         compact={true}
                     /> */}
           {/* <div className="border-t border-black/10 mt-4 mx-4"></div> */}
@@ -812,6 +858,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                         </div>
                     )} */}
         </>
+        )
       )}
       {isCollapsed && tooltip && (
         <div
