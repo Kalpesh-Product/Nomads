@@ -86,6 +86,22 @@ const Reviews = () => {
     staleTime: 1000 * 60,
   });
 
+  const {
+    data: restaurantReviews = [],
+    isLoading: isRestaurantReviewsLoading,
+    isError: isRestaurantReviewsError,
+    error: restaurantReviewsError,
+  } = useQuery({
+    queryKey: ["userRestaurantReviews", userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      const res = await axiosPrivate.get("/restaurant-reviews/my");
+      return Array.isArray(res.data?.data) ? res.data.data : [];
+    },
+    enabled: !!userId,
+    staleTime: 1000 * 60,
+  });
+
   const reviewedListings = reviews.reduce((acc, review) => {
     const company = review?.company;
 
@@ -136,6 +152,33 @@ const Reviews = () => {
     };
   });
 
+  const restaurantReviewCards = restaurantReviews.map((review) => {
+    const restaurant = review?.restaurant || {};
+    const restaurantName =
+      restaurant.restaurantName ||
+      restaurant.businessName ||
+      review.businessName ||
+      "Restaurant";
+    const restaurantImage =
+      restaurant.mainImage || restaurant.images?.[0]?.url || FALLBACK_IMAGE;
+
+    return {
+      ...review,
+      restaurant,
+      restaurantName,
+      reviewType: "restaurant",
+      cardTitle: restaurantName,
+      cardImage: restaurantImage,
+      cardLocation:
+        restaurant.city ||
+        restaurant.state ||
+        restaurant.country ||
+        review.state ||
+        "Unknown",
+      cardType: restaurant.restaurantType || "Restaurant",
+    };
+  });
+
   const formattedReviewDate = useMemo(() => {
     if (!selectedReview?.createdAt) return "";
 
@@ -156,7 +199,9 @@ const Reviews = () => {
           ? "/review"
           : reviewType === "place"
             ? "/place-reviews"
-            : "/event-reviews";
+            : reviewType === "restaurant"
+              ? "/restaurant-reviews"
+              : "/event-reviews";
       const reviewPath =
         reviewType === "listing" ? `${reviewId}/edit` : reviewId;
       const res = await axiosPrivate.patch(`${endpoint}/${reviewPath}`, {
@@ -172,6 +217,7 @@ const Reviews = () => {
         ...updatedReview,
         event: selectedReview?.event,
         place: selectedReview?.place,
+        restaurant: selectedReview?.restaurant,
         company: updatedReview?.company || selectedReview?.company,
         reviewType: selectedReview?.reviewType,
         status: "pending",
@@ -187,7 +233,9 @@ const Reviews = () => {
             ? ["userReviews", userId]
             : variables.reviewType === "place"
               ? ["userPlaceReviews", userId]
-              : ["userEventReviews", userId],
+              : variables.reviewType === "restaurant"
+                ? ["userRestaurantReviews", userId]
+                : ["userEventReviews", userId],
       });
     },
     onError: (mutationError) => {
@@ -216,11 +264,14 @@ const Reviews = () => {
   const reviewStatus = (selectedReview?.status || "pending").toLowerCase();
   const isSelectedReviewEditable = Boolean(
     selectedReview?._id &&
-      ["event", "place", "listing"].includes(selectedReview?.reviewType),
+      ["event", "place", "restaurant", "listing"].includes(
+        selectedReview?.reviewType,
+      ),
   );
   const modalTitle =
     selectedReview?.eventName ||
     selectedReview?.placeName ||
+    selectedReview?.restaurantName ||
     selectedReview?.company?.companyName ||
     selectedReview?.company?.companyTitle ||
     "Review";
@@ -270,7 +321,9 @@ const Reviews = () => {
           ? "/review"
           : reviewType === "place"
             ? "/place-reviews"
-            : "/event-reviews";
+            : reviewType === "restaurant"
+              ? "/restaurant-reviews"
+              : "/event-reviews";
       const res = await axiosPrivate.delete(`${endpoint}/${reviewId}`);
       return res.data;
     },
@@ -283,7 +336,9 @@ const Reviews = () => {
             ? ["userReviews", userId]
             : variables.reviewType === "place"
               ? ["userPlaceReviews", userId]
-              : ["userEventReviews", userId],
+              : variables.reviewType === "restaurant"
+                ? ["userRestaurantReviews", userId]
+                : ["userEventReviews", userId],
       });
     },
     onError: (mutationError) => {
@@ -394,13 +449,19 @@ const Reviews = () => {
     );
   };
 
-  if (isError || isEventReviewsError || isPlaceReviewsError) {
+  if (
+    isError ||
+    isEventReviewsError ||
+    isPlaceReviewsError ||
+    isRestaurantReviewsError
+  ) {
     return (
       <Container padding={false}>
         <div className="py-8 min-h-screen text-center text-red-500">
           {error?.response?.data?.message ||
             eventReviewsError?.response?.data?.message ||
             placeReviewsError?.response?.data?.message ||
+            restaurantReviewsError?.response?.data?.message ||
             "Failed to load your reviews."}
         </div>
       </Container>
@@ -459,6 +520,20 @@ const Reviews = () => {
             placeReviewCards,
             isPlaceReviewsLoading,
             "You haven't reviewed any places yet.",
+          )}
+        </div>
+
+        <hr className="my-10 border-gray-200" />
+
+        <div>
+          <h2 className="text-xl font-semibold mb-6 text-secondary-dark">
+            My Reviews - Restaurants
+          </h2>
+
+          {renderDestinationReviewCards(
+            restaurantReviewCards,
+            isRestaurantReviewsLoading,
+            "You haven't reviewed any restaurants yet.",
           )}
         </div>
       </div>
