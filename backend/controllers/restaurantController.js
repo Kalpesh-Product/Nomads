@@ -335,6 +335,57 @@ export const addRestaurantImagesBulk = async (req, res, next) => {
   }
 };
 
+export const uploadRestaurantLogo = async (req, res, next) => {
+  try {
+    const file = req.file;
+    const { restaurantId, businessId } = req.body || {};
+
+    if (!file) {
+      return res.status(400).json({ message: "No file provided" });
+    }
+
+    let restaurant;
+    if (restaurantId) {
+      if (!mongoose.isValidObjectId(restaurantId)) {
+        return res.status(400).json({
+          message: "Valid restaurant identifier is required",
+        });
+      }
+      restaurant = await Restaurant.findById(restaurantId).exec();
+    } else if (businessId) {
+      restaurant = await Restaurant.findOne({ businessId }).exec();
+    } else {
+      return res
+        .status(400)
+        .json({ message: "Provide restaurantId or businessId" });
+    }
+
+    if (!restaurant) {
+      return res.status(404).json({ message: "Restaurant not found" });
+    }
+
+    const folderPath = `nomads/restaurants/${restaurant.country}/${sanitizeFolderName(
+      restaurant.restaurantName || restaurant.businessName,
+    )}`;
+    const key = `${folderPath}/logo/${sanitizeFileName(file.originalname)}`;
+    const data = await uploadFileToS3(key, file);
+
+    restaurant.logo = data.url;
+    await restaurant.save({ validateBeforeSave: false });
+
+    return res.status(200).json({
+      message: "Restaurant logo uploaded successfully",
+      data: {
+        restaurantId: restaurant._id,
+        businessId: restaurant.businessId,
+        logo: restaurant.logo,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getRestaurants = async (req, res, next) => {
   try {
     const { destination, category, month } = req.query;

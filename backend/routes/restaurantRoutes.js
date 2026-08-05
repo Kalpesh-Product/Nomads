@@ -9,6 +9,7 @@ import {
   updateRestaurant,
   updateRestaurantStatus,
   addRestaurantImagesBulk,
+  uploadRestaurantLogo,
 } from "../controllers/restaurantController.js";
 
 const router = Router();
@@ -20,6 +21,7 @@ router.post(
   upload.array("images", 10),
   addRestaurantImagesBulk,
 );
+router.post("/upload-logo", upload.single("image"), uploadRestaurantLogo);
 router.get("/:restaurantId", getRestaurantById);
 router.post("/", addRestaurant);
 router.post("/bulk-insert", upload.single("restaurants-file"), bulkInsertRestaurants);
