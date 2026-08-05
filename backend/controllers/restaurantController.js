@@ -292,7 +292,6 @@ export const addRestaurantImagesBulk = async (req, res, next) => {
         const data = await uploadFileToS3(key, file);
         return {
           url: data.url,
-          id: data.id,
           index: startIndex + index + 1,
           originalName: file.originalname,
           key,
@@ -311,7 +310,6 @@ export const addRestaurantImagesBulk = async (req, res, next) => {
     if (successes.length) {
       restaurant.images = successes.map((image) => ({
         url: image.url,
-        id: image.id,
         index: image.index,
       }));
       restaurant.mainImage = successes[0].url;

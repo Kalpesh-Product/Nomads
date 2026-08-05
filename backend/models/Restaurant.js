@@ -41,7 +41,7 @@ const restaurantSchema = new mongoose.Schema(
       trim: true,
     },
     images: {
-      type: mongoose.Schema.Types.Mixed,
+      type: [{ url: String, index: Number }],
       default: [],
     },
     mainImage: {
