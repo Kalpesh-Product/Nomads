@@ -2,6 +2,7 @@ import { Readable } from "stream";
 import csvParser from "csv-parser";
 import mongoose from "mongoose";
 import Restaurant from "../models/Restaurant.js";
+import RestaurantReview from "../models/RestaurantReview.js";
 import { uploadFileToS3 } from "../config/s3Config.js";
 
 const REQUIRED_COLUMNS = [
@@ -596,13 +597,28 @@ export const getRestaurantById = async (req, res, next) => {
       });
     }
 
-    const restaurant = await Restaurant.findById(restaurantId);
+    const restaurant = await Restaurant.findById(restaurantId).lean();
 
     if (!restaurant) {
       return res.status(404).json({ message: "Restaurant not found" });
     }
 
-    return res.status(200).json(restaurant);
+    const reviews = await RestaurantReview.find({
+      status: "approved",
+      $or: [
+        { restaurant: restaurant._id },
+        { restaurantId: restaurant.restaurantId },
+        { businessId: restaurant.businessId },
+      ],
+    })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return res.status(200).json({
+      ...restaurant,
+      reviews,
+      totalReviews: reviews.length || restaurant.totalReviews || 0,
+    });
   } catch (error) {
     next(error);
   }
