@@ -318,7 +318,7 @@ const NomadAiLayout = () => {
                 className={
                   isAiProductPage
                     ? "2xl:min-w-[75%] 2xl:max-w-[80rem] 2xl:mx-auto 2xl:px-4"
-                    : ""
+                    : "min-[2400px]:min-w-[75%] min-[2400px]:max-w-[80rem] min-[2400px]:mx-auto"
                 }
               >
               <AiStickyBackBreadcrumb
