@@ -14,6 +14,12 @@ import {
   buildListingShareData,
   renderListingSharePage,
 } from "../utils/listingSharePage.js";
+import { fixedAmenitiesMap } from "../config/amenitiesMap.js";
+
+// Fields the growing "type it and it becomes an option for the next host"
+// dropdown is allowed to read distinct values from — whitelisted so the
+// query param can't be pointed at arbitrary schema fields.
+const ADDITIVE_FIELD_OPTIONS = new Set(["services", "units"]);
 
 // Emails granted special access (managed from the Wono Master Panel's User
 // Access module) can browse non-public listings on the public site too, not
@@ -1485,6 +1491,55 @@ export const getCompanyCountries = async (req, res, next) => {
   }
 };
 
+// Fixed, non-additive amenities list shown for `inclusions`, keyed by
+// companyType — HostPanel/WoNoMasterPanel fetch this once and filter
+// client-side as the host picks a company type. Kept in sync manually with
+// frontend/src/components/AmenitiesList.jsx (the public site's own copy).
+export const getAmenitiesMap = async (req, res, next) => {
+  try {
+    return res.status(200).json(fixedAmenitiesMap);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Distinct values already used for an additive field (services/units) across
+// every listing, so a value one host types becomes a pickable option for the
+// next host. Stored as comma-joined strings on the Company doc, so we split
+// in memory rather than relying on a Mongo-side distinct().
+export const getListingFieldOptions = async (req, res, next) => {
+  try {
+    const field = String(req.query.field || "").trim();
+    if (!ADDITIVE_FIELD_OPTIONS.has(field)) {
+      return res.status(400).json({
+        message: `Unsupported field. Use one of: ${[...ADDITIVE_FIELD_OPTIONS].join(", ")}`,
+      });
+    }
+
+    const docs = await Company.find({ [field]: { $exists: true, $ne: "" } })
+      .select(field)
+      .lean()
+      .exec();
+
+    const seen = new Map(); // lowercased token -> first-seen casing
+    for (const doc of docs) {
+      const raw = doc[field];
+      if (typeof raw !== "string") continue;
+      for (const token of raw.split(",")) {
+        const trimmed = token.trim();
+        if (!trimmed) continue;
+        const key = trimmed.toLowerCase();
+        if (!seen.has(key)) seen.set(key, trimmed);
+      }
+    }
+
+    const options = Array.from(seen.values()).sort((a, b) => a.localeCompare(b));
+    return res.status(200).json(options);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const addCompanyImage = async (req, res, next) => {
   try {
     const file = req.file;
@@ -1905,6 +1960,7 @@ export const editCompany = async (req, res, next) => {
       country,
       continent,
       about,
+      website,
       totalSeats,
       latitude,
       longitude,
@@ -1912,10 +1968,13 @@ export const editCompany = async (req, res, next) => {
       ratings,
       totalReviews,
       inclusions,
+      services,
+      units,
       cost,
       companyType,
       companyTitle,
       companyName,
+      logo,
       reviews,
       existingImages = [],
       images = [], // This comes from the remote API with all images (existing + new)
@@ -1926,7 +1985,10 @@ export const editCompany = async (req, res, next) => {
       return res.status(404).json({ message: "Company not found" });
     }
 
-    company.logo = normalizeLogo(company.logo);
+    // Only overwrite the stored logo when a new one was actually sent —
+    // per-listing logo is optional and falls back to whatever the company
+    // already had (its profile logo, synced in from HostPanel/Master Panel).
+    company.logo = normalizeLogo(logo) || normalizeLogo(company.logo);
 
     const newCompanyType = companyType
       ?.trim()
@@ -1947,6 +2009,7 @@ export const editCompany = async (req, res, next) => {
     company.companyName = companyName?.trim() || company.companyName;
     company.companyTitle = companyTitle?.trim() || company.companyTitle;
     company.about = about?.trim() || company.about;
+    company.website = website?.trim() || company.website;
     company.totalSeats = totalSeats ? parseInt(totalSeats) : company.totalSeats;
     company.latitude = latitude ? parseFloat(latitude) : company.latitude;
     company.longitude = longitude ? parseFloat(longitude) : company.longitude;
@@ -1957,6 +2020,8 @@ export const editCompany = async (req, res, next) => {
       ? parseInt(totalReviews)
       : company.totalReviews;
     company.inclusions = inclusions?.trim() || company.inclusions;
+    company.services = services?.trim() || company.services;
+    company.units = units?.trim() || company.units;
     company.companyType = newCompanyType || company.companyType;
 
     // ---------- IMAGE HANDLING ----------
