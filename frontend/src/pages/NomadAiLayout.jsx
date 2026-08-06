@@ -307,14 +307,29 @@ const NomadAiLayout = () => {
         </div>
         {shouldShowStickyBar && (
           <div className="w-full bg-white">
-            <div className="px-3 md:px-8 lg:px-10 xl:px-12 2xl:px-14">
+            <div
+              className={
+                isAiProductPage
+                  ? "px-3 md:px-8 lg:px-10 xl:px-12 2xl:px-12"
+                  : "px-3 md:px-8 lg:px-10 xl:px-12 2xl:px-14"
+              }
+            >
+              <div
+                className={
+                  isAiProductPage
+                    ? "2xl:min-w-[75%] 2xl:max-w-[80rem] 2xl:mx-auto 2xl:px-4"
+                    : ""
+                }
+              >
               <AiStickyBackBreadcrumb
                 onBack={handleStickyBack}
                 breadcrumbs={routeBreadcrumbs}
                 isLoading={isBreadcrumbLoading}
+                className={isAiProductPage ? "2xl:!px-0" : ""}
                 sticky={false}
                 textSizeClassName="text-sm md:text-sm lg:text-base"
               />
+              </div>
             </div>
           </div>
         )}

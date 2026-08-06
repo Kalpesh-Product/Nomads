@@ -1591,7 +1591,7 @@ const AiGlobalListingsList = () => {
                               <h2 className="text-subtitle font-semibold mb-5 text-secondary-dark">
                                 {sectionTitle}
                               </h2>
-                              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-x-5 gap-y-0">
+                              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-5">
                                 {displayItems.map((item, itemIndex) => (
                                   <motion.div
                                     key={item._id}
