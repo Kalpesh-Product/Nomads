@@ -30,6 +30,8 @@ import {
   getCompanyCountries,
   getCompanyOgData,
   getCompanySharePage,
+  getAmenitiesMap,
+  getListingFieldOptions,
 } from "../controllers/compayControllers.js";
 
 const proxyUpload = multer({ storage: multer.memoryStorage() });
@@ -51,6 +53,8 @@ router.get("/companies", getCompaniesData);
 router.get("/companiesn", getCompaniesDataNomads);
 router.get("/companiesma", getCompaniesDataMaster);
 router.get("/company-countries", getCompanyCountries);
+router.get("/amenities", getAmenitiesMap);
+router.get("/field-options", getListingFieldOptions);
 router.patch("/activate-product", activateProduct);
 router.patch("/deactivate-product", deactivateProduct);
 router.patch("/set-public-status", setListingPublicStatus);
