@@ -418,6 +418,37 @@ export const getHostUsers = async (req, res, next) => {
   }
 };
 
+export const checkHostUserEmail = async (req, res, next) => {
+  try {
+    const { email } = req.query;
+
+    if (!email || typeof email !== "string") {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!normalizedEmail) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const existingHostUser = await HostUser.findOne({
+      email: normalizedEmail,
+    })
+      .select("_id email")
+      .lean();
+
+    return res.status(200).json({
+      exists: Boolean(existingHostUser),
+      message: existingHostUser
+        ? "This email is already registered. Please use a different email."
+        : "Email is available",
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 export const updateHostUserStatusAndComment = async (req, res, next) => {
   try {
     const { hostUserId } = req.params;

@@ -2,6 +2,7 @@ import { Router } from "express";
 import { addB2CformSubmission } from "../controllers/form-controllers/b2cFormControllers.js";
 import {
   addB2BFormSubmission,
+  checkHostUserEmail,
   getHostUsers,
   registerFormSubmission,
   updateHostUserStatusAndComment,
@@ -26,6 +27,7 @@ router.post(
   registerFormSubmission,
 );
 router.get("/host-users", getHostUsers);
+router.get("/check-host-user-email", checkHostUserEmail);
 router.patch("/host-users/:hostUserId", updateHostUserStatusAndComment);
 
 export default router;

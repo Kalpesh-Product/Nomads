@@ -22,6 +22,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import axios from "../../utils/axios";
 import { showErrorAlert, showSuccessAlert } from "../../utils/alerts";
+import { api as publicApi } from "../../utils/axios";
 import { useFieldArray } from "react-hook-form";
 import { Country, State, City } from "country-state-city";
 import { MenuItem } from "@mui/material";
@@ -211,6 +212,10 @@ const AiHostSignup = () => {
   const [countriesNowData, setCountriesNowData] = useState([]);
   const [isCountriesNowLoading, setIsCountriesNowLoading] = useState(false);
   const [countriesNowError, setCountriesNowError] = useState("");
+  const [emailCheckState, setEmailCheckState] = useState({
+    checking: false,
+    exists: false,
+  });
   const selectedPlanFromQuery = normalizePlanFromQuery(
     signupParams.get("plan"),
   );
@@ -357,6 +362,14 @@ const AiHostSignup = () => {
     );
   }, [auth, setValue]);
 
+  useEffect(() => {
+    return () => {
+      if (emailCheckTimerRef.current) {
+        clearTimeout(emailCheckTimerRef.current);
+      }
+    };
+  }, []);
+
   const selectedCountryName = watch("country");
   const selectedStateName = watch("state");
   const selectedCountry = useMemo(
@@ -462,6 +475,39 @@ const AiHostSignup = () => {
     if (digits.length > 15) return;
 
     onChange(digits);
+  };
+
+  const emailCheckTimerRef = React.useRef(null);
+
+  const handleEmailChange = (event, onChange) => {
+    const value = event.target.value;
+    onChange(value);
+
+    if (emailCheckTimerRef.current) {
+      clearTimeout(emailCheckTimerRef.current);
+    }
+
+    if (!value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      setEmailCheckState({ checking: false, exists: false });
+      return;
+    }
+
+    setEmailCheckState((prev) => ({ ...prev, checking: true }));
+
+    emailCheckTimerRef.current = setTimeout(async () => {
+      try {
+        const response = await publicApi.get("/forms/check-host-user-email", {
+          params: { email: value },
+        });
+
+        setEmailCheckState({
+          checking: false,
+          exists: Boolean(response.data?.exists),
+        });
+      } catch {
+        setEmailCheckState({ checking: false, exists: false });
+      }
+    }, 500);
   };
 
   // inside your HostSignup or CreateWebsite component:
@@ -626,6 +672,8 @@ const AiHostSignup = () => {
     const isValid = await trigger(fieldsToValidate);
     if (!isValid) return; // stop if invalid
 
+    if (emailCheckState.exists) return;
+
     const stepValues = getValues();
     console.log(`Step ${activeStep + 1} values:`, stepValues);
 
@@ -709,20 +757,39 @@ const AiHostSignup = () => {
                   message: "Invalid email",
                 },
               }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Email"
-                  type="email"
-                  fullWidth
-                  variant="standard"
-                  margin="none"
-                  sx={compactStepFieldSx}
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                  InputLabelProps={{ sx: floatingLabelSx }}
-                />
-              )}
+              render={({ field, fieldState }) => {
+                const derivedHelperText =
+                  fieldState.error?.message ||
+                  (emailCheckState.checking
+                    ? "Checking email availability..."
+                    : emailCheckState.exists
+                      ? "This email is already registered. Please use a different email."
+                      : "");
+
+                return (
+                  <TextField
+                    {...field}
+                    label="Email"
+                    type="email"
+                    fullWidth
+                    variant="standard"
+                    margin="none"
+                    sx={compactStepFieldSx}
+                    error={
+                      !!fieldState.error ||
+                      (!emailCheckState.checking && emailCheckState.exists)
+                    }
+                    helperText={derivedHelperText}
+                    InputLabelProps={{ sx: floatingLabelSx }}
+                    onChange={(event) =>
+                      handleEmailChange(event, field.onChange)
+                    }
+                    onBlur={(event) => {
+                      field.onBlur();
+                    }}
+                  />
+                );
+              }}
             />
             <Controller
               name="role"
