@@ -127,6 +127,7 @@ const AiProduct = () => {
       "companyDetails",
       businessId || companyId,
       companyName || "unknown",
+      type || "any",
       userId || "guest",
     ],
     queryFn: async () => {
@@ -152,7 +153,7 @@ const AiProduct = () => {
       return response?.data;
     },
     enabled: !!businessId || !!companyId || !!companyName,
-    refetchOnMount: "always",
+    staleTime: 5 * 60 * 1000,
   });
 
   const infiniteReviews =
