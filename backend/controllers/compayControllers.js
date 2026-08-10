@@ -70,6 +70,20 @@ let companyLocationsCache = {
   pendingRequest: null,
 };
 
+const LISTING_GOOGLE_METRICS_CACHE_TTL_MS = 6 * 60 * 60 * 1000;
+const listingGoogleMetricsCache = new Map();
+
+const getListingGoogleMetricsCacheKey = (companyData) =>
+  [
+    companyData?._id?.toString(),
+    companyData?.companyType,
+    companyData?.state,
+    companyData?.latitude,
+    companyData?.longitude,
+  ]
+    .filter((value) => value !== undefined && value !== null && value !== "")
+    .join("|");
+
 const loadCompanyLocations = async () => {
   const companies = await Company.find({ isActive: true })
     .select("country state continent isPublic -_id")
@@ -950,6 +964,151 @@ export const getCompaniesDataNomads = async (req, res, next) => {
   }
 };
 
+const getListingGoogleMetrics = async ({
+  companyData,
+  keyword,
+  regionCenters,
+}) => {
+  const cacheKey = getListingGoogleMetricsCacheKey(companyData);
+  const now = Date.now();
+  const cached = listingGoogleMetricsCache.get(cacheKey);
+
+  if (cached?.pendingRequest) {
+    return cached.pendingRequest;
+  }
+
+  if (cached && cached.expiresAt > now) {
+    return cached.data;
+  }
+
+  const pendingRequest = (async () => {
+    const regionKey =
+      companyData.state?.toLowerCase() || companyData.city?.toLowerCase();
+    const centers = regionCenters[regionKey] || [
+      { lat: companyData.latitude, lng: companyData.longitude },
+    ];
+
+    let coworkingSpaces = [];
+    for (const center of centers) {
+      const res = await axios.get(
+        "https://maps.googleapis.com/maps/api/place/nearbysearch/json",
+        {
+          params: {
+            location: `${center.lat},${center.lng}`,
+            radius: 50000,
+            keyword,
+            key: process.env.GOOGLE_PLACES_API_KEY,
+          },
+        },
+      );
+      coworkingSpaces.push(...(res.data.results || []));
+    }
+
+    const detailedSpaces = await Promise.all(
+      coworkingSpaces.map(async (place) => {
+        try {
+          const detailsRes = await axios.get(
+            "https://maps.googleapis.com/maps/api/place/details/json",
+            {
+              params: {
+                place_id: place.place_id,
+                key: process.env.GOOGLE_PLACES_API_KEY,
+                fields:
+                  "name,rating,user_ratings_total,reviews,formatted_address,geometry",
+              },
+            },
+          );
+
+          const details = detailsRes.data.result || {};
+          const nearbyLoc = place.geometry?.location;
+          const detailsLoc = details.geometry?.location;
+          const location = nearbyLoc || detailsLoc || null;
+
+          const reviews = (details.reviews || [])
+            .filter((r) => r.rating === 5)
+            .slice(0, 5);
+
+          return {
+            place_id: place.place_id,
+            name: details.name ?? place.name,
+            address: details.formatted_address ?? place.vicinity ?? "",
+            rating: details.rating ?? place.rating ?? null,
+            user_ratings_total:
+              details.user_ratings_total ?? place.user_ratings_total ?? 0,
+            location,
+            reviews,
+          };
+        } catch (err) {
+          return {
+            place_id: place.place_id,
+            name: place.name,
+            address: place.vicinity ?? "",
+            rating: place.rating ?? null,
+            user_ratings_total: place.user_ratings_total ?? 0,
+            location: place.geometry?.location ?? null,
+            reviews: [],
+          };
+        }
+      }),
+    );
+
+    let closestGoogle = null;
+
+    const toTruncate = (num, decimals) => {
+      const factor = Math.pow(10, decimals);
+      return Math.trunc(num * factor) / factor;
+    };
+
+    closestGoogle = detailedSpaces.find(
+      (place) =>
+        place.location &&
+        place.location.lat === companyData.latitude &&
+        place.location.lng === companyData.longitude,
+    );
+
+    if (!closestGoogle) {
+      for (let decimals = 5; decimals >= 3; decimals--) {
+        const match = detailedSpaces.find((place) => {
+          if (!place.location) return false;
+
+          const googleLat = toTruncate(place.location.lat, decimals);
+          const googleLng = toTruncate(place.location.lng, decimals);
+          const companyLat = toTruncate(companyData.latitude, decimals);
+          const companyLng = toTruncate(companyData.longitude, decimals);
+
+          return googleLat === companyLat && googleLng === companyLng;
+        });
+
+        if (match) {
+          closestGoogle = match;
+          break;
+        }
+      }
+    }
+
+    return closestGoogle;
+  })();
+
+  listingGoogleMetricsCache.set(cacheKey, {
+    data: cached?.data || null,
+    expiresAt: cached?.expiresAt || 0,
+    pendingRequest,
+  });
+
+  try {
+    const data = await pendingRequest;
+    listingGoogleMetricsCache.set(cacheKey, {
+      data,
+      expiresAt: Date.now() + LISTING_GOOGLE_METRICS_CACHE_TTL_MS,
+      pendingRequest: null,
+    });
+    return data;
+  } catch (error) {
+    listingGoogleMetricsCache.delete(cacheKey);
+    throw error;
+  }
+};
+
 export const getCompanyData = async (req, res, next) => {
   // Array of llats & long for centres ot cover all regions
   // Add at the top of getCompanyData
@@ -1112,15 +1271,13 @@ export const getCompanyData = async (req, res, next) => {
     const keyword =
       keywordMap[companyData.companyType?.toLowerCase()] || "coworking space";
 
-    // ###
+    const closestGoogle = await getListingGoogleMetrics({
+      companyData,
+      keyword,
+      regionCenters,
+    });
 
-    // Decide centers: use multi-centers if region matches, else company coords
-    const regionKey =
-      companyData.state?.toLowerCase() || companyData.city?.toLowerCase();
-    const centers = regionCenters[regionKey] || [
-      { lat: companyData.latitude, lng: companyData.longitude },
-    ];
-
+    /*
     let coworkingSpaces = [];
     for (const center of centers) {
       const res = await axios.get(
@@ -1229,6 +1386,8 @@ export const getCompanyData = async (req, res, next) => {
         }
       }
     }
+
+    */
 
     // Fetch DB reviews & POC
     const [reviews, poc] = await Promise.all([

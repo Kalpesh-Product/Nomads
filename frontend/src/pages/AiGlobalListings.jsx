@@ -1,8 +1,8 @@
+import { lazy, Suspense } from "react";
 import { useLocation } from "react-router-dom";
-import GlobalListingsMap from "./GlobalListingsMap";
-import GlobalListingsList from "./GlobalListingsList"; // Assuming you split list logic
-import AiGlobalListingsMap from "./AiGlobalListingsMap";
-import AiGlobalListingsList from "./AiGlobalListingsList";
+
+const AiGlobalListingsMap = lazy(() => import("./AiGlobalListingsMap"));
+const AiGlobalListingsList = lazy(() => import("./AiGlobalListingsList"));
 
 const AiGlobalListings = () => {
   const { search } = useLocation();
@@ -12,7 +12,9 @@ const AiGlobalListings = () => {
   return (
     // <div className="pt-4 lg:pt-6">
     <div className="">
-      {view === "map" ? <AiGlobalListingsMap /> : <AiGlobalListingsList />}
+      <Suspense fallback={null}>
+        {view === "map" ? <AiGlobalListingsMap /> : <AiGlobalListingsList />}
+      </Suspense>
     </div>
   );
 };

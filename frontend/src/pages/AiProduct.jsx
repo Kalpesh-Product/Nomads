@@ -127,6 +127,7 @@ const AiProduct = () => {
       "companyDetails",
       businessId || companyId,
       companyName || "unknown",
+      type || "any",
       userId || "guest",
     ],
     queryFn: async () => {
@@ -152,7 +153,7 @@ const AiProduct = () => {
       return response?.data;
     },
     enabled: !!businessId || !!companyId || !!companyName,
-    refetchOnMount: "always",
+    staleTime: 5 * 60 * 1000,
   });
 
   const infiniteReviews =
@@ -877,7 +878,7 @@ const AiProduct = () => {
       </TransparentModal>
 
       {/* ==================== DESKTOP VIEW (lg and above) ==================== */}
-      <div className="hidden lg:block min-w-[75%] max-w-[80rem] lg:max-w-[80rem] mx-0 lg:mx-auto px-1 sm:px-6 lg:px-4">
+      <div className="hidden lg:block min-w-[75%] max-w-[80rem] lg:max-w-[80rem] mx-0 lg:mx-auto">
         <div className="pb-4">
           {/* Breadcrumb - Desktop Only */}
           <nav

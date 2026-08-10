@@ -605,11 +605,15 @@ const AiGlobalListingsMap = () => {
     listingsData,
   ]);
 
-  const groupedListings = sortedListings?.reduce((acc, item) => {
-    if (!acc[item.companyType]) acc[item.companyType] = [];
-    acc[item.companyType].push(item);
-    return acc;
-  }, {});
+  const groupedListings = useMemo(
+    () =>
+      sortedListings?.reduce((acc, item) => {
+        if (!acc[item.companyType]) acc[item.companyType] = [];
+        acc[item.companyType].push(item);
+        return acc;
+      }, {}),
+    [sortedListings],
+  );
 
   const toggleFavorite = (id) => {
     setFavorites((prev) =>
@@ -889,22 +893,25 @@ const AiGlobalListingsMap = () => {
     });
   };
 
-  const forMapsData = isLisitingLoading
-    ? []
-    : listingsData.map((item) => ({
-        ...item,
-        id: item._id,
-        lat: item.latitude,
-        lng: item.longitude,
-        name: item.companyName,
-        location: item.city,
-        reviews: item.reviewCount,
-        rating: item.ratings || 0,
-        reviews: item.totalReviews || 0,
-        image:
-          item.images?.[0]?.url ||
-          "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
-      }));
+  const forMapsData = useMemo(
+    () =>
+      isLisitingLoading
+        ? []
+        : listingsData.map((item) => ({
+            ...item,
+            id: item._id,
+            lat: item.latitude,
+            lng: item.longitude,
+            name: item.companyName,
+            location: item.city,
+            reviews: item.totalReviews || item.reviewCount || 0,
+            rating: item.ratings || 0,
+            image:
+              item.images?.[0]?.url ||
+              "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp",
+          })),
+    [isLisitingLoading, listingsData],
+  );
 
   return (
     <>

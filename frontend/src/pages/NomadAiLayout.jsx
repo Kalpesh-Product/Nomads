@@ -310,14 +310,14 @@ const NomadAiLayout = () => {
             <div
               className={
                 isAiProductPage
-                  ? "px-3 md:px-8 lg:px-10 xl:px-12 2xl:px-12"
+                  ? "px-3 lg:px-20"
                   : "px-3 md:px-8 lg:px-10 xl:px-12 2xl:px-14"
               }
             >
               <div
                 className={
                   isAiProductPage
-                    ? "2xl:min-w-[75%] 2xl:max-w-[80rem] 2xl:mx-auto 2xl:px-4"
+                    ? "mx-0 lg:min-w-[75%] lg:max-w-[80rem] lg:mx-auto"
                     : "min-[2400px]:min-w-[75%] min-[2400px]:max-w-[80rem] min-[2400px]:mx-auto"
                 }
               >
@@ -325,7 +325,7 @@ const NomadAiLayout = () => {
                 onBack={handleStickyBack}
                 breadcrumbs={routeBreadcrumbs}
                 isLoading={isBreadcrumbLoading}
-                className={isAiProductPage ? "2xl:!px-0" : ""}
+                className={isAiProductPage ? "!px-0" : ""}
                 sticky={false}
                 textSizeClassName="text-sm md:text-sm lg:text-base"
               />
@@ -339,7 +339,13 @@ const NomadAiLayout = () => {
           ref={contentRef}
           className="flex-1 overflow-auto custom-scrollbar-hide"
         >
-          <div className="px-1 md:px-6 lg:px-6 xl:px-10 2xl:px-12 min-h-[calc(100vh-100px)]">
+          <div
+            className={
+              isAiProductPage
+                ? "px-1 lg:px-20 min-h-[calc(100vh-100px)]"
+                : "px-1 md:px-6 lg:px-6 xl:px-10 2xl:px-12 min-h-[calc(100vh-100px)]"
+            }
+          >
             <Outlet />
           </div>
           {/* <Toaster /> */}
