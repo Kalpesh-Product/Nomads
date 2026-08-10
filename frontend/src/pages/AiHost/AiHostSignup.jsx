@@ -37,7 +37,8 @@ const UploadMultipleFilesInput = React.lazy(
 
 const steps = ["GOAL", "BASIC DETAILS"];
 const ACTIVATION_TITLE = "Your goal is set... let's get you activated";
-const ACTIVATION_TITLE_TYPING_INTERVAL_MS = 7;
+const ACTIVATION_TITLE_TYPING_DURATION_MS = 420;
+const ACTIVATION_TITLE_INITIAL_CHARS = 4;
 const COUNTRIES_NOW_ENDPOINT = "https://countriesnow.space/api/v0.1/countries";
 const STATE_CITY_FALLBACK_RADIUS_KM = 25;
 
@@ -251,7 +252,11 @@ const AiHostSignup = () => {
     : 1;
   const [activeStep, setActiveStep] = useState(initialStep);
   const [verticalTypeOpen, setVerticalTypeOpen] = useState(false);
-  const [typedActivationTitle, setTypedActivationTitle] = useState("");
+  const [typedActivationTitle, setTypedActivationTitle] = useState(() =>
+    initialStep === 1
+      ? ACTIVATION_TITLE.slice(0, ACTIVATION_TITLE_INITIAL_CHARS)
+      : "",
+  );
   const [countriesNowData, setCountriesNowData] = useState([]);
   const [isCountriesNowLoading, setIsCountriesNowLoading] = useState(false);
   const [countriesNowError, setCountriesNowError] = useState("");
@@ -340,19 +345,35 @@ const AiHostSignup = () => {
       return undefined;
     }
 
-    let currentIndex = 0;
-    setTypedActivationTitle("");
+    const initialChars = Math.min(
+      ACTIVATION_TITLE_INITIAL_CHARS,
+      ACTIVATION_TITLE.length,
+    );
+    const startTime = performance.now();
+    let animationFrameId;
 
-    const typingInterval = setInterval(() => {
-      currentIndex += 1;
-      setTypedActivationTitle(ACTIVATION_TITLE.slice(0, currentIndex));
+    setTypedActivationTitle(ACTIVATION_TITLE.slice(0, initialChars));
 
-      if (currentIndex >= ACTIVATION_TITLE.length) {
-        clearInterval(typingInterval);
+    const animateTyping = (currentTime) => {
+      const elapsedTime = currentTime - startTime;
+      const progress = Math.min(
+        elapsedTime / ACTIVATION_TITLE_TYPING_DURATION_MS,
+        1,
+      );
+      const visibleChars =
+        initialChars +
+        Math.round((ACTIVATION_TITLE.length - initialChars) * progress);
+
+      setTypedActivationTitle(ACTIVATION_TITLE.slice(0, visibleChars));
+
+      if (progress < 1) {
+        animationFrameId = requestAnimationFrame(animateTyping);
       }
-    }, ACTIVATION_TITLE_TYPING_INTERVAL_MS);
+    };
 
-    return () => clearInterval(typingInterval);
+    animationFrameId = requestAnimationFrame(animateTyping);
+
+    return () => cancelAnimationFrame(animationFrameId);
   }, [activeStep]);
 
   useEffect(() => {
