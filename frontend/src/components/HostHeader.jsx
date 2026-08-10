@@ -169,7 +169,7 @@ const HostHeader = () => {
                 className="py-4 cursor-pointer"
               >
                 <p className="text-secondary-dark text-lg font-semibold">
-                  Become A Nomad
+                  Become a Nomad
                 </p>
               </div>
               <div className="h-[0.2px] bg-gray-300"></div>

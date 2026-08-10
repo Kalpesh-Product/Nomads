@@ -330,7 +330,7 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
                   onClick={goToHosts}
                   className="relative pb-1 transition-all cursor-pointer duration-300 group bg-transparent border-none text-sm text-primary-blue"
                 >
-                  Become A Nomad
+                  Become a Nomad
                   <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-primary-blue transition-all duration-300 group-hover:w-full"></span>
                 </button>
               </div>
@@ -503,7 +503,7 @@ const AiHostHeader = ({ onMobileSidebarToggle }) => {
                     className="py-4 cursor-pointer"
                   >
                     <p className="text-secondary-dark text-lg">
-                      Become A Nomad
+                      Become a Nomad
                     </p>
                   </div>
                   <div className="h-[0.2px] bg-gray-300"></div>
