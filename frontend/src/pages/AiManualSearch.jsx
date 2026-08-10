@@ -13,6 +13,7 @@ import useAuth from "../hooks/useAuth";
 import useSpecialUserEmails from "../hooks/useSpecialUserEmails";
 import axios from "../utils/axios";
 
+import { aiDestinationCards } from "../constants/aiDestinationCards";
 import { persistSelectedDestination } from "../utils/selectedDestinationSession";
 import { companyLocationsQueryOptions } from "../utils/classicSearchLocations";
 
@@ -39,6 +40,26 @@ const normalizeLocationKey = (value = "") =>
 
 const getLocationKey = (country, state) =>
   `${normalizeLocationKey(country)}|${normalizeLocationKey(state)}`;
+
+const destinationCardTitleLookup = aiDestinationCards.reduce(
+  (lookup, destination) => {
+    const country = destination.routeCountry || destination.country;
+    const title =
+      destination.title || destination.displayCity || destination.city;
+    const locationKeys = [
+      destination.routeCity,
+      destination.city,
+      destination.displayCity,
+    ].filter(Boolean);
+
+    locationKeys.forEach((locationName) => {
+      lookup.set(getLocationKey(country, locationName), title);
+    });
+
+    return lookup;
+  },
+  new Map(),
+);
 
 const DropdownBadge = ({
   label,
@@ -166,14 +187,22 @@ const AiManualSearch = () => {
         const response = await axios.get("state-wise-weight");
         const destinations = response?.data?.data || [];
 
-        return new Map(
-          destinations
-            .filter((destination) => destination?.title && destination?.state)
-            .map((destination) => [
-              getLocationKey(destination.country, destination.state),
-              destination.title,
-            ]),
-        );
+        const lookup = new Map();
+
+        destinations.forEach((destination) => {
+          if (!destination?.title || !destination?.country) return;
+
+          [destination.state, destination.title]
+            .filter(Boolean)
+            .forEach((locationName) => {
+              lookup.set(
+                getLocationKey(destination.country, locationName),
+                destination.title,
+              );
+            });
+        });
+
+        return lookup;
       } catch (error) {
         console.error(error?.response?.data?.message);
         return new Map();
@@ -225,6 +254,9 @@ const AiManualSearch = () => {
       countryData?.states?.map((item) => ({
         label:
           destinationTitleLookup.get(
+            getLocationKey(countryData.country, item.name),
+          ) ||
+          destinationCardTitleLookup.get(
             getLocationKey(countryData.country, item.name),
           ) ||
           item.title ||

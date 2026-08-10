@@ -1,15 +1,11 @@
-import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import "./sweetalert.css";
 import "keen-slider/keen-slider.min.css";
-import App from "./App.jsx";
 import { RouterProvider } from "react-router-dom";
 import router from "./routes.jsx";
-import { createTheme, ThemeProvider } from "@mui/material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { HelmetProvider } from "@dr.pogodin/react-helmet";
 import { store, persistor } from "./redux/store.js";
 import { Provider } from "react-redux";
@@ -62,17 +58,13 @@ createRoot(document.getElementById("root")).render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
       <ThemeProvider theme={theme}>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <AuthContextProvider>
-            <QueryClientProvider client={queryClient}>
-              <HelmetProvider>
-                <RouterProvider router={router}>
-                  <App />
-                </RouterProvider>
-              </HelmetProvider>
-            </QueryClientProvider>
-          </AuthContextProvider>
-        </LocalizationProvider>
+        <AuthContextProvider>
+          <QueryClientProvider client={queryClient}>
+            <HelmetProvider>
+              <RouterProvider router={router} />
+            </HelmetProvider>
+          </QueryClientProvider>
+        </AuthContextProvider>
       </ThemeProvider>
     </PersistGate>
   </Provider>,

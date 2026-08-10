@@ -1,5 +1,6 @@
 import { Readable } from "stream";
 import csvParser from "csv-parser";
+import mongoose from "mongoose";
 import Restaurant from "../models/Restaurant.js";
 import RestaurantReview from "../models/RestaurantReview.js";
 
@@ -176,6 +177,109 @@ export const getRestaurantReviews = async (req, res, next) => {
   }
 };
 
+export const getRestaurantReviewsByUser = async (req, res, next) => {
+  try {
+    const reviews = await RestaurantReview.find({ reviewer: req.userData._id })
+      .populate(
+        "restaurant",
+        "restaurantName businessName mainImage images destination city state country restaurantType ratings",
+      )
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return res.status(200).json({
+      count: reviews.length,
+      data: reviews,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const addRestaurantReview = async (req, res, next) => {
+  try {
+    const {
+      restaurantId,
+      businessId,
+      name,
+      starCount,
+      description,
+      reviewSource,
+      reviewLink,
+    } = req.body || {};
+
+    if (!restaurantId && !businessId) {
+      return res
+        .status(400)
+        .json({ message: "Restaurant identifier is required" });
+    }
+
+    const parsedStarCount = Number(starCount);
+    if (
+      Number.isNaN(parsedStarCount) ||
+      parsedStarCount < 1 ||
+      parsedStarCount > 5
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Star count must be between 1 and 5" });
+    }
+
+    if (!name?.trim() || !description?.trim()) {
+      return res
+        .status(400)
+        .json({ message: "Reviewer name and review details are required" });
+    }
+
+    const restaurantQuery =
+      restaurantId && mongoose.isValidObjectId(restaurantId)
+        ? { _id: restaurantId }
+        : { businessId };
+
+    const restaurant = await Restaurant.findOne(restaurantQuery)
+      .select("_id restaurantId businessId businessName restaurantName")
+      .lean();
+
+    if (!restaurant) {
+      return res.status(404).json({ message: "Restaurant not found" });
+    }
+
+    const existingReview = await RestaurantReview.findOne({
+      restaurant: restaurant._id,
+      reviewer: req.userData._id,
+    }).lean();
+
+    if (existingReview) {
+      return res.status(400).json({
+        message: "You can add a review for the same restaurant only once",
+      });
+    }
+
+    const reviewerName = name.trim();
+    const review = await RestaurantReview.create({
+      restaurant: restaurant._id,
+      restaurantId: restaurant.restaurantId || restaurant._id.toString(),
+      businessId: restaurant.businessId,
+      businessName: restaurant.businessName || restaurant.restaurantName || "",
+      name: reviewerName,
+      reviewerName,
+      starCount: parsedStarCount,
+      description: description.trim(),
+      reviewSource: reviewSource?.trim() || "Nomads Website",
+      reviewLink: reviewLink?.trim() || "",
+      status: "pending",
+      reviewer: req.userData._id,
+    });
+
+    return res.status(201).json({
+      message: "Review submitted successfully",
+      review,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const updateRestaurantReviewStatus = async (req, res, next) => {
   try {
     const { reviewId } = req.params;
@@ -201,6 +305,84 @@ export const updateRestaurantReviewStatus = async (req, res, next) => {
     return res.status(200).json({
       message: `Restaurant review ${status} successfully`,
       review,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateRestaurantReview = async (req, res, next) => {
+  try {
+    const { reviewId } = req.params;
+    const { starCount, description } = req.body || {};
+
+    if (!mongoose.isValidObjectId(reviewId)) {
+      return res
+        .status(400)
+        .json({ message: "Valid review identifier is required" });
+    }
+
+    const parsedStarCount = Number(starCount);
+    if (
+      Number.isNaN(parsedStarCount) ||
+      parsedStarCount < 1 ||
+      parsedStarCount > 5
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Star count must be between 1 and 5" });
+    }
+
+    if (!description?.trim()) {
+      return res
+        .status(400)
+        .json({ message: "Review details are required" });
+    }
+
+    const review = await RestaurantReview.findOneAndUpdate(
+      { _id: reviewId, reviewer: req.userData._id },
+      {
+        starCount: parsedStarCount,
+        description: description.trim(),
+        status: "pending",
+      },
+      { new: true, runValidators: true },
+    );
+
+    if (!review) {
+      return res.status(404).json({ message: "Restaurant review not found" });
+    }
+
+    return res.status(200).json({
+      message: "Review updated successfully",
+      review,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteRestaurantReview = async (req, res, next) => {
+  try {
+    const { reviewId } = req.params;
+
+    if (!mongoose.isValidObjectId(reviewId)) {
+      return res
+        .status(400)
+        .json({ message: "Valid review identifier is required" });
+    }
+
+    const review = await RestaurantReview.findOneAndDelete({
+      _id: reviewId,
+      reviewer: req.userData._id,
+    });
+
+    if (!review) {
+      return res.status(404).json({ message: "Restaurant review not found" });
+    }
+
+    return res.status(200).json({
+      message: "Review deleted successfully",
     });
   } catch (error) {
     next(error);

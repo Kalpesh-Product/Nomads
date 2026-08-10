@@ -38,7 +38,7 @@ const floatingLabelSx = {
 };
 
 const numOfPeople = [
-  "Less then 10 People",
+  "Less than 10 People",
   "10 - 25 People",
   "25 - 50 People",
   "50 - 100 People",

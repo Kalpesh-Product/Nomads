@@ -25,6 +25,11 @@ const restaurantReviewSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    reviewerName: {
+      type: String,
+      trim: true,
+      default: "",
+    },
     starCount: {
       type: Number,
       min: 1,
@@ -46,6 +51,10 @@ const restaurantReviewSchema = new mongoose.Schema(
       type: String,
       enum: ["pending", "approved", "rejected"],
       default: "approved",
+    },
+    reviewer: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "NomadUser",
     },
   },
   { timestamps: true },

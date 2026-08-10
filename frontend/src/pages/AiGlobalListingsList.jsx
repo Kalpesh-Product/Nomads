@@ -58,7 +58,7 @@ const NEWS_CATEGORY = "news";
 const BLOGS_CATEGORY = "blogs";
 // const VALUE_ADDED_SERVICE_CARD_BACKGROUND_IMAGE = "/images/goa-image.jpg";
 const VALUE_ADDED_SERVICES_DEFAULT_VISIBLE_COUNT = 5;
-const TYPING_INTERVAL_MS = 7;
+const TYPING_INTERVAL_MS = 2;
 const SECOND_HEADING_DELAY_MS = 250;
 const THINKING_HEADING_TEXT = "Curating the best results for you";
 const CURATED_RESULTS_HEADING_TEXT =
@@ -1591,7 +1591,7 @@ const AiGlobalListingsList = () => {
                               <h2 className="text-subtitle font-semibold mb-5 text-secondary-dark">
                                 {sectionTitle}
                               </h2>
-                              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-x-5 gap-y-0">
+                              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-5">
                                 {displayItems.map((item, itemIndex) => (
                                   <motion.div
                                     key={item._id}

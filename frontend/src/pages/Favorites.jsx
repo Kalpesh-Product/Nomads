@@ -11,7 +11,7 @@ import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { showErrorAlert } from "../utils/alerts";
 
-const INITIAL_PREVIEW_COUNT = 4;
+const INITIAL_PREVIEW_COUNT = 5;
 
 const Favorites = ({
   showDestinationFavorites = false,
@@ -202,7 +202,7 @@ const Favorites = ({
               {isDestinationLoading ? (
                 <div className="text-center text-gray-500">Loading...</div>
               ) : visibleDestinations.length > 0 ? (
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
                   {visibleDestinations.map((destination) => {
                     return (
                       <article
@@ -312,7 +312,7 @@ const Favorites = ({
           {isLoading ? (
             <div className="text-center text-gray-500">Loading...</div>
           ) : visibleListings.length > 0 ? (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
               {visibleListings.map((item) => (
                 <ListingCard
                   key={item._id}

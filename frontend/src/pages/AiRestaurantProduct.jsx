@@ -50,6 +50,34 @@ import { navigateBackWithinApp } from "../utils/navigationHistory.js";
 
 dayjs.extend(relativeTime);
 
+const normalizeMediaUrl = (value) => {
+  const url = typeof value === "string" ? value.trim() : "";
+  if (!url) return "";
+
+  const normalized = url.toLowerCase();
+  const missingValues = new Set([
+    "n/a",
+    "na",
+    "no",
+    "none",
+    "null",
+    "undefined",
+    "not available",
+    "not present",
+    "no image",
+    "no images",
+    "no logo",
+  ]);
+
+  if (missingValues.has(normalized)) return "";
+
+  const isUsableMediaUrl =
+    /^(https?:\/\/|data:image\/|blob:|\/)/i.test(url) ||
+    /\.(avif|webp|png|jpe?g|gif|svg)([?#].*)?$/i.test(url);
+
+  return isUsableMediaUrl ? url : "";
+};
+
 const normalizeImageList = (...sources) => {
   const urls = sources
     .flatMap((source) => {
@@ -70,7 +98,7 @@ const normalizeImageList = (...sources) => {
         .split(/[\n,|]+/)
         .map((item) => item.trim());
     })
-    .map((url) => (typeof url === "string" ? url.trim() : ""))
+    .map(normalizeMediaUrl)
     .filter(Boolean);
 
   return Array.from(new Set(urls)).map((url, index) => ({
@@ -108,11 +136,9 @@ const normalizeRestaurantDetails = (restaurant = {}) => {
     restaurant.businessName ||
     restaurant.restaurantTitle ||
     "Restaurant";
-  const images = normalizeImageList(
-    restaurant.images,
-    restaurant.mainImage,
-    restaurant.logo,
-  );
+  const images = normalizeImageList(restaurant.images);
+  const logo = normalizeMediaUrl(restaurant.logo);
+  const mainImage = normalizeMediaUrl(restaurant.mainImage);
   const rating = Number(restaurant.ratings || restaurant.rating || 0);
 
   return {
@@ -128,7 +154,8 @@ const normalizeRestaurantDetails = (restaurant = {}) => {
     googleMap: restaurant.googleMap || restaurant.googleMapsLink || "",
     googleMapsLink: restaurant.googleMapsLink || restaurant.googleMap || "",
     images,
-    logo: restaurant.logo || images[0]?.url || "",
+    logo,
+    mainImage,
     about:
       restaurant.about ||
       restaurant.shortDescription ||
@@ -660,9 +687,10 @@ const AiRestaurantProduct = () => {
   });
 
   const { mutate: submitReview, isPending: isSubmittingReview } = useMutation({
-    mutationKey: ["submitReview", companyDetails?.companyId],
+    mutationKey: ["submitRestaurantReview", companyDetails?._id],
     mutationFn: async (data) => {
       const payload = {
+        restaurantId: companyDetails?._id,
         businessId: companyDetails?.businessId,
         name: data.name?.trim() || reviewerName || "Anonymous",
         starCount: Number(data.starCount),
@@ -670,7 +698,7 @@ const AiRestaurantProduct = () => {
         reviewSource: "Nomads Website",
         reviewLink: "",
       };
-      const response = await axios.post("/review", {
+      const response = await axios.post("/restaurant-reviews", {
         ...payload,
       });
       return response?.data;
@@ -679,7 +707,7 @@ const AiRestaurantProduct = () => {
       showSuccessAlert("Review submitted successfully.");
       resetReview();
       setIsAddReviewOpen(false);
-      queryClient.invalidateQueries({ queryKey: ["companyDetails"] });
+      queryClient.invalidateQueries({ queryKey: ["restaurantDetails"] });
     },
     onError: (error) => {
       showErrorAlert(

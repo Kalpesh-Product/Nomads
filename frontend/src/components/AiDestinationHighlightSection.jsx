@@ -1,44 +1,98 @@
 import { AiFillStar } from "react-icons/ai";
 
-const HighlightCard = ({ item, kind, onClick }) => (
-  <button
-    type="button"
-    onClick={() => onClick(item)}
-    className="flex w-full flex-col gap-2 rounded-lg bg-white text-left transition-transform hover:scale-[1.01]"
-  >
-    <div className="aspect-square w-full overflow-hidden rounded-3xl bg-gray-100">
-      {item.image && (
+const DEFAULT_HIGHLIGHT_IMAGE = "/images/goa-image.jpg";
+
+const normalizeImageUrl = (value) => {
+  const url = typeof value === "string" ? value.trim() : "";
+  if (!url) return "";
+
+  const normalized = url.toLowerCase();
+  const missingValues = new Set([
+    "n/a",
+    "na",
+    "no",
+    "none",
+    "null",
+    "undefined",
+    "not available",
+    "not present",
+    "no image",
+    "no images",
+    "no logo",
+  ]);
+
+  if (missingValues.has(normalized)) return "";
+
+  return url;
+};
+
+const getHighlightImage = (image) => {
+  if (Array.isArray(image)) {
+    const firstImage = image
+      .map((item) =>
+        typeof item === "string" ? item : item?.url || item?.image || item?.src,
+      )
+      .map(normalizeImageUrl)
+      .find(Boolean);
+
+    return firstImage || DEFAULT_HIGHLIGHT_IMAGE;
+  }
+
+  if (image && typeof image === "object") {
+    return (
+      normalizeImageUrl(image.url || image.image || image.src) ||
+      DEFAULT_HIGHLIGHT_IMAGE
+    );
+  }
+
+  return normalizeImageUrl(image) || DEFAULT_HIGHLIGHT_IMAGE;
+};
+
+const HighlightCard = ({ item, kind, onClick }) => {
+  const imageSrc = getHighlightImage(item.image);
+
+  return (
+    <button
+      type="button"
+      onClick={() => onClick(item)}
+      className="flex w-full flex-col gap-2 rounded-lg bg-white text-left transition-transform hover:scale-[1.01]"
+    >
+      <div className="aspect-square w-full overflow-hidden rounded-3xl bg-gray-100">
         <img
-          src={item.image}
+          src={imageSrc}
           alt={item.title}
           className="h-full w-full object-cover transition-transform hover:scale-105"
           loading="lazy"
+          onError={(event) => {
+            event.currentTarget.onerror = null;
+            event.currentTarget.src = DEFAULT_HIGHLIGHT_IMAGE;
+          }}
         />
-      )}
-    </div>
-    <div className="flex min-w-0 flex-col gap-1 px-4">
-      <p
-        className={`text-xs font-semibold md:text-sm ${
-          kind === "blog" || kind === "news" ? "line-clamp-2" : "truncate"
-        }`}
-        title={item.title}
-      >
-        {item.title}
-      </p>
-      {(item.location || item.meta) && (
-        <div className="flex items-center justify-between gap-2 text-xs font-medium text-gray-600 md:text-sm">
-          <span className="truncate">{item.location}</span>
-          <span className="flex shrink-0 items-center gap-1">
-            {(kind === "place" || kind === "restaurant") && (
-              <AiFillStar size={14} />
-            )}
-            {item.meta}
-          </span>
-        </div>
-      )}
-    </div>
-  </button>
-);
+      </div>
+      <div className="flex min-w-0 flex-col gap-1 px-4">
+        <p
+          className={`text-xs font-semibold md:text-sm ${
+            kind === "blog" || kind === "news" ? "line-clamp-2" : "truncate"
+          }`}
+          title={item.title}
+        >
+          {item.title}
+        </p>
+        {(item.location || item.meta) && (
+          <div className="flex items-center justify-between gap-2 text-xs font-medium text-gray-600 md:text-sm">
+            <span className="truncate">{item.location}</span>
+            <span className="flex shrink-0 items-center gap-1">
+              {(kind === "place" || kind === "restaurant") && (
+                <AiFillStar size={14} />
+              )}
+              {item.meta}
+            </span>
+          </div>
+        )}
+      </div>
+    </button>
+  );
+};
 
 const AiDestinationHighlightSection = ({
   title,

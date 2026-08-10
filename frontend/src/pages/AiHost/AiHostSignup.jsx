@@ -121,6 +121,48 @@ const checkedMenuItemSx = {
 const getFlagIconUrl = (isoCode) =>
   `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
 
+const isValidSignupEmail = (value = "") => {
+  const email = value.trim();
+  const invalidMessage = "Enter a valid email address";
+
+  if (!email) return "Email is required";
+  if (email.length > 254) return invalidMessage;
+  if (!/^[\x21-\x7E]+$/.test(email)) return invalidMessage;
+
+  const emailParts = email.split("@");
+  if (emailParts.length !== 2) return invalidMessage;
+
+  const [localPart, domain] = emailParts;
+  if (!localPart || !domain) return invalidMessage;
+  if (localPart.length > 64 || domain.length > 253) return invalidMessage;
+  if (
+    localPart.startsWith(".") ||
+    localPart.endsWith(".") ||
+    localPart.includes("..") ||
+    domain.includes("..")
+  ) {
+    return invalidMessage;
+  }
+  if (!/^[A-Za-z0-9!#$%&'*+/=?^_`{|}~.-]+$/.test(localPart)) {
+    return invalidMessage;
+  }
+
+  const domainLabels = domain.split(".");
+  if (domainLabels.length < 2) return invalidMessage;
+
+  const labelsAreValid = domainLabels.every((label) =>
+    /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?$/.test(label),
+  );
+  if (!labelsAreValid) return invalidMessage;
+
+  const tld = domainLabels[domainLabels.length - 1];
+  if (!/^(?:[A-Za-z]{2,63}|xn--[A-Za-z0-9-]{2,59})$/.test(tld)) {
+    return invalidMessage;
+  }
+
+  return true;
+};
+
 const normalizeLocationName = (value = "") =>
   value
     .toString()
@@ -751,11 +793,7 @@ const AiHostSignup = () => {
               name="email"
               control={control}
               rules={{
-                required: "Email is required",
-                pattern: {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: "Invalid email",
-                },
+                validate: isValidSignupEmail,
               }}
               render={({ field, fieldState }) => {
                 const derivedHelperText =
@@ -785,6 +823,13 @@ const AiHostSignup = () => {
                       handleEmailChange(event, field.onChange)
                     }
                     onBlur={(event) => {
+                      const trimmedEmail = event.target.value.trim();
+                      if (trimmedEmail !== event.target.value) {
+                        handleEmailChange(
+                          { target: { value: trimmedEmail } },
+                          field.onChange,
+                        );
+                      }
                       field.onBlur();
                     }}
                   />

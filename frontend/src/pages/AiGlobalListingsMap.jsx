@@ -51,7 +51,7 @@ const PLACES_CATEGORY = "places";
 const RESTAURANTS_CATEGORY = "restaurants";
 const NEWS_CATEGORY = "news";
 const BLOGS_CATEGORY = "blogs";
-const TYPING_INTERVAL_MS = 7;
+const TYPING_INTERVAL_MS = 2;
 const SECOND_HEADING_DELAY_MS = 250;
 const THINKING_HEADING_TEXT = "Curating the best results for you";
 const CURATED_RESULTS_HEADING_TEXT =
@@ -151,10 +151,16 @@ const AiGlobalListingsMap = () => {
 
   const [persistedSearchBarBadges, setPersistedSearchBarBadges] = useState([]);
 
-  const [typedHeading, setTypedHeading] = useState("");
-  const [isSecondHeadingPhase, setIsSecondHeadingPhase] = useState(false);
+  const shouldSkipHeadingIntro = Boolean(location.state?.skipHeadingIntro);
+
+  const [typedHeading, setTypedHeading] = useState(() =>
+    shouldSkipHeadingIntro ? CURATED_RESULTS_HEADING_TEXT : "",
+  );
+  const [isSecondHeadingPhase, setIsSecondHeadingPhase] = useState(
+    shouldSkipHeadingIntro,
+  );
   const [isHeadingSequenceComplete, setIsHeadingSequenceComplete] =
-    useState(false);
+    useState(shouldSkipHeadingIntro);
   const useCroppedDesktopShortcuts = useCroppedDesktopShortcutIcons();
   const listingPageStateStorageKey = useMemo(
     () =>
@@ -201,6 +207,13 @@ const AiGlobalListingsMap = () => {
   }, [formData?.category, location.search]);
 
   useEffect(() => {
+    if (shouldSkipHeadingIntro) {
+      setTypedHeading(CURATED_RESULTS_HEADING_TEXT);
+      setIsSecondHeadingPhase(true);
+      setIsHeadingSequenceComplete(true);
+      return undefined;
+    }
+
     const params = new URLSearchParams(location.search);
     const restoreKey = getAiVerticalsPageStateKey(
       (params.get("country") || "").trim().toLowerCase(),
@@ -248,7 +261,7 @@ const AiGlobalListingsMap = () => {
       clearTimeout(timeoutId);
       clearInterval(intervalId);
     };
-  }, [location.search]);
+  }, [location.search, shouldSkipHeadingIntro]);
 
   // Special users who can see all locations, managed dynamically via the
   // Wono Master Panel's User Access module.
@@ -773,6 +786,7 @@ const AiGlobalListingsMap = () => {
         state: {
           ...location.state,
           selectedStateLabel: selectedLocationLabel,
+          skipHeadingIntro: true,
           searchBarBadges,
         },
       });
@@ -825,6 +839,8 @@ const AiGlobalListingsMap = () => {
           country: currentFormData.country,
           location: currentFormData.location,
           category: normalizedCategoryValue,
+          selectedStateLabel: selectedLocationLabel,
+          skipHeadingIntro: true,
           searchBarBadges,
         },
       },

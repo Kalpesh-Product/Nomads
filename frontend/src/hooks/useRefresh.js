@@ -1,4 +1,5 @@
 import { api } from "../utils/axios";
+import { useCallback } from "react";
 import {
   clearStoredLoginState,
   storeLoginState,
@@ -7,7 +8,7 @@ import useAuth from "./useAuth";
 
 export default function useRefresh() {
   const { setAuth } = useAuth();
-  const refresh = async () => {
+  const refresh = useCallback(async () => {
     try {
       const response = await api.get("auth/refresh", {
         withCredentials: true,
@@ -31,6 +32,6 @@ export default function useRefresh() {
       });
       clearStoredLoginState();
     }
-  };
+  }, [setAuth]);
   return refresh;
 }
