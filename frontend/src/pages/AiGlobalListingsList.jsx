@@ -870,12 +870,16 @@ const AiGlobalListingsList = () => {
     popularLocationPlaces.length,
   ]);
 
-  const groupedListings = listingsData?.reduce((acc, item) => {
-    if (item.companyType === "privatestay") return acc;
-    if (!acc[item.companyType]) acc[item.companyType] = [];
-    acc[item.companyType].push(item);
-    return acc;
-  }, {});
+  const groupedListings = useMemo(
+    () =>
+      listingsData?.reduce((acc, item) => {
+        if (item.companyType === "privatestay") return acc;
+        if (!acc[item.companyType]) acc[item.companyType] = [];
+        acc[item.companyType].push(item);
+        return acc;
+      }, {}),
+    [listingsData],
+  );
 
   const typeLabels = {
     coworking: "Co-Working Spaces",
