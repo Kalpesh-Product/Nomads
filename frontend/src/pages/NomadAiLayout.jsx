@@ -310,14 +310,14 @@ const NomadAiLayout = () => {
             <div
               className={
                 isAiProductPage
-                  ? "px-1 md:px-20"
+                  ? "px-3 lg:px-20"
                   : "px-3 md:px-8 lg:px-10 xl:px-12 2xl:px-14"
               }
             >
               <div
                 className={
                   isAiProductPage
-                    ? "min-w-[75%] max-w-[80rem] lg:max-w-[80rem] mx-0 lg:mx-auto"
+                    ? "mx-0 lg:min-w-[75%] lg:max-w-[80rem] lg:mx-auto"
                     : "min-[2400px]:min-w-[75%] min-[2400px]:max-w-[80rem] min-[2400px]:mx-auto"
                 }
               >
@@ -342,7 +342,7 @@ const NomadAiLayout = () => {
           <div
             className={
               isAiProductPage
-                ? "px-1 md:px-20 min-h-[calc(100vh-100px)]"
+                ? "px-1 lg:px-20 min-h-[calc(100vh-100px)]"
                 : "px-1 md:px-6 lg:px-6 xl:px-10 2xl:px-12 min-h-[calc(100vh-100px)]"
             }
           >
