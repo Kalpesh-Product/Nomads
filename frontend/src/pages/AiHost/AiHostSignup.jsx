@@ -257,6 +257,7 @@ const AiHostSignup = () => {
   const [emailCheckState, setEmailCheckState] = useState({
     checking: false,
     exists: false,
+    error: "",
   });
   const selectedPlanFromQuery = normalizePlanFromQuery(
     signupParams.get("plan"),
@@ -520,34 +521,43 @@ const AiHostSignup = () => {
   };
 
   const emailCheckTimerRef = React.useRef(null);
+  const emailCheckRequestRef = React.useRef(0);
 
   const handleEmailChange = (event, onChange) => {
     const value = event.target.value;
     onChange(value);
+    const requestId = ++emailCheckRequestRef.current;
 
     if (emailCheckTimerRef.current) {
       clearTimeout(emailCheckTimerRef.current);
     }
 
     if (!value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-      setEmailCheckState({ checking: false, exists: false });
+      setEmailCheckState({ checking: false, exists: false, error: "" });
       return;
     }
 
-    setEmailCheckState((prev) => ({ ...prev, checking: true }));
+    setEmailCheckState({ checking: true, exists: false, error: "" });
 
     emailCheckTimerRef.current = setTimeout(async () => {
       try {
         const response = await publicApi.get("/forms/check-host-user-email", {
           params: { email: value },
         });
+        if (requestId !== emailCheckRequestRef.current) return;
 
         setEmailCheckState({
           checking: false,
           exists: Boolean(response.data?.exists),
+          error: "",
         });
       } catch {
-        setEmailCheckState({ checking: false, exists: false });
+        if (requestId !== emailCheckRequestRef.current) return;
+        setEmailCheckState({
+          checking: false,
+          exists: false,
+          error: "Unable to verify this email right now. Please try again.",
+        });
       }
     }, 500);
   };
@@ -714,7 +724,11 @@ const AiHostSignup = () => {
     const isValid = await trigger(fieldsToValidate);
     if (!isValid) return; // stop if invalid
 
-    if (emailCheckState.exists) return;
+    if (
+      emailCheckState.checking ||
+      emailCheckState.exists ||
+      emailCheckState.error
+    ) return;
 
     const stepValues = getValues();
     console.log(`Step ${activeStep + 1} values:`, stepValues);
@@ -802,7 +816,7 @@ const AiHostSignup = () => {
                     ? "Checking email availability..."
                     : emailCheckState.exists
                       ? "This email is already registered. Please use a different email."
-                      : "");
+                      : emailCheckState.error);
 
                 return (
                   <TextField
@@ -815,7 +829,8 @@ const AiHostSignup = () => {
                     sx={compactStepFieldSx}
                     error={
                       !!fieldState.error ||
-                      (!emailCheckState.checking && emailCheckState.exists)
+                      (!emailCheckState.checking && emailCheckState.exists) ||
+                      Boolean(emailCheckState.error)
                     }
                     helperText={derivedHelperText}
                     InputLabelProps={{ sx: floatingLabelSx }}
@@ -1987,6 +2002,20 @@ const AiHostSignup = () => {
           // )}
 
           onSubmit={handleSubmit((values) => {
+            if (
+              emailCheckState.checking ||
+              emailCheckState.exists ||
+              emailCheckState.error
+            ) {
+              showErrorAlert(
+                emailCheckState.exists
+                  ? "This email is already registered. Please sign in or use a different email."
+                  : emailCheckState.error ||
+                    "Please wait while we verify your email.",
+              );
+              return;
+            }
+
             const fd = new FormData();
 
             // Utility to ensure required fields always have something
@@ -2159,7 +2188,12 @@ const AiHostSignup = () => {
                   </div>
                   <Button
                     type="submit"
-                    disabled={isRegisterLoading}
+                    disabled={
+                      isRegisterLoading ||
+                      emailCheckState.checking ||
+                      emailCheckState.exists ||
+                      Boolean(emailCheckState.error)
+                    }
                     variant="contained"
                     sx={{
                       bgcolor: "black",

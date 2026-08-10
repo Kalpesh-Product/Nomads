@@ -12,6 +12,16 @@ import {
   formatSubmittedOn,
   renderNotificationEmail,
 } from "../../utils/emailTemplates.js";
+import { checkHostPanelEmail } from "../../utils/hostPanelAccounts.js";
+
+const hostSignupEmailExists = async (email) => {
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  const [existingSignupLead, existingHostPanelAccount] = await Promise.all([
+    HostUser.exists({ email: normalizedEmail }),
+    checkHostPanelEmail(normalizedEmail),
+  ]);
+  return Boolean(existingSignupLead || existingHostPanelAccount);
+};
 
 const PLAN_DISPLAY_NAMES = {
   BASIC: "Basic - Free",
@@ -432,15 +442,11 @@ export const checkHostUserEmail = async (req, res, next) => {
       return res.status(400).json({ message: "Email is required" });
     }
 
-    const existingHostUser = await HostUser.findOne({
-      email: normalizedEmail,
-    })
-      .select("_id email")
-      .lean();
+    const exists = await hostSignupEmailExists(normalizedEmail);
 
     return res.status(200).json({
-      exists: Boolean(existingHostUser),
-      message: existingHostUser
+      exists,
+      message: exists
         ? "This email is already registered. Please use a different email."
         : "Email is available",
     });
@@ -571,6 +577,19 @@ export const registerFormSubmission = async (req, res) => {
 
   try {
     const payload = req.body;
+    const normalizedEmail = String(payload.email || "").trim().toLowerCase();
+    if (!normalizedEmail) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+    if (await hostSignupEmailExists(normalizedEmail)) {
+      return res
+        .status(409)
+        .json({
+          message: "This email is already registered. Please sign in or use a different email.",
+        });
+    }
+    payload.email = normalizedEmail;
+
     const safeParse = (val, fallback) => {
       try {
         return typeof val === "string" ? JSON.parse(val) : val || fallback;
@@ -951,6 +970,13 @@ export const registerFormSubmission = async (req, res) => {
         message: err.errors[0], // only the first message
       });
     }
+    if (err?.status === 503) {
+      return res.status(503).json({
+        message:
+          "We could not verify this email with HostPanel. Please try again.",
+      });
+    }
+
     if (err?.status === 502) {
       return res
         .status(502)
