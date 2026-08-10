@@ -642,7 +642,8 @@ const getLabelFieldKeyForSelection = (selectedGoal, selectedGoalOption) => {
   );
 };
 
-const INITIAL_VISIBLE_DESTINATIONS = 20;
+const INITIAL_VISIBLE_DESTINATIONS = 12;
+const DESTINATION_LAZY_BATCH_SIZE = 8;
 const TYPING_INTERVAL_MS = 7;
 const SELECTED_HEADING_TRANSITION_DELAY_MS = 1200;
 const DESTINATION_REVEAL_INTERVAL_MS = 70;
@@ -1111,6 +1112,7 @@ const AiSearchResults = () => {
   const [isDestinationsLoading, setIsDestinationsLoading] = useState(false);
   const dropdownContainerRef = useRef(null);
   const closeDropdownTimeoutRef = useRef(null);
+  const lazyLoadSentinelRef = useRef(null);
 
   const topTypingIntervalRef = useRef(null);
   const bottomTypingIntervalRef = useRef(null);
@@ -1997,8 +1999,13 @@ const AiSearchResults = () => {
     );
     setVisibleDestinationCount(previousVisibleLength);
 
-    if (previousVisibleLength >= visibleDestinations.length) {
-      previousVisibleDestinationsLengthRef.current = visibleDestinations.length;
+    const initialRevealTarget = Math.min(
+      Math.max(previousVisibleLength, INITIAL_VISIBLE_DESTINATIONS),
+      visibleDestinations.length,
+    );
+
+    if (previousVisibleLength >= initialRevealTarget) {
+      previousVisibleDestinationsLengthRef.current = previousVisibleLength;
       return;
     }
 
@@ -2008,9 +2015,8 @@ const AiSearchResults = () => {
       currentVisibleCount += 1;
       setVisibleDestinationCount(currentVisibleCount);
 
-      if (currentVisibleCount >= visibleDestinations.length) {
-        previousVisibleDestinationsLengthRef.current =
-          visibleDestinations.length;
+      if (currentVisibleCount >= initialRevealTarget) {
+        previousVisibleDestinationsLengthRef.current = initialRevealTarget;
         clearInterval(revealInterval);
       }
     }, DESTINATION_REVEAL_INTERVAL_MS);
@@ -2020,6 +2026,63 @@ const AiSearchResults = () => {
       previousVisibleDestinationsLengthRef.current = currentVisibleCount;
     };
   }, [hasSelectedFilters, isResultsReady, visibleDestinations]);
+
+  useEffect(() => {
+    if (
+      !hasSelectedFilters ||
+      !isResultsReady ||
+      visibleDestinationCount <
+        Math.min(INITIAL_VISIBLE_DESTINATIONS, visibleDestinations.length) ||
+      visibleDestinationCount >= visibleDestinations.length
+    ) {
+      return undefined;
+    }
+
+    const sentinel = lazyLoadSentinelRef.current;
+    if (!sentinel) {
+      return undefined;
+    }
+
+    const loadNextDestinationBatch = () => {
+      setVisibleDestinationCount((currentCount) => {
+        const nextCount = Math.min(
+          currentCount + DESTINATION_LAZY_BATCH_SIZE,
+          visibleDestinations.length,
+        );
+        previousVisibleDestinationsLengthRef.current = nextCount;
+        return nextCount;
+      });
+    };
+
+    if (typeof IntersectionObserver === "undefined") {
+      loadNextDestinationBatch();
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          loadNextDestinationBatch();
+        }
+      },
+      {
+        root: getAiScrollContainer(),
+        rootMargin: "600px 0px",
+        threshold: 0,
+      },
+    );
+
+    observer.observe(sentinel);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [
+    hasSelectedFilters,
+    isResultsReady,
+    visibleDestinationCount,
+    visibleDestinations.length,
+  ]);
 
   useEffect(() => {
     hasRestoredSearchScrollRef.current = false;
@@ -2174,6 +2237,13 @@ const AiSearchResults = () => {
   ]);
 
   const shouldShowResultsContent = hasSelectedFilters && isResultsReady;
+  const renderedDestinations = useMemo(
+    () =>
+      shouldShowResultsContent
+        ? visibleDestinations.slice(0, visibleDestinationCount)
+        : [],
+    [shouldShowResultsContent, visibleDestinationCount, visibleDestinations],
+  );
   const shouldShowNarrative =
     hasSelectedFilters && (typedBottomHeading || typedResultsHeading);
 
@@ -2426,7 +2496,7 @@ const AiSearchResults = () => {
 
                   {shouldShowResultsContent ? (
                     <div className="mt-8 grid grid-cols-2 gap-3 md:mt-10 md:grid-cols-3 md:gap-4 xl:grid-cols-4">
-                      {visibleDestinations.map((destination, index) => {
+                      {renderedDestinations.map((destination, index) => {
                         const shouldShowVisaDuration =
                           isVisaRequirementFilterActive(
                             selectedVisaRequirement,
@@ -2452,11 +2522,7 @@ const AiSearchResults = () => {
                           <article
                             key={`${destination.city}-${destination.country}`}
                             data-search-result-card-key={destinationCardKey}
-                            className={`cursor-pointer transition-all duration-300 ${
-                              index < visibleDestinationCount
-                                ? "translate-y-0 opacity-100"
-                                : "pointer-events-none translate-y-2 opacity-0"
-                            }`}
+                            className="cursor-pointer translate-y-0 opacity-100 transition-all duration-300"
                             role="button"
                             tabIndex={0}
                             onClick={(event) =>
@@ -2474,6 +2540,10 @@ const AiSearchResults = () => {
                                 src={destination.image}
                                 alt={`${destination.city}, ${destination.country}`}
                                 className="aspect-square w-full rounded-xl object-cover md:rounded-2xl transition-transform duration-500 group-hover:scale-110"
+                                loading={index < 4 ? "eager" : "lazy"}
+                                fetchPriority={index < 4 ? "high" : "auto"}
+                                decoding="async"
+                                sizes="(min-width: 1280px) 25vw, (min-width: 768px) 33vw, 50vw"
                               />
 
                               <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-black/10" />
@@ -2619,6 +2689,13 @@ const AiSearchResults = () => {
                           </article>
                         );
                       })}
+                      {visibleDestinationCount < visibleDestinations.length && (
+                        <div
+                          ref={lazyLoadSentinelRef}
+                          className="col-span-full h-px w-full"
+                          aria-hidden="true"
+                        />
+                      )}
                     </div>
                   ) : (
                     <>
