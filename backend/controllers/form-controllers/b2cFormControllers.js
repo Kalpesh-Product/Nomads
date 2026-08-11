@@ -23,6 +23,14 @@ import {
 } from "../../utils/emailTemplates.js";
 
 const AI_CONTRIBUTOR_MESSAGE_CHARACTER_LIMIT = 1000;
+const AI_FAST_RESPONSE_SHEETS = new Set([
+  "AI_Visa_Support",
+  "AI_Overall_Activation_Support",
+  "AI_New_Company_Setup",
+  "AI_Consultation",
+  "AI_Workation",
+  "AI_Become_Contributor",
+]);
 
 function istNowPieces() {
   const tz = "Asia/Kolkata";
@@ -486,13 +494,17 @@ function toISODateOnly(v) {
 }
 
 export const addB2CformSubmission = async (req, res, next) => {
+  let responseSent = false;
+
   try {
     const { B2C_APPS_SCRIPT_URL } = process.env;
-    if (!B2C_APPS_SCRIPT_URL) {
+    const { sheetName } = req.body;
+    const isFastResponseSheet = AI_FAST_RESPONSE_SHEETS.has(sheetName);
+
+    if (!B2C_APPS_SCRIPT_URL && !isFastResponseSheet) {
       throw new Error("B2C_APPS_SCRIPT_URL is not configured");
     }
 
-    const { sheetName } = req.body;
     const isJobApp = sheetName === "Job_Application";
 
     if (isJobApp) {
@@ -1042,6 +1054,109 @@ export const addB2CformSubmission = async (req, res, next) => {
     // Build payload
     const payload = config.map(validatedData);
 
+    if (isFastResponseSheet) {
+      responseSent = true;
+      res.status(201).json({
+        status: "success",
+        message: config.successMsg,
+        data: payload,
+      });
+
+      setImmediate(async () => {
+        try {
+          if (sheetName === "AI_Visa_Support") {
+            await VisaSupport.create({
+              visaType: payload.visaType,
+              fullName: payload.fullName,
+              nationality: payload.nationality,
+              travellingCountry: payload.travellingCountry,
+              email: payload.email,
+              contactCode: payload.contactCode,
+              contactNumber: payload.contactNumber,
+              comments: payload.comments,
+            });
+          }
+
+          if (sheetName === "AI_Overall_Activation_Support") {
+            await OverallActivationSupport.create(payload);
+          }
+
+          if (sheetName === "AI_New_Company_Setup") {
+            await NewCompanySetup.create(payload);
+          }
+
+          if (sheetName === "AI_Consultation") {
+            await Consultation.create(payload);
+          }
+
+          if (sheetName === "AI_Workation") {
+            await Workation.create(payload);
+          }
+
+          if (sheetName === "AI_Become_Contributor") {
+            await BecomeContributor.create(payload);
+          }
+
+          let sheetsWarning = null;
+          const result = B2C_APPS_SCRIPT_URL
+            ? await fetch(B2C_APPS_SCRIPT_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              }).then((response) => response.json())
+            : {
+                status: "error",
+                message: "B2C_APPS_SCRIPT_URL is not configured",
+              };
+
+          if (result.status !== "success") {
+            const upstreamMessage =
+              result.message || "Failed to save data to Google Sheets";
+            const normalizedMessage =
+              typeof upstreamMessage === "string"
+                ? upstreamMessage.toLowerCase()
+                : "";
+            const isSheetConfigIssue =
+              normalizedMessage === "invalid sheetname" ||
+              normalizedMessage === "sheet not found";
+
+            if (isSheetConfigIssue) {
+              sheetsWarning = `Google Sheets sync skipped for "${payload.sheetName}". Please add this sheetName in Apps Script sheetConfigs and create the sheet tab.`;
+            } else {
+              throw new Error(upstreamMessage);
+            }
+          }
+
+          if (sheetsWarning) {
+            console.warn(sheetsWarning);
+          }
+
+          if (config.emailTemplate) {
+            const emailContent = config.emailTemplate(payload);
+
+            await sendMail({
+              to: emailContent.to,
+              subject: emailContent.subject,
+              html: emailContent.html,
+            });
+          }
+
+          await sendAdminFormNotification({
+            subject: "New form submission received",
+            formName: sheetName,
+            data: payload,
+          });
+        } catch (error) {
+          console.error(
+            `Background submission processing failed for ${sheetName}:`,
+            error.message,
+          );
+        }
+      });
+
+      return;
+    }
+
     if (sheetName === "All_Enquiry") {
       if (company && !mongoose.Types.ObjectId.isValid(company)) {
         return res.status(400).json({ message: "Invalid company id provided" });
@@ -1129,13 +1244,16 @@ export const addB2CformSubmission = async (req, res, next) => {
     let sheetsWarning = null;
 
     // Send to Google Apps Script
-    const response = await fetch(B2C_APPS_SCRIPT_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    const result = await response.json();
+    const result = B2C_APPS_SCRIPT_URL
+      ? await fetch(B2C_APPS_SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }).then((response) => response.json())
+      : {
+          status: "error",
+          message: "B2C_APPS_SCRIPT_URL is not configured",
+        };
 
     if (result.status !== "success") {
       const upstreamMessage =
@@ -1188,6 +1306,7 @@ export const addB2CformSubmission = async (req, res, next) => {
       data: payload,
     });
 
+    if (responseSent) return;
     res.status(201).json({
       status: "success",
       message: config.successMsg,
@@ -1199,10 +1318,12 @@ export const addB2CformSubmission = async (req, res, next) => {
     console.error(err.stack);
 
     if (err.name === "ValidationError") {
+      if (responseSent) return;
       return res.status(400).json({
         message: err.errors[0], // only the first message
       });
     }
+    if (responseSent) return;
     next(err);
   }
 };
