@@ -533,6 +533,7 @@ export const registerFormSubmission = async (req, res) => {
       .status(500)
       .json({ error: "Server misconfiguration: Web App URL not set" });
   }
+  let responseSent = false;
 
   // --- helpers ------------------------------------------------------
   const parseAppsScriptResponse = async (resp) => {
@@ -608,7 +609,12 @@ export const registerFormSubmission = async (req, res) => {
       formName: "register",
     };
 
-    const sheetResult = await postToAppsScript(apsBody);
+    const sheetWritePromise = postToAppsScript(apsBody).catch((error) => {
+      console.error(
+        "Google Sheet write failed:",
+        error?.detail || error.message,
+      );
+    });
 
     // STEP 1.5: also persist host signup user in MongoDB
     const hostUser = await HostUser.create({
@@ -646,6 +652,7 @@ export const registerFormSubmission = async (req, res) => {
     // ---------------- Website Data Save Logic ----------------
     const session = await mongoose.startSession();
     session.startTransaction();
+    let sessionEnded = false;
 
     try {
       const company = req.body.companyName || null;
@@ -743,6 +750,13 @@ export const registerFormSubmission = async (req, res) => {
           }
         }
       }
+
+      // The lead is recorded and upload counts are validated, so the browser
+      // can show success while website setup, file uploads, and emails finish.
+      responseSent = true;
+      res.status(201).json({
+        message: "Form submitted successfully",
+      });
 
       // companyLogo
       if (filesByField.companyLogo && filesByField.companyLogo[0]) {
@@ -855,6 +869,7 @@ export const registerFormSubmission = async (req, res) => {
 
           await session.commitTransaction();
           session.endSession();
+          sessionEnded = true;
         } catch (err) {
           console.error("create-template call failed:", err);
           websiteResult = { message: "create-template call failed" };
@@ -916,6 +931,15 @@ export const registerFormSubmission = async (req, res) => {
         formName: payload.formName || "register",
         data: payload,
       });
+      await sheetWritePromise;
+
+      if (!sessionEnded) {
+        if (session.inTransaction()) {
+          await session.commitTransaction();
+        }
+        session.endSession();
+        sessionEnded = true;
+      }
 
       // STEP 4: respond
       // Lead + email are already saved/sent above regardless of website creation.
@@ -923,6 +947,7 @@ export const registerFormSubmission = async (req, res) => {
       // will handle it manually (the lead is in MongoDB & Google Sheet).
       if (searchKey) {
         if (websiteCreatedOk) {
+          if (responseSent) return;
           return res.status(201).json({
             message: "Form submitted successfully",
           });
@@ -931,6 +956,7 @@ export const registerFormSubmission = async (req, res) => {
           console.error(
             "⚠️ Website creation failed but lead was saved. Returning success to user.",
           );
+          if (responseSent) return;
           return res.status(201).json({
             message:
               "Form submitted successfully, our team will get back to you soon",
@@ -938,25 +964,34 @@ export const registerFormSubmission = async (req, res) => {
         }
       }
     } catch (error) {
-      await session.abortTransaction();
-      session.endSession();
+      if (!sessionEnded && session.inTransaction()) {
+        await session.abortTransaction();
+      }
+      if (!sessionEnded) {
+        session.endSession();
+        sessionEnded = true;
+      }
       console.error("❌ Inner transaction error:", error);
+      if (responseSent) return;
       return res
         .status(500)
         .json({ error: "Transaction failed", detail: error.message });
     }
   } catch (err) {
     if (err.name === "ValidationError") {
+      if (responseSent) return;
       return res.status(400).json({
         message: err.errors[0], // only the first message
       });
     }
     if (err?.status === 502) {
+      if (responseSent) return;
       return res
         .status(502)
         .json({ error: "Upstream write failed", detail: err.detail });
     }
     console.error("❌ Outer error:", err);
+    if (responseSent) return;
     return res
       .status(500)
       .json({ error: "Unexpected server error", detail: err.message });
