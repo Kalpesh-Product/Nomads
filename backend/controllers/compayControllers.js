@@ -648,7 +648,14 @@ export const createCompany = async (req, res, next) => {
         company: savedCompany._id,
         companyId,
         name: review.name?.trim(),
-        starCount: parseInt(review.starCount || 1),
+        starCount: Math.min(
+          5,
+          Math.max(
+            1,
+            parseInt(review.starCount ?? review.rating ?? review.rate ?? 1, 10) ||
+              1,
+          ),
+        ),
         description: review.review?.trim(),
         reviewSource: review.reviewSource?.trim(),
         reviewLink: review.reviewLink?.trim(),
@@ -1572,14 +1579,11 @@ export const getListings = async (req, res, next) => {
     }
 
     const data = listings.map((list) => {
-      const totalReviews =
-        reviews.length > 0
-          ? companyType
-            ? reviews.filter((r) => r?.company?.companyType === companyType)
-            : reviews
-          : [];
+      const listReviews = reviews.filter(
+        (r) => String(r?.company?._id) === String(list?._id),
+      );
 
-      return { ...list, reviews: totalReviews };
+      return { ...list, reviews: listReviews };
     });
 
     return res.status(200).json(data);
@@ -2267,8 +2271,6 @@ export const editCompany = async (req, res, next) => {
     // }
 
     if (Array.isArray(reviews)) {
-      const existingReviews = await Review.find({ company: company._id });
-
       const incomingIds = reviews.map((r) => r._id).filter(Boolean);
 
       // Delete only removed ones
@@ -2279,12 +2281,30 @@ export const editCompany = async (req, res, next) => {
 
       // Upsert each review
       for (const review of reviews) {
+        const reviewData = {
+          name: review.name?.trim(),
+          starCount: Math.min(
+            5,
+            Math.max(
+              1,
+              parseInt(review.starCount ?? review.rating ?? review.rate ?? 1, 10) ||
+                1,
+            ),
+          ),
+          description: review.review?.trim() || review.description?.trim(),
+          reviewSource: review.reviewSource?.trim(),
+          reviewLink: review.reviewLink?.trim(),
+          isEnabled: review.isEnabled,
+          status: review.status,
+          source: review.source,
+        };
+
         if (review._id) {
-          await Review.findByIdAndUpdate(review._id, review);
+          await Review.findByIdAndUpdate(review._id, reviewData);
         } else {
           const reviewExists = await Review.findOne({
             company: company._id,
-            name: review.name,
+            name: review.name?.trim(),
           });
 
           if (reviewExists) {
@@ -2293,7 +2313,7 @@ export const editCompany = async (req, res, next) => {
             });
           } else {
             await Review.create({
-              ...review,
+              ...reviewData,
               company: company._id,
               companyId: company.companyId,
             });
