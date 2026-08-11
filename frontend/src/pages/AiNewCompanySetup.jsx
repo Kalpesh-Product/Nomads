@@ -4,22 +4,13 @@ import {
   Button,
   CircularProgress,
   InputAdornment,
-  InputBase,
   MenuItem,
   TextField,
-  Typography,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
 } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
-import { DatePicker } from "@mui/x-date-pickers";
 import { Country } from "country-state-city";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
-import { FaCheck } from "react-icons/fa";
 import Container from "../components/Container";
 import useAuth from "../hooks/useAuth";
 import axios from "../utils/axios";
@@ -27,7 +18,6 @@ import {
   getCountryNameFromSelectedDestination,
   readSelectedDestination,
 } from "../utils/selectedDestinationSession";
-import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 import { findCountryByName } from "../utils/countryFlags";
 import { HiCheck } from "react-icons/hi";
 
@@ -69,6 +59,8 @@ const NEW_COMPANY_PROMPT =
   "planning to build your business abroad? Share your details and we will support your setup journey.";
 const NEW_COMPANY_HEADING = "Company Setup Support";
 const NEW_COMPANY_TYPING_SEEN_KEY = "wono-new-company-typing-seen";
+const SUPPORT_QUERY_STALE_TIME = 10 * 60 * 1000;
+const SUPPORT_QUERY_GC_TIME = 30 * 60 * 1000;
 const getFlagIconUrl = (isoCode) =>
   `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
 const normalizePrefillValue = (value) => value?.trim().toLowerCase() || "";
@@ -91,8 +83,19 @@ const formatCountryWithState = (country, state) => {
   return `${trimmedCountry} - ${trimmedState}`;
 };
 
+const showSupportSuccessAlert = async (message, options) => {
+  const { showSuccessAlert } = await import("../utils/alerts");
+  return showSuccessAlert(message, options);
+};
+
+const showSupportErrorAlert = async (message) => {
+  const { showErrorAlert } = await import("../utils/alerts");
+  return showErrorAlert(message);
+};
+
 const AiNewCompanySetup = () => {
   const [typedMessage, setTypedMessage] = useState("");
+  const [typedPageHeading, setTypedPageHeading] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { auth } = useAuth();
@@ -111,6 +114,10 @@ const AiNewCompanySetup = () => {
         return [];
       }
     },
+    staleTime: SUPPORT_QUERY_STALE_TIME,
+    gcTime: SUPPORT_QUERY_GC_TIME,
+    refetchOnWindowFocus: false,
+    retry: false,
   });
   const { data: companyCountries = [] } = useQuery({
     queryKey: ["new-company-company-countries"],
@@ -123,6 +130,10 @@ const AiNewCompanySetup = () => {
         return [];
       }
     },
+    staleTime: SUPPORT_QUERY_STALE_TIME,
+    gcTime: SUPPORT_QUERY_GC_TIME,
+    refetchOnWindowFocus: false,
+    retry: false,
   });
 
   const destinationOptions = useMemo(() => {
@@ -196,7 +207,7 @@ const AiNewCompanySetup = () => {
       if (data?.warning) {
         console.warn(data.warning);
       }
-      await showSuccessAlert(
+      await showSupportSuccessAlert(
         "Our team will review your request and get back to you soon.",
         {
           title: "Support Request Submitted!",
@@ -205,7 +216,7 @@ const AiNewCompanySetup = () => {
       reset(defaultValues);
     },
     onError: (error) => {
-      showErrorAlert(
+      void showSupportErrorAlert(
         error?.response?.data?.message ||
           "Something went wrong while submitting your request.",
       );
@@ -321,28 +332,50 @@ const AiNewCompanySetup = () => {
 
     if (hasSeenTypingEffect) {
       setTypedMessage(newCompanyPrompt);
+      setTypedPageHeading(NEW_COMPANY_HEADING);
       setIsFormVisible(true);
       return;
     }
 
     setTypedMessage("");
+    setTypedPageHeading("");
     setIsFormVisible(false);
 
     let messageIndex = 0;
+    let headingIndex = 0;
+    let cleanupHeading = () => {};
+
+    const typeHeading = () => {
+      const headingInterval = setInterval(() => {
+        headingIndex += 1;
+        setTypedPageHeading(NEW_COMPANY_HEADING.slice(0, headingIndex));
+
+        if (headingIndex >= NEW_COMPANY_HEADING.length) {
+          clearInterval(headingInterval);
+          setIsFormVisible(true);
+          if (typeof window !== "undefined") {
+            window.localStorage.setItem(NEW_COMPANY_TYPING_SEEN_KEY, "true");
+          }
+        }
+      }, 1);
+
+      cleanupHeading = () => clearInterval(headingInterval);
+    };
+
     const messageInterval = setInterval(() => {
       messageIndex += 1;
       setTypedMessage(newCompanyPrompt.slice(0, messageIndex));
 
       if (messageIndex >= newCompanyPrompt.length) {
         clearInterval(messageInterval);
-        setIsFormVisible(true);
-        if (typeof window !== "undefined") {
-          window.localStorage.setItem(NEW_COMPANY_TYPING_SEEN_KEY, "true");
-        }
+        typeHeading();
       }
     }, 1);
 
-    return () => clearInterval(messageInterval);
+    return () => {
+      clearInterval(messageInterval);
+      cleanupHeading();
+    };
   }, [newCompanyPrompt]);
 
   const namePortion = typedMessage.slice(0, messagePrefix.length);
@@ -359,7 +392,7 @@ const AiNewCompanySetup = () => {
                 {messagePortion}
               </p>
               <h1 className="ai-phone-form-title text-hero min-h-[3rem] text-center font-play">
-                {NEW_COMPANY_HEADING}
+                {typedPageHeading}
               </h1>
             </div>
             <Box

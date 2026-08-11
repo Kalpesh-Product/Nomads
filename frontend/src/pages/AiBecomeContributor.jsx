@@ -4,15 +4,8 @@ import {
   Button,
   CircularProgress,
   InputAdornment,
-  InputBase,
   MenuItem,
   TextField,
-  Typography,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
 } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { Country } from "country-state-city";
@@ -20,7 +13,6 @@ import { useMutation } from "@tanstack/react-query";
 import Container from "../components/Container";
 import axios from "../utils/axios";
 import useAuth from "../hooks/useAuth";
-import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 import { HiCheck } from "react-icons/hi";
 
 const floatingLabelSx = {
@@ -67,6 +59,16 @@ const tickMenuItemSx = {
   "&.Mui-selected:hover .tick-icon": { opacity: 1 },
 };
 
+const showContributorSuccessAlert = async (message, options) => {
+  const { showSuccessAlert } = await import("../utils/alerts");
+  return showSuccessAlert(message, options);
+};
+
+const showContributorErrorAlert = async (message) => {
+  const { showErrorAlert } = await import("../utils/alerts");
+  return showErrorAlert(message);
+};
+
 const AiBecomeContributor = () => {
   const [typedMessage, setTypedMessage] = useState("");
   const [typedPageHeading, setTypedPageHeading] = useState("");
@@ -101,7 +103,7 @@ const AiBecomeContributor = () => {
       if (data?.warning) {
         console.warn(data.warning);
       }
-      await showSuccessAlert(
+      await showContributorSuccessAlert(
         "We’ll review your details and get back to you soon.",
         {
           title: "Thank You for Your Interest!",
@@ -110,7 +112,7 @@ const AiBecomeContributor = () => {
       reset(defaultValues);
     },
     onError: (error) => {
-      showErrorAlert(
+      void showContributorErrorAlert(
         error?.response?.data?.message ||
           "Something went wrong while submitting your request.",
       );
@@ -131,7 +133,7 @@ const AiBecomeContributor = () => {
     if (nextValue.length > MESSAGE_CHARACTER_LIMIT) {
       if (!messageLimitAlertedRef.current) {
         messageLimitAlertedRef.current = true;
-        showErrorAlert(
+        void showContributorErrorAlert(
           `Message cannot exceed ${MESSAGE_CHARACTER_LIMIT} characters.`,
         );
       }
