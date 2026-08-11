@@ -2,11 +2,7 @@ import { Outlet, useLocation } from "react-router-dom";
 // import Footer from "../components/Footer";
 // import { Toaster } from "react-hot-toast";
 import { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
-import AiHeader from "../../components/AiHeader";
 import AiSidebar from "./AiHostSidebar";
-import AiFooter from "../../components/AiFooter";
-import AiHome from "../AiHome";
 import AiHostFooter from "./AiHostFooter";
 import AiHostHeader from "./AiHostHeader";
 import BackToTopButton from "../../components/BackToTopButton";
@@ -16,8 +12,6 @@ const AiHostLayout = () => {
     const contentRef = useRef(null);
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
-    const formData = useSelector((state) => state.location.formValues);
-    console.log("formData from layout : ", formData);
     useEffect(() => {
         if (contentRef.current) {
             contentRef.current.scrollTo({ behavior: "smooth", top: "0" });

@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Stepper, Step } from "react-form-stepper";
 import { useForm, Controller } from "react-hook-form";
 import {
   TextField,
@@ -7,7 +6,6 @@ import {
   Box,
   InputAdornment,
   FormControl,
-  FormGroup,
   FormControlLabel,
   Checkbox,
   FormHelperText,
@@ -15,8 +13,8 @@ import {
   Select,
   ListItemText,
   ListSubheader,
+  MenuItem,
 } from "@mui/material";
-import Container from "../../components/Container";
 import GetStartedButton from "../../components/GetStartedButton";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
@@ -24,19 +22,23 @@ import axios from "../../utils/axios";
 import { showErrorAlert, showSuccessAlert } from "../../utils/alerts";
 import { api as publicApi } from "../../utils/axios";
 import { useFieldArray } from "react-hook-form";
-import { Country, State, City } from "country-state-city";
-import { MenuItem } from "@mui/material";
 import { FaCheck } from "react-icons/fa";
-import UploadFileInput from "../../components/UploadFileInput";
-import UploadMultipleFilesInput from "../../components/UploadMultipleFilesInput";
-import AiHostPricing from "./AiHostPricing";
 import useAuth from "../../hooks/useAuth";
 import AiStickyBackBreadcrumb from "../../components/AiStickyBackBreadcrumb";
 import { navigateBackWithinApp } from "../../utils/navigationHistory";
 
+const AiHostPricing = React.lazy(() => import("./AiHostPricing"));
+const UploadFileInput = React.lazy(
+  () => import("../../components/UploadFileInput"),
+);
+const UploadMultipleFilesInput = React.lazy(
+  () => import("../../components/UploadMultipleFilesInput"),
+);
+
 const steps = ["GOAL", "BASIC DETAILS"];
 const ACTIVATION_TITLE = "Your goal is set... let's get you activated";
-const ACTIVATION_TITLE_TYPING_INTERVAL_MS = 7;
+const ACTIVATION_TITLE_TYPING_DURATION_MS = 420;
+const ACTIVATION_TITLE_INITIAL_CHARS = 4;
 const COUNTRIES_NOW_ENDPOINT = "https://countriesnow.space/api/v0.1/countries";
 const STATE_CITY_FALLBACK_RADIUS_KM = 25;
 
@@ -91,7 +93,16 @@ const floatingLabelSx = {
 };
 
 const compactStepFieldSx = {
+  position: "relative",
   my: 0,
+  "& .MuiFormHelperText-root": {
+    position: "absolute",
+    top: "100%",
+    left: 0,
+    mt: "3px",
+    mx: 0,
+    lineHeight: 1.25,
+  },
 };
 
 const checkedMenuItemSx = {
@@ -250,7 +261,11 @@ const AiHostSignup = () => {
     : 1;
   const [activeStep, setActiveStep] = useState(initialStep);
   const [verticalTypeOpen, setVerticalTypeOpen] = useState(false);
-  const [typedActivationTitle, setTypedActivationTitle] = useState("");
+  const [typedActivationTitle, setTypedActivationTitle] = useState(() =>
+    initialStep === 1
+      ? ACTIVATION_TITLE.slice(0, ACTIVATION_TITLE_INITIAL_CHARS)
+      : "",
+  );
   const [countriesNowData, setCountriesNowData] = useState([]);
   const [isCountriesNowLoading, setIsCountriesNowLoading] = useState(false);
   const [countriesNowError, setCountriesNowError] = useState("");
@@ -259,13 +274,32 @@ const AiHostSignup = () => {
     exists: false,
     error: "",
   });
+  const [locationApi, setLocationApi] = useState(null);
   const selectedPlanFromQuery = normalizePlanFromQuery(
     signupParams.get("plan"),
   );
   const [selectedPlan, setSelectedPlan] = useState(selectedPlanFromQuery);
-  const countries = useMemo(() => Country.getAllCountries(), []);
+  const countriesNowLoadStartedRef = React.useRef(false);
+  const countries = useMemo(
+    () => locationApi?.Country?.getAllCountries() || [],
+    [locationApi],
+  );
 
-  const { control, handleSubmit, getValues, trigger, reset, watch, setValue } =
+  useEffect(() => {
+    let isMounted = true;
+
+    import("country-state-city").then((module) => {
+      if (isMounted) {
+        setLocationApi(module);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const { control, handleSubmit, trigger, reset, watch, setValue } =
     useForm({
       defaultValues: {
         Goals: selectedPlanFromQuery,
@@ -316,59 +350,40 @@ const AiHostSignup = () => {
   }, [selectedPlan, setValue]);
 
   useEffect(() => {
-    const controller = new AbortController();
-
-    const fetchCountriesNowData = async () => {
-      setIsCountriesNowLoading(true);
-      setCountriesNowError("");
-
-      try {
-        const response = await fetch(COUNTRIES_NOW_ENDPOINT, {
-          signal: controller.signal,
-        });
-
-        if (!response.ok) {
-          throw new Error("Unable to load city options");
-        }
-
-        const payload = await response.json();
-        setCountriesNowData(Array.isArray(payload?.data) ? payload.data : []);
-      } catch (error) {
-        if (error?.name !== "AbortError") {
-          setCountriesNowError("City options could not be loaded");
-          setCountriesNowData([]);
-        }
-      } finally {
-        if (!controller.signal.aborted) {
-          setIsCountriesNowLoading(false);
-        }
-      }
-    };
-
-    fetchCountriesNowData();
-
-    return () => controller.abort();
-  }, []);
-
-  useEffect(() => {
     if (activeStep !== 1) {
       setTypedActivationTitle("");
       return undefined;
     }
 
-    let currentIndex = 0;
-    setTypedActivationTitle("");
+    const initialChars = Math.min(
+      ACTIVATION_TITLE_INITIAL_CHARS,
+      ACTIVATION_TITLE.length,
+    );
+    const startTime = performance.now();
+    let animationFrameId;
 
-    const typingInterval = setInterval(() => {
-      currentIndex += 1;
-      setTypedActivationTitle(ACTIVATION_TITLE.slice(0, currentIndex));
+    setTypedActivationTitle(ACTIVATION_TITLE.slice(0, initialChars));
 
-      if (currentIndex >= ACTIVATION_TITLE.length) {
-        clearInterval(typingInterval);
+    const animateTyping = (currentTime) => {
+      const elapsedTime = currentTime - startTime;
+      const progress = Math.min(
+        elapsedTime / ACTIVATION_TITLE_TYPING_DURATION_MS,
+        1,
+      );
+      const visibleChars =
+        initialChars +
+        Math.round((ACTIVATION_TITLE.length - initialChars) * progress);
+
+      setTypedActivationTitle(ACTIVATION_TITLE.slice(0, visibleChars));
+
+      if (progress < 1) {
+        animationFrameId = requestAnimationFrame(animateTyping);
       }
-    }, ACTIVATION_TITLE_TYPING_INTERVAL_MS);
+    };
 
-    return () => clearInterval(typingInterval);
+    animationFrameId = requestAnimationFrame(animateTyping);
+
+    return () => cancelAnimationFrame(animationFrameId);
   }, [activeStep]);
 
   useEffect(() => {
@@ -423,12 +438,50 @@ const AiHostSignup = () => {
   const selectedState = useMemo(() => {
     if (!selectedCountry || !selectedStateName) return null;
 
-    return (
-      State.getStatesOfCountry(selectedCountry.isoCode).find(
-        (state) => state.name === selectedStateName,
-      ) || null
-    );
-  }, [selectedCountry, selectedStateName]);
+    const states =
+      locationApi?.State?.getStatesOfCountry(selectedCountry.isoCode) || [];
+
+    return states.find((state) => state.name === selectedStateName) || null;
+  }, [locationApi, selectedCountry, selectedStateName]);
+
+  useEffect(() => {
+    if (!selectedCountry || countriesNowLoadStartedRef.current) return;
+
+    countriesNowLoadStartedRef.current = true;
+    const controller = new AbortController();
+
+    const fetchCountriesNowData = async () => {
+      setIsCountriesNowLoading(true);
+      setCountriesNowError("");
+
+      try {
+        const response = await fetch(COUNTRIES_NOW_ENDPOINT, {
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error("Unable to load city options");
+        }
+
+        const payload = await response.json();
+        setCountriesNowData(Array.isArray(payload?.data) ? payload.data : []);
+      } catch (error) {
+        if (error?.name !== "AbortError") {
+          setCountriesNowError("City options could not be loaded");
+          setCountriesNowData([]);
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsCountriesNowLoading(false);
+        }
+      }
+    };
+
+    fetchCountriesNowData();
+
+    return () => controller.abort();
+  }, [selectedCountry]);
+
   const countriesNowCountryCities = useMemo(() => {
     if (!selectedCountry) return [];
 
@@ -447,9 +500,9 @@ const AiHostSignup = () => {
     return sortLocationNames(matchedCountry.cities);
   }, [countriesNowData, selectedCountry]);
   const selectedStateCities = useMemo(() => {
-    if (!selectedCountry || !selectedState) return [];
+    if (!locationApi || !selectedCountry || !selectedState) return [];
 
-    const stateCities = City.getCitiesOfState(
+    const stateCities = locationApi.City.getCitiesOfState(
       selectedCountry.isoCode,
       selectedState.isoCode,
     );
@@ -458,7 +511,8 @@ const AiHostSignup = () => {
       return sortLocationNames(stateCities.map((city) => city.name));
     }
 
-    const countryCities = City.getCitiesOfCountry(selectedCountry.isoCode) || [];
+    const countryCities =
+      locationApi.City.getCitiesOfCountry(selectedCountry.isoCode) || [];
     const countriesNowCityNames = new Set(
       countriesNowCountryCities.map((city) => normalizeLocationName(city)),
     );
@@ -492,7 +546,7 @@ const AiHostSignup = () => {
     return countriesNowStateMatches.length
       ? countriesNowStateMatches
       : stateNameCandidates;
-  }, [countriesNowCountryCities, selectedCountry, selectedState]);
+  }, [countriesNowCountryCities, locationApi, selectedCountry, selectedState]);
 
   const handleCountryChange = (countryName, onChange) => {
     const country = countries.find((item) => item.name === countryName);
@@ -730,9 +784,6 @@ const AiHostSignup = () => {
       emailCheckState.error
     ) return;
 
-    const stepValues = getValues();
-    console.log(`Step ${activeStep + 1} values:`, stepValues);
-
     setActiveStep((prev) => prev + 1);
   };
 
@@ -741,17 +792,19 @@ const AiHostSignup = () => {
       case 0:
         return (
           <>
-            <AiHostPricing
-              compact
-              startStep={1}
-              onSelectPlan={(plan) => {
-                const planTitle = plan?.title || "BASIC";
-                const normalizedPlan = normalizePlanFromQuery(planTitle);
-                setSelectedPlan(normalizedPlan);
-                setValue("Goals", normalizedPlan);
-                setActiveStep(1);
-              }}
-            />
+            <React.Suspense fallback={null}>
+              <AiHostPricing
+                compact
+                startStep={1}
+                onSelectPlan={(plan) => {
+                  const planTitle = plan?.title || "BASIC";
+                  const normalizedPlan = normalizePlanFromQuery(planTitle);
+                  setSelectedPlan(normalizedPlan);
+                  setValue("Goals", normalizedPlan);
+                  setActiveStep(1);
+                }}
+              />
+            </React.Suspense>
           </>
         );
       case 1:
@@ -909,7 +962,11 @@ const AiHostSignup = () => {
                   sx={compactStepFieldSx}
                   variant="standard"
                   error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
+                  helperText={
+                    fieldState.error?.message ||
+                    (!countries.length ? "Loading countries..." : undefined)
+                  }
+                  disabled={!countries.length}
                   InputLabelProps={{ sx: floatingLabelSx }}
                   SelectProps={{
                     renderValue: (value) => {
@@ -942,6 +999,11 @@ const AiHostSignup = () => {
                     handleCountryChange(event.target.value, field.onChange)
                   }
                 >
+                  {!countries.length && (
+                    <MenuItem disabled value="">
+                      Loading countries...
+                    </MenuItem>
+                  )}
                   {countries.map((c) => (
                     <MenuItem key={c.isoCode} value={c.name}>
                       <Box className="flex items-center gap-2">
@@ -1136,7 +1198,8 @@ const AiHostSignup = () => {
                   (c) => c.name === countryName,
                 );
                 const states = countryObj
-                  ? State.getStatesOfCountry(countryObj.isoCode)
+                  ? locationApi?.State?.getStatesOfCountry(countryObj.isoCode) ||
+                    []
                   : [];
 
                 return (
@@ -1273,12 +1336,14 @@ const AiHostSignup = () => {
                       },
                     }}
                   >
-                    <UploadFileInput
-                      id="companyLogo"
-                      value={field.value}
-                      label="Company Logo"
-                      onChange={field.onChange}
-                    />
+                    <React.Suspense fallback={null}>
+                      <UploadFileInput
+                        id="companyLogo"
+                        value={field.value}
+                        label="Company Logo"
+                        onChange={field.onChange}
+                      />
+                    </React.Suspense>
                   </Box>
                 )}
               />
@@ -1300,14 +1365,22 @@ const AiHostSignup = () => {
                       },
                     }}
                   >
-                    <UploadMultipleFilesInput
-                      {...field}
-                      name="heroImages"
-                      id="heroImages"
-                      label="Carousel Images"
-                      maxFiles={5}
-                      allowedExtensions={["jpg", "jpeg", "png", "pdf", "webp"]}
-                    />
+                    <React.Suspense fallback={null}>
+                      <UploadMultipleFilesInput
+                        {...field}
+                        name="heroImages"
+                        id="heroImages"
+                        label="Carousel Images"
+                        maxFiles={5}
+                        allowedExtensions={[
+                          "jpg",
+                          "jpeg",
+                          "png",
+                          "pdf",
+                          "webp",
+                        ]}
+                      />
+                    </React.Suspense>
                   </Box>
                 )}
               />
@@ -1475,20 +1548,22 @@ const AiHostSignup = () => {
                     name={`products.${index}.files`}
                     control={control}
                     render={({ field }) => (
-                      <UploadMultipleFilesInput
-                        {...field}
-                        name={`products.${index}.files`}
-                        id={`products-${index}-files`}
-                        label="Product Images"
-                        maxFiles={10}
-                        allowedExtensions={[
-                          "jpg",
-                          "jpeg",
-                          "png",
-                          "pdf",
-                          "webp",
-                        ]}
-                      />
+                      <React.Suspense fallback={null}>
+                        <UploadMultipleFilesInput
+                          {...field}
+                          name={`products.${index}.files`}
+                          id={`products-${index}-files`}
+                          label="Product Images"
+                          maxFiles={10}
+                          allowedExtensions={[
+                            "jpg",
+                            "jpeg",
+                            "png",
+                            "pdf",
+                            "webp",
+                          ]}
+                        />
+                      </React.Suspense>
                     )}
                   />
                 </div>
@@ -1520,14 +1595,22 @@ const AiHostSignup = () => {
                 name="gallery"
                 control={control}
                 render={({ field }) => (
-                  <UploadMultipleFilesInput
-                    {...field}
-                    name="gallery"
-                    id="gallery"
-                    label="Gallery Images"
-                    maxFiles={40}
-                    allowedExtensions={["jpg", "jpeg", "png", "pdf", "webp"]}
-                  />
+                  <React.Suspense fallback={null}>
+                    <UploadMultipleFilesInput
+                      {...field}
+                      name="gallery"
+                      id="gallery"
+                      label="Gallery Images"
+                      maxFiles={40}
+                      allowedExtensions={[
+                        "jpg",
+                        "jpeg",
+                        "png",
+                        "pdf",
+                        "webp",
+                      ]}
+                    />
+                  </React.Suspense>
                 )}
               />
             </div>
@@ -1709,7 +1792,6 @@ const AiHostSignup = () => {
                       ? valueWithMandatory.filter((s) => s !== service)
                       : [...valueWithMandatory, service];
 
-                    console.log("Selected services:", newValue);
                     field.onChange(newValue);
                   };
 

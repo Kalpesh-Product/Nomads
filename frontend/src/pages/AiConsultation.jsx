@@ -4,17 +4,10 @@ import {
   Button,
   CircularProgress,
   InputAdornment,
-  InputBase,
   MenuItem,
   TextField,
-  Typography,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
 } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
-import { DatePicker } from "@mui/x-date-pickers";
 import { Country } from "country-state-city";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
@@ -25,7 +18,6 @@ import {
   getCountryNameFromSelectedDestination,
   readSelectedDestination,
 } from "../utils/selectedDestinationSession";
-import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 import { findCountryByName } from "../utils/countryFlags";
 import { HiCheck } from "react-icons/hi";
 import { aiDestinationCards } from "../constants/aiDestinationCards";
@@ -66,6 +58,8 @@ const CONSULTATION_PROMPT =
   "share your consultation requirements and we will connect you with the right expert support.";
 const CONSULTATION_HEADING = "Consultation Support";
 const CONSULTATION_TYPING_SEEN_KEY = "wono-consultation-typing-seen";
+const SUPPORT_QUERY_STALE_TIME = 10 * 60 * 1000;
+const SUPPORT_QUERY_GC_TIME = 30 * 60 * 1000;
 const getFlagIconUrl = (isoCode) =>
   `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
 const normalizePrefillValue = (value) => value?.trim().toLowerCase() || "";
@@ -86,6 +80,16 @@ const formatCountryWithState = (country, state) => {
   if (!trimmedState) return trimmedCountry;
 
   return `${trimmedCountry} - ${trimmedState}`;
+};
+
+const showSupportSuccessAlert = async (message, options) => {
+  const { showSuccessAlert } = await import("../utils/alerts");
+  return showSuccessAlert(message, options);
+};
+
+const showSupportErrorAlert = async (message) => {
+  const { showErrorAlert } = await import("../utils/alerts");
+  return showErrorAlert(message);
 };
 
 const AiConsultation = () => {
@@ -109,6 +113,10 @@ const AiConsultation = () => {
         return [];
       }
     },
+    staleTime: SUPPORT_QUERY_STALE_TIME,
+    gcTime: SUPPORT_QUERY_GC_TIME,
+    refetchOnWindowFocus: false,
+    retry: false,
   });
   const { data: companyCountries = [] } = useQuery({
     queryKey: ["consultation-company-countries"],
@@ -121,6 +129,10 @@ const AiConsultation = () => {
         return [];
       }
     },
+    staleTime: SUPPORT_QUERY_STALE_TIME,
+    gcTime: SUPPORT_QUERY_GC_TIME,
+    refetchOnWindowFocus: false,
+    retry: false,
   });
 
   const destinationOptions = useMemo(() => {
@@ -195,7 +207,7 @@ const AiConsultation = () => {
       if (data?.warning) {
         console.warn(data.warning);
       }
-      await showSuccessAlert(
+      await showSupportSuccessAlert(
         "Our team will review your request and get back to you soon.",
         {
           title: "Support Request Submitted!",
@@ -204,7 +216,7 @@ const AiConsultation = () => {
       reset(defaultValues);
     },
     onError: (error) => {
-      showErrorAlert(
+      void showSupportErrorAlert(
         error?.response?.data?.message ||
           "Something went wrong while submitting your request.",
       );

@@ -8,7 +8,6 @@ import {
 } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { Country } from "country-state-city";
-import Swal from "sweetalert2";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "../utils/axios";
@@ -19,7 +18,6 @@ import {
   getCountryNameFromSelectedDestination,
   readSelectedDestination,
 } from "../utils/selectedDestinationSession";
-import { showErrorAlert } from "../utils/alerts";
 import { findCountryByName } from "../utils/countryFlags";
 import { HiCheck } from "react-icons/hi";
 
@@ -56,6 +54,8 @@ const VISA_SUPPORT_PROMPT =
   "tell us about your travel plans and we will help you navigate the visa process with confidence.";
 const VISA_SUPPORT_HEADING = "Visa Support";
 const VISA_SUPPORT_TYPING_SEEN_KEY = "wono-visa-support-typing-seen";
+const VISA_SUPPORT_QUERY_STALE_TIME = 10 * 60 * 1000;
+const VISA_SUPPORT_QUERY_GC_TIME = 30 * 60 * 1000;
 const getFlagIconUrl = (isoCode) =>
   `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
 const normalizePrefillValue = (value) => value?.trim().toLowerCase() || "";
@@ -76,6 +76,14 @@ const formatTravellingCountry = (country, state) => {
   if (!trimmedState) return trimmedCountry;
 
   return `${trimmedCountry} - ${trimmedState}`;
+};
+
+const loadSweetAlert = () =>
+  import("sweetalert2").then((module) => module.default);
+
+const showVisaSupportErrorAlert = async (message) => {
+  const { showErrorAlert } = await import("../utils/alerts");
+  return showErrorAlert(message);
 };
 
 const AiVisaSupport = () => {
@@ -106,6 +114,10 @@ const AiVisaSupport = () => {
         return [];
       }
     },
+    staleTime: VISA_SUPPORT_QUERY_STALE_TIME,
+    gcTime: VISA_SUPPORT_QUERY_GC_TIME,
+    refetchOnWindowFocus: false,
+    retry: false,
   });
   const { data: companyCountries = [] } = useQuery({
     queryKey: ["visa-support-company-countries"],
@@ -118,6 +130,10 @@ const AiVisaSupport = () => {
         return [];
       }
     },
+    staleTime: VISA_SUPPORT_QUERY_STALE_TIME,
+    gcTime: VISA_SUPPORT_QUERY_GC_TIME,
+    refetchOnWindowFocus: false,
+    retry: false,
   });
 
   const destinationOptions = useMemo(() => {
@@ -223,6 +239,7 @@ const AiVisaSupport = () => {
       return response.data;
     },
     onSuccess: async (_, formValues) => {
+      const Swal = await loadSweetAlert();
       await Swal.fire({
         title: "Visa Support Request Submitted!",
         text: "Choose how you’d like to continue with your visa support.",
@@ -249,7 +266,7 @@ const AiVisaSupport = () => {
       reset(defaultValues);
     },
     onError: (error) => {
-      showErrorAlert(
+      void showVisaSupportErrorAlert(
         error?.response?.data?.message ||
           "Something went wrong while submitting your request.",
       );

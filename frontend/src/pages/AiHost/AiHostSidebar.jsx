@@ -259,7 +259,7 @@ const becomeNomadItem = [{ label: "Become a Nomad", icon: HiOutlineViewGrid }];
 const hostLoginPrompt = {
   description:
     "Login to manage your host tools, listings, operations, and business setup.",
-  actionLabel: "Login as Host",
+  actionLabel: "Login as Business",
 };
 
 const loggedOutPrompt = {
@@ -826,19 +826,19 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         </>
       ) : (
         !isMobileOverlay && (
-        <>
-          {/* <div className="border-t border-black/10 mt-4 mx-4"></div>
+          <>
+            {/* <div className="border-t border-black/10 mt-4 mx-4"></div>
                     <SidebarSection
                         items={becomeNomadItem}
                         collapsed={isCollapsed}
                         onItemClick={handleBecomeNomadClick}
                         compact={true}
                     /> */}
-          {/* <div className="border-t border-black/10 mt-4 mx-4"></div> */}
-          <div className="px-4 pt-3">
-            <div className="border-t border-black/10"></div>
-          </div>
-          {/* {!isCollapsed && (
+            {/* <div className="border-t border-black/10 mt-4 mx-4"></div> */}
+            <div className="px-4 pt-3">
+              <div className="border-t border-black/10"></div>
+            </div>
+            {/* {!isCollapsed && (
                         <div className="mt-auto px-4 pb-4 pt-10">
                             <div className="rounded-[28px] p-4 shadow-sm">
                                 <p className="mt-2 text-nano leading-[0.9rem] text-black/55">
@@ -857,7 +857,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
                             </div>
                         </div>
                     )} */}
-        </>
+          </>
         )
       )}
       {isCollapsed && tooltip && (
