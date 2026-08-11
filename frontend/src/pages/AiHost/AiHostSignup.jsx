@@ -93,7 +93,16 @@ const floatingLabelSx = {
 };
 
 const compactStepFieldSx = {
+  position: "relative",
   my: 0,
+  "& .MuiFormHelperText-root": {
+    position: "absolute",
+    top: "100%",
+    left: 0,
+    mt: "3px",
+    mx: 0,
+    lineHeight: 1.25,
+  },
 };
 
 const checkedMenuItemSx = {
