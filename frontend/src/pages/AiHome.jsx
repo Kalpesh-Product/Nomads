@@ -5,6 +5,7 @@ import { MdOutlineWorkHistory } from "react-icons/md";
 import { HiOutlineCurrencyDollar } from "react-icons/hi";
 import { RiUserCommunityLine } from "react-icons/ri";
 import { TbAward, TbWorldWww } from "react-icons/tb";
+import { Helmet } from "@dr.pogodin/react-helmet";
 import useNomadLoginState from "../hooks/useNomadLoginState";
 
 import useAuth from "../hooks/useAuth";
@@ -279,101 +280,127 @@ const AiHome = () => {
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-100px)] flex-col bg-white">
-      <main className="flex-1 px-3 py-6 sm:px-6 lg:px-10">
-        <div className="mx-auto max-w-5xl text-center">
-          <h1 className="text-3xl font-medium text-black/90 font-play">
-            {typedGreeting}
-          </h1>
-          {!isLoggedIn ? (
-            <h2 className="mt-1 text-ls font-medium font-play">
-              <span className="text-black/90">(</span>
-              {renderBracketBrand("World of Nomads")}
-              <span className="text-black/90">)</span>
-            </h2>
-          ) : null}
-          {typedSubheading ? (
-            <h2 className="mt-5 text-sm font-semibold text-black/85 font-play sm:text-lg">
-              {typedSubheading}
-            </h2>
-          ) : null}
-          {/* <p className="mt-4 text-sm sm:text-lg font-medium text-black/85 font-play">
+    <>
+      <Helmet>
+        <title>
+          WONO | Digital Nomad Platform, Community & Work From Anywhere
+        </title>
+        <meta
+          name="description"
+          content="Discover WONO, a global platform for digital nomads. Explore places to work and stay, remote opportunities, nomad communities and resources designed to help you work from anywhere."
+        />
+        <meta
+          name="keywords"
+          content="digital nomad platform, digital nomad community, digital nomad lifestyle, digital nomads, nomad platform, nomad community, global nomad community, remote work platform, work from anywhere, remote work lifestyle, location independent lifestyle, location independent professionals, remote professionals, global remote workers, borderless working, borderless lifestyle, future of work, future of remote work, work and travel, live and work anywhere, global mobility platform, nomad ecosystem"
+        />
+        <meta
+          property="og:title"
+          content="WONO | Digital Nomad Platform, Community & Work From Anywhere"
+        />
+        <meta
+          property="og:description"
+          content="Discover WONO, a global platform for digital nomads. Explore places to work and stay, remote opportunities, nomad communities and resources designed to help you work from anywhere."
+        />
+        <meta property="og:image" content="/images/homepage.jpeg" />
+        <meta property="og:type" content="website" />
+        <link rel="canonical" href="https://wono.co/" />
+      </Helmet>
+      <div className="flex min-h-[calc(100vh-100px)] flex-col bg-white">
+        <main className="flex-1 px-3 py-6 sm:px-6 lg:px-10">
+          <div className="mx-auto max-w-5xl text-center">
+            <h1 className="text-3xl font-medium text-black/90 font-play">
+              {typedGreeting}
+            </h1>
+            {!isLoggedIn ? (
+              <h2 className="mt-1 text-ls font-medium font-play">
+                <span className="text-black/90">(</span>
+                {renderBracketBrand("World of Nomads")}
+                <span className="text-black/90">)</span>
+              </h2>
+            ) : null}
+            {typedSubheading ? (
+              <h2 className="mt-5 text-sm font-semibold text-black/85 font-play sm:text-lg">
+                {typedSubheading}
+              </h2>
+            ) : null}
+            {/* <p className="mt-4 text-sm sm:text-lg font-medium text-black/85 font-play">
             {typedThirdLine}
           </p> */}
-          <p className="mt-4 text-sm sm:text-xl font-medium text-primary-blue font-play">
-            {typedFourthLine}
-          </p>
+            <p className="mt-4 text-sm sm:text-xl font-medium text-primary-blue font-play">
+              {typedFourthLine}
+            </p>
 
-          <div
-            className={`mt-8 rounded-[40px] px-0 py-4 md:px-6 md:py-8 ${
-              areCardsVisible ? "visible" : "invisible"
-            }`}
-          >
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-2 md:gap-10 xl:grid-cols-3">
-              {recommendationCards.map((card, index) => {
-                const Icon = card.icon;
+            <div
+              className={`mt-8 rounded-[40px] px-0 py-4 md:px-6 md:py-8 ${
+                areCardsVisible ? "visible" : "invisible"
+              }`}
+            >
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-2 md:gap-10 xl:grid-cols-3">
+                {recommendationCards.map((card, index) => {
+                  const Icon = card.icon;
 
-                const isFreeCard = freeRecommendationTitles.has(card.title);
-                const loggedOutCardText = isFreeCard
-                  ? "No login required"
-                  : "Login required";
+                  const isFreeCard = freeRecommendationTitles.has(card.title);
+                  const loggedOutCardText = isFreeCard
+                    ? "No login required"
+                    : "Login required";
 
-                return (
-                  <div
-                    key={card.title}
-                    className={`transition-all duration-300 ${
-                      index < visibleCardCount
-                        ? "translate-y-0 opacity-100"
-                        : "pointer-events-none translate-y-2 opacity-0"
-                    }`}
-                  >
-                    <article
-                      onClick={() => handleCardClick(card)}
-                      className="group cursor-pointer rounded-2xl bg-[#f1f1f3] px-3 py-5 text-center transition-colors duration-200 hover:bg-[#e8e8ed] md:rounded-none md:bg-transparent md:px-0 md:py-0 md:hover:bg-transparent"
+                  return (
+                    <div
+                      key={card.title}
+                      className={`transition-all duration-300 ${
+                        index < visibleCardCount
+                          ? "translate-y-0 opacity-100"
+                          : "pointer-events-none translate-y-2 opacity-0"
+                      }`}
                     >
-                      <div className="md:hidden">
-                        <Icon
-                          size={24}
-                          className="mx-auto text-black/80 transition-colors duration-200 group-hover:text-sky-500"
-                        />
-                        <h3 className="mt-2 text-nano font-bold uppercase leading-tight text-black/90 transition-colors duration-200 group-hover:text-sky-500 sm:text-[0.8rem]">
-                          {card.title}
-                        </h3>
-                      </div>
-                      <div className="hidden rounded-2xl bg-[#f1f1f3] px-4 py-5 shadow-[0_1px_0_rgba(255,255,255,0.7)] transition-colors duration-200 group-hover:bg-sky-500 md:block">
-                        <div className="grid grid-cols-[24px_1fr] items-center gap-3 text-left pl-5">
+                      <article
+                        onClick={() => handleCardClick(card)}
+                        className="group cursor-pointer rounded-2xl bg-[#f1f1f3] px-3 py-5 text-center transition-colors duration-200 hover:bg-[#e8e8ed] md:rounded-none md:bg-transparent md:px-0 md:py-0 md:hover:bg-transparent"
+                      >
+                        <div className="md:hidden">
                           <Icon
                             size={24}
-                            className="shrink-0 text-black/80 transition-colors duration-200 group-hover:text-white"
+                            className="mx-auto text-black/80 transition-colors duration-200 group-hover:text-sky-500"
                           />
-                          <h3 className="text-nano font-bold uppercase leading-tight text-black/90 transition-colors duration-200 group-hover:text-white sm:text-[0.8rem] pl-5">
+                          <h3 className="mt-2 text-nano font-bold uppercase leading-tight text-black/90 transition-colors duration-200 group-hover:text-sky-500 sm:text-[0.8rem]">
                             {card.title}
                           </h3>
                         </div>
-                      </div>
-                    </article>
-                    {!isLoggedIn ? (
-                      <p
-                        className={`mt-2 text-[10px] font-semibold tracking-wide md:text-xs ${
-                          isFreeCard ? "text-primary-blue" : "text-black/70"
-                        }`}
-                      >
-                        {loggedOutCardText}
-                      </p>
-                    ) : null}
-                  </div>
-                );
-              })}
+                        <div className="hidden rounded-2xl bg-[#f1f1f3] px-4 py-5 shadow-[0_1px_0_rgba(255,255,255,0.7)] transition-colors duration-200 group-hover:bg-sky-500 md:block">
+                          <div className="grid grid-cols-[24px_1fr] items-center gap-3 text-left pl-5">
+                            <Icon
+                              size={24}
+                              className="shrink-0 text-black/80 transition-colors duration-200 group-hover:text-white"
+                            />
+                            <h3 className="text-nano font-bold uppercase leading-tight text-black/90 transition-colors duration-200 group-hover:text-white sm:text-[0.8rem] pl-5">
+                              {card.title}
+                            </h3>
+                          </div>
+                        </div>
+                      </article>
+                      {!isLoggedIn ? (
+                        <p
+                          className={`mt-2 text-[10px] font-semibold tracking-wide md:text-xs ${
+                            isFreeCard ? "text-primary-blue" : "text-black/70"
+                          }`}
+                        >
+                          {loggedOutCardText}
+                        </p>
+                      ) : null}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
-        </div>
-      </main>
+        </main>
 
-      {/* <div className="sticky bottom-0 z-10  bg-white/95 py-6 text-center text-nano text-gray-600 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+        {/* <div className="sticky bottom-0 z-10  bg-white/95 py-6 text-center text-nano text-gray-600 backdrop-blur supports-[backdrop-filter]:bg-white/80">
         WONO is currently in beta. We're continuously improving the platform based on your feedback. Building the future of global
         nomad living, one update at a time. See Cookie Preferences.
       </div> */}
-    </div>
+      </div>
+    </>
   );
 };
 
