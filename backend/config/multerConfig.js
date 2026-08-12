@@ -15,6 +15,8 @@ const upload = multer({
       file.mimetype === "image/png" ||
       file.mimetype === "image/webp" ||
       file.mimetype === "text/csv" ||
+      file.mimetype === "application/csv" ||
+      file.mimetype === "application/vnd.ms-excel" ||
       file.mimetype === "application/pdf"
     ) {
       cb(null, true);
