@@ -1,15 +1,10 @@
 import React from "react";
 import Container from "../../components/Container";
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
-import RotatingGlobe from "../../components/RotatingGlobe";
 import images from "../../assets/images";
 import FeatureCard from "../../components/FeatureCard";
-import { ReactFitty } from "react-fitty";
 import GetStartedButton from "../../components/GetStartedButton";
 import { NavLink, useNavigate } from "react-router-dom";
 import MySeperator from "../../components/MySeperator";
-import AiHome from "../AiHome";
 import AiHostPricing from "./AiHostPricing";
 import {
   TbFileDescription,
@@ -17,11 +12,51 @@ import {
   TbWorldWww,
 } from "react-icons/tb";
 
+const ReactFitty = React.lazy(() =>
+  import("react-fitty").then((module) => ({ default: module.ReactFitty })),
+);
+
+const FitText = ({ children }) => {
+  const wrapperRef = React.useRef(null);
+  const [shouldLoad, setShouldLoad] = React.useState(false);
+
+  React.useEffect(() => {
+    const element = wrapperRef.current;
+    if (shouldLoad || !element) return;
+
+    if (!("IntersectionObserver" in window)) {
+      setShouldLoad(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldLoad(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" },
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [shouldLoad]);
+
+  return (
+    <div ref={wrapperRef}>
+      {shouldLoad ? (
+        <React.Suspense fallback={children}>
+          <ReactFitty>{children}</ReactFitty>
+        </React.Suspense>
+      ) : (
+        children
+      )}
+    </div>
+  );
+};
+
 const HostHome = () => {
-  // mobile screen for globe responsiveness
-  const ismobile = window.innerWidth < 769;
-  const isTablet = window.innerWidth < 1025;
-  const isLaptop = window.innerWidth < 1441;
   const navigate = useNavigate();
   const amenities = [
     // Group 1
@@ -160,16 +195,16 @@ const HostHome = () => {
         <Container padding={false}>
           <div className="flex flex-col gap-6 lg:pt-16 lg:pb-8 pb-10 pt-10">
             <div className="flex flex-col leading-tight">
-              <ReactFitty>
+              <FitText>
                 <h1 className="font-semibold uppercase">
                   One Partner Platform
                 </h1>
-              </ReactFitty>
-              <ReactFitty>
+              </FitText>
+              <FitText>
                 <p className="font-semibold uppercase">
                   Infinite possibilities and opportunities!
                 </p>
-              </ReactFitty>
+              </FitText>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -201,14 +236,14 @@ const HostHome = () => {
       <section className="">
         <Container padding={false}>
           <div className="flex flex-col leading-tight lg:pt-16 lg:pb-8 pt-10 pb-10">
-            <ReactFitty>
+            <FitText>
               <h1 className="font-semibold uppercase">NO CODE SELF SERVE</h1>
-            </ReactFitty>
-            <ReactFitty>
+            </FitText>
+            <FitText>
               <p className="font-semibold uppercase">
                 TRANSACTIONAL WEBSITE & MOBILE SITE
               </p>
-            </ReactFitty>
+            </FitText>
             <p className="text-[clamp(1rem,1.5vw,3rem)] my-4 lg:my-4">
               Free customizable website templates which are strategically
               tailored for managing Lifestyle Businesses like Co-Working,
