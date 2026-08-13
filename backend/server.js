@@ -80,6 +80,7 @@ app.use("/api/leads", leadsRoutes);
 app.use("/api/special-access", specialAccessRoutes);
 app.use("/api/admin/nomad-users", verifyAdminApiKey, adminNomadUserRoutes);
 
+
 app.use("/api/news", newsRoutes);
 app.use("/api/blogs", blogRoutes); // New Blog Route
 app.use("/api/events", eventRoutes);

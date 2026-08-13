@@ -5,6 +5,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 import { CalendarDays, MapPin, Star } from "lucide-react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import Map from "../components/Map";
 import MuiModal from "../components/Modal";
 import SecondaryButton from "../components/SecondaryButton";
 import { annualEvents, popularPlaces } from "../data/aiDestinationHighlights";
@@ -24,6 +25,31 @@ const getInitials = (name = "") =>
 
 const emptyReviewPromptBottomSpacing = "1.5rem";
 
+const toValidCoordinate = (value) => {
+  if (value === undefined || value === null || String(value).trim() === "") {
+    return null;
+  }
+
+  const coordinate = Number(value);
+  return Number.isFinite(coordinate) ? coordinate : null;
+};
+
+const normalizePlaceItem = (place = {}) => ({
+  ...place,
+  id: place._id || place.id || place.serialNumber || place.placeName,
+  title: place.placeName || place.title,
+  image: place.mainImage || place.image,
+  location: place.address || place.location || place.destination,
+  lat: place.latitude ?? place.lat,
+  lng: place.longitude ?? place.lng,
+  meta: place.rating || place.meta,
+  category: place.category || place.placeType,
+  region: place.destination || place.region,
+  description:
+    place.shortDescription || place.description || place.sections?.[0]?.content,
+  googleMapsLink: place.googleMapsLink || place.googleMap || "",
+});
+
 const AiDestinationDetail = ({ type }) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -32,11 +58,26 @@ const AiDestinationDetail = ({ type }) => {
   const axiosPrivate = useAxiosPrivate();
   const [isAddReviewOpen, setIsAddReviewOpen] = useState(false);
   const [activeImage, setActiveImage] = useState(null);
-  const fallback = type === "event" ? annualEvents[0] : popularPlaces[0];
-  const item = location.state?.item || fallback;
   const isEvent = type === "event";
   const isRestaurant = type === "restaurant";
   const isReviewEnabled = !isRestaurant;
+  const fallback = type === "event" ? annualEvents[0] : popularPlaces[0];
+  const { data: placeDetails } = useQuery({
+    queryKey: ["placeDetails", placeId],
+    queryFn: async () => {
+      const response = await axios.get(`/places/${placeId}`);
+      return response.data;
+    },
+    enabled: type === "place" && !!placeId,
+    refetchOnWindowFocus: false,
+  });
+  const item = placeDetails
+    ? normalizePlaceItem(placeDetails)
+    : location.state?.item || fallback;
+  const mapLatitude = toValidCoordinate(item.lat ?? item.latitude);
+  const mapLongitude = toValidCoordinate(item.lng ?? item.longitude);
+  const hasMapCoordinates =
+    type === "place" && mapLatitude !== null && mapLongitude !== null;
   const placeMapsLink =
     typeof item.googleMapsLink === "string" ? item.googleMapsLink.trim() : "";
   const placeDirectionHref =
@@ -135,6 +176,20 @@ const AiDestinationDetail = ({ type }) => {
 
   const hasCompactEmptyReviewPrompt =
     isReviewEnabled && !isReviewsLoading && reviews.length === 0;
+  const placeMapLocations = hasMapCoordinates
+    ? [
+        {
+          id: item.id || placeId,
+          lat: mapLatitude,
+          lng: mapLongitude,
+          name: item.title,
+          location: item.region || item.location || item.address,
+          ratings: item.meta,
+          image: item.image,
+          googleMap: item.googleMapsLink,
+        },
+      ]
+    : [];
 
   return (
     <main className="mx-auto w-full max-w-[75rem] px-4 pb-8 lg:px-0">
@@ -253,6 +308,33 @@ const AiDestinationDetail = ({ type }) => {
                 </article>
               ))
             )}
+          </div>
+        </section>
+      )}
+
+      {hasMapCoordinates && (
+        <section className="mt-5 h-[500px] w-full overflow-hidden rounded-xl border-b border-gray-200 pb-8">
+          <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
+            <h1 className="text-title font-medium uppercase text-gray-700">
+              Where you'll be
+            </h1>
+            {placeMapsLink && (
+              <a
+                href={placeMapsLink}
+                target="_blank"
+                rel="noreferrer"
+                className="font-medium text-blue-600 underline"
+              >
+                Get Direction
+              </a>
+            )}
+          </div>
+          <div className="h-[410px] w-full overflow-hidden rounded-xl">
+            <Map
+              locations={placeMapLocations}
+              disableNavigation
+              disableTwoFingerScroll
+            />
           </div>
         </section>
       )}
