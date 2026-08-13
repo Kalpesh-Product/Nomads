@@ -600,6 +600,8 @@ const AiGlobalListingsList = () => {
           title: place.placeName,
           image: place.mainImage,
           location: place.address || place.destination,
+          lat: place.latitude,
+          lng: place.longitude,
           meta: place.rating,
           category: place.category || place.placeType,
           region: place.destination,

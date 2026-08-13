@@ -17,13 +17,67 @@ const PLACE_FIELDS = [
   "category",
   "month",
   "venue",
+  "latitude",
+  "longitude",
   "destination",
   "placeType",
   "sections",
 ];
 
+const NUMBER_FIELDS = new Set(["latitude", "longitude"]);
+
+const COORDINATE_FIELDS = {
+  latitude: {
+    label: "Latitude",
+    columns: ["Latitude", "latitude"],
+    min: -90,
+    max: 90,
+  },
+  longitude: {
+    label: "Longitude",
+    columns: ["Longitude", "longitude"],
+    min: -180,
+    max: 180,
+  },
+};
+
 const normalizeString = (value) =>
   typeof value === "string" ? value.trim() : value;
+
+const parseNumber = (value) => {
+  if (value === undefined || value === null || String(value).trim() === "") {
+    return undefined;
+  }
+
+  const parsed = Number(String(value).replace(/,/g, "").trim());
+  return Number.isFinite(parsed) ? parsed : Number.NaN;
+};
+
+const getCoordinateValidationError = (value, field) => {
+  const config = COORDINATE_FIELDS[field];
+  const parsed = parseNumber(value);
+
+  if (parsed === undefined) return null;
+
+  if (Number.isNaN(parsed)) {
+    return `${config.label} must be a valid number`;
+  }
+
+  if (parsed < config.min || parsed > config.max) {
+    return `${config.label} must be between ${config.min} and ${config.max}`;
+  }
+
+  return null;
+};
+
+const validateCoordinateFields = (payload) =>
+  Object.keys(COORDINATE_FIELDS)
+    .filter((field) => Object.prototype.hasOwnProperty.call(payload, field))
+    .map((field) => ({
+      field,
+      reason: getCoordinateValidationError(payload[field], field),
+    }))
+    .filter((error) => error.reason);
 
 const buildSectionsFromPayload = (sections) => {
   if (!Array.isArray(sections)) return [];
@@ -41,10 +95,13 @@ const buildPlacePayload = (body, { partial = false } = {}) => {
   for (const field of PLACE_FIELDS) {
     if (!Object.prototype.hasOwnProperty.call(body, field)) continue;
 
-    payload[field] =
-      field === "sections"
-        ? buildSectionsFromPayload(body[field])
-        : normalizeString(body[field]);
+    if (field === "sections") {
+      payload[field] = buildSectionsFromPayload(body[field]);
+    } else if (NUMBER_FIELDS.has(field)) {
+      payload[field] = parseNumber(body[field]);
+    } else {
+      payload[field] = normalizeString(body[field]);
+    }
   }
 
   if (!partial) {
@@ -110,6 +167,14 @@ const buildSections = (row) => {
   return sections;
 };
 
+const getCoordinateRowValue = (row, field) => {
+  const config = COORDINATE_FIELDS[field];
+
+  return config.columns
+    .map((column) => row[column])
+    .find((value) => value !== undefined && value !== null && value !== "");
+};
+
 const buildPlace = (row) => ({
   serialNumber: row["S. No"] || "",
   link: row["Link"] || "",
@@ -122,6 +187,8 @@ const buildPlace = (row) => ({
   category: row["Category"] || "",
   month: row["Month"] || "",
   venue: row["Venue"] || "",
+  latitude: parseNumber(getCoordinateRowValue(row, "latitude")),
+  longitude: parseNumber(getCoordinateRowValue(row, "longitude")),
   destination: row["Destination"],
   placeType: row["Type"] || "",
   sections: buildSections(row),
@@ -206,6 +273,19 @@ export const bulkInsertPlaces = async (req, res, next) => {
         }
       }
 
+      for (const field of Object.keys(COORDINATE_FIELDS)) {
+        const value = getCoordinateRowValue(row, field);
+        const reason = getCoordinateValidationError(value, field);
+
+        if (reason) {
+          errors.push({
+            row: rowNumber,
+            field: COORDINATE_FIELDS[field].label,
+            reason,
+          });
+        }
+      }
+
       rows.push(row);
     });
 
@@ -248,11 +328,19 @@ export const addPlace = async (req, res, next) => {
   try {
     const payload = buildPlacePayload(req.body || {});
     const missingFields = validateRequiredPlaceFields(payload);
+    const coordinateErrors = validateCoordinateFields(payload);
 
     if (missingFields.length > 0) {
       return res.status(400).json({
         message: "Required place fields are missing.",
         missingFields,
+      });
+    }
+
+    if (coordinateErrors.length > 0) {
+      return res.status(400).json({
+        message: "Place coordinates are invalid.",
+        errors: coordinateErrors,
       });
     }
 
@@ -296,10 +384,18 @@ export const updatePlace = async (req, res, next) => {
     }
 
     const payload = buildPlacePayload(req.body || {}, { partial: true });
+    const coordinateErrors = validateCoordinateFields(payload);
 
     if (Object.keys(payload).length === 0) {
       return res.status(400).json({
         message: "At least one place field is required to update.",
+      });
+    }
+
+    if (coordinateErrors.length > 0) {
+      return res.status(400).json({
+        message: "Place coordinates are invalid.",
+        errors: coordinateErrors,
       });
     }
 
