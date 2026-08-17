@@ -6,6 +6,18 @@ import Company from "../models/Company.js";
 import TestReview from "../models/TestReview.js";
 import NomadUser from "../models/NomadUser.js";
 
+const parseCsvRows = (file) =>
+  new Promise((resolve, reject) => {
+    const rows = [];
+    const stream = Readable.from(file.buffer.toString("utf-8").trim());
+
+    stream
+      .pipe(csvParser())
+      .on("data", (row) => rows.push(row))
+      .on("end", () => resolve(rows))
+      .on("error", (err) => reject(err));
+  });
+
 export const bulkInsertReviews = async (req, res, next) => {
   try {
     const file = req.file;
@@ -16,25 +28,43 @@ export const bulkInsertReviews = async (req, res, next) => {
         .json({ message: "Please provide a valid CSV file" });
     }
 
-    const companies = await Company.find().lean();
+    const rows = await parseCsvRows(file);
+    const businessIds = [
+      ...new Set(
+        rows
+          .map((row) => row["Business ID"]?.trim())
+          .filter(Boolean),
+      ),
+    ];
+
+    const companies = await Company.find({ businessId: { $in: businessIds } }).lean();
     const companyMap = new Map(
-      companies.map((item) => [item.businessId?.trim(), item._id]),
+      companies
+        .map((item) => [item.businessId?.trim(), item._id])
+        .filter(([businessId]) => businessId),
     );
 
     const companyIdMap = new Map();
     const companyNameMap = new Map(); // To get company names for logging
-    companies.map((company) => {
-      companyIdMap.set(company.businessId, company.companyId);
-      companyNameMap.set(company.businessId, company.companyName);
+    companies.forEach((company) => {
+      const businessId = company.businessId?.trim();
+      if (!businessId) return;
+      companyIdMap.set(businessId, company.companyId);
+      companyNameMap.set(businessId, company.companyName);
     });
 
     // Fetch existing reviews to check for duplicates
-    const existingReviews = await Review.find().select("name company");
+    const existingReviews = await Review.find({
+      company: { $in: companies.map((company) => company._id) },
+    }).select("name company");
     const existingReviewSet = new Set(
-      existingReviews.map(
-        (review) =>
-          `${review.name?.trim().toLowerCase()}|${review.company?.toString()}`,
-      ),
+      existingReviews
+        .map((review) => {
+          const reviewerName = review.name?.trim().toLowerCase();
+          const companyId = review.company?.toString();
+          return reviewerName && companyId ? `${reviewerName}|${companyId}` : null;
+        })
+        .filter(Boolean),
     );
 
     const reviews = [];
@@ -45,10 +75,7 @@ export const bulkInsertReviews = async (req, res, next) => {
     const duplicateExistingLogs = [];
     const duplicateCSVLogs = [];
 
-    const stream = Readable.from(file.buffer.toString("utf-8").trim());
-    stream
-      .pipe(csvParser())
-      .on("data", (row) => {
+    rows.forEach((row) => {
         const businessId = row["Business ID"]?.trim();
         const companyMongoId = companyMap.get(businessId);
         const companyId = companyIdMap.get(businessId);
@@ -117,8 +144,8 @@ export const bulkInsertReviews = async (req, res, next) => {
 
         seenInCSV.add(reviewKey);
         reviews.push(formattedReviews);
-      })
-      .on("end", async () => {
+      });
+
         // Log summary of duplicates
         console.log("\n📊 REVIEW SUMMARY:");
         console.log(`Total skipped (existing in DB): ${skippedExisting}`);
@@ -220,7 +247,6 @@ export const bulkInsertReviews = async (req, res, next) => {
             });
           }
         }
-      });
   } catch (error) {
     next(error);
   }

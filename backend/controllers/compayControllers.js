@@ -21,6 +21,28 @@ import { fixedAmenitiesMap } from "../config/amenitiesMap.js";
 // query param can't be pointed at arbitrary schema fields.
 const ADDITIVE_FIELD_OPTIONS = new Set(["services", "units"]);
 
+const parseCsvRows = (file) =>
+  new Promise((resolve, reject) => {
+    const rows = [];
+    const stream = Readable.from(file.buffer.toString("utf-8").trim());
+
+    stream
+      .pipe(csvParser())
+      .on("data", (row) => rows.push(row))
+      .on("end", () => resolve(rows))
+      .on("error", (err) => reject(err));
+  });
+
+const buildCompanyLookupKey = ({
+  name,
+  city,
+  state,
+  country,
+}) =>
+  `${name?.trim()?.toLowerCase()}|${city?.trim()?.toLowerCase()}|${state
+    ?.trim()
+    ?.toLowerCase()}|${country?.trim()?.toLowerCase()}`;
+
 // Emails granted special access (managed from the Wono Master Panel's User
 // Access module) can browse non-public listings on the public site too, not
 // just the extra countries/states getUniqueDataLocations already gives them.
@@ -157,11 +179,34 @@ export const bulkInsertCompanies = async (req, res, next) => {
         .json({ message: "Please provide a valid CSV file" });
     }
 
-    const companies = [];
+    const rows = await parseCsvRows(file);
+    const lookupKeys = [
+      ...new Set(
+        rows
+          .map((row) =>
+            buildCompanyLookupKey({
+              name: row["Business Name"],
+              city: row["City"],
+              state: row["State"],
+              country: row["Country"],
+            }),
+          )
+          .filter((key) => key && !key.includes("undefined")),
+      ),
+    ];
+    const businessIds = [
+      ...new Set(
+        rows
+          .map((row) => row["Business ID"]?.trim())
+          .filter(Boolean),
+      ),
+    ];
 
-    //fetch companies from master panel
     const hostCompanies = await axios.get(
       "http://localhost:5007/api/hosts/companies",
+      {
+        params: { lookupKeys: lookupKeys.join("\n") },
+      },
     );
 
     const companyMap = new Map();
@@ -176,27 +221,22 @@ export const bulkInsertCompanies = async (req, res, next) => {
       companyMap.set(key, company.companyId);
     });
 
-    // Fetch existing business IDs from the database
-    const existingCompanies = await Company.find().select("businessId");
+    const existingCompanies = await Company.find({
+      businessId: { $in: businessIds },
+    }).select("businessId");
     const existingBusinessIds = new Set(
       existingCompanies.map((c) => c.businessId?.trim()).filter(Boolean),
     );
 
-    const stream = Readable.from(file.buffer.toString("utf-8").trim());
-    stream
-      .pipe(csvParser())
-      .on("data", (row) => {
-        const rowKey = `${row["Business Name"]?.trim()?.toLowerCase()}|${row[
-          "City"
-        ]
-          ?.trim()
-          ?.toLowerCase()}|${row["State"]?.trim()?.toLowerCase()}|${row[
-          "Country"
-        ]
-          ?.trim()
-          ?.toLowerCase()}`;
+    const companies = rows.map((row) => {
+      const rowKey = buildCompanyLookupKey({
+        name: row["Business Name"],
+        city: row["City"],
+        state: row["State"],
+        country: row["Country"],
+      });
 
-        const company = {
+        return {
           businessId: row["Business ID"]?.trim(),
           companyId: companyMap.get(rowKey) || "",
           companyName: row["Business Name"]?.trim(),
@@ -222,73 +262,8 @@ export const bulkInsertCompanies = async (req, res, next) => {
             ? row["Type"]?.trim()?.split(" ").join("").toLowerCase()
             : row["Type"]?.trim()?.toLowerCase(),
         };
+    });
 
-        companies.push(company);
-      })
-      // .on("end", async () => {
-      //   try {
-      //     const seenInCSV = new Set();
-      //     const uniqueCompanies = [];
-      //     let skippedExisting = 0;
-      //     let skippedDuplicateInCSV = 0;
-
-      //     for (const company of companies) {
-      //       if (!company.businessId) continue;
-
-      //       const businessId = company.businessId.trim();
-
-      //       // Check if this business ID already exists in DB
-      //       if (existingBusinessIds.has(businessId)) {
-      //         skippedExisting++;
-      //         continue;
-      //       }
-
-      //       // Check for duplicates within the CSV
-      //       if (!seenInCSV.has(businessId)) {
-      //         seenInCSV.add(businessId);
-      //         uniqueCompanies.push(company);
-      //       } else {
-      //         // Duplicate business ID in CSV → skip
-      //         skippedDuplicateInCSV++;
-      //         continue;
-      //       }
-      //     }
-
-      //     const result = await Company.insertMany(uniqueCompanies);
-
-      //     const insertedCount = result.length;
-
-      //     res.status(200).json({
-      //       message: "Bulk insert completed",
-      //       total: companies.length,
-      //       inserted: insertedCount,
-      //       skippedExisting,
-      //       skippedDuplicateInCSV,
-      //     });
-      //   } catch (insertError) {
-      //     if (insertError.name === "BulkWriteError") {
-      //       const insertedCount = insertError.result?.nInserted || 0;
-
-      //       res.status(200).json({
-      //         message: "Bulk insert completed with partial failure",
-      //         total: companies.length,
-      //         inserted: insertedCount,
-      //         writeErrors: insertError.writeErrors?.map((e) => ({
-      //           index: e.index,
-      //           errmsg: e.errmsg,
-      //           code: e.code,
-      //         })),
-      //       });
-      //     } else {
-      //       res.status(500).json({
-      //         message: "Unexpected error during bulk insert",
-      //         error: insertError.message,
-      //       });
-      //     }
-      //   }
-      // });
-
-      .on("end", async () => {
         try {
           const seenInCSV = new Set();
           const uniqueCompanies = [];
@@ -394,7 +369,6 @@ export const bulkInsertCompanies = async (req, res, next) => {
             });
           }
         }
-      });
   } catch (error) {
     console.log(error);
     next(error);
