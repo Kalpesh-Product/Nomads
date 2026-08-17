@@ -35,7 +35,7 @@ const numOfPeople = [
   "10 - 25 People",
   "25 - 50 People",
   "50 - 100 People",
-  "More then 100 People",
+  "More than 100 People",
 ];
 
 const defaultValues = {
