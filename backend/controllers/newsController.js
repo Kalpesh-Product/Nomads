@@ -104,11 +104,12 @@ import TestNews from "../models/TestNews.js";
 
 export const getNews = async (req, res, next) => {
   try {
-    const { keyword } = req.query;
+    const { keyword, destination } = req.query;
 
     let query = {};
-    if (keyword) {
-      query.destination = { $regex: keyword, $options: "i" };
+    const searchKeyword = destination || keyword;
+    if (searchKeyword) {
+      query.destination = { $regex: searchKeyword, $options: "i" };
     }
 
     const blogs = await News.find(query).sort({ date: -1 });
