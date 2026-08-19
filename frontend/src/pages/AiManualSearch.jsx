@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import React, { useMemo, useRef, useState, useEffect } from "react";
+import { Helmet } from "@dr.pogodin/react-helmet";
 import {
   HiOutlineChevronDown,
   HiOutlineSearch,
@@ -439,6 +440,29 @@ const AiManualSearch = () => {
 
   return (
     <div className="min-h-full bg-white">
+      <Helmet>
+        <title>
+          WONO Manual Search | Find Digital Nomad Places, Coworking, Workation &amp; Stay
+        </title>
+        <meta
+          name="description"
+          content="Search WONO manually to find places for digital nomads, including coworking, coliving, communities and other resources for working and living anywhere."
+        />
+        <meta
+          name="keywords"
+          content="WONO manual search, WONO search, digital nomad search, digital nomad places, digital nomad platform, digital nomad destinations, digital nomad community, coworking spaces, coliving spaces, digital nomad accommodation, remote work spaces, work from anywhere, remote work, workation destinations, nomad places, nomad resources, places to work, places to stay, search digital nomad locations, find coworking spaces, find coliving spaces, find remote work locations, location independent lifestyle, Nomad Cafes, Workfriendly cafes"
+        />
+        <meta
+          property="og:title"
+          content="WONO Manual Search | Find Digital Nomad Places, Coworking, Workation & Stay"
+        />
+        <meta
+          property="og:description"
+          content="Search WONO manually to find places for digital nomads, including coworking, coliving, communities and other resources for working and living anywhere."
+        />
+        <meta property="og:type" content="website" />
+        <link rel="canonical" href="https://wono.co/manual-search" />
+      </Helmet>
       <main className="pb-8">
         <div className="mx-0 w-full max-w-none px-3 sm:max-w-[20rem] sm:px-6 max-[820px]:!max-w-none max-[820px]:!px-3 lg:mx-auto lg:max-w-[85rem] lg:px-0 lg:min-w-[75%]">
           <div className="rounded-[10px] bg-white px-0 pb-6">
