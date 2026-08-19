@@ -6,6 +6,18 @@ import TestPointOfContact from "../models/TestPointOfContacts.js";
 import axios from "axios";
 import TestListing from "../models/TestCompany.js";
 
+const parseCsvRows = (file) =>
+  new Promise((resolve, reject) => {
+    const rows = [];
+    const stream = Readable.from(file.buffer.toString("utf-8").trim());
+
+    stream
+      .pipe(csvParser())
+      .on("data", (row) => rows.push(row))
+      .on("end", () => resolve(rows))
+      .on("error", (err) => reject(err));
+  });
+
 export const bulkInsertPoc = async (req, res, next) => {
   try {
     const file = req.file;
@@ -16,17 +28,34 @@ export const bulkInsertPoc = async (req, res, next) => {
       });
     }
 
-    const companies = await Company.find().lean();
+    const rows = await parseCsvRows(file);
+    const businessIds = [
+      ...new Set(
+        rows
+          .map((row) => row["Business ID"]?.trim())
+          .filter(Boolean),
+      ),
+    ];
+
+    const companies = await Company.find({ businessId: { $in: businessIds } }).lean();
     const companyMap = new Map(
-      companies.map((item) => [item.businessId?.trim(), item._id]),
+      companies
+        .map((item) => [item.businessId?.trim(), item._id])
+        .filter(([businessId]) => businessId),
     );
     const companyIdMap = new Map(
-      companies.map((c) => [c.businessId, c.companyId]),
+      companies
+        .map((c) => [c.businessId?.trim(), c.companyId])
+        .filter(([businessId]) => businessId),
     );
 
-    const existingPocs = await PointOfContact.find()
-      .populate({ path: "company", select: "businessId" })
-      .select("name email companyId");
+    const companyIdsByMongoId = new Map(
+      companies.map((company) => [String(company._id), company.businessId?.trim()]),
+    );
+
+    const existingPocs = await PointOfContact.find({
+      company: { $in: companies.map((company) => company._id) },
+    }).select("name email companyId company");
 
     const brokenCompanyRefs = existingPocs.filter((p) => !p.company);
 
@@ -43,12 +72,13 @@ export const bulkInsertPoc = async (req, res, next) => {
     }
 
     const existingPocSet = new Set(
-      existingPocs.map(
-        (poc) =>
-          `${poc?.email
-            ?.trim()
-            .toLowerCase()}|${poc.company.businessId?.trim()}`,
-      ),
+      existingPocs
+        .map((poc) => {
+          const email = poc?.email?.trim().toLowerCase();
+          const businessId = companyIdsByMongoId.get(String(poc?.company || ""));
+          return email && businessId ? `${email}|${businessId}` : null;
+        })
+        .filter(Boolean),
     );
 
     // CSV parsing
@@ -59,10 +89,7 @@ export const bulkInsertPoc = async (req, res, next) => {
       const duplicateCSVLogs = [];
       const missingCompanyRows = [];
 
-      const stream = Readable.from(file.buffer.toString("utf-8").trim());
-      stream
-        .pipe(csvParser())
-        .on("data", (row) => {
+      rows.forEach((row) => {
           const businessId = row["Business ID"]?.trim();
           const companyMongoId = companyMap.get(businessId);
           const companyId = companyIdMap.get(businessId);
@@ -121,8 +148,8 @@ export const bulkInsertPoc = async (req, res, next) => {
 
           seenInCSV.add(pocKey);
           temp.push(pocData);
-        })
-        .on("end", () => {
+        });
+
           // Log duplicates for visibility
           // if (duplicateExistingLogs.length) {
           //   console.log("\n=== EXISTING POCs IN DB ===");
@@ -139,8 +166,6 @@ export const bulkInsertPoc = async (req, res, next) => {
             duplicateCSVLogs,
             missingCompanyRows,
           });
-        })
-        .on("error", (err) => reject(err));
     });
 
     const {

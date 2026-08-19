@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import useRefresh from "../hooks/useRefresh";
 import useAuth from "../hooks/useAuth";
 import Loading from "../pages/Loading";
+import GoogleAnalyticsPageView from "../components/GoogleAnalyticsPageView";
 
 const PUBLIC_PATHS = new Set([
   "/",
@@ -84,5 +85,10 @@ export default function PersistLogin() {
     }
   }, [auth?.accessToken, refresh, shouldBlockForRefresh]);
 
-  return shouldBlockForRefresh && isLoading ? <Loading /> : <Outlet />;
+  return (
+    <>
+      <GoogleAnalyticsPageView />
+      {shouldBlockForRefresh && isLoading ? <Loading /> : <Outlet />}
+    </>
+  );
 }
