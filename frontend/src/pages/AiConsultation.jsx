@@ -21,6 +21,7 @@ import {
 import { findCountryByName } from "../utils/countryFlags";
 import { HiCheck } from "react-icons/hi";
 import { aiDestinationCards } from "../constants/aiDestinationCards";
+import { Helmet } from "@dr.pogodin/react-helmet";
 
 const floatingLabelSx = {
   color: "black",
@@ -382,6 +383,24 @@ const AiConsultation = () => {
 
   return (
     <div className="bg-white text-black font-sans">
+      <Helmet>
+        <title>WONO Consultation | Personalized Support for Digital Nomads & Remote Professionals</title>
+        <meta
+          name="description"
+          content="Get personalized consultation support from WONO for digital nomad, remote work, business and international relocation needs. Connect with experts for guidance tailored to your goals and destination."
+        />
+        <meta
+          name="keywords"
+          content="digital nomad consultation, digital nomad consulting, remote work consultation, digital nomad support, digital nomad services, personalized consultation, business consultation, international business consultation, business setup consultation, company setup consultation, relocation consultation, international relocation support, remote professional consultation, remote entrepreneur support, location independent lifestyle, work from anywhere consultation, digital nomad guidance, nomad lifestyle support, global mobility consultation, international business support, business setup support, company formation consultation, overseas business consultation, customized business support, remote business setup, global business services, WONO consultation, WONO support, value added services"
+        />
+        <meta property="og:title" content="WONO Consultation | Personalized Support for Digital Nomads & Remote Professionals" />
+        <meta
+          property="og:description"
+          content="Get personalized consultation support from WONO for digital nomad, remote work, business and international relocation needs."
+        />
+        <meta property="og:type" content="website" />
+        <link rel="canonical" href="https://wono.co/consultation" />
+      </Helmet>
       <Container padding={false}>
         <section className="min-h-[60vh] flex items-center justify-center py-0">
           <div className="w-full max-w-5xl md:px-20 lg:px-20">
