@@ -119,11 +119,11 @@ export const getCatalogItemsForProductPage = (data, page) => {
   if (Array.isArray(page?.subProducts) && page.subProducts.length) {
     return page.subProducts
       .filter((item) => item?.enabled !== false)
-      .map((item) => normalizeCatalogItem(item, "Product"));
+      .map((item) => normalizeCatalogItem(item, "Service"));
   }
 
   return Array.isArray(data?.products)
-    ? data.products.map((item) => normalizeCatalogItem(item, "Product"))
+    ? data.products.map((item) => normalizeCatalogItem(item, "Service"))
     : [];
 };
 

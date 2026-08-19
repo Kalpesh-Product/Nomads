@@ -65,7 +65,7 @@ const TempFooter = ({
       : [
           { name: "Home", to: getSectionPath("home", pathname) },
           { name: "About Us", to: getSectionPath("about", pathname) },
-          { name: "Products", to: getSectionPath("products", pathname) },
+          { name: "Services", to: getSectionPath("products", pathname) },
           { name: "Gallery", to: getSectionPath("gallery", pathname) },
           { name: "Partner", to: getSectionPath("partner", pathname) },
           { name: "Careers", to: getSectionPath("careers", pathname) },
@@ -121,7 +121,7 @@ const TempFooter = ({
 
         {productLinks.length > 0 ? (
           <div>
-            <h4 className="mb-3 font-semibold">Products</h4>
+            <h4 className="mb-3 font-semibold">Services</h4>
             <ul className="space-y-1">
               {productLinks.map((p, idx) => (
                 <li key={idx}>

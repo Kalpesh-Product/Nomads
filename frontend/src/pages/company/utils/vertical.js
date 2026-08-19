@@ -24,7 +24,7 @@ export const getNavLabelByVertical = (vertical) => {
   if (normalized === "workation") return "Packages";
   if (normalized === "hostel") return "Dorms";
 
-  return "Products";
+  return "Services";
 };
 
 export const getSectionTitleByVertical = (vertical) => {
@@ -36,5 +36,5 @@ export const getSectionTitleByVertical = (vertical) => {
   if (normalized === "workation") return "Our Packages";
   if (normalized === "hostel") return "Our Dorms";
 
-  return "Our Products";
+  return "Our Services";
 };
