@@ -19,6 +19,7 @@ import {
   readSelectedDestination,
 } from "../utils/selectedDestinationSession";
 import { findCountryByName } from "../utils/countryFlags";
+import { Helmet } from "@dr.pogodin/react-helmet";
 import { HiCheck } from "react-icons/hi";
 
 import { aiDestinationCards } from "../constants/aiDestinationCards";
@@ -380,6 +381,28 @@ const AiOverallActivationSupport = () => {
 
   return (
     <div className="bg-white text-black font-sans">
+      <Helmet>
+        <title>Overall Activation Support for Work &amp; Stay Setup | WONO</title>
+        <meta
+          name="description"
+          content="Get end-to-end activation support from WONO for setting up stays, workspaces and new locations. Access personalised assistance for a smoother work-from-anywhere setup."
+        />
+        <meta
+          name="keywords"
+          content="activation support, overall activation support, digital nomad activation support, location setup assistance, new location setup support, work from anywhere setup, remote work setup assistance, digital nomad setup support, relocation setup assistance, end to end setup support, personalised setup assistance, accommodation setup assistance, stay setup support, workspace setup assistance, office setup assistance, coworking setup assistance, co living setup assistance, private stay setup assistance, private office setup support, remote workspace setup, destination setup assistance, on ground support, on ground activation support, relocation assistance for digital nomads, settling in support, remote worker relocation support, international relocation assistance, work and stay setup, digital nomad relocation services, custom activation support, location activation services, remote professional setup assistance"
+        />
+        <meta
+          property="og:title"
+          content="Overall Activation Support for Work &amp; Stay Setup | WONO"
+        />
+        <meta
+          property="og:description"
+          content="Get end-to-end activation support from WONO for setting up stays, workspaces and new locations. Access personalised assistance for a smoother work-from-anywhere setup."
+        />
+        <meta property="og:image" content="/images/homepage.jpeg" />
+        <meta property="og:type" content="website" />
+        <link rel="canonical" href="https://wono.co/overall-activation-support" />
+      </Helmet>
       <Container padding={false}>
         <section className="min-h-[60vh] flex items-center justify-center py-0">
           <div className="w-full max-w-5xl md:px-20 lg:px-20">
