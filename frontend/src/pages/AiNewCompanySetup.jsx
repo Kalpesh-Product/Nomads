@@ -20,6 +20,7 @@ import {
 } from "../utils/selectedDestinationSession";
 import { findCountryByName } from "../utils/countryFlags";
 import { HiCheck } from "react-icons/hi";
+import { Helmet } from "@dr.pogodin/react-helmet";
 
 import { aiDestinationCards } from "../constants/aiDestinationCards";
 
@@ -383,6 +384,24 @@ const AiNewCompanySetup = () => {
 
   return (
     <div className="bg-white text-black font-sans">
+      <Helmet>
+        <title>WONO New Company Setup | Business Setup Services for Digital Nomads</title>
+        <meta
+          name="description"
+          content="Set up your new company with WONO's value added services. Get support for company setup, business registration guidance and essential assistance for digital nomads, remote professionals and location-independent entrepreneurs"
+        />
+        <meta
+          name="keywords"
+          content="new company setup, company setup abroad, company formation abroad, business setup abroad, international company setup, company registration abroad, business registration abroad, company setup support, business setup support, company formation services, business formation services, startup setup support, new business setup, international business setup, foreign company setup, overseas company registration, entrepreneur support, remote entrepreneur, digital nomad entrepreneur, location independent business, global business setup, business setup assistance, company registration assistance, business registration support, digital nomad business services, remote business setup, WONO company setup, value added services"
+        />
+        <meta property="og:title" content="WONO New Company Setup | Business Setup Services for Digital Nomads" />
+        <meta
+          property="og:description"
+          content="Set up your new company with WONO's value added services. Get support for company setup, business registration guidance and essential assistance for digital nomads, remote professionals and location-independent entrepreneurs"
+        />
+        <meta property="og:type" content="website" />
+        <link rel="canonical" href="https://wono.co/new-company-setup" />
+      </Helmet>
       <Container padding={false}>
         <section className="min-h-[60vh] flex items-center justify-center py-0">
           <div className="w-full max-w-5xl md:px-20 lg:px-20">
