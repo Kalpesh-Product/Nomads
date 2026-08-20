@@ -1,7 +1,7 @@
 import React from "react";
 import { getMediaSrc } from "../utils/templateRouteUtils";
 
-const ProductCard = ({ product, onClick, buttonText = "VIEW DETAILS", showButton = true }) => {
+const ServiceCard = ({ product, onClick, buttonText = "VIEW DETAILS", showButton = true }) => {
   const imageSrc =
     getMediaSrc(product?.cardImage) ||
     getMediaSrc(product?.homeCardImage) ||
@@ -13,7 +13,7 @@ const ProductCard = ({ product, onClick, buttonText = "VIEW DETAILS", showButton
     product?.homeCardHeading ||
     product?.name ||
     product?.type ||
-    "Product";
+    "Service";
   const description =
     product?.homeCardSubText ||
     product?.subText ||
@@ -71,4 +71,4 @@ const ProductCard = ({ product, onClick, buttonText = "VIEW DETAILS", showButton
   );
 };
 
-export default ProductCard;
+export default ServiceCard;
