@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import {
   listNomadUsersForAdmin,
+  getDestinationListingAnalyticsForAdmin,
   getDestinationViewsForAdmin,
   getListingViewsForAdmin,
   getPopularDestinationsForAdmin,
@@ -13,6 +14,7 @@ const router = Router();
 
 router.get("/", listNomadUsersForAdmin);
 router.get("/popular-destinations", getPopularDestinationsForAdmin);
+router.get("/popular-destinations/listings", getDestinationListingAnalyticsForAdmin);
 router.get("/:userId/destination-views", getDestinationViewsForAdmin);
 router.get("/:userId/listing-views", getListingViewsForAdmin);
 router.get("/:userId/sessions", getSessionLogsForAdmin);

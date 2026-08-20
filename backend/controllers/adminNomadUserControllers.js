@@ -169,6 +169,119 @@ export const getPopularDestinationsForAdmin = async (req, res, next) => {
   }
 };
 
+export const getDestinationListingAnalyticsForAdmin = async (req, res, next) => {
+  try {
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 50));
+    const { country, state, title, continent } = req.query;
+    const filter = buildDateRangeFilter(req);
+
+    const trimmedCountry = String(country || "").trim();
+    const trimmedState = String(state || "").trim();
+    const trimmedTitle = String(title || "").trim();
+    const trimmedContinent = String(continent || "").trim();
+    const locationCandidates = [...new Set([trimmedState, trimmedTitle].filter(Boolean))];
+
+    if (!trimmedCountry || locationCandidates.length === 0) {
+      return res.status(400).json({ message: "country and destination are required" });
+    }
+
+    filter.country = new RegExp(`^${escapeRegex(trimmedCountry)}$`, "i");
+    filter.$or = locationCandidates.flatMap((location) => {
+      const exactLocation = new RegExp(`^${escapeRegex(location)}$`, "i");
+      return [{ city: exactLocation }, { state: exactLocation }];
+    });
+
+    const items = await NomadListingView.aggregate([
+      { $match: filter },
+      {
+        $group: {
+          _id: {
+            companyId: "$companyId",
+            businessId: "$businessId",
+            companyName: "$companyName",
+            city: "$city",
+            state: "$state",
+            country: "$country",
+            continent: "$continent",
+          },
+          clicks: { $sum: 1 },
+          uniqueUsersSet: { $addToSet: "$userId" },
+          lastClickedAt: { $max: "$createdAt" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          companyId: "$_id.companyId",
+          businessId: "$_id.businessId",
+          companyName: "$_id.companyName",
+          city: "$_id.city",
+          state: "$_id.state",
+          country: "$_id.country",
+          continent: "$_id.continent",
+          clicks: 1,
+          uniqueUsers: {
+            $size: {
+              $filter: {
+                input: "$uniqueUsersSet",
+                as: "userId",
+                cond: { $ne: ["$$userId", null] },
+              },
+            },
+          },
+          lastClickedAt: 1,
+        },
+      },
+      { $sort: { clicks: -1, lastClickedAt: -1 } },
+      { $limit: limit },
+    ]);
+
+    const totals = await NomadListingView.aggregate([
+      { $match: filter },
+      {
+        $group: {
+          _id: null,
+          totalClicks: { $sum: 1 },
+          listings: { $addToSet: { companyId: "$companyId", businessId: "$businessId", companyName: "$companyName" } },
+          uniqueUsersSet: { $addToSet: "$userId" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          totalClicks: 1,
+          totalListings: { $size: "$listings" },
+          uniqueUsers: {
+            $size: {
+              $filter: {
+                input: "$uniqueUsersSet",
+                as: "userId",
+                cond: { $ne: ["$$userId", null] },
+              },
+            },
+          },
+        },
+      },
+    ]);
+
+    return res.status(200).json({
+      items,
+      destination: {
+        country: trimmedCountry,
+        state: trimmedState,
+        continent: trimmedContinent,
+      },
+      totals: totals[0] || {
+        totalClicks: 0,
+        totalListings: 0,
+        uniqueUsers: 0,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Every per-user sub-resource (destination views, listing views, session
 // logs) is paginated, date-filterable, and sorted the same way — factor the
 // shared shape once instead of repeating it per endpoint.
