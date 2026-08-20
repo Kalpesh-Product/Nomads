@@ -495,6 +495,43 @@ export const trackDestinationView = async (req, res, next) => {
   }
 };
 
+export const trackDestinationClick = async (req, res, next) => {
+  try {
+    const {
+      continent,
+      country,
+      state,
+      city,
+      title,
+      sourcePage,
+      pagePath,
+      referrer,
+      sessionId,
+    } = req.body || {};
+    const trimmedCountry = String(country || "").trim();
+    const trimmedState = String(state || city || "").trim();
+
+    if (!trimmedCountry || !trimmedState) {
+      return res.status(400).json({ message: "country and state are required" });
+    }
+
+    await NomadDestinationView.create({
+      continent: String(continent || "").trim(),
+      country: trimmedCountry,
+      state: trimmedState,
+      title: String(title || "").trim(),
+      sourcePage: String(sourcePage || "").trim(),
+      pagePath: String(pagePath || "").trim(),
+      referrer: String(referrer || "").trim(),
+      sessionId: String(sessionId || "").trim(),
+    });
+
+    return res.status(201).json({ message: "Destination click recorded" });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Best-effort: records which specific listing/company a signed-in user
 // opened. Fire-and-forget from the frontend, so failures here should never
 // surface to the caller.

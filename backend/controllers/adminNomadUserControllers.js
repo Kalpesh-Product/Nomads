@@ -63,6 +63,112 @@ const buildDateRangeFilter = (req) => {
   return Object.keys(range).length ? { createdAt: range } : {};
 };
 
+export const getPopularDestinationsForAdmin = async (req, res, next) => {
+  try {
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 20));
+    const filter = buildDateRangeFilter(req);
+
+    const items = await NomadDestinationView.aggregate([
+      { $match: filter },
+      {
+        $group: {
+          _id: {
+            country: "$country",
+            state: "$state",
+            title: "$title",
+            continent: "$continent",
+          },
+          clicks: { $sum: 1 },
+          uniqueUsersSet: { $addToSet: "$userId" },
+          uniqueSessionsSet: { $addToSet: "$sessionId" },
+          lastClickedAt: { $max: "$createdAt" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          country: "$_id.country",
+          state: "$_id.state",
+          title: "$_id.title",
+          continent: "$_id.continent",
+          clicks: 1,
+          uniqueUsers: {
+            $size: {
+              $filter: {
+                input: "$uniqueUsersSet",
+                as: "userId",
+                cond: { $ne: ["$$userId", null] },
+              },
+            },
+          },
+          uniqueSessions: {
+            $size: {
+              $filter: {
+                input: "$uniqueSessionsSet",
+                as: "sessionId",
+                cond: { $and: [{ $ne: ["$$sessionId", null] }, { $ne: ["$$sessionId", ""] }] },
+              },
+            },
+          },
+          lastClickedAt: 1,
+        },
+      },
+      { $sort: { clicks: -1, lastClickedAt: -1 } },
+      { $limit: limit },
+    ]);
+
+    const totals = await NomadDestinationView.aggregate([
+      { $match: filter },
+      {
+        $group: {
+          _id: null,
+          totalClicks: { $sum: 1 },
+          destinations: { $addToSet: { country: "$country", state: "$state" } },
+          uniqueUsersSet: { $addToSet: "$userId" },
+          uniqueSessionsSet: { $addToSet: "$sessionId" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          totalClicks: 1,
+          totalDestinations: { $size: "$destinations" },
+          uniqueUsers: {
+            $size: {
+              $filter: {
+                input: "$uniqueUsersSet",
+                as: "userId",
+                cond: { $ne: ["$$userId", null] },
+              },
+            },
+          },
+          uniqueSessions: {
+            $size: {
+              $filter: {
+                input: "$uniqueSessionsSet",
+                as: "sessionId",
+                cond: { $and: [{ $ne: ["$$sessionId", null] }, { $ne: ["$$sessionId", ""] }] },
+              },
+            },
+          },
+        },
+      },
+    ]);
+
+    return res.status(200).json({
+      items,
+      totals: totals[0] || {
+        totalClicks: 0,
+        totalDestinations: 0,
+        uniqueUsers: 0,
+        uniqueSessions: 0,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Every per-user sub-resource (destination views, listing views, session
 // logs) is paginated, date-filterable, and sorted the same way — factor the
 // shared shape once instead of repeating it per endpoint.
