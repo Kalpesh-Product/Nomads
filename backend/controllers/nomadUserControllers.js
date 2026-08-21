@@ -49,6 +49,19 @@ const normalizeFavoriteDestinationImages = (destination = {}) => {
   };
 };
 
+const getRequestIpAddress = (req) => {
+  const forwardedFor = String(req.headers?.["x-forwarded-for"] || "")
+    .split(",")[0]
+    .trim();
+  const rawIp =
+    forwardedFor ||
+    String(req.headers?.["x-real-ip"] || "").trim() ||
+    req.ip ||
+    req.socket?.remoteAddress ||
+    "";
+  return String(rawIp).replace(/^::ffff:/, "").trim();
+};
+
 export const getUsers = async (req, res, next) => {
   try {
     const { userId } = req.query;
@@ -487,6 +500,7 @@ export const trackDestinationView = async (req, res, next) => {
       country: trimmedCountry,
       state: trimmedState,
       title: String(title || "").trim(),
+      ipAddress: getRequestIpAddress(req),
     });
 
     return res.status(201).json({ message: "Destination view recorded" });
@@ -537,6 +551,7 @@ export const trackDestinationClick = async (req, res, next) => {
       pagePath: String(pagePath || "").trim(),
       referrer: String(referrer || "").trim(),
       sessionId: String(sessionId || "").trim(),
+      ipAddress: getRequestIpAddress(req),
     });
 
     return res.status(201).json({ message: "Destination click recorded" });
@@ -594,6 +609,7 @@ export const trackListingClick = async (req, res, next) => {
       pagePath: String(pagePath || "").trim(),
       referrer: String(referrer || "").trim(),
       sessionId: String(sessionId || "").trim(),
+      ipAddress: getRequestIpAddress(req),
     });
 
     return res.status(201).json({ message: "Listing click recorded" });
@@ -626,6 +642,7 @@ export const trackListingView = async (req, res, next) => {
       state: String(state || "").trim(),
       country: String(country || "").trim(),
       continent: String(continent || "").trim(),
+      ipAddress: getRequestIpAddress(req),
     });
 
     return res.status(201).json({ message: "Listing view recorded" });

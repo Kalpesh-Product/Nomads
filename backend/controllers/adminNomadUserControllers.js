@@ -309,6 +309,91 @@ export const getDestinationListingAnalyticsForAdmin = async (req, res, next) => 
   }
 };
 
+export const getDestinationUsersForAdmin = async (req, res, next) => {
+  try {
+    const limit = Math.min(500, Math.max(1, parseInt(req.query.limit, 10) || 200));
+    const { country, state, title, continent } = req.query;
+    const filter = buildDateRangeFilter(req);
+
+    const trimmedCountry = String(country || "").trim();
+    const trimmedState = String(state || "").trim();
+    const trimmedTitle = String(title || "").trim();
+    const trimmedContinent = String(continent || "").trim();
+    const destinationCandidates = [...new Set([trimmedState, trimmedTitle].filter(Boolean))];
+
+    if (!trimmedCountry || destinationCandidates.length === 0) {
+      return res.status(400).json({ message: "country and destination are required" });
+    }
+
+    filter.country = new RegExp(`^${escapeRegex(trimmedCountry)}$`, "i");
+    filter.$or = destinationCandidates.map((destination) => ({
+      state: new RegExp(`^${escapeRegex(destination)}$`, "i"),
+    }));
+
+    const views = await NomadDestinationView.find(filter)
+      .populate({ path: "userId", select: "fullName firstName lastName email mobile country state" })
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .lean();
+
+    const toUserEntry = (view) => {
+      const user = view.userId && typeof view.userId === "object" ? view.userId : null;
+
+      return {
+        id: String(view._id),
+        ipAddress: view.ipAddress || "",
+        clickedAt: view.createdAt,
+        sessionId: view.sessionId || "",
+        sourcePage: view.sourcePage || "",
+        pagePath: view.pagePath || "",
+        user: user
+          ? {
+              id: String(user._id),
+              name:
+                user.fullName ||
+                [user.firstName, user.lastName].filter(Boolean).join(" ") ||
+                user.email ||
+                "Logged in user",
+              email: user.email || "",
+              mobile: user.mobile || "",
+              country: user.country || "",
+              state: user.state || "",
+            }
+          : null,
+      };
+    };
+
+    const guestUsers = [];
+    const loggedInUsers = [];
+    views.forEach((view) => {
+      const entry = toUserEntry(view);
+      if (entry.user) {
+        loggedInUsers.push(entry);
+      } else {
+        guestUsers.push(entry);
+      }
+    });
+
+    return res.status(200).json({
+      guestUsers,
+      loggedInUsers,
+      totals: {
+        guestUsers: guestUsers.length,
+        loggedInUsers: loggedInUsers.length,
+        totalUsers: guestUsers.length + loggedInUsers.length,
+      },
+      destination: {
+        country: trimmedCountry,
+        state: trimmedState,
+        title: trimmedTitle,
+        continent: trimmedContinent,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Every per-user sub-resource (destination views, listing views, session
 // logs) is paginated, date-filterable, and sorted the same way — factor the
 // shared shape once instead of repeating it per endpoint.

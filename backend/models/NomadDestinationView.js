@@ -18,6 +18,7 @@ const nomadDestinationViewSchema = new mongoose.Schema(
     pagePath: { type: String, trim: true },
     referrer: { type: String, trim: true },
     sessionId: { type: String, trim: true, index: true },
+    ipAddress: { type: String, trim: true },
   },
   { timestamps: true },
 );
