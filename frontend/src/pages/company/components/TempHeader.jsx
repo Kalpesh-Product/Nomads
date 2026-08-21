@@ -130,7 +130,7 @@ const TempHeader = forwardRef(
               aria-expanded={productsOpen}
             >
               <span className="inline-flex items-center gap-1">
-                <span>Products</span>
+                <span>Services</span>
                 <FiChevronDown className="mt-[1px]" size={14} />
               </span>
             </button>
@@ -150,7 +150,7 @@ const TempHeader = forwardRef(
                       : ""
                   }`}
                 >
-                  All Products
+                  All Services
                 </button>
 
                 {normalizedProductPages.map((product, index) => {
@@ -286,7 +286,7 @@ const TempHeader = forwardRef(
                         }`}
                       >
                         <span className="inline-flex items-center gap-1">
-                          <span>Products</span>
+                          <span>Services</span>
                           <FiChevronDown size={14} />
                         </span>
                       </button>

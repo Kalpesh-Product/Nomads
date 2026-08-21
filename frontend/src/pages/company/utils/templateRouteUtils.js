@@ -3,7 +3,7 @@ const TEMPLATE_PAGE_SEGMENT = "page";
 const FALLBACK_PAGE_NAV_ITEMS = [
   { name: "Home", slug: "home", enabled: true },
   { name: "About Us", slug: "about", enabled: true },
-  { name: "Products", slug: "products", enabled: true },
+  { name: "Services", slug: "products", enabled: true },
   { name: "Gallery", slug: "gallery", enabled: true },
   { name: "Partner", slug: "partner", enabled: true },
   { name: "Careers", slug: "careers", enabled: true },
@@ -27,7 +27,7 @@ const DEFAULT_PRODUCT_DROPDOWN_PAGES = [];
 const SECTION_LABELS = {
   home: "Home",
   about: "About Us",
-  products: "Products",
+  products: "Services",
   gallery: "Gallery",
   partner: "Partner",
   careers: "Careers",
@@ -119,7 +119,7 @@ export const normalizePageNavItems = (items, fallbackItems = FALLBACK_PAGE_NAV_I
     if (item.slug === "about") return "About Us";
     if (item.slug === "contact") return "Contact Us";
     if (item.slug === "home") return "Home";
-    if (item.slug === "products") return "Products";
+    if (item.slug === "products") return "Services";
     if (item.slug === "gallery") return "Gallery";
     if (item.slug === "testimonials") return "Testimonials";
     if (item.slug === "careers") return "Careers";
@@ -400,7 +400,7 @@ export const getTemplateBreadcrumbItems = ({
           matchedProduct?.name ||
             matchedProduct?.homeCardHeading ||
             matchedProduct?.heroHeading,
-        ) || "Product",
+        ) || "Service",
       path: productPath,
     });
 

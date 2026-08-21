@@ -229,7 +229,7 @@ const ProductModalContent = ({
         <div className="relative overflow-hidden rounded-xl">
           <img
             src={getMediaSrc(images[current]) || images[current]}
-            alt={product?.name || "Product"}
+            alt={product?.name || "Service"}
             className="h-56 w-full bg-black object-cover md:h-full md:object-contain"
           />
         </div>
@@ -265,7 +265,7 @@ const ProductModalContent = ({
         <div className="relative h-full overflow-hidden rounded-xl">
           <img
             src={getMediaSrc(images[current]) || images[current]}
-            alt={product?.name || "Product"}
+            alt={product?.name || "Service"}
             className="w-full h-48 md:h-full object-cover lg:object-contain bg-black"
           />
           <div className="absolute inset-0 bg-black/20"></div>
