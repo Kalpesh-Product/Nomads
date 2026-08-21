@@ -68,6 +68,17 @@ const AiProduct = () => {
   const companyId = stateCompanyId || null;
   const businessId = stateBusinessId || businessIdFromQuery || null;
   const type = stateType || typeFromQuery || null;
+  const listingSourceView = (() => {
+    const stateSourceView = String(locationState.sourceView || "").trim().toLowerCase();
+    if (["list", "map"].includes(stateSourceView)) return stateSourceView;
+
+    const returnToSearch = String(locationState.returnTo?.search || "");
+    const normalizedSearch = returnToSearch.startsWith("?")
+      ? returnToSearch.slice(1)
+      : returnToSearch;
+    const returnToView = new URLSearchParams(normalizedSearch).get("view");
+    return returnToView === "map" ? "map" : "";
+  })();
   const queryClient = useQueryClient();
   const { auth } = useAuth();
   const dispatch = useDispatch();
@@ -161,13 +172,12 @@ const AiProduct = () => {
       ? [...companyDetails.reviews, ...companyDetails.reviews]
       : companyDetails?.reviews || [];
 
-  // Best-effort: records that this signed-in user opened this specific
-  // listing. Fires once per listing load; failures (incl. logged-out users)
-  // are swallowed since this should never affect the page.
+  // Best-effort: records that a user opened this specific listing.
+  // The public analytics endpoint classifies signed-in users by cookie.
   useEffect(() => {
     if (!companyDetails?.companyName) return;
-    axiosPrivate
-      .post("user/listing-view", {
+    axios
+      .post("analytics/listing-click", {
         companyId: companyDetails.companyId,
         businessId: companyDetails.businessId,
         companyName: companyDetails.companyName,
@@ -175,10 +185,13 @@ const AiProduct = () => {
         state: companyDetails.state,
         country: companyDetails.country,
         continent: companyDetails.continent,
-      })
+        sourcePage: window.location.pathname,
+        pagePath: `${window.location.pathname}${window.location.search}${window.location.hash}`,
+        referrer: document.referrer,
+        sourceView: listingSourceView,
+      }, { withCredentials: true })
       .catch(() => {});
   }, [
-    axiosPrivate,
     companyDetails?.businessId,
     companyDetails?.companyId,
     companyDetails?.companyName,
@@ -186,6 +199,7 @@ const AiProduct = () => {
     companyDetails?.state,
     companyDetails?.country,
     companyDetails?.continent,
+    listingSourceView,
   ]);
 
   useEffect(() => {

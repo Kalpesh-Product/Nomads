@@ -63,6 +63,337 @@ const buildDateRangeFilter = (req) => {
   return Object.keys(range).length ? { createdAt: range } : {};
 };
 
+export const getPopularDestinationsForAdmin = async (req, res, next) => {
+  try {
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 20));
+    const filter = buildDateRangeFilter(req);
+
+    const items = await NomadDestinationView.aggregate([
+      { $match: filter },
+      {
+        $group: {
+          _id: {
+            country: "$country",
+            state: "$state",
+            title: "$title",
+            continent: "$continent",
+          },
+          clicks: { $sum: 1 },
+          guestClicks: { $sum: { $cond: [{ $ifNull: ["$userId", false] }, 0, 1] } },
+          loggedInClicks: { $sum: { $cond: [{ $ifNull: ["$userId", false] }, 1, 0] } },
+          uniqueUsersSet: { $addToSet: "$userId" },
+          uniqueSessionsSet: { $addToSet: "$sessionId" },
+          lastClickedAt: { $max: "$createdAt" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          country: "$_id.country",
+          state: "$_id.state",
+          title: "$_id.title",
+          continent: "$_id.continent",
+          clicks: 1,
+          guestClicks: 1,
+          loggedInClicks: 1,
+          uniqueUsers: {
+            $size: {
+              $filter: {
+                input: "$uniqueUsersSet",
+                as: "userId",
+                cond: { $ne: ["$$userId", null] },
+              },
+            },
+          },
+          uniqueSessions: {
+            $size: {
+              $filter: {
+                input: "$uniqueSessionsSet",
+                as: "sessionId",
+                cond: { $and: [{ $ne: ["$$sessionId", null] }, { $ne: ["$$sessionId", ""] }] },
+              },
+            },
+          },
+          lastClickedAt: 1,
+        },
+      },
+      { $sort: { clicks: -1, lastClickedAt: -1 } },
+      { $limit: limit },
+    ]);
+
+    const totals = await NomadDestinationView.aggregate([
+      { $match: filter },
+      {
+        $group: {
+          _id: null,
+          totalClicks: { $sum: 1 },
+          guestClicks: { $sum: { $cond: [{ $ifNull: ["$userId", false] }, 0, 1] } },
+          loggedInClicks: { $sum: { $cond: [{ $ifNull: ["$userId", false] }, 1, 0] } },
+          destinations: { $addToSet: { country: "$country", state: "$state" } },
+          uniqueUsersSet: { $addToSet: "$userId" },
+          uniqueSessionsSet: { $addToSet: "$sessionId" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          totalClicks: 1,
+          guestClicks: 1,
+          loggedInClicks: 1,
+          totalDestinations: { $size: "$destinations" },
+          uniqueUsers: {
+            $size: {
+              $filter: {
+                input: "$uniqueUsersSet",
+                as: "userId",
+                cond: { $ne: ["$$userId", null] },
+              },
+            },
+          },
+          uniqueSessions: {
+            $size: {
+              $filter: {
+                input: "$uniqueSessionsSet",
+                as: "sessionId",
+                cond: { $and: [{ $ne: ["$$sessionId", null] }, { $ne: ["$$sessionId", ""] }] },
+              },
+            },
+          },
+        },
+      },
+    ]);
+
+    return res.status(200).json({
+      items,
+      totals: totals[0] || {
+        totalClicks: 0,
+        guestClicks: 0,
+        loggedInClicks: 0,
+        totalDestinations: 0,
+        uniqueUsers: 0,
+        uniqueSessions: 0,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getDestinationListingAnalyticsForAdmin = async (req, res, next) => {
+  try {
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 50));
+    const { country, state, title, continent, viewMode } = req.query;
+    const filter = buildDateRangeFilter(req);
+
+    const trimmedCountry = String(country || "").trim();
+    const trimmedState = String(state || "").trim();
+    const trimmedTitle = String(title || "").trim();
+    const trimmedContinent = String(continent || "").trim();
+    const locationCandidates = [...new Set([trimmedState, trimmedTitle].filter(Boolean))];
+
+    if (!trimmedCountry || locationCandidates.length === 0) {
+      return res.status(400).json({ message: "country and destination are required" });
+    }
+
+    filter.country = new RegExp(`^${escapeRegex(trimmedCountry)}$`, "i");
+    filter.$or = locationCandidates.flatMap((location) => {
+      const exactLocation = new RegExp(`^${escapeRegex(location)}$`, "i");
+      return [{ city: exactLocation }, { state: exactLocation }];
+    });
+
+    const normalizedViewMode = String(viewMode || "").trim().toLowerCase();
+    if (normalizedViewMode === "map") {
+      filter.sourceView = "map";
+    } else if (normalizedViewMode === "list") {
+      filter.sourceView = "list";
+    }
+
+    const items = await NomadListingView.aggregate([
+      { $match: filter },
+      {
+        $group: {
+          _id: {
+            companyId: "$companyId",
+            businessId: "$businessId",
+            companyName: "$companyName",
+            city: "$city",
+            state: "$state",
+            country: "$country",
+            continent: "$continent",
+          },
+          clicks: { $sum: 1 },
+          guestClicks: { $sum: { $cond: [{ $ifNull: ["$userId", false] }, 0, 1] } },
+          loggedInClicks: { $sum: { $cond: [{ $ifNull: ["$userId", false] }, 1, 0] } },
+          uniqueUsersSet: { $addToSet: "$userId" },
+          lastClickedAt: { $max: "$createdAt" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          companyId: "$_id.companyId",
+          businessId: "$_id.businessId",
+          companyName: "$_id.companyName",
+          city: "$_id.city",
+          state: "$_id.state",
+          country: "$_id.country",
+          continent: "$_id.continent",
+          clicks: 1,
+          guestClicks: 1,
+          loggedInClicks: 1,
+          uniqueUsers: {
+            $size: {
+              $filter: {
+                input: "$uniqueUsersSet",
+                as: "userId",
+                cond: { $ne: ["$$userId", null] },
+              },
+            },
+          },
+          lastClickedAt: 1,
+        },
+      },
+      { $sort: { clicks: -1, lastClickedAt: -1 } },
+      { $limit: limit },
+    ]);
+
+    const totals = await NomadListingView.aggregate([
+      { $match: filter },
+      {
+        $group: {
+          _id: null,
+          totalClicks: { $sum: 1 },
+          guestClicks: { $sum: { $cond: [{ $ifNull: ["$userId", false] }, 0, 1] } },
+          loggedInClicks: { $sum: { $cond: [{ $ifNull: ["$userId", false] }, 1, 0] } },
+          listings: { $addToSet: { companyId: "$companyId", businessId: "$businessId", companyName: "$companyName" } },
+          uniqueUsersSet: { $addToSet: "$userId" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          totalClicks: 1,
+          guestClicks: 1,
+          loggedInClicks: 1,
+          totalListings: { $size: "$listings" },
+          uniqueUsers: {
+            $size: {
+              $filter: {
+                input: "$uniqueUsersSet",
+                as: "userId",
+                cond: { $ne: ["$$userId", null] },
+              },
+            },
+          },
+        },
+      },
+    ]);
+
+    return res.status(200).json({
+      items,
+      destination: {
+        country: trimmedCountry,
+        state: trimmedState,
+        continent: trimmedContinent,
+      },
+      totals: totals[0] || {
+        totalClicks: 0,
+        guestClicks: 0,
+        loggedInClicks: 0,
+        totalListings: 0,
+        uniqueUsers: 0,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getDestinationUsersForAdmin = async (req, res, next) => {
+  try {
+    const limit = Math.min(500, Math.max(1, parseInt(req.query.limit, 10) || 200));
+    const { country, state, title, continent } = req.query;
+    const filter = buildDateRangeFilter(req);
+
+    const trimmedCountry = String(country || "").trim();
+    const trimmedState = String(state || "").trim();
+    const trimmedTitle = String(title || "").trim();
+    const trimmedContinent = String(continent || "").trim();
+    const destinationCandidates = [...new Set([trimmedState, trimmedTitle].filter(Boolean))];
+
+    if (!trimmedCountry || destinationCandidates.length === 0) {
+      return res.status(400).json({ message: "country and destination are required" });
+    }
+
+    filter.country = new RegExp(`^${escapeRegex(trimmedCountry)}$`, "i");
+    filter.$or = destinationCandidates.map((destination) => ({
+      state: new RegExp(`^${escapeRegex(destination)}$`, "i"),
+    }));
+
+    const views = await NomadDestinationView.find(filter)
+      .populate({ path: "userId", select: "fullName firstName lastName email mobile country state" })
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .lean();
+
+    const toUserEntry = (view) => {
+      const user = view.userId && typeof view.userId === "object" ? view.userId : null;
+
+      return {
+        id: String(view._id),
+        ipAddress: view.ipAddress || "",
+        clickedAt: view.createdAt,
+        sessionId: view.sessionId || "",
+        sourcePage: view.sourcePage || "",
+        pagePath: view.pagePath || "",
+        user: user
+          ? {
+              id: String(user._id),
+              name:
+                user.fullName ||
+                [user.firstName, user.lastName].filter(Boolean).join(" ") ||
+                user.email ||
+                "Logged in user",
+              email: user.email || "",
+              mobile: user.mobile || "",
+              country: user.country || "",
+              state: user.state || "",
+            }
+          : null,
+      };
+    };
+
+    const guestUsers = [];
+    const loggedInUsers = [];
+    views.forEach((view) => {
+      const entry = toUserEntry(view);
+      if (entry.user) {
+        loggedInUsers.push(entry);
+      } else {
+        guestUsers.push(entry);
+      }
+    });
+
+    return res.status(200).json({
+      guestUsers,
+      loggedInUsers,
+      totals: {
+        guestUsers: guestUsers.length,
+        loggedInUsers: loggedInUsers.length,
+        totalUsers: guestUsers.length + loggedInUsers.length,
+      },
+      destination: {
+        country: trimmedCountry,
+        state: trimmedState,
+        title: trimmedTitle,
+        continent: trimmedContinent,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Every per-user sub-resource (destination views, listing views, session
 // logs) is paginated, date-filterable, and sorted the same way — factor the
 // shared shape once instead of repeating it per endpoint.

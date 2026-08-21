@@ -1,12 +1,31 @@
-import axiosPrivate from "./axios";
+import { api } from "./axios";
 
 export const SELECTED_DESTINATION_SESSION_KEY = "wonoSelectedDestination";
+const DESTINATION_CLICK_SESSION_KEY = "wonoDestinationClickSessionId";
+const DESTINATION_CLICK_DEDUPE_MS = 1000;
+let lastDestinationClick = { key: "", time: 0 };
 
 const normalizeValue = (value) =>
     typeof value === "string" ? value.trim().toLowerCase() : "";
 
 const normalizeDisplayValue = (value) =>
     typeof value === "string" ? value.trim() : "";
+
+const getDestinationClickSessionId = () => {
+    if (typeof window === "undefined") return "";
+
+    const existingSessionId = window.localStorage.getItem(
+        DESTINATION_CLICK_SESSION_KEY,
+    );
+    if (existingSessionId) return existingSessionId;
+
+    const sessionId =
+        typeof window.crypto?.randomUUID === "function"
+            ? window.crypto.randomUUID()
+            : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    window.localStorage.setItem(DESTINATION_CLICK_SESSION_KEY, sessionId);
+    return sessionId;
+};
 
 export const persistSelectedDestination = ({ continent, country, city, title }) => {
     if (typeof window === "undefined") return;
@@ -17,10 +36,23 @@ export const persistSelectedDestination = ({ continent, country, city, title }) 
 
     if (!normalizedCountry || !normalizedCity) return;
 
+    const normalizedContinent = normalizeValue(continent);
+    const clickKey = [
+        normalizedContinent,
+        normalizedCountry,
+        normalizedCity,
+        normalizedTitle.toLowerCase(),
+    ].join("|");
+    const now = Date.now();
+    const isDuplicateClick =
+        lastDestinationClick.key === clickKey &&
+        now - lastDestinationClick.time < DESTINATION_CLICK_DEDUPE_MS;
+    lastDestinationClick = { key: clickKey, time: now };
+
     window.sessionStorage.setItem(
         SELECTED_DESTINATION_SESSION_KEY,
         JSON.stringify({
-            continent: normalizeValue(continent),
+            continent: normalizedContinent,
             country: normalizedCountry,
             city: normalizedCity,
             title: normalizedTitle,
@@ -28,15 +60,21 @@ export const persistSelectedDestination = ({ continent, country, city, title }) 
         }),
     );
 
-    // Best-effort activity tracking — only recorded when the request carries
-    // a valid session; failures (incl. logged-out users) are swallowed.
-    axiosPrivate
-        .post("user/destination-view", {
+    if (isDuplicateClick) return;
+
+    // Best-effort popularity tracking. This is intentionally public so top
+    // destinations include logged-out visitors as well as signed-in users.
+    api
+        .post("analytics/destination-click", {
             continent,
             country,
             state: city,
             title: normalizedTitle,
-        })
+            sourcePage: window.location.pathname,
+            pagePath: `${window.location.pathname}${window.location.search}${window.location.hash}`,
+            referrer: document.referrer,
+            sessionId: getDestinationClickSessionId(),
+        }, { withCredentials: true })
         .catch(() => {});
 };
 

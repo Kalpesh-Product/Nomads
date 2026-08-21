@@ -49,6 +49,19 @@ const normalizeFavoriteDestinationImages = (destination = {}) => {
   };
 };
 
+const getRequestIpAddress = (req) => {
+  const forwardedFor = String(req.headers?.["x-forwarded-for"] || "")
+    .split(",")[0]
+    .trim();
+  const rawIp =
+    forwardedFor ||
+    String(req.headers?.["x-real-ip"] || "").trim() ||
+    req.ip ||
+    req.socket?.remoteAddress ||
+    "";
+  return String(rawIp).replace(/^::ffff:/, "").trim();
+};
+
 export const getUsers = async (req, res, next) => {
   try {
     const { userId } = req.query;
@@ -487,9 +500,119 @@ export const trackDestinationView = async (req, res, next) => {
       country: trimmedCountry,
       state: trimmedState,
       title: String(title || "").trim(),
+      ipAddress: getRequestIpAddress(req),
     });
 
     return res.status(201).json({ message: "Destination view recorded" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const trackDestinationClick = async (req, res, next) => {
+  try {
+    const {
+      continent,
+      country,
+      state,
+      city,
+      title,
+      sourcePage,
+      pagePath,
+      referrer,
+      sessionId,
+    } = req.body || {};
+    const refreshToken = req.cookies?.nomadCookie;
+    let userId = null;
+
+    if (refreshToken) {
+      try {
+        const user = await NomadUser.findOne({ refreshToken }).select("_id").lean().exec();
+        userId = user?._id || null;
+      } catch (error) {
+        userId = null;
+      }
+    }
+
+    const trimmedCountry = String(country || "").trim();
+    const trimmedState = String(state || city || "").trim();
+
+    if (!trimmedCountry || !trimmedState) {
+      return res.status(400).json({ message: "country and state are required" });
+    }
+
+    await NomadDestinationView.create({
+      userId,
+      continent: String(continent || "").trim(),
+      country: trimmedCountry,
+      state: trimmedState,
+      title: String(title || "").trim(),
+      sourcePage: String(sourcePage || "").trim(),
+      pagePath: String(pagePath || "").trim(),
+      referrer: String(referrer || "").trim(),
+      sessionId: String(sessionId || "").trim(),
+      ipAddress: getRequestIpAddress(req),
+    });
+
+    return res.status(201).json({ message: "Destination click recorded" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const trackListingClick = async (req, res, next) => {
+  try {
+    const refreshToken = req.cookies?.nomadCookie;
+    let userId = null;
+
+    if (refreshToken) {
+      try {
+        const user = await NomadUser.findOne({ refreshToken }).select("_id").lean().exec();
+        userId = user?._id || null;
+      } catch (error) {
+        userId = null;
+      }
+    }
+
+    const {
+      companyId,
+      businessId,
+      companyName,
+      city,
+      state,
+      country,
+      continent,
+      sourcePage,
+      sourceView,
+      pagePath,
+      referrer,
+      sessionId,
+    } = req.body || {};
+    const trimmedCompanyName = String(companyName || "").trim();
+    if (!trimmedCompanyName) {
+      return res.status(400).json({ message: "companyName is required" });
+    }
+
+    await NomadListingView.create({
+      userId,
+      companyId: String(companyId || "").trim(),
+      businessId: String(businessId || "").trim(),
+      companyName: trimmedCompanyName,
+      city: String(city || "").trim(),
+      state: String(state || "").trim(),
+      country: String(country || "").trim(),
+      continent: String(continent || "").trim(),
+      sourcePage: String(sourcePage || "").trim(),
+      sourceView: ["list", "map"].includes(String(sourceView || "").trim().toLowerCase())
+        ? String(sourceView || "").trim().toLowerCase()
+        : "",
+      pagePath: String(pagePath || "").trim(),
+      referrer: String(referrer || "").trim(),
+      sessionId: String(sessionId || "").trim(),
+      ipAddress: getRequestIpAddress(req),
+    });
+
+    return res.status(201).json({ message: "Listing click recorded" });
   } catch (error) {
     next(error);
   }
@@ -519,6 +642,7 @@ export const trackListingView = async (req, res, next) => {
       state: String(state || "").trim(),
       country: String(country || "").trim(),
       continent: String(continent || "").trim(),
+      ipAddress: getRequestIpAddress(req),
     });
 
     return res.status(201).json({ message: "Listing view recorded" });

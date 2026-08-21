@@ -2,8 +2,11 @@ import { Router } from "express";
 
 import {
   listNomadUsersForAdmin,
+  getDestinationListingAnalyticsForAdmin,
+  getDestinationUsersForAdmin,
   getDestinationViewsForAdmin,
   getListingViewsForAdmin,
+  getPopularDestinationsForAdmin,
   getSessionLogsForAdmin,
   getUserActivityForExport,
 } from "../controllers/adminNomadUserControllers.js";
@@ -11,6 +14,9 @@ import {
 const router = Router();
 
 router.get("/", listNomadUsersForAdmin);
+router.get("/popular-destinations", getPopularDestinationsForAdmin);
+router.get("/popular-destinations/listings", getDestinationListingAnalyticsForAdmin);
+router.get("/popular-destinations/users", getDestinationUsersForAdmin);
 router.get("/:userId/destination-views", getDestinationViewsForAdmin);
 router.get("/:userId/listing-views", getListingViewsForAdmin);
 router.get("/:userId/sessions", getSessionLogsForAdmin);

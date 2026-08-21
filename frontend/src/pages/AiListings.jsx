@@ -2015,6 +2015,7 @@ const AiListings = ({ forceListView = false }) => {
                                     companyId: item.companyId,
                                     businessId: item.businessId,
                                     type: item.companyType,
+                                    sourceView: "list",
                                     selectedStateLabel,
                                     searchBarBadges,
                                   },

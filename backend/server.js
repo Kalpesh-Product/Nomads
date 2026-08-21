@@ -47,6 +47,7 @@ import editorRoutes from "./routes/editorRoutes.js";
 import leadsRoutes from "./routes/leadsRoutes.js";
 import specialAccessRoutes from "./routes/specialAccessRoutes.js";
 import adminNomadUserRoutes from "./routes/adminNomadUserRoutes.js";
+import analyticsRoutes from "./routes/analyticsRoutes.js";
 import { verifyAdminApiKey } from "./middlewares/verifyAdminApiKey.js";
 
 const app = express();
@@ -78,6 +79,7 @@ app.use("/api/state-wise-weight", stateWiseWeightRoutes);
 app.use("/api/editor", editorRoutes);
 app.use("/api/leads", leadsRoutes);
 app.use("/api/special-access", specialAccessRoutes);
+app.use("/api/analytics", analyticsRoutes);
 app.use("/api/admin/nomad-users", verifyAdminApiKey, adminNomadUserRoutes);
 
 
