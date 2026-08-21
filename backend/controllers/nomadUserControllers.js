@@ -568,6 +568,7 @@ export const trackListingClick = async (req, res, next) => {
       country,
       continent,
       sourcePage,
+      sourceView,
       pagePath,
       referrer,
       sessionId,
@@ -587,6 +588,9 @@ export const trackListingClick = async (req, res, next) => {
       country: String(country || "").trim(),
       continent: String(continent || "").trim(),
       sourcePage: String(sourcePage || "").trim(),
+      sourceView: ["list", "map"].includes(String(sourceView || "").trim().toLowerCase())
+        ? String(sourceView || "").trim().toLowerCase()
+        : "",
       pagePath: String(pagePath || "").trim(),
       referrer: String(referrer || "").trim(),
       sessionId: String(sessionId || "").trim(),

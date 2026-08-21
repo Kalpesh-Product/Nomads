@@ -68,6 +68,17 @@ const AiProduct = () => {
   const companyId = stateCompanyId || null;
   const businessId = stateBusinessId || businessIdFromQuery || null;
   const type = stateType || typeFromQuery || null;
+  const listingSourceView = (() => {
+    const stateSourceView = String(locationState.sourceView || "").trim().toLowerCase();
+    if (["list", "map"].includes(stateSourceView)) return stateSourceView;
+
+    const returnToSearch = String(locationState.returnTo?.search || "");
+    const normalizedSearch = returnToSearch.startsWith("?")
+      ? returnToSearch.slice(1)
+      : returnToSearch;
+    const returnToView = new URLSearchParams(normalizedSearch).get("view");
+    return returnToView === "map" ? "map" : "";
+  })();
   const queryClient = useQueryClient();
   const { auth } = useAuth();
   const dispatch = useDispatch();
@@ -177,6 +188,7 @@ const AiProduct = () => {
         sourcePage: window.location.pathname,
         pagePath: `${window.location.pathname}${window.location.search}${window.location.hash}`,
         referrer: document.referrer,
+        sourceView: listingSourceView,
       }, { withCredentials: true })
       .catch(() => {});
   }, [
@@ -187,6 +199,7 @@ const AiProduct = () => {
     companyDetails?.state,
     companyDetails?.country,
     companyDetails?.continent,
+    listingSourceView,
   ]);
 
   useEffect(() => {

@@ -182,7 +182,7 @@ export const getPopularDestinationsForAdmin = async (req, res, next) => {
 export const getDestinationListingAnalyticsForAdmin = async (req, res, next) => {
   try {
     const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 50));
-    const { country, state, title, continent } = req.query;
+    const { country, state, title, continent, viewMode } = req.query;
     const filter = buildDateRangeFilter(req);
 
     const trimmedCountry = String(country || "").trim();
@@ -200,6 +200,13 @@ export const getDestinationListingAnalyticsForAdmin = async (req, res, next) => 
       const exactLocation = new RegExp(`^${escapeRegex(location)}$`, "i");
       return [{ city: exactLocation }, { state: exactLocation }];
     });
+
+    const normalizedViewMode = String(viewMode || "").trim().toLowerCase();
+    if (normalizedViewMode === "map") {
+      filter.sourceView = "map";
+    } else if (normalizedViewMode === "list") {
+      filter.sourceView = "list";
+    }
 
     const items = await NomadListingView.aggregate([
       { $match: filter },
