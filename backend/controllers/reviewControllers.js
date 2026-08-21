@@ -5,6 +5,7 @@ import csvParser from "csv-parser";
 import Company from "../models/Company.js";
 import TestReview from "../models/TestReview.js";
 import NomadUser from "../models/NomadUser.js";
+import { describeMissingNomadListingStep } from "../utils/nomadListingStatus.js";
 
 const parseCsvRows = (file) =>
   new Promise((resolve, reject) => {
@@ -671,7 +672,12 @@ export const createWebsiteReview = async (req, res, next) => {
     }).lean();
 
     if (!company) {
-      return res.status(404).json({ message: "Company not found" });
+      const stepMessage = await describeMissingNomadListingStep(
+        resolvedBusinessId,
+      );
+      return res
+        .status(404)
+        .json({ message: stepMessage || "Company not found" });
     }
 
     // Check for duplicate review (same name + company)

@@ -1,5 +1,6 @@
 import Lead from "../models/Lead.js";
 import Company from "../models/Company.js";
+import { describeMissingNomadListingStep } from "../utils/nomadListingStatus.js";
 
 export const createWebsiteLead = async (req, res, next) => {
   try {
@@ -73,7 +74,10 @@ export const createWebsiteLead = async (req, res, next) => {
     const company = await Company.findOne({ companyId }).lean();
 
     if (!company) {
-      return res.status(404).json({ message: "Company not found" });
+      const stepMessage = await describeMissingNomadListingStep(companyId);
+      return res
+        .status(404)
+        .json({ message: stepMessage || "Company not found" });
     }
 
     const lead = await Lead.create({
