@@ -9,6 +9,8 @@ import {
 import TempHeader from "./components/TempHeader";
 import TempFooter from "./components/TempFooter";
 import TemplateBreadcrumbs from "./components/TemplateBreadcrumbs";
+import FreshStudioHeader from "./templates/freshStudio/FreshStudioHeader";
+import FreshStudioFooter from "./templates/freshStudio/FreshStudioFooter";
 import ScrollToTop from "../../components/ScrollToTop";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../../utils/axios";
@@ -136,6 +138,20 @@ const TemplateSite = () => {
       jobTitleFromState,
     ],
   );
+  const themeVariant = normalizedData?.themeVariant || "default";
+  // Fresh Studio's dark/red chrome can't be expressed by TempHeader/
+  // TempFooter's light/blue styling (see templates/freshStudio/), so unlike
+  // every other section — which is swapped purely via
+  // templates/templateRegistry.js inside the routed Outlet — the site-level
+  // header/footer/breadcrumb bar are swapped here instead. This is the one
+  // place this port had to touch TemplateSite.jsx; its data-fetching above
+  // is untouched, and Classic's own header/footer keep rendering exactly as
+  // before for every non-fresh-studio site.
+  const isFreshStudio = themeVariant === "fresh-studio";
+  const productsPageEnabled = (normalizedData?.pageNavItems || []).some(
+    (item) => resolveSectionFromSlug(item.slug) === "products",
+  );
+
   const companyId = normalizedData?.companyId || "";
   const workspaceId = normalizedData?.workspaceId || "";
   const searchKey = normalizedData?.searchKey || "";
@@ -195,23 +211,37 @@ const TemplateSite = () => {
           <div className="animate-spin h-12 w-12 border-4 border-gray-300 border-t-primary-blue rounded-full" />
         </div>
       )}
-      <TempHeader
-        ref={headerRef}
-        logo={normalizedData?.companyLogoUrl}
-        pageNavItems={normalizedData?.pageNavItems}
-        navItems={normalizedData?.navItems}
-        productDropdownPages={normalizedData?.productDropdownPages}
-        productPages={normalizedData?.productPages}
-        pathname={location.pathname}
-      />
+      {isFreshStudio ? (
+        <FreshStudioHeader
+          ref={headerRef}
+          logo={normalizedData?.companyLogoUrl}
+          companyName={normalizedData?.companyName}
+          pageNavItems={normalizedData?.pageNavItems}
+          navItems={normalizedData?.navItems}
+          productDropdownPages={normalizedData?.productDropdownPages}
+          productPages={normalizedData?.productPages}
+        />
+      ) : (
+        <TempHeader
+          ref={headerRef}
+          logo={normalizedData?.companyLogoUrl}
+          pageNavItems={normalizedData?.pageNavItems}
+          navItems={normalizedData?.navItems}
+          productDropdownPages={normalizedData?.productDropdownPages}
+          productPages={normalizedData?.productPages}
+          pathname={location.pathname}
+        />
+      )}
       {breadcrumbItems.length > 1 ? (
         <TemplateBreadcrumbs
           items={breadcrumbItems}
-          dark={routeContext?.currentSection === "about"}
+          dark={isFreshStudio || routeContext?.currentSection === "about"}
           className={
-            routeContext?.currentSection === "about"
-              ? "bg-black"
-              : "bg-[#efefef]"
+            isFreshStudio
+              ? "bg-[#0A0A12]"
+              : routeContext?.currentSection === "about"
+                ? "bg-black"
+                : "bg-[#efefef]"
           }
         />
       ) : null}
@@ -231,19 +261,36 @@ const TemplateSite = () => {
         {/* <Toaster /> */}
       </main>
       <footer>
-        <TempFooter
-          address={normalizedData?.address}
-          contact={normalizedData?.contactTitle}
-          email={normalizedData?.websiteEmail}
-          phone={normalizedData?.phone}
-          registeredCompany={normalizedData?.registeredCompanyName}
-          logo={normalizedData?.companyLogoUrl}
-          isPending={isPending}
-          pageNavItems={normalizedData?.pageNavItems}
-          productDropdownPages={normalizedData?.productDropdownPages}
-          pathname={location.pathname}
-          socials={normalizedData?.socials}
-        />
+        {isFreshStudio ? (
+          <FreshStudioFooter
+            address={normalizedData?.address}
+            contact={normalizedData?.contactTitle}
+            email={normalizedData?.websiteEmail}
+            phone={normalizedData?.phone}
+            registeredCompany={normalizedData?.registeredCompanyName}
+            logo={normalizedData?.companyLogoUrl}
+            isPending={isPending}
+            pageNavItems={normalizedData?.pageNavItems}
+            productDropdownPages={normalizedData?.productDropdownPages}
+            pathname={location.pathname}
+            socials={normalizedData?.socials}
+            productsPageEnabled={productsPageEnabled}
+          />
+        ) : (
+          <TempFooter
+            address={normalizedData?.address}
+            contact={normalizedData?.contactTitle}
+            email={normalizedData?.websiteEmail}
+            phone={normalizedData?.phone}
+            registeredCompany={normalizedData?.registeredCompanyName}
+            logo={normalizedData?.companyLogoUrl}
+            isPending={isPending}
+            pageNavItems={normalizedData?.pageNavItems}
+            productDropdownPages={normalizedData?.productDropdownPages}
+            pathname={location.pathname}
+            socials={normalizedData?.socials}
+          />
+        )}
       </footer>
     </div>
   );
