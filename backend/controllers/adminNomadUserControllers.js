@@ -79,6 +79,8 @@ export const getPopularDestinationsForAdmin = async (req, res, next) => {
             continent: "$continent",
           },
           clicks: { $sum: 1 },
+          guestClicks: { $sum: { $cond: [{ $ifNull: ["$userId", false] }, 0, 1] } },
+          loggedInClicks: { $sum: { $cond: [{ $ifNull: ["$userId", false] }, 1, 0] } },
           uniqueUsersSet: { $addToSet: "$userId" },
           uniqueSessionsSet: { $addToSet: "$sessionId" },
           lastClickedAt: { $max: "$createdAt" },
@@ -92,6 +94,8 @@ export const getPopularDestinationsForAdmin = async (req, res, next) => {
           title: "$_id.title",
           continent: "$_id.continent",
           clicks: 1,
+          guestClicks: 1,
+          loggedInClicks: 1,
           uniqueUsers: {
             $size: {
               $filter: {
@@ -123,6 +127,8 @@ export const getPopularDestinationsForAdmin = async (req, res, next) => {
         $group: {
           _id: null,
           totalClicks: { $sum: 1 },
+          guestClicks: { $sum: { $cond: [{ $ifNull: ["$userId", false] }, 0, 1] } },
+          loggedInClicks: { $sum: { $cond: [{ $ifNull: ["$userId", false] }, 1, 0] } },
           destinations: { $addToSet: { country: "$country", state: "$state" } },
           uniqueUsersSet: { $addToSet: "$userId" },
           uniqueSessionsSet: { $addToSet: "$sessionId" },
@@ -132,6 +138,8 @@ export const getPopularDestinationsForAdmin = async (req, res, next) => {
         $project: {
           _id: 0,
           totalClicks: 1,
+          guestClicks: 1,
+          loggedInClicks: 1,
           totalDestinations: { $size: "$destinations" },
           uniqueUsers: {
             $size: {
@@ -159,6 +167,8 @@ export const getPopularDestinationsForAdmin = async (req, res, next) => {
       items,
       totals: totals[0] || {
         totalClicks: 0,
+        guestClicks: 0,
+        loggedInClicks: 0,
         totalDestinations: 0,
         uniqueUsers: 0,
         uniqueSessions: 0,
@@ -205,6 +215,8 @@ export const getDestinationListingAnalyticsForAdmin = async (req, res, next) => 
             continent: "$continent",
           },
           clicks: { $sum: 1 },
+          guestClicks: { $sum: { $cond: [{ $ifNull: ["$userId", false] }, 0, 1] } },
+          loggedInClicks: { $sum: { $cond: [{ $ifNull: ["$userId", false] }, 1, 0] } },
           uniqueUsersSet: { $addToSet: "$userId" },
           lastClickedAt: { $max: "$createdAt" },
         },
@@ -220,6 +232,8 @@ export const getDestinationListingAnalyticsForAdmin = async (req, res, next) => 
           country: "$_id.country",
           continent: "$_id.continent",
           clicks: 1,
+          guestClicks: 1,
+          loggedInClicks: 1,
           uniqueUsers: {
             $size: {
               $filter: {
@@ -242,6 +256,8 @@ export const getDestinationListingAnalyticsForAdmin = async (req, res, next) => 
         $group: {
           _id: null,
           totalClicks: { $sum: 1 },
+          guestClicks: { $sum: { $cond: [{ $ifNull: ["$userId", false] }, 0, 1] } },
+          loggedInClicks: { $sum: { $cond: [{ $ifNull: ["$userId", false] }, 1, 0] } },
           listings: { $addToSet: { companyId: "$companyId", businessId: "$businessId", companyName: "$companyName" } },
           uniqueUsersSet: { $addToSet: "$userId" },
         },
@@ -250,6 +266,8 @@ export const getDestinationListingAnalyticsForAdmin = async (req, res, next) => 
         $project: {
           _id: 0,
           totalClicks: 1,
+          guestClicks: 1,
+          loggedInClicks: 1,
           totalListings: { $size: "$listings" },
           uniqueUsers: {
             $size: {
@@ -273,6 +291,8 @@ export const getDestinationListingAnalyticsForAdmin = async (req, res, next) => 
       },
       totals: totals[0] || {
         totalClicks: 0,
+        guestClicks: 0,
+        loggedInClicks: 0,
         totalListings: 0,
         uniqueUsers: 0,
       },

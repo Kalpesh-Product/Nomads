@@ -508,6 +508,18 @@ export const trackDestinationClick = async (req, res, next) => {
       referrer,
       sessionId,
     } = req.body || {};
+    const refreshToken = req.cookies?.nomadCookie;
+    let userId = null;
+
+    if (refreshToken) {
+      try {
+        const user = await NomadUser.findOne({ refreshToken }).select("_id").lean().exec();
+        userId = user?._id || null;
+      } catch (error) {
+        userId = null;
+      }
+    }
+
     const trimmedCountry = String(country || "").trim();
     const trimmedState = String(state || city || "").trim();
 
@@ -516,6 +528,7 @@ export const trackDestinationClick = async (req, res, next) => {
     }
 
     await NomadDestinationView.create({
+      userId,
       continent: String(continent || "").trim(),
       country: trimmedCountry,
       state: trimmedState,
@@ -527,6 +540,59 @@ export const trackDestinationClick = async (req, res, next) => {
     });
 
     return res.status(201).json({ message: "Destination click recorded" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const trackListingClick = async (req, res, next) => {
+  try {
+    const refreshToken = req.cookies?.nomadCookie;
+    let userId = null;
+
+    if (refreshToken) {
+      try {
+        const user = await NomadUser.findOne({ refreshToken }).select("_id").lean().exec();
+        userId = user?._id || null;
+      } catch (error) {
+        userId = null;
+      }
+    }
+
+    const {
+      companyId,
+      businessId,
+      companyName,
+      city,
+      state,
+      country,
+      continent,
+      sourcePage,
+      pagePath,
+      referrer,
+      sessionId,
+    } = req.body || {};
+    const trimmedCompanyName = String(companyName || "").trim();
+    if (!trimmedCompanyName) {
+      return res.status(400).json({ message: "companyName is required" });
+    }
+
+    await NomadListingView.create({
+      userId,
+      companyId: String(companyId || "").trim(),
+      businessId: String(businessId || "").trim(),
+      companyName: trimmedCompanyName,
+      city: String(city || "").trim(),
+      state: String(state || "").trim(),
+      country: String(country || "").trim(),
+      continent: String(continent || "").trim(),
+      sourcePage: String(sourcePage || "").trim(),
+      pagePath: String(pagePath || "").trim(),
+      referrer: String(referrer || "").trim(),
+      sessionId: String(sessionId || "").trim(),
+    });
+
+    return res.status(201).json({ message: "Listing click recorded" });
   } catch (error) {
     next(error);
   }

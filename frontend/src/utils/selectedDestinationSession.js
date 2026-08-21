@@ -2,6 +2,8 @@ import { api } from "./axios";
 
 export const SELECTED_DESTINATION_SESSION_KEY = "wonoSelectedDestination";
 const DESTINATION_CLICK_SESSION_KEY = "wonoDestinationClickSessionId";
+const DESTINATION_CLICK_DEDUPE_MS = 1000;
+let lastDestinationClick = { key: "", time: 0 };
 
 const normalizeValue = (value) =>
     typeof value === "string" ? value.trim().toLowerCase() : "";
@@ -34,16 +36,31 @@ export const persistSelectedDestination = ({ continent, country, city, title }) 
 
     if (!normalizedCountry || !normalizedCity) return;
 
+    const normalizedContinent = normalizeValue(continent);
+    const clickKey = [
+        normalizedContinent,
+        normalizedCountry,
+        normalizedCity,
+        normalizedTitle.toLowerCase(),
+    ].join("|");
+    const now = Date.now();
+    const isDuplicateClick =
+        lastDestinationClick.key === clickKey &&
+        now - lastDestinationClick.time < DESTINATION_CLICK_DEDUPE_MS;
+    lastDestinationClick = { key: clickKey, time: now };
+
     window.sessionStorage.setItem(
         SELECTED_DESTINATION_SESSION_KEY,
         JSON.stringify({
-            continent: normalizeValue(continent),
+            continent: normalizedContinent,
             country: normalizedCountry,
             city: normalizedCity,
             title: normalizedTitle,
             updatedAt: Date.now(),
         }),
     );
+
+    if (isDuplicateClick) return;
 
     // Best-effort popularity tracking. This is intentionally public so top
     // destinations include logged-out visitors as well as signed-in users.
@@ -57,7 +74,7 @@ export const persistSelectedDestination = ({ continent, country, city, title }) 
             pagePath: `${window.location.pathname}${window.location.search}${window.location.hash}`,
             referrer: document.referrer,
             sessionId: getDestinationClickSessionId(),
-        })
+        }, { withCredentials: true })
         .catch(() => {});
 };
 
