@@ -41,7 +41,7 @@ const FreshStudioTemplatePartnerPage = () => {
     setSubmitPending(true);
     setSubmitError("");
     try {
-      await api.post("/api/leads/create-lead", {
+      await api.post("/leads/create-lead", {
         fullName: partnerForm.name,
         name: partnerForm.name,
         mobileNumber: partnerForm.mobile,
