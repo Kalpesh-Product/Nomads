@@ -11,6 +11,8 @@ import TempFooter from "./components/TempFooter";
 import TemplateBreadcrumbs from "./components/TemplateBreadcrumbs";
 import FreshStudioHeader from "./templates/freshStudio/FreshStudioHeader";
 import FreshStudioFooter from "./templates/freshStudio/FreshStudioFooter";
+import WarmOrganicHeader from "./templates/warmOrganic/WarmOrganicHeader";
+import WarmOrganicFooter from "./templates/warmOrganic/WarmOrganicFooter";
 import ScrollToTop from "../../components/ScrollToTop";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../../utils/axios";
@@ -148,6 +150,12 @@ const TemplateSite = () => {
   // is untouched, and Classic's own header/footer keep rendering exactly as
   // before for every non-fresh-studio site.
   const isFreshStudio = themeVariant === "fresh-studio";
+  // Same reasoning applies to Warm Organic: HostPanel's WarmOrganicTemplate.tsx
+  // has its own sticky white header (serif logo wordmark, rust active
+  // underline) and white footer with a warm CREAM/BROWN/RUST palette —
+  // distinct from both Classic's TempHeader/TempFooter and Fresh Studio's
+  // dark chrome — so it gets the same site-level swap here.
+  const isWarmOrganic = themeVariant === "warm-organic";
   const productsPageEnabled = (normalizedData?.pageNavItems || []).some(
     (item) => resolveSectionFromSlug(item.slug) === "products",
   );
@@ -221,6 +229,16 @@ const TemplateSite = () => {
           productDropdownPages={normalizedData?.productDropdownPages}
           productPages={normalizedData?.productPages}
         />
+      ) : isWarmOrganic ? (
+        <WarmOrganicHeader
+          ref={headerRef}
+          logo={normalizedData?.companyLogoUrl}
+          companyName={normalizedData?.companyName}
+          pageNavItems={normalizedData?.pageNavItems}
+          navItems={normalizedData?.navItems}
+          productDropdownPages={normalizedData?.productDropdownPages}
+          productPages={normalizedData?.productPages}
+        />
       ) : (
         <TempHeader
           ref={headerRef}
@@ -235,13 +253,15 @@ const TemplateSite = () => {
       {breadcrumbItems.length > 1 ? (
         <TemplateBreadcrumbs
           items={breadcrumbItems}
-          dark={isFreshStudio || routeContext?.currentSection === "about"}
+          dark={isFreshStudio || (!isWarmOrganic && routeContext?.currentSection === "about")}
           className={
             isFreshStudio
               ? "bg-[#0A0A12]"
-              : routeContext?.currentSection === "about"
-                ? "bg-black"
-                : "bg-[#efefef]"
+              : isWarmOrganic
+                ? "bg-[#F1E6D3]"
+                : routeContext?.currentSection === "about"
+                  ? "bg-black"
+                  : "bg-[#efefef]"
           }
         />
       ) : null}
@@ -263,6 +283,21 @@ const TemplateSite = () => {
       <footer>
         {isFreshStudio ? (
           <FreshStudioFooter
+            address={normalizedData?.address}
+            contact={normalizedData?.contactTitle}
+            email={normalizedData?.websiteEmail}
+            phone={normalizedData?.phone}
+            registeredCompany={normalizedData?.registeredCompanyName}
+            logo={normalizedData?.companyLogoUrl}
+            isPending={isPending}
+            pageNavItems={normalizedData?.pageNavItems}
+            productDropdownPages={normalizedData?.productDropdownPages}
+            pathname={location.pathname}
+            socials={normalizedData?.socials}
+            productsPageEnabled={productsPageEnabled}
+          />
+        ) : isWarmOrganic ? (
+          <WarmOrganicFooter
             address={normalizedData?.address}
             contact={normalizedData?.contactTitle}
             email={normalizedData?.websiteEmail}
