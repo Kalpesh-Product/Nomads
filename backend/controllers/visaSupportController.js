@@ -43,6 +43,19 @@ const normalizeRow = (row = {}) =>
     ]),
   );
 
+const getRowValue = (row, keys = []) =>
+  keys
+    .map((key) => row[key])
+    .find((value) => String(value || "").trim()) || "";
+
+const parseNumber = (value) => {
+  const cleaned = String(value ?? "").replace(/,/g, "").trim();
+  if (!cleaned) return null;
+
+  const parsed = Number(cleaned);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
 const readVisaSupportPartnerRows = (file) =>
   new Promise((resolve, reject) => {
     const rows = [];
@@ -61,44 +74,36 @@ const readVisaSupportPartnerRows = (file) =>
       .on("error", reject);
   });
 
-const getAgentValue = (row, agentNumber, field) => {
-  const candidateKeys = {
-    name: [`Agent ${agentNumber} name`],
-    website: [`Agent ${agentNumber} Website`],
-    email: [`Agent ${agentNumber} Email`],
-    contact: [
-      `Agent ${agentNumber} Contact`,
-      `Agent ${agentNumber} Phone`,
-    ],
+const buildVisaSupportPartnerFromRow = (row) => {
+  const country = String(getRowValue(row, ["Country"]) || "").trim();
+  const destination = String(
+    getRowValue(row, ["Destination", "City"]) || "",
+  ).trim();
+  const company = String(
+    getRowValue(row, ["Company", "Company "]) || "",
+  ).trim();
+
+  return {
+    srNo: parseNumber(getRowValue(row, ["Sr No", "Sr No."])),
+    continent: String(getRowValue(row, ["Continent"]) || "").trim(),
+    country,
+    destination,
+    visaType: String(getRowValue(row, ["Visa Type"]) || "").trim(),
+    company,
+    agentName: String(getRowValue(row, ["Agent Name"]) || "").trim(),
+    website: String(getRowValue(row, ["Website"]) || "").trim(),
+    contact: String(getRowValue(row, ["Contact", "Phone"]) || "").trim(),
+    email: String(getRowValue(row, ["Email"]) || "").trim().toLowerCase(),
+    address: String(getRowValue(row, ["Address"]) || "").trim(),
+    rating: parseNumber(getRowValue(row, ["Rating"])),
+    googleReviews: parseNumber(
+      getRowValue(row, ["Google Reviews", "Google Reviews "]),
+    ),
+    status: "Active",
+    normalizedCountry: normalizeKey(country),
+    normalizedDestination: normalizeKey(destination),
+    normalizedCompany: normalizeKey(company),
   };
-
-  return (
-    candidateKeys[field]
-      ?.map((key) => row[key])
-      .find((value) => String(value || "").trim()) || ""
-  );
-};
-
-const buildPartnersFromRow = (row) => {
-  const partners = [];
-
-  for (let agentNumber = 1; agentNumber <= 8; agentNumber += 1) {
-    const partner = {
-      agentNumber,
-      name: getAgentValue(row, agentNumber, "name"),
-      website: getAgentValue(row, agentNumber, "website"),
-      email: getAgentValue(row, agentNumber, "email"),
-      contact: getAgentValue(row, agentNumber, "contact"),
-    };
-
-    const hasAnyPartnerValue = Object.entries(partner).some(
-      ([key, value]) => key !== "agentNumber" && String(value || "").trim(),
-    );
-
-    if (hasAnyPartnerValue) partners.push(partner);
-  }
-
-  return partners;
 };
 
 export const createVisaSupport = async (req, res, next) => {
@@ -150,37 +155,33 @@ export const importVisaSupportPartnersCsv = async (req, res, next) => {
     const skippedRows = [];
 
     rows.forEach((row, index) => {
-      const country = String(row.Country || "").trim();
-      const city = String(row.City || "").trim();
-      const partners = buildPartnersFromRow(row);
+      const partner = buildVisaSupportPartnerFromRow(row);
 
-      if (!country || !city || !partners.length) {
+      if (!partner.country || !partner.destination || !partner.company) {
         skippedRows.push({
           row: index + 2,
-          country,
-          city,
+          country: partner.country,
+          destination: partner.destination,
+          company: partner.company,
           reason:
-            !country || !city
-              ? "Country and City are required"
-              : "No partner data found",
+            !partner.country || !partner.destination
+              ? "Country and Destination are required"
+              : "Company is required",
         });
         return;
       }
 
-      const normalizedCountry = normalizeKey(country);
-      const normalizedCity = normalizeKey(city);
-
       operations.push({
         updateOne: {
-          filter: { normalizedCountry, normalizedCity },
+          filter: {
+            normalizedCountry: partner.normalizedCountry,
+            normalizedDestination: partner.normalizedDestination,
+            normalizedCompany: partner.normalizedCompany,
+            email: partner.email,
+            contact: partner.contact,
+          },
           update: {
-            $set: {
-              country,
-              city,
-              normalizedCountry,
-              normalizedCity,
-              partners,
-            },
+            $set: partner,
           },
           upsert: true,
         },
@@ -193,6 +194,14 @@ export const importVisaSupportPartnersCsv = async (req, res, next) => {
         skippedRows,
       });
     }
+
+    await VisaSupportPartner.collection
+      .dropIndex("normalizedCountry_1_normalizedCity_1")
+      .catch((error) => {
+        if (error?.codeName !== "IndexNotFound" && error?.code !== 27) {
+          throw error;
+        }
+      });
 
     const result = await VisaSupportPartner.bulkWrite(operations, {
       ordered: false,
@@ -215,14 +224,19 @@ export const importVisaSupportPartnersCsv = async (req, res, next) => {
 
 export const getVisaSupportPartners = async (req, res, next) => {
   try {
-    const { country, city } = req.query;
-    const query = {};
+    const { country, destination, city } = req.query;
+    const query = {
+      normalizedDestination: { $exists: true, $ne: "" },
+      normalizedCompany: { $exists: true, $ne: "" },
+    };
 
     if (country) query.normalizedCountry = normalizeKey(country);
-    if (city) query.normalizedCity = normalizeKey(city);
+    if (destination || city) {
+      query.normalizedDestination = normalizeKey(destination || city);
+    }
 
     const partners = await VisaSupportPartner.find(query)
-      .sort({ country: 1, city: 1 })
+      .sort({ continent: 1, country: 1, destination: 1, company: 1 })
       .lean();
 
     return res.status(200).json({
