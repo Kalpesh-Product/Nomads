@@ -13,6 +13,8 @@ import FreshStudioHeader from "./templates/freshStudio/FreshStudioHeader";
 import FreshStudioFooter from "./templates/freshStudio/FreshStudioFooter";
 import WarmOrganicHeader from "./templates/warmOrganic/WarmOrganicHeader";
 import WarmOrganicFooter from "./templates/warmOrganic/WarmOrganicFooter";
+import EmeraldStudioHeader from "./templates/emeraldStudio/EmeraldStudioHeader";
+import EmeraldStudioFooter from "./templates/emeraldStudio/EmeraldStudioFooter";
 import ScrollToTop from "../../components/ScrollToTop";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../../utils/axios";
@@ -156,6 +158,14 @@ const TemplateSite = () => {
   // distinct from both Classic's TempHeader/TempFooter and Fresh Studio's
   // dark chrome — so it gets the same site-level swap here.
   const isWarmOrganic = themeVariant === "warm-organic";
+  // Same reasoning again for Emerald Studio: HostPanel's
+  // EmeraldStudioTemplate.tsx has its own fixed dark-emerald header
+  // (bg-[#002c22]/[0.92] backdrop-blur, amber active underline) and dark
+  // footer with amber accents — distinct from Classic, Fresh Studio's dark/
+  // red chrome, and Warm Organic's light cream/rust chrome — so it gets the
+  // same site-level swap here, completing all 4 HostPanel templates in
+  // Nomads.
+  const isEmeraldStudio = themeVariant === "emerald-studio";
   const productsPageEnabled = (normalizedData?.pageNavItems || []).some(
     (item) => resolveSectionFromSlug(item.slug) === "products",
   );
@@ -239,6 +249,16 @@ const TemplateSite = () => {
           productDropdownPages={normalizedData?.productDropdownPages}
           productPages={normalizedData?.productPages}
         />
+      ) : isEmeraldStudio ? (
+        <EmeraldStudioHeader
+          ref={headerRef}
+          logo={normalizedData?.companyLogoUrl}
+          companyName={normalizedData?.companyName}
+          pageNavItems={normalizedData?.pageNavItems}
+          navItems={normalizedData?.navItems}
+          productDropdownPages={normalizedData?.productDropdownPages}
+          productPages={normalizedData?.productPages}
+        />
       ) : (
         <TempHeader
           ref={headerRef}
@@ -253,15 +273,17 @@ const TemplateSite = () => {
       {breadcrumbItems.length > 1 ? (
         <TemplateBreadcrumbs
           items={breadcrumbItems}
-          dark={isFreshStudio || (!isWarmOrganic && routeContext?.currentSection === "about")}
+          dark={isFreshStudio || isEmeraldStudio || (!isWarmOrganic && routeContext?.currentSection === "about")}
           className={
             isFreshStudio
               ? "bg-[#0A0A12]"
               : isWarmOrganic
                 ? "bg-[#F1E6D3]"
-                : routeContext?.currentSection === "about"
-                  ? "bg-black"
-                  : "bg-[#efefef]"
+                : isEmeraldStudio
+                  ? "bg-[#002c22]"
+                  : routeContext?.currentSection === "about"
+                    ? "bg-black"
+                    : "bg-[#efefef]"
           }
         />
       ) : null}
@@ -303,6 +325,22 @@ const TemplateSite = () => {
             email={normalizedData?.websiteEmail}
             phone={normalizedData?.phone}
             registeredCompany={normalizedData?.registeredCompanyName}
+            logo={normalizedData?.companyLogoUrl}
+            isPending={isPending}
+            pageNavItems={normalizedData?.pageNavItems}
+            productDropdownPages={normalizedData?.productDropdownPages}
+            pathname={location.pathname}
+            socials={normalizedData?.socials}
+            productsPageEnabled={productsPageEnabled}
+          />
+        ) : isEmeraldStudio ? (
+          <EmeraldStudioFooter
+            address={normalizedData?.address}
+            contact={normalizedData?.contactTitle}
+            email={normalizedData?.websiteEmail}
+            phone={normalizedData?.phone}
+            registeredCompany={normalizedData?.registeredCompanyName}
+            companyName={normalizedData?.companyName}
             logo={normalizedData?.companyLogoUrl}
             isPending={isPending}
             pageNavItems={normalizedData?.pageNavItems}
