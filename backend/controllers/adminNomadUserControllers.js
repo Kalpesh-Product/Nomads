@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import axios from "axios";
 import NomadUser from "../models/NomadUser.js";
 import NomadDestinationView from "../models/NomadDestinationView.js";
 import NomadListingView from "../models/NomadListingView.js";
@@ -388,6 +389,169 @@ export const getDestinationUsersForAdmin = async (req, res, next) => {
         title: trimmedTitle,
         continent: trimmedContinent,
       },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// --- Visitor origin (IP -> location) analytics ------------------------------
+// Every destination click stores the caller's IP. To answer "which locations
+// send us the most users" we group clicks by IP, resolve the public ones via
+// ip-api.com's free batch endpoint (HTTP only on the free tier, up to 100
+// IPs per call, 15 calls/min — fine for server-to-server), and cache results
+// so each unique IP costs at most one lookup per day. Private/loopback IPs
+// (dev traffic) and unresolvable ones are reported separately instead of
+// being dropped.
+
+const GEO_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+const GEO_CACHE_MAX_ENTRIES = 5000;
+const geoCache = new Map();
+
+const isPrivateIp = (ip) =>
+  !ip ||
+  /^(127\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.|0\.0\.0\.0$)/.test(ip) ||
+  /^(::1$|::ffff:127\.|f[cd]|fe80)/i.test(ip);
+
+const buildLocationLabel = (geo) =>
+  [geo?.city, geo?.regionName, geo?.country].filter(Boolean).join(", ") || null;
+
+const lookupGeoForIps = async (ips) => {
+  const now = Date.now();
+  const missing = ips.filter((ip) => {
+    const hit = geoCache.get(ip);
+    return !hit || now - hit.cachedAt > GEO_CACHE_TTL_MS;
+  });
+
+  if (geoCache.size > GEO_CACHE_MAX_ENTRIES) {
+    geoCache.clear();
+  }
+
+  for (let i = 0; i < missing.length; i += 100) {
+    const chunk = missing.slice(i, i + 100);
+    try {
+      const { data } = await axios.post(
+        "http://ip-api.com/batch?fields=status,country,countryCode,regionName,city,query",
+        chunk,
+        { timeout: 12000 },
+      );
+      (Array.isArray(data) ? data : []).forEach((entry) => {
+        if (entry?.query && entry?.status === "success") {
+          geoCache.set(entry.query, { geo: entry, cachedAt: Date.now() });
+        }
+      });
+    } catch {
+      // Geo provider unavailable/rate-limited — those IPs stay unresolved.
+    }
+  }
+
+  return (ip) => geoCache.get(ip)?.geo || null;
+};
+
+export const getVisitorLocationBreakdownForAdmin = async (req, res, next) => {
+  try {
+    const filter = buildDateRangeFilter(req);
+
+    const [totalsRows, ipGroups] = await Promise.all([
+      NomadDestinationView.aggregate([
+        { $match: filter },
+        {
+          $group: {
+            _id: null,
+            totalClicks: { $sum: 1 },
+            guestClicks: { $sum: { $cond: [{ $ifNull: ["$userId", false] }, 0, 1] } },
+            loggedInClicks: { $sum: { $cond: [{ $ifNull: ["$userId", false] }, 1, 0] } },
+            uniqueIpsSet: { $addToSet: "$ipAddress" },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            totalClicks: 1,
+            guestClicks: 1,
+            loggedInClicks: 1,
+            uniqueIps: { $size: "$uniqueIpsSet" },
+          },
+        },
+      ]),
+      NomadDestinationView.aggregate([
+        { $match: filter },
+        {
+          $group: {
+            _id: "$ipAddress",
+            clicks: { $sum: 1 },
+            guestClicks: { $sum: { $cond: [{ $ifNull: ["$userId", false] }, 0, 1] } },
+            loggedInClicks: { $sum: { $cond: [{ $ifNull: ["$userId", false] }, 1, 0] } },
+            lastClickedAt: { $max: "$createdAt" },
+          },
+        },
+        { $sort: { clicks: -1, lastClickedAt: -1 } },
+        { $limit: 500 },
+      ]),
+    ]);
+
+    const totals = totalsRows[0] || {
+      totalClicks: 0,
+      guestClicks: 0,
+      loggedInClicks: 0,
+      uniqueIps: 0,
+    };
+
+    const publicGroups = [];
+    let localNetworkClicks = 0;
+    ipGroups.forEach((group) => {
+      if (isPrivateIp(group._id)) {
+        localNetworkClicks += group.clicks;
+      } else {
+        publicGroups.push(group);
+      }
+    });
+
+    const geoLookup = await lookupGeoForIps(publicGroups.map((group) => group._id));
+
+    const countryMap = new Map();
+    const cityMap = new Map();
+    const stateMap = new Map();
+    let resolvedClicks = 0;
+
+    publicGroups.forEach((group) => {
+      const geo = geoLookup(group._id);
+      const label = buildLocationLabel(geo);
+      if (!label) return;
+      resolvedClicks += group.clicks;
+      const country = geo.country || label;
+      countryMap.set(country, (countryMap.get(country) || 0) + group.clicks);
+      cityMap.set(label, (cityMap.get(label) || 0) + group.clicks);
+      const state = [geo.regionName, geo.country].filter(Boolean).join(", ") || null;
+      if (state) {
+        stateMap.set(state, (stateMap.get(state) || 0) + group.clicks);
+      }
+    });
+
+    const toRanked = (map, limit) =>
+      [...map.entries()]
+        .map(([label, value]) => ({ label, value }))
+        .sort((a, b) => b.value - a.value)
+        .slice(0, limit);
+
+    return res.status(200).json({
+      totals: {
+        ...totals,
+        resolvedClicks,
+        localNetworkClicks,
+        unknownClicks: Math.max(0, totals.totalClicks - resolvedClicks - localNetworkClicks),
+      },
+      countries: toRanked(countryMap, 12),
+      cities: toRanked(cityMap, 12),
+      states: toRanked(stateMap, 12),
+      topIps: publicGroups.slice(0, 12).map((group) => ({
+        ip: group._id || "",
+        label: buildLocationLabel(geoLookup(group._id)) || "Unknown location",
+        clicks: group.clicks,
+        guestClicks: group.guestClicks,
+        loggedInClicks: group.loggedInClicks,
+        lastClickedAt: group.lastClickedAt,
+      })),
     });
   } catch (error) {
     next(error);

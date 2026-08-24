@@ -9,12 +9,14 @@ import {
   getPopularDestinationsForAdmin,
   getSessionLogsForAdmin,
   getUserActivityForExport,
+  getVisitorLocationBreakdownForAdmin,
 } from "../controllers/adminNomadUserControllers.js";
 
 const router = Router();
 
 router.get("/", listNomadUsersForAdmin);
 router.get("/popular-destinations", getPopularDestinationsForAdmin);
+router.get("/popular-destinations/locations", getVisitorLocationBreakdownForAdmin);
 router.get("/popular-destinations/listings", getDestinationListingAnalyticsForAdmin);
 router.get("/popular-destinations/users", getDestinationUsersForAdmin);
 router.get("/:userId/destination-views", getDestinationViewsForAdmin);
