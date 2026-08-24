@@ -106,6 +106,47 @@ const buildVisaSupportPartnerFromRow = (row) => {
   };
 };
 
+const editableVisaSupportPartnerSchema = yup.object({
+  srNo: yup.number().nullable().transform((value, originalValue) => {
+    if (originalValue === "" || originalValue === null || originalValue === undefined) return null;
+    return Number.isFinite(value) ? value : null;
+  }),
+  continent: yup.string().trim().default(""),
+  country: yup.string().trim().required("Country is required"),
+  destination: yup.string().trim().required("Destination is required"),
+  visaType: yup.string().trim().default(""),
+  company: yup.string().trim().required("Company is required"),
+  agentName: yup.string().trim().default(""),
+  website: yup.string().trim().default(""),
+  contact: yup.string().trim().default(""),
+  email: yup.string().trim().email("Please provide a valid email").default(""),
+  address: yup.string().trim().default(""),
+  rating: yup.number().nullable().transform((value, originalValue) => {
+    if (originalValue === "" || originalValue === null || originalValue === undefined) return null;
+    return Number.isFinite(value) ? value : null;
+  }),
+  googleReviews: yup.number().nullable().transform((value, originalValue) => {
+    if (originalValue === "" || originalValue === null || originalValue === undefined) return null;
+    return Number.isFinite(value) ? value : null;
+  }),
+  status: yup.string().trim().default("Active"),
+});
+
+const buildEditableVisaSupportPartnerPayload = async (body = {}) => {
+  const payload = await editableVisaSupportPartnerSchema.validate(body, {
+    abortEarly: false,
+    stripUnknown: true,
+  });
+
+  return {
+    ...payload,
+    email: String(payload.email || "").trim().toLowerCase(),
+    normalizedCountry: normalizeKey(payload.country),
+    normalizedDestination: normalizeKey(payload.destination),
+    normalizedCompany: normalizeKey(payload.company),
+  };
+};
+
 export const createVisaSupport = async (req, res, next) => {
   try {
     const payload = await visaSupportSchema.validate(req.body, {
@@ -244,6 +285,55 @@ export const getVisaSupportPartners = async (req, res, next) => {
       data: partners,
     });
   } catch (error) {
+    return next(error);
+  }
+};
+
+export const getVisaSupportPartnerById = async (req, res, next) => {
+  try {
+    const partner = await VisaSupportPartner.findById(req.params.partnerId).lean();
+
+    if (!partner) {
+      return res.status(404).json({ message: "Visa support partner not found" });
+    }
+
+    return res.status(200).json({
+      message: "Visa support partner fetched successfully",
+      data: partner,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const updateVisaSupportPartner = async (req, res, next) => {
+  try {
+    const payload = await buildEditableVisaSupportPartnerPayload(req.body);
+    const partner = await VisaSupportPartner.findByIdAndUpdate(
+      req.params.partnerId,
+      { $set: payload },
+      { new: true, runValidators: true },
+    ).lean();
+
+    if (!partner) {
+      return res.status(404).json({ message: "Visa support partner not found" });
+    }
+
+    return res.status(200).json({
+      message: "Visa support partner updated successfully",
+      data: partner,
+    });
+  } catch (error) {
+    if (error.name === "ValidationError") {
+      return res.status(400).json({ message: error.errors[0] });
+    }
+
+    if (error?.code === 11000) {
+      return res.status(409).json({
+        message: "A visa support partner with the same country, destination, company, email, and contact already exists.",
+      });
+    }
+
     return next(error);
   }
 };
