@@ -337,12 +337,26 @@ export const getDestinationUsersForAdmin = async (req, res, next) => {
       .limit(limit)
       .lean();
 
+    const publicIps = [
+      ...new Set(views.map((view) => view.ipAddress).filter((ip) => ip && !isPrivateIp(ip))),
+    ];
+    const geoLookup = await lookupGeoForIps(publicIps);
+
     const toUserEntry = (view) => {
       const user = view.userId && typeof view.userId === "object" ? view.userId : null;
+      const geo =
+        view.ipAddress && !isPrivateIp(view.ipAddress) ? geoLookup(view.ipAddress) : null;
 
       return {
         id: String(view._id),
         ipAddress: view.ipAddress || "",
+        location: geo
+          ? {
+              city: geo.city || "",
+              state: geo.regionName || "",
+              country: geo.country || "",
+            }
+          : null,
         clickedAt: view.createdAt,
         sessionId: view.sessionId || "",
         sourcePage: view.sourcePage || "",
