@@ -221,7 +221,6 @@ function getTenantFromHost() {
   // Case 2: production subdomains (*.wono.co)
   if (hostname.endsWith(`.${rootDomain}`)) {
     const subdomain = hostname.replace(`.${rootDomain}`, "");
-    if (subdomain === "nomad") return "main";
     return subdomain;
   }
 
