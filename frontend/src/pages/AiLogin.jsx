@@ -7,6 +7,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import AiPrimaryButton from "../components/AiPrimaryButton";
+import Seo from "../components/Seo";
 import useAuth from "../hooks/useAuth";
 import axios from "../utils/axios";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
@@ -232,6 +233,7 @@ export default function AiLogin() {
 
   return (
     <>
+      <Seo path="/login" />
       <div className="flex min-h-[55vh] flex-col items-center justify-center gap-10 rounded-lg border-gray-300 px-6 py-8 md:min-h-[60vh] lg:min-h-[75vh]">
         <div className="w-full max-w-4xl">
           {loginContext ? (

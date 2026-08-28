@@ -15,6 +15,7 @@ import {
     CircularProgress,
 } from "@mui/material";
 import Container from "../components/Container";
+import Seo from "../components/Seo";
 import { Controller, useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
@@ -62,6 +63,7 @@ const AiAbout = () => {
 
     return (
         <div>
+            <Seo path="/about" />
             <section className="px-6 md:px-12 lg:px-28 py-8 md:py-2 flex flex-col gap-10">
                 {/* Header */}
                 <div className="flex flex-col items-center relative font-comic uppercase font-bold text-secondary-dark text-2xl md:text-4xl lg:text-5xl leading-tight mb-4">

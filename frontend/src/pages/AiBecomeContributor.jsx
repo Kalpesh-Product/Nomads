@@ -14,6 +14,7 @@ import Container from "../components/Container";
 import axios from "../utils/axios";
 import useAuth from "../hooks/useAuth";
 import { HiCheck } from "react-icons/hi";
+import Seo from "../components/Seo";
 
 const floatingLabelSx = {
   color: "black",
@@ -240,6 +241,7 @@ const AiBecomeContributor = () => {
 
   return (
     <div className="bg-white text-black font-sans">
+      <Seo path="/become-a-contributor?tab=password" />
       <Container padding={false}>
         <section className="min-h-[60vh] flex items-center justify-center py-0">
           <div className="w-full max-w-5xl md:px-20 lg:px-20">

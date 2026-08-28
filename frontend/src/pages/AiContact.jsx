@@ -15,6 +15,7 @@ import {
     CircularProgress,
 } from "@mui/material";
 import Container from "../components/Container";
+import Seo from "../components/Seo";
 import { Controller, useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 // import toast from "react-hot-toast";
@@ -85,6 +86,7 @@ const AiContact = () => {
 
     return (
         <div className="bg-white text-black font-sans">
+            <Seo path="/contact" />
             {/* About & Form */}
             {/* <section className="py-10 px-4 md:px-20"> */}
             <Container padding={false}>

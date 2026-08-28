@@ -27,6 +27,7 @@ import {
   // getGoalOptionMetricLabel,
   goalFilterMap,
 } from "../constants/aiGoalFilters";
+import Seo from "../components/Seo";
 
 const continentOptions = [
   "Explore The World",
@@ -1150,6 +1151,19 @@ const AiSearchResults = () => {
         selectedGoalOption
       }`
     : "Choose Your Goal!";
+  const selectedGoalSlug =
+    Object.entries(goalNameBySlug).find(
+      ([, goalName]) => goalName === selectedGoal,
+    )?.[0] || "workfromanywhere";
+  const seoSearchBasePath = goal
+    ? `/search/${goal.toLowerCase()}/results`
+    : `/search/${selectedGoalSlug}/results`;
+  const seoPath = selectedGoalOption
+    ? `${seoSearchBasePath}/World/${encodeURIComponent(selectedGoalOption)}`
+    : seoSearchBasePath;
+  const seoFallbackPath = selectedGoalOption
+    ? `${seoSearchBasePath}/World/${encodeURIComponent(selectedGoalOption)}`
+    : "/search/workfromanywhere/results";
   const passportCountry =
     auth?.user?.country ||
     auth?.user?.countryOfResidence ||
@@ -2352,6 +2366,7 @@ const AiSearchResults = () => {
 
   return (
     <div className="min-h-full bg-white">
+      <Seo path={seoPath} fallbackPath={seoFallbackPath} />
       <main className="pb-8">
         <div className="mx-0 w-full max-w-[80rem] px-3 sm:px-6 lg:mx-auto lg:max-w-[85rem] lg:px-0 lg:min-w-[75%]">
           <div className="rounded-[10px] bg-white px-0 pb-6">

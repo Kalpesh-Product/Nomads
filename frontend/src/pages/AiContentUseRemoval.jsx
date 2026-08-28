@@ -13,6 +13,7 @@ import { useMutation } from "@tanstack/react-query";
 import axios from "../utils/axios";
 import { isValidInternationalPhone } from "../utils/validators";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
+import Seo from "../components/Seo";
 
 const AiContentUseRemoval = () => {
     // -------------------------
@@ -380,6 +381,7 @@ const AiContentUseRemoval = () => {
 
     return (
         <div className="flex flex-col gap-10 px-6 md:px-12 lg:px-28 pb-8 md:pb-12 pt-0 text-[#364D59]">
+            <Seo path="/content-use-removal" />
             {/* Header */}
             <div className="flex flex-col items-center relative font-comic uppercase font-bold text-secondary-dark text-2xl md:text-4xl lg:text-5xl leading-tight">
                 <div className="relative inline-block text-center">

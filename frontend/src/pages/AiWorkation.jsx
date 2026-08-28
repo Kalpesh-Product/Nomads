@@ -21,6 +21,7 @@ import {
   readSelectedDestination,
 } from "../utils/selectedDestinationSession";
 import { HiCheck } from "react-icons/hi";
+import Seo from "../components/Seo";
 
 import { aiDestinationCards } from "../constants/aiDestinationCards";
 
@@ -348,6 +349,7 @@ const AiWorkation = () => {
 
   return (
     <div className="bg-white text-black font-sans">
+      <Seo path="/workation?tab=profile" />
       <Container padding={false}>
         <section className="min-h-[60vh] flex items-center justify-center py-0">
           <div className="w-full max-w-5xl md:px-20 lg:px-20">

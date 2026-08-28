@@ -1,6 +1,7 @@
 import React from "react";
 import blueUnderline from "../assets/blue_underline.png";
 import { Link } from "react-router-dom";
+import Seo from "../components/Seo";
 
 const faqs = [
     {
@@ -123,6 +124,7 @@ const faqs = [
 const AiFAQ = () => {
     return (
         <div className="flex flex-col gap-10 px-6 md:px-12 lg:px-28 pb-8 md:pb-12 pt-0 text-[#364D59]">
+            <Seo path="/faq" />
             <div className="flex flex-col items-center relative font-comic uppercase font-bold text-secondary-dark text-2xl md:text-3xl lg:text-4xl leading-tight">
                 <h3 className="text-center">Frequently Asked Questions (FAQ)</h3>
                 <img

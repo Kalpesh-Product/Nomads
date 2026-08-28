@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "../utils/axios";
 import romans from "romans";
 import { CircularProgress } from "@mui/material";
+import Seo from "../components/Seo";
 
 const AiCareer = () => {
     const [openIndex, setOpenIndex] = useState(null);
@@ -47,6 +48,7 @@ const AiCareer = () => {
 
     return (
         <>
+            <Seo path="/career" />
             <Container padding={false}>
                 <div className="py-8 md:py-12 lg:px-28 px-6">
                     <h3 className="font-comic text-3xl md:text-5xl lg:text-6xl font-semibold text-host mb-2">

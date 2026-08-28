@@ -11,6 +11,7 @@ import {
   TbLayoutDashboard,
   TbWorldWww,
 } from "react-icons/tb";
+import Seo from "../../components/Seo";
 
 const ReactFitty = React.lazy(() =>
   import("react-fitty").then((module) => ({ default: module.ReactFitty })),
@@ -123,6 +124,7 @@ const HostHome = () => {
   ];
   return (
     <main>
+      <Seo path="https://host.wono.co/" />
       <AiHostPricing />
       <Container padding={false}>
         <section className="pb-4 pt-16">

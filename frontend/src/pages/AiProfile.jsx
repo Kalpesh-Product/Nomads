@@ -18,6 +18,7 @@ import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 import { Country } from "country-state-city";
 import { HiCheck } from "react-icons/hi";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
+import Seo from "../components/Seo";
 
 const floatingLabelSx = {
   color: "black",
@@ -120,6 +121,11 @@ const AiProfile = () => {
 
   const initialTab = searchParams.get("tab") || "profile";
   const [activeTab, setActiveTab] = useState(initialTab);
+  const seoTab = ["profile", "favorites", "reviews", "password"].includes(
+    activeTab,
+  )
+    ? activeTab
+    : "profile";
   const [typedProfilePrompt, setTypedProfilePrompt] = useState("");
 
   const getPhonePrefixByCountryName = (countryName) => {
@@ -326,6 +332,7 @@ const AiProfile = () => {
 
   return (
     <div className="bg-white min-h-screen p-4 sm:p-6 font-sans text-[#364D59]">
+      <Seo path={`/profile?tab=${seoTab}`} fallbackPath="/profile?tab=profile" />
       {/* Tabs - Desktop style preserved, stacks on very small screens */}
       {/* <div className="flex flex-col sm:flex-row mb-6 border rounded-lg overflow-hidden max-w-3xl mx-auto">
                 <button
