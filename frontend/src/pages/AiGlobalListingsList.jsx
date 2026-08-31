@@ -22,7 +22,7 @@ import { IoSearch } from "react-icons/io5";
 import SearchBarCombobox from "../components/SearchBarCombobox.jsx";
 import AiSelectedBadgesSearchBar from "../components/AiSelectedBadgesSearchBar.jsx";
 import { AnimatePresence, motion } from "motion/react";
-import { Helmet } from "@dr.pogodin/react-helmet";
+import Seo from "../components/Seo.jsx";
 import useAuth from "../hooks/useAuth.js";
 import useSpecialUserEmails from "../hooks/useSpecialUserEmails.js";
 import { HiOutlineX } from "react-icons/hi";
@@ -64,6 +64,21 @@ const THINKING_HEADING_TEXT = "Curating the best results for you";
 const CURATED_RESULTS_HEADING_TEXT =
   "Please find below, the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
 const AI_SCROLL_CONTAINER_ID = "nomad-ai-scroll-container";
+
+const buildPlacesSeoFallbackPath = (search = "") => {
+  const params = new URLSearchParams(search);
+  const category = params.get("category");
+  const country = params.get("country");
+  const destination = params.get("location") || params.get("state");
+
+  if (category !== PLACES_CATEGORY || !country || !destination) {
+    return "/verticals";
+  }
+
+  return `/listings-list?country=${encodeURIComponent(
+    country,
+  )}&location=${encodeURIComponent(destination)}&category=places`;
+};
 
 const CategoryShortcutButton = ({
   label,
@@ -274,6 +289,10 @@ const AiGlobalListingsList = () => {
       ALL_LISTINGS_CATEGORY
     );
   }, [location.search, location.state]);
+  const seoFallbackPath = useMemo(
+    () => buildPlacesSeoFallbackPath(location.search),
+    [location.search],
+  );
 
   const [typedHeading, setTypedHeading] = useState(() =>
     shouldSkipHeadingIntro ? CURATED_RESULTS_HEADING_TEXT : "",
@@ -1357,25 +1376,7 @@ const AiGlobalListingsList = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Explore Work, Stay & Cafe Spaces | Nomads</title>
-        <meta
-          name="description"
-          content="Discover top coworking spaces, hostels, cafes, and private stays in your chosen destination. Work, live, and connect with global nomads."
-        />
-        <meta
-          name="keywords"
-          content="digital nomads, coworking spaces, hostels, workation, cafes, private stays, remote work Goa"
-        />
-        <meta property="og:title" content="Explore Nomad Spaces | Nomads" />
-        <meta
-          property="og:description"
-          content="Find inspiring spaces to work, stay, and connect with other digital nomads across the globe."
-        />
-        <meta property="og:image" content="/images/homepage.jpeg" />
-        <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://wono.co/verticals" />
-      </Helmet>
+      <Seo fallbackPath={seoFallbackPath} image="/images/homepage.jpeg" />
 
       {/* ==================== DESKTOP VIEW (lg and above) ==================== */}
       <div className="hidden lg:flex flex-col gap-6 px-1 md:px-10">

@@ -1,4 +1,13 @@
+import placeSeoEntries from "./placeSeoEntries.js";
+
 const seoEntries = [
+  ...placeSeoEntries,
+  {
+    "link": "https://wono.co/verticals",
+    "title": "Explore Work, Stay & Cafe Spaces | Nomads",
+    "description": "Discover top coworking spaces, hostels, cafes, and private stays in your chosen destination. Work, live, and connect with global nomads.",
+    "keywords": "digital nomads, coworking spaces, hostels, workation, cafes, private stays, remote work Goa"
+  },
   {
     "link": "https://wono.co/",
     "title": "WONO | Digital Nomad Platform, Community & Work From Anywhere",

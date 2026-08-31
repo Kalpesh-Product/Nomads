@@ -43,6 +43,7 @@ import {
   useCroppedDesktopShortcutIcons,
 } from "../utils/categoryShortcutIcons.js";
 import { navigateBackWithinApp } from "../utils/navigationHistory.js";
+import Seo from "../components/Seo.jsx";
 
 const ALL_LISTINGS_CATEGORY = "alllistings";
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
@@ -1241,6 +1242,7 @@ const AiListings = ({ forceListView = false }) => {
 
   return (
     <div className="flex flex-col gap:2 lg:gap-6 ">
+      <Seo fallbackPath="/verticals" />
       <div
         className={`${forceListView ? "flex" : "hidden lg:flex"} flex-col gap-6 lg:px-10`}
       >

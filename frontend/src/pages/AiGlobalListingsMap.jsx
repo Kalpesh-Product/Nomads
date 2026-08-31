@@ -25,7 +25,7 @@ import SearchBarCombobox from "../components/SearchBarCombobox.jsx";
 import AiSelectedBadgesSearchBar from "../components/AiSelectedBadgesSearchBar.jsx";
 import { AnimatePresence, motion } from "motion/react";
 import PaginatedGrid from "../components/PaginatedGrid.jsx";
-import { Helmet } from "@dr.pogodin/react-helmet";
+import Seo from "../components/Seo.jsx";
 import useAuth from "../hooks/useAuth.js";
 import useSpecialUserEmails from "../hooks/useSpecialUserEmails.js";
 import { HiOutlineX } from "react-icons/hi";
@@ -56,6 +56,20 @@ const SECOND_HEADING_DELAY_MS = 250;
 const THINKING_HEADING_TEXT = "Curating the best results for you";
 const CURATED_RESULTS_HEADING_TEXT =
   "Please find below, the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
+const buildPlacesSeoFallbackPath = (search = "") => {
+  const params = new URLSearchParams(search);
+  const category = params.get("category");
+  const country = params.get("country");
+  const destination = params.get("location") || params.get("state");
+
+  if (category !== PLACES_CATEGORY || !country || !destination) {
+    return "/verticals";
+  }
+
+  return `/listings-list?country=${encodeURIComponent(
+    country,
+  )}&location=${encodeURIComponent(destination)}&category=places`;
+};
 const normalizeContentDestination = (label) =>
   label
     ? label
@@ -205,6 +219,10 @@ const AiGlobalListingsMap = () => {
       ALL_LISTINGS_CATEGORY
     );
   }, [formData?.category, location.search]);
+  const seoFallbackPath = useMemo(
+    () => buildPlacesSeoFallbackPath(location.search),
+    [location.search],
+  );
 
   useEffect(() => {
     if (shouldSkipHeadingIntro) {
@@ -916,28 +934,7 @@ const AiGlobalListingsMap = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Nomads | Explore Global Co-working & Stay Listings</title>
-        <meta
-          name="description"
-          content="Discover top-rated coworking spaces, hostels, cafes, and workation stays across the world. Browse verified listings with reviews, maps, and amenities for digital nomads."
-        />
-        <meta
-          name="keywords"
-          content="digital nomads, coworking map, global listings, workation, hostels, cafes, coliving, remote work, Goa, stay and work"
-        />
-        <meta
-          property="og:title"
-          content="Nomads | Explore Global Co-working & Stay Listings"
-        />
-        <meta
-          property="og:description"
-          content="Explore the world's best coworking and coliving spaces on the Nomads global map — find, compare, and connect instantly."
-        />
-        <meta property="og:image" content="/images/map-preview.jpeg" />
-        <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://wono.co/verticals" />
-      </Helmet>
+      <Seo fallbackPath={seoFallbackPath} image="/images/map-preview.jpeg" />
 
       {/* ==================== DESKTOP VIEW (lg and above) ==================== */}
       <div className="hidden lg:flex flex-col gap-6 px-1 md:px-10">
