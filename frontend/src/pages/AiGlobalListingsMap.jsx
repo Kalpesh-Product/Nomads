@@ -56,19 +56,20 @@ const SECOND_HEADING_DELAY_MS = 250;
 const THINKING_HEADING_TEXT = "Curating the best results for you";
 const CURATED_RESULTS_HEADING_TEXT =
   "Please find below, the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
-const buildPlacesSeoFallbackPath = (search = "") => {
+const buildListingsSeoFallbackPath = (search = "") => {
   const params = new URLSearchParams(search);
   const category = params.get("category");
   const country = params.get("country");
   const destination = params.get("location") || params.get("state");
+  const supportedSeoCategories = [PLACES_CATEGORY, ANNUAL_EVENTS_CATEGORY];
 
-  if (category !== PLACES_CATEGORY || !country || !destination) {
+  if (!supportedSeoCategories.includes(category) || !country || !destination) {
     return "/verticals";
   }
 
   return `/listings-list?country=${encodeURIComponent(
     country,
-  )}&location=${encodeURIComponent(destination)}&category=places`;
+  )}&location=${encodeURIComponent(destination)}&category=${category}`;
 };
 const normalizeContentDestination = (label) =>
   label
@@ -220,7 +221,7 @@ const AiGlobalListingsMap = () => {
     );
   }, [formData?.category, location.search]);
   const seoFallbackPath = useMemo(
-    () => buildPlacesSeoFallbackPath(location.search),
+    () => buildListingsSeoFallbackPath(location.search),
     [location.search],
   );
 

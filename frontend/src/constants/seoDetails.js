@@ -1,6 +1,8 @@
+import eventSeoEntries from "./eventSeoEntries.js";
 import placeSeoEntries from "./placeSeoEntries.js";
 
 const seoEntries = [
+  ...eventSeoEntries,
   ...placeSeoEntries,
   {
     "link": "https://wono.co/verticals",

@@ -65,19 +65,20 @@ const CURATED_RESULTS_HEADING_TEXT =
   "Please find below, the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
 const AI_SCROLL_CONTAINER_ID = "nomad-ai-scroll-container";
 
-const buildPlacesSeoFallbackPath = (search = "") => {
+const buildListingsSeoFallbackPath = (search = "") => {
   const params = new URLSearchParams(search);
   const category = params.get("category");
   const country = params.get("country");
   const destination = params.get("location") || params.get("state");
+  const supportedSeoCategories = [PLACES_CATEGORY, ANNUAL_EVENTS_CATEGORY];
 
-  if (category !== PLACES_CATEGORY || !country || !destination) {
+  if (!supportedSeoCategories.includes(category) || !country || !destination) {
     return "/verticals";
   }
 
   return `/listings-list?country=${encodeURIComponent(
     country,
-  )}&location=${encodeURIComponent(destination)}&category=places`;
+  )}&location=${encodeURIComponent(destination)}&category=${category}`;
 };
 
 const CategoryShortcutButton = ({
@@ -290,7 +291,7 @@ const AiGlobalListingsList = () => {
     );
   }, [location.search, location.state]);
   const seoFallbackPath = useMemo(
-    () => buildPlacesSeoFallbackPath(location.search),
+    () => buildListingsSeoFallbackPath(location.search),
     [location.search],
   );
 
