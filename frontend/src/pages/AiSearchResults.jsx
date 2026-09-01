@@ -61,8 +61,7 @@ const getVisaRequirementApiValue = (value) =>
   visaRequirementApiValueMap[value] || value;
 
 const DEFAULT_PASSPORT_COUNTRY = "India";
-const WORLD_RANKING_RESULTS_GUIDE_SEEN_KEY =
-  "wono-world-ranking-results-guide-seen";
+const AI_SEARCH_RESULTS_GUIDE_SEEN_KEY = "wono-ai-search-results-guide-seen";
 
 const destinationCards = aiDestinationCards;
 const getDestinationFavoriteKey = (destination) =>
@@ -1134,7 +1133,7 @@ const AiSearchResults = () => {
   const hasHydratedVisaRulesRef = useRef(
     Boolean(initialSearchResultsPageState),
   );
-  const hasAutoStartedWorldRankingGuideRef = useRef(false);
+  const hasAutoStartedResultsGuideRef = useRef(false);
   const hasHydratedDestinationRevealRef = useRef(
     Boolean(initialSearchResultsPageState),
   );
@@ -2266,13 +2265,14 @@ const AiSearchResults = () => {
         : [],
     [shouldShowResultsContent, visibleDestinationCount, visibleDestinations],
   );
-  const isWorldRankingResultsPage =
-    selectedGoal === "World Ranking" || goal?.toLowerCase() === "worldranking";
+  const isAiGoalResultsPage = goal
+    ? Boolean(goalNameBySlug[goal.toLowerCase()])
+    : Boolean(selectedGoal);
   const shouldShowNarrative =
     hasSelectedFilters && (typedBottomHeading || typedResultsHeading);
 
-  const startWorldRankingResultsGuide = useCallback(() => {
-    if (typeof window === "undefined" || !isWorldRankingResultsPage) {
+  const startAiSearchResultsGuide = useCallback(() => {
+    if (typeof window === "undefined" || !isAiGoalResultsPage) {
       return;
     }
 
@@ -2326,37 +2326,37 @@ const AiSearchResults = () => {
       doneBtnText: "Done",
       steps: guideSteps,
       onDestroyed: () => {
-        window.localStorage.setItem(WORLD_RANKING_RESULTS_GUIDE_SEEN_KEY, "1");
+        window.localStorage.setItem(AI_SEARCH_RESULTS_GUIDE_SEEN_KEY, "1");
       },
     });
 
     guide.drive();
-  }, [goal, isWorldRankingResultsPage, selectedGoal]);
+  }, [isAiGoalResultsPage]);
 
   useEffect(() => {
     if (
       typeof window === "undefined" ||
-      !isWorldRankingResultsPage ||
-      hasAutoStartedWorldRankingGuideRef.current ||
-      window.localStorage.getItem(WORLD_RANKING_RESULTS_GUIDE_SEEN_KEY) === "1"
+      !isAiGoalResultsPage ||
+      hasAutoStartedResultsGuideRef.current ||
+      window.localStorage.getItem(AI_SEARCH_RESULTS_GUIDE_SEEN_KEY) === "1"
     ) {
       return undefined;
     }
 
-    hasAutoStartedWorldRankingGuideRef.current = true;
+    hasAutoStartedResultsGuideRef.current = true;
 
     const guideDelay = window.setTimeout(() => {
-      startWorldRankingResultsGuide();
+      startAiSearchResultsGuide();
     }, 700);
 
     return () => {
       window.clearTimeout(guideDelay);
     };
   }, [
-    isWorldRankingResultsPage,
+    isAiGoalResultsPage,
     renderedDestinations.length,
     shouldShowNarrative,
-    startWorldRankingResultsGuide,
+    startAiSearchResultsGuide,
   ]);
 
   const [resultsHeadingFirstLine, resultsHeadingRemainingLines] =
@@ -2481,10 +2481,10 @@ const AiSearchResults = () => {
                 )}
                 {typedTopHeading}
               </p>
-              {isWorldRankingResultsPage && (
+              {isAiGoalResultsPage && (
                 <button
                   type="button"
-                  onClick={startWorldRankingResultsGuide}
+                  onClick={startAiSearchResultsGuide}
                   className="inline-flex w-fit items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-black/75 shadow-sm transition-colors hover:border-sky-500 hover:text-sky-600"
                 >
                   <HiOutlineQuestionMarkCircle
