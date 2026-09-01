@@ -5,8 +5,11 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
 import {
   HiOutlineChevronDown,
+  HiOutlineQuestionMarkCircle,
   HiOutlineSearch,
   HiOutlineX,
 } from "react-icons/hi";
@@ -58,6 +61,8 @@ const getVisaRequirementApiValue = (value) =>
   visaRequirementApiValueMap[value] || value;
 
 const DEFAULT_PASSPORT_COUNTRY = "India";
+const WORLD_RANKING_RESULTS_GUIDE_SEEN_KEY =
+  "wono-world-ranking-results-guide-seen";
 
 const destinationCards = aiDestinationCards;
 const getDestinationFavoriteKey = (destination) =>
@@ -960,12 +965,14 @@ const DropdownBadge = ({
   onSelect,
   align = "left",
   size = "default",
+  tourId,
 }) => {
   const menuAlignment = align === "right" ? "right-0" : "left-0";
   const isSmall = size === "small";
 
   return (
     <div
+      data-tour={tourId}
       className={`relative min-w-0 ${isSmall ? "w-full sm:flex-1" : "w-full flex-1"}`}
       onClick={(event) => event.stopPropagation()}
     >
@@ -1127,6 +1134,7 @@ const AiSearchResults = () => {
   const hasHydratedVisaRulesRef = useRef(
     Boolean(initialSearchResultsPageState),
   );
+  const hasAutoStartedWorldRankingGuideRef = useRef(false);
   const hasHydratedDestinationRevealRef = useRef(
     Boolean(initialSearchResultsPageState),
   );
@@ -2258,8 +2266,98 @@ const AiSearchResults = () => {
         : [],
     [shouldShowResultsContent, visibleDestinationCount, visibleDestinations],
   );
+  const isWorldRankingResultsPage =
+    selectedGoal === "World Ranking" || goal?.toLowerCase() === "worldranking";
   const shouldShowNarrative =
     hasSelectedFilters && (typedBottomHeading || typedResultsHeading);
+
+  const startWorldRankingResultsGuide = useCallback(() => {
+    if (typeof window === "undefined" || !isWorldRankingResultsPage) {
+      return;
+    }
+
+    const getVisibleElement = (selector) =>
+      Array.from(document.querySelectorAll(selector)).find(
+        (element) =>
+          element.getClientRects().length > 0 &&
+          window.getComputedStyle(element).visibility !== "hidden",
+      );
+
+    const guideSteps = [
+      {
+        selector: '[data-tour="world-ranking-continent-filter"]',
+        popover: {
+          title: "Choose a region",
+          description:
+            "Use this dropdown to switch between worldwide results and a specific continent.",
+          side: "bottom",
+          align: "start",
+        },
+      },
+      {
+        selector: '[data-tour="world-ranking-goal-filter"]',
+        popover: {
+          title: "Refine the ranking",
+          description:
+            "Pick the exact ranking attribute that matters most for the current world ranking view.",
+          side: "bottom",
+          align: "start",
+        },
+      },
+    ]
+      .map(({ selector, popover }) => ({
+        element: getVisibleElement(selector),
+        popover,
+      }))
+      .filter((step) => step.element);
+
+    if (!guideSteps.length) {
+      return;
+    }
+
+    const guide = driver({
+      showProgress: true,
+      allowClose: true,
+      animate: true,
+      overlayOpacity: 0.55,
+      popoverClass: "wono-driver-popover",
+      nextBtnText: "Next",
+      prevBtnText: "Back",
+      doneBtnText: "Done",
+      steps: guideSteps,
+      onDestroyed: () => {
+        window.localStorage.setItem(WORLD_RANKING_RESULTS_GUIDE_SEEN_KEY, "1");
+      },
+    });
+
+    guide.drive();
+  }, [goal, isWorldRankingResultsPage, selectedGoal]);
+
+  useEffect(() => {
+    if (
+      typeof window === "undefined" ||
+      !isWorldRankingResultsPage ||
+      hasAutoStartedWorldRankingGuideRef.current ||
+      window.localStorage.getItem(WORLD_RANKING_RESULTS_GUIDE_SEEN_KEY) === "1"
+    ) {
+      return undefined;
+    }
+
+    hasAutoStartedWorldRankingGuideRef.current = true;
+
+    const guideDelay = window.setTimeout(() => {
+      startWorldRankingResultsGuide();
+    }, 700);
+
+    return () => {
+      window.clearTimeout(guideDelay);
+    };
+  }, [
+    isWorldRankingResultsPage,
+    renderedDestinations.length,
+    shouldShowNarrative,
+    startWorldRankingResultsGuide,
+  ]);
 
   const [resultsHeadingFirstLine, resultsHeadingRemainingLines] =
     useMemo(() => {
@@ -2370,7 +2468,10 @@ const AiSearchResults = () => {
       <main className="pb-8">
         <div className="mx-0 w-full max-w-[80rem] px-3 sm:px-6 lg:mx-auto lg:max-w-[85rem] lg:px-0 lg:min-w-[75%]">
           <div className="rounded-[10px] bg-white px-0 pb-6">
-            <div className="mt-6 mb-6 lg:ml-[2.5rem] lg:mr-10">
+            <div
+              data-tour="world-ranking-heading"
+              className="mt-6 mb-6 flex flex-col gap-3 lg:ml-[2.5rem] lg:mr-10 lg:flex-row lg:items-start lg:justify-between"
+            >
               <p className="flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
                 {isThinkingHeadingVisible && (
                   <span
@@ -2380,9 +2481,25 @@ const AiSearchResults = () => {
                 )}
                 {typedTopHeading}
               </p>
+              {isWorldRankingResultsPage && (
+                <button
+                  type="button"
+                  onClick={startWorldRankingResultsGuide}
+                  className="inline-flex w-fit items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-black/75 shadow-sm transition-colors hover:border-sky-500 hover:text-sky-600"
+                >
+                  <HiOutlineQuestionMarkCircle
+                    className="text-base"
+                    aria-hidden="true"
+                  />
+                  Guide
+                </button>
+              )}
             </div>
 
-            <div className="mt-4 hidden max-w-full items-center rounded-[30px] border bg-white px-4 py-2 shadow-[0_5px_14px_rgba(0,0,0,0.12)] sm:flex lg:ml-[2.5rem] lg:mr-10">
+            <div
+              data-tour="world-ranking-search-summary"
+              className="mt-4 hidden max-w-full items-center rounded-[30px] border bg-white px-4 py-2 shadow-[0_5px_14px_rgba(0,0,0,0.12)] sm:flex lg:ml-[2.5rem] lg:mr-10"
+            >
               <div className="flex flex-wrap items-center gap-2">
                 {searchBarBadges.map((badgeLabel, index) => (
                   <div
@@ -2420,6 +2537,7 @@ const AiSearchResults = () => {
                   isOpen={openDropdown === "continent"}
                   onToggle={() => handleDropdownToggle("continent")}
                   onSelect={handleContinentSelect}
+                  tourId="world-ranking-continent-filter"
                 />
 
                 <DropdownBadge
@@ -2429,6 +2547,7 @@ const AiSearchResults = () => {
                   isOpen={openDropdown === "goalOption"}
                   onToggle={() => handleDropdownToggle("goalOption")}
                   onSelect={handleGoalOptionSelect}
+                  tourId="world-ranking-goal-filter"
                 />
               </div>
 
@@ -2439,7 +2558,10 @@ const AiSearchResults = () => {
                       {/* <p className="text-sm font-medium leading-relaxed text-primary-blue lg:text-[0.9rem] font-play">
                         {typedBottomHeading}
                       </p> */}
-                      <div className="mt-6 text-sm leading-relaxed text-black/85 lg:text-[0.9rem] font-play">
+                      <div
+                        data-tour="world-ranking-narrative"
+                        className="mt-6 text-sm leading-relaxed text-black/85 lg:text-[0.9rem] font-play"
+                      >
                         <span className="block font-bold">
                           {formattedNarrative.introLine}
                         </span>
@@ -2500,6 +2622,7 @@ const AiSearchResults = () => {
                                   }
                                   onSelect={handleVisaRequirementSelect}
                                   size="small"
+                                  tourId="world-ranking-visa-filter"
                                 />
                               </div>
                             </div>
@@ -2510,7 +2633,10 @@ const AiSearchResults = () => {
                   )}
 
                   {shouldShowResultsContent ? (
-                    <div className="mt-8 grid grid-cols-2 gap-3 md:mt-10 md:grid-cols-3 md:gap-4 xl:grid-cols-4">
+                    <div
+                      data-tour="world-ranking-results-grid"
+                      className="mt-8 grid grid-cols-2 gap-3 md:mt-10 md:grid-cols-3 md:gap-4 xl:grid-cols-4"
+                    >
                       {renderedDestinations.map((destination, index) => {
                         const shouldShowVisaDuration =
                           isVisaRequirementFilterActive(
@@ -2536,6 +2662,11 @@ const AiSearchResults = () => {
                         return (
                           <article
                             key={`${destination.city}-${destination.country}`}
+                            data-tour={
+                              index === 0
+                                ? "world-ranking-result-card"
+                                : undefined
+                            }
                             data-search-result-card-key={destinationCardKey}
                             className="cursor-pointer translate-y-0 opacity-100 transition-all duration-300"
                             role="button"
