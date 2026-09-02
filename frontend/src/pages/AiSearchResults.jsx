@@ -5,11 +5,8 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { driver } from "driver.js";
-import "driver.js/dist/driver.css";
 import {
   HiOutlineChevronDown,
-  HiOutlineQuestionMarkCircle,
   HiOutlineSearch,
   HiOutlineX,
 } from "react-icons/hi";
@@ -61,8 +58,6 @@ const getVisaRequirementApiValue = (value) =>
   visaRequirementApiValueMap[value] || value;
 
 const DEFAULT_PASSPORT_COUNTRY = "India";
-const WORLD_RANKING_RESULTS_GUIDE_SEEN_KEY =
-  "wono-world-ranking-results-guide-seen";
 
 const destinationCards = aiDestinationCards;
 const getDestinationFavoriteKey = (destination) =>
@@ -1134,7 +1129,6 @@ const AiSearchResults = () => {
   const hasHydratedVisaRulesRef = useRef(
     Boolean(initialSearchResultsPageState),
   );
-  const hasAutoStartedWorldRankingGuideRef = useRef(false);
   const hasHydratedDestinationRevealRef = useRef(
     Boolean(initialSearchResultsPageState),
   );
@@ -2266,98 +2260,8 @@ const AiSearchResults = () => {
         : [],
     [shouldShowResultsContent, visibleDestinationCount, visibleDestinations],
   );
-  const isWorldRankingResultsPage =
-    selectedGoal === "World Ranking" || goal?.toLowerCase() === "worldranking";
   const shouldShowNarrative =
     hasSelectedFilters && (typedBottomHeading || typedResultsHeading);
-
-  const startWorldRankingResultsGuide = useCallback(() => {
-    if (typeof window === "undefined" || !isWorldRankingResultsPage) {
-      return;
-    }
-
-    const getVisibleElement = (selector) =>
-      Array.from(document.querySelectorAll(selector)).find(
-        (element) =>
-          element.getClientRects().length > 0 &&
-          window.getComputedStyle(element).visibility !== "hidden",
-      );
-
-    const guideSteps = [
-      {
-        selector: '[data-tour="world-ranking-continent-filter"]',
-        popover: {
-          title: "Choose a region",
-          description:
-            "Use this dropdown to switch between worldwide results and a specific continent.",
-          side: "bottom",
-          align: "start",
-        },
-      },
-      {
-        selector: '[data-tour="world-ranking-goal-filter"]',
-        popover: {
-          title: "Refine the ranking",
-          description:
-            "Pick the exact ranking attribute that matters most for the current world ranking view.",
-          side: "bottom",
-          align: "start",
-        },
-      },
-    ]
-      .map(({ selector, popover }) => ({
-        element: getVisibleElement(selector),
-        popover,
-      }))
-      .filter((step) => step.element);
-
-    if (!guideSteps.length) {
-      return;
-    }
-
-    const guide = driver({
-      showProgress: true,
-      allowClose: true,
-      animate: true,
-      overlayOpacity: 0.55,
-      popoverClass: "wono-driver-popover",
-      nextBtnText: "Next",
-      prevBtnText: "Back",
-      doneBtnText: "Done",
-      steps: guideSteps,
-      onDestroyed: () => {
-        window.localStorage.setItem(WORLD_RANKING_RESULTS_GUIDE_SEEN_KEY, "1");
-      },
-    });
-
-    guide.drive();
-  }, [goal, isWorldRankingResultsPage, selectedGoal]);
-
-  useEffect(() => {
-    if (
-      typeof window === "undefined" ||
-      !isWorldRankingResultsPage ||
-      hasAutoStartedWorldRankingGuideRef.current ||
-      window.localStorage.getItem(WORLD_RANKING_RESULTS_GUIDE_SEEN_KEY) === "1"
-    ) {
-      return undefined;
-    }
-
-    hasAutoStartedWorldRankingGuideRef.current = true;
-
-    const guideDelay = window.setTimeout(() => {
-      startWorldRankingResultsGuide();
-    }, 700);
-
-    return () => {
-      window.clearTimeout(guideDelay);
-    };
-  }, [
-    isWorldRankingResultsPage,
-    renderedDestinations.length,
-    shouldShowNarrative,
-    startWorldRankingResultsGuide,
-  ]);
 
   const [resultsHeadingFirstLine, resultsHeadingRemainingLines] =
     useMemo(() => {
@@ -2481,19 +2385,6 @@ const AiSearchResults = () => {
                 )}
                 {typedTopHeading}
               </p>
-              {isWorldRankingResultsPage && (
-                <button
-                  type="button"
-                  onClick={startWorldRankingResultsGuide}
-                  className="inline-flex w-fit items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-black/75 shadow-sm transition-colors hover:border-sky-500 hover:text-sky-600"
-                >
-                  <HiOutlineQuestionMarkCircle
-                    className="text-base"
-                    aria-hidden="true"
-                  />
-                  Guide
-                </button>
-              )}
             </div>
 
             <div

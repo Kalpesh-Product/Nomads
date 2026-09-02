@@ -27,7 +27,6 @@
     "country-state-city": "^3.2.1",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.18",
-    "driver.js": "^1.8.0",
     "keen-slider": "^6.8.6",
     "libphonenumber-js": "^1.12.26",
     "lucide-react": "^0.483.0",
