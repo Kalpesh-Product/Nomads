@@ -132,6 +132,33 @@ const companySchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  // Soft delete — a host can remove their own listing (only while it's
+  // isActive:false) without permanently destroying it. Deleting always
+  // forces isActive/isPublic false too, so it drops off every visibility
+  // query immediately; recovering it restores the record but leaves those
+  // two flags off, so it goes back through review rather than reappearing
+  // live.
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
+  deletedAt: {
+    type: Date,
+  },
+  deletedBy: {
+    type: String,
+    trim: true,
+  },
+  // Host-initiated ask for staff to restore a deleted listing. Recovery
+  // itself (clearing isDeleted) is a separate staff action gated on this
+  // being true — a deleted listing with no request just sits deleted.
+  recoveryRequested: {
+    type: Boolean,
+    default: false,
+  },
+  recoveryRequestedAt: {
+    type: Date,
+  },
 }, { timestamps: true });
 
 companySchema.index({ companyType: 1 });
