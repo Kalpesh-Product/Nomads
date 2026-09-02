@@ -448,6 +448,7 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
                     state={{
                       redirectTo: getNomadLoginRedirectPath(),
                     }}
+                    data-tour="home-login-link"
                     className="relative inline-block pb-1 transition-all cursor-pointer duration-300 group bg-transparent border-none text-sm text-primary-blue whitespace-nowrap"
                   >
                     Login as Nomad

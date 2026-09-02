@@ -1,8 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FaGlobeAmericas } from "react-icons/fa";
 import { MdOutlineWorkHistory } from "react-icons/md";
-import { HiOutlineCurrencyDollar } from "react-icons/hi";
+import {
+  HiOutlineCurrencyDollar,
+  HiOutlineQuestionMarkCircle,
+} from "react-icons/hi";
 import { RiUserCommunityLine } from "react-icons/ri";
 import { TbAward, TbWorldWww } from "react-icons/tb";
 import { Helmet } from "@dr.pogodin/react-helmet";
@@ -12,6 +17,7 @@ import useAuth from "../hooks/useAuth";
 
 const getTypingSeenKey = (isLoggedIn) =>
   `wono-ai-home-typing-seen-${isLoggedIn ? "logged-in" : "logged-out"}`;
+const HOME_GUIDE_SEEN_KEY = "wono-ai-home-guide-seen";
 
 const gatedRecommendationTitles = new Set([
   "Work From Anywhere",
@@ -91,6 +97,7 @@ const AiHome = () => {
 
   const [areCardsVisible, setAreCardsVisible] = useState(false);
   const [visibleCardCount, setVisibleCardCount] = useState(0);
+  const hasAutoStartedHomeGuideRef = useRef(false);
 
   const { auth } = useAuth();
   const hasNomadLoginState = useNomadLoginState();
@@ -244,6 +251,99 @@ const AiHome = () => {
     };
   }, [areCardsVisible]);
 
+  const startHomeGuide = useCallback(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const getVisibleElement = (selector) =>
+      Array.from(document.querySelectorAll(selector)).find(
+        (element) =>
+          element.getClientRects().length > 0 &&
+          window.getComputedStyle(element).visibility !== "hidden",
+      );
+
+    const sidebarElement =
+      getVisibleElement('[data-tour="home-sidebar"]') ||
+      getVisibleElement('[data-tour="home-mobile-sidebar"]');
+
+    const guideSteps = [
+      {
+        element: getVisibleElement('[data-tour="home-login-link"]'),
+        popover: {
+          title: "Login as Nomad",
+          description:
+            "Login to unlock personalized goals and recommendations for your nomad journey.",
+          side: "bottom",
+          align: "end",
+        },
+      },
+      {
+        element: getVisibleElement('[data-tour="home-goal-cards"]'),
+        popover: {
+          title: "Choose your goal",
+          description:
+            "These six cards help you start with rankings, lifestyle goals, savings, career, community, or classic search.",
+          side: "bottom",
+          align: "center",
+        },
+      },
+      {
+        element: sidebarElement,
+        popover: {
+          title: "Explore from the sidebar",
+          description:
+            "Use the sidebar to move through WONO intelligence, value-added services, and your profile tools.",
+          side: "right",
+          align: "start",
+        },
+      },
+    ].filter((step) => step.element);
+
+    if (!guideSteps.length) {
+      return;
+    }
+
+    const guide = driver({
+      showProgress: true,
+      allowClose: true,
+      animate: true,
+      overlayOpacity: 0.55,
+      popoverClass: "wono-driver-popover",
+      nextBtnText: "Next",
+      prevBtnText: "Back",
+      doneBtnText: "Done",
+      steps: guideSteps,
+      onDestroyed: () => {
+        window.localStorage.setItem(HOME_GUIDE_SEEN_KEY, "1");
+      },
+    });
+
+    guide.drive();
+  }, []);
+
+  useEffect(() => {
+    if (
+      typeof window === "undefined" ||
+      !areCardsVisible ||
+      visibleCardCount < recommendationCards.length ||
+      hasAutoStartedHomeGuideRef.current ||
+      window.localStorage.getItem(HOME_GUIDE_SEEN_KEY) === "1"
+    ) {
+      return undefined;
+    }
+
+    hasAutoStartedHomeGuideRef.current = true;
+
+    const guideDelay = window.setTimeout(() => {
+      startHomeGuide();
+    }, 700);
+
+    return () => {
+      window.clearTimeout(guideDelay);
+    };
+  }, [areCardsVisible, startHomeGuide, visibleCardCount]);
+
   const handleCardClick = (card) => {
     const params = new URLSearchParams(location.search);
     const targetSearch = params.toString() ? `?${params.toString()}` : "";
@@ -308,6 +408,19 @@ const AiHome = () => {
       <div className="flex min-h-[calc(100vh-100px)] flex-col bg-white">
         <main className="flex-1 px-3 py-6 sm:px-6 lg:px-10">
           <div className="mx-auto max-w-5xl text-center">
+            <div className="mb-3 flex justify-end">
+              <button
+                type="button"
+                onClick={startHomeGuide}
+                className="inline-flex w-fit items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-black/75 shadow-sm transition-colors hover:border-sky-500 hover:text-sky-600"
+              >
+                <HiOutlineQuestionMarkCircle
+                  className="text-base"
+                  aria-hidden="true"
+                />
+                Guide
+              </button>
+            </div>
             <h1 className="text-3xl font-medium text-black/90 font-play">
               {typedGreeting}
             </h1>
@@ -335,7 +448,10 @@ const AiHome = () => {
                 areCardsVisible ? "visible" : "invisible"
               }`}
             >
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-2 md:gap-10 xl:grid-cols-3">
+              <div
+                data-tour="home-goal-cards"
+                className="grid grid-cols-2 gap-4 md:grid-cols-2 md:gap-10 xl:grid-cols-3"
+              >
                 {recommendationCards.map((card, index) => {
                   const Icon = card.icon;
 
