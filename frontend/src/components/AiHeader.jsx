@@ -317,6 +317,7 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
                               : verticalsMapViewLink
                           }
                           state={aiVerticalsToggleState}
+                          data-tour="verticals-map-view-link"
                           className="group relative text-md text-black"
                         >
                           <span className="relative z-10 group-hover:font-bold mb-2 text-sm font-semibold">
