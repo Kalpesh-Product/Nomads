@@ -328,6 +328,7 @@ const NomadAiLayout = () => {
                 className={isAiProductPage ? "!px-0" : ""}
                 sticky={false}
                 textSizeClassName="text-sm md:text-sm lg:text-base"
+                tourId={isAiProductPage ? "product-breadcrumb" : undefined}
               />
               </div>
             </div>

@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
 import { Controller, useForm } from "react-hook-form";
 import { TextField } from "@mui/material";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
+import { HiOutlineQuestionMarkCircle } from "react-icons/hi";
 import { CalendarDays, MapPin, Star } from "lucide-react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Map from "../components/Map";
@@ -24,6 +27,7 @@ const getInitials = (name = "") =>
     .slice(0, 2);
 
 const emptyReviewPromptBottomSpacing = "1.5rem";
+const PLACE_DETAIL_GUIDE_SEEN_KEY = "wono-place-detail-guide-seen";
 
 const toValidCoordinate = (value) => {
   if (value === undefined || value === null || String(value).trim() === "") {
@@ -58,6 +62,7 @@ const AiDestinationDetail = ({ type }) => {
   const axiosPrivate = useAxiosPrivate();
   const [isAddReviewOpen, setIsAddReviewOpen] = useState(false);
   const [activeImage, setActiveImage] = useState(null);
+  const hasAutoStartedPlaceDetailGuideRef = useRef(false);
   const isEvent = type === "event";
   const isRestaurant = type === "restaurant";
   const isReviewEnabled = !isRestaurant;
@@ -191,19 +196,129 @@ const AiDestinationDetail = ({ type }) => {
       ]
     : [];
 
+  const startPlaceDetailGuide = useCallback(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const getVisibleElement = (selector) =>
+      Array.from(document.querySelectorAll(selector)).find(
+        (element) =>
+          element.getClientRects().length > 0 &&
+          window.getComputedStyle(element).visibility !== "hidden",
+      );
+
+    const guideSteps = [
+      {
+        selector: '[data-tour="place-write-review"]',
+        popover: {
+          title: "Write a review",
+          description:
+            "Share your experience and help other nomads understand this place.",
+          side: "bottom",
+          align: "center",
+        },
+      },
+      {
+        selector: '[data-tour="place-map-section"]',
+        popover: {
+          title: "Map location",
+          description:
+            "Use this map to see where the place is located before visiting.",
+          side: "top",
+          align: "center",
+        },
+      },
+      {
+        selector: '[data-tour="place-get-direction"]',
+        popover: {
+          title: "Get directions",
+          description:
+            "Open this place in Google Maps for directions and route planning.",
+          side: "left",
+          align: "center",
+        },
+      },
+    ]
+      .map(({ selector, popover }) => ({
+        element: getVisibleElement(selector),
+        popover,
+      }))
+      .filter((step) => step.element);
+
+    if (!guideSteps.length) {
+      return;
+    }
+
+    const guide = driver({
+      showProgress: true,
+      allowClose: true,
+      animate: true,
+      overlayOpacity: 0.55,
+      popoverClass: "wono-driver-popover",
+      nextBtnText: "Next",
+      prevBtnText: "Back",
+      doneBtnText: "Done",
+      steps: guideSteps,
+      onDestroyed: () => {
+        window.localStorage.setItem(PLACE_DETAIL_GUIDE_SEEN_KEY, "1");
+      },
+    });
+
+    guide.drive();
+  }, []);
+
+  useEffect(() => {
+    if (
+      typeof window === "undefined" ||
+      type !== "place" ||
+      !item?.id ||
+      hasAutoStartedPlaceDetailGuideRef.current ||
+      window.localStorage.getItem(PLACE_DETAIL_GUIDE_SEEN_KEY) === "1"
+    ) {
+      return undefined;
+    }
+
+    hasAutoStartedPlaceDetailGuideRef.current = true;
+
+    const guideDelay = window.setTimeout(() => {
+      startPlaceDetailGuide();
+    }, 700);
+
+    return () => {
+      window.clearTimeout(guideDelay);
+    };
+  }, [item?.id, startPlaceDetailGuide, type]);
+
   return (
     <main className="mx-auto w-full max-w-[75rem] px-4 pb-8 lg:px-0">
       <header className="mb-5">
-        <h1 className="text-2xl font-bold text-black md:text-title">
-          {item.title}
-        </h1>
+        <div className="flex items-start justify-between gap-3">
+          <h1 className="text-2xl font-bold text-black md:text-title">
+            {item.title}
+          </h1>
+          {type === "place" && (
+            <button
+              type="button"
+              onClick={startPlaceDetailGuide}
+              className="inline-flex w-fit shrink-0 items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-black/75 shadow-sm transition-colors hover:border-sky-500 hover:text-sky-600"
+            >
+              <HiOutlineQuestionMarkCircle
+                className="text-base"
+                aria-hidden="true"
+              />
+              Guide
+            </button>
+          )}
+        </div>
         <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-sm md:text-base">
           <p className="flex items-center gap-2">
             {isEvent ? <CalendarDays size={17} /> : <MapPin size={17} />}
             {isEvent ? item.subtitle : `Address: ${item.address}`}
           </p>
-          {!isEvent && (
+          {/* {!isEvent && (
             <a
+              data-tour="place-get-direction"
               href={placeDirectionHref}
               target="_blank"
               rel="noreferrer"
@@ -211,7 +326,7 @@ const AiDestinationDetail = ({ type }) => {
             >
               Get Direction
             </a>
-          )}
+          )} */}
         </div>
       </header>
 
@@ -264,6 +379,7 @@ const AiDestinationDetail = ({ type }) => {
           <div className="mb-8 text-center">
             <button
               type="button"
+              data-tour="place-write-review"
               onClick={handleWriteReviewClick}
               className="rounded-full bg-primary-blue px-8 py-3 text-sm font-semibold text-white"
             >
@@ -313,13 +429,17 @@ const AiDestinationDetail = ({ type }) => {
       )}
 
       {hasMapCoordinates && (
-        <section className="mt-5 h-[500px] w-full overflow-hidden rounded-xl border-b border-gray-200 pb-8">
+        <section
+          data-tour="place-map-section"
+          className="mt-5 h-[500px] w-full overflow-hidden rounded-xl border-b border-gray-200 pb-8"
+        >
           <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
             <h1 className="text-title font-medium uppercase text-gray-700">
               Where you'll be
             </h1>
             {placeMapsLink && (
               <a
+                data-tour="place-get-direction"
                 href={placeMapsLink}
                 target="_blank"
                 rel="noreferrer"
