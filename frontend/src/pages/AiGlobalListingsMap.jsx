@@ -67,6 +67,7 @@ const buildListingsSeoFallbackPath = (search = "") => {
   const supportedSeoCategories = [
     PLACES_CATEGORY,
     ANNUAL_EVENTS_CATEGORY,
+    NEWS_CATEGORY,
     BLOGS_CATEGORY,
   ];
 
