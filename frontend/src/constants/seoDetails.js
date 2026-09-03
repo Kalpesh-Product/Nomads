@@ -1,9 +1,11 @@
 import eventSeoEntries from "./eventSeoEntries.js";
 import placeSeoEntries from "./placeSeoEntries.js";
+import blogSeoEntries from "./blogSeoEntries.js";
 
 const seoEntries = [
   ...eventSeoEntries,
   ...placeSeoEntries,
+  ...blogSeoEntries,
   {
     "link": "https://wono.co/verticals",
     "title": "Explore Work, Stay & Cafe Spaces | Nomads",

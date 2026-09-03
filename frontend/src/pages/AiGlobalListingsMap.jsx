@@ -64,7 +64,11 @@ const buildListingsSeoFallbackPath = (search = "") => {
   const category = params.get("category");
   const country = params.get("country");
   const destination = params.get("location") || params.get("state");
-  const supportedSeoCategories = [PLACES_CATEGORY, ANNUAL_EVENTS_CATEGORY];
+  const supportedSeoCategories = [
+    PLACES_CATEGORY,
+    ANNUAL_EVENTS_CATEGORY,
+    BLOGS_CATEGORY,
+  ];
 
   if (!supportedSeoCategories.includes(category) || !country || !destination) {
     return "/verticals";
