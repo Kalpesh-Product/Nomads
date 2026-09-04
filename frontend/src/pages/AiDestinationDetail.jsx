@@ -29,6 +29,7 @@ const getInitials = (name = "") =>
 const emptyReviewPromptBottomSpacing = "1.5rem";
 const PLACE_DETAIL_GUIDE_SEEN_KEY = "wono-place-detail-guide-seen";
 const EVENT_DETAIL_GUIDE_SEEN_KEY = "wono-event-detail-guide-seen";
+const ARE_GUIDES_TEMPORARILY_DISABLED = true;
 
 const toValidCoordinate = (value) => {
   if (value === undefined || value === null || String(value).trim() === "") {
@@ -199,7 +200,7 @@ const AiDestinationDetail = ({ type }) => {
     : [];
 
   const startPlaceDetailGuide = useCallback(() => {
-    if (typeof window === "undefined") {
+    if (typeof window === "undefined" || ARE_GUIDES_TEMPORARILY_DISABLED) {
       return;
     }
 
@@ -271,7 +272,7 @@ const AiDestinationDetail = ({ type }) => {
   }, []);
 
   const startEventDetailGuide = useCallback(() => {
-    if (typeof window === "undefined") {
+    if (typeof window === "undefined" || ARE_GUIDES_TEMPORARILY_DISABLED) {
       return;
     }
 
@@ -355,6 +356,7 @@ const AiDestinationDetail = ({ type }) => {
   useEffect(() => {
     if (
       typeof window === "undefined" ||
+      ARE_GUIDES_TEMPORARILY_DISABLED ||
       type !== "place" ||
       !item?.id ||
       hasAutoStartedPlaceDetailGuideRef.current ||
@@ -377,6 +379,7 @@ const AiDestinationDetail = ({ type }) => {
   useEffect(() => {
     if (
       typeof window === "undefined" ||
+      ARE_GUIDES_TEMPORARILY_DISABLED ||
       type !== "event" ||
       !item?.id ||
       hasAutoStartedEventDetailGuideRef.current ||

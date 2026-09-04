@@ -5,6 +5,7 @@ import { useLocation } from "react-router-dom";
 import humanDate from "../utils/humanDate";
 
 const AI_CONTENT_DETAIL_GUIDE_SEEN_KEY_PREFIX = "wono-ai-content-detail-guide-seen";
+const ARE_GUIDES_TEMPORARILY_DISABLED = true;
 
 const AiBlogDetails = () => {
   // const newsContent = [
@@ -70,7 +71,7 @@ const AiBlogDetails = () => {
   };
 
   const startContentDetailGuide = useCallback(() => {
-    if (typeof window === "undefined") {
+    if (typeof window === "undefined" || ARE_GUIDES_TEMPORARILY_DISABLED) {
       return;
     }
 
@@ -146,6 +147,7 @@ const AiBlogDetails = () => {
   useEffect(() => {
     if (
       typeof window === "undefined" ||
+      ARE_GUIDES_TEMPORARILY_DISABLED ||
       !content ||
       hasAutoStartedContentDetailGuideRef.current ||
       window.localStorage.getItem(contentDetailGuideSeenKey) === "1"

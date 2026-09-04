@@ -62,6 +62,7 @@ const getVisaRequirementApiValue = (value) =>
 
 const DEFAULT_PASSPORT_COUNTRY = "India";
 const AI_SEARCH_RESULTS_GUIDE_SEEN_KEY = "wono-ai-search-results-guide-seen";
+const ARE_GUIDES_TEMPORARILY_DISABLED = true;
 
 const destinationCards = aiDestinationCards;
 const getDestinationFavoriteKey = (destination) =>
@@ -2272,7 +2273,11 @@ const AiSearchResults = () => {
     hasSelectedFilters && (typedBottomHeading || typedResultsHeading);
 
   const startAiSearchResultsGuide = useCallback(() => {
-    if (typeof window === "undefined" || !isAiGoalResultsPage) {
+    if (
+      typeof window === "undefined" ||
+      ARE_GUIDES_TEMPORARILY_DISABLED ||
+      !isAiGoalResultsPage
+    ) {
       return;
     }
 
@@ -2336,6 +2341,7 @@ const AiSearchResults = () => {
   useEffect(() => {
     if (
       typeof window === "undefined" ||
+      ARE_GUIDES_TEMPORARILY_DISABLED ||
       !isAiGoalResultsPage ||
       hasAutoStartedResultsGuideRef.current ||
       window.localStorage.getItem(AI_SEARCH_RESULTS_GUIDE_SEEN_KEY) === "1"

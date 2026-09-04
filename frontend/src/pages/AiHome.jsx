@@ -18,6 +18,7 @@ import useAuth from "../hooks/useAuth";
 const getTypingSeenKey = (isLoggedIn) =>
   `wono-ai-home-typing-seen-${isLoggedIn ? "logged-in" : "logged-out"}`;
 const HOME_GUIDE_SEEN_KEY = "wono-ai-home-guide-seen";
+const ARE_GUIDES_TEMPORARILY_DISABLED = true;
 
 const gatedRecommendationTitles = new Set([
   "Work From Anywhere",
@@ -252,7 +253,7 @@ const AiHome = () => {
   }, [areCardsVisible]);
 
   const startHomeGuide = useCallback(() => {
-    if (typeof window === "undefined") {
+    if (typeof window === "undefined" || ARE_GUIDES_TEMPORARILY_DISABLED) {
       return;
     }
 
@@ -326,6 +327,7 @@ const AiHome = () => {
     if (
       typeof window === "undefined" ||
       !areCardsVisible ||
+      ARE_GUIDES_TEMPORARILY_DISABLED ||
       visibleCardCount < recommendationCards.length ||
       hasAutoStartedHomeGuideRef.current ||
       window.localStorage.getItem(HOME_GUIDE_SEEN_KEY) === "1"

@@ -34,6 +34,7 @@ const contentAlignClassName = "max-[820px]:!px-0 md:px-10";
 
 const TYPING_INTERVAL_MS = 7;
 const MANUAL_SEARCH_GUIDE_SEEN_KEY = "wono-manual-search-guide-seen";
+const ARE_GUIDES_TEMPORARILY_DISABLED = true;
 
 const normalizeLocationKey = (value = "") =>
   value
@@ -445,7 +446,7 @@ const AiManualSearch = () => {
   }, [hasAllSelections, initialTopHeadingText, selectedTopHeadingText]);
 
   const startManualSearchGuide = useCallback(() => {
-    if (typeof window === "undefined") {
+    if (typeof window === "undefined" || ARE_GUIDES_TEMPORARILY_DISABLED) {
       return;
     }
 
@@ -519,6 +520,7 @@ const AiManualSearch = () => {
   useEffect(() => {
     if (
       typeof window === "undefined" ||
+      ARE_GUIDES_TEMPORARILY_DISABLED ||
       hasAutoStartedManualSearchGuideRef.current ||
       window.localStorage.getItem(MANUAL_SEARCH_GUIDE_SEEN_KEY) === "1"
     ) {

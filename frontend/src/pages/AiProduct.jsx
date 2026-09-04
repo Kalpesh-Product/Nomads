@@ -59,6 +59,7 @@ import { navigateBackWithinApp } from "../utils/navigationHistory.js";
 dayjs.extend(relativeTime);
 
 const PRODUCT_GUIDE_SEEN_KEY = "wono-ai-product-guide-seen";
+const ARE_GUIDES_TEMPORARILY_DISABLED = true;
 
 const AiProduct = () => {
   const location = useLocation();
@@ -784,7 +785,7 @@ const AiProduct = () => {
   const mapsData = [forMapsData];
 
   const startProductGuide = useCallback(() => {
-    if (typeof window === "undefined") {
+    if (typeof window === "undefined" || ARE_GUIDES_TEMPORARILY_DISABLED) {
       return;
     }
 
@@ -878,6 +879,7 @@ const AiProduct = () => {
   useEffect(() => {
     if (
       typeof window === "undefined" ||
+      ARE_GUIDES_TEMPORARILY_DISABLED ||
       isCompanyDetails ||
       !companyDetails ||
       hasAutoStartedProductGuideRef.current ||
