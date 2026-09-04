@@ -212,6 +212,16 @@ const AiDestinationDetail = ({ type }) => {
 
     const guideSteps = [
       {
+        selector: '[data-tour="detail-meta-section"]',
+        popover: {
+          title: "Place details",
+          description:
+            "This section summarizes the place type, rating, and destination area.",
+          side: "top",
+          align: "center",
+        },
+      },
+      {
         selector: '[data-tour="place-write-review"]',
         popover: {
           title: "Write a review",
@@ -227,6 +237,16 @@ const AiDestinationDetail = ({ type }) => {
           title: "Map location",
           description:
             "Use this map to see where the place is located before visiting.",
+          side: "top",
+          align: "center",
+        },
+      },
+      {
+        selector: '[data-tour="detail-disclaimer-section"]',
+        popover: {
+          title: "Content disclaimer",
+          description:
+            "This explains how WONO uses public information and links to the full content and copyright policy.",
           side: "top",
           align: "center",
         },
@@ -284,33 +304,13 @@ const AiDestinationDetail = ({ type }) => {
 
     const guideSteps = [
       {
-        selector: '[data-tour="event-category"]',
+        selector: '[data-tour="detail-meta-section"]',
         popover: {
-          title: "Event category",
+          title: "Event details",
           description:
-            "This shows the type of event, such as film, arts, community, or local culture.",
-          side: "top",
-          align: "start",
-        },
-      },
-      {
-        selector: '[data-tour="event-month"]',
-        popover: {
-          title: "Event month",
-          description:
-            "Use this to quickly understand when the event usually takes place.",
+            "This section summarizes the event category, month, and venue information.",
           side: "top",
           align: "center",
-        },
-      },
-      {
-        selector: '[data-tour="event-location"]',
-        popover: {
-          title: "Event venue",
-          description:
-            "This tells you where the event is hosted or which venues are involved.",
-          side: "top",
-          align: "end",
         },
       },
       {
@@ -320,6 +320,16 @@ const AiDestinationDetail = ({ type }) => {
           description:
             "Share your experience after attending so other nomads can learn from it.",
           side: "bottom",
+          align: "center",
+        },
+      },
+      {
+        selector: '[data-tour="detail-disclaimer-section"]',
+        popover: {
+          title: "Content disclaimer",
+          description:
+            "This explains how WONO uses public information and links to the full content and copyright policy.",
+          side: "top",
           align: "center",
         },
       },
@@ -447,14 +457,12 @@ const AiDestinationDetail = ({ type }) => {
         />
       </div>
 
-      <div className="my-5 grid gap-3 border-b border-gray-200 pb-5 text-base font-semibold md:grid-cols-3 md:text-lg">
-        <span data-tour={isEvent ? "event-category" : undefined}>
-          {item.category}
-        </span>
-        <span
-          data-tour={isEvent ? "event-month" : undefined}
-          className="flex items-center gap-1 md:justify-center"
-        >
+      <div
+        data-tour="detail-meta-section"
+        className="my-5 grid gap-3 border-b border-gray-200 pb-5 text-base font-semibold md:grid-cols-3 md:text-lg"
+      >
+        <span>{item.category}</span>
+        <span className="flex items-center gap-1 md:justify-center">
           {isEvent ? (
             item.meta
           ) : (
@@ -463,10 +471,7 @@ const AiDestinationDetail = ({ type }) => {
             </>
           )}
         </span>
-        <span
-          data-tour={isEvent ? "event-location" : undefined}
-          className="md:text-right"
-        >
+        <span className="md:text-right">
           {isEvent ? item.location : item.region}
         </span>
       </div>
@@ -575,7 +580,10 @@ const AiDestinationDetail = ({ type }) => {
         </section>
       )}
 
-      <div className="mt-5 text-[0.5rem] leading-relaxed text-gray-500">
+      <div
+        data-tour="detail-disclaimer-section"
+        className="mt-5 text-[0.5rem] leading-relaxed text-gray-500"
+      >
         <p className="mb-2">
           <b>Source:</b> All above content, images and details are placeholder
           content for the supplied mockup and will be replaced with verified
