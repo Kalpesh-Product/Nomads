@@ -846,6 +846,16 @@ const AiProduct = () => {
           align: "center",
         },
       },
+      {
+        selector: '[data-tour="product-disclaimer-section"]',
+        popover: {
+          title: "Content disclaimer",
+          description:
+            "This explains how WONO uses public information and links to the full content and copyright policy.",
+          side: "top",
+          align: "center",
+        },
+      },
     ]
       .map(({ selector, popover }) => ({
         element: getVisibleElement(selector),
@@ -1879,7 +1889,10 @@ render={({ field }) => (
             )}
 
             {/* Desktop Disclaimer */}
-            <div className="text-[0.74rem] text-gray-500 leading-relaxed">
+            <div
+              data-tour="product-disclaimer-section"
+              className="text-[0.74rem] text-gray-500 leading-relaxed"
+            >
               <p className="mb-2">
                 <b>Source:</b> All above content, images and details have been
                 sourced from publicly available information.
@@ -2823,7 +2836,10 @@ render={({ field }) => (
             <hr className="mt-5 mb-0 lg:mt-10 lg:mb-0" />
 
             {/* Mobile Disclaimer */}
-            <div className="text-[0.74rem] text-gray-500 leading-relaxed">
+            <div
+              data-tour="product-disclaimer-section"
+              className="text-[0.74rem] text-gray-500 leading-relaxed"
+            >
               <p className="mb-2">
                 <b>Source:</b> All above content, images and details have been
                 sourced from publicly available information.
