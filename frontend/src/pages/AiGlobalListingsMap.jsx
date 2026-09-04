@@ -64,6 +64,9 @@ const buildListingsSeoFallbackPath = (search = "") => {
   const category = params.get("category");
   const country = params.get("country");
   const destination = params.get("location") || params.get("state");
+  const goal = params.get("goal");
+  const continent = params.get("continent");
+  const goalOption = params.get("goalOption");
   const supportedSeoCategories = [
     PLACES_CATEGORY,
     ANNUAL_EVENTS_CATEGORY,
@@ -71,13 +74,33 @@ const buildListingsSeoFallbackPath = (search = "") => {
     BLOGS_CATEGORY,
   ];
 
-  if (!supportedSeoCategories.includes(category) || !country || !destination) {
-    return "/verticals";
+  if (category) {
+    if (
+      !supportedSeoCategories.includes(category) ||
+      !country ||
+      !destination
+    ) {
+      return "/verticals";
+    }
+
+    return `/listings-list?country=${encodeURIComponent(
+      country,
+    )}&location=${encodeURIComponent(destination)}&category=${category}`;
   }
 
-  return `/listings-list?country=${encodeURIComponent(
-    country,
-  )}&location=${encodeURIComponent(destination)}&category=${category}`;
+  if (country && destination && goal && continent && goalOption) {
+    const destinationSeoParams = new URLSearchParams({
+      country,
+      state: destination,
+      goal,
+      continent,
+      goalOption,
+    });
+
+    return `/verticals?${destinationSeoParams.toString()}`;
+  }
+
+  return "/verticals";
 };
 const normalizeContentDestination = (label) =>
   label

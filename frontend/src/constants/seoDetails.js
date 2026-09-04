@@ -2,12 +2,14 @@ import eventSeoEntries from "./eventSeoEntries.js";
 import placeSeoEntries from "./placeSeoEntries.js";
 import blogSeoEntries from "./blogSeoEntries.js";
 import newsSeoEntries from "./newsSeoEntries.js";
+import destinationSeoEntries from "./destinationSeoEntries.js";
 
 const seoEntries = [
   ...eventSeoEntries,
   ...placeSeoEntries,
   ...blogSeoEntries,
   ...newsSeoEntries,
+  ...destinationSeoEntries,
   {
     "link": "https://wono.co/verticals",
     "title": "Explore Work, Stay & Cafe Spaces | Nomads",
@@ -436,23 +438,66 @@ const decodePath = (path = "") => {
   }
 };
 
+const getDestinationSeoLookupKey = (value = "") => {
+  try {
+    const url = new URL(value, "https://wono.co");
+    const pathname =
+      url.pathname.length > 1 ? url.pathname.replace(/\/$/, "") : url.pathname;
+
+    if (pathname !== "/verticals") return null;
+
+    const country = url.searchParams.get("country");
+    const destination =
+      url.searchParams.get("state") || url.searchParams.get("location");
+
+    if (!country || !destination) return null;
+
+    const params = new URLSearchParams({
+      country,
+      state: destination,
+    });
+
+    return `/verticals?${params.toString()}`;
+  } catch {
+    return null;
+  }
+};
+
 const seoByPath = seoEntries.reduce((lookup, entry) => {
   const key = normalizePath(entry.link);
+  const destinationKey = getDestinationSeoLookupKey(entry.link);
   lookup[key] = entry;
   lookup[decodePath(key)] = entry;
+
+  if (destinationKey) {
+    lookup[destinationKey] = entry;
+    lookup[decodePath(destinationKey)] = entry;
+  }
+
   return lookup;
 }, {});
 
 export const getSeoDetailsByPath = (path, fallbackPath) => {
   const key = normalizePath(path);
   const decodedKey = decodePath(key);
+  const destinationKey = getDestinationSeoLookupKey(path);
   const fallbackKey = fallbackPath ? normalizePath(fallbackPath) : null;
+  const fallbackDestinationKey = fallbackPath
+    ? getDestinationSeoLookupKey(fallbackPath)
+    : null;
 
   return (
     seoByPath[key] ||
     seoByPath[decodedKey] ||
+    (destinationKey
+      ? seoByPath[destinationKey] || seoByPath[decodePath(destinationKey)]
+      : null) ||
     (fallbackKey
       ? seoByPath[fallbackKey] || seoByPath[decodePath(fallbackKey)]
+      : null) ||
+    (fallbackDestinationKey
+      ? seoByPath[fallbackDestinationKey] ||
+        seoByPath[decodePath(fallbackDestinationKey)]
       : null) ||
     null
   );
