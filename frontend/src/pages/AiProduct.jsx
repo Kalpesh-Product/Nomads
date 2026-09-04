@@ -1,4 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
 import {
   NavLink,
   useLocation,
@@ -41,6 +43,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import AmenitiesList from "../components/AmenitiesList";
 import { FaCheck } from "react-icons/fa";
+import { HiOutlineQuestionMarkCircle } from "react-icons/hi";
 import TransparentModal from "../components/TransparentModal";
 import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
@@ -54,6 +57,9 @@ import {
 import { navigateBackWithinApp } from "../utils/navigationHistory.js";
 
 dayjs.extend(relativeTime);
+
+const PRODUCT_GUIDE_SEEN_KEY = "wono-ai-product-guide-seen";
+const ARE_GUIDES_TEMPORARILY_DISABLED = true;
 
 const AiProduct = () => {
   const location = useLocation();
@@ -100,6 +106,7 @@ const AiProduct = () => {
   const carouselRef = useRef(null);
   const reviewScrollRef = useRef(null); // For Mobile/Tablet
   const desktopReviewScrollRef = useRef(null); // For Desktop
+  const hasAutoStartedProductGuideRef = useRef(false);
 
   const handleScroll = (e) => {
     const scrollLeft = e.target.scrollLeft;
@@ -777,6 +784,121 @@ const AiProduct = () => {
 
   const mapsData = [forMapsData];
 
+  const startProductGuide = useCallback(() => {
+    if (typeof window === "undefined" || ARE_GUIDES_TEMPORARILY_DISABLED) {
+      return;
+    }
+
+    const getVisibleElement = (selector) =>
+      Array.from(document.querySelectorAll(selector)).find(
+        (element) =>
+          element.getClientRects().length > 0 &&
+          window.getComputedStyle(element).visibility !== "hidden",
+      );
+
+    const guideSteps = [
+      {
+        selector: '[data-tour="product-breadcrumb"]',
+        popover: {
+          title: "Breadcrumb navigation",
+          description:
+            "Use this path to jump back to the selected region, destination, or listing category.",
+          side: "bottom",
+          align: "start",
+        },
+      },
+      {
+        selector: '[data-tour="product-enquiry-form"]',
+        popover: {
+          title: "Send an enquiry",
+          description:
+            "Share your details here to enquire and receive a quote from the listing team.",
+          side: "left",
+          align: "start",
+        },
+      },
+      {
+        selector: '[data-tour="product-write-review"]',
+        popover: {
+          title: "Write a review",
+          description:
+            "Leave feedback for this listing after you have visited or used the space.",
+          side: "top",
+          align: "center",
+        },
+      },
+      {
+        selector: '[data-tour="product-map-section"]',
+        popover: {
+          title: "Map location",
+          description:
+            "Check where this listing is located before planning your visit.",
+          side: "top",
+          align: "center",
+        },
+      },
+      {
+        selector: '[data-tour="product-get-direction"]',
+        popover: {
+          title: "Get directions",
+          description:
+            "Open the listing in Google Maps to navigate directly to the location.",
+          side: "left",
+          align: "center",
+        },
+      },
+    ]
+      .map(({ selector, popover }) => ({
+        element: getVisibleElement(selector),
+        popover,
+      }))
+      .filter((step) => step.element);
+
+    if (!guideSteps.length) {
+      return;
+    }
+
+    const guide = driver({
+      showProgress: true,
+      allowClose: true,
+      animate: true,
+      overlayOpacity: 0.55,
+      popoverClass: "wono-driver-popover",
+      nextBtnText: "Next",
+      prevBtnText: "Back",
+      doneBtnText: "Done",
+      steps: guideSteps,
+      onDestroyed: () => {
+        window.localStorage.setItem(PRODUCT_GUIDE_SEEN_KEY, "1");
+      },
+    });
+
+    guide.drive();
+  }, []);
+
+  useEffect(() => {
+    if (
+      typeof window === "undefined" ||
+      ARE_GUIDES_TEMPORARILY_DISABLED ||
+      isCompanyDetails ||
+      !companyDetails ||
+      hasAutoStartedProductGuideRef.current ||
+      window.localStorage.getItem(PRODUCT_GUIDE_SEEN_KEY) === "1"
+    ) {
+      return undefined;
+    }
+
+    hasAutoStartedProductGuideRef.current = true;
+
+    const guideDelay = window.setTimeout(() => {
+      startProductGuide();
+    }, 700);
+
+    return () => {
+      window.clearTimeout(guideDelay);
+    };
+  }, [companyDetails, isCompanyDetails, startProductGuide]);
+
   const handleCopyShareLink = async () => {
     if (!shareUrl) return;
     if (navigator?.clipboard?.writeText) {
@@ -949,9 +1071,24 @@ const AiProduct = () => {
                 </span>
               ))}
           </nav>
-          <h1 className="text-title font-semibold text-secondary-dark">
-            {listingTitle || "Loading Title..."}
-          </h1>
+          <div className="flex items-start justify-between gap-3">
+            <h1 className="text-title font-semibold text-secondary-dark">
+              {listingTitle || "Loading Title..."}
+            </h1>
+            {/* Guide button hidden for now. Uncomment when guides should be manually accessible again.
+            <button
+              type="button"
+              onClick={startProductGuide}
+              className="inline-flex w-fit shrink-0 items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-black/75 shadow-sm transition-colors hover:border-sky-500 hover:text-sky-600"
+            >
+              <HiOutlineQuestionMarkCircle
+                className="text-base"
+                aria-hidden="true"
+              />
+              Guide
+            </button>
+            */}
+          </div>
         </div>
 
         <div className="flex flex-col gap-8">
@@ -1200,7 +1337,10 @@ const AiProduct = () => {
                 </div>
               </div>
 
-              <div className="shadow-md flex flex-col gap-4 p-6 rounded-xl border-2">
+              <div
+                data-tour="product-enquiry-form"
+                className="shadow-md flex flex-col gap-4 p-6 rounded-xl border-2"
+              >
                 <h1 className="text-card-title text-secondary-dark font-semibold leading-normal">
                   Enquire & Receive Quote
                 </h1>
@@ -1536,6 +1676,7 @@ render={({ field }) => (
             <div className="flex justify-center">
               <button
                 type="button"
+                data-tour="product-write-review"
                 className="flex rounded-full items-center cursor-pointer justify-center  gap-2
         bg-primary-blue hover:bg-secondary-light text-primary
         text-content leading-5
@@ -1578,11 +1719,14 @@ render={({ field }) => (
             <hr className="my-5 lg:my-10" />
 
             {/* Desktop Map */}
-            <div className="w-full h-[500px] flex flex-col gap-8 rounded-xl overflow-hidden">
+            <div
+              data-tour="product-map-section"
+              className="w-full h-[500px] flex flex-col gap-8 rounded-xl overflow-hidden"
+            >
              
-            <div class="mt-2 flex flex-wrap items-center justify-between gap-2 text-sm md:text-base"> <h1 className="text-title font-medium text-gray-700 uppercase">
+            <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-sm md:text-base"> <h1 className="text-title font-medium text-gray-700 uppercase">
                 Where you'll be
-              </h1> <a href={companyDetails?.googleMap} target="_blank" rel="noreferrer" class="font-medium text-blue-600 underline">Get Direction</a></div>
+              </h1> <a data-tour="product-get-direction" href={companyDetails?.googleMap} target="_blank" rel="noreferrer" className="font-medium text-blue-600 underline">Get Direction</a></div>
               <Map
                 locations={mapsData}
                 disableNavigation
@@ -1847,9 +1991,24 @@ render={({ field }) => (
                 </span>
               ))}
           </nav>
-          <h1 className="text-title font-semibold text-secondary-dark">
-            {companyDetails?.companyName || "Loading Title..."}
-          </h1>
+          <div className="flex items-start justify-between gap-3">
+            <h1 className="text-title font-semibold text-secondary-dark">
+              {companyDetails?.companyName || "Loading Title..."}
+            </h1>
+            {/* Guide button hidden for now. Uncomment when guides should be manually accessible again.
+            <button
+              type="button"
+              onClick={startProductGuide}
+              className="inline-flex w-fit shrink-0 items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-black/75 shadow-sm transition-colors hover:border-sky-500 hover:text-sky-600"
+            >
+              <HiOutlineQuestionMarkCircle
+                className="text-base"
+                aria-hidden="true"
+              />
+              Guide
+            </button>
+            */}
+          </div>
         </div>
 
         <div className="flex flex-col gap-8">
@@ -2162,7 +2321,10 @@ render={({ field }) => (
                 </div>
 
                 {/* Mobile/Tablet Enquiry Form */}
-                <div className="shadow-lg flex flex-col gap-2 md:gap-4 p-4 md:p-5 lg:p-8 rounded-2xl border border-gray-100 bg-white max-w-full">
+                <div
+                  data-tour="product-enquiry-form"
+                  className="shadow-lg flex flex-col gap-2 md:gap-4 p-4 md:p-5 lg:p-8 rounded-2xl border border-gray-100 bg-white max-w-full"
+                >
                   <h1 className="text-lg text-center md:text-base lg:text-xl xl:text-2xl text-secondary-dark font-bold">
                     Enquire & Receive Quote
                   </h1>
@@ -2483,6 +2645,7 @@ render={({ field }) => (
             <div className="flex justify-center items-center mb-6">
               <button
                 type="button"
+                data-tour="product-write-review"
                 className="flex rounded-full items-center cursor-pointer justify-center  gap-2
         bg-primary-blue hover:bg-secondary-light text-primary
         text-content leading-5
@@ -2497,7 +2660,10 @@ render={({ field }) => (
             <hr className="my-5 lg:my-10" />
 
             {/* Mobile Map */}
-            <div className="w-full h-[350px] md:h-[500px] flex flex-col gap-8 rounded-xl overflow-hidden mt-6">
+            <div
+              data-tour="product-map-section"
+              className="w-full h-[350px] md:h-[500px] flex flex-col gap-8 rounded-xl overflow-hidden mt-6"
+            >
               <h1 className="text-title font-medium text-gray-700 uppercase">
                 Where you'll be
               </h1>

@@ -7,6 +7,8 @@ import {
 } from "@mui/material";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useEffect, useMemo, useState } from "react";
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
 import { Controller, useForm } from "react-hook-form";
 import Container from "../components/Container";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
@@ -28,7 +30,7 @@ import PaginatedGrid from "../components/PaginatedGrid.jsx";
 import Seo from "../components/Seo.jsx";
 import useAuth from "../hooks/useAuth.js";
 import useSpecialUserEmails from "../hooks/useSpecialUserEmails.js";
-import { HiOutlineX } from "react-icons/hi";
+import { HiOutlineQuestionMarkCircle, HiOutlineX } from "react-icons/hi";
 import {
   persistSelectedDestination,
   readSelectedDestination,
@@ -56,20 +58,50 @@ const SECOND_HEADING_DELAY_MS = 250;
 const THINKING_HEADING_TEXT = "Curating the best results for you";
 const CURATED_RESULTS_HEADING_TEXT =
   "Please find below, the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
+const VERTICALS_MAP_GUIDE_SEEN_KEY = "wono-verticals-map-guide-seen";
+const ARE_GUIDES_TEMPORARILY_DISABLED = true;
 const buildListingsSeoFallbackPath = (search = "") => {
   const params = new URLSearchParams(search);
   const category = params.get("category");
   const country = params.get("country");
   const destination = params.get("location") || params.get("state");
-  const supportedSeoCategories = [PLACES_CATEGORY, ANNUAL_EVENTS_CATEGORY];
+  const goal = params.get("goal");
+  const continent = params.get("continent");
+  const goalOption = params.get("goalOption");
+  const supportedSeoCategories = [
+    PLACES_CATEGORY,
+    ANNUAL_EVENTS_CATEGORY,
+    NEWS_CATEGORY,
+    BLOGS_CATEGORY,
+  ];
 
-  if (!supportedSeoCategories.includes(category) || !country || !destination) {
-    return "/verticals";
+  if (category) {
+    if (
+      !supportedSeoCategories.includes(category) ||
+      !country ||
+      !destination
+    ) {
+      return "/verticals";
+    }
+
+    return `/listings-list?country=${encodeURIComponent(
+      country,
+    )}&location=${encodeURIComponent(destination)}&category=${category}`;
   }
 
-  return `/listings-list?country=${encodeURIComponent(
-    country,
-  )}&location=${encodeURIComponent(destination)}&category=${category}`;
+  if (country && destination && goal && continent && goalOption) {
+    const destinationSeoParams = new URLSearchParams({
+      country,
+      state: destination,
+      goal,
+      continent,
+      goalOption,
+    });
+
+    return `/verticals?${destinationSeoParams.toString()}`;
+  }
+
+  return "/verticals";
 };
 const normalizeContentDestination = (label) =>
   label
@@ -176,6 +208,7 @@ const AiGlobalListingsMap = () => {
   );
   const [isHeadingSequenceComplete, setIsHeadingSequenceComplete] =
     useState(shouldSkipHeadingIntro);
+  const hasAutoStartedVerticalsMapGuideRef = React.useRef(false);
   const useCroppedDesktopShortcuts = useCroppedDesktopShortcutIcons();
   const listingPageStateStorageKey = useMemo(
     () =>
@@ -933,6 +966,101 @@ const AiGlobalListingsMap = () => {
     [isLisitingLoading, listingsData],
   );
 
+  const startVerticalsMapGuide = React.useCallback(() => {
+    if (typeof window === "undefined" || ARE_GUIDES_TEMPORARILY_DISABLED) {
+      return;
+    }
+
+    const getVisibleElement = (selector) =>
+      Array.from(document.querySelectorAll(selector)).find(
+        (element) =>
+          element.getClientRects().length > 0 &&
+          window.getComputedStyle(element).visibility !== "hidden",
+      );
+
+    const guideSteps = [
+      {
+        selector: '[data-tour="verticals-map-category-strip"]',
+        popover: {
+          title: "Filter by category",
+          description:
+            "Use this strip to filter what appears in the map view by listing type and local content.",
+          side: "bottom",
+          align: "center",
+        },
+      },
+      {
+        selector: '[data-tour="verticals-map-section"]',
+        popover: {
+          title: "Explore the map",
+          description:
+            "Use the map to browse destination listings by where they are located.",
+          side: "left",
+          align: "center",
+        },
+      },
+      {
+        selector: '[data-tour="verticals-list-view-link"]',
+        popover: {
+          title: "Switch to List View",
+          description:
+            "Use List View to compare the same destination results as cards.",
+          side: "bottom",
+          align: "start",
+        },
+      },
+    ]
+      .map(({ selector, popover }) => ({
+        element: getVisibleElement(selector),
+        popover,
+      }))
+      .filter((step) => step.element);
+
+    if (!guideSteps.length) {
+      return;
+    }
+
+    const guide = driver({
+      showProgress: true,
+      allowClose: true,
+      animate: true,
+      overlayOpacity: 0.55,
+      popoverClass: "wono-driver-popover",
+      nextBtnText: "Next",
+      prevBtnText: "Back",
+      doneBtnText: "Done",
+      steps: guideSteps,
+      onDestroyed: () => {
+        window.localStorage.setItem(VERTICALS_MAP_GUIDE_SEEN_KEY, "1");
+      },
+    });
+
+    guide.drive();
+  }, []);
+
+  useEffect(() => {
+    if (
+      typeof window === "undefined" ||
+      ARE_GUIDES_TEMPORARILY_DISABLED ||
+      !isHeadingSequenceComplete ||
+      isLisitingLoading ||
+      hasAutoStartedVerticalsMapGuideRef.current ||
+      window.localStorage.getItem(VERTICALS_MAP_GUIDE_SEEN_KEY) === "1"
+    ) {
+      return undefined;
+    }
+
+    hasAutoStartedVerticalsMapGuideRef.current = true;
+
+    const guideDelay = window.setTimeout(() => {
+      startVerticalsMapGuide();
+    }, 700);
+
+    return () => {
+      window.clearTimeout(guideDelay);
+    };
+  }, [isHeadingSequenceComplete, isLisitingLoading, startVerticalsMapGuide]);
+
   return (
     <>
       <Seo fallbackPath={seoFallbackPath} image="/images/map-preview.jpeg" />
@@ -946,15 +1074,30 @@ const AiGlobalListingsMap = () => {
             onBack={() => navigateBackWithinApp(navigate)}
             onClear={() => navigate("/search/results")}
             heading={
-              <p className="mt-0 mb-5 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.8rem] font-play">
-                {!isSecondHeadingPhase && (
-                  <span
-                    className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-b-transparent"
+              <div className="mt-0 mb-5 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                <p className="flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.8rem] font-play">
+                  {!isSecondHeadingPhase && (
+                    <span
+                      className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-b-transparent"
+                      aria-hidden="true"
+                    />
+                  )}
+                  {typedHeading}
+                </p>
+                {/* Guide button hidden for now. Uncomment when guides should be manually accessible again.
+                <button
+                  type="button"
+                  onClick={startVerticalsMapGuide}
+                  className="inline-flex w-fit items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-black/75 shadow-sm transition-colors hover:border-sky-500 hover:text-sky-600"
+                >
+                  <HiOutlineQuestionMarkCircle
+                    className="text-base"
                     aria-hidden="true"
                   />
-                )}
-                {typedHeading}
-              </p>
+                  Guide
+                </button>
+                */}
+              </div>
             }
             className="mb-2"
             fullWidth
@@ -966,7 +1109,10 @@ const AiGlobalListingsMap = () => {
           <div className="w-full px-0">
             <div className="flex flex-col gap-4 justify-between items-center">
               <div className="w-full pb-4">
-                <div className="flex justify-between items-center">
+                <div
+                  data-tour="verticals-map-category-strip"
+                  className="flex justify-between items-center"
+                >
                   {isLisitingLoading ? (
                     <CategoryShortcutSkeletons
                       itemClassName="px-1 py-2 flex items-center justify-center w-full"
@@ -1155,7 +1301,10 @@ const AiGlobalListingsMap = () => {
                     </div>
                   )}
                 </div>
-                <div className="col-span-4 sticky top-24 h-screen lg:h-[68%] pb-10">
+                <div
+                  data-tour="verticals-map-section"
+                  className="col-span-4 sticky top-24 h-screen lg:h-[68%] pb-10"
+                >
                   <div className="rounded-xl h-full overflow-hidden">
                     {isLisitingLoading ? (
                       <SkeletonMap />
@@ -1215,7 +1364,10 @@ const AiGlobalListingsMap = () => {
             </div>
 
             {/* Collection/Category Chips */}
-            <div className="pointer-events-auto w-full max-w-[450px] flex overflow-x-auto gap-2 pb-2 scrollbar-hide scroll-smooth snap-x">
+            <div
+              data-tour="verticals-map-category-strip"
+              className="pointer-events-auto w-full max-w-[450px] flex overflow-x-auto gap-2 pb-2 scrollbar-hide scroll-smooth snap-x"
+            >
               {[
                 { label: "All", value: ALL_LISTINGS_CATEGORY },
                 ...categoryOptions.filter(
@@ -1343,7 +1495,10 @@ const AiGlobalListingsMap = () => {
             {" "}
             {/* Add padding to account for floating search bar */}
             <div className="font-semibold text-md grid grid-cols-9 gap-4 pt-3">
-              <div className="col-span-full fixed inset-0 lg:relative lg:inset-auto h-screen pb-10 z-40">
+              <div
+                data-tour="verticals-map-section"
+                className="col-span-full fixed inset-0 lg:relative lg:inset-auto h-screen pb-10 z-40"
+              >
                 <div className="h-full w-full rounded-xl overflow-hidden">
                   {isLisitingLoading ? (
                     <SkeletonMap />

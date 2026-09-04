@@ -507,6 +507,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   return (
     <>
       <aside
+        data-tour={isMobileOverlay ? "home-mobile-sidebar" : "home-sidebar"}
         className={`flex h-full max-h-screen flex-col overflow-y-auto overscroll-contain border-r border-black/10 bg-[#efefef] transition-all duration-300 custom-scrollbar-hide ${
           isMobileOverlay
             ? "w-[calc(100%-52px)] max-w-[320px]"

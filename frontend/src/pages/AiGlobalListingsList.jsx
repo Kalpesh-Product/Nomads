@@ -1,6 +1,8 @@
 import { MenuItem, TextField } from "@mui/material";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useEffect, useMemo, useState } from "react";
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
 import { Controller, useForm } from "react-hook-form";
 import { CiSearch } from "react-icons/ci";
 import { AiFillStar } from "react-icons/ai";
@@ -25,7 +27,7 @@ import { AnimatePresence, motion } from "motion/react";
 import Seo from "../components/Seo.jsx";
 import useAuth from "../hooks/useAuth.js";
 import useSpecialUserEmails from "../hooks/useSpecialUserEmails.js";
-import { HiOutlineX } from "react-icons/hi";
+import { HiOutlineQuestionMarkCircle, HiOutlineX } from "react-icons/hi";
 import {
   persistSelectedDestination,
   readSelectedDestination,
@@ -64,21 +66,51 @@ const THINKING_HEADING_TEXT = "Curating the best results for you";
 const CURATED_RESULTS_HEADING_TEXT =
   "Please find below, the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
 const AI_SCROLL_CONTAINER_ID = "nomad-ai-scroll-container";
+const VERTICALS_LIST_GUIDE_SEEN_KEY = "wono-verticals-list-guide-seen";
+const ARE_GUIDES_TEMPORARILY_DISABLED = true;
 
 const buildListingsSeoFallbackPath = (search = "") => {
   const params = new URLSearchParams(search);
   const category = params.get("category");
   const country = params.get("country");
   const destination = params.get("location") || params.get("state");
-  const supportedSeoCategories = [PLACES_CATEGORY, ANNUAL_EVENTS_CATEGORY];
+  const goal = params.get("goal");
+  const continent = params.get("continent");
+  const goalOption = params.get("goalOption");
+  const supportedSeoCategories = [
+    PLACES_CATEGORY,
+    ANNUAL_EVENTS_CATEGORY,
+    NEWS_CATEGORY,
+    BLOGS_CATEGORY,
+  ];
 
-  if (!supportedSeoCategories.includes(category) || !country || !destination) {
-    return "/verticals";
+  if (category) {
+    if (
+      !supportedSeoCategories.includes(category) ||
+      !country ||
+      !destination
+    ) {
+      return "/verticals";
+    }
+
+    return `/listings-list?country=${encodeURIComponent(
+      country,
+    )}&location=${encodeURIComponent(destination)}&category=${category}`;
   }
 
-  return `/listings-list?country=${encodeURIComponent(
-    country,
-  )}&location=${encodeURIComponent(destination)}&category=${category}`;
+  if (country && destination && goal && continent && goalOption) {
+    const destinationSeoParams = new URLSearchParams({
+      country,
+      state: destination,
+      goal,
+      continent,
+      goalOption,
+    });
+
+    return `/verticals?${destinationSeoParams.toString()}`;
+  }
+
+  return "/verticals";
 };
 
 const CategoryShortcutButton = ({
@@ -728,6 +760,7 @@ const AiGlobalListingsList = () => {
   }, [formData?.country, formData?.location]);
 
   const hasRestoredPageStateRef = React.useRef(false);
+  const hasAutoStartedVerticalsListGuideRef = React.useRef(false);
   const sectionRefs = React.useRef({});
   const getDiscoverySectionKey = React.useCallback((categoryValue) => {
     const viewport = window.innerWidth >= 1024 ? "desktop" : "mobile";
@@ -1375,6 +1408,111 @@ const AiGlobalListingsList = () => {
     });
   }, [getDiscoverySectionRef, isHeadingSequenceComplete, location.search]);
 
+  const startVerticalsListGuide = React.useCallback(() => {
+    if (typeof window === "undefined" || ARE_GUIDES_TEMPORARILY_DISABLED) {
+      return;
+    }
+
+    const getVisibleElement = (selector) =>
+      Array.from(document.querySelectorAll(selector)).find(
+        (element) =>
+          element.getClientRects().length > 0 &&
+          window.getComputedStyle(element).visibility !== "hidden",
+      );
+
+    const guideSteps = [
+      {
+        selector: '[data-tour="verticals-category-strip"]',
+        popover: {
+          title: "Filter by category",
+          description:
+            "Use this strip to filter listings by coworking, coliving, hostels, meetings, cafes, events, places, news, blogs, and value adds.",
+          side: "bottom",
+          align: "center",
+        },
+      },
+      {
+        selector: '[data-tour="verticals-popular-coworking"]',
+        popover: {
+          title: "Popular coworking spaces",
+          description:
+            "Browse the top coworking options curated for the selected destination.",
+          side: "bottom",
+          align: "start",
+        },
+      },
+      {
+        selector: '[data-tour="verticals-first-view-more"]',
+        popover: {
+          title: "View more listings",
+          description:
+            "Open more results from this section when the first set of cards is not enough.",
+          side: "left",
+          align: "center",
+        },
+      },
+      {
+        selector: '[data-tour="verticals-map-view-link"]',
+        popover: {
+          title: "Switch to Map View",
+          description:
+            "Use Map View to explore the same destination results geographically.",
+          side: "bottom",
+          align: "start",
+        },
+      },
+    ]
+      .map(({ selector, popover }) => ({
+        element: getVisibleElement(selector),
+        popover,
+      }))
+      .filter((step) => step.element);
+
+    if (!guideSteps.length) {
+      return;
+    }
+
+    const guide = driver({
+      showProgress: true,
+      allowClose: true,
+      animate: true,
+      overlayOpacity: 0.55,
+      popoverClass: "wono-driver-popover",
+      nextBtnText: "Next",
+      prevBtnText: "Back",
+      doneBtnText: "Done",
+      steps: guideSteps,
+      onDestroyed: () => {
+        window.localStorage.setItem(VERTICALS_LIST_GUIDE_SEEN_KEY, "1");
+      },
+    });
+
+    guide.drive();
+  }, []);
+
+  useEffect(() => {
+    if (
+      typeof window === "undefined" ||
+      ARE_GUIDES_TEMPORARILY_DISABLED ||
+      !isHeadingSequenceComplete ||
+      isLisitingLoading ||
+      hasAutoStartedVerticalsListGuideRef.current ||
+      window.localStorage.getItem(VERTICALS_LIST_GUIDE_SEEN_KEY) === "1"
+    ) {
+      return undefined;
+    }
+
+    hasAutoStartedVerticalsListGuideRef.current = true;
+
+    const guideDelay = window.setTimeout(() => {
+      startVerticalsListGuide();
+    }, 700);
+
+    return () => {
+      window.clearTimeout(guideDelay);
+    };
+  }, [isHeadingSequenceComplete, isLisitingLoading, startVerticalsListGuide]);
+
   return (
     <>
       <Seo fallbackPath={seoFallbackPath} image="/images/homepage.jpeg" />
@@ -1388,15 +1526,30 @@ const AiGlobalListingsList = () => {
             onBack={() => navigateBackWithinApp(navigate)}
             onClear={() => navigateBackWithinApp(navigate)}
             heading={
-              <p className=" mt-0 mb-5 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
-                {!isSecondHeadingPhase && (
-                  <span
-                    className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-b-transparent"
+              <div className="mt-0 mb-5 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                <p className="flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
+                  {!isSecondHeadingPhase && (
+                    <span
+                      className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-b-transparent"
+                      aria-hidden="true"
+                    />
+                  )}
+                  {typedHeading}
+                </p>
+                {/* Guide button hidden for now. Uncomment when guides should be manually accessible again.
+                <button
+                  type="button"
+                  onClick={startVerticalsListGuide}
+                  className="inline-flex w-fit items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-black/75 shadow-sm transition-colors hover:border-sky-500 hover:text-sky-600"
+                >
+                  <HiOutlineQuestionMarkCircle
+                    className="text-base"
                     aria-hidden="true"
                   />
-                )}
-                {typedHeading}
-              </p>
+                  Guide
+                </button>
+                */}
+              </div>
             }
             className="mb-2"
             fullWidth
@@ -1408,7 +1561,10 @@ const AiGlobalListingsList = () => {
           <div className="w-full px-0">
             <div className="flex flex-col gap-4 justify-between items-center w-full h-full">
               <div className="w-full pb-4">
-                <div className="flex justify-between items-center">
+                <div
+                  data-tour="verticals-category-strip"
+                  className="flex justify-between items-center"
+                >
                   {isLisitingLoading ? (
                     <CategoryShortcutSkeletons
                       itemClassName="px-1 py-2 flex items-center justify-center w-full"
@@ -1583,6 +1739,11 @@ const AiGlobalListingsList = () => {
                           return (
                             <div
                               key={type}
+                              data-tour={
+                                type === "coworking"
+                                  ? "verticals-popular-coworking"
+                                  : undefined
+                              }
                               ref={(element) => {
                                 if (element) {
                                   sectionRefs.current[type] = element;
@@ -1626,6 +1787,11 @@ const AiGlobalListingsList = () => {
                                 <div className="mt-0 text-right">
                                   <button
                                     onClick={() => handleShowMoreClick(type)}
+                                    data-tour={
+                                      type === "coworking"
+                                        ? "verticals-first-view-more"
+                                        : undefined
+                                    }
                                     className="relative inline-block pb-1 text-primary-blue text-sm font-semibold transition-all cursor-pointer duration-300 group bg-transparent border-none"
                                   >
                                     <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-primary-blue transition-all duration-300 group-hover:w-full"></span>
@@ -1865,7 +2031,10 @@ const AiGlobalListingsList = () => {
               </div>
             </div>
 
-            <div className="lg:hidden flex justify-start overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 max-sm:pb-2">
+            <div
+              data-tour="verticals-category-strip"
+              className="lg:hidden flex justify-start overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 max-sm:pb-2"
+            >
               {isLisitingLoading ? (
                 <CategoryShortcutSkeletons
                   itemClassName="flex-shrink-0 snap-start px-2 py-2 flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] min-w-[5rem] md:min-w-[5.75rem] max-sm:py-1"

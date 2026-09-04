@@ -200,7 +200,7 @@ export default function AmenitiesList({ type = "coworking", inclusions = [] }) {
             key={amenity}
             className="flex items-center gap-3 w-full"
           >
-            <div className="h-10 w-10 flex-shrink-0 overflow-hidden relative rounded-lg bg-gray-50 p-1">
+            <div className="h-10 w-10 flex-shrink-0 overflow-hidden relative rounded-lg p-1">
               <img
                 src={iconSrc}
                 className="h-full w-full object-contain"

@@ -58,6 +58,8 @@ const getVisaRequirementApiValue = (value) =>
   visaRequirementApiValueMap[value] || value;
 
 const DEFAULT_PASSPORT_COUNTRY = "India";
+const AI_SEARCH_RESULTS_GUIDE_SEEN_KEY = "wono-ai-search-results-guide-seen";
+const ARE_GUIDES_TEMPORARILY_DISABLED = true;
 
 const destinationCards = aiDestinationCards;
 const getDestinationFavoriteKey = (destination) =>
@@ -1129,6 +1131,7 @@ const AiSearchResults = () => {
   const hasHydratedVisaRulesRef = useRef(
     Boolean(initialSearchResultsPageState),
   );
+  const hasAutoStartedResultsGuideRef = useRef(false);
   const hasHydratedDestinationRevealRef = useRef(
     Boolean(initialSearchResultsPageState),
   );
@@ -2260,8 +2263,104 @@ const AiSearchResults = () => {
         : [],
     [shouldShowResultsContent, visibleDestinationCount, visibleDestinations],
   );
+  const isAiGoalResultsPage = goal
+    ? Boolean(goalNameBySlug[goal.toLowerCase()])
+    : Boolean(selectedGoal);
   const shouldShowNarrative =
     hasSelectedFilters && (typedBottomHeading || typedResultsHeading);
+
+  const startAiSearchResultsGuide = useCallback(() => {
+    if (
+      typeof window === "undefined" ||
+      ARE_GUIDES_TEMPORARILY_DISABLED ||
+      !isAiGoalResultsPage
+    ) {
+      return;
+    }
+
+    const getVisibleElement = (selector) =>
+      Array.from(document.querySelectorAll(selector)).find(
+        (element) =>
+          element.getClientRects().length > 0 &&
+          window.getComputedStyle(element).visibility !== "hidden",
+      );
+
+    const guideSteps = [
+      {
+        selector: '[data-tour="world-ranking-continent-filter"]',
+        popover: {
+          title: "Choose a region",
+          description:
+            "Use this dropdown to switch between worldwide results and a specific continent.",
+          side: "bottom",
+          align: "start",
+        },
+      },
+      {
+        selector: '[data-tour="world-ranking-goal-filter"]',
+        popover: {
+          title: "Refine the ranking",
+          description:
+            "Pick the exact ranking attribute that matters most for the current world ranking view.",
+          side: "bottom",
+          align: "start",
+        },
+      },
+    ]
+      .map(({ selector, popover }) => ({
+        element: getVisibleElement(selector),
+        popover,
+      }))
+      .filter((step) => step.element);
+
+    if (!guideSteps.length) {
+      return;
+    }
+
+    const guide = driver({
+      showProgress: true,
+      allowClose: true,
+      animate: true,
+      overlayOpacity: 0.55,
+      popoverClass: "wono-driver-popover",
+      nextBtnText: "Next",
+      prevBtnText: "Back",
+      doneBtnText: "Done",
+      steps: guideSteps,
+      onDestroyed: () => {
+        window.localStorage.setItem(AI_SEARCH_RESULTS_GUIDE_SEEN_KEY, "1");
+      },
+    });
+
+    guide.drive();
+  }, [isAiGoalResultsPage]);
+
+  useEffect(() => {
+    if (
+      typeof window === "undefined" ||
+      ARE_GUIDES_TEMPORARILY_DISABLED ||
+      !isAiGoalResultsPage ||
+      hasAutoStartedResultsGuideRef.current ||
+      window.localStorage.getItem(AI_SEARCH_RESULTS_GUIDE_SEEN_KEY) === "1"
+    ) {
+      return undefined;
+    }
+
+    hasAutoStartedResultsGuideRef.current = true;
+
+    const guideDelay = window.setTimeout(() => {
+      startAiSearchResultsGuide();
+    }, 700);
+
+    return () => {
+      window.clearTimeout(guideDelay);
+    };
+  }, [
+    isAiGoalResultsPage,
+    renderedDestinations.length,
+    shouldShowNarrative,
+    startAiSearchResultsGuide,
+  ]);
 
   const [resultsHeadingFirstLine, resultsHeadingRemainingLines] =
     useMemo(() => {
@@ -2385,6 +2484,21 @@ const AiSearchResults = () => {
                 )}
                 {typedTopHeading}
               </p>
+              {/* Guide button hidden for now. Uncomment when guides should be manually accessible again.
+              {isAiGoalResultsPage && (
+                <button
+                  type="button"
+                  onClick={startAiSearchResultsGuide}
+                  className="inline-flex w-fit items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-black/75 shadow-sm transition-colors hover:border-sky-500 hover:text-sky-600"
+                >
+                  <HiOutlineQuestionMarkCircle
+                    className="text-base"
+                    aria-hidden="true"
+                  />
+                  Guide
+                </button>
+              )}
+              */}
             </div>
 
             <div
