@@ -69,6 +69,19 @@ const buildExactKeyword = (label) => {
   const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   return `^${escaped}$`;
 };
+const formatContentDate = (date) => {
+  if (!date) return "";
+
+  const parsedDate = new Date(date);
+  if (!Number.isNaN(parsedDate.getTime())) {
+    const day = String(parsedDate.getDate()).padStart(2, "0");
+    const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
+    const year = parsedDate.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
+
+  return String(date).replace(/\//g, "-");
+};
 const extractImageFromContent = (content) => {
   const match = content?.match(/<img.*?src=["'](.*?)["']/);
   return match ? match[1] : null;
@@ -1119,7 +1132,7 @@ const AiListings = ({ forceListView = false }) => {
           newsItem.mainImage ||
           extractImageFromContent(newsItem.content || newsItem.description),
         location: newsItem.author || newsItem.source || "Source",
-        meta: newsItem.date ? new Date(newsItem.date).toLocaleDateString() : "",
+        meta: formatContentDate(newsItem.date),
         description: newsItem.mainContent || newsItem.description,
       })),
     [newsData],
@@ -1134,7 +1147,7 @@ const AiListings = ({ forceListView = false }) => {
           blog.mainImage ||
           extractImageFromContent(blog.content || blog.description),
         location: blog.author || "Author",
-        meta: blog.date ? new Date(blog.date).toLocaleDateString() : "",
+        meta: formatContentDate(blog.date),
         description: blog.mainContent || blog.description,
       })),
     [blogsData],

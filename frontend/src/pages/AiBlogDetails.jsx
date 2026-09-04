@@ -1,6 +1,11 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
 import { useLocation } from "react-router-dom";
 import humanDate from "../utils/humanDate";
+
+const AI_CONTENT_DETAIL_GUIDE_SEEN_KEY_PREFIX = "wono-ai-content-detail-guide-seen";
+const ARE_GUIDES_TEMPORARILY_DISABLED = true;
 
 const AiBlogDetails = () => {
   // const newsContent = [
@@ -34,9 +39,14 @@ const AiBlogDetails = () => {
   //   },
   // ];
   const location = useLocation();
-  const { content } = location.state;
+  const { content } = location.state || {};
   console.log("content : ", content);
   const newsContent = content?.sections || [];
+  const contentType = location.pathname.includes("/news/")
+    ? "news"
+    : "blog";
+  const contentDetailGuideSeenKey = `${AI_CONTENT_DETAIL_GUIDE_SEEN_KEY_PREFIX}-${contentType}`;
+  const hasAutoStartedContentDetailGuideRef = useRef(false);
 
   const [activeImage, setActiveImage] = useState(null);
 
@@ -59,6 +69,102 @@ const AiBlogDetails = () => {
       window.location.href = "https://host.wono.co/content-and-copyright";
     }
   };
+
+  const startContentDetailGuide = useCallback(() => {
+    if (typeof window === "undefined" || ARE_GUIDES_TEMPORARILY_DISABLED) {
+      return;
+    }
+
+    const getVisibleElement = (selector) =>
+      Array.from(document.querySelectorAll(selector)).find(
+        (element) =>
+          element.getClientRects().length > 0 &&
+          window.getComputedStyle(element).visibility !== "hidden",
+      );
+
+    const guideSteps = [
+      {
+        selector: '[data-tour="content-author"]',
+        popover: {
+          title: contentType === "news" ? "News source" : "Author",
+          description:
+            contentType === "news"
+              ? "This shows who published or provided the news item."
+              : "This shows who wrote or published the blog post.",
+          side: "top",
+          align: "start",
+        },
+      },
+      {
+        selector: '[data-tour="content-date"]',
+        popover: {
+          title: "Published date",
+          description:
+            "Use this date to understand when the article was published or last recorded.",
+          side: "top",
+          align: "center",
+        },
+      },
+      {
+        selector: '[data-tour="content-source"]',
+        popover: {
+          title: "Original source",
+          description:
+            "This identifies the source connected with the content.",
+          side: "top",
+          align: "end",
+        },
+      },
+    ]
+      .map(({ selector, popover }) => ({
+        element: getVisibleElement(selector),
+        popover,
+      }))
+      .filter((step) => step.element);
+
+    if (!guideSteps.length) {
+      return;
+    }
+
+    const guide = driver({
+      showProgress: true,
+      allowClose: true,
+      animate: true,
+      overlayOpacity: 0.55,
+      popoverClass: "wono-driver-popover",
+      nextBtnText: "Next",
+      prevBtnText: "Back",
+      doneBtnText: "Done",
+      steps: guideSteps,
+      onDestroyed: () => {
+        window.localStorage.setItem(contentDetailGuideSeenKey, "1");
+      },
+    });
+
+    guide.drive();
+  }, [contentDetailGuideSeenKey, contentType]);
+
+  useEffect(() => {
+    if (
+      typeof window === "undefined" ||
+      ARE_GUIDES_TEMPORARILY_DISABLED ||
+      !content ||
+      hasAutoStartedContentDetailGuideRef.current ||
+      window.localStorage.getItem(contentDetailGuideSeenKey) === "1"
+    ) {
+      return undefined;
+    }
+
+    hasAutoStartedContentDetailGuideRef.current = true;
+
+    const guideDelay = window.setTimeout(() => {
+      startContentDetailGuide();
+    }, 700);
+
+    return () => {
+      window.clearTimeout(guideDelay);
+    };
+  }, [content, contentDetailGuideSeenKey, startContentDetailGuide]);
 
   return (
     <div className="min-w-[70%] max-w-[80rem] lg:max-w-[75rem] mx-0 md:mx-auto p-4 lg:p-0">
@@ -125,13 +231,22 @@ const AiBlogDetails = () => {
         </section>
         <hr />
         <footer className="flex w-full flex-col items-center gap-2 text-center text-sm md:flex-row md:items-center md:justify-between md:gap-4 md:text-left md:text-base">
-          <p className="w-full break-words md:w-auto">
+          <p
+            data-tour="content-author"
+            className="w-full break-words md:w-auto"
+          >
             {content?.author || ""}
           </p>
-          <p className="w-full break-words md:w-auto">
+          <p
+            data-tour="content-date"
+            className="w-full break-words md:w-auto"
+          >
             {humanDate(content?.date) || new Date().toLocaleString()}
           </p>
-          <p className="w-full break-words md:w-auto md:text-right">
+          <p
+            data-tour="content-source"
+            className="w-full break-words md:w-auto md:text-right"
+          >
             {typeof content?.source === "object"
               ? content?.source?.name || "Source"
               : content?.source || "Source"}

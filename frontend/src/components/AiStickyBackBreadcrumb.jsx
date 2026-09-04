@@ -11,11 +11,13 @@ const AiStickyBackBreadcrumb = ({
   textSizeClassName = "",
   label = null,
   sticky = true,
+  tourId,
 }) => {
   const stickyClassName = sticky ? `sticky ${topClassName}` : "";
 
   return (
     <div
+      data-tour={tourId}
       className={`${stickyClassName} z-[100] bg-white pt-0 pb-4 shadow-none md:px-10 ${className}`}
     >
       <div className={`flex min-w-0 items-center gap-2 ${rowClassName}`}>

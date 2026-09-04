@@ -317,6 +317,7 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
                               : verticalsMapViewLink
                           }
                           state={aiVerticalsToggleState}
+                          data-tour="verticals-map-view-link"
                           className="group relative text-md text-black"
                         >
                           <span className="relative z-10 group-hover:font-bold mb-2 text-sm font-semibold">
@@ -338,6 +339,7 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
                               : verticalsListViewLink
                           }
                           state={aiVerticalsToggleState}
+                          data-tour="verticals-list-view-link"
                           className="group relative text-md text-black"
                         >
                           <span className="relative z-10 group-hover:font-bold mb-2 text-sm font-semibold">
@@ -448,6 +450,7 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
                     state={{
                       redirectTo: getNomadLoginRedirectPath(),
                     }}
+                    data-tour="home-login-link"
                     className="relative inline-block pb-1 transition-all cursor-pointer duration-300 group bg-transparent border-none text-sm text-primary-blue whitespace-nowrap"
                   >
                     Login as Nomad

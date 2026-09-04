@@ -1,8 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import React, { useMemo, useRef, useState, useEffect } from "react";
+import React, { useCallback, useMemo, useRef, useState, useEffect } from "react";
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
 import { Helmet } from "@dr.pogodin/react-helmet";
 import {
   HiOutlineChevronDown,
+  HiOutlineQuestionMarkCircle,
   HiOutlineSearch,
   HiOutlineX,
 } from "react-icons/hi";
@@ -30,6 +33,8 @@ const contentAlignClassName = "max-[820px]:!px-0 md:px-10";
 // ];
 
 const TYPING_INTERVAL_MS = 7;
+const MANUAL_SEARCH_GUIDE_SEEN_KEY = "wono-manual-search-guide-seen";
+const ARE_GUIDES_TEMPORARILY_DISABLED = true;
 
 const normalizeLocationKey = (value = "") =>
   value
@@ -70,9 +75,10 @@ const DropdownBadge = ({
   onToggle,
   onSelect,
   disabled = false,
+  tourId,
 }) => {
   return (
-    <div className="relative w-full min-w-0 flex-1">
+    <div className="relative w-full min-w-0 flex-1" data-tour={tourId}>
       <button
         type="button"
         onClick={onToggle}
@@ -148,6 +154,7 @@ const AiManualSearch = () => {
   const { continent: continentParam, country: countryParam } = useParams();
   const dispatch = useDispatch();
   const dropdownContainerRef = useRef(null);
+  const hasAutoStartedManualSearchGuideRef = useRef(false);
   const { auth } = useAuth();
 
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -438,6 +445,99 @@ const AiManualSearch = () => {
     };
   }, [hasAllSelections, initialTopHeadingText, selectedTopHeadingText]);
 
+  const startManualSearchGuide = useCallback(() => {
+    if (typeof window === "undefined" || ARE_GUIDES_TEMPORARILY_DISABLED) {
+      return;
+    }
+
+    const getVisibleElement = (selector) =>
+      Array.from(document.querySelectorAll(selector)).find(
+        (element) =>
+          element.getClientRects().length > 0 &&
+          window.getComputedStyle(element).visibility !== "hidden",
+      );
+
+    const guideSteps = [
+      {
+        selector: '[data-tour="manual-search-continent-filter"]',
+        popover: {
+          title: "Choose a continent",
+          description:
+            "Start by narrowing the search to the region you want to explore.",
+          side: "bottom",
+          align: "start",
+        },
+      },
+      {
+        selector: '[data-tour="manual-search-country-filter"]',
+        popover: {
+          title: "Choose a country",
+          description:
+            "After selecting a continent, pick the country for your classic search.",
+          side: "bottom",
+          align: "start",
+        },
+      },
+      {
+        selector: '[data-tour="manual-search-location-filter"]',
+        popover: {
+          title: "Choose a location",
+          description:
+            "Finish with a city or state to open curated listings for that place.",
+          side: "bottom",
+          align: "start",
+        },
+      },
+    ]
+      .map(({ selector, popover }) => ({
+        element: getVisibleElement(selector),
+        popover,
+      }))
+      .filter((step) => step.element);
+
+    if (!guideSteps.length) {
+      return;
+    }
+
+    const guide = driver({
+      showProgress: true,
+      allowClose: true,
+      animate: true,
+      overlayOpacity: 0.55,
+      popoverClass: "wono-driver-popover",
+      nextBtnText: "Next",
+      prevBtnText: "Back",
+      doneBtnText: "Done",
+      steps: guideSteps,
+      onDestroyed: () => {
+        window.localStorage.setItem(MANUAL_SEARCH_GUIDE_SEEN_KEY, "1");
+      },
+    });
+
+    guide.drive();
+  }, []);
+
+  useEffect(() => {
+    if (
+      typeof window === "undefined" ||
+      ARE_GUIDES_TEMPORARILY_DISABLED ||
+      hasAutoStartedManualSearchGuideRef.current ||
+      window.localStorage.getItem(MANUAL_SEARCH_GUIDE_SEEN_KEY) === "1"
+    ) {
+      return undefined;
+    }
+
+    hasAutoStartedManualSearchGuideRef.current = true;
+
+    const guideDelay = window.setTimeout(() => {
+      startManualSearchGuide();
+    }, 700);
+
+    return () => {
+      window.clearTimeout(guideDelay);
+    };
+  }, [startManualSearchGuide]);
+
   return (
     <div className="min-h-full bg-white">
       <Helmet>
@@ -466,10 +566,25 @@ const AiManualSearch = () => {
       <main className="pb-8">
         <div className="mx-0 w-full max-w-none px-3 sm:max-w-[20rem] sm:px-6 max-[820px]:!max-w-none max-[820px]:!px-3 lg:mx-auto lg:max-w-[85rem] lg:px-0 lg:min-w-[75%]">
           <div className="rounded-[10px] bg-white px-0 pb-6">
-            <div className={`mt-6 mb-6 ${contentAlignClassName}`}>
+            <div
+              className={`mt-6 mb-6 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between ${contentAlignClassName}`}
+            >
               <p className="text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
                 {typedTopHeading}
               </p>
+              {/* Guide button hidden for now. Uncomment when guides should be manually accessible again.
+              <button
+                type="button"
+                onClick={startManualSearchGuide}
+                className="inline-flex w-fit items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-black/75 shadow-sm transition-colors hover:border-sky-500 hover:text-sky-600"
+              >
+                <HiOutlineQuestionMarkCircle
+                  className="text-base"
+                  aria-hidden="true"
+                />
+                Guide
+              </button>
+              */}
             </div>
 
             <div className={contentAlignClassName}>
@@ -530,6 +645,7 @@ const AiManualSearch = () => {
                     setOpenDropdown(null);
                     navigateToManualSearchStep({ continent: value });
                   }}
+                  tourId="manual-search-continent-filter"
                 />
 
                 <DropdownBadge
@@ -550,6 +666,7 @@ const AiManualSearch = () => {
                     });
                   }}
                   disabled={!selectedContinent}
+                  tourId="manual-search-country-filter"
                 />
 
                 <DropdownBadge
@@ -570,6 +687,7 @@ const AiManualSearch = () => {
                     });
                   }}
                   disabled={!selectedCountry}
+                  tourId="manual-search-location-filter"
                 />
               </div>
 
