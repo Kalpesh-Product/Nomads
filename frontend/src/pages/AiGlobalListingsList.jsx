@@ -1511,6 +1511,7 @@ const AiGlobalListingsList = () => {
                   )}
                   {typedHeading}
                 </p>
+                {/* Guide button hidden for now. Uncomment when guides should be manually accessible again.
                 <button
                   type="button"
                   onClick={startVerticalsListGuide}
@@ -1522,6 +1523,7 @@ const AiGlobalListingsList = () => {
                   />
                   Guide
                 </button>
+                */}
               </div>
             }
             className="mb-2"

@@ -570,6 +570,7 @@ const AiManualSearch = () => {
               <p className="text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
                 {typedTopHeading}
               </p>
+              {/* Guide button hidden for now. Uncomment when guides should be manually accessible again.
               <button
                 type="button"
                 onClick={startManualSearchGuide}
@@ -581,6 +582,7 @@ const AiManualSearch = () => {
                 />
                 Guide
               </button>
+              */}
             </div>
 
             <div className={contentAlignClassName}>

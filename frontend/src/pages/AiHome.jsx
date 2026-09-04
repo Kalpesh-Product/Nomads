@@ -408,6 +408,7 @@ const AiHome = () => {
       <div className="flex min-h-[calc(100vh-100px)] flex-col bg-white">
         <main className="flex-1 px-3 py-6 sm:px-6 lg:px-10">
           <div className="mx-auto max-w-5xl text-center">
+            {/* Guide button hidden for now. Uncomment when guides should be manually accessible again.
             <div className="mb-3 flex justify-end">
               <button
                 type="button"
@@ -421,6 +422,7 @@ const AiHome = () => {
                 Guide
               </button>
             </div>
+            */}
             <h1 className="text-3xl font-medium text-black/90 font-play">
               {typedGreeting}
             </h1>

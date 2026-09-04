@@ -1059,6 +1059,7 @@ const AiGlobalListingsMap = () => {
                   )}
                   {typedHeading}
                 </p>
+                {/* Guide button hidden for now. Uncomment when guides should be manually accessible again.
                 <button
                   type="button"
                   onClick={startVerticalsMapGuide}
@@ -1070,6 +1071,7 @@ const AiGlobalListingsMap = () => {
                   />
                   Guide
                 </button>
+                */}
               </div>
             }
             className="mb-2"

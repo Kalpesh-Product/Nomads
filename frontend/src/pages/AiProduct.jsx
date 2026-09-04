@@ -1073,6 +1073,7 @@ const AiProduct = () => {
             <h1 className="text-title font-semibold text-secondary-dark">
               {listingTitle || "Loading Title..."}
             </h1>
+            {/* Guide button hidden for now. Uncomment when guides should be manually accessible again.
             <button
               type="button"
               onClick={startProductGuide}
@@ -1084,6 +1085,7 @@ const AiProduct = () => {
               />
               Guide
             </button>
+            */}
           </div>
         </div>
 
@@ -1991,6 +1993,7 @@ render={({ field }) => (
             <h1 className="text-title font-semibold text-secondary-dark">
               {companyDetails?.companyName || "Loading Title..."}
             </h1>
+            {/* Guide button hidden for now. Uncomment when guides should be manually accessible again.
             <button
               type="button"
               onClick={startProductGuide}
@@ -2002,6 +2005,7 @@ render={({ field }) => (
               />
               Guide
             </button>
+            */}
           </div>
         </div>
 

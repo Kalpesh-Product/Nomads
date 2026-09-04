@@ -297,6 +297,7 @@ const AiDestinationDetail = ({ type }) => {
           <h1 className="text-2xl font-bold text-black md:text-title">
             {item.title}
           </h1>
+          {/* Guide button hidden for now. Uncomment when guides should be manually accessible again.
           {type === "place" && (
             <button
               type="button"
@@ -310,6 +311,7 @@ const AiDestinationDetail = ({ type }) => {
               Guide
             </button>
           )}
+          */}
         </div>
         <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-sm md:text-base">
           <p className="flex items-center gap-2">

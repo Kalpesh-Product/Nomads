@@ -2481,6 +2481,7 @@ const AiSearchResults = () => {
                 )}
                 {typedTopHeading}
               </p>
+              {/* Guide button hidden for now. Uncomment when guides should be manually accessible again.
               {isAiGoalResultsPage && (
                 <button
                   type="button"
@@ -2494,6 +2495,7 @@ const AiSearchResults = () => {
                   Guide
                 </button>
               )}
+              */}
             </div>
 
             <div
