@@ -28,6 +28,7 @@ const getInitials = (name = "") =>
 
 const emptyReviewPromptBottomSpacing = "1.5rem";
 const PLACE_DETAIL_GUIDE_SEEN_KEY = "wono-place-detail-guide-seen";
+const EVENT_DETAIL_GUIDE_SEEN_KEY = "wono-event-detail-guide-seen";
 
 const toValidCoordinate = (value) => {
   if (value === undefined || value === null || String(value).trim() === "") {
@@ -63,6 +64,7 @@ const AiDestinationDetail = ({ type }) => {
   const [isAddReviewOpen, setIsAddReviewOpen] = useState(false);
   const [activeImage, setActiveImage] = useState(null);
   const hasAutoStartedPlaceDetailGuideRef = useRef(false);
+  const hasAutoStartedEventDetailGuideRef = useRef(false);
   const isEvent = type === "event";
   const isRestaurant = type === "restaurant";
   const isReviewEnabled = !isRestaurant;
@@ -268,6 +270,88 @@ const AiDestinationDetail = ({ type }) => {
     guide.drive();
   }, []);
 
+  const startEventDetailGuide = useCallback(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const getVisibleElement = (selector) =>
+      Array.from(document.querySelectorAll(selector)).find(
+        (element) =>
+          element.getClientRects().length > 0 &&
+          window.getComputedStyle(element).visibility !== "hidden",
+      );
+
+    const guideSteps = [
+      {
+        selector: '[data-tour="event-category"]',
+        popover: {
+          title: "Event category",
+          description:
+            "This shows the type of event, such as film, arts, community, or local culture.",
+          side: "top",
+          align: "start",
+        },
+      },
+      {
+        selector: '[data-tour="event-month"]',
+        popover: {
+          title: "Event month",
+          description:
+            "Use this to quickly understand when the event usually takes place.",
+          side: "top",
+          align: "center",
+        },
+      },
+      {
+        selector: '[data-tour="event-location"]',
+        popover: {
+          title: "Event venue",
+          description:
+            "This tells you where the event is hosted or which venues are involved.",
+          side: "top",
+          align: "end",
+        },
+      },
+      {
+        selector: '[data-tour="event-write-review"]',
+        popover: {
+          title: "Write a review",
+          description:
+            "Share your experience after attending so other nomads can learn from it.",
+          side: "bottom",
+          align: "center",
+        },
+      },
+    ]
+      .map(({ selector, popover }) => ({
+        element: getVisibleElement(selector),
+        popover,
+      }))
+      .filter((step) => step.element);
+
+    if (!guideSteps.length) {
+      return;
+    }
+
+    const guide = driver({
+      showProgress: true,
+      allowClose: true,
+      animate: true,
+      overlayOpacity: 0.55,
+      popoverClass: "wono-driver-popover",
+      nextBtnText: "Next",
+      prevBtnText: "Back",
+      doneBtnText: "Done",
+      steps: guideSteps,
+      onDestroyed: () => {
+        window.localStorage.setItem(EVENT_DETAIL_GUIDE_SEEN_KEY, "1");
+      },
+    });
+
+    guide.drive();
+  }, []);
+
   useEffect(() => {
     if (
       typeof window === "undefined" ||
@@ -289,6 +373,28 @@ const AiDestinationDetail = ({ type }) => {
       window.clearTimeout(guideDelay);
     };
   }, [item?.id, startPlaceDetailGuide, type]);
+
+  useEffect(() => {
+    if (
+      typeof window === "undefined" ||
+      type !== "event" ||
+      !item?.id ||
+      hasAutoStartedEventDetailGuideRef.current ||
+      window.localStorage.getItem(EVENT_DETAIL_GUIDE_SEEN_KEY) === "1"
+    ) {
+      return undefined;
+    }
+
+    hasAutoStartedEventDetailGuideRef.current = true;
+
+    const guideDelay = window.setTimeout(() => {
+      startEventDetailGuide();
+    }, 700);
+
+    return () => {
+      window.clearTimeout(guideDelay);
+    };
+  }, [item?.id, startEventDetailGuide, type]);
 
   return (
     <main className="mx-auto w-full max-w-[75rem] px-4 pb-8 lg:px-0">
@@ -342,8 +448,13 @@ const AiDestinationDetail = ({ type }) => {
       </div>
 
       <div className="my-5 grid gap-3 border-b border-gray-200 pb-5 text-base font-semibold md:grid-cols-3 md:text-lg">
-        <span>{item.category}</span>
-        <span className="flex items-center gap-1 md:justify-center">
+        <span data-tour={isEvent ? "event-category" : undefined}>
+          {item.category}
+        </span>
+        <span
+          data-tour={isEvent ? "event-month" : undefined}
+          className="flex items-center gap-1 md:justify-center"
+        >
           {isEvent ? (
             item.meta
           ) : (
@@ -352,7 +463,10 @@ const AiDestinationDetail = ({ type }) => {
             </>
           )}
         </span>
-        <span className="md:text-right">
+        <span
+          data-tour={isEvent ? "event-location" : undefined}
+          className="md:text-right"
+        >
           {isEvent ? item.location : item.region}
         </span>
       </div>
@@ -381,7 +495,7 @@ const AiDestinationDetail = ({ type }) => {
           <div className="mb-8 text-center">
             <button
               type="button"
-              data-tour="place-write-review"
+              data-tour={isEvent ? "event-write-review" : "place-write-review"}
               onClick={handleWriteReviewClick}
               className="rounded-full bg-primary-blue px-8 py-3 text-sm font-semibold text-white"
             >
