@@ -19,12 +19,13 @@ const AiSelectedBadgesSearchBar = ({
     : "max-w-[50rem] lg:max-w-[61rem] xl:max-w-[61rem]";
 
   return (
-    <div data-tour={tourId} className={`hidden lg:block ${className}`}>
+    <div className={`hidden lg:block ${className}`}>
       {heading && (
         <div className={`mx-auto mt-2 w-full ${widthClassName}`}>{heading}</div>
       )}
 
       <div
+        data-tour={tourId}
         className={`mx-auto flex min-h-[58px] w-full items-center rounded-full border bg-white px-4 py-2 shadow-[0_5px_14px_rgba(0,0,0,0.12)] ${widthClassName} ${heading ? "mt-2" : "mt-4"}`}
       >
         <div className="flex flex-1 flex-wrap items-center gap-2 overflow-hidden">
