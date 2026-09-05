@@ -29,6 +29,9 @@ const getInitials = (name = "") =>
 const emptyReviewPromptBottomSpacing = "1.5rem";
 const PLACE_DETAIL_GUIDE_SEEN_KEY = "wono-place-detail-guide-seen";
 const EVENT_DETAIL_GUIDE_SEEN_KEY = "wono-event-detail-guide-seen";
+const ARE_GUIDES_TEMPORARILY_DISABLED = true;
+const DETAIL_DISCLAIMER_TOUR_SELECTOR =
+  '[data-tour="detail-disclaimer-section"]';
 
 const toValidCoordinate = (value) => {
   if (value === undefined || value === null || String(value).trim() === "") {
@@ -199,7 +202,7 @@ const AiDestinationDetail = ({ type }) => {
     : [];
 
   const startPlaceDetailGuide = useCallback(() => {
-    if (typeof window === "undefined") {
+    if (typeof window === "undefined" || ARE_GUIDES_TEMPORARILY_DISABLED) {
       return;
     }
 
@@ -242,16 +245,6 @@ const AiDestinationDetail = ({ type }) => {
         },
       },
       {
-        selector: '[data-tour="detail-disclaimer-section"]',
-        popover: {
-          title: "Content disclaimer",
-          description:
-            "This explains how WONO uses public information and links to the full content and copyright policy.",
-          side: "top",
-          align: "center",
-        },
-      },
-      {
         selector: '[data-tour="place-get-direction"]',
         popover: {
           title: "Get directions",
@@ -261,7 +254,20 @@ const AiDestinationDetail = ({ type }) => {
           align: "center",
         },
       },
+      {
+        selector: DETAIL_DISCLAIMER_TOUR_SELECTOR,
+        popover: {
+          title: "Content disclaimer",
+          description:
+            "This explains how WONO uses public information and links to the full content and copyright policy.",
+          side: "top",
+          align: "center",
+        },
+      },
     ]
+      .sort((step) =>
+        step.selector === DETAIL_DISCLAIMER_TOUR_SELECTOR ? 1 : -1,
+      )
       .map(({ selector, popover }) => ({
         element: getVisibleElement(selector),
         popover,
@@ -291,7 +297,7 @@ const AiDestinationDetail = ({ type }) => {
   }, []);
 
   const startEventDetailGuide = useCallback(() => {
-    if (typeof window === "undefined") {
+    if (typeof window === "undefined" || ARE_GUIDES_TEMPORARILY_DISABLED) {
       return;
     }
 
@@ -324,7 +330,7 @@ const AiDestinationDetail = ({ type }) => {
         },
       },
       {
-        selector: '[data-tour="detail-disclaimer-section"]',
+        selector: DETAIL_DISCLAIMER_TOUR_SELECTOR,
         popover: {
           title: "Content disclaimer",
           description:
@@ -334,6 +340,9 @@ const AiDestinationDetail = ({ type }) => {
         },
       },
     ]
+      .sort((step) =>
+        step.selector === DETAIL_DISCLAIMER_TOUR_SELECTOR ? 1 : -1,
+      )
       .map(({ selector, popover }) => ({
         element: getVisibleElement(selector),
         popover,
@@ -365,6 +374,7 @@ const AiDestinationDetail = ({ type }) => {
   useEffect(() => {
     if (
       typeof window === "undefined" ||
+      ARE_GUIDES_TEMPORARILY_DISABLED ||
       type !== "place" ||
       !item?.id ||
       hasAutoStartedPlaceDetailGuideRef.current ||
@@ -387,6 +397,7 @@ const AiDestinationDetail = ({ type }) => {
   useEffect(() => {
     if (
       typeof window === "undefined" ||
+      ARE_GUIDES_TEMPORARILY_DISABLED ||
       type !== "event" ||
       !item?.id ||
       hasAutoStartedEventDetailGuideRef.current ||

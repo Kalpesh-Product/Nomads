@@ -59,6 +59,7 @@ const THINKING_HEADING_TEXT = "Curating the best results for you";
 const CURATED_RESULTS_HEADING_TEXT =
   "Please find below, the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
 const VERTICALS_MAP_GUIDE_SEEN_KEY = "wono-verticals-map-guide-seen";
+const ARE_GUIDES_TEMPORARILY_DISABLED = true;
 const buildListingsSeoFallbackPath = (search = "") => {
   const params = new URLSearchParams(search);
   const category = params.get("category");
@@ -943,7 +944,7 @@ const AiGlobalListingsMap = () => {
   );
 
   const startVerticalsMapGuide = React.useCallback(() => {
-    if (typeof window === "undefined") {
+    if (typeof window === "undefined" || ARE_GUIDES_TEMPORARILY_DISABLED) {
       return;
     }
 
@@ -1017,6 +1018,7 @@ const AiGlobalListingsMap = () => {
   useEffect(() => {
     if (
       typeof window === "undefined" ||
+      ARE_GUIDES_TEMPORARILY_DISABLED ||
       !isHeadingSequenceComplete ||
       isLisitingLoading ||
       hasAutoStartedVerticalsMapGuideRef.current ||

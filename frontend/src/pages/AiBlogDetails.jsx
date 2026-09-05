@@ -5,6 +5,9 @@ import { useLocation } from "react-router-dom";
 import humanDate from "../utils/humanDate";
 
 const AI_CONTENT_DETAIL_GUIDE_SEEN_KEY_PREFIX = "wono-ai-content-detail-guide-seen";
+const ARE_GUIDES_TEMPORARILY_DISABLED = true;
+const CONTENT_DISCLAIMER_TOUR_SELECTOR =
+  '[data-tour="content-disclaimer-section"]';
 
 const AiBlogDetails = () => {
   // const newsContent = [
@@ -70,7 +73,7 @@ const AiBlogDetails = () => {
   };
 
   const startContentDetailGuide = useCallback(() => {
-    if (typeof window === "undefined") {
+    if (typeof window === "undefined" || ARE_GUIDES_TEMPORARILY_DISABLED) {
       return;
     }
 
@@ -95,7 +98,7 @@ const AiBlogDetails = () => {
         },
       },
       {
-        selector: '[data-tour="content-disclaimer-section"]',
+        selector: CONTENT_DISCLAIMER_TOUR_SELECTOR,
         popover: {
           title: "Content disclaimer",
           description:
@@ -105,6 +108,9 @@ const AiBlogDetails = () => {
         },
       },
     ]
+      .sort((step) =>
+        step.selector === CONTENT_DISCLAIMER_TOUR_SELECTOR ? 1 : -1,
+      )
       .map(({ selector, popover }) => ({
         element: getVisibleElement(selector),
         popover,
@@ -136,6 +142,7 @@ const AiBlogDetails = () => {
   useEffect(() => {
     if (
       typeof window === "undefined" ||
+      ARE_GUIDES_TEMPORARILY_DISABLED ||
       !content ||
       hasAutoStartedContentDetailGuideRef.current ||
       window.localStorage.getItem(contentDetailGuideSeenKey) === "1"
