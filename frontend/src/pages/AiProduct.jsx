@@ -60,6 +60,8 @@ dayjs.extend(relativeTime);
 
 const PRODUCT_GUIDE_SEEN_KEY = "wono-ai-product-guide-seen";
 const ARE_GUIDES_TEMPORARILY_DISABLED = true;
+const PRODUCT_DISCLAIMER_TOUR_SELECTOR =
+  '[data-tour="product-disclaimer-section"]';
 
 const AiProduct = () => {
   const location = useLocation();
@@ -67,7 +69,11 @@ const AiProduct = () => {
   const { company } = useParams();
   const [searchParams] = useSearchParams();
   const locationState = location.state || {};
-  const { companyId: stateCompanyId, businessId: stateBusinessId, type: stateType } = locationState;
+  const {
+    companyId: stateCompanyId,
+    businessId: stateBusinessId,
+    type: stateType,
+  } = locationState;
   const typeFromQuery = searchParams.get("companyType")?.trim() || null;
   const businessIdFromQuery = searchParams.get("businessId")?.trim() || null;
   const companyName = company ? company.trim() : "";
@@ -75,7 +81,9 @@ const AiProduct = () => {
   const businessId = stateBusinessId || businessIdFromQuery || null;
   const type = stateType || typeFromQuery || null;
   const listingSourceView = (() => {
-    const stateSourceView = String(locationState.sourceView || "").trim().toLowerCase();
+    const stateSourceView = String(locationState.sourceView || "")
+      .trim()
+      .toLowerCase();
     if (["list", "map"].includes(stateSourceView)) return stateSourceView;
 
     const returnToSearch = String(locationState.returnTo?.search || "");
@@ -184,19 +192,23 @@ const AiProduct = () => {
   useEffect(() => {
     if (!companyDetails?.companyName) return;
     axios
-      .post("analytics/listing-click", {
-        companyId: companyDetails.companyId,
-        businessId: companyDetails.businessId,
-        companyName: companyDetails.companyName,
-        city: companyDetails.city,
-        state: companyDetails.state,
-        country: companyDetails.country,
-        continent: companyDetails.continent,
-        sourcePage: window.location.pathname,
-        pagePath: `${window.location.pathname}${window.location.search}${window.location.hash}`,
-        referrer: document.referrer,
-        sourceView: listingSourceView,
-      }, { withCredentials: true })
+      .post(
+        "analytics/listing-click",
+        {
+          companyId: companyDetails.companyId,
+          businessId: companyDetails.businessId,
+          companyName: companyDetails.companyName,
+          city: companyDetails.city,
+          state: companyDetails.state,
+          country: companyDetails.country,
+          continent: companyDetails.continent,
+          sourcePage: window.location.pathname,
+          pagePath: `${window.location.pathname}${window.location.search}${window.location.hash}`,
+          referrer: document.referrer,
+          sourceView: listingSourceView,
+        },
+        { withCredentials: true },
+      )
       .catch(() => {});
   }, [
     companyDetails?.businessId,
@@ -477,12 +489,9 @@ const AiProduct = () => {
     }
 
     if (fallbackCountry && fallbackState) {
-      navigate(
-        `/verticals?country=${fallbackCountry}&state=${fallbackState}`,
-        {
-          state: location.state,
-        },
-      );
+      navigate(`/verticals?country=${fallbackCountry}&state=${fallbackState}`, {
+        state: location.state,
+      });
       return;
     }
 
@@ -723,8 +732,7 @@ const AiProduct = () => {
   };
 
   const canonicalListingUrl = buildCanonicalListingUrl({
-    currentUrl:
-      typeof window !== "undefined" ? window.location.href : "",
+    currentUrl: typeof window !== "undefined" ? window.location.href : "",
     companyType: companyDetails?.companyType,
     fallbackUrl: companyDetails?.websiteTemplateLink || "",
   });
@@ -847,7 +855,20 @@ const AiProduct = () => {
           align: "center",
         },
       },
+      {
+        selector: PRODUCT_DISCLAIMER_TOUR_SELECTOR,
+        popover: {
+          title: "Content disclaimer",
+          description:
+            "This explains how WONO uses public information and links to the full content and copyright policy.",
+          side: "top",
+          align: "center",
+        },
+      },
     ]
+      .sort((step) =>
+        step.selector === PRODUCT_DISCLAIMER_TOUR_SELECTOR ? 1 : -1,
+      )
       .map(({ selector, popover }) => ({
         element: getVisibleElement(selector),
         popover,
@@ -1381,57 +1402,57 @@ const AiProduct = () => {
                     )}
                   />
                   <Controller
-  name="noOfPeople"
-  control={control}
-  rules={{
-    required: "No. of people is required",
-    validate: (value) =>
-      Number(value) > 0 || "At least one person is required",
-  }}
-render={({ field }) => (
-  <div className="relative w-full mt-7">
-    <label className="absolute left-0 top-0 text-xs text-gray-600">
-      No. Of People
-    </label>
+                    name="noOfPeople"
+                    control={control}
+                    rules={{
+                      required: "No. of people is required",
+                      validate: (value) =>
+                        Number(value) > 0 || "At least one person is required",
+                    }}
+                    render={({ field }) => (
+                      <div className="relative w-full mt-7">
+                        <label className="absolute left-0 top-0 text-xs text-gray-600">
+                          No. Of People
+                        </label>
 
-    <div className="flex items-center w-full border-b border-gray-400 pt-[14px] h-[40px]">
-      <button
-        type="button"
-        onClick={() =>
-          field.onChange(
-            Math.max(0, Number(field.value || 0) - 1),
-          )
-        }
-        className="px-3 text-lg leading-none font-semibold text-gray-600 hover:text-primary-blue"
-      >
-        −
-      </button>
+                        <div className="flex items-center w-full border-b border-gray-400 pt-[14px] h-[40px]">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              field.onChange(
+                                Math.max(0, Number(field.value || 0) - 1),
+                              )
+                            }
+                            className="px-3 text-lg leading-none font-semibold text-gray-600 hover:text-primary-blue"
+                          >
+                            −
+                          </button>
 
-      <input
-        {...field}
-        readOnly
-        value={field.value || 0}
-        className="w-full text-center outline-none bg-transparent text-sm font-medium text-gray-800"
-      />
+                          <input
+                            {...field}
+                            readOnly
+                            value={field.value || 0}
+                            className="w-full text-center outline-none bg-transparent text-sm font-medium text-gray-800"
+                          />
 
-      <button
-        type="button"
-        onClick={() =>
-          field.onChange(Number(field.value || 0) + 1)
-        }
-        className="px-3 text-lg leading-none font-semibold text-gray-600 hover:text-primary-blue"
-      >
-        +
-      </button>
-    </div>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              field.onChange(Number(field.value || 0) + 1)
+                            }
+                            className="px-3 text-lg leading-none font-semibold text-gray-600 hover:text-primary-blue"
+                          >
+                            +
+                          </button>
+                        </div>
 
-    {errors?.noOfPeople && (
-      <p className="mt-1 text-xs text-red-500">
-        {errors.noOfPeople.message}
-      </p>
-    )}
-  </div>
-)}
+                        {errors?.noOfPeople && (
+                          <p className="mt-1 text-xs text-red-500">
+                            {errors.noOfPeople.message}
+                          </p>
+                        )}
+                      </div>
+                    )}
                   />
 
                   <Controller
@@ -1723,10 +1744,21 @@ render={({ field }) => (
               data-tour="product-map-section"
               className="w-full h-[500px] flex flex-col gap-8 rounded-xl overflow-hidden"
             >
-             
-            <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-sm md:text-base"> <h1 className="text-title font-medium text-gray-700 uppercase">
-                Where you'll be
-              </h1> <a data-tour="product-get-direction" href={companyDetails?.googleMap} target="_blank" rel="noreferrer" className="font-medium text-blue-600 underline">Get Direction</a></div>
+              <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-sm md:text-base">
+                {" "}
+                <h1 className="text-title font-medium text-gray-700 uppercase">
+                  Where you'll be
+                </h1>{" "}
+                <a
+                  data-tour="product-get-direction"
+                  href={companyDetails?.googleMap}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-medium text-blue-600 underline"
+                >
+                  Get Direction
+                </a>
+              </div>
               <Map
                 locations={mapsData}
                 disableNavigation
@@ -1881,7 +1913,10 @@ render={({ field }) => (
             )}
 
             {/* Desktop Disclaimer */}
-            <div className="text-[0.74rem] text-gray-500 leading-relaxed">
+            <div
+              data-tour="product-disclaimer-section"
+              className="text-[0.74rem] text-gray-500 leading-relaxed"
+            >
               <p className="mb-2">
                 <b>Source:</b> All above content, images and details have been
                 sourced from publicly available information.
@@ -2825,7 +2860,10 @@ render={({ field }) => (
             <hr className="mt-5 mb-0 lg:mt-10 lg:mb-0" />
 
             {/* Mobile Disclaimer */}
-            <div className="text-[0.74rem] text-gray-500 leading-relaxed">
+            <div
+              data-tour="product-disclaimer-section"
+              className="text-[0.74rem] text-gray-500 leading-relaxed"
+            >
               <p className="mb-2">
                 <b>Source:</b> All above content, images and details have been
                 sourced from publicly available information.

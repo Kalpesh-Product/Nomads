@@ -270,16 +270,6 @@ const AiHome = () => {
 
     const guideSteps = [
       {
-        element: getVisibleElement('[data-tour="home-login-link"]'),
-        popover: {
-          title: "Login as Nomad",
-          description:
-            "Login to unlock personalized goals and recommendations for your nomad journey.",
-          side: "bottom",
-          align: "end",
-        },
-      },
-      {
         element: getVisibleElement('[data-tour="home-goal-cards"]'),
         popover: {
           title: "Choose your goal",
@@ -297,6 +287,16 @@ const AiHome = () => {
             "Use the sidebar to move through WONO intelligence, value-added services, and your profile tools.",
           side: "right",
           align: "start",
+        },
+      },
+      {
+        element: getVisibleElement('[data-tour="home-login-link"]'),
+        popover: {
+          title: "Login as Nomad",
+          description:
+            "Login to unlock personalized goals and recommendations for your nomad journey.",
+          side: "bottom",
+          align: "end",
         },
       },
     ].filter((step) => step.element);
@@ -326,6 +326,7 @@ const AiHome = () => {
   useEffect(() => {
     if (
       typeof window === "undefined" ||
+      ARE_GUIDES_TEMPORARILY_DISABLED ||
       !areCardsVisible ||
       ARE_GUIDES_TEMPORARILY_DISABLED ||
       visibleCardCount < recommendationCards.length ||
