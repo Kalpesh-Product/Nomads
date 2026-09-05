@@ -215,6 +215,16 @@ const AiDestinationDetail = ({ type }) => {
 
     const guideSteps = [
       {
+        selector: '[data-tour="detail-breadcrumb"]',
+        popover: {
+          title: "Breadcrumb navigation",
+          description:
+            "Use this path to jump back to the selected region, destination, or listing category.",
+          side: "bottom",
+          align: "start",
+        },
+      },
+      {
         selector: '[data-tour="detail-meta-section"]',
         popover: {
           title: "Place details",
@@ -306,6 +316,16 @@ const AiDestinationDetail = ({ type }) => {
       );
 
     const guideSteps = [
+      {
+        selector: '[data-tour="detail-breadcrumb"]',
+        popover: {
+          title: "Breadcrumb navigation",
+          description:
+            "Use this path to jump back to the selected region, destination, or event category.",
+          side: "bottom",
+          align: "start",
+        },
+      },
       {
         selector: '[data-tour="detail-meta-section"]',
         popover: {

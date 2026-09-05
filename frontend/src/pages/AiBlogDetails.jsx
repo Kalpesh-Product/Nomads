@@ -85,6 +85,16 @@ const AiBlogDetails = () => {
 
     const guideSteps = [
       {
+        selector: '[data-tour="content-breadcrumb"]',
+        popover: {
+          title: "Breadcrumb navigation",
+          description:
+            "Use this path to jump back to the selected region, destination, or content category.",
+          side: "bottom",
+          align: "start",
+        },
+      },
+      {
         selector: '[data-tour="content-meta-section"]',
         popover: {
           title: contentType === "news" ? "News details" : "Blog details",

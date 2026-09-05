@@ -1423,6 +1423,16 @@ const AiGlobalListingsList = () => {
 
     const guideSteps = [
       {
+        selector: '[data-tour="verticals-breadcrumb"]',
+        popover: {
+          title: "Breadcrumb navigation",
+          description:
+            "Use this path to go back or review the selected destination filters.",
+          side: "bottom",
+          align: "start",
+        },
+      },
+      {
         selector: '[data-tour="verticals-category-strip"]',
         popover: {
           title: "Filter by category",
@@ -1526,6 +1536,7 @@ const AiGlobalListingsList = () => {
             stateLabel={selectedLocationLabel}
             onBack={() => navigateBackWithinApp(navigate)}
             onClear={() => navigateBackWithinApp(navigate)}
+            tourId="verticals-breadcrumb"
             heading={
               <div className="mt-0 mb-5 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                 <p className="flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
@@ -2004,7 +2015,10 @@ const AiGlobalListingsList = () => {
         <div className="flex flex-col gap-4 justify-center items-center w-full lg:mt-0 max-sm:gap-2">
           <div className="w-full lg:min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-2 sm:px-6 lg:px-0">
             <div className="lg:hidden w-full flex flex-col gap-4 mb-4 max-sm:gap-2 max-sm:mb-2">
-              <div className="mx-auto flex min-h-[46px] w-[92%] items-center rounded-full border bg-white px-3 py-2 shadow-[0_5px_14px_rgba(0,0,0,0.12)] max-sm:w-full max-sm:px-2">
+              <div
+                data-tour="verticals-breadcrumb"
+                className="mx-auto flex min-h-[46px] w-[92%] items-center rounded-full border bg-white px-3 py-2 shadow-[0_5px_14px_rgba(0,0,0,0.12)] max-sm:w-full max-sm:px-2"
+              >
                 <div className="flex flex-1 items-center gap-1 overflow-x-auto pr-2 custom-scrollbar-hide">
                   {dedupeAiSearchBadges(searchBarBadges).map(
                     (badgeLabel, index) => (

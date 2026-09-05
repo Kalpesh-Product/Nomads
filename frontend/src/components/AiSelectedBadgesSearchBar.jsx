@@ -11,6 +11,7 @@ const AiSelectedBadgesSearchBar = ({
   heading = null,
   className = "",
   fullWidth = false,
+  tourId,
 }) => {
   const visibleBadges = dedupeAiSearchBadges(badges);
   const widthClassName = fullWidth
@@ -18,7 +19,7 @@ const AiSelectedBadgesSearchBar = ({
     : "max-w-[50rem] lg:max-w-[61rem] xl:max-w-[61rem]";
 
   return (
-    <div className={`hidden lg:block ${className}`}>
+    <div data-tour={tourId} className={`hidden lg:block ${className}`}>
       {heading && (
         <div className={`mx-auto mt-2 w-full ${widthClassName}`}>{heading}</div>
       )}
