@@ -59,7 +59,7 @@ import { navigateBackWithinApp } from "../utils/navigationHistory.js";
 dayjs.extend(relativeTime);
 
 const PRODUCT_GUIDE_SEEN_KEY = "wono-ai-product-guide-seen";
-const ARE_GUIDES_TEMPORARILY_DISABLED = true;
+const ARE_GUIDES_TEMPORARILY_DISABLED = false;
 const PRODUCT_DISCLAIMER_TOUR_SELECTOR =
   '[data-tour="product-disclaimer-section"]';
 
@@ -866,9 +866,6 @@ const AiProduct = () => {
         },
       },
     ]
-      .sort((step) =>
-        step.selector === PRODUCT_DISCLAIMER_TOUR_SELECTOR ? 1 : -1,
-      )
       .map(({ selector, popover }) => ({
         element: getVisibleElement(selector),
         popover,

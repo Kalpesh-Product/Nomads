@@ -18,7 +18,7 @@ import useAuth from "../hooks/useAuth";
 const getTypingSeenKey = (isLoggedIn) =>
   `wono-ai-home-typing-seen-${isLoggedIn ? "logged-in" : "logged-out"}`;
 const HOME_GUIDE_SEEN_KEY = "wono-ai-home-guide-seen";
-const ARE_GUIDES_TEMPORARILY_DISABLED = true;
+const ARE_GUIDES_TEMPORARILY_DISABLED = false;
 
 const gatedRecommendationTitles = new Set([
   "Work From Anywhere",

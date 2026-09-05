@@ -29,7 +29,7 @@ const getInitials = (name = "") =>
 const emptyReviewPromptBottomSpacing = "1.5rem";
 const PLACE_DETAIL_GUIDE_SEEN_KEY = "wono-place-detail-guide-seen";
 const EVENT_DETAIL_GUIDE_SEEN_KEY = "wono-event-detail-guide-seen";
-const ARE_GUIDES_TEMPORARILY_DISABLED = true;
+const ARE_GUIDES_TEMPORARILY_DISABLED = false;
 const DETAIL_DISCLAIMER_TOUR_SELECTOR =
   '[data-tour="detail-disclaimer-section"]';
 
@@ -265,9 +265,6 @@ const AiDestinationDetail = ({ type }) => {
         },
       },
     ]
-      .sort((step) =>
-        step.selector === DETAIL_DISCLAIMER_TOUR_SELECTOR ? 1 : -1,
-      )
       .map(({ selector, popover }) => ({
         element: getVisibleElement(selector),
         popover,
@@ -340,9 +337,6 @@ const AiDestinationDetail = ({ type }) => {
         },
       },
     ]
-      .sort((step) =>
-        step.selector === DETAIL_DISCLAIMER_TOUR_SELECTOR ? 1 : -1,
-      )
       .map(({ selector, popover }) => ({
         element: getVisibleElement(selector),
         popover,

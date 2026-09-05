@@ -6,7 +6,7 @@ import humanDate from "../utils/humanDate";
 
 const AI_CONTENT_DETAIL_GUIDE_SEEN_KEY_PREFIX =
   "wono-ai-content-detail-guide-seen";
-const ARE_GUIDES_TEMPORARILY_DISABLED = true;
+const ARE_GUIDES_TEMPORARILY_DISABLED = false;
 const CONTENT_DISCLAIMER_TOUR_SELECTOR =
   '[data-tour="content-disclaimer-section"]';
 
@@ -107,9 +107,6 @@ const AiBlogDetails = () => {
         },
       },
     ]
-      .sort((step) =>
-        step.selector === CONTENT_DISCLAIMER_TOUR_SELECTOR ? 1 : -1,
-      )
       .map(({ selector, popover }) => ({
         element: getVisibleElement(selector),
         popover,
