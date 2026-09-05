@@ -264,16 +264,17 @@ const AiDestinationDetail = ({ type }) => {
           align: "center",
         },
       },
-      {
-        selector: DETAIL_DISCLAIMER_TOUR_SELECTOR,
-        popover: {
-          title: "Content disclaimer",
-          description:
-            "This explains how WONO uses public information and links to the full content and copyright policy.",
-          side: "top",
-          align: "center",
-        },
-      },
+      // Disclaimer guide hidden for now. Uncomment when needed again.
+      // {
+      //   selector: DETAIL_DISCLAIMER_TOUR_SELECTOR,
+      //   popover: {
+      //     title: "Content disclaimer",
+      //     description:
+      //       "This explains how WONO uses public information and links to the full content and copyright policy.",
+      //     side: "top",
+      //     align: "center",
+      //   },
+      // },
     ]
       .map(({ selector, popover }) => ({
         element: getVisibleElement(selector),
@@ -346,16 +347,17 @@ const AiDestinationDetail = ({ type }) => {
           align: "center",
         },
       },
-      {
-        selector: DETAIL_DISCLAIMER_TOUR_SELECTOR,
-        popover: {
-          title: "Content disclaimer",
-          description:
-            "This explains how WONO uses public information and links to the full content and copyright policy.",
-          side: "top",
-          align: "center",
-        },
-      },
+      // Disclaimer guide hidden for now. Uncomment when needed again.
+      // {
+      //   selector: DETAIL_DISCLAIMER_TOUR_SELECTOR,
+      //   popover: {
+      //     title: "Content disclaimer",
+      //     description:
+      //       "This explains how WONO uses public information and links to the full content and copyright policy.",
+      //     side: "top",
+      //     align: "center",
+      //   },
+      // },
     ]
       .map(({ selector, popover }) => ({
         element: getVisibleElement(selector),
