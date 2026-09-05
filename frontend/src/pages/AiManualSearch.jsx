@@ -1,5 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import React, { useCallback, useMemo, useRef, useState, useEffect } from "react";
+import React, {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  useEffect,
+} from "react";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import { Helmet } from "@dr.pogodin/react-helmet";
@@ -34,7 +40,7 @@ const contentAlignClassName = "max-[820px]:!px-0 md:px-10";
 
 const TYPING_INTERVAL_MS = 7;
 const MANUAL_SEARCH_GUIDE_SEEN_KEY = "wono-manual-search-guide-seen";
-const ARE_GUIDES_TEMPORARILY_DISABLED = true;
+const ARE_GUIDES_TEMPORARILY_DISABLED = false;
 
 const normalizeLocationKey = (value = "") =>
   value
@@ -542,7 +548,8 @@ const AiManualSearch = () => {
     <div className="min-h-full bg-white">
       <Helmet>
         <title>
-          WONO Manual Search | Find Digital Nomad Places, Coworking, Workation &amp; Stay
+          WONO Manual Search | Find Digital Nomad Places, Coworking, Workation
+          &amp; Stay
         </title>
         <meta
           name="description"

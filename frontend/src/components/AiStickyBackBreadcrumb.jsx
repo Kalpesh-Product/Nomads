@@ -17,10 +17,12 @@ const AiStickyBackBreadcrumb = ({
 
   return (
     <div
-      data-tour={tourId}
       className={`${stickyClassName} z-[100] bg-white pt-0 pb-4 shadow-none md:px-10 ${className}`}
     >
-      <div className={`flex min-w-0 items-center gap-2 ${rowClassName}`}>
+      <div
+        data-tour={tourId}
+        className={`flex w-fit max-w-full min-w-0 items-center gap-2 ${rowClassName}`}
+      >
         <button
           type="button"
           onClick={onBack}

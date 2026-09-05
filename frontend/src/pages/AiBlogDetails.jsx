@@ -4,8 +4,11 @@ import "driver.js/dist/driver.css";
 import { useLocation } from "react-router-dom";
 import humanDate from "../utils/humanDate";
 
-const AI_CONTENT_DETAIL_GUIDE_SEEN_KEY_PREFIX = "wono-ai-content-detail-guide-seen";
-const ARE_GUIDES_TEMPORARILY_DISABLED = true;
+const AI_CONTENT_DETAIL_GUIDE_SEEN_KEY_PREFIX =
+  "wono-ai-content-detail-guide-seen";
+const ARE_GUIDES_TEMPORARILY_DISABLED = false;
+const CONTENT_DISCLAIMER_TOUR_SELECTOR =
+  '[data-tour="content-disclaimer-section"]';
 
 const AiBlogDetails = () => {
   // const newsContent = [
@@ -42,9 +45,7 @@ const AiBlogDetails = () => {
   const { content } = location.state || {};
   console.log("content : ", content);
   const newsContent = content?.sections || [];
-  const contentType = location.pathname.includes("/news/")
-    ? "news"
-    : "blog";
+  const contentType = location.pathname.includes("/news/") ? "news" : "blog";
   const contentDetailGuideSeenKey = `${AI_CONTENT_DETAIL_GUIDE_SEEN_KEY_PREFIX}-${contentType}`;
   const hasAutoStartedContentDetailGuideRef = useRef(false);
 
@@ -84,37 +85,38 @@ const AiBlogDetails = () => {
 
     const guideSteps = [
       {
-        selector: '[data-tour="content-author"]',
+        selector: '[data-tour="content-breadcrumb"]',
         popover: {
-          title: contentType === "news" ? "News source" : "Author",
+          title: "Breadcrumb navigation",
           description:
-            contentType === "news"
-              ? "This shows who published or provided the news item."
-              : "This shows who wrote or published the blog post.",
-          side: "top",
+            "Use this path to jump back to the selected region, destination, or content category.",
+          side: "bottom",
           align: "start",
         },
       },
       {
-        selector: '[data-tour="content-date"]',
+        selector: '[data-tour="content-meta-section"]',
         popover: {
-          title: "Published date",
+          title: contentType === "news" ? "News details" : "Blog details",
           description:
-            "Use this date to understand when the article was published or last recorded.",
+            contentType === "news"
+              ? "This section shows the publisher, date, and original source for the news item."
+              : "This section shows the author, date, and source for the blog post.",
           side: "top",
           align: "center",
         },
       },
-      {
-        selector: '[data-tour="content-source"]',
-        popover: {
-          title: "Original source",
-          description:
-            "This identifies the source connected with the content.",
-          side: "top",
-          align: "end",
-        },
-      },
+      // Disclaimer guide hidden for now. Uncomment when needed again.
+      // {
+      //   selector: CONTENT_DISCLAIMER_TOUR_SELECTOR,
+      //   popover: {
+      //     title: "Content disclaimer",
+      //     description:
+      //       "This explains how WONO uses public information and links to the full content and copyright policy.",
+      //     side: "top",
+      //     align: "center",
+      //   },
+      // },
     ]
       .map(({ selector, popover }) => ({
         element: getVisibleElement(selector),
@@ -230,23 +232,17 @@ const AiBlogDetails = () => {
             ))}
         </section>
         <hr />
-        <footer className="flex w-full flex-col items-center gap-2 text-center text-sm md:flex-row md:items-center md:justify-between md:gap-4 md:text-left md:text-base">
-          <p
-            data-tour="content-author"
-            className="w-full break-words md:w-auto"
-          >
+        <footer
+          data-tour="content-meta-section"
+          className="flex w-full flex-col items-center gap-2 text-center text-sm md:flex-row md:items-center md:justify-between md:gap-4 md:text-left md:text-base"
+        >
+          <p className="w-full break-words md:w-auto">
             {content?.author || ""}
           </p>
-          <p
-            data-tour="content-date"
-            className="w-full break-words md:w-auto"
-          >
+          <p className="w-full break-words md:w-auto">
             {humanDate(content?.date) || new Date().toLocaleString()}
           </p>
-          <p
-            data-tour="content-source"
-            className="w-full break-words md:w-auto md:text-right"
-          >
+          <p className="w-full break-words md:w-auto md:text-right">
             {typeof content?.source === "object"
               ? content?.source?.name || "Source"
               : content?.source || "Source"}
@@ -282,7 +278,10 @@ const AiBlogDetails = () => {
       )}
 
       {/* Content & Source Disclaimer */}
-      <div className="text-[0.5rem] text-gray-500 leading-relaxed mt-5">
+      <div
+        data-tour="content-disclaimer-section"
+        className="text-[0.5rem] text-gray-500 leading-relaxed mt-5"
+      >
         <p className="mb-2">
           <b>Source:</b> All above content, images and details have been sourced
           from publicly available information.

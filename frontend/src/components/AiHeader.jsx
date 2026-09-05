@@ -36,6 +36,12 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
   const isAiEditorialPage =
     location.pathname.startsWith("/blog") ||
     location.pathname.startsWith("/news");
+  const isAiDetailCategoryHeaderPage =
+    location.pathname === "/blog/blog-details" ||
+    location.pathname === "/news/news-details" ||
+    location.pathname.startsWith("/places/") ||
+    location.pathname.startsWith("/events/") ||
+    location.pathname.startsWith("/listings/");
   const shouldCheckNewsBlogLinks =
     showToggle ||
     isAiEditorialPage ||
@@ -204,6 +210,8 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
     matchedSessionTitle ||
     (stateParam ? formatStateLabel(stateParam) : "");
   const stateLabel = rawStateLabel ? formatStateLabel(rawStateLabel) : "";
+  const eventsLabel = stateLabel ? `${stateLabel} Events` : "Events";
+  const placesLabel = stateLabel ? `${stateLabel} Places` : "Places";
   const newsLabel = stateLabel ? `${stateLabel} News` : "News";
   const blogLabel = stateLabel ? `${stateLabel} Blog` : "Blog";
   const { hasBlogs, hasNews, hasNewsOrBlogs } = useLocationContentAvailability({
@@ -212,8 +220,15 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
   });
   const showNewsBlogLinks =
     shouldCheckNewsBlogLinks && hasNewsOrBlogs && !isAiDestinationListingsPage;
+  const showDetailCategoryLinks = isAiDetailCategoryHeaderPage;
+  const showDestinationCategoryLinks =
+    showDetailCategoryLinks || showNewsBlogLinks;
 
-  const currentSearch = location.search || location.state?.sourceSearch || "";
+  const currentSearch =
+    location.search ||
+    location.state?.sourceSearch ||
+    location.state?.returnTo?.search ||
+    "";
   const buildEditorialListingsLink = (category) => {
     const params = new URLSearchParams(currentSearch);
     const country = params.get("country") || countryParam;
@@ -227,6 +242,8 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
 
     return `/listings-list?${params.toString()}`;
   };
+  const eventsListingsLink = buildEditorialListingsLink("annualevents");
+  const placesListingsLink = buildEditorialListingsLink("places");
   const newsListingsLink = buildEditorialListingsLink("news");
   const blogsListingsLink = buildEditorialListingsLink("blogs");
   const aiVerticalsToggleState = (() => {
@@ -264,10 +281,38 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
 
   const headerLinks = [
     // { id: 1, text: "Home", to: "/" },
-    { id: 2, type: "news", text: newsLabel, to: newsListingsLink },
-    { id: 3, type: "blog", text: blogLabel, to: blogsListingsLink },
+    {
+      id: 2,
+      type: "events",
+      text: eventsLabel,
+      to: eventsListingsLink,
+    },
+    {
+      id: 3,
+      type: "places",
+      text: placesLabel,
+      to: placesListingsLink,
+    },
+    { id: 4, type: "blog", text: blogLabel, to: blogsListingsLink },
+    { id: 5, type: "news", text: newsLabel, to: newsListingsLink },
     // { id: 4, type: "offers", text: offersLabel },
   ];
+
+  const shouldShowDestinationCategoryLink = (item) => {
+    if (showDetailCategoryLinks) {
+      return ["events", "places", "blog", "news"].includes(item.type);
+    }
+
+    if (showNewsBlogLinks) {
+      return (
+        (item.type === "news" && hasNews) ||
+        (item.type === "blog" && hasBlogs) ||
+        item.type === "offers"
+      );
+    }
+
+    return true;
+  };
 
   const shouldShowHeaderLinks =
     location.pathname.startsWith("/listings") &&
@@ -405,33 +450,23 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
             </div>
 
             <li className="flex items-center gap-6">
-              {showNewsBlogLinks && (
+              {showDestinationCategoryLinks && (
                 <ul>
-                  {/* Blogs and News - Added on the LEFT side of Map/List View */}
                   <li className="flex items-center gap-6">
-                    {hasNews && (
-                      <Link
-                        to={newsListingsLink}
-                        className="group relative text-md text-black font-semibold whitespace-nowrap"
-                      >
-                        <span className="relative z-10 group-hover:font-bold mb-2 text-sm whitespace-nowrap">
-                          {newsLabel}
-                        </span>
-                        <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-primary-blue transition-all duration-300 group-hover:w-full"></span>
-                      </Link>
-                    )}
-
-                    {hasBlogs && (
-                      <Link
-                        to={blogsListingsLink}
-                        className="group relative text-md text-black font-semibold whitespace-nowrap"
-                      >
-                        <span className="relative z-10 group-hover:font-bold mb-2 text-sm whitespace-nowrap">
-                          {blogLabel}
-                        </span>
-                        <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-primary-blue transition-all duration-300 group-hover:w-full"></span>
-                      </Link>
-                    )}
+                    {headerLinks
+                      .filter(shouldShowDestinationCategoryLink)
+                      .map((item) => (
+                        <Link
+                          key={item.id}
+                          to={item.to}
+                          className="group relative text-md text-black font-semibold whitespace-nowrap"
+                        >
+                          <span className="relative z-10 group-hover:font-bold mb-2 text-sm whitespace-nowrap">
+                            {item.text}
+                          </span>
+                          <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-primary-blue transition-all duration-300 group-hover:w-full"></span>
+                        </Link>
+                      ))}
 
                     {/* <span className="group relative text-md text-black font-semibold whitespace-nowrap">
                       <span className="relative z-10 mb-2 text-sm whitespace-nowrap">
@@ -590,15 +625,9 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
                   </span>
                 </div>
 
-                {(shouldShowHeaderLinks || showNewsBlogLinks) &&
+                {(shouldShowHeaderLinks || showDestinationCategoryLinks) &&
                   headerLinks
-                    .filter((item) =>
-                      showNewsBlogLinks
-                        ? (item.type === "news" && hasNews) ||
-                          (item.type === "blog" && hasBlogs) ||
-                          item.type === "offers"
-                        : true,
-                    )
+                    .filter(shouldShowDestinationCategoryLink)
                     .map((item) => (
                       <li key={item.id} className="items-center text-center">
                         <div

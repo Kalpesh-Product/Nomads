@@ -169,6 +169,13 @@ const NomadAiLayout = () => {
     return true;
   })();
 
+  const isContentDetailPage =
+    location.pathname === "/blog/blog-details" ||
+    location.pathname === "/news/news-details";
+  const isDestinationDetailPage =
+    location.pathname.startsWith("/places/") ||
+    location.pathname.startsWith("/events/");
+
   const routeBreadcrumbs = (() => {
     if (
       location.pathname === "/world-rankings" ||
@@ -231,9 +238,6 @@ const NomadAiLayout = () => {
     const segments = location.pathname.split("/").filter(Boolean);
     if (segments.length === 0) return [];
 
-    const isContentDetailPage =
-      location.pathname === "/blog/blog-details" ||
-      location.pathname === "/news/news-details";
     const detailStateName = location.state?.selectedStateLabel;
 
     return segments
@@ -254,6 +258,13 @@ const NomadAiLayout = () => {
   })();
 
   const isAiProductPage = location.pathname.startsWith("/listings/");
+  const stickyBreadcrumbTourId = isAiProductPage
+    ? "product-breadcrumb"
+    : isContentDetailPage
+      ? "content-breadcrumb"
+      : isDestinationDetailPage
+        ? "detail-breadcrumb"
+        : undefined;
   const isBreadcrumbLoading =
     isAiProductPage && Boolean(location.state?.breadcrumbLoading);
   const handleStickyBack = () => {
@@ -328,7 +339,7 @@ const NomadAiLayout = () => {
                 className={isAiProductPage ? "!px-0" : ""}
                 sticky={false}
                 textSizeClassName="text-sm md:text-sm lg:text-base"
-                tourId={isAiProductPage ? "product-breadcrumb" : undefined}
+                tourId={stickyBreadcrumbTourId}
               />
               </div>
             </div>
