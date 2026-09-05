@@ -62,7 +62,7 @@ const getVisaRequirementApiValue = (value) =>
 
 const DEFAULT_PASSPORT_COUNTRY = "India";
 const AI_SEARCH_RESULTS_GUIDE_SEEN_KEY = "wono-ai-search-results-guide-seen";
-const ARE_GUIDES_TEMPORARILY_DISABLED = true;
+const ARE_GUIDES_TEMPORARILY_DISABLED = false;
 
 const destinationCards = aiDestinationCards;
 const getDestinationFavoriteKey = (destination) =>

@@ -11,6 +11,7 @@ const AiSelectedBadgesSearchBar = ({
   heading = null,
   className = "",
   fullWidth = false,
+  tourId,
 }) => {
   const visibleBadges = dedupeAiSearchBadges(badges);
   const widthClassName = fullWidth
@@ -24,6 +25,7 @@ const AiSelectedBadgesSearchBar = ({
       )}
 
       <div
+        data-tour={tourId}
         className={`mx-auto flex min-h-[58px] w-full items-center rounded-full border bg-white px-4 py-2 shadow-[0_5px_14px_rgba(0,0,0,0.12)] ${widthClassName} ${heading ? "mt-2" : "mt-4"}`}
       >
         <div className="flex flex-1 flex-wrap items-center gap-2 overflow-hidden">

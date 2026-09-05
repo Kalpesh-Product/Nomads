@@ -59,7 +59,7 @@ const THINKING_HEADING_TEXT = "Curating the best results for you";
 const CURATED_RESULTS_HEADING_TEXT =
   "Please find below, the best curated results from the options you suggested to me to help you discover and work from the best nomad destinations.";
 const VERTICALS_MAP_GUIDE_SEEN_KEY = "wono-verticals-map-guide-seen";
-const ARE_GUIDES_TEMPORARILY_DISABLED = true;
+const ARE_GUIDES_TEMPORARILY_DISABLED = false;
 const buildListingsSeoFallbackPath = (search = "") => {
   const params = new URLSearchParams(search);
   const category = params.get("category");
@@ -206,8 +206,9 @@ const AiGlobalListingsMap = () => {
   const [isSecondHeadingPhase, setIsSecondHeadingPhase] = useState(
     shouldSkipHeadingIntro,
   );
-  const [isHeadingSequenceComplete, setIsHeadingSequenceComplete] =
-    useState(shouldSkipHeadingIntro);
+  const [isHeadingSequenceComplete, setIsHeadingSequenceComplete] = useState(
+    shouldSkipHeadingIntro,
+  );
   const hasAutoStartedVerticalsMapGuideRef = React.useRef(false);
   const useCroppedDesktopShortcuts = useCroppedDesktopShortcutIcons();
   const listingPageStateStorageKey = useMemo(
