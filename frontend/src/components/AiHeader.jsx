@@ -40,7 +40,8 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
     location.pathname === "/blog/blog-details" ||
     location.pathname === "/news/news-details" ||
     location.pathname.startsWith("/places/") ||
-    location.pathname.startsWith("/events/");
+    location.pathname.startsWith("/events/") ||
+    location.pathname.startsWith("/listings/");
   const shouldCheckNewsBlogLinks =
     showToggle ||
     isAiEditorialPage ||
