@@ -45,6 +45,17 @@ const AiBlogDetails = () => {
   const { content } = location.state || {};
   console.log("content : ", content);
   const newsContent = content?.sections || [];
+  let sectionImageIndex = 0;
+  const sectionsWithImageAlignment = newsContent.map((item) => {
+    if (!item.image) {
+      return { ...item, imageSide: null };
+    }
+
+    const imageSide = sectionImageIndex % 2 === 0 ? "left" : "right";
+    sectionImageIndex += 1;
+
+    return { ...item, imageSide };
+  });
   const contentType = location.pathname.includes("/news/") ? "news" : "blog";
   const contentDetailGuideSeenKey = `${AI_CONTENT_DETAIL_GUIDE_SEEN_KEY_PREFIX}-${contentType}`;
   const hasAutoStartedContentDetailGuideRef = useRef(false);
@@ -226,16 +237,13 @@ const AiBlogDetails = () => {
         </section>
         <hr />
         <section className="flex flex-col gap-8">
-          {newsContent &&
-            newsContent.map((item, index) => (
+          {sectionsWithImageAlignment &&
+            sectionsWithImageAlignment.map((item) => (
               <article key={item.id} className="clear-both flow-root">
                 <h1 className="mb-4 text-card-title font-bold leading-[1.2] md:leading-[1.35]">
                   {item.title}
                 </h1>
-                {renderFloatingImage(
-                  item.image,
-                  index % 2 === 0 ? "left" : "right",
-                )}
+                {renderFloatingImage(item.image, item.imageSide)}
                 {renderContent(item.content)}
               </article>
             ))}
