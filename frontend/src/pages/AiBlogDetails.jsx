@@ -61,7 +61,35 @@ const AiBlogDetails = () => {
     setActiveImage(null);
   };
 
-  const renderContent = (text) => <p className="whitespace-pre-line">{text}</p>;
+  const renderContent = (text) => (
+    <p className="whitespace-pre-line leading-relaxed">
+      {String(text || "").trimStart()}
+    </p>
+  );
+
+  const renderFloatingImage = (imageUrl, imageSide = "right") => {
+    if (!imageUrl) {
+      return null;
+    }
+
+    const floatClasses =
+      imageSide === "left"
+        ? "md:float-left md:mr-8"
+        : "md:float-right md:ml-8";
+
+    return (
+      <div
+        className={`mb-5 h-auto w-full overflow-hidden rounded-xl md:mb-3 md:w-[38%] lg:w-[36%] ${floatClasses}`}
+      >
+        <img
+          src={imageUrl}
+          alt="main-image"
+          className="block h-auto w-full cursor-pointer"
+          onClick={() => handleImageOpen(imageUrl)}
+        />
+      </div>
+    );
+  };
 
   const goToHostsContentCopyright = () => {
     if (window.location.hostname.includes("localhost")) {
@@ -179,30 +207,17 @@ const AiBlogDetails = () => {
         <ArrowLeft size={16} />
       </button> */}
       <div className="flex flex-col gap-8">
-        <section className="space-y-8">
-          <h1 className="text-title leading-normal font-bold">
+        <section className="clear-both flow-root">
+          <h1 className="mb-8 text-title leading-normal font-bold">
             {content?.mainTitle ||
               content?.title ||
               "Lorem ipsum dolor sit amet consectetur adipisicing elit."}
           </h1>
-          <div className="h-96 rounded-xl w-full overflow-hidden">
-            <img
-              src={
-                content?.mainImage ||
-                content?.image ||
-                "https://wallpapercave.com/wp/w8Lgiy5.jpg"
-              }
-              alt="main-image"
-              className="object-contain h-full w-full cursor-pointer"
-              onClick={() =>
-                handleImageOpen(
-                  content?.mainImage ||
-                    content?.image ||
-                    "https://wallpapercave.com/wp/w8Lgiy5.jpg",
-                )
-              }
-            />
-          </div>
+          {renderFloatingImage(
+            content?.mainImage ||
+              content?.image ||
+              "https://wallpapercave.com/wp/w8Lgiy5.jpg",
+          )}
           {renderContent(
             content?.mainContent ||
               content?.content ||
@@ -212,20 +227,14 @@ const AiBlogDetails = () => {
         <hr />
         <section className="flex flex-col gap-8">
           {newsContent &&
-            newsContent.map((item) => (
-              <article key={item.id} className="space-y-4">
-                <h1 className="text-card-title font-bold leading-[1.2] md:leading-[1.35] lg:leading-[1rem]">
+            newsContent.map((item, index) => (
+              <article key={item.id} className="clear-both flow-root">
+                <h1 className="mb-4 text-card-title font-bold leading-[1.2] md:leading-[1.35]">
                   {item.title}
                 </h1>
-                {item.image && (
-                  <div className="h-96 rounded-xl w-full overflow-hidden">
-                    <img
-                      src={item.image}
-                      alt="main-image"
-                      className="object-contain h-full w-full cursor-pointer"
-                      onClick={() => handleImageOpen(item.image)}
-                    />
-                  </div>
+                {renderFloatingImage(
+                  item.image,
+                  index % 2 === 0 ? "left" : "right",
                 )}
                 {renderContent(item.content)}
               </article>
