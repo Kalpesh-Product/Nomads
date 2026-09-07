@@ -322,21 +322,21 @@ const NomadAiLayout = () => {
               className={
                 isAiProductPage
                   ? "px-3 lg:px-20"
-                  : "px-3 md:px-8 lg:px-10 xl:px-12 2xl:px-14"
+                  : "px-1 md:px-20"
               }
             >
               <div
                 className={
                   isAiProductPage
                     ? "mx-0 lg:min-w-[75%] lg:max-w-[80rem] lg:mx-auto"
-                    : "min-[2400px]:min-w-[75%] min-[2400px]:max-w-[80rem] min-[2400px]:mx-auto"
+                    : "min-w-[75%] max-w-[80rem] lg:max-w-[80rem] mx-0 lg:mx-auto px-1 sm:px-6 lg:px-0"
                 }
               >
               <AiStickyBackBreadcrumb
                 onBack={handleStickyBack}
                 breadcrumbs={routeBreadcrumbs}
                 isLoading={isBreadcrumbLoading}
-                className={isAiProductPage ? "!px-0" : ""}
+                className="!px-0"
                 sticky={false}
                 textSizeClassName="text-sm md:text-sm lg:text-base"
                 tourId={stickyBreadcrumbTourId}
