@@ -2476,7 +2476,7 @@ const AiSearchResults = () => {
           <div className="rounded-[10px] bg-white px-0 pb-6">
             <div
               data-tour="world-ranking-heading"
-              className="mt-6 mb-6 flex flex-col gap-3 lg:ml-[2.5rem] lg:mr-10 lg:flex-row lg:items-start lg:justify-between"
+              className="mt-2 mb-5 flex flex-col gap-3 lg:ml-[2.5rem] lg:mr-10 lg:flex-row lg:items-start lg:justify-between"
             >
               <p className="flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
                 {isThinkingHeadingVisible && (
@@ -2506,7 +2506,7 @@ const AiSearchResults = () => {
 
             <div
               data-tour="world-ranking-search-summary"
-              className="mt-4 hidden max-w-full items-center rounded-[30px] border bg-white px-4 py-2 shadow-[0_5px_14px_rgba(0,0,0,0.12)] sm:flex lg:ml-[2.5rem] lg:mr-10"
+              className="mt-2 hidden max-w-full items-center rounded-[30px] border bg-white px-4 py-2 shadow-[0_5px_14px_rgba(0,0,0,0.12)] sm:flex lg:ml-[2.5rem] lg:mr-10"
             >
               <div className="flex flex-wrap items-center gap-2">
                 {searchBarBadges.map((badgeLabel, index) => (
