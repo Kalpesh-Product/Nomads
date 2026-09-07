@@ -72,7 +72,7 @@ const HighlightCard = ({ item, kind, onClick }) => {
       <div className="flex min-w-0 flex-col gap-1 px-4">
         <p
           className={`text-xs font-semibold md:text-sm ${
-            kind === "blog" || kind === "news" ? "line-clamp-2" : "truncate"
+            kind === "blog" || kind === "news" ? "line-clamp-1" : "truncate"
           }`}
           title={item.title}
         >

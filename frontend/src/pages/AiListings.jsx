@@ -82,6 +82,29 @@ const formatContentDate = (date) => {
 
   return String(date).replace(/\//g, "-");
 };
+const getContentDateTime = (date) => {
+  if (!date) return 0;
+
+  const parsedDate = new Date(date);
+  if (!Number.isNaN(parsedDate.getTime())) {
+    return parsedDate.getTime();
+  }
+
+  const normalizedDate = String(date).trim();
+  const dateParts = normalizedDate.match(
+    /^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/,
+  );
+  if (!dateParts) return 0;
+
+  const [, day, month, year] = dateParts;
+  const fallbackDate = new Date(Number(year), Number(month) - 1, Number(day));
+
+  return Number.isNaN(fallbackDate.getTime()) ? 0 : fallbackDate.getTime();
+};
+const sortContentByLatestDate = (items) =>
+  [...items].sort(
+    (a, b) => getContentDateTime(b.date) - getContentDateTime(a.date),
+  );
 const extractImageFromContent = (content) => {
   const match = content?.match(/<img.*?src=["'](.*?)["']/);
   return match ? match[1] : null;
@@ -1124,7 +1147,7 @@ const AiListings = ({ forceListView = false }) => {
   );
   const newsItems = useMemo(
     () =>
-      newsData.map((newsItem) => ({
+      sortContentByLatestDate(newsData).map((newsItem) => ({
         ...newsItem,
         id: newsItem.guid || newsItem._id || newsItem.mainTitle,
         title: newsItem.mainTitle || newsItem.title,
@@ -1139,7 +1162,7 @@ const AiListings = ({ forceListView = false }) => {
   );
   const blogItems = useMemo(
     () =>
-      blogsData.map((blog) => ({
+      sortContentByLatestDate(blogsData).map((blog) => ({
         ...blog,
         id: blog.guid || blog._id || blog.mainTitle,
         title: blog.mainTitle || blog.title,
