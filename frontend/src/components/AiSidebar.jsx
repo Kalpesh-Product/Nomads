@@ -245,14 +245,22 @@ const SidebarSection = ({
                     });
                   }}
                   onBlur={() => onTooltipChange?.(null)}
-                  className={`group relative flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-left transition-all hover:bg-white ${
-                    isActive ? "bg-white text-black shadow-sm" : "text-black/80"
+                  className={`group relative flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-left transition-all ${
+                    collapsed
+                      ? "before:absolute before:inset-y-0 before:left-0 before:-right-1 before:rounded-md before:transition-colors hover:before:bg-white"
+                      : "hover:bg-white"
+                  } ${
+                    isActive
+                      ? collapsed
+                        ? "text-black before:bg-white before:shadow-sm"
+                        : "bg-white text-black shadow-sm"
+                      : "text-black/80"
                   }`}
                   aria-label={collapsed ? item.label : undefined}
                 >
                   <Icon
                     size={18}
-                    className={`shrink-0 ${isActive ? "text-primary-blue" : "text-black/80"}`}
+                    className={`relative z-10 shrink-0 ${isActive ? "text-primary-blue" : "text-black/80"}`}
                   />
 
                   {!collapsed && (

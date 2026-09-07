@@ -1260,7 +1260,7 @@ const AiListings = ({ forceListView = false }) => {
         className={`${forceListView ? "flex" : "hidden lg:flex"} flex-col gap-6 lg:px-10`}
       >
         <div
-          className={`w-full lg:min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto ${
+          className={`w-full lg:min-w-[75%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto ${
             forceListView
               ? "px-2 sm:px-6 max-[820px]:!px-0 lg:px-0"
               : "px-4 sm:px-6 lg:px-0"
