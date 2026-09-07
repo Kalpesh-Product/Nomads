@@ -1285,7 +1285,7 @@ const AiListings = ({ forceListView = false }) => {
         <div
           className={`w-full lg:min-w-[75%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto ${
             forceListView
-              ? "px-2 sm:px-6 max-[820px]:!px-0 lg:px-0"
+              ? "px-2 sm:px-6 lg:px-0"
               : "px-4 sm:px-6 lg:px-0"
           }`}
         >
