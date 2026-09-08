@@ -55,6 +55,8 @@ import {
   buildListingShareUrl,
 } from "../utils/listingShareUrl.js";
 import { navigateBackWithinApp } from "../utils/navigationHistory.js";
+import Seo from "../components/Seo.jsx";
+import { getProductSeoDetailsByPath } from "../constants/productSeoDetails.js";
 
 dayjs.extend(relativeTime);
 
@@ -742,6 +744,17 @@ const AiProduct = () => {
     companyType: companyDetails?.companyType || type,
     canonicalUrl: canonicalListingUrl,
   });
+  const productSeoFallbackPath =
+    companyDetails?.companyName && companyDetails?.companyType
+      ? `/listings/${encodeURIComponent(
+          companyDetails.companyName,
+        )}?companyType=${encodeURIComponent(companyDetails.companyType)}`
+      : undefined;
+  const productSeoImage = companyDetails?.images?.[0]?.url;
+  const productSeoDetails = getProductSeoDetailsByPath(
+    `${location.pathname}${location.search}`,
+    productSeoFallbackPath,
+  );
 
   const shareTitle =
     companyDetails?.companyTitle || companyDetails?.companyName
@@ -974,6 +987,7 @@ const AiProduct = () => {
 
   return (
     <div className="pb-4 pt-4 px-4 sm:px-0 sm:pt-0 ">
+      <Seo details={productSeoDetails} image={productSeoImage} />
       {/* Share Modal - Shared between both views */}
       <TransparentModal
         open={shareMenuOpen}

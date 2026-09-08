@@ -1495,7 +1495,7 @@ const AiListings = ({ forceListView = false }) => {
               </motion.div>
             )}
           </AnimatePresence>
-          <div className="min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0 ">
+          <div className="w-full max-w-none mx-0 px-0">
             <div className="lg:flex w-full items-center justify-between hidden">
               <div className="flex flex-col gap-4 justify-center items-center  w-full mt-10 lg:mt-0">
                 <div className="hidden lg:flex flex-col gap-4 justify-between items-center w-full h-full">
@@ -1785,7 +1785,9 @@ const AiListings = ({ forceListView = false }) => {
           <Container
             padding={false}
             className={
-              forceListView ? "!px-0 sm:!px-6 max-[820px]:!px-0 lg:!px-0" : ""
+              forceListView
+                ? "!min-w-0 !max-w-none !mx-0 !w-full !px-0 sm:!px-6 max-[820px]:!px-0 lg:!px-0"
+                : "!min-w-0 !max-w-none !mx-0 !w-full"
             }
           >
             {/* Dynamic Header */}
