@@ -2733,7 +2733,7 @@ const AiSearchResults = () => {
                               </button>
 
                               <div className="pointer-events-none absolute inset-x-2 bottom-3 text-center text-white md:inset-x-4 md:bottom-4">
-                                <h3 className="text-lg uppercase font-normal tracking-wide md:text-3xl">
+                                <h3 className="text-lg uppercase font-medium tracking-wide md:text-3xl md:font-normal">
                                   {destination.title}
                                   {/* {destination.displayCity || destination.city} */}
                                 </h3>
