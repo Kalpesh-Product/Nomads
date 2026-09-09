@@ -155,7 +155,8 @@ const ListingCard = ({
             "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp"
           }
           alt={item.companyName}
-          className="w-full h-full object-cover hover:scale-105 transition-all"
+          draggable={false}
+          className="prevent-image-download w-full h-full object-cover hover:scale-105 transition-all"
           loading="lazy"
         />
 

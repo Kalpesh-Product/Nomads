@@ -1306,7 +1306,7 @@ const AiListings = ({ forceListView = false }) => {
             )} */}
             </div>
           )}
-          <p className="mb-4 mt-6 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:hidden font-play">
+          <p className="mb-4 mt-2 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:hidden font-play">
             {!isSecondHeadingPhase && (
               <span
                 className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-b-transparent"
@@ -1341,9 +1341,9 @@ const AiListings = ({ forceListView = false }) => {
                   {badgesWithCategory.map((badgeLabel, index) => (
                     <span
                       key={`${badgeLabel}-${index}`}
-                      className="inline-flex min-h-[26px] max-w-[5.75rem] shrink-0 items-center justify-center rounded-full border border-black/25 px-2.5 py-1 text-center text-[9px] font-medium leading-tight text-black/85"
+                      className="inline-flex min-h-[26px] w-max shrink-0 items-center justify-center rounded-full border border-black/25 px-2.5 py-1 text-center text-[9px] font-medium leading-tight text-black/85"
                     >
-                      <span className="truncate">{badgeLabel}</span>
+                      <span className="whitespace-nowrap">{badgeLabel}</span>
                     </span>
                   ))}
                 </div>

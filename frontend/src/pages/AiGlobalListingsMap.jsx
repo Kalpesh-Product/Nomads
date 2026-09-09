@@ -1336,9 +1336,9 @@ const AiGlobalListingsMap = () => {
                   (badgeLabel, index) => (
                     <span
                       key={`${badgeLabel}-${index}`}
-                      className="inline-flex min-h-[26px] max-w-[5.75rem] shrink-0 items-center justify-center rounded-full border border-black/25 px-2.5 py-1 text-center text-[9px] font-medium leading-tight text-black/85"
+                      className="inline-flex min-h-[26px] w-max shrink-0 items-center justify-center rounded-full border border-black/25 px-2.5 py-1 text-center text-[9px] font-medium leading-tight text-black/85"
                     >
-                      <span className="truncate">{badgeLabel}</span>
+                      <span className="whitespace-nowrap">{badgeLabel}</span>
                     </span>
                   ),
                 )}
