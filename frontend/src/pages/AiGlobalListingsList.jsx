@@ -2060,7 +2060,7 @@ const AiGlobalListingsList = () => {
       <div className="lg:hidden flex flex-col gap-2 max-sm:gap-1">
         <div className="flex flex-col gap-4 justify-center items-center w-full lg:mt-0 max-sm:gap-2">
           <div className="w-full lg:min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-2 sm:px-6 lg:px-0">
-            <p className="mb-4 mt-6 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:hidden font-play">
+            <p className="mb-4 mt-2 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:hidden font-play">
               {!isSecondHeadingPhase && (
                 <span
                   className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-b-transparent"
