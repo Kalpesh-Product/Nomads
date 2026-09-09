@@ -260,7 +260,7 @@ const HorizontalScrollWrapper = ({ children, title }) => {
   return (
     <div className="relative group/scroll mb-6 max-sm:mb-4">
       <div className="flex items-center justify-between mb-4 gap-2 max-sm:mb-2">
-        <h2 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight">
+        <h2 className="text-lg sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight">
           {title}
         </h2>
       </div>
