@@ -2693,7 +2693,8 @@ const AiSearchResults = () => {
                               <img
                                 src={destination.image}
                                 alt={`${destination.city}, ${destination.country}`}
-                                className="aspect-square w-full rounded-xl object-cover md:rounded-2xl transition-transform duration-500 group-hover:scale-110"
+                                draggable={false}
+                                className="prevent-image-download aspect-square w-full rounded-xl object-cover md:rounded-2xl transition-transform duration-500 group-hover:scale-110"
                                 loading={index < 4 ? "eager" : "lazy"}
                                 fetchPriority={index < 4 ? "high" : "auto"}
                                 decoding="async"
