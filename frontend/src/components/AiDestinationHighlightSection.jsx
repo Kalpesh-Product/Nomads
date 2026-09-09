@@ -116,7 +116,7 @@ const AiDestinationHighlightSection = ({
           {items.map((item) => (
             <div
               key={item.id}
-              className="w-[calc(85%-0.5rem)] flex-shrink-0 snap-start md:w-[calc(33.33%-1rem)]"
+              className="w-[calc(68%-0.5rem)] flex-shrink-0 snap-start sm:w-[calc(55%-0.5rem)] md:w-[calc(33.33%-1rem)]"
             >
               <HighlightCard item={item} kind={kind} onClick={onCardClick} />
             </div>

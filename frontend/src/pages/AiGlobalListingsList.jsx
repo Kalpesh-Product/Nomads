@@ -2291,7 +2291,7 @@ const AiGlobalListingsList = () => {
                             {itemsToShow.map((item) => (
                               <div
                                 key={item._id}
-                                className="w-[calc(85%-0.5rem)] md:w-[calc(33.33%-1rem)] lg:w-[calc(20%-1.5rem)] flex-shrink-0 snap-start"
+                                className="w-[calc(68%-0.5rem)] sm:w-[calc(55%-0.5rem)] md:w-[calc(33.33%-1rem)] lg:w-[calc(20%-1.5rem)] flex-shrink-0 snap-start"
                               >
                                 <ListingCard
                                   item={item}
@@ -2303,7 +2303,7 @@ const AiGlobalListingsList = () => {
                               </div>
                             ))}
                             {hasMore && (
-                              <div className="w-[calc(85%-0.5rem)] md:w-[calc(33.33%-1rem)] lg:w-[calc(20%-1.5rem)] flex-shrink-0 snap-start">
+                              <div className="w-[calc(68%-0.5rem)] sm:w-[calc(55%-0.5rem)] md:w-[calc(33.33%-1rem)] lg:w-[calc(20%-1.5rem)] flex-shrink-0 snap-start">
                                 <button
                                   onClick={() => handleCategoryClick(type)}
                                   className="w-full aspect-square border-2 border-gray-100 rounded-3xl flex flex-col items-center justify-center gap-3 hover:border-primary-blue hover:shadow-md transition-all bg-gray-50/30 group md:justify-start md:pt-12"
