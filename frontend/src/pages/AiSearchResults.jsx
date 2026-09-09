@@ -2700,7 +2700,7 @@ const AiSearchResults = () => {
                                 sizes="(min-width: 1280px) 25vw, (min-width: 768px) 33vw, 50vw"
                               />
 
-                              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-black/10" />
+                              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[58%] bg-gradient-to-t from-black/75 via-black/35 to-transparent md:inset-0 md:h-auto md:from-black/55 md:via-black/10 md:to-black/10" />
 
                               <div className="pointer-events-none absolute left-3 top-3 text-white text-xl  md:left-4 md:top-4 md:text-2xl">
                                 #
