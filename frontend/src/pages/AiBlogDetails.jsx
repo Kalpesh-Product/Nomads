@@ -208,7 +208,7 @@ const AiBlogDetails = () => {
   }, [content, contentDetailGuideSeenKey, startContentDetailGuide]);
 
   return (
-    <div className="min-w-[70%] max-w-[80rem] lg:max-w-[75rem] mx-0 md:mx-auto p-4 lg:p-0">
+    <div className="min-w-[70%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto p-4 lg:p-0">
       {/* <button
         type="button"
         onClick={handleBackButtonClick}

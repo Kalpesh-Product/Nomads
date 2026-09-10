@@ -1280,7 +1280,9 @@ const AiListings = ({ forceListView = false }) => {
     <div className="flex flex-col gap:2 lg:gap-6 ">
       <Seo fallbackPath="/verticals" />
       <div
-        className={`${forceListView ? "flex" : "hidden lg:flex"} flex-col gap-6 lg:px-10`}
+        className={`${forceListView ? "flex" : "hidden lg:flex"} flex-col gap-6 ${
+          forceListView ? "lg:px-0" : "lg:px-10"
+        }`}
       >
         <div
           className={`w-full lg:min-w-[75%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto ${
