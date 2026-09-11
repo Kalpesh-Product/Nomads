@@ -466,6 +466,18 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
   const isCollapsed = isMobileOverlay ? false : collapsed;
 
+  useEffect(() => {
+    if (isMobileOverlay) return undefined;
+
+    document.documentElement.dataset.nomadSidebar = isCollapsed
+      ? "collapsed"
+      : "expanded";
+
+    return () => {
+      delete document.documentElement.dataset.nomadSidebar;
+    };
+  }, [isCollapsed, isMobileOverlay]);
+
   const normalizedPath = location.pathname.replace(/\/$/, "") || "/";
   const redirectGoal = location.pathname
     .replace(/\/$/, "")
