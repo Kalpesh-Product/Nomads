@@ -434,7 +434,7 @@ const AiDestinationDetail = ({ type }) => {
   }, [item?.id, startEventDetailGuide, type]);
 
   return (
-    <main className="mx-auto w-full max-w-[75rem] px-4 pb-8 lg:px-0">
+    <main className="mx-auto w-full max-w-[80rem] px-4 pb-8 lg:px-0">
       <header className="mb-5">
         <div className="flex items-start justify-between gap-3">
           <h1 className="text-2xl font-bold text-black md:text-title">

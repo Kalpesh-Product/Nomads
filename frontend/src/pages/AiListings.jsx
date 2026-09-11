@@ -82,6 +82,29 @@ const formatContentDate = (date) => {
 
   return String(date).replace(/\//g, "-");
 };
+const getContentDateTime = (date) => {
+  if (!date) return 0;
+
+  const parsedDate = new Date(date);
+  if (!Number.isNaN(parsedDate.getTime())) {
+    return parsedDate.getTime();
+  }
+
+  const normalizedDate = String(date).trim();
+  const dateParts = normalizedDate.match(
+    /^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/,
+  );
+  if (!dateParts) return 0;
+
+  const [, day, month, year] = dateParts;
+  const fallbackDate = new Date(Number(year), Number(month) - 1, Number(day));
+
+  return Number.isNaN(fallbackDate.getTime()) ? 0 : fallbackDate.getTime();
+};
+const sortContentByLatestDate = (items) =>
+  [...items].sort(
+    (a, b) => getContentDateTime(b.date) - getContentDateTime(a.date),
+  );
 const extractImageFromContent = (content) => {
   const match = content?.match(/<img.*?src=["'](.*?)["']/);
   return match ? match[1] : null;
@@ -1124,7 +1147,7 @@ const AiListings = ({ forceListView = false }) => {
   );
   const newsItems = useMemo(
     () =>
-      newsData.map((newsItem) => ({
+      sortContentByLatestDate(newsData).map((newsItem) => ({
         ...newsItem,
         id: newsItem.guid || newsItem._id || newsItem.mainTitle,
         title: newsItem.mainTitle || newsItem.title,
@@ -1139,7 +1162,7 @@ const AiListings = ({ forceListView = false }) => {
   );
   const blogItems = useMemo(
     () =>
-      blogsData.map((blog) => ({
+      sortContentByLatestDate(blogsData).map((blog) => ({
         ...blog,
         id: blog.guid || blog._id || blog.mainTitle,
         title: blog.mainTitle || blog.title,
@@ -1257,12 +1280,14 @@ const AiListings = ({ forceListView = false }) => {
     <div className="flex flex-col gap:2 lg:gap-6 ">
       <Seo fallbackPath="/verticals" />
       <div
-        className={`${forceListView ? "flex" : "hidden lg:flex"} flex-col gap-6 lg:px-10`}
+        className={`${forceListView ? "flex" : "hidden lg:flex"} flex-col gap-6 ${
+          forceListView ? "lg:px-0" : "lg:px-10"
+        }`}
       >
         <div
-          className={`w-full lg:min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto ${
+          className={`w-full lg:min-w-[75%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto ${
             forceListView
-              ? "px-2 sm:px-6 max-[820px]:!px-0 lg:px-0"
+              ? "px-2 sm:px-6 lg:px-0"
               : "px-4 sm:px-6 lg:px-0"
           }`}
         >
@@ -1283,7 +1308,7 @@ const AiListings = ({ forceListView = false }) => {
             )} */}
             </div>
           )}
-          <p className="mb-4 mt-6 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:hidden font-play">
+          <p className="mb-4 mt-2 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:hidden font-play">
             {!isSecondHeadingPhase && (
               <span
                 className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-b-transparent"
@@ -1318,9 +1343,9 @@ const AiListings = ({ forceListView = false }) => {
                   {badgesWithCategory.map((badgeLabel, index) => (
                     <span
                       key={`${badgeLabel}-${index}`}
-                      className="inline-flex min-h-[26px] max-w-[5.75rem] shrink-0 items-center justify-center rounded-full border border-black/25 px-2.5 py-1 text-center text-[9px] font-medium leading-tight text-black/85"
+                      className="inline-flex min-h-[26px] w-max shrink-0 items-center justify-center rounded-full border border-black/25 px-2.5 py-1 text-center text-[9px] font-medium leading-tight text-black/85"
                     >
-                      <span className="truncate">{badgeLabel}</span>
+                      <span className="whitespace-nowrap">{badgeLabel}</span>
                     </span>
                   ))}
                 </div>
@@ -1472,7 +1497,7 @@ const AiListings = ({ forceListView = false }) => {
               </motion.div>
             )}
           </AnimatePresence>
-          <div className="min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-6 sm:px-6 lg:px-0 ">
+          <div className="w-full max-w-none mx-0 px-0">
             <div className="lg:flex w-full items-center justify-between hidden">
               <div className="flex flex-col gap-4 justify-center items-center  w-full mt-10 lg:mt-0">
                 <div className="hidden lg:flex flex-col gap-4 justify-between items-center w-full h-full">
@@ -1762,7 +1787,9 @@ const AiListings = ({ forceListView = false }) => {
           <Container
             padding={false}
             className={
-              forceListView ? "!px-0 sm:!px-6 max-[820px]:!px-0 lg:!px-0" : ""
+              forceListView
+                ? "!min-w-0 !max-w-none !mx-0 !w-full !px-0 sm:!px-6 max-[820px]:!px-0 lg:!px-0"
+                : "!min-w-0 !max-w-none !mx-0 !w-full"
             }
           >
             {/* Dynamic Header */}

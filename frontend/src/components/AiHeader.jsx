@@ -223,6 +223,8 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
   const showDetailCategoryLinks = isAiDetailCategoryHeaderPage;
   const showDestinationCategoryLinks =
     showDetailCategoryLinks || showNewsBlogLinks;
+  const shouldLockListingDetailHeaderLinks =
+    location.pathname.startsWith("/listings/");
 
   const currentSearch =
     location.search ||
@@ -322,10 +324,16 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
     <div
       className={`bg-white/80 backdrop-blur-md px-1 ${
         forceMobileNavigation ? "" : "md:px-20"
+      } ${
+        shouldLockListingDetailHeaderLinks ? "lg:py-1" : ""
       }`}
     >
       <AiContainer padding={false}>
-        <div className="flex py-3 justify-between items-center lg:py-[0.625rem]">
+        <div
+          className={`flex py-3 justify-between items-center lg:py-[0.625rem] ${
+            shouldLockListingDetailHeaderLinks ? "lg:min-h-[72px]" : ""
+          }`}
+        >
           {/* Logo */}
           <div className="flex items-center">
             <button
@@ -438,7 +446,13 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
           </div>
 
           {/* Right Section - Desktop */}
-          <div className="hidden lg:flex items-center pl-10 gap-12">
+          <div
+            className={`hidden lg:flex items-center pl-10 gap-12 ${
+              shouldLockListingDetailHeaderLinks
+                ? "lg:fixed lg:right-[60px] lg:top-1 lg:h-[72px] lg:z-50"
+                : ""
+            }`}
+          >
             <div className="flex items-center gap-3">
               {/* <button
                 type="button"

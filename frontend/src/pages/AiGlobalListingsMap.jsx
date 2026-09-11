@@ -1105,10 +1105,10 @@ const AiGlobalListingsMap = () => {
           />
         </div>
         <div
-          className={`${isHeadingSequenceComplete ? "flex" : "hidden"} flex-col gap-4 justify-center items-center w-full`}
+          className={`${isHeadingSequenceComplete ? "flex" : "hidden"} mx-auto min-w-[75%] w-full max-w-[80rem] flex-col gap-4 px-1 sm:px-6 lg:px-0`}
         >
           <div className="w-full px-0">
-            <div className="flex flex-col gap-4 justify-between items-center">
+            <div className="flex flex-col gap-4 justify-between items-center w-full h-full">
               <div className="w-full pb-4">
                 <div
                   data-tour="verticals-map-category-strip"
@@ -1336,9 +1336,9 @@ const AiGlobalListingsMap = () => {
                   (badgeLabel, index) => (
                     <span
                       key={`${badgeLabel}-${index}`}
-                      className="inline-flex min-h-[26px] max-w-[5.75rem] shrink-0 items-center justify-center rounded-full border border-black/25 px-2.5 py-1 text-center text-[9px] font-medium leading-tight text-black/85"
+                      className="inline-flex min-h-[26px] w-max shrink-0 items-center justify-center rounded-full border border-black/25 px-2.5 py-1 text-center text-[9px] font-medium leading-tight text-black/85"
                     >
-                      <span className="truncate">{badgeLabel}</span>
+                      <span className="whitespace-nowrap">{badgeLabel}</span>
                     </span>
                   ),
                 )}

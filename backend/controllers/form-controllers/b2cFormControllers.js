@@ -10,6 +10,7 @@ import NewCompanySetup from "../../models/NewCompanySetup.js";
 import Consultation from "../../models/Consultation.js";
 import Workation from "../../models/Workation.js";
 import BecomeContributor from "../../models/BecomeContributor.js";
+import ContentRemoval from "../../models/ContentRemoval.js";
 import { randomUUID } from "crypto";
 import bcrypt from "bcrypt";
 import { uploadFileToS3 } from "../../config/s3Config.js";
@@ -1206,6 +1207,10 @@ export const addB2CformSubmission = async (req, res, next) => {
       const signupEntry = new NomadUser(payload);
 
       await signupEntry.save();
+    }
+
+    if (sheetName === "Content_Removal_Requests") {
+      await ContentRemoval.create(payload);
     }
 
     if (sheetName === "AI_Visa_Support") {
