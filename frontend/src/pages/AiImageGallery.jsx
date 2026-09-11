@@ -271,7 +271,7 @@ const AiImageGallery = () => {
   };
 
   return (
-    <div className="w-full pb-6 flex flex-col gap-4">
+    <div className="w-full pb-6 flex flex-col gap-4 2xl:min-w-[75%] 2xl:max-w-[80rem] 2xl:mx-auto">
       <div>
         <nav
           aria-label="Breadcrumb"
