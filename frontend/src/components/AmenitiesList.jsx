@@ -189,7 +189,7 @@ export default function AmenitiesList({ type = "coworking", inclusions = [] }) {
   });
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-8 lg:gap-y-10 lg:gap-x-8">
+    <div className="amenities-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-8 lg:gap-y-10 lg:gap-x-8">
       {sortedAmenities.map((amenity) => {
         const key = normalizeKey(amenity);
         const isAvailable = normalizedInclusions.includes(key);
@@ -211,7 +211,7 @@ export default function AmenitiesList({ type = "coworking", inclusions = [] }) {
               )}
             </div>
             <p
-              className={`text-left text-secondary-dark font-medium leading-tight text-xs md:text-small uppercase whitespace-nowrap ${!isAvailable ? "line-through text-gray-400" : ""
+              className={`amenity-label text-left text-secondary-dark font-medium leading-tight text-xs md:text-small uppercase whitespace-nowrap ${!isAvailable ? "line-through text-gray-400" : ""
                 }`}
             >
               {amenity}
