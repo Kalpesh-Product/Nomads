@@ -330,7 +330,7 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
     >
       <AiContainer padding={false}>
         <div
-          className={`flex py-3 justify-between items-center lg:py-[0.625rem] ${
+          className={`relative flex py-3 justify-between items-center lg:py-[0.625rem] ${
             shouldLockListingDetailHeaderLinks ? "lg:min-h-[72px]" : ""
           }`}
         >
@@ -449,7 +449,7 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
           <div
             className={`hidden lg:flex items-center pl-10 gap-12 ${
               shouldLockListingDetailHeaderLinks
-                ? "lg:fixed lg:right-[60px] lg:top-1 lg:h-[72px] lg:z-50"
+                ? "lg:absolute lg:right-0 lg:top-1 lg:h-[72px] lg:z-50"
                 : ""
             }`}
           >
