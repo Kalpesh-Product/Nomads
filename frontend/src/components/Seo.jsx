@@ -3,10 +3,10 @@ import { useLocation } from "react-router-dom";
 
 import { getSeoDetailsByPath } from "../constants/seoDetails";
 
-const Seo = ({ path, fallbackPath, image }) => {
+const Seo = ({ path, fallbackPath, image, details }) => {
   const location = useLocation();
   const lookupPath = path || `${location.pathname}${location.search}`;
-  const seo = getSeoDetailsByPath(lookupPath, fallbackPath);
+  const seo = details || getSeoDetailsByPath(lookupPath, fallbackPath);
 
   if (!seo) return null;
 

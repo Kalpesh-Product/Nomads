@@ -2473,7 +2473,7 @@ const AiSearchResults = () => {
           <div className="rounded-[10px] bg-white px-0 pb-6">
             <div
               data-tour="world-ranking-heading"
-              className="mt-6 mb-6 flex flex-col gap-3 lg:ml-[2.5rem] lg:mr-10 lg:flex-row lg:items-start lg:justify-between"
+              className="mt-2 mb-5 flex flex-col gap-3 lg:ml-[2.5rem] lg:mr-10 lg:flex-row lg:items-start lg:justify-between"
             >
               <p className="flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.9rem] font-play">
                 {isThinkingHeadingVisible && (
@@ -2503,7 +2503,7 @@ const AiSearchResults = () => {
 
             <div
               data-tour="world-ranking-search-summary"
-              className="mt-4 hidden max-w-full items-center rounded-[30px] border bg-white px-4 py-2 shadow-[0_5px_14px_rgba(0,0,0,0.12)] sm:flex lg:ml-[2.5rem] lg:mr-10"
+              className="mt-2 hidden max-w-full items-center rounded-[30px] border bg-white px-4 py-2 shadow-[0_5px_14px_rgba(0,0,0,0.12)] sm:flex lg:ml-[2.5rem] lg:mr-10"
             >
               <div className="flex flex-wrap items-center gap-2">
                 {searchBarBadges.map((badgeLabel, index) => (
@@ -2690,14 +2690,15 @@ const AiSearchResults = () => {
                               <img
                                 src={destination.image}
                                 alt={`${destination.city}, ${destination.country}`}
-                                className="aspect-square w-full rounded-xl object-cover md:rounded-2xl transition-transform duration-500 group-hover:scale-110"
+                                draggable={false}
+                                className="prevent-image-download aspect-square w-full rounded-xl object-cover md:rounded-2xl transition-transform duration-500 group-hover:scale-110"
                                 loading={index < 4 ? "eager" : "lazy"}
                                 fetchPriority={index < 4 ? "high" : "auto"}
                                 decoding="async"
                                 sizes="(min-width: 1280px) 25vw, (min-width: 768px) 33vw, 50vw"
                               />
 
-                              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-black/10" />
+                              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[58%] bg-gradient-to-t from-black/75 via-black/35 to-transparent md:inset-0 md:h-auto md:from-black/55 md:via-black/10 md:to-black/10" />
 
                               <div className="pointer-events-none absolute left-3 top-3 text-white text-xl  md:left-4 md:top-4 md:text-2xl">
                                 #
@@ -2730,7 +2731,7 @@ const AiSearchResults = () => {
                               </button>
 
                               <div className="pointer-events-none absolute inset-x-2 bottom-3 text-center text-white md:inset-x-4 md:bottom-4">
-                                <h3 className="text-lg uppercase font-normal tracking-wide md:text-3xl">
+                                <h3 className="text-lg uppercase font-medium tracking-wide md:text-3xl md:font-normal">
                                   {destination.title}
                                   {/* {destination.displayCity || destination.city} */}
                                 </h3>

@@ -72,7 +72,7 @@ const HighlightCard = ({ item, kind, onClick }) => {
       <div className="flex min-w-0 flex-col gap-1 px-4">
         <p
           className={`text-xs font-semibold md:text-sm ${
-            kind === "blog" || kind === "news" ? "line-clamp-2" : "truncate"
+            kind === "blog" || kind === "news" ? "line-clamp-1" : "truncate"
           }`}
           title={item.title}
         >
@@ -109,14 +109,14 @@ const AiDestinationHighlightSection = ({
   if (mobile) {
     return (
       <div ref={sectionRef} className="mb-6 scroll-mt-24 max-sm:mb-4">
-        <h2 className="mb-4 text-sm font-semibold leading-tight text-secondary-dark sm:text-base md:text-subtitle max-sm:mb-2">
+        <h2 className="mb-4 text-lg font-semibold leading-tight text-secondary-dark sm:text-base md:text-subtitle max-sm:mb-2">
           {title}
         </h2>
         <div className="custom-scrollbar-hide flex snap-x snap-mandatory flex-nowrap gap-4 overflow-x-auto pb-2 max-sm:gap-3 max-sm:pb-1">
           {items.map((item) => (
             <div
               key={item.id}
-              className="w-[calc(85%-0.5rem)] flex-shrink-0 snap-start md:w-[calc(33.33%-1rem)]"
+              className="w-[calc(68%-0.5rem)] flex-shrink-0 snap-start sm:w-[calc(55%-0.5rem)] md:w-[calc(33.33%-1rem)]"
             >
               <HighlightCard item={item} kind={kind} onClick={onCardClick} />
             </div>
