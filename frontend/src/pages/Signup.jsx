@@ -6,7 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 import axios from "../utils/axios";
 // import toast from "react-hot-toast";
 import PrimaryButton from "../components/PrimaryButton";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import MuiModal from "../components/Modal";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import useAuth from "../hooks/useAuth";
@@ -19,6 +19,7 @@ export default function Signup() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { auth } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
   const toggleConfirmPasswordVisibility = () =>
@@ -217,7 +218,9 @@ export default function Signup() {
             <p className="text-center">
               Already have an account?&nbsp;
               <span className="underline">
-                <Link to="/login">Login</Link>
+                <Link to="/login" state={location.state}>
+                  Login
+                </Link>
               </span>
             </p>
           </div>
