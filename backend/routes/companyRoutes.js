@@ -21,6 +21,9 @@ import {
   bulkUpdateCompanyInclusions,
   deactivateProduct,
   setListingPublicStatus,
+  softDeleteProduct,
+  requestListingRecovery,
+  recoverProduct,
   getLocationTree,
   setBulkListingPublicStatus,
   editCompanyImagesBulk,
@@ -58,6 +61,9 @@ router.get("/field-options", getListingFieldOptions);
 router.patch("/activate-product", activateProduct);
 router.patch("/deactivate-product", deactivateProduct);
 router.patch("/set-public-status", setListingPublicStatus);
+router.patch("/soft-delete-product", softDeleteProduct);
+router.patch("/request-listing-recovery", requestListingRecovery);
+router.patch("/recover-product", recoverProduct);
 router.get("/location-tree", getLocationTree);
 router.patch("/bulk-set-public-status", setBulkListingPublicStatus);
 router.get("/get-single-company-data", getCompanyData);

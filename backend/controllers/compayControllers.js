@@ -886,6 +886,7 @@ export const getCompaniesDataNomads = async (req, res, next) => {
     const canSeeNonPublic = await isSpecialAccessUser(userId);
     const match = {
       companyType: { $ne: "privatestay" },
+      isDeleted: { $ne: true },
       ...(canSeeNonPublic ? { $or: [{ isActive: true }, { isPublic: true }] } : { isPublic: true }),
     };
 
@@ -1193,6 +1194,7 @@ export const getCompanyData = async (req, res, next) => {
     // visible to Wono staff with special access, for internal review before
     // a listing goes live. Added after the identifier check above so "no
     // identifier" still 400s.
+    companyQuery.isDeleted = { $ne: true };
     if (await isSpecialAccessUser(userId)) {
       companyQuery.$or = [{ isActive: true }, { isPublic: true }];
     } else {
@@ -2435,6 +2437,114 @@ export const setListingPublicStatus = async (req, res, next) => {
     return res.status(200).json({
       message: `Listing made ${isPublic ? "public" : "private"} successfully`,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Soft delete — gated on isPublic, not isActive: isPublic (Visibility) is
+// the host's own flag, isActive (Master Status) is staff's. Deleting is a
+// host action, so it's gated on something the host controls themselves —
+// otherwise they'd be stuck waiting on staff to deactivate before they
+// could delete their own listing. Always forces isActive/isPublic off too,
+// so it drops out of every visibility query the instant it's deleted.
+export const softDeleteProduct = async (req, res, next) => {
+  try {
+    const { businessId, deletedBy } = req.body;
+
+    if (!businessId) {
+      return res.status(400).json({ message: "Business Id missing" });
+    }
+
+    const product = await Company.findOne({ businessId });
+    if (!product) {
+      return res.status(404).json({ message: "Listing not found" });
+    }
+    if (product.isDeleted) {
+      return res.status(409).json({ message: "Listing is already deleted" });
+    }
+    if (product.isPublic) {
+      return res.status(409).json({
+        code: "NOMAD_LISTING_PUBLIC",
+        message: "Turn off this listing's visibility before deleting it.",
+      });
+    }
+
+    product.isDeleted = true;
+    product.deletedAt = new Date();
+    product.deletedBy = String(deletedBy || "host").trim() || "host";
+    product.isActive = false;
+    product.isPublic = false;
+    product.recoveryRequested = false;
+    product.recoveryRequestedAt = undefined;
+    await product.save();
+
+    companyLocationsCache = { data: null, expiresAt: 0, pendingRequest: null };
+
+    return res.status(200).json({ message: "Listing deleted" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Host-side ask for staff to restore a deleted listing — doesn't restore
+// anything itself, just flags the listing so Master Panel's Recover action
+// (recoverProduct below) becomes available for it.
+export const requestListingRecovery = async (req, res, next) => {
+  try {
+    const { businessId } = req.body;
+
+    if (!businessId) {
+      return res.status(400).json({ message: "Business Id missing" });
+    }
+
+    const product = await Company.findOne({ businessId });
+    if (!product) {
+      return res.status(404).json({ message: "Listing not found" });
+    }
+    if (!product.isDeleted) {
+      return res.status(409).json({ message: "Listing isn't deleted" });
+    }
+
+    product.recoveryRequested = true;
+    product.recoveryRequestedAt = new Date();
+    await product.save();
+
+    return res.status(200).json({ message: "Recovery requested" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Staff-only: undoes a soft delete. isActive/isPublic are left off on
+// purpose — a recovered listing goes back through the normal activation
+// flow rather than reappearing live with no review.
+export const recoverProduct = async (req, res, next) => {
+  try {
+    const { businessId } = req.body;
+
+    if (!businessId) {
+      return res.status(400).json({ message: "Business Id missing" });
+    }
+
+    const product = await Company.findOne({ businessId });
+    if (!product) {
+      return res.status(404).json({ message: "Listing not found" });
+    }
+    if (!product.isDeleted) {
+      return res.status(409).json({ message: "Listing isn't deleted" });
+    }
+
+    product.isDeleted = false;
+    product.deletedAt = undefined;
+    product.deletedBy = undefined;
+    product.recoveryRequested = false;
+    product.recoveryRequestedAt = undefined;
+    await product.save();
+
+    companyLocationsCache = { data: null, expiresAt: 0, pendingRequest: null };
+
+    return res.status(200).json({ message: "Listing recovered" });
   } catch (error) {
     next(error);
   }
