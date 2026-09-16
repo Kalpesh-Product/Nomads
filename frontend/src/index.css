@@ -25,6 +25,16 @@
       line-height: 1.55 !important;
     }
   }
+
+  @media (min-width: 1280px) and (max-width: 1440px) {
+    html[data-nomad-sidebar="expanded"] .amenities-grid {
+      column-gap: 3rem;
+    }
+
+    html[data-nomad-sidebar="expanded"] .amenity-label {
+      white-space: normal;
+    }
+  }
 }
 
 @font-face {
