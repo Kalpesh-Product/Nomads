@@ -6,6 +6,7 @@ import {
   AiTwotoneHeart,
 } from "react-icons/ai";
 import { IoClose } from "react-icons/io5";
+import { MdVerified } from "react-icons/md";
 import Swal from "sweetalert2";
 
 import { useNavigate } from "react-router-dom";
@@ -208,13 +209,20 @@ const ListingCard = ({
 
       <div className="h-[25%] flex flex-col gap-1 pl-4 pr-1">
         <div className="flex w-full justify-between items-center">
-          <div className="w-full">
+          <div className="w-full flex items-center gap-1 min-w-0">
             <p
-              className="text-xs md:text-sm font-semibold truncate"
+              className="text-xs md:text-sm font-semibold truncate min-w-0"
               title={listingName}
             >
               {listingName}
             </p>
+            {item?.isVerified && (
+              <MdVerified
+                className="text-[#1d9bf0] shrink-0"
+                size={17}
+                title="Verified Business"
+              />
+            )}
           </div>
         </div>
 

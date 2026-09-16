@@ -334,7 +334,9 @@ export default function AiLogin() {
               <p className="text-gray-600 hover:text-black">
                 <span>New to WoNo? </span>
                 <span className="underline">
-                  <Link to="/signup">Sign Up</Link>
+                  <Link to="/signup" state={location.state}>
+                    Sign Up
+                  </Link>
                 </span>
               </p>
             </div>

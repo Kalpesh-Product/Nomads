@@ -21,6 +21,20 @@ import { fixedAmenitiesMap } from "../config/amenitiesMap.js";
 // query param can't be pointed at arbitrary schema fields.
 const ADDITIVE_FIELD_OPTIONS = new Set(["services", "units"]);
 
+// Verification badges are payment-gated with an expiry date, but nothing
+// writes isVerified back to false once verificationExpiresAt passes — it's
+// computed live on every read instead, so there's no cron needed to keep it
+// in sync.
+function computeEffectiveVerification(company) {
+  const expired =
+    company.verificationExpiresAt &&
+    new Date(company.verificationExpiresAt) <= new Date();
+  return {
+    isVerified: Boolean(company.isVerified) && !expired,
+    verificationTier: expired ? null : company.verificationTier,
+  };
+}
+
 const parseCsvRows = (file) =>
   new Promise((resolve, reject) => {
     const rows = [];
@@ -913,6 +927,9 @@ export const getCompaniesDataNomads = async (req, res, next) => {
           // your original rating fields
           ratings: 1,
           totalReviews: 1,
+          isVerified: 1,
+          verificationTier: 1,
+          verificationExpiresAt: 1,
 
           images: { $slice: ["$images", 1] },
         },
@@ -926,6 +943,11 @@ export const getCompaniesDataNomads = async (req, res, next) => {
       locale: "en",
       strength: 2,
     });
+
+    companyData = companyData.map((c) => ({
+      ...c,
+      ...computeEffectiveVerification(c),
+    }));
 
     // Add likes
     if (userId && mongoose.Types.ObjectId.isValid(userId)) {
@@ -1217,11 +1239,11 @@ export const getCompanyData = async (req, res, next) => {
 
     const company = await Company.findOne(companyQuery).lean().exec();
 
-    let companyData = company;
-
-    if (!companyData) {
+    if (!company) {
       return res.status(404).json({ error: "Company not found" });
     }
+
+    let companyData = { ...company, ...computeEffectiveVerification(company) };
 
     if (userId) {
       if (!mongoose.Types.ObjectId.isValid(userId)) {
@@ -1559,7 +1581,11 @@ export const getListings = async (req, res, next) => {
         (r) => String(r?.company?._id) === String(list?._id),
       );
 
-      return { ...list, reviews: listReviews };
+      return {
+        ...list,
+        ...computeEffectiveVerification(list),
+        reviews: listReviews,
+      };
     });
 
     return res.status(200).json(data);

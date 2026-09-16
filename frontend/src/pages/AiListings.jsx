@@ -639,6 +639,15 @@ const AiListings = ({ forceListView = false }) => {
     return [...baseBadges, categoryBadgeLabel];
   }, [searchBarBadges, categoryBadgeLabel]);
 
+  // Verified listings (badge status already factors in expiry — see
+  // computeEffectiveVerification in the Nomads backend) sort ahead of
+  // unverified ones; everything else keeps its prior relative order.
+  const sortVerifiedFirst = React.useCallback(
+    (items) =>
+      [...items].sort((a, b) => Number(Boolean(b.isVerified)) - Number(Boolean(a.isVerified))),
+    [],
+  );
+
   const filteredListings = React.useMemo(() => {
     if (!listingsData) return [];
     if (
@@ -652,7 +661,7 @@ const AiListings = ({ forceListView = false }) => {
       return [];
     }
 
-    if (!formData?.category) return listingsData;
+    if (!formData?.category) return sortVerifiedFirst(listingsData);
 
     const categoryResults = listingsData.filter(
       (item) => item.companyType === formData.category,
@@ -660,15 +669,19 @@ const AiListings = ({ forceListView = false }) => {
 
     // ✅ If no listings match the selected category, fallback to all listings
     // return categoryResults.length > 0 ? categoryResults : listingsData;
-    if (categoryResults.length === 0) return listingsData;
+    if (categoryResults.length === 0) return sortVerifiedFirst(listingsData);
 
     return [...categoryResults].sort((a, b) => {
+      const aVerified = Number(Boolean(a.isVerified));
+      const bVerified = Number(Boolean(b.isVerified));
+      if (aVerified !== bVerified) return bVerified - aVerified;
+
       const aRating = Number.parseFloat(a.ratings) || 0;
       const bRating = Number.parseFloat(b.ratings) || 0;
 
       return bRating - aRating;
     });
-  }, [listingsData, formData?.category]);
+  }, [listingsData, formData?.category, sortVerifiedFirst]);
 
   const toggleFavorite = (id) => {
     setFavorites((prev) =>
@@ -1255,6 +1268,11 @@ const AiListings = ({ forceListView = false }) => {
   };
 
   // Prioritize BIZ Nest and MeWo first, then sort the rest by rating descending
+  // NOTE: sortedListings is currently dead code — the actual rendered list is
+  // filteredListings below (PaginatedGrid's `data` prop, line ~2026, has this
+  // commented out in favor of filteredListings). Left as-is; the verified-first
+  // requirement is implemented in filteredListings instead, since that's what
+  // actually reaches the screen.
   const prioritizedCompanies = ["BIZ Nest", "MeWo"];
   const sortedListings = [...(listingsData || [])].sort((a, b) => {
     const aIsPriority = prioritizedCompanies.includes(a.companyName);

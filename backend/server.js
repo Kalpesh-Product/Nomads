@@ -48,6 +48,8 @@ import leadsRoutes from "./routes/leadsRoutes.js";
 import specialAccessRoutes from "./routes/specialAccessRoutes.js";
 import adminNomadUserRoutes from "./routes/adminNomadUserRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
+import verificationRoutes from "./routes/verificationRoutes.js";
+import adminVerificationRoutes from "./routes/adminVerificationRoutes.js";
 import { verifyAdminApiKey } from "./middlewares/verifyAdminApiKey.js";
 
 const app = express();
@@ -62,6 +64,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use("/api/auth", authRoutes);
 app.use("/api/user", verifyJwt, nomadUserRoutes);
+app.use("/api/verification", verifyJwt, verificationRoutes);
 app.use("/api/company", companyRoutes);
 app.use("/api/poc", pocRoutes);
 app.use("/api/review", reviewRoutes);
@@ -81,6 +84,11 @@ app.use("/api/leads", leadsRoutes);
 app.use("/api/special-access", specialAccessRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/admin/nomad-users", verifyAdminApiKey, adminNomadUserRoutes);
+app.use(
+  "/api/admin/verification-requests",
+  verifyAdminApiKey,
+  adminVerificationRoutes,
+);
 
 
 app.use("/api/news", newsRoutes);

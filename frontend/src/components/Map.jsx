@@ -7,6 +7,7 @@ import {
   MarkerClusterer,
 } from "@react-google-maps/api";
 import { FaStar } from "react-icons/fa6";
+import { MdVerified } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 
 const FALLBACK_CENTER = { lat: 15.501, lng: 73.8294 };
@@ -78,8 +79,17 @@ const MarkerItem = React.memo(function MarkerItem({
               className="w-full h-20 object-cover rounded-md"
             />
             <div className="flex flex-row items-center justify-between">
-              <div className="mt-1 font-semibold text-xs text-black truncate">
-                {loc.name}
+              <div className="mt-1 flex items-center gap-1 min-w-0">
+                <span className="font-semibold text-xs text-black truncate min-w-0">
+                  {loc.name}
+                </span>
+                {loc.isVerified && (
+                  <MdVerified
+                    className="text-[#1d9bf0] shrink-0"
+                    size={12}
+                    title="Verified Business"
+                  />
+                )}
               </div>
               <div className="flex items-center gap-1 mt-1 text-xs">
                 <FaStar />

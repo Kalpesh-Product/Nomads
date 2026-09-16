@@ -6,12 +6,14 @@ import { Drawer, Avatar, Popover, CircularProgress } from "@mui/material";
 import { IoCloseSharp } from "react-icons/io5";
 import { HiOutlineMenu } from "react-icons/hi";
 import { FiLogOut, FiUser } from "react-icons/fi";
+import { MdVerified } from "react-icons/md";
 import useAuth from "../hooks/useAuth";
 import useNomadLoginState from "../hooks/useNomadLoginState";
 import AiContainer from "./AiContainer";
 import useLogout from "../hooks/useLogout";
 import { clearStoredLoginState } from "../hooks/useNomadLoginState";
 import useLocationContentAvailability from "../hooks/useLocationContentAvailability";
+import useHasVerificationRequest from "../hooks/useHasVerificationRequest";
 import { readSelectedDestination } from "../utils/selectedDestinationSession";
 
 const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
@@ -96,6 +98,7 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
 
   const { auth } = useAuth();
   const logout = useLogout();
+  const hasVerificationRequest = useHasVerificationRequest();
   const hasNomadLoginState = useNomadLoginState();
   const isLoggedIn = Boolean(auth?.user) || hasNomadLoginState;
   const userInitial = auth?.user?.fullName?.charAt(0)?.toUpperCase() || "A";
@@ -106,6 +109,11 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
 
   const handleProfileMenuClick = () => {
     navigate("/profile?tab=profile");
+    handlePopoverClose();
+  };
+
+  const handleVerificationMenuClick = () => {
+    navigate("/profile?tab=verification");
     handlePopoverClose();
   };
 
@@ -588,6 +596,18 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
                   </span>
                   <span>Profile</span>
                 </button>
+                {hasVerificationRequest && (
+                  <button
+                    type="button"
+                    onClick={handleVerificationMenuClick}
+                    className="w-full min-w-[140px] h-10 px-5 rounded-2xl bg-white shadow-sm border border-gray-200 flex items-center gap-3 text-[#2f2f2f] text-[15px] font-medium hover:shadow-md active:bg-gray-50 transition-all"
+                  >
+                    <span className="w-5 h-5 flex items-center justify-center text-gray-500">
+                      <MdVerified />
+                    </span>
+                    <span>My Verification</span>
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={handleSignOut}
