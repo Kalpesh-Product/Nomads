@@ -7,7 +7,6 @@ import {
 } from "@mui/material";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useEffect, useMemo, useState } from "react";
-import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import { Controller, useForm } from "react-hook-form";
 import Container from "../components/Container";
@@ -15,6 +14,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import Map from "../components/Map";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "../utils/axios.js";
+import { createDriverGuide, destroyActiveGuide } from "../utils/driverGuide.js";
 import renderStars from "../utils/renderStarts.jsx";
 import SkeletonCard from "../components/Skeletons/SkeletonCard.jsx";
 import SkeletonMap from "../components/Skeletons/SkeletonMap.jsx";
@@ -1021,7 +1021,7 @@ const AiGlobalListingsMap = () => {
       return;
     }
 
-    const guide = driver({
+    const guide = createDriverGuide({
       showProgress: true,
       allowClose: true,
       animate: true,
@@ -1720,7 +1720,8 @@ const AiGlobalListingsMap = () => {
       {/* Floating List Toggle Button (Mobile Only) */}
       <div className="lg:hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-[1200]">
         <button
-          onClick={() =>
+          onClick={() => {
+            destroyActiveGuide();
             navigate(
               `/verticals?country=${formData?.country}&location=${formData?.location}`,
               {
@@ -1745,8 +1746,8 @@ const AiGlobalListingsMap = () => {
                   },
                 },
               },
-            )
-          }
+            );
+          }}
           className="bg-[#222222] text-white px-5 py-3 rounded-full flex items-center gap-2 shadow-xl hover:scale-105 transition-transform active:scale-95"
         >
           <span className="text-sm font-semibold tracking-wide">Show list</span>

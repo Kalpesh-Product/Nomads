@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import { Controller, useForm } from "react-hook-form";
 import { TextField } from "@mui/material";
@@ -16,6 +15,7 @@ import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 import axios from "../utils/axios";
+import { createDriverGuide } from "../utils/driverGuide";
 import { noOnlyWhitespace } from "../utils/validators";
 
 const getInitials = (name = "") =>
@@ -286,7 +286,7 @@ const AiDestinationDetail = ({ type }) => {
       return;
     }
 
-    const guide = driver({
+    const guide = createDriverGuide({
       showProgress: true,
       allowClose: true,
       animate: true,
@@ -369,7 +369,7 @@ const AiDestinationDetail = ({ type }) => {
       return;
     }
 
-    const guide = driver({
+    const guide = createDriverGuide({
       showProgress: true,
       allowClose: true,
       animate: true,

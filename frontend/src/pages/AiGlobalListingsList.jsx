@@ -1,7 +1,6 @@
 import { MenuItem, TextField } from "@mui/material";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useEffect, useMemo, useState } from "react";
-import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import { Controller, useForm } from "react-hook-form";
 import { CiSearch } from "react-icons/ci";
@@ -13,6 +12,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import Map from "../components/Map";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "../utils/axios.js";
+import { createDriverGuide, destroyActiveGuide } from "../utils/driverGuide.js";
 import renderStars from "../utils/renderStarts.jsx";
 import SkeletonCard from "../components/Skeletons/SkeletonCard.jsx";
 import SkeletonMap from "../components/Skeletons/SkeletonMap.jsx";
@@ -1399,6 +1399,8 @@ const AiGlobalListingsList = () => {
 
   // Handle map navigation with validation
   const handleShowMap = () => {
+    destroyActiveGuide();
+
     console.log("Show map clicked", {
       country: formData?.country,
       location: formData?.location,
@@ -1529,7 +1531,7 @@ const AiGlobalListingsList = () => {
       return;
     }
 
-    const guide = driver({
+    const guide = createDriverGuide({
       showProgress: true,
       allowClose: true,
       animate: true,
