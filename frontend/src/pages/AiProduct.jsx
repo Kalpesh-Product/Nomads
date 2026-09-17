@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import {
   NavLink,
@@ -19,6 +18,7 @@ import ReviewCard from "../components/ReviewCard";
 import LeafRatings from "../components/LeafRatings";
 import axios from "../utils/axios";
 import renderStars from "../utils/renderStarts";
+import { createDriverGuide } from "../utils/driverGuide";
 import relativeTime from "dayjs/plugin/relativeTime";
 import MuiModal from "../components/Modal";
 import Map from "../components/Map";
@@ -890,7 +890,7 @@ const AiProduct = () => {
       return;
     }
 
-    const guide = driver({
+    const guide = createDriverGuide({
       showProgress: true,
       allowClose: true,
       animate: true,
