@@ -43,6 +43,7 @@ import {
   useCroppedDesktopShortcutIcons,
 } from "../utils/categoryShortcutIcons.js";
 import { navigateBackWithinApp } from "../utils/navigationHistory.js";
+import { buildSearchResultsReturnTarget } from "../utils/aiSearchResultsNavigation.js";
 import Seo from "../components/Seo.jsx";
 
 const ALL_LISTINGS_CATEGORY = "alllistings";
@@ -239,6 +240,18 @@ const AiListings = ({ forceListView = false }) => {
 
     return selectedStateBadge ? [selectedStateBadge] : [];
   }, [location.search, location.state, persistedSearchBarBadges]);
+
+  const handleSearchBarClear = () => {
+    const target = buildSearchResultsReturnTarget(
+      location.search,
+      location.state,
+    );
+
+    navigate(target.pathname, {
+      replace: true,
+      state: target.state,
+    });
+  };
 
   useEffect(() => {
     if (shouldSkipHeadingIntro) {
@@ -1321,7 +1334,7 @@ const AiListings = ({ forceListView = false }) => {
             badges={badgesWithCategory}
             stateLabel={selectedStateLabel}
             onBack={() => navigateBackWithinApp(navigate)}
-            onClear={() => navigate("/search/results")}
+            onClear={handleSearchBarClear}
             heading={
               <p className="mt-0 mb-5 hidden items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:flex lg:text-[0.9rem] font-play">
                 {!isSecondHeadingPhase && (
@@ -1353,7 +1366,7 @@ const AiListings = ({ forceListView = false }) => {
                 <div className="flex shrink-0 items-center gap-1.5">
                   <button
                     type="button"
-                    onClick={() => navigate("/search/results")}
+                    onClick={handleSearchBarClear}
                     aria-label="Clear search"
                     className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-black/70 transition-colors hover:bg-black/5 hover:text-black"
                   >

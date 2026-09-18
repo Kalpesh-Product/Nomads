@@ -43,6 +43,7 @@ import {
 import AiDestinationHighlightSection from "../components/AiDestinationHighlightSection.jsx";
 import { DESTINATION_HIGHLIGHT_FILTERS } from "../data/aiDestinationHighlights.js";
 import { navigateBackWithinApp } from "../utils/navigationHistory.js";
+import { buildSearchResultsReturnTarget } from "../utils/aiSearchResultsNavigation.js";
 
 // import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
 // import {
@@ -395,6 +396,18 @@ const AiGlobalListingsList = () => {
     location.state,
     persistedSearchBarBadges,
   ]);
+
+  const handleSearchBarClear = () => {
+    const target = buildSearchResultsReturnTarget(
+      location.search,
+      location.state,
+    );
+
+    navigate(target.pathname, {
+      replace: true,
+      state: target.state,
+    });
+  };
 
   const headingSequenceKey = useMemo(() => {
     const params = new URLSearchParams(location.search);
@@ -1581,7 +1594,7 @@ const AiGlobalListingsList = () => {
             badges={searchBarBadges}
             stateLabel={selectedLocationLabel}
             onBack={() => navigateBackWithinApp(navigate)}
-            onClear={() => navigateBackWithinApp(navigate)}
+            onClear={handleSearchBarClear}
             tourId="verticals-breadcrumb"
             heading={
               <div className="mt-0 mb-5 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
@@ -2090,7 +2103,7 @@ const AiGlobalListingsList = () => {
                 <div className="flex shrink-0 items-center gap-1.5">
                   <button
                     type="button"
-                    onClick={() => navigateBackWithinApp(navigate)}
+                    onClick={handleSearchBarClear}
                     aria-label="Clear search and go back"
                     className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-black/70 transition-colors hover:bg-black/5 hover:text-black"
                   >

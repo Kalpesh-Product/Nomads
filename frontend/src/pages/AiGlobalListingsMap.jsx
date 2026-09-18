@@ -45,6 +45,7 @@ import {
 } from "../utils/categoryShortcutIcons.js";
 import { DESTINATION_HIGHLIGHT_FILTERS } from "../data/aiDestinationHighlights.js";
 import { navigateBackWithinApp } from "../utils/navigationHistory.js";
+import { buildSearchResultsReturnTarget } from "../utils/aiSearchResultsNavigation.js";
 
 const ALL_LISTINGS_CATEGORY = "alllistings";
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
@@ -241,6 +242,18 @@ const AiGlobalListingsMap = () => {
     location.state,
     persistedSearchBarBadges,
   ]);
+
+  const handleSearchBarClear = () => {
+    const target = buildSearchResultsReturnTarget(
+      location.search,
+      location.state,
+    );
+
+    navigate(target.pathname, {
+      replace: true,
+      state: target.state,
+    });
+  };
 
   const activeCategoryValue = useMemo(() => {
     const params = new URLSearchParams(location.search);
@@ -1071,7 +1084,7 @@ const AiGlobalListingsMap = () => {
             badges={searchBarBadges}
             stateLabel={selectedLocationLabel}
             onBack={() => navigateBackWithinApp(navigate)}
-            onClear={() => navigate("/search/results")}
+            onClear={handleSearchBarClear}
             heading={
               <div className="mt-0 mb-5 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                 <p className="flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.8rem] font-play">
@@ -1345,7 +1358,7 @@ const AiGlobalListingsMap = () => {
               <div className="flex shrink-0 items-center gap-1.5">
                 <button
                   type="button"
-                  onClick={() => navigate("/search/results")}
+                  onClick={handleSearchBarClear}
                   aria-label="Clear search"
                   className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-black/70 transition-colors hover:bg-black/5 hover:text-black"
                 >
