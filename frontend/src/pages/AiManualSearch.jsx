@@ -515,12 +515,10 @@ const AiManualSearch = () => {
       prevBtnText: "Back",
       doneBtnText: "Done",
       steps: guideSteps,
-      onDestroyed: () => {
-        window.localStorage.setItem(MANUAL_SEARCH_GUIDE_SEEN_KEY, "1");
-      },
+      guideSeenKey: MANUAL_SEARCH_GUIDE_SEEN_KEY,
     });
 
-    guide.drive();
+    guide?.drive();
   }, []);
 
   useEffect(() => {

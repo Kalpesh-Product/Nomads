@@ -2330,12 +2330,10 @@ const AiSearchResults = () => {
       prevBtnText: "Back",
       doneBtnText: "Done",
       steps: guideSteps,
-      onDestroyed: () => {
-        window.localStorage.setItem(AI_SEARCH_RESULTS_GUIDE_SEEN_KEY, "1");
-      },
+      guideSeenKey: AI_SEARCH_RESULTS_GUIDE_SEEN_KEY,
     });
 
-    guide.drive();
+    guide?.drive();
   }, [isAiGoalResultsPage]);
 
   useEffect(() => {

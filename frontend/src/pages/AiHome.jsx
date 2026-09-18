@@ -315,12 +315,10 @@ const AiHome = () => {
       prevBtnText: "Back",
       doneBtnText: "Done",
       steps: guideSteps,
-      onDestroyed: () => {
-        window.localStorage.setItem(HOME_GUIDE_SEEN_KEY, "1");
-      },
+      guideSeenKey: HOME_GUIDE_SEEN_KEY,
     });
 
-    guide.drive();
+    guide?.drive();
   }, []);
 
   useEffect(() => {

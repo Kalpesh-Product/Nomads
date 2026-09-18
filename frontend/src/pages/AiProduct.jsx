@@ -900,12 +900,10 @@ const AiProduct = () => {
       prevBtnText: "Back",
       doneBtnText: "Done",
       steps: guideSteps,
-      onDestroyed: () => {
-        window.localStorage.setItem(PRODUCT_GUIDE_SEEN_KEY, "1");
-      },
+      guideSeenKey: PRODUCT_GUIDE_SEEN_KEY,
     });
 
-    guide.drive();
+    guide?.drive();
   }, []);
 
   useEffect(() => {

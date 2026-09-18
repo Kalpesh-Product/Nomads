@@ -1541,12 +1541,10 @@ const AiGlobalListingsList = () => {
       prevBtnText: "Back",
       doneBtnText: "Done",
       steps: guideSteps,
-      onDestroyed: () => {
-        window.localStorage.setItem(VERTICALS_LIST_GUIDE_SEEN_KEY, "1");
-      },
+      guideSeenKey: VERTICALS_LIST_GUIDE_SEEN_KEY,
     });
 
-    guide.drive();
+    guide?.drive();
   }, []);
 
   useEffect(() => {
