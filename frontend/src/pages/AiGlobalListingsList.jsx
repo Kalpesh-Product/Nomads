@@ -409,6 +409,22 @@ const AiGlobalListingsList = () => {
     });
   };
 
+  const handleBackNavigation = () => {
+    if (location.state?.returnedFromListing) {
+      const target = buildSearchResultsReturnTarget(
+        location.search,
+        location.state,
+      );
+
+      navigate(target.pathname, {
+        state: target.state,
+      });
+      return;
+    }
+
+    navigateBackWithinApp(navigate);
+  };
+
   const headingSequenceKey = useMemo(() => {
     const params = new URLSearchParams(location.search);
     const country = (params.get("country") || "").trim().toLowerCase();
@@ -1593,7 +1609,7 @@ const AiGlobalListingsList = () => {
           <AiSelectedBadgesSearchBar
             badges={searchBarBadges}
             stateLabel={selectedLocationLabel}
-            onBack={() => navigateBackWithinApp(navigate)}
+            onBack={handleBackNavigation}
             onClear={handleSearchBarClear}
             tourId="verticals-breadcrumb"
             heading={

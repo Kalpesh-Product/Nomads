@@ -485,14 +485,22 @@ const AiProduct = () => {
             returnTo.search ||
             `?country=${fallbackCountry || ""}&state=${fallbackState || ""}`,
         },
-        { state: location.state },
+        {
+          state: {
+            ...location.state,
+            returnedFromListing: true,
+          },
+        },
       );
       return;
     }
 
     if (fallbackCountry && fallbackState) {
       navigate(`/verticals?country=${fallbackCountry}&state=${fallbackState}`, {
-        state: location.state,
+        state: {
+          ...location.state,
+          returnedFromListing: true,
+        },
       });
       return;
     }
