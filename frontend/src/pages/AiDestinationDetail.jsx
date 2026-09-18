@@ -296,12 +296,10 @@ const AiDestinationDetail = ({ type }) => {
       prevBtnText: "Back",
       doneBtnText: "Done",
       steps: guideSteps,
-      onDestroyed: () => {
-        window.localStorage.setItem(PLACE_DETAIL_GUIDE_SEEN_KEY, "1");
-      },
+      guideSeenKey: PLACE_DETAIL_GUIDE_SEEN_KEY,
     });
 
-    guide.drive();
+    guide?.drive();
   }, []);
 
   const startEventDetailGuide = useCallback(() => {
@@ -379,12 +377,10 @@ const AiDestinationDetail = ({ type }) => {
       prevBtnText: "Back",
       doneBtnText: "Done",
       steps: guideSteps,
-      onDestroyed: () => {
-        window.localStorage.setItem(EVENT_DETAIL_GUIDE_SEEN_KEY, "1");
-      },
+      guideSeenKey: EVENT_DETAIL_GUIDE_SEEN_KEY,
     });
 
-    guide.drive();
+    guide?.drive();
   }, []);
 
   useEffect(() => {

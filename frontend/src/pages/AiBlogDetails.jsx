@@ -177,12 +177,10 @@ const AiBlogDetails = () => {
       prevBtnText: "Back",
       doneBtnText: "Done",
       steps: guideSteps,
-      onDestroyed: () => {
-        window.localStorage.setItem(contentDetailGuideSeenKey, "1");
-      },
+      guideSeenKey: contentDetailGuideSeenKey,
     });
 
-    guide.drive();
+    guide?.drive();
   }, [contentDetailGuideSeenKey, contentType]);
 
   useEffect(() => {

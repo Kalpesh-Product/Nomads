@@ -75,21 +75,44 @@ export const installGuideNavigationCleanup = () => {
   };
 };
 
+export const hasSeenDriverGuide = (guideSeenKey) => {
+  if (typeof window === "undefined" || !guideSeenKey) {
+    return false;
+  }
+
+  return window.localStorage.getItem(guideSeenKey) === "1";
+};
+
+export const markDriverGuideSeen = (guideSeenKey) => {
+  if (typeof window === "undefined" || !guideSeenKey) {
+    return;
+  }
+
+  window.localStorage.setItem(guideSeenKey, "1");
+};
+
 export const createDriverGuide = (options) => {
+  const { guideSeenKey, ...driverOptions } = options;
+
+  if (hasSeenDriverGuide(guideSeenKey)) {
+    return null;
+  }
+
   destroyActiveGuide();
 
   let guide;
   guide = driver({
-    ...options,
+    ...driverOptions,
     onDestroyed: (...args) => {
       if (activeGuide === guide) {
         activeGuide = null;
       }
 
-      options.onDestroyed?.(...args);
+      driverOptions.onDestroyed?.(...args);
     },
   });
 
   activeGuide = guide;
+  markDriverGuideSeen(guideSeenKey);
   return guide;
 };

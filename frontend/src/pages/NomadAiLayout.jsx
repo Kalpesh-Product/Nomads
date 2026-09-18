@@ -15,6 +15,7 @@ import AiFooter from "../components/AiFooter";
 import BackToTopButton from "../components/BackToTopButton";
 import AiStickyBackBreadcrumb from "../components/AiStickyBackBreadcrumb";
 import { navigateBackWithinApp } from "../utils/navigationHistory";
+import { buildSearchResultsReturnTarget } from "../utils/aiSearchResultsNavigation";
 
 const EXCLUDED_STICKY_BAR_PATHS = new Set([]);
 
@@ -275,6 +276,21 @@ const NomadAiLayout = () => {
   const handleStickyBack = () => {
     const returnTo = location.state?.returnTo;
 
+    if (
+      location.pathname === "/verticals" &&
+      (location.state?.returnedFromListing || returnTo?.pathname === "/verticals")
+    ) {
+      const target = buildSearchResultsReturnTarget(
+        location.search,
+        location.state,
+      );
+
+      navigate(target.pathname, {
+        state: target.state,
+      });
+      return;
+    }
+
     if (returnTo?.pathname) {
       navigate(
         {
@@ -284,6 +300,9 @@ const NomadAiLayout = () => {
         {
           state: {
             ...location.state,
+            ...(returnTo.pathname === "/verticals"
+              ? { returnedFromListing: true }
+              : {}),
           },
         },
       );

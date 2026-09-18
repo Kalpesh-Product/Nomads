@@ -485,14 +485,22 @@ const AiProduct = () => {
             returnTo.search ||
             `?country=${fallbackCountry || ""}&state=${fallbackState || ""}`,
         },
-        { state: location.state },
+        {
+          state: {
+            ...location.state,
+            returnedFromListing: true,
+          },
+        },
       );
       return;
     }
 
     if (fallbackCountry && fallbackState) {
       navigate(`/verticals?country=${fallbackCountry}&state=${fallbackState}`, {
-        state: location.state,
+        state: {
+          ...location.state,
+          returnedFromListing: true,
+        },
       });
       return;
     }
@@ -900,12 +908,10 @@ const AiProduct = () => {
       prevBtnText: "Back",
       doneBtnText: "Done",
       steps: guideSteps,
-      onDestroyed: () => {
-        window.localStorage.setItem(PRODUCT_GUIDE_SEEN_KEY, "1");
-      },
+      guideSeenKey: PRODUCT_GUIDE_SEEN_KEY,
     });
 
-    guide.drive();
+    guide?.drive();
   }, []);
 
   useEffect(() => {
