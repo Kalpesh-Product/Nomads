@@ -13,7 +13,6 @@ import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Favorites from "./Favorites";
 import Reviews from "./Reviews";
-import MyVerification from "./MyVerification";
 import { CircularProgress } from "@mui/material";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 import { Country } from "country-state-city";
@@ -122,13 +121,9 @@ const AiProfile = () => {
 
   const initialTab = searchParams.get("tab") || "profile";
   const [activeTab, setActiveTab] = useState(initialTab);
-  const seoTab = [
-    "profile",
-    "favorites",
-    "reviews",
-    "password",
-    "verification",
-  ].includes(activeTab)
+  const seoTab = ["profile", "favorites", "reviews", "password"].includes(
+    activeTab,
+  )
     ? activeTab
     : "profile";
   const [typedProfilePrompt, setTypedProfilePrompt] = useState("");
@@ -713,7 +708,6 @@ const AiProfile = () => {
         />
       )}
       {activeTab === "reviews" && <Reviews />}
-      {activeTab === "verification" && <MyVerification />}
     </div>
   );
 };

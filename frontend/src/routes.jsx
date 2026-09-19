@@ -168,7 +168,6 @@ const AiContentAndCopyright = lazyPage(() =>
 const AiContentUseRemoval = lazyPage(() =>
   import("./pages/AiContentUseRemoval"),
 );
-const VerifyBusiness = lazyPage(() => import("./pages/VerifyBusiness"));
 const AiJobDetail = lazyPage(() => import("./pages/AiJobDetail"));
 const AiDestinationDetail = lazyPage(() => import("./pages/AiDestinationDetail"));
 
@@ -375,10 +374,6 @@ if (tenant === "main") {
             {
               path: "content-use-removal",
               element: <AiContentUseRemoval />,
-            },
-            {
-              path: "verify-business",
-              element: <VerifyBusiness />,
             },
             { path: "site-is-down", element: <SiteIsDown /> },
             {
@@ -587,10 +582,6 @@ if (tenant === "main") {
             {
               path: "content-use-removal",
               element: <AiContentUseRemoval />,
-            },
-            {
-              path: "verify-business",
-              element: <VerifyBusiness />,
             },
           ],
         },

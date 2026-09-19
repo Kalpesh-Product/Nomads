@@ -1,12 +1,5 @@
 import Company from "../models/Company.js";
 import BusinessVerificationRequest from "../models/BusinessVerificationRequest.js";
-import { uploadFileToS3 } from "../config/s3Config.js";
-import { sendMail } from "../config/mailer.js";
-import { renderNotificationEmail } from "../utils/emailTemplates.js";
-import {
-  createVerificationPaymentLink,
-  getVerificationPaymentHistory,
-} from "../utils/wompVerificationClient.js";
 
 const VERIFICATION_TIER_AMOUNTS_USD = {
   "1m": 10,
@@ -15,91 +8,32 @@ const VERIFICATION_TIER_AMOUNTS_USD = {
   "1y": 80,
 };
 
-const VERIFICATION_TIER_LABELS = {
-  "1m": "1 Month",
-  "3m": "3 Months",
-  "6m": "6 Months",
-  "1y": "1 Year",
+const VERIFICATION_TIER_MONTHS = {
+  "1m": 1,
+  "3m": 3,
+  "6m": 6,
+  "1y": 12,
 };
 
-const SEARCH_RESULTS_LIMIT = 20;
-
-export const searchCompanies = async (req, res, next) => {
+// POST /api/admin/verification-requests — a host's verification submission
+// from HostPanel. Lands as "pending" for staff review (Company Verification
+// Leads in the master panel); payment only opens up once staff approve it.
+// A company only ever has one request: a rejected one is reopened in place
+// (so the host can fix documents and resubmit), a pending one blocks a
+// duplicate, and an approved one goes through the payment path instead.
+export const createVerificationRequestAdmin = async (req, res, next) => {
   try {
-    const q = (req.query.q || "").trim();
-    if (!q) return res.status(200).json([]);
-
-    const regex = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
-
-    const companies = await Company.find({
-      isActive: true,
-      $or: [{ companyName: regex }, { registeredEntityName: regex }],
-    })
-      .select(
-        "companyId companyName businessId companyType city state country continent website registeredEntityName logo",
-      )
-      .lean()
-      .exec();
-
-    const grouped = new Map();
-    for (const company of companies) {
-      if (!company.companyId) continue;
-      if (!grouped.has(company.companyId)) {
-        grouped.set(company.companyId, {
-          companyId: company.companyId,
-          companyName: company.companyName,
-          city: company.city,
-          state: company.state,
-          country: company.country,
-          continent: company.continent,
-          website: company.website,
-          registeredEntityName: company.registeredEntityName,
-          logo: company.logo,
-          verticals: [],
-        });
-      }
-      grouped.get(company.companyId).verticals.push({
-        businessId: company.businessId,
-        companyType: company.companyType,
-      });
-    }
-
-    const results = Array.from(grouped.values()).slice(
-      0,
-      SEARCH_RESULTS_LIMIT,
-    );
-
-    return res.status(200).json(results);
-  } catch (error) {
-    next(error);
-  }
-};
-
-const parseJsonArray = (value) => {
-  if (Array.isArray(value)) return value;
-  if (typeof value !== "string" || !value) return [];
-  try {
-    const parsed = JSON.parse(value);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-};
-
-export const submitVerificationRequest = async (req, res, next) => {
-  try {
-    const userId = req.userData?._id;
-    if (!userId) return res.status(401).json({ message: "Unauthorized" });
-
     const {
       companyId,
       companyName,
       businessName,
+      verticalsSnapshot,
       fullName,
       email,
       mobile,
       role,
       country,
+      industry,
       registeredCompanyName,
       companyCountry,
       companyState,
@@ -107,10 +41,8 @@ export const submitVerificationRequest = async (req, res, next) => {
       continent,
       websiteUrl,
       requestedTier,
+      proofDocuments,
     } = req.body;
-
-    const verticalsSnapshot = parseJsonArray(req.body.verticalsSnapshot);
-    const industry = parseJsonArray(req.body.industry);
 
     const requiredFields = {
       companyId,
@@ -137,16 +69,16 @@ export const submitVerificationRequest = async (req, res, next) => {
         .json({ message: `${missingField[0]} is required` });
     }
 
-    if (!industry.length) {
+    if (!Array.isArray(industry) || !industry.length) {
       return res
         .status(400)
         .json({ message: "At least one industry/vertical is required" });
     }
 
-    if (!req.file) {
+    if (!Array.isArray(proofDocuments) || !proofDocuments.length) {
       return res
         .status(400)
-        .json({ message: "A proof document is required" });
+        .json({ message: "At least one proof document is required" });
     }
 
     const requestedAmountUsd = VERIFICATION_TIER_AMOUNTS_USD[requestedTier];
@@ -154,18 +86,14 @@ export const submitVerificationRequest = async (req, res, next) => {
       return res.status(400).json({ message: "Invalid requestedTier" });
     }
 
-    const route = `verification-proofs/${Date.now()}_${req.file.originalname.replace(/\s+/g, "_")}`;
-    const uploaded = await uploadFileToS3(route, {
-      buffer: req.file.buffer,
-      mimetype: req.file.mimetype,
-    });
-
-    const request = await BusinessVerificationRequest.create({
-      nomadUser: userId,
+    const fields = {
+      submittedVia: "host_panel",
       companyId,
       companyName,
       businessName,
-      verticalsSnapshot,
+      verticalsSnapshot: Array.isArray(verticalsSnapshot)
+        ? verticalsSnapshot
+        : [],
       fullName,
       email,
       mobile,
@@ -180,63 +108,48 @@ export const submitVerificationRequest = async (req, res, next) => {
       websiteUrl,
       requestedTier,
       requestedAmountUsd,
-      proofDocument: { url: uploaded.url, id: uploaded.id },
+      proofDocuments: proofDocuments.map(({ label, url, id }) => ({
+        label,
+        url,
+        id,
+      })),
       status: "pending",
-    });
+      paymentStatus: "not_required",
+      rejectionReason: "",
+    };
 
-    try {
-      await sendMail({
-        to: email,
-        subject: "Business Verification Request Received",
-        text: `Hi ${fullName}, we've received your business verification request for ${businessName || companyName}. Our team will contact you for verification shortly.`,
-        html: renderNotificationEmail({
-          heroTitle: "Request Received!",
-          heroSubtitle: "Your business verification request has been submitted.",
-          greetingHtml: `
-            <p style="margin:0 0 4px;">Hello ${fullName},</p>
-            <p class="email-text" style="margin:0;">We've received your verification request for <b class="email-heading">${businessName || companyName}</b>. Our team will contact you for verification shortly.</p>
-          `,
-          detailsTitle: "Submitted Details",
-          detailRows: [
-            ["Business Name", businessName || companyName],
-            ["Registered Company Name", registeredCompanyName],
-            ["Role", role],
-            ["Industry / Vertical", industry.join(", ")],
-            ["Company Location", [companyCity, companyState, companyCountry].filter(Boolean).join(", ")],
-            ["Continent", continent],
-            ["Requested Plan", VERIFICATION_TIER_LABELS[requestedTier] || requestedTier],
-          ],
-          whatNextTitle: "What Happens Next?",
-          whatNextItems: [
-            "Our team will review your submitted details and proof document.",
-            "We'll reach out to verify your business and confirm payment.",
-            "Once approved, your blue verification badge goes live on all your listings.",
-          ],
-        }),
-      });
-    } catch (emailError) {
-      console.error("Failed to send verification confirmation email:", emailError);
+    const existing = await BusinessVerificationRequest.findOne({ companyId });
+    if (existing) {
+      if (existing.status !== "rejected") {
+        return res.status(409).json({
+          message:
+            existing.status === "pending"
+              ? "A verification request for this company is already under review."
+              : "This company's verification request was already approved.",
+        });
+      }
+      existing.set(fields);
+      await existing.save();
+      return res.status(200).json({ data: existing });
     }
 
-    return res.status(201).json(request);
+    const request = await BusinessVerificationRequest.create(fields);
+    return res.status(201).json({ data: request });
   } catch (error) {
     next(error);
   }
 };
 
-const VERIFICATION_TIER_MONTHS = {
-  "1m": 1,
-  "3m": 3,
-  "6m": 6,
-  "1y": 12,
-};
-
 // Internal admin surface — gated by verifyAdminApiKey, called by the master
 // panel's server (not a signed-in Nomad app user). Mirrors the shape of
 // getHostUsers/updateHostUserStatusAndComment in b2bFormControllers.js.
+// Optional ?companyId= filter — used by the HostPanel proxy to check for an
+// existing request before creating a duplicate for the same company.
 export const getVerificationRequestsAdmin = async (req, res, next) => {
   try {
-    const requests = await BusinessVerificationRequest.find({})
+    const { companyId } = req.query;
+    const query = companyId ? { companyId } : {};
+    const requests = await BusinessVerificationRequest.find(query)
       .sort({ createdAt: -1 })
       .lean();
 
@@ -249,7 +162,7 @@ export const getVerificationRequestsAdmin = async (req, res, next) => {
 export const updateVerificationRequestStatus = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
+    const { status, rejectionReason } = req.body;
     const allowedStatuses = ["pending", "approved", "rejected"];
 
     if (!allowedStatuses.includes(status)) {
@@ -269,6 +182,8 @@ export const updateVerificationRequestStatus = async (req, res, next) => {
     // The badge (Company.isVerified) is only ever flipped on by
     // markVerificationRequestPaid, once a real payment is confirmed.
     request.paymentStatus = status === "approved" ? "awaiting_payment" : "not_required";
+    request.rejectionReason =
+      status === "rejected" ? String(rejectionReason || "").trim() : "";
     await request.save();
 
     return res.status(200).json(request);
@@ -372,6 +287,33 @@ export const markVerificationRequestPaid = async (req, res, next) => {
   }
 };
 
+// PATCH /api/admin/verification-requests/badge-visibility
+// Body: { businessId, hidden }. Display-only — toggling this never touches
+// isVerified/verificationTier/verificationExpiresAt, so it can be flipped
+// back and forth freely without affecting the underlying paid verification.
+export const setVerifiedBadgeVisibility = async (req, res, next) => {
+  try {
+    const { businessId, hidden } = req.body;
+    if (!businessId) {
+      return res.status(400).json({ message: "businessId is required" });
+    }
+
+    const listing = await Company.findOneAndUpdate(
+      { businessId },
+      { $set: { verifiedBadgeHidden: Boolean(hidden) } },
+      { new: true },
+    ).lean();
+
+    if (!listing) {
+      return res.status(404).json({ message: "Listing not found" });
+    }
+
+    return res.status(200).json({ data: listing });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // GET /api/admin/verification-requests/renewals-due?withinDays=5
 export const getVerificationRenewalsDue = async (req, res, next) => {
   try {
@@ -440,87 +382,6 @@ export const markVerificationExpiryNoticeSent = async (req, res, next) => {
     }
     return res.status(200).json({ message: "ok" });
   } catch (error) {
-    next(error);
-  }
-};
-
-// GET /api/verification/my-requests (JWT, Nomad app user) — every request
-// this user has ever submitted, so the frontend can show status and offer
-// renew/change-plan per business they've submitted for.
-export const getMyVerificationRequests = async (req, res, next) => {
-  try {
-    const requests = await BusinessVerificationRequest.find({
-      nomadUser: req.userData._id,
-    })
-      .sort({ createdAt: -1 })
-      .lean();
-
-    return res.status(200).json({ data: requests });
-  } catch (error) {
-    next(error);
-  }
-};
-
-// POST /api/verification/:requestId/request-payment-link (JWT, Nomad app user)
-// Body: { tier }. Self-serve renew/change-plan — requires a PRIOR successful
-// payment (paymentStatus === "paid"); the very first payment still only ever
-// comes from admin approval, unchanged.
-export const requestSelfServePaymentLink = async (req, res, next) => {
-  try {
-    const { requestId } = req.params;
-    const { tier } = req.body || {};
-
-    if (!VERIFICATION_TIER_MONTHS[tier]) {
-      return res.status(400).json({ message: "Invalid tier" });
-    }
-
-    const request = await BusinessVerificationRequest.findById(requestId);
-    if (!request || String(request.nomadUser) !== String(req.userData._id)) {
-      return res.status(404).json({ message: "Verification request not found" });
-    }
-    if (request.paymentStatus !== "paid") {
-      return res.status(400).json({
-        message:
-          "Complete your initial verification payment before renewing or changing plans",
-      });
-    }
-
-    const { paymentLinkUrl } = await createVerificationPaymentLink({
-      nomadsRequestId: request._id.toString(),
-      tier,
-    });
-
-    return res.status(200).json({ paymentLinkUrl });
-  } catch (error) {
-    if (error.status) {
-      return res.status(error.status).json({ message: error.message });
-    }
-    next(error);
-  }
-};
-
-// GET /api/verification/:requestId/history (JWT, Nomad app user) — every
-// past payment attempt (initial, renewals, upgrades/downgrades) for one of
-// the user's own verification requests, so the self-serve page can show
-// "past plan vs current plan" instead of just the current state.
-export const getRequestPaymentHistory = async (req, res, next) => {
-  try {
-    const { requestId } = req.params;
-
-    const request = await BusinessVerificationRequest.findById(requestId).lean();
-    if (!request || String(request.nomadUser) !== String(req.userData._id)) {
-      return res.status(404).json({ message: "Verification request not found" });
-    }
-
-    const { data } = await getVerificationPaymentHistory({
-      nomadsRequestId: requestId,
-    });
-
-    return res.status(200).json({ data: data || [] });
-  } catch (error) {
-    if (error.status) {
-      return res.status(error.status).json({ message: error.message });
-    }
     next(error);
   }
 };

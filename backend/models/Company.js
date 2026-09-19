@@ -144,6 +144,13 @@ const companySchema = new mongoose.Schema({
   verificationExpiresAt: {
     type: Date,
   },
+  // Display-only override: lets a host hide the blue badge on a specific
+  // listing without touching the underlying paid verification/expiry —
+  // toggling it back off shows the badge again immediately, no re-payment.
+  verifiedBadgeHidden: {
+    type: Boolean,
+    default: false,
+  },
   // Soft delete — a host can remove their own listing (only while it's
   // isActive:false) without permanently destroying it. Deleting always
   // forces isActive/isPublic false too, so it drops off every visibility

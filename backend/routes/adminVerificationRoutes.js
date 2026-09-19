@@ -1,8 +1,10 @@
 import { Router } from "express";
 
 import {
+  createVerificationRequestAdmin,
   getVerificationRequestsAdmin,
   updateVerificationRequestStatus,
+  setVerifiedBadgeVisibility,
   getVerificationRenewalsDue,
   markVerificationReminderSent,
   markVerificationRequestPaid,
@@ -14,8 +16,10 @@ import {
 const router = Router();
 
 router.get("/", getVerificationRequestsAdmin);
+router.post("/", createVerificationRequestAdmin);
 router.get("/renewals-due", getVerificationRenewalsDue); // must precede "/:id"
 router.get("/expired-pending-notice", getExpiredPendingNotice); // must precede "/:id"
+router.patch("/badge-visibility", setVerifiedBadgeVisibility);
 router.get("/:id", getVerificationRequestByIdAdmin);
 router.patch("/:id/status", updateVerificationRequestStatus);
 router.post("/:id/mark-paid", markVerificationRequestPaid);

@@ -48,7 +48,6 @@ import leadsRoutes from "./routes/leadsRoutes.js";
 import specialAccessRoutes from "./routes/specialAccessRoutes.js";
 import adminNomadUserRoutes from "./routes/adminNomadUserRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
-import verificationRoutes from "./routes/verificationRoutes.js";
 import adminVerificationRoutes from "./routes/adminVerificationRoutes.js";
 import { verifyAdminApiKey } from "./middlewares/verifyAdminApiKey.js";
 
@@ -64,7 +63,6 @@ const PORT = process.env.PORT || 3000;
 
 app.use("/api/auth", authRoutes);
 app.use("/api/user", verifyJwt, nomadUserRoutes);
-app.use("/api/verification", verifyJwt, verificationRoutes);
 app.use("/api/company", companyRoutes);
 app.use("/api/poc", pocRoutes);
 app.use("/api/review", reviewRoutes);

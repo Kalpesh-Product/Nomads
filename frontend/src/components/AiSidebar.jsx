@@ -30,9 +30,8 @@ import { TbAward, TbWorldWww } from "react-icons/tb";
 import { HiOutlineUserGroup } from "react-icons/hi";
 import { MdComputer } from "react-icons/md";
 import { IoBriefcaseSharp } from "react-icons/io5";
-import { MdRateReview, MdVerified } from "react-icons/md";
+import { MdRateReview } from "react-icons/md";
 import { companyLocationsQueryOptions } from "../utils/classicSearchLocations";
-import useHasVerificationRequest from "../hooks/useHasVerificationRequest";
 
 const gatedRecommendationLabels = new Set([
   "Work From Anywhere",
@@ -128,9 +127,6 @@ const profileItems = [
   { label: "Favorites", icon: HiOutlineHeart, tab: "favorites" },
   { label: "Reviews", icon: MdRateReview, tab: "reviews" },
   { label: "Change Password", icon: HiOutlineKey, tab: "password" },
-  // Only shown to users who've actually submitted a verification request —
-  // filtered out below via hasVerificationRequest.
-  { label: "My Verification", icon: MdVerified, tab: "verification" },
 ];
 
 const signOutItem = [{ label: "Sign Out", icon: HiOutlineLogout }];
@@ -311,13 +307,10 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
   const { auth } = useAuth();
   const logout = useLogout();
-  const hasVerificationRequest = useHasVerificationRequest();
   const userFullName = auth?.user?.fullName?.trim() || "Profile";
 
-  const profileItemsWithUserName = profileItems
-    .filter((item) => item.tab !== "verification" || hasVerificationRequest)
-    .map((item) =>
-      item.label === "userFullName" ? { ...item, label: userFullName } : item,
+  const profileItemsWithUserName = profileItems.map((item) =>
+    item.label === "userFullName" ? { ...item, label: userFullName } : item,
   );
 
   useEffect(() => {

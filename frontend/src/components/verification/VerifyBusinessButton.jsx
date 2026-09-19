@@ -1,103 +1,41 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { Tooltip } from "@mui/material";
 import { MdVerified } from "react-icons/md";
-import { useQuery } from "@tanstack/react-query";
-import useAuth from "../../hooks/useAuth";
-import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 
-const VerifyBusinessButton = ({
-  companyId,
-  companyName,
-  isVerified,
-  country,
-  state,
-  city,
-  continent,
-  website,
-  registeredEntityName,
-}) => {
-  const { auth } = useAuth();
-  const userId = auth?.user?._id || auth?.user?.id;
-  const navigate = useNavigate();
-  const axiosPrivate = useAxiosPrivate();
+const HOST_PANEL_URL = String(
+  import.meta.env.VITE_HOST_PANEL_URL || "https://host.wono.co",
+).replace(/\/+$/, "");
 
-  // Only fetched to decide whether *this* logged-in viewer is the one who
-  // submitted verification for *this* company — so a small "Manage" link can
-  // sit next to the badge for them, without showing it to every visitor.
-  const { data: myRequests = [] } = useQuery({
-    queryKey: ["my-verification-requests"],
-    queryFn: async () => {
-      const response = await axiosPrivate.get("/verification/my-requests");
-      return response.data?.data || [];
-    },
-    enabled: Boolean(isVerified && userId && companyId),
-    staleTime: 5 * 60 * 1000,
-  });
-
+// Verification is now entirely host-managed (submitted, paid, renewed from
+// HostPanel's own "Verify Business" module) — this component only ever
+// shows the resulting badge, or a nudge to go become a host in the first
+// place. It no longer opens anything on the Nomads site itself.
+const VerifyBusinessButton = ({ companyId, isVerified }) => {
   if (!companyId) return null;
 
   if (isVerified) {
-    const canManage = myRequests.some(
-      (request) =>
-        request.companyId === companyId && request.paymentStatus === "paid",
-    );
-
-    // Sits right after the name, on the left side of the row — unlike the
-    // unverified "Verify Business" button which is pushed to the right (see
-    // the parent h1's conditional justify-between).
     return (
-      <span className="inline-flex items-center gap-2 ml-2 align-middle">
-        <Tooltip title="Verified Business">
-          <span className="inline-flex items-center">
-            <MdVerified className="text-[#1d9bf0] text-2x2" />
-          </span>
-        </Tooltip>
-        {canManage && (
-          <button
-            type="button"
-            onClick={() => navigate("/profile?tab=verification")}
-            className="text-xs font-medium text-primary-blue underline"
-          >
-            Manage Verification
-          </button>
-        )}
-      </span>
+      <Tooltip title="Verified Business">
+        <span className="inline-flex items-center ml-2 align-middle">
+          <MdVerified className="text-[#1d9bf0] text-2xl" />
+        </span>
+      </Tooltip>
     );
   }
 
-  const buildTargetUrl = () => {
-    const params = new URLSearchParams();
-    params.set("companyId", companyId);
-    if (companyName) params.set("companyName", companyName);
-    if (country) params.set("country", country);
-    if (state) params.set("state", state);
-    if (city) params.set("city", city);
-    if (continent) params.set("continent", continent);
-    if (website) params.set("website", website);
-    if (registeredEntityName)
-      params.set("registeredEntityName", registeredEntityName);
-    return `/verify-business?${params.toString()}`;
-  };
-
-  const handleClick = () => {
-    const target = buildTargetUrl();
-    if (!userId) {
-      navigate("/login", { state: { redirectTo: target } });
-      return;
-    }
-    navigate(target);
-  };
-
   return (
-    <button
-      type="button"
-      onClick={handleClick}
-      className="ml-2 inline-flex items-center gap-1 text-xs font-medium text-primary-blue border border-primary-blue rounded-full px-3 py-1 hover:bg-primary-blue hover:text-white transition-colors align-middle"
-    >
-      <MdVerified className="text-sm" />
-      Verify Business
-    </button>
+    <Tooltip title="Register to become a host to get verified badge">
+      <button
+        type="button"
+        onClick={() => {
+          window.location.href = `${HOST_PANEL_URL}/signup`;
+        }}
+        className="ml-2 inline-flex items-center gap-1 text-xs font-medium text-primary-blue border border-primary-blue rounded-full px-3 py-1 hover:bg-primary-blue hover:text-white transition-colors align-middle"
+      >
+        <MdVerified className="text-sm" />
+        Verify Business
+      </button>
+    </Tooltip>
   );
 };
 

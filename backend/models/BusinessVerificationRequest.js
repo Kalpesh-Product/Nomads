@@ -2,10 +2,20 @@ import mongoose from "mongoose";
 
 const businessVerificationRequestSchema = new mongoose.Schema(
   {
+    // Optional because a host-panel-submitted request (submittedVia:
+    // "host_panel") has no NomadUser at all — it comes from a HostUser in a
+    // separate app/auth system.
     nomadUser: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "NomadUser",
-      required: true,
+    },
+    // Where this request originated — drives which fields are guaranteed to
+    // be present (nomad_self_serve always has nomadUser + proofDocument;
+    // host_panel has neither, for now).
+    submittedVia: {
+      type: String,
+      enum: ["nomad_self_serve", "host_panel"],
+      default: "nomad_self_serve",
     },
     companyId: {
       type: String,
@@ -93,12 +103,33 @@ const businessVerificationRequestSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    // Required for nomad_self_serve; not collected yet for host_panel
+    // submissions (planned as a separate follow-up).
     proofDocument: {
       type: {
         url: String,
         id: String,
       },
-      required: true,
+    },
+    // Multiple labelled documents (registration certificate, tax ID, etc.)
+    // collected by HostPanel's verification form. `proofDocument` above is
+    // the legacy single-file field from the old Nomads self-serve form.
+    proofDocuments: {
+      type: [
+        {
+          label: String,
+          url: String,
+          id: String,
+        },
+      ],
+      default: [],
+    },
+    // Set when staff reject the request — shown to the host in HostPanel so
+    // they know what to fix before resubmitting.
+    rejectionReason: {
+      type: String,
+      trim: true,
+      default: "",
     },
     requestedTier: {
       type: String,

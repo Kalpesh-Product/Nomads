@@ -1112,14 +1112,7 @@ const AiProduct = () => {
               {listingTitle || "Loading Title..."}
               <VerifyBusinessButton
                 companyId={companyDetails?.companyId}
-                companyName={listingTitle}
-                isVerified={companyDetails?.isVerified}
-                country={companyDetails?.country}
-                state={companyDetails?.state}
-                city={companyDetails?.city}
-                continent={companyDetails?.continent}
-                website={companyDetails?.website}
-                registeredEntityName={companyDetails?.registeredEntityName}
+                isVerified={companyDetails?.verifiedBadgeVisible}
               />
             </h1>
             {/* Guide button hidden for now. Uncomment when guides should be manually accessible again.
@@ -2059,14 +2052,7 @@ const AiProduct = () => {
               {companyDetails?.companyName || "Loading Title..."}
               <VerifyBusinessButton
                 companyId={companyDetails?.companyId}
-                companyName={companyDetails?.companyName}
-                isVerified={companyDetails?.isVerified}
-                country={companyDetails?.country}
-                state={companyDetails?.state}
-                city={companyDetails?.city}
-                continent={companyDetails?.continent}
-                website={companyDetails?.website}
-                registeredEntityName={companyDetails?.registeredEntityName}
+                isVerified={companyDetails?.verifiedBadgeVisible}
               />
             </h1>
             {/* Guide button hidden for now. Uncomment when guides should be manually accessible again.

@@ -29,9 +29,13 @@ function computeEffectiveVerification(company) {
   const expired =
     company.verificationExpiresAt &&
     new Date(company.verificationExpiresAt) <= new Date();
+  const isVerified = Boolean(company.isVerified) && !expired;
   return {
-    isVerified: Boolean(company.isVerified) && !expired,
+    isVerified,
     verificationTier: expired ? null : company.verificationTier,
+    // What the public site should actually render — same as isVerified
+    // unless the host has chosen to hide the badge on this listing.
+    verifiedBadgeVisible: isVerified && !company.verifiedBadgeHidden,
   };
 }
 
