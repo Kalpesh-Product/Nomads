@@ -7,7 +7,6 @@ import {
 } from "@mui/material";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useEffect, useMemo, useState } from "react";
-import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import { Controller, useForm } from "react-hook-form";
 import Container from "../components/Container";
@@ -15,6 +14,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import Map from "../components/Map";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "../utils/axios.js";
+import { createDriverGuide, destroyActiveGuide } from "../utils/driverGuide.js";
 import renderStars from "../utils/renderStarts.jsx";
 import SkeletonCard from "../components/Skeletons/SkeletonCard.jsx";
 import SkeletonMap from "../components/Skeletons/SkeletonMap.jsx";
@@ -45,6 +45,7 @@ import {
 } from "../utils/categoryShortcutIcons.js";
 import { DESTINATION_HIGHLIGHT_FILTERS } from "../data/aiDestinationHighlights.js";
 import { navigateBackWithinApp } from "../utils/navigationHistory.js";
+import { buildSearchResultsReturnTarget } from "../utils/aiSearchResultsNavigation.js";
 
 const ALL_LISTINGS_CATEGORY = "alllistings";
 const VALUE_ADDED_SERVICES_CATEGORY = "valueaddedservices";
@@ -241,6 +242,18 @@ const AiGlobalListingsMap = () => {
     location.state,
     persistedSearchBarBadges,
   ]);
+
+  const handleSearchBarClear = () => {
+    const target = buildSearchResultsReturnTarget(
+      location.search,
+      location.state,
+    );
+
+    navigate(target.pathname, {
+      replace: true,
+      state: target.state,
+    });
+  };
 
   const activeCategoryValue = useMemo(() => {
     const params = new URLSearchParams(location.search);
@@ -1021,7 +1034,7 @@ const AiGlobalListingsMap = () => {
       return;
     }
 
-    const guide = driver({
+    const guide = createDriverGuide({
       showProgress: true,
       allowClose: true,
       animate: true,
@@ -1031,12 +1044,10 @@ const AiGlobalListingsMap = () => {
       prevBtnText: "Back",
       doneBtnText: "Done",
       steps: guideSteps,
-      onDestroyed: () => {
-        window.localStorage.setItem(VERTICALS_MAP_GUIDE_SEEN_KEY, "1");
-      },
+      guideSeenKey: VERTICALS_MAP_GUIDE_SEEN_KEY,
     });
 
-    guide.drive();
+    guide?.drive();
   }, []);
 
   useEffect(() => {
@@ -1073,7 +1084,7 @@ const AiGlobalListingsMap = () => {
             badges={searchBarBadges}
             stateLabel={selectedLocationLabel}
             onBack={() => navigateBackWithinApp(navigate)}
-            onClear={() => navigate("/search/results")}
+            onClear={handleSearchBarClear}
             heading={
               <div className="mt-0 mb-5 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                 <p className="flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:text-[0.8rem] font-play">
@@ -1347,7 +1358,7 @@ const AiGlobalListingsMap = () => {
               <div className="flex shrink-0 items-center gap-1.5">
                 <button
                   type="button"
-                  onClick={() => navigate("/search/results")}
+                  onClick={handleSearchBarClear}
                   aria-label="Clear search"
                   className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-black/70 transition-colors hover:bg-black/5 hover:text-black"
                 >
@@ -1720,7 +1731,8 @@ const AiGlobalListingsMap = () => {
       {/* Floating List Toggle Button (Mobile Only) */}
       <div className="lg:hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-[1200]">
         <button
-          onClick={() =>
+          onClick={() => {
+            destroyActiveGuide();
             navigate(
               `/verticals?country=${formData?.country}&location=${formData?.location}`,
               {
@@ -1745,8 +1757,8 @@ const AiGlobalListingsMap = () => {
                   },
                 },
               },
-            )
-          }
+            );
+          }}
           className="bg-[#222222] text-white px-5 py-3 rounded-full flex items-center gap-2 shadow-xl hover:scale-105 transition-transform active:scale-95"
         >
           <span className="text-sm font-semibold tracking-wide">Show list</span>

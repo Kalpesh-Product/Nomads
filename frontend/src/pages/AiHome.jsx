@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FaGlobeAmericas } from "react-icons/fa";
@@ -12,6 +11,7 @@ import { RiUserCommunityLine } from "react-icons/ri";
 import { TbAward, TbWorldWww } from "react-icons/tb";
 import { Helmet } from "@dr.pogodin/react-helmet";
 import useNomadLoginState from "../hooks/useNomadLoginState";
+import { createDriverGuide, destroyActiveGuide } from "../utils/driverGuide";
 
 import useAuth from "../hooks/useAuth";
 
@@ -305,7 +305,7 @@ const AiHome = () => {
       return;
     }
 
-    const guide = driver({
+    const guide = createDriverGuide({
       showProgress: true,
       allowClose: true,
       animate: true,
@@ -315,12 +315,10 @@ const AiHome = () => {
       prevBtnText: "Back",
       doneBtnText: "Done",
       steps: guideSteps,
-      onDestroyed: () => {
-        window.localStorage.setItem(HOME_GUIDE_SEEN_KEY, "1");
-      },
+      guideSeenKey: HOME_GUIDE_SEEN_KEY,
     });
 
-    guide.drive();
+    guide?.drive();
   }, []);
 
   useEffect(() => {
@@ -348,6 +346,8 @@ const AiHome = () => {
   }, [areCardsVisible, startHomeGuide, visibleCardCount]);
 
   const handleCardClick = (card) => {
+    destroyActiveGuide();
+
     const params = new URLSearchParams(location.search);
     const targetSearch = params.toString() ? `?${params.toString()}` : "";
     const targetRoute = `${card.path}${targetSearch}`;

@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import {
   NavLink,
@@ -19,6 +18,7 @@ import ReviewCard from "../components/ReviewCard";
 import LeafRatings from "../components/LeafRatings";
 import axios from "../utils/axios";
 import renderStars from "../utils/renderStarts";
+import { createDriverGuide } from "../utils/driverGuide";
 import relativeTime from "dayjs/plugin/relativeTime";
 import MuiModal from "../components/Modal";
 import Map from "../components/Map";
@@ -485,14 +485,22 @@ const AiProduct = () => {
             returnTo.search ||
             `?country=${fallbackCountry || ""}&state=${fallbackState || ""}`,
         },
-        { state: location.state },
+        {
+          state: {
+            ...location.state,
+            returnedFromListing: true,
+          },
+        },
       );
       return;
     }
 
     if (fallbackCountry && fallbackState) {
       navigate(`/verticals?country=${fallbackCountry}&state=${fallbackState}`, {
-        state: location.state,
+        state: {
+          ...location.state,
+          returnedFromListing: true,
+        },
       });
       return;
     }
@@ -890,7 +898,7 @@ const AiProduct = () => {
       return;
     }
 
-    const guide = driver({
+    const guide = createDriverGuide({
       showProgress: true,
       allowClose: true,
       animate: true,
@@ -900,12 +908,10 @@ const AiProduct = () => {
       prevBtnText: "Back",
       doneBtnText: "Done",
       steps: guideSteps,
-      onDestroyed: () => {
-        window.localStorage.setItem(PRODUCT_GUIDE_SEEN_KEY, "1");
-      },
+      guideSeenKey: PRODUCT_GUIDE_SEEN_KEY,
     });
 
-    guide.drive();
+    guide?.drive();
   }, []);
 
   useEffect(() => {

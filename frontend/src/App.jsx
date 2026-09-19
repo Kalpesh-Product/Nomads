@@ -1,8 +1,13 @@
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { Outlet, useLocation } from "react-router-dom";
+import {
+  destroyActiveGuide,
+  installGuideNavigationCleanup,
+} from "./utils/driverGuide";
 
 const App = () => {
   const location = useLocation();
+  const previousRouteRef = useRef(`${location.pathname}${location.search}`);
 
   // ✅ Disable right-click globally (across all routes)
   useEffect(() => {
@@ -10,6 +15,21 @@ const App = () => {
     window.addEventListener("contextmenu", disableContextMenu);
     return () => window.removeEventListener("contextmenu", disableContextMenu);
   }, []);
+
+  useEffect(() => installGuideNavigationCleanup(), []);
+
+  useLayoutEffect(() => {
+    const currentRoute = `${location.pathname}${location.search}`;
+
+    if (previousRouteRef.current !== currentRoute) {
+      destroyActiveGuide();
+      previousRouteRef.current = currentRoute;
+    }
+
+    return () => {
+      destroyActiveGuide();
+    };
+  }, [location.pathname, location.search]);
 
   // Only hide header and footer on these routes
   const hideHeaderFooter = location.pathname === "/";
