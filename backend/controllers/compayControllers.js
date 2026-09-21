@@ -2881,3 +2881,46 @@ export const applyToCompanyJob = async (req, res, next) => {
     return res.status(status).json({ message });
   }
 };
+
+// Internal (admin-key gated): when the master panel links a host account to
+// an existing company, the listings the host had already added under their
+// own companyId are folded into that company so host + transferred listings
+// live under one companyId — listings, ownership checks and leads all key off
+// it. Leads follow their listing via the `company` ref.
+export const reassignListings = async (req, res, next) => {
+  try {
+    const fromCompanyId = String(req.body?.fromCompanyId || "").trim();
+    const toCompanyId = String(req.body?.toCompanyId || "").trim();
+
+    if (!fromCompanyId || !toCompanyId) {
+      return res
+        .status(400)
+        .json({ message: "fromCompanyId and toCompanyId are required" });
+    }
+    if (fromCompanyId === toCompanyId) {
+      return res
+        .status(400)
+        .json({ message: "Source and target company are the same" });
+    }
+
+    const listings = await Company.find({ companyId: fromCompanyId })
+      .select("_id businessId")
+      .lean();
+
+    if (!listings.length) {
+      return res.status(200).json({ moved: 0, businessIds: [] });
+    }
+
+    const ids = listings.map((l) => l._id);
+    await Company.updateMany({ _id: { $in: ids } }, { $set: { companyId: toCompanyId } });
+    await Lead.updateMany({ company: { $in: ids } }, { $set: { companyId: toCompanyId } });
+
+    return res.status(200).json({
+      moved: listings.length,
+      businessIds: listings.map((l) => l.businessId),
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
