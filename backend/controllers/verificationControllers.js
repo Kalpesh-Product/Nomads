@@ -1,11 +1,12 @@
 import Company from "../models/Company.js";
 import BusinessVerificationRequest from "../models/BusinessVerificationRequest.js";
 
+// Only 1 month and 1 year can be purchased now. VERIFICATION_TIER_MONTHS
+// below still lists the retired 3m / 6m plans so payments already in flight
+// (and existing verifications) on them keep working.
 const VERIFICATION_TIER_AMOUNTS_USD = {
   "1m": 10,
-  "3m": 25,
-  "6m": 45,
-  "1y": 80,
+  "1y": 50,
 };
 
 const VERIFICATION_TIER_MONTHS = {
