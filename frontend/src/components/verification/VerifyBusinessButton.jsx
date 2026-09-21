@@ -33,7 +33,7 @@ const VerifyBusinessButton = ({ companyId, isVerified }) => {
         className="ml-2 inline-flex items-center gap-1 text-xs font-medium text-primary-blue border border-primary-blue rounded-full px-3 py-1 hover:bg-primary-blue hover:text-white transition-colors align-middle"
       >
         <MdVerified className="text-sm" />
-        Verify Business
+        Unverified
       </button>
     </Tooltip>
   );
