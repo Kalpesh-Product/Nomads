@@ -1636,8 +1636,14 @@ const AiGlobalListingsMap = () => {
                           )
                             ? 0
                             : 1;
+                          // Verified businesses come ahead of unverified
+                          // ones within this vertical's section, same as
+                          // the single-vertical listings page.
+                          const aVerified = a.isVerified ? 0 : 1;
+                          const bVerified = b.isVerified ? 0 : 1;
                           return (
                             aPriority - bPriority ||
+                            aVerified - bVerified ||
                             (b.ratings || 0) - (a.ratings || 0)
                           );
                         });

@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import GetStartedButton from "../../components/GetStartedButton";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "../../utils/axios";
 import { showErrorAlert, showSuccessAlert } from "../../utils/alerts";
 import { api as publicApi } from "../../utils/axios";
@@ -280,6 +280,17 @@ const AiHostSignup = () => {
   );
   const [selectedPlan, setSelectedPlan] = useState(selectedPlanFromQuery);
   const countriesNowLoadStartedRef = React.useRef(false);
+
+  // Same live price shown on the AiHostPricing card (step 0 of this flow) —
+  // shares the "publicPlanPricing" query key/cache with it.
+  const { data: professionalPlanPriceUsd } = useQuery({
+    queryKey: ["publicPlanPricing"],
+    queryFn: async () => {
+      const response = await publicApi.get("/forms/plan-pricing");
+      return response?.data?.professionalPlanPriceUsd;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
   const countries = useMemo(
     () => locationApi?.Country?.getAllCountries() || [],
     [locationApi],
@@ -830,7 +841,7 @@ const AiHostSignup = () => {
                 >
                   <MenuItem value="BASIC">BASIC - FREE</MenuItem>
                   <MenuItem value="PROFESSIONAL">
-                    PROFESSIONAL - $199 / Month
+                    PROFESSIONAL - ${professionalPlanPriceUsd ?? 199} / Month
                   </MenuItem>
                   <MenuItem value="CUSTOMISE">
                     CUSTOMISE - PERSONALISED

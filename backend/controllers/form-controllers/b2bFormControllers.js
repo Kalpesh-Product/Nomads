@@ -13,6 +13,7 @@ import {
   renderNotificationEmail,
 } from "../../utils/emailTemplates.js";
 import { checkHostPanelEmail } from "../../utils/hostPanelAccounts.js";
+import { getProfessionalPlanPriceUsd } from "../../utils/planPricing.js";
 
 const hostSignupEmailExists = async (email) => {
   const normalizedEmail = String(email || "").trim().toLowerCase();
@@ -23,16 +24,30 @@ const hostSignupEmailExists = async (email) => {
   return Boolean(existingSignupLead || existingHostPanelAccount);
 };
 
+// Professional's price is fetched live (see planDisplayName below) — this
+// only covers Basic/Custom, which have no dollar figure to keep in sync.
 const PLAN_DISPLAY_NAMES = {
   BASIC: "Basic - Free",
-  PROFESSIONAL: "Professional - $199",
   CUSTOMISE: "Customise - Personalised",
 };
 
-function planDisplayName(goals) {
+async function planDisplayName(goals) {
   const key = (goals || "").trim().toUpperCase();
+  if (key === "PROFESSIONAL") {
+    const price = await getProfessionalPlanPriceUsd();
+    return `Professional - $${price}`;
+  }
   return PLAN_DISPLAY_NAMES[key] || goals || "-";
 }
+
+// GET /api/forms/plan-pricing — public, no auth. Proxies MasterPanel's own
+// public price endpoint so the frontend never has to call MasterPanel
+// directly (avoids CORS and keeps the "which service owns pricing" line
+// clean — Nomads' backend, not its frontend, talks cross-service).
+export const getPublicPlanPricing = async (req, res) => {
+  const professionalPlanPriceUsd = await getProfessionalPlanPriceUsd();
+  return res.status(200).json({ professionalPlanPriceUsd });
+};
 
 const istNowPieces = () => {
   const tz = "Asia/Kolkata";
@@ -905,6 +920,7 @@ export const registerFormSubmission = async (req, res) => {
           )}-${String(totalHostUsers).padStart(5, "0")}`;
           const { submittedDate, submittedTime } =
             formatSubmittedOn(registeredAt);
+          const selectedPlanDisplayName = await planDisplayName(payload.Goals);
 
           await sendMail({
             to: payload.email,
@@ -927,7 +943,7 @@ export const registerFormSubmission = async (req, res) => {
               detailRows: [
                 ["Name", payload.name || "-"],
                 ["Email", payload.email],
-                ["Selected Plan", planDisplayName(payload.Goals)],
+                ["Selected Plan", selectedPlanDisplayName],
                 ["Company", payload.companyName || "-"],
                 ["Registration Date", `${submittedDate}<br/>${submittedTime}`],
               ],

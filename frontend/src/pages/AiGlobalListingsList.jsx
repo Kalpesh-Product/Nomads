@@ -1783,6 +1783,15 @@ const AiGlobalListingsList = () => {
                             }
                             if (aPriorityIndex !== -1) return -1;
                             if (bPriorityIndex !== -1) return 1;
+                            // Verified businesses (badge status already
+                            // factors in expiry — see
+                            // computeEffectiveVerification in the Nomads
+                            // backend) come ahead of unverified ones within
+                            // this vertical's section, same as the single-
+                            // vertical listings page.
+                            const aVerified = Number(Boolean(a.isVerified));
+                            const bVerified = Number(Boolean(b.isVerified));
+                            if (aVerified !== bVerified) return bVerified - aVerified;
                             const aRating = Number(a.ratings || 0);
                             const bRating = Number(b.ratings || 0);
                             return bRating - aRating;
@@ -2270,6 +2279,12 @@ const AiGlobalListingsList = () => {
                           }
                           if (aPriorityIndex !== -1) return -1;
                           if (bPriorityIndex !== -1) return 1;
+                          // Verified businesses come ahead of unverified
+                          // ones within this vertical's section, same as
+                          // the single-vertical listings page.
+                          const aVerified = Number(Boolean(a.isVerified));
+                          const bVerified = Number(Boolean(b.isVerified));
+                          if (aVerified !== bVerified) return bVerified - aVerified;
                           const aRating = Number(a.ratings || 0);
                           const bRating = Number(b.ratings || 0);
                           return bRating - aRating;

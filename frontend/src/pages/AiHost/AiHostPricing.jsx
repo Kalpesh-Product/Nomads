@@ -1,11 +1,19 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { api as publicApi } from "../../utils/axios";
 import { FaGlobeAmericas } from "react-icons/fa";
 import { HiOutlineCurrencyDollar } from "react-icons/hi";
 import { TbAward } from "react-icons/tb";
 import useNomadLoginState from "../../hooks/useNomadLoginState";
 import { FaCheck } from "react-icons/fa";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+
+// Kept only as the fallback shown while the live price loads (or if the
+// request fails) — the real number comes from
+// GET /forms/plan-pricing (Nomads backend) -> MasterPanel's Plan Pricing
+// settings, so it always matches whatever staff set there.
+const FALLBACK_PROFESSIONAL_PLAN_PRICE_USD = 199;
 
 const AI_HOME_TYPING_SEEN_KEY = "wono-ai-home-typing-seen";
 
@@ -123,6 +131,25 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
   const cardsScrollRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const { data: professionalPlanPriceUsd } = useQuery({
+    queryKey: ["publicPlanPricing"],
+    queryFn: async () => {
+      const response = await publicApi.get("/forms/plan-pricing");
+      return response?.data?.professionalPlanPriceUsd;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const cards = useMemo(
+    () =>
+      recommendationCards.map((card) =>
+        card.title === "PROFESSIONAL"
+          ? { ...card, price: `$${professionalPlanPriceUsd ?? FALLBACK_PROFESSIONAL_PLAN_PRICE_USD}` }
+          : card,
+      ),
+    [professionalPlanPriceUsd],
+  );
 
   const greetingText = isLoggedIn ? "Hi Abrar" : "Meet Wono";
   const subheadingText = isLoggedIn
@@ -342,7 +369,7 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
                     : "grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3"
                 }`}
               >
-                {recommendationCards.map((card, index) => {
+                {cards.map((card, index) => {
                   const isGated = gatedRecommendationTitles.has(card.title);
 
                   return (

@@ -4,6 +4,7 @@ import {
   addB2BFormSubmission,
   checkHostUserEmail,
   getHostUsers,
+  getPublicPlanPricing,
   registerFormSubmission,
   updateHostUserStatusAndComment,
 } from "../controllers/form-controllers/b2bFormControllers.js";
@@ -28,6 +29,7 @@ router.post(
 );
 router.get("/host-users", getHostUsers);
 router.get("/check-host-user-email", checkHostUserEmail);
+router.get("/plan-pricing", getPublicPlanPricing);
 router.patch("/host-users/:hostUserId", updateHostUserStatusAndComment);
 
 export default router;
