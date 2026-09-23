@@ -13,7 +13,7 @@ import {
   renderNotificationEmail,
 } from "../../utils/emailTemplates.js";
 import { checkHostPanelEmail } from "../../utils/hostPanelAccounts.js";
-import { getProfessionalPlanPriceUsd } from "../../utils/planPricing.js";
+import { getProfessionalPlanPricing } from "../../utils/planPricing.js";
 
 const hostSignupEmailExists = async (email) => {
   const normalizedEmail = String(email || "").trim().toLowerCase();
@@ -31,11 +31,19 @@ const PLAN_DISPLAY_NAMES = {
   CUSTOMISE: "Customise - Personalised",
 };
 
-async function planDisplayName(goals) {
+const normalizeBillingCycle = (value) =>
+  ["monthly", "annual"].includes(String(value || "").trim().toLowerCase())
+    ? String(value).trim().toLowerCase()
+    : "monthly";
+
+async function planDisplayName(goals, billingCycle = "monthly") {
   const key = (goals || "").trim().toUpperCase();
   if (key === "PROFESSIONAL") {
-    const price = await getProfessionalPlanPriceUsd();
-    return `Professional - $${price}`;
+    const { professionalPlanPriceUsd, professionalAnnualPlanPriceUsd } =
+      await getProfessionalPlanPricing();
+    return normalizeBillingCycle(billingCycle) === "annual"
+      ? `Professional - $${Number(professionalAnnualPlanPriceUsd).toLocaleString("en-US")}/year billed annually`
+      : `Professional - $${professionalPlanPriceUsd}/month`;
   }
   return PLAN_DISPLAY_NAMES[key] || goals || "-";
 }
@@ -45,8 +53,12 @@ async function planDisplayName(goals) {
 // directly (avoids CORS and keeps the "which service owns pricing" line
 // clean — Nomads' backend, not its frontend, talks cross-service).
 export const getPublicPlanPricing = async (req, res) => {
-  const professionalPlanPriceUsd = await getProfessionalPlanPriceUsd();
-  return res.status(200).json({ professionalPlanPriceUsd });
+  const { professionalPlanPriceUsd, professionalAnnualPlanPriceUsd } =
+    await getProfessionalPlanPricing();
+  return res.status(200).json({
+    professionalPlanPriceUsd,
+    professionalAnnualPlanPriceUsd,
+  });
 };
 
 const istNowPieces = () => {
@@ -660,6 +672,7 @@ export const registerFormSubmission = async (req, res) => {
       city: payload.city,
       role: payload.role,
       goals: payload.Goals,
+      billingCycle: normalizeBillingCycle(payload.billingCycle),
       companyName: payload.companyName,
       industry: payload.industry,
       verticalType: payload.verticalType,
@@ -920,7 +933,10 @@ export const registerFormSubmission = async (req, res) => {
           )}-${String(totalHostUsers).padStart(5, "0")}`;
           const { submittedDate, submittedTime } =
             formatSubmittedOn(registeredAt);
-          const selectedPlanDisplayName = await planDisplayName(payload.Goals);
+          const selectedPlanDisplayName = await planDisplayName(
+            payload.Goals,
+            payload.billingCycle,
+          );
 
           await sendMail({
             to: payload.email,

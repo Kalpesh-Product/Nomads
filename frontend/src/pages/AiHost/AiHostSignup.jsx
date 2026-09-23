@@ -245,6 +245,11 @@ const normalizePlanFromQuery = (plan) => {
   return planMap[normalized] || "BASIC";
 };
 
+const normalizeBillingCycleFromQuery = (value) =>
+  ["monthly", "annual"].includes(String(value || "").trim().toLowerCase())
+    ? String(value).trim().toLowerCase()
+    : "monthly";
+
 const AiHostSignup = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -279,18 +284,25 @@ const AiHostSignup = () => {
     signupParams.get("plan"),
   );
   const [selectedPlan, setSelectedPlan] = useState(selectedPlanFromQuery);
+  const [billingCycle, setBillingCycle] = useState(() =>
+    normalizeBillingCycleFromQuery(signupParams.get("billingCycle")),
+  );
   const countriesNowLoadStartedRef = React.useRef(false);
 
-  // Same live price shown on the AiHostPricing card (step 0 of this flow) —
-  // shares the "publicPlanPricing" query key/cache with it.
-  const { data: professionalPlanPriceUsd } = useQuery({
+  // Same live prices shown on the AiHostPricing card (step 0 of this flow) —
+  // shares the "publicPlanPricing" query key/cache with it. Returns both the
+  // monthly rate and the full yearly (annual) rate.
+  const { data: planPricing } = useQuery({
     queryKey: ["publicPlanPricing"],
     queryFn: async () => {
       const response = await publicApi.get("/forms/plan-pricing");
-      return response?.data?.professionalPlanPriceUsd;
+      return response?.data || {};
     },
     staleTime: 5 * 60 * 1000,
   });
+  const professionalPlanPriceUsd = planPricing?.professionalPlanPriceUsd;
+  const professionalAnnualPlanPriceUsd =
+    planPricing?.professionalAnnualPlanPriceUsd;
   const countries = useMemo(
     () => locationApi?.Country?.getAllCountries() || [],
     [locationApi],
@@ -314,6 +326,9 @@ const AiHostSignup = () => {
     useForm({
       defaultValues: {
         Goals: selectedPlanFromQuery,
+        billingCycle: normalizeBillingCycleFromQuery(
+          signupParams.get("billingCycle"),
+        ),
         name: "",
         email: "",
         mobile: "",
@@ -359,6 +374,10 @@ const AiHostSignup = () => {
   useEffect(() => {
     setValue("Goals", selectedPlan);
   }, [selectedPlan, setValue]);
+
+  useEffect(() => {
+    setValue("billingCycle", billingCycle);
+  }, [billingCycle, setValue]);
 
   useEffect(() => {
     if (activeStep !== 1) {
@@ -807,11 +826,24 @@ const AiHostSignup = () => {
               <AiHostPricing
                 compact
                 startStep={1}
+                initialBillingCycle={billingCycle}
                 onSelectPlan={(plan) => {
                   const planTitle = plan?.title || "BASIC";
                   const normalizedPlan = normalizePlanFromQuery(planTitle);
+                  const nextCycle = normalizeBillingCycleFromQuery(
+                    plan?.billingCycle,
+                  );
                   setSelectedPlan(normalizedPlan);
+                  setBillingCycle(nextCycle);
                   setValue("Goals", normalizedPlan);
+                  setValue("billingCycle", nextCycle);
+                  const updatedParams = new URLSearchParams(location.search);
+                  updatedParams.set("plan", normalizedPlan);
+                  updatedParams.set("billingCycle", nextCycle);
+                  navigate(
+                    `${location.pathname}?${updatedParams.toString()}`,
+                    { replace: true },
+                  );
                   setActiveStep(1);
                 }}
               />
@@ -841,7 +873,13 @@ const AiHostSignup = () => {
                 >
                   <MenuItem value="BASIC">BASIC - FREE</MenuItem>
                   <MenuItem value="PROFESSIONAL">
-                    PROFESSIONAL - ${professionalPlanPriceUsd ?? 199} / Month
+                    {billingCycle === "annual"
+                      ? `PROFESSIONAL - $${
+                          professionalAnnualPlanPriceUsd ??
+                          professionalPlanPriceUsd ??
+                          199
+                        } / Year`
+                      : `PROFESSIONAL - $${professionalPlanPriceUsd ?? 199} / Month`}
                   </MenuItem>
                   <MenuItem value="CUSTOMISE">
                     CUSTOMISE - PERSONALISED
@@ -849,6 +887,16 @@ const AiHostSignup = () => {
                 </TextField>
               )}
             />
+            {/* {selectedPlan === "PROFESSIONAL" && (
+              <p className="mt-2 text-[10px] font-medium text-[#8a93a3]">
+                {billingCycle === "annual"
+                  ? `Billed annually — $${Math.round(
+                      professionalAnnualPlanPriceUsd ??
+                        (professionalPlanPriceUsd ?? 199) * 12,
+                    ).toLocaleString()} for 12 months`
+                  : "Billed monthly"}
+              </p>
+            )} */}
             <Controller
               name="name"
               control={control}

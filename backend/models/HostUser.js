@@ -10,6 +10,13 @@ const hostUserSchema = new mongoose.Schema(
     city: { type: String, trim: true },
     role: { type: String, trim: true },
     goals: { type: String, trim: true },
+    billingCycle: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      enum: ["monthly", "annual"],
+      default: "monthly",
+    },
     companyName: { type: String, trim: true },
     industry: { type: String, trim: true },
     verticalType: {
