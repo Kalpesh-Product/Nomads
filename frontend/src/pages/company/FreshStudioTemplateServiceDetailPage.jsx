@@ -298,7 +298,7 @@ const FreshStudioTemplateServiceDetailPage = () => {
                   {page?.heroHeading || page?.name}
                 </h1>
                 {page?.heroSubHeading ? (
-                  <p className="mt-2 text-[13px] leading-relaxed md:mt-3 md:text-lg" style={{ color: "rgba(255,255,255,0.75)" }}>
+                  <p className="mt-2 text-[13px] leading-relaxed md:mt-3 md:text-lg" style={{ color: "white" }}>
                     {page.heroSubHeading}
                   </p>
                 ) : null}

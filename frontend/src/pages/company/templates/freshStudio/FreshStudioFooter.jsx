@@ -6,7 +6,7 @@ import {
   normalizePageNavItems,
   normalizeProductDropdownPages,
 } from "../../utils/templateRouteUtils";
-import { getEnabledFooterSocials } from "../../utils/footerSocialLinks";
+import { getEnabledFooterSocialsWithFallback } from "../../utils/footerSocialLinks";
 import { HEADING, MUTED, PAGE_BG, SOCIAL_ICON, SOCIAL_LABEL, focusStyle } from "./FreshStudioShared";
 
 // Site-level footer for Fresh Studio — same prop shape as the shared
@@ -35,7 +35,7 @@ const FreshStudioFooter = ({
     Array.isArray(productDropdownPages) ? productDropdownPages : [],
   ).map((p) => ({ name: p.name || p.slug || "", to: getProductPath(p.slug, pathname) }));
 
-  const socialLinks = getEnabledFooterSocials(socials);
+  const socialLinks = getEnabledFooterSocialsWithFallback(socials);
 
   return (
     // Unlike HostPanel's Fresh Studio (where the footer is a direct child of
@@ -61,19 +61,23 @@ const FreshStudioFooter = ({
           ) : null}
           {socialLinks.length > 0 ? (
             <div className="mt-4 flex items-center justify-center gap-3 md:justify-start">
-              {socialLinks.map((social) => (
-                <a
-                  key={`footer-social-${social.key}`}
-                  href={social.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label={SOCIAL_LABEL[social.key] || social.label}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border transition hover:bg-white hover:text-[#0A0A12] focus-visible:outline focus-visible:outline-2"
-                  style={{ borderColor: "rgba(255,255,255,0.18)", color: "#ffffff", ...focusStyle }}
-                >
-                  {SOCIAL_ICON[social.key]}
-                </a>
-              ))}
+              {socialLinks.map((social) => {
+                const Tag = social.href ? "a" : "span";
+                const linkProps = social.href ? { href: social.href, target: "_blank", rel: "noreferrer" } : { role: "img" };
+                return (
+                  <Tag
+                    key={`footer-social-${social.key}`}
+                    {...linkProps}
+                    aria-label={SOCIAL_LABEL[social.key] || social.label}
+                    className={`inline-flex h-9 w-9 items-center justify-center rounded-full border transition focus-visible:outline focus-visible:outline-2 ${
+                      social.href ? "hover:bg-white hover:text-[#0A0A12]" : "cursor-default"
+                    }`}
+                    style={{ borderColor: "rgba(255,255,255,0.18)", color: "#ffffff", ...focusStyle }}
+                  >
+                    {SOCIAL_ICON[social.key]}
+                  </Tag>
+                );
+              })}
             </div>
           ) : null}
         </div>

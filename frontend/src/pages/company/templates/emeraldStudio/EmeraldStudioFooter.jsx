@@ -6,7 +6,8 @@ import {
   normalizePageNavItems,
   normalizeProductDropdownPages,
 } from "../../utils/templateRouteUtils";
-import { getEnabledFooterSocials } from "../../utils/footerSocialLinks";
+import { getEnabledFooterSocialsWithFallback } from "../../utils/footerSocialLinks";
+import { SOCIAL_ICON } from "../freshStudio/FreshStudioShared";
 import { HEADING_FONT, SOCIAL_LABEL } from "./EmeraldStudioShared";
 
 // Site-level footer for Emerald Studio — same prop shape as the shared
@@ -40,7 +41,7 @@ const EmeraldStudioFooter = ({
     .slice(0, 4)
     .map((p) => ({ name: p.name || p.slug || "", to: getProductPath(p.slug, pathname) }));
 
-  const socialLinks = getEnabledFooterSocials(socials);
+  const socialLinks = getEnabledFooterSocialsWithFallback(socials);
   const displayName = registeredCompany || companyName || "";
 
   return (
@@ -62,17 +63,22 @@ const EmeraldStudioFooter = ({
           {!isPending && address ? <p className="text-stone-500 text-sm leading-relaxed mt-1">{address}</p> : null}
           {socialLinks.length ? (
             <div className="flex gap-4 mt-4 md:justify-start justify-center">
-              {socialLinks.map((social) => (
-                <a
-                  key={`footer-social-${social.key}`}
-                  href={social.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-stone-600 text-xs hover:text-amber-400 transition-colors"
-                >
-                  {SOCIAL_LABEL[social.key] || social.label}
-                </a>
-              ))}
+              {socialLinks.map((social) => {
+                const Tag = social.href ? "a" : "span";
+                const linkProps = social.href ? { href: social.href, target: "_blank", rel: "noreferrer" } : { role: "img" };
+                return (
+                  <Tag
+                    key={`footer-social-${social.key}`}
+                    {...linkProps}
+                    aria-label={SOCIAL_LABEL[social.key] || social.label}
+                    className={`inline-flex h-9 w-9 items-center justify-center rounded-full border border-amber-400/50 text-amber-400 transition-colors ${
+                      social.href ? "hover:bg-amber-400 hover:text-emerald-950" : "cursor-default"
+                    }`}
+                  >
+                    {SOCIAL_ICON[social.key]}
+                  </Tag>
+                );
+              })}
             </div>
           ) : null}
         </div>
