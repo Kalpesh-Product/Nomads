@@ -326,7 +326,7 @@ const EmeraldStudioTemplateServiceDetailPage = () => {
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
                   {(Array.isArray(data?.menuItems) ? data.menuItems : []).map((item, idx) => (
                     <div key={idx} className="rounded-xl border border-emerald-800/50 bg-emerald-900/40 p-5">
-                      {item?.image ? <img src={item.image} alt={item?.name} className="aspect-[4/3] w-full rounded-lg object-cover" /> : null}
+                      {getMediaSrc(item?.image) ? <img src={getMediaSrc(item.image)} alt={item?.name} className="aspect-[4/3] w-full rounded-lg object-cover" /> : null}
                       <div className="mt-3 flex items-center justify-between">
                         <h4 className={`text-[15px] font-semibold text-stone-100 ${HEADING_FONT}`}>{item?.name}</h4>
                         {item?.price ? <span className="text-[13px] text-stone-400">{item.price}</span> : null}

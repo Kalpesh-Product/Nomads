@@ -94,7 +94,7 @@ const FreshStudioFooter = ({
         {productsPageEnabled ? (
           <div>
             <h3 className="text-[12px] font-semibold uppercase tracking-[0.08em]" style={{ color: HEADING }}>
-              Services
+              {quickLinks.find((link) => link.slug === "products")?.name || "Services"}
             </h3>
             <div className="mt-3 flex flex-col items-center gap-2 text-[13.5px] md:items-start" style={{ color: MUTED }}>
               {productLinks.length > 0 ? (

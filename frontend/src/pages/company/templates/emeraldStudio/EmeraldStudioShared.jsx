@@ -132,7 +132,7 @@ export const ProductGrid = ({ products, onSelect }) => (
             )}
           </div>
           <h3 className={`mb-2 text-lg font-semibold text-stone-100 ${HEADING_FONT}`}>
-            {product?.name || product?.title || product?.heading || "Service"}
+            {product?.homeCardHeading || product?.heading || product?.name || product?.title || "Service"}
           </h3>
           {description ? (
             <p className="line-clamp-2 text-sm leading-relaxed text-stone-400">{description}</p>

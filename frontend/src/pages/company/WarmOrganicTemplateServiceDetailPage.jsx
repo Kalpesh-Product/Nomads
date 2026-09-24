@@ -287,7 +287,7 @@ const WarmOrganicTemplateServiceDetailPage = () => {
                 {page?.heroHeading || page?.name}
               </h1>
               {page?.heroSubHeading ? (
-                <p className="mx-auto mt-1 max-w-xl text-[14.5px]" style={{ color: MUTED }}>
+                <p className="mx-auto mt-1 max-w-xl text-[14.5px]" style={{ color: "white" }}>
                   {page.heroSubHeading}
                 </p>
               ) : null}
@@ -333,7 +333,7 @@ const WarmOrganicTemplateServiceDetailPage = () => {
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
                   {(Array.isArray(data?.menuItems) ? data.menuItems : []).map((item, idx) => (
                     <div key={idx} className="rounded-2xl p-5" style={{ backgroundColor: CREAM }}>
-                      {item?.image ? <img src={item.image} alt={item?.name} className="aspect-[4/3] w-full rounded-xl object-cover" /> : null}
+                      {getMediaSrc(item?.image) ? <img src={getMediaSrc(item.image)} alt={item?.name} className="aspect-[4/3] w-full rounded-xl object-cover" /> : null}
                       <div className="mt-3 flex items-center justify-between">
                         <h4 className={`text-[15px] font-normal ${SERIF}`}>{item?.name}</h4>
                         {item?.price ? (
@@ -342,6 +342,11 @@ const WarmOrganicTemplateServiceDetailPage = () => {
                           </span>
                         ) : null}
                       </div>
+                      {item?.description ? (
+                        <p className="mt-2 text-[13px] leading-relaxed" style={{ color: MUTED }}>
+                          {item.description}
+                        </p>
+                      ) : null}
                     </div>
                   ))}
                 </div>

@@ -343,7 +343,7 @@ const FreshStudioTemplateServiceDetailPage = () => {
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3">
                 {(Array.isArray(data?.menuItems) ? data.menuItems : []).map((item, idx) => (
                   <div key={idx} className={`${CARD} border p-4`} style={{ borderColor: "rgba(255,255,255,0.12)" }}>
-                    {item?.image ? <img src={item.image} alt={item?.name} className="aspect-[4/3] w-full rounded-[4px] object-cover" /> : null}
+                    {getMediaSrc(item?.image) ? <img src={getMediaSrc(item.image)} alt={item?.name} className="aspect-[4/3] w-full rounded-[4px] object-cover" /> : null}
                     <div className="mt-3 flex items-center justify-between">
                       <h4 className="text-[14px] font-semibold" style={{ color: HEADING }}>
                         {item?.name}

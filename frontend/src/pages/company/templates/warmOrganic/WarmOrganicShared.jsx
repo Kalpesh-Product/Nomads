@@ -144,7 +144,7 @@ export const ProductGrid = ({ products, onSelect, tints = CARD_TINTS }) => (
             )}
           </div>
           <div className="flex flex-1 flex-col items-center gap-3 px-5 py-5 text-center">
-            <h3 className={`text-[16px] font-normal ${SERIF}`}>{product?.name || product?.heading || "Service"}</h3>
+            <h3 className={`text-[16px] font-normal ${SERIF}`}>{product?.homeCardHeading || product?.heading || product?.name || "Service"}</h3>
             {description ? (
               <p className="line-clamp-2 text-[12.5px] leading-relaxed" style={{ color: MUTED }}>
                 {description}

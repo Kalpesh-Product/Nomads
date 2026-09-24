@@ -140,7 +140,7 @@ export const ProductGrid = ({ products, onSelect, fallbackImage }) => (
           </div>
           <div className="flex flex-1 flex-col items-center gap-1.5 p-5 text-center">
             <span className="text-[15px] font-semibold" style={{ color: HEADING }}>
-              {product?.name || product?.heading || "Service"}
+              {product?.homeCardHeading || product?.heading || product?.name || "Service"}
             </span>
             {description ? (
               <span className="line-clamp-2 text-[13px] leading-relaxed" style={{ color: MUTED }}>

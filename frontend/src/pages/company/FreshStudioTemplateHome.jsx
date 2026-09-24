@@ -131,7 +131,7 @@ const FreshStudioTemplateHome = () => {
 
       {t.aboutPageEnabled && t.isHomeSectionEnabled("home_about") && aboutIntroBlocks.length ? (
         <section className={PAGE_WRAP}>
-          <LinedHeading title="About" style={{ color: ACCENT }} />
+          <LinedHeading title={String(data?.aboutTitle || "").trim() || "About"} style={{ color: ACCENT }} />
           <div className="mx-auto mt-6 flex max-w-2xl flex-col items-center gap-4 text-center">
             {aboutIntroBlocks.map((text, idx) => (
               <p key={idx} className="text-[15px] leading-relaxed">
@@ -144,7 +144,7 @@ const FreshStudioTemplateHome = () => {
 
       {t.productsPageEnabled && t.isHomeSectionEnabled("home_products") && t.productPages.length ? (
         <section className={PAGE_WRAP}>
-          <LinedHeading title="What we offer" style={{ color: ACCENT }} />
+          <LinedHeading title={String(data?.productTitle || "").trim() || "What we offer"} style={{ color: ACCENT }} />
           <div className="mt-6">
             <ProductGrid products={t.productPages} onSelect={t.handleProductCardAction} />
           </div>
@@ -155,9 +155,9 @@ const FreshStudioTemplateHome = () => {
         <Inclusions inclusions={data.inclusions} title="Inclusions" />
       ) : null}
 
-      {t.galleryPageEnabled && t.isHomeSectionEnabled("home_gallery") ? (
+      {t.galleryPageEnabled && t.isHomeSectionEnabled("home_gallery") && t.galleryItems.length > 0 ? (
         <section className={PAGE_WRAP}>
-          <LinedHeading title="Gallery" style={{ color: ACCENT }} />
+          <LinedHeading title={String(data?.galleryTitle || "").trim() || "Gallery"} style={{ color: ACCENT }} />
           <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3">
             {t.homeGalleryItems.map((src, idx) => (
               <div key={idx} className="aspect-square overflow-hidden rounded-[4px]" style={{ backgroundColor: "#15151f" }}>
@@ -182,7 +182,7 @@ const FreshStudioTemplateHome = () => {
 
       {t.isHomeSectionEnabled("home_testimonials") && t.testimonials.length ? (
         <section className={PAGE_WRAP}>
-          <LinedHeading title="What people say" style={{ color: ACCENT }} />
+          <LinedHeading title={String(data?.testimonialTitle || "").trim() || "What people say"} style={{ color: ACCENT }} />
           <div className="mt-7">
             <TestimonialsCarousel testimonials={t.testimonials} />
           </div>
@@ -209,7 +209,7 @@ const FreshStudioTemplateHome = () => {
                 Contact
               </span>
               <h2 className={`text-[26px] font-extrabold md:text-[32px] ${HEADING_FONT}`} style={{ color: WHITE }}>
-                {data?.companyName ? `Let's talk, ${data.companyName}` : "Get in touch"}
+                {String(data?.contactTitle || "").trim() || (data?.companyName ? `Let's talk, ${data.companyName}` : "Get in touch")}
               </h2>
             </div>
             <div
