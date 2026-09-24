@@ -283,7 +283,7 @@ const EmeraldStudioTemplateServiceDetailPage = () => {
               )}
               <div className="absolute inset-0 flex flex-col items-center justify-end gap-2 px-6 pb-10 text-center md:pb-14">
                 <h1 className={`text-3xl md:text-5xl font-semibold text-stone-100 ${HEADING_FONT}`}>{page?.heroHeading || page?.name}</h1>
-                {page?.heroSubHeading ? <p className="mx-auto mt-1 max-w-xl text-stone-400 text-base">{page.heroSubHeading}</p> : null}
+                {page?.heroSubHeading ? <p className="mx-auto mt-1 max-w-xl text-white text-base">{page.heroSubHeading}</p> : null}
                 {page?.heroButtonText ? (
                   <button
                     type="button"
