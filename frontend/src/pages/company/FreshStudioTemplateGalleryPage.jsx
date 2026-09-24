@@ -36,7 +36,7 @@ const FreshStudioTemplateGalleryPage = () => {
               type="button"
               onClick={() => openViewer(idx)}
               className="aspect-square overflow-hidden rounded-[4px] focus-visible:outline focus-visible:outline-2"
-              style={{ backgroundColor: "#15151f", ...focusStyle }}
+              style={{ backgroundColor: "var(--t-surface2, #15151f)", ...focusStyle }}
             >
               <img src={src} alt={`Gallery ${idx + 1}`} className="h-full w-full object-cover transition duration-300 hover:scale-105" />
             </button>

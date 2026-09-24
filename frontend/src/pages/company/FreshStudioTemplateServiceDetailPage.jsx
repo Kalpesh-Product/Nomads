@@ -20,6 +20,7 @@ import {
   ProductGrid,
   TEXT,
   WHITE,
+  ON_ACCENT,
   focusStyle,
   inputFocusStyle,
   inputStyle,
@@ -119,7 +120,7 @@ const FreshStudioTemplateServiceDetailPage = () => {
               type="button"
               onClick={() => t.goToSection("products")}
               className={`${PILL_BUTTON} mt-6`}
-              style={{ background: ACCENT_GRADIENT, color: WHITE }}
+              style={{ background: ACCENT_GRADIENT, color: ON_ACCENT }}
             >
               Back to Services
             </button>
@@ -206,7 +207,7 @@ const FreshStudioTemplateServiceDetailPage = () => {
                     className="h-[300px] w-full rounded-[4px] object-cover md:h-[520px]"
                   />
                 ) : (
-                  <div className="h-[300px] w-full rounded-[4px] md:h-[520px]" style={{ backgroundColor: "#15151f" }} />
+                  <div className="h-[300px] w-full rounded-[4px] md:h-[520px]" style={{ backgroundColor: "var(--t-surface2, #15151f)" }} />
                 )}
               </div>
 
@@ -241,7 +242,7 @@ const FreshStudioTemplateServiceDetailPage = () => {
 
                 <div className="shrink-0">
                   {leadSubmitted ? (
-                    <div className={`${CARD} flex h-full min-h-[220px] flex-col items-center justify-center gap-3 border p-6 text-center`} style={{ borderColor: "rgba(255,255,255,0.12)" }}>
+                    <div className={`${CARD} flex h-full min-h-[220px] flex-col items-center justify-center gap-3 border p-6 text-center`} style={{ borderColor: "color-mix(in srgb, var(--t-text, #ffffff) 12%, transparent)" }}>
                       <p className="text-[16px] font-semibold" style={{ color: HEADING }}>
                         Enquiry submitted successfully.
                       </p>
@@ -250,7 +251,7 @@ const FreshStudioTemplateServiceDetailPage = () => {
                       </p>
                     </div>
                   ) : (
-                    <form onSubmit={submitLeadForm} className={`${CARD} flex flex-col gap-3 border p-5`} style={{ borderColor: "rgba(255,255,255,0.12)" }}>
+                    <form onSubmit={submitLeadForm} className={`${CARD} flex flex-col gap-3 border p-5`} style={{ borderColor: "color-mix(in srgb, var(--t-text, #ffffff) 12%, transparent)" }}>
                       <span className={EYEBROW} style={{ color: ACCENT }}>
                         Enquire now
                       </span>
@@ -268,12 +269,12 @@ const FreshStudioTemplateServiceDetailPage = () => {
                           />
                         ))}
                       </div>
-                      {leadSubmitError ? <p className="text-[12px] text-[#D94B4B]">{leadSubmitError}</p> : null}
+                      {leadSubmitError ? <p className="text-[12px] text-[color:var(--t-accent,#D94B4B)]">{leadSubmitError}</p> : null}
                       <button
                         type="submit"
                         disabled={leadSubmitPending}
                         className={`${PILL_BUTTON} mt-1 disabled:opacity-50`}
-                        style={{ background: ACCENT_GRADIENT, color: WHITE, ...focusStyle }}
+                        style={{ background: ACCENT_GRADIENT, color: ON_ACCENT, ...focusStyle }}
                       >
                         {leadSubmitPending ? "Submitting…" : "Submit enquiry"}
                       </button>
@@ -288,7 +289,7 @@ const FreshStudioTemplateServiceDetailPage = () => {
         </>
       ) : (
         <>
-          <section className="relative h-[62svh] min-h-[450px] overflow-hidden md:h-[84vh] md:min-h-[550px]" style={{ backgroundColor: "#15151f" }}>
+          <section className="relative h-[62svh] min-h-[450px] overflow-hidden md:h-[84vh] md:min-h-[550px]" style={{ backgroundColor: "var(--t-surface2, #15151f)" }}>
             {selectedProductHeroImage ? (
               <img src={selectedProductHeroImage} alt={page?.name || "Service"} className="absolute inset-0 h-full w-full object-cover opacity-60" />
             ) : null}
@@ -303,7 +304,7 @@ const FreshStudioTemplateServiceDetailPage = () => {
                   </p>
                 ) : null}
                 {page?.heroButtonText ? (
-                  <button type="button" className={`${PILL_BUTTON} mt-4 md:mt-6`} style={{ background: ACCENT_GRADIENT, color: WHITE }}>
+                  <button type="button" className={`${PILL_BUTTON} mt-4 md:mt-6`} style={{ background: ACCENT_GRADIENT, color: ON_ACCENT }}>
                     {String(page.heroButtonText).toUpperCase()}
                   </button>
                 ) : null}
@@ -342,7 +343,7 @@ const FreshStudioTemplateServiceDetailPage = () => {
             {isMenuProductSlug(page?.slug || "") ? (
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3">
                 {(Array.isArray(data?.menuItems) ? data.menuItems : []).map((item, idx) => (
-                  <div key={idx} className={`${CARD} border p-4`} style={{ borderColor: "rgba(255,255,255,0.12)" }}>
+                  <div key={idx} className={`${CARD} border p-4`} style={{ borderColor: "color-mix(in srgb, var(--t-text, #ffffff) 12%, transparent)" }}>
                     {getMediaSrc(item?.image) ? <img src={getMediaSrc(item.image)} alt={item?.name} className="aspect-[4/3] w-full rounded-[4px] object-cover" /> : null}
                     <div className="mt-3 flex items-center justify-between">
                       <h4 className="text-[14px] font-semibold" style={{ color: HEADING }}>

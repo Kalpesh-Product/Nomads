@@ -25,7 +25,7 @@ const WarmOrganicTemplateGalleryPage = () => {
   };
 
   return (
-    <div className={`wo-template min-h-screen ${SANS}`} style={{ backgroundColor: "#F1E6D3", color: BROWN }}>
+    <div className={`wo-template min-h-screen ${SANS}`} style={{ backgroundColor: "var(--t-bg, #F1E6D3)", color: BROWN }}>
       <style>{FONT_IMPORT}</style>
       <section className={PAGE_WRAP}>
         <LinedHeading title={data?.galleryTitle || "Gallery"} className="justify-center" />
@@ -36,7 +36,7 @@ const WarmOrganicTemplateGalleryPage = () => {
               type="button"
               onClick={() => openViewer(idx)}
               className="aspect-square overflow-hidden rounded-2xl"
-              style={{ backgroundColor: `${BROWN}0D` }}
+              style={{ backgroundColor: `color-mix(in srgb, var(--t-text, #2B211A) 5%, transparent)` }}
             >
               <img src={src} alt={`Gallery ${idx + 1}`} className="h-full w-full object-cover transition duration-300 hover:scale-105" />
             </button>

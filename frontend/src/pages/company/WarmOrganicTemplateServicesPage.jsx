@@ -11,7 +11,7 @@ const WarmOrganicTemplateServicesPage = () => {
   if (!data) return <div>Site data is currently unavailable</div>;
 
   return (
-    <div className={`wo-template min-h-screen ${SANS}`} style={{ backgroundColor: "#F1E6D3", color: BROWN }}>
+    <div className={`wo-template min-h-screen ${SANS}`} style={{ backgroundColor: "var(--t-bg, #F1E6D3)", color: BROWN }}>
       <style>{FONT_IMPORT}</style>
       <section className={PAGE_WRAP}>
         <LinedHeading title={String(data?.productTitle || "").trim() || "Our Services"} className="justify-center" />

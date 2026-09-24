@@ -32,7 +32,7 @@ const EmeraldStudioTemplateGalleryPage = () => {
   };
 
   return (
-    <div className={`${TEMPLATE_ROOT_CLASS} min-h-screen bg-[#002c22] text-stone-100 ${BODY_FONT}`}>
+    <div className={`${TEMPLATE_ROOT_CLASS} min-h-screen bg-[#4a6b96] text-white ${BODY_FONT}`}>
       <style>{`${FONT_IMPORT}${STYLE_OVERRIDES}`}</style>
       <section className={`pt-20 pb-16 px-6 ${SECTION_BG}`}>
         <div className="max-w-7xl mx-auto text-center">
@@ -44,7 +44,7 @@ const EmeraldStudioTemplateGalleryPage = () => {
           {galleryItems.map((src, idx) => (
             <div
               key={idx}
-              className="group relative aspect-[4/3] rounded-xl overflow-hidden bg-[#004f3b] cursor-pointer"
+              className="group relative aspect-[4/3] rounded-xl overflow-hidden bg-[#1f3556]/35 cursor-pointer"
               onClick={() => openViewer(idx)}
             >
               <img
@@ -58,8 +58,8 @@ const EmeraldStudioTemplateGalleryPage = () => {
       </section>
 
       {viewerOpen ? (
-        <div className="fixed inset-0 z-50 bg-emerald-950/95 flex items-center justify-center px-6" onClick={() => setViewerOpen(false)}>
-          <button className="absolute top-6 right-6 text-stone-400 hover:text-stone-100 transition-colors" onClick={() => setViewerOpen(false)}>
+        <div className="fixed inset-0 z-50 bg-[#2f4a70]/95 flex items-center justify-center px-6" onClick={() => setViewerOpen(false)}>
+          <button className="absolute top-6 right-6 text-white/90 hover:text-white transition-colors" onClick={() => setViewerOpen(false)}>
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -68,7 +68,7 @@ const EmeraldStudioTemplateGalleryPage = () => {
             <img src={galleryItems[viewerIndex]} alt="" className="w-full rounded-2xl" />
           </div>
           <button
-            className="absolute left-6 top-1/2 -translate-y-1/2 text-stone-400 hover:text-amber-400 transition-colors"
+            className="absolute left-6 top-1/2 -translate-y-1/2 text-white/90 hover:text-white transition-colors"
             onClick={(e) => {
               e.stopPropagation();
               goToIndex(viewerIndex - 1);
@@ -79,7 +79,7 @@ const EmeraldStudioTemplateGalleryPage = () => {
             </svg>
           </button>
           <button
-            className="absolute right-6 top-1/2 -translate-y-1/2 text-stone-400 hover:text-amber-400 transition-colors"
+            className="absolute right-6 top-1/2 -translate-y-1/2 text-white/90 hover:text-white transition-colors"
             onClick={(e) => {
               e.stopPropagation();
               goToIndex(viewerIndex + 1);

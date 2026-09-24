@@ -8,7 +8,7 @@ import {
   normalizeProductDropdownPages,
   resolveSectionFromSlug,
 } from "../../utils/templateRouteUtils";
-import { AMBER, FONT_IMPORT, HEADING_FONT } from "./EmeraldStudioShared";
+import { FONT_IMPORT, HEADING_FONT } from "./EmeraldStudioShared";
 
 // Site-level header for Emerald Studio — mirrors HostPanel's
 // EmeraldStudioTemplate header 1:1 visually (dark emerald bar, amber active
@@ -82,7 +82,7 @@ const EmeraldStudioHeader = forwardRef(
           <div key={item.slug} className="relative inline-flex items-center">
             <div
               className={`inline-flex items-center gap-1.5 border-b-2 pb-1 text-sm transition-colors duration-150 ${
-                isActive || productsOpen ? "border-amber-400 text-amber-400" : "border-transparent text-stone-400"
+                isActive || productsOpen ? "border-white text-white" : "border-transparent text-white/90"
               }`}
             >
               <button type="button" onClick={() => goTo(getSectionPath("products", location.pathname))}>
@@ -101,11 +101,11 @@ const EmeraldStudioHeader = forwardRef(
               </button>
             </div>
             {productsOpen && normalizedProductPages.length > 0 ? (
-              <div className="absolute left-1/2 top-full z-50 mt-3 w-60 -translate-x-1/2 rounded-xl border border-emerald-800/60 bg-emerald-950 p-2 shadow-2xl">
+              <div className="absolute left-1/2 top-full z-50 mt-3 w-60 -translate-x-1/2 rounded-xl border border-white/25 bg-[#2f4a70] p-2 shadow-2xl">
                 <button
                   type="button"
                   onClick={() => goTo(getSectionPath("products", location.pathname))}
-                  className="block w-full rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-stone-300 hover:bg-emerald-900/60 hover:text-stone-100"
+                  className="block w-full rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-white/90 hover:bg-white/20 hover:text-white"
                 >
                   All Services
                 </button>
@@ -116,8 +116,8 @@ const EmeraldStudioHeader = forwardRef(
                       key={product.slug || index}
                       type="button"
                       onClick={() => goTo(getProductPath(product.slug, location.pathname))}
-                      className={`block w-full rounded-lg px-3 py-2.5 text-left text-sm hover:bg-emerald-900/60 ${
-                        isSelected ? "font-semibold text-amber-400" : "text-stone-400"
+                      className={`block w-full rounded-lg px-3 py-2.5 text-left text-sm hover:bg-white/20 ${
+                        isSelected ? "font-semibold text-white" : "text-white/90"
                       }`}
                     >
                       {product.name}
@@ -136,7 +136,7 @@ const EmeraldStudioHeader = forwardRef(
           type="button"
           onClick={() => goTo(item.to)}
           className={`border-b-2 pb-1 text-sm transition-colors duration-150 ${
-            isActive ? "border-amber-400 text-amber-400" : "border-transparent text-stone-400 hover:border-amber-400/60 hover:text-stone-100"
+            isActive ? "border-white text-white" : "border-transparent text-white/90 hover:border-white/50 hover:text-white"
           }`}
         >
           {item.name}
@@ -145,7 +145,7 @@ const EmeraldStudioHeader = forwardRef(
     };
 
     return (
-      <header ref={ref} className="sticky top-0 z-30 bg-[#002c22]/[0.92] backdrop-blur border-b border-[#006045]/40">
+      <header ref={ref} className="sticky top-0 z-30 bg-[#4a6b96]/[0.92] backdrop-blur border-b border-white/20">
         <style>{FONT_IMPORT}</style>
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-6 py-4 md:px-6">
           <button
@@ -158,10 +158,10 @@ const EmeraldStudioHeader = forwardRef(
               <img src={logo} alt={companyName || "Logo"} className="h-8 w-auto object-contain" />
             ) : (
               <>
-                <span className={`w-7 h-7 rounded-sm bg-amber-400 flex items-center justify-center text-emerald-950 font-bold text-sm ${HEADING_FONT}`}>
+                <span className={`w-7 h-7 rounded-sm bg-white flex items-center justify-center text-slate-900 font-bold text-sm ${HEADING_FONT}`}>
                   {(companyName || "Y").charAt(0).toUpperCase()}
                 </span>
-                <span className={`font-semibold text-lg tracking-tight text-stone-100 ${HEADING_FONT}`}>{companyName || "Your Company"}</span>
+                <span className={`font-semibold text-lg tracking-tight text-white ${HEADING_FONT}`}>{companyName || "Your Company"}</span>
               </>
             )}
           </button>
@@ -169,12 +169,12 @@ const EmeraldStudioHeader = forwardRef(
           <button
             type="button"
             onClick={() => setMobileOpen((prev) => !prev)}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-emerald-700 md:hidden"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/50 md:hidden"
             aria-label="Toggle navigation"
           >
             <span className="flex flex-col gap-1">
-              <span className="block h-px w-4 bg-stone-300" />
-              <span className="block h-px w-4 bg-stone-300" />
+              <span className="block h-px w-4 bg-white" />
+              <span className="block h-px w-4 bg-white" />
             </span>
           </button>
 
@@ -183,7 +183,7 @@ const EmeraldStudioHeader = forwardRef(
             <button
               type="button"
               onClick={() => window.location.assign("https://hostpanel.wono.co/")}
-              className="text-sm font-semibold text-stone-200 px-4 py-2 rounded border border-[#007a55] hover:border-[#ffb900] hover:text-[#ffb900] transition-colors"
+              className="text-sm font-semibold text-white px-4 py-2 rounded border border-white/60 hover:border-white hover:text-white transition-colors"
             >
               Login
             </button>
@@ -191,7 +191,7 @@ const EmeraldStudioHeader = forwardRef(
         </div>
 
         {mobileOpen ? (
-          <div className="md:hidden bg-emerald-950 border-t border-emerald-800/40 px-6 py-4 flex flex-col gap-4">
+          <div className="md:hidden bg-[#2f4a70] border-t border-white/20 px-6 py-4 flex flex-col gap-4">
             {links.map((item) => {
               const section = resolveSectionFromSlug(item.slug || item.name);
               const isActive = currentSection === section;
@@ -202,14 +202,14 @@ const EmeraldStudioHeader = forwardRef(
                       <button
                         type="button"
                         onClick={() => goTo(getSectionPath("products", location.pathname))}
-                        className={`flex-1 text-left text-sm font-medium ${isActive ? "text-amber-400" : "text-stone-400"}`}
+                        className={`flex-1 text-left text-sm font-medium ${isActive ? "text-white" : "text-white/90"}`}
                       >
                         {item.name}
                       </button>
                       <button
                         type="button"
                         onClick={() => setMobileProductsOpen((prev) => !prev)}
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-emerald-700"
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/50"
                         aria-label="Toggle product pages"
                       >
                         <svg viewBox="0 0 20 20" aria-hidden="true" className={`h-3.5 w-3.5 transition-transform ${mobileProductsOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -218,13 +218,13 @@ const EmeraldStudioHeader = forwardRef(
                       </button>
                     </div>
                     {mobileProductsOpen && normalizedProductPages.length > 0 ? (
-                      <div className="mt-2 flex flex-col gap-1 border-t border-emerald-800/40 pt-2">
+                      <div className="mt-2 flex flex-col gap-1 border-t border-white/20 pt-2">
                         {normalizedProductPages.map((product, index) => (
                           <button
                             key={`m-product-${product.slug || index}`}
                             type="button"
                             onClick={() => goTo(getProductPath(product.slug, location.pathname))}
-                            className="rounded px-2 py-2 text-left text-sm text-stone-400 hover:text-stone-100"
+                            className="rounded px-2 py-2 text-left text-sm text-white/90 hover:text-white"
                           >
                             {product.name}
                           </button>
@@ -240,7 +240,7 @@ const EmeraldStudioHeader = forwardRef(
                   type="button"
                   onClick={() => goTo(item.to)}
                   className={`w-fit border-b-2 pb-1 text-sm font-medium text-left transition-colors duration-150 ${
-                    isActive ? "border-amber-400 text-amber-400" : "border-transparent text-stone-400"
+                    isActive ? "border-white text-white" : "border-transparent text-white/90"
                   }`}
                 >
                   {item.name}
@@ -250,7 +250,7 @@ const EmeraldStudioHeader = forwardRef(
             <button
               type="button"
               onClick={() => window.location.assign("https://hostpanel.wono.co/")}
-              className="text-sm font-semibold text-left text-[#ffb900] py-2"
+              className="text-sm font-semibold text-left text-white py-2"
             >
               Login
             </button>

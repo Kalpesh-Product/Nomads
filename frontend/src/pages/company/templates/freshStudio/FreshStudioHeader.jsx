@@ -81,7 +81,7 @@ const FreshStudioHeader = forwardRef(
               style={
                 isActive || productsOpen
                   ? { color: ACCENT, borderColor: ACCENT }
-                  : { color: "rgba(255,255,255,0.72)", borderColor: "transparent" }
+                  : { color: "color-mix(in srgb, var(--t-text, #ffffff) min(100%, calc(var(--t-k, 1) * 72%)), transparent)", borderColor: "transparent" }
               }
             >
               <button type="button" onClick={() => goTo(getSectionPath("products", location.pathname))}>
@@ -100,11 +100,11 @@ const FreshStudioHeader = forwardRef(
               </button>
             </div>
             {productsOpen && normalizedProductPages.length > 0 ? (
-              <div className="absolute left-1/2 top-full z-50 mt-3 w-60 -translate-x-1/2 rounded-xl border border-white/10 bg-[#11111a] p-2 shadow-2xl">
+              <div className="absolute left-1/2 top-full z-50 mt-3 w-60 -translate-x-1/2 rounded-xl border border-[color:color-mix(in_srgb,var(--t-text,#ffffff)_10%,transparent)] bg-[var(--t-surface,#11111a)] p-2 shadow-2xl">
                 <button
                   type="button"
                   onClick={() => goTo(getSectionPath("products", location.pathname))}
-                  className="block w-full rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-white/70 hover:bg-white/[0.07] hover:text-white"
+                  className="block w-full rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-[color:color-mix(in_srgb,var(--t-text,#ffffff)_70%,transparent)] hover:bg-[color-mix(in_srgb,var(--t-text,#ffffff)_7%,transparent)] hover:text-[color:var(--t-text,#ffffff)]"
                 >
                   All Services
                 </button>
@@ -116,7 +116,7 @@ const FreshStudioHeader = forwardRef(
                       type="button"
                       onClick={() => goTo(getProductPath(product.slug, location.pathname))}
                       className="block w-full rounded-lg px-3 py-2.5 text-left text-sm"
-                      style={isSelected ? { color: ACCENT, borderColor: ACCENT } : { color: "rgba(255,255,255,0.7)" }}
+                      style={isSelected ? { color: ACCENT, borderColor: ACCENT } : { color: "color-mix(in srgb, var(--t-text, #ffffff) min(100%, calc(var(--t-k, 1) * 70%)), transparent)" }}
                     >
                       {product.name}
                     </button>
@@ -134,7 +134,7 @@ const FreshStudioHeader = forwardRef(
           type="button"
           onClick={() => goTo(item.to)}
           className="border-b-2 pb-1 text-[14px] font-medium transition duration-150 focus-visible:outline focus-visible:outline-2"
-          style={{ color: isActive ? ACCENT : "rgba(255,255,255,0.72)", borderColor: isActive ? ACCENT : "transparent", ...focusStyle }}
+          style={{ color: isActive ? ACCENT : "color-mix(in srgb, var(--t-text, #ffffff) min(100%, calc(var(--t-k, 1) * 72%)), transparent)", borderColor: isActive ? ACCENT : "transparent", ...focusStyle }}
         >
           {item.name}
         </button>
@@ -145,7 +145,7 @@ const FreshStudioHeader = forwardRef(
       <header
         ref={ref}
         className="sticky top-0 z-30"
-        style={{ backgroundColor: "rgba(10,10,18,0.92)", backdropFilter: "blur(8px)", borderBottom: "1px solid rgba(255,255,255,0.10)" }}
+        style={{ backgroundColor: "color-mix(in srgb, var(--t-bg, #0A0A12) 92%, transparent)", backdropFilter: "blur(8px)", borderBottom: "1px solid color-mix(in srgb, var(--t-text, #ffffff) 10%, transparent)" }}
       >
         <style>{FONT_IMPORT}</style>
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-6 py-4 md:px-10">
@@ -159,7 +159,7 @@ const FreshStudioHeader = forwardRef(
             {logo ? (
               <img src={logo} alt={companyName || "Logo"} className="h-full w-auto object-left object-contain" />
             ) : (
-              <span className="text-[15px] font-bold text-white font-['Manrope',ui-sans-serif,system-ui,sans-serif]">{companyName}</span>
+              <span className="text-[15px] font-bold text-[color:var(--t-text,#ffffff)] font-['Manrope',ui-sans-serif,system-ui,sans-serif]">{companyName}</span>
             )}
           </button>
 
@@ -167,12 +167,12 @@ const FreshStudioHeader = forwardRef(
             type="button"
             onClick={() => setMobileOpen((prev) => !prev)}
             className="inline-flex h-9 w-9 items-center justify-center rounded-[4px] md:hidden focus-visible:outline focus-visible:outline-2"
-            style={{ border: "1px solid rgba(255,255,255,0.18)", ...focusStyle }}
+            style={{ border: "1px solid color-mix(in srgb, var(--t-text, #ffffff) 18%, transparent)", ...focusStyle }}
             aria-label="Toggle navigation"
           >
             <span className="flex flex-col gap-1">
-              <span className="block h-px w-4 bg-white" />
-              <span className="block h-px w-4 bg-white" />
+              <span className="block h-px w-4 bg-[var(--t-text,#ffffff)]" />
+              <span className="block h-px w-4 bg-[var(--t-text,#ffffff)]" />
             </span>
           </button>
 
@@ -181,7 +181,7 @@ const FreshStudioHeader = forwardRef(
             <button
               type="button"
               onClick={() => window.location.assign("https://hostpanel.wono.co/")}
-              className="rounded-full border border-white/22 px-5 py-2 text-[13px] font-semibold text-white transition hover:border-[#D94B4B] hover:text-[#D94B4B] focus-visible:outline focus-visible:outline-2"
+              className="rounded-full border border-[color:color-mix(in_srgb,var(--t-text,#ffffff)_22%,transparent)] px-5 py-2 text-[13px] font-semibold text-[color:var(--t-text,#ffffff)] transition hover:border-[color:var(--t-accent,#D94B4B)] hover:text-[color:var(--t-accent,#D94B4B)] focus-visible:outline focus-visible:outline-2"
               style={focusStyle}
             >
               Login
@@ -190,22 +190,22 @@ const FreshStudioHeader = forwardRef(
         </div>
 
         {mobileOpen ? (
-          <div className="mx-auto w-full max-w-7xl px-6 py-3 md:hidden" style={{ borderTop: "1px solid rgba(255,255,255,0.10)" }}>
+          <div className="mx-auto w-full max-w-7xl px-6 py-3 md:hidden" style={{ borderTop: "1px solid color-mix(in srgb, var(--t-text, #ffffff) 10%, transparent)" }}>
             <div className="flex flex-col">
               {links.map((item) => {
                 const section = resolveSectionFromSlug(item.slug || item.name);
                 const isActive = currentSection === section;
                 if (section === "products") {
                   return (
-                    <div key={`m-${item.slug}`} className="border-b border-white/[0.08]">
+                    <div key={`m-${item.slug}`} className="border-b border-[color:color-mix(in_srgb,var(--t-text,#ffffff)_8%,transparent)]">
                       <div className="flex items-center gap-2 py-3">
-                        <button type="button" onClick={() => goTo(getSectionPath("products", location.pathname))} className="flex-1 text-left text-[14px] font-medium text-white/80">
+                        <button type="button" onClick={() => goTo(getSectionPath("products", location.pathname))} className="flex-1 text-left text-[14px] font-medium text-[color:color-mix(in_srgb,var(--t-text,#ffffff)_80%,transparent)]">
                           {item.name}
                         </button>
                         <button
                           type="button"
                           onClick={() => setMobileProductsOpen((prev) => !prev)}
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/20"
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[color:color-mix(in_srgb,var(--t-text,#ffffff)_20%,transparent)]"
                           aria-label="Toggle product pages"
                         >
                           <svg viewBox="0 0 20 20" aria-hidden="true" className={`h-3.5 w-3.5 transition-transform ${mobileProductsOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -214,13 +214,13 @@ const FreshStudioHeader = forwardRef(
                         </button>
                       </div>
                       {mobileProductsOpen && normalizedProductPages.length > 0 ? (
-                        <div className="flex flex-col gap-1 border-t border-white/[0.08] bg-white/[0.03] p-2">
+                        <div className="flex flex-col gap-1 border-t border-[color:color-mix(in_srgb,var(--t-text,#ffffff)_8%,transparent)] bg-[color-mix(in_srgb,var(--t-text,#ffffff)_3%,transparent)] p-2">
                           {normalizedProductPages.map((product, index) => (
                             <button
                               key={`m-product-${product.slug || index}`}
                               type="button"
                               onClick={() => goTo(getProductPath(product.slug, location.pathname))}
-                              className="rounded px-3 py-2 text-left text-sm text-white/70 hover:bg-white/[0.07] hover:text-white"
+                              className="rounded px-3 py-2 text-left text-sm text-[color:color-mix(in_srgb,var(--t-text,#ffffff)_70%,transparent)] hover:bg-[color-mix(in_srgb,var(--t-text,#ffffff)_7%,transparent)] hover:text-[color:var(--t-text,#ffffff)]"
                             >
                               {product.name}
                             </button>
@@ -236,7 +236,7 @@ const FreshStudioHeader = forwardRef(
                     type="button"
                     onClick={() => goTo(item.to)}
                     className="py-3 text-left text-[14px] font-medium"
-                    style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", color: isActive ? ACCENT : "rgba(255,255,255,0.72)" }}
+                    style={{ borderBottom: "1px solid color-mix(in srgb, var(--t-text, #ffffff) 8%, transparent)", color: isActive ? ACCENT : "color-mix(in srgb, var(--t-text, #ffffff) min(100%, calc(var(--t-k, 1) * 72%)), transparent)" }}
                   >
                     {item.name}
                   </button>
@@ -246,7 +246,7 @@ const FreshStudioHeader = forwardRef(
                 type="button"
                 onClick={() => window.location.assign("https://hostpanel.wono.co/")}
                 className="py-3 text-left text-[14px] font-semibold"
-                style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", color: ACCENT }}
+                style={{ borderBottom: "1px solid color-mix(in srgb, var(--t-text, #ffffff) 8%, transparent)", color: ACCENT }}
               >
                 Login
               </button>

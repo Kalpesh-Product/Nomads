@@ -100,16 +100,16 @@ const EmeraldStudioTemplateServiceDetailPage = () => {
 
   if (!page) {
     return (
-      <div className={`${TEMPLATE_ROOT_CLASS} min-h-screen bg-[#002c22] text-stone-100 ${BODY_FONT}`}>
+      <div className={`${TEMPLATE_ROOT_CLASS} min-h-screen bg-[#4a6b96] text-white ${BODY_FONT}`}>
         <style>{`${FONT_IMPORT}${STYLE_OVERRIDES}`}</style>
         <section className={`pt-20 pb-16 px-6 ${SECTION_BG}`}>
           <div className="max-w-7xl mx-auto text-center">
-            <h1 className={`text-2xl font-semibold text-stone-100 ${HEADING_FONT}`}>Service Page Not Found</h1>
-            <p className="mt-2 text-sm text-stone-400">This page is not configured for this website.</p>
+            <h1 className={`text-2xl font-semibold text-white ${HEADING_FONT}`}>Service Page Not Found</h1>
+            <p className="mt-2 text-sm text-white/90">This page is not configured for this website.</p>
             <button
               type="button"
               onClick={() => t.goToSection("products")}
-              className="mt-6 inline-flex items-center gap-2 bg-amber-400 text-emerald-950 font-semibold px-7 py-3 rounded hover:bg-amber-300 transition-colors text-sm"
+              className="mt-6 inline-flex items-center gap-2 bg-white text-slate-900 font-semibold px-7 py-3 rounded hover:bg-sky-50 transition-colors text-sm"
             >
               Back to Services
             </button>
@@ -181,7 +181,7 @@ const EmeraldStudioTemplateServiceDetailPage = () => {
   };
 
   return (
-    <div className={`${TEMPLATE_ROOT_CLASS} min-h-screen bg-[#002c22] text-stone-100 ${BODY_FONT}`}>
+    <div className={`${TEMPLATE_ROOT_CLASS} min-h-screen bg-[#4a6b96] text-white ${BODY_FONT}`}>
       <style>{`${FONT_IMPORT}${STYLE_OVERRIDES}`}</style>
       {selectedDetailItem ? (
         <>
@@ -195,17 +195,17 @@ const EmeraldStudioTemplateServiceDetailPage = () => {
                     className="h-[300px] w-full rounded-2xl object-cover md:h-full"
                   />
                 ) : (
-                  <div className="h-[300px] w-full rounded-2xl bg-emerald-900 md:h-full" />
+                  <div className="h-[300px] w-full rounded-2xl bg-[#1f3556]/35 md:h-full" />
                 )}
               </div>
               <div className="flex flex-col">
                 <div className="shrink-0">
                   <LinedHeading title={page?.name || "Service"} className="justify-center md:justify-start" />
-                  <h1 className={`text-3xl md:text-4xl font-semibold text-stone-100 mb-4 ${HEADING_FONT} text-center md:text-left`}>
+                  <h1 className={`text-3xl md:text-4xl font-semibold text-white mb-4 ${HEADING_FONT} text-center md:text-left`}>
                     {selectedDetailItem?.name || selectedDetailItem?.title || "Service"}
                   </h1>
                   {selectedDetailItem?.price || selectedDetailItem?.cost ? (
-                    <p className="text-stone-400 text-lg mb-4 text-center md:text-left">{selectedDetailItem?.price || selectedDetailItem?.cost}</p>
+                    <p className="text-white/90 text-lg mb-4 text-center md:text-left">{selectedDetailItem?.price || selectedDetailItem?.cost}</p>
                   ) : null}
                 </div>
                 <div className="flex-1 overflow-y-auto py-2 pr-1 md:max-h-[220px]">
@@ -216,8 +216,8 @@ const EmeraldStudioTemplateServiceDetailPage = () => {
                         .map((s) => s.trim())
                         .filter(Boolean)
                         .map((point, i) => (
-                          <li key={`desc-bullet-${i}`} className="flex items-start gap-2 text-sm leading-relaxed text-stone-400">
-                            <span className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400" />
+                          <li key={`desc-bullet-${i}`} className="flex items-start gap-2 text-sm leading-relaxed text-white/90">
+                            <span className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full bg-white" />
                             <span>{point}</span>
                           </li>
                         ))}
@@ -226,18 +226,18 @@ const EmeraldStudioTemplateServiceDetailPage = () => {
                 </div>
                 <div className="shrink-0 min-h-[380px]">
                   {leadSubmitted ? (
-                    <div className="flex h-full min-h-[380px] flex-col items-center justify-center rounded-2xl border border-emerald-800/50 bg-emerald-900/30 p-8 text-center">
-                      <div className="w-14 h-14 rounded-full bg-amber-400 flex items-center justify-center text-emerald-950 text-2xl mb-4 mx-auto">✓</div>
-                      <h3 className={`text-xl font-semibold text-stone-100 mb-2 ${HEADING_FONT}`}>Enquiry submitted!</h3>
-                      <p className="text-stone-400 text-sm">We&apos;ll get back to you shortly.</p>
+                    <div className="flex h-full min-h-[380px] flex-col items-center justify-center rounded-2xl border border-white/25 bg-[#1f3556]/30 p-8 text-center">
+                      <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center text-slate-900 text-2xl mb-4 mx-auto">✓</div>
+                      <h3 className={`text-xl font-semibold text-white mb-2 ${HEADING_FONT}`}>Enquiry submitted!</h3>
+                      <p className="text-white/90 text-sm">We&apos;ll get back to you shortly.</p>
                     </div>
                   ) : (
-                    <form onSubmit={submitLeadForm} className="bg-emerald-900/30 border border-emerald-800/50 rounded-2xl p-8 space-y-4">
+                    <form onSubmit={submitLeadForm} className="bg-[#1f3556]/30 border border-white/25 rounded-2xl p-8 space-y-4">
                       <LinedHeading title="Enquire now" />
                       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         {leadFormFields.map((field) => (
                           <div key={field.key}>
-                            <label className="block text-xs font-semibold text-stone-400 uppercase tracking-wider mb-1">{field.label}</label>
+                            <label className="block text-xs font-semibold text-white/90 uppercase tracking-wider mb-1">{field.label}</label>
                             <input
                               type={field.type === "date" ? "date" : field.type}
                               required={field.required}
@@ -249,11 +249,11 @@ const EmeraldStudioTemplateServiceDetailPage = () => {
                           </div>
                         ))}
                       </div>
-                      {leadSubmitError ? <p className="text-xs text-red-400">{leadSubmitError}</p> : null}
+                      {leadSubmitError ? <p className="text-xs text-red-200">{leadSubmitError}</p> : null}
                       <button
                         type="submit"
                         disabled={leadSubmitPending}
-                        className="w-full bg-amber-400 text-emerald-950 font-semibold py-3.5 rounded-lg hover:bg-amber-300 transition-colors text-sm disabled:opacity-50"
+                        className="w-full bg-white text-slate-900 font-semibold py-3.5 rounded-lg hover:bg-sky-50 transition-colors text-sm disabled:opacity-50"
                       >
                         {leadSubmitPending ? "Submitting…" : "Submit Enquiry"}
                       </button>
@@ -269,26 +269,26 @@ const EmeraldStudioTemplateServiceDetailPage = () => {
       ) : (
         <>
           {page?.heroEnabled !== false ? (
-            <section className="relative h-[50svh] min-h-[320px] overflow-hidden md:h-[88vh] md:min-h-[400px] bg-[#002c22]">
+            <section className="relative h-[50svh] min-h-[320px] overflow-hidden md:h-[88vh] md:min-h-[400px] bg-[#4a6b96]">
               {selectedProductHeroImage ? (
                 <img src={selectedProductHeroImage} alt={page?.name || "Service"} className="absolute inset-0 h-full w-full object-cover opacity-100" />
               ) : (
                 <div
                   className="absolute inset-0 opacity-[0.06]"
                   style={{
-                    backgroundImage: "linear-gradient(#ffb900 1px, transparent 1px), linear-gradient(90deg, #ffb900 1px, transparent 1px)",
+                    backgroundImage: "linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px)",
                     backgroundSize: "60px 60px",
                   }}
                 />
               )}
               <div className="absolute inset-0 flex flex-col items-center justify-end gap-2 px-6 pb-10 text-center md:pb-14">
-                <h1 className={`text-3xl md:text-5xl font-semibold text-stone-100 ${HEADING_FONT}`}>{page?.heroHeading || page?.name}</h1>
+                <h1 className={`text-3xl md:text-5xl font-semibold text-white ${HEADING_FONT}`}>{page?.heroHeading || page?.name}</h1>
                 {page?.heroSubHeading ? <p className="mx-auto mt-1 max-w-xl text-white text-base">{page.heroSubHeading}</p> : null}
                 {page?.heroButtonText ? (
                   <button
                     type="button"
                     onClick={() => t.goToSection("contact")}
-                    className="mt-2 inline-flex items-center gap-2 bg-amber-400 text-emerald-950 font-semibold px-7 py-3.5 rounded hover:bg-amber-300 transition-colors text-sm"
+                    className="mt-2 inline-flex items-center gap-2 bg-white text-slate-900 font-semibold px-7 py-3.5 rounded hover:bg-sky-50 transition-colors text-sm"
                   >
                     {page.heroButtonText}
                   </button>
@@ -325,11 +325,11 @@ const EmeraldStudioTemplateServiceDetailPage = () => {
               {isMenuProductSlug(page?.slug || "") ? (
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
                   {(Array.isArray(data?.menuItems) ? data.menuItems : []).map((item, idx) => (
-                    <div key={idx} className="rounded-xl border border-emerald-800/50 bg-emerald-900/40 p-5">
+                    <div key={idx} className="rounded-xl border border-white/25 bg-[#1f3556]/35 p-5">
                       {getMediaSrc(item?.image) ? <img src={getMediaSrc(item.image)} alt={item?.name} className="aspect-[4/3] w-full rounded-lg object-cover" /> : null}
                       <div className="mt-3 flex items-center justify-between">
-                        <h4 className={`text-[15px] font-semibold text-stone-100 ${HEADING_FONT}`}>{item?.name}</h4>
-                        {item?.price ? <span className="text-[13px] text-stone-400">{item.price}</span> : null}
+                        <h4 className={`text-[15px] font-semibold text-white ${HEADING_FONT}`}>{item?.name}</h4>
+                        {item?.price ? <span className="text-[13px] text-white/90">{item.price}</span> : null}
                       </div>
                     </div>
                   ))}
