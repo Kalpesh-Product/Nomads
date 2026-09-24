@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
-// "Emerald Studio" — dark emerald canvas (#002c22), amber-gold accent
-// (#ffb900), Fraunces serif headings over Outfit body text. Ported from
+// "Emerald Studio" — light steel-blue canvas (#4a6b96), white accent
+// (#ffffff), Fraunces serif headings over Outfit body text. Ported from
 // HostPanel's EmeraldStudioTemplate.tsx (client/src/pages/Dashboard/
 // FrontendDashboard/WebsiteBuilder/templates/EmeraldStudioTemplate.tsx) —
 // this module holds the visual atoms shared by all 9 Emerald Studio section
@@ -15,33 +15,24 @@ import React, { useEffect, useState } from "react";
 export const FONT_IMPORT =
   "@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=Outfit:wght@300;400;500;600;700&display=swap');";
 
-export const BG = "#002c22";
-export const AMBER = "#ffb900";
+export const BG = "#4a6b96";
+export const ACCENT = "#ffffff";
 export const HEADING_FONT = "font-['Fraunces',Georgia,serif]";
 export const BODY_FONT = "font-['Outfit',system-ui,sans-serif]";
 
 export const WRAP = "max-w-7xl mx-auto px-6";
 export const PAGE_WRAP = "max-w-7xl mx-auto px-6 pt-20 pb-16";
-export const SECTION_BG = "bg-[#004f3b]/20";
+export const SECTION_BG = "bg-[#1f3556]/15";
 
-// HostPanel's EmeraldStudioTemplate.tsx scopes a small set of Tailwind
-// utility overrides under a `.fm-template` class because its default
-// `amber-400`/`emerald-950` shades don't quite match the exact hex tokens
-// this template wants (#ffb900 amber, #002c22 deep emerald). Every Emerald
-// Studio page here uses the same `bg-amber-400`/`text-amber-400`/
-// `text-emerald-950` utility classes throughout (ported verbatim from that
-// source), so each page root wraps in this same class name and re-declares
-// the identical override block to keep the exact color values, the same
-// approach every other Emerald Studio visual constant in this file mirrors.
+// Same class name HostPanel's EmeraldStudioTemplate.tsx uses for its scoped
+// overrides (there `.fm-template`). Each page root carries this class and
+// re-declares the small override block below.
 export const TEMPLATE_ROOT_CLASS = "es-template";
 export const STYLE_OVERRIDES = `
   .es-template { background-color: ${BG}; }
-  .es-template .bg-amber-400 { background-color: ${AMBER}; }
-  .es-template .text-amber-400 { color: ${AMBER}; }
-  .es-template .text-emerald-950 { color: ${BG}; }
   .es-template button, .es-template a[href] { cursor: pointer; }
   .es-template button:focus-visible, .es-template a:focus-visible, .es-template input:focus-visible, .es-template select:focus-visible, .es-template textarea:focus-visible {
-    outline: 2px solid ${AMBER};
+    outline: 2px solid ${ACCENT};
     outline-offset: 2px;
   }
   @media (prefers-reduced-motion: reduce) {
@@ -50,22 +41,22 @@ export const STYLE_OVERRIDES = `
 `;
 
 export const INPUT =
-  "w-full bg-emerald-950/60 border border-emerald-800 rounded-lg px-4 py-3 text-stone-100 text-sm placeholder:text-stone-600 focus:outline-none focus:border-amber-400 transition-colors";
+  "w-full bg-white/10 border border-white/25 rounded-lg px-4 py-3 text-white text-sm placeholder:text-white/90 focus:outline-none focus:border-white transition-colors";
 
 export const LinedHeading = ({ title, className = "" }) => (
   <div className={`flex items-center gap-4 mb-6 ${className}`}>
-    <div className="flex-1 h-px bg-amber-400" />
+    <div className="flex-1 h-px bg-white" />
     <h2
-      className={`text-sm font-semibold uppercase tracking-[0.15em] sm:text-base md:text-xl lg:text-[18px] text-amber-400 ${HEADING_FONT}`}
+      className={`text-sm font-semibold uppercase tracking-[0.15em] sm:text-base md:text-xl lg:text-[18px] text-white ${HEADING_FONT}`}
     >
       {title}
     </h2>
-    <div className="flex-1 h-px bg-amber-400" />
+    <div className="flex-1 h-px bg-white" />
   </div>
 );
 
 export const CONTACT_ICON_CIRCLE = ({ children }) => (
-  <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-amber-400/50 text-amber-400">
+  <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/50 text-white">
     {children}
   </span>
 );
@@ -118,9 +109,9 @@ export const ProductGrid = ({ products, onSelect }) => (
           key={idx}
           type="button"
           onClick={() => onSelect(product)}
-          className="group flex h-full flex-col items-center rounded-xl border border-emerald-800/50 bg-emerald-900/40 p-7 text-center transition-all duration-300 hover:-translate-y-0.5 hover:border-amber-400/40 hover:bg-emerald-900/60 hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
+          className="group flex h-full flex-col items-center rounded-xl border border-white/25 bg-[#1f3556]/35 p-7 text-center transition-all duration-300 hover:-translate-y-0.5 hover:border-white/50 hover:bg-white/20 hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
         >
-          <div className="mb-4 flex h-[200px] w-full items-center justify-center overflow-hidden rounded-lg bg-emerald-950/60 md:h-[230px]">
+          <div className="mb-4 flex h-[200px] w-full items-center justify-center overflow-hidden rounded-lg bg-white/10 md:h-[230px]">
             {image ? (
               <img
                 src={image}
@@ -128,16 +119,16 @@ export const ProductGrid = ({ products, onSelect }) => (
                 className="h-full w-full object-cover opacity-80 transition-transform duration-300 group-hover:scale-105 group-hover:opacity-100"
               />
             ) : (
-              <span className="text-2xl text-amber-400 transition-transform duration-300 group-hover:scale-110">◈</span>
+              <span className="text-2xl text-white transition-transform duration-300 group-hover:scale-110">◈</span>
             )}
           </div>
-          <h3 className={`mb-2 text-lg font-semibold text-stone-100 ${HEADING_FONT}`}>
+          <h3 className={`mb-2 text-lg font-semibold text-white ${HEADING_FONT}`}>
             {product?.homeCardHeading || product?.heading || product?.name || product?.title || "Service"}
           </h3>
           {description ? (
-            <p className="line-clamp-2 text-sm leading-relaxed text-stone-400">{description}</p>
+            <p className="line-clamp-2 text-sm leading-relaxed text-white/90">{description}</p>
           ) : null}
-          <span className="mt-auto pt-3 text-xs font-semibold uppercase tracking-wider text-amber-400 group-hover:underline">
+          <span className="mt-auto pt-3 text-xs font-semibold uppercase tracking-wider text-white group-hover:underline">
             Learn more →
           </span>
         </button>
@@ -147,10 +138,10 @@ export const ProductGrid = ({ products, onSelect }) => (
 );
 
 export const LogoCarousel = ({ logos, title }) => (
-  <section className="border-y border-emerald-800/40 bg-[#004f3b]/20 px-6 py-12">
+  <section className="border-y border-white/20 bg-[#1f3556]/15 px-6 py-12">
     <div className="max-w-7xl mx-auto">
       {title ? (
-        <p className="mb-8 text-center text-xs font-semibold uppercase tracking-widest text-stone-500">{title}</p>
+        <p className="mb-8 text-center text-xs font-semibold uppercase tracking-widest text-white/90">{title}</p>
       ) : null}
       <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-7">
         {logos.map((logo, index) => (
@@ -209,19 +200,19 @@ export const FaqList = ({ faqs }) => {
             const blocks = isOpen ? splitFaqAnswer(item.answer) : [];
             const hasBullets = blocks.some((b) => b.type === "bullet");
             return (
-              <div key={`${item.question}-${index}`} className="overflow-hidden rounded-xl border border-emerald-800/50 bg-emerald-900/40">
+              <div key={`${item.question}-${index}`} className="overflow-hidden rounded-xl border border-white/25 bg-[#1f3556]/35">
                 <button
                   type="button"
                   onClick={() => setOpenIndex(isOpen ? null : index)}
                   className="flex w-full items-center justify-between gap-6 px-5 py-4 text-left"
                 >
                   <span className="flex min-w-0 items-center gap-3">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-400 text-[12px] font-bold text-emerald-950">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white text-[12px] font-bold text-slate-900">
                       {index + 1}
                     </span>
-                    <span className="font-semibold text-stone-100">{item.question}</span>
+                    <span className="font-semibold text-white">{item.question}</span>
                   </span>
-                  <span className="text-amber-400 text-xl">{isOpen ? "−" : "+"}</span>
+                  <span className="text-white text-xl">{isOpen ? "−" : "+"}</span>
                 </button>
                 {isOpen ? (
                   <div className="px-5 pb-5">
@@ -229,11 +220,11 @@ export const FaqList = ({ faqs }) => {
                       {blocks.map((block, bi) =>
                         block.type === "bullet" ? (
                           <div key={bi} className="flex items-start gap-2">
-                            <span className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400" />
-                            <p className="text-sm leading-relaxed text-stone-400">{block.text}</p>
+                            <span className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full bg-white" />
+                            <p className="text-sm leading-relaxed text-white/90">{block.text}</p>
                           </div>
                         ) : (
-                          <p key={bi} className={`text-sm leading-relaxed text-stone-400 ${hasBullets ? "pl-4" : ""}`}>
+                          <p key={bi} className={`text-sm leading-relaxed text-white/90 ${hasBullets ? "pl-4" : ""}`}>
                             {block.text}
                           </p>
                         ),
@@ -254,7 +245,7 @@ export const StarIcon = ({ filled, size = 14 }) => (
   <svg
     viewBox="0 0 20 20"
     className="inline-block"
-    style={{ width: size, height: size, color: filled ? "#ffb900" : "#3f5d52", fill: "currentColor" }}
+    style={{ width: size, height: size, color: filled ? "#fde68a" : "rgba(255,255,255,0.35)", fill: "currentColor" }}
   >
     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.957c.3.921-.755 1.688-1.538 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37 2.448c-.783.57-1.838-.197-1.538-1.118l1.287-3.957a1 1 0 00-.364-1.118L3.063 9.39c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.957z" />
   </svg>
@@ -267,13 +258,13 @@ export const OverallRating = ({ testimonials }) => {
   const rounded = Math.round(average);
   return (
     <div className="mb-8 flex flex-col items-center gap-1">
-      <span className={`text-5xl font-semibold text-stone-100 ${HEADING_FONT}`}>{average.toFixed(1)}</span>
+      <span className={`text-5xl font-semibold text-white ${HEADING_FONT}`}>{average.toFixed(1)}</span>
       <div className="flex items-center gap-1">
         {Array.from({ length: 5 }).map((_, i) => (
           <StarIcon key={i} filled={i < rounded} size={20} />
         ))}
       </div>
-      <span className="text-sm text-stone-400">
+      <span className="text-sm text-white/90">
         {ratings.length} review{ratings.length !== 1 ? "s" : ""}
       </span>
     </div>
@@ -288,21 +279,21 @@ const EmeraldTestimonialCard = ({ item }) => {
   const isLong = text.length > TESTIMONIAL_MAX_CHARS;
   const [expanded, setExpanded] = useState(false);
   return (
-    <div className="h-full min-h-[254px] bg-[#004f3b]/40 border border-[#006045]/50 rounded-xl p-8 flex flex-col gap-6">
-      <p className="text-stone-300 text-base leading-relaxed flex-1">
+    <div className="h-full min-h-[254px] bg-[#1f3556]/35 border border-white/25 rounded-xl p-8 flex flex-col gap-6">
+      <p className="text-white/90 text-base leading-relaxed flex-1">
         &ldquo;{expanded || !isLong ? text : `${text.slice(0, TESTIMONIAL_MAX_CHARS).trimEnd()}...`}&rdquo;
       </p>
       {isLong ? (
         <button
           type="button"
           onClick={() => setExpanded((prev) => !prev)}
-          className="-mt-4 self-start text-xs font-semibold text-amber-400 hover:underline"
+          className="-mt-4 self-start text-xs font-semibold text-white hover:underline"
         >
           {expanded ? "Show less" : "View more"}
         </button>
       ) : null}
-      <div className="flex items-center gap-3 border-t border-emerald-800/50 pt-5">
-        <div className="w-10 h-10 rounded-full bg-amber-400 text-emerald-950 font-bold text-sm flex items-center justify-center shrink-0">
+      <div className="flex items-center gap-3 border-t border-white/25 pt-5">
+        <div className="w-10 h-10 rounded-full bg-white text-slate-900 font-bold text-sm flex items-center justify-center shrink-0">
           {item?.name
             ?.split(" ")
             .map((w) => w.charAt(0))
@@ -311,7 +302,7 @@ const EmeraldTestimonialCard = ({ item }) => {
             .toUpperCase() || "?"}
         </div>
         <div>
-          <p className="font-semibold text-sm text-stone-100">{item?.name}</p>
+          <p className="font-semibold text-sm text-white">{item?.name}</p>
           {rating ? (
             <div className="flex items-center gap-0.5">
               {Array.from({ length: 5 }).map((_, i) => (
@@ -398,7 +389,7 @@ export const TestimonialsCarousel = ({ testimonials, showWriteReview, onOpenRevi
             <button
               type="button"
               onClick={onOpenReview}
-              className="text-sm font-medium text-amber-400 hover:text-amber-300 underline underline-offset-4 transition-colors"
+              className="text-sm font-medium text-white hover:text-white underline underline-offset-4 transition-colors"
             >
               Write a review →
             </button>
@@ -449,7 +440,7 @@ export const TestimonialsCarousel = ({ testimonials, showWriteReview, onOpenRevi
           <button
             type="button"
             onClick={onOpenReview}
-            className="text-sm font-medium text-amber-400 hover:text-amber-300 underline underline-offset-4 transition-colors"
+            className="text-sm font-medium text-white hover:text-white underline underline-offset-4 transition-colors"
           >
             Write a review →
           </button>
@@ -462,7 +453,7 @@ export const TestimonialsCarousel = ({ testimonials, showWriteReview, onOpenRevi
 // Same master inclusions icon set as WarmOrganicShared.jsx / FreshStudioShared.jsx
 // / Nomads' own InclusionsSection.jsx / HostPanel's inclusionIcons.tsx (kept in
 // sync across all three repos) — duplicated here (rather than imported) so
-// this stays amber-colorable and Emerald-Studio-specific without touching the
+// this stays accent-colorable and Emerald-Studio-specific without touching the
 // shared light-themed component Classic already depends on.
 const ALL_INCLUSIONS = [
   { key: "workspace", label: "Workspace", icon: (<svg viewBox="0 0 40 40" className="h-10 w-10" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="6" y="10" width="28" height="18" rx="2" /><path d="M14 28v4M26 28v4M10 32h20" /><rect x="12" y="15" width="8" height="6" rx="1" /></svg>) },
@@ -519,8 +510,8 @@ export const Inclusions = ({ inclusions, title = "Inclusions" }) => {
             const { label, icon } = getInclusionMeta(item);
             return (
               <div key={item?.key || index} className="flex flex-col items-center gap-2 text-center">
-                <span className="text-amber-400">{icon}</span>
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-stone-400">{label}</span>
+                <span className="text-white">{icon}</span>
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-white/90">{label}</span>
               </div>
             );
           })}

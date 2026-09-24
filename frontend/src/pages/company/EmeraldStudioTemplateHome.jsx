@@ -59,57 +59,57 @@ const EmeraldStudioTemplateHome = () => {
   const showWriteReview = data?.testimonialsEnableWriteReview !== false;
 
   return (
-    <div className={`${TEMPLATE_ROOT_CLASS} min-h-screen bg-[#002c22] text-stone-100 ${BODY_FONT}`}>
+    <div className={`${TEMPLATE_ROOT_CLASS} min-h-screen bg-[#4a6b96] text-white ${BODY_FONT}`}>
       <style>{`${FONT_IMPORT}${STYLE_OVERRIDES}`}</style>
 
       {t.isHomeSectionEnabled("home_hero") ? (
-        <section className="relative py-16 md:py-24 px-6 overflow-hidden bg-[#002c22]">
+        <section className="relative py-16 md:py-24 px-6 overflow-hidden bg-gradient-to-b from-[#3f5d85] via-[#4a6b96] to-[#557699]">
           <div
             className="absolute inset-0 opacity-[0.04]"
             style={{
-              backgroundImage: "linear-gradient(#ffb900 1px, transparent 1px), linear-gradient(90deg, #ffb900 1px, transparent 1px)",
+              backgroundImage: "linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px)",
               backgroundSize: "60px 60px",
             }}
           />
-          <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full bg-[#007a55]/20 blur-[60px] pointer-events-none" />
+          <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full bg-sky-200/20 blur-[60px] pointer-events-none" />
           <div className="relative max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center">
             <div>
-              <h1 className={`text-4xl md:text-6xl font-semibold leading-[1.08] tracking-tight mb-6 text-stone-100 ${HEADING_FONT}`}>
+              <h1 className={`text-4xl md:text-6xl font-semibold leading-[1.08] tracking-tight mb-6 text-white ${HEADING_FONT}`}>
                 {data?.title || data?.companyName || "Your Company"}
               </h1>
-              <p className="text-lg text-stone-400 leading-relaxed mb-10">{data?.subTitle || ""}</p>
+              <p className="text-lg text-white/90 leading-relaxed mb-10">{data?.subTitle || ""}</p>
               <div className="flex flex-wrap gap-4">
                 <button
                   type="button"
                   onClick={() => t.goToSection("products")}
-                  className={`inline-flex items-center gap-2 bg-amber-400 text-emerald-950 font-semibold px-7 py-3.5 rounded hover:bg-amber-300 transition-colors text-sm ${BODY_FONT}`}
+                  className={`inline-flex items-center gap-2 bg-white text-slate-900 font-semibold px-7 py-3.5 rounded-full hover:bg-sky-50 transition-colors text-sm ${BODY_FONT}`}
                 >
                   Explore Services →
                 </button>
                 <button
                   type="button"
                   onClick={() => t.goToSection("contact")}
-                  className="inline-flex items-center gap-2 border border-emerald-700 text-stone-300 font-medium px-7 py-3.5 rounded hover:border-amber-400 hover:text-amber-400 transition-colors text-sm"
+                  className="inline-flex items-center gap-2 border border-white/50 text-white/90 font-medium px-7 py-3.5 rounded-full hover:border-white hover:text-white transition-colors text-sm"
                 >
                   Contact Us
                 </button>
               </div>
             </div>
             <div className="relative hidden md:block">
-              <div className="relative rounded-2xl overflow-hidden h-[420px] bg-[#004f3b]">
+              <div className="relative rounded-2xl overflow-hidden h-[420px] bg-[#1f3556]/35">
                 {resolvedHomeHeroImage ? (
                   <img src={resolvedHomeHeroImage} alt="" className="w-full h-full object-cover opacity-80" />
                 ) : null}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#002c22]/50 to-transparent rounded-2xl" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#4a6b96]/50 to-transparent rounded-2xl" />
                 {showHeroCarousel ? (
-                  <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-emerald-950/80 px-4 py-2 rounded-b-2xl backdrop-blur-sm">
-                    <button type="button" onClick={handleHeroPrev} className="text-xs font-medium text-stone-400 hover:text-amber-400 transition-colors">
+                  <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-[#2f4a70]/85 px-4 py-2 rounded-b-2xl backdrop-blur-sm">
+                    <button type="button" onClick={handleHeroPrev} className="text-xs font-medium text-white/90 hover:text-white transition-colors">
                       ← Prev
                     </button>
-                    <span className="text-xs text-stone-500">
+                    <span className="text-xs text-white/90">
                       {heroIndex + 1} / {heroImages.length}
                     </span>
-                    <button type="button" onClick={handleHeroNext} className="text-xs font-medium text-stone-400 hover:text-amber-400 transition-colors">
+                    <button type="button" onClick={handleHeroNext} className="text-xs font-medium text-white/90 hover:text-white transition-colors">
                       Next →
                     </button>
                   </div>
@@ -121,12 +121,12 @@ const EmeraldStudioTemplateHome = () => {
       ) : null}
 
       {Array.isArray(data?.stats) && data.stats.length > 0 ? (
-        <div className="bg-amber-400 py-14 px-6">
+        <div className="bg-white py-14 px-6">
           <div className="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-8">
             {data.stats.map((s, i) => (
               <div key={i} className="text-center">
-                <p className={`text-4xl font-bold text-emerald-950 mb-1 ${HEADING_FONT}`}>{s.value || s.label || ""}</p>
-                <p className="text-emerald-800 text-xs font-semibold uppercase tracking-widest">{s.label || ""}</p>
+                <p className={`text-4xl font-bold text-slate-900 mb-1 ${HEADING_FONT}`}>{s.value || s.label || ""}</p>
+                <p className="text-slate-600 text-xs font-semibold uppercase tracking-widest">{s.label || ""}</p>
               </div>
             ))}
           </div>
@@ -139,14 +139,14 @@ const EmeraldStudioTemplateHome = () => {
             <LinedHeading title={String(data?.aboutTitle || "").trim() || "About Our Vision"} className="justify-center" />
             <div className="mt-8 max-w-2xl mx-auto space-y-4 text-center">
               {aboutIntroBlocks.map((paragraph, index) => (
-                <p key={index} className="text-stone-400 text-base leading-8">
+                <p key={index} className="text-white/90 text-base leading-8">
                   {paragraph}
                 </p>
               ))}
               <button
                 type="button"
                 onClick={() => t.goToSection("about")}
-                className="text-sm font-semibold text-amber-400 underline underline-offset-4"
+                className="text-sm font-semibold text-white underline underline-offset-4"
               >
                 Learn more about us →
               </button>
@@ -166,7 +166,7 @@ const EmeraldStudioTemplateHome = () => {
               <button
                 type="button"
                 onClick={() => t.goToSection("products")}
-                className="text-sm font-medium text-amber-400 hover:text-amber-300 underline underline-offset-4 transition-colors"
+                className="text-sm font-medium text-white hover:text-white underline underline-offset-4 transition-colors"
               >
                 View all products →
               </button>
@@ -191,7 +191,7 @@ const EmeraldStudioTemplateHome = () => {
                   key={idx}
                   type="button"
                   onClick={() => t.goToSection("gallery")}
-                  className="group relative rounded-xl overflow-hidden bg-emerald-900 aspect-[4/3]"
+                  className="group relative rounded-xl overflow-hidden bg-[#1f3556]/35 aspect-[4/3]"
                 >
                   <img
                     src={src}
@@ -206,7 +206,7 @@ const EmeraldStudioTemplateHome = () => {
                 <button
                   type="button"
                   onClick={() => t.goToSection("gallery")}
-                  className="rounded-full border border-emerald-700 px-6 py-2.5 text-[13px] font-semibold text-stone-200 hover:border-amber-400 hover:text-amber-400 transition-colors"
+                  className="rounded-full border border-white/50 px-6 py-2.5 text-[13px] font-semibold text-white hover:border-white hover:text-white transition-colors"
                 >
                   Show more →
                 </button>
@@ -235,19 +235,19 @@ const EmeraldStudioTemplateHome = () => {
               {data?.mapUrl ? (
                 <iframe title="Map" src={data.mapUrl} loading="lazy" className="h-[380px] w-full rounded-2xl border-0" />
               ) : (
-                <div className="min-h-[300px] rounded-2xl bg-emerald-900/40 border border-emerald-800/50" />
+                <div className="min-h-[300px] rounded-2xl bg-[#1f3556]/35 border border-white/25" />
               )}
-              <div className="rounded-2xl border border-emerald-800/50 bg-emerald-900/40 p-8 flex flex-col">
+              <div className="rounded-2xl border border-white/25 bg-[#1f3556]/35 p-8 flex flex-col">
                 {data?.companyLogoUrl ? (
                   <img src={data.companyLogoUrl} alt={data.companyName || "Company"} className="mb-12 h-12 w-auto self-center object-contain" />
                 ) : (
-                  <span className={`mb-5 flex h-12 w-12 items-center justify-center self-start rounded-lg bg-amber-400 text-lg font-bold text-emerald-950 ${HEADING_FONT}`}>
+                  <span className={`mb-5 flex h-12 w-12 items-center justify-center self-start rounded-lg bg-white text-lg font-bold text-slate-900 ${HEADING_FONT}`}>
                     {(data?.companyName || "Y").charAt(0).toUpperCase()}
                   </span>
                 )}
-                <div className="space-y-4 text-lg text-stone-300">
+                <div className="space-y-4 text-lg text-white/90">
                   {t.contactEmail ? (
-                    <a className="flex items-center gap-4 hover:text-amber-400" href={`mailto:${t.contactEmail}`}>
+                    <a className="flex items-center gap-4 hover:text-white" href={`mailto:${t.contactEmail}`}>
                       <CONTACT_ICON_CIRCLE>
                         <ContactMailIcon />
                       </CONTACT_ICON_CIRCLE>
@@ -255,7 +255,7 @@ const EmeraldStudioTemplateHome = () => {
                     </a>
                   ) : null}
                   {t.contactPhone ? (
-                    <a className="flex items-center gap-4 hover:text-amber-400" href={`tel:${t.contactPhone.replace(/[^\d+]/g, "")}`}>
+                    <a className="flex items-center gap-4 hover:text-white" href={`tel:${t.contactPhone.replace(/[^\d+]/g, "")}`}>
                       <CONTACT_ICON_CIRCLE>
                         <ContactPhoneIcon />
                       </CONTACT_ICON_CIRCLE>

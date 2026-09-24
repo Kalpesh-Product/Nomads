@@ -72,13 +72,13 @@ const EmeraldStudioTemplatePartnerPage = () => {
   };
 
   return (
-    <div className={`${TEMPLATE_ROOT_CLASS} min-h-screen bg-[#002c22] text-stone-100 ${BODY_FONT}`}>
+    <div className={`${TEMPLATE_ROOT_CLASS} min-h-screen bg-[#4a6b96] text-white ${BODY_FONT}`}>
       <style>{`${FONT_IMPORT}${STYLE_OVERRIDES}`}</style>
       <section className={`pt-20 pb-24 px-6 ${SECTION_BG}`}>
         <div className="max-w-7xl mx-auto">
           <LinedHeading title={partnerPageHeading} className="justify-center" />
           <div className="grid md:grid-cols-2 gap-14 mt-12 text-left">
-            <div className="text-stone-400 text-base leading-relaxed">
+            <div className="text-white/90 text-base leading-relaxed">
               {partnerPageContent ? (
                 partnerPageContent.split("\n").map((p, i) => (
                   <p key={i} className="mb-4 last:mb-0">
@@ -86,16 +86,16 @@ const EmeraldStudioTemplatePartnerPage = () => {
                   </p>
                 ))
               ) : (
-                <p className="text-stone-500">Partner content coming soon.</p>
+                <p className="text-white/90">Partner content coming soon.</p>
               )}
             </div>
-            <div className="bg-emerald-900/30 border border-emerald-800/50 rounded-2xl p-8">
+            <div className="bg-[#1f3556]/30 border border-white/25 rounded-2xl p-8">
               <LinedHeading title={partnerFormTitle} />
 
               {submitSuccess ? (
-                <div className="mt-4 rounded-xl border border-emerald-800/50 bg-emerald-900/40 p-6 text-center">
-                  <h3 className={`text-lg font-semibold text-stone-100 mb-1 ${HEADING_FONT}`}>Thank you for your interest!</h3>
-                  <p className="text-stone-400 text-sm">We&apos;ll get back to you shortly.</p>
+                <div className="mt-4 rounded-xl border border-white/25 bg-[#1f3556]/35 p-6 text-center">
+                  <h3 className={`text-lg font-semibold text-white mb-1 ${HEADING_FONT}`}>Thank you for your interest!</h3>
+                  <p className="text-white/90 text-sm">We&apos;ll get back to you shortly.</p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="mt-4 space-y-4">
@@ -130,11 +130,11 @@ const EmeraldStudioTemplatePartnerPage = () => {
                     onChange={(e) => setPartnerForm((p) => ({ ...p, message: e.target.value }))}
                     className={INPUT}
                   />
-                  {submitError ? <p className="text-xs text-red-400">{submitError}</p> : null}
+                  {submitError ? <p className="text-xs text-red-200">{submitError}</p> : null}
                   <button
                     type="submit"
                     disabled={submitPending}
-                    className="w-full bg-amber-400 text-emerald-950 font-semibold py-3.5 rounded-lg hover:bg-amber-300 transition-colors text-sm disabled:opacity-50"
+                    className="w-full bg-white text-slate-900 font-semibold py-3.5 rounded-lg hover:bg-sky-50 transition-colors text-sm disabled:opacity-50"
                   >
                     {submitPending ? "Submitting…" : "Connect"}
                   </button>

@@ -39,7 +39,7 @@ const WarmOrganicFooter = ({
   const socialLinks = getEnabledFooterSocialsWithFallback(socials);
 
   return (
-    <footer className="bg-white border-t border-black/5" style={{ color: BROWN }}>
+    <footer className="bg-[var(--t-raised,#ffffff)] border-t border-black/5" style={{ color: BROWN }}>
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-6 py-14 text-center md:grid-cols-[1.35fr_1fr_1fr_1fr] md:text-left">
         <div className="flex flex-col items-center md:items-start">
           {logo ? (
@@ -60,7 +60,7 @@ const WarmOrganicFooter = ({
                     {...linkProps}
                     aria-label={SOCIAL_LABEL[social.key] || social.label}
                     className={`inline-flex h-9 w-9 items-center justify-center rounded-full transition ${social.href ? "hover:opacity-75" : "cursor-default"}`}
-                    style={{ backgroundColor: `${RUST}15`, color: RUST }}
+                    style={{ backgroundColor: `color-mix(in srgb, var(--t-accent, #B85C38) 8%, transparent)`, color: RUST }}
                   >
                     {SOCIAL_ICON[social.key]}
                   </Tag>
@@ -111,7 +111,7 @@ const WarmOrganicFooter = ({
           </div>
         </div>
       </div>
-      <div className="px-6 py-4 text-center text-[11.5px] opacity-60" style={{ borderTop: `1px solid ${BROWN}15` }}>
+      <div className="px-6 py-4 text-center text-[11.5px] opacity-60" style={{ borderTop: `1px solid color-mix(in srgb, var(--t-text, #2B211A) 8%, transparent)` }}>
         &copy; {new Date().getFullYear()} {registeredCompany || ""}. All rights reserved.
       </div>
     </footer>

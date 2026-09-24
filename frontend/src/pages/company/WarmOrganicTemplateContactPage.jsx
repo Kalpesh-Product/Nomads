@@ -23,7 +23,7 @@ const WarmOrganicTemplateContactPage = () => {
   if (!data) return <div>Site data is currently unavailable</div>;
 
   return (
-    <div className={`wo-template min-h-screen ${SANS}`} style={{ backgroundColor: "#F1E6D3", color: BROWN }}>
+    <div className={`wo-template min-h-screen ${SANS}`} style={{ backgroundColor: "var(--t-bg, #F1E6D3)", color: BROWN }}>
       <style>{FONT_IMPORT}</style>
       <section className={PAGE_WRAP}>
         <LinedHeading title={data?.contactPageHeading || data?.contactTitle || "Contact"} className="justify-center" />
@@ -31,7 +31,7 @@ const WarmOrganicTemplateContactPage = () => {
           {data?.mapUrl ? (
             <iframe title="map" src={data.mapUrl} className="h-[300px] w-full rounded-3xl border-0 md:h-[420px]" loading="lazy" />
           ) : (
-            <div className="h-[300px] w-full rounded-3xl md:h-[420px]" style={{ backgroundColor: `${BROWN}0D` }} />
+            <div className="h-[300px] w-full rounded-3xl md:h-[420px]" style={{ backgroundColor: `color-mix(in srgb, var(--t-text, #2B211A) 5%, transparent)` }} />
           )}
           <div className="flex flex-col gap-5 rounded-3xl p-7 text-[15px]" style={{ backgroundColor: CREAM, color: MUTED }}>
             {data?.companyLogoUrl ? (

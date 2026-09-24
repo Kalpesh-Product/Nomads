@@ -46,7 +46,7 @@ const FreshStudioTemplateAboutPage = () => {
         {aboutNarrativeBlocks.length ? (
           <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-2">
             {aboutNarrativeBlocks.map((item) => (
-              <div key={item.title} className={`${CARD} border p-5`} style={{ borderColor: "rgba(255,255,255,0.12)" }}>
+              <div key={item.title} className={`${CARD} border p-5`} style={{ borderColor: "color-mix(in srgb, var(--t-text, #ffffff) 12%, transparent)" }}>
                 <h3 className="text-[13px] font-semibold uppercase tracking-[0.06em]" style={{ color: ACCENT }}>
                   {item.title}
                 </h3>
@@ -69,7 +69,7 @@ const FreshStudioTemplateAboutPage = () => {
                     {founderImg ? (
                       <img src={founderImg} alt={founder?.name} className="h-full min-h-[280px] w-full rounded-[4px] object-cover md:min-h-[420px]" />
                     ) : (
-                      <div className="h-full min-h-[280px] w-full rounded-[4px] md:min-h-[420px]" style={{ backgroundColor: "#15151f" }} />
+                      <div className="h-full min-h-[280px] w-full rounded-[4px] md:min-h-[420px]" style={{ backgroundColor: "var(--t-surface2, #15151f)" }} />
                     )}
                   </div>
                   <div className="flex w-full flex-col justify-center md:w-1/2">
@@ -98,7 +98,7 @@ const FreshStudioTemplateAboutPage = () => {
                     {image ? (
                       <img src={image} alt={card?.title || ""} className="aspect-square w-full rounded-[4px] object-cover" />
                     ) : (
-                      <div className="aspect-square w-full rounded-[4px]" style={{ backgroundColor: "#15151f" }} />
+                      <div className="aspect-square w-full rounded-[4px]" style={{ backgroundColor: "var(--t-surface2, #15151f)" }} />
                     )}
                     {card?.title ? (
                       <h5 className={`mt-3 text-[15px] font-bold ${HEADING_FONT}`} style={{ color: HEADING }}>

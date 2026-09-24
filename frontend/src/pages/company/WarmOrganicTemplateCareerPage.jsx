@@ -6,6 +6,8 @@ import { isValidPhoneNumber, validatePhoneNumberLength } from "libphonenumber-js
 import axios from "axios";
 import { useTemplateData } from "./templates/useTemplateData";
 import {
+  ON_SECONDARY,
+  FOREST_FG,
   BROWN,
   CREAM,
   FONT_IMPORT,
@@ -247,7 +249,7 @@ const WarmOrganicTemplateCareerPage = () => {
   const introParagraphs = careersPageIntro ? careersPageIntro.split("\n").filter(Boolean) : CAREERS_FALLBACK_INTRO;
 
   return (
-    <div className={`wo-template min-h-screen ${SANS}`} style={{ backgroundColor: "#F1E6D3", color: BROWN }}>
+    <div className={`wo-template min-h-screen ${SANS}`} style={{ backgroundColor: "var(--t-bg, #F1E6D3)", color: BROWN }}>
       <style>{FONT_IMPORT}</style>
       <section className={PAGE_WRAP}>
         {!selectedJob ? (
@@ -295,7 +297,7 @@ const WarmOrganicTemplateCareerPage = () => {
                               key={job.jobCode || idx}
                               type="button"
                               onClick={() => handleSelectJob({ ...job, department: dept.department })}
-                              className="flex items-center justify-between rounded-xl bg-white px-4 py-3 text-left"
+                              className="flex items-center justify-between rounded-xl bg-[var(--t-raised,#ffffff)] px-4 py-3 text-left"
                             >
                               <p className="text-[13px] font-medium">{job?.title || job?.designation || job?.name}</p>
                               <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: RUST }}>
@@ -312,7 +314,7 @@ const WarmOrganicTemplateCareerPage = () => {
                   type="button"
                   onClick={handleGeneralApply}
                   className="mt-4 self-start rounded-full px-6 py-3 text-[13px] font-semibold"
-                  style={{ backgroundColor: FOREST, color: CREAM }}
+                  style={{ backgroundColor: FOREST, color: ON_SECONDARY }}
                 >
                   {applyBtnText === "Apply Now" ? "General application" : applyBtnText}
                 </button>
@@ -339,7 +341,7 @@ const WarmOrganicTemplateCareerPage = () => {
               type="button"
               onClick={() => t.goToSection("careers")}
               className="text-[12.5px] font-semibold underline underline-offset-4"
-              style={{ color: FOREST }}
+              style={{ color: FOREST_FG }}
             >
               ← Back
             </button>
@@ -347,7 +349,7 @@ const WarmOrganicTemplateCareerPage = () => {
               {isGeneral ? "General Application" : getCareersJobTitle(selectedJob)}
             </h2>
             {!isGeneral ? (
-              <div className="mt-6 flex justify-center gap-6" style={{ borderBottom: `1px solid ${BROWN}22` }}>
+              <div className="mt-6 flex justify-center gap-6" style={{ borderBottom: `1px solid color-mix(in srgb, var(--t-text, #2B211A) 13%, transparent)` }}>
                 <button
                   type="button"
                   onClick={() => setActiveTab("description")}
@@ -485,10 +487,10 @@ const WarmOrganicTemplateCareerPage = () => {
                         </option>
                       ))}
                     </select>
-                    <div className="flex items-stretch rounded-xl bg-white" style={inputStyle}>
+                    <div className="flex items-stretch rounded-xl bg-[var(--t-raised,#ffffff)]" style={inputStyle}>
                       <span
                         className="flex shrink-0 items-center rounded-l-xl px-3 text-[13px]"
-                        style={{ borderRight: `1px solid ${BROWN}33`, color: MUTED }}
+                        style={{ borderRight: `1px solid color-mix(in srgb, var(--t-text, #2B211A) 20%, transparent)`, color: MUTED }}
                       >
                         {applyDialCode || "+ --"}
                       </span>
@@ -507,11 +509,11 @@ const WarmOrganicTemplateCareerPage = () => {
                       />
                     </div>
                     <label
-                      className="flex cursor-pointer items-center justify-between rounded-xl bg-white px-3 py-2.5 text-[13px]"
-                      style={{ border: `1px solid ${BROWN}44` }}
+                      className="flex cursor-pointer items-center justify-between rounded-xl bg-[var(--t-raised,#ffffff)] px-3 py-2.5 text-[13px]"
+                      style={{ border: `1px solid color-mix(in srgb, var(--t-text, #2B211A) 27%, transparent)` }}
                     >
                       <span>{resumeFile ? resumeFile.name : "Upload resume / CV *"}</span>
-                      <span className="rounded-lg px-2 py-1 text-[10px] uppercase tracking-wider" style={{ border: `1px solid ${BROWN}33` }}>
+                      <span className="rounded-lg px-2 py-1 text-[10px] uppercase tracking-wider" style={{ border: `1px solid color-mix(in srgb, var(--t-text, #2B211A) 20%, transparent)` }}>
                         Choose file
                       </span>
                       <input
@@ -572,7 +574,7 @@ const WarmOrganicTemplateCareerPage = () => {
                       type="submit"
                       disabled={submitPending}
                       className="md:col-span-2 rounded-full py-3 text-[13px] mt-5 font-semibold disabled:opacity-50"
-                      style={{ backgroundColor: FOREST, color: CREAM }}
+                      style={{ backgroundColor: FOREST, color: ON_SECONDARY }}
                     >
                       {submitPending ? "Submitting…" : "Submit application"}
                     </button>

@@ -16,7 +16,7 @@ const FreshStudioTemplateContactPage = () => {
       <section className={PAGE_WRAP}>
         <LinedHeading title={data?.contactPageHeading || data?.contactTitle || "Get in touch"} className="mb-6" style={{ color: ACCENT }} />
         {data?.contactPageIntro ? (
-          <p className="mb-6 text-center text-[14px]" style={{ color: "rgba(255,255,255,0.6)" }}>
+          <p className="mb-6 text-center text-[14px]" style={{ color: "color-mix(in srgb, var(--t-text, #ffffff) min(100%, calc(var(--t-k, 1) * 60%)), transparent)" }}>
             {data.contactPageIntro}
           </p>
         ) : null}
@@ -24,9 +24,9 @@ const FreshStudioTemplateContactPage = () => {
           {data?.mapUrl ? (
             <iframe title="map" src={data.mapUrl} className="h-[300px] w-full rounded-[4px] border-0 md:h-[420px]" loading="lazy" />
           ) : (
-            <div className="h-[300px] w-full rounded-[4px] md:h-[420px]" style={{ backgroundColor: "#15151f" }} />
+            <div className="h-[300px] w-full rounded-[4px] md:h-[420px]" style={{ backgroundColor: "var(--t-surface2, #15151f)" }} />
           )}
-          <div className={`${CARD} border flex flex-col p-7`} style={{ borderColor: "rgba(255,255,255,0.12)" }}>
+          <div className={`${CARD} border flex flex-col p-7`} style={{ borderColor: "color-mix(in srgb, var(--t-text, #ffffff) 12%, transparent)" }}>
             {data?.companyLogoUrl ? (
               <img src={data.companyLogoUrl} alt={data.companyName || "Company"} className="mx-auto h-12 w-auto object-contain" />
             ) : null}

@@ -19,7 +19,7 @@ const EmeraldStudioTemplateServicesPage = () => {
   if (!data) return <div>Site data is currently unavailable</div>;
 
   return (
-    <div className={`${TEMPLATE_ROOT_CLASS} min-h-screen bg-[#002c22] text-stone-100 ${BODY_FONT}`}>
+    <div className={`${TEMPLATE_ROOT_CLASS} min-h-screen bg-[#4a6b96] text-white ${BODY_FONT}`}>
       <style>{`${FONT_IMPORT}${STYLE_OVERRIDES}`}</style>
       <section className={`pt-20 pb-16 px-6 ${SECTION_BG}`}>
         <div className="max-w-7xl mx-auto text-center">

@@ -12,20 +12,23 @@ import React, { useCallback, useEffect, useState } from "react";
 // FreshStudioShared.jsx used for Fresh Studio.
 export const FONT_IMPORT =
   "@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Karla:wght@400;500;600&display=swap');";
-export const SAND = "#F1E6D3";
-export const RUST = "#B85C38";
-export const FOREST = "#3E5641";
-export const CREAM = "#FBF3E7";
-export const BROWN = "#2B211A";
-export const MUTED = "#5A4A3C";
+export const SAND = "var(--t-bg, #F1E6D3)";
+export const RUST = "var(--t-accent, #B85C38)";
+export const ON_ACCENT = "var(--t-accent-text, #ffffff)";
+export const ON_SECONDARY = "var(--t-secondary-text, #FBF3E7)";
+export const FOREST_FG = "var(--t-secondary-fg, #3E5641)";
+export const FOREST = "var(--t-secondary, #3E5641)";
+export const CREAM = "var(--t-surface, #FBF3E7)";
+export const BROWN = "var(--t-text, #2B211A)";
+export const MUTED = "var(--t-muted, #5A4A3C)";
 export const SERIF = "font-['Fraunces',ui-serif,Georgia,serif]";
 export const SANS = "font-['Karla',ui-sans-serif,system-ui,sans-serif]";
 
 export const WRAP = "mx-auto w-full max-w-7xl";
 export const EYEBROW = `text-[13.5px] font-semibold uppercase tracking-[0.12em] ${SANS}`;
 export const PAGE_WRAP = `${WRAP} px-6 py-12 md:px-11 md:py-16`;
-export const INPUT = "w-full rounded-xl px-4 py-2.5 text-[14px] outline-none bg-white";
-export const inputStyle = { border: `1px solid ${BROWN}33` };
+export const INPUT = "w-full rounded-xl px-4 py-2.5 text-[14px] outline-none bg-[var(--t-raised,#ffffff)]";
+export const inputStyle = { border: `1px solid color-mix(in srgb, var(--t-text, #2B211A) 20%, transparent)` };
 export const focusStyle = { outlineColor: RUST };
 
 export const LinedHeading = ({ title, className = "" }) => (
@@ -117,7 +120,7 @@ export const ContactMapIcon = () => (
 export const getProductCardDescription = (product) =>
   String(product?.subText || product?.homeCardSubText || product?.description || "").trim();
 
-export const CARD_TINTS = [FOREST, RUST, "#8C6A46"];
+export const CARD_TINTS = [FOREST, RUST, "var(--t-tint3, #8C6A46)"];
 
 export const ProductGrid = ({ products, onSelect, tints = CARD_TINTS }) => (
   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -127,9 +130,9 @@ export const ProductGrid = ({ products, onSelect, tints = CARD_TINTS }) => (
         <article
           key={idx}
           className="flex flex-col overflow-hidden rounded-2xl transition hover:-translate-y-0.5"
-          style={{ backgroundColor: CREAM, boxShadow: "0 14px 28px -18px rgba(43,33,26,0.35)" }}
+          style={{ backgroundColor: CREAM, boxShadow: "0 14px 28px -18px color-mix(in srgb, var(--t-text, #2B211A) 35%, transparent)" }}
         >
-          <div className="w-full overflow-hidden rounded-t-2xl" style={{ backgroundColor: `${BROWN}0D` }}>
+          <div className="w-full overflow-hidden rounded-t-2xl" style={{ backgroundColor: `color-mix(in srgb, var(--t-text, #2B211A) 5%, transparent)` }}>
             {product?.cardImage ? (
               <img
                 src={product.cardImage}
@@ -252,7 +255,7 @@ export const FaqList = ({ faqs }) => {
               >
                 <span className="flex min-w-0 items-center gap-3">
                   <span
-                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[12px] font-bold text-white"
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[12px] font-bold text-[color:var(--t-accent-text,#ffffff)]"
                     style={{ backgroundColor: RUST }}
                   >
                     {idx + 1}
@@ -295,7 +298,7 @@ export const StarIcon = ({ filled, size = 14 }) => (
   <svg
     viewBox="0 0 20 20"
     className="inline-block"
-    style={{ width: size, height: size, color: filled ? "#B85C38" : "#D4C5B0", fill: "currentColor" }}
+    style={{ width: size, height: size, color: filled ? "var(--t-accent, #B85C38)" : "var(--t-line, #D4C5B0)", fill: "currentColor" }}
   >
     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.957c.3.921-.755 1.688-1.538 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37 2.448c-.783.57-1.838-.197-1.538-1.118l1.287-3.957a1 1 0 00-.364-1.118L3.063 9.39c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.957z" />
   </svg>
@@ -335,7 +338,7 @@ const WarmTestimonialCard = ({ item, idx }) => {
       className="h-full rounded-sm p-6"
       style={{
         backgroundColor: CREAM,
-        boxShadow: "0 16px 30px -20px rgba(43,33,26,0.4)",
+        boxShadow: "0 16px 30px -20px color-mix(in srgb, var(--t-text, #2B211A) 40%, transparent)",
         transform: `rotate(${idx % 2 === 0 ? -1.5 : 1}deg)`,
       }}
     >
@@ -443,7 +446,7 @@ export const TestimonialsCarousel = ({ testimonials, showWriteReview, onOpenRevi
               type="button"
               onClick={onOpenReview}
               className="rounded-full px-6 py-2 text-[12px] font-semibold uppercase tracking-wider transition hover:opacity-80"
-              style={{ border: `1px solid ${FOREST}`, color: FOREST }}
+              style={{ border: `1px solid ${FOREST_FG}`, color: FOREST_FG }}
             >
               Write a review
             </button>
@@ -482,7 +485,7 @@ export const TestimonialsCarousel = ({ testimonials, showWriteReview, onOpenRevi
             }}
             aria-label={`Go to testimonial ${i + 1}`}
             className="h-2 w-2 rounded-full transition-all"
-            style={{ width: i === dotIndex ? 20 : 8, backgroundColor: i === dotIndex ? RUST : `${BROWN}33` }}
+            style={{ width: i === dotIndex ? 20 : 8, backgroundColor: i === dotIndex ? RUST : `color-mix(in srgb, var(--t-text, #2B211A) 20%, transparent)` }}
           />
         ))}
       </div>
@@ -492,7 +495,7 @@ export const TestimonialsCarousel = ({ testimonials, showWriteReview, onOpenRevi
             type="button"
             onClick={onOpenReview}
             className="rounded-full px-6 py-2 text-[12px] font-semibold uppercase tracking-wider transition hover:opacity-80"
-            style={{ border: `1px solid ${FOREST}`, color: FOREST }}
+            style={{ border: `1px solid ${FOREST_FG}`, color: FOREST_FG }}
           >
             Write a review
           </button>

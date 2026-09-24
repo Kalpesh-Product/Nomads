@@ -39,7 +39,7 @@ const EmeraldStudioTemplateAboutPage = () => {
   const founders = Array.isArray(data?.founders) ? data.founders.filter((f) => String(f?.name || "").trim()) : [];
 
   return (
-    <div className={`${TEMPLATE_ROOT_CLASS} min-h-screen bg-[#002c22] text-stone-100 ${BODY_FONT}`}>
+    <div className={`${TEMPLATE_ROOT_CLASS} min-h-screen bg-[#4a6b96] text-white ${BODY_FONT}`}>
       <style>{`${FONT_IMPORT}${STYLE_OVERRIDES}`}</style>
 
       <section className={`pt-20 pb-20 px-6 ${SECTION_BG}`}>
@@ -48,7 +48,7 @@ const EmeraldStudioTemplateAboutPage = () => {
           {aboutIntroBlocks.length > 0 ? (
             <div className="max-w-2xl mx-auto space-y-4">
               {aboutIntroBlocks.map((paragraph, idx) => (
-                <p key={idx} className="text-stone-400 text-lg leading-relaxed">
+                <p key={idx} className="text-white/90 text-lg leading-relaxed">
                   {paragraph}
                 </p>
               ))}
@@ -59,11 +59,11 @@ const EmeraldStudioTemplateAboutPage = () => {
         {aboutNarrativeBlocks.length ? (
           <div className="mt-14 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
             {aboutNarrativeBlocks.map((item, i) => (
-              <div key={item.title} className="flex gap-5 bg-emerald-900/40 border border-emerald-800/50 rounded-xl p-7">
-                <span className={`text-amber-400 font-bold text-xl shrink-0 ${HEADING_FONT}`}>{String(i + 1).padStart(2, "0")}</span>
+              <div key={item.title} className="flex gap-5 bg-[#1f3556]/35 border border-white/25 rounded-xl p-7">
+                <span className={`text-white font-bold text-xl shrink-0 ${HEADING_FONT}`}>{String(i + 1).padStart(2, "0")}</span>
                 <div>
-                  <h3 className={`font-semibold text-lg mb-2 text-stone-100 ${HEADING_FONT}`}>{item.title}</h3>
-                  <p className="text-stone-400 text-sm leading-relaxed whitespace-pre-line">{item.body}</p>
+                  <h3 className={`font-semibold text-lg mb-2 text-white ${HEADING_FONT}`}>{item.title}</h3>
+                  <p className="text-white/90 text-sm leading-relaxed whitespace-pre-line">{item.body}</p>
                 </div>
               </div>
             ))}
@@ -80,7 +80,7 @@ const EmeraldStudioTemplateAboutPage = () => {
                 const founderImg = getMediaSrc(founder?.image);
                 return (
                   <div key={idx} className="group">
-                    <div className="rounded-xl overflow-hidden h-64 bg-emerald-900 mb-4">
+                    <div className="rounded-xl overflow-hidden h-64 bg-[#1f3556]/35 mb-4">
                       {founderImg ? (
                         <img
                           src={founderImg}
@@ -89,9 +89,9 @@ const EmeraldStudioTemplateAboutPage = () => {
                         />
                       ) : null}
                     </div>
-                    <p className={`font-semibold text-stone-100 ${HEADING_FONT}`}>{founder?.name}</p>
-                    <p className="text-stone-500 text-sm">{founder?.role}</p>
-                    {founder?.bio ? <p className="text-stone-400 text-xs mt-1 leading-relaxed">{founder.bio}</p> : null}
+                    <p className={`font-semibold text-white ${HEADING_FONT}`}>{founder?.name}</p>
+                    <p className="text-white/90 text-sm">{founder?.role}</p>
+                    {founder?.bio ? <p className="text-white/90 text-xs mt-1 leading-relaxed">{founder.bio}</p> : null}
                   </div>
                 );
               })}
@@ -112,10 +112,10 @@ const EmeraldStudioTemplateAboutPage = () => {
                     {image ? (
                       <img src={image} alt={card?.title || ""} className="aspect-[4/3] w-full object-cover rounded-xl" />
                     ) : (
-                      <div className="aspect-[4/3] w-full bg-emerald-900/40 rounded-xl" />
+                      <div className="aspect-[4/3] w-full bg-[#1f3556]/35 rounded-xl" />
                     )}
-                    {card?.title ? <p className={`mt-3 font-semibold text-stone-100 ${HEADING_FONT}`}>{card.title}</p> : null}
-                    {card?.description ? <p className="mt-1 text-stone-400 text-sm">{card.description}</p> : null}
+                    {card?.title ? <p className={`mt-3 font-semibold text-white ${HEADING_FONT}`}>{card.title}</p> : null}
+                    {card?.description ? <p className="mt-1 text-white/90 text-sm">{card.description}</p> : null}
                   </div>
                 );
               })}

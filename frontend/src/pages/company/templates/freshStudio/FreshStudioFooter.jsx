@@ -43,7 +43,7 @@ const FreshStudioFooter = ({
     // sibling of <main> at the TemplateSite.jsx level with nothing dark
     // behind it — it needs its own explicit background or the page's light
     // body background bleeds through underneath it.
-    <footer style={{ backgroundColor: PAGE_BG, borderTop: "1px solid rgba(255,255,255,0.10)" }}>
+    <footer style={{ backgroundColor: PAGE_BG, borderTop: "1px solid color-mix(in srgb, var(--t-text, #ffffff) 10%, transparent)" }}>
       <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 px-6 py-14 text-center md:grid-cols-[1.35fr_1fr_1fr_1fr] md:px-10 md:text-left">
         <div>
           {logo ? (
@@ -70,9 +70,9 @@ const FreshStudioFooter = ({
                     {...linkProps}
                     aria-label={SOCIAL_LABEL[social.key] || social.label}
                     className={`inline-flex h-9 w-9 items-center justify-center rounded-full border transition focus-visible:outline focus-visible:outline-2 ${
-                      social.href ? "hover:bg-white hover:text-[#0A0A12]" : "cursor-default"
+                      social.href ? "hover:bg-[var(--t-text,#ffffff)] hover:text-[color:var(--t-bg,#0A0A12)]" : "cursor-default"
                     }`}
-                    style={{ borderColor: "rgba(255,255,255,0.18)", color: "#ffffff", ...focusStyle }}
+                    style={{ borderColor: "color-mix(in srgb, var(--t-text, #ffffff) 18%, transparent)", color: "#ffffff", ...focusStyle }}
                   >
                     {SOCIAL_ICON[social.key]}
                   </Tag>
@@ -108,7 +108,7 @@ const FreshStudioFooter = ({
                   </Link>
                 ))
               ) : (
-                <p style={{ color: "rgba(255,255,255,0.35)" }}>No products listed</p>
+                <p style={{ color: "color-mix(in srgb, var(--t-text, #ffffff) 35%, transparent)" }}>No products listed</p>
               )}
             </div>
           </div>
@@ -129,7 +129,7 @@ const FreshStudioFooter = ({
           </div>
         </div>
       </div>
-      <div className="px-6 py-4 text-center text-[12px]" style={{ borderTop: "1px solid rgba(255,255,255,0.10)", color: MUTED }}>
+      <div className="px-6 py-4 text-center text-[12px]" style={{ borderTop: "1px solid color-mix(in srgb, var(--t-text, #ffffff) 10%, transparent)", color: MUTED }}>
         &copy; {new Date().getFullYear()} {registeredCompany || ""}. All rights reserved.
       </div>
     </footer>

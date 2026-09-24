@@ -13,28 +13,29 @@ export const FONT_IMPORT =
   "@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Work+Sans:wght@400;500;600&display=swap');";
 export const HEADING_FONT = "font-['Manrope',ui-sans-serif,system-ui,sans-serif]";
 export const FONT = "font-['Work_Sans',ui-sans-serif,system-ui,sans-serif]";
-export const TEXT = "rgba(255,255,255,0.72)";
-export const HEADING = "#ffffff";
-export const MUTED = "rgba(255,255,255,0.55)";
-export const WHITE = "#ffffff";
-export const ACCENT = "#D94B4B";
-export const ACCENT_GRADIENT = "linear-gradient(135deg, #D94B4B 0%, #D94B4B 100%)";
-export const PAGE_BG = "#0A0A12";
+export const TEXT = "color-mix(in srgb, var(--t-text, #ffffff) min(100%, calc(var(--t-k, 1) * 72%)), transparent)";
+export const HEADING = "var(--t-text, #ffffff)";
+export const MUTED = "color-mix(in srgb, var(--t-text, #ffffff) min(100%, calc(var(--t-k, 1) * 55%)), transparent)";
+export const WHITE = "var(--t-text, #ffffff)";
+export const ON_ACCENT = "var(--t-accent-text, #ffffff)";
+export const ACCENT = "var(--t-accent, #D94B4B)";
+export const ACCENT_GRADIENT = "linear-gradient(135deg, var(--t-accent, #D94B4B) 0%, var(--t-accent, #D94B4B) 100%)";
+export const PAGE_BG = "var(--t-bg, #0A0A12)";
 
 export const WRAP = "mx-auto w-full max-w-7xl px-6 md:px-10";
 export const PAGE_WRAP = `${WRAP} py-12 md:py-16`;
 export const EYEBROW = `text-[12px] font-semibold uppercase tracking-[0.08em] ${FONT}`;
 export const SECTION_HEADING = `text-sm font-semibold uppercase tracking-[0.15em] sm:text-base md:text-xl lg:text-[26px] ${HEADING_FONT}`;
-export const CARD = "rounded-[4px] bg-[#14141c] transition duration-150";
+export const CARD = "rounded-[4px] bg-[var(--t-surface,#14141c)] transition duration-150";
 export const PILL_BUTTON = `inline-flex items-center justify-center rounded-full px-7 py-3 text-[14px] font-semibold transition duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${FONT}`;
 export const INPUT =
-  "w-full rounded-[4px] border px-3.5 py-2.5 text-[14px] outline-none transition duration-150 bg-[#14141c] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1";
-export const inputStyle = { borderColor: "rgba(255,255,255,0.18)", color: TEXT };
+  "w-full rounded-[4px] border px-3.5 py-2.5 text-[14px] outline-none transition duration-150 bg-[var(--t-surface,#14141c)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1";
+export const inputStyle = { borderColor: "color-mix(in srgb, var(--t-text, #ffffff) 18%, transparent)", color: TEXT };
 export const focusStyle = { outlineColor: ACCENT };
 // Form fields use a neutral focus outline instead of the red accent — a red
 // ring around every input read as a validation/error state rather than a
 // normal focus indicator. Buttons/links keep the accent outline (focusStyle).
-export const inputFocusStyle = { outlineColor: "rgba(255,255,255,0.35)" };
+export const inputFocusStyle = { outlineColor: "color-mix(in srgb, var(--t-text, #ffffff) 35%, transparent)" };
 
 export const LinedHeading = ({ title, className = "", style }) => (
   <div className={`flex items-center gap-4 ${className}`}>
@@ -127,9 +128,9 @@ export const ProductGrid = ({ products, onSelect, fallbackImage }) => (
           type="button"
           onClick={() => onSelect(product)}
           className={`${CARD} group flex flex-col overflow-hidden border text-left hover:-translate-y-0.5 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2`}
-          style={{ borderColor: "rgba(255,255,255,0.12)", ...focusStyle }}
+          style={{ borderColor: "color-mix(in srgb, var(--t-text, #ffffff) 12%, transparent)", ...focusStyle }}
         >
-          <div className="aspect-[4/3] w-full overflow-hidden" style={{ backgroundColor: "#15151f" }}>
+          <div className="aspect-[4/3] w-full overflow-hidden" style={{ backgroundColor: "var(--t-surface2, #15151f)" }}>
             {cardImage ? (
               <img
                 src={cardImage}
@@ -204,7 +205,7 @@ const getTestimonialsPerView = () => {
 };
 
 const TestimonialCard = ({ item }) => (
-  <div className={`${CARD} h-full border p-5`} style={{ borderColor: "rgba(255,255,255,0.12)" }}>
+  <div className={`${CARD} h-full border p-5`} style={{ borderColor: "color-mix(in srgb, var(--t-text, #ffffff) 12%, transparent)" }}>
     <div className="text-[13px]" style={{ color: ACCENT }}>
       {"★".repeat(Number(item?.rating) || 5)}
     </div>
@@ -307,7 +308,7 @@ export const TestimonialsCarousel = ({ testimonials }) => {
             }}
             aria-label={`Go to testimonial ${i + 1}`}
             className="h-1.5 rounded-full transition-all"
-            style={{ width: i === dotIndex ? 24 : 6, backgroundColor: i === dotIndex ? ACCENT : "rgba(255,255,255,0.18)" }}
+            style={{ width: i === dotIndex ? 24 : 6, backgroundColor: i === dotIndex ? ACCENT : "color-mix(in srgb, var(--t-text, #ffffff) 18%, transparent)" }}
           />
         ))}
       </div>
@@ -354,7 +355,7 @@ export const FaqList = ({ faqs }) => {
           const blocks = isOpen ? splitFaqAnswer(faq.answer) : [];
           const hasBullets = blocks.some((b) => b.type === "bullet");
           return (
-            <div key={idx} className={`${CARD} overflow-hidden border`} style={{ borderColor: "rgba(255,255,255,0.12)" }}>
+            <div key={idx} className={`${CARD} overflow-hidden border`} style={{ borderColor: "color-mix(in srgb, var(--t-text, #ffffff) 12%, transparent)" }}>
               <button
                 type="button"
                 onClick={() => setOpen(isOpen ? null : idx)}
@@ -363,7 +364,7 @@ export const FaqList = ({ faqs }) => {
               >
                 <span className="flex min-w-0 items-center gap-3">
                   <span
-                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[12px] font-bold text-white"
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[12px] font-bold text-[color:var(--t-accent-text,#ffffff)]"
                     style={{ background: ACCENT_GRADIENT }}
                   >
                     {idx + 1}
@@ -374,13 +375,13 @@ export const FaqList = ({ faqs }) => {
                 </span>
                 <span
                   className="ml-4 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-[16px]"
-                  style={{ borderColor: "rgba(255,255,255,0.18)", color: MUTED }}
+                  style={{ borderColor: "color-mix(in srgb, var(--t-text, #ffffff) 18%, transparent)", color: MUTED }}
                 >
                   {isOpen ? "−" : "+"}
                 </span>
               </button>
               {isOpen ? (
-                <div className="border-t px-5 py-4" style={{ borderColor: "rgba(255,255,255,0.10)", backgroundColor: "#101018" }}>
+                <div className="border-t px-5 py-4" style={{ borderColor: "color-mix(in srgb, var(--t-text, #ffffff) 10%, transparent)", backgroundColor: "var(--t-surface2, #101018)" }}>
                   <div className="space-y-2">
                     {blocks.map((block, bi) =>
                       block.type === "bullet" ? (

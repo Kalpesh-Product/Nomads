@@ -14,6 +14,7 @@ import {
   PILL_BUTTON,
   TEXT,
   WHITE,
+  ON_ACCENT,
   focusStyle,
   inputFocusStyle,
   inputStyle,
@@ -87,7 +88,7 @@ const FreshStudioTemplatePartnerPage = () => {
               <p style={{ color: MUTED }}>Partner content coming soon.</p>
             )}
           </div>
-          <div className={`${CARD} border p-6`} style={{ borderColor: "rgba(255,255,255,0.12)" }}>
+          <div className={`${CARD} border p-6`} style={{ borderColor: "color-mix(in srgb, var(--t-text, #ffffff) 12%, transparent)" }}>
             <h3 className="text-center text-[18px] font-semibold md:text-[20px]" style={{ color: HEADING }}>
               {partnerFormTitle}
             </h3>
@@ -138,12 +139,12 @@ const FreshStudioTemplatePartnerPage = () => {
                   className={INPUT}
                   style={{ ...inputStyle, ...inputFocusStyle }}
                 />
-                {submitError ? <p className="text-[12px] text-[#D94B4B]">{submitError}</p> : null}
+                {submitError ? <p className="text-[12px] text-[color:var(--t-accent,#D94B4B)]">{submitError}</p> : null}
                 <button
                   type="submit"
                   disabled={submitPending}
                   className={`${PILL_BUTTON} disabled:opacity-50`}
-                  style={{ background: ACCENT_GRADIENT, color: WHITE, ...focusStyle }}
+                  style={{ background: ACCENT_GRADIENT, color: ON_ACCENT, ...focusStyle }}
                 >
                   {submitPending ? "Submitting…" : "Connect"}
                 </button>

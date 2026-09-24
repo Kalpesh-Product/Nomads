@@ -15,7 +15,7 @@ const WarmOrganicTemplateTestimonialsPage = () => {
   const showWriteReview = data?.testimonialsEnableWriteReview !== false;
 
   return (
-    <div className={`wo-template min-h-screen ${SANS}`} style={{ backgroundColor: "#F1E6D3", color: BROWN }}>
+    <div className={`wo-template min-h-screen ${SANS}`} style={{ backgroundColor: "var(--t-bg, #F1E6D3)", color: BROWN }}>
       <style>{FONT_IMPORT}</style>
       <section className={PAGE_WRAP}>
         <div className="flex flex-col items-center gap-4">

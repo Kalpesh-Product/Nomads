@@ -41,7 +41,7 @@ const WarmOrganicTemplateAboutPage = () => {
   const founders = Array.isArray(data?.founders) ? data.founders.filter((f) => String(f?.name || "").trim()) : [];
 
   return (
-    <div className={`wo-template min-h-screen ${SANS}`} style={{ backgroundColor: "#F1E6D3", color: BROWN }}>
+    <div className={`wo-template min-h-screen ${SANS}`} style={{ backgroundColor: "var(--t-bg, #F1E6D3)", color: BROWN }}>
       <style>{FONT_IMPORT}</style>
       <section className={PAGE_WRAP}>
         <LinedHeading title={String(data?.aboutTitle || "").trim() || "About Our Vision"} className="justify-center" />
@@ -78,7 +78,7 @@ const WarmOrganicTemplateAboutPage = () => {
                   {founderImg ? (
                     <img src={founderImg} alt={founder?.name} className="aspect-square w-full rounded-3xl object-cover" />
                   ) : (
-                    <div className="aspect-square w-full rounded-3xl" style={{ backgroundColor: `${BROWN}0D` }} />
+                    <div className="aspect-square w-full rounded-3xl" style={{ backgroundColor: `color-mix(in srgb, var(--t-text, #2B211A) 5%, transparent)` }} />
                   )}
                   <div>
                     <h4 className={`text-[20px] font-normal ${SERIF}`}>{founder?.name}</h4>
@@ -106,7 +106,7 @@ const WarmOrganicTemplateAboutPage = () => {
                     {image ? (
                       <img src={image} alt={card?.title || ""} className="aspect-square w-full rounded-2xl object-cover" />
                     ) : (
-                      <div className="aspect-square w-full rounded-2xl" style={{ backgroundColor: `${BROWN}0D` }} />
+                      <div className="aspect-square w-full rounded-2xl" style={{ backgroundColor: `color-mix(in srgb, var(--t-text, #2B211A) 5%, transparent)` }} />
                     )}
                     {card?.title ? (
                       <h5 className={`mt-3 text-[15px] font-normal ${SERIF}`}>{card.title}</h5>
