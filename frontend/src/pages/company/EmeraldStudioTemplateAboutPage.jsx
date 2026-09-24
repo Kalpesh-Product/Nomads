@@ -46,7 +46,13 @@ const EmeraldStudioTemplateAboutPage = () => {
         <div className="max-w-7xl mx-auto text-center">
           <LinedHeading title={String(data?.aboutTitle || "").trim() || "About Our Vision"} className="justify-center" />
           {aboutIntroBlocks.length > 0 ? (
-            <p className="text-stone-400 text-lg max-w-2xl mx-auto leading-relaxed">{aboutIntroBlocks[0]}</p>
+            <div className="max-w-2xl mx-auto space-y-4">
+              {aboutIntroBlocks.map((paragraph, idx) => (
+                <p key={idx} className="text-stone-400 text-lg leading-relaxed">
+                  {paragraph}
+                </p>
+              ))}
+            </div>
           ) : null}
         </div>
 

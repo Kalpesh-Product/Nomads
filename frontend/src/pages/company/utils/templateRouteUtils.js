@@ -119,7 +119,9 @@ export const normalizePageNavItems = (items, fallbackItems = FALLBACK_PAGE_NAV_I
     if (item.slug === "about") return "About Us";
     if (item.slug === "contact") return "Contact Us";
     if (item.slug === "home") return "Home";
-    if (item.slug === "products") return "Services";
+    if (item.slug === "products") {
+      return item.name.toLowerCase() === "products" ? "Services" : item.name;
+    }
     if (item.slug === "gallery") return "Gallery";
     if (item.slug === "testimonials") return "Testimonials";
     if (item.slug === "careers") return "Careers";
@@ -144,35 +146,35 @@ export const normalizePageNavItems = (items, fallbackItems = FALLBACK_PAGE_NAV_I
   });
 };
 
+// The API already flattens page images to plain URL strings in `productPages`
+// (heroImage / heroImages), while `productDropdownPages` keeps {id,url}
+// objects — accept both so a second pass never throws the URLs away.
+const toMediaObject = (value) => {
+  if (!value) return undefined;
+  if (typeof value === "string") {
+    const url = normalizeString(value);
+    return url ? { id: "", url } : undefined;
+  }
+  if (typeof value === "object") {
+    const id = normalizeString(value.id);
+    const url = normalizeString(value.url) || normalizeString(value.preview);
+    return id || url ? { id, url } : undefined;
+  }
+  return undefined;
+};
+
 export const normalizeProductDropdownPages = (items) => {
   if (!Array.isArray(items) || items.length === 0) return DEFAULT_PRODUCT_DROPDOWN_PAGES;
 
   return items
     .map((item) => {
       const heroImages = Array.isArray(item?.heroImages)
-        ? item.heroImages
-            .map((img) => ({
-              id: normalizeString(img?.id),
-              url: normalizeString(img?.url),
-            }))
-            .filter((img) => img.id || img.url)
+        ? item.heroImages.map(toMediaObject).filter(Boolean)
         : [];
 
-      const heroImage =
-        item?.heroImage && typeof item.heroImage === "object"
-          ? {
-              id: normalizeString(item.heroImage.id),
-              url: normalizeString(item.heroImage.url),
-            }
-          : undefined;
+      const heroImage = toMediaObject(item?.heroImage);
 
-      const homeCardImage =
-        item?.homeCardImage && typeof item.homeCardImage === "object"
-          ? {
-              id: normalizeString(item.homeCardImage.id),
-              url: normalizeString(item.homeCardImage.url),
-            }
-          : undefined;
+      const homeCardImage = toMediaObject(item?.homeCardImage);
 
       return {
         ...item,
@@ -326,7 +328,11 @@ export const normalizeTemplateData = (data) => {
     productPages: normalizedProductPages,
     products: Array.isArray(data?.products) ? data.products : [],
     menuItems: Array.isArray(data?.menuItems) ? data.menuItems : [],
-    gallery: Array.isArray(data?.gallery) ? data.gallery : [],
+    // Each gallery image has an Enabled toggle in the builder; hide the ones
+    // switched off.
+    gallery: Array.isArray(data?.gallery)
+      ? data.gallery.filter((item) => item?.enabled !== false)
+      : [],
     testimonials: Array.isArray(data?.testimonials) ? data.testimonials : [],
     about: Array.isArray(data?.about) ? data.about : [],
     aboutPageImageCards: Array.isArray(data?.aboutPageImageCards)

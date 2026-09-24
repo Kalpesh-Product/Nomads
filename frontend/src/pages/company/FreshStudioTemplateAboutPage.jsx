@@ -34,7 +34,7 @@ const FreshStudioTemplateAboutPage = () => {
     <div className="min-h-screen font-['Work_Sans',ui-sans-serif,system-ui,sans-serif]" style={{ backgroundColor: PAGE_BG, color: TEXT }}>
       <style>{FONT_IMPORT}</style>
       <section className={PAGE_WRAP}>
-        <LinedHeading title="About us" className="mb-2" style={{ color: ACCENT }} />
+        <LinedHeading title={String(data?.aboutTitle || "").trim() || "About us"} className="mb-2" style={{ color: ACCENT }} />
         <div className="mx-auto mt-6 flex max-w-2xl flex-col items-center gap-4 text-center">
           {aboutIntroBlocks.map((text, idx) => (
             <p key={idx} className="text-[15px] leading-relaxed">
