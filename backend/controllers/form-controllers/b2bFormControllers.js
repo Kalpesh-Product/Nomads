@@ -684,7 +684,7 @@ export const registerFormSubmission = async (req, res) => {
         const invalids = ["n/a", "na", "none", "undefined", "null", "-"];
         if (invalids.includes(trimmed)) return "";
 
-        return trimmed.split("-")[0].replace(/\s+/g, "");
+        return trimmed.split("-")[0].replace(/[^a-z0-9_]/g, "");
       };
 
       const searchKey = formatCompanyName(payload.companyName);

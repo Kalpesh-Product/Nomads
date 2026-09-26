@@ -148,6 +148,20 @@ const leadSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    // Booking end time and seating choice, sent by the newer website templates.
+    endTime: {
+      type: String,
+      trim: true,
+    },
+    seating: {
+      type: String,
+      trim: true,
+    },
+    // Length of a meeting-room booking, e.g. "2 hrs".
+    duration: {
+      type: String,
+      trim: true,
+    },
     roomType: {
       type: String,
       trim: true,
