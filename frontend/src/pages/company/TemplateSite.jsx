@@ -36,6 +36,8 @@ import {
   resolveSectionFromSlug,
 } from "./utils/templateRouteUtils";
 import { mapTestimonialItem } from "./utils/pageTemplateUtils";
+import { NomadsSiteContext } from "./verticalTemplates/NomadsSiteContext";
+import { VERTICAL_TEMPLATES, isVerticalTemplate } from "./verticalTemplates";
 
 // The shared breadcrumb bar hard-codes light/dark text; on Fresh Studio and
 // Warm Organic it should follow the business's text colour instead.
@@ -257,6 +259,25 @@ const TemplateSite = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPending, isCurrentSectionEnabled]);
+
+  // Savor, Wayfarer, Haven and Commons are complete sites of their own (header, pages, footer),
+  // driven by the published data, so they replace the shared chrome and routed sections below.
+  if (isVerticalTemplate(themeVariant)) {
+    const VerticalTemplate = VERTICAL_TEMPLATES[themeVariant];
+    if (isPending || !data) {
+      return (
+        <div className="fixed inset-0 z-[9999] bg-white flex items-center justify-center">
+          <div className="animate-spin h-12 w-12 border-4 border-gray-300 border-t-primary-blue rounded-full" />
+        </div>
+      );
+    }
+    return (
+      <NomadsSiteContext.Provider value={{ data, approvedReviews }}>
+        <ScrollToTop />
+        <VerticalTemplate />
+      </NomadsSiteContext.Provider>
+    );
+  }
 
   return (
     <div
