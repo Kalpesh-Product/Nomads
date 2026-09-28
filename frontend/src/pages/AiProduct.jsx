@@ -1112,6 +1112,7 @@ const AiProduct = () => {
               {listingTitle || "Loading Title..."}
               <VerifyBusinessButton
                 companyId={companyDetails?.companyId}
+                businessId={companyDetails?.businessId}
                 isVerified={companyDetails?.verifiedBadgeVisible}
               />
             </h1>
@@ -2052,6 +2053,7 @@ const AiProduct = () => {
               {companyDetails?.companyName || "Loading Title..."}
               <VerifyBusinessButton
                 companyId={companyDetails?.companyId}
+                businessId={companyDetails?.businessId}
                 isVerified={companyDetails?.verifiedBadgeVisible}
               />
             </h1>

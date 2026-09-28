@@ -265,6 +265,12 @@ const AiHostSignup = () => {
     ? Math.max(0, Math.min(1, requestedStep))
     : 1;
   const [activeStep, setActiveStep] = useState(initialStep);
+  // Set when the visitor arrived via "Verify Business" on a wono.co listing:
+  // the click id in ?vc= pre-fills (and locks) the company they asked to verify.
+  const [activeClickId, setActiveClickId] = useState(
+    () => signupParams.get("vc") || "",
+  );
+  const [verifyClick, setVerifyClick] = useState(null);
   const [verticalTypeOpen, setVerticalTypeOpen] = useState(false);
   const [typedActivationTitle, setTypedActivationTitle] = useState(() =>
     initialStep === 1
@@ -374,6 +380,45 @@ const AiHostSignup = () => {
   useEffect(() => {
     setValue("Goals", selectedPlan);
   }, [selectedPlan, setValue]);
+
+  useEffect(() => {
+    if (!activeClickId) return undefined;
+    let active = true;
+    const loadVerifyClick = async () => {
+      try {
+        const response = await publicApi.get(
+          `/forms/verify-click/${encodeURIComponent(activeClickId)}`,
+        );
+        if (!active) return;
+        const data = response.data || {};
+        setVerifyClick(data);
+        setValue("companyName", data.companyName || "");
+        if (Array.isArray(data.verticalType) && data.verticalType.length) {
+          setValue("verticalType", data.verticalType);
+        }
+        setValue("companyCountry", data.country || "");
+        setValue("companyState", data.state || "");
+        setValue("companyCity", data.city || "");
+      } catch {
+        // Invalid or stale link: carry on as a normal signup.
+        if (active) setActiveClickId("");
+      }
+    };
+    loadVerifyClick();
+    return () => {
+      active = false;
+    };
+  }, [activeClickId, setValue]);
+
+  const clearVerifyClick = () => {
+    setVerifyClick(null);
+    setActiveClickId("");
+    setValue("companyName", "");
+    setValue("verticalType", []);
+    setValue("companyCountry", "");
+    setValue("companyState", "");
+    setValue("companyCity", "");
+  };
 
   useEffect(() => {
     setValue("billingCycle", billingCycle);
@@ -703,9 +748,9 @@ const AiHostSignup = () => {
     },
     onSuccess: (data) => {
       showSuccessAlert(
-        "We’ll email you once your account is activated.",
+        "We've emailed you a link — use the Verify Email button in it to verify your email address.",
         {
-          title: "Activation Request Submitted!",
+          title: "Thank You for Submitting!",
           titleClassName: "swal2-title--activation-request",
         },
       ).then(() => {
@@ -1152,13 +1197,42 @@ const AiHostSignup = () => {
               render={({ field, fieldState }) => (
                 <TextField
                   {...field}
+                  InputProps={{ readOnly: Boolean(verifyClick) }}
                   label="Company Name"
                   fullWidth
                   margin="none"
                   sx={compactStepFieldSx}
                   variant="standard"
                   error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
+                  helperText={
+                    fieldState.error?.message ||
+                    (verifyClick ? (
+                      <>
+                        From your wono.co listing ·{" "}
+                        <button
+                          type="button"
+                          onClick={clearVerifyClick}
+                          className="text-primary-blue underline"
+                        >
+                          Not your business?
+                        </button>
+                      </>
+                    ) : undefined)
+                  }
+                  // While showing the wono.co note, float it under the field
+                  // instead of adding a line, so the rows below don't shift.
+                  FormHelperTextProps={
+                    verifyClick && !fieldState.error
+                      ? {
+                          sx: {
+                            position: "absolute",
+                            top: "100%",
+                            left: 0,
+                            whiteSpace: "nowrap",
+                          },
+                        }
+                      : undefined
+                  }
                   InputLabelProps={{ sx: floatingLabelSx }}
                 />
               )}
@@ -2188,6 +2262,9 @@ const AiHostSignup = () => {
             );
             fd.set("contactCode", withFallback(values.contactCode, "N/A"));
             fd.set("verticalType", JSON.stringify(values.verticalType || []));
+            if (verifyClick && activeClickId) {
+              fd.set("verifyClickId", activeClickId);
+            }
             // About (array → join into text or fallback)
             const aboutArray =
               values.about?.map((a, i) =>

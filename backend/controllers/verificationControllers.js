@@ -1,5 +1,50 @@
 import Company from "../models/Company.js";
 import BusinessVerificationRequest from "../models/BusinessVerificationRequest.js";
+import { sendMail } from "../config/mailer.js";
+import { renderNotificationEmail, formatLongDate } from "../utils/emailTemplates.js";
+
+const escapeHtml = (value) =>
+  String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+
+const hostPanelUrl = () =>
+  String(process.env.HOST_PANEL_FRONTEND_URL || "https://hostpanel.wono.co").replace(
+    /\/+$/,
+    "",
+  );
+
+// Sent once, when a HostPanel request is approved and its free period begins.
+const sendFreeBadgeActiveEmail = async (request, startsAt, endsAt) => {
+  const company = escapeHtml(request.companyName);
+  await sendMail({
+    to: request.email,
+    subject: "Your Verified Badge Is Live",
+    text: `Your verified badge for ${request.companyName} is live — free until ${formatLongDate(endsAt)}.`,
+    html: renderNotificationEmail({
+      heroTitle: "Your Verified Badge Is Live",
+      heroSubtitle: "Approved — free for your first 3 months.",
+      greetingHtml: `
+        <p style="margin:0 0 4px;">Hello ${escapeHtml(request.fullName)},</p>
+        <p class="email-text" style="margin:0;">Our team has approved your documents. The verified badge for <b class="email-heading">${company}</b> is now shown on your listings — free for the first 3 months.</p>
+      `,
+      detailsTitle: "Your Verified Badge",
+      detailRows: [
+        ["Company", company],
+        ["Plan", "Free · 3 months"],
+        ["Started", formatLongDate(startsAt)],
+        ["Ends", formatLongDate(endsAt)],
+      ],
+      ctaButton: {
+        label: "Manage Verification",
+        href: `${hostPanelUrl()}/key-apps/verify-business`,
+        caption: "We'll remind you a month before it ends. Renew for 1 month or 1 year to keep it.",
+      },
+    }),
+  });
+};
 
 // Only 1 month and 1 year can be purchased now. VERIFICATION_TIER_MONTHS
 // below still lists the retired 3m / 6m plans so payments already in flight
@@ -15,6 +60,14 @@ const VERIFICATION_TIER_MONTHS = {
   "6m": 6,
   "1y": 12,
 };
+
+// Company decision: every plan gets the verified badge free for the first 3
+// months after approval. Stored under the legacy "3m" tier so all existing
+// display / expiry / reminder logic keeps working unchanged.
+const FREE_VERIFICATION_MONTHS = 3;
+// The "ending soon" email/banner goes out once this many days remain, i.e.
+// after roughly 2 of the 3 free months.
+const TRIAL_ENDING_NOTICE_DAYS = 30;
 
 // POST /api/admin/verification-requests — a host's verification submission
 // from HostPanel. Lands as "pending" for staff review (Company Verification
@@ -178,13 +231,61 @@ export const updateVerificationRequestStatus = async (req, res, next) => {
     }
 
     request.status = status;
-    // Approve no longer instantly verifies the company — it only clears the
-    // request for a Stripe payment link to be sent by the master panel.
-    // The badge (Company.isVerified) is only ever flipped on by
-    // markVerificationRequestPaid, once a real payment is confirmed.
-    request.paymentStatus = status === "approved" ? "awaiting_payment" : "not_required";
     request.rejectionReason =
       status === "rejected" ? String(rejectionReason || "").trim() : "";
+
+    // A HostPanel request that is approved for the first time is activated
+    // straight away for FREE_VERIFICATION_MONTHS, with no payment. Payment only
+    // comes in when the host renews (1 month / 1 year). Everything else keeps
+    // the original rule: approve only opens the door to a payment link, and
+    // the badge is switched on by markVerificationRequestPaid.
+    const grantsFreePeriod =
+      status === "approved" &&
+      request.submittedVia === "host_panel" &&
+      !request.freePeriodGrantedAt &&
+      !request.activeTier;
+
+    if (grantsFreePeriod) {
+      const now = new Date();
+      const endsAt = new Date(now);
+      endsAt.setMonth(endsAt.getMonth() + FREE_VERIFICATION_MONTHS);
+
+      request.paymentStatus = "paid";
+      request.activeTier = "3m";
+      request.activeAmountUsd = 0;
+      request.paidAt = now;
+      request.isFreePeriod = true;
+      request.freePeriodGrantedAt = now;
+      request.verificationStartsAt = now;
+      request.verificationExpiresAt = endsAt;
+      request.renewalReminderSentAt = null;
+      request.expiryNoticeSentAt = null;
+      request.trialEndingNoticeSentAt = null;
+      await request.save();
+
+      // Verification is company-wide, exactly as in markVerificationRequestPaid.
+      await Company.updateMany(
+        { companyId: request.companyId },
+        {
+          $set: {
+            isVerified: true,
+            verificationTier: "3m",
+            verificationExpiresAt: endsAt,
+          },
+        },
+      );
+      try {
+        await sendFreeBadgeActiveEmail(request, now, endsAt);
+      } catch (mailError) {
+        console.error("Failed to send verified-badge-live email:", mailError.message);
+      }
+      return res.status(200).json(request);
+    }
+
+    if (!(status === "approved" && request.paymentStatus === "paid")) {
+      request.paymentStatus =
+        status === "approved" ? "awaiting_payment" : "not_required";
+    }
     await request.save();
 
     return res.status(200).json(request);
@@ -255,6 +356,16 @@ export const markVerificationRequestPaid = async (req, res, next) => {
       request.verificationExpiresAt,
       tier,
     );
+    // A renewal that extends a still-running period keeps the original start
+    // (continuous coverage); a first payment or a restart after lapse starts now.
+    const stillRunning =
+      request.verificationExpiresAt &&
+      new Date(request.verificationExpiresAt) > new Date();
+    if (!stillRunning || !request.verificationStartsAt) {
+      request.verificationStartsAt = new Date();
+    }
+    request.isFreePeriod = false;
+    request.trialEndingNoticeSentAt = null;
 
     request.paymentStatus = "paid";
     request.activeTier = tier;
@@ -332,6 +443,46 @@ export const getVerificationRenewalsDue = async (req, res, next) => {
       .lean();
 
     return res.status(200).json({ count: requests.length, data: requests });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// GET /api/admin/verification-requests/trial-ending-soon
+// Free-period verifications with about a month left that haven't been told.
+export const getVerificationTrialsEndingSoon = async (req, res, next) => {
+  try {
+    const withinDays = Number(req.query.withinDays) || TRIAL_ENDING_NOTICE_DAYS;
+    const now = new Date();
+    const cutoff = new Date(now.getTime() + withinDays * 24 * 60 * 60 * 1000);
+
+    const requests = await BusinessVerificationRequest.find({
+      status: "approved",
+      isFreePeriod: true,
+      verificationExpiresAt: { $gt: now, $lte: cutoff },
+      trialEndingNoticeSentAt: null,
+    })
+      .sort({ verificationExpiresAt: 1 })
+      .lean();
+
+    return res.status(200).json({ count: requests.length, data: requests });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// POST /api/admin/verification-requests/:id/mark-trial-notice-sent
+export const markVerificationTrialNoticeSent = async (req, res, next) => {
+  try {
+    const request = await BusinessVerificationRequest.findByIdAndUpdate(
+      req.params.id,
+      { trialEndingNoticeSentAt: new Date() },
+      { new: true },
+    );
+    if (!request) {
+      return res.status(404).json({ message: "Verification request not found" });
+    }
+    return res.status(200).json({ message: "ok" });
   } catch (error) {
     next(error);
   }

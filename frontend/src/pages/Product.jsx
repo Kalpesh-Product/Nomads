@@ -739,6 +739,7 @@ const Product = () => {
             {listingTitle || "Loading Title..."}
             <VerifyBusinessButton
               companyId={companyDetails?.companyId}
+              businessId={companyDetails?.businessId}
               isVerified={companyDetails?.verifiedBadgeVisible}
             />
           </h1>
@@ -1622,6 +1623,7 @@ const Product = () => {
             {listingTitle || "Loading Title..."}
             <VerifyBusinessButton
               companyId={companyDetails?.companyId}
+              businessId={companyDetails?.businessId}
               isVerified={companyDetails?.verifiedBadgeVisible}
             />
           </h1>

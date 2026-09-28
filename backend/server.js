@@ -49,6 +49,7 @@ import specialAccessRoutes from "./routes/specialAccessRoutes.js";
 import adminNomadUserRoutes from "./routes/adminNomadUserRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
 import adminVerificationRoutes from "./routes/adminVerificationRoutes.js";
+import adminVerifyClickRoutes from "./routes/adminVerifyClickRoutes.js";
 import { verifyAdminApiKey } from "./middlewares/verifyAdminApiKey.js";
 
 const app = express();
@@ -86,6 +87,11 @@ app.use(
   "/api/admin/verification-requests",
   verifyAdminApiKey,
   adminVerificationRoutes,
+);
+app.use(
+  "/api/admin/verify-business-clicks",
+  verifyAdminApiKey,
+  adminVerifyClickRoutes,
 );
 
 

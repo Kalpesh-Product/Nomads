@@ -38,6 +38,7 @@ import {
   reassignListings,
 } from "../controllers/compayControllers.js";
 import { verifyAdminApiKey } from "../middlewares/verifyAdminApiKey.js";
+import { trackVerifyBusinessClick } from "../controllers/verifyBusinessClickController.js";
 
 const proxyUpload = multer({ storage: multer.memoryStorage() });
 
@@ -53,6 +54,9 @@ router.patch(
   upload.single("inclusions"),
   bulkUpdateCompanyInclusions
 );
+
+// Public: records a "Verify Business" click on a listing page.
+router.post("/verify-business-click", trackVerifyBusinessClick);
 
 router.get("/companies", getCompaniesData);
 router.get("/companiesn", getCompaniesDataNomads);

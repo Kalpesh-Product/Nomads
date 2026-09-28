@@ -165,6 +165,16 @@ const businessVerificationRequestSchema = new mongoose.Schema(
     paidAt: { type: Date, default: null },
     // Mirrors Company.verificationExpiresAt for this companyId.
     verificationExpiresAt: { type: Date, default: null },
+    // When the current stretch of verification began (kept across renewals
+    // that extend it without a gap; reset when it lapses and restarts).
+    verificationStartsAt: { type: Date, default: null },
+    // Every approved HostPanel request gets FREE_VERIFICATION_MONTHS free. True
+    // while that free stretch is what's active; flipped off by the first paid
+    // renewal. freePeriodGrantedAt makes the grant strictly once per request.
+    isFreePeriod: { type: Boolean, default: false },
+    freePeriodGrantedAt: { type: Date, default: null },
+    // Idempotency marker for the "free period ends in a month" email/cron.
+    trialEndingNoticeSentAt: { type: Date, default: null },
     // Idempotency marker for the 5-day-before-expiry reminder job; reset to
     // null on every successful payment so the next cycle can remind again.
     renewalReminderSentAt: { type: Date, default: null },
