@@ -36,7 +36,8 @@ const UploadMultipleFilesInput = React.lazy(
 );
 
 const steps = ["GOAL", "BASIC DETAILS"];
-const ACTIVATION_TITLE = "Your goal is set... let's get you activated";
+const DEFAULT_ACTIVATION_TITLE = "Your goal is set... let's get you activated";
+const VERIFY_ACTIVATION_TITLE = "Get Yourself Activated...";
 const ACTIVATION_TITLE_TYPING_DURATION_MS = 420;
 const ACTIVATION_TITLE_INITIAL_CHARS = 4;
 const COUNTRIES_NOW_ENDPOINT = "https://countriesnow.space/api/v0.1/countries";
@@ -271,6 +272,11 @@ const AiHostSignup = () => {
     () => signupParams.get("vc") || "",
   );
   const [verifyClick, setVerifyClick] = useState(null);
+  // Fixed at arrival so the title doesn't change if the company is unlocked later.
+  const [cameFromVerify] = useState(() => Boolean(signupParams.get("vc")));
+  const ACTIVATION_TITLE = cameFromVerify
+    ? VERIFY_ACTIVATION_TITLE
+    : DEFAULT_ACTIVATION_TITLE;
   const [verticalTypeOpen, setVerticalTypeOpen] = useState(false);
   const [typedActivationTitle, setTypedActivationTitle] = useState(() =>
     initialStep === 1
@@ -459,7 +465,7 @@ const AiHostSignup = () => {
     animationFrameId = requestAnimationFrame(animateTyping);
 
     return () => cancelAnimationFrame(animationFrameId);
-  }, [activeStep]);
+  }, [activeStep, ACTIVATION_TITLE]);
 
   useEffect(() => {
     if (!auth?.user) return;

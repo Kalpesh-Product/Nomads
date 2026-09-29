@@ -51,10 +51,14 @@ const businessVerificationRequestSchema = new mongoose.Schema(
       trim: true,
       required: true,
     },
+    // Not required: a host-panel-originated request (an existing-listings
+    // claim auto-activating the badge) pulls contact details straight from
+    // the HostUser account, which may not have a phone number on file. A
+    // missing mobile number must never block the free 3-month grant.
     mobile: {
       type: String,
       trim: true,
-      required: true,
+      default: "",
     },
     role: {
       type: String,

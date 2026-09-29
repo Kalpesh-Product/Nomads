@@ -103,7 +103,6 @@ export const createVerificationRequestAdmin = async (req, res, next) => {
       companyName,
       fullName,
       email,
-      mobile,
       role,
       country,
       registeredCompanyName,
