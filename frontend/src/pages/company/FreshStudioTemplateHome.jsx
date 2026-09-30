@@ -78,7 +78,7 @@ const FreshStudioTemplateHome = () => {
               </div>
               <div
                 className="absolute inset-0"
-                style={{ background: "linear-gradient(180deg, rgba(10,10,18,0.35) 0%, rgba(10,10,18,0.55) 55%, rgba(10,10,18,0.82) 100%)" }}
+                style={{ background: "linear-gradient(180deg, color-mix(in srgb, var(--t-bg, #0A0A12) 35%, transparent) 0%, color-mix(in srgb, var(--t-bg, #0A0A12) 55%, transparent) 55%, color-mix(in srgb, var(--t-bg, #0A0A12) 82%, transparent) 100%)" }}
               />
             </div>
           ) : null}
@@ -87,13 +87,13 @@ const FreshStudioTemplateHome = () => {
               <h1 className={`text-[38px] font-black leading-[1.05] tracking-[-0.02em] md:text-[56px] ${HEADING_FONT}`} style={{ color: WHITE }}>
                 {data?.title || data?.companyName || ""}
               </h1>
-              <p className="max-w-md text-[15px] leading-relaxed" style={{ color: "rgba(255,255,255,0.62)" }}>
+              <p className="max-w-md text-[15px] leading-relaxed" style={{ color: "color-mix(in srgb, var(--t-text, #ffffff) min(100%, calc(var(--t-k, 1) * 62%)), transparent)" }}>
                 {data?.subTitle || ""}
               </p>
               <div className="flex flex-wrap items-center gap-3">
                 <button
                   type="button"
-                  className="rounded-full px-7 py-3 text-[14px] font-semibold text-white transition duration-200 hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                  className="rounded-full px-7 py-3 text-[14px] font-semibold text-[color:var(--t-accent-text,#ffffff)] transition duration-200 hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
                   style={{ background: ACCENT_GRADIENT, outlineColor: ACCENT }}
                 >
                   {data?.CTAButtonText || "Get in touch"}
@@ -101,8 +101,8 @@ const FreshStudioTemplateHome = () => {
                 <button
                   type="button"
                   onClick={() => t.goToSection("contact")}
-                  className="rounded-full bg-white px-7 py-3 text-[14px] font-semibold transition duration-200 hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-                  style={{ color: "#0A0A12", outlineColor: WHITE }}
+                  className="rounded-full bg-[var(--t-text,#ffffff)] px-7 py-3 text-[14px] font-semibold transition duration-200 hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                  style={{ color: "var(--t-bg, #0A0A12)", outlineColor: WHITE }}
                 >
                   Contact us
                 </button>
@@ -112,15 +112,15 @@ const FreshStudioTemplateHome = () => {
             <div className="relative md:justify-self-end">
               <div
                 className="pointer-events-none absolute -inset-6 rounded-[40px] opacity-50 blur-3xl md:-inset-10"
-                style={{ background: "radial-gradient(circle, #D94B4B, transparent 65%)" }}
+                style={{ background: "radial-gradient(circle, var(--t-accent, #D94B4B), transparent 65%)" }}
               />
-              <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[28px] md:aspect-square md:w-[420px] md:rounded-[32px]" style={{ backgroundColor: "#16161f" }}>
+              <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[28px] md:aspect-square md:w-[420px] md:rounded-[32px]" style={{ backgroundColor: "var(--t-surface2, #16161f)" }}>
                 {mainHeroImage ? (
                   <img src={mainHeroImage} alt="" className="h-full w-full object-cover" />
                 ) : (
                   <div
                     className="pointer-events-none absolute inset-0"
-                    style={{ background: "radial-gradient(circle at 30% 25%, rgba(217,75,75,1), transparent 55%)" }}
+                    style={{ background: "radial-gradient(circle at 30% 25%, var(--t-accent, #D94B4B), transparent 55%)" }}
                   />
                 )}
               </div>
@@ -131,7 +131,7 @@ const FreshStudioTemplateHome = () => {
 
       {t.aboutPageEnabled && t.isHomeSectionEnabled("home_about") && aboutIntroBlocks.length ? (
         <section className={PAGE_WRAP}>
-          <LinedHeading title="About" style={{ color: ACCENT }} />
+          <LinedHeading title={String(data?.aboutTitle || "").trim() || "About"} style={{ color: ACCENT }} />
           <div className="mx-auto mt-6 flex max-w-2xl flex-col items-center gap-4 text-center">
             {aboutIntroBlocks.map((text, idx) => (
               <p key={idx} className="text-[15px] leading-relaxed">
@@ -144,7 +144,7 @@ const FreshStudioTemplateHome = () => {
 
       {t.productsPageEnabled && t.isHomeSectionEnabled("home_products") && t.productPages.length ? (
         <section className={PAGE_WRAP}>
-          <LinedHeading title="What we offer" style={{ color: ACCENT }} />
+          <LinedHeading title={String(data?.productTitle || "").trim() || "What we offer"} style={{ color: ACCENT }} />
           <div className="mt-6">
             <ProductGrid products={t.productPages} onSelect={t.handleProductCardAction} />
           </div>
@@ -155,12 +155,12 @@ const FreshStudioTemplateHome = () => {
         <Inclusions inclusions={data.inclusions} title="Inclusions" />
       ) : null}
 
-      {t.galleryPageEnabled && t.isHomeSectionEnabled("home_gallery") ? (
+      {t.galleryPageEnabled && t.isHomeSectionEnabled("home_gallery") && t.galleryItems.length > 0 ? (
         <section className={PAGE_WRAP}>
-          <LinedHeading title="Gallery" style={{ color: ACCENT }} />
+          <LinedHeading title={String(data?.galleryTitle || "").trim() || "Gallery"} style={{ color: ACCENT }} />
           <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3">
             {t.homeGalleryItems.map((src, idx) => (
-              <div key={idx} className="aspect-square overflow-hidden rounded-[4px]" style={{ backgroundColor: "#15151f" }}>
+              <div key={idx} className="aspect-square overflow-hidden rounded-[4px]" style={{ backgroundColor: "var(--t-surface2, #15151f)" }}>
                 <img src={src} alt={`Gallery ${idx + 1}`} className="h-full w-full object-cover transition duration-300 hover:scale-105" />
               </div>
             ))}
@@ -171,7 +171,7 @@ const FreshStudioTemplateHome = () => {
                 type="button"
                 onClick={() => t.goToSection("gallery")}
                 className="rounded-full px-6 py-2.5 text-[13px] font-semibold focus-visible:outline focus-visible:outline-2"
-                style={{ border: "1px solid rgba(255,255,255,0.22)", color: HEADING, ...focusStyle }}
+                style={{ border: "1px solid color-mix(in srgb, var(--t-text, #ffffff) 22%, transparent)", color: HEADING, ...focusStyle }}
               >
                 Show more →
               </button>
@@ -182,7 +182,7 @@ const FreshStudioTemplateHome = () => {
 
       {t.isHomeSectionEnabled("home_testimonials") && t.testimonials.length ? (
         <section className={PAGE_WRAP}>
-          <LinedHeading title="What people say" style={{ color: ACCENT }} />
+          <LinedHeading title={String(data?.testimonialTitle || "").trim() || "What people say"} style={{ color: ACCENT }} />
           <div className="mt-7">
             <TestimonialsCarousel testimonials={t.testimonials} />
           </div>
@@ -192,7 +192,7 @@ const FreshStudioTemplateHome = () => {
                 type="button"
                 onClick={() => setReviewOpen(true)}
                 className="rounded-full px-6 py-2.5 text-[13px] font-semibold focus-visible:outline focus-visible:outline-2"
-                style={{ border: "1px solid rgba(255,255,255,0.22)", color: HEADING, ...focusStyle }}
+                style={{ border: "1px solid color-mix(in srgb, var(--t-text, #ffffff) 22%, transparent)", color: HEADING, ...focusStyle }}
               >
                 Write a review
               </button>
@@ -205,16 +205,16 @@ const FreshStudioTemplateHome = () => {
         <>
           <section className="relative overflow-hidden" style={{ background: ACCENT_GRADIENT }}>
             <div className={`${WRAP} relative z-10 flex flex-col items-center gap-2 py-12 text-center md:py-14`}>
-              <span className={EYEBROW} style={{ color: "rgba(255,255,255,0.85)" }}>
+              <span className={EYEBROW} style={{ color: "color-mix(in srgb, var(--t-text, #ffffff) min(100%, calc(var(--t-k, 1) * 85%)), transparent)" }}>
                 Contact
               </span>
               <h2 className={`text-[26px] font-extrabold md:text-[32px] ${HEADING_FONT}`} style={{ color: WHITE }}>
-                {data?.companyName ? `Let's talk, ${data.companyName}` : "Get in touch"}
+                {String(data?.contactTitle || "").trim() || (data?.companyName ? `Let's talk, ${data.companyName}` : "Get in touch")}
               </h2>
             </div>
             <div
               className="pointer-events-none absolute inset-0"
-              style={{ background: "radial-gradient(circle at 85% 30%, rgba(255,255,255,0.10), transparent 45%)" }}
+              style={{ background: "radial-gradient(circle at 85% 30%, color-mix(in srgb, var(--t-text, #ffffff) 10%, transparent), transparent 45%)" }}
             />
           </section>
           <section className={PAGE_WRAP}>
@@ -222,9 +222,9 @@ const FreshStudioTemplateHome = () => {
               {data?.mapUrl ? (
                 <iframe title="map" src={data.mapUrl} className="h-[320px] w-full rounded-[4px] border-0 md:h-[420px]" loading="lazy" />
               ) : (
-                <div className="h-[320px] w-full rounded-[4px] md:h-[420px]" style={{ backgroundColor: "#15151f" }} />
+                <div className="h-[320px] w-full rounded-[4px] md:h-[420px]" style={{ backgroundColor: "var(--t-surface2, #15151f)" }} />
               )}
-              <div className={`${CARD} border flex flex-col justify-center gap-4 p-7`} style={{ borderColor: "rgba(255,255,255,0.12)" }}>
+              <div className={`${CARD} border flex flex-col justify-center gap-4 p-7`} style={{ borderColor: "color-mix(in srgb, var(--t-text, #ffffff) 12%, transparent)" }}>
                 {data?.companyLogoUrl ? (
                   <img src={data.companyLogoUrl} alt={data.companyName || "Company"} className="mb-2 h-12 w-auto object-contain" />
                 ) : null}

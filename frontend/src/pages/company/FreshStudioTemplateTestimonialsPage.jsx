@@ -21,7 +21,7 @@ const FreshStudioTemplateTestimonialsPage = () => {
         <div className="flex flex-col items-center gap-4 text-center">
           <LinedHeading title={data?.testimonialsPageHeading || "Testimonials"} style={{ color: ACCENT }} />
           {data?.testimonialsPageIntro ? (
-            <p className="text-[14px]" style={{ color: "rgba(255,255,255,0.6)" }}>
+            <p className="text-[14px]" style={{ color: "color-mix(in srgb, var(--t-text, #ffffff) min(100%, calc(var(--t-k, 1) * 60%)), transparent)" }}>
               {data.testimonialsPageIntro}
             </p>
           ) : null}

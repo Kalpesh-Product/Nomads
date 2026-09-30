@@ -1,6 +1,7 @@
 import React from "react";
 import { useTemplateData } from "./templates/useTemplateData";
 import {
+  ON_SECONDARY,
   BROWN,
   CONTACT_ICON_CIRCLE,
   ContactMailIcon,
@@ -64,7 +65,7 @@ const WarmOrganicTemplateHome = () => {
   const showWriteReview = data?.testimonialsEnableWriteReview !== false;
 
   return (
-    <div className={`wo-template min-h-screen ${SANS}`} style={{ backgroundColor: "#F1E6D3", color: BROWN }}>
+    <div className={`wo-template min-h-screen ${SANS}`} style={{ backgroundColor: "var(--t-bg, #F1E6D3)", color: BROWN }}>
       <style>{`
         ${FONT_IMPORT}
         .wo-template button, .wo-template a[href] { cursor: pointer; }
@@ -84,7 +85,7 @@ const WarmOrganicTemplateHome = () => {
               className="pointer-events-none absolute inset-0"
               style={{
                 background:
-                  "radial-gradient(ellipse 60% 50% at 15% 15%, rgba(184,92,56,0.14), transparent 60%), radial-gradient(ellipse 50% 45% at 90% 85%, rgba(62,86,65,0.10), transparent 55%)",
+                  "radial-gradient(ellipse 60% 50% at 15% 15%, color-mix(in srgb, var(--t-accent, #B85C38) 14%, transparent), transparent 60%), radial-gradient(ellipse 50% 45% at 90% 85%, color-mix(in srgb, var(--t-secondary, #3E5641) 10%, transparent), transparent 55%)",
               }}
             />
             <div className={`${WRAP} relative grid gap-8 px-6 py-8 md:grid-cols-2 md:gap-10 md:px-11 md:py-12`}>
@@ -101,7 +102,7 @@ const WarmOrganicTemplateHome = () => {
                 <button
                   type="button"
                   className="self-start rounded-full px-7 py-3 text-[13px] font-semibold transition duration-200 hover:opacity-90"
-                  style={{ backgroundColor: FOREST, color: CREAM }}
+                  style={{ backgroundColor: FOREST, color: ON_SECONDARY }}
                 >
                   {data?.CTAButtonText || "Book a Tour"}
                 </button>
@@ -109,7 +110,7 @@ const WarmOrganicTemplateHome = () => {
               <div
                 className="relative flex aspect-square items-end justify-center overflow-hidden"
                 style={{
-                  background: `linear-gradient(150deg, #C9764E 0%, ${RUST} 55%, #8C4A2E 100%)`,
+                  background: `linear-gradient(150deg, var(--t-accent-light, #C9764E) 0%, ${RUST} 55%, var(--t-accent-dark, #8C4A2E) 100%)`,
                   borderRadius: "46% 54% 61% 39% / 45% 41% 59% 55%",
                 }}
               >
@@ -132,7 +133,7 @@ const WarmOrganicTemplateHome = () => {
               </div>
             </div>
           </section>
-          <div className="mx-6 md:mx-11" style={{ height: 1, backgroundColor: `${BROWN}26` }} />
+          <div className="mx-6 md:mx-11" style={{ height: 1, backgroundColor: `color-mix(in srgb, var(--t-text, #2B211A) 15%, transparent)` }} />
         </>
       ) : null}
 
@@ -170,7 +171,7 @@ const WarmOrganicTemplateHome = () => {
                 type="button"
                 onClick={() => t.goToSection("gallery")}
                 className="aspect-square overflow-hidden rounded-2xl"
-                style={{ backgroundColor: `${BROWN}0D` }}
+                style={{ backgroundColor: `color-mix(in srgb, var(--t-text, #2B211A) 5%, transparent)` }}
               >
                 <img src={src} alt={`Gallery ${idx + 1}`} className="h-full w-full object-cover transition duration-300 hover:scale-105" />
               </button>
@@ -182,7 +183,7 @@ const WarmOrganicTemplateHome = () => {
                 type="button"
                 onClick={() => t.goToSection("gallery")}
                 className="rounded-full px-6 py-2.5 text-[13px] font-semibold"
-                style={{ border: `1px solid ${BROWN}33`, color: BROWN }}
+                style={{ border: `1px solid color-mix(in srgb, var(--t-text, #2B211A) 20%, transparent)`, color: BROWN }}
               >
                 Show more →
               </button>
@@ -207,7 +208,7 @@ const WarmOrganicTemplateHome = () => {
             {data?.mapUrl ? (
               <iframe title="map" src={data.mapUrl} className="h-[320px] w-full rounded-3xl border-0 md:h-[420px]" loading="lazy" />
             ) : (
-              <div className="h-[320px] w-full rounded-3xl md:h-[420px]" style={{ backgroundColor: `${BROWN}0D` }} />
+              <div className="h-[320px] w-full rounded-3xl md:h-[420px]" style={{ backgroundColor: `color-mix(in srgb, var(--t-text, #2B211A) 5%, transparent)` }} />
             )}
             <div className="flex flex-col gap-5 rounded-3xl p-7 text-[15px]" style={{ backgroundColor: CREAM, color: MUTED }}>
               {data?.companyLogoUrl ? (

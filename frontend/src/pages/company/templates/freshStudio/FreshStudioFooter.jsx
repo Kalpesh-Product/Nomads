@@ -6,7 +6,7 @@ import {
   normalizePageNavItems,
   normalizeProductDropdownPages,
 } from "../../utils/templateRouteUtils";
-import { getEnabledFooterSocials } from "../../utils/footerSocialLinks";
+import { getEnabledFooterSocialsWithFallback } from "../../utils/footerSocialLinks";
 import { HEADING, MUTED, PAGE_BG, SOCIAL_ICON, SOCIAL_LABEL, focusStyle } from "./FreshStudioShared";
 
 // Site-level footer for Fresh Studio — same prop shape as the shared
@@ -35,7 +35,7 @@ const FreshStudioFooter = ({
     Array.isArray(productDropdownPages) ? productDropdownPages : [],
   ).map((p) => ({ name: p.name || p.slug || "", to: getProductPath(p.slug, pathname) }));
 
-  const socialLinks = getEnabledFooterSocials(socials);
+  const socialLinks = getEnabledFooterSocialsWithFallback(socials);
 
   return (
     // Unlike HostPanel's Fresh Studio (where the footer is a direct child of
@@ -43,7 +43,7 @@ const FreshStudioFooter = ({
     // sibling of <main> at the TemplateSite.jsx level with nothing dark
     // behind it — it needs its own explicit background or the page's light
     // body background bleeds through underneath it.
-    <footer style={{ backgroundColor: PAGE_BG, borderTop: "1px solid rgba(255,255,255,0.10)" }}>
+    <footer style={{ backgroundColor: PAGE_BG, borderTop: "1px solid color-mix(in srgb, var(--t-text, #ffffff) 10%, transparent)" }}>
       <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 px-6 py-14 text-center md:grid-cols-[1.35fr_1fr_1fr_1fr] md:px-10 md:text-left">
         <div>
           {logo ? (
@@ -61,19 +61,23 @@ const FreshStudioFooter = ({
           ) : null}
           {socialLinks.length > 0 ? (
             <div className="mt-4 flex items-center justify-center gap-3 md:justify-start">
-              {socialLinks.map((social) => (
-                <a
-                  key={`footer-social-${social.key}`}
-                  href={social.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label={SOCIAL_LABEL[social.key] || social.label}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border transition hover:bg-white hover:text-[#0A0A12] focus-visible:outline focus-visible:outline-2"
-                  style={{ borderColor: "rgba(255,255,255,0.18)", color: "#ffffff", ...focusStyle }}
-                >
-                  {SOCIAL_ICON[social.key]}
-                </a>
-              ))}
+              {socialLinks.map((social) => {
+                const Tag = social.href ? "a" : "span";
+                const linkProps = social.href ? { href: social.href, target: "_blank", rel: "noreferrer" } : { role: "img" };
+                return (
+                  <Tag
+                    key={`footer-social-${social.key}`}
+                    {...linkProps}
+                    aria-label={SOCIAL_LABEL[social.key] || social.label}
+                    className={`inline-flex h-9 w-9 items-center justify-center rounded-full border transition focus-visible:outline focus-visible:outline-2 ${
+                      social.href ? "hover:bg-[var(--t-text,#ffffff)] hover:text-[color:var(--t-bg,#0A0A12)]" : "cursor-default"
+                    }`}
+                    style={{ borderColor: "color-mix(in srgb, var(--t-text, #ffffff) 18%, transparent)", color: "#ffffff", ...focusStyle }}
+                  >
+                    {SOCIAL_ICON[social.key]}
+                  </Tag>
+                );
+              })}
             </div>
           ) : null}
         </div>
@@ -94,7 +98,7 @@ const FreshStudioFooter = ({
         {productsPageEnabled ? (
           <div>
             <h3 className="text-[12px] font-semibold uppercase tracking-[0.08em]" style={{ color: HEADING }}>
-              Services
+              {quickLinks.find((link) => link.slug === "products")?.name || "Services"}
             </h3>
             <div className="mt-3 flex flex-col items-center gap-2 text-[13.5px] md:items-start" style={{ color: MUTED }}>
               {productLinks.length > 0 ? (
@@ -104,7 +108,7 @@ const FreshStudioFooter = ({
                   </Link>
                 ))
               ) : (
-                <p style={{ color: "rgba(255,255,255,0.35)" }}>No products listed</p>
+                <p style={{ color: "color-mix(in srgb, var(--t-text, #ffffff) 35%, transparent)" }}>No products listed</p>
               )}
             </div>
           </div>
@@ -125,7 +129,7 @@ const FreshStudioFooter = ({
           </div>
         </div>
       </div>
-      <div className="px-6 py-4 text-center text-[12px]" style={{ borderTop: "1px solid rgba(255,255,255,0.10)", color: MUTED }}>
+      <div className="px-6 py-4 text-center text-[12px]" style={{ borderTop: "1px solid color-mix(in srgb, var(--t-text, #ffffff) 10%, transparent)", color: MUTED }}>
         &copy; {new Date().getFullYear()} {registeredCompany || ""}. All rights reserved.
       </div>
     </footer>

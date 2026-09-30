@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useTemplateData } from "./templates/useTemplateData";
 import {
+  ON_SECONDARY,
   BROWN,
   CREAM,
   FONT_IMPORT,
@@ -67,7 +68,7 @@ const WarmOrganicTemplatePartnerPage = () => {
   };
 
   return (
-    <div className={`wo-template min-h-screen ${SANS}`} style={{ backgroundColor: "#F1E6D3", color: BROWN }}>
+    <div className={`wo-template min-h-screen ${SANS}`} style={{ backgroundColor: "var(--t-bg, #F1E6D3)", color: BROWN }}>
       <style>{FONT_IMPORT}</style>
       <section className={PAGE_WRAP}>
         <LinedHeading title={partnerPageHeading} className="justify-center" />
@@ -89,7 +90,7 @@ const WarmOrganicTemplatePartnerPage = () => {
             </h3>
 
             {submitSuccess ? (
-              <div className="mt-6 rounded-2xl p-6 text-center" style={{ backgroundColor: "#FBF3E7" }}>
+              <div className="mt-6 rounded-2xl p-6 text-center" style={{ backgroundColor: "var(--t-surface, #FBF3E7)" }}>
                 <p className="text-[14px] font-medium">Thank you for your interest!</p>
                 <p className="mt-1 text-[13px]" style={{ color: MUTED }}>
                   We'll get back to you shortly.
@@ -137,7 +138,7 @@ const WarmOrganicTemplatePartnerPage = () => {
                   type="submit"
                   disabled={submitPending}
                   className="rounded-full py-3 text-[13px] font-semibold disabled:opacity-50"
-                  style={{ backgroundColor: FOREST, color: CREAM }}
+                  style={{ backgroundColor: FOREST, color: ON_SECONDARY }}
                 >
                   {submitPending ? "Submitting…" : "Connect"}
                 </button>

@@ -20,6 +20,7 @@ import {
   PILL_BUTTON,
   TEXT,
   WHITE,
+  ON_ACCENT,
   focusStyle,
   inputFocusStyle,
   inputStyle,
@@ -353,7 +354,7 @@ const FreshStudioTemplateCareerPage = () => {
       <div className="flex items-stretch overflow-hidden rounded-[4px]" style={inputStyle}>
         <span
           className="flex shrink-0 items-center border px-3 text-[13px]"
-          style={{ borderColor: "rgba(255,255,255,0.22)", color: MUTED, backgroundColor: "#1c1c26" }}
+          style={{ borderColor: "color-mix(in srgb, var(--t-text, #ffffff) 22%, transparent)", color: MUTED, backgroundColor: "var(--t-surface2, #1c1c26)" }}
         >
           {applyDialCode || "+ --"}
         </span>
@@ -368,16 +369,16 @@ const FreshStudioTemplateCareerPage = () => {
             if (form.country && digits && validatePhoneNumberLength(digits, form.country) === "TOO_LONG") return;
             setForm((p) => ({ ...p, phone: cleaned }));
           }}
-          className="w-full border px-3 py-2.5 text-[14px] bg-[#14141c]"
-          style={{ borderColor: "rgba(255,255,255,0.22)", color: TEXT }}
+          className="w-full border px-3 py-2.5 text-[14px] bg-[var(--t-surface,#14141c)]"
+          style={{ borderColor: "color-mix(in srgb, var(--t-text, #ffffff) 22%, transparent)", color: TEXT }}
         />
       </div>
       <label
         className="flex cursor-pointer items-center justify-between rounded-[4px] border px-3 py-2.5 text-[13px]"
-        style={{ borderColor: "rgba(255,255,255,0.22)", color: MUTED }}
+        style={{ borderColor: "color-mix(in srgb, var(--t-text, #ffffff) 22%, transparent)", color: MUTED }}
       >
         <span>{resumeFile ? resumeFile.name : "Upload resume / CV *"}</span>
-        <span className="rounded-[3px] border px-2 py-1 text-[11px] uppercase tracking-wider" style={{ borderColor: "rgba(255,255,255,0.18)" }}>
+        <span className="rounded-[3px] border px-2 py-1 text-[11px] uppercase tracking-wider" style={{ borderColor: "color-mix(in srgb, var(--t-text, #ffffff) 18%, transparent)" }}>
           Choose file
         </span>
         <input type="file" required accept=".pdf,.doc,.docx" className="hidden" onChange={(e) => setResumeFile(e.target.files?.[0] || null)} />
@@ -458,7 +459,7 @@ const FreshStudioTemplateCareerPage = () => {
                 {departments.map((dept) => {
                   const isOpen = openDept === dept.department;
                   return (
-                    <div key={dept.department} className={`${CARD} border`} style={{ borderColor: "rgba(255,255,255,0.12)" }}>
+                    <div key={dept.department} className={`${CARD} border`} style={{ borderColor: "color-mix(in srgb, var(--t-text, #ffffff) 12%, transparent)" }}>
                       <button
                         type="button"
                         onClick={() => setOpenDept(isOpen ? "" : dept.department)}
@@ -477,7 +478,7 @@ const FreshStudioTemplateCareerPage = () => {
                               key={job.jobCode || idx}
                               type="button"
                               onClick={() => handleSelectJob({ ...job, department: dept.department })}
-                              className="flex items-center justify-between rounded-[4px] px-3 py-2.5 text-left transition hover:bg-white/5 focus-visible:outline focus-visible:outline-2"
+                              className="flex items-center justify-between rounded-[4px] px-3 py-2.5 text-left transition hover:bg-[color-mix(in_srgb,var(--t-text,#ffffff)_5%,transparent)] focus-visible:outline focus-visible:outline-2"
                               style={focusStyle}
                             >
                               <div className="min-w-0">
@@ -507,7 +508,7 @@ const FreshStudioTemplateCareerPage = () => {
               </div>
             )}
 
-            <div className="mt-10 flex flex-col items-center border-t pt-8 text-center" style={{ borderColor: "rgba(255,255,255,0.10)" }}>
+            <div className="mt-10 flex flex-col items-center border-t pt-8 text-center" style={{ borderColor: "color-mix(in srgb, var(--t-text, #ffffff) 10%, transparent)" }}>
               {companyLogo ? (
                 <img src={companyLogo} alt={companyName} className="h-12 object-contain" />
               ) : companyName ? (
@@ -518,7 +519,7 @@ const FreshStudioTemplateCareerPage = () => {
               <p className="mt-4 max-w-lg text-[14px] leading-7" style={{ color: MUTED }}>
                 {careersClosingText || "Please send in your resume here on Apply Now if you cannot find your department of interest."}
               </p>
-              <p className="mt-1 text-[12px]" style={{ color: "rgba(255,255,255,0.4)" }}>
+              <p className="mt-1 text-[12px]" style={{ color: "color-mix(in srgb, var(--t-text, #ffffff) 40%, transparent)" }}>
                 {careersClosingHeading || "*Mention your applying department in the message box"}
               </p>
             </div>
@@ -533,7 +534,7 @@ const FreshStudioTemplateCareerPage = () => {
             </h2>
 
             {!isGeneral ? (
-              <div className="mt-6 flex gap-6" style={{ borderBottom: "1px solid rgba(255,255,255,0.10)" }}>
+              <div className="mt-6 flex gap-6" style={{ borderBottom: "1px solid color-mix(in srgb, var(--t-text, #ffffff) 10%, transparent)" }}>
                 <button
                   type="button"
                   onClick={() => setActiveTab("description")}
@@ -599,7 +600,7 @@ const FreshStudioTemplateCareerPage = () => {
                     </ul>
                   </div>
                 ) : null}
-                <div className="mt-2 pt-6 text-center" style={{ borderTop: "1px solid rgba(255,255,255,0.10)" }}>
+                <div className="mt-2 pt-6 text-center" style={{ borderTop: "1px solid color-mix(in srgb, var(--t-text, #ffffff) 10%, transparent)" }}>
                   {companyLogo ? (
                     <img src={companyLogo} alt={companyName} className="mx-auto h-12 object-contain" />
                   ) : companyName ? (
@@ -623,7 +624,7 @@ const FreshStudioTemplateCareerPage = () => {
             {activeTab === "apply" || isGeneral ? (
               <div className="mt-8">
                 {submitSuccess ? (
-                  <div className={`${CARD} border p-6 text-center`} style={{ borderColor: "rgba(255,255,255,0.12)" }}>
+                  <div className={`${CARD} border p-6 text-center`} style={{ borderColor: "color-mix(in srgb, var(--t-text, #ffffff) 12%, transparent)" }}>
                     <p className="text-[14px] font-semibold" style={{ color: HEADING }}>
                       Application submitted!
                     </p>
@@ -632,14 +633,14 @@ const FreshStudioTemplateCareerPage = () => {
                     </p>
                   </div>
                 ) : (
-                  <form onSubmit={handleSubmit} className={`${CARD} border grid grid-cols-1 gap-3 p-6 md:grid-cols-2 md:p-7`} style={{ borderColor: "rgba(255,255,255,0.12)" }}>
+                  <form onSubmit={handleSubmit} className={`${CARD} border grid grid-cols-1 gap-3 p-6 md:grid-cols-2 md:p-7`} style={{ borderColor: "color-mix(in srgb, var(--t-text, #ffffff) 12%, transparent)" }}>
                     {renderFormFields()}
-                    {submitError ? <p className="md:col-span-2 text-[12px] text-[#D94B4B]">{submitError}</p> : null}
+                    {submitError ? <p className="md:col-span-2 text-[12px] text-[color:var(--t-accent,#D94B4B)]">{submitError}</p> : null}
                     <button
                       type="submit"
                       disabled={submitPending}
                       className={`${PILL_BUTTON} md:col-span-2 disabled:opacity-50`}
-                      style={{ background: ACCENT_GRADIENT, color: WHITE, ...focusStyle }}
+                      style={{ background: ACCENT_GRADIENT, color: ON_ACCENT, ...focusStyle }}
                     >
                       {submitPending ? "Submitting…" : "Submit application"}
                     </button>

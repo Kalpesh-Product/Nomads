@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import { useLocation } from "react-router-dom";
 import humanDate from "../utils/humanDate";
+import { createDriverGuide } from "../utils/driverGuide";
 
 const AI_CONTENT_DETAIL_GUIDE_SEEN_KEY_PREFIX =
   "wono-ai-content-detail-guide-seen";
@@ -167,7 +167,7 @@ const AiBlogDetails = () => {
       return;
     }
 
-    const guide = driver({
+    const guide = createDriverGuide({
       showProgress: true,
       allowClose: true,
       animate: true,
@@ -177,12 +177,10 @@ const AiBlogDetails = () => {
       prevBtnText: "Back",
       doneBtnText: "Done",
       steps: guideSteps,
-      onDestroyed: () => {
-        window.localStorage.setItem(contentDetailGuideSeenKey, "1");
-      },
+      guideSeenKey: contentDetailGuideSeenKey,
     });
 
-    guide.drive();
+    guide?.drive();
   }, [contentDetailGuideSeenKey, contentType]);
 
   useEffect(() => {

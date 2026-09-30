@@ -6,7 +6,6 @@ import React, {
   useState,
   useEffect,
 } from "react";
-import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import { Helmet } from "@dr.pogodin/react-helmet";
 import {
@@ -22,6 +21,7 @@ import { setFormValues } from "../features/locationSlice";
 import useAuth from "../hooks/useAuth";
 import useSpecialUserEmails from "../hooks/useSpecialUserEmails";
 import axios from "../utils/axios";
+import { createDriverGuide } from "../utils/driverGuide";
 
 import { aiDestinationCards } from "../constants/aiDestinationCards";
 import { persistSelectedDestination } from "../utils/selectedDestinationSession";
@@ -505,7 +505,7 @@ const AiManualSearch = () => {
       return;
     }
 
-    const guide = driver({
+    const guide = createDriverGuide({
       showProgress: true,
       allowClose: true,
       animate: true,
@@ -515,12 +515,10 @@ const AiManualSearch = () => {
       prevBtnText: "Back",
       doneBtnText: "Done",
       steps: guideSteps,
-      onDestroyed: () => {
-        window.localStorage.setItem(MANUAL_SEARCH_GUIDE_SEEN_KEY, "1");
-      },
+      guideSeenKey: MANUAL_SEARCH_GUIDE_SEEN_KEY,
     });
 
-    guide.drive();
+    guide?.drive();
   }, []);
 
   useEffect(() => {
