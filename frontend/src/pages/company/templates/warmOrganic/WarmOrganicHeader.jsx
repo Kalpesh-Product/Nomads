@@ -77,7 +77,7 @@ const WarmOrganicHeader = forwardRef(
           <div key={item.slug} className="relative inline-flex items-center">
             <div
               className={`inline-flex items-center gap-1.5 border-b-2 pb-1 text-[13px] transition-colors duration-150 ${SANS}`}
-              style={isActive || productsOpen ? { color: RUST, borderColor: RUST, fontWeight: 600 } : { color: "#5A4A3C", borderColor: "transparent" }}
+              style={isActive || productsOpen ? { color: RUST, borderColor: RUST, fontWeight: 600 } : { color: "var(--t-muted, #5A4A3C)", borderColor: "transparent" }}
             >
               <button type="button" onClick={() => goTo(getSectionPath("products", location.pathname))}>
                 {item.name}
@@ -95,12 +95,12 @@ const WarmOrganicHeader = forwardRef(
               </button>
             </div>
             {productsOpen && normalizedProductPages.length > 0 ? (
-              <div className="absolute left-1/2 top-full z-50 mt-3 w-60 -translate-x-1/2 rounded-2xl bg-white p-2 shadow-2xl" style={{ border: `1px solid ${BROWN}22` }}>
+              <div className="absolute left-1/2 top-full z-50 mt-3 w-60 -translate-x-1/2 rounded-2xl bg-[var(--t-raised,#ffffff)] p-2 shadow-2xl" style={{ border: `1px solid color-mix(in srgb, var(--t-text, #2B211A) 13%, transparent)` }}>
                 <button
                   type="button"
                   onClick={() => goTo(getSectionPath("products", location.pathname))}
                   className="block w-full rounded-xl px-3 py-2.5 text-left text-sm font-semibold hover:bg-black/[0.03]"
-                  style={{ color: "#5A4A3C" }}
+                  style={{ color: "var(--t-muted, #5A4A3C)" }}
                 >
                   All Services
                 </button>
@@ -112,7 +112,7 @@ const WarmOrganicHeader = forwardRef(
                       type="button"
                       onClick={() => goTo(getProductPath(product.slug, location.pathname))}
                       className="block w-full rounded-xl px-3 py-2.5 text-left text-sm hover:bg-black/[0.03]"
-                      style={isSelected ? { color: RUST, fontWeight: 600 } : { color: "#5A4A3C" }}
+                      style={isSelected ? { color: RUST, fontWeight: 600 } : { color: "var(--t-muted, #5A4A3C)" }}
                     >
                       {product.name}
                     </button>
@@ -130,7 +130,7 @@ const WarmOrganicHeader = forwardRef(
           type="button"
           onClick={() => goTo(item.to)}
           className={`text-[13px] border-b-2 pb-1 transition-colors duration-150 ${SANS} ${isActive ? "font-semibold" : "font-normal"}`}
-          style={{ color: isActive ? RUST : "#5A4A3C", borderColor: isActive ? RUST : "transparent" }}
+          style={{ color: isActive ? RUST : "var(--t-muted, #5A4A3C)", borderColor: isActive ? RUST : "transparent" }}
         >
           {item.name}
         </button>
@@ -140,8 +140,8 @@ const WarmOrganicHeader = forwardRef(
     return (
       <header
         ref={ref}
-        className="sticky top-0 z-30 bg-white border-b border-black/5"
-        style={{ backdropFilter: "blur(4px)" }}
+        className="sticky top-0 z-30 bg-[var(--t-raised,#ffffff)] border-b border-black/5"
+        style={{ backdropFilter: "blur(4px)", color: BROWN }}
       >
         <style>{FONT_IMPORT}</style>
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-6 py-5 md:px-11">
@@ -162,7 +162,7 @@ const WarmOrganicHeader = forwardRef(
             type="button"
             onClick={() => setMobileOpen((prev) => !prev)}
             className="inline-flex h-9 w-9 items-center justify-center rounded-full md:hidden"
-            style={{ border: `1px solid ${BROWN}33` }}
+            style={{ border: `1px solid color-mix(in srgb, var(--t-text, #2B211A) 20%, transparent)` }}
             aria-label="Toggle navigation"
           >
             <span className="flex flex-col gap-1">
@@ -185,14 +185,14 @@ const WarmOrganicHeader = forwardRef(
         </div>
 
         {mobileOpen ? (
-          <div className="px-6 py-3 md:hidden" style={{ borderTop: `1px solid ${BROWN}22` }}>
+          <div className="px-6 py-3 md:hidden" style={{ borderTop: `1px solid color-mix(in srgb, var(--t-text, #2B211A) 13%, transparent)` }}>
             <div className="flex flex-col">
               {links.map((item) => {
                 const section = resolveSectionFromSlug(item.slug || item.name);
                 const isActive = currentSection === section;
                 if (section === "products") {
                   return (
-                    <div key={`m-${item.slug}`} style={{ borderBottom: `1px solid ${BROWN}15` }}>
+                    <div key={`m-${item.slug}`} style={{ borderBottom: `1px solid color-mix(in srgb, var(--t-text, #2B211A) 8%, transparent)` }}>
                       <div className="flex items-center gap-2 py-3">
                         <button type="button" onClick={() => goTo(getSectionPath("products", location.pathname))} className="flex-1 text-left text-[14px]">
                           {item.name}
@@ -201,7 +201,7 @@ const WarmOrganicHeader = forwardRef(
                           type="button"
                           onClick={() => setMobileProductsOpen((prev) => !prev)}
                           className="inline-flex h-8 w-8 items-center justify-center rounded-full"
-                          style={{ border: `1px solid ${BROWN}33` }}
+                          style={{ border: `1px solid color-mix(in srgb, var(--t-text, #2B211A) 20%, transparent)` }}
                           aria-label="Toggle product pages"
                         >
                           <svg viewBox="0 0 20 20" aria-hidden="true" className={`h-3.5 w-3.5 transition-transform ${mobileProductsOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -210,14 +210,14 @@ const WarmOrganicHeader = forwardRef(
                         </button>
                       </div>
                       {mobileProductsOpen && normalizedProductPages.length > 0 ? (
-                        <div className="flex flex-col gap-1 pb-2" style={{ borderTop: `1px solid ${BROWN}15` }}>
+                        <div className="flex flex-col gap-1 pb-2" style={{ borderTop: `1px solid color-mix(in srgb, var(--t-text, #2B211A) 8%, transparent)` }}>
                           {normalizedProductPages.map((product, index) => (
                             <button
                               key={`m-product-${product.slug || index}`}
                               type="button"
                               onClick={() => goTo(getProductPath(product.slug, location.pathname))}
                               className="rounded px-3 py-2 text-left text-sm hover:bg-black/[0.03]"
-                              style={{ color: "#5A4A3C" }}
+                              style={{ color: "var(--t-muted, #5A4A3C)" }}
                             >
                               {product.name}
                             </button>
@@ -233,7 +233,7 @@ const WarmOrganicHeader = forwardRef(
                     type="button"
                     onClick={() => goTo(item.to)}
                     className="py-3 text-left text-[14px]"
-                    style={{ borderBottom: `1px solid ${BROWN}15` }}
+                    style={{ borderBottom: `1px solid color-mix(in srgb, var(--t-text, #2B211A) 8%, transparent)` }}
                   >
                     {item.name}
                   </button>
@@ -243,7 +243,7 @@ const WarmOrganicHeader = forwardRef(
                 type="button"
                 onClick={() => window.location.assign("https://hostpanel.wono.co/")}
                 className="py-3 text-left text-[14px] font-semibold"
-                style={{ borderBottom: `1px solid ${BROWN}15`, color: RUST }}
+                style={{ borderBottom: `1px solid color-mix(in srgb, var(--t-text, #2B211A) 8%, transparent)`, color: RUST }}
               >
                 Login
               </button>

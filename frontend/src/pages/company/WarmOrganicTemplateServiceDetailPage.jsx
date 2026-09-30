@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useTemplateData } from "./templates/useTemplateData";
 import {
+  ON_SECONDARY,
   BROWN,
   CREAM,
   EYEBROW,
@@ -104,7 +105,7 @@ const WarmOrganicTemplateServiceDetailPage = () => {
 
   if (!page) {
     return (
-      <div className={`wo-template min-h-screen ${SANS}`} style={{ backgroundColor: "#F1E6D3", color: BROWN }}>
+      <div className={`wo-template min-h-screen ${SANS}`} style={{ backgroundColor: "var(--t-bg, #F1E6D3)", color: BROWN }}>
         <style>{FONT_IMPORT}</style>
         <section className={PAGE_WRAP}>
           <div className="text-center">
@@ -116,7 +117,7 @@ const WarmOrganicTemplateServiceDetailPage = () => {
               type="button"
               onClick={() => t.goToSection("products")}
               className="mt-6 rounded-full px-7 py-3 text-[13px] font-semibold"
-              style={{ backgroundColor: FOREST, color: CREAM }}
+              style={{ backgroundColor: FOREST, color: ON_SECONDARY }}
             >
               Back to Services
             </button>
@@ -187,7 +188,7 @@ const WarmOrganicTemplateServiceDetailPage = () => {
   };
 
   return (
-    <div className={`wo-template min-h-screen ${SANS}`} style={{ backgroundColor: "#F1E6D3", color: BROWN }}>
+    <div className={`wo-template min-h-screen ${SANS}`} style={{ backgroundColor: "var(--t-bg, #F1E6D3)", color: BROWN }}>
       <style>{FONT_IMPORT}</style>
       {selectedDetailItem ? (
         <>
@@ -201,7 +202,7 @@ const WarmOrganicTemplateServiceDetailPage = () => {
                     className="h-[300px] w-full rounded-3xl object-cover md:h-[480px]"
                   />
                 ) : (
-                  <div className="h-[300px] w-full rounded-3xl md:h-[480px]" style={{ backgroundColor: `${BROWN}0D` }} />
+                  <div className="h-[300px] w-full rounded-3xl md:h-[480px]" style={{ backgroundColor: `color-mix(in srgb, var(--t-text, #2B211A) 5%, transparent)` }} />
                 )}
               </div>
               <div className="flex flex-col md:h-[480px]">
@@ -263,7 +264,7 @@ const WarmOrganicTemplateServiceDetailPage = () => {
                         type="submit"
                         disabled={leadSubmitPending}
                         className="rounded-full py-3 text-[13px] font-semibold disabled:opacity-50"
-                        style={{ backgroundColor: FOREST, color: CREAM }}
+                        style={{ backgroundColor: FOREST, color: ON_SECONDARY }}
                       >
                         {leadSubmitPending ? "Submitting…" : "Submit enquiry"}
                       </button>
@@ -278,7 +279,7 @@ const WarmOrganicTemplateServiceDetailPage = () => {
         </>
       ) : (
         <>
-          <section className="relative h-[50svh] min-h-[320px] overflow-hidden md:h-[85vh] md:min-h-[400px]" style={{ backgroundColor: `${BROWN}0D` }}>
+          <section className="relative h-[50svh] min-h-[320px] overflow-hidden md:h-[85vh] md:min-h-[400px]" style={{ backgroundColor: `color-mix(in srgb, var(--t-text, #2B211A) 5%, transparent)` }}>
             {selectedProductHeroImage ? (
               <img src={selectedProductHeroImage} alt={page?.name || "Service"} className="absolute inset-0 h-full w-full object-cover opacity-100" />
             ) : null}
@@ -287,7 +288,7 @@ const WarmOrganicTemplateServiceDetailPage = () => {
                 {page?.heroHeading || page?.name}
               </h1>
               {page?.heroSubHeading ? (
-                <p className="mx-auto mt-1 max-w-xl text-[14.5px]" style={{ color: MUTED }}>
+                <p className="mx-auto mt-1 max-w-xl text-[14.5px]" style={{ color: "white" }}>
                   {page.heroSubHeading}
                 </p>
               ) : null}
@@ -295,7 +296,7 @@ const WarmOrganicTemplateServiceDetailPage = () => {
                 <button
                   type="button"
                   className="mt-2 self-center rounded-full px-7 py-3 text-[13px] font-semibold transition duration-200 hover:opacity-90"
-                  style={{ backgroundColor: FOREST, color: CREAM }}
+                  style={{ backgroundColor: FOREST, color: ON_SECONDARY }}
                 >
                   {page.heroButtonText}
                 </button>
@@ -333,7 +334,7 @@ const WarmOrganicTemplateServiceDetailPage = () => {
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
                   {(Array.isArray(data?.menuItems) ? data.menuItems : []).map((item, idx) => (
                     <div key={idx} className="rounded-2xl p-5" style={{ backgroundColor: CREAM }}>
-                      {item?.image ? <img src={item.image} alt={item?.name} className="aspect-[4/3] w-full rounded-xl object-cover" /> : null}
+                      {getMediaSrc(item?.image) ? <img src={getMediaSrc(item.image)} alt={item?.name} className="aspect-[4/3] w-full rounded-xl object-cover" /> : null}
                       <div className="mt-3 flex items-center justify-between">
                         <h4 className={`text-[15px] font-normal ${SERIF}`}>{item?.name}</h4>
                         {item?.price ? (
@@ -342,6 +343,11 @@ const WarmOrganicTemplateServiceDetailPage = () => {
                           </span>
                         ) : null}
                       </div>
+                      {item?.description ? (
+                        <p className="mt-2 text-[13px] leading-relaxed" style={{ color: MUTED }}>
+                          {item.description}
+                        </p>
+                      ) : null}
                     </div>
                   ))}
                 </div>

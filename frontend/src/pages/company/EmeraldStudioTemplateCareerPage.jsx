@@ -79,8 +79,8 @@ const parseCareersFormFields = (value) => {
 // aboutTheJob/keyResponsibilities/requirements as plain whitespace-pre-wrap
 // paragraphs (no bullet-splitting, no softSkills block, no resume-fallback
 // closing block) — ported faithfully as-is, same as Warm Organic's port.
-// The apply-form card itself is full-width (bg-emerald-900/30 border
-// border-emerald-800/50 rounded-2xl p-8, grid md:grid-cols-2), matching the
+// The apply-form card itself is full-width (bg-[#1f3556]/30 border
+// border-white/25 rounded-2xl p-8, grid md:grid-cols-2), matching the
 // bug fix already applied to HostPanel's source this session (previously it
 // was constrained to max-w-2xl).
 const EmeraldStudioTemplateCareerPage = () => {
@@ -241,14 +241,14 @@ const EmeraldStudioTemplateCareerPage = () => {
   const introParagraphs = careersPageIntro ? careersPageIntro.split("\n").filter(Boolean) : CAREERS_FALLBACK_INTRO;
 
   return (
-    <div className={`${TEMPLATE_ROOT_CLASS} min-h-screen bg-[#002c22] text-stone-100 ${BODY_FONT}`}>
+    <div className={`${TEMPLATE_ROOT_CLASS} min-h-screen bg-[#4a6b96] text-white ${BODY_FONT}`}>
       <style>{`${FONT_IMPORT}${STYLE_OVERRIDES}`}</style>
       <section className={`pt-20 pb-24 px-6 ${SECTION_BG}`}>
         <div className="max-w-7xl mx-auto">
           {!selectedJob ? (
             <>
               <LinedHeading title={companyName ? `Join Our Team - ${companyName}` : "Join Our Team - Company Name"} className="justify-center" />
-              <div className="text-stone-400 text-lg max-w-2xl mx-auto text-center leading-relaxed mb-12">
+              <div className="text-white/90 text-lg max-w-2xl mx-auto text-center leading-relaxed mb-12">
                 {introParagraphs.map((p, i) => (
                   <p key={i} className="mb-3 last:mb-0">
                     {p}
@@ -257,24 +257,24 @@ const EmeraldStudioTemplateCareerPage = () => {
               </div>
 
               {jobsLoading ? (
-                <p className="text-stone-500">Loading open roles…</p>
+                <p className="text-white/90">Loading open roles…</p>
               ) : jobs.length === 0 ? (
-                <p className="text-stone-500">No job openings at the moment — check back later.</p>
+                <p className="text-white/90">No job openings at the moment — check back later.</p>
               ) : (
                 <div className="space-y-4">
                   {departments.map((dept) => {
                     const isOpen = openDept === dept.department;
                     return (
-                      <div key={dept.department} className="bg-emerald-900/40 border border-emerald-800/50 rounded-xl overflow-hidden">
+                      <div key={dept.department} className="bg-[#1f3556]/35 border border-white/25 rounded-xl overflow-hidden">
                         <button
                           type="button"
                           onClick={() => setOpenDept(isOpen ? "" : dept.department)}
                           className="w-full flex items-center justify-between px-7 py-5 text-left"
                         >
-                          <span className={`font-semibold text-lg text-stone-100 ${HEADING_FONT}`}>
+                          <span className={`font-semibold text-lg text-white ${HEADING_FONT}`}>
                             {dept.ordinal}. {dept.department}
                           </span>
-                          <span className="text-amber-400">{isOpen ? "−" : "+"}</span>
+                          <span className="text-white">{isOpen ? "−" : "+"}</span>
                         </button>
                         {isOpen ? (
                           <div className="px-7 pb-5 space-y-1">
@@ -283,13 +283,13 @@ const EmeraldStudioTemplateCareerPage = () => {
                                 key={job.jobCode || idx}
                                 type="button"
                                 onClick={() => handleSelectJob({ ...job, department: dept.department })}
-                                className="w-full flex items-center justify-between border-t border-emerald-800/40 py-4 text-left hover:text-amber-400 transition-colors"
+                                className="w-full flex items-center justify-between border-t border-white/20 py-4 text-left hover:text-white transition-colors"
                               >
                                 <div>
-                                  <p className="font-medium text-stone-100 text-sm">{job?.title || job?.designation || job?.name}</p>
-                                  <p className="text-stone-500 text-xs mt-0.5">{job?.location || ""}</p>
+                                  <p className="font-medium text-white text-sm">{job?.title || job?.designation || job?.name}</p>
+                                  <p className="text-white/90 text-xs mt-0.5">{job?.location || ""}</p>
                                 </div>
-                                <span className="text-amber-400 text-xs font-semibold uppercase tracking-wider">{applyBtnText} →</span>
+                                <span className="text-white text-xs font-semibold uppercase tracking-wider">{applyBtnText} →</span>
                               </button>
                             ))}
                           </div>
@@ -300,16 +300,16 @@ const EmeraldStudioTemplateCareerPage = () => {
                   <button
                     type="button"
                     onClick={handleGeneralApply}
-                    className="mt-8 inline-flex items-center gap-2 border border-emerald-700 text-stone-300 font-medium px-7 py-3.5 rounded hover:border-amber-400 hover:text-amber-400 transition-colors text-sm"
+                    className="mt-8 inline-flex items-center gap-2 border border-white/50 text-white/90 font-medium px-7 py-3.5 rounded hover:border-white hover:text-white transition-colors text-sm"
                   >
                     General Application
                   </button>
                   {careersClosingText || careersClosingHeading ? (
                     <div className="mt-12 text-center">
                       {careersClosingHeading ? (
-                        <p className={`text-lg font-semibold text-stone-100 ${HEADING_FONT}`}>{careersClosingHeading}</p>
+                        <p className={`text-lg font-semibold text-white ${HEADING_FONT}`}>{careersClosingHeading}</p>
                       ) : null}
-                      {careersClosingText ? <p className="mt-2 text-stone-400 text-sm leading-relaxed">{careersClosingText}</p> : null}
+                      {careersClosingText ? <p className="mt-2 text-white/90 text-sm leading-relaxed">{careersClosingText}</p> : null}
                     </div>
                   ) : null}
                 </div>
@@ -320,21 +320,21 @@ const EmeraldStudioTemplateCareerPage = () => {
               <button
                 type="button"
                 onClick={() => t.goToSection("careers")}
-                className="text-sm font-medium text-amber-400 hover:text-amber-300 underline underline-offset-4 mb-6"
+                className="text-sm font-medium text-white hover:text-white underline underline-offset-4 mb-6"
               >
                 ← Back to Careers
               </button>
-              <h1 className={`text-4xl md:text-5xl font-semibold text-stone-100 mb-6 ${HEADING_FONT}`}>
+              <h1 className={`text-4xl md:text-5xl font-semibold text-white mb-6 ${HEADING_FONT}`}>
                 {isGeneral ? "General Application" : getCareersJobTitle(selectedJob)}
               </h1>
 
               {!isGeneral ? (
-                <div className="flex gap-6 border-b border-emerald-800/50 mb-8">
+                <div className="flex gap-6 border-b border-white/25 mb-8">
                   <button
                     type="button"
                     onClick={() => setActiveTab("description")}
                     className={`pb-3 text-xs font-semibold uppercase tracking-widest transition-colors ${
-                      activeTab === "description" ? "text-amber-400 border-b-2 border-amber-400" : "text-stone-500 hover:text-stone-300"
+                      activeTab === "description" ? "text-white border-b-2 border-white" : "text-white/90 hover:text-white"
                     }`}
                   >
                     Description
@@ -343,7 +343,7 @@ const EmeraldStudioTemplateCareerPage = () => {
                     type="button"
                     onClick={() => setActiveTab("apply")}
                     className={`pb-3 text-xs font-semibold uppercase tracking-widest transition-colors ${
-                      activeTab === "apply" ? "text-amber-400 border-b-2 border-amber-400" : "text-stone-500 hover:text-stone-300"
+                      activeTab === "apply" ? "text-white border-b-2 border-white" : "text-white/90 hover:text-white"
                     }`}
                   >
                     Apply
@@ -352,22 +352,22 @@ const EmeraldStudioTemplateCareerPage = () => {
               ) : null}
 
               {activeTab === "description" && !isGeneral ? (
-                <div className="max-w-2xl space-y-6 text-stone-400 text-base leading-relaxed">
+                <div className="max-w-2xl space-y-6 text-white/90 text-base leading-relaxed">
                   {selectedJob?.aboutTheJob ? (
                     <div>
-                      <p className="font-semibold text-stone-100 mb-1">About this role</p>
+                      <p className="font-semibold text-white mb-1">About this role</p>
                       <p className="whitespace-pre-wrap">{selectedJob.aboutTheJob}</p>
                     </div>
                   ) : null}
                   {selectedJob?.keyResponsibilities ? (
                     <div>
-                      <p className="font-semibold text-stone-100 mb-1">Key responsibilities</p>
+                      <p className="font-semibold text-white mb-1">Key responsibilities</p>
                       <p className="whitespace-pre-wrap">{selectedJob.keyResponsibilities}</p>
                     </div>
                   ) : null}
                   {selectedJob?.requirements ? (
                     <div>
-                      <p className="font-semibold text-stone-100 mb-1">Requirements</p>
+                      <p className="font-semibold text-white mb-1">Requirements</p>
                       <p className="whitespace-pre-wrap">{selectedJob.requirements}</p>
                     </div>
                   ) : null}
@@ -377,18 +377,18 @@ const EmeraldStudioTemplateCareerPage = () => {
               {activeTab === "apply" || isGeneral ? (
                 <div>
                   {submitSuccess ? (
-                    <div className="bg-emerald-900/30 border border-emerald-800/50 rounded-2xl p-8 text-center">
-                      <div className="w-14 h-14 rounded-full bg-amber-400 flex items-center justify-center text-emerald-950 text-2xl mb-4 mx-auto">✓</div>
-                      <h3 className={`text-xl font-semibold text-stone-100 mb-2 ${HEADING_FONT}`}>Application submitted!</h3>
-                      <p className="text-stone-400 text-sm">We&apos;ll review it and get back to you shortly.</p>
+                    <div className="bg-[#1f3556]/30 border border-white/25 rounded-2xl p-8 text-center">
+                      <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center text-slate-900 text-2xl mb-4 mx-auto">✓</div>
+                      <h3 className={`text-xl font-semibold text-white mb-2 ${HEADING_FONT}`}>Application submitted!</h3>
+                      <p className="text-white/90 text-sm">We&apos;ll review it and get back to you shortly.</p>
                     </div>
                   ) : (
                     <form
                       onSubmit={handleSubmit}
-                      className="bg-emerald-900/30 border border-emerald-800/50 rounded-2xl p-8 grid grid-cols-1 md:grid-cols-2 gap-4"
+                      className="bg-[#1f3556]/30 border border-white/25 rounded-2xl p-8 grid grid-cols-1 md:grid-cols-2 gap-4"
                     >
                       <div>
-                        <label className="block text-xs font-semibold text-stone-400 uppercase tracking-wider mb-1">Full Name *</label>
+                        <label className="block text-xs font-semibold text-white/90 uppercase tracking-wider mb-1">Full Name *</label>
                         <input
                           type="text"
                           required
@@ -398,7 +398,7 @@ const EmeraldStudioTemplateCareerPage = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-stone-400 uppercase tracking-wider mb-1">Email *</label>
+                        <label className="block text-xs font-semibold text-white/90 uppercase tracking-wider mb-1">Email *</label>
                         <input
                           type="email"
                           required
@@ -408,7 +408,7 @@ const EmeraldStudioTemplateCareerPage = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-stone-400 uppercase tracking-wider mb-1">Date of Birth *</label>
+                        <label className="block text-xs font-semibold text-white/90 uppercase tracking-wider mb-1">Date of Birth *</label>
                         <input
                           type="date"
                           required
@@ -418,7 +418,7 @@ const EmeraldStudioTemplateCareerPage = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-stone-400 uppercase tracking-wider mb-1">Country *</label>
+                        <label className="block text-xs font-semibold text-white/90 uppercase tracking-wider mb-1">Country *</label>
                         <select
                           required
                           value={form.country}
@@ -434,7 +434,7 @@ const EmeraldStudioTemplateCareerPage = () => {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-stone-400 uppercase tracking-wider mb-1">State *</label>
+                        <label className="block text-xs font-semibold text-white/90 uppercase tracking-wider mb-1">State *</label>
                         <select
                           required
                           disabled={!form.country}
@@ -451,7 +451,7 @@ const EmeraldStudioTemplateCareerPage = () => {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-stone-400 uppercase tracking-wider mb-1">City *</label>
+                        <label className="block text-xs font-semibold text-white/90 uppercase tracking-wider mb-1">City *</label>
                         <select
                           required
                           disabled={!form.state}
@@ -468,9 +468,9 @@ const EmeraldStudioTemplateCareerPage = () => {
                         </select>
                       </div>
                       <div className="md:col-span-2">
-                        <label className="block text-xs font-semibold text-stone-400 uppercase tracking-wider mb-1">Phone *</label>
+                        <label className="block text-xs font-semibold text-white/90 uppercase tracking-wider mb-1">Phone *</label>
                         <div className="flex items-stretch">
-                          <span className="flex shrink-0 items-center border border-r-0 border-emerald-800 bg-emerald-950/60 px-3 text-sm text-stone-500 rounded-l-lg">
+                          <span className="flex shrink-0 items-center border border-r-0 border-white/25 bg-white/10 px-3 text-sm text-white/90 rounded-l-lg">
                             {applyDialCode || "+ --"}
                           </span>
                           <input
@@ -483,14 +483,14 @@ const EmeraldStudioTemplateCareerPage = () => {
                               if (form.country && digits && validatePhoneNumberLength(digits, form.country) === "TOO_LONG") return;
                               setForm((p) => ({ ...p, phone: cleaned }));
                             }}
-                            className="flex-1 bg-emerald-950/60 border border-emerald-800 rounded-r-lg px-4 py-3 text-stone-100 text-sm focus:outline-none focus:border-amber-400 transition-colors"
+                            className="flex-1 bg-white/10 border border-white/25 rounded-r-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-white transition-colors"
                           />
                         </div>
                       </div>
                       <div className="md:col-span-2">
-                        <label className="flex cursor-pointer items-center justify-between border border-dashed border-emerald-700 px-4 py-3 text-sm rounded-lg hover:border-amber-400 transition-colors">
-                          <span className="text-stone-300">{resumeFile ? resumeFile.name : "Upload resume / CV *"}</span>
-                          <span className="border border-emerald-700 px-3 py-1 text-xs uppercase tracking-wider text-stone-400 rounded">Choose file</span>
+                        <label className="flex cursor-pointer items-center justify-between border border-dashed border-white/50 px-4 py-3 text-sm rounded-lg hover:border-white transition-colors">
+                          <span className="text-white/90">{resumeFile ? resumeFile.name : "Upload resume / CV *"}</span>
+                          <span className="border border-white/50 px-3 py-1 text-xs uppercase tracking-wider text-white/90 rounded">Choose file</span>
                           <input
                             type="file"
                             required
@@ -503,7 +503,7 @@ const EmeraldStudioTemplateCareerPage = () => {
                       {careersFormFields.map((field) =>
                         field.type === "textarea" ? (
                           <div key={field.id} className="md:col-span-2">
-                            <label className="block text-xs font-semibold text-stone-400 uppercase tracking-wider mb-1">
+                            <label className="block text-xs font-semibold text-white/90 uppercase tracking-wider mb-1">
                               {field.label}
                               {field.required ? " *" : ""}
                             </label>
@@ -517,7 +517,7 @@ const EmeraldStudioTemplateCareerPage = () => {
                           </div>
                         ) : field.type === "select" ? (
                           <div key={field.id} className={field.fullWidth ? "md:col-span-2" : ""}>
-                            <label className="block text-xs font-semibold text-stone-400 uppercase tracking-wider mb-1">
+                            <label className="block text-xs font-semibold text-white/90 uppercase tracking-wider mb-1">
                               {field.label}
                               {field.required ? " *" : ""}
                             </label>
@@ -541,7 +541,7 @@ const EmeraldStudioTemplateCareerPage = () => {
                           </div>
                         ) : (
                           <div key={field.id} className={field.fullWidth ? "md:col-span-2" : ""}>
-                            <label className="block text-xs font-semibold text-stone-400 uppercase tracking-wider mb-1">
+                            <label className="block text-xs font-semibold text-white/90 uppercase tracking-wider mb-1">
                               {field.label}
                               {field.required ? " *" : ""}
                             </label>
@@ -555,12 +555,12 @@ const EmeraldStudioTemplateCareerPage = () => {
                           </div>
                         ),
                       )}
-                      {submitError ? <p className="md:col-span-2 text-xs text-red-400">{submitError}</p> : null}
+                      {submitError ? <p className="md:col-span-2 text-xs text-red-200">{submitError}</p> : null}
                       <div className="md:col-span-2">
                         <button
                           type="submit"
                           disabled={submitPending}
-                          className="w-full bg-amber-400 text-emerald-950 font-semibold py-3.5 rounded-lg hover:bg-amber-300 transition-colors text-sm disabled:opacity-50"
+                          className="w-full bg-white text-slate-900 font-semibold py-3.5 rounded-lg hover:bg-sky-50 transition-colors text-sm disabled:opacity-50"
                         >
                           {submitPending ? "Submitting…" : "Submit Application"}
                         </button>

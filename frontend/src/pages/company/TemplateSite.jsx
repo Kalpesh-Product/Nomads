@@ -15,6 +15,13 @@ import WarmOrganicHeader from "./templates/warmOrganic/WarmOrganicHeader";
 import WarmOrganicFooter from "./templates/warmOrganic/WarmOrganicFooter";
 import EmeraldStudioHeader from "./templates/emeraldStudio/EmeraldStudioHeader";
 import EmeraldStudioFooter from "./templates/emeraldStudio/EmeraldStudioFooter";
+import {
+  EMERALD_BASE_CSS,
+  buildEmeraldThemeCss,
+  resolveEmeraldTheme,
+} from "./templates/theme/emeraldTheme";
+import { buildClassicThemeCss } from "./templates/theme/classicTheme";
+import { buildThemeVars } from "./templates/theme/templateTheme";
 import ScrollToTop from "../../components/ScrollToTop";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../../utils/axios";
@@ -29,6 +36,22 @@ import {
   resolveSectionFromSlug,
 } from "./utils/templateRouteUtils";
 import { mapTestimonialItem } from "./utils/pageTemplateUtils";
+import { NomadsSiteContext } from "./verticalTemplates/NomadsSiteContext";
+import { VERTICAL_TEMPLATES, isVerticalTemplate } from "./verticalTemplates";
+
+// The shared breadcrumb bar hard-codes light/dark text; on Fresh Studio and
+// Warm Organic it should follow the business's text colour instead.
+const crumbCss = (defaultText) => {
+  const t = "var(--t-text," + defaultText + ")";
+  const mixed = (p) => "color-mix(in srgb," + t + " " + p + "%,transparent)";
+  const c = (name) => ".t-crumbs ." + name.replace("/", "\\/");
+  return [
+    ".t-crumbs{color:" + mixed(72) + "}",
+    c("text-white/60") + "," + c("text-slate-600") + "{color:" + mixed(72) + "}",
+    c("text-white/40") + "," + c("text-slate-400") + "{color:" + mixed(60) + "}",
+    c("text-white") + "," + c("text-black") + "{color:" + t + "}",
+  ].join("");
+};
 
 const TemplateSite = () => {
   const location = useLocation();
@@ -166,6 +189,23 @@ const TemplateSite = () => {
   // same site-level swap here, completing all 4 HostPanel templates in
   // Nomads.
   const isEmeraldStudio = themeVariant === "emerald-studio";
+  // Per-business colours picked in the website builder (empty = default blue).
+  const styleConfig = normalizedData?.styleConfig;
+  const emeraldThemeCss = isEmeraldStudio
+    ? buildEmeraldThemeCss(styleConfig, ".es-scope")
+    : "";
+  // Classic re-points its utility classes (like Emerald); Fresh Studio and
+  // Warm Organic read CSS variables set on the wrapper, so their header,
+  // pages and footer all pick up the same colours.
+  const isClassic = !isFreshStudio && !isWarmOrganic && !isEmeraldStudio;
+  const classicThemeCss = isClassic
+    ? buildClassicThemeCss(styleConfig, ".classic-scope")
+    : "";
+  const themeVars = isFreshStudio
+    ? buildThemeVars("fresh-studio", styleConfig)
+    : isWarmOrganic
+      ? buildThemeVars("warm-organic", styleConfig)
+      : undefined;
   const productsPageEnabled = (normalizedData?.pageNavItems || []).some(
     (item) => resolveSectionFromSlug(item.slug) === "products",
   );
@@ -220,9 +260,45 @@ const TemplateSite = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPending, isCurrentSectionEnabled]);
 
+  // Savor, Wayfarer, Haven and Commons are complete sites of their own (header, pages, footer),
+  // driven by the published data, so they replace the shared chrome and routed sections below.
+  if (isVerticalTemplate(themeVariant)) {
+    const VerticalTemplate = VERTICAL_TEMPLATES[themeVariant];
+    if (isPending || !data) {
+      return (
+        <div className="fixed inset-0 z-[9999] bg-white flex items-center justify-center">
+          <div className="animate-spin h-12 w-12 border-4 border-gray-300 border-t-primary-blue rounded-full" />
+        </div>
+      );
+    }
+    return (
+      <NomadsSiteContext.Provider value={{ data, approvedReviews }}>
+        <ScrollToTop />
+        <VerticalTemplate />
+      </NomadsSiteContext.Provider>
+    );
+  }
+
   return (
-    <div className="h-screen relative overflow-y-auto overflow-hidden flex flex-col custom-scrollbar-hide">
+    <div
+      className={`h-screen relative overflow-y-auto overflow-hidden flex flex-col custom-scrollbar-hide${
+        isEmeraldStudio ? " es-scope" : isClassic ? " classic-scope" : ""
+      }`}
+      style={
+        isEmeraldStudio
+          ? { backgroundColor: resolveEmeraldTheme(styleConfig).bg }
+          : themeVars
+      }
+    >
       <ScrollToTop />
+      {isFreshStudio || isWarmOrganic ? (
+        <style>{crumbCss(isFreshStudio ? "#ffffff" : "#2B211A")}</style>
+      ) : null}
+      {isEmeraldStudio ? (
+        <style>{`${EMERALD_BASE_CSS}${emeraldThemeCss}`}</style>
+      ) : classicThemeCss ? (
+        <style>{classicThemeCss}</style>
+      ) : null}
       {/* Page loader overlay */}
       {isLoading && (
         <div className="fixed inset-0 z-[9999] bg-white flex items-center justify-center">
@@ -276,11 +352,11 @@ const TemplateSite = () => {
           dark={isFreshStudio || isEmeraldStudio || (!isWarmOrganic && routeContext?.currentSection === "about")}
           className={
             isFreshStudio
-              ? "bg-[#0A0A12]"
+              ? "t-crumbs bg-[var(--t-bg,#0A0A12)]"
               : isWarmOrganic
-                ? "bg-[#F1E6D3]"
+                ? "t-crumbs bg-[var(--t-bg,#F1E6D3)]"
                 : isEmeraldStudio
-                  ? "bg-[#002c22]"
+                  ? "bg-[#4a6b96]"
                   : routeContext?.currentSection === "about"
                     ? "bg-black"
                     : "bg-[#efefef]"

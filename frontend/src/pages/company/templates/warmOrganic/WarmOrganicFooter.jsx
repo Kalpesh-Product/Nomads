@@ -6,7 +6,7 @@ import {
   normalizePageNavItems,
   normalizeProductDropdownPages,
 } from "../../utils/templateRouteUtils";
-import { getEnabledFooterSocials } from "../../utils/footerSocialLinks";
+import { getEnabledFooterSocialsWithFallback } from "../../utils/footerSocialLinks";
 import { BROWN, RUST, SERIF, SOCIAL_ICON, SOCIAL_LABEL } from "./WarmOrganicShared";
 
 // Site-level footer for Warm Organic — same prop shape as the shared
@@ -36,10 +36,10 @@ const WarmOrganicFooter = ({
     Array.isArray(productDropdownPages) ? productDropdownPages : [],
   ).map((p) => ({ name: p.name || p.slug || "", to: getProductPath(p.slug, pathname) }));
 
-  const socialLinks = getEnabledFooterSocials(socials);
+  const socialLinks = getEnabledFooterSocialsWithFallback(socials);
 
   return (
-    <footer className="bg-white border-t border-black/5" style={{ color: BROWN }}>
+    <footer className="bg-[var(--t-raised,#ffffff)] border-t border-black/5" style={{ color: BROWN }}>
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-6 py-14 text-center md:grid-cols-[1.35fr_1fr_1fr_1fr] md:text-left">
         <div className="flex flex-col items-center md:items-start">
           {logo ? (
@@ -51,19 +51,21 @@ const WarmOrganicFooter = ({
           {!isPending && address ? <p className="mt-1 text-[13px] opacity-70">{address}</p> : null}
           {socialLinks.length ? (
             <div className="mt-4 flex items-center justify-center gap-3 md:justify-start">
-              {socialLinks.map((social) => (
-                <a
-                  key={`footer-social-${social.key}`}
-                  href={social.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label={SOCIAL_LABEL[social.key] || social.label}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full transition hover:opacity-75"
-                  style={{ backgroundColor: `${RUST}15`, color: RUST }}
-                >
-                  {SOCIAL_ICON[social.key]}
-                </a>
-              ))}
+              {socialLinks.map((social) => {
+                const Tag = social.href ? "a" : "span";
+                const linkProps = social.href ? { href: social.href, target: "_blank", rel: "noreferrer" } : { role: "img" };
+                return (
+                  <Tag
+                    key={`footer-social-${social.key}`}
+                    {...linkProps}
+                    aria-label={SOCIAL_LABEL[social.key] || social.label}
+                    className={`inline-flex h-9 w-9 items-center justify-center rounded-full transition ${social.href ? "hover:opacity-75" : "cursor-default"}`}
+                    style={{ backgroundColor: `color-mix(in srgb, var(--t-accent, #B85C38) 8%, transparent)`, color: RUST }}
+                  >
+                    {SOCIAL_ICON[social.key]}
+                  </Tag>
+                );
+              })}
             </div>
           ) : null}
         </div>
@@ -109,7 +111,7 @@ const WarmOrganicFooter = ({
           </div>
         </div>
       </div>
-      <div className="px-6 py-4 text-center text-[11.5px] opacity-60" style={{ borderTop: `1px solid ${BROWN}15` }}>
+      <div className="px-6 py-4 text-center text-[11.5px] opacity-60" style={{ borderTop: `1px solid color-mix(in srgb, var(--t-text, #2B211A) 8%, transparent)` }}>
         &copy; {new Date().getFullYear()} {registeredCompany || ""}. All rights reserved.
       </div>
     </footer>

@@ -5,7 +5,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import {
   HiOutlineChevronDown,
@@ -18,6 +17,7 @@ import { FaCheck, FaSyncAlt } from "react-icons/fa";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { aiDestinationCards } from "../constants/aiDestinationCards";
+import { createDriverGuide } from "../utils/driverGuide";
 import { persistSelectedDestination } from "../utils/selectedDestinationSession";
 
 import axios from "../utils/axios";
@@ -2320,7 +2320,7 @@ const AiSearchResults = () => {
       return;
     }
 
-    const guide = driver({
+    const guide = createDriverGuide({
       showProgress: true,
       allowClose: true,
       animate: true,
@@ -2330,12 +2330,10 @@ const AiSearchResults = () => {
       prevBtnText: "Back",
       doneBtnText: "Done",
       steps: guideSteps,
-      onDestroyed: () => {
-        window.localStorage.setItem(AI_SEARCH_RESULTS_GUIDE_SEEN_KEY, "1");
-      },
+      guideSeenKey: AI_SEARCH_RESULTS_GUIDE_SEEN_KEY,
     });
 
-    guide.drive();
+    guide?.drive();
   }, [isAiGoalResultsPage]);
 
   useEffect(() => {

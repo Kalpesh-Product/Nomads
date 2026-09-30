@@ -13,6 +13,7 @@ import useLogout from "../hooks/useLogout";
 import { clearStoredLoginState } from "../hooks/useNomadLoginState";
 import useLocationContentAvailability from "../hooks/useLocationContentAvailability";
 import { readSelectedDestination } from "../utils/selectedDestinationSession";
+import { destroyActiveGuide } from "../utils/driverGuide";
 
 const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
   const [open, setOpen] = useState(false);
@@ -369,6 +370,7 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
                               ? mapViewLink
                               : verticalsMapViewLink
                           }
+                          onClick={destroyActiveGuide}
                           state={aiVerticalsToggleState}
                           data-tour="verticals-map-view-link"
                           className="group relative text-md text-black"
@@ -391,6 +393,7 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
                               ? listViewLink
                               : verticalsListViewLink
                           }
+                          onClick={destroyActiveGuide}
                           state={aiVerticalsToggleState}
                           data-tour="verticals-list-view-link"
                           className="group relative text-md text-black"
