@@ -16,6 +16,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Container from "../components/Container";
 import axios from "../utils/axios";
 import useAuth from "../hooks/useAuth";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { HiCheck } from "react-icons/hi";
 import Seo from "../components/Seo";
 
@@ -66,6 +67,10 @@ const CONTRIBUTION_TYPE_GROUPS = [
   },
 ];
 const CONTRIBUTOR_CONTRIBUTION_OPTIONS = CONTRIBUTION_TYPE_GROUPS[0].options;
+const getSelectedContributorOptions = (selectedOptions = []) =>
+  selectedOptions.filter((option) =>
+    CONTRIBUTOR_CONTRIBUTION_OPTIONS.includes(option),
+  );
 
 const tickMenuItemSx = {
   "& .tick-icon": { opacity: 0, color: "#1976d2" },
@@ -92,7 +97,8 @@ const AiBecomeContributor = () => {
   const messageLimitAlertedRef = useRef(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { auth } = useAuth();
+  const axiosPrivate = useAxiosPrivate();
+  const { auth, setAuth } = useAuth();
   const isLoggedIn = Boolean(auth?.user);
   const countries = useMemo(() => Country.getAllCountries(), []);
   const { handleSubmit, control, reset, setValue, watch } = useForm({
@@ -110,7 +116,26 @@ const AiBecomeContributor = () => {
   const contributorPrompt = `${messagePrefix}${CONTRIBUTOR_PROMPT}`;
 
   const { mutate: submitContributor } = useMutation({
-    mutationFn: async (formValues) => {
+    mutationFn: async ({ formValues, contributorOptions }) => {
+      if (isLoggedIn && contributorOptions.length) {
+        const contributorRoleResponse = await axiosPrivate.patch(
+          "/user/contributor-roles",
+          {
+            contributionTypes: contributorOptions,
+          },
+        );
+
+        if (contributorRoleResponse?.data?.user) {
+          setAuth((prevState) => ({
+            ...prevState,
+            user: {
+              ...prevState.user,
+              ...contributorRoleResponse.data.user,
+            },
+          }));
+        }
+      }
+
       const response = await axios.post("forms/add-new-b2c-form-submission", {
         ...formValues,
         sheetName: "AI_Become_Contributor",
@@ -141,6 +166,9 @@ const AiBecomeContributor = () => {
   });
 
   const handleFormSubmit = (formValues) => {
+    const contributorOptions = Array.isArray(formValues.contributionType)
+      ? getSelectedContributorOptions(formValues.contributionType)
+      : [];
     const normalizedValues = {
       ...formValues,
       contributionType: Array.isArray(formValues.contributionType)
@@ -149,13 +177,11 @@ const AiBecomeContributor = () => {
     };
 
     setIsSubmitting(true);
-    submitContributor(normalizedValues);
+    submitContributor({ formValues: normalizedValues, contributorOptions });
   };
 
   const selectedContributorOptionsRequireLogin = (selectedOptions = []) =>
-    selectedOptions.some((option) =>
-      CONTRIBUTOR_CONTRIBUTION_OPTIONS.includes(option),
-    );
+    getSelectedContributorOptions(selectedOptions).length > 0;
 
   const handleFormGateAndSubmit = (event) => {
     if (

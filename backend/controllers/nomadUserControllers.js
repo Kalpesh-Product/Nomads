@@ -5,6 +5,13 @@ import NomadDestinationView from "../models/NomadDestinationView.js";
 import NomadListingView from "../models/NomadListingView.js";
 import bcrypt from "bcrypt";
 
+const contributorRoleFieldByOption = {
+  "Become a Blogger": "isBlogger",
+  "Become A News Writer": "isNewsWriter",
+  "Contribute To Places": "isPlaceWriter",
+  "Contribute To Events": "isEventWriter",
+};
+
 const normalizeFavoriteDestinationImages = (destination = {}) => {
   const rawImages =
     destination.images instanceof Map
@@ -233,6 +240,76 @@ export const changePassword = async (req, res) => {
   } catch (error) {
     console.error("[changePassword] error:", error);
     return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const updateContributorRoles = async (req, res, next) => {
+  try {
+    const userId = req.userData?._id;
+    const { contributionTypes } = req.body || {};
+
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    if (!Array.isArray(contributionTypes)) {
+      return res
+        .status(400)
+        .json({ message: "Contribution types must be an array" });
+    }
+
+    const roleUpdates = contributionTypes.reduce((updates, option) => {
+      const field = contributorRoleFieldByOption[option];
+
+      if (field) {
+        updates[field] = true;
+      }
+
+      return updates;
+    }, {});
+
+    if (!Object.keys(roleUpdates).length) {
+      return res.status(400).json({
+        message: "No valid contributor roles were selected",
+      });
+    }
+
+    const updatedUser = await NomadUser.findByIdAndUpdate(
+      userId,
+      { $set: roleUpdates },
+      {
+        new: true,
+        runValidators: true,
+      },
+    ).select(
+      "_id fullName email country countryOfResidence contactCode contactNumber saves likes favoriteDestination isBlogger isNewsWriter isEventWriter isPlaceWriter",
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      message: "Contributor roles updated successfully",
+      user: {
+        id: updatedUser._id,
+        fullName: updatedUser.fullName,
+        email: updatedUser.email,
+        country: updatedUser.country,
+        countryOfResidence: updatedUser.countryOfResidence,
+        contactCode: updatedUser.contactCode,
+        contactNumber: updatedUser.contactNumber,
+        saves: updatedUser.saves,
+        likes: updatedUser.likes,
+        favoriteDestination: updatedUser.favoriteDestination,
+        isBlogger: updatedUser.isBlogger,
+        isNewsWriter: updatedUser.isNewsWriter,
+        isEventWriter: updatedUser.isEventWriter,
+        isPlaceWriter: updatedUser.isPlaceWriter,
+      },
+    });
+  } catch (error) {
+    next(error);
   }
 };
 
