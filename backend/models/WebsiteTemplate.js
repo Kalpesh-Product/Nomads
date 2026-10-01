@@ -109,6 +109,9 @@ const templateSchema = new mongoose.Schema(
     contactPageHeading: { type: String },
     contactPageIntro: { type: String },
     mapUrl: { type: String, required: true },
+    // A direct video URL (mp4 etc.) some templates (Camelia) can use for the hero instead of a
+    // photo slideshow. Optional — templates that don't support it simply ignore it.
+    heroVideoUrl: { type: String },
     email: { type: String, required: true },
     websiteEmail: { type: String },
     phone: { type: String, required: true },

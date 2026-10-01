@@ -208,6 +208,7 @@ const normalizeTemplatePayload = (template) => {
     sectionOverrides: template?.sectionOverrides || {},
     styleConfig: template?.styleConfig || {},
     mapUrl: normalizeString(template?.mapUrl),
+    heroVideoUrl: normalizeString(template?.heroVideoUrl),
     phone: normalizeString(template?.phone || template?.contactPersonPhone),
     address: normalizeString(template?.address),
     copyrightText: normalizeString(template?.copyrightText),

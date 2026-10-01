@@ -1,6 +1,7 @@
 import SavorTemplate from "./savor/SavorTemplate";
 import WayfarerTemplate from "./wayfarer/WayfarerTemplate";
 import HavenTemplate from "./haven/HavenTemplate";
+import CameliaTemplate from "./camelia/CameliaTemplate";
 import CommonsTemplate from "./commons/CommonsTemplate";
 import HuddleTemplate from "./huddle/HuddleTemplate";
 
@@ -11,6 +12,7 @@ export const VERTICAL_TEMPLATES = {
   savor: SavorTemplate,
   wayfarer: WayfarerTemplate,
   haven: HavenTemplate,
+  camelia: CameliaTemplate,
   commons: CommonsTemplate,
   huddle: HuddleTemplate,
 };
