@@ -72,20 +72,7 @@ const AiContributionDashboard = ({ type }) => {
     <>
       <Seo path={config.seoPath} />
       <main className="mx-auto w-full max-w-5xl px-1 py-2 md:px-6 lg:px-0">
-        <div className="mb-8 flex items-center gap-2 border-b border-black/10 pb-8 text-primary-blue">
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-primary-blue text-primary-blue"
-            aria-label="Go back"
-          >
-            <span className="text-lg leading-none">‹</span>
-          </button>
-          <span className="text-sm text-primary-blue">›</span>
-          <span className="text-sm font-medium">{config.label}</span>
-        </div>
-
-        <div className="flex items-center justify-between gap-4">
+        <div className="mt-6 flex items-center justify-between gap-4 border-t border-black/10 pt-6">
           <h1 className="text-lg font-semibold text-black">{config.heading}</h1>
           <button
             type="button"
