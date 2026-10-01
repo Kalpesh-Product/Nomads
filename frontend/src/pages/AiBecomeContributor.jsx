@@ -2,8 +2,10 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Box,
   Button,
+  Checkbox,
   CircularProgress,
   InputAdornment,
+  ListSubheader,
   MenuItem,
   TextField,
 } from "@mui/material";
@@ -23,7 +25,7 @@ const floatingLabelSx = {
 };
 
 const defaultValues = {
-  contributionType: "",
+  contributionType: [],
   fullName: "",
   email: "",
   currentCountry: "",
@@ -40,17 +42,27 @@ const CONTRIBUTOR_HEADING = "Become a Wono Contributor";
 const CONTRIBUTOR_TYPING_SEEN_KEY = "wono-contributor-typing-seen";
 const getFlagIconUrl = (isoCode) =>
   `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
-const CONTRIBUTION_TYPE_OPTIONS = [
-  "Add your Business Listing & Services",
-  "Become a Overall Destination Partner",
-  "Become a Local Experience Partner",
-  "Become a Visa & Immigration Partner",
-  "Become a Tax & Financial Advisory Partner",
-  "Become a Company Setup Services Partner",
-  "Become a Nomad Blog & News Writer",
-  "Become A Content Contributor",
-  "Become a Remote Jobs Posting Partner",
-  "Not Sure - Lets Connect & Explore",
+const CONTRIBUTION_TYPE_GROUPS = [
+  {
+    label: "Contributor",
+    options: [
+      "Become a Blogger",
+      "Become A News Writer",
+      "Contribute To Places",
+      "Contribute To Events",
+    ],
+  },
+  {
+    label: "Partner",
+    options: [
+      "Become a Visa & Immigration Partner",
+      "Become a Company Setup Services Partner",
+      "Become a Activation Support Partner",
+      "Become a Consultation Support Partner",
+      "Become a Workation Support Partner",
+      "Not Sure - Lets Connect & Explore",
+    ],
+  },
 ];
 
 const tickMenuItemSx = {
@@ -124,8 +136,15 @@ const AiBecomeContributor = () => {
   });
 
   const handleFormSubmit = (formValues) => {
+    const normalizedValues = {
+      ...formValues,
+      contributionType: Array.isArray(formValues.contributionType)
+        ? formValues.contributionType.join(", ")
+        : formValues.contributionType,
+    };
+
     setIsSubmitting(true);
-    submitContributor(formValues);
+    submitContributor(normalizedValues);
   };
 
   const handleMessageChange = (event, onChange) => {
@@ -271,7 +290,10 @@ const AiBecomeContributor = () => {
                 <Controller
                   name="contributionType"
                   control={control}
-                  rules={{ required: "Contribution Type is required" }}
+                  rules={{
+                    validate: (value) =>
+                      value?.length > 0 || "Contribution Type is required",
+                  }}
                   render={({ field, fieldState }) => (
                     <TextField
                       {...field}
@@ -282,20 +304,60 @@ const AiBecomeContributor = () => {
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
-                      onChange={(event) => field.onChange(event.target.value)}
+                      SelectProps={{
+                        multiple: true,
+                        renderValue: (selected) => selected.join(", "),
+                        MenuProps: {
+                          PaperProps: {
+                            sx: {
+                              mt: 0.5,
+                              maxHeight: 420,
+                              "& .MuiMenuItem-root": {
+                                minHeight: 32,
+                                py: 0.5,
+                              },
+                            },
+                          },
+                        },
+                      }}
+                      onChange={(event) => {
+                        const value = event.target.value;
+                        field.onChange(
+                          typeof value === "string" ? value.split(",") : value,
+                        );
+                      }}
                     >
-                      {CONTRIBUTION_TYPE_OPTIONS.map((option) => (
-                        <MenuItem
-                          key={option}
-                          value={option}
-                          sx={tickMenuItemSx}
+                      {CONTRIBUTION_TYPE_GROUPS.map((group) => [
+                        <ListSubheader
+                          key={group.label}
+                          disableSticky
+                          sx={{
+                            color: "black",
+                            fontSize: "1rem",
+                            fontWeight: 700,
+                            lineHeight: 1.4,
+                            pt: 1.5,
+                            pb: 0.5,
+                          }}
                         >
-                          <Box className="flex w-full items-center gap-2">
-                            <HiCheck className="tick-icon" size={16} />
+                          {group.label}
+                        </ListSubheader>,
+                        ...group.options.map((option) => (
+                          <MenuItem key={option} value={option}>
+                            <Checkbox
+                              checked={field.value.includes(option)}
+                              size="small"
+                              sx={{
+                                color: "#666",
+                                mr: 1,
+                                p: 0,
+                                "&.Mui-checked": { color: "#1976d2" },
+                              }}
+                            />
                             <span>{option}</span>
-                          </Box>
-                        </MenuItem>
-                      ))}
+                          </MenuItem>
+                        )),
+                      ])}
                     </TextField>
                   )}
                 />
