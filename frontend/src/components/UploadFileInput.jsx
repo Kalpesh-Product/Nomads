@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import { TextField, IconButton, Avatar, Box } from "@mui/material";
-import { LuImageUp } from "react-icons/lu";
-import { MdDelete } from "react-icons/md";
+import { LuImageUp, LuEye } from "react-icons/lu";
+import { MdClose } from "react-icons/md";
 import MuiModal from "./MuiModal";
 
 const UploadFileInput = ({
@@ -11,6 +11,7 @@ const UploadFileInput = ({
   label = "Upload File",
   allowedExtensions = ["jpg", "jpeg", "png", "pdf", "webp"],
   previewType = "auto",
+  showPreview = true,
   id,
 }) => {
   const fileInputRef = useRef(null);
@@ -51,6 +52,10 @@ const UploadFileInput = ({
   const handleClear = () => {
     onChange(null);
     setPreviewUrl(null);
+  };
+
+  const handlePreviewClick = () => {
+    if (previewUrl) window.open(previewUrl, "_blank", "noopener,noreferrer");
   };
 
   const acceptAttr = allowedExtensions.map((ext) => `.${ext}`).join(",");
@@ -124,27 +129,39 @@ const UploadFileInput = ({
         InputProps={{
           readOnly: true,
           endAdornment: (
-            <IconButton
-              component="label"
-              htmlFor={id ?? "file-upload"}
-              color="primary">
-              <LuImageUp />
-            </IconButton>
+            <>
+              {value && (
+                <IconButton
+                  onClick={handleClear}
+                  title="Remove file"
+                  color="error"
+                >
+                  <MdClose />
+                </IconButton>
+              )}
+              {value && previewUrl && (
+                <IconButton
+                  onClick={handlePreviewClick}
+                  title="Preview in new tab"
+                  color="default"
+                >
+                  <LuEye />
+                </IconButton>
+              )}
+              <IconButton
+                component="label"
+                htmlFor={id ?? "file-upload"}
+                color="primary"
+              >
+                <LuImageUp />
+              </IconButton>
+            </>
           ),
         }}
       />
 
       {/* Inline Preview */}
-      {renderPreview()}
-
-      {/* Delete */}
-      {value && previewUrl && (
-        <div className="flex justify-end">
-          <IconButton color="error" onClick={handleClear}>
-            <MdDelete />
-          </IconButton>
-        </div>
-      )}
+      {showPreview && renderPreview()}
     </Box>
   );
 };

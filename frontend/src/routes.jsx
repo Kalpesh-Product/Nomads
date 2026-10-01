@@ -177,6 +177,9 @@ const AiHostProfile = lazyPage(() => import("./pages/AiHost/AiHostProfile"));
 const AiHostResetPassword = lazyPage(() =>
   import("./pages/AiHost/AiHostResetPassword"),
 );
+const AiHostVerifyEmail = lazyPage(() =>
+  import("./pages/AiHost/AiHostVerifyEmail"),
+);
 const AiHostModules = lazyPage(() => import("./pages/AiHost/AiHostModules"));
 const AiHostThemes = lazyPage(() => import("./pages/AiHost/AiHostThemes"));
 const AiHostLeads = lazyPage(() => import("./pages/AiHost/AiHostLeads"));
@@ -695,6 +698,7 @@ if (tenant === "main") {
               element: <AiHostResetPassword />,
             },
             { path: "signup", element: <AiHostSignup /> },
+            { path: "verify-email", element: <AiHostVerifyEmail /> },
             { path: "product", element: <AiHostProduct /> },
             { path: "modules", element: <AiHostModules /> },
             { path: "themes", element: <AiHostThemes /> },

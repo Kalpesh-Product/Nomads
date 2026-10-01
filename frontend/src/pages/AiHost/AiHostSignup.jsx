@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import GetStartedButton from "../../components/GetStartedButton";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "../../utils/axios";
 import { showErrorAlert, showSuccessAlert } from "../../utils/alerts";
 import { api as publicApi } from "../../utils/axios";
@@ -36,7 +36,8 @@ const UploadMultipleFilesInput = React.lazy(
 );
 
 const steps = ["GOAL", "BASIC DETAILS"];
-const ACTIVATION_TITLE = "Your goal is set... let's get you activated";
+const DEFAULT_ACTIVATION_TITLE = "Your goal is set... let's get you activated";
+const VERIFY_ACTIVATION_TITLE = "Get Yourself Activated...";
 const ACTIVATION_TITLE_TYPING_DURATION_MS = 420;
 const ACTIVATION_TITLE_INITIAL_CHARS = 4;
 const COUNTRIES_NOW_ENDPOINT = "https://countriesnow.space/api/v0.1/countries";
@@ -245,6 +246,11 @@ const normalizePlanFromQuery = (plan) => {
   return planMap[normalized] || "BASIC";
 };
 
+const normalizeBillingCycleFromQuery = (value) =>
+  ["monthly", "annual"].includes(String(value || "").trim().toLowerCase())
+    ? String(value).trim().toLowerCase()
+    : "monthly";
+
 const AiHostSignup = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -260,6 +266,17 @@ const AiHostSignup = () => {
     ? Math.max(0, Math.min(1, requestedStep))
     : 1;
   const [activeStep, setActiveStep] = useState(initialStep);
+  // Set when the visitor arrived via "Verify Business" on a wono.co listing:
+  // the click id in ?vc= pre-fills (and locks) the company they asked to verify.
+  const [activeClickId, setActiveClickId] = useState(
+    () => signupParams.get("vc") || "",
+  );
+  const [verifyClick, setVerifyClick] = useState(null);
+  // Fixed at arrival so the title doesn't change if the company is unlocked later.
+  const [cameFromVerify] = useState(() => Boolean(signupParams.get("vc")));
+  const ACTIVATION_TITLE = cameFromVerify
+    ? VERIFY_ACTIVATION_TITLE
+    : DEFAULT_ACTIVATION_TITLE;
   const [verticalTypeOpen, setVerticalTypeOpen] = useState(false);
   const [typedActivationTitle, setTypedActivationTitle] = useState(() =>
     initialStep === 1
@@ -279,7 +296,25 @@ const AiHostSignup = () => {
     signupParams.get("plan"),
   );
   const [selectedPlan, setSelectedPlan] = useState(selectedPlanFromQuery);
+  const [billingCycle, setBillingCycle] = useState(() =>
+    normalizeBillingCycleFromQuery(signupParams.get("billingCycle")),
+  );
   const countriesNowLoadStartedRef = React.useRef(false);
+
+  // Same live prices shown on the AiHostPricing card (step 0 of this flow) —
+  // shares the "publicPlanPricing" query key/cache with it. Returns both the
+  // monthly rate and the full yearly (annual) rate.
+  const { data: planPricing } = useQuery({
+    queryKey: ["publicPlanPricing"],
+    queryFn: async () => {
+      const response = await publicApi.get("/forms/plan-pricing");
+      return response?.data || {};
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+  const professionalPlanPriceUsd = planPricing?.professionalPlanPriceUsd;
+  const professionalAnnualPlanPriceUsd =
+    planPricing?.professionalAnnualPlanPriceUsd;
   const countries = useMemo(
     () => locationApi?.Country?.getAllCountries() || [],
     [locationApi],
@@ -303,6 +338,9 @@ const AiHostSignup = () => {
     useForm({
       defaultValues: {
         Goals: selectedPlanFromQuery,
+        billingCycle: normalizeBillingCycleFromQuery(
+          signupParams.get("billingCycle"),
+        ),
         name: "",
         email: "",
         mobile: "",
@@ -350,6 +388,49 @@ const AiHostSignup = () => {
   }, [selectedPlan, setValue]);
 
   useEffect(() => {
+    if (!activeClickId) return undefined;
+    let active = true;
+    const loadVerifyClick = async () => {
+      try {
+        const response = await publicApi.get(
+          `/forms/verify-click/${encodeURIComponent(activeClickId)}`,
+        );
+        if (!active) return;
+        const data = response.data || {};
+        setVerifyClick(data);
+        setValue("companyName", data.companyName || "");
+        if (Array.isArray(data.verticalType) && data.verticalType.length) {
+          setValue("verticalType", data.verticalType);
+        }
+        setValue("companyCountry", data.country || "");
+        setValue("companyState", data.state || "");
+        setValue("companyCity", data.city || "");
+      } catch {
+        // Invalid or stale link: carry on as a normal signup.
+        if (active) setActiveClickId("");
+      }
+    };
+    loadVerifyClick();
+    return () => {
+      active = false;
+    };
+  }, [activeClickId, setValue]);
+
+  const clearVerifyClick = () => {
+    setVerifyClick(null);
+    setActiveClickId("");
+    setValue("companyName", "");
+    setValue("verticalType", []);
+    setValue("companyCountry", "");
+    setValue("companyState", "");
+    setValue("companyCity", "");
+  };
+
+  useEffect(() => {
+    setValue("billingCycle", billingCycle);
+  }, [billingCycle, setValue]);
+
+  useEffect(() => {
     if (activeStep !== 1) {
       setTypedActivationTitle("");
       return undefined;
@@ -384,7 +465,7 @@ const AiHostSignup = () => {
     animationFrameId = requestAnimationFrame(animateTyping);
 
     return () => cancelAnimationFrame(animationFrameId);
-  }, [activeStep]);
+  }, [activeStep, ACTIVATION_TITLE]);
 
   useEffect(() => {
     if (!auth?.user) return;
@@ -673,9 +754,9 @@ const AiHostSignup = () => {
     },
     onSuccess: (data) => {
       showSuccessAlert(
-        "We’ll email you once your account is activated.",
+        "We've emailed you a link — use the Verify Email button in it to verify your email address.",
         {
-          title: "Activation Request Submitted!",
+          title: "Thank You for Submitting!",
           titleClassName: "swal2-title--activation-request",
         },
       ).then(() => {
@@ -796,11 +877,24 @@ const AiHostSignup = () => {
               <AiHostPricing
                 compact
                 startStep={1}
+                initialBillingCycle={billingCycle}
                 onSelectPlan={(plan) => {
                   const planTitle = plan?.title || "BASIC";
                   const normalizedPlan = normalizePlanFromQuery(planTitle);
+                  const nextCycle = normalizeBillingCycleFromQuery(
+                    plan?.billingCycle,
+                  );
                   setSelectedPlan(normalizedPlan);
+                  setBillingCycle(nextCycle);
                   setValue("Goals", normalizedPlan);
+                  setValue("billingCycle", nextCycle);
+                  const updatedParams = new URLSearchParams(location.search);
+                  updatedParams.set("plan", normalizedPlan);
+                  updatedParams.set("billingCycle", nextCycle);
+                  navigate(
+                    `${location.pathname}?${updatedParams.toString()}`,
+                    { replace: true },
+                  );
                   setActiveStep(1);
                 }}
               />
@@ -830,7 +924,13 @@ const AiHostSignup = () => {
                 >
                   <MenuItem value="BASIC">BASIC - FREE</MenuItem>
                   <MenuItem value="PROFESSIONAL">
-                    PROFESSIONAL - $199 / Month
+                    {billingCycle === "annual"
+                      ? `PROFESSIONAL - $${
+                          professionalAnnualPlanPriceUsd ??
+                          professionalPlanPriceUsd ??
+                          199
+                        } / Year`
+                      : `PROFESSIONAL - $${professionalPlanPriceUsd ?? 199} / Month`}
                   </MenuItem>
                   <MenuItem value="CUSTOMISE">
                     CUSTOMISE - PERSONALISED
@@ -838,6 +938,16 @@ const AiHostSignup = () => {
                 </TextField>
               )}
             />
+            {/* {selectedPlan === "PROFESSIONAL" && (
+              <p className="mt-2 text-[10px] font-medium text-[#8a93a3]">
+                {billingCycle === "annual"
+                  ? `Billed annually — $${Math.round(
+                      professionalAnnualPlanPriceUsd ??
+                        (professionalPlanPriceUsd ?? 199) * 12,
+                    ).toLocaleString()} for 12 months`
+                  : "Billed monthly"}
+              </p>
+            )} */}
             <Controller
               name="name"
               control={control}
@@ -1093,13 +1203,42 @@ const AiHostSignup = () => {
               render={({ field, fieldState }) => (
                 <TextField
                   {...field}
+                  InputProps={{ readOnly: Boolean(verifyClick) }}
                   label="Company Name"
                   fullWidth
                   margin="none"
                   sx={compactStepFieldSx}
                   variant="standard"
                   error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
+                  helperText={
+                    fieldState.error?.message ||
+                    (verifyClick ? (
+                      <>
+                        From your wono.co listing ·{" "}
+                        <button
+                          type="button"
+                          onClick={clearVerifyClick}
+                          className="text-primary-blue underline"
+                        >
+                          Not your business?
+                        </button>
+                      </>
+                    ) : undefined)
+                  }
+                  // While showing the wono.co note, float it under the field
+                  // instead of adding a line, so the rows below don't shift.
+                  FormHelperTextProps={
+                    verifyClick && !fieldState.error
+                      ? {
+                          sx: {
+                            position: "absolute",
+                            top: "100%",
+                            left: 0,
+                            whiteSpace: "nowrap",
+                          },
+                        }
+                      : undefined
+                  }
                   InputLabelProps={{ sx: floatingLabelSx }}
                 />
               )}
@@ -2129,6 +2268,9 @@ const AiHostSignup = () => {
             );
             fd.set("contactCode", withFallback(values.contactCode, "N/A"));
             fd.set("verticalType", JSON.stringify(values.verticalType || []));
+            if (verifyClick && activeClickId) {
+              fd.set("verifyClickId", activeClickId);
+            }
             // About (array → join into text or fallback)
             const aboutArray =
               values.about?.map((a, i) =>

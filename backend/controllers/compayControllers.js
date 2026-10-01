@@ -21,6 +21,24 @@ import { fixedAmenitiesMap } from "../config/amenitiesMap.js";
 // query param can't be pointed at arbitrary schema fields.
 const ADDITIVE_FIELD_OPTIONS = new Set(["services", "units"]);
 
+// Verification badges are payment-gated with an expiry date, but nothing
+// writes isVerified back to false once verificationExpiresAt passes — it's
+// computed live on every read instead, so there's no cron needed to keep it
+// in sync.
+function computeEffectiveVerification(company) {
+  const expired =
+    company.verificationExpiresAt &&
+    new Date(company.verificationExpiresAt) <= new Date();
+  const isVerified = Boolean(company.isVerified) && !expired;
+  return {
+    isVerified,
+    verificationTier: expired ? null : company.verificationTier,
+    // What the public site should actually render — same as isVerified
+    // unless the host has chosen to hide the badge on this listing.
+    verifiedBadgeVisible: isVerified && !company.verifiedBadgeHidden,
+  };
+}
+
 const parseCsvRows = (file) =>
   new Promise((resolve, reject) => {
     const rows = [];
@@ -913,6 +931,9 @@ export const getCompaniesDataNomads = async (req, res, next) => {
           // your original rating fields
           ratings: 1,
           totalReviews: 1,
+          isVerified: 1,
+          verificationTier: 1,
+          verificationExpiresAt: 1,
 
           images: { $slice: ["$images", 1] },
         },
@@ -926,6 +947,11 @@ export const getCompaniesDataNomads = async (req, res, next) => {
       locale: "en",
       strength: 2,
     });
+
+    companyData = companyData.map((c) => ({
+      ...c,
+      ...computeEffectiveVerification(c),
+    }));
 
     // Add likes
     if (userId && mongoose.Types.ObjectId.isValid(userId)) {
@@ -1217,11 +1243,11 @@ export const getCompanyData = async (req, res, next) => {
 
     const company = await Company.findOne(companyQuery).lean().exec();
 
-    let companyData = company;
-
-    if (!companyData) {
+    if (!company) {
       return res.status(404).json({ error: "Company not found" });
     }
+
+    let companyData = { ...company, ...computeEffectiveVerification(company) };
 
     if (userId) {
       if (!mongoose.Types.ObjectId.isValid(userId)) {
@@ -1559,7 +1585,11 @@ export const getListings = async (req, res, next) => {
         (r) => String(r?.company?._id) === String(list?._id),
       );
 
-      return { ...list, reviews: listReviews };
+      return {
+        ...list,
+        ...computeEffectiveVerification(list),
+        reviews: listReviews,
+      };
     });
 
     return res.status(200).json(data);
@@ -2851,3 +2881,46 @@ export const applyToCompanyJob = async (req, res, next) => {
     return res.status(status).json({ message });
   }
 };
+
+// Internal (admin-key gated): when the master panel links a host account to
+// an existing company, the listings the host had already added under their
+// own companyId are folded into that company so host + transferred listings
+// live under one companyId — listings, ownership checks and leads all key off
+// it. Leads follow their listing via the `company` ref.
+export const reassignListings = async (req, res, next) => {
+  try {
+    const fromCompanyId = String(req.body?.fromCompanyId || "").trim();
+    const toCompanyId = String(req.body?.toCompanyId || "").trim();
+
+    if (!fromCompanyId || !toCompanyId) {
+      return res
+        .status(400)
+        .json({ message: "fromCompanyId and toCompanyId are required" });
+    }
+    if (fromCompanyId === toCompanyId) {
+      return res
+        .status(400)
+        .json({ message: "Source and target company are the same" });
+    }
+
+    const listings = await Company.find({ companyId: fromCompanyId })
+      .select("_id businessId")
+      .lean();
+
+    if (!listings.length) {
+      return res.status(200).json({ moved: 0, businessIds: [] });
+    }
+
+    const ids = listings.map((l) => l._id);
+    await Company.updateMany({ _id: { $in: ids } }, { $set: { companyId: toCompanyId } });
+    await Lead.updateMany({ company: { $in: ids } }, { $set: { companyId: toCompanyId } });
+
+    return res.status(200).json({
+      moved: listings.length,
+      businessIds: listings.map((l) => l.businessId),
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+

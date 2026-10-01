@@ -8,7 +8,7 @@ import {
 import { MuiTelInput } from "mui-tel-input";
 import { Controller, useForm } from "react-hook-form";
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { Country } from "country-state-city";
 import { useMutation } from "@tanstack/react-query";
@@ -31,6 +31,7 @@ export default function AiSignup() {
   const [typedSignupHeading, setTypedSignupHeading] = useState("");
   const [isFormVisible, setIsFormVisible] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
   const toggleConfirmPasswordVisibility = () =>
@@ -76,7 +77,7 @@ export default function AiSignup() {
         "Signup successful! Please check your email for confirmation.",
       );
       reset();
-      navigate("/login");
+      navigate("/login", { state: location.state });
     },
     onError: (error) => {
       showErrorAlert(error.response?.data?.message || "Something went wrong");
@@ -346,7 +347,9 @@ export default function AiSignup() {
             <p className="text-center">
               Already have an account?&nbsp;
               <span className="underline">
-                <Link to="/login">Login</Link>
+                <Link to="/login" state={location.state}>
+                  Login
+                </Link>
               </span>
             </p>
           </div>

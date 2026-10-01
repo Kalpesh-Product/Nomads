@@ -1,9 +1,15 @@
 import { uploadFileToS3 } from "../../config/s3Config.js";
-import { randomUUID } from "crypto";
+import { randomUUID, randomInt, createHash, timingSafeEqual } from "crypto";
+import jwt from "jsonwebtoken";
 import yup from "yup";
 import mongoose from "mongoose";
 import WebsiteTemplate from "../../models/WebsiteTemplate.js";
 import HostUser from "../../models/HostUser.js";
+import Otp from "../../models/Otp.js";
+import {
+  attachHostUserToClick,
+  findUnusedVerifyClick,
+} from "../verifyBusinessClickController.js";
 import sharp from "sharp";
 import { sendMail, sendAdminFormNotification } from "../../config/mailer.js";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
@@ -13,26 +19,507 @@ import {
   renderNotificationEmail,
 } from "../../utils/emailTemplates.js";
 import { checkHostPanelEmail } from "../../utils/hostPanelAccounts.js";
+import { getProfessionalPlanPricing } from "../../utils/planPricing.js";
+
+// Matches unverified leads whose verification link (7 days, see
+// HOST_EMAIL_LINK_EXPIRY) has run out. They were never visible to staff, so the
+// email is treated as free again and the stale row is replaced on re-signup.
+const HOST_EMAIL_LINK_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+const staleUnverifiedLeadFilter = (email) => {
+  const cutoff = new Date(Date.now() - HOST_EMAIL_LINK_TTL_MS);
+  return {
+    email,
+    emailVerified: false,
+    $or: [
+      { verificationLinkSentAt: { $lt: cutoff } },
+      { verificationLinkSentAt: null, createdAt: { $lt: cutoff } },
+    ],
+  };
+};
 
 const hostSignupEmailExists = async (email) => {
   const normalizedEmail = String(email || "").trim().toLowerCase();
   const [existingSignupLead, existingHostPanelAccount] = await Promise.all([
-    HostUser.exists({ email: normalizedEmail }),
+    HostUser.exists({
+      email: normalizedEmail,
+      $nor: [staleUnverifiedLeadFilter(normalizedEmail)],
+    }),
     checkHostPanelEmail(normalizedEmail),
   ]);
   return Boolean(existingSignupLead || existingHostPanelAccount);
 };
 
+// Professional's price is fetched live (see planDisplayName below) — this
+// only covers Basic/Custom, which have no dollar figure to keep in sync.
 const PLAN_DISPLAY_NAMES = {
   BASIC: "Basic - Free",
-  PROFESSIONAL: "Professional - $199",
   CUSTOMISE: "Customise - Personalised",
 };
 
-function planDisplayName(goals) {
+const normalizeBillingCycle = (value) =>
+  ["monthly", "annual"].includes(String(value || "").trim().toLowerCase())
+    ? String(value).trim().toLowerCase()
+    : "monthly";
+
+async function planDisplayName(goals, billingCycle = "monthly") {
   const key = (goals || "").trim().toUpperCase();
+  if (key === "PROFESSIONAL") {
+    const { professionalPlanPriceUsd, professionalAnnualPlanPriceUsd } =
+      await getProfessionalPlanPricing();
+    return normalizeBillingCycle(billingCycle) === "annual"
+      ? `Professional - $${Number(professionalAnnualPlanPriceUsd).toLocaleString("en-US")}/year billed annually`
+      : `Professional - $${professionalPlanPriceUsd}/month`;
+  }
   return PLAN_DISPLAY_NAMES[key] || goals || "-";
 }
+
+// GET /api/forms/plan-pricing — public, no auth. Proxies MasterPanel's own
+// public price endpoint so the frontend never has to call MasterPanel
+// directly (avoids CORS and keeps the "which service owns pricing" line
+// clean — Nomads' backend, not its frontend, talks cross-service).
+export const getPublicPlanPricing = async (req, res) => {
+  const { professionalPlanPriceUsd, professionalAnnualPlanPriceUsd } =
+    await getProfessionalPlanPricing();
+  return res.status(200).json({
+    professionalPlanPriceUsd,
+    professionalAnnualPlanPriceUsd,
+  });
+};
+
+// ---------------------------------------------------------------------------
+// Host lead email verification
+//
+// After signing up, the submitter gets (1) a welcome email and (2) a "verify
+// your email" email whose link opens the host site's /verify-email page. That
+// page requests an OTP by email and submits it here. Only verified leads are
+// listed to the master panel (see getHostUsers).
+// ---------------------------------------------------------------------------
+const HOST_EMAIL_TOKEN_PURPOSE = "host-email-verification";
+const HOST_EMAIL_LINK_EXPIRY = "7d";
+const HOST_EMAIL_OTP_TTL_MS = 10 * 60 * 1000;
+const HOST_EMAIL_OTP_COOLDOWN_MS = 45 * 1000;
+const HOST_EMAIL_LINK_COOLDOWN_MS = 60 * 1000;
+const HOST_EMAIL_OTP_MAX_ATTEMPTS = 5;
+
+const hostEmailTokenSecret = () =>
+  process.env.HOST_EMAIL_VERIFY_SECRET || process.env.ACCESS_TOKEN_SECRET;
+
+const hostSiteBaseUrl = () => {
+  const configured = String(process.env.HOST_SITE_URL || "").trim();
+  if (configured) return configured.replace(/\/+$/, "");
+  return process.env.NODE_ENV === "production"
+    ? "https://host.wono.co"
+    : "http://host.localhost:5173";
+};
+
+const escapeHtml = (value) =>
+  String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
+const maskEmail = (email) => {
+  const [local = "", domain = ""] = String(email || "").split("@");
+  if (!domain) return "";
+  const visible = local.slice(0, Math.min(2, local.length));
+  return `${visible}${"*".repeat(Math.max(local.length - visible.length, 1))}@${domain}`;
+};
+
+const hashOtpCode = (code) =>
+  createHash("sha256").update(String(code)).digest("hex");
+
+const otpMatches = (submitted, storedHash) => {
+  const a = Buffer.from(hashOtpCode(submitted), "hex");
+  const b = Buffer.from(String(storedHash || ""), "hex");
+  return a.length === b.length && timingSafeEqual(a, b);
+};
+
+const signHostEmailToken = (hostUser) =>
+  jwt.sign(
+    {
+      purpose: HOST_EMAIL_TOKEN_PURPOSE,
+      hostUserId: String(hostUser._id),
+      email: hostUser.email,
+    },
+    hostEmailTokenSecret(),
+    { expiresIn: HOST_EMAIL_LINK_EXPIRY },
+  );
+
+// Resolves the HostUser a verification link belongs to, or an { error } that
+// can be sent straight back to the client.
+const resolveHostUserFromToken = async (token) => {
+  if (!token || typeof token !== "string") {
+    return {
+      error: {
+        status: 400,
+        code: "LINK_INVALID",
+        message: "This verification link is invalid.",
+      },
+    };
+  }
+  let decoded;
+  try {
+    decoded = jwt.verify(token, hostEmailTokenSecret());
+  } catch (err) {
+    const expired = err?.name === "TokenExpiredError";
+    return {
+      error: {
+        status: 400,
+        code: expired ? "LINK_EXPIRED" : "LINK_INVALID",
+        message: expired
+          ? "This verification link has expired. Request a new one below."
+          : "This verification link is invalid.",
+      },
+    };
+  }
+  if (decoded?.purpose !== HOST_EMAIL_TOKEN_PURPOSE) {
+    return {
+      error: {
+        status: 400,
+        code: "LINK_INVALID",
+        message: "This verification link is invalid.",
+      },
+    };
+  }
+  const hostUser = await HostUser.findById(decoded.hostUserId);
+  if (!hostUser) {
+    return {
+      error: {
+        status: 404,
+        code: "LINK_INVALID",
+        message: "We couldn't find this registration.",
+      },
+    };
+  }
+  return { hostUser };
+};
+
+const buildHostVerifyUrl = (hostUser) =>
+  `${hostSiteBaseUrl()}/verify-email?token=${encodeURIComponent(
+    signHostEmailToken(hostUser),
+  )}`;
+
+const markVerificationLinkSent = (hostUser) =>
+  HostUser.updateOne(
+    { _id: hostUser._id },
+    { $set: { verificationLinkSentAt: new Date() } },
+  );
+
+// Standalone verification email — only used to re-send a lost/expired link.
+// The first link goes out inside the welcome email (sendHostSignupEmails).
+const sendHostVerificationLinkEmail = async (hostUser) => {
+  const verifyUrl = buildHostVerifyUrl(hostUser);
+  const name = escapeHtml(hostUser.name || "there");
+
+  await sendMail({
+    to: hostUser.email,
+    subject: "Verify your email address - WONO",
+    text: `Hi ${hostUser.name || "there"}, please verify your email address to get your WONO host request reviewed: ${verifyUrl}`,
+    html: renderNotificationEmail({
+      heroTitle: "Verify Your Email",
+      heroSubtitle: "Thank you for submitting your request.",
+      greetingHtml: `
+        <p style="margin:0 0 4px;">Hello ${name},</p>
+        <p class="email-text" style="margin:0;">Thank you for submitting your request to become a WONO host. Please use the button below to verify your email address — once it's verified, our team will review your request and contact you shortly.</p>
+      `,
+      referenceLabel: "Registration ID",
+      referenceValue: hostUser.registrationId || undefined,
+      ctaButton: {
+        label: "Verify Email",
+        href: verifyUrl,
+        caption:
+          "You'll be asked to enter a 6-digit code we email you. This link expires in 7 days.",
+      },
+      whatNextTitle: "What Happens Next?",
+      whatNextItems: [
+        "Click the button above to open the verification page",
+        "Enter the one-time code we send to this email",
+        "Our team will contact you shortly",
+      ],
+      noteHtml:
+        "If you didn't submit a WONO host request, you can safely ignore this email.",
+    }),
+  });
+
+  await markVerificationLinkSent(hostUser);
+};
+
+const sendHostEmailOtp = async (hostUser) => {
+  const code = String(randomInt(100000, 1000000));
+  await Otp.updateMany(
+    {
+      email: hostUser.email,
+      purpose: "host_email_verification",
+      isUsed: false,
+    },
+    { $set: { isUsed: true } },
+  );
+  await Otp.create({
+    email: hostUser.email,
+    code: hashOtpCode(code),
+    purpose: "host_email_verification",
+    expiresAt: new Date(Date.now() + HOST_EMAIL_OTP_TTL_MS),
+    payload: { hostUserId: String(hostUser._id) },
+  });
+
+  await sendMail({
+    to: hostUser.email,
+    subject: "Your WONO verification code",
+    text: `Your WONO email verification code is ${code}. It expires in 10 minutes.`,
+    html: renderNotificationEmail({
+      heroTitle: "Verify Your Email",
+      heroSubtitle: "Use the code below to verify your email address.",
+      greetingHtml: `
+        <p style="margin:0 0 4px;">Hello ${escapeHtml(hostUser.name || "there")},</p>
+        <p class="email-text" style="margin:0;">Enter this code on the verification page to confirm your email address.</p>
+      `,
+      otpCode: { code, expiryMinutes: HOST_EMAIL_OTP_TTL_MS / 60000 },
+      noteHtml:
+        "For your security, never share this code with anyone.<br/>WONO will never ask you for your OTP or password.<br/><br/><b>Didn't request this?</b> You can safely ignore this email.",
+    }),
+  });
+};
+
+// Stable reference shown in the lead's emails. Assigned once, at signup.
+const ensureRegistrationId = async (hostUser) => {
+  if (hostUser.registrationId) return hostUser.registrationId;
+  const total = await HostUser.countDocuments({});
+  const registrationId = `WN-REG-${referenceDateStamp(
+    hostUser.createdAt || new Date(),
+  )}-${String(total).padStart(5, "0")}`;
+  await HostUser.updateOne({ _id: hostUser._id }, { $set: { registrationId } });
+  hostUser.registrationId = registrationId;
+  return registrationId;
+};
+
+// At signup the lead gets ONE email: thank-you + the verify-your-email button.
+// "Welcome to WONO!" is sent only once the address is verified (see
+// sendHostWelcomeEmail / verifyHostEmailOtp).
+const sendHostSignupEmails = async ({ hostUser }) => {
+  try {
+    await ensureRegistrationId(hostUser);
+    await sendHostVerificationLinkEmail(hostUser);
+    console.log("✅ Verification email sent to", hostUser.email);
+  } catch (err) {
+    console.error("❌ Failed to send verification email:", err.message);
+  }
+};
+
+// Sent right after the lead verifies their email: the welcome + what happens next.
+const sendHostWelcomeEmail = async (hostUser) => {
+  const registeredAt = hostUser.createdAt || new Date();
+  const { submittedDate, submittedTime } = formatSubmittedOn(registeredAt);
+  const selectedPlanDisplayName = await planDisplayName(
+    hostUser.goals,
+    hostUser.billingCycle,
+  );
+  await sendMail({
+    to: hostUser.email,
+    subject: "Welcome to WONO!",
+    text: `Hi ${hostUser.name || "there"}, your email is verified and your request is with our team. Registration ID: ${hostUser.registrationId || "-"}. We will contact you shortly.`,
+    html: renderNotificationEmail({
+      heroTitle: "Welcome to WONO!",
+      heroSubtitle: "Your email is verified and your request is with our team.",
+      greetingHtml: `
+        <p style="margin:0 0 4px;">Hello ${escapeHtml(hostUser.name || "there")},</p>
+        <p class="email-text" style="margin:0;">Thank you for registering with WONO. Your email address is verified and our team will contact you shortly.</p>
+      `,
+      referenceLabel: "Registration ID",
+      referenceValue: hostUser.registrationId || undefined,
+      detailsTitle: "Registration Details",
+      detailRows: [
+        ["Name", escapeHtml(hostUser.name || "-")],
+        ["Email", escapeHtml(hostUser.email)],
+        ["Selected Plan", selectedPlanDisplayName],
+        ["Company", escapeHtml(hostUser.companyName || "-")],
+        ["Registration Date", `${submittedDate}<br/>${submittedTime}`],
+      ],
+      whatNextTitle: "What Happens Next?",
+      whatNextItems: [
+        "Request submitted successfully",
+        "Email verified",
+        "Our team will review your information and contact you shortly",
+      ],
+    }),
+  });
+};
+
+// POST /api/forms/host-email/send-otp  { token }
+// Called when the verify-email page opens (and by its "resend" button).
+export const sendHostEmailVerificationOtp = async (req, res, next) => {
+  try {
+    const resolved = await resolveHostUserFromToken(req.body?.token);
+    if (resolved.error) {
+      const { status, ...body } = resolved.error;
+      return res.status(status).json(body);
+    }
+    const { hostUser } = resolved;
+    const email = maskEmail(hostUser.email);
+
+    if (hostUser.emailVerified) {
+      return res.status(200).json({ alreadyVerified: true, email });
+    }
+
+    // Opening the verify page asks for a code once. Reloading or revisiting
+    // it while that code is still usable must NOT email another one — a new
+    // code goes out only when the person explicitly presses "Resend"
+    // (resend: true), and then only after the cooldown.
+    const resend = req.body?.resend === true;
+    const lastOtp = await Otp.findOne({
+      email: hostUser.email,
+      purpose: "host_email_verification",
+      isUsed: false,
+    })
+      .sort({ createdAt: -1 })
+      .lean();
+    const codeStillUsable =
+      lastOtp &&
+      new Date(lastOtp.expiresAt).getTime() > Date.now() &&
+      lastOtp.attempts < HOST_EMAIL_OTP_MAX_ATTEMPTS;
+    if (codeStillUsable) {
+      const waitMs =
+        new Date(lastOtp.createdAt).getTime() +
+        HOST_EMAIL_OTP_COOLDOWN_MS -
+        Date.now();
+      if (!resend || waitMs > 0) {
+        return res.status(200).json({
+          sent: false,
+          alreadySent: true,
+          email,
+          retryAfterSeconds: Math.max(0, Math.ceil(waitMs / 1000)),
+          message: "We've already emailed you a code. Check your inbox.",
+        });
+      }
+    }
+
+    await sendHostEmailOtp(hostUser);
+    return res.status(200).json({
+      sent: true,
+      email,
+      retryAfterSeconds: HOST_EMAIL_OTP_COOLDOWN_MS / 1000,
+      message: "Verification code sent to your email.",
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+// POST /api/forms/host-email/verify-otp  { token, otp }
+export const verifyHostEmailOtp = async (req, res, next) => {
+  try {
+    const otp = String(req.body?.otp || "").trim();
+    if (!/^\d{6}$/.test(otp)) {
+      return res
+        .status(400)
+        .json({ message: "Enter the 6-digit code from your email." });
+    }
+
+    const resolved = await resolveHostUserFromToken(req.body?.token);
+    if (resolved.error) {
+      const { status, ...body } = resolved.error;
+      return res.status(status).json(body);
+    }
+    const { hostUser } = resolved;
+
+    if (hostUser.emailVerified) {
+      return res.status(200).json({ verified: true, alreadyVerified: true });
+    }
+
+    const record = await Otp.findOne({
+      email: hostUser.email,
+      purpose: "host_email_verification",
+      isUsed: false,
+    }).sort({ createdAt: -1 });
+
+    if (!record) {
+      return res
+        .status(400)
+        .json({ message: "Please request a verification code first." });
+    }
+    if (record.expiresAt.getTime() < Date.now()) {
+      record.isUsed = true;
+      await record.save();
+      return res
+        .status(400)
+        .json({ message: "This code has expired. Request a new one." });
+    }
+    if (record.attempts >= HOST_EMAIL_OTP_MAX_ATTEMPTS) {
+      record.isUsed = true;
+      await record.save();
+      return res
+        .status(429)
+        .json({ message: "Too many attempts. Request a new code." });
+    }
+    if (!otpMatches(otp, record.code)) {
+      record.attempts += 1;
+      await record.save();
+      return res.status(400).json({ message: "Incorrect code. Try again." });
+    }
+
+    record.isUsed = true;
+    await record.save();
+    hostUser.emailVerified = true;
+    hostUser.emailVerifiedAt = new Date();
+    await hostUser.save();
+
+    try {
+      await sendHostWelcomeEmail(hostUser);
+    } catch (err) {
+      console.error("❌ Failed to send welcome email:", err.message);
+    }
+
+    try {
+      await sendAdminFormNotification({
+        subject: "Host lead email verified",
+        formName: hostUser.formName || "register",
+        data: {
+          name: hostUser.name,
+          email: hostUser.email,
+          companyName: hostUser.companyName,
+          plan: hostUser.goals,
+        },
+      });
+    } catch (err) {
+      console.error("❌ Failed to send verification admin notice:", err.message);
+    }
+
+    return res.status(200).json({
+      verified: true,
+      message: "Email verified. Our team will review your request shortly.",
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+// POST /api/forms/host-email/resend-link  { email }
+// For an expired/lost link. Always answers 200 so it can't be used to probe
+// which emails have signed up.
+export const resendHostEmailVerificationLink = async (req, res, next) => {
+  try {
+    const email = String(req.body?.email || "").trim().toLowerCase();
+    const generic = {
+      message:
+        "If this email has a pending request, a new verification link is on its way.",
+    };
+    if (!email) return res.status(200).json(generic);
+
+    const hostUser = await HostUser.findOne({ email, emailVerified: false });
+    if (!hostUser) return res.status(200).json(generic);
+
+    const lastSent = hostUser.verificationLinkSentAt?.getTime() || 0;
+    if (Date.now() - lastSent < HOST_EMAIL_LINK_COOLDOWN_MS) {
+      return res.status(200).json(generic);
+    }
+
+    await sendHostVerificationLinkEmail(hostUser);
+    return res.status(200).json(generic);
+  } catch (error) {
+    return next(error);
+  }
+};
 
 const istNowPieces = () => {
   const tz = "Asia/Kolkata";
@@ -417,7 +904,12 @@ export const addB2BFormSubmission = async (req, res, next) => {
 
 export const getHostUsers = async (req, res, next) => {
   try {
-    const hostUsers = await HostUser.find({}).sort({ createdAt: -1 }).lean();
+    // Leads appear in the master panel only after the submitter verified
+    // their email. `$ne: false` (not `: true`) keeps legacy leads, which were
+    // created before verification existed and have no emailVerified field.
+    const hostUsers = await HostUser.find({ emailVerified: { $ne: false } })
+      .sort({ createdAt: -1 })
+      .lean();
 
     return res.status(200).json({
       count: hostUsers.length,
@@ -591,6 +1083,8 @@ export const registerFormSubmission = async (req, res) => {
     }
     payload.email = normalizedEmail;
 
+    await HostUser.deleteMany(staleUnverifiedLeadFilter(normalizedEmail));
+
     const safeParse = (val, fallback) => {
       try {
         return typeof val === "string" ? JSON.parse(val) : val || fallback;
@@ -635,8 +1129,23 @@ export const registerFormSubmission = async (req, res) => {
       );
     });
 
+    // Came from "Verify Business" on a wono.co listing? Carry that company
+    // through so staff can link its listings when they invite the host.
+    const verifyClick = await findUnusedVerifyClick(payload.verifyClickId);
+
     // STEP 1.5: also persist host signup user in MongoDB
     const hostUser = await HostUser.create({
+      ...(verifyClick
+        ? {
+            nomadsCompanyId: verifyClick.companyId,
+            verifyClickId: String(verifyClick._id),
+            sourceListing: {
+              businessId: verifyClick.businessId || "",
+              companyType: verifyClick.companyType || "",
+              companyName: verifyClick.companyName || "",
+            },
+          }
+        : {}),
       name: payload.name,
       email: payload.email,
       mobile: payload.mobile,
@@ -645,6 +1154,7 @@ export const registerFormSubmission = async (req, res) => {
       city: payload.city,
       role: payload.role,
       goals: payload.Goals,
+      billingCycle: normalizeBillingCycle(payload.billingCycle),
       companyName: payload.companyName,
       industry: payload.industry,
       verticalType: payload.verticalType,
@@ -657,6 +1167,14 @@ export const registerFormSubmission = async (req, res) => {
       status: "pending",
       payload,
     });
+
+    if (verifyClick) {
+      try {
+        await attachHostUserToClick(verifyClick._id, hostUser._id);
+      } catch (err) {
+        console.error("Failed to link signup to verify-business click:", err.message);
+      }
+    }
 
     // STEP 2: normalize incoming JSON strings
     let { products, testimonials, about } = payload;
@@ -777,6 +1295,12 @@ export const registerFormSubmission = async (req, res) => {
         message: "Form submitted successfully",
       });
 
+      // Sent before the slow upload/website work so a failure there can't
+      // strand the lead without its verification email.
+      if (payload.email) {
+        await sendHostSignupEmails({ hostUser, payload });
+      }
+
       // companyLogo
       if (filesByField.companyLogo && filesByField.companyLogo[0]) {
         const logoFile = filesByField.companyLogo[0];
@@ -892,56 +1416,6 @@ export const registerFormSubmission = async (req, res) => {
         } catch (err) {
           console.error("create-template call failed:", err);
           websiteResult = { message: "create-template call failed" };
-        }
-      }
-
-      // STEP 5: send confirmation email to user
-      if (payload.email) {
-        try {
-          const registeredAt = hostUser.createdAt || new Date();
-          const totalHostUsers = await HostUser.countDocuments({});
-          const registrationId = `WN-REG-${referenceDateStamp(
-            registeredAt,
-          )}-${String(totalHostUsers).padStart(5, "0")}`;
-          const { submittedDate, submittedTime } =
-            formatSubmittedOn(registeredAt);
-
-          await sendMail({
-            to: payload.email,
-            subject: "Welcome to WONO!",
-            text: `Hi ${payload.name || "User"}, thanks for registering with WONO! Registration ID: ${registrationId}. Our team will contact you shortly.`,
-            html: renderNotificationEmail({
-              heroTitle: "Welcome to WONO!",
-              heroSubtitle: "Thank you for registering with WONO.",
-              greetingHtml: `
-                <p style="margin:0 0 4px;">Hello ${payload.name || "User"},</p>
-                <p class="email-text" style="margin:0;">We're excited to have you onboard. Our team will contact you shortly${
-                  searchKey
-                    ? " and will inform you once your website is created"
-                    : ""
-                }.</p>
-              `,
-              referenceLabel: "Registration ID",
-              referenceValue: registrationId,
-              detailsTitle: "Registration Details",
-              detailRows: [
-                ["Name", payload.name || "-"],
-                ["Email", payload.email],
-                ["Selected Plan", planDisplayName(payload.Goals)],
-                ["Company", payload.companyName || "-"],
-                ["Registration Date", `${submittedDate}<br/>${submittedTime}`],
-              ],
-              whatNextTitle: "What Happens Next?",
-              whatNextItems: [
-                "Registration completed successfully",
-                "Our team will review your information",
-                "We will contact you shortly",
-              ],
-            }),
-          });
-          console.log("✅ Registration email sent to", payload.email);
-        } catch (err) {
-          console.error("❌ Failed to send email:", err.message);
         }
       }
 

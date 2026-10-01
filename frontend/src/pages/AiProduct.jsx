@@ -48,6 +48,7 @@ import TransparentModal from "../components/TransparentModal";
 import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
+import VerifyBusinessButton from "../components/verification/VerifyBusinessButton";
 import { setFormValues } from "../features/locationSlice.js";
 import { readSelectedDestination } from "../utils/selectedDestinationSession";
 import {
@@ -1111,8 +1112,15 @@ const AiProduct = () => {
               ))}
           </nav>
           <div className="flex items-start justify-between gap-3">
-            <h1 className="text-title font-semibold text-secondary-dark">
+            <h1
+              className={`text-title font-semibold text-secondary-dark flex items-center flex-wrap ${companyDetails?.isVerified ? "" : "justify-between"}`}
+            >
               {listingTitle || "Loading Title..."}
+              <VerifyBusinessButton
+                companyId={companyDetails?.companyId}
+                businessId={companyDetails?.businessId}
+                isVerified={companyDetails?.verifiedBadgeVisible}
+              />
             </h1>
             {/* Guide button hidden for now. Uncomment when guides should be manually accessible again.
             <button
@@ -2045,8 +2053,15 @@ const AiProduct = () => {
               ))}
           </nav>
           <div className="flex items-start justify-between gap-3">
-            <h1 className="text-title font-semibold text-secondary-dark">
+            <h1
+              className={`text-title font-semibold text-secondary-dark flex items-center flex-wrap ${companyDetails?.isVerified ? "" : "justify-between"}`}
+            >
               {companyDetails?.companyName || "Loading Title..."}
+              <VerifyBusinessButton
+                companyId={companyDetails?.companyId}
+                businessId={companyDetails?.businessId}
+                isVerified={companyDetails?.verifiedBadgeVisible}
+              />
             </h1>
             {/* Guide button hidden for now. Uncomment when guides should be manually accessible again.
             <button

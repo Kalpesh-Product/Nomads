@@ -1,11 +1,19 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { api as publicApi } from "../../utils/axios";
 import { FaGlobeAmericas } from "react-icons/fa";
 import { HiOutlineCurrencyDollar } from "react-icons/hi";
 import { TbAward } from "react-icons/tb";
 import useNomadLoginState from "../../hooks/useNomadLoginState";
 import { FaCheck } from "react-icons/fa";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+
+// Kept only as the fallback shown while the live price loads (or if the
+// request fails) — the real number comes from
+// GET /forms/plan-pricing (Nomads backend) -> MasterPanel's Plan Pricing
+// settings, so it always matches whatever staff set there.
+const FALLBACK_PROFESSIONAL_PLAN_PRICE_USD = 199;
 
 const AI_HOME_TYPING_SEEN_KEY = "wono-ai-home-typing-seen";
 
@@ -39,6 +47,7 @@ const recommendationCards = [
       "Access Grants",
       "Visitor Management (Standard Visitor)",
       "4 Nomad Listings",
+      "Verified Badge - Free for 3 Months",
       "Built-in Chatbot",
       "Customer Support",
       "Cloud Storage",
@@ -86,8 +95,8 @@ const recommendationCards = [
       "End-to-End Finance Suite",
       "HR Management System (HRMS)",
       "IT Infrastructure Module",
-      "Maintenance Management Module",
       "9+ Nomad Listings",
+      "Maintenance Management Module",
       "AI-Driven Lead Generation",
       "AI Customer Experience Agent",
       "AI Sales Automation",
@@ -107,7 +116,12 @@ const gatedRecommendationTitles = new Set([
   "Find Your Community",
 ]);
 
-const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
+const AiHostPricing = ({
+  compact = false,
+  startStep = 1,
+  onSelectPlan,
+  initialBillingCycle = "monthly",
+}) => {
   const navigate = useNavigate();
   const location = useLocation();
   const isLoggedIn = useNomadLoginState();
@@ -120,9 +134,72 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
     compact ? recommendationCards.length : 0,
   );
   const [selectedPlanTitle, setSelectedPlanTitle] = useState("");
+  const [billingCycle, setBillingCycle] = useState(initialBillingCycle);
   const cardsScrollRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const { data: planPricing } = useQuery({
+    queryKey: ["publicPlanPricing"],
+    queryFn: async () => {
+      const response = await publicApi.get("/forms/plan-pricing");
+      return response?.data || {};
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+  const professionalPlanPriceUsd = planPricing?.professionalPlanPriceUsd;
+  const professionalAnnualPlanPriceUsd =
+    planPricing?.professionalAnnualPlanPriceUsd;
+  // annual price = FULL yearly total (e.g. $1,999/yr). Save is the discount
+  // vs paying the monthly rate for 12 months (199×12 = 2,388 → ~16%).
+  const annualSavePercent =
+    professionalPlanPriceUsd && professionalAnnualPlanPriceUsd
+      ? Math.max(
+          0,
+          Math.round(
+            (1 -
+              professionalAnnualPlanPriceUsd /
+                (professionalPlanPriceUsd * 12)) *
+              100,
+          ),
+        )
+      : 0;
+
+  const cards = useMemo(
+    () =>
+      recommendationCards.map((card) => {
+        if (card.title !== "PROFESSIONAL") return card;
+        const monthly =
+          professionalPlanPriceUsd ?? FALLBACK_PROFESSIONAL_PLAN_PRICE_USD;
+        const annual =
+          professionalAnnualPlanPriceUsd ??
+          Math.round(monthly * 12); // yearly total
+        const isAnnual = billingCycle === "annual";
+        return {
+          ...card,
+          // Annual: full yearly price ($1,999/yr). Monthly: per-month.
+          price: isAnnual
+            ? `$${Math.round(annual).toLocaleString()}`
+            : `$${monthly}`,
+          priceSuffix: isAnnual ? "/year" : "/month",
+          billedAnnually: isAnnual,
+          savePercent: isAnnual ? annualSavePercent : 0,
+          monthlyYearlyTotal: isAnnual
+            ? `$${Math.round(monthly * 12).toLocaleString()}`
+            : "",
+          annualYearlyTotal: isAnnual
+            ? `$${Math.round(annual).toLocaleString()}`
+            : "",
+          billingCycle,
+        };
+      }),
+    [
+      professionalPlanPriceUsd,
+      professionalAnnualPlanPriceUsd,
+      annualSavePercent,
+      billingCycle,
+    ],
+  );
 
   const greetingText = isLoggedIn ? "Hi Abrar" : "Meet Wono";
   const subheadingText = isLoggedIn
@@ -255,6 +332,10 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
     params.set("step", String(startStep));
     if (card.path.includes("/signup")) {
       params.set("plan", card.title);
+      // Carry the billing cycle picked on the pricing page into the signup
+      // form so its toggle opens on the SAME choice (monthly/annual) instead
+      // of silently resetting to monthly.
+      params.set("billingCycle", card.billingCycle || "monthly");
     }
     const queryString = params.toString();
     const targetPath = `${card.path}${queryString ? `?${queryString}` : ""}`;
@@ -304,6 +385,40 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
             <div
               className={`relative mt-8 ${areCardsVisible ? "visible" : "invisible"}`}
             >
+              <div className="mb-8 flex items-center justify-center">
+                <div className="inline-flex items-center rounded-full border border-[#dfe5ef] bg-[#f5f7fb] p-1">
+                  <button
+                    type="button"
+                    onClick={() => setBillingCycle("monthly")}
+                    className={[
+                      "rounded-full px-5 py-2 text-sm font-semibold transition-all",
+                      billingCycle === "monthly"
+                        ? "bg-white text-[#0f1730] shadow"
+                        : "text-[#60708b] hover:text-[#0f1730]",
+                    ].join(" ")}
+                  >
+                    Monthly
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setBillingCycle("annual")}
+                    className={[
+                      "flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition-all",
+                      billingCycle === "annual"
+                        ? "bg-white text-[#0f1730] shadow"
+                        : "text-[#60708b] hover:text-[#0f1730]",
+                    ].join(" ")}
+                  >
+                    Annual
+                    {annualSavePercent > 0 && (
+                      <span className="rounded-full bg-[#dff5ea] px-2 py-0.5 text-[10px] font-bold text-[#16b26a]">
+                        Save up to {annualSavePercent}%
+                      </span>
+                    )}
+                  </button>
+                </div>
+              </div>
+
               {recommendationCards.length > 3 && (
                 <>
                   <button
@@ -342,7 +457,7 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
                     : "grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3"
                 }`}
               >
-                {recommendationCards.map((card, index) => {
+                {cards.map((card, index) => {
                   const isGated = gatedRecommendationTitles.has(card.title);
 
                   return (
@@ -392,6 +507,35 @@ const AiHostPricing = ({ compact = false, startStep = 1, onSelectPlan }) => {
                             </span>
                           )}
                         </div>
+
+                        {card.billedAnnually && (
+                          <div className="mt-1.5">
+                            <p className="flex items-center justify-center gap-1.5 text-[10px] font-semibold text-[#16b26a]">
+                              <span>Billed annually</span>
+                              {card.savePercent > 0 && (
+                                <span className="rounded-full bg-[#dff5ea] px-1.5 py-0.5 font-bold">
+                                  Save up to {card.savePercent}%
+                                </span>
+                              )}
+                            </p>
+                            {card.savePercent > 0 &&
+                              card.monthlyYearlyTotal &&
+                              card.annualYearlyTotal && (
+                                <p className="mt-1 text-center text-[10px] font-medium text-[#8a93a3]">
+                                  <span className="line-through">
+                                    {card.monthlyYearlyTotal}
+                                  </span>
+                                  <span className="mx-1 text-[#8a93a3]">
+                                    &#8594;
+                                  </span>
+                                  <span className="font-bold text-[#0f1730]">
+                                    {card.annualYearlyTotal}
+                                  </span>
+                                  <span className="text-[#8a93a3]">/yr</span>
+                                </p>
+                              )}
+                          </div>
+                        )}
 
                         <div className="mt-5 border-t border-[#dfe5ef] pt-6" />
 

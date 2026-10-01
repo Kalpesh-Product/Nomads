@@ -52,6 +52,8 @@ import leadsRoutes from "./routes/leadsRoutes.js";
 import specialAccessRoutes from "./routes/specialAccessRoutes.js";
 import adminNomadUserRoutes from "./routes/adminNomadUserRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
+import adminVerificationRoutes from "./routes/adminVerificationRoutes.js";
+import adminVerifyClickRoutes from "./routes/adminVerifyClickRoutes.js";
 import { verifyAdminApiKey } from "./middlewares/verifyAdminApiKey.js";
 
 const app = express();
@@ -89,6 +91,16 @@ app.use("/api/leads", leadsRoutes);
 app.use("/api/special-access", specialAccessRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/admin/nomad-users", verifyAdminApiKey, adminNomadUserRoutes);
+app.use(
+  "/api/admin/verification-requests",
+  verifyAdminApiKey,
+  adminVerificationRoutes,
+);
+app.use(
+  "/api/admin/verify-business-clicks",
+  verifyAdminApiKey,
+  adminVerifyClickRoutes,
+);
 
 
 app.use("/api/news", newsRoutes);

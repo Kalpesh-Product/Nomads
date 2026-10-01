@@ -45,6 +45,7 @@ import TransparentModal from "../components/TransparentModal";
 import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
+import VerifyBusinessButton from "../components/verification/VerifyBusinessButton";
 import { setFormValues } from "../features/locationSlice.js";
 import {
   buildCanonicalListingUrl,
@@ -732,8 +733,15 @@ const Product = () => {
                 </span>
               ))}
           </nav>
-          <h1 className="text-title font-semibold text-secondary-dark">
+          <h1
+            className={`text-title font-semibold text-secondary-dark flex items-center flex-wrap ${companyDetails?.isVerified ? "" : "justify-between"}`}
+          >
             {listingTitle || "Loading Title..."}
+            <VerifyBusinessButton
+              companyId={companyDetails?.companyId}
+              businessId={companyDetails?.businessId}
+              isVerified={companyDetails?.verifiedBadgeVisible}
+            />
           </h1>
         </div>
 
@@ -1609,8 +1617,15 @@ const Product = () => {
                 </span>
               ))}
           </nav>
-          <h1 className="text-title font-semibold text-secondary-dark">
+          <h1
+            className={`text-title font-semibold text-secondary-dark flex items-center flex-wrap ${companyDetails?.isVerified ? "" : "justify-between"}`}
+          >
             {listingTitle || "Loading Title..."}
+            <VerifyBusinessButton
+              companyId={companyDetails?.companyId}
+              businessId={companyDetails?.businessId}
+              isVerified={companyDetails?.verifiedBadgeVisible}
+            />
           </h1>
         </div>
 
