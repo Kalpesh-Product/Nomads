@@ -12,6 +12,7 @@ import {
 import { Controller, useForm } from "react-hook-form";
 import { Country } from "country-state-city";
 import { useMutation } from "@tanstack/react-query";
+import { useLocation, useNavigate } from "react-router-dom";
 import Container from "../components/Container";
 import axios from "../utils/axios";
 import useAuth from "../hooks/useAuth";
@@ -64,6 +65,7 @@ const CONTRIBUTION_TYPE_GROUPS = [
     ],
   },
 ];
+const CONTRIBUTOR_CONTRIBUTION_OPTIONS = CONTRIBUTION_TYPE_GROUPS[0].options;
 
 const tickMenuItemSx = {
   "& .tick-icon": { opacity: 0, color: "#1976d2" },
@@ -88,12 +90,15 @@ const AiBecomeContributor = () => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const messageLimitAlertedRef = useRef(false);
+  const navigate = useNavigate();
+  const location = useLocation();
   const { auth } = useAuth();
   const isLoggedIn = Boolean(auth?.user);
   const countries = useMemo(() => Country.getAllCountries(), []);
   const { handleSubmit, control, reset, setValue, watch } = useForm({
     defaultValues,
   });
+  const selectedContributionTypes = watch("contributionType");
   const selectedCountry = watch("currentCountry");
   const selectedCountryData = useMemo(
     () => countries.find((country) => country.name === selectedCountry) || null,
@@ -145,6 +150,33 @@ const AiBecomeContributor = () => {
 
     setIsSubmitting(true);
     submitContributor(normalizedValues);
+  };
+
+  const selectedContributorOptionsRequireLogin = (selectedOptions = []) =>
+    selectedOptions.some((option) =>
+      CONTRIBUTOR_CONTRIBUTION_OPTIONS.includes(option),
+    );
+
+  const handleFormGateAndSubmit = (event) => {
+    if (
+      !isLoggedIn &&
+      selectedContributorOptionsRequireLogin(selectedContributionTypes)
+    ) {
+      event.preventDefault();
+      navigate("/login", {
+        state: {
+          loginContext: {
+            title: "Become a Contributor",
+            description:
+              "Login as a Nomad to contribute blogs, news, places, or events to WoNo.",
+          },
+          redirectTo: `${location.pathname}${location.search}`,
+        },
+      });
+      return;
+    }
+
+    void handleSubmit(handleFormSubmit)(event);
   };
 
   const handleMessageChange = (event, onChange) => {
@@ -281,7 +313,7 @@ const AiBecomeContributor = () => {
             </div>
             <Box
               component="form"
-              onSubmit={handleSubmit(handleFormSubmit)}
+              onSubmit={handleFormGateAndSubmit}
               className={`bg-white p-0 md:p-0 rounded-2xl ${
                 isFormVisible ? "visible" : "invisible"
               }`}
