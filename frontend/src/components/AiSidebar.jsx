@@ -18,6 +18,7 @@ import {
   HiOutlineHeart,
   HiOutlineUserCircle,
   HiOutlineKey,
+  HiOutlineLink,
   HiOutlineLogout,
   HiOutlineLogin,
 } from "react-icons/hi";
@@ -128,6 +129,36 @@ const profileItems = [
   { label: "Reviews", icon: MdRateReview, tab: "reviews" },
   { label: "Change Password", icon: HiOutlineKey, tab: "password" },
 ];
+
+const contributionProfileItems = [
+  {
+    label: "Blog Contributions",
+    icon: HiOutlineLink,
+    path: "/blog-contributions",
+    flag: "isBlogger",
+  },
+  {
+    label: "News Contributions",
+    icon: HiOutlineLink,
+    path: "/news-contributions",
+    flag: "isNewsWriter",
+  },
+  {
+    label: "Event Contributions",
+    icon: HiOutlineLink,
+    path: "/event-contributions",
+    flag: "isEventWriter",
+  },
+  {
+    label: "Places Contributions",
+    icon: HiOutlineLink,
+    path: "/places-contributions",
+    flag: "isPlaceWriter",
+  },
+];
+const contributionProfilePaths = contributionProfileItems.map(
+  (item) => item.path,
+);
 
 const signOutItem = [{ label: "Sign Out", icon: HiOutlineLogout }];
 
@@ -312,6 +343,9 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   const profileItemsWithUserName = profileItems.map((item) =>
     item.label === "userFullName" ? { ...item, label: userFullName } : item,
   );
+  const visibleContributionProfileItems = contributionProfileItems.filter(
+    (item) => Boolean(auth?.user?.[item.flag]),
+  );
 
   useEffect(() => {
     queryClient.prefetchQuery(companyLocationsQueryOptions);
@@ -320,6 +354,11 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   useEffect(() => {
     const normalizedPath = location.pathname.replace(/\/$/, "") || "/";
     const isAiHomePage = normalizedPath === "/";
+    const isProfilePage =
+      normalizedPath === "/profile" ||
+      contributionProfilePaths.some(
+        (path) => normalizedPath === path || normalizedPath.startsWith(`${path}/`),
+      );
     const isValueAdditionPage = valueAdditionItems.some((item) => {
       if (!item.path) return false;
 
@@ -338,6 +377,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
     setIsRecommendationsOpen(true);
     setIsValueAdditionsOpen(isValueAdditionPage);
+    setIsProfileOpen(isProfilePage);
   }, [location.pathname]);
 
   const isLoggedIn = Boolean(auth?.user) || readStoredLoginState();
@@ -389,6 +429,15 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   };
 
   const handleProfileClick = (item) => {
+    if (item.path) {
+      const params = new URLSearchParams(location.search);
+      navigate({
+        pathname: item.path,
+        search: params.toString() ? `?${params.toString()}` : "",
+      });
+      return;
+    }
+
     if (!item.tab) return;
 
     const params = new URLSearchParams(location.search);
@@ -523,6 +572,25 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
       normalizedPath === becomeContributorLink.path ||
       normalizedPath.startsWith(`${becomeContributorLink.path}/`),
   };
+  const profileItemsWithActivePath = profileItemsWithUserName.map((item) => ({
+    ...item,
+    active:
+      item.path &&
+      (normalizedPath === item.path ||
+        normalizedPath.startsWith(`${item.path}/`)),
+  }));
+  const contributionProfileItemsWithActivePath =
+    visibleContributionProfileItems.map((item) => ({
+      ...item,
+      active:
+        normalizedPath === item.path ||
+        normalizedPath.startsWith(`${item.path}/`),
+    }));
+  const finalProfileItems = [
+    ...profileItemsWithActivePath.slice(0, 3),
+    ...contributionProfileItemsWithActivePath,
+    ...profileItemsWithActivePath.slice(3),
+  ];
 
   return (
     <>
@@ -605,7 +673,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
           <>
             <SidebarSection
               title="Profile"
-              items={profileItemsWithUserName}
+              items={finalProfileItems}
               collapsed={isCollapsed}
               isExpandable
               isOpen={isProfileOpen}

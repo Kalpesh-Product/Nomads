@@ -146,6 +146,9 @@ const AiManualSearch = lazyPage(() => import("./pages/AiManualSearch"));
 const AiBecomeContributor = lazyPage(() =>
   import("./pages/AiBecomeContributor"),
 );
+const AiContributionDashboard = lazyPage(() =>
+  import("./pages/AiContributionDashboard"),
+);
 const AiBlogsFetch = lazyPage(() => import("./components/AiBlogsFetch"));
 const AiNewsFetch = lazyPage(() => import("./components/AiNewsFetch"));
 const AiBlogDetails = lazyPage(() => import("./pages/AiBlogDetails"));
@@ -335,6 +338,22 @@ if (tenant === "main") {
               element: withDatePickerProvider(<AiWorkation />),
             },
             { path: "profile", element: <AiProfile /> },
+            {
+              path: "blog-contributions",
+              element: <AiContributionDashboard type="blog" />,
+            },
+            {
+              path: "news-contributions",
+              element: <AiContributionDashboard type="news" />,
+            },
+            {
+              path: "event-contributions",
+              element: <AiContributionDashboard type="event" />,
+            },
+            {
+              path: "places-contributions",
+              element: <AiContributionDashboard type="places" />,
+            },
             {
               path: "become-a-contributor",
               element: <AiBecomeContributor />,

@@ -175,6 +175,10 @@ export const updateProfile = async (req, res) => {
         designation: updatedUser.designation,
         contactCode: updatedUser.contactCode,
         contactNumber: updatedUser.contactNumber,
+        isBlogger: updatedUser.isBlogger,
+        isNewsWriter: updatedUser.isNewsWriter,
+        isEventWriter: updatedUser.isEventWriter,
+        isPlaceWriter: updatedUser.isPlaceWriter,
       },
     });
   } catch (error) {

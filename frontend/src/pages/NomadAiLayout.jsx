@@ -23,6 +23,10 @@ const HIDE_STICKY_BAR_EXACT_PATHS = new Set([
   "/home",
   "/home-logged-in",
   "/search",
+  "/blog-contributions",
+  "/news-contributions",
+  "/event-contributions",
+  "/places-contributions",
 ]);
 
 const AI_SCROLL_POSITIONS_STORAGE_KEY = "nomadAiScrollPositions";
