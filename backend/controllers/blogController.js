@@ -298,6 +298,42 @@ export const getMyBlogs = async (req, res, next) => {
     }
 };
 
+export const getBlogContributions = async (req, res, next) => {
+    try {
+        const { status, search } = req.query;
+        const query = {
+            contributor: { $exists: true, $ne: null },
+            isDraft: { $ne: true },
+        };
+
+        if (status && status !== "all") {
+            query.status = status;
+        }
+
+        if (search) {
+            const pattern = { $regex: search, $options: "i" };
+            query.$or = [
+                { mainTitle: pattern },
+                { mainContent: pattern },
+                { author: pattern },
+                { source: pattern },
+                { destination: pattern },
+            ];
+        }
+
+        const blogs = await Blog.find(query)
+            .populate("contributor", "firstName lastName fullName name email")
+            .sort({ updatedAt: -1, date: -1 });
+
+        return res.status(200).json({
+            count: blogs.length,
+            data: blogs,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const createMyBlog = async (req, res, next) => {
     try {
         const user = req.userData._id;
@@ -315,6 +351,42 @@ export const createMyBlog = async (req, res, next) => {
             message: isDraft
                 ? "Blog saved as draft successfully"
                 : "Blog submitted successfully",
+            blog,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const updateBlogContributionStatus = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+        const normalizedStatus = String(status || "").toLowerCase();
+
+        if (!["pending", "approved", "rejected"].includes(normalizedStatus)) {
+            return res.status(400).json({ message: "Invalid blog status" });
+        }
+
+        const blog = await Blog.findOneAndUpdate(
+            {
+                _id: id,
+                contributor: { $exists: true, $ne: null },
+                isDraft: { $ne: true },
+            },
+            {
+                status: normalizedStatus,
+                isActive: normalizedStatus === "approved",
+            },
+            { new: true },
+        ).populate("contributor", "firstName lastName fullName name email");
+
+        if (!blog) {
+            return res.status(404).json({ message: "Blog contribution not found" });
+        }
+
+        return res.status(200).json({
+            message: `Blog ${normalizedStatus} successfully`,
             blog,
         });
     } catch (error) {
