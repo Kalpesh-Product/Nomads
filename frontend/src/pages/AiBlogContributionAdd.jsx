@@ -146,8 +146,8 @@ const BlogPreviewCard = ({ blog, stateName }) => {
   const thumbnail = blog.mainImage;
 
   return (
-    <article className="w-full max-w-[150px]">
-      <div className="relative aspect-square overflow-hidden rounded-xl bg-slate-100">
+    <article className="flex w-full flex-col gap-2 rounded-lg bg-white text-left transition-all">
+      <div className="relative aspect-square overflow-hidden rounded-2xl bg-slate-100">
         {thumbnail ? (
           <img
             src={thumbnail}
@@ -173,14 +173,27 @@ const BlogPreviewCard = ({ blog, stateName }) => {
           View
         </button>
       </div>
-      <h3 className="mt-2 line-clamp-2 text-xs font-semibold text-black">
-        {blog.mainTitle}
-      </h3>
-      <div className="mt-1 flex items-center justify-between gap-2 text-[11px] text-slate-600">
-        <span className="truncate">{blog.author || "Author"}</span>
-        <time className="shrink-0" dateTime={blog.date}>
-          {blog.date ? humanDate(blog.date) : ""}
-        </time>
+      <div className="flex h-[25%] flex-col gap-1 px-4 pr-1">
+        <h3
+          className="truncate text-xs font-semibold md:text-sm"
+          title={blog.mainTitle}
+        >
+          {blog.mainTitle}
+        </h3>
+        <div className="flex w-full items-center justify-between gap-2">
+          <span
+            className="truncate text-xs font-medium text-gray-600 md:text-sm"
+            title={blog.author || "Author"}
+          >
+            {blog.author || "Author"}
+          </span>
+          <time
+            className="shrink-0 text-xs font-medium text-gray-600 md:text-sm"
+            dateTime={blog.date}
+          >
+            {blog.date ? humanDate(blog.date) : ""}
+          </time>
+        </div>
       </div>
     </article>
   );
@@ -537,7 +550,7 @@ const AiBlogContributionAdd = () => {
               {isBlogsLoading ? (
                 <p className="text-sm text-slate-500">Loading blogs...</p>
               ) : existingBlogs.length > 0 ? (
-                <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
                   {existingBlogs.map((blog) => (
                     <BlogPreviewCard
                       key={blog._id}

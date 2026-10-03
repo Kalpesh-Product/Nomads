@@ -148,7 +148,7 @@ const BlogContributionCard = ({ blog }) => {
   const status = (blog.status || "pending").toLowerCase();
 
   return (
-    <article className="w-full max-w-[164px]">
+    <article className="flex w-full flex-col gap-2 rounded-lg bg-white text-left transition-all">
       <div className="relative aspect-square overflow-hidden rounded-2xl bg-slate-100">
         <img
           src={blog.mainImage || fallbackImage}
@@ -184,14 +184,27 @@ const BlogContributionCard = ({ blog }) => {
         ) : null}
       </div>
 
-      <h3 className="mt-2 line-clamp-2 text-xs font-semibold text-black">
-        {blog.mainTitle || "Untitled Blog"}
-      </h3>
-      <div className="mt-1 flex items-center justify-between gap-2 text-[11px] text-slate-600">
-        <span className="truncate">{blog.destination || "Destination"}</span>
-        <time className="shrink-0" dateTime={blog.date || blog.updatedAt}>
-          {humanDate(blog.date || blog.updatedAt)}
-        </time>
+      <div className="flex h-[25%] flex-col gap-1 px-4 pr-1">
+        <h3
+          className="truncate text-xs font-semibold md:text-sm"
+          title={blog.mainTitle || "Untitled Blog"}
+        >
+          {blog.mainTitle || "Untitled Blog"}
+        </h3>
+        <div className="flex w-full items-center justify-between gap-2">
+          <span
+            className="truncate text-xs font-medium text-gray-600 md:text-sm"
+            title={blog.destination || "Destination"}
+          >
+            {blog.destination || "Destination"}
+          </span>
+          <time
+            className="shrink-0 text-xs font-medium text-gray-600 md:text-sm"
+            dateTime={blog.date || blog.updatedAt}
+          >
+            {humanDate(blog.date || blog.updatedAt)}
+          </time>
+        </div>
       </div>
     </article>
   );
@@ -293,7 +306,7 @@ const AiContributionDashboard = ({ type }) => {
                 </div>
 
                 {filteredSubmittedBlogs.length > 0 ? (
-                  <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-5">
+                  <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
                     {filteredSubmittedBlogs.map((blog) => (
                       <BlogContributionCard key={blog._id} blog={blog} />
                     ))}
@@ -311,7 +324,7 @@ const AiContributionDashboard = ({ type }) => {
                     Saved As Drafts
                   </h2>
                   {draftBlogs.length > 0 ? (
-                    <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-5">
+                    <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
                       {draftBlogs.map((blog) => (
                         <BlogContributionCard key={blog._id} blog={blog} />
                       ))}
