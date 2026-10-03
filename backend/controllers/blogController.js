@@ -59,11 +59,18 @@ const RSS_FEEDS = {
 export const getBlogs = async (req, res, next) => {
     try {
         const { keyword, destination } = req.query;
-        let query = {};
+        let query = {
+            isDraft: { $ne: true },
+            isActive: { $ne: false },
+            $or: [{ status: "approved" }, { status: { $exists: false } }],
+        };
 
         const searchKeyword = destination || keyword;
         if (searchKeyword) {
-            query.destination = { $regex: searchKeyword, $options: "i" };
+            query = {
+                ...query,
+                destination: { $regex: searchKeyword, $options: "i" },
+            };
         }
 
         const blogs = await Blog.find(query).sort({ date: -1 });
@@ -80,7 +87,13 @@ export const getBlogs = async (req, res, next) => {
 export const getBlogDestinationCounts = async (req, res, next) => {
     try {
         const counts = await Blog.aggregate([
-            { $match: { isActive: { $ne: false } } },
+            {
+                $match: {
+                    isActive: { $ne: false },
+                    isDraft: { $ne: true },
+                    $or: [{ status: "approved" }, { status: { $exists: false } }],
+                },
+            },
             { $group: { _id: "$destination", count: { $sum: 1 } } },
         ]);
         return res.status(200).json(
@@ -263,6 +276,47 @@ export const createBlog = async (req, res, next) => {
     try {
         const blog = await Blog.create(req.body);
         res.status(201).json({ message: "Blog created", blog });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getMyBlogs = async (req, res, next) => {
+    try {
+        const user = req.userData._id;
+        const blogs = await Blog.find({ contributor: user }).sort({
+            updatedAt: -1,
+            date: -1,
+        });
+
+        return res.status(200).json({
+            count: blogs.length,
+            data: blogs,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const createMyBlog = async (req, res, next) => {
+    try {
+        const user = req.userData._id;
+        const isDraft = Boolean(req.body?.isDraft);
+
+        const blog = await Blog.create({
+            ...req.body,
+            contributor: user,
+            status: "pending",
+            isDraft,
+            isActive: !isDraft,
+        });
+
+        res.status(201).json({
+            message: isDraft
+                ? "Blog saved as draft successfully"
+                : "Blog submitted successfully",
+            blog,
+        });
     } catch (error) {
         next(error);
     }

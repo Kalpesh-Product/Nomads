@@ -9,6 +9,7 @@ import {
 import { FaCheck } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useSpecialUserEmails from "../hooks/useSpecialUserEmails";
 import axios from "../utils/axios";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
@@ -188,6 +189,7 @@ const BlogPreviewCard = ({ blog, stateName }) => {
 const AiBlogContributionAdd = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const axiosPrivate = useAxiosPrivate();
   const dropdownContainerRef = useRef(null);
   const { auth } = useAuth();
   const user = auth?.user || {};
@@ -330,16 +332,18 @@ const AiBlogContributionAdd = () => {
   });
 
   const { mutate: createBlog, isPending: isSaving } = useMutation({
-    mutationFn: async (payload) => axios.post("/blogs/blogs", payload),
+    mutationFn: async (payload) => axiosPrivate.post("/blogs/my", payload),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: ["blog-contribution-existing-blogs", selectedDestination],
       });
+      await queryClient.invalidateQueries({
+        queryKey: ["myBlogContributions", user?._id || user?.id],
+      });
       await showSuccessAlert("Blog saved successfully.", {
         title: "Blog Added",
       });
-      setShowForm(false);
-      setFormValues(initialFormState(contributorName, selectedDestination));
+      navigate("/blog-contributions");
     },
     onError: (error) => {
       showErrorAlert(
@@ -442,9 +446,10 @@ const AiBlogContributionAdd = () => {
       date: formValues.date ? new Date(formValues.date).toISOString() : null,
       destination: selectedDestination,
       blogType: formValues.link.trim(),
+      link: formValues.link.trim(),
       source: formValues.source.trim(),
       sections: cleanedSections,
-      isActive: status === "active",
+      isDraft: status === "draft",
     });
   };
 
