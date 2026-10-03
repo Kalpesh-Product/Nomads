@@ -149,6 +149,9 @@ const AiBecomeContributor = lazyPage(() =>
 const AiContributionDashboard = lazyPage(() =>
   import("./pages/AiContributionDashboard"),
 );
+const AiBlogContributionAdd = lazyPage(() =>
+  import("./pages/AiBlogContributionAdd"),
+);
 const AiBlogsFetch = lazyPage(() => import("./components/AiBlogsFetch"));
 const AiNewsFetch = lazyPage(() => import("./components/AiNewsFetch"));
 const AiBlogDetails = lazyPage(() => import("./pages/AiBlogDetails"));
@@ -341,6 +344,10 @@ if (tenant === "main") {
             {
               path: "blog-contributions",
               element: <AiContributionDashboard type="blog" />,
+            },
+            {
+              path: "blog-contributions/add",
+              element: <AiBlogContributionAdd />,
             },
             {
               path: "news-contributions",

@@ -76,6 +76,7 @@ const AiContributionDashboard = ({ type }) => {
           <h1 className="text-lg font-semibold text-black">{config.heading}</h1>
           <button
             type="button"
+            onClick={() => navigate(`${config.seoPath}/add`)}
             className="inline-flex items-center gap-1 rounded-full bg-primary-blue px-6 py-3 text-sm font-semibold uppercase text-white transition hover:bg-sky-500"
           >
             <HiPlus size={18} />
