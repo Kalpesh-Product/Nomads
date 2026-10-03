@@ -252,6 +252,7 @@ const AiContributionDashboard = ({ type }) => {
         );
   const draftBlogs = blogContributions.filter((blog) => blog.isDraft);
   const isBlogPage = type === "blog";
+  const shouldShowStatusFilter = submittedBlogs.length > 0;
 
   return (
     <>
@@ -283,10 +284,12 @@ const AiContributionDashboard = ({ type }) => {
                   <h2 className="text-base font-semibold text-black">
                     Published Blogs
                   </h2>
-                  <BlogStatusFilter
-                    value={statusFilter}
-                    onChange={setStatusFilter}
-                  />
+                  {shouldShowStatusFilter ? (
+                    <BlogStatusFilter
+                      value={statusFilter}
+                      onChange={setStatusFilter}
+                    />
+                  ) : null}
                 </div>
 
                 {filteredSubmittedBlogs.length > 0 ? (
