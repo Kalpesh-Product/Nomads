@@ -6,12 +6,15 @@ import {
   bulkInsertnews,
   createNews,
   createMyNews,
+  getNewsContributions,
   getMyNews,
+  updateNewsContributionStatus,
   updateNews,
   deleteNews,
 } from "../controllers/newsController.js";
 import upload from "../config/multerConfig.js";
 import { verifyJwt } from "../middlewares/verifyJwt.js";
+import { verifyAdminApiKey } from "../middlewares/verifyAdminApiKey.js";
 
 const router = Router();
 router.get("/news", getNews);
@@ -19,6 +22,8 @@ router.get("/get-news", getNews);
 router.get("/destination-counts", getNewsDestinationCounts);
 router.get("/my", verifyJwt, getMyNews);
 router.post("/my", verifyJwt, createMyNews);
+router.get("/contributions", verifyAdminApiKey, getNewsContributions);
+router.patch("/contributions/:id/status", verifyAdminApiKey, updateNewsContributionStatus);
 router.post("/news", createNews);
 router.put("/news/:id", updateNews);
 router.delete("/news/:id", deleteNews);
