@@ -21,28 +21,19 @@ import {
 import { checkHostPanelEmail } from "../../utils/hostPanelAccounts.js";
 import { getProfessionalPlanPricing } from "../../utils/planPricing.js";
 
-// Matches unverified leads whose verification link (7 days, see
-// HOST_EMAIL_LINK_EXPIRY) has run out. They were never visible to staff, so the
-// email is treated as free again and the stale row is replaced on re-signup.
-const HOST_EMAIL_LINK_TTL_MS = 7 * 24 * 60 * 60 * 1000;
-const staleUnverifiedLeadFilter = (email) => {
-  const cutoff = new Date(Date.now() - HOST_EMAIL_LINK_TTL_MS);
-  return {
-    email,
-    emailVerified: false,
-    $or: [
-      { verificationLinkSentAt: { $lt: cutoff } },
-      { verificationLinkSentAt: null, createdAt: { $lt: cutoff } },
-    ],
-  };
-};
+// Unverified leads never reached the master panel, so they don't count as
+// "used". Each new submission replaces them and invalidates their links/codes.
+const unverifiedLeadFilter = (email) => ({
+  email,
+  emailVerified: false,
+});
 
 const hostSignupEmailExists = async (email) => {
   const normalizedEmail = String(email || "").trim().toLowerCase();
   const [existingSignupLead, existingHostPanelAccount] = await Promise.all([
     HostUser.exists({
       email: normalizedEmail,
-      $nor: [staleUnverifiedLeadFilter(normalizedEmail)],
+      emailVerified: { $ne: false },
     }),
     checkHostPanelEmail(normalizedEmail),
   ]);
@@ -189,7 +180,8 @@ const resolveHostUserFromToken = async (token) => {
       error: {
         status: 404,
         code: "LINK_INVALID",
-        message: "We couldn't find this registration.",
+        message:
+          "This verification link is no longer valid. It was replaced by a newer request, or the request was removed. Please use the latest verification email.",
       },
     };
   }
@@ -1083,7 +1075,17 @@ export const registerFormSubmission = async (req, res) => {
     }
     payload.email = normalizedEmail;
 
-    await HostUser.deleteMany(staleUnverifiedLeadFilter(normalizedEmail));
+    // Re-submitting before verifying replaces the earlier unverified lead, so
+    // its link stops working and only the newest verification link is valid.
+    await HostUser.deleteMany(unverifiedLeadFilter(normalizedEmail));
+    await Otp.updateMany(
+      {
+        email: normalizedEmail,
+        purpose: "host_email_verification",
+        isUsed: false,
+      },
+      { $set: { isUsed: true } },
+    );
 
     const safeParse = (val, fallback) => {
       try {
