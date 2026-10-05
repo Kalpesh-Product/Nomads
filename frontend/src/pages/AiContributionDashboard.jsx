@@ -15,6 +15,14 @@ const contributionPageConfig = {
     heading: "My Blog Contributions",
     addLabel: "Add Blog",
     emptyText: "You haven't added any blogs yet.",
+    draftEmptyText: "You don't have any saved drafts yet.",
+    submittedHeading: "Published Blogs",
+    draftHeading: "Saved As Drafts",
+    noStatusText: (status) => `No ${status} blogs found.`,
+    contentLabel: "Blog",
+    endpoint: "/blogs/my",
+    queryKey: "myBlogContributions",
+    detailsRoute: "/blog/blog-details",
     flag: "isBlogger",
     seoPath: "/blog-contributions",
   },
@@ -23,6 +31,14 @@ const contributionPageConfig = {
     heading: "My News Contributions",
     addLabel: "Add News",
     emptyText: "You haven't added any news yet.",
+    draftEmptyText: "You don't have any saved drafts yet.",
+    submittedHeading: "Published News",
+    draftHeading: "Saved As Drafts",
+    noStatusText: (status) => `No ${status} news found.`,
+    contentLabel: "News",
+    endpoint: "/news/my",
+    queryKey: "myNewsContributions",
+    detailsRoute: "/news/news-details",
     flag: "isNewsWriter",
     seoPath: "/news-contributions",
   },
@@ -60,7 +76,7 @@ const statusBadgeStyles = {
 const fallbackImage =
   "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp";
 
-const BlogStatusFilter = ({ value, onChange }) => {
+const ContributionStatusFilter = ({ value, onChange, label = "Contribution" }) => {
   const [isOpen, setIsOpen] = useState(false);
   const filterRef = useRef(null);
   const selectedLabel =
@@ -99,7 +115,7 @@ const BlogStatusFilter = ({ value, onChange }) => {
 
         {isOpen ? (
           <div className="absolute right-0 top-full z-40 mt-3 w-full rounded-2xl border border-sky-100 bg-white p-2 shadow-[0_12px_30px_rgba(15,23,42,0.12)]">
-            <ul role="listbox" aria-label="Blog status filter">
+            <ul role="listbox" aria-label={`${label} status filter`}>
               {statusOptions.map((option) => {
                 const isSelected = option.value === value;
 
@@ -142,36 +158,36 @@ const BlogStatusFilter = ({ value, onChange }) => {
   );
 };
 
-const BlogContributionCard = ({ blog }) => {
+const ContributionCard = ({ item, config }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const status = (blog.status || "pending").toLowerCase();
+  const status = (item.status || "pending").toLowerCase();
 
   return (
     <article className="flex w-full flex-col gap-2 rounded-lg bg-white text-left transition-all">
       <div className="relative aspect-square overflow-hidden rounded-2xl bg-slate-100">
         <img
-          src={blog.mainImage || fallbackImage}
-          alt={blog.mainTitle}
+          src={item.mainImage || fallbackImage}
+          alt={item.mainTitle}
           className="h-full w-full object-cover"
           loading="lazy"
         />
         <button
           type="button"
           onClick={() =>
-            navigate("/blog/blog-details", {
+            navigate(config.detailsRoute, {
               state: {
-                content: blog,
-                selectedStateLabel: blog.destination,
+                content: item,
+                selectedStateLabel: item.destination,
                 sourceSearch: location.search,
               },
             })
           }
           className="absolute left-1/2 top-1/2 inline-flex -translate-x-1/2 -translate-y-1/2 rounded-full bg-black/55 px-4 py-1.5 text-xs font-medium text-white transition hover:bg-black/70"
         >
-          View Blog Content
+          View {config.contentLabel} Content
         </button>
-        {!blog.isDraft ? (
+        {!item.isDraft ? (
           <div className="absolute bottom-2 right-2">
             <span
               className={`rounded-full border px-2 py-1 text-[10px] font-semibold capitalize ${
@@ -187,22 +203,22 @@ const BlogContributionCard = ({ blog }) => {
       <div className="flex h-[25%] flex-col gap-1 px-4 pr-1">
         <h3
           className="truncate text-xs font-semibold md:text-sm"
-          title={blog.mainTitle || "Untitled Blog"}
+          title={item.mainTitle || `Untitled ${config.contentLabel}`}
         >
-          {blog.mainTitle || "Untitled Blog"}
+          {item.mainTitle || `Untitled ${config.contentLabel}`}
         </h3>
         <div className="flex w-full items-center justify-between gap-2">
           <span
             className="truncate text-xs font-medium text-gray-600 md:text-sm"
-            title={blog.destination || "Destination"}
+            title={item.destination || "Destination"}
           >
-            {blog.destination || "Destination"}
+            {item.destination || "Destination"}
           </span>
           <time
             className="shrink-0 text-xs font-medium text-gray-600 md:text-sm"
-            dateTime={blog.date || blog.updatedAt}
+            dateTime={item.date || item.updatedAt}
           >
-            {humanDate(blog.date || blog.updatedAt)}
+            {humanDate(item.date || item.updatedAt)}
           </time>
         </div>
       </div>
@@ -223,16 +239,16 @@ const AiContributionDashboard = ({ type }) => {
   const hasAccess = Boolean(auth?.user?.[config.flag]);
 
   const {
-    data: blogContributions = [],
-    isLoading: isBlogsLoading,
-    isError: isBlogsError,
+    data: contributions = [],
+    isLoading: isContributionsLoading,
+    isError: isContributionsError,
   } = useQuery({
-    queryKey: ["myBlogContributions", userId],
+    queryKey: [config.queryKey, userId],
     queryFn: async () => {
-      const response = await axiosPrivate.get("/blogs/my");
+      const response = await axiosPrivate.get(config.endpoint);
       return Array.isArray(response.data?.data) ? response.data.data : [];
     },
-    enabled: type === "blog" && Boolean(userId) && hasAccess,
+    enabled: ["blog", "news"].includes(type) && Boolean(userId) && hasAccess,
     staleTime: 1000 * 60,
   });
 
@@ -256,16 +272,16 @@ const AiContributionDashboard = ({ type }) => {
     return null;
   }
 
-  const submittedBlogs = blogContributions.filter((blog) => !blog.isDraft);
-  const filteredSubmittedBlogs =
+  const submittedContributions = contributions.filter((item) => !item.isDraft);
+  const filteredSubmittedContributions =
     statusFilter === "all"
-      ? submittedBlogs
-      : submittedBlogs.filter(
-          (blog) => (blog.status || "pending").toLowerCase() === statusFilter,
+      ? submittedContributions
+      : submittedContributions.filter(
+          (item) => (item.status || "pending").toLowerCase() === statusFilter,
         );
-  const draftBlogs = blogContributions.filter((blog) => blog.isDraft);
-  const isBlogPage = type === "blog";
-  const shouldShowStatusFilter = submittedBlogs.length > 0;
+  const draftContributions = contributions.filter((item) => item.isDraft);
+  const hasContributionList = ["blog", "news"].includes(type);
+  const shouldShowStatusFilter = submittedContributions.length > 0;
 
   return (
     <>
@@ -283,55 +299,56 @@ const AiContributionDashboard = ({ type }) => {
           </button>
         </div>
 
-        {isBlogPage ? (
+        {hasContributionList ? (
           <div className="mt-8 min-h-[28rem]">
-            {isBlogsLoading ? (
+            {isContributionsLoading ? (
               <p className="text-center text-sm text-slate-500">Loading...</p>
-            ) : isBlogsError ? (
+            ) : isContributionsError ? (
               <p className="text-center text-sm text-red-500">
-                Could not load your blog contributions.
+                Could not load your {config.contentLabel.toLowerCase()} contributions.
               </p>
             ) : (
               <>
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <h2 className="text-base font-semibold text-black">
-                    Published Blogs
+                    {config.submittedHeading}
                   </h2>
                   {shouldShowStatusFilter ? (
-                    <BlogStatusFilter
+                    <ContributionStatusFilter
                       value={statusFilter}
                       onChange={setStatusFilter}
+                      label={config.contentLabel}
                     />
                   ) : null}
                 </div>
 
-                {filteredSubmittedBlogs.length > 0 ? (
+                {filteredSubmittedContributions.length > 0 ? (
                   <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
-                    {filteredSubmittedBlogs.map((blog) => (
-                      <BlogContributionCard key={blog._id} blog={blog} />
+                    {filteredSubmittedContributions.map((item) => (
+                      <ContributionCard key={item._id} item={item} config={config} />
                     ))}
                   </div>
                 ) : (
                   <div className="mt-6 rounded-lg border border-dotted p-6 text-center text-sm text-gray-500">
                     {statusFilter === "all"
                       ? config.emptyText
-                      : `No ${statusFilter} blogs found.`}
+                      : config.noStatusText(statusFilter)}
                   </div>
                 )}
 
                 <section className="mt-10">
                   <h2 className="text-base font-semibold text-black">
-                    Saved As Drafts
+                    {config.draftHeading}
                   </h2>
-                  {draftBlogs.length > 0 ? (
+                  {draftContributions.length > 0 ? (
                     <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
-                      {draftBlogs.map((blog) => (
-                        <BlogContributionCard key={blog._id} blog={blog} />
+                      {draftContributions.map((item) => (
+                        <ContributionCard key={item._id} item={item} config={config} />
                       ))}
                     </div>
                   ) : (
                     <div className="mt-6 rounded-lg border border-dotted p-6 text-center text-sm text-gray-500">
-                      You don't have any saved drafts yet.
+                      {config.draftEmptyText}
                     </div>
                   )}
                 </section>

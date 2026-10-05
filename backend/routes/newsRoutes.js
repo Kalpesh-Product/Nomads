@@ -5,15 +5,20 @@ import {
   getNewsDestinationCounts,
   bulkInsertnews,
   createNews,
+  createMyNews,
+  getMyNews,
   updateNews,
   deleteNews,
 } from "../controllers/newsController.js";
 import upload from "../config/multerConfig.js";
+import { verifyJwt } from "../middlewares/verifyJwt.js";
 
 const router = Router();
 router.get("/news", getNews);
 router.get("/get-news", getNews);
 router.get("/destination-counts", getNewsDestinationCounts);
+router.get("/my", verifyJwt, getMyNews);
+router.post("/my", verifyJwt, createMyNews);
 router.post("/news", createNews);
 router.put("/news/:id", updateNews);
 router.delete("/news/:id", deleteNews);

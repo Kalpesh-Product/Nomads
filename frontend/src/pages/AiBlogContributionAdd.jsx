@@ -59,6 +59,45 @@ const initialFormState = (author = "", destination = "") => ({
   sections: [emptySection()],
 });
 
+const contributionAddConfig = {
+  blog: {
+    contentLabel: "Blog",
+    contentLabelPlural: "Blogs",
+    accessFlag: "isBlogger",
+    dashboardPath: "/blog-contributions",
+    addPath: "/blog-contributions/add",
+    myEndpoint: "/blogs/my",
+    existingEndpoint: "/blogs/get-blogs",
+    existingQueryKey: "blog-contribution-existing-blogs",
+    myQueryKey: "myBlogContributions",
+    destinationTitleQueryKey: "blog-contribution-destination-titles",
+    detailsRoute: "/blog/blog-details",
+    successMessage: "Blog saved successfully.",
+    successTitle: "Blog Added",
+    errorMessage: "Could not save this blog. Please check the details and try again.",
+    submitButtonLabel: "Publish Blog",
+    writeButtonLabel: "Write a Blog",
+  },
+  news: {
+    contentLabel: "News",
+    contentLabelPlural: "News",
+    accessFlag: "isNewsWriter",
+    dashboardPath: "/news-contributions",
+    addPath: "/news-contributions/add",
+    myEndpoint: "/news/my",
+    existingEndpoint: "/news/get-news",
+    existingQueryKey: "news-contribution-existing-news",
+    myQueryKey: "myNewsContributions",
+    destinationTitleQueryKey: "news-contribution-destination-titles",
+    detailsRoute: "/news/news-details",
+    successMessage: "News saved successfully.",
+    successTitle: "News Added",
+    errorMessage: "Could not save this news item. Please check the details and try again.",
+    submitButtonLabel: "Publish News",
+    writeButtonLabel: "Write News",
+  },
+};
+
 const inputClassName =
   "min-h-[42px] w-full rounded-md border border-black/10 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100";
 const labelClassName = "mb-2 block text-xs font-semibold text-slate-600";
@@ -140,10 +179,10 @@ const DropdownBadge = ({
   </div>
 );
 
-const BlogPreviewCard = ({ blog, stateName }) => {
+const ContributionPreviewCard = ({ item, stateName, config }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const thumbnail = blog.mainImage;
+  const thumbnail = item.mainImage;
 
   return (
     <article className="flex w-full flex-col gap-2 rounded-lg bg-white text-left transition-all">
@@ -151,7 +190,7 @@ const BlogPreviewCard = ({ blog, stateName }) => {
         {thumbnail ? (
           <img
             src={thumbnail}
-            alt={blog.mainTitle}
+            alt={item.mainTitle}
             className="h-full w-full object-cover"
             loading="lazy"
           />
@@ -159,9 +198,9 @@ const BlogPreviewCard = ({ blog, stateName }) => {
         <button
           type="button"
           onClick={() =>
-            navigate("/blog/blog-details", {
+            navigate(config.detailsRoute, {
               state: {
-                content: blog,
+                content: item,
                 selectedStateLabel: stateName,
                 sourceSearch: location.search,
               },
@@ -176,22 +215,22 @@ const BlogPreviewCard = ({ blog, stateName }) => {
       <div className="flex h-[25%] flex-col gap-1 px-4 pr-1">
         <h3
           className="truncate text-xs font-semibold md:text-sm"
-          title={blog.mainTitle}
+          title={item.mainTitle}
         >
-          {blog.mainTitle}
+          {item.mainTitle}
         </h3>
         <div className="flex w-full items-center justify-between gap-2">
           <span
             className="truncate text-xs font-medium text-gray-600 md:text-sm"
-            title={blog.author || "Author"}
+            title={item.author || "Author"}
           >
-            {blog.author || "Author"}
+            {item.author || "Author"}
           </span>
           <time
             className="shrink-0 text-xs font-medium text-gray-600 md:text-sm"
-            dateTime={blog.date}
+            dateTime={item.date}
           >
-            {blog.date ? humanDate(blog.date) : ""}
+            {item.date ? humanDate(item.date) : ""}
           </time>
         </div>
       </div>
@@ -199,14 +238,15 @@ const BlogPreviewCard = ({ blog, stateName }) => {
   );
 };
 
-const AiBlogContributionAdd = () => {
+const AiBlogContributionAdd = ({ type = "blog" }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const axiosPrivate = useAxiosPrivate();
   const dropdownContainerRef = useRef(null);
   const { auth } = useAuth();
   const user = auth?.user || {};
-  const hasAccess = Boolean(user?.isBlogger);
+  const config = contributionAddConfig[type] || contributionAddConfig.blog;
+  const hasAccess = Boolean(user?.[config.accessFlag]);
   const contributorName = user?.fullName?.trim() || user?.name || "";
 
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -237,7 +277,7 @@ const AiBlogContributionAdd = () => {
   }, [rawLocations, specialUserEmails, user?.email]);
 
   const { data: destinationTitleLookup = new Map() } = useQuery({
-    queryKey: ["blog-contribution-destination-titles"],
+    queryKey: [config.destinationTitleQueryKey],
     queryFn: async () => {
       try {
         const response = await axios.get("state-wise-weight");
@@ -329,10 +369,10 @@ const AiBlogContributionAdd = () => {
     locationOptions.find((option) => option.value === selectedLocation)
       ?.destination || selectedLocationLabel;
 
-  const { data: existingBlogs = [], isPending: isBlogsLoading } = useQuery({
-    queryKey: ["blog-contribution-existing-blogs", selectedDestination],
+  const { data: existingItems = [], isPending: isExistingItemsLoading } = useQuery({
+    queryKey: [config.existingQueryKey, selectedDestination],
     queryFn: async () => {
-      const response = await axios.get("/blogs/get-blogs", {
+      const response = await axios.get(config.existingEndpoint, {
         params: {
           keyword: buildExactKeyword(selectedDestination),
         },
@@ -344,24 +384,24 @@ const AiBlogContributionAdd = () => {
     refetchOnWindowFocus: false,
   });
 
-  const { mutate: createBlog, isPending: isSaving } = useMutation({
-    mutationFn: async (payload) => axiosPrivate.post("/blogs/my", payload),
+  const { mutate: createContribution, isPending: isSaving } = useMutation({
+    mutationFn: async (payload) => axiosPrivate.post(config.myEndpoint, payload),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["blog-contribution-existing-blogs", selectedDestination],
+        queryKey: [config.existingQueryKey, selectedDestination],
       });
       await queryClient.invalidateQueries({
-        queryKey: ["myBlogContributions", user?._id || user?.id],
+        queryKey: [config.myQueryKey, user?._id || user?.id],
       });
-      await showSuccessAlert("Blog saved successfully.", {
-        title: "Blog Added",
+      await showSuccessAlert(config.successMessage, {
+        title: config.successTitle,
       });
-      navigate("/blog-contributions");
+      navigate(config.dashboardPath);
     },
     onError: (error) => {
       showErrorAlert(
         error?.response?.data?.message ||
-          "Could not save this blog. Please check the details and try again.",
+          config.errorMessage,
       );
     },
   });
@@ -370,7 +410,7 @@ const AiBlogContributionAdd = () => {
     if (!auth?.user) {
       navigate("/login", {
         replace: true,
-        state: { redirectTo: "/blog-contributions/add" },
+        state: { redirectTo: config.addPath },
       });
       return;
     }
@@ -378,7 +418,7 @@ const AiBlogContributionAdd = () => {
     if (!hasAccess) {
       navigate("/profile", { replace: true });
     }
-  }, [auth?.user, hasAccess, navigate]);
+  }, [auth?.user, config.addPath, hasAccess, navigate]);
 
   useEffect(() => {
     setFormValues((current) => ({
@@ -451,7 +491,7 @@ const AiBlogContributionAdd = () => {
       return;
     }
 
-    createBlog({
+    createContribution({
       mainTitle: formValues.mainTitle.trim(),
       mainImage: formValues.mainImage.trim(),
       mainContent: formValues.mainContent.trim(),
@@ -472,8 +512,8 @@ const AiBlogContributionAdd = () => {
         <section className="mt-4">
           <p className="font-play text-sm font-medium leading-snug text-black/85 lg:text-[0.95rem]">
             {hasAllSelections
-              ? "Below are the existing blogs for the selected location."
-              : "Please select the continent, country and state from each below to add your blog."}
+              ? `Below are the existing ${config.contentLabelPlural.toLowerCase()} for the selected location.`
+              : `Please select the continent, country and state from each below to add your ${config.contentLabel.toLowerCase()}.`}
           </p>
 
           <div
@@ -544,24 +584,27 @@ const AiBlogContributionAdd = () => {
           {hasAllSelections ? (
             <div className="mt-8">
               <h1 className="mb-4 pl-0 text-sm font-semibold text-black md:pl-12">
-                Latest {locationLabel} Blogs
+                Latest {locationLabel} {config.contentLabelPlural}
               </h1>
 
-              {isBlogsLoading ? (
-                <p className="text-sm text-slate-500">Loading blogs...</p>
-              ) : existingBlogs.length > 0 ? (
+              {isExistingItemsLoading ? (
+                <p className="text-sm text-slate-500">
+                  Loading {config.contentLabelPlural.toLowerCase()}...
+                </p>
+              ) : existingItems.length > 0 ? (
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
-                  {existingBlogs.map((blog) => (
-                    <BlogPreviewCard
-                      key={blog._id}
-                      blog={blog}
+                  {existingItems.map((item) => (
+                    <ContributionPreviewCard
+                      key={item._id}
+                      item={item}
                       stateName={locationLabel}
+                      config={config}
                     />
                   ))}
                 </div>
               ) : (
                 <p className="text-sm text-slate-500">
-                  No blog posts found for {locationLabel}.
+                  No {config.contentLabel.toLowerCase()} posts found for {locationLabel}.
                 </p>
               )}
 
@@ -571,7 +614,7 @@ const AiBlogContributionAdd = () => {
                   onClick={() => setShowForm(true)}
                   className="inline-flex min-h-[48px] min-w-[13rem] items-center justify-center rounded-full bg-primary-blue px-8 py-3 text-sm font-semibold text-white transition hover:bg-sky-500"
                 >
-                  Write a Blog
+                  {config.writeButtonLabel}
                 </button>
               </div>
             </div>
@@ -581,7 +624,7 @@ const AiBlogContributionAdd = () => {
         <section className="mt-3 bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
           <div className="rounded-lg border border-slate-200 bg-white px-4 py-6 sm:px-6 lg:px-8">
             <h1 className="mb-8 text-2xl font-semibold uppercase text-slate-700">
-              Add Blog
+              Add {config.contentLabel}
             </h1>
 
             <div className="grid gap-5 lg:grid-cols-2">
@@ -779,7 +822,7 @@ const AiBlogContributionAdd = () => {
                 disabled={isSaving}
                 className="rounded-lg bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-400"
               >
-                Publish Blog
+                {config.submitButtonLabel}
               </button>
               <button
                 type="button"

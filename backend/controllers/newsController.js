@@ -106,15 +106,22 @@ export const getNews = async (req, res, next) => {
   try {
     const { keyword, destination } = req.query;
 
-    let query = {};
+    let query = {
+      isDraft: { $ne: true },
+      isActive: { $ne: false },
+      $or: [{ status: "approved" }, { status: { $exists: false } }],
+    };
     const searchKeyword = destination || keyword;
     if (searchKeyword) {
-      query.destination = { $regex: searchKeyword, $options: "i" };
+      query = {
+        ...query,
+        destination: { $regex: searchKeyword, $options: "i" },
+      };
     }
 
-    const blogs = await News.find(query).sort({ date: -1 });
+    const news = await News.find(query).sort({ date: -1 });
 
-    return res.status(200).json(blogs);
+    return res.status(200).json(news);
   } catch (error) {
     next(error);
   }
@@ -127,7 +134,13 @@ export const getNews = async (req, res, next) => {
 export const getNewsDestinationCounts = async (req, res, next) => {
   try {
     const counts = await News.aggregate([
-      { $match: { isActive: { $ne: false } } },
+      {
+        $match: {
+          isActive: { $ne: false },
+          isDraft: { $ne: true },
+          $or: [{ status: "approved" }, { status: { $exists: false } }],
+        },
+      },
       { $group: { _id: "$destination", count: { $sum: 1 } } },
     ]);
     return res.status(200).json(
@@ -227,6 +240,47 @@ export const createNews = async (req, res, next) => {
   try {
     const news = await News.create(req.body);
     res.status(201).json({ message: "News created", news });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getMyNews = async (req, res, next) => {
+  try {
+    const user = req.userData._id;
+    const news = await News.find({ contributor: user }).sort({
+      updatedAt: -1,
+      date: -1,
+    });
+
+    return res.status(200).json({
+      count: news.length,
+      data: news,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const createMyNews = async (req, res, next) => {
+  try {
+    const user = req.userData._id;
+    const isDraft = Boolean(req.body?.isDraft);
+
+    const news = await News.create({
+      ...req.body,
+      contributor: user,
+      status: "pending",
+      isDraft,
+      isActive: !isDraft,
+    });
+
+    res.status(201).json({
+      message: isDraft
+        ? "News saved as draft successfully"
+        : "News submitted successfully",
+      news,
+    });
   } catch (error) {
     next(error);
   }

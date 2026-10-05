@@ -347,11 +347,15 @@ if (tenant === "main") {
             },
             {
               path: "blog-contributions/add",
-              element: <AiBlogContributionAdd />,
+              element: <AiBlogContributionAdd type="blog" />,
             },
             {
               path: "news-contributions",
               element: <AiContributionDashboard type="news" />,
+            },
+            {
+              path: "news-contributions/add",
+              element: <AiBlogContributionAdd type="news" />,
             },
             {
               path: "event-contributions",
