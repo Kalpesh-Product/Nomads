@@ -10,6 +10,7 @@ import {
   getEventById,
   getMyEvents,
   updateEventContributionStatus,
+  updateMyEvent,
   updateEvent,
   updateEventStatus,
 } from "../controllers/eventController.js";
@@ -22,6 +23,7 @@ router.get("/", getEvents);
 router.get("/destination/:destination", getEventsByDestination);
 router.get("/my", verifyJwt, getMyEvents);
 router.post("/my", verifyJwt, createMyEvent);
+router.patch("/my/:id", verifyJwt, updateMyEvent);
 router.get("/contributions", verifyAdminApiKey, getEventContributions);
 router.patch("/contributions/:id/status", verifyAdminApiKey, updateEventContributionStatus);
 router.get("/:eventId", getEventById);

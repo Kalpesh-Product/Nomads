@@ -420,6 +420,59 @@ export const createMyPlace = async (req, res, next) => {
   }
 };
 
+export const updateMyPlace = async (req, res, next) => {
+  try {
+    const user = req.userData._id;
+    const { id } = req.params;
+    const isDraft = Boolean(req.body?.isDraft);
+    const payload = buildPlacePayload(req.body || {});
+    const missingFields = validateRequiredPlaceFields(payload);
+    const coordinateErrors = validateCoordinateFields(payload);
+
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        message: "Required place fields are missing.",
+        missingFields,
+      });
+    }
+
+    if (coordinateErrors.length > 0) {
+      return res.status(400).json({
+        message: "Place coordinates are invalid.",
+        errors: coordinateErrors,
+      });
+    }
+
+    const place = await Place.findOneAndUpdate(
+      {
+        _id: id,
+        contributor: user,
+      },
+      {
+        ...payload,
+        contributor: user,
+        status: "pending",
+        isDraft,
+        isActive: !isDraft,
+      },
+      { new: true, runValidators: true },
+    );
+
+    if (!place) {
+      return res.status(404).json({ message: "Place contribution not found" });
+    }
+
+    return res.status(200).json({
+      message: isDraft
+        ? "Place draft updated successfully"
+        : "Place submitted successfully",
+      place,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getPlaceContributions = async (req, res, next) => {
   try {
     const { status, search } = req.query;

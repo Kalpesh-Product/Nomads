@@ -365,6 +365,10 @@ if (tenant === "main") {
               element: <AiBlogContributionAdd type="news" />,
             },
             {
+              path: "news-contributions/:newsId",
+              element: <AiBlogContributionPreview type="news" />,
+            },
+            {
               path: "event-contributions",
               element: <AiContributionDashboard type="event" />,
             },
@@ -373,12 +377,20 @@ if (tenant === "main") {
               element: <AiBlogContributionAdd type="event" />,
             },
             {
+              path: "event-contributions/:eventId",
+              element: <AiBlogContributionPreview type="event" />,
+            },
+            {
               path: "places-contributions",
               element: <AiContributionDashboard type="places" />,
             },
             {
               path: "places-contributions/add",
               element: <AiBlogContributionAdd type="places" />,
+            },
+            {
+              path: "places-contributions/:placeId",
+              element: <AiBlogContributionPreview type="places" />,
             },
             {
               path: "become-a-contributor",

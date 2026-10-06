@@ -319,6 +319,51 @@ export const createMyEvent = async (req, res, next) => {
   }
 };
 
+export const updateMyEvent = async (req, res, next) => {
+  try {
+    const user = req.userData._id;
+    const { id } = req.params;
+    const isDraft = Boolean(req.body?.isDraft);
+    const payload = buildEventPayload(req.body || {});
+    const missingFields = validateRequiredEventFields(payload);
+
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        message: "Required event fields are missing.",
+        missingFields,
+      });
+    }
+
+    const event = await Event.findOneAndUpdate(
+      {
+        _id: id,
+        contributor: user,
+      },
+      {
+        ...payload,
+        contributor: user,
+        status: "pending",
+        isDraft,
+        isActive: !isDraft,
+      },
+      { new: true, runValidators: true },
+    );
+
+    if (!event) {
+      return res.status(404).json({ message: "Event contribution not found" });
+    }
+
+    return res.status(200).json({
+      message: isDraft
+        ? "Event draft updated successfully"
+        : "Event submitted successfully",
+      event,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getEventContributions = async (req, res, next) => {
   try {
     const { status, search } = req.query;

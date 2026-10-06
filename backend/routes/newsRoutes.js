@@ -9,6 +9,7 @@ import {
   getNewsContributions,
   getMyNews,
   updateNewsContributionStatus,
+  updateMyNews,
   updateNews,
   deleteNews,
 } from "../controllers/newsController.js";
@@ -22,6 +23,7 @@ router.get("/get-news", getNews);
 router.get("/destination-counts", getNewsDestinationCounts);
 router.get("/my", verifyJwt, getMyNews);
 router.post("/my", verifyJwt, createMyNews);
+router.patch("/my/:id", verifyJwt, updateMyNews);
 router.get("/contributions", verifyAdminApiKey, getNewsContributions);
 router.patch("/contributions/:id/status", verifyAdminApiKey, updateNewsContributionStatus);
 router.post("/news", createNews);

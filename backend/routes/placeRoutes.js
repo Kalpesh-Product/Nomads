@@ -10,6 +10,7 @@ import {
   getMyPlaces,
   getPlaceContributions,
   updatePlaceContributionStatus,
+  updateMyPlace,
   updatePlace,
   updatePlaceStatus,
 } from "../controllers/placeController.js";
@@ -22,6 +23,7 @@ router.get("/", getPlaces);
 router.get("/destination/:destination", getPlacesByDestination);
 router.get("/my", verifyJwt, getMyPlaces);
 router.post("/my", verifyJwt, createMyPlace);
+router.patch("/my/:id", verifyJwt, updateMyPlace);
 router.get("/contributions", verifyAdminApiKey, getPlaceContributions);
 router.patch("/contributions/:id/status", verifyAdminApiKey, updatePlaceContributionStatus);
 router.get("/:placeId", getPlaceById);

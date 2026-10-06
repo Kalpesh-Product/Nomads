@@ -322,6 +322,42 @@ export const createMyNews = async (req, res, next) => {
   }
 };
 
+export const updateMyNews = async (req, res, next) => {
+  try {
+    const user = req.userData._id;
+    const { id } = req.params;
+    const isDraft = Boolean(req.body?.isDraft);
+
+    const news = await News.findOneAndUpdate(
+      {
+        _id: id,
+        contributor: user,
+      },
+      {
+        ...req.body,
+        contributor: user,
+        status: "pending",
+        isDraft,
+        isActive: !isDraft,
+      },
+      { new: true, runValidators: true },
+    );
+
+    if (!news) {
+      return res.status(404).json({ message: "News contribution not found" });
+    }
+
+    return res.status(200).json({
+      message: isDraft
+        ? "News draft updated successfully"
+        : "News submitted successfully",
+      news,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const updateNewsContributionStatus = async (req, res, next) => {
   try {
     const { id } = req.params;
