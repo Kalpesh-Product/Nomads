@@ -227,7 +227,7 @@ const BlogEditForm = ({ blog, onCancel }) => {
 
   return (
     <main className="mx-auto w-full max-w-[74rem] px-1 pb-8 pt-2 md:px-6 lg:px-0">
-      <section className="mt-3 bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
+      <section className="mt-3 bg-transparent px-4 py-6 sm:px-6 lg:px-8">
         <div className="rounded-lg border border-slate-200 bg-white px-4 py-6 sm:px-6 lg:px-8">
           <h1 className="mb-8 text-2xl font-semibold uppercase text-slate-700">
             Edit Blog
