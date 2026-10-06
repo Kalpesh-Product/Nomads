@@ -879,84 +879,88 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               />
             </div>
 
-            <h2 className="mt-5 text-lg font-semibold text-slate-700">
-              Sections
-            </h2>
+            {config.formType === "event" ? null : (
+              <>
+                <h2 className="mt-5 text-lg font-semibold text-slate-700">
+                  Sections
+                </h2>
 
-            <div className="mt-3 space-y-4">
-              {formValues.sections.map((section, index) => (
-                <div
-                  key={index}
-                  className="rounded-lg border border-slate-200 bg-white p-4"
-                >
-                  <div className="mb-4 flex items-center justify-between gap-3">
-                    <h3 className="text-sm font-medium text-slate-600">
-                      Section {index + 1}
-                    </h3>
-                    {formValues.sections.length > 1 ? (
-                      <button
-                        type="button"
-                        onClick={() => removeSection(index)}
-                        className="inline-flex items-center gap-1 text-xs font-medium text-red-500 hover:text-red-600"
-                      >
-                        <HiOutlineTrash size={14} />
-                        Remove
-                      </button>
-                    ) : null}
-                  </div>
+                <div className="mt-3 space-y-4">
+                  {formValues.sections.map((section, index) => (
+                    <div
+                      key={index}
+                      className="rounded-lg border border-slate-200 bg-white p-4"
+                    >
+                      <div className="mb-4 flex items-center justify-between gap-3">
+                        <h3 className="text-sm font-medium text-slate-600">
+                          Section {index + 1}
+                        </h3>
+                        {formValues.sections.length > 1 ? (
+                          <button
+                            type="button"
+                            onClick={() => removeSection(index)}
+                            className="inline-flex items-center gap-1 text-xs font-medium text-red-500 hover:text-red-600"
+                          >
+                            <HiOutlineTrash size={14} />
+                            Remove
+                          </button>
+                        ) : null}
+                      </div>
 
-                  <div className="space-y-4">
-                    <div>
-                      <label className={labelClassName}>Section Title</label>
-                      <input
-                        className={inputClassName}
-                        value={section.title}
-                        onChange={(event) =>
-                          updateSection(index, "title", event.target.value)
-                        }
-                        placeholder="Section Title"
-                      />
+                      <div className="space-y-4">
+                        <div>
+                          <label className={labelClassName}>Section Title</label>
+                          <input
+                            className={inputClassName}
+                            value={section.title}
+                            onChange={(event) =>
+                              updateSection(index, "title", event.target.value)
+                            }
+                            placeholder="Section Title"
+                          />
+                        </div>
+                        <div>
+                          <label className={labelClassName}>Section Image URL</label>
+                          <input
+                            className={inputClassName}
+                            value={section.image}
+                            onChange={(event) =>
+                              updateSection(index, "image", event.target.value)
+                            }
+                            placeholder="Section Image URL"
+                          />
+                        </div>
+                        <div>
+                          <label className={labelClassName}>Section Content</label>
+                          <textarea
+                            className={`${inputClassName} min-h-[150px] resize-y leading-relaxed`}
+                            value={section.content}
+                            onChange={(event) =>
+                              updateSection(index, "content", event.target.value)
+                            }
+                            placeholder="Section content"
+                          />
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <label className={labelClassName}>Section Image URL</label>
-                      <input
-                        className={inputClassName}
-                        value={section.image}
-                        onChange={(event) =>
-                          updateSection(index, "image", event.target.value)
-                        }
-                        placeholder="Section Image URL"
-                      />
-                    </div>
-                    <div>
-                      <label className={labelClassName}>Section Content</label>
-                      <textarea
-                        className={`${inputClassName} min-h-[150px] resize-y leading-relaxed`}
-                        value={section.content}
-                        onChange={(event) =>
-                          updateSection(index, "content", event.target.value)
-                        }
-                        placeholder="Section content"
-                      />
-                    </div>
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
 
-            <button
-              type="button"
-              onClick={() =>
-                setFormValues((current) => ({
-                  ...current,
-                  sections: [...current.sections, emptySection()],
-                }))
-              }
-              className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-blue-800 hover:text-primary-blue"
-            >
-              <HiOutlinePlus size={16} />
-              Add Section
-            </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setFormValues((current) => ({
+                      ...current,
+                      sections: [...current.sections, emptySection()],
+                    }))
+                  }
+                  className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-blue-800 hover:text-primary-blue"
+                >
+                  <HiOutlinePlus size={16} />
+                  Add Section
+                </button>
+              </>
+            )}
 
             <div className="mt-14 flex flex-wrap items-center justify-center gap-4">
               <button
