@@ -197,7 +197,11 @@ const buildPlace = (row) => ({
 export const getPlaces = async (req, res, next) => {
   try {
     const { destination, category, month } = req.query;
-    const query = {};
+    const query = {
+      isDraft: { $ne: true },
+      isActive: { $ne: false },
+      $or: [{ status: "approved" }, { status: { $exists: false } }],
+    };
 
     if (destination) {
       query.destination = {
@@ -232,6 +236,9 @@ export const getPlacesByDestination = async (req, res, next) => {
         $regex: `^${buildExactDestinationPattern(destination)}$`,
         $options: "i",
       },
+      isDraft: { $ne: true },
+      isActive: { $ne: false },
+      $or: [{ status: "approved" }, { status: { $exists: false } }],
     }).sort({ placeName: 1 });
 
     return res.status(200).json(places);
@@ -348,6 +355,64 @@ export const addPlace = async (req, res, next) => {
 
     return res.status(201).json({
       message: "Place created successfully",
+      place,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getMyPlaces = async (req, res, next) => {
+  try {
+    const user = req.userData._id;
+    const places = await Place.find({ contributor: user }).sort({
+      updatedAt: -1,
+      createdAt: -1,
+    });
+
+    return res.status(200).json({
+      count: places.length,
+      data: places,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const createMyPlace = async (req, res, next) => {
+  try {
+    const user = req.userData._id;
+    const isDraft = Boolean(req.body?.isDraft);
+    const payload = buildPlacePayload(req.body || {});
+    const missingFields = validateRequiredPlaceFields(payload);
+    const coordinateErrors = validateCoordinateFields(payload);
+
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        message: "Required place fields are missing.",
+        missingFields,
+      });
+    }
+
+    if (coordinateErrors.length > 0) {
+      return res.status(400).json({
+        message: "Place coordinates are invalid.",
+        errors: coordinateErrors,
+      });
+    }
+
+    const place = await Place.create({
+      ...payload,
+      contributor: user,
+      status: "pending",
+      isDraft,
+      isActive: !isDraft,
+    });
+
+    return res.status(201).json({
+      message: isDraft
+        ? "Place saved as draft successfully"
+        : "Place submitted successfully",
       place,
     });
   } catch (error) {

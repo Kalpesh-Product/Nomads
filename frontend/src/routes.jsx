@@ -370,6 +370,10 @@ if (tenant === "main") {
               element: <AiContributionDashboard type="places" />,
             },
             {
+              path: "places-contributions/add",
+              element: <AiBlogContributionAdd type="places" />,
+            },
+            {
               path: "become-a-contributor",
               element: <AiBecomeContributor />,
             },

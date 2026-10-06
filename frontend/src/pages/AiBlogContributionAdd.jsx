@@ -58,6 +58,13 @@ const initialFormState = (author = "", destination = "") => ({
   mainContent: "",
   eventName: "",
   shortDescription: "",
+  placeName: "",
+  address: "",
+  googleMapsLink: "",
+  rating: "",
+  latitude: "",
+  longitude: "",
+  placeType: "",
   category: "",
   month: "",
   venue: "",
@@ -121,6 +128,26 @@ const contributionAddConfig = {
     submitButtonLabel: "Publish Event",
     writeButtonLabel: "Write Event",
     formType: "event",
+  },
+  places: {
+    contentLabel: "Place",
+    contentLabelPlural: "Places",
+    accessFlag: "isPlaceWriter",
+    dashboardPath: "/places-contributions",
+    addPath: "/places-contributions/add",
+    myEndpoint: "/places/my",
+    existingEndpoint: "/places",
+    existingParams: (destination) => ({ destination }),
+    existingQueryKey: "place-contribution-existing-places",
+    myQueryKey: "myPlaceContributions",
+    destinationTitleQueryKey: "place-contribution-destination-titles",
+    detailsRoute: (item) => `/places/${item._id || item.id}`,
+    successMessage: "Place saved successfully.",
+    successTitle: "Place Added",
+    errorMessage: "Could not save this place. Please check the details and try again.",
+    submitButtonLabel: "Publish Place",
+    writeButtonLabel: "Write Place",
+    formType: "place",
   },
 };
 
@@ -209,8 +236,18 @@ const ContributionPreviewCard = ({ item, stateName, config }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const thumbnail = item.mainImage || item.image;
-  const title = item.mainTitle || item.eventName || item.title || config.contentLabel;
-  const subtitle = item.author || item.venue || item.destination || "Destination";
+  const title =
+    item.mainTitle ||
+    item.eventName ||
+    item.placeName ||
+    item.title ||
+    config.contentLabel;
+  const subtitle =
+    item.author ||
+    item.venue ||
+    item.address ||
+    item.destination ||
+    "Destination";
   const itemDate = item.date || item.updatedAt || item.createdAt;
   const detailsRoute =
     typeof config.detailsRoute === "function"
@@ -229,6 +266,20 @@ const ContributionPreviewCard = ({ item, stateName, config }) => {
           description: item.shortDescription || item.description,
           region: item.destination || item.region,
         }
+      : config.formType === "place"
+        ? {
+            ...item,
+            id: item._id || item.id,
+            title: item.placeName || item.title,
+            image: item.mainImage || item.image,
+            location: item.address || item.location,
+            meta: item.rating || item.meta,
+            description: item.shortDescription || item.description,
+            category: item.category || item.placeType,
+            region: item.destination || item.region,
+            lat: item.latitude,
+            lng: item.longitude,
+          }
       : item;
 
   return (
@@ -533,19 +584,30 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
       .filter((section) => section.title || section.image || section.content);
 
     const isEventForm = config.formType === "event";
-    const titleValue = isEventForm ? formValues.eventName : formValues.mainTitle;
-    const contentValue = isEventForm
+    const isPlaceForm = config.formType === "place";
+    const titleValue = isEventForm
+      ? formValues.eventName
+      : isPlaceForm
+        ? formValues.placeName
+        : formValues.mainTitle;
+    const contentValue = isEventForm || isPlaceForm
       ? formValues.shortDescription
       : formValues.mainContent;
 
     if (!titleValue.trim()) {
-      showErrorAlert(isEventForm ? "Event name is required." : "Main title is required.");
+      showErrorAlert(
+        isEventForm
+          ? "Event name is required."
+          : isPlaceForm
+            ? "Place name is required."
+            : "Main title is required.",
+      );
       return;
     }
 
     if (!contentValue.trim()) {
       showErrorAlert(
-        isEventForm
+        isEventForm || isPlaceForm
           ? "Short description is required."
           : "Main content is required.",
       );
@@ -563,6 +625,28 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
         month: formValues.month.trim(),
         venue: formValues.venue.trim(),
         eventType: formValues.eventType.trim(),
+        sections: cleanedSections,
+        isDraft: status === "draft",
+      });
+      return;
+    }
+
+    if (isPlaceForm) {
+      createContribution({
+        placeName: formValues.placeName.trim(),
+        shortDescription: formValues.shortDescription.trim(),
+        mainImage: formValues.mainImage.trim(),
+        destination: selectedDestination,
+        link: formValues.link.trim(),
+        address: formValues.address.trim(),
+        googleMapsLink: formValues.googleMapsLink.trim(),
+        rating: formValues.rating.trim(),
+        category: formValues.category.trim(),
+        month: formValues.month.trim(),
+        venue: formValues.venue.trim(),
+        latitude: formValues.latitude,
+        longitude: formValues.longitude,
+        placeType: formValues.placeType.trim(),
         sections: cleanedSections,
         isDraft: status === "draft",
       });
@@ -725,22 +809,38 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               </div>
               <div>
                 <label className={labelClassName}>
-                  {config.formType === "event" ? "Event Name" : "Main Title"}
+                  {config.formType === "event"
+                    ? "Event Name"
+                    : config.formType === "place"
+                      ? "Place Name"
+                      : "Main Title"}
                 </label>
                 <input
                   className={inputClassName}
                   value={
                     config.formType === "event"
                       ? formValues.eventName
+                      : config.formType === "place"
+                        ? formValues.placeName
                       : formValues.mainTitle
                   }
                   onChange={(event) =>
                     updateFormField(
-                      config.formType === "event" ? "eventName" : "mainTitle",
+                      config.formType === "event"
+                        ? "eventName"
+                        : config.formType === "place"
+                          ? "placeName"
+                          : "mainTitle",
                       event.target.value,
                     )
                   }
-                  placeholder={config.formType === "event" ? "Event name" : "Main title"}
+                  placeholder={
+                    config.formType === "event"
+                      ? "Event name"
+                      : config.formType === "place"
+                        ? "Place name"
+                        : "Main title"
+                  }
                 />
               </div>
               <div>
@@ -803,6 +903,113 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                   />
                 </div>
               </div>
+            ) : config.formType === "place" ? (
+              <>
+                <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+                  <div>
+                    <label className={labelClassName}>Address</label>
+                    <input
+                      className={inputClassName}
+                      value={formValues.address}
+                      onChange={(event) =>
+                        updateFormField("address", event.target.value)
+                      }
+                      placeholder="Address"
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClassName}>Google Maps Link</label>
+                    <input
+                      className={inputClassName}
+                      value={formValues.googleMapsLink}
+                      onChange={(event) =>
+                        updateFormField("googleMapsLink", event.target.value)
+                      }
+                      placeholder="Google Maps link"
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClassName}>Rating</label>
+                    <input
+                      className={inputClassName}
+                      value={formValues.rating}
+                      onChange={(event) =>
+                        updateFormField("rating", event.target.value)
+                      }
+                      placeholder="Rating"
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClassName}>Type</label>
+                    <input
+                      className={inputClassName}
+                      value={formValues.placeType}
+                      onChange={(event) =>
+                        updateFormField("placeType", event.target.value)
+                      }
+                      placeholder="Type"
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-5">
+                  <div>
+                    <label className={labelClassName}>Category</label>
+                    <input
+                      className={inputClassName}
+                      value={formValues.category}
+                      onChange={(event) =>
+                        updateFormField("category", event.target.value)
+                      }
+                      placeholder="Category"
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClassName}>Month</label>
+                    <input
+                      className={inputClassName}
+                      value={formValues.month}
+                      onChange={(event) =>
+                        updateFormField("month", event.target.value)
+                      }
+                      placeholder="Month"
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClassName}>Venue</label>
+                    <input
+                      className={inputClassName}
+                      value={formValues.venue}
+                      onChange={(event) =>
+                        updateFormField("venue", event.target.value)
+                      }
+                      placeholder="Venue"
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClassName}>Latitude</label>
+                    <input
+                      className={inputClassName}
+                      value={formValues.latitude}
+                      onChange={(event) =>
+                        updateFormField("latitude", event.target.value)
+                      }
+                      placeholder="Latitude"
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClassName}>Longitude</label>
+                    <input
+                      className={inputClassName}
+                      value={formValues.longitude}
+                      onChange={(event) =>
+                        updateFormField("longitude", event.target.value)
+                      }
+                      placeholder="Longitude"
+                    />
+                  </div>
+                </div>
+              </>
             ) : (
               <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
                 <div>
@@ -854,25 +1061,27 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
 
             <div className="mt-6">
               <label className={labelClassName}>
-                {config.formType === "event" ? "Short Description" : "Main Content"}
+                {config.formType === "event" || config.formType === "place"
+                  ? "Short Description"
+                  : "Main Content"}
               </label>
               <textarea
                 className={`${inputClassName} min-h-[150px] resize-y leading-relaxed`}
                 value={
-                  config.formType === "event"
+                  config.formType === "event" || config.formType === "place"
                     ? formValues.shortDescription
                     : formValues.mainContent
                 }
                 onChange={(event) =>
                   updateFormField(
-                    config.formType === "event"
+                    config.formType === "event" || config.formType === "place"
                       ? "shortDescription"
                       : "mainContent",
                     event.target.value,
                   )
                 }
                 placeholder={
-                  config.formType === "event"
+                  config.formType === "event" || config.formType === "place"
                     ? "Short description"
                     : "Main content"
                 }

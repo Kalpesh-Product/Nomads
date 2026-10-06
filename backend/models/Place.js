@@ -77,6 +77,19 @@ const placeSchema = new mongoose.Schema(
       trim: true,
       default: "",
     },
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "approved",
+    },
+    contributor: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "NomadUser",
+    },
+    isDraft: {
+      type: Boolean,
+      default: false,
+    },
     sections: [
       {
         title: { type: String, default: "" },

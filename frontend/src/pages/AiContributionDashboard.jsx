@@ -63,6 +63,14 @@ const contributionPageConfig = {
     heading: "My Places Contributions",
     addLabel: "Add Place",
     emptyText: "You haven't added any places yet.",
+    draftEmptyText: "You don't have any saved drafts yet.",
+    submittedHeading: "Published Places",
+    draftHeading: "Saved As Drafts",
+    noStatusText: (status) => `No ${status} places found.`,
+    contentLabel: "Place",
+    endpoint: "/places/my",
+    queryKey: "myPlaceContributions",
+    detailsRoute: (item) => `/places/${item._id || item.id}`,
     flag: "isPlaceWriter",
     seoPath: "/places-contributions",
   },
@@ -170,7 +178,11 @@ const ContributionCard = ({ item, config }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const status = (item.status || "pending").toLowerCase();
-  const title = item.mainTitle || item.eventName || `Untitled ${config.contentLabel}`;
+  const title =
+    item.mainTitle ||
+    item.eventName ||
+    item.placeName ||
+    `Untitled ${config.contentLabel}`;
   const image = item.mainImage || item.image || fallbackImage;
   const destination = item.destination || item.location || "Destination";
   const itemDate = item.date || item.updatedAt || item.createdAt;
@@ -191,6 +203,20 @@ const ContributionCard = ({ item, config }) => {
           description: item.shortDescription || item.description,
           region: item.destination || item.region,
         }
+      : config.contentLabel === "Place"
+        ? {
+            ...item,
+            id: item._id || item.id,
+            title: item.placeName || item.title,
+            image: item.mainImage || item.image,
+            location: item.address || item.location,
+            meta: item.rating || item.meta,
+            description: item.shortDescription || item.description,
+            category: item.category || item.placeType,
+            region: item.destination || item.region,
+            lat: item.latitude,
+            lng: item.longitude,
+          }
       : item;
 
   return (
@@ -279,7 +305,7 @@ const AiContributionDashboard = ({ type }) => {
       const response = await axiosPrivate.get(config.endpoint);
       return Array.isArray(response.data?.data) ? response.data.data : [];
     },
-    enabled: ["blog", "news", "event"].includes(type) && Boolean(userId) && hasAccess,
+    enabled: ["blog", "news", "event", "places"].includes(type) && Boolean(userId) && hasAccess,
     staleTime: 1000 * 60,
   });
 
@@ -311,7 +337,7 @@ const AiContributionDashboard = ({ type }) => {
           (item) => (item.status || "pending").toLowerCase() === statusFilter,
         );
   const draftContributions = contributions.filter((item) => item.isDraft);
-  const hasContributionList = ["blog", "news", "event"].includes(type);
+  const hasContributionList = ["blog", "news", "event", "places"].includes(type);
   const shouldShowStatusFilter = submittedContributions.length > 0;
 
   return (
