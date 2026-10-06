@@ -4,6 +4,7 @@ import HavenTemplate from "./haven/HavenTemplate";
 import CameliaTemplate from "./camelia/CameliaTemplate";
 import CommonsTemplate from "./commons/CommonsTemplate";
 import HuddleTemplate from "./huddle/HuddleTemplate";
+import TravigoTemplate from "./travigo/TravigoTemplate";
 
 // The vertical-led templates (café, hostel, co-living, co-working, meeting rooms). Each one is a complete site
 // (header, every page, footer) driven by the same published data as the panels' builder preview,
@@ -15,6 +16,7 @@ export const VERTICAL_TEMPLATES = {
   camelia: CameliaTemplate,
   commons: CommonsTemplate,
   huddle: HuddleTemplate,
+  travigo: TravigoTemplate,
 };
 
 export const isVerticalTemplate = (themeVariant) =>
