@@ -362,6 +362,10 @@ if (tenant === "main") {
               element: <AiContributionDashboard type="event" />,
             },
             {
+              path: "event-contributions/add",
+              element: <AiBlogContributionAdd type="event" />,
+            },
+            {
               path: "places-contributions",
               element: <AiContributionDashboard type="places" />,
             },

@@ -47,6 +47,14 @@ const contributionPageConfig = {
     heading: "My Event Contributions",
     addLabel: "Add Event",
     emptyText: "You haven't added any events yet.",
+    draftEmptyText: "You don't have any saved drafts yet.",
+    submittedHeading: "Published Events",
+    draftHeading: "Saved As Drafts",
+    noStatusText: (status) => `No ${status} events found.`,
+    contentLabel: "Event",
+    endpoint: "/events/my",
+    queryKey: "myEventContributions",
+    detailsRoute: (item) => `/events/${item._id || item.id}`,
     flag: "isEventWriter",
     seoPath: "/event-contributions",
   },
@@ -162,23 +170,46 @@ const ContributionCard = ({ item, config }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const status = (item.status || "pending").toLowerCase();
+  const title = item.mainTitle || item.eventName || `Untitled ${config.contentLabel}`;
+  const image = item.mainImage || item.image || fallbackImage;
+  const destination = item.destination || item.location || "Destination";
+  const itemDate = item.date || item.updatedAt || item.createdAt;
+  const detailsRoute =
+    typeof config.detailsRoute === "function"
+      ? config.detailsRoute(item)
+      : config.detailsRoute;
+  const detailStateContent =
+    config.contentLabel === "Event"
+      ? {
+          ...item,
+          id: item._id || item.id,
+          title: item.eventName || item.title,
+          image: item.mainImage || item.image,
+          location: item.venue || item.location,
+          meta: item.month || item.meta,
+          subtitle: item.month ? `During the month of ${item.month}` : item.subtitle,
+          description: item.shortDescription || item.description,
+          region: item.destination || item.region,
+        }
+      : item;
 
   return (
     <article className="flex w-full flex-col gap-2 rounded-lg bg-white text-left transition-all">
       <div className="relative aspect-square overflow-hidden rounded-2xl bg-slate-100">
         <img
-          src={item.mainImage || fallbackImage}
-          alt={item.mainTitle}
+          src={image}
+          alt={title}
           className="h-full w-full object-cover"
           loading="lazy"
         />
         <button
           type="button"
           onClick={() =>
-            navigate(config.detailsRoute, {
+            navigate(detailsRoute, {
               state: {
                 content: item,
-                selectedStateLabel: item.destination,
+                item: detailStateContent,
+                selectedStateLabel: destination,
                 sourceSearch: location.search,
               },
             })
@@ -203,22 +234,22 @@ const ContributionCard = ({ item, config }) => {
       <div className="flex h-[25%] flex-col gap-1 px-4 pr-1">
         <h3
           className="truncate text-xs font-semibold md:text-sm"
-          title={item.mainTitle || `Untitled ${config.contentLabel}`}
+          title={title}
         >
-          {item.mainTitle || `Untitled ${config.contentLabel}`}
+          {title}
         </h3>
         <div className="flex w-full items-center justify-between gap-2">
           <span
             className="truncate text-xs font-medium text-gray-600 md:text-sm"
-            title={item.destination || "Destination"}
+            title={destination}
           >
-            {item.destination || "Destination"}
+            {destination}
           </span>
           <time
             className="shrink-0 text-xs font-medium text-gray-600 md:text-sm"
-            dateTime={item.date || item.updatedAt}
+            dateTime={itemDate}
           >
-            {humanDate(item.date || item.updatedAt)}
+            {humanDate(itemDate)}
           </time>
         </div>
       </div>
@@ -248,7 +279,7 @@ const AiContributionDashboard = ({ type }) => {
       const response = await axiosPrivate.get(config.endpoint);
       return Array.isArray(response.data?.data) ? response.data.data : [];
     },
-    enabled: ["blog", "news"].includes(type) && Boolean(userId) && hasAccess,
+    enabled: ["blog", "news", "event"].includes(type) && Boolean(userId) && hasAccess,
     staleTime: 1000 * 60,
   });
 
@@ -280,7 +311,7 @@ const AiContributionDashboard = ({ type }) => {
           (item) => (item.status || "pending").toLowerCase() === statusFilter,
         );
   const draftContributions = contributions.filter((item) => item.isDraft);
-  const hasContributionList = ["blog", "news"].includes(type);
+  const hasContributionList = ["blog", "news", "event"].includes(type);
   const shouldShowStatusFilter = submittedContributions.length > 0;
 
   return (

@@ -123,12 +123,17 @@ const buildEvent = (row) => ({
 
 export const getEvents = async (req, res, next) => {
   try {
-    const { destination, category, month } = req.query;
-    const query = {};
+    const { destination, keyword, category, month } = req.query;
+    const query = {
+      isDraft: { $ne: true },
+      isActive: { $ne: false },
+      $or: [{ status: "approved" }, { status: { $exists: false } }],
+    };
 
-    if (destination) {
+    const searchDestination = destination || keyword;
+    if (searchDestination) {
       query.destination = {
-        $regex: `^${buildExactDestinationPattern(destination)}$`,
+        $regex: `^${buildExactDestinationPattern(searchDestination)}$`,
         $options: "i",
       };
     }
@@ -159,6 +164,9 @@ export const getEventsByDestination = async (req, res, next) => {
         $regex: `^${buildExactDestinationPattern(destination)}$`,
         $options: "i",
       },
+      isDraft: { $ne: true },
+      isActive: { $ne: false },
+      $or: [{ status: "approved" }, { status: { $exists: false } }],
     }).sort({ eventName: 1 });
 
     return res.status(200).json(events);
@@ -254,6 +262,56 @@ export const addEvent = async (req, res, next) => {
 
     return res.status(201).json({
       message: "Event created successfully",
+      event,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getMyEvents = async (req, res, next) => {
+  try {
+    const user = req.userData._id;
+    const events = await Event.find({ contributor: user }).sort({
+      updatedAt: -1,
+      createdAt: -1,
+    });
+
+    return res.status(200).json({
+      count: events.length,
+      data: events,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const createMyEvent = async (req, res, next) => {
+  try {
+    const user = req.userData._id;
+    const isDraft = Boolean(req.body?.isDraft);
+    const payload = buildEventPayload(req.body || {});
+    const missingFields = validateRequiredEventFields(payload);
+
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        message: "Required event fields are missing.",
+        missingFields,
+      });
+    }
+
+    const event = await Event.create({
+      ...payload,
+      contributor: user,
+      status: "pending",
+      isDraft,
+      isActive: !isDraft,
+    });
+
+    return res.status(201).json({
+      message: isDraft
+        ? "Event saved as draft successfully"
+        : "Event submitted successfully",
       event,
     });
   } catch (error) {

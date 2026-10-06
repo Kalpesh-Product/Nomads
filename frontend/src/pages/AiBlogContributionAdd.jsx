@@ -56,6 +56,12 @@ const initialFormState = (author = "", destination = "") => ({
   date: "",
   status: "active",
   mainContent: "",
+  eventName: "",
+  shortDescription: "",
+  category: "",
+  month: "",
+  venue: "",
+  eventType: "",
   sections: [emptySection()],
 });
 
@@ -95,6 +101,26 @@ const contributionAddConfig = {
     errorMessage: "Could not save this news item. Please check the details and try again.",
     submitButtonLabel: "Publish News",
     writeButtonLabel: "Write News",
+  },
+  event: {
+    contentLabel: "Event",
+    contentLabelPlural: "Events",
+    accessFlag: "isEventWriter",
+    dashboardPath: "/event-contributions",
+    addPath: "/event-contributions/add",
+    myEndpoint: "/events/my",
+    existingEndpoint: "/events",
+    existingParams: (destination) => ({ destination }),
+    existingQueryKey: "event-contribution-existing-events",
+    myQueryKey: "myEventContributions",
+    destinationTitleQueryKey: "event-contribution-destination-titles",
+    detailsRoute: (item) => `/events/${item._id || item.id}`,
+    successMessage: "Event saved successfully.",
+    successTitle: "Event Added",
+    errorMessage: "Could not save this event. Please check the details and try again.",
+    submitButtonLabel: "Publish Event",
+    writeButtonLabel: "Write Event",
+    formType: "event",
   },
 };
 
@@ -182,7 +208,28 @@ const DropdownBadge = ({
 const ContributionPreviewCard = ({ item, stateName, config }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const thumbnail = item.mainImage;
+  const thumbnail = item.mainImage || item.image;
+  const title = item.mainTitle || item.eventName || item.title || config.contentLabel;
+  const subtitle = item.author || item.venue || item.destination || "Destination";
+  const itemDate = item.date || item.updatedAt || item.createdAt;
+  const detailsRoute =
+    typeof config.detailsRoute === "function"
+      ? config.detailsRoute(item)
+      : config.detailsRoute;
+  const detailStateItem =
+    config.formType === "event"
+      ? {
+          ...item,
+          id: item._id || item.id,
+          title: item.eventName || item.title,
+          image: item.mainImage || item.image,
+          location: item.venue || item.location,
+          meta: item.month || item.meta,
+          subtitle: item.month ? `During the month of ${item.month}` : item.subtitle,
+          description: item.shortDescription || item.description,
+          region: item.destination || item.region,
+        }
+      : item;
 
   return (
     <article className="flex w-full flex-col gap-2 rounded-lg bg-white text-left transition-all">
@@ -190,7 +237,7 @@ const ContributionPreviewCard = ({ item, stateName, config }) => {
         {thumbnail ? (
           <img
             src={thumbnail}
-            alt={item.mainTitle}
+            alt={title}
             className="h-full w-full object-cover"
             loading="lazy"
           />
@@ -198,9 +245,10 @@ const ContributionPreviewCard = ({ item, stateName, config }) => {
         <button
           type="button"
           onClick={() =>
-            navigate(config.detailsRoute, {
+            navigate(detailsRoute, {
               state: {
                 content: item,
+                item: detailStateItem,
                 selectedStateLabel: stateName,
                 sourceSearch: location.search,
               },
@@ -215,22 +263,22 @@ const ContributionPreviewCard = ({ item, stateName, config }) => {
       <div className="flex h-[25%] flex-col gap-1 px-4 pr-1">
         <h3
           className="truncate text-xs font-semibold md:text-sm"
-          title={item.mainTitle}
+          title={title}
         >
-          {item.mainTitle}
+          {title}
         </h3>
         <div className="flex w-full items-center justify-between gap-2">
           <span
             className="truncate text-xs font-medium text-gray-600 md:text-sm"
-            title={item.author || "Author"}
+            title={subtitle}
           >
-            {item.author || "Author"}
+            {subtitle}
           </span>
           <time
             className="shrink-0 text-xs font-medium text-gray-600 md:text-sm"
-            dateTime={item.date}
+            dateTime={itemDate}
           >
-            {item.date ? humanDate(item.date) : ""}
+            {itemDate ? humanDate(itemDate) : ""}
           </time>
         </div>
       </div>
@@ -373,9 +421,12 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
     queryKey: [config.existingQueryKey, selectedDestination],
     queryFn: async () => {
       const response = await axios.get(config.existingEndpoint, {
-        params: {
-          keyword: buildExactKeyword(selectedDestination),
-        },
+        params:
+          typeof config.existingParams === "function"
+            ? config.existingParams(selectedDestination)
+            : {
+                keyword: buildExactKeyword(selectedDestination),
+              },
       });
 
       return Array.isArray(response.data) ? response.data : [];
@@ -481,13 +532,40 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
       }))
       .filter((section) => section.title || section.image || section.content);
 
-    if (!formValues.mainTitle.trim()) {
-      showErrorAlert("Main title is required.");
+    const isEventForm = config.formType === "event";
+    const titleValue = isEventForm ? formValues.eventName : formValues.mainTitle;
+    const contentValue = isEventForm
+      ? formValues.shortDescription
+      : formValues.mainContent;
+
+    if (!titleValue.trim()) {
+      showErrorAlert(isEventForm ? "Event name is required." : "Main title is required.");
       return;
     }
 
-    if (!formValues.mainContent.trim()) {
-      showErrorAlert("Main content is required.");
+    if (!contentValue.trim()) {
+      showErrorAlert(
+        isEventForm
+          ? "Short description is required."
+          : "Main content is required.",
+      );
+      return;
+    }
+
+    if (isEventForm) {
+      createContribution({
+        eventName: formValues.eventName.trim(),
+        shortDescription: formValues.shortDescription.trim(),
+        mainImage: formValues.mainImage.trim(),
+        destination: selectedDestination,
+        link: formValues.link.trim(),
+        category: formValues.category.trim(),
+        month: formValues.month.trim(),
+        venue: formValues.venue.trim(),
+        eventType: formValues.eventType.trim(),
+        sections: cleanedSections,
+        isDraft: status === "draft",
+      });
       return;
     }
 
@@ -646,14 +724,23 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                 />
               </div>
               <div>
-                <label className={labelClassName}>Main Title</label>
+                <label className={labelClassName}>
+                  {config.formType === "event" ? "Event Name" : "Main Title"}
+                </label>
                 <input
                   className={inputClassName}
-                  value={formValues.mainTitle}
-                  onChange={(event) =>
-                    updateFormField("mainTitle", event.target.value)
+                  value={
+                    config.formType === "event"
+                      ? formValues.eventName
+                      : formValues.mainTitle
                   }
-                  placeholder="Main title"
+                  onChange={(event) =>
+                    updateFormField(
+                      config.formType === "event" ? "eventName" : "mainTitle",
+                      event.target.value,
+                    )
+                  }
+                  placeholder={config.formType === "event" ? "Event name" : "Main title"}
                 />
               </div>
               <div>
@@ -669,62 +756,126 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               </div>
             </div>
 
-            <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-              <div>
-                <label className={labelClassName}>Author</label>
-                <input
-                  className={inputClassName}
-                  value={formValues.author}
-                  onChange={(event) =>
-                    updateFormField("author", event.target.value)
-                  }
-                  placeholder="Author"
-                />
+            {config.formType === "event" ? (
+              <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+                <div>
+                  <label className={labelClassName}>Category</label>
+                  <input
+                    className={inputClassName}
+                    value={formValues.category}
+                    onChange={(event) =>
+                      updateFormField("category", event.target.value)
+                    }
+                    placeholder="Category"
+                  />
+                </div>
+                <div>
+                  <label className={labelClassName}>Month</label>
+                  <input
+                    className={inputClassName}
+                    value={formValues.month}
+                    onChange={(event) =>
+                      updateFormField("month", event.target.value)
+                    }
+                    placeholder="Month"
+                  />
+                </div>
+                <div>
+                  <label className={labelClassName}>Venue</label>
+                  <input
+                    className={inputClassName}
+                    value={formValues.venue}
+                    onChange={(event) =>
+                      updateFormField("venue", event.target.value)
+                    }
+                    placeholder="Venue"
+                  />
+                </div>
+                <div>
+                  <label className={labelClassName}>Type</label>
+                  <input
+                    className={inputClassName}
+                    value={formValues.eventType}
+                    onChange={(event) =>
+                      updateFormField("eventType", event.target.value)
+                    }
+                    placeholder="Type"
+                  />
+                </div>
               </div>
-              <div>
-                <label className={labelClassName}>Source</label>
-                <input
-                  className={inputClassName}
-                  value={formValues.source}
-                  onChange={(event) =>
-                    updateFormField("source", event.target.value)
-                  }
-                  placeholder="Source"
-                />
+            ) : (
+              <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+                <div>
+                  <label className={labelClassName}>Author</label>
+                  <input
+                    className={inputClassName}
+                    value={formValues.author}
+                    onChange={(event) =>
+                      updateFormField("author", event.target.value)
+                    }
+                    placeholder="Author"
+                  />
+                </div>
+                <div>
+                  <label className={labelClassName}>Source</label>
+                  <input
+                    className={inputClassName}
+                    value={formValues.source}
+                    onChange={(event) =>
+                      updateFormField("source", event.target.value)
+                    }
+                    placeholder="Source"
+                  />
+                </div>
+                <div>
+                  <label className={labelClassName}>Date</label>
+                  <input
+                    className={inputClassName}
+                    type="date"
+                    value={formValues.date}
+                    onChange={(event) => updateFormField("date", event.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className={labelClassName}>Status</label>
+                  <select
+                    className={inputClassName}
+                    value={formValues.status}
+                    onChange={(event) =>
+                      updateFormField("status", event.target.value)
+                    }
+                  >
+                    <option value="active">Active</option>
+                    <option value="draft">Draft</option>
+                  </select>
+                </div>
               </div>
-              <div>
-                <label className={labelClassName}>Date</label>
-                <input
-                  className={inputClassName}
-                  type="date"
-                  value={formValues.date}
-                  onChange={(event) => updateFormField("date", event.target.value)}
-                />
-              </div>
-              <div>
-                <label className={labelClassName}>Status</label>
-                <select
-                  className={inputClassName}
-                  value={formValues.status}
-                  onChange={(event) =>
-                    updateFormField("status", event.target.value)
-                  }
-                >
-                  <option value="active">Active</option>
-                  <option value="draft">Draft</option>
-                </select>
-              </div>
-            </div>
+            )}
 
             <div className="mt-6">
-              <label className={labelClassName}>Main Content</label>
+              <label className={labelClassName}>
+                {config.formType === "event" ? "Short Description" : "Main Content"}
+              </label>
               <textarea
                 className={`${inputClassName} min-h-[150px] resize-y leading-relaxed`}
-                value={formValues.mainContent}
-                onChange={(event) =>
-                  updateFormField("mainContent", event.target.value)
+                value={
+                  config.formType === "event"
+                    ? formValues.shortDescription
+                    : formValues.mainContent
                 }
-                placeholder="Main content"
+                onChange={(event) =>
+                  updateFormField(
+                    config.formType === "event"
+                      ? "shortDescription"
+                      : "mainContent",
+                    event.target.value,
+                  )
+                }
+                placeholder={
+                  config.formType === "event"
+                    ? "Short description"
+                    : "Main content"
+                }
               />
             </div>
 
