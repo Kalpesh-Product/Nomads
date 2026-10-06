@@ -22,7 +22,7 @@ const contributionPageConfig = {
     contentLabel: "Blog",
     endpoint: "/blogs/my",
     queryKey: "myBlogContributions",
-    detailsRoute: "/blog/blog-details",
+    detailsRoute: (item) => `/blog-contributions/${item._id || item.id}`,
     flag: "isBlogger",
     seoPath: "/blog-contributions",
   },
@@ -237,6 +237,10 @@ const ContributionCard = ({ item, config }) => {
                 item: detailStateContent,
                 selectedStateLabel: destination,
                 sourceSearch: location.search,
+                stickyBreadcrumbs: [
+                  { label: config.label, path: config.seoPath },
+                  { label: title },
+                ],
               },
             })
           }

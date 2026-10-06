@@ -358,6 +358,42 @@ export const createMyBlog = async (req, res, next) => {
     }
 };
 
+export const updateMyBlog = async (req, res, next) => {
+    try {
+        const user = req.userData._id;
+        const { id } = req.params;
+        const isDraft = Boolean(req.body?.isDraft);
+
+        const blog = await Blog.findOneAndUpdate(
+            {
+                _id: id,
+                contributor: user,
+            },
+            {
+                ...req.body,
+                contributor: user,
+                status: "pending",
+                isDraft,
+                isActive: !isDraft,
+            },
+            { new: true, runValidators: true },
+        );
+
+        if (!blog) {
+            return res.status(404).json({ message: "Blog contribution not found" });
+        }
+
+        return res.status(200).json({
+            message: isDraft
+                ? "Blog draft updated successfully"
+                : "Blog submitted successfully",
+            blog,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const updateBlogContributionStatus = async (req, res, next) => {
     try {
         const { id } = req.params;
