@@ -1088,7 +1088,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               />
             </div>
 
-            {config.formType === "event" ? null : (
+            {config.formType === "event" || config.formType === "place" ? null : (
               <>
                 <h2 className="mt-5 text-lg font-semibold text-slate-700">
                   Sections

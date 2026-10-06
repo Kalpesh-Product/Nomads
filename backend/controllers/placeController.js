@@ -420,6 +420,81 @@ export const createMyPlace = async (req, res, next) => {
   }
 };
 
+export const getPlaceContributions = async (req, res, next) => {
+  try {
+    const { status, search } = req.query;
+    const query = {
+      contributor: { $exists: true, $ne: null },
+      isDraft: { $ne: true },
+    };
+
+    if (status && status !== "all") {
+      query.status = status;
+    }
+
+    if (search) {
+      const pattern = { $regex: escapeRegex(search), $options: "i" };
+      query.$or = [
+        { placeName: pattern },
+        { shortDescription: pattern },
+        { address: pattern },
+        { category: pattern },
+        { month: pattern },
+        { venue: pattern },
+        { destination: pattern },
+        { placeType: pattern },
+      ];
+    }
+
+    const places = await Place.find(query)
+      .populate("contributor", "firstName lastName fullName name email")
+      .sort({ updatedAt: -1, createdAt: -1 });
+
+    return res.status(200).json({
+      count: places.length,
+      data: places,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updatePlaceContributionStatus = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const normalizedStatus = String(status || "").toLowerCase();
+
+    if (!["pending", "approved", "rejected"].includes(normalizedStatus)) {
+      return res.status(400).json({ message: "Invalid place status" });
+    }
+
+    const place = await Place.findOneAndUpdate(
+      {
+        _id: id,
+        contributor: { $exists: true, $ne: null },
+        isDraft: { $ne: true },
+      },
+      {
+        status: normalizedStatus,
+        isActive: normalizedStatus === "approved",
+      },
+      { new: true },
+    ).populate("contributor", "firstName lastName fullName name email");
+
+    if (!place) {
+      return res.status(404).json({ message: "Place contribution not found" });
+    }
+
+    return res.status(200).json({
+      message: `Place ${normalizedStatus} successfully`,
+      place,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getPlaceById = async (req, res, next) => {
   try {
     const { placeId } = req.params;
