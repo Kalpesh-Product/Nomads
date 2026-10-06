@@ -347,7 +347,7 @@ const AiContributionDashboard = ({ type }) => {
   return (
     <>
       <Seo path={config.seoPath} />
-      <main className="mx-auto w-full max-w-[70rem] px-1 py-2 md:px-6 lg:px-0">
+      <main className="mx-auto w-full max-w-[80rem] px-4 py-2 md:px-8 lg:px-8">
         <div className="mt-6 flex items-center justify-between gap-4 border-t border-black/10 pt-6">
           <h1 className="text-lg font-semibold text-black">{config.heading}</h1>
           <button

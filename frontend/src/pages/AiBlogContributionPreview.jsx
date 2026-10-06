@@ -166,7 +166,7 @@ const ArticlePreview = ({ item, config, onEdit }) => {
   });
 
   return (
-    <div className="mx-auto w-full max-w-[80rem] px-1 pb-10 pt-4 md:px-6 lg:px-0">
+    <div className="mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8">
       <PreviewHeader config={config} item={item} onEdit={onEdit} />
 
       <div className="flex flex-col gap-8">
@@ -235,7 +235,7 @@ const DestinationPreview = ({ item, config, onEdit }) => {
   const rightMeta = isEvent ? item.venue : item.address || item.venue;
 
   return (
-    <div className="mx-auto w-full max-w-[80rem] px-1 pb-10 pt-4 md:px-6 lg:px-0">
+    <div className="mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8">
       <PreviewHeader config={config} item={item} onEdit={onEdit} />
 
       <section className="mt-4">
@@ -538,7 +538,7 @@ const ContributionEditForm = ({ item, config, onCancel }) => {
   const isSaving = updateContributionMutation.isPending;
 
   return (
-    <main className="mx-auto w-full max-w-[74rem] px-1 pb-8 pt-2 md:px-6 lg:px-0">
+    <main className="mx-auto w-full max-w-[80rem] px-4 pb-8 pt-2 md:px-8 lg:px-8">
       <section className="mt-3 bg-transparent px-4 py-6 sm:px-6 lg:px-8">
         <div className="rounded-lg border border-slate-200 bg-white px-4 py-6 sm:px-6 lg:px-8">
           <h1 className="mb-8 text-2xl font-semibold uppercase text-slate-700">
@@ -788,7 +788,7 @@ const AiBlogContributionPreview = ({ type = "blog" }) => {
 
   if (isLoading && !item) {
     return (
-      <div className="mx-auto w-full max-w-[74rem] px-1 py-10 text-center text-sm text-slate-500 md:px-6 lg:px-0">
+      <div className="mx-auto w-full max-w-[80rem] px-4 py-10 text-center text-sm text-slate-500 md:px-8 lg:px-8">
         Loading {config.label.toLowerCase()} preview...
       </div>
     );
@@ -796,7 +796,7 @@ const AiBlogContributionPreview = ({ type = "blog" }) => {
 
   if (isError || !item) {
     return (
-      <div className="mx-auto w-full max-w-[74rem] px-1 py-10 text-center md:px-6 lg:px-0">
+      <div className="mx-auto w-full max-w-[80rem] px-4 py-10 text-center md:px-8 lg:px-8">
         <p className="text-sm text-red-500">
           Could not load this {config.label.toLowerCase()} contribution.
         </p>

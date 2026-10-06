@@ -669,7 +669,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
   };
 
   return (
-    <main className="mx-auto w-full max-w-[74rem] px-1 pb-8 pt-2 md:px-6 lg:px-0">
+    <main className="mx-auto w-full max-w-[80rem] px-4 pb-8 pt-2 md:px-8 lg:px-8">
       {!showForm ? (
         <section className="mt-4">
           <p className="font-play text-sm font-medium leading-snug text-black/85 lg:text-[0.95rem]">
@@ -783,7 +783,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
           ) : null}
         </section>
       ) : (
-        <section className="mt-3 bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
+        <section className="mt-3 bg-transparent px-4 py-6 sm:px-6 lg:px-8">
           <div className="rounded-lg border border-slate-200 bg-white px-4 py-6 sm:px-6 lg:px-8">
             <h1 className="mb-8 text-2xl font-semibold uppercase text-slate-700">
               Add {config.contentLabel}
