@@ -319,6 +319,80 @@ export const createMyEvent = async (req, res, next) => {
   }
 };
 
+export const getEventContributions = async (req, res, next) => {
+  try {
+    const { status, search } = req.query;
+    const query = {
+      contributor: { $exists: true, $ne: null },
+      isDraft: { $ne: true },
+    };
+
+    if (status && status !== "all") {
+      query.status = status;
+    }
+
+    if (search) {
+      const pattern = { $regex: escapeRegex(search), $options: "i" };
+      query.$or = [
+        { eventName: pattern },
+        { shortDescription: pattern },
+        { category: pattern },
+        { month: pattern },
+        { venue: pattern },
+        { destination: pattern },
+        { eventType: pattern },
+      ];
+    }
+
+    const events = await Event.find(query)
+      .populate("contributor", "firstName lastName fullName name email")
+      .sort({ updatedAt: -1, createdAt: -1 });
+
+    return res.status(200).json({
+      count: events.length,
+      data: events,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateEventContributionStatus = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const normalizedStatus = String(status || "").toLowerCase();
+
+    if (!["pending", "approved", "rejected"].includes(normalizedStatus)) {
+      return res.status(400).json({ message: "Invalid event status" });
+    }
+
+    const event = await Event.findOneAndUpdate(
+      {
+        _id: id,
+        contributor: { $exists: true, $ne: null },
+        isDraft: { $ne: true },
+      },
+      {
+        status: normalizedStatus,
+        isActive: normalizedStatus === "approved",
+      },
+      { new: true },
+    ).populate("contributor", "firstName lastName fullName name email");
+
+    if (!event) {
+      return res.status(404).json({ message: "Event contribution not found" });
+    }
+
+    return res.status(200).json({
+      message: `Event ${normalizedStatus} successfully`,
+      event,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getEventById = async (req, res, next) => {
   try {
     const { eventId } = req.params;
