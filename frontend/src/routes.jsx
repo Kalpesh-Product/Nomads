@@ -150,6 +150,9 @@ const AiContributionDashboard = lazyPage(() =>
   import("./pages/AiContributionDashboard"),
 );
 const AiContributionsHub = lazyPage(() => import("./pages/AiContributionsHub"));
+const AiContributionsHubTwo = lazyPage(() =>
+  import("./pages/AiContributionsHubTwo"),
+);
 const AiBlogContributionAdd = lazyPage(() =>
   import("./pages/AiBlogContributionAdd"),
 );
@@ -348,6 +351,10 @@ if (tenant === "main") {
             {
               path: "contributions",
               element: <AiContributionsHub />,
+            },
+            {
+              path: "contributions-2",
+              element: <AiContributionsHubTwo />,
             },
             {
               path: "blog-contributions",
