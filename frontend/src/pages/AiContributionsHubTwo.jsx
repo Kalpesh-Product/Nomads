@@ -314,17 +314,14 @@ const AiContributionsHubTwo = () => {
             </div>
           </section>
 
-          <section className="mt-6 overflow-hidden rounded-[1.5rem] border border-sky-100 bg-gradient-to-br from-white via-white to-sky-50/60 p-5">
-            <div className="flex flex-wrap items-center justify-between gap-3">
+          <section className="mt-6">
+            <div>
               <div>
                 <h2 className="text-xl font-bold text-black">Quick Links</h2>
                 <p className="mt-1 text-sm leading-5 text-black/55">
                   View or create content in one tap.
                 </p>
               </div>
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-blue text-white shadow-[0_8px_20px_rgba(14,165,233,0.25)]">
-                <HiOutlineSparkles size={18} />
-              </span>
             </div>
 
             <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -361,25 +358,31 @@ const AiContributionsHubTwo = () => {
                           </p>
                         </div>
                       </div>
-                      <div className="mt-3 grid grid-cols-3 gap-1.5">
-                        <span className="inline-flex items-center justify-center gap-1 rounded-full bg-emerald-50 px-1.5 py-1 text-[10px] font-semibold text-emerald-700">
-                          <span className="text-xs font-bold leading-none">
+                      <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+                        <div className="rounded-lg bg-slate-50 px-2 py-2">
+                          <p className="text-sm font-bold text-black">
                             {liveCount}
-                          </span>
-                          <span className="text-emerald-700/70">live</span>
-                        </span>
-                        <span className="inline-flex items-center justify-center gap-1 rounded-full bg-amber-50 px-1.5 py-1 text-[10px] font-semibold text-amber-700">
-                          <span className="text-xs font-bold leading-none">
+                          </p>
+                          <p className="text-[10px] font-medium text-black/45">
+                            live
+                          </p>
+                        </div>
+                        <div className="rounded-lg bg-slate-50 px-2 py-2">
+                          <p className="text-sm font-bold text-black">
                             {pendingCount}
-                          </span>
-                          <span className="text-amber-700/70">pending</span>
-                        </span>
-                        <span className="inline-flex items-center justify-center gap-1 rounded-full bg-slate-100 px-1.5 py-1 text-[10px] font-semibold text-slate-700">
-                          <span className="text-xs font-bold leading-none">
+                          </p>
+                          <p className="text-[10px] font-medium text-black/45">
+                            pending
+                          </p>
+                        </div>
+                        <div className="rounded-lg bg-slate-50 px-2 py-2">
+                          <p className="text-sm font-bold text-black">
                             {draftCount}
-                          </span>
-                          <span className="text-slate-600/70">drafts</span>
-                        </span>
+                          </p>
+                          <p className="text-[10px] font-medium text-black/45">
+                            drafts
+                          </p>
+                        </div>
                       </div>
                       <div className="mt-3 grid grid-cols-2 gap-2 rounded-full bg-slate-50 p-1">
                         <button
@@ -406,7 +409,7 @@ const AiContributionsHubTwo = () => {
             </div>
           </section>
 
-          <section className="mt-6 space-y-5">
+          <section className="mt-6 grid gap-5 xl:grid-cols-2">
                 <div className="rounded-[1.5rem] border border-cyan-100 bg-gradient-to-br from-[#ecfbff] via-white to-[#f3f8ff] p-5">
                   <h2 className="text-xl font-bold text-black">
                     Top contributions
