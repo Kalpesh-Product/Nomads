@@ -355,7 +355,7 @@ const AiContributionsHubTwo = () => {
                   )}
                 </div>
 
-                <div className="rounded-[1.5rem] bg-white p-5 shadow-[0_12px_34px_rgba(15,23,42,0.05)] ring-1 ring-black/10">
+                <div className="rounded-[1.5rem] bg-slate-50 p-5">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                       <h2 className="text-xl font-bold text-black">
@@ -376,11 +376,11 @@ const AiContributionsHubTwo = () => {
                   </div>
 
                   {isLoading ? (
-                    <div className="mt-5 rounded-lg border border-dotted bg-slate-50 p-8 text-center text-sm text-black/50">
+                    <div className="mt-5 rounded-lg border border-dotted bg-white p-8 text-center text-sm text-black/50">
                       Loading recent contributions...
                     </div>
                   ) : recentListItems.length > 0 ? (
-                    <div className="mt-5 overflow-hidden rounded-lg border border-black/10">
+                    <div className="mt-5 space-y-1">
                       {recentListItems.map(({ item, config }, index) => {
                         const Icon = config.icon;
                         const status = item.isDraft
@@ -392,8 +392,11 @@ const AiContributionsHubTwo = () => {
                             key={`${config.key}-recent-${item._id || item.id || index}`}
                             type="button"
                             onClick={() => navigate(config.detailsPath(item))}
-                            className="flex w-full items-center gap-4 border-b border-black/10 bg-white px-4 py-3 text-left transition last:border-b-0 hover:bg-slate-50"
+                            className="grid w-full grid-cols-[2.25rem_2.75rem_minmax(0,1fr)_auto] items-center gap-4 rounded-lg px-3 py-3 text-left transition hover:bg-white"
                           >
+                            <span className="text-lg font-semibold text-black/25">
+                              {String(index + 1).padStart(2, "0")}
+                            </span>
                             <div
                               className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${config.softColor}`}
                             >
@@ -407,13 +410,16 @@ const AiContributionsHubTwo = () => {
                                 {config.singular} in {getDestination(item)}
                               </p>
                             </div>
-                            <div className="hidden text-right sm:block">
-                              <p className="text-xs font-medium text-black/50">
+                            <div className="hidden items-center gap-4 text-sm font-semibold text-black/75 md:flex">
+                              <span className="whitespace-nowrap text-xs font-medium text-black/50">
                                 {humanDate(getItemDate(item))}
-                              </p>
-                              <p className="mt-1 text-xs font-semibold capitalize text-black/70">
+                              </span>
+                              <span className="rounded-full bg-white px-3 py-1 text-xs capitalize text-black/65">
                                 {status}
-                              </p>
+                              </span>
+                              <span className="rounded-full bg-white px-3 py-1 text-xs text-black/65">
+                                {config.label}
+                              </span>
                             </div>
                             <HiArrowRight
                               className="shrink-0 text-black/35"
