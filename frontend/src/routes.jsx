@@ -149,6 +149,7 @@ const AiBecomeContributor = lazyPage(() =>
 const AiContributionDashboard = lazyPage(() =>
   import("./pages/AiContributionDashboard"),
 );
+const AiContributionsHub = lazyPage(() => import("./pages/AiContributionsHub"));
 const AiBlogContributionAdd = lazyPage(() =>
   import("./pages/AiBlogContributionAdd"),
 );
@@ -344,6 +345,10 @@ if (tenant === "main") {
               element: withDatePickerProvider(<AiWorkation />),
             },
             { path: "profile", element: <AiProfile /> },
+            {
+              path: "contributions",
+              element: <AiContributionsHub />,
+            },
             {
               path: "blog-contributions",
               element: <AiContributionDashboard type="blog" />,

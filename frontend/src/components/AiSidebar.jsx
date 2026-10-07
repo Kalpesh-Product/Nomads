@@ -132,6 +132,12 @@ const profileItems = [
 
 const contributionProfileItems = [
   {
+    label: "Contributions",
+    icon: HiOutlineViewGrid,
+    path: "/contributions",
+    flags: ["isBlogger", "isNewsWriter", "isEventWriter", "isPlaceWriter"],
+  },
+  {
     label: "Blog Contributions",
     icon: HiOutlineLink,
     path: "/blog-contributions",
@@ -344,7 +350,9 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     item.label === "userFullName" ? { ...item, label: userFullName } : item,
   );
   const visibleContributionProfileItems = contributionProfileItems.filter(
-    (item) => Boolean(auth?.user?.[item.flag]),
+    (item) =>
+      Boolean(auth?.user?.[item.flag]) ||
+      item.flags?.some((flag) => Boolean(auth?.user?.[flag])),
   );
 
   useEffect(() => {
