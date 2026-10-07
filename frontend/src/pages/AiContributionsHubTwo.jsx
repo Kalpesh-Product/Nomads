@@ -462,14 +462,14 @@ const AiContributionsHubTwo = () => {
                   <div className="bg-gradient-to-br from-sky-50 via-white to-cyan-50 p-5">
                     <div className="flex items-center justify-between gap-3">
                       <div>
-                        <h2 className="text-sm font-bold text-black">
+                        <h2 className="text-base font-bold text-black">
                           Quick Links
                         </h2>
-                        <p className="mt-1 text-xs text-black/50">
+                        <p className="mt-1 text-sm leading-5 text-black/55">
                           View or create content in one tap.
                         </p>
                       </div>
-                      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-blue text-white shadow-[0_8px_20px_rgba(14,165,233,0.25)]">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-blue text-white shadow-[0_8px_20px_rgba(14,165,233,0.25)]">
                         <HiOutlineSparkles size={17} />
                       </span>
                     </div>
@@ -490,10 +490,10 @@ const AiContributionsHubTwo = () => {
                               <Icon size={20} />
                             </span>
                             <div className="min-w-0">
-                              <p className="text-sm font-bold text-black">
+                              <p className="text-base font-bold text-black">
                                 {config.label}
                               </p>
-                              <p className="text-[11px] font-medium text-black/45">
+                              <p className="text-xs font-medium text-black/45">
                                 Manage {config.singular.toLowerCase()} entries
                               </p>
                             </div>
@@ -502,7 +502,7 @@ const AiContributionsHubTwo = () => {
                             <button
                               type="button"
                               onClick={() => navigate(config.listPath)}
-                              className="inline-flex items-center justify-center gap-1 rounded-full border border-primary-blue/20 bg-white px-3 py-2 text-[11px] font-bold text-primary-blue transition hover:bg-sky-50"
+                              className="inline-flex items-center justify-center gap-1.5 rounded-full border border-primary-blue/20 bg-white px-3 py-2 text-xs font-bold text-primary-blue transition hover:bg-sky-50"
                             >
                               <HiOutlineEye size={14} />
                               View
@@ -510,7 +510,7 @@ const AiContributionsHubTwo = () => {
                             <button
                               type="button"
                               onClick={() => navigate(config.addPath)}
-                              className="inline-flex items-center justify-center gap-1 rounded-full bg-primary-blue px-3 py-2 text-[11px] font-bold text-white shadow-[0_8px_18px_rgba(14,165,233,0.22)] transition hover:bg-sky-500"
+                              className="inline-flex items-center justify-center gap-1.5 rounded-full bg-primary-blue px-3 py-2 text-xs font-bold text-white shadow-[0_8px_18px_rgba(14,165,233,0.22)] transition hover:bg-sky-500"
                             >
                               <HiOutlinePlus size={14} />
                               Add
