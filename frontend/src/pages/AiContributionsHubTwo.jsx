@@ -314,8 +314,99 @@ const AiContributionsHubTwo = () => {
             </div>
           </section>
 
-          <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1fr)_18rem]">
-            <section className="space-y-5">
+          <section className="mt-6 overflow-hidden rounded-[1.5rem] border border-sky-100 bg-gradient-to-br from-white via-white to-sky-50/60 p-5">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 className="text-xl font-bold text-black">Quick Links</h2>
+                <p className="mt-1 text-sm leading-5 text-black/55">
+                  View or create content in one tap.
+                </p>
+              </div>
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-blue text-white shadow-[0_8px_20px_rgba(14,165,233,0.25)]">
+                <HiOutlineSparkles size={18} />
+              </span>
+            </div>
+
+            <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              {sections.map(({ config, items }) => {
+                const Icon = config.icon;
+                const liveCount = items.filter(
+                  (item) =>
+                    !item.isDraft &&
+                    (item.status || "pending").toLowerCase() === "approved",
+                ).length;
+                const pendingCount = items.filter(
+                  (item) =>
+                    !item.isDraft &&
+                    (item.status || "pending").toLowerCase() === "pending",
+                ).length;
+                const draftCount = items.filter((item) => item.isDraft).length;
+
+                return (
+                  <div
+                    key={config.key}
+                    className="overflow-hidden rounded-xl border border-black/10 bg-white/90 transition hover:-translate-y-0.5 hover:border-primary-blue/30"
+                  >
+                    <div className={`h-1 ${config.color}`} />
+                    <div className="p-3.5">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex min-w-0 items-center gap-2.5">
+                          <span
+                            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${config.softColor}`}
+                          >
+                            <Icon size={18} />
+                          </span>
+                          <p className="truncate text-sm font-bold text-black">
+                            {config.label}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="mt-3 grid grid-cols-3 gap-1.5">
+                        <span className="inline-flex items-center justify-center gap-1 rounded-full bg-emerald-50 px-1.5 py-1 text-[10px] font-semibold text-emerald-700">
+                          <span className="text-xs font-bold leading-none">
+                            {liveCount}
+                          </span>
+                          <span className="text-emerald-700/70">live</span>
+                        </span>
+                        <span className="inline-flex items-center justify-center gap-1 rounded-full bg-amber-50 px-1.5 py-1 text-[10px] font-semibold text-amber-700">
+                          <span className="text-xs font-bold leading-none">
+                            {pendingCount}
+                          </span>
+                          <span className="text-amber-700/70">pending</span>
+                        </span>
+                        <span className="inline-flex items-center justify-center gap-1 rounded-full bg-slate-100 px-1.5 py-1 text-[10px] font-semibold text-slate-700">
+                          <span className="text-xs font-bold leading-none">
+                            {draftCount}
+                          </span>
+                          <span className="text-slate-600/70">drafts</span>
+                        </span>
+                      </div>
+                      <div className="mt-3 grid grid-cols-2 gap-2 rounded-full bg-slate-50 p-1">
+                        <button
+                          type="button"
+                          onClick={() => navigate(config.listPath)}
+                          className="inline-flex items-center justify-center gap-1.5 rounded-full bg-white px-3 py-2 text-xs font-bold text-black transition hover:text-primary-blue"
+                        >
+                          View
+                          <HiArrowRight size={14} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => navigate(config.addPath)}
+                          className="inline-flex items-center justify-center gap-1.5 rounded-full bg-primary-blue px-3 py-2 text-xs font-bold text-white transition hover:bg-sky-500"
+                        >
+                          Add
+                          <HiOutlinePlus size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          <section className="mt-6 space-y-5">
                 <div className="rounded-[1.5rem] border border-cyan-100 bg-gradient-to-br from-[#ecfbff] via-white to-[#f3f8ff] p-5">
                   <h2 className="text-xl font-bold text-black">
                     Top contributions
@@ -423,111 +514,7 @@ const AiContributionsHubTwo = () => {
                     </div>
                   )}
                 </div>
-              </section>
-
-              <aside className="space-y-4">
-                <div className="overflow-hidden rounded-[1.25rem] border border-sky-100 bg-gradient-to-br from-white via-white to-sky-50/60">
-                  <div className="p-5 pb-4">
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
-                        <h2 className="text-lg font-bold text-black">
-                          Quick Links
-                        </h2>
-                        <p className="mt-1 text-sm leading-5 text-black/55">
-                          View or create content in one tap.
-                        </p>
-                      </div>
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-blue text-white shadow-[0_8px_20px_rgba(14,165,233,0.25)]">
-                        <HiOutlineSparkles size={17} />
-                      </span>
-                    </div>
-                  </div>
-                  <div className="space-y-3 p-4 pt-0">
-                    {sections.map(({ config, items }) => {
-                      const Icon = config.icon;
-                      const liveCount = items.filter(
-                        (item) =>
-                          !item.isDraft &&
-                          (item.status || "pending").toLowerCase() === "approved",
-                      ).length;
-                      const pendingCount = items.filter(
-                        (item) =>
-                          !item.isDraft &&
-                          (item.status || "pending").toLowerCase() === "pending",
-                      ).length;
-                      const draftCount = items.filter((item) => item.isDraft).length;
-
-                      return (
-                        <div
-                          key={config.key}
-                          className="overflow-hidden rounded-xl border border-black/10 bg-white/90 transition hover:-translate-y-0.5 hover:border-primary-blue/30"
-                        >
-                          <div className={`h-1 ${config.color}`} />
-                          <div className="p-3.5">
-                            <div className="flex items-center justify-between gap-3">
-                              <div className="flex min-w-0 items-center gap-2.5">
-                                <span
-                                  className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${config.softColor}`}
-                                >
-                                  <Icon size={18} />
-                                </span>
-                                <p className="truncate text-sm font-bold text-black">
-                                  {config.label}
-                                </p>
-                              </div>
-                            </div>
-                            <div className="mt-3 grid grid-cols-3 gap-1.5">
-                              <span className="inline-flex items-center justify-center gap-1 rounded-full bg-emerald-50 px-1.5 py-1 text-[10px] font-semibold text-emerald-700">
-                                <span className="text-xs font-bold leading-none">
-                                  {liveCount}
-                                </span>
-                                <span className="text-emerald-700/70">
-                                  live
-                                </span>
-                              </span>
-                              <span className="inline-flex items-center justify-center gap-1 rounded-full bg-amber-50 px-1.5 py-1 text-[10px] font-semibold text-amber-700">
-                                <span className="text-xs font-bold leading-none">
-                                  {pendingCount}
-                                </span>
-                                <span className="text-amber-700/70">
-                                  pending
-                                </span>
-                              </span>
-                              <span className="inline-flex items-center justify-center gap-1 rounded-full bg-slate-100 px-1.5 py-1 text-[10px] font-semibold text-slate-700">
-                                <span className="text-xs font-bold leading-none">
-                                  {draftCount}
-                                </span>
-                                <span className="text-slate-600/70">
-                                  drafts
-                                </span>
-                              </span>
-                            </div>
-                            <div className="mt-3 grid grid-cols-2 gap-2 rounded-full bg-slate-50 p-1">
-                              <button
-                                type="button"
-                                onClick={() => navigate(config.listPath)}
-                                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-white px-3 py-2 text-xs font-bold text-black transition hover:text-primary-blue"
-                              >
-                                View
-                                <HiArrowRight size={14} />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => navigate(config.addPath)}
-                                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-primary-blue px-3 py-2 text-xs font-bold text-white transition hover:bg-sky-500"
-                              >
-                                Add
-                                <HiOutlinePlus size={14} />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-            </aside>
-          </div>
+          </section>
         </div>
       </main>
     </>
