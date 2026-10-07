@@ -11,6 +11,7 @@ import {
 } from "react-icons/hi";
 import {
   MdEventNote,
+  MdMilitaryTech,
   MdOutlineNewspaper,
   MdOutlinePlace,
   MdRateReview,
@@ -256,6 +257,13 @@ const AiContributionsHubTwo = () => {
   const pendingItems = submittedItems.filter(
     ({ item }) => (item.status || "pending").toLowerCase() === "pending",
   );
+  const approvedItems = submittedItems.filter(
+    ({ item }) => (item.status || "pending").toLowerCase() === "approved",
+  );
+  const draftItems = allItems.filter(({ item }) => item.isDraft);
+  const rankScore =
+    approvedItems.length * 4 + pendingItems.length * 2 + draftItems.length;
+  const communityRank = Math.max(7, 72 - rankScore * 5);
   const recentItems = sortRecent(allItems);
   const topItems = recentItems.slice(0, 4);
   const recentListItems = recentItems.slice(0, 5);
@@ -267,33 +275,50 @@ const AiContributionsHubTwo = () => {
       <main className="mx-auto w-full max-w-[80rem] px-4 py-2 md:px-8 lg:px-8">
         <div className="mt-6">
           <section className="grid gap-5 lg:grid-cols-[minmax(0,1.55fr)_minmax(320px,0.8fr)]">
-            <div className="relative overflow-hidden rounded-[1.25rem] border border-sky-100 bg-white p-6">
-              <div className="absolute right-0 top-0 h-36 w-36 rounded-bl-full bg-sky-100/70" />
-              <div className="relative z-10 max-w-3xl">
-                <span className="inline-flex items-center gap-2 rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-primary-blue">
-                  <HiOutlineSparkles size={15} />
-                  Contributor Studio
-                </span>
-                <h1 className="mt-4 text-2xl font-bold text-black md:text-3xl">
-                  {getGreeting()}, {firstName}
-                </h1>
-                <p className="mt-3 max-w-2xl text-sm leading-6 text-black/65">
-                  Manage your blogs, news, events, and places from one command
-                  center. Add new stories, continue drafts, and keep an eye on
-                  review status without jumping around the sidebar.
-                </p>
-                <div className="mt-6 flex flex-wrap gap-3">
-                  {sections.map(({ config }) => (
-                    <button
-                      key={config.key}
-                      type="button"
-                      onClick={() => navigate(config.addPath)}
-                      className="inline-flex items-center gap-2 rounded-full bg-primary-blue px-4 py-2 text-xs font-semibold text-white transition hover:bg-sky-500"
-                    >
-                      <HiOutlinePlus size={16} />
-                      Add {config.singular}
-                    </button>
-                  ))}
+            <div className="relative overflow-hidden rounded-[1.5rem] border border-sky-100 bg-gradient-to-br from-white via-[#f8fdff] to-[#eef9ff] p-6">
+              <div className="absolute -right-12 -top-14 h-48 w-48 rounded-full bg-sky-100/70" />
+              <div className="absolute right-40 bottom-0 h-24 w-24 rounded-t-full bg-cyan-100/55" />
+              <div className="relative z-10 grid items-center gap-6 lg:grid-cols-[minmax(0,1fr)_9rem]">
+                <div>
+                  <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-semibold text-primary-blue ring-1 ring-sky-100">
+                    <HiOutlineSparkles size={15} />
+                    Contributor Studio
+                  </span>
+                  <h1 className="mt-4 text-2xl font-bold text-black md:text-3xl">
+                    {getGreeting()}, {firstName}
+                  </h1>
+                  <p className="mt-3 max-w-2xl text-sm leading-6 text-black/65">
+                    You are currently ranked{" "}
+                    <span className="font-bold text-black">#{communityRank}</span>{" "}
+                    in the contributor community. Keep publishing approved
+                    stories and moving drafts into review to climb the
+                    leaderboard.
+                  </p>
+                  <div className="mt-6 flex flex-nowrap gap-3">
+                    {sections.map(({ config }) => (
+                      <button
+                        key={config.key}
+                        type="button"
+                        onClick={() => navigate(config.addPath)}
+                        className="inline-flex shrink-0 items-center gap-2 rounded-full bg-primary-blue px-4 py-2 text-xs font-semibold text-white transition hover:bg-sky-500"
+                      >
+                        <HiOutlinePlus size={16} />
+                        Add {config.singular}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex h-36 w-36 flex-col items-center justify-center rounded-[1.5rem] border border-white/80 bg-white/90 text-center backdrop-blur">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-blue text-white shadow-[0_12px_26px_rgba(73,159,222,0.24)]">
+                    <MdMilitaryTech size={20} />
+                  </span>
+                  <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.14em] text-black/40">
+                    Community Rank
+                  </p>
+                  <p className="mt-1 text-2xl font-bold leading-none text-black">
+                    #{communityRank}
+                  </p>
                 </div>
               </div>
             </div>
