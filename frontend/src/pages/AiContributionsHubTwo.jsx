@@ -343,6 +343,14 @@ const AiContributionsHubTwo = () => {
                         const status = item.isDraft
                           ? "draft"
                           : (item.status || "pending").toLowerCase();
+                        const statusClass =
+                          status === "approved"
+                            ? "bg-emerald-50 text-emerald-700"
+                            : status === "rejected"
+                              ? "bg-rose-50 text-rose-700"
+                              : status === "draft"
+                                ? "bg-slate-100 text-slate-700"
+                                : "bg-amber-50 text-amber-700";
 
                         return (
                           <button
@@ -376,7 +384,9 @@ const AiContributionsHubTwo = () => {
                               <span className="whitespace-nowrap text-xs font-medium text-black/50">
                                 {humanDate(getItemDate(item))}
                               </span>
-                              <span className="rounded-full bg-white px-3 py-1 text-xs capitalize text-black/65">
+                              <span
+                                className={`rounded-full px-3 py-1 text-xs capitalize ${statusClass}`}
+                              >
                                 {status}
                               </span>
                               <span className="rounded-full bg-white px-3 py-1 text-xs text-black/65">
@@ -415,11 +425,11 @@ const AiContributionsHubTwo = () => {
                   tone="bg-cyan-100"
                 />
 
-                <div className="overflow-hidden rounded-[1.25rem] border border-sky-100 bg-white">
-                  <div className="p-5">
+                <div className="overflow-hidden rounded-[1.25rem] border border-sky-100 bg-gradient-to-br from-white via-white to-sky-50/60">
+                  <div className="p-5 pb-4">
                     <div className="flex items-center justify-between gap-3">
                       <div>
-                        <h2 className="text-base font-bold text-black">
+                        <h2 className="text-lg font-bold text-black">
                           Quick Links
                         </h2>
                         <p className="mt-1 text-sm leading-5 text-black/55">
@@ -449,53 +459,53 @@ const AiContributionsHubTwo = () => {
                       return (
                         <div
                           key={config.key}
-                          className="overflow-hidden rounded-lg border border-black/10 bg-white transition hover:border-primary-blue/30"
+                          className="overflow-hidden rounded-xl border border-black/10 bg-white/90 transition hover:-translate-y-0.5 hover:border-primary-blue/30"
                         >
-                          <div className={`h-1.5 ${config.color}`} />
-                          <div className="p-4">
-                            <div className="flex items-start justify-between gap-3">
-                              <div className="min-w-0">
-                                <p className="text-xs font-semibold uppercase tracking-wide text-black/45">
+                          <div className={`h-1 ${config.color}`} />
+                          <div className="p-3.5">
+                            <div className="flex items-center justify-between gap-3">
+                              <div className="flex min-w-0 items-center gap-2.5">
+                                <span
+                                  className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${config.softColor}`}
+                                >
+                                  <Icon size={18} />
+                                </span>
+                                <p className="truncate text-sm font-bold text-black">
                                   {config.label}
                                 </p>
                               </div>
-                              <span
-                                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${config.softColor}`}
-                              >
-                                <Icon size={20} />
+                            </div>
+                            <div className="mt-3 grid grid-cols-3 gap-1.5">
+                              <span className="inline-flex items-center justify-center gap-1 rounded-full bg-emerald-50 px-1.5 py-1 text-[10px] font-semibold text-emerald-700">
+                                <span className="text-xs font-bold leading-none">
+                                  {liveCount}
+                                </span>
+                                <span className="text-emerald-700/70">
+                                  live
+                                </span>
+                              </span>
+                              <span className="inline-flex items-center justify-center gap-1 rounded-full bg-amber-50 px-1.5 py-1 text-[10px] font-semibold text-amber-700">
+                                <span className="text-xs font-bold leading-none">
+                                  {pendingCount}
+                                </span>
+                                <span className="text-amber-700/70">
+                                  pending
+                                </span>
+                              </span>
+                              <span className="inline-flex items-center justify-center gap-1 rounded-full bg-slate-100 px-1.5 py-1 text-[10px] font-semibold text-slate-700">
+                                <span className="text-xs font-bold leading-none">
+                                  {draftCount}
+                                </span>
+                                <span className="text-slate-600/70">
+                                  drafts
+                                </span>
                               </span>
                             </div>
-                            <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-                              <div className="rounded-lg bg-slate-50 px-2 py-2">
-                                <p className="text-sm font-bold text-black">
-                                  {liveCount}
-                                </p>
-                                <p className="text-[10px] font-medium text-black/45">
-                                  live
-                                </p>
-                              </div>
-                              <div className="rounded-lg bg-slate-50 px-2 py-2">
-                                <p className="text-sm font-bold text-black">
-                                  {pendingCount}
-                                </p>
-                                <p className="text-[10px] font-medium text-black/45">
-                                  pending
-                                </p>
-                              </div>
-                              <div className="rounded-lg bg-slate-50 px-2 py-2">
-                                <p className="text-sm font-bold text-black">
-                                  {draftCount}
-                                </p>
-                                <p className="text-[10px] font-medium text-black/45">
-                                  drafts
-                                </p>
-                              </div>
-                            </div>
-                            <div className="mt-4 grid grid-cols-2 gap-2">
+                            <div className="mt-3 grid grid-cols-2 gap-2 rounded-full bg-slate-50 p-1">
                               <button
                                 type="button"
                                 onClick={() => navigate(config.listPath)}
-                                className="inline-flex items-center justify-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-2 text-xs font-bold text-black transition hover:border-primary-blue/30 hover:text-primary-blue"
+                                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-white px-3 py-2 text-xs font-bold text-black transition hover:text-primary-blue"
                               >
                                 View
                                 <HiArrowRight size={14} />
