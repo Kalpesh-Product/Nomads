@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { useQueries } from "@tanstack/react-query";
 import {
   HiArrowRight,
+  HiHeart,
   HiOutlineClock,
   HiOutlineDocumentText,
-  HiOutlineEye,
   HiOutlinePlus,
   HiOutlineSparkles,
 } from "react-icons/hi";
@@ -112,6 +112,19 @@ const getDestination = (item) =>
 
 const getItemDate = (item) => item?.date || item?.updatedAt || item?.createdAt;
 
+const getLikeCount = (item, fallback) => {
+  const value =
+    item?.likesCount ?? item?.likeCount ?? item?.totalLikes ?? item?.likes;
+
+  if (Array.isArray(value)) return value.length;
+  if (typeof value === "number") return value;
+  if (typeof value === "string" && value.trim() && !Number.isNaN(Number(value))) {
+    return Number(value);
+  }
+
+  return fallback;
+};
+
 const sortRecent = (items) =>
   [...items].sort(
     (a, b) =>
@@ -181,8 +194,8 @@ const TopContributionRow = ({ entry, index }) => {
       </div>
       <div className="hidden items-center gap-5 text-sm font-semibold text-black/75 md:flex">
         <span className="inline-flex items-center gap-1.5">
-          <HiOutlineEye className="text-primary-blue" size={18} />
-          {Math.max(1, index + 2)}.{index + 1}K
+          <HiHeart className="text-rose-500" size={18} />
+          {getLikeCount(item, `${Math.max(1, index + 2)}.${index + 1}K`)}
         </span>
         <span className="inline-flex items-center gap-1.5">
           <MdRateReview className="text-primary-blue" size={18} />
@@ -343,13 +356,10 @@ const AiContributionsHubTwo = () => {
             <div>
               <div>
                 <h2 className="text-xl font-bold text-black">Quick Links</h2>
-                <p className="mt-1 text-sm leading-5 text-black/55">
-                  View or create content in one tap.
-                </p>
               </div>
             </div>
 
-            <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
               {sections.map(({ config, items }) => {
                 const Icon = config.icon;
                 const liveCount = items.filter(
