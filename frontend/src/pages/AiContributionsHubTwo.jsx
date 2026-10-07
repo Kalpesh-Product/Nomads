@@ -297,19 +297,9 @@ const AiContributionsHubTwo = () => {
                 </div>
 
                 <div className="rounded-[1.5rem] border border-cyan-100 bg-gradient-to-br from-[#ecfbff] via-white to-[#f3f8ff] p-5">
-                  <div className="flex items-center justify-between gap-3">
-                    <h2 className="text-xl font-bold text-black">
-                      Top contributions
-                    </h2>
-                    <button
-                      type="button"
-                      onClick={() => navigate("/contributions")}
-                      className="inline-flex items-center gap-1 text-xs font-semibold text-primary-blue"
-                    >
-                      Main view
-                      <HiArrowRight size={15} />
-                    </button>
-                  </div>
+                  <h2 className="text-xl font-bold text-black">
+                    Top contributions
+                  </h2>
 
                   {isLoading ? (
                     <div className="mt-5 rounded-lg border border-dotted bg-white p-8 text-center text-sm text-black/50">
@@ -333,23 +323,13 @@ const AiContributionsHubTwo = () => {
                 </div>
 
                 <div className="rounded-[1.5rem] bg-slate-50 p-5">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div>
-                      <h2 className="text-xl font-bold text-black">
-                        Recent Contributions
-                      </h2>
-                      <p className="mt-1 text-xs text-black/55">
-                        The latest items across blogs, news, events, and places.
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => navigate("/contributions")}
-                      className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-3 py-1.5 text-xs font-semibold text-primary-blue transition hover:bg-sky-100"
-                    >
-                      View all
-                      <HiArrowRight size={15} />
-                    </button>
+                  <div>
+                    <h2 className="text-xl font-bold text-black">
+                      Recent Contributions
+                    </h2>
+                    <p className="mt-1 text-xs text-black/55">
+                      The latest items across blogs, news, events, and places.
+                    </p>
                   </div>
 
                   {isLoading ? (
