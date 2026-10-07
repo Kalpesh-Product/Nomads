@@ -434,7 +434,11 @@ const AiContributionsHubTwo = () => {
                   <div className="space-y-3 p-4 pt-0">
                     {sections.map(({ config, items }) => {
                       const Icon = config.icon;
-                      const liveCount = items.filter((item) => !item.isDraft).length;
+                      const liveCount = items.filter(
+                        (item) =>
+                          !item.isDraft &&
+                          (item.status || "pending").toLowerCase() === "approved",
+                      ).length;
                       const pendingCount = items.filter(
                         (item) =>
                           !item.isDraft &&
@@ -454,9 +458,6 @@ const AiContributionsHubTwo = () => {
                                 <p className="text-xs font-semibold uppercase tracking-wide text-black/45">
                                   {config.label}
                                 </p>
-                                <p className="mt-1 text-2xl font-bold leading-none text-black">
-                                  {items.length}
-                                </p>
                               </div>
                               <span
                                 className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${config.softColor}`}
@@ -464,9 +465,6 @@ const AiContributionsHubTwo = () => {
                                 <Icon size={20} />
                               </span>
                             </div>
-                            <p className="mt-3 text-xs leading-5 text-black/55">
-                              Manage {config.singular.toLowerCase()} entries
-                            </p>
                             <div className="mt-4 grid grid-cols-3 gap-2 text-center">
                               <div className="rounded-lg bg-slate-50 px-2 py-2">
                                 <p className="text-sm font-bold text-black">
