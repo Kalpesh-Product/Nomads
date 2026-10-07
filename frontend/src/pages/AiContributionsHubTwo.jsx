@@ -256,6 +256,7 @@ const AiContributionsHubTwo = () => {
   );
   const recentItems = sortRecent(allItems);
   const topItems = recentItems.slice(0, 4);
+  const recentListItems = recentItems.slice(0, 5);
   const isLoading = sections.some((section) => section.query?.isLoading);
 
   return (
@@ -350,6 +351,81 @@ const AiContributionsHubTwo = () => {
                   ) : (
                     <div className="mt-5 rounded-lg border border-dotted bg-white p-8 text-center text-sm text-black/50">
                       Add your first contribution to start building this list.
+                    </div>
+                  )}
+                </div>
+
+                <div className="rounded-[1.5rem] bg-white p-5 shadow-[0_12px_34px_rgba(15,23,42,0.05)] ring-1 ring-black/10">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <h2 className="text-xl font-bold text-black">
+                        Recent Contributions
+                      </h2>
+                      <p className="mt-1 text-xs text-black/55">
+                        The latest items across blogs, news, events, and places.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => navigate("/contributions")}
+                      className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-3 py-1.5 text-xs font-semibold text-primary-blue transition hover:bg-sky-100"
+                    >
+                      View all
+                      <HiArrowRight size={15} />
+                    </button>
+                  </div>
+
+                  {isLoading ? (
+                    <div className="mt-5 rounded-lg border border-dotted bg-slate-50 p-8 text-center text-sm text-black/50">
+                      Loading recent contributions...
+                    </div>
+                  ) : recentListItems.length > 0 ? (
+                    <div className="mt-5 overflow-hidden rounded-lg border border-black/10">
+                      {recentListItems.map(({ item, config }, index) => {
+                        const Icon = config.icon;
+                        const status = item.isDraft
+                          ? "draft"
+                          : (item.status || "pending").toLowerCase();
+
+                        return (
+                          <button
+                            key={`${config.key}-recent-${item._id || item.id || index}`}
+                            type="button"
+                            onClick={() => navigate(config.detailsPath(item))}
+                            className="flex w-full items-center gap-4 border-b border-black/10 bg-white px-4 py-3 text-left transition last:border-b-0 hover:bg-slate-50"
+                          >
+                            <div
+                              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${config.softColor}`}
+                            >
+                              <Icon size={20} />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-sm font-semibold text-black">
+                                {getTitle(item, config)}
+                              </p>
+                              <p className="mt-1 truncate text-xs text-black/50">
+                                {config.singular} in {getDestination(item)}
+                              </p>
+                            </div>
+                            <div className="hidden text-right sm:block">
+                              <p className="text-xs font-medium text-black/50">
+                                {humanDate(getItemDate(item))}
+                              </p>
+                              <p className="mt-1 text-xs font-semibold capitalize text-black/70">
+                                {status}
+                              </p>
+                            </div>
+                            <HiArrowRight
+                              className="shrink-0 text-black/35"
+                              size={18}
+                            />
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="mt-5 rounded-lg border border-dotted bg-slate-50 p-8 text-center text-sm text-black/50">
+                      No recent contributions yet.
                     </div>
                   )}
                 </div>
