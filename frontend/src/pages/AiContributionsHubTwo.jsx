@@ -8,7 +8,6 @@ import {
   HiOutlineEye,
   HiOutlinePencilAlt,
   HiOutlinePlus,
-  HiOutlineSearch,
   HiOutlineSparkles,
   HiOutlineThumbUp,
 } from "react-icons/hi";
@@ -263,32 +262,9 @@ const AiContributionsHubTwo = () => {
     <>
       <Seo path="/contributions-2" />
       <main className="mx-auto w-full max-w-[80rem] px-4 py-2 md:px-8 lg:px-8">
-        <div className="mt-6 border-t border-black/10 pt-6">
-          <div className="rounded-[2rem] border border-black/10 bg-white p-4 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
-            <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_18rem]">
-              <section className="space-y-5">
-                <div className="flex flex-wrap items-center gap-3">
-                  <div className="relative min-w-[16rem] flex-1">
-                    <HiOutlineSearch
-                      className="absolute left-4 top-1/2 -translate-y-1/2 text-black/35"
-                      size={19}
-                    />
-                    <input
-                      type="search"
-                      placeholder="Search contributions"
-                      className="h-12 w-full rounded-lg border border-black/10 bg-slate-50 pl-11 pr-4 text-sm outline-none transition focus:border-primary-blue/40 focus:bg-white"
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => navigate(sections[0]?.config.addPath || "/contributions")}
-                    className="inline-flex h-12 items-center gap-2 rounded-lg bg-primary-blue px-5 text-sm font-semibold text-white transition hover:bg-sky-500"
-                  >
-                    <HiOutlinePencilAlt size={18} />
-                    Write new post
-                  </button>
-                </div>
-
+        <div className="mt-6">
+          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_18rem]">
+            <section className="space-y-5">
                 <div className="relative overflow-hidden rounded-[1.5rem] bg-[#dff4ff] p-6 md:p-8">
                   <div className="absolute right-6 top-6 hidden h-28 w-28 rounded-full bg-white/45 md:block" />
                   <div className="absolute bottom-0 right-20 hidden h-20 w-44 rounded-t-full bg-sky-200/60 md:block" />
@@ -560,8 +536,7 @@ const AiContributionsHubTwo = () => {
                     })}
                   </div>
                 </div>
-              </aside>
-            </div>
+            </aside>
           </div>
         </div>
       </main>
