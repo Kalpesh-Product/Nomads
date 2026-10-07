@@ -486,7 +486,18 @@ const AiContributionsHubTwo = () => {
                       Loading recent contributions...
                     </div>
                   ) : recentListItems.length > 0 ? (
-                    <div className="mt-5 space-y-1">
+                    <div className="mt-5">
+                      <div className="hidden grid-cols-[4.75rem_minmax(0,1fr)_6rem_5.75rem_5rem] items-center gap-4 px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-black/35 md:grid">
+                        <span>Image</span>
+                        <span>Title</span>
+                        <span className="justify-self-center whitespace-nowrap">
+                          Last Updated
+                        </span>
+                        <span className="justify-self-center">Status</span>
+                        <span className="justify-self-center">Category</span>
+                      </div>
+                      <div className="hidden border-t border-black/10 md:block" />
+                      <div className="mt-2 space-y-1">
                       {recentListItems.map(({ item, config }, index) => {
                         const Icon = config.icon;
                         const status = item.isDraft
@@ -506,7 +517,7 @@ const AiContributionsHubTwo = () => {
                             key={`${config.key}-recent-${item._id || item.id || index}`}
                             type="button"
                             onClick={() => navigate(config.detailsPath(item))}
-                            className="grid w-full grid-cols-[4.75rem_minmax(0,1fr)_auto] items-center gap-4 rounded-lg px-3 py-3 text-left transition hover:bg-white"
+                            className="grid w-full grid-cols-[4.75rem_minmax(0,1fr)] items-center gap-4 rounded-lg px-3 py-3 text-left transition hover:bg-white md:grid-cols-[4.75rem_minmax(0,1fr)_6rem_5.75rem_5rem]"
                           >
                             <div className="relative h-16 w-16 overflow-hidden rounded-lg bg-slate-100">
                               <img
@@ -529,22 +540,21 @@ const AiContributionsHubTwo = () => {
                                 {config.singular} in {getDestination(item)}
                               </p>
                             </div>
-                            <div className="hidden items-center gap-4 text-sm font-semibold text-black/75 md:flex">
-                              <span className="whitespace-nowrap text-xs font-medium text-black/50">
-                                {humanDate(getItemDate(item))}
-                              </span>
-                              <span
-                                className={`rounded-full px-3 py-1 text-xs capitalize ${statusClass}`}
-                              >
-                                {status}
-                              </span>
-                              <span className="rounded-full bg-white px-3 py-1 text-xs text-black/65">
-                                {config.label}
-                              </span>
-                            </div>
+                            <span className="hidden justify-self-center whitespace-nowrap text-xs font-medium text-black/50 md:block">
+                              {humanDate(getItemDate(item))}
+                            </span>
+                            <span
+                              className={`hidden w-fit justify-self-center rounded-full px-3 py-1 text-xs capitalize md:inline-flex ${statusClass}`}
+                            >
+                              {status}
+                            </span>
+                            <span className="hidden w-fit justify-self-center rounded-full bg-white px-3 py-1 text-xs text-black/65 md:inline-flex">
+                              {config.label}
+                            </span>
                           </button>
                         );
                       })}
+                      </div>
                     </div>
                   ) : (
                     <div className="mt-5 rounded-lg border border-dotted bg-slate-50 p-8 text-center text-sm text-black/50">
