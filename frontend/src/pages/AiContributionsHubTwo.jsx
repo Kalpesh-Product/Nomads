@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useQueries } from "@tanstack/react-query";
 import {
   HiArrowRight,
-  HiOutlineCalendar,
   HiOutlineClock,
   HiOutlineCurrencyDollar,
   HiOutlineEye,
@@ -257,7 +256,6 @@ const AiContributionsHubTwo = () => {
   );
   const recentItems = sortRecent(allItems);
   const topItems = recentItems.slice(0, 4);
-  const todayItems = recentItems.slice(0, 3);
   const isLoading = sections.some((section) => section.query?.isLoading);
 
   return (
@@ -377,46 +375,30 @@ const AiContributionsHubTwo = () => {
                   tone="bg-cyan-100"
                 />
 
-                <div className="overflow-hidden rounded-[1.25rem] border border-sky-100 bg-white shadow-sm">
-                  <div className="flex items-center justify-between bg-sky-50 px-5 py-4">
-                    <h2 className="text-sm font-bold text-black">
-                      Today&apos;s desk
-                    </h2>
-                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-black/55">
-                      <HiOutlineCalendar size={15} />
-                      {new Date().toLocaleDateString("en-IN", {
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </span>
-                  </div>
-                  <div className="divide-y divide-black/10 px-5">
-                    {todayItems.length > 0 ? (
-                      todayItems.map(({ item, config }, index) => (
+                <div className="rounded-[1.25rem] border border-sky-100 bg-white p-5 shadow-sm">
+                  <h2 className="text-sm font-bold text-black">Quick Links</h2>
+                  <p className="mt-1 text-xs text-black/50">
+                    Jump directly into each contribution workspace.
+                  </p>
+                  <div className="mt-4 space-y-2">
+                    {sections.map(({ config }) => {
+                      const Icon = config.icon;
+
+                      return (
                         <button
-                          key={`${config.key}-desk-${item._id || item.id || index}`}
+                          key={config.key}
                           type="button"
-                          onClick={() => navigate(config.detailsPath(item))}
-                          className="flex w-full gap-3 py-4 text-left"
+                          onClick={() => navigate(config.listPath)}
+                          className="flex w-full items-center justify-between rounded-lg border border-black/10 bg-slate-50 px-4 py-3 text-left text-sm font-semibold text-black transition hover:border-primary-blue/30 hover:bg-sky-50 hover:text-primary-blue"
                         >
-                          <span className="text-xs font-bold text-primary-blue">
-                            {["12:30", "14:15", "17:30"][index] || "18:00"}
+                          <span className="inline-flex items-center gap-2">
+                            <Icon size={18} />
+                            View {config.label}
                           </span>
-                          <span className="min-w-0">
-                            <span className="line-clamp-2 text-xs font-semibold text-black">
-                              {getTitle(item, config)}
-                            </span>
-                            <span className="mt-1 block text-[11px] text-black/45">
-                              {config.singular} • {getDestination(item)}
-                            </span>
-                          </span>
+                          <HiArrowRight size={16} />
                         </button>
-                      ))
-                    ) : (
-                      <p className="py-6 text-center text-xs text-black/45">
-                        Nothing scheduled yet.
-                      </p>
-                    )}
+                      );
+                    })}
                   </div>
                 </div>
               </aside>
