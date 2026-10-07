@@ -9,9 +9,13 @@ import {
   HiOutlinePencilAlt,
   HiOutlinePlus,
   HiOutlineSparkles,
-  HiOutlineThumbUp,
 } from "react-icons/hi";
-import { MdEventNote, MdOutlineNewspaper, MdOutlinePlace } from "react-icons/md";
+import {
+  MdEventNote,
+  MdOutlineNewspaper,
+  MdOutlinePlace,
+  MdRateReview,
+} from "react-icons/md";
 import { TbNotebook } from "react-icons/tb";
 import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
@@ -177,11 +181,8 @@ const TopContributionRow = ({ entry, index }) => {
           {Math.max(1, index + 2)}.{index + 1}K
         </span>
         <span className="inline-flex items-center gap-1.5">
-          <HiOutlineThumbUp className="text-primary-blue" size={18} />
+          <MdRateReview className="text-primary-blue" size={18} />
           {Math.max(1, index + 1)}.{index + 4}K
-        </span>
-        <span className="rounded-full bg-white px-3 py-1 text-xs capitalize text-black/65">
-          {item.isDraft ? "draft" : item.status || "pending"}
         </span>
       </div>
     </button>
