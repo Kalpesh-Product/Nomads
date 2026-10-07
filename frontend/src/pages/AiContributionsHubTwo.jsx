@@ -319,7 +319,7 @@ const AiContributionsHubTwo = () => {
                   </div>
                 </div>
 
-                <div className="rounded-[1.5rem] bg-slate-50 p-5">
+                <div className="rounded-[1.5rem] border border-cyan-100 bg-gradient-to-br from-[#ecfbff] via-white to-[#f3f8ff] p-5">
                   <div className="flex items-center justify-between gap-3">
                     <h2 className="text-xl font-bold text-black">
                       Top contributions
@@ -392,18 +392,23 @@ const AiContributionsHubTwo = () => {
                             key={`${config.key}-recent-${item._id || item.id || index}`}
                             type="button"
                             onClick={() => navigate(config.detailsPath(item))}
-                            className="grid w-full grid-cols-[2.25rem_2.75rem_minmax(0,1fr)_auto] items-center gap-4 rounded-lg px-3 py-3 text-left transition hover:bg-white"
+                            className="grid w-full grid-cols-[4.75rem_minmax(0,1fr)_auto] items-center gap-4 rounded-lg px-3 py-3 text-left transition hover:bg-white"
                           >
-                            <span className="text-lg font-semibold text-black/25">
-                              {String(index + 1).padStart(2, "0")}
-                            </span>
-                            <div
-                              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${config.softColor}`}
-                            >
-                              <Icon size={20} />
+                            <div className="relative h-16 w-16 overflow-hidden rounded-lg bg-slate-100">
+                              <img
+                                src={getImage(item, config)}
+                                alt={getTitle(item, config)}
+                                className="h-full w-full object-cover"
+                                loading="lazy"
+                              />
+                              <span
+                                className={`absolute bottom-1 right-1 flex h-6 w-6 items-center justify-center rounded-full ${config.color} text-white`}
+                              >
+                                <Icon size={14} />
+                              </span>
                             </div>
                             <div className="min-w-0 flex-1">
-                              <p className="truncate text-sm font-semibold text-black">
+                              <p className="line-clamp-2 text-sm font-semibold leading-5 text-black">
                                 {getTitle(item, config)}
                               </p>
                               <p className="mt-1 truncate text-xs text-black/50">
@@ -421,10 +426,6 @@ const AiContributionsHubTwo = () => {
                                 {config.label}
                               </span>
                             </div>
-                            <HiArrowRight
-                              className="shrink-0 text-black/35"
-                              size={18}
-                            />
                           </button>
                         );
                       })}
@@ -457,28 +458,65 @@ const AiContributionsHubTwo = () => {
                   tone="bg-cyan-100"
                 />
 
-                <div className="rounded-[1.25rem] border border-sky-100 bg-white p-5 shadow-sm">
-                  <h2 className="text-sm font-bold text-black">Quick Links</h2>
-                  <p className="mt-1 text-xs text-black/50">
-                    Jump directly into each contribution workspace.
-                  </p>
-                  <div className="mt-4 space-y-2">
+                <div className="overflow-hidden rounded-[1.25rem] border border-sky-100 bg-white shadow-sm">
+                  <div className="bg-gradient-to-br from-sky-50 via-white to-cyan-50 p-5">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <h2 className="text-sm font-bold text-black">
+                          Quick Links
+                        </h2>
+                        <p className="mt-1 text-xs text-black/50">
+                          View or create content in one tap.
+                        </p>
+                      </div>
+                      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-blue text-white shadow-[0_8px_20px_rgba(14,165,233,0.25)]">
+                        <HiOutlineSparkles size={17} />
+                      </span>
+                    </div>
+                  </div>
+                  <div className="space-y-3 p-4">
                     {sections.map(({ config }) => {
                       const Icon = config.icon;
 
                       return (
-                        <button
+                        <div
                           key={config.key}
-                          type="button"
-                          onClick={() => navigate(config.listPath)}
-                          className="flex w-full items-center justify-between rounded-lg border border-black/10 bg-slate-50 px-4 py-3 text-left text-sm font-semibold text-black transition hover:border-primary-blue/30 hover:bg-sky-50 hover:text-primary-blue"
+                          className="rounded-xl border border-black/10 bg-slate-50/80 p-3 transition hover:border-primary-blue/30 hover:bg-sky-50"
                         >
-                          <span className="inline-flex items-center gap-2">
-                            <Icon size={18} />
-                            View {config.label}
-                          </span>
-                          <HiArrowRight size={16} />
-                        </button>
+                          <div className="flex items-center gap-3">
+                            <span
+                              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${config.softColor}`}
+                            >
+                              <Icon size={20} />
+                            </span>
+                            <div className="min-w-0">
+                              <p className="text-sm font-bold text-black">
+                                {config.label}
+                              </p>
+                              <p className="text-[11px] font-medium text-black/45">
+                                Manage {config.singular.toLowerCase()} entries
+                              </p>
+                            </div>
+                          </div>
+                          <div className="mt-3 grid grid-cols-2 gap-2">
+                            <button
+                              type="button"
+                              onClick={() => navigate(config.listPath)}
+                              className="inline-flex items-center justify-center gap-1 rounded-full border border-primary-blue/20 bg-white px-3 py-2 text-[11px] font-bold text-primary-blue transition hover:bg-sky-50"
+                            >
+                              <HiOutlineEye size={14} />
+                              View
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => navigate(config.addPath)}
+                              className="inline-flex items-center justify-center gap-1 rounded-full bg-primary-blue px-3 py-2 text-[11px] font-bold text-white shadow-[0_8px_18px_rgba(14,165,233,0.22)] transition hover:bg-sky-500"
+                            >
+                              <HiOutlinePlus size={14} />
+                              Add
+                            </button>
+                          </div>
+                        </div>
                       );
                     })}
                   </div>
