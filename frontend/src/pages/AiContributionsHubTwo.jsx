@@ -4,9 +4,8 @@ import { useQueries } from "@tanstack/react-query";
 import {
   HiArrowRight,
   HiOutlineClock,
-  HiOutlineCurrencyDollar,
+  HiOutlineDocumentText,
   HiOutlineEye,
-  HiOutlinePencilAlt,
   HiOutlinePlus,
   HiOutlineSparkles,
 } from "react-icons/hi";
@@ -121,20 +120,24 @@ const sortRecent = (items) =>
 
 const getGreeting = () => {
   const hour = new Date().getHours();
-  if (hour < 12) return "Hello, good morning";
-  if (hour < 17) return "Hello, good afternoon";
-  return "Hello, good evening";
+  if (hour < 12) return "Good morning";
+  if (hour < 17) return "Good afternoon";
+  return "Good evening";
 };
 
-const MetricTile = ({ icon: Icon, value, label, tone }) => (
-  <div className={`rounded-lg p-5 ${tone}`}>
-    <div className="flex items-center gap-4">
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-white/85 text-primary-blue shadow-sm">
-        <Icon size={22} />
-      </div>
+const StatPill = ({ label, value, tone, icon: Icon }) => (
+  <div className="rounded-[1.25rem] border border-black/10 bg-white p-4">
+    <div className="flex items-center justify-between gap-4">
       <div>
-        <p className="text-3xl font-bold leading-none text-black">{value}</p>
-        <p className="mt-1 text-sm font-medium text-black/60">{label}</p>
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-black/45">
+          {label}
+        </p>
+        <p className="mt-2 text-2xl font-bold text-black">{value}</p>
+      </div>
+      <div
+        className={`flex h-11 w-11 items-center justify-center rounded-full ${tone}`}
+      >
+        <Icon size={20} />
       </div>
     </div>
   </div>
@@ -250,7 +253,6 @@ const AiContributionsHubTwo = () => {
     section.items.map((item) => ({ item, config: section.config })),
   );
   const submittedItems = allItems.filter(({ item }) => !item.isDraft);
-  const draftItems = allItems.filter(({ item }) => item.isDraft);
   const pendingItems = submittedItems.filter(
     ({ item }) => (item.status || "pending").toLowerCase() === "pending",
   );
@@ -264,38 +266,56 @@ const AiContributionsHubTwo = () => {
       <Seo path="/contributions-2" />
       <main className="mx-auto w-full max-w-[80rem] px-4 py-2 md:px-8 lg:px-8">
         <div className="mt-6">
-          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_18rem]">
-            <section className="space-y-5">
-                <div className="relative overflow-hidden rounded-[1.5rem] bg-[#dff4ff] p-6 md:p-8">
-                  <div className="absolute right-6 top-6 hidden h-28 w-28 rounded-full bg-white/45 md:block" />
-                  <div className="absolute bottom-0 right-20 hidden h-20 w-44 rounded-t-full bg-sky-200/60 md:block" />
-                  <div className="relative z-10 max-w-xl">
-                    <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-semibold text-primary-blue">
-                      <HiOutlineSparkles size={15} />
-                      Contributor dashboard
-                    </span>
-                    <h1 className="mt-4 text-3xl font-bold text-black">
-                      {getGreeting()}, {firstName}!
-                    </h1>
-                    <p className="mt-3 text-sm leading-6 text-black/65">
-                      Your stories, local updates, events, and places are gathered
-                      here in one editorial workspace.
-                    </p>
-                    <div className="mt-6 flex flex-wrap gap-2">
-                      {sections.map(({ config }) => (
-                        <button
-                          key={config.key}
-                          type="button"
-                          onClick={() => navigate(config.addPath)}
-                          className="rounded-full bg-white px-4 py-2 text-xs font-semibold text-black shadow-sm transition hover:text-primary-blue"
-                        >
-                          + {config.singular}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+          <section className="grid gap-5 lg:grid-cols-[minmax(0,1.55fr)_minmax(320px,0.8fr)]">
+            <div className="relative overflow-hidden rounded-[1.25rem] border border-sky-100 bg-white p-6">
+              <div className="absolute right-0 top-0 h-36 w-36 rounded-bl-full bg-sky-100/70" />
+              <div className="relative z-10 max-w-3xl">
+                <span className="inline-flex items-center gap-2 rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-primary-blue">
+                  <HiOutlineSparkles size={15} />
+                  Contributor Studio
+                </span>
+                <h1 className="mt-4 text-2xl font-bold text-black md:text-3xl">
+                  {getGreeting()}, {firstName}
+                </h1>
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-black/65">
+                  Manage your blogs, news, events, and places from one command
+                  center. Add new stories, continue drafts, and keep an eye on
+                  review status without jumping around the sidebar.
+                </p>
+                <div className="mt-6 flex flex-wrap gap-3">
+                  {sections.map(({ config }) => (
+                    <button
+                      key={config.key}
+                      type="button"
+                      onClick={() => navigate(config.addPath)}
+                      className="inline-flex items-center gap-2 rounded-full bg-primary-blue px-4 py-2 text-xs font-semibold text-white transition hover:bg-sky-500"
+                    >
+                      <HiOutlinePlus size={16} />
+                      Add {config.singular}
+                    </button>
+                  ))}
                 </div>
+              </div>
+            </div>
 
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+              <StatPill
+                label="Total Contributions"
+                value={allItems.length}
+                tone="bg-sky-50 text-primary-blue"
+                icon={HiOutlineDocumentText}
+              />
+              <StatPill
+                label="Pending Review"
+                value={pendingItems.length}
+                tone="bg-yellow-50 text-yellow-700"
+                icon={HiOutlineClock}
+              />
+            </div>
+          </section>
+
+          <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1fr)_18rem]">
+            <section className="space-y-5">
                 <div className="rounded-[1.5rem] border border-cyan-100 bg-gradient-to-br from-[#ecfbff] via-white to-[#f3f8ff] p-5">
                   <h2 className="text-xl font-bold text-black">
                     Top contributions
@@ -406,25 +426,6 @@ const AiContributionsHubTwo = () => {
               </section>
 
               <aside className="space-y-4">
-                <MetricTile
-                  icon={HiOutlineCurrencyDollar}
-                  value={submittedItems.length}
-                  label="Submitted"
-                  tone="bg-sky-100"
-                />
-                <MetricTile
-                  icon={HiOutlinePencilAlt}
-                  value={draftItems.length}
-                  label="Saved drafts"
-                  tone="bg-indigo-100"
-                />
-                <MetricTile
-                  icon={HiOutlineClock}
-                  value={pendingItems.length}
-                  label="Pending review"
-                  tone="bg-cyan-100"
-                />
-
                 <div className="overflow-hidden rounded-[1.25rem] border border-sky-100 bg-gradient-to-br from-white via-white to-sky-50/60">
                   <div className="p-5 pb-4">
                     <div className="flex items-center justify-between gap-3">
