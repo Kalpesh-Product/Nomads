@@ -22,9 +22,9 @@ const contributionPageConfig = {
     contentLabel: "Blog",
     endpoint: "/blogs/my",
     queryKey: "myBlogContributions",
-    detailsRoute: (item) => `/blog-contributions/${item._id || item.id}`,
+    detailsRoute: (item) => `/contributions/blog/${item._id || item.id}`,
     flag: "isBlogger",
-    seoPath: "/blog-contributions",
+    seoPath: "/contributions/blog",
   },
   news: {
     label: "News Contributions",
@@ -38,9 +38,9 @@ const contributionPageConfig = {
     contentLabel: "News",
     endpoint: "/news/my",
     queryKey: "myNewsContributions",
-    detailsRoute: (item) => `/news-contributions/${item._id || item.id}`,
+    detailsRoute: (item) => `/contributions/news/${item._id || item.id}`,
     flag: "isNewsWriter",
-    seoPath: "/news-contributions",
+    seoPath: "/contributions/news",
   },
   event: {
     label: "Event Contributions",
@@ -54,9 +54,9 @@ const contributionPageConfig = {
     contentLabel: "Event",
     endpoint: "/events/my",
     queryKey: "myEventContributions",
-    detailsRoute: (item) => `/event-contributions/${item._id || item.id}`,
+    detailsRoute: (item) => `/contributions/event/${item._id || item.id}`,
     flag: "isEventWriter",
-    seoPath: "/event-contributions",
+    seoPath: "/contributions/event",
   },
   places: {
     label: "Places Contributions",
@@ -70,9 +70,9 @@ const contributionPageConfig = {
     contentLabel: "Place",
     endpoint: "/places/my",
     queryKey: "myPlaceContributions",
-    detailsRoute: (item) => `/places-contributions/${item._id || item.id}`,
+    detailsRoute: (item) => `/contributions/places/${item._id || item.id}`,
     flag: "isPlaceWriter",
-    seoPath: "/places-contributions",
+    seoPath: "/contributions/places",
   },
 };
 

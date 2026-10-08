@@ -15,7 +15,7 @@ const contributionPreviewConfig = {
   blog: {
     label: "Blog",
     labelPlural: "Blog Contributions",
-    dashboardPath: "/blog-contributions",
+    dashboardPath: "/contributions/blog",
     myEndpoint: "/blogs/my",
     queryKey: "myBlogContributions",
     updateSuccessTitle: "Blog Updated",
@@ -27,7 +27,7 @@ const contributionPreviewConfig = {
   news: {
     label: "News",
     labelPlural: "News Contributions",
-    dashboardPath: "/news-contributions",
+    dashboardPath: "/contributions/news",
     myEndpoint: "/news/my",
     queryKey: "myNewsContributions",
     updateSuccessTitle: "News Updated",
@@ -39,7 +39,7 @@ const contributionPreviewConfig = {
   event: {
     label: "Event",
     labelPlural: "Event Contributions",
-    dashboardPath: "/event-contributions",
+    dashboardPath: "/contributions/event",
     myEndpoint: "/events/my",
     queryKey: "myEventContributions",
     updateSuccessTitle: "Event Updated",
@@ -52,7 +52,7 @@ const contributionPreviewConfig = {
   places: {
     label: "Place",
     labelPlural: "Place Contributions",
-    dashboardPath: "/places-contributions",
+    dashboardPath: "/contributions/places",
     myEndpoint: "/places/my",
     queryKey: "myPlaceContributions",
     updateSuccessTitle: "Place Updated",

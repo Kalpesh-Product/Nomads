@@ -152,25 +152,25 @@ const contributionProfileItems = [
   {
     label: "Blog Contributions",
     icon: HiOutlineLink,
-    path: "/blog-contributions",
+    path: "/contributions/blog",
     flag: "isBlogger",
   },
   {
     label: "News Contributions",
     icon: HiOutlineLink,
-    path: "/news-contributions",
+    path: "/contributions/news",
     flag: "isNewsWriter",
   },
   {
     label: "Event Contributions",
     icon: HiOutlineLink,
-    path: "/event-contributions",
+    path: "/contributions/event",
     flag: "isEventWriter",
   },
   {
     label: "Places Contributions",
     icon: HiOutlineLink,
-    path: "/places-contributions",
+    path: "/contributions/places",
     flag: "isPlaceWriter",
   },
 ];

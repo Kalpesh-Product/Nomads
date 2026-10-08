@@ -361,16 +361,48 @@ if (tenant === "main") {
               element: <AiContributionDashboard type="all" initialFilter="blog" />,
             },
             {
+              path: "contributions/blog/add",
+              element: <AiBlogContributionAdd type="blog" />,
+            },
+            {
+              path: "contributions/blog/:blogId",
+              element: <AiBlogContributionPreview />,
+            },
+            {
               path: "contributions/news",
               element: <AiContributionDashboard type="all" initialFilter="news" />,
+            },
+            {
+              path: "contributions/news/add",
+              element: <AiBlogContributionAdd type="news" />,
+            },
+            {
+              path: "contributions/news/:newsId",
+              element: <AiBlogContributionPreview type="news" />,
             },
             {
               path: "contributions/event",
               element: <AiContributionDashboard type="all" initialFilter="event" />,
             },
             {
+              path: "contributions/event/add",
+              element: <AiBlogContributionAdd type="event" />,
+            },
+            {
+              path: "contributions/event/:eventId",
+              element: <AiBlogContributionPreview type="event" />,
+            },
+            {
               path: "contributions/places",
               element: <AiContributionDashboard type="all" initialFilter="places" />,
+            },
+            {
+              path: "contributions/places/add",
+              element: <AiBlogContributionAdd type="places" />,
+            },
+            {
+              path: "contributions/places/:placeId",
+              element: <AiBlogContributionPreview type="places" />,
             },
             {
               path: "contributions-2",

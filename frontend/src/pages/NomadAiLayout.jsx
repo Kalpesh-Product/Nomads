@@ -89,6 +89,14 @@ const normalizeBreadcrumbLabel = (segment) => {
   return toTitle(segment);
 };
 
+const contributionBreadcrumbLabels = {
+  all: "All Contributions",
+  blog: "Blog Contributions",
+  news: "News Contributions",
+  event: "Event Contributions",
+  places: "Places Contributions",
+};
+
 const NomadAiLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -244,10 +252,16 @@ const NomadAiLayout = () => {
     return segments
       .map((segment, index) => {
         const isLast = index === segments.length - 1;
+        const isContributionChild =
+          segments[0] === "contributions" &&
+          index === 1 &&
+          contributionBreadcrumbLabels[segment];
         return {
           label:
             isLast && isContentDetailPage && detailStateName
               ? toTitle(detailStateName)
+              : isContributionChild
+                ? contributionBreadcrumbLabels[segment]
               : normalizeBreadcrumbLabel(segment),
           onClick: isLast
             ? null
