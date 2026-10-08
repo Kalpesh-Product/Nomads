@@ -148,30 +148,35 @@ const contributionProfileItems = [
     icon: HiOutlineLink,
     path: "/contributions/all",
     flags: ["isBlogger", "isNewsWriter", "isEventWriter", "isPlaceWriter"],
+    hiddenFromSidebar: true,
   },
   {
     label: "Blog Contributions",
     icon: HiOutlineLink,
     path: "/contributions/blog",
     flag: "isBlogger",
+    hiddenFromSidebar: true,
   },
   {
     label: "News Contributions",
     icon: HiOutlineLink,
     path: "/contributions/news",
     flag: "isNewsWriter",
+    hiddenFromSidebar: true,
   },
   {
     label: "Event Contributions",
     icon: HiOutlineLink,
     path: "/contributions/event",
     flag: "isEventWriter",
+    hiddenFromSidebar: true,
   },
   {
     label: "Places Contributions",
     icon: HiOutlineLink,
     path: "/contributions/places",
     flag: "isPlaceWriter",
+    hiddenFromSidebar: true,
   },
 ];
 const contributionProfilePaths = contributionProfileItems.map(
@@ -363,8 +368,9 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   );
   const visibleContributionProfileItems = contributionProfileItems.filter(
     (item) =>
-      Boolean(auth?.user?.[item.flag]) ||
-      item.flags?.some((flag) => Boolean(auth?.user?.[flag])),
+      !item.hiddenFromSidebar &&
+      (Boolean(auth?.user?.[item.flag]) ||
+        item.flags?.some((flag) => Boolean(auth?.user?.[flag]))),
   );
 
   useEffect(() => {
