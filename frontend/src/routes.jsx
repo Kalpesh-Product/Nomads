@@ -357,6 +357,10 @@ if (tenant === "main") {
               element: <AiContributionsHubTwo />,
             },
             {
+              path: "all-contributions",
+              element: <AiContributionDashboard type="all" />,
+            },
+            {
               path: "blog-contributions",
               element: <AiContributionDashboard type="blog" />,
             },

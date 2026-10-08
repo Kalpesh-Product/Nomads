@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
 import { FaCheck } from "react-icons/fa";
 import { HiPlus } from "react-icons/hi";
 import { HiOutlineChevronDown } from "react-icons/hi2";
@@ -75,6 +75,16 @@ const contributionPageConfig = {
     seoPath: "/places-contributions",
   },
 };
+
+const combinedContributionTypes = ["blog", "news", "event", "places"];
+
+const contributionTypeFilters = [
+  { label: "All", value: "all" },
+  { label: "Blogs", value: "blog" },
+  { label: "News", value: "news" },
+  { label: "Events", value: "event" },
+  { label: "Places", value: "places" },
+];
 
 const statusOptions = [
   { label: "Show All", value: "all" },
@@ -287,30 +297,104 @@ const ContributionCard = ({ item, config }) => {
   );
 };
 
+const ContributionTypeFilter = ({ value, onChange, availableTypes }) => {
+  const options = contributionTypeFilters.filter(
+    (option) => option.value === "all" || availableTypes.includes(option.value),
+  );
+
+  return (
+    <div className="flex flex-wrap items-center gap-y-2 text-lg font-play">
+      {options.map((option, index) => {
+        const isSelected = option.value === value;
+
+        return (
+          <React.Fragment key={option.value}>
+            {index > 0 ? (
+              <span className="mx-3 text-primary-blue/80">|</span>
+            ) : null}
+            <button
+              type="button"
+              onClick={() => onChange(option.value)}
+              className={`transition-colors ${
+                isSelected
+                  ? "font-semibold text-black"
+                  : "text-black/40 hover:text-black/70"
+              }`}
+            >
+              {option.label}
+            </button>
+          </React.Fragment>
+        );
+      })}
+    </div>
+  );
+};
+
 const AiContributionDashboard = ({ type }) => {
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
   const { auth } = useAuth();
   const userId = auth?.user?._id || auth?.user?.id;
   const [statusFilter, setStatusFilter] = useState("all");
-  const config = useMemo(
-    () => contributionPageConfig[type] || contributionPageConfig.blog,
-    [type],
-  );
-  const hasAccess = Boolean(auth?.user?.[config.flag]);
+  const [contributionFilter, setContributionFilter] = useState("all");
+  const isCombinedPage = type === "all";
+  const config = useMemo(() => {
+    if (isCombinedPage) {
+      return {
+        label: "All Contributions",
+        heading: "My Contributions",
+        emptyText: "You haven't added any contributions yet.",
+        draftEmptyText: "You don't have any saved drafts yet.",
+        submittedHeading: "Published",
+        draftHeading: "Saved As Drafts",
+        noStatusText: (status) => `No ${status} contributions found.`,
+        contentLabel: "Contribution",
+        seoPath: "/all-contributions",
+      };
+    }
 
-  const {
-    data: contributions = [],
-    isLoading: isContributionsLoading,
-    isError: isContributionsError,
-  } = useQuery({
-    queryKey: [config.queryKey, userId],
-    queryFn: async () => {
-      const response = await axiosPrivate.get(config.endpoint);
-      return Array.isArray(response.data?.data) ? response.data.data : [];
-    },
-    enabled: ["blog", "news", "event", "places"].includes(type) && Boolean(userId) && hasAccess,
-    staleTime: 1000 * 60,
+    return contributionPageConfig[type] || contributionPageConfig.blog;
+  }, [isCombinedPage, type]);
+  const accessibleTypes = useMemo(
+    () =>
+      combinedContributionTypes.filter((itemType) =>
+        Boolean(auth?.user?.[contributionPageConfig[itemType].flag]),
+      ),
+    [auth?.user],
+  );
+  const queryTypes = isCombinedPage
+    ? accessibleTypes
+    : [type].filter((itemType) => contributionPageConfig[itemType]);
+  const hasAccess = isCombinedPage
+    ? accessibleTypes.length > 0
+    : Boolean(auth?.user?.[config.flag]);
+
+  const contributionQueries = useQueries({
+    queries: queryTypes.map((itemType) => {
+      const itemConfig = contributionPageConfig[itemType];
+
+      return {
+        queryKey: [
+          isCombinedPage
+            ? `${itemConfig.queryKey}AllContributions`
+            : itemConfig.queryKey,
+          userId,
+        ],
+        queryFn: async () => {
+          const response = await axiosPrivate.get(itemConfig.endpoint);
+          const items = Array.isArray(response.data?.data)
+            ? response.data.data
+            : [];
+
+          return items.map((item) => ({
+            ...item,
+            __contributionType: itemType,
+          }));
+        },
+        enabled: Boolean(userId) && Boolean(auth?.user?.[itemConfig.flag]),
+        staleTime: 1000 * 60,
+      };
+    }),
   });
 
   useEffect(() => {
@@ -333,16 +417,43 @@ const AiContributionDashboard = ({ type }) => {
     return null;
   }
 
-  const submittedContributions = contributions.filter((item) => !item.isDraft);
+  const contributions = contributionQueries.flatMap((query, index) => {
+    const itemType = queryTypes[index];
+    const itemConfig = contributionPageConfig[itemType];
+    const items = Array.isArray(query.data) ? query.data : [];
+
+    return items.map((item) => ({
+      item,
+      config: itemConfig,
+      itemType,
+    }));
+  });
+  const isContributionsLoading = contributionQueries.some(
+    (query) => query.isLoading,
+  );
+  const isContributionsError = contributionQueries.some((query) => query.isError);
+  const visibleContributions =
+    isCombinedPage && contributionFilter !== "all"
+      ? contributions.filter((entry) => entry.itemType === contributionFilter)
+      : contributions;
+  const selectedFilterConfig =
+    isCombinedPage && contributionFilter !== "all"
+      ? contributionPageConfig[contributionFilter]
+      : config;
+  const submittedContributions = visibleContributions.filter(
+    ({ item }) => !item.isDraft,
+  );
   const filteredSubmittedContributions =
     statusFilter === "all"
       ? submittedContributions
       : submittedContributions.filter(
-          (item) => (item.status || "pending").toLowerCase() === statusFilter,
+          ({ item }) => (item.status || "pending").toLowerCase() === statusFilter,
         );
-  const draftContributions = contributions.filter((item) => item.isDraft);
-  const hasContributionList = ["blog", "news", "event", "places"].includes(type);
-  const shouldShowStatusFilter = submittedContributions.length > 0;
+  const draftContributions = visibleContributions.filter(({ item }) => item.isDraft);
+  const hasContributionList = isCombinedPage || ["blog", "news", "event", "places"].includes(type);
+  const shouldShowStatusFilter =
+    isCombinedPage || submittedContributions.length > 0;
+  const shouldShowAddButton = !isCombinedPage || contributionFilter !== "all";
 
   return (
     <>
@@ -350,14 +461,22 @@ const AiContributionDashboard = ({ type }) => {
       <main className="mx-auto w-full max-w-[80rem] px-4 py-2 md:px-8 lg:px-8">
         <div className="mt-6 flex items-center justify-between gap-4 border-t border-black/10 pt-6">
           <h1 className="text-lg font-semibold text-black">{config.heading}</h1>
-          <button
-            type="button"
-            onClick={() => navigate(`${config.seoPath}/add`)}
-            className="inline-flex items-center gap-1 rounded-full bg-primary-blue px-6 py-3 text-sm font-semibold uppercase text-white transition hover:bg-sky-500"
-          >
-            <HiPlus size={18} />
-            {config.addLabel}
-          </button>
+          {isCombinedPage ? (
+            <ContributionStatusFilter
+              value={statusFilter}
+              onChange={setStatusFilter}
+              label={config.contentLabel}
+            />
+          ) : shouldShowAddButton ? (
+            <button
+              type="button"
+              onClick={() => navigate(`${selectedFilterConfig.seoPath}/add`)}
+              className="inline-flex items-center gap-1 rounded-full bg-primary-blue px-6 py-3 text-sm font-semibold uppercase text-white transition hover:bg-sky-500"
+            >
+              <HiPlus size={18} />
+              {selectedFilterConfig.addLabel}
+            </button>
+          ) : null}
         </div>
 
         {hasContributionList ? (
@@ -370,11 +489,30 @@ const AiContributionDashboard = ({ type }) => {
               </p>
             ) : (
               <>
+                {isCombinedPage ? (
+                  <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                    <ContributionTypeFilter
+                      value={contributionFilter}
+                      onChange={setContributionFilter}
+                      availableTypes={accessibleTypes}
+                    />
+                    {shouldShowAddButton ? (
+                      <button
+                        type="button"
+                        onClick={() => navigate(`${selectedFilterConfig.seoPath}/add`)}
+                        className="inline-flex w-fit items-center gap-1 rounded-full bg-primary-blue px-6 py-3 text-sm font-semibold uppercase text-white transition hover:bg-sky-500"
+                      >
+                        <HiPlus size={18} />
+                        {selectedFilterConfig.addLabel}
+                      </button>
+                    ) : null}
+                  </div>
+                ) : null}
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <h2 className="text-base font-semibold text-black">
                     {config.submittedHeading}
                   </h2>
-                  {shouldShowStatusFilter ? (
+                  {!isCombinedPage && shouldShowStatusFilter ? (
                     <ContributionStatusFilter
                       value={statusFilter}
                       onChange={setStatusFilter}
@@ -385,8 +523,12 @@ const AiContributionDashboard = ({ type }) => {
 
                 {filteredSubmittedContributions.length > 0 ? (
                   <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
-                    {filteredSubmittedContributions.map((item) => (
-                      <ContributionCard key={item._id} item={item} config={config} />
+                    {filteredSubmittedContributions.map(({ item, config: itemConfig }) => (
+                      <ContributionCard
+                        key={`${itemConfig.contentLabel}-${item._id || item.id}`}
+                        item={item}
+                        config={itemConfig}
+                      />
                     ))}
                   </div>
                 ) : (
@@ -403,8 +545,12 @@ const AiContributionDashboard = ({ type }) => {
                   </h2>
                   {draftContributions.length > 0 ? (
                     <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
-                      {draftContributions.map((item) => (
-                        <ContributionCard key={item._id} item={item} config={config} />
+                      {draftContributions.map(({ item, config: itemConfig }) => (
+                        <ContributionCard
+                          key={`${itemConfig.contentLabel}-draft-${item._id || item.id}`}
+                          item={item}
+                          config={itemConfig}
+                        />
                       ))}
                     </div>
                   ) : (

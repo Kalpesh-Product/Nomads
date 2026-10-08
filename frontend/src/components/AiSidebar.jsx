@@ -144,6 +144,12 @@ const contributionProfileItems = [
     flags: ["isBlogger", "isNewsWriter", "isEventWriter", "isPlaceWriter"],
   },
   {
+    label: "All Contributions",
+    icon: HiOutlineLink,
+    path: "/all-contributions",
+    flags: ["isBlogger", "isNewsWriter", "isEventWriter", "isPlaceWriter"],
+  },
+  {
     label: "Blog Contributions",
     icon: HiOutlineLink,
     path: "/blog-contributions",
