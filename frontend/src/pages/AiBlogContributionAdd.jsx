@@ -34,6 +34,9 @@ const normalizeLocationKey = (value = "") =>
 const getLocationKey = (country, state) =>
   `${normalizeLocationKey(country)}|${normalizeLocationKey(state)}`;
 
+const getSelectionStorageKey = (type) =>
+  `wono-contribution-add-selection-${type}`;
+
 const getItemId = (item = {}) => item._id || item.id;
 
 const getItemDateValue = (item = {}) =>
@@ -243,7 +246,7 @@ const DropdownBadge = ({
   </div>
 );
 
-const ContributionPreviewCard = ({ item, stateName, config }) => {
+const ContributionPreviewCard = ({ item, stateName, config, returnSelection }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const isSubmittedByUser = Boolean(item.__submittedByUser);
@@ -321,6 +324,7 @@ const ContributionPreviewCard = ({ item, stateName, config }) => {
                 content: item,
                 item: detailStateItem,
                 selectedStateLabel: stateName,
+                returnSelection,
                 sourceSearch: location.search,
               },
             })
@@ -359,12 +363,14 @@ const ContributionPreviewCard = ({ item, stateName, config }) => {
 
 const AiBlogContributionAdd = ({ type = "blog" }) => {
   const navigate = useNavigate();
+  const routeLocation = useLocation();
   const queryClient = useQueryClient();
   const axiosPrivate = useAxiosPrivate();
   const dropdownContainerRef = useRef(null);
   const { auth } = useAuth();
   const user = auth?.user || {};
   const config = contributionAddConfig[type] || contributionAddConfig.blog;
+  const selectionStorageKey = getSelectionStorageKey(type);
   const hasAccess = Boolean(user?.[config.accessFlag]);
   const contributorName = user?.fullName?.trim() || user?.name || "";
 
@@ -487,6 +493,15 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
   const selectedDestination =
     locationOptions.find((option) => option.value === selectedLocation)
       ?.destination || selectedLocationLabel;
+  const currentSelection = useMemo(
+    () => ({
+      continent: selectedContinent,
+      country: selectedCountry,
+      location: selectedLocation,
+      locationLabel: selectedLocationLabel,
+    }),
+    [selectedContinent, selectedCountry, selectedLocation, selectedLocationLabel],
+  );
 
   const { data: existingItems = [], isPending: isExistingItemsLoading } = useQuery({
     queryKey: [config.existingQueryKey, selectedDestination],
@@ -604,6 +619,67 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
       destination: selectedDestination || current.destination,
     }));
   }, [contributorName, selectedDestination]);
+
+  useEffect(() => {
+    if (continentOptions.length === 0 || locations.length === 0) return;
+
+    if (routeLocation.state?.freshAdd) {
+      sessionStorage.removeItem(selectionStorageKey);
+      navigate(`${routeLocation.pathname}${routeLocation.search}`, {
+        replace: true,
+        state: { ...routeLocation.state, freshAdd: false },
+      });
+      return;
+    }
+
+    const stateSelection = routeLocation.state?.returnSelection;
+    let savedSelection = null;
+
+    if (!stateSelection) {
+      try {
+        savedSelection = JSON.parse(
+          sessionStorage.getItem(selectionStorageKey) || "null",
+        );
+      } catch {
+        savedSelection = null;
+      }
+    }
+
+    const selection = stateSelection || savedSelection;
+    if (
+      !selection?.continent ||
+      !selection?.country ||
+      !selection?.location ||
+      selectedContinent ||
+      selectedCountry ||
+      selectedLocation
+    ) {
+      return;
+    }
+
+    setSelectedContinent(selection.continent);
+    setSelectedCountry(selection.country);
+    setSelectedLocation(selection.location);
+    setSelectedLocationLabel(selection.locationLabel || "");
+    setShowForm(false);
+  }, [
+    continentOptions.length,
+    locations.length,
+    navigate,
+    routeLocation.pathname,
+    routeLocation.search,
+    routeLocation.state,
+    selectedContinent,
+    selectedCountry,
+    selectedLocation,
+    selectionStorageKey,
+  ]);
+
+  useEffect(() => {
+    if (!hasAllSelections) return;
+
+    sessionStorage.setItem(selectionStorageKey, JSON.stringify(currentSelection));
+  }, [currentSelection, hasAllSelections, selectionStorageKey]);
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
@@ -836,6 +912,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                       item={item}
                       stateName={locationLabel}
                       config={config}
+                      returnSelection={currentSelection}
                     />
                   ))}
                 </div>

@@ -304,7 +304,9 @@ const AiContributionsHub = () => {
                     <button
                       key={config.key}
                       type="button"
-                      onClick={() => navigate(config.addPath)}
+                      onClick={() =>
+                        navigate(config.addPath, { state: { freshAdd: true } })
+                      }
                       className="inline-flex items-center gap-2 rounded-full bg-primary-blue px-4 py-2 text-xs font-semibold text-white transition hover:bg-sky-500"
                     >
                       <HiOutlinePlus size={16} />
@@ -404,7 +406,9 @@ const AiContributionsHub = () => {
                       </button>
                       <button
                         type="button"
-                        onClick={() => navigate(config.addPath)}
+                        onClick={() =>
+                          navigate(config.addPath, { state: { freshAdd: true } })
+                        }
                         className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-primary-blue px-3 py-2 text-xs font-semibold text-white transition hover:bg-sky-500"
                       >
                         Add
@@ -507,7 +511,9 @@ const AiContributionsHub = () => {
                     <button
                       key={config.key}
                       type="button"
-                      onClick={() => navigate(config.addPath)}
+                      onClick={() =>
+                        navigate(config.addPath, { state: { freshAdd: true } })
+                      }
                       className="flex w-full items-center justify-between rounded-lg border border-black/10 bg-slate-50 px-4 py-3 text-left text-sm font-semibold text-black transition hover:border-primary-blue/30 hover:bg-sky-50 hover:text-primary-blue"
                     >
                       <span className="inline-flex items-center gap-2">
