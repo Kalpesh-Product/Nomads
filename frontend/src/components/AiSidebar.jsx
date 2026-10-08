@@ -146,7 +146,7 @@ const contributionProfileItems = [
   {
     label: "All Contributions",
     icon: HiOutlineLink,
-    path: "/all-contributions",
+    path: "/contributions/all",
     flags: ["isBlogger", "isNewsWriter", "isEventWriter", "isPlaceWriter"],
   },
   {

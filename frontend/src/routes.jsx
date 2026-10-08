@@ -353,6 +353,26 @@ if (tenant === "main") {
               element: <AiContributionsHubTwo />,
             },
             {
+              path: "contributions/all",
+              element: <AiContributionDashboard type="all" initialFilter="all" />,
+            },
+            {
+              path: "contributions/blog",
+              element: <AiContributionDashboard type="all" initialFilter="blog" />,
+            },
+            {
+              path: "contributions/news",
+              element: <AiContributionDashboard type="all" initialFilter="news" />,
+            },
+            {
+              path: "contributions/event",
+              element: <AiContributionDashboard type="all" initialFilter="event" />,
+            },
+            {
+              path: "contributions/places",
+              element: <AiContributionDashboard type="all" initialFilter="places" />,
+            },
+            {
               path: "contributions-2",
               element: <AiContributionsHub />,
             },

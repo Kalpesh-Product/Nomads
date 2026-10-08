@@ -423,7 +423,7 @@ const AiContributionsHubTwo = () => {
                         <button
                           type="button"
                           onClick={() =>
-                            navigate(`/all-contributions?type=${config.key}`)
+                            navigate(`/contributions/${config.key}`)
                           }
                           className="inline-flex items-center justify-center gap-1.5 rounded-full bg-white px-3 py-2 text-xs font-bold text-black transition hover:text-primary-blue"
                         >

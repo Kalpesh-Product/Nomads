@@ -97,15 +97,28 @@ const contributionFilterAliases = {
   all: "all",
 };
 
-const getContributionFilterFromParams = (searchParams) => {
+const contributionFilterPaths = {
+  all: "/contributions/all",
+  blog: "/contributions/blog",
+  news: "/contributions/news",
+  event: "/contributions/event",
+  places: "/contributions/places",
+};
+
+const normalizeContributionFilter = (value) => {
+  const normalizedValue = String(value || "all").toLowerCase().trim();
+
+  return contributionFilterAliases[normalizedValue] || "all";
+};
+
+const getContributionFilterFromParams = (searchParams, fallback = "all") => {
   const rawValue =
     searchParams.get("type") ||
     searchParams.get("filter") ||
     searchParams.get("tab") ||
-    "all";
-  const normalizedValue = rawValue.toLowerCase().trim();
+    fallback;
 
-  return contributionFilterAliases[normalizedValue] || "all";
+  return normalizeContributionFilter(rawValue);
 };
 
 const statusOptions = [
@@ -352,15 +365,15 @@ const ContributionTypeFilter = ({ value, onChange, availableTypes }) => {
   );
 };
 
-const AiContributionDashboard = ({ type }) => {
+const AiContributionDashboard = ({ type, initialFilter = "all" }) => {
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const axiosPrivate = useAxiosPrivate();
   const { auth } = useAuth();
   const userId = auth?.user?._id || auth?.user?.id;
   const [statusFilter, setStatusFilter] = useState("all");
   const [contributionFilter, setContributionFilter] = useState(() =>
-    getContributionFilterFromParams(searchParams),
+    getContributionFilterFromParams(searchParams, initialFilter),
   );
   const isCombinedPage = type === "all";
   const config = useMemo(() => {
@@ -374,12 +387,12 @@ const AiContributionDashboard = ({ type }) => {
         draftHeading: "Saved As Drafts",
         noStatusText: (status) => `No ${status} contributions found.`,
         contentLabel: "Contribution",
-        seoPath: "/all-contributions",
+        seoPath: contributionFilterPaths[normalizeContributionFilter(initialFilter)],
       };
     }
 
     return contributionPageConfig[type] || contributionPageConfig.blog;
-  }, [isCombinedPage, type]);
+  }, [initialFilter, isCombinedPage, type]);
   const accessibleTypes = useMemo(
     () =>
       combinedContributionTypes.filter((itemType) =>
@@ -393,31 +406,16 @@ const AiContributionDashboard = ({ type }) => {
   const hasAccess = isCombinedPage
     ? accessibleTypes.length > 0
     : Boolean(auth?.user?.[config.flag]);
-  const urlContributionFilter = getContributionFilterFromParams(searchParams);
+  const urlContributionFilter = getContributionFilterFromParams(
+    searchParams,
+    initialFilter,
+  );
 
   const handleContributionFilterChange = (nextFilter) => {
     setContributionFilter(nextFilter);
 
     if (!isCombinedPage) return;
-
-    setSearchParams(
-      (currentParams) => {
-        const nextParams = new URLSearchParams(currentParams);
-
-        if (nextFilter === "all") {
-          nextParams.delete("type");
-          nextParams.delete("filter");
-          nextParams.delete("tab");
-        } else {
-          nextParams.set("type", nextFilter);
-          nextParams.delete("filter");
-          nextParams.delete("tab");
-        }
-
-        return nextParams;
-      },
-      { replace: false },
-    );
+    navigate(contributionFilterPaths[nextFilter] || contributionFilterPaths.all);
   };
 
   const contributionQueries = useQueries({
