@@ -350,11 +350,11 @@ if (tenant === "main") {
             { path: "profile", element: <AiProfile /> },
             {
               path: "contributions",
-              element: <AiContributionsHub />,
+              element: <AiContributionsHubTwo />,
             },
             {
               path: "contributions-2",
-              element: <AiContributionsHubTwo />,
+              element: <AiContributionsHub />,
             },
             {
               path: "all-contributions",

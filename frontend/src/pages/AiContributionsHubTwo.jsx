@@ -234,7 +234,7 @@ const AiContributionsHubTwo = () => {
     if (!auth?.user) {
       navigate("/login", {
         replace: true,
-        state: { redirectTo: "/contributions-2" },
+        state: { redirectTo: "/contributions" },
       });
       return;
     }
@@ -284,7 +284,7 @@ const AiContributionsHubTwo = () => {
 
   return (
     <>
-      <Seo path="/contributions-2" />
+      <Seo path="/contributions" />
       <main className="mx-auto w-full max-w-[80rem] px-4 py-2 md:px-8 lg:px-8">
         <div className="mt-6">
           <section className="grid gap-5 lg:grid-cols-[minmax(0,1.55fr)_minmax(320px,0.8fr)]">
