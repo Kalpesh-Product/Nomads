@@ -91,10 +91,10 @@ const normalizeBreadcrumbLabel = (segment) => {
 
 const contributionBreadcrumbLabels = {
   all: "All Contributions",
-  blog: "Blog Contributions",
-  news: "News Contributions",
-  event: "Event Contributions",
-  places: "Places Contributions",
+  blog: "Blogs",
+  news: "News",
+  event: "Events",
+  places: "Places",
 };
 
 const NomadAiLayout = () => {
