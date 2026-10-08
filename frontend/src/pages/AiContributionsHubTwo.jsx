@@ -422,7 +422,9 @@ const AiContributionsHubTwo = () => {
                       <div className="mt-3 grid grid-cols-2 gap-2 rounded-full bg-slate-50 p-1">
                         <button
                           type="button"
-                          onClick={() => navigate(config.listPath)}
+                          onClick={() =>
+                            navigate(`/all-contributions?type=${config.key}`)
+                          }
                           className="inline-flex items-center justify-center gap-1.5 rounded-full bg-white px-3 py-2 text-xs font-bold text-black transition hover:text-primary-blue"
                         >
                           View

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useQueries } from "@tanstack/react-query";
 import { FaCheck } from "react-icons/fa";
 import { HiPlus } from "react-icons/hi";
@@ -85,6 +85,28 @@ const contributionTypeFilters = [
   { label: "Events", value: "event" },
   { label: "Places", value: "places" },
 ];
+
+const contributionFilterAliases = {
+  blogs: "blog",
+  blog: "blog",
+  news: "news",
+  events: "event",
+  event: "event",
+  places: "places",
+  place: "places",
+  all: "all",
+};
+
+const getContributionFilterFromParams = (searchParams) => {
+  const rawValue =
+    searchParams.get("type") ||
+    searchParams.get("filter") ||
+    searchParams.get("tab") ||
+    "all";
+  const normalizedValue = rawValue.toLowerCase().trim();
+
+  return contributionFilterAliases[normalizedValue] || "all";
+};
 
 const statusOptions = [
   { label: "Show All", value: "all" },
@@ -332,11 +354,14 @@ const ContributionTypeFilter = ({ value, onChange, availableTypes }) => {
 
 const AiContributionDashboard = ({ type }) => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const axiosPrivate = useAxiosPrivate();
   const { auth } = useAuth();
   const userId = auth?.user?._id || auth?.user?.id;
   const [statusFilter, setStatusFilter] = useState("all");
-  const [contributionFilter, setContributionFilter] = useState("all");
+  const [contributionFilter, setContributionFilter] = useState(() =>
+    getContributionFilterFromParams(searchParams),
+  );
   const isCombinedPage = type === "all";
   const config = useMemo(() => {
     if (isCombinedPage) {
@@ -368,6 +393,32 @@ const AiContributionDashboard = ({ type }) => {
   const hasAccess = isCombinedPage
     ? accessibleTypes.length > 0
     : Boolean(auth?.user?.[config.flag]);
+  const urlContributionFilter = getContributionFilterFromParams(searchParams);
+
+  const handleContributionFilterChange = (nextFilter) => {
+    setContributionFilter(nextFilter);
+
+    if (!isCombinedPage) return;
+
+    setSearchParams(
+      (currentParams) => {
+        const nextParams = new URLSearchParams(currentParams);
+
+        if (nextFilter === "all") {
+          nextParams.delete("type");
+          nextParams.delete("filter");
+          nextParams.delete("tab");
+        } else {
+          nextParams.set("type", nextFilter);
+          nextParams.delete("filter");
+          nextParams.delete("tab");
+        }
+
+        return nextParams;
+      },
+      { replace: false },
+    );
+  };
 
   const contributionQueries = useQueries({
     queries: queryTypes.map((itemType) => {
@@ -412,6 +463,18 @@ const AiContributionDashboard = ({ type }) => {
       navigate("/profile", { replace: true });
     }
   }, [auth?.user, config.seoPath, hasAccess, navigate]);
+
+  useEffect(() => {
+    if (!isCombinedPage) return;
+
+    const nextFilter =
+      urlContributionFilter === "all" ||
+      accessibleTypes.includes(urlContributionFilter)
+        ? urlContributionFilter
+        : "all";
+
+    setContributionFilter(nextFilter);
+  }, [accessibleTypes, isCombinedPage, urlContributionFilter]);
 
   if (!auth?.user || !hasAccess) {
     return null;
@@ -493,7 +556,7 @@ const AiContributionDashboard = ({ type }) => {
                   <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                     <ContributionTypeFilter
                       value={contributionFilter}
-                      onChange={setContributionFilter}
+                      onChange={handleContributionFilterChange}
                       availableTypes={accessibleTypes}
                     />
                     {shouldShowAddButton ? (
