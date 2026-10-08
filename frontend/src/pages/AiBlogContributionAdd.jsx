@@ -34,6 +34,17 @@ const normalizeLocationKey = (value = "") =>
 const getLocationKey = (country, state) =>
   `${normalizeLocationKey(country)}|${normalizeLocationKey(state)}`;
 
+const getItemId = (item = {}) => item._id || item.id;
+
+const getItemDateValue = (item = {}) =>
+  new Date(item.date || item.updatedAt || item.createdAt || 0).getTime();
+
+const getItemDestination = (item = {}) =>
+  item.destination || item.location || item.region || "";
+
+const isSameDestination = (item = {}, destination = "") =>
+  normalizeLocationKey(getItemDestination(item)) === normalizeLocationKey(destination);
+
 const buildExactKeyword = (label) => {
   if (!label) return null;
   const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -235,6 +246,7 @@ const DropdownBadge = ({
 const ContributionPreviewCard = ({ item, stateName, config }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const isSubmittedByUser = Boolean(item.__submittedByUser);
   const thumbnail = item.mainImage || item.image;
   const title =
     item.mainTitle ||
@@ -249,8 +261,11 @@ const ContributionPreviewCard = ({ item, stateName, config }) => {
     item.destination ||
     "Destination";
   const itemDate = item.date || item.updatedAt || item.createdAt;
+  const itemId = getItemId(item);
   const detailsRoute =
-    typeof config.detailsRoute === "function"
+    isSubmittedByUser && itemId
+      ? `${config.dashboardPath}/${itemId}`
+      : typeof config.detailsRoute === "function"
       ? config.detailsRoute(item)
       : config.detailsRoute;
   const detailStateItem =
@@ -292,6 +307,11 @@ const ContributionPreviewCard = ({ item, stateName, config }) => {
             className="h-full w-full object-cover"
             loading="lazy"
           />
+        ) : null}
+        {isSubmittedByUser ? (
+          <span className="absolute left-2 top-2 rounded-full bg-primary-blue px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-white shadow-[0_8px_18px_rgba(73,159,222,0.25)]">
+            Submitted by you
+          </span>
         ) : null}
         <button
           type="button"
@@ -485,6 +505,61 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
     enabled: Boolean(selectedDestination),
     refetchOnWindowFocus: false,
   });
+
+  const { data: userSubmittedItems = [], isPending: isUserSubmittedItemsLoading } =
+    useQuery({
+      queryKey: [config.myQueryKey, user?._id || user?.id, selectedDestination],
+      queryFn: async () => {
+        const response = await axiosPrivate.get(config.myEndpoint);
+        const items = Array.isArray(response.data?.data) ? response.data.data : [];
+
+        return items
+          .filter(
+            (item) =>
+              isSameDestination(item, selectedDestination) &&
+              !item.isDraft &&
+              (item.status || "pending").toLowerCase() === "approved",
+          )
+          .sort((a, b) => getItemDateValue(b) - getItemDateValue(a))
+          .map((item) => ({
+            ...item,
+            __submittedByUser: true,
+          }));
+      },
+      enabled: Boolean(selectedDestination) && Boolean(user?._id || user?.id),
+      refetchOnWindowFocus: false,
+    });
+
+  const previewItems = useMemo(() => {
+    const submittedIds = new Set(
+      userSubmittedItems.map((item) => getItemId(item)).filter(Boolean),
+    );
+    const submittedTitles = new Set(
+      userSubmittedItems
+        .map((item) =>
+          normalizeLocationKey(
+            item.mainTitle || item.eventName || item.placeName || item.title || "",
+          ),
+        )
+        .filter(Boolean),
+    );
+    const publicItems = existingItems.filter((item) => {
+      const itemId = getItemId(item);
+      const itemTitle = normalizeLocationKey(
+        item.mainTitle || item.eventName || item.placeName || item.title || "",
+      );
+
+      return !(
+        (itemId && submittedIds.has(itemId)) ||
+        (itemTitle && submittedTitles.has(itemTitle))
+      );
+    });
+
+    return [...userSubmittedItems, ...publicItems];
+  }, [existingItems, userSubmittedItems]);
+
+  const isPreviewItemsLoading =
+    isExistingItemsLoading || isUserSubmittedItemsLoading;
 
   const { mutate: createContribution, isPending: isSaving } = useMutation({
     mutationFn: async (payload) => axiosPrivate.post(config.myEndpoint, payload),
@@ -749,15 +824,15 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                 Latest {locationLabel} {config.contentLabelPlural}
               </h1>
 
-              {isExistingItemsLoading ? (
+              {isPreviewItemsLoading ? (
                 <p className="text-sm text-slate-500">
                   Loading {config.contentLabelPlural.toLowerCase()}...
                 </p>
-              ) : existingItems.length > 0 ? (
+              ) : previewItems.length > 0 ? (
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
-                  {existingItems.map((item) => (
+                  {previewItems.map((item, index) => (
                     <ContributionPreviewCard
-                      key={item._id}
+                      key={`${item.__submittedByUser ? "mine" : "public"}-${getItemId(item) || index}`}
                       item={item}
                       stateName={locationLabel}
                       config={config}
