@@ -31,6 +31,7 @@ const defaultValues = {
   fullName: "",
   email: "",
   currentCountry: "",
+  linkedinProfile: "",
   contactCode: "",
   contactNumber: "",
   message: "",
@@ -42,6 +43,9 @@ const CONTRIBUTOR_PROMPT =
   "we are constantly looking out for individuals who can support our cause to make WoNo the largest Nomad Community & Platform in the world. We know we will not be able to do this alone.";
 const CONTRIBUTOR_HEADING = "Become a Wono Contributor";
 const CONTRIBUTOR_TYPING_SEEN_KEY = "wono-contributor-typing-seen";
+const PENDING_CONTRIBUTOR_SUBMISSION_KEY =
+  "wono-pending-contributor-submission";
+const PENDING_CONTRIBUTOR_SUBMISSION_MAX_AGE = 30 * 60 * 1000;
 const getFlagIconUrl = (isoCode) =>
   `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
 const CONTRIBUTION_TYPE_GROUPS = [
@@ -72,6 +76,48 @@ const getSelectedContributorOptions = (selectedOptions = []) =>
     CONTRIBUTOR_CONTRIBUTION_OPTIONS.includes(option),
   );
 
+const readPendingContributorSubmission = () => {
+  if (typeof window === "undefined") return null;
+
+  try {
+    const storedValue = window.sessionStorage.getItem(
+      PENDING_CONTRIBUTOR_SUBMISSION_KEY,
+    );
+    if (!storedValue) return null;
+
+    const parsedValue = JSON.parse(storedValue);
+    if (!parsedValue?.formValues || !Array.isArray(parsedValue.contributorOptions)) {
+      return null;
+    }
+    if (
+      parsedValue.createdAt &&
+      Date.now() - parsedValue.createdAt > PENDING_CONTRIBUTOR_SUBMISSION_MAX_AGE
+    ) {
+      clearPendingContributorSubmission();
+      return null;
+    }
+
+    return parsedValue;
+  } catch {
+    return null;
+  }
+};
+
+const writePendingContributorSubmission = (payload) => {
+  if (typeof window === "undefined") return;
+
+  window.sessionStorage.setItem(
+    PENDING_CONTRIBUTOR_SUBMISSION_KEY,
+    JSON.stringify(payload),
+  );
+};
+
+const clearPendingContributorSubmission = () => {
+  if (typeof window === "undefined") return;
+
+  window.sessionStorage.removeItem(PENDING_CONTRIBUTOR_SUBMISSION_KEY);
+};
+
 const tickMenuItemSx = {
   "& .tick-icon": { opacity: 0, color: "#1976d2" },
   "&:hover .tick-icon": { opacity: 1 },
@@ -95,6 +141,7 @@ const AiBecomeContributor = () => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const messageLimitAlertedRef = useRef(false);
+  const pendingSubmissionHandledRef = useRef(false);
   const navigate = useNavigate();
   const location = useLocation();
   const axiosPrivate = useAxiosPrivate();
@@ -114,6 +161,20 @@ const AiBecomeContributor = () => {
     ? (auth?.user?.fullName?.split(" ")[0] || "User") + ", "
     : "Hey, ";
   const contributorPrompt = `${messagePrefix}${CONTRIBUTOR_PROMPT}`;
+
+  const getContributorSubmissionPayload = (formValues) => {
+    const contributorOptions = Array.isArray(formValues.contributionType)
+      ? getSelectedContributorOptions(formValues.contributionType)
+      : [];
+    const normalizedValues = {
+      ...formValues,
+      contributionType: Array.isArray(formValues.contributionType)
+        ? formValues.contributionType.join(", ")
+        : formValues.contributionType,
+    };
+
+    return { contributorOptions, normalizedValues };
+  };
 
   const { mutate: submitContributor } = useMutation({
     mutationFn: async ({ formValues, contributorOptions }) => {
@@ -146,6 +207,7 @@ const AiBecomeContributor = () => {
       if (data?.warning) {
         console.warn(data.warning);
       }
+      clearPendingContributorSubmission();
       await showContributorSuccessAlert(
         "We’ll review your details and get back to you soon.",
         {
@@ -166,15 +228,8 @@ const AiBecomeContributor = () => {
   });
 
   const handleFormSubmit = (formValues) => {
-    const contributorOptions = Array.isArray(formValues.contributionType)
-      ? getSelectedContributorOptions(formValues.contributionType)
-      : [];
-    const normalizedValues = {
-      ...formValues,
-      contributionType: Array.isArray(formValues.contributionType)
-        ? formValues.contributionType.join(", ")
-        : formValues.contributionType,
-    };
+    const { contributorOptions, normalizedValues } =
+      getContributorSubmissionPayload(formValues);
 
     setIsSubmitting(true);
     submitContributor({ formValues: normalizedValues, contributorOptions });
@@ -188,17 +243,26 @@ const AiBecomeContributor = () => {
       !isLoggedIn &&
       selectedContributorOptionsRequireLogin(selectedContributionTypes)
     ) {
-      event.preventDefault();
-      navigate("/login", {
-        state: {
-          loginContext: {
-            title: "Become a Contributor",
-            description:
-              "Login as a Nomad to contribute blogs, news, places, or events to WoNo.",
+      void handleSubmit((formValues) => {
+        const { contributorOptions } = getContributorSubmissionPayload(formValues);
+
+        writePendingContributorSubmission({
+          formValues,
+          contributorOptions,
+          createdAt: Date.now(),
+        });
+
+        navigate("/login", {
+          state: {
+            loginContext: {
+              title: "Become a Contributor",
+              description:
+                "Login as a Nomad to contribute blogs, news, places, or events to WoNo.",
+            },
+            redirectTo: `${location.pathname}${location.search}`,
           },
-          redirectTo: `${location.pathname}${location.search}`,
-        },
-      });
+        });
+      })(event);
       return;
     }
 
@@ -242,6 +306,26 @@ const AiBecomeContributor = () => {
 
   useEffect(() => {
     if (isLoggedIn && auth?.user) {
+      const pendingSubmission = readPendingContributorSubmission();
+      if (
+        pendingSubmission &&
+        !pendingSubmissionHandledRef.current &&
+        pendingSubmission.contributorOptions.length > 0
+      ) {
+        pendingSubmissionHandledRef.current = true;
+        reset(pendingSubmission.formValues);
+        const { contributorOptions, normalizedValues } =
+          getContributorSubmissionPayload(pendingSubmission.formValues);
+
+        setIsFormVisible(true);
+        setIsSubmitting(true);
+        submitContributor({
+          formValues: normalizedValues,
+          contributorOptions,
+        });
+        return;
+      }
+
       const {
         fullName,
         email,
@@ -259,7 +343,7 @@ const AiBecomeContributor = () => {
         setValue("currentCountry", userCountry);
       }
     }
-  }, [isLoggedIn, auth, setValue]);
+  }, [isLoggedIn, auth, reset, setValue, submitContributor]);
 
   useEffect(() => {
     const hasSeenTypingEffect =
