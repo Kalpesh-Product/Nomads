@@ -353,7 +353,7 @@ const ContributionPreviewCard = ({ item, stateName, config, returnSelection }) =
         ) : null}
         {isSubmittedByUser ? (
           <span className="absolute left-2 top-2 rounded-full bg-primary-blue px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-white shadow-[0_8px_18px_rgba(73,159,222,0.25)]">
-            Submitted by you
+            Published by you
           </span>
         ) : null}
         <button
@@ -381,7 +381,7 @@ const ContributionPreviewCard = ({ item, stateName, config, returnSelection }) =
                 },
               })
             }
-            className="absolute left-1/2 top-[58%] inline-flex -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full bg-primary-blue px-4 py-1.5 text-xs font-medium text-white transition hover:bg-sky-500"
+            className="absolute left-1/2 top-[58%] inline-flex -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full bg-black/55 px-4 py-1.5 text-xs font-medium text-white transition hover:bg-black/70"
           >
             <HiOutlinePencil size={14} />
             Edit
