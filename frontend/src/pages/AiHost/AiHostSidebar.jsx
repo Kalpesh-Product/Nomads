@@ -75,37 +75,37 @@ const recommendationItems = [
   {
     label: "Build & Manage Website",
     icon: CgWebsite,
-    path: "/website-builder",
+    // path: "/website-builder",
   },
   {
     label: "Nomad Listings",
     icon: TbWorldWww,
-    path: "/modules",
+    // path: "/modules",
   },
   {
     label: "Sales Management",
     icon: MdOutlineHandshake,
-    path: "/modules",
+    // path: "/modules",
   },
   {
     label: "Finance Management",
     icon: MdAccountBalance,
-    path: "/themes",
+    // path: "/themes",
   },
   {
     label: "Administration Management",
     icon: HiOutlineBriefcase,
-    path: "/leads",
+    // path: "/leads",
   },
   {
     label: "HR Management",
     icon: BsPeopleFill,
-    path: "/career",
+    // path: "/career",
   },
   {
     label: "IT Infrastructure",
     icon: FaDesktop,
-    path: "/calendar",
+    // path: "/calendar",
   },
   {
     label: "Maintenance Management",
@@ -118,22 +118,22 @@ const valueAdditionItems = [
   {
     label: "Visitor Management",
     icon: BsPersonVcard,
-    path: "/assets",
+    // path: "/assets",
   },
   {
     label: "Assets Management",
     icon: HiOutlineArchive,
-    path: "/extra-common-modules",
+    // path: "/extra-common-modules",
   },
   {
     label: "Inventory Management",
     icon: HiOutlineLibrary,
-    path: "/extra-common-modules",
+    // path: "/extra-common-modules",
   },
   {
     label: "Finance Management",
     icon: HiOutlineCash,
-    path: "/assets",
+    // path: "/assets",
   },
   {
     label: "Reports Management",
@@ -145,32 +145,32 @@ const commonFeatures = [
   {
     label: "Dashboard",
     icon: HiOutlineViewGrid,
-    path: "/extra-common-modules",
+    // path: "/extra-common-modules",
   },
   {
     label: "Customer Support",
     icon: MdOutlineSupportAgent,
-    path: "/extra-common-modules",
+    // path: "/extra-common-modules",
   },
   {
     label: "Tasks",
     icon: HiOutlineClipboardList,
-    path: "/assets",
+    // path: "/assets",
   },
   {
     label: "Ticketing System",
     icon: MdOutlineSupportAgent,
-    path: "/inventory",
+    // path: "/inventory",
   },
   {
     label: "Meeting Room Booking System",
     icon: MdMeetingRoom,
-    path: "/finance-management",
+    // path: "/finance-management",
   },
   {
     label: "Attendance",
     icon: MdOutlineFingerprint,
-    path: "/extra-common-modules",
+    // path: "/extra-common-modules",
   },
   {
     label: "Leave Requests",
@@ -179,7 +179,7 @@ const commonFeatures = [
   {
     label: "Calendar",
     icon: TbCalendarUser,
-    path: "/finance-management",
+    // path: "/finance-management",
   },
 ];
 
@@ -187,32 +187,32 @@ const coreModules = [
   {
     label: "Organization Management",
     icon: HiOutlineLibrary,
-    path: "/extra-common-modules",
+    // path: "/extra-common-modules",
   },
   {
     label: "Module Management",
     icon: HiOutlineTemplate,
-    path: "/extra-common-modules",
+    // path: "/extra-common-modules",
   },
   {
     label: "Access Grants",
     icon: HiOutlineKey,
-    path: "/assets",
+    // path: "/assets",
   },
   {
     label: "Unit Setting",
     icon: HiOutlineCash,
-    path: "/extra-common-modules",
+    // path: "/extra-common-modules",
   },
   {
     label: "Unit Management",
     icon: HiOutlineTemplate,
-    path: "/extra-common-modules",
+    // path: "/extra-common-modules",
   },
   {
     label: "Analytics",
     icon: HiOutlineChartBar,
-    path: "/assets",
+    // path: "/assets",
   },
 ];
 
@@ -220,37 +220,37 @@ const departmentAccess = [
   {
     label: "Hr Department",
     icon: HiOutlineUsers,
-    path: "/extra-common-modules",
+    // path: "/extra-common-modules",
   },
   {
     label: "Administration Department",
     icon: HiOutlineBriefcase,
-    path: "/extra-common-modules",
+    // path: "/extra-common-modules",
   },
   {
     label: "Sales Department",
     icon: HiOutlineTrendingUp,
-    path: "/assets",
+    // path: "/assets",
   },
   {
     label: "Finance Department",
     icon: HiOutlineCurrencyDollar,
-    path: "/extra-common-modules",
+    // path: "/extra-common-modules",
   },
   {
     label: "Maintainence Department",
     icon: HiOutlineWrenchScrewdriver,
-    path: "/extra-common-modules",
+    // path: "/extra-common-modules",
   },
   {
     label: "Tech Department",
     icon: HiOutlineChip,
-    path: "/assets",
+    // path: "/assets",
   },
   {
     label: "IT Department",
     icon: HiOutlineDatabase,
-    path: "/assets",
+    // path: "/assets",
   },
 ];
 
