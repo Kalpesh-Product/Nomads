@@ -104,6 +104,15 @@ const contributionEditBreadcrumbLabels = {
   places: "Edit Place",
 };
 
+const contributionListPaths = new Set([
+  "/contributions",
+  "/contributions/all",
+  "/contributions/blog",
+  "/contributions/news",
+  "/contributions/event",
+  "/contributions/places",
+]);
+
 const NomadAiLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -229,7 +238,9 @@ const NomadAiLayout = () => {
       return [];
     }
 
-    const customBreadcrumbs = location.state?.stickyBreadcrumbs;
+    const customBreadcrumbs = contributionListPaths.has(location.pathname)
+      ? null
+      : location.state?.stickyBreadcrumbs;
     if (Array.isArray(customBreadcrumbs) && customBreadcrumbs.length > 0) {
       return customBreadcrumbs
         .map((item, index) => {
