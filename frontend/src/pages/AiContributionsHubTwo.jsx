@@ -278,7 +278,7 @@ const AiContributionsHubTwo = () => {
     approvedItems.length * 4 + pendingItems.length * 2 + draftItems.length;
   const communityRank = Math.max(7, 72 - rankScore * 5);
   const recentItems = sortRecent(allItems);
-  const topItems = recentItems.slice(0, 4);
+  const topItems = recentItems.slice(0, 5);
   const recentListItems = recentItems.slice(0, 5);
   const isLoading = sections.some((section) => section.query?.isLoading);
 
