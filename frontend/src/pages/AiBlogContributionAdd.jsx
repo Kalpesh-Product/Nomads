@@ -177,19 +177,33 @@ const DropdownBadge = ({
   onToggle,
   onSelect,
   disabled = false,
-}) => (
+  variant = "pill",
+}) => {
+  const isInputVariant = variant === "input";
+
+  return (
   <div className="relative w-full min-w-0 flex-1">
     <button
       type="button"
       onClick={onToggle}
       disabled={disabled}
-      className={`flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${
-        disabled
-          ? "cursor-not-allowed border-black/10 bg-black/[0.03] text-black/35"
-          : isOpen
-            ? "border-sky-500 bg-sky-500 text-white"
-            : "border-black/20 bg-white text-black/85 hover:border-sky-500"
-      }`}
+      className={
+        isInputVariant
+          ? `flex min-h-[42px] w-full items-center justify-between gap-2 rounded-md border px-3 py-2 text-sm font-medium outline-none transition-colors ${
+              disabled
+                ? "cursor-not-allowed border-black/10 bg-black/[0.03] text-black/35"
+                : isOpen
+                  ? "border-sky-400 bg-white text-slate-700 ring-2 ring-sky-100"
+                  : "border-black/10 bg-white text-slate-700 hover:border-sky-400"
+            }`
+          : `flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${
+              disabled
+                ? "cursor-not-allowed border-black/10 bg-black/[0.03] text-black/35"
+                : isOpen
+                  ? "border-sky-500 bg-sky-500 text-white"
+                  : "border-black/20 bg-white text-black/85 hover:border-sky-500"
+            }`
+      }
       aria-haspopup="listbox"
       aria-expanded={isOpen}
     >
@@ -201,7 +215,11 @@ const DropdownBadge = ({
     </button>
 
     {isOpen && !disabled && (
-      <div className="absolute top-full z-40 mt-3 w-full min-w-[11rem] max-w-[calc(100vw-4rem)] rounded-2xl border border-sky-100 bg-white p-2 shadow-[0_12px_30px_rgba(15,23,42,0.12)]">
+      <div
+        className={`absolute top-full z-40 w-full min-w-[11rem] max-w-[calc(100vw-4rem)] border border-sky-100 bg-white p-2 shadow-[0_12px_30px_rgba(15,23,42,0.12)] ${
+          isInputVariant ? "mt-2 rounded-md" : "mt-3 rounded-2xl"
+        }`}
+      >
         <ul
           className="max-h-72 overflow-y-auto"
           role="listbox"
@@ -244,7 +262,8 @@ const DropdownBadge = ({
       </div>
     )}
   </div>
-);
+  );
+};
 
 const ContributionPreviewCard = ({ item, stateName, config, returnSelection }) => {
   const navigate = useNavigate();
@@ -955,6 +974,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                 options={continentOptions}
                 selectedValue={continentLabel}
                 isOpen={openDropdown === "form-continent"}
+                variant="input"
                 onToggle={() =>
                   setOpenDropdown((current) =>
                     current === "form-continent" ? null : "form-continent",
@@ -978,6 +998,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                 options={countryOptions}
                 selectedValue={countryLabel}
                 isOpen={openDropdown === "form-country"}
+                variant="input"
                 onToggle={() =>
                   setOpenDropdown((current) =>
                     current === "form-country" ? null : "form-country",
@@ -1001,6 +1022,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                 options={locationOptions}
                 selectedValue={locationLabel}
                 isOpen={openDropdown === "form-location"}
+                variant="input"
                 onToggle={() =>
                   setOpenDropdown((current) =>
                     current === "form-location" ? null : "form-location",
