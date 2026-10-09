@@ -747,7 +747,9 @@ const AiBlogContributionPreview = ({ type = "blog" }) => {
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
   const { auth } = useAuth();
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(() =>
+    Boolean(location.state?.startEditing),
+  );
   const config = contributionPreviewConfig[type] || contributionPreviewConfig.blog;
   const stateItem = location.state?.content || location.state?.item;
 

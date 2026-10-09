@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   HiOutlineChevronDown,
   HiOutlineEye,
+  HiOutlinePencil,
   HiOutlinePlus,
   HiOutlineTrash,
 } from "react-icons/hi";
@@ -37,6 +38,8 @@ const getLocationKey = (country, state) =>
 const getSelectionStorageKey = (type) =>
   `wono-contribution-add-selection-${type}`;
 
+const CONTENT_PREVIEW_STORAGE_PREFIX = "wono-contribution-preview";
+
 const getItemId = (item = {}) => item._id || item.id;
 
 const getItemDateValue = (item = {}) =>
@@ -47,6 +50,16 @@ const getItemDestination = (item = {}) =>
 
 const isSameDestination = (item = {}, destination = "") =>
   normalizeLocationKey(getItemDestination(item)) === normalizeLocationKey(destination);
+
+const storePreviewItemForNewTab = (type, item) => {
+  const itemId = getItemId(item) || Date.now();
+  const key = `${CONTENT_PREVIEW_STORAGE_PREFIX}-${type}-${itemId}-${Date.now()}`;
+
+  const serializedItem = JSON.stringify(item);
+  localStorage.setItem(key, serializedItem);
+  sessionStorage.setItem(key, serializedItem);
+  return key;
+};
 
 const buildExactKeyword = (label) => {
   if (!label) return null;
@@ -284,12 +297,11 @@ const ContributionPreviewCard = ({ item, stateName, config, returnSelection }) =
     "Destination";
   const itemDate = item.date || item.updatedAt || item.createdAt;
   const itemId = getItemId(item);
-  const detailsRoute =
-    isSubmittedByUser && itemId
-      ? `${config.dashboardPath}/${itemId}`
-      : typeof config.detailsRoute === "function"
+  const publicDetailsRoute =
+    typeof config.detailsRoute === "function"
       ? config.detailsRoute(item)
       : config.detailsRoute;
+  const editRoute = itemId ? `${config.dashboardPath}/${itemId}` : null;
   const detailStateItem =
     config.formType === "event"
       ? {
@@ -318,6 +330,15 @@ const ContributionPreviewCard = ({ item, stateName, config, returnSelection }) =
             lng: item.longitude,
           }
       : item;
+  const openPublicDetails = () => {
+    const previewKey = storePreviewItemForNewTab(config.contentLabel.toLowerCase(), detailStateItem);
+    const separator = publicDetailsRoute.includes("?") ? "&" : "?";
+    window.open(
+      `${publicDetailsRoute}${separator}previewKey=${encodeURIComponent(previewKey)}`,
+      "_blank",
+      "noopener,noreferrer",
+    );
+  };
 
   return (
     <article className="flex w-full flex-col gap-2 rounded-lg bg-white text-left transition-all">
@@ -337,22 +358,35 @@ const ContributionPreviewCard = ({ item, stateName, config, returnSelection }) =
         ) : null}
         <button
           type="button"
-          onClick={() =>
-            navigate(detailsRoute, {
-              state: {
-                content: item,
-                item: detailStateItem,
-                selectedStateLabel: stateName,
-                returnSelection,
-                sourceSearch: location.search,
-              },
-            })
-          }
-          className="absolute left-1/2 top-1/2 inline-flex -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full bg-black/55 px-4 py-1.5 text-xs font-medium text-white transition hover:bg-black/70"
+          onClick={openPublicDetails}
+          className={`absolute left-1/2 inline-flex -translate-x-1/2 items-center gap-1 rounded-full bg-black/55 px-4 py-1.5 text-xs font-medium text-white transition hover:bg-black/70 ${
+            isSubmittedByUser ? "top-[42%] -translate-y-1/2" : "top-1/2 -translate-y-1/2"
+          }`}
         >
           <HiOutlineEye size={14} />
           View
         </button>
+        {isSubmittedByUser && editRoute ? (
+          <button
+            type="button"
+            onClick={() =>
+              navigate(editRoute, {
+                state: {
+                  content: item,
+                  item: detailStateItem,
+                  selectedStateLabel: stateName,
+                  returnSelection,
+                  sourceSearch: location.search,
+                  startEditing: true,
+                },
+              })
+            }
+            className="absolute left-1/2 top-[58%] inline-flex -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full bg-primary-blue px-4 py-1.5 text-xs font-medium text-white transition hover:bg-sky-500"
+          >
+            <HiOutlinePencil size={14} />
+            Edit
+          </button>
+        ) : null}
       </div>
       <div className="flex h-[25%] flex-col gap-1 px-4 pr-1">
         <h3
