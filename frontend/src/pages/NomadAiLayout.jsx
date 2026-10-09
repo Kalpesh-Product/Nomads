@@ -97,6 +97,13 @@ const contributionBreadcrumbLabels = {
   places: "Places",
 };
 
+const contributionEditBreadcrumbLabels = {
+  blog: "Edit Blog",
+  news: "Edit News",
+  event: "Edit Event",
+  places: "Edit Place",
+};
+
 const NomadAiLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -256,10 +263,17 @@ const NomadAiLayout = () => {
           segments[0] === "contributions" &&
           index === 1 &&
           contributionBreadcrumbLabels[segment];
+        const isContributionEditItem =
+          segments[0] === "contributions" &&
+          index === 2 &&
+          segment !== "add" &&
+          contributionEditBreadcrumbLabels[segments[1]];
         return {
           label:
             isLast && isContentDetailPage && detailStateName
               ? toTitle(detailStateName)
+              : isContributionEditItem
+                ? contributionEditBreadcrumbLabels[segments[1]]
               : isContributionChild
                 ? contributionBreadcrumbLabels[segment]
               : normalizeBreadcrumbLabel(segment),
