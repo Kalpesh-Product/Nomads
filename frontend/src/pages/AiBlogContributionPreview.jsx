@@ -292,6 +292,52 @@ const DestinationPreview = ({ item, config, onEdit }) => {
   );
 };
 
+const EditActions = ({ config, isSaving, onCancel, onSubmit }) => (
+  <div className="mb-6 flex flex-col gap-3 border-b border-black/10 pb-5 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-blue">
+        Editing {config.label}
+      </p>
+      <h1 className="mt-1 text-lg font-semibold text-slate-900">
+        Update public-facing content
+      </h1>
+    </div>
+    <div className="flex flex-wrap items-center gap-3">
+      <button
+        type="button"
+        onClick={onCancel}
+        disabled={isSaving}
+        className="rounded-full border border-black/10 bg-white px-5 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        onClick={() => onSubmit(true)}
+        disabled={isSaving}
+        className="rounded-full border border-sky-100 bg-sky-50 px-5 py-2 text-sm font-semibold text-primary-blue transition hover:bg-sky-100 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        Save Draft
+      </button>
+      <button
+        type="button"
+        onClick={() => onSubmit(false)}
+        disabled={isSaving}
+        className="rounded-full bg-primary-blue px-5 py-2 text-sm font-semibold text-white transition hover:bg-sky-500 disabled:cursor-not-allowed disabled:bg-slate-400"
+      >
+        {config.submitButtonLabel}
+      </button>
+    </div>
+  </div>
+);
+
+const editTitleClassName =
+  "w-full rounded-lg border border-transparent bg-white/70 px-3 py-2 text-title font-bold leading-normal outline-none transition focus:border-sky-300 focus:bg-white focus:ring-2 focus:ring-sky-100";
+const editTextAreaClassName =
+  "w-full resize-y rounded-lg border border-transparent bg-white/70 px-3 py-2 leading-relaxed outline-none transition focus:border-sky-300 focus:bg-white focus:ring-2 focus:ring-sky-100";
+const editImageInputClassName =
+  "mt-3 w-full rounded-full border border-black/10 bg-white px-4 py-2 text-sm text-slate-700 outline-none transition focus:border-sky-300 focus:ring-2 focus:ring-sky-100";
+
 const ArticleFields = ({ formValues, updateFormField }) => (
   <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
     <Field label="Author">
@@ -537,204 +583,232 @@ const ContributionEditForm = ({ item, config, onCancel }) => {
 
   const isSaving = updateContributionMutation.isPending;
 
+  if (showSections) {
+    return (
+      <ArticleInlineEdit
+        config={config}
+        formValues={formValues}
+        updateFormField={updateFormField}
+        updateSection={updateSection}
+        removeSection={removeSection}
+        addSection={() =>
+          setFormValues((current) => ({
+            ...current,
+            sections: [...current.sections, emptySection()],
+          }))
+        }
+        handleSubmit={handleSubmit}
+        isSaving={isSaving}
+        onCancel={onCancel}
+      />
+    );
+  }
+
   return (
-    <main className="mx-auto w-full max-w-[80rem] px-4 pb-8 pt-2 md:px-8 lg:px-8">
-      <section className="mt-3 bg-transparent px-4 py-6 sm:px-6 lg:px-8">
-        <div className="rounded-lg border border-slate-200 bg-white px-4 py-6 sm:px-6 lg:px-8">
-          <h1 className="mb-8 text-2xl font-semibold uppercase text-slate-700">
-            Edit {config.label}
-          </h1>
+    <DestinationInlineEdit
+      config={config}
+      formValues={formValues}
+      updateFormField={updateFormField}
+      handleSubmit={handleSubmit}
+      isSaving={isSaving}
+      onCancel={onCancel}
+    />
+  );
+};
 
-          <div className="grid gap-5 lg:grid-cols-2">
-            <Field label="Destination">
-              <input className={inputClassName} value={formValues.destination} readOnly />
-            </Field>
-            <Field label="Link">
-              <input
-                className={inputClassName}
-                value={formValues.link}
-                onChange={(event) => updateFormField("link", event.target.value)}
-                placeholder="Type URL here"
-              />
-            </Field>
-            <Field
-              label={
-                isEventForm ? "Event Name" : isPlaceForm ? "Place Name" : "Main Title"
-              }
-            >
-              <input
-                className={inputClassName}
-                value={
-                  isEventForm
-                    ? formValues.eventName
-                    : isPlaceForm
-                      ? formValues.placeName
-                      : formValues.mainTitle
-                }
-                onChange={(event) =>
-                  updateFormField(
-                    isEventForm
-                      ? "eventName"
-                      : isPlaceForm
-                        ? "placeName"
-                        : "mainTitle",
-                    event.target.value,
-                  )
-                }
-                placeholder={
-                  isEventForm
-                    ? "Event name"
-                    : isPlaceForm
-                      ? "Place name"
-                      : "Main title"
-                }
-              />
-            </Field>
-            <Field label="Main Image URL">
-              <input
-                className={inputClassName}
-                value={formValues.mainImage}
-                onChange={(event) => updateFormField("mainImage", event.target.value)}
-                placeholder="Main image URL"
-              />
-            </Field>
-          </div>
+const ArticleInlineEdit = ({
+  config,
+  formValues,
+  updateFormField,
+  updateSection,
+  removeSection,
+  addSection,
+  handleSubmit,
+  isSaving,
+  onCancel,
+}) => {
+  let sectionImageIndex = 0;
+  const sections = formValues.sections.map((section) => {
+    if (!section.image) return { ...section, imageSide: null };
+    const imageSide = sectionImageIndex % 2 === 0 ? "left" : "right";
+    sectionImageIndex += 1;
+    return { ...section, imageSide };
+  });
 
-          {isEventForm ? (
-            <EventFields formValues={formValues} updateFormField={updateFormField} />
-          ) : isPlaceForm ? (
-            <PlaceFields formValues={formValues} updateFormField={updateFormField} />
-          ) : (
-            <ArticleFields formValues={formValues} updateFormField={updateFormField} />
-          )}
+  return (
+    <main className="mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8">
+      <EditActions
+        config={config}
+        isSaving={isSaving}
+        onCancel={onCancel}
+        onSubmit={handleSubmit}
+      />
+
+      <div className="flex flex-col gap-8">
+        <section className="clear-both flow-root">
+          <input
+            className={editTitleClassName}
+            value={formValues.mainTitle}
+            onChange={(event) => updateFormField("mainTitle", event.target.value)}
+            placeholder="Main title"
+          />
 
           <div className="mt-6">
-            <label className={labelClassName}>
-              {isEventForm || isPlaceForm ? "Short Description" : "Main Content"}
-            </label>
-            <textarea
-              className={`${inputClassName} min-h-[150px] resize-y leading-relaxed`}
-              value={
-                isEventForm || isPlaceForm
-                  ? formValues.shortDescription
-                  : formValues.mainContent
-              }
-              onChange={(event) =>
-                updateFormField(
-                  isEventForm || isPlaceForm ? "shortDescription" : "mainContent",
-                  event.target.value,
-                )
-              }
-              placeholder={
-                isEventForm || isPlaceForm ? "Short description" : "Main content"
-              }
+            {formValues.mainImage ? (
+              <FloatingImage src={formValues.mainImage} alt={formValues.mainTitle} />
+            ) : null}
+            <input
+              className={editImageInputClassName}
+              value={formValues.mainImage}
+              onChange={(event) => updateFormField("mainImage", event.target.value)}
+              placeholder="Main image URL"
             />
           </div>
 
-          {showSections ? (
-            <>
-              <h2 className="mt-5 text-lg font-semibold text-slate-700">Sections</h2>
-              <div className="mt-3 space-y-4">
-                {formValues.sections.map((section, index) => (
-                  <div
-                    key={index}
-                    className="rounded-lg border border-slate-200 bg-white p-4"
-                  >
-                    <div className="mb-4 flex items-center justify-between gap-3">
-                      <h3 className="text-sm font-medium text-slate-600">
-                        Section {index + 1}
-                      </h3>
-                      {formValues.sections.length > 1 ? (
-                        <button
-                          type="button"
-                          onClick={() => removeSection(index)}
-                          className="inline-flex items-center gap-1 text-xs font-medium text-red-500 hover:text-red-600"
-                        >
-                          <HiOutlineTrash size={14} />
-                          Remove
-                        </button>
-                      ) : null}
-                    </div>
+          <textarea
+            className={`${editTextAreaClassName} mt-5 min-h-[220px]`}
+            value={formValues.mainContent}
+            onChange={(event) => updateFormField("mainContent", event.target.value)}
+            placeholder="Main content"
+          />
+        </section>
 
-                    <div className="space-y-4">
-                      <Field label="Section Title">
-                        <input
-                          className={inputClassName}
-                          value={section.title}
-                          onChange={(event) =>
-                            updateSection(index, "title", event.target.value)
-                          }
-                          placeholder="Section Title"
-                        />
-                      </Field>
-                      <Field label="Section Image URL">
-                        <input
-                          className={inputClassName}
-                          value={section.image}
-                          onChange={(event) =>
-                            updateSection(index, "image", event.target.value)
-                          }
-                          placeholder="Section Image URL"
-                        />
-                      </Field>
-                      <Field label="Section Content">
-                        <textarea
-                          className={`${inputClassName} min-h-[150px] resize-y leading-relaxed`}
-                          value={section.content}
-                          onChange={(event) =>
-                            updateSection(index, "content", event.target.value)
-                          }
-                          placeholder="Section content"
-                        />
-                      </Field>
-                    </div>
-                  </div>
-                ))}
+        <hr />
+
+        <section className="flex flex-col gap-8">
+          {sections.map((section, index) => (
+            <article key={index} className="clear-both flow-root rounded-xl bg-white/50 p-3">
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+                  Section {index + 1}
+                </p>
+                {formValues.sections.length > 1 ? (
+                  <button
+                    type="button"
+                    onClick={() => removeSection(index)}
+                    className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold text-red-500 transition hover:bg-red-50"
+                  >
+                    <HiOutlineTrash size={14} />
+                    Remove
+                  </button>
+                ) : null}
               </div>
 
-              <button
-                type="button"
-                onClick={() =>
-                  setFormValues((current) => ({
-                    ...current,
-                    sections: [...current.sections, emptySection()],
-                  }))
-                }
-                className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-blue-800 hover:text-primary-blue"
-              >
-                <HiOutlinePlus size={16} />
-                Add Section
-              </button>
-            </>
-          ) : null}
+              <input
+                className="mb-4 w-full rounded-lg border border-transparent bg-white/70 px-3 py-2 text-card-title font-bold leading-[1.2] outline-none transition focus:border-sky-300 focus:bg-white focus:ring-2 focus:ring-sky-100 md:leading-[1.35]"
+                value={section.title}
+                onChange={(event) => updateSection(index, "title", event.target.value)}
+                placeholder="Section title"
+              />
+              {section.image ? (
+                <FloatingImage
+                  src={section.image}
+                  alt={section.title || `Section ${index + 1}`}
+                  side={section.imageSide}
+                />
+              ) : null}
+              <input
+                className={editImageInputClassName}
+                value={section.image}
+                onChange={(event) => updateSection(index, "image", event.target.value)}
+                placeholder="Section image URL"
+              />
+              <textarea
+                className={`${editTextAreaClassName} mt-4 min-h-[170px]`}
+                value={section.content}
+                onChange={(event) => updateSection(index, "content", event.target.value)}
+                placeholder="Section content"
+              />
+            </article>
+          ))}
 
-          <div className="mt-14 flex flex-wrap items-center justify-center gap-4">
-            <button
-              type="button"
-              onClick={() => handleSubmit(true)}
-              disabled={isSaving}
-              className="rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-400"
-            >
-              Save As Draft
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSubmit(false)}
-              disabled={isSaving}
-              className="rounded-lg bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-400"
-            >
-              {config.submitButtonLabel}
-            </button>
-            <button
-              type="button"
-              onClick={onCancel}
-              disabled={isSaving}
-              className="rounded-lg bg-slate-300 px-6 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-400 disabled:cursor-not-allowed"
-            >
-              Cancel
-            </button>
+          <button
+            type="button"
+            onClick={addSection}
+            className="inline-flex w-fit items-center gap-1 rounded-full border border-sky-100 bg-sky-50 px-4 py-2 text-sm font-semibold text-primary-blue transition hover:bg-sky-100"
+          >
+            <HiOutlinePlus size={16} />
+            Add Section
+          </button>
+        </section>
+
+        <hr />
+        <footer className="flex w-full flex-col items-center gap-2 text-center text-sm text-slate-500 md:flex-row md:items-center md:justify-between md:gap-4 md:text-left md:text-base">
+          <p className="w-full break-words md:w-auto">{formValues.author || ""}</p>
+          <p className="w-full break-words md:w-auto">
+            {humanDate(formValues.date)}
+          </p>
+          <p className="w-full break-words md:w-auto md:text-right">
+            {formValues.source || "Source"}
+          </p>
+        </footer>
+      </div>
+    </main>
+  );
+};
+
+const DestinationInlineEdit = ({
+  config,
+  formValues,
+  updateFormField,
+  handleSubmit,
+  isSaving,
+  onCancel,
+}) => {
+  const isEvent = config.formType === "event";
+  const titleField = isEvent ? "eventName" : "placeName";
+  const titlePlaceholder = isEvent ? "Event name" : "Place name";
+  const primaryMeta = isEvent ? formValues.category : formValues.category || formValues.placeType;
+  const centerMeta = isEvent ? formValues.month : formValues.rating || formValues.month;
+  const rightMeta = isEvent ? formValues.venue : formValues.address || formValues.venue;
+
+  return (
+    <main className="mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8">
+      <EditActions
+        config={config}
+        isSaving={isSaving}
+        onCancel={onCancel}
+        onSubmit={handleSubmit}
+      />
+
+      <section className="mt-4">
+        <input
+          className={editTitleClassName}
+          value={formValues[titleField]}
+          onChange={(event) => updateFormField(titleField, event.target.value)}
+          placeholder={titlePlaceholder}
+        />
+
+        {formValues.mainImage ? (
+          <div className="mt-6 aspect-[3.3/1] w-full overflow-hidden rounded-xl bg-slate-100">
+            <img
+              src={formValues.mainImage}
+              alt={formValues[titleField]}
+              className="h-full w-full object-cover"
+            />
           </div>
+        ) : null}
+        <input
+          className={editImageInputClassName}
+          value={formValues.mainImage}
+          onChange={(event) => updateFormField("mainImage", event.target.value)}
+          placeholder="Main image URL"
+        />
+
+        <div className="mt-6 grid gap-4 text-base font-bold text-black md:grid-cols-3">
+          <p>{primaryMeta || ""}</p>
+          <p className="md:text-center">{centerMeta || ""}</p>
+          <p className="md:text-right">{rightMeta || ""}</p>
         </div>
+
+        <hr className="my-6" />
+
+        <textarea
+          className={`${editTextAreaClassName} min-h-[220px]`}
+          value={formValues.shortDescription}
+          onChange={(event) => updateFormField("shortDescription", event.target.value)}
+          placeholder="Short description"
+        />
       </section>
     </main>
   );
