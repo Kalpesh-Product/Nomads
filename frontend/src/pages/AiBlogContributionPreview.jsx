@@ -293,7 +293,7 @@ const DestinationPreview = ({ item, config, onEdit }) => {
 };
 
 const EditActions = ({ config, isSaving, onCancel, onSubmit }) => (
-  <div className="mb-6 flex flex-col gap-3 border-b border-black/10 pb-5 sm:flex-row sm:items-center sm:justify-between">
+  <div className="sticky top-0 z-30 -mx-4 mb-6 flex flex-col gap-3 border-b border-black/10 bg-[#fffef2]/95 px-4 pb-5 pt-2 backdrop-blur sm:flex-row sm:items-center sm:justify-between md:-mx-8 md:px-8 lg:-mx-8">
     <div>
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-blue">
         Editing {config.label}
