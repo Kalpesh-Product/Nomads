@@ -166,7 +166,7 @@ const TopContributionRow = ({ entry, index }) => {
     <button
       type="button"
       onClick={() => navigate(config.detailsPath(item))}
-      className="grid w-full grid-cols-[2.25rem_4.75rem_minmax(0,1fr)_auto] items-center gap-4 rounded-lg px-3 py-3 text-left transition hover:bg-white"
+      className="grid w-full grid-cols-[2.25rem_4.75rem_minmax(0,1fr)] items-center gap-4 rounded-lg px-3 py-3 text-left transition hover:bg-white md:grid-cols-[2.25rem_4.75rem_minmax(0,1fr)_5rem_5rem]"
     >
       <span className="text-lg font-semibold text-black/25">
         {String(index + 1).padStart(2, "0")}
@@ -192,16 +192,14 @@ const TopContributionRow = ({ entry, index }) => {
           {getDestination(item)} • {humanDate(getItemDate(item))}
         </p>
       </div>
-      <div className="hidden items-center gap-5 text-sm font-semibold text-black/75 md:flex">
-        <span className="inline-flex items-center gap-1.5">
-          <HiHeart className="text-rose-500" size={18} />
-          {getLikeCount(item, `${Math.max(1, index + 2)}.${index + 1}K`)}
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <MdRateReview className="text-primary-blue" size={18} />
-          {Math.max(1, index + 1)}.{index + 4}K
-        </span>
-      </div>
+      <span className="hidden items-center justify-center gap-1.5 text-sm font-semibold text-black/75 md:inline-flex">
+        <HiHeart className="text-rose-500" size={18} />
+        {getLikeCount(item, `${Math.max(1, index + 2)}.${index + 1}K`)}
+      </span>
+      <span className="hidden items-center justify-center gap-1.5 text-sm font-semibold text-black/75 md:inline-flex">
+        <MdRateReview className="text-primary-blue" size={18} />
+        {Math.max(1, index + 1)}.{index + 4}K
+      </span>
     </button>
   );
 };
@@ -446,14 +444,24 @@ const AiContributionsHubTwo = () => {
                       Loading contributions...
                     </div>
                   ) : topItems.length > 0 ? (
-                    <div className="mt-5 space-y-1">
-                      {topItems.map((entry, index) => (
-                        <TopContributionRow
-                          key={`${entry.config.key}-${entry.item._id || entry.item.id || index}`}
-                          entry={entry}
-                          index={index}
-                        />
-                      ))}
+                    <div className="mt-5">
+                      <div className="hidden grid-cols-[2.25rem_4.75rem_minmax(0,1fr)_5rem_5rem] items-center gap-4 px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-black/35 md:grid">
+                        <span>Rank</span>
+                        <span>Image</span>
+                        <span>Title</span>
+                        <span className="justify-self-center">Likes</span>
+                        <span className="justify-self-center">Reviews</span>
+                      </div>
+                      <div className="hidden border-t border-black/10 md:block" />
+                      <div className="mt-2 space-y-1">
+                        {topItems.map((entry, index) => (
+                          <TopContributionRow
+                            key={`${entry.config.key}-${entry.item._id || entry.item.id || index}`}
+                            entry={entry}
+                            index={index}
+                          />
+                        ))}
+                      </div>
                     </div>
                   ) : (
                     <div className="mt-5 rounded-lg border border-dotted bg-white p-8 text-center text-sm text-black/50">
