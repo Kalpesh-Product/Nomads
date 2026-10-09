@@ -438,6 +438,9 @@ const AiContributionsHubTwo = () => {
                   <h2 className="text-xl font-bold text-black">
                     Top contributions
                   </h2>
+                  <p className="mt-1 text-xs text-black/55">
+                    The most engaged items across blogs, news, events, and places.
+                  </p>
 
                   {isLoading ? (
                     <div className="mt-5 rounded-lg border border-dotted bg-white p-8 text-center text-sm text-black/50">
