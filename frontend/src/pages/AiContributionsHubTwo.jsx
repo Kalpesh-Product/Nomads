@@ -307,21 +307,6 @@ const AiContributionsHubTwo = () => {
                     stories and moving drafts into review to climb the
                     leaderboard.
                   </p>
-                  <div className="mt-6 flex flex-nowrap gap-3">
-                    {sections.map(({ config }) => (
-                      <button
-                        key={config.key}
-                        type="button"
-                        onClick={() =>
-                          navigate(config.addPath, { state: { freshAdd: true } })
-                        }
-                        className="inline-flex shrink-0 items-center gap-2 rounded-full bg-primary-blue px-4 py-2 text-xs font-semibold text-white transition hover:bg-sky-500"
-                      >
-                        <HiOutlinePlus size={16} />
-                        Add {config.singular}
-                      </button>
-                    ))}
-                  </div>
                 </div>
 
                 <div className="flex h-36 w-36 flex-col items-center justify-center rounded-[1.5rem] border border-white/80 bg-white/90 text-center backdrop-blur">
