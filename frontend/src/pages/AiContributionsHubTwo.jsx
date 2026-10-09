@@ -418,7 +418,9 @@ const AiContributionsHubTwo = () => {
                         <button
                           type="button"
                           onClick={() =>
-                            navigate(config.addPath, { state: { freshAdd: true } })
+                            navigate(config.addPath, {
+                              state: { freshAdd: true, openForm: true },
+                            })
                           }
                           className="inline-flex items-center justify-center gap-1.5 rounded-full bg-primary-blue px-3 py-2 text-xs font-bold text-white transition hover:bg-sky-500"
                         >

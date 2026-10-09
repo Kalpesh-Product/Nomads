@@ -432,7 +432,9 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
   const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [selectedLocationLabel, setSelectedLocationLabel] = useState("");
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(() =>
+    Boolean(routeLocation.state?.openForm),
+  );
   const [formValues, setFormValues] = useState(() =>
     initialFormState(contributorName),
   );
@@ -679,11 +681,15 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
   useEffect(() => {
     if (continentOptions.length === 0 || locations.length === 0) return;
 
+    if (routeLocation.state?.openForm && !showForm) {
+      setShowForm(true);
+    }
+
     if (routeLocation.state?.freshAdd) {
       sessionStorage.removeItem(selectionStorageKey);
       navigate(`${routeLocation.pathname}${routeLocation.search}`, {
         replace: true,
-        state: { ...routeLocation.state, freshAdd: false },
+        state: { ...routeLocation.state, freshAdd: false, openForm: false },
       });
       return;
     }
@@ -729,6 +735,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
     selectedCountry,
     selectedLocation,
     selectionStorageKey,
+    showForm,
   ]);
 
   useEffect(() => {

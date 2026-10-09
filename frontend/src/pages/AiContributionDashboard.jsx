@@ -533,7 +533,7 @@ const AiContributionDashboard = ({ type, initialFilter = "all" }) => {
               type="button"
               onClick={() =>
                 navigate(`${selectedFilterConfig.seoPath}/add`, {
-                  state: { freshAdd: true },
+                  state: { freshAdd: true, openForm: true },
                 })
               }
               className="inline-flex items-center gap-1 rounded-full bg-primary-blue px-6 py-3 text-sm font-semibold uppercase text-white transition hover:bg-sky-500"
@@ -566,7 +566,7 @@ const AiContributionDashboard = ({ type, initialFilter = "all" }) => {
                         type="button"
                         onClick={() =>
                           navigate(`${selectedFilterConfig.seoPath}/add`, {
-                            state: { freshAdd: true },
+                            state: { freshAdd: true, openForm: true },
                           })
                         }
                         className="inline-flex w-fit items-center gap-1 rounded-full bg-primary-blue px-6 py-3 text-sm font-semibold uppercase text-white transition hover:bg-sky-500"
