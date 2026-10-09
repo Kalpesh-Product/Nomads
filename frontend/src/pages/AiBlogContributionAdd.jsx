@@ -502,22 +502,25 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
     }),
     [selectedContinent, selectedCountry, selectedLocation, selectedLocationLabel],
   );
+  const previewHeadingLocation = hasAllSelections ? locationLabel : "All";
 
   const { data: existingItems = [], isPending: isExistingItemsLoading } = useQuery({
     queryKey: [config.existingQueryKey, selectedDestination],
     queryFn: async () => {
       const response = await axios.get(config.existingEndpoint, {
         params:
-          typeof config.existingParams === "function"
+          selectedDestination && typeof config.existingParams === "function"
             ? config.existingParams(selectedDestination)
-            : {
-                keyword: buildExactKeyword(selectedDestination),
-              },
+            : selectedDestination
+              ? {
+                  keyword: buildExactKeyword(selectedDestination),
+                }
+              : {},
       });
 
       return Array.isArray(response.data) ? response.data : [];
     },
-    enabled: Boolean(selectedDestination),
+    enabled: true,
     refetchOnWindowFocus: false,
   });
 
@@ -531,7 +534,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
         return items
           .filter(
             (item) =>
-              isSameDestination(item, selectedDestination) &&
+              (!selectedDestination || isSameDestination(item, selectedDestination)) &&
               !item.isDraft &&
               (item.status || "pending").toLowerCase() === "approved",
           )
@@ -541,7 +544,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
             __submittedByUser: true,
           }));
       },
-      enabled: Boolean(selectedDestination) && Boolean(user?._id || user?.id),
+      enabled: Boolean(user?._id || user?.id),
       refetchOnWindowFocus: false,
     });
 
@@ -765,6 +768,11 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
       return;
     }
 
+    if (!selectedDestination) {
+      showErrorAlert("Please select a continent, country and state.");
+      return;
+    }
+
     if (isEventForm) {
       createContribution({
         eventName: formValues.eventName.trim(),
@@ -826,12 +834,12 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
           <p className="font-play text-sm font-medium leading-snug text-black/85 lg:text-[0.95rem]">
             {hasAllSelections
               ? `Below are the existing ${config.contentLabelPlural.toLowerCase()} for the selected location.`
-              : `Please select the continent, country and state from each below to add your ${config.contentLabel.toLowerCase()}.`}
+              : `Browse all available ${config.contentLabelPlural.toLowerCase()} or filter by continent, country and state.`}
           </p>
 
           <div
             ref={dropdownContainerRef}
-            className="relative z-30 mt-6 grid w-full grid-cols-1 gap-4 lg:grid-cols-3"
+            className="relative z-30 mt-6 grid w-full grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto]"
           >
             <DropdownBadge
               label="Continent"
@@ -892,12 +900,19 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               }}
               disabled={!selectedCountry}
             />
+
+            <button
+              type="button"
+              onClick={() => setShowForm(true)}
+              className="inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-full bg-primary-blue px-6 py-2 text-sm font-semibold text-white transition hover:bg-sky-500 lg:min-w-[10rem]"
+            >
+              {config.writeButtonLabel}
+            </button>
           </div>
 
-          {hasAllSelections ? (
-            <div className="mt-8">
+          <div className="mt-8">
               <h1 className="mb-4 pl-0 text-sm font-semibold text-black md:pl-12">
-                Latest {locationLabel} {config.contentLabelPlural}
+                Latest {previewHeadingLocation} {config.contentLabelPlural}
               </h1>
 
               {isPreviewItemsLoading ? (
@@ -918,21 +933,11 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                 </div>
               ) : (
                 <p className="text-sm text-slate-500">
-                  No {config.contentLabel.toLowerCase()} posts found for {locationLabel}.
+                  No {config.contentLabel.toLowerCase()} posts found
+                  {hasAllSelections ? ` for ${locationLabel}` : ""}.
                 </p>
               )}
-
-              <div className="mt-10 flex justify-center">
-                <button
-                  type="button"
-                  onClick={() => setShowForm(true)}
-                  className="inline-flex min-h-[48px] min-w-[13rem] items-center justify-center rounded-full bg-primary-blue px-8 py-3 text-sm font-semibold text-white transition hover:bg-sky-500"
-                >
-                  {config.writeButtonLabel}
-                </button>
-              </div>
             </div>
-          ) : null}
         </section>
       ) : (
         <section className="mt-3 bg-transparent px-4 py-6 sm:px-6 lg:px-8">
@@ -941,15 +946,80 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               Add {config.contentLabel}
             </h1>
 
+            <div
+              ref={dropdownContainerRef}
+              className="relative z-30 mb-5 grid gap-4 lg:grid-cols-3"
+            >
+              <DropdownBadge
+                label="Continent"
+                options={continentOptions}
+                selectedValue={continentLabel}
+                isOpen={openDropdown === "form-continent"}
+                onToggle={() =>
+                  setOpenDropdown((current) =>
+                    current === "form-continent" ? null : "form-continent",
+                  )
+                }
+                onSelect={(option) => {
+                  setSelectedContinent(option.value);
+                  setSelectedCountry("");
+                  setSelectedLocation("");
+                  setSelectedLocationLabel("");
+                  setFormValues((current) => ({
+                    ...current,
+                    destination: "",
+                  }));
+                  setOpenDropdown(null);
+                }}
+              />
+
+              <DropdownBadge
+                label="Country"
+                options={countryOptions}
+                selectedValue={countryLabel}
+                isOpen={openDropdown === "form-country"}
+                onToggle={() =>
+                  setOpenDropdown((current) =>
+                    current === "form-country" ? null : "form-country",
+                  )
+                }
+                onSelect={(option) => {
+                  setSelectedCountry(option.value);
+                  setSelectedLocation("");
+                  setSelectedLocationLabel("");
+                  setFormValues((current) => ({
+                    ...current,
+                    destination: "",
+                  }));
+                  setOpenDropdown(null);
+                }}
+                disabled={!selectedContinent}
+              />
+
+              <DropdownBadge
+                label="Location"
+                options={locationOptions}
+                selectedValue={locationLabel}
+                isOpen={openDropdown === "form-location"}
+                onToggle={() =>
+                  setOpenDropdown((current) =>
+                    current === "form-location" ? null : "form-location",
+                  )
+                }
+                onSelect={(option) => {
+                  setSelectedLocation(option.value);
+                  setSelectedLocationLabel(option.label);
+                  setFormValues((current) => ({
+                    ...current,
+                    destination: option.destination,
+                  }));
+                  setOpenDropdown(null);
+                }}
+                disabled={!selectedCountry}
+              />
+            </div>
+
             <div className="grid gap-5 lg:grid-cols-2">
-              <div>
-                <label className={labelClassName}>Destination</label>
-                <input
-                  className={inputClassName}
-                  value={formValues.destination}
-                  readOnly
-                />
-              </div>
               <div>
                 <label className={labelClassName}>Link</label>
                 <input
