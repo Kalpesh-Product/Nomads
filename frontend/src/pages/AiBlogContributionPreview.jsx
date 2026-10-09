@@ -446,10 +446,10 @@ const ContributionEditForm = ({ item, config, onCancel }) => {
       axiosPrivate.patch(`${config.myEndpoint}/${itemId}`, payload),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: [config.queryKey] });
-      await showSuccessAlert(config.updateSuccessMessage, {
+      navigate(config.dashboardPath, { replace: true });
+      showSuccessAlert(config.updateSuccessMessage, {
         title: config.updateSuccessTitle,
       });
-      navigate(config.dashboardPath);
     },
     onError: (error) => {
       showErrorAlert(error?.response?.data?.message || config.errorMessage);
