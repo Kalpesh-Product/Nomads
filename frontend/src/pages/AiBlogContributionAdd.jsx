@@ -502,7 +502,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
     }),
     [selectedContinent, selectedCountry, selectedLocation, selectedLocationLabel],
   );
-  const previewHeadingLocation = hasAllSelections ? locationLabel : "All";
+  const previewHeadingLocation = hasAllSelections ? `${locationLabel} ` : "";
 
   const { data: existingItems = [], isPending: isExistingItemsLoading } = useQuery({
     queryKey: [config.existingQueryKey, selectedDestination],
@@ -912,7 +912,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
 
           <div className="mt-8">
               <h1 className="mb-4 pl-0 text-sm font-semibold text-black md:pl-12">
-                Latest {previewHeadingLocation} {config.contentLabelPlural}
+                Latest {previewHeadingLocation}{config.contentLabelPlural}
               </h1>
 
               {isPreviewItemsLoading ? (
