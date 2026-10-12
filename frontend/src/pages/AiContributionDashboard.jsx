@@ -137,6 +137,30 @@ const statusBadgeStyles = {
 const fallbackImage =
   "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp";
 
+const statusSortOrder = {
+  pending: 0,
+  approved: 1,
+  rejected: 2,
+};
+
+const getContributionDate = (item) => item?.date || item?.updatedAt || item?.createdAt;
+
+const sortByStatusAndRecent = (entries) =>
+  [...entries].sort((a, b) => {
+    const aStatus = String(a.item?.status || "pending").toLowerCase();
+    const bStatus = String(b.item?.status || "pending").toLowerCase();
+    const statusDifference =
+      (statusSortOrder[aStatus] ?? Number.MAX_SAFE_INTEGER) -
+      (statusSortOrder[bStatus] ?? Number.MAX_SAFE_INTEGER);
+
+    if (statusDifference !== 0) return statusDifference;
+
+    return (
+      new Date(getContributionDate(b.item) || 0).getTime() -
+      new Date(getContributionDate(a.item) || 0).getTime()
+    );
+  });
+
 const ContributionStatusFilter = ({ value, onChange, label = "Contribution" }) => {
   const [isOpen, setIsOpen] = useState(false);
   const filterRef = useRef(null);
@@ -510,6 +534,9 @@ const AiContributionDashboard = ({ type, initialFilter = "all" }) => {
       : submittedContributions.filter(
           ({ item }) => (item.status || "pending").toLowerCase() === statusFilter,
         );
+  const sortedSubmittedContributions = sortByStatusAndRecent(
+    filteredSubmittedContributions,
+  );
   const draftContributions = visibleContributions.filter(({ item }) => item.isDraft);
   const hasContributionList = isCombinedPage || ["blog", "news", "event", "places"].includes(type);
   const shouldShowStatusFilter =
@@ -590,9 +617,9 @@ const AiContributionDashboard = ({ type, initialFilter = "all" }) => {
                   ) : null}
                 </div>
 
-                {filteredSubmittedContributions.length > 0 ? (
+                {sortedSubmittedContributions.length > 0 ? (
                   <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
-                    {filteredSubmittedContributions.map(({ item, config: itemConfig }) => (
+                    {sortedSubmittedContributions.map(({ item, config: itemConfig }) => (
                       <ContributionCard
                         key={`${itemConfig.contentLabel}-${item._id || item.id}`}
                         item={item}
