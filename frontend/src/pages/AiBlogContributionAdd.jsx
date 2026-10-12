@@ -1000,7 +1000,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
             </div>
         </section>
       ) : (
-        <section className="mt-3 bg-transparent px-4 py-6 sm:px-6 lg:px-8">
+        <section className="mt-0 bg-transparent px-0 py-2">
           <div className="rounded-lg border border-slate-200 bg-white px-4 py-6 sm:px-6 lg:px-8">
             <h1 className="mb-8 text-2xl font-semibold uppercase text-slate-700">
               Add {config.contentLabel}
