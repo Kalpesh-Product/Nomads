@@ -160,7 +160,6 @@ const StatPill = ({ label, value, tone, icon: Icon }) => (
 const TopContributionRow = ({ entry, index }) => {
   const navigate = useNavigate();
   const { item, config } = entry;
-  const Icon = config.icon;
 
   return (
     <button
@@ -178,18 +177,14 @@ const TopContributionRow = ({ entry, index }) => {
           className="h-full w-full object-cover"
           loading="lazy"
         />
-        <span
-          className={`absolute bottom-1 right-1 flex h-6 w-6 items-center justify-center rounded-full ${config.color} text-white`}
-        >
-          <Icon size={14} />
-        </span>
       </div>
       <div className="min-w-0">
         <p className="line-clamp-2 text-sm font-semibold leading-5 text-black">
           {getTitle(item, config)}
         </p>
         <p className="mt-1 text-xs font-medium text-black/45">
-          {getDestination(item)} • {humanDate(getItemDate(item))}
+          {config.singular} in {getDestination(item)} •{" "}
+          {humanDate(getItemDate(item))}
         </p>
       </div>
       <span className="hidden items-center justify-center gap-1.5 text-sm font-semibold text-black/75 md:inline-flex">
@@ -503,7 +498,6 @@ const AiContributionsHubTwo = () => {
                       <div className="hidden border-t border-black/10 md:block" />
                       <div className="mt-2 space-y-1">
                       {recentListItems.map(({ item, config }, index) => {
-                        const Icon = config.icon;
                         const status = item.isDraft
                           ? "draft"
                           : (item.status || "pending").toLowerCase();
@@ -530,11 +524,6 @@ const AiContributionsHubTwo = () => {
                                 className="h-full w-full object-cover"
                                 loading="lazy"
                               />
-                              <span
-                                className={`absolute bottom-1 right-1 flex h-6 w-6 items-center justify-center rounded-full ${config.color} text-white`}
-                              >
-                                <Icon size={14} />
-                              </span>
                             </div>
                             <div className="min-w-0 flex-1">
                               <p className="line-clamp-2 text-sm font-semibold leading-5 text-black">
