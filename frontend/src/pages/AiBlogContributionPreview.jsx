@@ -67,6 +67,7 @@ const contributionPreviewConfig = {
 const emptySection = () => ({
   title: "",
   image: "",
+  imageFile: null,
   content: "",
 });
 
@@ -85,6 +86,7 @@ const buildFormState = (item = {}) => ({
   link: item.link || item.blogType || "",
   mainTitle: item.mainTitle || "",
   mainImage: item.mainImage || item.image || "",
+  mainImageFile: null,
   author: item.author || "",
   source: getSourceName(item.source),
   date: toDateInputValue(item.date),
@@ -107,6 +109,7 @@ const buildFormState = (item = {}) => ({
       ? item.sections.map((section) => ({
           title: section.title || "",
           image: section.image || "",
+          imageFile: null,
           content: section.content || "",
         }))
       : [emptySection()],
@@ -116,6 +119,48 @@ const Field = ({ label, children }) => (
   <div>
     <label className={labelClassName}>{label}</label>
     {children}
+  </div>
+);
+
+const BlogImageFileInput = ({
+  id,
+  label,
+  file,
+  existingUrl,
+  onChange,
+  onClear,
+}) => (
+  <div className="mt-3 rounded-xl border border-black/10 bg-white/70 p-3">
+    <label className={labelClassName} htmlFor={id}>
+      {label}
+    </label>
+    <div className="flex min-h-[42px] items-center gap-3 rounded-md border border-black/10 bg-white px-3 py-2 text-sm transition focus-within:border-sky-400 focus-within:ring-2 focus-within:ring-sky-100">
+      <input
+        id={id}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        className="sr-only"
+        onChange={(event) => onChange(event.target.files?.[0] || null)}
+      />
+      <label
+        htmlFor={id}
+        className="shrink-0 cursor-pointer rounded-md bg-sky-50 px-3 py-1.5 text-xs font-semibold text-sky-700 transition hover:bg-sky-100"
+      >
+        Choose image
+      </label>
+      <span className="min-w-0 flex-1 truncate text-slate-600">
+        {file?.name || (existingUrl ? "Keeping current image" : "No file selected")}
+      </span>
+      {file ? (
+        <button
+          type="button"
+          onClick={onClear}
+          className="shrink-0 text-xs font-semibold text-red-500 hover:text-red-600"
+        >
+          Remove
+        </button>
+      ) : null}
+    </div>
   </div>
 );
 
@@ -461,6 +506,7 @@ const ContributionEditForm = ({ item, config, onCancel }) => {
   const itemId = item._id || item.id;
   const isEventForm = config.formType === "event";
   const isPlaceForm = config.formType === "place";
+  const isBlogContribution = config.label.toLowerCase() === "blog";
   const showSections = !isEventForm && !isPlaceForm;
 
   const updateContributionMutation = useMutation({
@@ -490,6 +536,22 @@ const ContributionEditForm = ({ item, config, onCancel }) => {
       ...current,
       sections: current.sections.map((section, sectionIndex) =>
         sectionIndex === index ? { ...section, [field]: value } : section,
+      ),
+    }));
+  };
+
+  const updateBlogImageFile = (field, file) => {
+    setFormValues((current) => ({
+      ...current,
+      [`${field}File`]: file,
+    }));
+  };
+
+  const updateSectionImageFile = (index, file) => {
+    setFormValues((current) => ({
+      ...current,
+      sections: current.sections.map((section, sectionIndex) =>
+        sectionIndex === index ? { ...section, imageFile: file } : section,
       ),
     }));
   };
@@ -586,21 +648,47 @@ const ContributionEditForm = ({ item, config, onCancel }) => {
       return;
     }
 
-    updateContributionMutation.mutate({
-      payload: {
-        mainTitle: formValues.mainTitle.trim(),
-        mainImage: formValues.mainImage.trim(),
-        mainContent: formValues.mainContent.trim(),
-        author: formValues.author.trim(),
-        date: formValues.date ? new Date(formValues.date).toISOString() : null,
-        destination: formValues.destination,
-        blogType: formValues.link.trim(),
-        link: formValues.link.trim(),
-        source: formValues.source.trim(),
-        sections: cleanedSections,
-        isDraft,
-      },
-    });
+    const payload = {
+      mainTitle: formValues.mainTitle.trim(),
+      mainImage: formValues.mainImage.trim(),
+      mainContent: formValues.mainContent.trim(),
+      author: formValues.author.trim(),
+      date: formValues.date ? new Date(formValues.date).toISOString() : null,
+      destination: formValues.destination,
+      blogType: isBlogContribution ? "" : formValues.link.trim(),
+      link: isBlogContribution ? "" : formValues.link.trim(),
+      source: formValues.source.trim(),
+      sections: cleanedSections,
+      isDraft,
+    };
+
+    if (isBlogContribution) {
+      const formData = new FormData();
+
+      Object.entries(payload).forEach(([key, value]) => {
+        if (key === "sections") {
+          formData.append(key, JSON.stringify(value));
+          return;
+        }
+
+        formData.append(key, value ?? "");
+      });
+
+      if (formValues.mainImageFile) {
+        formData.append("mainImageFile", formValues.mainImageFile);
+      }
+
+      formValues.sections.forEach((section, index) => {
+        if (section.imageFile) {
+          formData.append(`sectionImageFiles[${index}]`, section.imageFile);
+        }
+      });
+
+      updateContributionMutation.mutate({ payload: formData });
+      return;
+    }
+
+    updateContributionMutation.mutate({ payload });
   };
 
   const isSaving = updateContributionMutation.isPending;
@@ -612,6 +700,8 @@ const ContributionEditForm = ({ item, config, onCancel }) => {
         formValues={formValues}
         updateFormField={updateFormField}
         updateSection={updateSection}
+        updateBlogImageFile={updateBlogImageFile}
+        updateSectionImageFile={updateSectionImageFile}
         removeSection={removeSection}
         addSection={() =>
           setFormValues((current) => ({
@@ -643,12 +733,15 @@ const ArticleInlineEdit = ({
   formValues,
   updateFormField,
   updateSection,
+  updateBlogImageFile,
+  updateSectionImageFile,
   removeSection,
   addSection,
   handleSubmit,
   isSaving,
   onCancel,
 }) => {
+  const isBlogContribution = config.label.toLowerCase() === "blog";
   let sectionImageIndex = 0;
   const sections = formValues.sections.map((section) => {
     if (!section.image) return { ...section, imageSide: null };
@@ -679,12 +772,23 @@ const ArticleInlineEdit = ({
             {formValues.mainImage ? (
               <FloatingImage src={formValues.mainImage} alt={formValues.mainTitle} />
             ) : null}
-            <input
-              className={editImageInputClassName}
-              value={formValues.mainImage}
-              onChange={(event) => updateFormField("mainImage", event.target.value)}
-              placeholder="Main image URL"
-            />
+            {isBlogContribution ? (
+              <BlogImageFileInput
+                id="edit-blog-main-image"
+                label="Main Image"
+                file={formValues.mainImageFile}
+                existingUrl={formValues.mainImage}
+                onChange={(file) => updateBlogImageFile("mainImage", file)}
+                onClear={() => updateBlogImageFile("mainImage", null)}
+              />
+            ) : (
+              <input
+                className={editImageInputClassName}
+                value={formValues.mainImage}
+                onChange={(event) => updateFormField("mainImage", event.target.value)}
+                placeholder="Main image URL"
+              />
+            )}
           </div>
 
           <textarea
@@ -729,12 +833,23 @@ const ArticleInlineEdit = ({
                   side={section.imageSide}
                 />
               ) : null}
-              <input
-                className={editImageInputClassName}
-                value={section.image}
-                onChange={(event) => updateSection(index, "image", event.target.value)}
-                placeholder="Section image URL"
-              />
+              {isBlogContribution ? (
+                <BlogImageFileInput
+                  id={`edit-blog-section-image-${index}`}
+                  label={`Section ${index + 1} Image`}
+                  file={section.imageFile}
+                  existingUrl={section.image}
+                  onChange={(file) => updateSectionImageFile(index, file)}
+                  onClear={() => updateSectionImageFile(index, null)}
+                />
+              ) : (
+                <input
+                  className={editImageInputClassName}
+                  value={section.image}
+                  onChange={(event) => updateSection(index, "image", event.target.value)}
+                  placeholder="Section image URL"
+                />
+              )}
               <textarea
                 className={`${editTextAreaClassName} mt-4 min-h-[170px]`}
                 value={section.content}
