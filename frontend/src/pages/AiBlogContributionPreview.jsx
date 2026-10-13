@@ -196,13 +196,15 @@ const EditableFloatingImage = ({ src, file, alt, side = "right" }) => {
   return <FloatingImage src={previewUrl || src} alt={alt} side={side} />;
 };
 
-const canEditContribution = (item = {}) => {
+const canEditContribution = (item = {}, config = {}) => {
+  if (config.label === "Blog" && item.isDraft) return true;
+
   const status = (item.status || "pending").toLowerCase();
   return !item.isDraft && ["approved", "rejected"].includes(status);
 };
 
 const PreviewHeader = ({ config, item, onEdit }) => {
-  const canEdit = canEditContribution(item);
+  const canEdit = canEditContribution(item, config);
   const status = String(item.status || "pending").toLowerCase();
   const rejectionReason = String(item.rejectionReason || "").trim();
 
@@ -1024,7 +1026,7 @@ const AiBlogContributionPreview = ({ type = "blog" }) => {
     return items.find((entry) => entry._id === itemId || entry.id === itemId);
   }, [itemId, items, stateItem]);
 
-  const canEdit = canEditContribution(item);
+  const canEdit = canEditContribution(item, config);
 
   useEffect(() => {
     if (isEditing && !canEdit) {

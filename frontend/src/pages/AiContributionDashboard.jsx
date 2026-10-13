@@ -255,6 +255,7 @@ const ContributionCard = ({ item, config }) => {
   const image = item.mainImage || item.image || fallbackImage;
   const destination = item.destination || item.location || "Destination";
   const itemDate = item.date || item.updatedAt || item.createdAt;
+  const isEditableBlogDraft = config.contentLabel === "Blog" && item.isDraft;
   const detailsRoute =
     typeof config.detailsRoute === "function"
       ? config.detailsRoute(item)
@@ -310,12 +311,13 @@ const ContributionCard = ({ item, config }) => {
                   { label: config.label, path: config.seoPath },
                   { label: title },
                 ],
+                startEditing: isEditableBlogDraft,
               },
             })
           }
           className="absolute left-1/2 top-1/2 inline-flex -translate-x-1/2 -translate-y-1/2 rounded-full bg-black/55 px-4 py-1.5 text-xs font-medium text-white transition hover:bg-black/70"
         >
-          View {config.contentLabel} Content
+          {isEditableBlogDraft ? "Edit Blog Draft" : `View ${config.contentLabel} Content`}
         </button>
         {!item.isDraft ? (
           <div className="absolute bottom-2 right-2">
