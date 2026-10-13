@@ -877,7 +877,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
       mainTitle: formValues.mainTitle.trim(),
       mainImage: formValues.mainImage.trim(),
       mainContent: formValues.mainContent.trim(),
-      author: formValues.author.trim(),
+      author: isBlogContribution ? contributorName : formValues.author.trim(),
       date: isBlogContribution
         ? new Date().toISOString()
         : formValues.date
@@ -1087,11 +1087,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               />
             </div>
 
-            <div
-              className={`grid gap-5 ${
-                isBlogContribution ? "lg:grid-cols-2" : "lg:grid-cols-3"
-              }`}
-            >
+            <div className="grid gap-5 lg:grid-cols-3">
               {isBlogContribution ? null : (
                 <div>
                   <label className={labelClassName}>Link</label>
@@ -1152,6 +1148,19 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                   placeholder="Main image URL"
                 />
               </div>
+              {isBlogContribution ? (
+                <div>
+                  <label className={labelClassName}>Source</label>
+                  <input
+                    className={inputClassName}
+                    value={formValues.source}
+                    onChange={(event) =>
+                      updateFormField("source", event.target.value)
+                    }
+                    placeholder="Source"
+                  />
+                </div>
+              ) : null}
             </div>
 
             {config.formType === "event" ? (
@@ -1308,11 +1317,9 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                   </div>
                 </div>
               </>
-            ) : (
+            ) : isBlogContribution ? null : (
               <div
-                className={`mt-5 grid gap-5 md:grid-cols-2 ${
-                  isBlogContribution ? "lg:grid-cols-2" : "lg:grid-cols-4"
-                }`}
+                className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-4"
               >
                 <div>
                   <label className={labelClassName}>Author</label>
@@ -1336,34 +1343,30 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                     placeholder="Source"
                   />
                 </div>
-                {isBlogContribution ? null : (
-                  <>
-                    <div>
-                      <label className={labelClassName}>Date</label>
-                      <input
-                        className={inputClassName}
-                        type="date"
-                        value={formValues.date}
-                        onChange={(event) =>
-                          updateFormField("date", event.target.value)
-                        }
-                      />
-                    </div>
-                    <div>
-                      <label className={labelClassName}>Status</label>
-                      <select
-                        className={inputClassName}
-                        value={formValues.status}
-                        onChange={(event) =>
-                          updateFormField("status", event.target.value)
-                        }
-                      >
-                        <option value="active">Active</option>
-                        <option value="draft">Draft</option>
-                      </select>
-                    </div>
-                  </>
-                )}
+                <div>
+                  <label className={labelClassName}>Date</label>
+                  <input
+                    className={inputClassName}
+                    type="date"
+                    value={formValues.date}
+                    onChange={(event) =>
+                      updateFormField("date", event.target.value)
+                    }
+                  />
+                </div>
+                <div>
+                  <label className={labelClassName}>Status</label>
+                  <select
+                    className={inputClassName}
+                    value={formValues.status}
+                    onChange={(event) =>
+                      updateFormField("status", event.target.value)
+                    }
+                  >
+                    <option value="active">Active</option>
+                    <option value="draft">Draft</option>
+                  </select>
+                </div>
               </div>
             )}
 
