@@ -179,6 +179,23 @@ const FloatingImage = ({ src, alt, side = "right" }) => {
   );
 };
 
+const EditableFloatingImage = ({ src, file, alt, side = "right" }) => {
+  const [previewUrl, setPreviewUrl] = useState("");
+
+  useEffect(() => {
+    if (!file) {
+      setPreviewUrl("");
+      return undefined;
+    }
+
+    const objectUrl = URL.createObjectURL(file);
+    setPreviewUrl(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [file]);
+
+  return <FloatingImage src={previewUrl || src} alt={alt} side={side} />;
+};
+
 const canEditContribution = (item = {}) => {
   const status = (item.status || "pending").toLowerCase();
   return !item.isDraft && ["approved", "rejected"].includes(status);
@@ -769,9 +786,11 @@ const ArticleInlineEdit = ({
           />
 
           <div className="mt-6">
-            {formValues.mainImage ? (
-              <FloatingImage src={formValues.mainImage} alt={formValues.mainTitle} />
-            ) : null}
+            <EditableFloatingImage
+              src={formValues.mainImage}
+              file={formValues.mainImageFile}
+              alt={formValues.mainTitle}
+            />
             {isBlogContribution ? (
               <BlogImageFileInput
                 id="edit-blog-main-image"
@@ -826,13 +845,12 @@ const ArticleInlineEdit = ({
                 onChange={(event) => updateSection(index, "title", event.target.value)}
                 placeholder="Section title"
               />
-              {section.image ? (
-                <FloatingImage
-                  src={section.image}
-                  alt={section.title || `Section ${index + 1}`}
-                  side={section.imageSide}
-                />
-              ) : null}
+              <EditableFloatingImage
+                src={section.image}
+                file={section.imageFile}
+                alt={section.title || `Section ${index + 1}`}
+                side={section.imageSide}
+              />
               {isBlogContribution ? (
                 <BlogImageFileInput
                   id={`edit-blog-section-image-${index}`}

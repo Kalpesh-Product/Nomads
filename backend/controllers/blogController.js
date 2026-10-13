@@ -25,6 +25,16 @@ const sanitizeFileName = (value, fallback = "image") => {
     return cleaned || fallback;
 };
 
+const getS3KeyFromUrl = (fileUrl) => {
+    try {
+        if (!fileUrl) return "";
+        const url = new URL(fileUrl);
+        return decodeURIComponent(url.pathname.slice(1));
+    } catch {
+        return "";
+    }
+};
+
 const parseSections = (sections) => {
     if (Array.isArray(sections)) return sections;
 
@@ -53,9 +63,9 @@ const buildBlogPayloadWithUploads = async (req) => {
     const mainImageFile = files.find((file) => file.fieldname === "mainImageFile");
 
     if (mainImageFile) {
-        const key = `${baseFolder}/Main Image/${sanitizeFileName(
-            mainImageFile.originalname,
-        )}`;
+        const key =
+            getS3KeyFromUrl(payload.mainImage) ||
+            `${baseFolder}/Main Image/${sanitizeFileName(mainImageFile.originalname)}`;
         const uploaded = await uploadFileToS3(key, mainImageFile);
         payload.mainImage = uploaded.url;
     }
@@ -69,14 +79,16 @@ const buildBlogPayloadWithUploads = async (req) => {
 
     await Promise.all(
         sectionImageUploads.map(async ({ index, file }) => {
-            const key = `${baseFolder}/Section ${index + 1} Image/${sanitizeFileName(
-                file.originalname,
-            )}`;
-            const uploaded = await uploadFileToS3(key, file);
-
             if (!payload.sections[index]) {
                 payload.sections[index] = { title: "", content: "", image: "" };
             }
+
+            const key =
+                getS3KeyFromUrl(payload.sections[index].image) ||
+                `${baseFolder}/Section ${index + 1} Image/${sanitizeFileName(
+                    file.originalname,
+                )}`;
+            const uploaded = await uploadFileToS3(key, file);
 
             payload.sections[index] = {
                 ...payload.sections[index],
