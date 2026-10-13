@@ -191,6 +191,17 @@ const contributionAddConfig = {
 const inputClassName =
   "min-h-[42px] w-full rounded-md border border-black/10 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100";
 const labelClassName = "mb-2 block text-xs font-semibold text-slate-600";
+const errorTextClassName = "mt-1 text-xs font-medium text-red-500";
+
+const RequiredLabel = ({ children }) => (
+  <label className={labelClassName}>
+    {children}
+    <span className="ml-0.5 text-red-500">*</span>
+  </label>
+);
+
+const FieldError = ({ message }) =>
+  message ? <p className={errorTextClassName}>{message}</p> : null;
 
 const DropdownBadge = ({
   label,
@@ -449,6 +460,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
   const [formValues, setFormValues] = useState(() =>
     initialFormState(contributorName),
   );
+  const [formErrors, setFormErrors] = useState({});
 
   const specialUserEmails = useSpecialUserEmails();
   const { data: rawLocations = [] } = useQuery(companyLocationsQueryOptions);
@@ -773,7 +785,30 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
     return null;
   }
 
+  const getErrorMessage = (field) =>
+    isBlogContribution ? formErrors[field] : "";
+  const getBlogInputClassName = (field) =>
+    `${inputClassName} ${
+      getErrorMessage(field)
+        ? "!border-red-500 focus:!border-red-500 focus:!ring-red-100"
+        : ""
+    }`;
+  const clearFormError = (field) => {
+    if (!formErrors[field]) return;
+
+    setFormErrors((current) => {
+      const next = { ...current };
+      delete next[field];
+      return next;
+    });
+  };
+  const clearSectionFormError = (index, field) => {
+    clearFormError(`sections.${index}.${field}`);
+  };
+
   const updateFormField = (field, value) => {
+    clearFormError(field);
+
     setFormValues((current) => ({
       ...current,
       [field]: value,
@@ -781,6 +816,8 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
   };
 
   const updateSection = (index, field, value) => {
+    clearSectionFormError(index, field);
+
     setFormValues((current) => ({
       ...current,
       sections: current.sections.map((section, sectionIndex) =>
@@ -797,6 +834,36 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
           ? current.sections.filter((_, sectionIndex) => sectionIndex !== index)
           : current.sections,
     }));
+  };
+
+  const validateBlogForm = () => {
+    const errors = {};
+
+    if (!selectedContinent) errors.continent = "Continent is required";
+    if (!selectedCountry) errors.country = "Country is required";
+    if (!selectedLocation) errors.location = "Location is required";
+    if (!formValues.mainTitle.trim()) errors.mainTitle = "Main title is required";
+    if (!formValues.mainImage.trim()) {
+      errors.mainImage = "Main image URL is required";
+    }
+    if (!formValues.source.trim()) errors.source = "Source is required";
+    if (!formValues.mainContent.trim()) {
+      errors.mainContent = "Main content is required";
+    }
+
+    formValues.sections.forEach((section, index) => {
+      if (!section.title.trim()) {
+        errors[`sections.${index}.title`] = "Section title is required";
+      }
+      if (!section.image.trim()) {
+        errors[`sections.${index}.image`] = "Section image URL is required";
+      }
+      if (!section.content.trim()) {
+        errors[`sections.${index}.content`] = "Section content is required";
+      }
+    });
+
+    return errors;
   };
 
   const handleSubmit = (status) => {
@@ -818,6 +885,15 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
     const contentValue = isEventForm || isPlaceForm
       ? formValues.shortDescription
       : formValues.mainContent;
+
+    if (isBlogContribution) {
+      const validationErrors = validateBlogForm();
+      setFormErrors(validationErrors);
+
+      if (Object.keys(validationErrors).length > 0) {
+        return;
+      }
+    }
 
     if (!titleValue.trim()) {
       showErrorAlert(
@@ -1025,76 +1101,102 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               ref={dropdownContainerRef}
               className="relative z-30 mb-5 grid gap-4 lg:grid-cols-3"
             >
-              <DropdownBadge
-                label="Continent"
-                options={continentOptions}
-                selectedValue={continentLabel}
-                isOpen={openDropdown === "form-continent"}
-                variant="input"
-                onToggle={() =>
-                  setOpenDropdown((current) =>
-                    current === "form-continent" ? null : "form-continent",
-                  )
-                }
-                onSelect={(option) => {
-                  setSelectedContinent(option.value);
-                  setSelectedCountry("");
-                  setSelectedLocation("");
-                  setSelectedLocationLabel("");
-                  setFormValues((current) => ({
-                    ...current,
-                    destination: "",
-                  }));
-                  setOpenDropdown(null);
-                }}
-              />
+              <div>
+                {isBlogContribution ? <RequiredLabel>Continent</RequiredLabel> : null}
+                <DropdownBadge
+                  label="Continent"
+                  options={continentOptions}
+                  selectedValue={continentLabel}
+                  isOpen={openDropdown === "form-continent"}
+                  variant="input"
+                  onToggle={() =>
+                    setOpenDropdown((current) =>
+                      current === "form-continent" ? null : "form-continent",
+                    )
+                  }
+                  onSelect={(option) => {
+                    setSelectedContinent(option.value);
+                    setSelectedCountry("");
+                    setSelectedLocation("");
+                    setSelectedLocationLabel("");
+                    setFormValues((current) => ({
+                      ...current,
+                      destination: "",
+                    }));
+                    setFormErrors((current) => {
+                      const next = { ...current };
+                      delete next.continent;
+                      delete next.country;
+                      delete next.location;
+                      return next;
+                    });
+                    setOpenDropdown(null);
+                  }}
+                />
+                <FieldError message={getErrorMessage("continent")} />
+              </div>
 
-              <DropdownBadge
-                label="Country"
-                options={countryOptions}
-                selectedValue={countryLabel}
-                isOpen={openDropdown === "form-country"}
-                variant="input"
-                onToggle={() =>
-                  setOpenDropdown((current) =>
-                    current === "form-country" ? null : "form-country",
-                  )
-                }
-                onSelect={(option) => {
-                  setSelectedCountry(option.value);
-                  setSelectedLocation("");
-                  setSelectedLocationLabel("");
-                  setFormValues((current) => ({
-                    ...current,
-                    destination: "",
-                  }));
-                  setOpenDropdown(null);
-                }}
-                disabled={!selectedContinent}
-              />
+              <div>
+                {isBlogContribution ? <RequiredLabel>Country</RequiredLabel> : null}
+                <DropdownBadge
+                  label="Country"
+                  options={countryOptions}
+                  selectedValue={countryLabel}
+                  isOpen={openDropdown === "form-country"}
+                  variant="input"
+                  onToggle={() =>
+                    setOpenDropdown((current) =>
+                      current === "form-country" ? null : "form-country",
+                    )
+                  }
+                  onSelect={(option) => {
+                    setSelectedCountry(option.value);
+                    setSelectedLocation("");
+                    setSelectedLocationLabel("");
+                    setFormValues((current) => ({
+                      ...current,
+                      destination: "",
+                    }));
+                    setFormErrors((current) => {
+                      const next = { ...current };
+                      delete next.country;
+                      delete next.location;
+                      return next;
+                    });
+                    setOpenDropdown(null);
+                  }}
+                  disabled={!selectedContinent}
+                />
+                <FieldError message={getErrorMessage("country")} />
+              </div>
 
-              <DropdownBadge
-                label="Location"
-                options={locationOptions}
-                selectedValue={locationLabel}
-                isOpen={openDropdown === "form-location"}
-                variant="input"
-                onToggle={() =>
-                  setOpenDropdown((current) =>
-                    current === "form-location" ? null : "form-location",
-                  )
-                }
-                onSelect={(option) => {
-                  setSelectedLocation(option.value);
-                  setSelectedLocationLabel(option.label);
-                  setFormValues((current) => ({
-                    ...current,
-                    destination: option.destination,
-                  }));
-                  setOpenDropdown(null);
-                }}
-                disabled={!selectedCountry}
-              />
+              <div>
+                {isBlogContribution ? <RequiredLabel>Location</RequiredLabel> : null}
+                <DropdownBadge
+                  label="Location"
+                  options={locationOptions}
+                  selectedValue={locationLabel}
+                  isOpen={openDropdown === "form-location"}
+                  variant="input"
+                  onToggle={() =>
+                    setOpenDropdown((current) =>
+                      current === "form-location" ? null : "form-location",
+                    )
+                  }
+                  onSelect={(option) => {
+                    setSelectedLocation(option.value);
+                    setSelectedLocationLabel(option.label);
+                    setFormValues((current) => ({
+                      ...current,
+                      destination: option.destination,
+                    }));
+                    clearFormError("location");
+                    setOpenDropdown(null);
+                  }}
+                  disabled={!selectedCountry}
+                />
+                <FieldError message={getErrorMessage("location")} />
+              </div>
             </div>
 
             <div className="grid gap-5 lg:grid-cols-3">
@@ -1112,15 +1214,21 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                 </div>
               )}
               <div>
-                <label className={labelClassName}>
-                  {config.formType === "event"
-                    ? "Event Name"
-                    : config.formType === "place"
-                      ? "Place Name"
-                      : "Main Title"}
-                </label>
+                {isBlogContribution ? (
+                  <RequiredLabel>Main Title</RequiredLabel>
+                ) : (
+                  <label className={labelClassName}>
+                    {config.formType === "event"
+                      ? "Event Name"
+                      : config.formType === "place"
+                        ? "Place Name"
+                        : "Main Title"}
+                  </label>
+                )}
                 <input
-                  className={inputClassName}
+                  className={getBlogInputClassName("mainTitle")}
+                  required={isBlogContribution}
+                  aria-invalid={Boolean(getErrorMessage("mainTitle"))}
                   value={
                     config.formType === "event"
                       ? formValues.eventName
@@ -1149,11 +1257,18 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                         : "Main title"
                   }
                 />
+                <FieldError message={getErrorMessage("mainTitle")} />
               </div>
               <div>
-                <label className={labelClassName}>Main Image URL</label>
+                {isBlogContribution ? (
+                  <RequiredLabel>Main Image URL</RequiredLabel>
+                ) : (
+                  <label className={labelClassName}>Main Image URL</label>
+                )}
                 <input
-                  className={inputClassName}
+                  className={getBlogInputClassName("mainImage")}
+                  required={isBlogContribution}
+                  aria-invalid={Boolean(getErrorMessage("mainImage"))}
                   value={formValues.mainImage}
                   maxLength={
                     isBlogContribution ? blogFieldLimits.mainImage : undefined
@@ -1163,12 +1278,15 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                   }
                   placeholder="Main image URL"
                 />
+                <FieldError message={getErrorMessage("mainImage")} />
               </div>
               {isBlogContribution ? (
                 <div>
-                  <label className={labelClassName}>Source</label>
+                  <RequiredLabel>Source</RequiredLabel>
                   <input
-                    className={inputClassName}
+                    className={getBlogInputClassName("source")}
+                    required
+                    aria-invalid={Boolean(getErrorMessage("source"))}
                     value={formValues.source}
                     maxLength={blogFieldLimits.source}
                     onChange={(event) =>
@@ -1176,6 +1294,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                     }
                     placeholder="Source"
                   />
+                  <FieldError message={getErrorMessage("source")} />
                 </div>
               ) : null}
             </div>
@@ -1388,13 +1507,19 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
             )}
 
             <div className="mt-6">
-              <label className={labelClassName}>
-                {config.formType === "event" || config.formType === "place"
-                  ? "Short Description"
-                  : "Main Content"}
-              </label>
+              {isBlogContribution ? (
+                <RequiredLabel>Main Content</RequiredLabel>
+              ) : (
+                <label className={labelClassName}>
+                  {config.formType === "event" || config.formType === "place"
+                    ? "Short Description"
+                    : "Main Content"}
+                </label>
+              )}
               <textarea
-                className={`${inputClassName} min-h-[150px] resize-y leading-relaxed`}
+                className={`${getBlogInputClassName("mainContent")} min-h-[150px] resize-y leading-relaxed`}
+                required={isBlogContribution}
+                aria-invalid={Boolean(getErrorMessage("mainContent"))}
                 value={
                   config.formType === "event" || config.formType === "place"
                     ? formValues.shortDescription
@@ -1417,6 +1542,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                     : "Main content"
                 }
               />
+              <FieldError message={getErrorMessage("mainContent")} />
             </div>
 
             {config.formType === "event" || config.formType === "place" ? null : (
@@ -1449,9 +1575,19 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
 
                       <div className="space-y-4">
                         <div>
-                          <label className={labelClassName}>Section Title</label>
+                          {isBlogContribution ? (
+                            <RequiredLabel>Section Title</RequiredLabel>
+                          ) : (
+                            <label className={labelClassName}>Section Title</label>
+                          )}
                           <input
-                            className={inputClassName}
+                            className={getBlogInputClassName(
+                              `sections.${index}.title`,
+                            )}
+                            required={isBlogContribution}
+                            aria-invalid={Boolean(
+                              getErrorMessage(`sections.${index}.title`),
+                            )}
                             value={section.title}
                             maxLength={
                               isBlogContribution
@@ -1463,11 +1599,26 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                             }
                             placeholder="Section Title"
                           />
+                          <FieldError
+                            message={getErrorMessage(`sections.${index}.title`)}
+                          />
                         </div>
                         <div>
-                          <label className={labelClassName}>Section Image URL</label>
+                          {isBlogContribution ? (
+                            <RequiredLabel>Section Image URL</RequiredLabel>
+                          ) : (
+                            <label className={labelClassName}>
+                              Section Image URL
+                            </label>
+                          )}
                           <input
-                            className={inputClassName}
+                            className={getBlogInputClassName(
+                              `sections.${index}.image`,
+                            )}
+                            required={isBlogContribution}
+                            aria-invalid={Boolean(
+                              getErrorMessage(`sections.${index}.image`),
+                            )}
                             value={section.image}
                             maxLength={
                               isBlogContribution
@@ -1479,11 +1630,26 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                             }
                             placeholder="Section Image URL"
                           />
+                          <FieldError
+                            message={getErrorMessage(`sections.${index}.image`)}
+                          />
                         </div>
                         <div>
-                          <label className={labelClassName}>Section Content</label>
+                          {isBlogContribution ? (
+                            <RequiredLabel>Section Content</RequiredLabel>
+                          ) : (
+                            <label className={labelClassName}>
+                              Section Content
+                            </label>
+                          )}
                           <textarea
-                            className={`${inputClassName} min-h-[150px] resize-y leading-relaxed`}
+                            className={`${getBlogInputClassName(
+                              `sections.${index}.content`,
+                            )} min-h-[150px] resize-y leading-relaxed`}
+                            required={isBlogContribution}
+                            aria-invalid={Boolean(
+                              getErrorMessage(`sections.${index}.content`),
+                            )}
                             value={section.content}
                             maxLength={
                               isBlogContribution
@@ -1494,6 +1660,11 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                               updateSection(index, "content", event.target.value)
                             }
                             placeholder="Section content"
+                          />
+                          <FieldError
+                            message={getErrorMessage(
+                              `sections.${index}.content`,
+                            )}
                           />
                         </div>
                       </div>
