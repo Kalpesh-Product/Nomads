@@ -23,6 +23,7 @@ export const THEME_DEFAULTS = {
     tulum: { bg: "#f1f1ed", text: "#6e7a73", accent: "#8a968f", surfaceUp: true },
     lodge: { bg: "#ffffff", text: "#1c1f21", accent: "#7fa388", surfaceUp: true },
     tastyc: { bg: "#f4efe7", text: "#1a1715", accent: "#cf7736", surfaceUp: true },
+    flowspace: { bg: "#fbfaeb", text: "#11110f", accent: "#11110f", surfaceUp: true },
     travigo: { bg: "#f5f3ed", text: "#111111", accent: "#111111", surfaceUp: true },
     haven: { bg: "#f4f1ea", text: "#26312b", accent: "#5b7f6a", surfaceUp: true },
     camelia: { bg: "#f6f3ec", text: "#2b2a26", accent: "#8a9a86", surfaceUp: true },

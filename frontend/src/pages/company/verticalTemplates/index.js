@@ -7,6 +7,7 @@ import HuddleTemplate from "./huddle/HuddleTemplate";
 import TravigoTemplate from "./travigo/TravigoTemplate";
 import LodgeTemplate from "./lodge/LodgeTemplate";
 import TastycTemplate from "./tastyc/TastycTemplate";
+import FlowspaceTemplate from "./flowspace/FlowspaceTemplate";
 import TulumTemplate from "./tulum/TulumTemplate";
 import GrindelwaldTemplate from "./grindelwald/GrindelwaldTemplate";
 
@@ -23,6 +24,7 @@ export const VERTICAL_TEMPLATES = {
   travigo: TravigoTemplate,
   lodge: LodgeTemplate,
   tastyc: TastycTemplate,
+  flowspace: FlowspaceTemplate,
   tulum: TulumTemplate,
   grindelwald: GrindelwaldTemplate,
 };
