@@ -101,6 +101,9 @@ export const getVerifyBusinessClick = async (req, res, next) => {
       state: click.state,
       city: click.city,
       verticalType,
+      // Where the visitor clicked "Verify Business" from, so the signup's back
+      // button can return them to that listing.
+      listingUrl: click.listingUrl || "",
     });
   } catch (error) {
     return next(error);
