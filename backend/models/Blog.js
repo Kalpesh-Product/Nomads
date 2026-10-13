@@ -33,6 +33,12 @@ const blogSchema = new mongoose.Schema({
         enum: ["pending", "approved", "rejected"],
         default: "approved",
     },
+    rejectionReason: {
+        type: String,
+        trim: true,
+        default: "",
+        maxlength: 500,
+    },
     contributor: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "NomadUser",

@@ -343,6 +343,7 @@ export const createMyBlog = async (req, res, next) => {
             ...req.body,
             contributor: user,
             status: "pending",
+            rejectionReason: "",
             isDraft,
             isActive: !isDraft,
         });
@@ -373,6 +374,7 @@ export const updateMyBlog = async (req, res, next) => {
                 ...req.body,
                 contributor: user,
                 status: "pending",
+                rejectionReason: "",
                 isDraft,
                 isActive: !isDraft,
             },
@@ -397,11 +399,16 @@ export const updateMyBlog = async (req, res, next) => {
 export const updateBlogContributionStatus = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const { status } = req.body;
+        const { status, rejectionReason } = req.body;
         const normalizedStatus = String(status || "").toLowerCase();
+        const normalizedReason = String(rejectionReason || "").trim();
 
         if (!["pending", "approved", "rejected"].includes(normalizedStatus)) {
             return res.status(400).json({ message: "Invalid blog status" });
+        }
+
+        if (normalizedStatus === "rejected" && !normalizedReason) {
+            return res.status(400).json({ message: "Rejection reason is required" });
         }
 
         const blog = await Blog.findOneAndUpdate(
@@ -412,6 +419,7 @@ export const updateBlogContributionStatus = async (req, res, next) => {
             },
             {
                 status: normalizedStatus,
+                rejectionReason: normalizedStatus === "rejected" ? normalizedReason : "",
                 isActive: normalizedStatus === "approved",
             },
             { new: true },

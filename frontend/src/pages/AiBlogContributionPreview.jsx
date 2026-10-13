@@ -141,28 +141,39 @@ const canEditContribution = (item = {}) => {
 
 const PreviewHeader = ({ config, item, onEdit }) => {
   const canEdit = canEditContribution(item);
+  const status = String(item.status || "pending").toLowerCase();
+  const rejectionReason = String(item.rejectionReason || "").trim();
 
   return (
-  <div className="mb-5 flex items-center justify-between gap-4">
-    <div>
-      <h1 className="text-sm font-semibold text-black/50">
-        {config.label} Preview
-      </h1>
-      <p className="text-xs font-medium capitalize text-slate-500">
-        Status: {item.status || "pending"}
-      </p>
+    <div className="mb-5">
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-sm font-semibold text-black/50">
+            {config.label} Preview
+          </h1>
+          <p className="text-xs font-medium capitalize text-slate-500">
+            Status: {item.status || "pending"}
+          </p>
+        </div>
+        {canEdit ? (
+          <button
+            type="button"
+            onClick={onEdit}
+            className="inline-flex items-center gap-2 rounded-full bg-primary-blue px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-sky-500"
+          >
+            <HiOutlinePencil size={16} />
+            Edit
+          </button>
+        ) : null}
+      </div>
+
+      {status === "rejected" && rejectionReason ? (
+        <div className="mt-4 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <p className="font-semibold">Rejection reason</p>
+          <p className="mt-1 whitespace-pre-line">{rejectionReason}</p>
+        </div>
+      ) : null}
     </div>
-    {canEdit ? (
-      <button
-        type="button"
-        onClick={onEdit}
-        className="inline-flex items-center gap-2 rounded-full bg-primary-blue px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-sky-500"
-      >
-        <HiOutlinePencil size={16} />
-        Edit
-      </button>
-    ) : null}
-  </div>
   );
 };
 
