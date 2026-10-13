@@ -423,6 +423,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
   const { auth } = useAuth();
   const user = auth?.user || {};
   const config = contributionAddConfig[type] || contributionAddConfig.blog;
+  const isBlogContribution = type === "blog";
   const selectionStorageKey = getSelectionStorageKey(type);
   const hasAccess = Boolean(user?.[config.accessFlag]);
   const contributorName = user?.fullName?.trim() || user?.name || "";
@@ -877,10 +878,14 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
       mainImage: formValues.mainImage.trim(),
       mainContent: formValues.mainContent.trim(),
       author: formValues.author.trim(),
-      date: formValues.date ? new Date(formValues.date).toISOString() : null,
+      date: isBlogContribution
+        ? new Date().toISOString()
+        : formValues.date
+          ? new Date(formValues.date).toISOString()
+          : null,
       destination: selectedDestination,
-      blogType: formValues.link.trim(),
-      link: formValues.link.trim(),
+      blogType: isBlogContribution ? "" : formValues.link.trim(),
+      link: isBlogContribution ? "" : formValues.link.trim(),
       source: formValues.source.trim(),
       sections: cleanedSections,
       isDraft: status === "draft",
@@ -1082,16 +1087,24 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               />
             </div>
 
-            <div className="grid gap-5 lg:grid-cols-3">
-              <div>
-                <label className={labelClassName}>Link</label>
-                <input
-                  className={inputClassName}
-                  value={formValues.link}
-                  onChange={(event) => updateFormField("link", event.target.value)}
-                  placeholder="Type URL here"
-                />
-              </div>
+            <div
+              className={`grid gap-5 ${
+                isBlogContribution ? "lg:grid-cols-2" : "lg:grid-cols-3"
+              }`}
+            >
+              {isBlogContribution ? null : (
+                <div>
+                  <label className={labelClassName}>Link</label>
+                  <input
+                    className={inputClassName}
+                    value={formValues.link}
+                    onChange={(event) =>
+                      updateFormField("link", event.target.value)
+                    }
+                    placeholder="Type URL here"
+                  />
+                </div>
+              )}
               <div>
                 <label className={labelClassName}>
                   {config.formType === "event"
@@ -1296,7 +1309,11 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                 </div>
               </>
             ) : (
-              <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+              <div
+                className={`mt-5 grid gap-5 md:grid-cols-2 ${
+                  isBlogContribution ? "lg:grid-cols-2" : "lg:grid-cols-4"
+                }`}
+              >
                 <div>
                   <label className={labelClassName}>Author</label>
                   <input
@@ -1319,28 +1336,34 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                     placeholder="Source"
                   />
                 </div>
-                <div>
-                  <label className={labelClassName}>Date</label>
-                  <input
-                    className={inputClassName}
-                    type="date"
-                    value={formValues.date}
-                    onChange={(event) => updateFormField("date", event.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className={labelClassName}>Status</label>
-                  <select
-                    className={inputClassName}
-                    value={formValues.status}
-                    onChange={(event) =>
-                      updateFormField("status", event.target.value)
-                    }
-                  >
-                    <option value="active">Active</option>
-                    <option value="draft">Draft</option>
-                  </select>
-                </div>
+                {isBlogContribution ? null : (
+                  <>
+                    <div>
+                      <label className={labelClassName}>Date</label>
+                      <input
+                        className={inputClassName}
+                        type="date"
+                        value={formValues.date}
+                        onChange={(event) =>
+                          updateFormField("date", event.target.value)
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label className={labelClassName}>Status</label>
+                      <select
+                        className={inputClassName}
+                        value={formValues.status}
+                        onChange={(event) =>
+                          updateFormField("status", event.target.value)
+                        }
+                      >
+                        <option value="active">Active</option>
+                        <option value="draft">Draft</option>
+                      </select>
+                    </div>
+                  </>
+                )}
               </div>
             )}
 
