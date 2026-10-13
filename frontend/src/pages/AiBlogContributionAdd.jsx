@@ -73,6 +73,16 @@ const emptySection = () => ({
   content: "",
 });
 
+const blogFieldLimits = {
+  mainTitle: 70,
+  mainImage: 2048,
+  source: 120,
+  mainContent: 5000,
+  sectionTitle: 100,
+  sectionImage: 2048,
+  sectionContent: 2500,
+};
+
 const initialFormState = (author = "", destination = "") => ({
   destination,
   link: "",
@@ -1128,6 +1138,9 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                       event.target.value,
                     )
                   }
+                  maxLength={
+                    isBlogContribution ? blogFieldLimits.mainTitle : undefined
+                  }
                   placeholder={
                     config.formType === "event"
                       ? "Event name"
@@ -1142,6 +1155,9 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                 <input
                   className={inputClassName}
                   value={formValues.mainImage}
+                  maxLength={
+                    isBlogContribution ? blogFieldLimits.mainImage : undefined
+                  }
                   onChange={(event) =>
                     updateFormField("mainImage", event.target.value)
                   }
@@ -1154,6 +1170,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                   <input
                     className={inputClassName}
                     value={formValues.source}
+                    maxLength={blogFieldLimits.source}
                     onChange={(event) =>
                       updateFormField("source", event.target.value)
                     }
@@ -1383,6 +1400,9 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                     ? formValues.shortDescription
                     : formValues.mainContent
                 }
+                maxLength={
+                  isBlogContribution ? blogFieldLimits.mainContent : undefined
+                }
                 onChange={(event) =>
                   updateFormField(
                     config.formType === "event" || config.formType === "place"
@@ -1433,6 +1453,11 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                           <input
                             className={inputClassName}
                             value={section.title}
+                            maxLength={
+                              isBlogContribution
+                                ? blogFieldLimits.sectionTitle
+                                : undefined
+                            }
                             onChange={(event) =>
                               updateSection(index, "title", event.target.value)
                             }
@@ -1444,6 +1469,11 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                           <input
                             className={inputClassName}
                             value={section.image}
+                            maxLength={
+                              isBlogContribution
+                                ? blogFieldLimits.sectionImage
+                                : undefined
+                            }
                             onChange={(event) =>
                               updateSection(index, "image", event.target.value)
                             }
@@ -1455,6 +1485,11 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                           <textarea
                             className={`${inputClassName} min-h-[150px] resize-y leading-relaxed`}
                             value={section.content}
+                            maxLength={
+                              isBlogContribution
+                                ? blogFieldLimits.sectionContent
+                                : undefined
+                            }
                             onChange={(event) =>
                               updateSection(index, "content", event.target.value)
                             }
