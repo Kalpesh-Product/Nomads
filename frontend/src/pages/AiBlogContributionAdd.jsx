@@ -448,6 +448,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
   const selectionStorageKey = getSelectionStorageKey(type);
   const hasAccess = Boolean(user?.[config.accessFlag]);
   const contributorName = user?.fullName?.trim() || user?.name || "";
+  const isAddRoute = routeLocation.pathname.endsWith("/add");
 
   const [openDropdown, setOpenDropdown] = useState(null);
   const [selectedContinent, setSelectedContinent] = useState("");
@@ -455,7 +456,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
   const [selectedLocation, setSelectedLocation] = useState("");
   const [selectedLocationLabel, setSelectedLocationLabel] = useState("");
   const [showForm, setShowForm] = useState(() =>
-    Boolean(routeLocation.state?.openForm),
+    isAddRoute || Boolean(routeLocation.state?.openForm),
   );
   const [formValues, setFormValues] = useState(() =>
     initialFormState(contributorName),
@@ -704,7 +705,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
   useEffect(() => {
     if (continentOptions.length === 0 || locations.length === 0) return;
 
-    if (routeLocation.state?.openForm && !showForm) {
+    if ((isAddRoute || routeLocation.state?.openForm) && !showForm) {
       setShowForm(true);
     }
 
@@ -712,7 +713,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
       sessionStorage.removeItem(selectionStorageKey);
       navigate(`${routeLocation.pathname}${routeLocation.search}`, {
         replace: true,
-        state: { ...routeLocation.state, freshAdd: false, openForm: false },
+        state: { ...routeLocation.state, freshAdd: false, openForm: isAddRoute },
       });
       return;
     }
@@ -746,9 +747,12 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
     setSelectedCountry(selection.country);
     setSelectedLocation(selection.location);
     setSelectedLocationLabel(selection.locationLabel || "");
-    setShowForm(false);
+    if (!isAddRoute) {
+      setShowForm(false);
+    }
   }, [
     continentOptions.length,
+    isAddRoute,
     locations.length,
     navigate,
     routeLocation.pathname,
@@ -1707,7 +1711,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               </button>
               <button
                 type="button"
-                onClick={() => setShowForm(false)}
+                onClick={() => navigate(config.dashboardPath)}
                 disabled={isSaving}
                 className="rounded-lg bg-slate-300 px-6 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-400 disabled:cursor-not-allowed"
               >
