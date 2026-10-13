@@ -3,8 +3,90 @@ import { Readable } from "stream";
 import csvParser from "csv-parser";
 import Blog from "../models/Blog.js";
 import TestBlog from "../models/TestBlog.js";
+import { uploadFileToS3 } from "../config/s3Config.js";
 
 const RSS2JSON_BASE = "https://api.rss2json.com/v1/api.json";
+
+const sanitizeS3PathSegment = (value, fallback = "untitled") => {
+    const cleaned = String(value || "")
+        .replace(/[/\\?%*:|"<>]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+
+    return cleaned || fallback;
+};
+
+const sanitizeFileName = (value, fallback = "image") => {
+    const cleaned = String(value || "")
+        .replace(/[/\\?%*:|"<>]/g, "_")
+        .replace(/\s+/g, "_")
+        .trim();
+
+    return cleaned || fallback;
+};
+
+const parseSections = (sections) => {
+    if (Array.isArray(sections)) return sections;
+
+    if (typeof sections !== "string") return [];
+
+    try {
+        const parsed = JSON.parse(sections);
+        return Array.isArray(parsed) ? parsed : [];
+    } catch {
+        return [];
+    }
+};
+
+const buildBlogPayloadWithUploads = async (req) => {
+    const payload = {
+        ...req.body,
+        sections: parseSections(req.body.sections),
+    };
+    const files = Array.isArray(req.files) ? req.files : [];
+
+    if (!files.length) return payload;
+
+    const destinationFolder = sanitizeS3PathSegment(payload.destination, "Destination");
+    const blogFolder = sanitizeS3PathSegment(payload.mainTitle, "Blog");
+    const baseFolder = `nomads/blogs/${destinationFolder}/${blogFolder}`;
+    const mainImageFile = files.find((file) => file.fieldname === "mainImageFile");
+
+    if (mainImageFile) {
+        const key = `${baseFolder}/Main Image/${sanitizeFileName(
+            mainImageFile.originalname,
+        )}`;
+        const uploaded = await uploadFileToS3(key, mainImageFile);
+        payload.mainImage = uploaded.url;
+    }
+
+    const sectionImageUploads = files
+        .map((file) => {
+            const match = file.fieldname.match(/^sectionImageFiles\[(\d+)\]$/);
+            return match ? { index: Number(match[1]), file } : null;
+        })
+        .filter(Boolean);
+
+    await Promise.all(
+        sectionImageUploads.map(async ({ index, file }) => {
+            const key = `${baseFolder}/Section ${index + 1} Image/${sanitizeFileName(
+                file.originalname,
+            )}`;
+            const uploaded = await uploadFileToS3(key, file);
+
+            if (!payload.sections[index]) {
+                payload.sections[index] = { title: "", content: "", image: "" };
+            }
+
+            payload.sections[index] = {
+                ...payload.sections[index],
+                image: uploaded.url,
+            };
+        }),
+    );
+
+    return payload;
+};
 
 // RSS feeds for different locations (can expand later)
 // const RSS_FEEDS = {
@@ -337,10 +419,11 @@ export const getBlogContributions = async (req, res, next) => {
 export const createMyBlog = async (req, res, next) => {
     try {
         const user = req.userData._id;
-        const isDraft = Boolean(req.body?.isDraft);
+        const payload = await buildBlogPayloadWithUploads(req);
+        const isDraft = String(payload?.isDraft) === "true" || payload?.isDraft === true;
 
         const blog = await Blog.create({
-            ...req.body,
+            ...payload,
             contributor: user,
             status: "pending",
             rejectionReason: "",
@@ -363,7 +446,8 @@ export const updateMyBlog = async (req, res, next) => {
     try {
         const user = req.userData._id;
         const { id } = req.params;
-        const isDraft = Boolean(req.body?.isDraft);
+        const payload = await buildBlogPayloadWithUploads(req);
+        const isDraft = String(payload?.isDraft) === "true" || payload?.isDraft === true;
 
         const blog = await Blog.findOneAndUpdate(
             {
@@ -371,7 +455,7 @@ export const updateMyBlog = async (req, res, next) => {
                 contributor: user,
             },
             {
-                ...req.body,
+                ...payload,
                 contributor: user,
                 status: "pending",
                 rejectionReason: "",

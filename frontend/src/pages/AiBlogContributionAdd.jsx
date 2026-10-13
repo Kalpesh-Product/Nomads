@@ -70,6 +70,7 @@ const buildExactKeyword = (label) => {
 const emptySection = () => ({
   title: "",
   image: "",
+  imageFile: null,
   content: "",
 });
 
@@ -202,6 +203,51 @@ const RequiredLabel = ({ children }) => (
 
 const FieldError = ({ message }) =>
   message ? <p className={errorTextClassName}>{message}</p> : null;
+
+const BlogImageFileInput = ({
+  id,
+  label,
+  file,
+  error,
+  onChange,
+  onClear,
+}) => (
+  <div>
+    <RequiredLabel>{label}</RequiredLabel>
+    <div
+      className={`flex min-h-[42px] items-center gap-3 rounded-md border bg-white px-3 py-2 text-sm transition ${
+        error ? "border-red-500" : "border-black/10 focus-within:border-sky-400 focus-within:ring-2 focus-within:ring-sky-100"
+      }`}
+    >
+      <input
+        id={id}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        className="sr-only"
+        onChange={(event) => onChange(event.target.files?.[0] || null)}
+      />
+      <label
+        htmlFor={id}
+        className="shrink-0 cursor-pointer rounded-md bg-sky-50 px-3 py-1.5 text-xs font-semibold text-sky-700 transition hover:bg-sky-100"
+      >
+        Choose image
+      </label>
+      <span className="min-w-0 flex-1 truncate text-slate-600">
+        {file?.name || "No file selected"}
+      </span>
+      {file ? (
+        <button
+          type="button"
+          onClick={onClear}
+          className="shrink-0 text-xs font-semibold text-red-500 hover:text-red-600"
+        >
+          Remove
+        </button>
+      ) : null}
+    </div>
+    <FieldError message={error} />
+  </div>
+);
 
 const DropdownBadge = ({
   label,
@@ -830,6 +876,29 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
     }));
   };
 
+  const updateBlogImageFile = (field, file) => {
+    clearFormError(field);
+
+    setFormValues((current) => ({
+      ...current,
+      [field]: "",
+      [`${field}File`]: file,
+    }));
+  };
+
+  const updateSectionImageFile = (index, file) => {
+    clearSectionFormError(index, "image");
+
+    setFormValues((current) => ({
+      ...current,
+      sections: current.sections.map((section, sectionIndex) =>
+        sectionIndex === index
+          ? { ...section, image: "", imageFile: file }
+          : section,
+      ),
+    }));
+  };
+
   const removeSection = (index) => {
     setFormValues((current) => ({
       ...current,
@@ -847,8 +916,8 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
     if (!selectedCountry) errors.country = "Country is required";
     if (!selectedLocation) errors.location = "Location is required";
     if (!formValues.mainTitle.trim()) errors.mainTitle = "Main title is required";
-    if (!formValues.mainImage.trim()) {
-      errors.mainImage = "Main image URL is required";
+    if (!formValues.mainImageFile && !formValues.mainImage.trim()) {
+      errors.mainImage = "Main image is required";
     }
     if (!formValues.source.trim()) errors.source = "Source is required";
     if (!formValues.mainContent.trim()) {
@@ -859,8 +928,8 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
       if (!section.title.trim()) {
         errors[`sections.${index}.title`] = "Section title is required";
       }
-      if (!section.image.trim()) {
-        errors[`sections.${index}.image`] = "Section image URL is required";
+      if (!section.imageFile && !section.image.trim()) {
+        errors[`sections.${index}.image`] = "Section image is required";
       }
       if (!section.content.trim()) {
         errors[`sections.${index}.content`] = "Section content is required";
@@ -921,6 +990,45 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
 
     if (!selectedDestination) {
       showErrorAlert("Please select a continent, country and state.");
+      return;
+    }
+
+    if (isBlogContribution) {
+      const payload = {
+        mainTitle: formValues.mainTitle.trim(),
+        mainImage: formValues.mainImage.trim(),
+        mainContent: formValues.mainContent.trim(),
+        author: contributorName,
+        date: new Date().toISOString(),
+        destination: selectedDestination,
+        blogType: "",
+        link: "",
+        source: formValues.source.trim(),
+        sections: cleanedSections,
+        isDraft: status === "draft",
+      };
+      const formData = new FormData();
+
+      Object.entries(payload).forEach(([key, value]) => {
+        if (key === "sections") {
+          formData.append(key, JSON.stringify(value));
+          return;
+        }
+
+        formData.append(key, value ?? "");
+      });
+
+      if (formValues.mainImageFile) {
+        formData.append("mainImageFile", formValues.mainImageFile);
+      }
+
+      formValues.sections.forEach((section, index) => {
+        if (section.imageFile) {
+          formData.append(`sectionImageFiles[${index}]`, section.imageFile);
+        }
+      });
+
+      createContribution(formData);
       return;
     }
 
@@ -1265,24 +1373,27 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               </div>
               <div>
                 {isBlogContribution ? (
-                  <RequiredLabel>Main Image URL</RequiredLabel>
+                  <BlogImageFileInput
+                    id="blog-main-image"
+                    label="Main Image"
+                    file={formValues.mainImageFile}
+                    error={getErrorMessage("mainImage")}
+                    onChange={(file) => updateBlogImageFile("mainImage", file)}
+                    onClear={() => updateBlogImageFile("mainImage", null)}
+                  />
                 ) : (
+                  <>
                   <label className={labelClassName}>Main Image URL</label>
+                  <input
+                    className={getBlogInputClassName("mainImage")}
+                    value={formValues.mainImage}
+                    onChange={(event) =>
+                      updateFormField("mainImage", event.target.value)
+                    }
+                    placeholder="Main image URL"
+                  />
+                </>
                 )}
-                <input
-                  className={getBlogInputClassName("mainImage")}
-                  required={isBlogContribution}
-                  aria-invalid={Boolean(getErrorMessage("mainImage"))}
-                  value={formValues.mainImage}
-                  maxLength={
-                    isBlogContribution ? blogFieldLimits.mainImage : undefined
-                  }
-                  onChange={(event) =>
-                    updateFormField("mainImage", event.target.value)
-                  }
-                  placeholder="Main image URL"
-                />
-                <FieldError message={getErrorMessage("mainImage")} />
               </div>
               {isBlogContribution ? (
                 <div>
@@ -1609,34 +1720,33 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                         </div>
                         <div>
                           {isBlogContribution ? (
-                            <RequiredLabel>Section Image URL</RequiredLabel>
+                            <BlogImageFileInput
+                              id={`blog-section-image-${index}`}
+                              label={`Section ${index + 1} Image`}
+                              file={section.imageFile}
+                              error={getErrorMessage(`sections.${index}.image`)}
+                              onChange={(file) =>
+                                updateSectionImageFile(index, file)
+                              }
+                              onClear={() => updateSectionImageFile(index, null)}
+                            />
                           ) : (
-                            <label className={labelClassName}>
-                              Section Image URL
-                            </label>
+                            <>
+                              <label className={labelClassName}>
+                                Section Image URL
+                              </label>
+                              <input
+                                className={getBlogInputClassName(
+                                  `sections.${index}.image`,
+                                )}
+                                value={section.image}
+                                onChange={(event) =>
+                                  updateSection(index, "image", event.target.value)
+                                }
+                                placeholder="Section Image URL"
+                              />
+                            </>
                           )}
-                          <input
-                            className={getBlogInputClassName(
-                              `sections.${index}.image`,
-                            )}
-                            required={isBlogContribution}
-                            aria-invalid={Boolean(
-                              getErrorMessage(`sections.${index}.image`),
-                            )}
-                            value={section.image}
-                            maxLength={
-                              isBlogContribution
-                                ? blogFieldLimits.sectionImage
-                                : undefined
-                            }
-                            onChange={(event) =>
-                              updateSection(index, "image", event.target.value)
-                            }
-                            placeholder="Section Image URL"
-                          />
-                          <FieldError
-                            message={getErrorMessage(`sections.${index}.image`)}
-                          />
                         </div>
                         <div>
                           {isBlogContribution ? (
