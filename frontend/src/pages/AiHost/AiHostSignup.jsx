@@ -255,7 +255,27 @@ const AiHostSignup = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { auth } = useAuth();
-  const onBack = () => navigateBackWithinApp(navigate);
+  const onBack = () => {
+    // Prefer real in-app history (e.g. moving between steps).
+    if (navigateBackWithinApp(navigate)) return;
+
+    // Visitors who arrive via the "Verify Business" redirect land here as a
+    // fresh page load, but the listing they clicked from is the previous entry
+    // in the browser history. Go back the browser's way so that listing is
+    // restored together with its own navigation state (returnTo/breadcrumb) —
+    // loading its URL would land on a clean copy whose back button is dead.
+    if (cameFromVerify && window.history.length > 1) {
+      navigate(-1);
+      return;
+    }
+
+    // Fallback: the recorded listing, else the host home.
+    if (verifyClick?.listingUrl) {
+      window.location.href = verifyClick.listingUrl;
+      return;
+    }
+    navigate("/");
+  };
   const hostRedirectUrl = `${window.location.origin}/`;
 
   const signupParams = new URLSearchParams(location.search);
