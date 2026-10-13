@@ -134,7 +134,15 @@ const FloatingImage = ({ src, alt, side = "right" }) => {
   );
 };
 
-const PreviewHeader = ({ config, item, onEdit }) => (
+const canEditContribution = (item = {}) => {
+  const status = (item.status || "pending").toLowerCase();
+  return !item.isDraft && ["approved", "rejected"].includes(status);
+};
+
+const PreviewHeader = ({ config, item, onEdit }) => {
+  const canEdit = canEditContribution(item);
+
+  return (
   <div className="mb-5 flex items-center justify-between gap-4">
     <div>
       <h1 className="text-sm font-semibold text-black/50">
@@ -144,16 +152,19 @@ const PreviewHeader = ({ config, item, onEdit }) => (
         Status: {item.status || "pending"}
       </p>
     </div>
-    <button
-      type="button"
-      onClick={onEdit}
-      className="inline-flex items-center gap-2 rounded-full bg-primary-blue px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-sky-500"
-    >
-      <HiOutlinePencil size={16} />
-      Edit
-    </button>
+    {canEdit ? (
+      <button
+        type="button"
+        onClick={onEdit}
+        className="inline-flex items-center gap-2 rounded-full bg-primary-blue px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-sky-500"
+      >
+        <HiOutlinePencil size={16} />
+        Edit
+      </button>
+    ) : null}
   </div>
-);
+  );
+};
 
 const ArticlePreview = ({ item, config, onEdit }) => {
   let sectionImageIndex = 0;
@@ -869,6 +880,14 @@ const AiBlogContributionPreview = ({ type = "blog" }) => {
     return items.find((entry) => entry._id === itemId || entry.id === itemId);
   }, [itemId, items, stateItem]);
 
+  const canEdit = canEditContribution(item);
+
+  useEffect(() => {
+    if (isEditing && !canEdit) {
+      setIsEditing(false);
+    }
+  }, [canEdit, isEditing]);
+
   if (!auth?.user) {
     return null;
   }
@@ -898,7 +917,7 @@ const AiBlogContributionPreview = ({ type = "blog" }) => {
     );
   }
 
-  if (isEditing) {
+  if (isEditing && canEdit) {
     return (
       <ContributionEditForm
         item={item}
