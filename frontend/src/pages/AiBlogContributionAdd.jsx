@@ -1027,8 +1027,8 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
             ? new Date(formValues.date).toISOString()
             : null,
         destination: selectedDestination,
-        blogType: isArticleContribution ? "" : formValues.link.trim(),
-        link: isArticleContribution ? "" : formValues.link.trim(),
+        blogType: "",
+        link: "",
         source: formValues.source.trim(),
         sections: cleanedSections,
         isDraft: status === "draft",
@@ -1064,7 +1064,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
         shortDescription: formValues.shortDescription.trim(),
         mainImage: formValues.mainImage.trim(),
         destination: selectedDestination,
-        link: formValues.link.trim(),
+        link: "",
         category: formValues.category.trim(),
         month: formValues.month.trim(),
         venue: formValues.venue.trim(),
@@ -1103,7 +1103,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
         shortDescription: formValues.shortDescription.trim(),
         mainImage: formValues.mainImage.trim(),
         destination: selectedDestination,
-        link: formValues.link.trim(),
+        link: "",
         address: formValues.address.trim(),
         googleMapsLink: formValues.googleMapsLink.trim(),
         rating: formValues.rating.trim(),
@@ -1152,8 +1152,8 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
           ? new Date(formValues.date).toISOString()
           : null,
       destination: selectedDestination,
-      blogType: isArticleContribution ? "" : formValues.link.trim(),
-      link: isArticleContribution ? "" : formValues.link.trim(),
+      blogType: "",
+      link: "",
       source: formValues.source.trim(),
       sections: cleanedSections,
       isDraft: status === "draft",
@@ -1382,20 +1382,6 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
             </div>
 
             <div className="grid gap-5 lg:grid-cols-3">
-              {isArticleContribution ? null : (
-                <div>
-                  <label className={labelClassName}>Link</label>
-                  <input
-                    className={inputClassName}
-                    value={formValues.link}
-                    maxLength={contributionFieldLimits.link}
-                    onChange={(event) =>
-                      updateFormField("link", event.target.value)
-                    }
-                    placeholder="Type URL here"
-                  />
-                </div>
-              )}
               <div>
                 <RequiredLabel>
                   {isEventForm
