@@ -1490,10 +1490,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                   <FieldError message={getErrorMessage("source")} />
                 </div>
               ) : null}
-            </div>
-
-            {config.formType === "event" ? (
-              <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+              {isEventForm ? (
                 <div>
                   <RequiredLabel>Category</RequiredLabel>
                   <input
@@ -1509,6 +1506,28 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                   />
                   <FieldError message={getErrorMessage("category")} />
                 </div>
+              ) : null}
+              {isPlaceForm ? (
+                <div>
+                  <RequiredLabel>Address</RequiredLabel>
+                  <input
+                    className={getFieldClassName("address")}
+                    required
+                    aria-invalid={Boolean(getErrorMessage("address"))}
+                    value={formValues.address}
+                    maxLength={contributionFieldLimits.address}
+                    onChange={(event) =>
+                      updateFormField("address", event.target.value)
+                    }
+                    placeholder="Address"
+                  />
+                  <FieldError message={getErrorMessage("address")} />
+                </div>
+              ) : null}
+            </div>
+
+            {config.formType === "event" ? (
+              <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                 <div>
                   <RequiredLabel>Month</RequiredLabel>
                   <input
@@ -1557,22 +1576,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               </div>
             ) : config.formType === "place" ? (
               <>
-                <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-                  <div>
-                    <RequiredLabel>Address</RequiredLabel>
-                    <input
-                      className={getFieldClassName("address")}
-                      required
-                      aria-invalid={Boolean(getErrorMessage("address"))}
-                      value={formValues.address}
-                      maxLength={contributionFieldLimits.address}
-                      onChange={(event) =>
-                        updateFormField("address", event.target.value)
-                      }
-                      placeholder="Address"
-                    />
-                    <FieldError message={getErrorMessage("address")} />
-                  </div>
+                <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                   <div>
                     <RequiredLabel>Google Maps Link</RequiredLabel>
                     <input
