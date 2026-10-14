@@ -74,14 +74,24 @@ const emptySection = () => ({
   content: "",
 });
 
-const blogFieldLimits = {
+const contributionFieldLimits = {
   mainTitle: 70,
   mainImage: 2048,
   source: 120,
   mainContent: 5000,
+  shortDescription: 1000,
   sectionTitle: 100,
   sectionImage: 2048,
   sectionContent: 2500,
+  link: 2048,
+  category: 80,
+  month: 40,
+  venue: 120,
+  type: 80,
+  address: 180,
+  googleMapsLink: 2048,
+  rating: 20,
+  coordinate: 30,
 };
 
 const initialFormState = (author = "", destination = "") => ({
@@ -495,7 +505,9 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
   const { auth } = useAuth();
   const user = auth?.user || {};
   const config = contributionAddConfig[type] || contributionAddConfig.blog;
-  const isBlogContribution = type === "blog";
+  const isArticleContribution = ["blog", "news"].includes(type);
+  const isEventForm = config.formType === "event";
+  const isPlaceForm = config.formType === "place";
   const supportsImageUploads = ["blog", "news", "event", "places"].includes(type);
   const supportsSectionImageUploads = ["blog", "news"].includes(type);
   const selectionStorageKey = getSelectionStorageKey(type);
@@ -842,9 +854,8 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
     return null;
   }
 
-  const getErrorMessage = (field) =>
-    isBlogContribution ? formErrors[field] : "";
-  const getBlogInputClassName = (field) =>
+  const getErrorMessage = (field) => formErrors[field] || "";
+  const getFieldClassName = (field) =>
     `${inputClassName} ${
       getErrorMessage(field)
         ? "!border-red-500 focus:!border-red-500 focus:!ring-red-100"
@@ -916,12 +927,54 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
     }));
   };
 
-  const validateBlogForm = () => {
+  const validateContributionForm = () => {
     const errors = {};
 
     if (!selectedContinent) errors.continent = "Continent is required";
     if (!selectedCountry) errors.country = "Country is required";
-    if (!selectedLocation) errors.location = "Location is required";
+    if (!selectedLocation || !selectedDestination) {
+      errors.location = "Location is required";
+    }
+
+    if (isEventForm) {
+      if (!formValues.eventName.trim()) errors.eventName = "Event name is required";
+      if (!formValues.mainImageFile && !formValues.mainImage.trim()) {
+        errors.mainImage = "Main image is required";
+      }
+      if (!formValues.category.trim()) errors.category = "Category is required";
+      if (!formValues.month.trim()) errors.month = "Month is required";
+      if (!formValues.venue.trim()) errors.venue = "Venue is required";
+      if (!formValues.eventType.trim()) errors.eventType = "Type is required";
+      if (!formValues.shortDescription.trim()) {
+        errors.shortDescription = "Short description is required";
+      }
+
+      return errors;
+    }
+
+    if (isPlaceForm) {
+      if (!formValues.placeName.trim()) errors.placeName = "Place name is required";
+      if (!formValues.mainImageFile && !formValues.mainImage.trim()) {
+        errors.mainImage = "Main image is required";
+      }
+      if (!formValues.address.trim()) errors.address = "Address is required";
+      if (!formValues.googleMapsLink.trim()) {
+        errors.googleMapsLink = "Google Maps link is required";
+      }
+      if (!formValues.rating.trim()) errors.rating = "Rating is required";
+      if (!formValues.placeType.trim()) errors.placeType = "Type is required";
+      if (!formValues.category.trim()) errors.category = "Category is required";
+      if (!formValues.month.trim()) errors.month = "Month is required";
+      if (!formValues.venue.trim()) errors.venue = "Venue is required";
+      if (!formValues.latitude.trim()) errors.latitude = "Latitude is required";
+      if (!formValues.longitude.trim()) errors.longitude = "Longitude is required";
+      if (!formValues.shortDescription.trim()) {
+        errors.shortDescription = "Short description is required";
+      }
+
+      return errors;
+    }
+
     if (!formValues.mainTitle.trim()) errors.mainTitle = "Main title is required";
     if (!formValues.mainImageFile && !formValues.mainImage.trim()) {
       errors.mainImage = "Main image is required";
@@ -955,48 +1008,10 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
       }))
       .filter((section) => section.title || section.image || section.content);
 
-    const isEventForm = config.formType === "event";
-    const isPlaceForm = config.formType === "place";
-    const titleValue = isEventForm
-      ? formValues.eventName
-      : isPlaceForm
-        ? formValues.placeName
-        : formValues.mainTitle;
-    const contentValue = isEventForm || isPlaceForm
-      ? formValues.shortDescription
-      : formValues.mainContent;
+    const validationErrors = validateContributionForm();
+    setFormErrors(validationErrors);
 
-    if (isBlogContribution) {
-      const validationErrors = validateBlogForm();
-      setFormErrors(validationErrors);
-
-      if (Object.keys(validationErrors).length > 0) {
-        return;
-      }
-    }
-
-    if (!titleValue.trim()) {
-      showErrorAlert(
-        isEventForm
-          ? "Event name is required."
-          : isPlaceForm
-            ? "Place name is required."
-            : "Main title is required.",
-      );
-      return;
-    }
-
-    if (!contentValue.trim()) {
-      showErrorAlert(
-        isEventForm || isPlaceForm
-          ? "Short description is required."
-          : "Main content is required.",
-      );
-      return;
-    }
-
-    if (!selectedDestination) {
-      showErrorAlert("Please select a continent, country and state.");
+    if (Object.keys(validationErrors).length > 0) {
       return;
     }
 
@@ -1005,15 +1020,15 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
         mainTitle: formValues.mainTitle.trim(),
         mainImage: formValues.mainImage.trim(),
         mainContent: formValues.mainContent.trim(),
-        author: isBlogContribution ? contributorName : formValues.author.trim(),
-        date: isBlogContribution
+        author: isArticleContribution ? contributorName : formValues.author.trim(),
+        date: isArticleContribution
           ? new Date().toISOString()
           : formValues.date
             ? new Date(formValues.date).toISOString()
             : null,
         destination: selectedDestination,
-        blogType: isBlogContribution ? "" : formValues.link.trim(),
-        link: isBlogContribution ? "" : formValues.link.trim(),
+        blogType: isArticleContribution ? "" : formValues.link.trim(),
+        link: isArticleContribution ? "" : formValues.link.trim(),
         source: formValues.source.trim(),
         sections: cleanedSections,
         isDraft: status === "draft",
@@ -1130,15 +1145,15 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
       mainTitle: formValues.mainTitle.trim(),
       mainImage: formValues.mainImage.trim(),
       mainContent: formValues.mainContent.trim(),
-      author: isBlogContribution ? contributorName : formValues.author.trim(),
-      date: isBlogContribution
+      author: isArticleContribution ? contributorName : formValues.author.trim(),
+      date: isArticleContribution
         ? new Date().toISOString()
         : formValues.date
           ? new Date(formValues.date).toISOString()
           : null,
       destination: selectedDestination,
-      blogType: isBlogContribution ? "" : formValues.link.trim(),
-      link: isBlogContribution ? "" : formValues.link.trim(),
+      blogType: isArticleContribution ? "" : formValues.link.trim(),
+      link: isArticleContribution ? "" : formValues.link.trim(),
       source: formValues.source.trim(),
       sections: cleanedSections,
       isDraft: status === "draft",
@@ -1269,7 +1284,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               className="relative z-30 mb-5 grid gap-4 lg:grid-cols-3"
             >
               <div>
-                {isBlogContribution ? <RequiredLabel>Continent</RequiredLabel> : null}
+                <RequiredLabel>Continent</RequiredLabel>
                 <DropdownBadge
                   label="Continent"
                   options={continentOptions}
@@ -1304,7 +1319,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               </div>
 
               <div>
-                {isBlogContribution ? <RequiredLabel>Country</RequiredLabel> : null}
+                <RequiredLabel>Country</RequiredLabel>
                 <DropdownBadge
                   label="Country"
                   options={countryOptions}
@@ -1338,7 +1353,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               </div>
 
               <div>
-                {isBlogContribution ? <RequiredLabel>Location</RequiredLabel> : null}
+                <RequiredLabel>Location</RequiredLabel>
                 <DropdownBadge
                   label="Location"
                   options={locationOptions}
@@ -1367,12 +1382,13 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
             </div>
 
             <div className="grid gap-5 lg:grid-cols-3">
-              {isBlogContribution ? null : (
+              {isArticleContribution ? null : (
                 <div>
                   <label className={labelClassName}>Link</label>
                   <input
                     className={inputClassName}
                     value={formValues.link}
+                    maxLength={contributionFieldLimits.link}
                     onChange={(event) =>
                       updateFormField("link", event.target.value)
                     }
@@ -1381,50 +1397,66 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                 </div>
               )}
               <div>
-                {isBlogContribution ? (
-                  <RequiredLabel>Main Title</RequiredLabel>
-                ) : (
-                  <label className={labelClassName}>
-                    {config.formType === "event"
-                      ? "Event Name"
-                      : config.formType === "place"
-                        ? "Place Name"
-                        : "Main Title"}
-                  </label>
-                )}
+                <RequiredLabel>
+                  {isEventForm
+                    ? "Event Name"
+                    : isPlaceForm
+                      ? "Place Name"
+                      : "Main Title"}
+                </RequiredLabel>
                 <input
-                  className={getBlogInputClassName("mainTitle")}
-                  required={isBlogContribution}
-                  aria-invalid={Boolean(getErrorMessage("mainTitle"))}
+                  className={getFieldClassName(
+                    isEventForm
+                      ? "eventName"
+                      : isPlaceForm
+                        ? "placeName"
+                        : "mainTitle",
+                  )}
+                  required
+                  aria-invalid={Boolean(
+                    getErrorMessage(
+                      isEventForm
+                        ? "eventName"
+                        : isPlaceForm
+                          ? "placeName"
+                          : "mainTitle",
+                    ),
+                  )}
                   value={
-                    config.formType === "event"
+                    isEventForm
                       ? formValues.eventName
-                      : config.formType === "place"
+                      : isPlaceForm
                         ? formValues.placeName
                       : formValues.mainTitle
                   }
                   onChange={(event) =>
                     updateFormField(
-                      config.formType === "event"
+                      isEventForm
                         ? "eventName"
-                        : config.formType === "place"
+                        : isPlaceForm
                           ? "placeName"
                           : "mainTitle",
                       event.target.value,
                     )
                   }
-                  maxLength={
-                    isBlogContribution ? blogFieldLimits.mainTitle : undefined
-                  }
+                  maxLength={contributionFieldLimits.mainTitle}
                   placeholder={
-                    config.formType === "event"
+                    isEventForm
                       ? "Event name"
-                      : config.formType === "place"
+                      : isPlaceForm
                         ? "Place name"
                         : "Main title"
                   }
                 />
-                <FieldError message={getErrorMessage("mainTitle")} />
+                <FieldError
+                  message={getErrorMessage(
+                    isEventForm
+                      ? "eventName"
+                      : isPlaceForm
+                        ? "placeName"
+                        : "mainTitle",
+                  )}
+                />
               </div>
               <div>
                 {supportsImageUploads ? (
@@ -1433,33 +1465,37 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                     label="Main Image"
                     file={formValues.mainImageFile}
                     error={getErrorMessage("mainImage")}
-                    required={isBlogContribution}
+                    required
                     onChange={(file) => updateBlogImageFile("mainImage", file)}
                     onClear={() => updateBlogImageFile("mainImage", null)}
                   />
                 ) : (
                   <>
-                  <label className={labelClassName}>Main Image URL</label>
+                  <RequiredLabel>Main Image URL</RequiredLabel>
                   <input
-                    className={getBlogInputClassName("mainImage")}
+                    className={getFieldClassName("mainImage")}
+                    required
+                    aria-invalid={Boolean(getErrorMessage("mainImage"))}
                     value={formValues.mainImage}
+                    maxLength={contributionFieldLimits.mainImage}
                     onChange={(event) =>
                       updateFormField("mainImage", event.target.value)
                     }
                     placeholder="Main image URL"
                   />
+                  <FieldError message={getErrorMessage("mainImage")} />
                 </>
                 )}
               </div>
-              {isBlogContribution ? (
+              {isArticleContribution ? (
                 <div>
                   <RequiredLabel>Source</RequiredLabel>
                   <input
-                    className={getBlogInputClassName("source")}
+                    className={getFieldClassName("source")}
                     required
                     aria-invalid={Boolean(getErrorMessage("source"))}
                     value={formValues.source}
-                    maxLength={blogFieldLimits.source}
+                    maxLength={contributionFieldLimits.source}
                     onChange={(event) =>
                       updateFormField("source", event.target.value)
                     }
@@ -1473,158 +1509,210 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
             {config.formType === "event" ? (
               <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
                 <div>
-                  <label className={labelClassName}>Category</label>
+                  <RequiredLabel>Category</RequiredLabel>
                   <input
-                    className={inputClassName}
+                    className={getFieldClassName("category")}
+                    required
+                    aria-invalid={Boolean(getErrorMessage("category"))}
                     value={formValues.category}
+                    maxLength={contributionFieldLimits.category}
                     onChange={(event) =>
                       updateFormField("category", event.target.value)
                     }
                     placeholder="Category"
                   />
+                  <FieldError message={getErrorMessage("category")} />
                 </div>
                 <div>
-                  <label className={labelClassName}>Month</label>
+                  <RequiredLabel>Month</RequiredLabel>
                   <input
-                    className={inputClassName}
+                    className={getFieldClassName("month")}
+                    required
+                    aria-invalid={Boolean(getErrorMessage("month"))}
                     value={formValues.month}
+                    maxLength={contributionFieldLimits.month}
                     onChange={(event) =>
                       updateFormField("month", event.target.value)
                     }
                     placeholder="Month"
                   />
+                  <FieldError message={getErrorMessage("month")} />
                 </div>
                 <div>
-                  <label className={labelClassName}>Venue</label>
+                  <RequiredLabel>Venue</RequiredLabel>
                   <input
-                    className={inputClassName}
+                    className={getFieldClassName("venue")}
+                    required
+                    aria-invalid={Boolean(getErrorMessage("venue"))}
                     value={formValues.venue}
+                    maxLength={contributionFieldLimits.venue}
                     onChange={(event) =>
                       updateFormField("venue", event.target.value)
                     }
                     placeholder="Venue"
                   />
+                  <FieldError message={getErrorMessage("venue")} />
                 </div>
                 <div>
-                  <label className={labelClassName}>Type</label>
+                  <RequiredLabel>Type</RequiredLabel>
                   <input
-                    className={inputClassName}
+                    className={getFieldClassName("eventType")}
+                    required
+                    aria-invalid={Boolean(getErrorMessage("eventType"))}
                     value={formValues.eventType}
+                    maxLength={contributionFieldLimits.type}
                     onChange={(event) =>
                       updateFormField("eventType", event.target.value)
                     }
                     placeholder="Type"
                   />
+                  <FieldError message={getErrorMessage("eventType")} />
                 </div>
               </div>
             ) : config.formType === "place" ? (
               <>
                 <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
                   <div>
-                    <label className={labelClassName}>Address</label>
+                    <RequiredLabel>Address</RequiredLabel>
                     <input
-                      className={inputClassName}
+                      className={getFieldClassName("address")}
+                      required
+                      aria-invalid={Boolean(getErrorMessage("address"))}
                       value={formValues.address}
+                      maxLength={contributionFieldLimits.address}
                       onChange={(event) =>
                         updateFormField("address", event.target.value)
                       }
                       placeholder="Address"
                     />
+                    <FieldError message={getErrorMessage("address")} />
                   </div>
                   <div>
-                    <label className={labelClassName}>Google Maps Link</label>
+                    <RequiredLabel>Google Maps Link</RequiredLabel>
                     <input
-                      className={inputClassName}
+                      className={getFieldClassName("googleMapsLink")}
+                      required
+                      aria-invalid={Boolean(getErrorMessage("googleMapsLink"))}
                       value={formValues.googleMapsLink}
+                      maxLength={contributionFieldLimits.googleMapsLink}
                       onChange={(event) =>
                         updateFormField("googleMapsLink", event.target.value)
                       }
                       placeholder="Google Maps link"
                     />
+                    <FieldError message={getErrorMessage("googleMapsLink")} />
                   </div>
                   <div>
-                    <label className={labelClassName}>Rating</label>
+                    <RequiredLabel>Rating</RequiredLabel>
                     <input
-                      className={inputClassName}
+                      className={getFieldClassName("rating")}
+                      required
+                      aria-invalid={Boolean(getErrorMessage("rating"))}
                       value={formValues.rating}
+                      maxLength={contributionFieldLimits.rating}
                       onChange={(event) =>
                         updateFormField("rating", event.target.value)
                       }
                       placeholder="Rating"
                     />
+                    <FieldError message={getErrorMessage("rating")} />
                   </div>
                   <div>
-                    <label className={labelClassName}>Type</label>
+                    <RequiredLabel>Type</RequiredLabel>
                     <input
-                      className={inputClassName}
+                      className={getFieldClassName("placeType")}
+                      required
+                      aria-invalid={Boolean(getErrorMessage("placeType"))}
                       value={formValues.placeType}
+                      maxLength={contributionFieldLimits.type}
                       onChange={(event) =>
                         updateFormField("placeType", event.target.value)
                       }
                       placeholder="Type"
                     />
+                    <FieldError message={getErrorMessage("placeType")} />
                   </div>
                 </div>
 
                 <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-5">
                   <div>
-                    <label className={labelClassName}>Category</label>
+                    <RequiredLabel>Category</RequiredLabel>
                     <input
-                      className={inputClassName}
+                      className={getFieldClassName("category")}
+                      required
+                      aria-invalid={Boolean(getErrorMessage("category"))}
                       value={formValues.category}
+                      maxLength={contributionFieldLimits.category}
                       onChange={(event) =>
                         updateFormField("category", event.target.value)
                       }
                       placeholder="Category"
                     />
+                    <FieldError message={getErrorMessage("category")} />
                   </div>
                   <div>
-                    <label className={labelClassName}>Month</label>
+                    <RequiredLabel>Month</RequiredLabel>
                     <input
-                      className={inputClassName}
+                      className={getFieldClassName("month")}
+                      required
+                      aria-invalid={Boolean(getErrorMessage("month"))}
                       value={formValues.month}
+                      maxLength={contributionFieldLimits.month}
                       onChange={(event) =>
                         updateFormField("month", event.target.value)
                       }
                       placeholder="Month"
                     />
+                    <FieldError message={getErrorMessage("month")} />
                   </div>
                   <div>
-                    <label className={labelClassName}>Venue</label>
+                    <RequiredLabel>Venue</RequiredLabel>
                     <input
-                      className={inputClassName}
+                      className={getFieldClassName("venue")}
+                      required
+                      aria-invalid={Boolean(getErrorMessage("venue"))}
                       value={formValues.venue}
+                      maxLength={contributionFieldLimits.venue}
                       onChange={(event) =>
                         updateFormField("venue", event.target.value)
                       }
                       placeholder="Venue"
                     />
+                    <FieldError message={getErrorMessage("venue")} />
                   </div>
                   <div>
-                    <label className={labelClassName}>Latitude</label>
+                    <RequiredLabel>Latitude</RequiredLabel>
                     <input
-                      className={inputClassName}
+                      className={getFieldClassName("latitude")}
+                      required
+                      aria-invalid={Boolean(getErrorMessage("latitude"))}
                       value={formValues.latitude}
+                      maxLength={contributionFieldLimits.coordinate}
                       onChange={(event) =>
                         updateFormField("latitude", event.target.value)
                       }
                       placeholder="Latitude"
                     />
+                    <FieldError message={getErrorMessage("latitude")} />
                   </div>
                   <div>
-                    <label className={labelClassName}>Longitude</label>
+                    <RequiredLabel>Longitude</RequiredLabel>
                     <input
-                      className={inputClassName}
+                      className={getFieldClassName("longitude")}
+                      required
+                      aria-invalid={Boolean(getErrorMessage("longitude"))}
                       value={formValues.longitude}
+                      maxLength={contributionFieldLimits.coordinate}
                       onChange={(event) =>
                         updateFormField("longitude", event.target.value)
                       }
                       placeholder="Longitude"
                     />
+                    <FieldError message={getErrorMessage("longitude")} />
                   </div>
                 </div>
               </>
-            ) : isBlogContribution ? null : (
+            ) : isArticleContribution ? null : (
               <div
                 className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-4"
               >
@@ -1678,42 +1766,48 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
             )}
 
             <div className="mt-6">
-              {isBlogContribution ? (
-                <RequiredLabel>Main Content</RequiredLabel>
-              ) : (
-                <label className={labelClassName}>
-                  {config.formType === "event" || config.formType === "place"
-                    ? "Short Description"
-                    : "Main Content"}
-                </label>
-              )}
+              <RequiredLabel>
+                {isEventForm || isPlaceForm ? "Short Description" : "Main Content"}
+              </RequiredLabel>
               <textarea
-                className={`${getBlogInputClassName("mainContent")} min-h-[150px] resize-y leading-relaxed`}
-                required={isBlogContribution}
-                aria-invalid={Boolean(getErrorMessage("mainContent"))}
+                className={`${getFieldClassName(
+                  isEventForm || isPlaceForm ? "shortDescription" : "mainContent",
+                )} min-h-[150px] resize-y leading-relaxed`}
+                required
+                aria-invalid={Boolean(
+                  getErrorMessage(
+                    isEventForm || isPlaceForm ? "shortDescription" : "mainContent",
+                  ),
+                )}
                 value={
-                  config.formType === "event" || config.formType === "place"
+                  isEventForm || isPlaceForm
                     ? formValues.shortDescription
                     : formValues.mainContent
                 }
                 maxLength={
-                  isBlogContribution ? blogFieldLimits.mainContent : undefined
+                  isEventForm || isPlaceForm
+                    ? contributionFieldLimits.shortDescription
+                    : contributionFieldLimits.mainContent
                 }
                 onChange={(event) =>
                   updateFormField(
-                    config.formType === "event" || config.formType === "place"
+                    isEventForm || isPlaceForm
                       ? "shortDescription"
                       : "mainContent",
                     event.target.value,
                   )
                 }
                 placeholder={
-                  config.formType === "event" || config.formType === "place"
+                  isEventForm || isPlaceForm
                     ? "Short description"
                     : "Main content"
                 }
               />
-              <FieldError message={getErrorMessage("mainContent")} />
+              <FieldError
+                message={getErrorMessage(
+                  isEventForm || isPlaceForm ? "shortDescription" : "mainContent",
+                )}
+              />
             </div>
 
             {config.formType === "event" || config.formType === "place" ? null : (
@@ -1746,25 +1840,17 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
 
                       <div className="space-y-4">
                         <div>
-                          {isBlogContribution ? (
-                            <RequiredLabel>Section Title</RequiredLabel>
-                          ) : (
-                            <label className={labelClassName}>Section Title</label>
-                          )}
+                          <RequiredLabel>Section Title</RequiredLabel>
                           <input
-                            className={getBlogInputClassName(
+                            className={getFieldClassName(
                               `sections.${index}.title`,
                             )}
-                            required={isBlogContribution}
+                            required
                             aria-invalid={Boolean(
                               getErrorMessage(`sections.${index}.title`),
                             )}
                             value={section.title}
-                            maxLength={
-                              isBlogContribution
-                                ? blogFieldLimits.sectionTitle
-                                : undefined
-                            }
+                            maxLength={contributionFieldLimits.sectionTitle}
                             onChange={(event) =>
                               updateSection(index, "title", event.target.value)
                             }
@@ -1781,7 +1867,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                               label={`Section ${index + 1} Image`}
                               file={section.imageFile}
                               error={getErrorMessage(`sections.${index}.image`)}
-                              required={isBlogContribution}
+                              required
                               onChange={(file) =>
                                 updateSectionImageFile(index, file)
                               }
@@ -1789,44 +1875,42 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                             />
                           ) : (
                             <>
-                              <label className={labelClassName}>
+                              <RequiredLabel>
                                 Section Image URL
-                              </label>
+                              </RequiredLabel>
                               <input
-                                className={getBlogInputClassName(
+                                className={getFieldClassName(
                                   `sections.${index}.image`,
                                 )}
+                                required
+                                aria-invalid={Boolean(
+                                  getErrorMessage(`sections.${index}.image`),
+                                )}
                                 value={section.image}
+                                maxLength={contributionFieldLimits.sectionImage}
                                 onChange={(event) =>
                                   updateSection(index, "image", event.target.value)
                                 }
                                 placeholder="Section Image URL"
                               />
+                              <FieldError
+                                message={getErrorMessage(`sections.${index}.image`)}
+                              />
                             </>
                           )}
                         </div>
                         <div>
-                          {isBlogContribution ? (
-                            <RequiredLabel>Section Content</RequiredLabel>
-                          ) : (
-                            <label className={labelClassName}>
-                              Section Content
-                            </label>
-                          )}
+                          <RequiredLabel>Section Content</RequiredLabel>
                           <textarea
-                            className={`${getBlogInputClassName(
+                            className={`${getFieldClassName(
                               `sections.${index}.content`,
                             )} min-h-[150px] resize-y leading-relaxed`}
-                            required={isBlogContribution}
+                            required
                             aria-invalid={Boolean(
                               getErrorMessage(`sections.${index}.content`),
                             )}
                             value={section.content}
-                            maxLength={
-                              isBlogContribution
-                                ? blogFieldLimits.sectionContent
-                                : undefined
-                            }
+                            maxLength={contributionFieldLimits.sectionContent}
                             onChange={(event) =>
                               updateSection(index, "content", event.target.value)
                             }
