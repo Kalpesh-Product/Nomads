@@ -99,6 +99,36 @@ const TemplateSite = () => {
   const isLoading = isPending || isPageChanging;
   const routeContext = getTemplateRouteContext(location.pathname);
 
+  useEffect(() => {
+    const companyName = String(normalizedData?.companyName || "").trim();
+    const favicon = String(normalizedData?.companyLogoUrl || "").trim();
+    if (!companyName && !favicon) return undefined;
+
+    const previousTitle = document.title;
+    const existingIcons = Array.from(document.querySelectorAll('link[rel~="icon"]'));
+    const previousIcons = existingIcons.map((icon) => ({ icon, href: icon.getAttribute("href") }));
+    let createdIcon = null;
+
+    if (companyName) document.title = companyName;
+    if (favicon) {
+      if (existingIcons.length) {
+        existingIcons.forEach((icon) => { icon.href = favicon; });
+      } else {
+        const icon = document.createElement("link");
+        icon.rel = "icon";
+        icon.href = favicon;
+        document.head.appendChild(icon);
+        createdIcon = icon;
+      }
+    }
+
+    return () => {
+      document.title = previousTitle;
+      previousIcons.forEach(({ icon, href }) => href === null ? icon.removeAttribute("href") : icon.setAttribute("href", href));
+      createdIcon?.remove();
+    };
+  }, [normalizedData?.companyName, normalizedData?.companyLogoUrl]);
+
   // Get item name for breadcrumb if we're on an item detail page
   let itemName = "";
   if (slug && itemSlug && normalizedData) {
