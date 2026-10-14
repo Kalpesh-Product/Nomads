@@ -5,6 +5,7 @@ import News from "../models/News.js";
 import { Readable } from "stream";
 import csvParser from "csv-parser";
 import TestNews from "../models/TestNews.js";
+import { buildContributionPayloadWithUploads } from "../utils/contributionImageUploads.js";
 
 // const BASE = "https://gnews.io/api/v4";
 // const APIKEY = process.env.GNEWS_API_KEY;
@@ -301,10 +302,16 @@ export const getNewsContributions = async (req, res, next) => {
 export const createMyNews = async (req, res, next) => {
   try {
     const user = req.userData._id;
-    const isDraft = Boolean(req.body?.isDraft);
+    const payload = await buildContributionPayloadWithUploads({
+      body: req.body,
+      files: req.files,
+      folderType: "news",
+      title: req.body?.mainTitle,
+    });
+    const isDraft = String(payload?.isDraft) === "true" || payload?.isDraft === true;
 
     const news = await News.create({
-      ...req.body,
+      ...payload,
       contributor: user,
       status: "pending",
       isDraft,
@@ -326,7 +333,13 @@ export const updateMyNews = async (req, res, next) => {
   try {
     const user = req.userData._id;
     const { id } = req.params;
-    const isDraft = Boolean(req.body?.isDraft);
+    const payload = await buildContributionPayloadWithUploads({
+      body: req.body,
+      files: req.files,
+      folderType: "news",
+      title: req.body?.mainTitle,
+    });
+    const isDraft = String(payload?.isDraft) === "true" || payload?.isDraft === true;
 
     const news = await News.findOneAndUpdate(
       {
@@ -334,7 +347,7 @@ export const updateMyNews = async (req, res, next) => {
         contributor: user,
       },
       {
-        ...req.body,
+        ...payload,
         contributor: user,
         status: "pending",
         isDraft,

@@ -2,6 +2,10 @@ import { Readable } from "stream";
 import csvParser from "csv-parser";
 import mongoose from "mongoose";
 import Place from "../models/Place.js";
+import {
+  buildContributionPayloadWithUploads,
+  parseContributionSections,
+} from "../utils/contributionImageUploads.js";
 
 const REQUIRED_COLUMNS = ["Place Name", "Destination"];
 
@@ -80,9 +84,10 @@ const validateCoordinateFields = (payload) =>
     .filter((error) => error.reason);
 
 const buildSectionsFromPayload = (sections) => {
-  if (!Array.isArray(sections)) return [];
+  const parsedSections = parseContributionSections(sections);
+  if (!Array.isArray(parsedSections)) return [];
 
-  return sections.map((section = {}) => ({
+  return parsedSections.map((section = {}) => ({
     title: normalizeString(section.title) || "",
     image: normalizeString(section.image) || "",
     content: normalizeString(section.content) || "",
@@ -382,8 +387,15 @@ export const getMyPlaces = async (req, res, next) => {
 export const createMyPlace = async (req, res, next) => {
   try {
     const user = req.userData._id;
-    const isDraft = Boolean(req.body?.isDraft);
-    const payload = buildPlacePayload(req.body || {});
+    const uploadPayload = await buildContributionPayloadWithUploads({
+      body: req.body,
+      files: req.files,
+      folderType: "places",
+      title: req.body?.placeName,
+    });
+    const isDraft =
+      String(uploadPayload?.isDraft) === "true" || uploadPayload?.isDraft === true;
+    const payload = buildPlacePayload(uploadPayload || {});
     const missingFields = validateRequiredPlaceFields(payload);
     const coordinateErrors = validateCoordinateFields(payload);
 
@@ -424,8 +436,15 @@ export const updateMyPlace = async (req, res, next) => {
   try {
     const user = req.userData._id;
     const { id } = req.params;
-    const isDraft = Boolean(req.body?.isDraft);
-    const payload = buildPlacePayload(req.body || {});
+    const uploadPayload = await buildContributionPayloadWithUploads({
+      body: req.body,
+      files: req.files,
+      folderType: "places",
+      title: req.body?.placeName,
+    });
+    const isDraft =
+      String(uploadPayload?.isDraft) === "true" || uploadPayload?.isDraft === true;
+    const payload = buildPlacePayload(uploadPayload || {});
     const missingFields = validateRequiredPlaceFields(payload);
     const coordinateErrors = validateCoordinateFields(payload);
 

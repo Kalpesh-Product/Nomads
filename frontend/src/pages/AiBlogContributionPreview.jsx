@@ -196,8 +196,30 @@ const EditableFloatingImage = ({ src, file, alt, side = "right" }) => {
   return <FloatingImage src={previewUrl || src} alt={alt} side={side} />;
 };
 
+const EditableImage = ({ src, file, alt }) => {
+  const [previewUrl, setPreviewUrl] = useState("");
+
+  useEffect(() => {
+    if (!file) {
+      setPreviewUrl("");
+      return undefined;
+    }
+
+    const objectUrl = URL.createObjectURL(file);
+    setPreviewUrl(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [file]);
+
+  const imageSrc = previewUrl || src;
+  if (!imageSrc) return null;
+
+  return <img src={imageSrc} alt={alt} className="h-full w-full object-cover" />;
+};
+
 const canEditContribution = (item = {}, config = {}) => {
-  if (config.label === "Blog" && item.isDraft) return true;
+  if (item.isDraft && ["Blog", "News", "Event", "Place"].includes(config.label)) {
+    return true;
+  }
 
   const status = (item.status || "pending").toLowerCase();
   return !item.isDraft && ["approved", "rejected"].includes(status);
@@ -525,7 +547,12 @@ const ContributionEditForm = ({ item, config, onCancel }) => {
   const itemId = item._id || item.id;
   const isEventForm = config.formType === "event";
   const isPlaceForm = config.formType === "place";
-  const isBlogContribution = config.label.toLowerCase() === "blog";
+  const isImageUploadContribution = ["blog", "news", "event", "place"].includes(
+    config.label.toLowerCase(),
+  );
+  const isArticleUploadContribution = ["blog", "news"].includes(
+    config.label.toLowerCase(),
+  );
   const showSections = !isEventForm && !isPlaceForm;
 
   const updateContributionMutation = useMutation({
@@ -605,21 +632,41 @@ const ContributionEditForm = ({ item, config, onCancel }) => {
         return;
       }
 
-      updateContributionMutation.mutate({
-        payload: {
-          eventName: formValues.eventName.trim(),
-          shortDescription: formValues.shortDescription.trim(),
-          mainImage: formValues.mainImage.trim(),
-          destination: formValues.destination,
-          link: formValues.link.trim(),
-          category: formValues.category.trim(),
-          month: formValues.month.trim(),
-          venue: formValues.venue.trim(),
-          eventType: formValues.eventType.trim(),
-          sections: [],
-          isDraft,
-        },
-      });
+      const payload = {
+        eventName: formValues.eventName.trim(),
+        shortDescription: formValues.shortDescription.trim(),
+        mainImage: formValues.mainImage.trim(),
+        destination: formValues.destination,
+        link: formValues.link.trim(),
+        category: formValues.category.trim(),
+        month: formValues.month.trim(),
+        venue: formValues.venue.trim(),
+        eventType: formValues.eventType.trim(),
+        sections: [],
+        isDraft,
+      };
+
+      if (isImageUploadContribution) {
+        const formData = new FormData();
+
+        Object.entries(payload).forEach(([key, value]) => {
+          if (key === "sections") {
+            formData.append(key, JSON.stringify(value));
+            return;
+          }
+
+          formData.append(key, value ?? "");
+        });
+
+        if (formValues.mainImageFile) {
+          formData.append("mainImageFile", formValues.mainImageFile);
+        }
+
+        updateContributionMutation.mutate({ payload: formData });
+        return;
+      }
+
+      updateContributionMutation.mutate({ payload });
       return;
     }
 
@@ -634,26 +681,46 @@ const ContributionEditForm = ({ item, config, onCancel }) => {
         return;
       }
 
-      updateContributionMutation.mutate({
-        payload: {
-          placeName: formValues.placeName.trim(),
-          shortDescription: formValues.shortDescription.trim(),
-          mainImage: formValues.mainImage.trim(),
-          destination: formValues.destination,
-          link: formValues.link.trim(),
-          address: formValues.address.trim(),
-          googleMapsLink: formValues.googleMapsLink.trim(),
-          rating: formValues.rating.trim(),
-          category: formValues.category.trim(),
-          month: formValues.month.trim(),
-          venue: formValues.venue.trim(),
-          latitude: formValues.latitude,
-          longitude: formValues.longitude,
-          placeType: formValues.placeType.trim(),
-          sections: [],
-          isDraft,
-        },
-      });
+      const payload = {
+        placeName: formValues.placeName.trim(),
+        shortDescription: formValues.shortDescription.trim(),
+        mainImage: formValues.mainImage.trim(),
+        destination: formValues.destination,
+        link: formValues.link.trim(),
+        address: formValues.address.trim(),
+        googleMapsLink: formValues.googleMapsLink.trim(),
+        rating: formValues.rating.trim(),
+        category: formValues.category.trim(),
+        month: formValues.month.trim(),
+        venue: formValues.venue.trim(),
+        latitude: formValues.latitude,
+        longitude: formValues.longitude,
+        placeType: formValues.placeType.trim(),
+        sections: [],
+        isDraft,
+      };
+
+      if (isImageUploadContribution) {
+        const formData = new FormData();
+
+        Object.entries(payload).forEach(([key, value]) => {
+          if (key === "sections") {
+            formData.append(key, JSON.stringify(value));
+            return;
+          }
+
+          formData.append(key, value ?? "");
+        });
+
+        if (formValues.mainImageFile) {
+          formData.append("mainImageFile", formValues.mainImageFile);
+        }
+
+        updateContributionMutation.mutate({ payload: formData });
+        return;
+      }
+
+      updateContributionMutation.mutate({ payload });
       return;
     }
 
@@ -674,14 +741,14 @@ const ContributionEditForm = ({ item, config, onCancel }) => {
       author: formValues.author.trim(),
       date: formValues.date ? new Date(formValues.date).toISOString() : null,
       destination: formValues.destination,
-      blogType: isBlogContribution ? "" : formValues.link.trim(),
-      link: isBlogContribution ? "" : formValues.link.trim(),
+      blogType: config.label === "Blog" ? "" : formValues.link.trim(),
+      link: config.label === "Blog" ? "" : formValues.link.trim(),
       source: formValues.source.trim(),
       sections: cleanedSections,
       isDraft,
     };
 
-    if (isBlogContribution) {
+    if (isArticleUploadContribution) {
       const formData = new FormData();
 
       Object.entries(payload).forEach(([key, value]) => {
@@ -740,6 +807,7 @@ const ContributionEditForm = ({ item, config, onCancel }) => {
       config={config}
       formValues={formValues}
       updateFormField={updateFormField}
+      updateBlogImageFile={updateBlogImageFile}
       handleSubmit={handleSubmit}
       isSaving={isSaving}
       onCancel={onCancel}
@@ -760,7 +828,9 @@ const ArticleInlineEdit = ({
   isSaving,
   onCancel,
 }) => {
-  const isBlogContribution = config.label.toLowerCase() === "blog";
+  const supportsArticleImageUploads = ["blog", "news"].includes(
+    config.label.toLowerCase(),
+  );
   let sectionImageIndex = 0;
   const sections = formValues.sections.map((section) => {
     if (!section.image) return { ...section, imageSide: null };
@@ -793,7 +863,7 @@ const ArticleInlineEdit = ({
               file={formValues.mainImageFile}
               alt={formValues.mainTitle}
             />
-            {isBlogContribution ? (
+            {supportsArticleImageUploads ? (
               <BlogImageFileInput
                 id="edit-blog-main-image"
                 label="Main Image"
@@ -853,7 +923,7 @@ const ArticleInlineEdit = ({
                 alt={section.title || `Section ${index + 1}`}
                 side={section.imageSide}
               />
-              {isBlogContribution ? (
+              {supportsArticleImageUploads ? (
                 <BlogImageFileInput
                   id={`edit-blog-section-image-${index}`}
                   label={`Section ${index + 1} Image`}
@@ -919,6 +989,7 @@ const DestinationInlineEdit = ({
   config,
   formValues,
   updateFormField,
+  updateBlogImageFile,
   handleSubmit,
   isSaving,
   onCancel,
@@ -947,20 +1018,22 @@ const DestinationInlineEdit = ({
           placeholder={titlePlaceholder}
         />
 
-        {formValues.mainImage ? (
+        {formValues.mainImage || formValues.mainImageFile ? (
           <div className="mt-6 aspect-[3.3/1] w-full overflow-hidden rounded-xl bg-slate-100">
-            <img
+            <EditableImage
               src={formValues.mainImage}
+              file={formValues.mainImageFile}
               alt={formValues[titleField]}
-              className="h-full w-full object-cover"
             />
           </div>
         ) : null}
-        <input
-          className={editImageInputClassName}
-          value={formValues.mainImage}
-          onChange={(event) => updateFormField("mainImage", event.target.value)}
-          placeholder="Main image URL"
+        <BlogImageFileInput
+          id={`edit-${config.label.toLowerCase()}-main-image`}
+          label="Main Image"
+          file={formValues.mainImageFile}
+          existingUrl={formValues.mainImage}
+          onChange={(file) => updateBlogImageFile("mainImage", file)}
+          onClear={() => updateBlogImageFile("mainImage", null)}
         />
 
         <div className="mt-6 grid gap-4 text-base font-bold text-black md:grid-cols-3">

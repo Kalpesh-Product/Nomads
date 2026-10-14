@@ -209,11 +209,16 @@ const BlogImageFileInput = ({
   label,
   file,
   error,
+  required = false,
   onChange,
   onClear,
 }) => (
   <div>
-    <RequiredLabel>{label}</RequiredLabel>
+    {required ? (
+      <RequiredLabel>{label}</RequiredLabel>
+    ) : (
+      <label className={labelClassName}>{label}</label>
+    )}
     <div
       className={`flex min-h-[42px] items-center gap-3 rounded-md border bg-white px-3 py-2 text-sm transition ${
         error ? "border-red-500" : "border-black/10 focus-within:border-sky-400 focus-within:ring-2 focus-within:ring-sky-100"
@@ -491,6 +496,8 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
   const user = auth?.user || {};
   const config = contributionAddConfig[type] || contributionAddConfig.blog;
   const isBlogContribution = type === "blog";
+  const supportsImageUploads = ["blog", "news", "event", "places"].includes(type);
+  const supportsSectionImageUploads = ["blog", "news"].includes(type);
   const selectionStorageKey = getSelectionStorageKey(type);
   const hasAccess = Boolean(user?.[config.accessFlag]);
   const contributorName = user?.fullName?.trim() || user?.name || "";
@@ -993,16 +1000,20 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
       return;
     }
 
-    if (isBlogContribution) {
+    if (supportsSectionImageUploads) {
       const payload = {
         mainTitle: formValues.mainTitle.trim(),
         mainImage: formValues.mainImage.trim(),
         mainContent: formValues.mainContent.trim(),
-        author: contributorName,
-        date: new Date().toISOString(),
+        author: isBlogContribution ? contributorName : formValues.author.trim(),
+        date: isBlogContribution
+          ? new Date().toISOString()
+          : formValues.date
+            ? new Date(formValues.date).toISOString()
+            : null,
         destination: selectedDestination,
-        blogType: "",
-        link: "",
+        blogType: isBlogContribution ? "" : formValues.link.trim(),
+        link: isBlogContribution ? "" : formValues.link.trim(),
         source: formValues.source.trim(),
         sections: cleanedSections,
         isDraft: status === "draft",
@@ -1033,7 +1044,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
     }
 
     if (isEventForm) {
-      createContribution({
+      const payload = {
         eventName: formValues.eventName.trim(),
         shortDescription: formValues.shortDescription.trim(),
         mainImage: formValues.mainImage.trim(),
@@ -1045,12 +1056,34 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
         eventType: formValues.eventType.trim(),
         sections: cleanedSections,
         isDraft: status === "draft",
-      });
+      };
+
+      if (supportsImageUploads) {
+        const formData = new FormData();
+
+        Object.entries(payload).forEach(([key, value]) => {
+          if (key === "sections") {
+            formData.append(key, JSON.stringify(value));
+            return;
+          }
+
+          formData.append(key, value ?? "");
+        });
+
+        if (formValues.mainImageFile) {
+          formData.append("mainImageFile", formValues.mainImageFile);
+        }
+
+        createContribution(formData);
+        return;
+      }
+
+      createContribution(payload);
       return;
     }
 
     if (isPlaceForm) {
-      createContribution({
+      const payload = {
         placeName: formValues.placeName.trim(),
         shortDescription: formValues.shortDescription.trim(),
         mainImage: formValues.mainImage.trim(),
@@ -1067,7 +1100,29 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
         placeType: formValues.placeType.trim(),
         sections: cleanedSections,
         isDraft: status === "draft",
-      });
+      };
+
+      if (supportsImageUploads) {
+        const formData = new FormData();
+
+        Object.entries(payload).forEach(([key, value]) => {
+          if (key === "sections") {
+            formData.append(key, JSON.stringify(value));
+            return;
+          }
+
+          formData.append(key, value ?? "");
+        });
+
+        if (formValues.mainImageFile) {
+          formData.append("mainImageFile", formValues.mainImageFile);
+        }
+
+        createContribution(formData);
+        return;
+      }
+
+      createContribution(payload);
       return;
     }
 
@@ -1372,12 +1427,13 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                 <FieldError message={getErrorMessage("mainTitle")} />
               </div>
               <div>
-                {isBlogContribution ? (
+                {supportsImageUploads ? (
                   <BlogImageFileInput
                     id="blog-main-image"
                     label="Main Image"
                     file={formValues.mainImageFile}
                     error={getErrorMessage("mainImage")}
+                    required={isBlogContribution}
                     onChange={(file) => updateBlogImageFile("mainImage", file)}
                     onClear={() => updateBlogImageFile("mainImage", null)}
                   />
@@ -1719,12 +1775,13 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                           />
                         </div>
                         <div>
-                          {isBlogContribution ? (
+                          {supportsSectionImageUploads ? (
                             <BlogImageFileInput
                               id={`blog-section-image-${index}`}
                               label={`Section ${index + 1} Image`}
                               file={section.imageFile}
                               error={getErrorMessage(`sections.${index}.image`)}
+                              required={isBlogContribution}
                               onChange={(file) =>
                                 updateSectionImageFile(index, file)
                               }

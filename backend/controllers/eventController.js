@@ -2,6 +2,10 @@ import { Readable } from "stream";
 import csvParser from "csv-parser";
 import mongoose from "mongoose";
 import Event from "../models/Event.js";
+import {
+  buildContributionPayloadWithUploads,
+  parseContributionSections,
+} from "../utils/contributionImageUploads.js";
 
 const REQUIRED_COLUMNS = ["Event Name", "Short Description", "Destination"];
 
@@ -23,9 +27,10 @@ const normalizeString = (value) =>
   typeof value === "string" ? value.trim() : value;
 
 const buildSectionsFromPayload = (sections) => {
-  if (!Array.isArray(sections)) return [];
+  const parsedSections = parseContributionSections(sections);
+  if (!Array.isArray(parsedSections)) return [];
 
-  return sections.map((section = {}) => ({
+  return parsedSections.map((section = {}) => ({
     title: normalizeString(section.title) || "",
     image: normalizeString(section.image) || "",
     content: normalizeString(section.content) || "",
@@ -289,8 +294,15 @@ export const getMyEvents = async (req, res, next) => {
 export const createMyEvent = async (req, res, next) => {
   try {
     const user = req.userData._id;
-    const isDraft = Boolean(req.body?.isDraft);
-    const payload = buildEventPayload(req.body || {});
+    const uploadPayload = await buildContributionPayloadWithUploads({
+      body: req.body,
+      files: req.files,
+      folderType: "events",
+      title: req.body?.eventName,
+    });
+    const isDraft =
+      String(uploadPayload?.isDraft) === "true" || uploadPayload?.isDraft === true;
+    const payload = buildEventPayload(uploadPayload || {});
     const missingFields = validateRequiredEventFields(payload);
 
     if (missingFields.length > 0) {
@@ -323,8 +335,15 @@ export const updateMyEvent = async (req, res, next) => {
   try {
     const user = req.userData._id;
     const { id } = req.params;
-    const isDraft = Boolean(req.body?.isDraft);
-    const payload = buildEventPayload(req.body || {});
+    const uploadPayload = await buildContributionPayloadWithUploads({
+      body: req.body,
+      files: req.files,
+      folderType: "events",
+      title: req.body?.eventName,
+    });
+    const isDraft =
+      String(uploadPayload?.isDraft) === "true" || uploadPayload?.isDraft === true;
+    const payload = buildEventPayload(uploadPayload || {});
     const missingFields = validateRequiredEventFields(payload);
 
     if (missingFields.length > 0) {
