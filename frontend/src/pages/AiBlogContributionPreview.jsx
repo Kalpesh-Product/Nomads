@@ -563,6 +563,13 @@ const PlaceFields = ({ formValues, updateFormField }) => (
 );
 
 const ContributionEditForm = ({ item, config, onCancel }) => {
+  const isBlogRepublish =
+    config.label === "Blog" &&
+    !item.isDraft &&
+    ["approved", "rejected"].includes(String(item.status || "").toLowerCase());
+  const editConfig = isBlogRepublish
+    ? { ...config, submitButtonLabel: "Re-publish Blog" }
+    : config;
   const axiosPrivate = useAxiosPrivate();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -805,7 +812,7 @@ const ContributionEditForm = ({ item, config, onCancel }) => {
   if (showSections) {
     return (
       <ArticleInlineEdit
-        config={config}
+        config={editConfig}
         formValues={formValues}
         updateFormField={updateFormField}
         updateSection={updateSection}
