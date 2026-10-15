@@ -24,6 +24,7 @@ export const THEME_DEFAULTS = {
     lodge: { bg: "#ffffff", text: "#1c1f21", accent: "#7fa388", surfaceUp: true },
     tastyc: { bg: "#f4efe7", text: "#1a1715", accent: "#cf7736", surfaceUp: true },
     flowspace: { bg: "#fbfaeb", text: "#11110f", accent: "#11110f", surfaceUp: true },
+    workscape: { bg: "#ffffff", text: "#20201f", accent: "#a99d93", surfaceUp: true },
     worpace: { bg: "#f7f7e8", text: "#11110f", accent: "#11110f", surfaceUp: true },
     travigo: { bg: "#f5f3ed", text: "#111111", accent: "#111111", surfaceUp: true },
     haven: { bg: "#f4f1ea", text: "#26312b", accent: "#5b7f6a", surfaceUp: true },
