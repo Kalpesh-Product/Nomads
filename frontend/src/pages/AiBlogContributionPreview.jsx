@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { HiOutlinePencil, HiOutlinePlus, HiOutlineTrash } from "react-icons/hi";
+import Swal from "sweetalert2";
 import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import humanDate from "../utils/humanDate";
@@ -641,7 +642,7 @@ const ContributionEditForm = ({ item, config, onCancel }) => {
     }));
   };
 
-  const handleSubmit = (isDraft) => {
+  const handleSubmit = async (isDraft) => {
     const cleanedSections = formValues.sections
       .map((section) => ({
         title: section.title.trim(),
@@ -761,6 +762,33 @@ const ContributionEditForm = ({ item, config, onCancel }) => {
     if (!formValues.mainContent.trim()) {
       showErrorAlert("Main content is required.");
       return;
+    }
+
+    if (config.label === "Blog" && isRepublish && !isDraft) {
+      const result = await Swal.fire({
+        icon: "warning",
+        title: "Re-publish this blog?",
+        text: "Re-publishing will permanently replace the previously saved version of this blog with your current changes. The previous version cannot be restored. Your blog will be submitted for review again.",
+        showCancelButton: true,
+        confirmButtonText: "Re-publish Blog",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#49a3dd",
+        focusCancel: true,
+        heightAuto: false,
+        customClass: {
+          popup: "swal2-popup--rounded",
+          title: "swal2-title--serif",
+          confirmButton: "swal2-button--pill swal2-button--republish",
+          cancelButton: "swal2-button--pill swal2-button--republish",
+        },
+      });
+
+      if (result.dismiss === Swal.DismissReason.cancel) {
+        onCancel();
+        return;
+      }
+
+      if (!result.isConfirmed) return;
     }
 
     const payload = {
