@@ -253,6 +253,15 @@ const PreviewHeader = ({ config, item, onEdit }) => {
         ) : null}
       </div>
 
+      {status === "pending" && !item.isDraft ? (
+        <div className="mt-4 rounded-xl border border-yellow-200 bg-yellow-100 px-4 py-3 text-sm text-yellow-700">
+          <p className="font-semibold">Under review</p>
+          <p className="mt-1">
+            This {config.label.toLowerCase()} is currently under review.
+          </p>
+        </div>
+      ) : null}
+
       {status === "rejected" && rejectionReason ? (
         <div className="mt-4 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
           <p className="font-semibold">Rejection reason</p>
