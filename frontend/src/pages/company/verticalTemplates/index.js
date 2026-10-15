@@ -7,6 +7,7 @@ import HuddleTemplate from "./huddle/HuddleTemplate";
 import TravigoTemplate from "./travigo/TravigoTemplate";
 import LodgeTemplate from "./lodge/LodgeTemplate";
 import TastycTemplate from "./tastyc/TastycTemplate";
+import GrandBarTemplate from "./grandbar/GrandBarTemplate";
 import FlowspaceTemplate from "./flowspace/FlowspaceTemplate";
 import WorkscapeTemplate from "./workscape/WorkscapeTemplate";
 import WorpaceTemplate from "./worpace/WorpaceTemplate";
@@ -26,6 +27,7 @@ export const VERTICAL_TEMPLATES = {
   travigo: TravigoTemplate,
   lodge: LodgeTemplate,
   tastyc: TastycTemplate,
+  grandbar: GrandBarTemplate,
   flowspace: FlowspaceTemplate,
   workscape: WorkscapeTemplate,
   worpace: WorpaceTemplate,
