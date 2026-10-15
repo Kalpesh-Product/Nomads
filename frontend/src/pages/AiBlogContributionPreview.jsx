@@ -468,13 +468,13 @@ const ArticleFields = ({ formValues, updateFormField }) => (
         placeholder="Author"
       />
     </Field>
-    <Field label="Source">
+    <Field label="Source (optional)">
       <CharacterLimitedField
         maxLength={contributionFieldLimits.source}
         className={inputClassName}
         value={formValues.source}
         onChange={(event) => updateFormField("source", event.target.value)}
-        placeholder="Source"
+        placeholder="Source (optional)"
       />
     </Field>
     <Field label="Date">
@@ -642,6 +642,35 @@ const ContributionEditForm = ({ item, config, onCancel }) => {
     }));
   };
 
+  const confirmRepublish = async (isDraft) => {
+    if (!isRepublish || isDraft) return true;
+    const contentName = config.label === "News" ? "news item" : config.label.toLowerCase();
+    const result = await Swal.fire({
+      icon: "warning",
+      title: `Re-publish this ${contentName}?`,
+      text: `Re-publishing will permanently replace the previously saved version of this ${contentName} with your current changes. The previous version cannot be restored. Your ${contentName} will be submitted for review again.`,
+      showCancelButton: true,
+      confirmButtonText: `Re-publish ${config.label}`,
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#49a3dd",
+      focusCancel: true,
+      heightAuto: false,
+      customClass: {
+        popup: "swal2-popup--rounded",
+        title: "swal2-title--serif",
+        confirmButton: "swal2-button--pill swal2-button--republish",
+        cancelButton: "swal2-button--pill swal2-button--republish",
+      },
+    });
+
+    if (result.dismiss === Swal.DismissReason.cancel) {
+      onCancel();
+      return false;
+    }
+
+    return result.isConfirmed;
+  };
+
   const handleSubmit = async (isDraft) => {
     const cleanedSections = formValues.sections
       .map((section) => ({
@@ -661,6 +690,8 @@ const ContributionEditForm = ({ item, config, onCancel }) => {
         showErrorAlert("Short description is required.");
         return;
       }
+
+      if (!(await confirmRepublish(isDraft))) return;
 
       const payload = {
         eventName: formValues.eventName.trim(),
@@ -710,6 +741,8 @@ const ContributionEditForm = ({ item, config, onCancel }) => {
         showErrorAlert("Short description is required.");
         return;
       }
+
+      if (!(await confirmRepublish(isDraft))) return;
 
       const payload = {
         placeName: formValues.placeName.trim(),
@@ -764,32 +797,7 @@ const ContributionEditForm = ({ item, config, onCancel }) => {
       return;
     }
 
-    if (config.label === "Blog" && isRepublish && !isDraft) {
-      const result = await Swal.fire({
-        icon: "warning",
-        title: "Re-publish this blog?",
-        text: "Re-publishing will permanently replace the previously saved version of this blog with your current changes. The previous version cannot be restored. Your blog will be submitted for review again.",
-        showCancelButton: true,
-        confirmButtonText: "Re-publish Blog",
-        cancelButtonText: "Cancel",
-        confirmButtonColor: "#49a3dd",
-        focusCancel: true,
-        heightAuto: false,
-        customClass: {
-          popup: "swal2-popup--rounded",
-          title: "swal2-title--serif",
-          confirmButton: "swal2-button--pill swal2-button--republish",
-          cancelButton: "swal2-button--pill swal2-button--republish",
-        },
-      });
-
-      if (result.dismiss === Swal.DismissReason.cancel) {
-        onCancel();
-        return;
-      }
-
-      if (!result.isConfirmed) return;
-    }
+    if (!(await confirmRepublish(isDraft))) return;
 
     const payload = {
       mainTitle: formValues.mainTitle.trim(),
@@ -1044,7 +1052,8 @@ const ArticleInlineEdit = ({
             className="w-full rounded-lg border border-transparent bg-white/70 px-3 py-2 text-left outline-none transition focus:border-sky-300 focus:bg-white focus:ring-2 focus:ring-sky-100 md:text-right"
             value={formValues.source}
             onChange={(event) => updateFormField("source", event.target.value)}
-            placeholder="Source"
+            placeholder="Source (optional)"
+            aria-label="Source (optional)"
           />
         </footer>
       </div>

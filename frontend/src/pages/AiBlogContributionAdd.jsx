@@ -961,7 +961,6 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
     if (!formValues.mainImageFile && !formValues.mainImage.trim()) {
       errors.mainImage = "Main image is required";
     }
-    if (!formValues.source.trim()) errors.source = "Source is required";
     if (!formValues.mainContent.trim()) {
       errors.mainContent = "Main content is required";
     }
@@ -1457,17 +1456,16 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               </div>
               {isArticleContribution ? (
                 <div>
-                  <RequiredLabel>Source</RequiredLabel>
+                  <label className={labelClassName}>Source (optional)</label>
                   <CharacterLimitedField
                     className={getFieldClassName("source")}
-                    required
                     aria-invalid={Boolean(getErrorMessage("source"))}
                     value={formValues.source}
                     maxLength={contributionFieldLimits.source}
                     onChange={(event) =>
                       updateFormField("source", event.target.value)
                     }
-                    placeholder="Source"
+                    placeholder="Source (optional)"
                   />
                   <FieldError message={getErrorMessage("source")} />
                 </div>
@@ -1700,14 +1698,14 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                   />
                 </div>
                 <div>
-                  <label className={labelClassName}>Source</label>
+                  <label className={labelClassName}>Source (optional)</label>
                   <input
                     className={inputClassName}
                     value={formValues.source}
                     onChange={(event) =>
                       updateFormField("source", event.target.value)
                     }
-                    placeholder="Source"
+                    placeholder="Source (optional)"
                   />
                 </div>
                 <div>
