@@ -1,3 +1,5 @@
+import CharacterLimitedField from "../components/CharacterLimitedField";
+import contributionFieldLimits from "../constants/contributionFieldLimits";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -466,7 +468,8 @@ const ArticleFields = ({ formValues, updateFormField }) => (
       />
     </Field>
     <Field label="Source">
-      <input
+      <CharacterLimitedField
+        maxLength={contributionFieldLimits.source}
         className={inputClassName}
         value={formValues.source}
         onChange={(event) => updateFormField("source", event.target.value)}
@@ -487,6 +490,14 @@ const ArticleFields = ({ formValues, updateFormField }) => (
   </div>
 );
 
+const metadataFieldLimits = {
+  ...contributionFieldLimits,
+  eventType: contributionFieldLimits.type,
+  placeType: contributionFieldLimits.type,
+  latitude: contributionFieldLimits.coordinate,
+  longitude: contributionFieldLimits.coordinate,
+};
+
 const EventFields = ({ formValues, updateFormField }) => (
   <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
     {[
@@ -496,7 +507,8 @@ const EventFields = ({ formValues, updateFormField }) => (
       ["Type", "eventType"],
     ].map(([label, field]) => (
       <Field key={field} label={label}>
-        <input
+        <CharacterLimitedField
+          maxLength={metadataFieldLimits[field]}
           className={inputClassName}
           value={formValues[field]}
           onChange={(event) => updateFormField(field, event.target.value)}
@@ -517,7 +529,8 @@ const PlaceFields = ({ formValues, updateFormField }) => (
         ["Type", "placeType"],
       ].map(([label, field]) => (
         <Field key={field} label={label}>
-          <input
+          <CharacterLimitedField
+            maxLength={metadataFieldLimits[field]}
             className={inputClassName}
             value={formValues[field]}
             onChange={(event) => updateFormField(field, event.target.value)}
@@ -536,7 +549,8 @@ const PlaceFields = ({ formValues, updateFormField }) => (
         ["Longitude", "longitude"],
       ].map(([label, field]) => (
         <Field key={field} label={label}>
-          <input
+          <CharacterLimitedField
+            maxLength={metadataFieldLimits[field]}
             className={inputClassName}
             value={formValues[field]}
             onChange={(event) => updateFormField(field, event.target.value)}
@@ -859,7 +873,8 @@ const ArticleInlineEdit = ({
 
       <div className="flex flex-col gap-8">
         <section className="clear-both flow-root">
-          <input
+          <CharacterLimitedField
+            maxLength={contributionFieldLimits.mainTitle}
             className={editTitleClassName}
             value={formValues.mainTitle}
             onChange={(event) => updateFormField("mainTitle", event.target.value)}
@@ -882,7 +897,8 @@ const ArticleInlineEdit = ({
                 onClear={() => updateBlogImageFile("mainImage", null)}
               />
             ) : (
-              <input
+              <CharacterLimitedField
+                maxLength={contributionFieldLimits.mainImage}
                 className={editImageInputClassName}
                 value={formValues.mainImage}
                 onChange={(event) => updateFormField("mainImage", event.target.value)}
@@ -891,7 +907,10 @@ const ArticleInlineEdit = ({
             )}
           </div>
 
-          <textarea
+          <CharacterLimitedField
+
+            as="textarea"
+            maxLength={contributionFieldLimits.mainContent}
             className={`${editTextAreaClassName} mt-5 min-h-[220px]`}
             value={formValues.mainContent}
             onChange={(event) => updateFormField("mainContent", event.target.value)}
@@ -920,7 +939,8 @@ const ArticleInlineEdit = ({
                 ) : null}
               </div>
 
-              <input
+              <CharacterLimitedField
+                maxLength={contributionFieldLimits.sectionTitle}
                 className="mb-4 w-full rounded-lg border border-transparent bg-white/70 px-3 py-2 text-card-title font-bold leading-[1.2] outline-none transition focus:border-sky-300 focus:bg-white focus:ring-2 focus:ring-sky-100 md:leading-[1.35]"
                 value={section.title}
                 onChange={(event) => updateSection(index, "title", event.target.value)}
@@ -942,14 +962,17 @@ const ArticleInlineEdit = ({
                   onClear={() => updateSectionImageFile(index, null)}
                 />
               ) : (
-                <input
+                <CharacterLimitedField
+                  maxLength={contributionFieldLimits.sectionImage}
                   className={editImageInputClassName}
                   value={section.image}
                   onChange={(event) => updateSection(index, "image", event.target.value)}
                   placeholder="Section image URL"
                 />
               )}
-              <textarea
+              <CharacterLimitedField
+                as="textarea"
+            maxLength={contributionFieldLimits.sectionContent}
                 className={`${editTextAreaClassName} mt-4 min-h-[170px]`}
                 value={section.content}
                 onChange={(event) => updateSection(index, "content", event.target.value)}
@@ -982,7 +1005,8 @@ const ArticleInlineEdit = ({
             value={formValues.date}
             onChange={(event) => updateFormField("date", event.target.value)}
           />
-          <input
+          <CharacterLimitedField
+            maxLength={contributionFieldLimits.source}
             className="w-full rounded-lg border border-transparent bg-white/70 px-3 py-2 text-left outline-none transition focus:border-sky-300 focus:bg-white focus:ring-2 focus:ring-sky-100 md:text-right"
             value={formValues.source}
             onChange={(event) => updateFormField("source", event.target.value)}
@@ -1020,7 +1044,8 @@ const DestinationInlineEdit = ({
       />
 
       <section className="mt-4">
-        <input
+        <CharacterLimitedField
+          maxLength={contributionFieldLimits.mainTitle}
           className={editTitleClassName}
           value={formValues[titleField]}
           onChange={(event) => updateFormField(titleField, event.target.value)}
@@ -1053,7 +1078,10 @@ const DestinationInlineEdit = ({
 
         <hr className="my-6" />
 
-        <textarea
+        <CharacterLimitedField
+
+          as="textarea"
+            maxLength={contributionFieldLimits.shortDescription}
           className={`${editTextAreaClassName} min-h-[220px]`}
           value={formValues.shortDescription}
           onChange={(event) => updateFormField("shortDescription", event.target.value)}

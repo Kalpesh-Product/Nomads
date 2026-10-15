@@ -1,3 +1,5 @@
+import CharacterLimitedField from "../components/CharacterLimitedField";
+import contributionFieldLimits from "../constants/contributionFieldLimits";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -73,26 +75,6 @@ const emptySection = () => ({
   imageFile: null,
   content: "",
 });
-
-const contributionFieldLimits = {
-  mainTitle: 70,
-  mainImage: 2048,
-  source: 120,
-  mainContent: 5000,
-  shortDescription: 1000,
-  sectionTitle: 100,
-  sectionImage: 2048,
-  sectionContent: 2500,
-  link: 2048,
-  category: 80,
-  month: 40,
-  venue: 120,
-  type: 80,
-  address: 180,
-  googleMapsLink: 2048,
-  rating: 20,
-  coordinate: 30,
-};
 
 const initialFormState = (author = "", destination = "") => ({
   destination,
@@ -213,23 +195,6 @@ const RequiredLabel = ({ children }) => (
 
 const FieldError = ({ message }) =>
   message ? <p className={errorTextClassName}>{message}</p> : null;
-
-const CharacterCount = ({ id, value = "", maxLength }) => {
-  const remaining = Math.max(0, maxLength - value.length);
-  const nearLimit = remaining <= Math.ceil(maxLength * 0.1);
-
-  return (
-    <p
-      id={id}
-      className={`mt-1.5 flex flex-wrap justify-between gap-x-3 text-xs tabular-nums ${
-        nearLimit ? "font-medium text-amber-700" : "text-slate-500"
-      }`}
-    >
-      <span>{remaining.toLocaleString()} characters remaining</span>
-      <span>{maxLength.toLocaleString()} max</span>
-    </p>
-  );
-};
 
 const BlogImageFileInput = ({
   id,
@@ -1407,7 +1372,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                       ? "Place Name"
                       : "Main Title"}
                 </RequiredLabel>
-                <input
+                <CharacterLimitedField
                   className={getFieldClassName(
                     isEventForm
                       ? "eventName"
@@ -1443,7 +1408,6 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                     )
                   }
                   maxLength={contributionFieldLimits.mainTitle}
-                  aria-describedby="contribution-title-count"
                   placeholder={
                     isEventForm
                       ? "Event name"
@@ -1451,17 +1415,6 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                         ? "Place name"
                         : "Main title"
                   }
-                />
-                <CharacterCount
-                  id="contribution-title-count"
-                  value={
-                    isEventForm
-                      ? formValues.eventName
-                      : isPlaceForm
-                        ? formValues.placeName
-                        : formValues.mainTitle
-                  }
-                  maxLength={contributionFieldLimits.mainTitle}
                 />
                 <FieldError
                   message={getErrorMessage(
@@ -1487,7 +1440,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                 ) : (
                   <>
                   <RequiredLabel>Main Image URL</RequiredLabel>
-                  <input
+                  <CharacterLimitedField
                     className={getFieldClassName("mainImage")}
                     required
                     aria-invalid={Boolean(getErrorMessage("mainImage"))}
@@ -1505,22 +1458,16 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               {isArticleContribution ? (
                 <div>
                   <RequiredLabel>Source</RequiredLabel>
-                  <input
+                  <CharacterLimitedField
                     className={getFieldClassName("source")}
                     required
                     aria-invalid={Boolean(getErrorMessage("source"))}
                     value={formValues.source}
                     maxLength={contributionFieldLimits.source}
-                    aria-describedby="contribution-source-count"
                     onChange={(event) =>
                       updateFormField("source", event.target.value)
                     }
                     placeholder="Source"
-                  />
-                  <CharacterCount
-                    id="contribution-source-count"
-                    value={formValues.source}
-                    maxLength={contributionFieldLimits.source}
                   />
                   <FieldError message={getErrorMessage("source")} />
                 </div>
@@ -1528,7 +1475,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               {isEventForm ? (
                 <div>
                   <RequiredLabel>Category</RequiredLabel>
-                  <input
+                  <CharacterLimitedField
                     className={getFieldClassName("category")}
                     required
                     aria-invalid={Boolean(getErrorMessage("category"))}
@@ -1545,7 +1492,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               {isPlaceForm ? (
                 <div>
                   <RequiredLabel>Address</RequiredLabel>
-                  <input
+                  <CharacterLimitedField
                     className={getFieldClassName("address")}
                     required
                     aria-invalid={Boolean(getErrorMessage("address"))}
@@ -1565,7 +1512,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                 <div>
                   <RequiredLabel>Month</RequiredLabel>
-                  <input
+                  <CharacterLimitedField
                     className={getFieldClassName("month")}
                     required
                     aria-invalid={Boolean(getErrorMessage("month"))}
@@ -1580,7 +1527,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                 </div>
                 <div>
                   <RequiredLabel>Venue</RequiredLabel>
-                  <input
+                  <CharacterLimitedField
                     className={getFieldClassName("venue")}
                     required
                     aria-invalid={Boolean(getErrorMessage("venue"))}
@@ -1595,7 +1542,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                 </div>
                 <div>
                   <RequiredLabel>Type</RequiredLabel>
-                  <input
+                  <CharacterLimitedField
                     className={getFieldClassName("eventType")}
                     required
                     aria-invalid={Boolean(getErrorMessage("eventType"))}
@@ -1614,7 +1561,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                 <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                   <div>
                     <RequiredLabel>Google Maps Link</RequiredLabel>
-                    <input
+                    <CharacterLimitedField
                       className={getFieldClassName("googleMapsLink")}
                       required
                       aria-invalid={Boolean(getErrorMessage("googleMapsLink"))}
@@ -1629,7 +1576,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                   </div>
                   <div>
                     <RequiredLabel>Rating</RequiredLabel>
-                    <input
+                    <CharacterLimitedField
                       className={getFieldClassName("rating")}
                       required
                       aria-invalid={Boolean(getErrorMessage("rating"))}
@@ -1644,7 +1591,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                   </div>
                   <div>
                     <RequiredLabel>Type</RequiredLabel>
-                    <input
+                    <CharacterLimitedField
                       className={getFieldClassName("placeType")}
                       required
                       aria-invalid={Boolean(getErrorMessage("placeType"))}
@@ -1662,7 +1609,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                 <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-5">
                   <div>
                     <RequiredLabel>Category</RequiredLabel>
-                    <input
+                    <CharacterLimitedField
                       className={getFieldClassName("category")}
                       required
                       aria-invalid={Boolean(getErrorMessage("category"))}
@@ -1677,7 +1624,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                   </div>
                   <div>
                     <RequiredLabel>Month</RequiredLabel>
-                    <input
+                    <CharacterLimitedField
                       className={getFieldClassName("month")}
                       required
                       aria-invalid={Boolean(getErrorMessage("month"))}
@@ -1692,7 +1639,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                   </div>
                   <div>
                     <RequiredLabel>Venue</RequiredLabel>
-                    <input
+                    <CharacterLimitedField
                       className={getFieldClassName("venue")}
                       required
                       aria-invalid={Boolean(getErrorMessage("venue"))}
@@ -1707,7 +1654,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                   </div>
                   <div>
                     <RequiredLabel>Latitude</RequiredLabel>
-                    <input
+                    <CharacterLimitedField
                       className={getFieldClassName("latitude")}
                       required
                       aria-invalid={Boolean(getErrorMessage("latitude"))}
@@ -1722,7 +1669,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                   </div>
                   <div>
                     <RequiredLabel>Longitude</RequiredLabel>
-                    <input
+                    <CharacterLimitedField
                       className={getFieldClassName("longitude")}
                       required
                       aria-invalid={Boolean(getErrorMessage("longitude"))}
@@ -1794,8 +1741,8 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               <RequiredLabel>
                 {isEventForm || isPlaceForm ? "Short Description" : "Main Content"}
               </RequiredLabel>
-              <textarea
-                aria-describedby="contribution-content-count"
+              <CharacterLimitedField
+                as="textarea"
                 className={`${getFieldClassName(
                   isEventForm || isPlaceForm ? "shortDescription" : "mainContent",
                 )} min-h-[150px] resize-y leading-relaxed`}
@@ -1827,19 +1774,6 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                   isEventForm || isPlaceForm
                     ? "Short description"
                     : "Main content"
-                }
-              />
-              <CharacterCount
-                id="contribution-content-count"
-                value={
-                  isEventForm || isPlaceForm
-                    ? formValues.shortDescription
-                    : formValues.mainContent
-                }
-                maxLength={
-                  isEventForm || isPlaceForm
-                    ? contributionFieldLimits.shortDescription
-                    : contributionFieldLimits.mainContent
                 }
               />
               <FieldError
@@ -1880,7 +1814,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                       <div className="space-y-4">
                         <div>
                           <RequiredLabel>Section Title</RequiredLabel>
-                          <input
+                          <CharacterLimitedField
                             className={getFieldClassName(
                               `sections.${index}.title`,
                             )}
@@ -1890,16 +1824,10 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                             )}
                             value={section.title}
                             maxLength={contributionFieldLimits.sectionTitle}
-                            aria-describedby={`section-${index}-title-count`}
                             onChange={(event) =>
                               updateSection(index, "title", event.target.value)
                             }
                             placeholder="Section Title"
-                          />
-                          <CharacterCount
-                            id={`section-${index}-title-count`}
-                            value={section.title}
-                            maxLength={contributionFieldLimits.sectionTitle}
                           />
                           <FieldError
                             message={getErrorMessage(`sections.${index}.title`)}
@@ -1923,7 +1851,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                               <RequiredLabel>
                                 Section Image URL
                               </RequiredLabel>
-                              <input
+                              <CharacterLimitedField
                                 className={getFieldClassName(
                                   `sections.${index}.image`,
                                 )}
@@ -1946,7 +1874,8 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                         </div>
                         <div>
                           <RequiredLabel>Section Content</RequiredLabel>
-                          <textarea
+                          <CharacterLimitedField
+                            as="textarea"
                             className={`${getFieldClassName(
                               `sections.${index}.content`,
                             )} min-h-[150px] resize-y leading-relaxed`}
@@ -1956,16 +1885,10 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                             )}
                             value={section.content}
                             maxLength={contributionFieldLimits.sectionContent}
-                            aria-describedby={`section-${index}-content-count`}
                             onChange={(event) =>
                               updateSection(index, "content", event.target.value)
                             }
                             placeholder="Section content"
-                          />
-                          <CharacterCount
-                            id={`section-${index}-content-count`}
-                            value={section.content}
-                            maxLength={contributionFieldLimits.sectionContent}
                           />
                           <FieldError
                             message={getErrorMessage(
