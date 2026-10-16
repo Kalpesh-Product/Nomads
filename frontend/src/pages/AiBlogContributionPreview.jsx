@@ -231,19 +231,23 @@ const canEditContribution = (item = {}, config = {}) => {
 const PreviewHeader = ({ config, item, onEdit }) => {
   const canEdit = canEditContribution(item, config);
   const status = String(item.status || "pending").toLowerCase();
+  const isPending = status === "pending" && !item.isDraft;
   const rejectionReason = String(item.rejectionReason || "").trim();
+  const previewDetails = (
+    <div>
+      <h1 className="text-sm font-semibold text-black/50">
+        {config.label} Preview
+      </h1>
+      <p className="text-xs font-medium capitalize text-slate-500">
+        Status: {item.status || "pending"}
+      </p>
+    </div>
+  );
 
   return (
     <div className="mb-5">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-sm font-semibold text-black/50">
-            {config.label} Preview
-          </h1>
-          <p className="text-xs font-medium capitalize text-slate-500">
-            Status: {item.status || "pending"}
-          </p>
-        </div>
+      {!isPending && <div className="flex items-center justify-between gap-4">
+        {previewDetails}
         {canEdit ? (
           <button
             type="button"
@@ -254,13 +258,15 @@ const PreviewHeader = ({ config, item, onEdit }) => {
             Edit
           </button>
         ) : null}
-      </div>
+      </div>}
 
-      {status === "pending" && !item.isDraft ? (
-        <div className="mt-4 rounded-xl border border-yellow-200 bg-yellow-100 px-4 py-3 text-sm text-yellow-700">
-          <p className="font-semibold">Under review</p>
-          <p className="mt-1">
+      {isPending ? (
+        <div className="flex items-center justify-between gap-4 rounded-xl border border-yellow-200 bg-yellow-100 px-4 py-5 text-sm text-yellow-700">
+          <p>
             This {config.label.toLowerCase()} is currently under review.
+          </p>
+          <p className="shrink-0 text-right text-sm font-semibold capitalize text-black/50">
+            Status: {item.status || "pending"}
           </p>
         </div>
       ) : null}
